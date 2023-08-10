@@ -84,7 +84,7 @@ def register_actions_from_dir(base_module, action_dir):
     """
     for path in os.listdir(action_dir):
         # skip non module files
-        if '__init__' in path or path.startswith('.'):
+        if '__init__' in path or '__pycache' in path or path.startswith('.'):
             continue
 
         name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc

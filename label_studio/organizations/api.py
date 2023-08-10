@@ -15,7 +15,6 @@ from drf_yasg import openapi
 from django.utils.decorators import method_decorator
 
 from label_studio.core.permissions import all_permissions, ViewClassPermission
-from label_studio.core.utils.common import get_object_with_check_and_log
 from label_studio.core.utils.params import bool_from_request
 
 from organizations.models import Organization
@@ -46,11 +45,6 @@ class OrganizationListAPI(generics.ListCreateAPIView):
         DELETE=all_permissions.organizations_change,
     )
     serializer_class = OrganizationIdSerializer
-
-    def get_object(self):
-        org = get_object_with_check_and_log(self.request, Organization, pk=self.kwargs[self.lookup_field])
-        self.check_object_permissions(self.request, org)
-        return org
 
     def filter_queryset(self, queryset):
         return queryset.filter(users=self.request.user).distinct()
@@ -141,11 +135,6 @@ class OrganizationAPI(generics.RetrieveUpdateAPIView):
     redirect_route = 'organizations-dashboard'
     redirect_kwarg = 'pk'
 
-    def get_object(self):
-        org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
-        self.check_object_permissions(self.request, org)
-        return org
-
     def get(self, request, *args, **kwargs):
         return super(OrganizationAPI, self).get(request, *args, **kwargs)
 
@@ -163,13 +152,13 @@ class OrganizationAPI(generics.RetrieveUpdateAPIView):
         operation_description='Get a link to use to invite a new member to an organization in Label Studio Enterprise.',
         responses={200: OrganizationInviteSerializer()}
     ))
-class OrganizationInviteAPI(APIView):
+class OrganizationInviteAPI(generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
+    queryset = Organization.objects.all()
     permission_required = all_permissions.organizations_change
 
     def get(self, request, *args, **kwargs):
-        org = get_object_with_check_and_log(self.request, Organization, pk=request.user.active_organization_id)
-        self.check_object_permissions(self.request, org)
+        org = request.user.active_organization
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
         if hasattr(settings, 'FORCE_SCRIPT_NAME') and settings.FORCE_SCRIPT_NAME:
             invite_url = invite_url.replace(settings.FORCE_SCRIPT_NAME, '', 1)

@@ -4,7 +4,6 @@ import re
 import ujson as json
 import logging
 
-
 from pydantic import BaseModel
 
 from django.db import models
@@ -120,16 +119,36 @@ def get_fields_for_evaluation(prepare_params, user):
     return result
 
 
-def apply_ordering(queryset, ordering, project, request):
+def apply_ordering(queryset, ordering, project, request, view_data=None):
     if ordering:
+
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
-        field_name, ascending = preprocess_field_name(ordering[0], only_undefined_field=False)
-        if field_name == 'storage_filename': 
-            field_name = 'io_storages_localfilesimportstoragelink'
+        raw_field_name = ordering[0]
+        numeric_ordering = False
+        unsigned_field_name = raw_field_name.lstrip('-+')
+        if (
+            view_data is not None and
+            'columnsDisplayType' in view_data and
+            unsigned_field_name in view_data['columnsDisplayType'] and
+            view_data['columnsDisplayType'][unsigned_field_name] == 'Number'
+        ):
+            numeric_ordering = True
+        field_name, ascending = preprocess_field_name(raw_field_name, only_undefined_field=False)
+
         if field_name.startswith('data__'):
             # annotate task with data field for float/int/bool ordering support
             json_field = field_name.replace('data__', '')
-            queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
+            numeric_ordering_applied = False
+            if numeric_ordering is True:
+                queryset = queryset.annotate(ordering_field=Cast(KeyTextTransform(json_field, 'data'), output_field=FloatField()))
+                # for non numeric values we need fallback to string ordering
+                try:
+                    queryset.first()
+                    numeric_ordering_applied = True
+                except Exception as e:
+                    logger.warning(f'Failed to apply numeric ordering for field {json_field}: {e}')
+            if not numeric_ordering_applied:
+                queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
             f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
 
         else:
@@ -164,16 +183,19 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     from django.db.models.expressions import RawSQL
     from tasks.models import Annotation, Prediction
 
-    flag = flag_set('ff_back_dev_3865_filters_anno_171222_short', project.organization.created_by)
-    if field_name == 'annotations_results' and flag:
+    _class = Annotation if field_name == 'annotations_results' else Prediction
+
+    # Annotation
+    if field_name == 'annotations_results':
         subquery = Q(id__in=
             Annotation.objects
                 .annotate(json_str=RawSQL('cast(result as text)', ''))
                 .filter(Q(project=project) & Q(json_str__contains=_filter.value))
+                .filter(task=OuterRef('pk'))
                 .values_list('task', flat=True)
         )
+    # Predictions: they don't have `project` yet
     else:
-        _class = Annotation if field_name == 'annotations_results' else Prediction
         subquery = Exists(
             _class.objects
             .annotate(json_str=RawSQL('cast(result as text)', ''))
@@ -195,8 +217,13 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     elif _filter.operator == Operator.NOT_CONTAINS:
         filter_expressions.append(~Q(subquery))
         return 'continue'
-
-
+    elif _filter.operator == Operator.EMPTY:
+        if cast_bool_from_str(_filter.value):
+            q = Q(annotations__result__isnull=True) | Q(annotations__result=[])
+        else:
+            q = Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
+        filter_expressions.append(q)
+        return 'continue'
 
 def add_user_filter(enabled, key, _filter, filter_expressions):
     if enabled and _filter.operator == Operator.CONTAINS:
@@ -405,6 +432,12 @@ def apply_filters(queryset, filters, project, request):
             cast_value(_filter)
             filter_expressions.append(Q(**{field_name: _filter.value}))
 
+    """WARNING: Stringifying filter_expressions will evaluate the (sub)queryset.
+        Do not use a log in the following manner:
+        logger.debug(f'Apply filter: {filter_expressions}')
+        Even in DEBUG mode, a subqueryset that has OuterRef will raise an error
+        if evaluated outside a parent queryset.
+    """
     if filters.conjunction == ConjunctionEnum.OR:
         result_filter = Q()
         for filter_expression in filter_expressions:
@@ -433,7 +466,7 @@ class TaskQuerySet(models.QuerySet):
         project = Project.objects.get(pk=prepare_params.project)
         request = prepare_params.request
         queryset = apply_filters(queryset, prepare_params.filters, project, request)
-        queryset = apply_ordering(queryset, prepare_params.ordering, project, request)
+        queryset = apply_ordering(queryset, prepare_params.ordering, project, request, view_data=prepare_params.data)
 
         if not prepare_params.selectedItems:
             return queryset
@@ -469,7 +502,6 @@ def annotate_completed_at(queryset):
             When(is_labeled=True, then=Subquery(newest.values("created_at")))
         )
     )
-
 
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
@@ -540,6 +572,12 @@ def annotate_avg_lead_time(queryset):
     return queryset.annotate(avg_lead_time=Avg('annotations__lead_time'))
 
 
+def annotate_draft_exists(queryset):
+    from tasks.models import AnnotationDraft
+
+    return queryset.annotate(draft_exists=Exists(AnnotationDraft.objects.filter(task=OuterRef('pk'))))
+
+
 def file_upload(queryset):
     return queryset.annotate(file_upload_field=F('file_upload__file'))
 
@@ -558,6 +596,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,
     "file_upload": file_upload,
+    "draft_exists": annotate_draft_exists,
 }
 
 

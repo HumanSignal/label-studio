@@ -12,8 +12,14 @@ from tasks.serializers import TaskSerializerBulk
 from data_manager.functions import DataManagerException
 from data_manager.actions.basic import delete_tasks
 from core.permissions import AllPermissions
+from core.label_config import replace_task_data_undefined_with_config_field
 from collections import defaultdict
 from core.redis import start_job_async_or_sync
+
+from io_storages.s3.models import S3ImportStorageLink
+from io_storages.gcs.models import GCSImportStorageLink
+from io_storages.azure_blob.models import AzureBlobImportStorageLink
+from io_storages.localfiles.models import LocalFilesImportStorage
 
 logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
@@ -23,7 +29,7 @@ def propagate_annotations(project, queryset, **kwargs):
     request = kwargs['request']
     user = request.user
     source_annotation_id = request.data.get('source_annotation_id')
-    annotations = Annotation.objects.filter(task__project=project, id=source_annotation_id)
+    annotations = Annotation.objects.filter(project=project, id=source_annotation_id)
     if not annotations:
         raise DataManagerException(f'Source annotation {source_annotation_id} not found in the current project')
     source_annotation = annotations.first()
@@ -56,7 +62,7 @@ def propagate_annotations(project, queryset, **kwargs):
 
 
 def propagate_annotations_form(user, project):
-    first_annotation = Annotation.objects.filter(task__project=project).first()
+    first_annotation = Annotation.objects.filter(project=project).first()
     field = {
         'type': 'number',
         'name': 'source_annotation_id',
@@ -70,16 +76,57 @@ def propagate_annotations_form(user, project):
 
 
 def remove_duplicates(project, queryset, **kwargs):
-    tasks = list(
-        queryset
-        .annotate(total_annotations=Count('annotations'))
-        .values('data', 'id', 'total_annotations')
-    )
+    # get io_storage_* links for tasks, we need to copy them
+    storages = []
+    for field in dir(Task):
+        if field.startswith('io_storages_'):
+            storages += [field]
+
+    tasks = list(queryset.values(
+        'data', 'id', 'total_annotations', *storages
+    ))
     duplicates = defaultdict(list)
     for task in list(tasks):
+        replace_task_data_undefined_with_config_field(task['data'], project)
         task['data'] = json.dumps(task['data'])
         duplicates[task['data']].append(task)
 
+    ### build storage links for duplicates ###
+    classes = {
+        'io_storages_s3importstoragelink': S3ImportStorageLink,
+        'io_storages_gcsimportstoragelink': GCSImportStorageLink,
+        'io_storages_azureblobimportstoragelink': AzureBlobImportStorageLink,
+        'io_storages_localfilesimportstoragelink': LocalFilesImportStorage,
+        # 'io_storages_redisimportstoragelink',
+        # 'lse_io_storages_lses3importstoragelink'  # not supported yet
+    }
+    for data in list(duplicates):
+        tasks = duplicates[data]
+        source = None
+
+        # find first task with existing storage link
+        for task in tasks:
+            for link in classes:
+                if link in task and task[link] is not None:
+                    # we don't support case when there are many storage links in duplicated tasks
+                    if source is not None:
+                        source = None
+                        break
+                    source = (task, classes[link], task[link])  # last arg is a storage link id
+
+        # add storage links to duplicates
+        if source:
+            _class = source[1]  # get link name
+            for task in tasks:
+                if task['id'] != source[0]['id']:
+                    link_instance = _class.objects.get(id=source[2])
+                    _class.create(
+                        task=Task.objects.get(id=task['id']),
+                        key=link_instance.key,
+                        storage=link_instance.storage
+                    )
+
+    ### remove duplicates ###
     removing = []
 
     # prepare main tasks which won't be deleted
@@ -127,7 +174,7 @@ def rename_labels(project, queryset, **kwargs):
         raise Exception('Wrong old label name, it is not from labeling config: ' + old_label_name)
     label_type = labels[control_tag]['type'].lower()
 
-    annotations = Annotation.objects.filter(task__project=project)
+    annotations = Annotation.objects.filter(project=project)
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         annotations = annotations \
             .filter(result__icontains=control_tag) \
@@ -163,7 +210,7 @@ def rename_labels(project, queryset, **kwargs):
     # update summaries
     project.summary.reset()
     project.summary.update_data_columns(project.tasks.all())
-    annotations = Annotation.objects.filter(task__project=project)
+    annotations = Annotation.objects.filter(project=project)
     project.summary.update_created_annotations_and_labels(annotations)
 
     return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}
@@ -252,6 +299,7 @@ def process_arrays(params):
 
 
 add_data_field_examples = (
+    'range(2) or '
     'sample() or '
     'random(<min_int>, <max_int>) or '
     'choices(["<value1>", "<value2>", ...], [<weight1>, <weight2>, ...]) or '
@@ -271,8 +319,16 @@ def add_expression(queryset, size, value, value_name):
 
     tasks = list(queryset.only('data'))
 
+    # range
+    if command == 'range':
+        assert len(args) == 1, "range(start:int) should have start argument "
+        start = int(args[0])
+        values = range(start, start + size)
+        for i, v in enumerate(values):
+            tasks[i].data[value_name] = v
+
     # permutation sampling
-    if command == 'sample':
+    elif command == 'sample':
         assert len(args) == 0, "sample() doesn't have arguments"
         values = random.sample(range(0, size), size)
         for i, v in enumerate(values):
@@ -280,14 +336,15 @@ def add_expression(queryset, size, value, value_name):
 
     # uniform random
     elif command == 'random':
-        assert len(args) == 2, 'random() should have 2 args: min & max'
+        assert len(args) == 2, 'random(min, max) should have 2 args: min & max'
         minimum, maximum = int(args[0]), int(args[1])
         for i in range(size):
             tasks[i].data[value_name] = random.randint(minimum, maximum)
 
     # sampling with choices and weights
     elif command == 'choices':
-        assert 0 < len(args) < 3, 'choices() should have 1 or 2 args: values & weights (default=None)'
+        assert 0 < len(args) < 3, 'choices(values:list, weights:list) ' \
+                                  'should have 1 or 2 args: values & weights (default=None)'
         weights = json.loads(args[1]) if len(args) == 2 else None
         values = random.choices(
             population=json.loads(args[0]),
@@ -299,7 +356,7 @@ def add_expression(queryset, size, value, value_name):
 
     # replace
     elif command == 'replace':
-        assert len(args) == 2, 'replace() should have 2 args: old value & new value'
+        assert len(args) == 2, 'replace(old_value:str, new_value:str) should have 2 args: old value & new value'
         old_value, new_value = json.loads(args[0]), json.loads(args[1])
         for task in tasks:
             if value_name in task.data:
@@ -340,7 +397,7 @@ def add_data_field_form(user, project):
 actions = [
     {
         'entry_point': add_data_field,
-        'permission': all_permissions.tasks_change,
+        'permission': all_permissions.projects_change,
         'title': 'Add Or Modify Data Field',
         'order': 1,
         'experimental': True,
@@ -372,7 +429,7 @@ actions = [
 
     {
         'entry_point': remove_duplicates,
-        'permission': all_permissions.tasks_change,
+        'permission': all_permissions.projects_change,
         'title': 'Remove Duplicated Tasks',
         'order': 1,
         'experimental': True,

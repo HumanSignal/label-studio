@@ -4,9 +4,9 @@ from tasks.models import Annotation
 
 
 def bulk_update_label(old_label, new_label, organization, project=None):
-    annotations = Annotation.objects.filter(task__project__organization=organization)
+    annotations = Annotation.objects.filter(project__organization=organization)
     if project is not None:
-        annotations = annotations.filter(task__project=project)
+        annotations = annotations.filter(project=project)
 
     updated_count = 0
     with transaction.atomic():

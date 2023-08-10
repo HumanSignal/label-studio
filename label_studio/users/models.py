@@ -145,11 +145,11 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         return True
 
     def active_organization_annotations(self):
-        return self.annotations.filter(task__project__organization=self.active_organization)
+        return self.annotations.filter(project__organization=self.active_organization)
 
     def active_organization_contributed_project_number(self):
         annotations = self.active_organization_annotations()
-        return annotations.values_list('task__project').distinct().count()
+        return annotations.values_list('project').distinct().count()
 
     @property
     def own_organization(self):

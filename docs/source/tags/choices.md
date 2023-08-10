@@ -6,11 +6,17 @@ meta_title: Choices Tag for Multiple Choice Labels
 meta_description: Customize Label Studio with multiple choice labels for machine learning and data science projects.
 ---
 
-Use the Choices tag to create a group of choices, with radio buttons, or checkboxes. Can be used for single or multi-class classification. Use for advanced classification tasks where annotators can choose one or multiple answers.
+The `Choices` tag is used to create a group of choices, with radio buttons or checkboxes. It can be used for single or multi-class classification. Also, it is used for advanced classification tasks where annotators can choose one or multiple answers.
 
-Choices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying <Choice>s. All the parameters from options will be transferred to corresponding tags.
+Choices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying `<Choice>`s. All the parameters from options will be transferred to corresponding tags.
 
-The Choices tag can be used with any data types.
+The `Choices` tag can be used with any data types.
+
+[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality.
+
+[^2]: `ff_dev_2007_dev_2008_dynamic_tag_children_250322_short` should be enabled to use dynamic options.
+
+[^3]: `ff_dev_2007_rework_choices_280322_short` should be enabled to use `html` attribute
 
 ### Parameters
 
@@ -27,7 +33,8 @@ The Choices tag can be used with any data types.
 | [whenLabelValue] | <code>string</code> |  | Narrow down visibility by label value |
 | [whenChoiceValue] | <code>string</code> |  | Narrow down visibility by choice value |
 | [perRegion] | <code>boolean</code> |  | Use this tag to select a choice for a specific region instead of the entire task |
-| [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded choices (see example below) |
+| [perItem] | <code>boolean</code> |  | Use this tag to select a choice for a specific item inside the object instead of the whole object[^1] |
+| [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded choices (see example below)[^2] |
 | [allowNested] | <code>boolean</code> |  | Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one. |
 
 ### Example
@@ -46,6 +53,10 @@ Basic text classification labeling configuration
 </View>
 ```
 **Example** *(This config with dynamic labels)*  
+
+`Choice`s can be loaded dynamically from task data[^2]. It should be an array of objects with attributes.
+  `html` can be used to show enriched content[^3], it has higher priority than `value`, however `value` will be used in the exported result.
+
 ```html
 <View>
   <Audio name="audio" value="$audio" />
@@ -54,8 +65,8 @@ Basic text classification labeling configuration
 <!-- {
   "data": {
     "variants": [
-      { "value": "Do or doughnut. There is no try." },
-      { "value": "Do or do not. There is no trial." },
+      { "value": "Do or doughnut. There is no try.", "html": "<img src='https://labelstud.io/images/logo.png'>" },
+      { "value": "Do or do not. There is no trial.", "html": "<h1>You can use hypertext here</h2>" },
       { "value": "Do or do not. There is no try." },
       { "value": "Duo do not. There is no try." }
     ]

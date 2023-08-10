@@ -11,7 +11,7 @@ from django.db.models import F
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import FilterSet
+from django_filters import FilterSet, CharFilter
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -22,12 +22,13 @@ from rest_framework.views import exception_handler
 from django.http import Http404
 
 from core.utils.common import temporary_disconnect_all_signals
+from core.mixins import GetParentObjectMixin
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
-    Project, ProjectSummary, ProjectManager
+    Project, ProjectSummary, ProjectManager, ProjectImport, ProjectReimport
 )
 from projects.serializers import (
-    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer
+    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer, ProjectImportSerializer, ProjectReimportSerializer
 )
 from projects.functions.next_task import get_next_task
 from tasks.models import Task
@@ -36,11 +37,11 @@ from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_fo
 from webhooks.models import WebhookAction
 
 from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import (
-    get_object_with_check_and_log, paginator, paginator_help)
+from core.utils.common import (paginator, paginator_help)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 from core.filters import ListFilter
+from projects.functions.stream_history import get_label_stream_history
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
@@ -52,7 +53,7 @@ _result_schema = openapi.Schema(
     title='Labeling result',
     description='Labeling result (choices, labels, bounding boxes, etc.)',
     type=openapi.TYPE_OBJECT,
-    properies={
+    properties={
         'from_name': openapi.Schema(
             title='from_name',
             description='The name of the labeling tag from the project config',
@@ -96,6 +97,7 @@ class ProjectListPagination(PageNumberPagination):
 
 class ProjectFilterSet(FilterSet):
     ids = ListFilter(field_name="id", lookup_expr="in")
+    title = CharFilter(field_name="title", lookup_expr="icontains")
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -276,6 +278,18 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         response['queue'] = queue_info
         return Response(response)
 
+class LabelStreamHistoryAPI(generics.RetrieveAPIView):
+    permission_required = all_permissions.tasks_view
+    queryset = Project.objects.all()
+    swagger_schema = None  # this endpoint doesn't need to be in swagger API docs
+
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+
+        history = get_label_stream_history(request.user, project)
+
+        return Response(history)
+
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Projects'],
@@ -355,6 +369,46 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Get project import info',
+        operation_description='Return data related to async project import operation',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project import.'),
+        ],
+    ))
+class ProjectImportAPI(generics.RetrieveAPIView):
+    parser_classes = (JSONParser,)
+    serializer_class = ProjectImportSerializer
+    permission_required = all_permissions.projects_change
+    queryset = ProjectImport.objects.all()
+    lookup_url_kwarg = 'import_pk'
+
+
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Get project reimport info',
+        operation_description='Return data related to async project reimport operation',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project reimport.'),
+        ],
+    ))
+class ProjectReimportAPI(generics.RetrieveAPIView):
+    parser_classes = (JSONParser,)
+    serializer_class = ProjectReimportSerializer
+    permission_required = all_permissions.projects_change
+    queryset = ProjectReimport.objects.all()
+    lookup_url_kwarg = 'reimport_pk'
+
+
 @method_decorator(name='delete', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Delete all tasks',
@@ -384,11 +438,12 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 description='A unique integer value identifying this project.'),
         ] + paginator_help('tasks', 'Projects')['manual_parameters'],
     ))
-class ProjectTaskListAPI(generics.ListCreateAPIView,
+class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView,
                          generics.DestroyAPIView):
 
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
+    parent_queryset = Project.objects.all()
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
@@ -431,11 +486,11 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
 
     def get_serializer_context(self):
         context = super(ProjectTaskListAPI, self).get_serializer_context()
-        context['project'] = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
+        context['project'] = self.get_parent_object()
         return context
 
     def perform_create(self, serializer):
-        project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
+        project = self.get_parent_object()
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
         return instance

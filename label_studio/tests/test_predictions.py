@@ -750,7 +750,7 @@ def test_interactive_annotating_failing(business_client, configured_project):
 
     assert 'errors' in result
 
-    # BAD ML RESPONCE
+    # BAD ML RESPONSE
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', f'{ml_backend.url}/predict', json={'kebab': [[['eat']]]}, status_code=200)
 

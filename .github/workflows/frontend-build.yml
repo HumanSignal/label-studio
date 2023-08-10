@@ -6,12 +6,18 @@ on:
       ref:
         required: true
         type: string
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Ref"
+        required: true
+        type: string
 
 env:
-  NODE: 14
+  NODE: 18
   CACHE_NAME_PREFIX: v1
   FRONTEND_DIR: label_studio/frontend
-  FRONTEND_BUILD_COMMIT_MESSAGE: Build frontend
+  FRONTEND_BUILD_COMMIT_MESSAGE: "ci: Build frontend"
 
 jobs:
   build:
@@ -37,28 +43,33 @@ jobs:
         with:
           node-version: "${{ env.NODE }}"
 
-      - name: Get npm cache directory path
-        id: npm-cache
-        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+      - name: Upgrade Yarn
+        run: npm install -g yarn@1.22
 
-      - name: Configure npm cache
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - name: Configure yarn cache
         uses: actions/cache@v3
         with:
-          path: ${{ steps.npm-cache.outputs.dir }}
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            yarn-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Print Yarn cache size
-        run: du -d 0 -h ${{ steps.npm-cache.outputs.dir }} || true
+        run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
 
       - name: Build
         run: |
-          npm ci
-          npm run build:production
+          yarn install --frozen-lockfile
+          yarn run build:production
         working-directory: ${{ env.FRONTEND_DIR }}
 
       - name: Commit and Push
         run: |
           git add "${{ env.FRONTEND_DIR }}"
           git status -s
-          git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' || true
+          git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
           git push origin HEAD

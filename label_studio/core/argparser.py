@@ -108,7 +108,13 @@ def parse_input_args(input_args):
 
     parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
-        'project_name', help='Path to directory where project state will be initialized', type=project_name
+        'project_name', help='Path to directory where project state will be initialized', type=project_name,
+        nargs='?'
+    )
+    parser_init.add_argument(
+        '-q', '--quiet', dest='quiet_mode', action='store_true',
+        help='Quiet (silence) mode for init when it does not ask about username and password',
+        default=False
     )
 
     # start sub-command parser

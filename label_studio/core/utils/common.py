@@ -2,6 +2,8 @@
 """
 from __future__ import unicode_literals
 
+from typing import Generator, Iterable, Mapping, Callable, Optional, Any
+
 import os
 import io
 import time
@@ -38,7 +40,7 @@ from rest_framework.exceptions import ErrorDetail
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
-from django.contrib.postgres.operations import TrigramExtension
+from django.contrib.postgres.operations import TrigramExtension, BtreeGinExtension
 
 from core.utils.params import get_env
 from datetime import datetime
@@ -229,35 +231,6 @@ def sample_query(q, sample_size):
     return q.filter(id__in=random_ids)
 
 
-def get_project(obj):
-    from projects.models import Project, ProjectSummary
-    from tasks.models import Task, Annotation, AnnotationDraft
-    from io_storages.base_models import ImportStorage
-    from data_manager.models import View
-
-    if isinstance(obj, Project):
-        return obj
-    elif isinstance(obj, (Task, ProjectSummary, View, ImportStorage)):
-        return obj.project
-    elif isinstance(obj, (Annotation, AnnotationDraft)):
-        return obj.task.project
-    else:
-        raise AttributeError(f'Can\'t get Project from instance {obj}')
-
-
-def request_permissions_add(request, key, model_instance):
-    """ Store accessible objects via permissions to request. It's used for access log.
-    """
-    request.permissions = {} if not hasattr(request, 'permissions') else request.permissions
-    # this func could be called multiple times in one request, and this means there are multiple objects on page/api
-    # do not save different values, just rewrite value to None
-    if key not in request.permissions:
-        request.permissions[key] = copy.deepcopy(model_instance)
-    else:
-        if request.permissions[key] is not None and request.permissions[key].id != model_instance.id:
-            request.permissions[key] = None
-
-
 def get_client_ip(request):
     """ Get IP address from django request
 
@@ -318,12 +291,33 @@ def start_browser(ls_url, no_browser):
     logger.info('Start browser at URL: ' + browser_url)
 
 
-@contextlib.contextmanager
-def conditional_atomic():
-    """Skip opening transaction for sqlite database backend
-    for performance improvement"""
+def db_is_not_sqlite() -> bool:
+    """
+    A common predicate for use with conditional_atomic.
 
-    if settings.DJANGO_DB != settings.DJANGO_DB_SQLITE:
+    Checks if the DB is NOT sqlite, because sqlite dbs are locked during any write.
+    """
+
+    return settings.DJANGO_DB != settings.DJANGO_DB_SQLITE
+
+@contextlib.contextmanager
+def conditional_atomic(
+        predicate: Callable[..., bool] = db_is_not_sqlite,
+        predicate_args: Optional[Iterable[Any]] = None,
+        predicate_kwargs: Optional[Mapping[str, Any]] = None,
+    ) -> Generator[None, None, None]:
+    """Use transaction if and only if the passed predicate function returns true
+
+    Params:
+        predicate: function taking any combination of args and kwargs
+          defaults to `db_is_not_sqlite` for historical/compatibility reasons.
+        predicate_args: optional array of positional args for the predicate
+        predicate_kwargs: optional map of keyword args for the predicate
+    """
+
+    should_use_transaction = predicate(*(predicate_args or []), **(predicate_kwargs or {}))
+
+    if should_use_transaction:
         with transaction.atomic():
             yield
     else:
@@ -451,7 +445,7 @@ def collect_versions(force=False):
             'current_version_is_outdated': label_studio.__current_version_is_outdated__
         },
         # backend full git info
-        'label-studio-os-backend': version.get_git_commit_info()
+        'label-studio-os-backend': version.get_git_commit_info(ls=True)
     }
 
     # label studio frontend
@@ -505,7 +499,7 @@ def collect_versions(force=False):
 
 
 def get_organization_from_request(request):
-    """Helper for backward compatability with org_pk in session """
+    """Helper for backward compatibility with org_pk in session """
     # TODO remove session logic in next release
     user = request.user
     if user and user.is_authenticated:
@@ -540,9 +534,6 @@ def import_from_string(func_string):
     except ImportError:
         msg = f"Could not import {func_string} from settings"
         raise ImportError(msg)
-
-
-get_object_with_check_and_log = load_func(settings.GET_OBJECT_WITH_CHECK_AND_LOG)
 
 
 class temporary_disconnect_signal:
@@ -681,3 +672,67 @@ def trigram_migration_operations(next_step):
         ops = []
 
     return ops
+
+
+def btree_gin_migration_operations(next_step):
+    ops = [
+        BtreeGinExtension(),
+        next_step,
+    ]
+    SKIP_BTREE_GIN_EXTENSION = get_env('SKIP_BTREE_GIN_EXTENSION', None)
+    if SKIP_BTREE_GIN_EXTENSION == '1' or SKIP_BTREE_GIN_EXTENSION == 'yes' or SKIP_BTREE_GIN_EXTENSION == 'true':
+        ops = [
+            next_step
+        ]
+    if SKIP_BTREE_GIN_EXTENSION == 'full':
+        ops = []
+
+    return ops
+
+
+def merge_labels_counters(dict1, dict2):
+    """
+    Merge two dictionaries with nested dictionary values into a single dictionary.
+
+    Args:
+        dict1 (dict): The first dictionary to merge.
+        dict2 (dict): The second dictionary to merge.
+
+    Returns:
+        dict: A new dictionary with the merged nested dictionaries.
+
+    Example:
+        dict1 = {'sentiment': {'Negative': 1, 'Positive': 1}}
+        dict2 = {'sentiment': {'Positive': 2, 'Neutral': 1}}
+        result_dict = merge_nested_dicts(dict1, dict2)
+        # {'sentiment': {'Negative': 1, 'Positive': 3, 'Neutral': 1}}
+    """
+    result_dict = {}
+
+    # iterate over keys in both dictionaries
+    for key in set(dict1.keys()) | set(dict2.keys()):
+        # add the corresponding values if they exist in both dictionaries
+        value = {}
+        if key in dict1:
+            value.update(dict1[key])
+        if key in dict2:
+            for subkey in dict2[key]:
+                value[subkey] = value.get(subkey, 0) + dict2[key][subkey]
+        # add the key-value pair to the result dictionary
+        result_dict[key] = value
+
+    return result_dict
+
+
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        logging.debug(f"{func.__name__} execution time: {end-start} seconds")
+        return result
+    return wrapper
+
+
+def empty(*args, **kwargs):
+    pass

@@ -16,7 +16,6 @@ azure_params: &azure_params
   - type: text
     name: account_name
     label: Account Name
-    placeholder: us-east-1
   - type: password
     name: account_key
     label: Account Key
@@ -58,7 +57,7 @@ ImportStorage:
             name: presign_ttl
             label: Expiration minutes
             min: 1
-            value: 1
+            value: 15
             dependency: presign
 
 ExportStorage:

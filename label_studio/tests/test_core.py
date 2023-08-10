@@ -4,6 +4,11 @@ import pytest
 import types
 from core.utils.common import int_from_request
 from core.utils.params import bool_from_request
+from core.utils.io import validate_upload_url
+from core.utils.exceptions import InvalidUploadUrlError
+from core.utils.exceptions import LabelStudioAPIException
+
+from rest_framework.exceptions import ValidationError
 
 
 @pytest.mark.parametrize('param, result', [
@@ -52,7 +57,7 @@ def test_core_int_from_request(param, result):
         error = False
         try:
             int_from_request(params, 'test', 0)
-        except ValueError:
+        except ValidationError:
             error = True
 
         assert error
@@ -133,3 +138,51 @@ def test_start_browser():
 
     assert start_browser('http://localhost:8080', True) is None
     assert start_browser('http://localhost:8080', False) is None
+
+@pytest.mark.parametrize('url, block_local_urls, raises_exc', [
+    ('http://0.0.0.0', True, InvalidUploadUrlError),
+    ('http://0.0.0.0', False, None),
+    ('https://0.0.0.0', True, InvalidUploadUrlError),
+    ('https://0.0.0.0', False, None),
+    # Non-http[s] schemes
+    ('ftp://example.org', True, InvalidUploadUrlError),
+    ('ftp://example.org', False, InvalidUploadUrlError),
+    ('FILE:///etc/passwd', True, InvalidUploadUrlError),
+    ('file:///etc/passwd', False, InvalidUploadUrlError),
+    # Start and end of 127.0.0.0/8
+    ('https://127.0.0.0', True, InvalidUploadUrlError),
+    ('https://127.255.255.255', True, InvalidUploadUrlError),
+    # Start and end of 10.0.0.0/8
+    ('http://10.0.0.0', True, InvalidUploadUrlError),
+    ('https://10.255.255.255', True, InvalidUploadUrlError),
+    # Start and end of 172.16.0.0/12
+    ('https://172.16.0.0', True, InvalidUploadUrlError),
+    ('https://172.31.255.255', True, InvalidUploadUrlError),
+    # Start and end of 192.168.0.0/16
+    ('https://192.168.0.0', True, InvalidUploadUrlError),
+    ('https://192.168.255.255', True, InvalidUploadUrlError),
+    # Valid external IPs
+    ('https://4.4.4.4', True, None),
+    ('https://8.8.8.8', True, None),
+    ('http://8.8.8.8', False, None),
+    # Valid external websites
+    ('https://example.org', True, None),
+    ('http://example.org', False, None),
+    # Space prepended to otherwise valid external IP
+    (' http://8.8.8.8', False, InvalidUploadUrlError),
+    # Host that doesn't resolve
+    ('http://example', False, LabelStudioAPIException),
+    ('http://example', True, LabelStudioAPIException),
+    # localhost
+    ('http://localhost', True, InvalidUploadUrlError),
+    ('http://localhost', False, None),
+ ])
+@pytest.mark.django_db
+def test_core_validate_upload_url(url, block_local_urls, raises_exc):
+
+    if raises_exc is None:
+        assert validate_upload_url(url, block_local_urls=block_local_urls) is None
+        return
+
+    with pytest.raises(raises_exc) as e:
+        validate_upload_url(url, block_local_urls=block_local_urls)

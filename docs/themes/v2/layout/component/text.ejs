@@ -1,0 +1,6 @@
+<% var size = locals.size || "" %>
+<% var text = locals.text || "" %>
+<% var tag = locals.tag || "p" %>
+<% var customClass = locals.customClass || "" %>
+
+<<%= tag %> class="Text <%= customClass %> <%= size %> "><%= text %></<%= tag %>>

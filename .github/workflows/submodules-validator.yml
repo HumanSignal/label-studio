@@ -1,17 +1,19 @@
 name: "Dependencies check"
 
 on:
-  workflow_call:
-    inputs:
-      head_sha:
-        required: true
-        type: string
-      base_sha:
-        required: true
-        type: string
-      target_branch:
-        required: true
-        type: string
+  push:
+    branches:
+      - develop
+      - 'ls-release/**'
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    branches:
+      - develop
+      - 'ls-release/**'
 
 env:
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
@@ -28,14 +30,14 @@ jobs:
         with:
           script: |
             const {repo, owner} = context.repo;
-            const head_sha = '${{ inputs.head_sha }}'
-            const base_sha = '${{ inputs.base_sha }}'
-            const targetBranch = '${{ inputs.target_branch }}'.replace('refs/heads/', '')
+            const head_sha = '${{ github.event.pull_request.head.sha || github.event.after }}'
+            const base_sha = '${{ github.event.pull_request.base.sha || github.event.before }}'
+            const targetBranch = '${{ github.event.pull_request.base.ref || github.event.ref }}'.replace('refs/heads/', '')
             const strictCheckBranchPrefixes = ['ls-release/']
 
             let submodules = [
-                {owner: 'heartexlabs', repo: 'label-studio-frontend'},
-                {owner: 'heartexlabs', repo: 'dm2'}
+                {owner: owner, repo: 'label-studio-frontend'},
+                {owner: owner, repo: 'dm2'}
             ]
             
             

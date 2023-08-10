@@ -13,17 +13,17 @@ from rest_framework import generics, viewsets, views
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
+from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
-from core.utils.common import (
-    DjangoFilterDescriptionInspector,
-    get_object_with_check_and_log,
-)
+from core.utils.common import DjangoFilterDescriptionInspector
 from core.utils.params import bool_from_request
+from core.mixins import GetParentObjectMixin
 from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
 from projects.models import Project
+from projects.functions.stream_history import fill_history_annotation
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from tasks.serializers import (
     AnnotationDraftSerializer,
@@ -65,6 +65,11 @@ logger = logging.getLogger(__name__)
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_QUERY,
             description='Project ID'),
+        openapi.Parameter(
+            name='resolve_uri',
+            type=openapi.TYPE_BOOLEAN,
+            in_=openapi.IN_QUERY,
+            description='Resolve task data URIs using Cloud Storage'),
     ],
 ))
 class TaskListAPI(DMTaskListAPI):
@@ -74,7 +79,7 @@ class TaskListAPI(DMTaskListAPI):
         POST=all_permissions.tasks_create,
     )
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['project',]
+    filterset_fields = ['project']
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -176,12 +181,15 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
                 and not self.task.predictions.exists():
             evaluate_predictions([self.task])
+            self.task.refresh_from_db()
 
         serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])
         data = serializer.data
         return Response(data)
 
     def get_queryset(self):
+        task_id = self.request.parser_context['kwargs'].get('pk')
+        task = generics.get_object_or_404(Task, pk=task_id)
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {"all": False, "included": [self.kwargs.get("pk")]}
         if review:
@@ -192,7 +200,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             kwargs = {'all_fields': True}
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
-            project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
+            project = task.project.id
         return self.prefetch(
             Task.prepared.get_queryset(
                 prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),
@@ -267,10 +275,9 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def update(self, request, *args, **kwargs):
         # save user history with annotator_id, time & annotation result
-        annotation_id = self.kwargs['pk']
-        annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
-        annotation.updated_by = request.user
-        annotation.save(update_fields=['updated_by'])
+        annotation = self.get_object()
+        # use updated instead of save to avoid duplicated signals
+        Annotation.objects.filter(id=annotation.id).update(updated_by=request.user)
 
         task = annotation.task
         if self.request.data.get('ground_truth'):
@@ -341,12 +348,13 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         ],
         request_body=AnnotationSerializer
         ))
-class AnnotationsListAPI(generics.ListCreateAPIView):
+class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.annotations_view,
         POST=all_permissions.annotations_create,
     )
+    parent_queryset = Task.objects.all()
 
     serializer_class = AnnotationSerializer
 
@@ -365,7 +373,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         return AnnotationDraft.objects.filter(id=draft_id).delete()
 
     def perform_create(self, ser):
-        task = get_object_with_check_and_log(self.request, Task, pk=self.kwargs['pk'])
+        task = self.get_parent_object()
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
 
@@ -395,9 +403,18 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         if 'completed_by' not in ser.validated_data:
             extra_args['completed_by'] = self.request.user
 
+        draft_id = self.request.data.get('draft_id')
+
+        if draft_id is not None and flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):
+            # if the annotation will be created from draft - get created_at from draft to keep continuity of history
+            draft = AnnotationDraft.objects.filter(id=draft_id).first()
+            if draft is not None:
+                extra_args['draft_created_at'] = draft.created_at
+
         # create annotation
         logger.debug(f'User={self.request.user}: save annotation')
         annotation = ser.save(**extra_args)
+
         logger.debug(f'Save activity for user={self.request.user}')
         self.request.user.activity_at = timezone.now()
         self.request.user.save()
@@ -407,13 +424,14 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         task.release_lock(user)
 
         # if annotation created from draft - remove this draft
-        draft_id = self.request.data.get('draft_id')
         if draft_id is not None:
             logger.debug(f'Remove draft {draft_id} after creating annotation {annotation.id}')
             self.delete_draft(draft_id, annotation.id)
 
         if self.request.data.get('ground_truth'):
             annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
+
+        fill_history_annotation(user, task, annotation)
 
         return annotation
 
@@ -528,24 +546,27 @@ class PredictionAPI(viewsets.ModelViewSet):
         return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Convert annotation to draft',
         operation_description='Convert annotation to draft',
         ))
-class AnnotationConvertAPI(views.APIView):
+class AnnotationConvertAPI(generics.RetrieveAPIView):
     permission_required = ViewClassPermission(
         POST=all_permissions.annotations_change
     )
+    queryset = Annotation.objects.all()
 
     def process_intermediate_state(self, annotation, draft):
         pass
 
     @swagger_auto_schema(auto_schema=None)
     def post(self, request, *args, **kwargs):
-        annotation = get_object_with_check_and_log(request, Annotation, pk=self.kwargs['pk'])
-        organization = annotation.task.project.organization
-        project = annotation.task.project
+        annotation = self.get_object()
+        organization = annotation.project.organization
+        project = annotation.project
+
         pk = annotation.pk
 
         with transaction.atomic():

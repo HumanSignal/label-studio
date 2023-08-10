@@ -13,6 +13,25 @@ function flatten(nested) {
   return [].concat(...nested);
 }
 
+// Keep in sync with core.settings.SUPPORTED_EXTENSIONS on the BE.
+const supportedExtensions = {
+  text: ['txt'],
+  audio: ['wav', 'mp3', 'flac', 'm4a', 'ogg'],
+  video: ['mp4', 'webp', 'webm'],
+  image: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'],
+  html: ['html', 'htm', 'xml'],
+  timeSeries: ['csv', 'tsv'],
+  common: ['csv', 'tsv', 'txt', 'json'],
+};
+const allSupportedExtensions = flatten(Object.values(supportedExtensions));
+
+function getFileExtension(fileName) {
+  if (!fileName) {
+    return fileName;
+  }
+  return fileName.split('.').pop().toLowerCase();
+}
+
 function traverseFileTree(item, path) {
   return new Promise((resolve) => {
     path = path || "";
@@ -110,6 +129,7 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
+
 export const ImportPage = ({
   project,
   show = true,
@@ -123,7 +143,6 @@ export const ImportPage = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
-  const [ids, _setIds] = useState([]);
   const api = useAPI();
 
   const processFiles = (state, action) => {
@@ -136,20 +155,17 @@ export const ImportPage = ({
     if (action.uploaded) {
       return { ...state, uploaded: unique([...state.uploaded, ...action.uploaded], (a, b) => a.id === b.id) };
     }
-    // if (action.ids) {
-    //   const ids = unique([...state.ids, ...action.ids]);
-    //   onFileListUpdate?.(ids);
-    //   return {...state, ids };
-    // }
+    if (action.ids) {
+      const ids = unique([...state.ids, ...action.ids]);
+
+      onFileListUpdate?.(ids);
+      return { ...state, ids };
+    }
     return state;
   };
-  const [files, dispatch] = useReducer(processFiles, { uploaded: [], uploading: [] });
-  const showList = Boolean(files.uploaded?.length || files.uploading?.length);
 
-  const setIds = (ids) => {
-    _setIds(ids);
-    onFileListUpdate?.(ids);
-  };
+  const [files, dispatch] = useReducer(processFiles, { uploaded: [], uploading: [], ids: [] });
+  const showList = Boolean(files.uploaded?.length || files.uploading?.length);
 
   const loadFilesList = useCallback(async (file_upload_ids) => {
     const query = {};
@@ -163,8 +179,9 @@ export const ImportPage = ({
     });
 
     dispatch({ uploaded: files ?? [] });
+
     if (files?.length) {
-      setIds(unique([...ids, ...files.map(f => f.id)]));
+      dispatch({ ids: files.map(f => f.id) });
     }
     return files;
   }, [project]);
@@ -186,17 +203,17 @@ export const ImportPage = ({
     setLoading(false);
     onWaiting?.(false);
   };
-  const onFinish = useCallback(res => {
+  const onFinish = useCallback(async res => {
     const { could_be_tasks_list, data_columns, file_upload_ids } = res;
-    const file_ids = [...ids, ...file_upload_ids];
 
-    setIds(file_ids);
+    dispatch({ ids: file_upload_ids });
     if (could_be_tasks_list && !csvHandling) setCsvHandling("choose");
     setLoading(true);
     onWaiting?.(false);
     addColumns(data_columns);
-    return loadFilesList(file_ids).then(() => setLoading(false));
-  }, [addColumns, loadFilesList, setIds, ids, setLoading]);
+
+    return loadFilesList(file_upload_ids).then(() => setLoading(false));
+  }, [addColumns, loadFilesList, setLoading]);
 
   const importFiles = useCallback(async (files, body) => {
     dispatch({ sending: files });
@@ -225,7 +242,13 @@ export const ImportPage = ({
     files = [...files]; // they can be array-like object
     const fd = new FormData;
 
-    for (let f of files) fd.append(f.name, f);
+    for (let f of files) {
+      if (!allSupportedExtensions.includes(getFileExtension(f.name))) {
+        onError(new Error(`The filetype of file "${f.name}" is not supported.`));
+        return;
+      }
+      fd.append(f.name, f);
+    }
     return importFiles(files, fd);
   }, [importFiles, onStart]);
 
@@ -310,13 +333,13 @@ export const ImportPage = ({
                 <header>Drag & drop files here<br/>or click to browse</header>
                 <IconUpload height="64" className={dropzoneClass.elem("icon")} />
                 <dl>
-                  <dt>Text</dt><dd>txt</dd>
-                  <dt>Audio</dt><dd>wav, aiff, mp3, au, flac, m4a, ogg</dd>
-                  <dt>Video</dt><dd>mpeg4/H.264 webp, webm*</dd>
-                  <dt>Images</dt><dd>jpg, png, gif, bmp, svg, webp</dd>
-                  <dt>HTML</dt><dd>html, htm, xml</dd>
-                  <dt>Time Series</dt><dd>csv, tsv</dd>
-                  <dt>Common Formats</dt><dd>csv, tsv, txt, json</dd>
+                  <dt>Text</dt><dd>{supportedExtensions.text.join(', ')}</dd>
+                  <dt>Audio</dt><dd>{supportedExtensions.audio.join(', ')}</dd>
+                  <dt>Video</dt><dd>mpeg4/H.264 webp, webm* {/* Keep in sync with supportedExtensions.video */}</dd>
+                  <dt>Images</dt><dd>{supportedExtensions.image.join(', ')}</dd>
+                  <dt>HTML</dt><dd>{supportedExtensions.html.join(', ')}</dd>
+                  <dt>Time Series</dt><dd>{supportedExtensions.timeSeries.join(', ')}</dd>
+                  <dt>Common Formats</dt><dd>{supportedExtensions.common.join(', ')}</dd>
                 </dl>
                 <b>
                    * – Support depends on the browser<br/>
@@ -330,8 +353,8 @@ export const ImportPage = ({
           {showList && (
             <table>
               <tbody>
-                {files.uploading.map(file => (
-                  <tr key={file.name}>
+                {files.uploading.map((file, idx) => (
+                  <tr key={`${idx}-${file.name}`}>
                     <td>{file.name}</td>
                     <td><span className={importClass.elem("file-status").mod({ uploading: true })} /></td>
                   </tr>

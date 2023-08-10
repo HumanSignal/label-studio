@@ -1,0 +1,518 @@
+textarea_in_view:
+  label_config: '
+    <View>
+    <Text name="transcript" value="$transcript"></Text>
+    <TextArea name="mytext" toName="transcript"
+                showSubmitButton="true" maxSubmissions="1" editable="true"
+                required="true" />
+    </View>
+    '
+  status_code: 200
+textarea_in_view_without_toName:
+  label_config: '
+    <View>
+    <Text name="transcript" value="$transcript"></Text>
+    <TextArea name="mytext"
+                showSubmitButton="true" maxSubmissions="1" editable="true"
+                required="true" />
+    </View>
+    '
+  status_code: 400
+textareas_in_view:
+  label_config: '
+    <View>
+    <Text name="transcript" value="$transcript"></Text>
+    <TextArea name="mytext1" toName="transcript"
+                showSubmitButton="true" maxSubmissions="1" editable="true"
+                required="true" />
+    <TextArea name="mytext2" toName="transcript"
+                    showSubmitButton="true" maxSubmissions="1" editable="true"
+                    required="true" />
+    <TextArea name="mytext3" toName="transcript"
+                    showSubmitButton="true" maxSubmissions="1" editable="true"
+                    required="true" />
+    </View>
+    '
+  status_code: 200
+textareas_in_views:
+  label_config: '
+    <View>
+    <Text name="transcript" value="$transcript"></Text>
+    <View>
+    <TextArea name="mytext1" toName="transcript"
+                showSubmitButton="true" maxSubmissions="1" editable="true"
+                required="true" />
+    </View>
+    <View>
+    <TextArea name="mytext2" toName="transcript"
+                    showSubmitButton="true" maxSubmissions="1" editable="true"
+                    required="true" />
+    <TextArea name="mytext3" toName="transcript"
+                    showSubmitButton="true" maxSubmissions="1" editable="true"
+                    required="true" />
+    </View>
+    </View>
+    '
+  status_code: 200
+
+choices_without_choices_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices name="choices" toName="trans" />
+    </View>
+    '
+  status_code: 400
+choices_with_1choice_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices name="choices" toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    '
+  status_code: 200
+choices_with_1choice_without_value_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices name="choices" toName="trans">
+      <Choice />
+    </Choices>
+    </View>
+    '
+  status_code: 400
+choices_with_1choice_in_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    </View>
+    <View>
+    <Choices name="choices" toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    '
+  status_code: 400
+choices_with_1choice_in_several_views:
+  label_config: '
+    <View>
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    </View>
+    <View>
+    <Choices name="choices" toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
+choices_with_1choice_in_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Choices name="choices" toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
+choices_in_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Choices name="choices" toName="trans">
+      <Choice value="1"/>
+      <Choice value="2"/>
+      <Choice value="3"/>
+      <Choice value="4"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
+choices_withoutname_with_1choice_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    '
+  status_code: 400
+choices_withouttoname_with_1choice_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices name="choices" >
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    '
+  status_code: 400
+choices_in_several_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Choices name="choices" toName="trans">
+    <View>
+      <Choice value="1"/>
+    </View>
+    <View>
+      <Choice value="2"/>
+    </View>
+      <Choice value="3"/>
+      <Choice value="4"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
+several_choices_in_several_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Choices name="choices1" toName="trans">
+    <View>
+      <Choice value="1"/>
+    </View>
+    <View>
+      <Choice value="2"/>
+    </View>
+    </Choices>
+    <Choices name="choices2" toName="trans">
+      <Choice value="3"/>
+      <Choice value="4"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
+
+labels_without_labels_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" toName="trans" />
+    </View>
+    '
+  status_code: 400
+labels_with_1label_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    '
+  status_code: 200
+labels_with_1label_without_value_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" toName="trans">
+      <Label />
+    </Labels>
+    </View>
+    '
+  status_code: 400
+labels_with_1label_in_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    </View>
+    <View>
+    <Labels name="labels" toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    '
+  status_code: 400
+labels_with_1label_in_several_views:
+  label_config: '
+    <View>
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    </View>
+    <View>
+    <Labels name="labels" toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+labels_with_1label_in_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Labels name="labels" toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+labels_in_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Labels name="labels" toName="trans">
+      <Label value="1"/>
+      <Label value="2"/>
+      <Label value="3"/>
+      <Label value="4"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+labels_withoutname_with_1label_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    '
+  status_code: 400
+labels_withouttoname_with_1label_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" >
+      <Label value="test"/>
+    </Labels>
+    </View>
+    '
+  status_code: 400
+labels_in_several_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Labels name="labels" toName="trans">
+    <View>
+      <Label value="1"/>
+    </View>
+    <View>
+      <Label value="2"/>
+    </View>
+      <Label value="3"/>
+      <Label value="4"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+several_labels_in_several_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Labels name="labels1" toName="trans">
+    <View>
+      <Label value="1"/>
+    </View>
+    <View>
+      <Label value="2"/>
+    </View>
+    </Labels>
+    <Labels name="labels2" toName="trans">
+      <Label value="3"/>
+      <Label value="4"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+no_views:
+  label_config: '
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" toName="trans">
+      <Label value="1"/>
+      <Label value="2"/>
+    </Labels>
+    '
+  status_code: 400
+only_views:
+  label_config: '
+    <View>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 200
+only_views_with_1view:
+  label_config: '
+    <View>
+    <View>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_image_without_params:
+  label_config: '
+    <View>
+    <Image />
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_image_without_name:
+  label_config: '
+    <View>
+    <View>
+    </View>
+        <Image value="$image"/>
+    </View>
+    '
+  status_code: 400
+only_views_with_image_without_value:
+  label_config: '
+    <View>
+    <View>
+    <Image name="image"/>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_correct_image:
+  label_config: '
+    <View>
+    <Image name="image" value="$image"/>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 200
+only_views_with_text_without_params:
+  label_config: '
+    <View>
+    <Text />
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_text_without_name:
+  label_config: '
+    <View>
+    <View>
+    </View>
+        <Text value="$text"/>
+    </View>
+    '
+  status_code: 400
+only_views_with_text_without_value:
+  label_config: '
+    <View>
+    <View>
+    <Text name="text"/>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_correct_text:
+  label_config: '
+    <View>
+    <Text name="text" value="$text"/>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 200
+only_views_with_hypertext_without_params:
+  label_config: '
+    <View>
+    <HyperText />
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_hypertext_without_name:
+  label_config: '
+    <View>
+    <View>
+    </View>
+        <HyperText value="$text"/>
+    </View>
+    '
+  status_code: 400
+only_views_with_hypertext_without_value:
+  label_config: '
+    <View>
+    <View>
+    <HyperText name="text"/>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_correct_hypertext:
+  label_config: '
+    <View>
+    <HyperText name="text" value="$text"/>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 200
+only_views_with_same_hypertext_names:
+  label_config: '
+    <View>
+    <HyperText name="text" value="$text"/>
+    <HyperText name="text" value="$text"/>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+several_views_with_several_components:
+  label_config: '
+    <View>
+    <HyperText name="hypertext" value="$hypertext"/>
+    <View>
+    <Text name="text" value="$text"/>
+    <View>
+    <TextArea name="mytext1" toName="text"/>
+    <View>
+        <Image name="image" value="$image"/>
+            <View>
+            <Labels name="labels" toName="text">
+            <View>
+              <Label value="1"/>
+            </View>
+            <View>
+              <Label value="2"/>
+              <View>
+                  <Choices name="choice_test" toName="text">
+                                      <Choice value="test1"/>
+                                      <Choice value="test2"/>
+                                    </Choices>
+              </View>
+            </View>
+              <Label value="3"/>
+              <Label value="4"/>
+            </Labels>
+            </View>
+    </View>
+    </View>
+    </View>
+    </View>
+    '
+  status_code: 200

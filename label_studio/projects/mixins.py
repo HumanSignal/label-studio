@@ -25,7 +25,7 @@ class ProjectMixin:
         # get only id from queryset to decrease data size in job
         if not (isinstance(tasks_queryset, set) or isinstance(tasks_queryset, list)):
             tasks_queryset = set(tasks_queryset.values_list('id', flat=True))
-        start_job_async_or_sync(self._update_tasks_counters_and_is_labeled, tasks_queryset, from_scratch=from_scratch)
+        start_job_async_or_sync(self._update_tasks_counters_and_is_labeled, list(tasks_queryset), from_scratch=from_scratch)
 
     def update_tasks_counters_and_task_states(self, tasks_queryset, maximum_annotations_changed,
                                             overlap_cohort_percentage_changed, tasks_number_changed, from_scratch=True):
@@ -62,6 +62,7 @@ class ProjectMixin:
         """
         Dummy stub for has_permission
         """
+        user.project = self  # link for activity log
         return True
 
     def _can_use_overlap(self):

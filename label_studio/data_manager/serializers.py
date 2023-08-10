@@ -125,7 +125,7 @@ class ViewSerializer(serializers.ModelSerializer):
                 self._create_filters(filter_group=filter_group, filters_data=filters_data)
 
                 validated_data["filter_group_id"] = filter_group.id
-            view = View.objects.create(**validated_data)
+            view = self.Meta.model.objects.create(**validated_data)
 
             return view
 
@@ -178,6 +178,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
+    draft_exists = serializers.BooleanField(required=False)
     updated_by = serializers.SerializerMethodField(required=False, read_only=True)
 
     CHAR_LIMITS = 500

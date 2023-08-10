@@ -14,13 +14,19 @@ title_bucket_prefix: &title_bucket_prefix
 gcs_credentials: &gcs_credentials
   - type: password
     name: google_application_credentials
-    label: Google Application Credentials
-    placeholder: Copy and paste here the content of credentials.json
+    label: Google Application Credentials, leave blank to use default credentials (ADC)
+    placeholder: Paste the contents of credentials.json here OR leave blank to use ADC
     autoComplete: "new-password"
     skipAutofill: true
     allowEmpty: false
     validators:
       - json
+
+project_id: &project_id
+  - type: text
+    name: google_project_id
+    label: Google Project ID
+    placeholder: 'Leave blank to inherit from the Google Application Credentials...'
 
 ImportStorage:
   # Title, Bucket, Prefix
@@ -54,15 +60,21 @@ ImportStorage:
             name: presign_ttl
             label: Expiration minutes
             min: 1
-            value: 1
+            value: 15
             dependency: presign
 
   # GCS credentials
   - columnCount: 1
     fields: *gcs_credentials
+  # Project ID
+  - columnCount: 1
+    fields: *project_id
 
 ExportStorage:
   - columnCount: 3
     fields: *title_bucket_prefix
   - columnCount: 1
     fields: *gcs_credentials
+  # Project ID
+  - columnCount: 1
+    fields: *project_id

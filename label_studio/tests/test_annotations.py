@@ -103,7 +103,7 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
 @pytest.mark.django_db
 def test_delete_annotation(business_client, configured_project):
     task = Task.objects.first()
-    annotation = Annotation.objects.create(task=task, result=[])
+    annotation = Annotation.objects.create(task=task, project=configured_project, result=[])
     assert task.annotations.count() == 1
     r = business_client.delete('/api/annotations/{}/'.format(annotation.id))
     assert r.status_code == 204

@@ -2,6 +2,7 @@
 """
 import ujson as json
 import time
+import logging
 
 from uuid import uuid4
 from django.http import HttpResponsePermanentRedirect
@@ -15,6 +16,8 @@ from django.conf import settings
 from django.utils.http import escape_leading_slashes
 from rest_framework.permissions import SAFE_METHODS
 from core.utils.contextlog import ContextLog
+
+logger = logging.getLogger(__name__)
 
 
 def enforce_csrf_checks(func):
@@ -179,6 +182,7 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
 
         # Check if this request is too far from when the login happened
         if (current_time - last_login) > settings.MAX_SESSION_AGE:
+            logger.info(f'Request is too far from last login {current_time - last_login:.0f} > {settings.MAX_SESSION_AGE}; logout')
             logout(request)
 
         # Push the expiry to the max every time a new request is made to a url that indicates user activity

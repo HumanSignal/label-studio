@@ -43,4 +43,5 @@ class LabelLink(models.Model):
         ]
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)

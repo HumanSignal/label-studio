@@ -114,6 +114,8 @@ jobs:
           fi
 
       - name: Package
+        env:
+          VERSION_OVERRIDE: ${{ inputs.version }}
         run: python setup.py sdist bdist_wheel
 
       - name: Upload to PYPI
@@ -128,7 +130,7 @@ jobs:
         if: inputs.upload_to_pypi
         uses: actions/github-script@v6
         env:
-          VERSION: ${{ github.event.pull_request.title }}
+          VERSION: ${{ inputs.version }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -141,7 +143,7 @@ jobs:
               const {data: pypiPackage} = await github.request('https://pypi.org/pypi/label-studio/json')
               if ('releases' in pypiPackage && version in pypiPackage.releases) {
                 const release = pypiPackage.releases[version]
-                const artifact = release.find(e => e.packagetype === 'bdist_wheel')
+                const artifact = release.find(e => e.packagetype === 'sdist')
                 console.log(artifact);
                 core.setOutput("pipy-artifact-url", artifact.url);
                 core.setOutput("pipy-artifact-digests-sha256", artifact.digests.sha256);

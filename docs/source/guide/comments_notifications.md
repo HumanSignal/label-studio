@@ -5,7 +5,7 @@ type: guide
 tier: enterprise
 section: "Labeling"
 order: 410
-badge: <i class='ent'></i>
+order_enterprise: 113
 meta_title: Comment and notification systems in Label Studio
 meta_description: The Comments and Notifications feature defines how annotators, reviewers and administrators communicate and receive updates on projects and tasks.
 ---
@@ -25,19 +25,18 @@ The following two workflows are flexible and can be combined. For example, in Fi
 
 <center>
 <br>
-<img src="/images/comments-notifications/workflow-notifications.png"/>
+<img src="/images/comments-notifications/workflow-notifications.png" class="gif-border"/>
 <br><i>Figure 1A. The workflow based on notifications</i><br>
 
 <br>
 
-<img src="/images/comments-notifications/workflow-data-manager.png" style="margin: 0 auto"/>
+<img src="/images/comments-notifications/workflow-data-manager.png" style="margin: 0 auto" class="gif-border"/>
 <br><i>Figure 2B. The workflow based on the Data Manager</i><br>
 </center>
 
-
 ### Notification workflow
 
-This approach is centered on the notification panel (see figure 1A). The entry point here is the notification link, it allows to go into editing or review mode (depending on your role). Note that label or review streams are deactivated there, only a task from a notification link is shown.
+This approach is centered on the notification panel (see figure 1A). The entry point here is the notification link, it allows going into editing or review mode (depending on your role). Note that label or review streams are deactivated there, only a task from a notification link is shown.
 
 #### Annotators
 
@@ -83,10 +82,10 @@ Reviewers (or other higher roles) can write comments during the review stream. I
 
 ### Submitted annotations vs postponed drafts
 
-The standard labeling workflow is to submit an annotation. This action affects statistics, agreement, and annotator performance scores. In some cases where annotators want to avoid submitting (e.g. while they wait for their comment to be resolved), they can use the postpone draft functionality by clicking blue arrow button in the labeling stream: 
+The standard labeling workflow is to submit an annotation. This action affects statistics, agreement, and annotator performance scores. In some cases where annotators want to avoid submitting (e.g. while they wait for their comment to be resolved), they can use to postpone draft functionality by clicking blue arrow button in the labeling stream: 
 
 <br>
-<img src="/images/comments-notifications/postpone.png" clas="gif-border">
+<img src="/images/comments-notifications/postpone.png" class="gif-border">
 <br>
 
 It’s helpful to combine postponed drafts with comments, because users can clarify some questions without affecting a dataset labeling state. Annotators can access their postponed drafts in the following ways: 
@@ -135,24 +134,24 @@ To resolve comments, click on a task and on the right side of the window you wil
 
 When you click **Resolve**, you will see a green color check mark next to your comment. This represents a resolved comment.
 
-<center><br>
+<br>
 <img src="/images/comments-notifications/resolved-comment-green-tick-mark.png" class="gif-border" style="max-width: 300px!important;"/>
 <br/>
 <i>Figure 6: Green color check mark for resolved comments.</i>
-</center>
+
 
 To unresolve comments, click the three dots (**...**) >> **Unresolve** button.
 
 <br>
 <img src="/images/comments-notifications/unresolve.png" class="gif-border"/>
-<i>Figure 7: Unresolved comments</i>
+<i>Figure 7: Unresolved comments.</i>
 
 There is a special pink icon that appears on comments attached to annotations or drafts in the dropdown menu that indicates unresolved comments:
 
 <br>
 <img src="/images/comments-notifications/comment-pink.png" class="gif-border"> 
-
-
+</br>
+<i>Figure 8: Pink color check mark for unresolved comments.</i>
 
 
 ## Comments 
@@ -207,22 +206,22 @@ Table 1 displays the three key user actions on the **Comments** feature.
 ### Project settings
 
 You can make it mandatory to write comments when annotators click Skip on annotations. You can find it in Project Settings on the Annotation tab:
-<br><img src="/images/comments-notifications/annotator-skip.png"><br>
+<br><img src="/images/comments-notifications/annotator-skip.png" class="gif-border"><br>
 
 A similar option is available for reviewers. You can find it in Project Settings on the Review tab:
-<br><img src="/images/comments-notifications/reviewer-reject.png"><br>
-
+<br>
+<img src="/images/comments-notifications/reviewer-reject.png" class="gif-border">
+<br>
 
 
 ## Notifications 
 
 To see the notifications, navigate and click the user profile icon on the top-right of the Label Studio UI.  The **Notifications** pane opens with a bell icon next to it. The blue color bell icon indicates unread notifications and the grey color bell icon indicates read notifications.
 
-<center>
 <br>
 <img src="/images/comments-notifications/notifications.png" class="gif-border"/><br/>
-<i>Figure 8: Notification panel.</i>
-</center>
+<i>Figure 9: Notification panel.</i>
+
 
 1. Navigate and click the user profile icon on the top-right of the Label Studio UI.
 2. The **Notifications** pane opens on the right side of the Label Studio UI. 
@@ -230,6 +229,6 @@ To see the notifications, navigate and click the user profile icon on the top-ri
 4. To mark all the notification as a read notification, click on the three dots (**...**) >> **Mark All as Read** option. 
 
 !!! info
-    The read notification has a grey color background which means a user has already read this notification.
+    The read notification has a gray color background which means a user has already read this notification.
 
 

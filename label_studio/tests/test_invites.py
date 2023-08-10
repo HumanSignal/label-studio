@@ -56,7 +56,7 @@ def test_reset_token_not_valid(business_client, client, settings):
 def test_token_get_not_post_shows_form(business_client, client, settings):
     settings.DISABLE_SIGNUP_WITHOUT_LINK = True
 
-    # cant bypass post
+    # can't bypass post
     response = business_client.get('/api/invite')
     invite_url = response.json()['invite_url']
     response = client.get(f'{invite_url}&email=test_user@example.com&password=test_password')

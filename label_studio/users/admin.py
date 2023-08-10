@@ -10,6 +10,7 @@ from projects.models import Project
 from ml.models import MLBackend, MLBackendTrainJob
 from tasks.models import Task, Annotation, Prediction
 from organizations.models import Organization, OrganizationMember
+from core.models import AsyncMigrationStatus
 
 
 class UserAdminShort(UserAdmin):
@@ -33,6 +34,25 @@ class UserAdminShort(UserAdmin):
                           ('Important dates', {'fields': ('last_login', 'date_joined')}))
 
 
+class AsyncMigrationStatusAdmin(admin.ModelAdmin):
+    def __init__(self, *args, **kwargs):
+        super(AsyncMigrationStatusAdmin, self).__init__(*args, **kwargs)
+
+        self.list_display = ('id', 'name', 'project', 'status', 'created_at', 'updated_at', 'meta')
+        self.list_filter = ('name', 'status')
+        self.search_fields = ('name', 'project__id')
+        self.ordering = ('id',)
+
+
+class OrganizationMemberAdmin(admin.ModelAdmin):
+    def __init__(self, *args, **kwargs):
+        super(OrganizationMemberAdmin, self).__init__(*args, **kwargs)
+
+        self.list_display = ('id', 'user', 'organization', 'created_at', 'updated_at')
+        self.search_fields = ('user__email', 'organization__title')
+        self.ordering = ('id',)
+
+
 admin.site.register(User, UserAdminShort)
 admin.site.register(Project)
 admin.site.register(MLBackend)
@@ -41,7 +61,8 @@ admin.site.register(Task)
 admin.site.register(Annotation)
 admin.site.register(Prediction)
 admin.site.register(Organization)
-admin.site.register(OrganizationMember)
+admin.site.register(OrganizationMember, OrganizationMemberAdmin)
+admin.site.register(AsyncMigrationStatus, AsyncMigrationStatusAdmin)
 
 # remove unused django groups
 admin.site.unregister(Group)

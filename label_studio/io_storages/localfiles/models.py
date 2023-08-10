@@ -14,13 +14,14 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
-from io_storages.base_models import (
-      ExportStorage,
-      ExportStorageLink,
-      ImportStorage,
-      ImportStorageLink,
-)
 from tasks.models import Annotation
+from io_storages.base_models import (
+    ExportStorage,
+    ExportStorageLink,
+    ImportStorage,
+    ImportStorageLink,
+    ProjectStorageMixin
+)
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class LocalFilesMixin(models.Model):
                                   'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
 
 
-class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
+class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
     url_scheme = 'https'
 
     def can_resolve_url(self, url):
@@ -94,8 +95,16 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
     def scan_and_create_links(self):
         return self._scan_and_create_links(LocalFilesImportStorageLink)
 
+    class Meta:
+        abstract = True
 
-class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
+
+class LocalFilesImportStorage(ProjectStorageMixin, LocalFilesImportStorageBase):
+    class Meta:
+        abstract = False
+
+
+class LocalFilesExportStorage(LocalFilesMixin, ExportStorage):
 
     def save_annotation(self, annotation):
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
@@ -103,7 +112,7 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
 
         # get key that identifies this object in storage
         key = LocalFilesExportStorageLink.get_key(annotation)
-        key = os.path.join(self.path, f"{key}.json")
+        key = os.path.join(self.path, f"{key}")
 
         # put object into storage
         with open(key, mode='w') as f:
@@ -123,7 +132,7 @@ class LocalFilesExportStorageLink(ExportStorageLink):
 
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_local_files(sender, instance, **kwargs):
-    project = instance.task.project
+    project = instance.project
     if hasattr(project, 'io_storages_localfilesexportstorages'):
         for storage in project.io_storages_localfilesexportstorages.all():
             logger.debug(f'Export {instance} to Local Storage {storage}')

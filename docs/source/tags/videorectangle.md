@@ -2,7 +2,6 @@
 title: VideoRectangle
 type: tags
 order: 429
-is_new: t
 meta_title: Video Tag for Video Labeling
 meta_description: Customize Label Studio with the Video tag for basic video annotation tasks for machine learning and data science projects.
 ---

@@ -1,9 +1,13 @@
 ---
-title: Label and annotate data 
+title: Label and annotate data
+tier: all 
 type: guide
-order: 402
+order: 208
+order_enterprise: 112
 meta_title: Label and annotate data
-meta_description: Label and annotate data using the Label Studio UI to create bounding boxes, label text spans, set up relations, and filter and sort project data for your machine learning dataset creation.
+meta_description: Label and annotate data to create bounding boxes, label text spans, set up relations. Filter and sort project data for machine learning dataset creation.
+section: "Labeling"
+
 ---
 
 Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can start labeling and annotating your data.
@@ -41,10 +45,11 @@ When you label with bounding boxes and other image segmentation tasks, or when y
 1. Select the label that you want to apply to the region.
 2. Draw the bounding box or highlight the text that you want to label. 
 3. In the **Regions** or **Labels** sidebar, locate and select the region that you labeled and click the eye icon to hide the region.
-4. Select the next label that you want to apply to the overlapping region.
-5. Draw the bounding box or highlight the text that you want to label.
-6. Continue hiding and labeling regions until you've completed annotating the task. If you want, select the eye icon next to **Regions** to hide and then show all regions labeled on the task to confirm the end result.
-7. Click **Submit** to submit the completed annotation and move on to the next task.
+4. Or press cmd or ctrl to draw over the existing **Regions** or **Labels** (NOTE: This do not work for Keypoints)
+5. Select the next label that you want to apply to the overlapping region.
+6. Draw the bounding box or highlight the text that you want to label.
+7. Continue hiding and labeling regions until you've completed annotating the task. If you want, select the eye icon next to **Regions** to hide and then show all regions labeled on the task to confirm the end result.
+8. Click **Submit** to submit the completed annotation and move on to the next task.
 
 ### Select multiple regions
 You can select multiple regions while labeling to make changes to them together. 
@@ -101,9 +106,11 @@ When annotators skip a task, the task no longer appears in the labeling queue fo
 
 In both Label Studio and Label Studio Enterprise, you can label tasks with collaborators. Tasks are locked while someone performs annotations so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling if the minimum annotations per task is set to more than one. By default, tasks only need to be annotated by one annotator. 
 
-<div class="enterprise"><p>
+<div class="enterprise-only">
+
 If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, <a href="setup_project.html">update the project settings</a>. After you update the minimum annotations required per task, annotators can use the Label Stream workflow to label their tasks.  
-</p></div>
+
+</div>
 
 If you want to label tasks more than once, even if the minimum annotations required is set to one, do the following:
 
@@ -123,7 +130,7 @@ If you have a machine learning backend set up to [get interactive preannotations
 2. For image labeling, you can choose whether to **Auto accept annotation suggestions** after you enable auto-annotation. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear, but you can reject or approve them manually, either individually or all at once. Predicted text regions are automatically accepted.
 
 
-## Use keyboard shortcuts to label regions faster
+## Use keyboard shortcuts
 
 Use keyboard shortcuts, or hotkeys, to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
 
@@ -141,8 +148,8 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `alt` + `h` | Hide a selected region. | 
 | `ctrl` + `d` OR `cmd` + `d` | Duplicate a selected region. |
 | `u` | Unselect a selected region. | 
-| `shift + down` | On the data manager, change the row selection to the next row, 1 below the current row. |
-| `shift + up` | On the data manager, change the row selection to the previous row, 1 above the current row. |
+| `shift + down` | On the data manager, change the row selection to the next row, 1 below the current row. The quick view for the selected task row appears automatically. |
+| `shift + up` | On the data manager, change the row selection to the previous row, 1 above the current row. The quick view for the selected task row appears automatically. |
 | `shift + right` | On the data manager, open the labeling quick view for the selected task row. | 
 | `shift + left` | On the data manager, close the labeling quick view for the selected task row. |
 
@@ -164,13 +171,6 @@ When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `
 | `b` | If performing brush mask labeling, select the brush option in the toolbar. 
 | `[` | When the brush or eraser option is selected, decrease the size of the brush or eraser. |
 | `]` | When the brush or eraser option is selected, increase the size of the brush or eraser. |
-
-### Audio-specific hotkeys
-When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use specific hotkeys to take audio-specific actions.
-
-| Key | Description |
-| --- | --- | 
-| `ctrl` + `b` OR `cmd` + `b` | Rewind audio 1 second. |
 
 ### Time series-specific hotkeys
 When labeling timeseries data with the `TimeSeries` tag, you can use specific hotkeys to take actions on a selected region on the time series data.
@@ -215,9 +215,9 @@ Click the settings icon when labeling to configure the labeling interface to sui
 
 For example, keep a label selected after creating a region, display labels on bounding boxes, polygons and other regions while labeling, and show line numbers for text labeling.
 
-<center>
-  <img src='../images/lsf-settings.png' class="gif-border">
-</center>
+
+<img style="max-width: 600px" src='../images/lsf-settings.png' class="gif-border">
+<br/>
 <i>Figure 2: Customize the labeling interface  </i>
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
@@ -282,13 +282,13 @@ If you make a mistake when labeling with the brush mask, you can erase it. You m
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
 
 
-## <i class='ent'/></i> Outliner 
+## Outliner 
 
 The **Outliner** is a replacement for the existing interface with a multiple-panel approach. This feature improves the user experience to fit more data in these two columns (**Outliner** and **Details**) and provides more options when working with regions. For example, Image segmentation is the only type of labeling that supports custom controls on the details panel. 
 
 ### Feature capabilities
 
-Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the left of the image and **Details** panel on the right of the image. 
+Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the right of the image and **Details** panel on the left of the image. 
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/outliner-details-panels-view.png" style="opacity: 0.8" class="gif-border"/></div>
@@ -355,8 +355,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 !!! note 
     In the upcoming releases, video segmentation will be available to control keyframes, animations, and custom metadata. 
 
-
-<i class='ent'></i>The Comments box is available inside the outliner. 
+<div class="enterprise-only"> <p>The <b>Comments</b> box is available inside the outliner. </p></div>
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>
@@ -423,7 +422,11 @@ One region belongs to another one. It is typically done for NLP type of text. Fo
 
 To create bounding boxes on top you can use two ways:
 
-1. Press the rectangle tool (R) (note: this option is not always visible).
+1. Press the rectangle tool (R). 
+
+!!! note 
+    This option is not always visible.
+
 2. Label a bounding box, and then label another bounding box inside it.
 
 Now, you should be able to drag when the rectangle tool is not selected. Remember that when the rectangle tool is selected, you can make rectangles even if it is on top of another rectangle.

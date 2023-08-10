@@ -9,6 +9,7 @@ from datetime import datetime
 
 import ujson as json
 from core import version
+from core.feature_flags import flag_set
 from core.utils.common import load_func
 from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
 from django.conf import settings
@@ -98,7 +99,7 @@ class DataExport(object):
         """Generate two files: meta info and result file and store them locally for logging"""
         filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
         filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
-        annotation_number = Annotation.objects.filter(task__project=project).count()
+        annotation_number = Annotation.objects.filter(project=project).count()
         try:
             platform_version = version.get_git_version()
         except:
@@ -175,3 +176,78 @@ class DataExport(object):
             content_type = 'application/zip'
             filename = name + '.zip'
             return out, content_type, filename
+
+
+class ConvertedFormat(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', _('Created')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        FAILED = 'failed', _('Failed')
+        COMPLETED = 'completed', _('Completed')
+
+    project = models.ForeignKey(
+        'projects.Project',
+        null=True,
+        related_name='export_conversions',
+        on_delete=models.CASCADE,
+    )
+    organization = models.ForeignKey(
+        'organizations.Organization',
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='export_conversions',
+    )
+    export = models.ForeignKey(
+        Export,
+        related_name='converted_formats',
+        on_delete=models.CASCADE,
+        help_text='Export snapshot for this converted file'
+    )
+    file = models.FileField(
+        upload_to=settings.DELAYED_EXPORT_DIR,
+        null=True,
+    )
+    status = models.CharField(
+        max_length=64,
+        choices=Status.choices,
+        default=Status.CREATED,
+    )
+    traceback = models.TextField(
+        null=True,
+        blank=True,
+        help_text='Traceback report in case of errors'
+    )
+    export_type = models.CharField(
+        max_length=64
+    )
+    created_at = models.DateTimeField(
+        _('created at'),
+        null=True,
+        auto_now_add=True,
+        help_text='Creation time',
+    )
+    updated_at = models.DateTimeField(
+        _('updated at'),
+        null=True,
+        auto_now_add=True,
+        help_text='Updated time',
+    )
+    finished_at = models.DateTimeField(
+        _('finished at'),
+        help_text='Complete or fail time',
+        null=True,
+        default=None,
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_('created by'),
+    )
+
+    def delete(self, *args, **kwargs):
+        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
+            if self.file:
+                self.file.delete()
+        super().delete(*args, **kwargs)

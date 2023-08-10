@@ -1,9 +1,14 @@
 ---
-title: Frontend library
+title: Frontend builds
+short: Frontend builds
 type: guide
-order: 705
+tier: all
+order: 219
+order_enterprise: 126
 meta_title: Customize User Interface
 meta_description: Label Studio documentation for integrating the Label Studio frontend interface into your own machine learning or data labeling application workflow.
+section: "Integration and Development"
+
 ---
 
 The [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) (LSF) is the main labeling interface distributed within Label Studio and as a separate package via NPM and Unpkg. You can integrate the LSF into your projects without Label Studio to provide data labeling capabilities to your users.
@@ -13,9 +18,13 @@ LSF can be customized and extended to fit your needs, and you can use a custom v
 LSF is located as a separate GitHub repository: https://github.com/heartexlabs/label-studio-frontend
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/frontend/lsf-in-ls.jpg" style="opacity: 0.9"/></div>
+<img src="/images/frontend/lsf-in-ls.jpg" class="gif-border">
+
+<i>Figure 1: Label Studio Frontend </i>
+
 
 ## Installation
+
 There are two ways to install the LSF as follows:
 
 1. Using the package manager
@@ -42,6 +51,7 @@ yarn add heartexlabs@label-studio@latest
 ```
 
 ## Frontend integration guide
+
 The LSF can be used with Vanilla JS or with the framework of your choice. The following examples cover basic integration with Vanilla and React.
 
 ### Vanilla JS integration
@@ -51,7 +61,6 @@ To see all the available options for the initialization of LabelStudio object, s
 
 {% collapse "Using modern JS techniques (recommended)" %}
 
-#### Using modern JS techniques (recommended)
 This guide assumes that you're using a bundler like Webpack or Rollup to assemble your JS bundles, and LSF is installed via a package manager.
 
 In your HTML add the following code:
@@ -108,14 +117,14 @@ labelStudio.on("labelStudioLoad", (LS) => {
 });
 
 labelStudio.on("submitAnnotation", (LS, annotation) => {
-  // Retrive an annotation in JSON format
+  // Retrieve an annotation in JSON format
   console.log(annotation.serializeAnnotation())
 });
 ```
 {% endcollapse %}
 
 {% collapse "Using plain HTML and JS" %}
-#### Using plain HTML and JS
+
 This technique is useful if you're not using a bundler or if you want to use the LSF in a static HTML page.
 
 ```xhtml
@@ -224,13 +233,14 @@ render(<App />, document.getElementById('root'));
 ```
 {% endcollapse %}
 
+
 ## Frontend development
 
 Refer to the [Frontend Reference](frontend_reference.html) when developing with Label Studio Frontend.
 
 ### Manual builds
 
-If you want to build a new tag or change the behaviour of default components inside of LSF, then you need to go into the LSF repo and review the [Development part](https://github.com/heartexlabs/label-studio-frontend#development) of the README file. Making any changes requires that you have a good knowledge of React and Javascript.build.js <branch-name-from-official-lsf-repo>
+If you want to build a new tag or change the behaviour of default components inside of LSF, then you need to go into the LSF repo and review the [Development part](https://github.com/heartexlabs/label-studio-frontend#development) of the README file. Making any changes requires that you have a good knowledge of React and Javascript.build.js `<branch-name-from-official-lsf-repo>`
 
 ### GitHub Artifacts
 
@@ -245,9 +255,12 @@ cd label-studio/frontend
 yarn download:lsf <branch-name-from-official-lsf-repo>
 ```
 
+
+<div class="opensource-only">
+
 ## Custom LSF in Label Studio
 
-LS Frontend (LSF) with Backend (LSB) integration is similar what is described in the [Frontend integration guide](#Frontend-integration-guide). The Javascript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in the Label Studio Backend. The main idea of this integration based on LSF callbacks.
+LS Frontend (LSF) with Backend (LSB) integration is similar what is described in the [Frontend integration guide](#Frontend-integration-guide). The JavaScript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in the Label Studio Backend. The main idea of this integration based on LSF callbacks.
 
 Check out a quick guide on how to use custom LSF in Label Studio.
 
@@ -263,7 +276,8 @@ All frontend-related files are stored under `label-studio/frontend` directory. Y
 
 Under `dist/` folder locate the `lsf/` folder and replace its contents with your custom LSF build.
 
-> Inside every folder under `dist/` you will find a `version.json` file. Do not modify or remove it. Its presence is required for the Label Studio to operate.
+!!! info
+    Inside every folder under `dist/` you will find a `version.json` file. Do not modify or remove it. Its presence is required for the Label Studio to operate.
 
 1. **Do not forget** to remove the old build from LSB:
     ```bash
@@ -277,7 +291,9 @@ Under `dist/` folder locate the `lsf/` folder and replace its contents with your
 
     If you installed LS as a pip package, replace `<env-path>/lib/python<version>/site-packages/label_studio/frontend/dist/lsf/`
 
-3. Run the LS instance as usual. It is now uses the new LSF build:
+3. Run the LS instance as usual. It is now using the new LSF build:
     ```bash
     label-studio start <your-project>
     ```
+
+</div>

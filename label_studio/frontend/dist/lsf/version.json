@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3896: Fix closed polygon undoing by hotkey",
-  "commit": "25580365ef5a016748664f8cde2c97712a5686fa",
+  "message": "fix: LSDV-5446: Fix disappearing icons",
+  "commit": "8139d7b800560232b66157871d45c2d524a9f94f",
   "branch": "master",
-  "date": "2022/12/30 17:04:27"
+  "date": "2023/08/03 14:08:19"
 }

@@ -6,7 +6,7 @@ meta_title: Label Tag for Single Label Tags
 meta_description: Customize Label Studio with the Label tag to assign a single label to regions in a task for machine learning and data science projects.
 ---
 
-Label tag represents a single label. Use with the Labels tag, including BrushLabels, EllipseLabels, HyperTextLabels, KeyPointLabels, and other Labels tags to specify the value of a specific label.
+The `Label` tag represents a single label. Use with the `Labels` tag, including `BrushLabels`, `EllipseLabels`, `HyperTextLabels`, `KeyPointLabels`, and other `Labels` tags to specify the value of a specific label.
 
 ### Parameters
 

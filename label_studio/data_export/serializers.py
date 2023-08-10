@@ -11,10 +11,11 @@ from ml.mixins import InteractiveMixin
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
+from data_export.models import DataExport
 from users.serializers import UserSimpleSerializer
 from label_studio_tools.postprocessing.video import extract_key_frames
 
-from .models import Export
+from .models import Export, ConvertedFormat
 
 
 class CompletedBySerializer(serializers.ModelSerializer):
@@ -35,7 +36,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     def get_result(self, obj):
         # run frames extraction on param, result and result type
         if obj.result and self.context.get('interpolate_key_frames', False) and \
-                is_video_object_tracking(parsed_config=obj.task.project.get_parsed_config()):
+                is_video_object_tracking(parsed_config=obj.project.get_parsed_config()):
             return extract_key_frames(obj.result)
         return obj.result
 
@@ -48,7 +49,12 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
 
     # resolve $undefined$ key in task data, if any
     def to_representation(self, task):
-        project = task.project
+        # avoid long project initializations
+        project = getattr(self, '_project', None)
+        if project is None:
+            project = task.project
+            setattr(self, '_project', project)
+
         data = task.data
         # add interpolate_key_frames param to annotations serializer
         if 'annotations' in self.fields:
@@ -63,7 +69,14 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         expandable_fields = {
             'drafts': (AnnotationDraftSerializer, {'many': True}),
             'predictions': (PredictionSerializer, {'many': True}),
+            'annotations': (AnnotationSerializer, {'many': True})
         }
+
+
+class ConvertedFormatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConvertedFormat
+        fields = ['id', 'status', 'export_type', 'traceback']
 
 
 class ExportSerializer(serializers.ModelSerializer):
@@ -77,10 +90,12 @@ class ExportSerializer(serializers.ModelSerializer):
             'status',
             'md5',
             'counters',
+            'converted_formats',
         ]
         fields = ['title'] + read_only
 
     created_by = UserSimpleSerializer(required=False)
+    converted_formats = ConvertedFormatSerializer(many=True, required=False)
 
 
 ONLY_OR_EXCLUDE_CHOICE = [
@@ -146,6 +161,17 @@ class SerializationOptionsSerializer(serializers.Serializer):
         help_text='Interpolate video key frames',
         required=False
     )
+
+
+class ExportConvertSerializer(serializers.Serializer):
+    export_type = serializers.CharField(help_text='Export file format.')
+
+    def validate_export_type(self, value):
+        project = self.context.get('project')
+        export_formats = [f['name'] for f in DataExport.get_export_formats(project)]
+        if value not in export_formats:
+            raise serializers.ValidationError(f'{value} is not supported export format')
+        return value
 
 
 class ExportCreateSerializer(ExportSerializer):

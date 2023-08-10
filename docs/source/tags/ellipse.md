@@ -6,9 +6,9 @@ meta_title: Ellipse Tag for Adding Elliptical Bounding Box to Images
 meta_description: Customize Label Studio with ellipse tags to add elliptical bounding boxes to images for machine learning and data science projects.
 ---
 
-Use the Ellipse tag to add an elliptical bounding box to an image. Use for bounding box image segmentation tasks with ellipses.
+The `Ellipse` tag is used to add an elliptical bounding box to an image. Use for bounding box image segmentation tasks with ellipses.
 
-Use with the following data types: image
+Use with the following data types: image.
 
 ### Parameters
 

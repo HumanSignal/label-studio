@@ -46,6 +46,8 @@ class S3ImportStorageSerializer(ImportStorageSerializer):
             if '404' in e.response.get('Error').get('Code'):
                 raise ValidationError('Cannot find bucket {bucket_name} in S3'.format(
                     bucket_name=storage.bucket))
+        except TypeError as e:
+            raise ValidationError(f'It seems access keys are incorrect: {e}')
         return data
 
 

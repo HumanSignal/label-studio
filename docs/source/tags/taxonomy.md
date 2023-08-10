@@ -6,9 +6,11 @@ meta_title: Taxonomy Tag for Hierarchical Labels
 meta_description: Customize Label Studio with the Taxonomy tag and use hierarchical labels for machine learning and data science projects.
 ---
 
-Use the Taxonomy tag to create one or more hierarchical classifications, storing both choice selections and their ancestors in the results. Use for nested classification tasks with the Choice tag.
+The `Taxonomy` tag is used to create one or more hierarchical classifications, storing both choice selections and their ancestors in the results. Use for nested classification tasks with the `Choice` tag.
 
-Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
+Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
+
+[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
 
 ### Parameters
 
@@ -25,6 +27,8 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [required] | <code>boolean</code> | <code>false</code> | Whether taxonomy validation is required |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 | [placeholder=] | <code>string</code> |  | What to display as prompt on the input |
+| [perRegion] | <code>boolean</code> |  | Use this tag to classify specific regions instead of the whole object |
+| [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object[^1] |
 
 ### Example
 

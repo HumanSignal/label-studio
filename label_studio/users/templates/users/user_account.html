@@ -106,7 +106,13 @@
         </textarea>
         <p class="actions">
           <button type="button" class="blinking-status ls-button" data-copy="example_fetch">Copy</button>
-          <a class="ls-button" href="https://labelstud.io/guide/api.html" target="_blank">Documentation</a>
+          <a class="ls-button"
+             {% if settings.VERSION_EDITION == 'Enterprise' %}
+             href="https://docs.heartex.com/guide/api.html"
+             {% else %}
+             href="https://labelstud.io/guide/api.html"
+             {% endif %} target="_blank">Documentation
+          </a>
         </p>
       </div>
     </form>
@@ -176,7 +182,7 @@
   <script>
     (() => {
       {% if settings.HOSTNAME %}
-      const hostname = {{ settings.HOSTNAME }};
+      const hostname = '{{ settings.HOSTNAME }}';
       {% else %}
       const hostname = 'http://localhost:8080';
       {% endif %}

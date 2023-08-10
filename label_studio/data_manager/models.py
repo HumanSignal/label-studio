@@ -7,10 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from data_manager.prepare_params import PrepareParams
 
 
-class View(models.Model):
-    project = models.ForeignKey(
-        "projects.Project", related_name="views", on_delete=models.CASCADE, help_text="Project ID"
-    )
+class ViewBaseModel(models.Model):
     data = models.JSONField(_("data"), default=dict, null=True, help_text="Custom view data")
     ordering = models.JSONField(_("ordering"), default=dict, null=True, help_text="Ordering parameters")
     selected_items = models.JSONField(_("selected items"), default=dict, null=True, help_text="Selected items")
@@ -19,17 +16,32 @@ class View(models.Model):
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="views",
+        related_name='%(app_label)s_%(class)ss',
         on_delete=models.CASCADE,
         help_text="User who made this view",
         null=True,
     )
 
+    class Meta:
+        abstract = True
+
+
+class ProjectViewMixin(models.Model):
+    project = models.ForeignKey(
+        "projects.Project", related_name="views", on_delete=models.CASCADE, help_text="Project ID"
+    )
+
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         if self.project.organization == user.active_organization:
             return True
         return False
 
+    class Meta:
+        abstract = True
+
+
+class View(ViewBaseModel, ProjectViewMixin):
     def get_prepare_tasks_params(self, add_selected_items=False):
         # convert filters to PrepareParams structure
         filters = None

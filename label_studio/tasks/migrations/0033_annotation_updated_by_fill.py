@@ -9,6 +9,8 @@ from django.db.models import F
 from projects.models import Project
 from tasks.models import Annotation
 
+import logging
+
 
 def _fill_annotations_updated_by():
     projects = Project.objects.all()
@@ -24,10 +26,10 @@ def _fill_annotations_updated_by():
                 status=AsyncMigrationStatus.STATUS_STARTED,
         )
 
-
         Annotation.objects.filter(project=project).update(updated_by=F('completed_by'))
         migration.status = AsyncMigrationStatus.STATUS_FINISHED
         migration.save()
+
 
 def forward(apps, _):
     annotations = Annotation.objects.all()
@@ -44,8 +46,10 @@ def forward(apps, _):
 
     start_job_async_or_sync(_fill_annotations_updated_by)
 
+
 def backward(apps, _):
     pass
+
 
 class Migration(migrations.Migration):
 

@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import json
+import ujson as json
+import uuid
 import logging
 import os
 import datetime
@@ -25,8 +26,14 @@ from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
 from core.redis import start_job_async_or_sync
-from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, \
-    temporary_disconnect_list_signal
+from core.utils.common import (
+    conditional_atomic,
+    find_first_one_to_one_related_field_by_prefix,
+    load_func,
+    string_is_url,
+    temporary_disconnect_list_signal,
+)
+from core.utils.db import should_run_bulk_update_in_transaction
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from core.current_request import get_current_request
@@ -62,7 +69,7 @@ class Task(TaskMixin, models.Model):
                                    help_text='Last annotator or reviewer who updated this task')
     is_labeled = models.BooleanField(_('is_labeled'), default=False,
                                      help_text='True if the number of annotations for this task is greater than or equal '
-                                               'to the number of maximum_completions for the project', db_index=True)
+                                               'to the number of maximum_completions for the project')
     overlap = models.IntegerField(_('overlap'), default=1, db_index=True,
                                   help_text='Number of distinct annotators that processed the current task')
     file_upload = models.ForeignKey(
@@ -103,7 +110,6 @@ class Task(TaskMixin, models.Model):
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
-            models.Index(fields=['is_labeled'])
         ]
 
     @property
@@ -129,29 +135,49 @@ class Task(TaskMixin, models.Model):
 
     def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
-        num_locks = self.num_locks
-        if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
-        else:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
+        from projects.functions.next_task import get_next_task_logging_level
+        SkipQueue = self.project.SkipQueue
 
+        if self.project.skip_queue == SkipQueue.REQUEUE_FOR_ME:
+            # REQUEUE_FOR_ME means: only my skipped tasks go back to me,
+            # alien's skipped annotations are counted as regular annotations
+            q = Q(was_cancelled=True) & Q(completed_by=user)
+        elif self.project.skip_queue == SkipQueue.REQUEUE_FOR_OTHERS:
+            # REQUEUE_FOR_OTHERS: my skipped tasks go to others
+            # alien's skipped annotations are not counted at all
+            q = Q(was_cancelled=True) & ~Q(completed_by=user)
+        else:  # SkipQueue.IGNORE_SKIPPED
+            # IGNORE_SKIPPED: my skipped tasks don't go anywhere
+            # alien's and my skipped annotations are counted as regular annotations
+            q = Q()
+
+        num_locks = self.num_locks_user(user=user)
+        num_annotations = self.annotations.exclude(q | Q(ground_truth=True)).count()
         num = num_locks + num_annotations
         if num > self.overlap:
             logger.error(
-                f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
+                f"Num takes={num} > overlap={self.overlap} for task={self.id}, "
+                f"skipped mode {self.project.skip_queue} - it's a bug",
                 extra=dict(
-                    lock_ttl=self.get_lock_ttl(),
+                    lock_ttl=self.locks.values_list('user', 'expire_at'),
                     num_locks=num_locks,
                     num_annotations=num_annotations,
                 )
             )
         result = bool(num >= self.overlap)
-        logger.debug(f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
+        logger.log(
+            get_next_task_logging_level(user),
+            f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations} '
+            f'skipped mode: {self.project.skip_queue}'
+        )
         return result
 
     @property
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
+
+    def num_locks_user(self, user):
+        return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
 
     @property
     def storage_filename(self):
@@ -159,12 +185,8 @@ class Task(TaskMixin, models.Model):
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
 
-    def get_lock_ttl(self):
-        if settings.TASK_LOCK_TTL is not None:
-            return settings.TASK_LOCK_TTL
-        return settings.TASK_LOCK_MIN_TTL
-
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def clear_expired_locks(self):
@@ -172,12 +194,20 @@ class Task(TaskMixin, models.Model):
 
     def set_lock(self, user):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
+        from projects.functions.next_task import get_next_task_logging_level
+
         num_locks = self.num_locks
         if num_locks < self.overlap:
-            lock_ttl = self.get_lock_ttl()
+            lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
-            TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.debug(f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
+            try:
+                task_lock = TaskLock.objects.get(task=self, user=user)
+            except TaskLock.DoesNotExist:
+                TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
+            else:
+                task_lock.expire_at = expire_at
+                task_lock.save()
+            logger.log(get_next_task_logging_level(user), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
@@ -209,6 +239,16 @@ class Task(TaskMixin, models.Model):
         if isinstance(filename, str):
             return filename.replace(settings.MEDIA_URL, '')
         return filename
+
+    def resolve_storage_uri(self, url, project):
+        storage = self.storage
+
+        if not storage:
+            storage_objects = project.get_all_storage_objects(type_='import')
+            storage = self._get_storage_by_url(url, storage_objects)
+
+        if storage:
+            return { "url": storage.generate_http_url(url), "presign_ttl": storage.presign_ttl }
 
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
@@ -242,10 +282,18 @@ class Task(TaskMixin, models.Model):
                     continue
 
                 # project storage
+                # TODO: to resolve nested lists and dicts we should improve _get_storage_by_url(),
+                # TODO: problem with current approach: it can be used only the first storage that _get_storage_by_url
+                # TODO: returns. However, maybe the second storage will resolve uris properly. 
+                # TODO: resolve_uri() already supports them
                 storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
                 if storage:
                     try:
-                        resolved_uri = storage.resolve_uri(task_data[field])
+                        proxy_task = None
+                        if flag_set('fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short', user='auto'):
+                            proxy_task = self
+
+                        resolved_uri = storage.resolve_uri(task_data[field], proxy_task)
                     except Exception as exc:
                         logger.debug(exc, exc_info=True)
                         resolved_uri = None
@@ -262,6 +310,16 @@ class Task(TaskMixin, models.Model):
             # and 'can_resolve_url' will fail
             if isinstance(url, str) and storage_object.can_resolve_url(url):
                 return storage_object
+
+        # url is list or dict
+        if flag_set('fflag_feat_front_lsdv_4661_full_uri_resolve_15032023_short', user='auto'):
+            if isinstance(url, dict) or isinstance(url, list):
+                for storage_object in storage_objects:
+                    if storage_object.can_resolve_url(url):
+                        # note: only first found storage_object will be used for link resoling
+                        # probably we need to use more advanced can_resolve_url mechanics
+                        # that takes into account not only prefixes, but bucket path too
+                        return storage_object
 
     @property
     def storage(self):
@@ -334,7 +392,7 @@ post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
 class AnnotationManager(models.Manager):
     def for_user(self, user):
-        return self.filter(task__project__organization=user.active_organization)
+        return self.filter(project__organization=user.active_organization)
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -370,10 +428,11 @@ class Annotation(models.Model):
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_annotations',
                                    on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'),
                                    help_text='Last user who updated this annotation')
-    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
-    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
+    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task')
+    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
+    draft_created_at = models.DateTimeField(_('draft created at'), null=True, default=None, help_text='Draft creation time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
     prediction = JSONField(
         _('prediction'),
@@ -387,6 +446,14 @@ class Annotation(models.Model):
                                           related_name='child_annotations',
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
+    unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
+    import_id = models.BigIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Original annotation ID that was at the import step or NULL if this annotation wasn't imported"
+    )
     last_action = models.CharField(
         _('last action'),
         max_length=128,
@@ -415,7 +482,8 @@ class Annotation(models.Model):
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
             models.Index(fields=['last_action']),
-            models.Index(fields=['last_created_by']),
+            models.Index(fields=['project', 'ground_truth']),
+            models.Index(fields=['project', 'was_cancelled']),
         ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
@@ -432,18 +500,19 @@ class Annotation(models.Model):
         return len(res)
 
     def has_permission(self, user):
-        return self.task.project.has_permission(user)
+        user.project = self.project  # link for activity log
+        return self.project.has_permission(user)
 
     def increase_project_summary_counters(self):
-        if hasattr(self.task.project, 'summary'):
+        if hasattr(self.project, 'summary'):
             logger.debug(f'Increase project.summary counters from {self}')
-            summary = self.task.project.summary
+            summary = self.project.summary
             summary.update_created_annotations_and_labels([self])
 
     def decrease_project_summary_counters(self):
-        if hasattr(self.task.project, 'summary'):
+        if hasattr(self.project, 'summary'):
             logger.debug(f'Decrease project.summary counters from {self}')
-            summary = self.task.project.summary
+            summary = self.project.summary
             summary.remove_created_annotations_and_labels([self])
 
     def update_task(self):
@@ -496,6 +565,7 @@ class TaskLock(models.Model):
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='locks', help_text='Locked task')
     expire_at = models.DateTimeField(_('expire_at'))
+    unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='task_locks', on_delete=models.CASCADE,
         help_text='User who locked this task')
@@ -523,6 +593,13 @@ class AnnotationDraft(models.Model):
         help_text='User postponed this draft (clicked a forward button) in the label stream',
         db_index=True
     )
+    import_id = models.BigIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Original draft ID that was at the import step or NULL if this draft wasn't imported"
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last update time')
@@ -532,7 +609,22 @@ class AnnotationDraft(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            project = self.task.project
+            if hasattr(project, 'summary'):
+                project.summary.update_created_labels_drafts([self])
+
+    def delete(self, *args, **kwargs):
+        with transaction.atomic():
+            project = self.task.project
+            if hasattr(project, 'summary'):
+                project.summary.remove_created_drafts_and_labels([self])
+            super().delete(*args, **kwargs)
 
 
 class Prediction(models.Model):
@@ -554,6 +646,7 @@ class Prediction(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     @classmethod
@@ -650,7 +743,7 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
-    """Reduce data column counters afer removing task"""
+    """Reduce data column counters after removing task"""
     instance.decrease_project_summary_counters()
 
 
@@ -760,10 +853,10 @@ def update_ml_backend(sender, instance, **kwargs):
     if instance.ground_truth:
         return
 
-    project = instance.task.project
+    project = instance.project
 
     if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
-        annotation_count = Annotation.objects.filter(task__project=project).count()
+        annotation_count = Annotation.objects.filter(project=project).count()
 
         # start training every N annotation
         if annotation_count % project.min_annotations_to_start_training == 0:
@@ -803,17 +896,21 @@ def bulk_update_stats_project_tasks(tasks, project=None):
     # get project if it's not in params
     if project is None:
         project = tasks[0].project
-    with transaction.atomic():
+
+    with conditional_atomic(
+        predicate=should_run_bulk_update_in_transaction,
+        predicate_args=[project.organization.created_by],
+    ):
         use_overlap = project._can_use_overlap()
         maximum_annotations = project.maximum_annotations
         # update filters if we can use overlap
         if use_overlap:
             # finished tasks
             finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
-                                          Q(total_annotations__gte=1, overlap=1))
-            finished_tasks.update(is_labeled=True)
-            # unfinished tasks
-            tasks.exclude(id__in=finished_tasks).update(is_labeled=False)
+                                            Q(total_annotations__gte=1, overlap=1))
+            finished_tasks_ids = finished_tasks.values_list('id', flat=True)
+            tasks.update(is_labeled=Q(id__in=finished_tasks_ids))
+
         else:
             # update objects without saving if we can't use overlap
             for task in tasks:
@@ -825,6 +922,7 @@ def bulk_update_stats_project_tasks(tasks, project=None):
                 logger.error("Operational error while updating tasks: {exc}", exc_info=True)
                 # try to update query batches one more time
                 start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

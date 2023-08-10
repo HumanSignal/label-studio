@@ -43,14 +43,12 @@ class Webhook(models.Model):
 
     send_payload = models.BooleanField(
         _("does webhook send the payload"), default=True, help_text=('If value is False send only action'),
-        db_index=True
     )
 
     send_for_all_actions = models.BooleanField(
         _("Use webhook for all actions"),
         default=True,
         help_text='If value is False - used only for actions from WebhookAction',
-        db_index=True
     )
 
     headers = models.JSONField(
@@ -64,7 +62,6 @@ class Webhook(models.Model):
         _("is webhook active"),
         default=True,
         help_text=('If value is False the webhook is disabled'),
-        db_index=True
     )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text=_('Creation time'), db_index=True)
@@ -91,6 +88,7 @@ class Webhook(models.Model):
         WebhookAction.objects.filter(webhook=self, action__in=(old_actions - actions)).delete()
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.organization.has_user(user)
 
     class Meta:
@@ -168,7 +166,7 @@ class WebhookAction(models.Model):
             'many': False,
             'model': Annotation,
             'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
-            'project-field': 'task__project',
+            'project-field': 'project',
             'nested-fields': {
                 'task': {
                     'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
@@ -184,7 +182,7 @@ class WebhookAction(models.Model):
             'many': True,
             'model': Annotation,
             'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
-            'project-field': 'task__project',
+            'project-field': 'project',
             'nested-fields': {
                 'task': {
                     'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
@@ -200,7 +198,7 @@ class WebhookAction(models.Model):
             'many': False,
             'model': Annotation,
             'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
-            'project-field': 'task__project',
+            'project-field': 'project',
             'nested-fields': {
                 'task': {
                     'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
@@ -216,7 +214,7 @@ class WebhookAction(models.Model):
             'many': True,
             'model': Annotation,
             'serializer': OnlyIDWebhookSerializer,
-            'project-field': 'task__project',
+            'project-field': 'project',
         },
         LABEL_LINK_CREATED: {
             'name': _('Label link created'),

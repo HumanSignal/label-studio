@@ -63,9 +63,12 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'WARNING',
         },
+        'ldclient.util': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
     },
 }
-
 
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
@@ -107,7 +110,6 @@ SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
 DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
-
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -154,7 +156,6 @@ DATABASES_ALL['default'] = DATABASES_ALL[DJANGO_DB_POSTGRESQL]
 DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-
 
 if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
     logging.info('Google Cloud Logging handler is enabled.')
@@ -216,7 +217,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
     'core.middleware.CommonMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
@@ -262,7 +262,7 @@ ALLOWED_HOSTS = ['*']
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
-AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend',]
+AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend', ]
 USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
@@ -382,8 +382,11 @@ STATICFILES_STORAGE = 'core.storage.SkipMissedManifestStaticFilesStorage'
 
 # Sessions and CSRF
 SESSION_COOKIE_SECURE = bool(int(get_env('SESSION_COOKIE_SECURE', False)))
+SESSION_COOKIE_SAMESITE = get_env('SESSION_COOKIE_SAMESITE', 'Lax')
+
 CSRF_COOKIE_SECURE = bool(int(get_env('CSRF_COOKIE_SECURE', SESSION_COOKIE_SECURE)))
 CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))
+CSRF_COOKIE_SAMESITE = get_env('CSRF_COOKIE_SAMESITE', 'Lax')
 
 # Inactivity user sessions
 INACTIVITY_SESSION_TIMEOUT_ENABLED = bool(int(get_env('INACTIVITY_SESSION_TIMEOUT_ENABLED', True)))
@@ -401,6 +404,36 @@ MEDIA_URL = '/data/'
 UPLOAD_DIR = 'upload'
 AVATAR_PATH = 'avatars'
 
+SUPPORTED_EXTENSIONS = set(
+    [
+        '.bmp',
+        '.csv',
+        '.flac',
+        '.gif',
+        '.htm',
+        '.html',
+        '.jpg',
+        '.jpeg',
+        '.json',
+        '.m4a',
+        '.mp3',
+        '.ogg',
+        '.png',
+        '.svg',
+        '.tsv',
+        '.txt',
+        '.wav',
+        '.xml',
+        '.mp4',
+        '.webm',
+        '.webp',
+    ]
+)
+
+# directory for files created during unit tests
+TEST_DATA_ROOT = os.path.join(BASE_DATA_DIR, 'test_data')
+os.makedirs(TEST_DATA_ROOT, exist_ok=True)
+
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
 EXPORT_URL_ROOT = '/export/'
@@ -416,9 +449,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1
 TASKS_MAX_NUMBER = 1000000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
-TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else None
-TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
-TASK_LOCK_MIN_TTL = int(get_env('TASK_LOCK_MIN_TTL', 120))
+TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL', default=86400))
+
+LABEL_STREAM_HISTORY_LIMIT = int(get_env('LABEL_STREAM_HISTORY_LIMIT', default=100))
 
 RANDOM_NEXT_TASK_SAMPLE_SIZE = int(get_env('RANDOM_NEXT_TASK_SAMPLE_SIZE', 50))
 
@@ -472,9 +505,10 @@ IO_STORAGES_IMPORT_LINK_NAMES = [
 ]
 
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
-GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
+POST_PROCESS_REIMPORT = 'core.utils.common.empty'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
+USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
@@ -529,7 +563,6 @@ import mimetypes
 mimetypes.add_type("application/javascript", ".js", True)
 mimetypes.add_type("image/png", ".png", True)
 
-
 # fields name was used in DM api before
 REST_FLEX_FIELDS = {"FIELDS_PARAM": "include"}
 
@@ -543,8 +576,11 @@ FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)
 FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
-# default value for feature flags (if not overrided by environment or client)
+# default value for feature flags (if not overridden by environment or client)
 FEATURE_FLAGS_DEFAULT_VALUE = False
+
+# Whether to send analytics telemetry data
+COLLECT_ANALYTICS = get_bool_env('collect_analytics', True)
 
 # Strip harmful content from SVG files by default
 SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
@@ -556,6 +592,12 @@ RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))
 APP_WEBSERVER = get_env('APP_WEBSERVER', 'django')
 
 BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
+
+FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
+FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
+STORAGE_IN_PROGRESS_TIMER = get_env('STORAGE_IN_PROGRESS_TIMER', 5.0)
+
+USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)
 
 if get_env('MINIO_STORAGE_ENDPOINT') and not get_bool_env('MINIO_SKIP', False):
     CLOUD_FILE_STORAGE_ENABLED = True
@@ -579,8 +621,15 @@ if get_env('STORAGE_TYPE') == "s3":
         AWS_SECRET_ACCESS_KEY = get_env('STORAGE_AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = get_env('STORAGE_AWS_BUCKET_NAME')
     AWS_S3_REGION_NAME = get_env('STORAGE_AWS_REGION_NAME', None)
+    AWS_S3_ENDPOINT_URL = get_env('STORAGE_AWS_ENDPOINT_URL', None)
+    if get_env('STORAGE_AWS_OBJECT_PARAMETERS'):
+        AWS_S3_OBJECT_PARAMETERS = json.loads(get_env('STORAGE_AWS_OBJECT_PARAMETERS'))
     AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))
     AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')
+    AWS_S3_USE_SSL = get_bool_env('STORAGE_AWS_S3_USE_SSL', True)
+    AWS_S3_VERIFY = get_env('STORAGE_AWS_S3_VERIFY', None)
+    if AWS_S3_VERIFY == 'false' or AWS_S3_VERIFY == 'False' or AWS_S3_VERIFY == '0':
+        AWS_S3_VERIFY = False
 
 if get_env('STORAGE_TYPE') == "azure":
     CLOUD_FILE_STORAGE_ENABLED = True
@@ -599,3 +648,11 @@ if get_env('STORAGE_TYPE') == "gcs":
     GS_BUCKET_NAME = get_env('STORAGE_GCS_BUCKET_NAME')
     GS_EXPIRATION = timedelta(seconds=int(get_env('STORAGE_GCS_EXPIRATION_SECS', '86400')))
     GS_LOCATION = get_env('STORAGE_GCS_FOLDER', default='')
+    GS_CUSTOM_ENDPOINT = get_env('STORAGE_GCS_ENDPOINT')
+
+CSRF_TRUSTED_ORIGINS = get_env('CSRF_TRUSTED_ORIGINS', [])
+if CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS.split(",")
+
+REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
+GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)

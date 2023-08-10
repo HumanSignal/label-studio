@@ -15,9 +15,8 @@ on:
 
 env:
   DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"
-  IMAGE_NAME: "heartexlabs/label-studio"
+  IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
   RELEASE_DOCKERFILE: "Dockerfile.release"
-  RELEASE_UBI_DOCKERFILE: "Dockerfile.redhat.release"
   PREFLIGHT_REPO: "quay.io/opdev/preflight:stable"
   DOCKER_CONFIG_PATH: "/home/runner/.docker/config.json"
   LAUNCHDARKLY_DOWNLOAD_PATH: "feature_flags.json"
@@ -25,11 +24,10 @@ env:
 jobs:
   docker_release_retag:
     name: "Docker image"
-    timeout-minutes: 45
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     outputs:
       image_version: ${{ steps.get_info.outputs.image_version }}
-      ubi_image_version: ${{ steps.get_info.outputs.ubi_image_version }}
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
@@ -54,8 +52,9 @@ jobs:
             const check = check_runs.find(e => e.name === '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}')
             const details = JSON.parse(check.output.summary)
             console.log(details)
+            core.setOutput("branch", details.branch);
+            core.setOutput("pretty_branch_name", details.pretty_branch_name);
             core.setOutput("image_version", details.image_version);
-            core.setOutput("ubi_image_version", details.ubi_image_version);
             core.setOutput("sha", details.sha);
 
       - name: Checkout
@@ -171,16 +170,16 @@ jobs:
           fi
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.2.1
+        uses: docker/setup-buildx-action@v2.9.1
 
       - name: Login to DockerHub
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v2.2.0
         with:
-          username: heartexlabs
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to RedHat Registry
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v2.2.0
         with:
           registry: quay.io
           username: ${{ secrets.REDHAT_REGISTRY_LOGIN }}
@@ -188,6 +187,9 @@ jobs:
 
       - name: Prepare Release Dockerfile
         id: release_dockerfile
+        env:
+          VERSION_OVERRIDE: ${{ inputs.release_tag }}
+          BRANCH_OVERRIDE: ${{ steps.get_info.outputs.branch }}
         shell: bash
         run: |
           set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
@@ -205,23 +207,12 @@ jobs:
           COPY --chown=54546:0 ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} /label-studio/label_studio/feature_flags.json
           EOF
 
-      - name: Build Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.2.0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Build and Push Release Ubuntu Docker image
+        uses: docker/build-push-action@v4.1.1
         id: docker_build
-        with:
-          context: ${{ steps.release_dockerfile.outputs.release_dir }}
-          file: ${{ steps.release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_DOCKERFILE }}
-          load: true
-          tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Copy compiled static from builded Docker image
-        run: docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
-
-      - name: Push Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.2.0
-        id: docker_push
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
           file: ${{ steps.release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_DOCKERFILE }}
@@ -229,6 +220,14 @@ jobs:
           tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Copy compiled static from builded Docker image
+        run: |
+          # Usually it takes 10-20 sec so the image becomes available
+          sleep 10s
+          docker pull ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }}
+          docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
 
       - name: Create Sentry release @ backend
         uses: getsentry/action-release@v1
@@ -250,47 +249,3 @@ jobs:
           version: label-studio@${{ inputs.release_tag }}
           projects: opensource-v1-frontend
           sourcemaps: label_studio/frontend/dist
-
-      - name: Prepare Release UBI Dockerfile
-        id: ubi_release_dockerfile
-        shell: bash
-        run: |
-          set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
-
-          release_dir=ubi_release_${{ inputs.release_tag }}
-          echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
-          mkdir -p $release_dir
-          cp label_studio/core/version_.py $release_dir/
-          cp feature_flags.json $release_dir/
-          cd $release_dir
-
-          cat <<EOF > "${{ env.RELEASE_UBI_DOCKERFILE }}"
-          FROM registry.connect.redhat.com/heartexlabs/label-studio:${{ steps.get_info.outputs.image_version }}
-          COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
-          COPY --chown=54546:0 feature_flags.json /label-studio/label_studio/feature_flags.json
-          EOF
-
-      - name: Build and push Release UBI Docker image
-        uses: docker/build-push-action@v3.2.0
-        id: docker_build_and_push_ubi
-        with:
-          context: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}
-          file: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_UBI_DOCKERFILE }}
-          push: true
-          tags: ${{ steps.generate-tags.outputs.ubi-tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Run preflight and submit validation results to RedHat
-        shell: bash
-        run: |
-          docker pull ${{ env.PREFLIGHT_REPO }}
-          while IFS= read -d ',' image; do
-            docker run --rm -v ${{ env.DOCKER_CONFIG_PATH }}:${{ env.DOCKER_CONFIG_PATH }} \
-              --env PFLT_DOCKERCONFIG=${{ env.DOCKER_CONFIG_PATH }} \
-              --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
-              --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
-              ${{ env.PREFLIGHT_REPO }} \
-              check container "${image}" \
-              --submit
-          done <<< '${{ steps.generate-tags.outputs.redhat-tags }},'

@@ -11,7 +11,8 @@ from label_studio.core.utils.common import load_func
 
 def get_storage_classes(storage_type='import'):
     """Helper function to return all registered ***ImportStorage classes.
-    It's been made through the APIViews rather than using models directly to make it consistent with what we expose
+    It's been made through the APIViews rather than using models directly to make it consistent with what we expose.
+    Note: this func doesn't include LocalFiles storages!
     storage_type: import, export
     """
     storage_list = load_func(settings.GET_STORAGE_LIST)

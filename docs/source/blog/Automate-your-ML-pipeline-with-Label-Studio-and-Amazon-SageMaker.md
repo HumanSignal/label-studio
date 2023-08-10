@@ -396,7 +396,7 @@ AWS_GATEWAY_LAMBDA_RESOURCE_ID=$(aws apigateway create-resource \
 --parent-id "$GATEWAY_ROOT_ID" \
 --path-part LcWebHook | jq -r .id)
 ```
-6. Update the API Gateway with the resource ID for AWS Lambda. By default this example does not use authorization for the HTTP request, but you might want to secure your API Gatway configuration. See [Set up method request authorization](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-settings-method-request.html#setup-method-request-authorization) in the Amazon API Gateway documentation. From the command line, run the following:
+6. Update the API Gateway with the resource ID for AWS Lambda. By default this example does not use authorization for the HTTP request, but you might want to secure your API Gateway configuration. See [Set up method request authorization](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-settings-method-request.html#setup-method-request-authorization) in the Amazon API Gateway documentation. From the command line, run the following:
 ```bash
 aws apigateway put-method \
 --rest-api-id "$GATEWAY_ID" \

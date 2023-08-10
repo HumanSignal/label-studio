@@ -7,11 +7,10 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.exceptions import ValidationError
 from projects.models import Project
 
-from core.utils.common import get_object_with_check_and_log
 from core.label_config import get_sample_task
 from core.utils.common import get_organization_from_request
 
@@ -49,7 +48,7 @@ def upload_example_using_config(request):
     org_pk = get_organization_from_request(request)
     secure_mode = False
     if org_pk is not None:
-        org = get_object_with_check_and_log(request, Organization, pk=org_pk)
+        org = generics.get_object_or_404(Organization, pk=org_pk)
         secure_mode = org.secure_mode
 
     try:

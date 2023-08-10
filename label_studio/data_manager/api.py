@@ -13,7 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.conf import settings
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, load_func
+from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
@@ -161,7 +161,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
         return {
-            'resolve_uri': True,
+            'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'request': request,
             'project': project,
             'drafts': all_fields,
@@ -189,10 +189,10 @@ class TaskListAPI(generics.ListCreateAPIView):
         view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
         project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)
         if project_pk:
-            project = get_object_with_check_and_log(request, Project, pk=project_pk)
+            project = generics.get_object_or_404(Project, pk=project_pk)
             self.check_object_permissions(request, project)
         elif view_pk:
-            view = get_object_with_check_and_log(request, View, pk=view_pk)
+            view = generics.get_object_or_404(View, pk=view_pk)
             project = view.project
             self.check_object_permissions(request, project)
         else:
@@ -234,6 +234,7 @@ class TaskListAPI(generics.ListCreateAPIView):
             if not review and project.evaluate_predictions_automatically:
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
+                [tasks_by_ids[_id].refresh_from_db() for _id in ids]
 
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
@@ -257,7 +258,7 @@ class ProjectColumnsAPI(APIView):
 
     def get(self, request):
         pk = int_from_request(request.GET, "project", 1)
-        project = get_object_with_check_and_log(request, Project, pk=pk)
+        project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
         GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
         data = GET_ALL_COLUMNS(project, request.user)
@@ -274,7 +275,7 @@ class ProjectStateAPI(APIView):
 
     def get(self, request):
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
-        project = get_object_with_check_and_log(request, Project, pk=pk)
+        project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
 
@@ -286,7 +287,7 @@ class ProjectStateAPI(APIView):
                 "source_syncing": False,
                 "target_syncing": False,
                 "task_count": project.tasks.count(),
-                "annotation_count": Annotation.objects.filter(task__project=project).count(),
+                "annotation_count": Annotation.objects.filter(project=project).count(),
                 'config_has_control_tags': len(project.get_parsed_config()) > 0
             }
         )
@@ -311,13 +312,13 @@ class ProjectActionsAPI(APIView):
 
     def get(self, request):
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
-        project = get_object_with_check_and_log(request, Project, pk=pk)
+        project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
         return Response(get_all_actions(request.user, project))
 
     def post(self, request):
         pk = int_from_request(request.GET, "project", None)
-        project = get_object_with_check_and_log(request, Project, pk=pk)
+        project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
 
         queryset = get_prepared_queryset(request, project)

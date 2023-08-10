@@ -7,13 +7,12 @@ import os
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from drf_yasg import openapi as openapi
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 
 from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log
 from core.utils.io import read_yaml
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
 from projects.models import Project
@@ -28,10 +27,14 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
-        ImportStorageClass = self.serializer_class.Meta.model
-        return ImportStorageClass.objects.filter(project_id=project.id)
+        StorageClass = self.serializer_class.Meta.model
+        storages = StorageClass.objects.filter(project_id=project.id)
+
+        # check failed jobs and sync their statuses
+        StorageClass.ensure_storage_statuses(storages)
+        return storages
 
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -53,12 +56,24 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
-        ImportStorageClass = self.serializer_class.Meta.model
-        return ImportStorageClass.objects.filter(project_id=project.id)
+        StorageClass = self.serializer_class.Meta.model
+        storages = StorageClass.objects.filter(project_id=project.id)
+
+        # check failed jobs and sync their statuses
+        StorageClass.ensure_storage_statuses(storages)
+        return storages
 
     def perform_create(self, serializer):
+        # double check: not export storages don't validate connection in serializer,
+        # just make another explicit check here, note: in this create API we have credentials in request.data
+        instance = serializer.Meta.model(**serializer.validated_data)
+        try:
+            instance.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+
         storage = serializer.save()
         if settings.SYNC_ON_TARGET_STORAGE_CREATION:
             storage.sync()
@@ -119,14 +134,28 @@ class StorageValidateAPI(generics.CreateAPIView):
     permission_required = all_permissions.projects_change
 
     def create(self, request, *args, **kwargs):
-        instance = None
         storage_id = request.data.get('id')
+        instance = None
         if storage_id:
             instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
             if not instance.has_permission(request.user):
                 raise PermissionDenied()
-        serializer = self.get_serializer(instance=instance, data=request.data)
+
+        # combine instance fields with request.data
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        # if storage exists, we have to use instance from DB,
+        # because instance from serializer won't have credentials, they were popped intentionally
+        if instance:
+            instance = serializer.update(instance, serializer.validated_data)
+        else:
+            instance = serializer.Meta.model(**serializer.validated_data)
+
+        # double check: not all storages validate connection in serializer, just make another explicit check here
+        try:
+            instance.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
         return Response()
 
 

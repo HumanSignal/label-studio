@@ -8,21 +8,21 @@ on:
         type: string
 
 env:
-  NODE: '14'
+  NODE: '18'
   CACHE_NAME_PREFIX: v1
 
 jobs:
   run_pytest_sqlite:
     name: LS SQLite Ubuntu
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version:
-          - '3.7'
           - '3.8'
           - '3.9'
           - '3.10'
+          - '3.11'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -53,7 +53,7 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
+          sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
       - uses: actions/cache@v3
         name: Configure pip cache
@@ -113,7 +113,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.4
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -123,7 +123,7 @@ jobs:
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -194,7 +194,7 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
+          sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
       - uses: actions/cache@v3
         name: Configure pip cache
@@ -252,7 +252,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.4
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -267,10 +267,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.7'
           - '3.8'
           - '3.9'
           - '3.10'
+          - '3.11'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -317,7 +317,7 @@ jobs:
           pip install -e .
 
       - name: Fix sqlite.dll for python < 3.9
-        if: ${{ contains(matrix.python-version, '3.7') || contains(matrix.python-version, '3.8') }}
+        if: ${{ contains(matrix.python-version, '3.8') }}
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8

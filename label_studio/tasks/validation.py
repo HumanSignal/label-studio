@@ -24,7 +24,7 @@ _DATA_TYPES = {
     'Table': [dict, str],
     'TimeSeries': [dict, list, str],
     'TimeSeriesChannel': [dict, list, str],
-    'List': [list],
+    'List': [list, str],
     'Choices': [str, list],
     'PolygonLabels': [str, list],
     'Labels': [str, list],
@@ -35,7 +35,8 @@ _DATA_TYPES = {
     'ParagraphLabels': [str, list],
     'RectangleLabels': [str, list],
     'TimeSeriesLabels': [str, list],
-    'Taxonomy': [str, list],
+    'Taxonomy': [str, list, type(None)],
+    'Ranker': [list, str],
 }
 logger = logging.getLogger(__name__)
 
@@ -88,12 +89,6 @@ class TaskValidator:
                                               type=type(data_item).__name__, data_type=data_type,
                                               expected_types=[e.__name__ for e in expected_types]))
 
-            if data_type == 'List':
-                for item in data_item:
-                    key = 'text'  # FIXME: read key from config (elementValue from List)
-                    if key not in item:
-                        raise ValidationError('Each item from List must have key "' + key + '"')
-
         return data
 
     @staticmethod
@@ -125,6 +120,10 @@ class TaskValidator:
     @staticmethod
     def raise_if_wrong_class(task, key, class_def):
         if key in task and not isinstance(task[key], class_def):
+            if isinstance(class_def, tuple):
+                class_def = ' or '.join([c.__name__ for c in class_def])
+            else:
+                class_def = class_def.__name__
             raise ValidationError('Task[{key}] must be {class_def}'.format(key=key, class_def=class_def))
 
     def validate(self, task):

@@ -4,5 +4,5 @@
     <Label value="Speaker 1" />
     <Label value="Speaker 2" />
   </Labels>
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
 </View>

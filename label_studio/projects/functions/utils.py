@@ -10,7 +10,7 @@ def make_queryset_from_iterable(tasks_list):
     if isinstance(tasks_list, set):
         tasks_list = list(tasks_list)
     # Make query set from list of IDs
-    if isinstance(tasks_list, list):
+    if isinstance(tasks_list, list) and len(tasks_list) > 0:
         # Extract task IDs from Tasks list
         if isinstance(tasks_list[0], Task):
             tasks_list = [task.id for task in tasks_list]

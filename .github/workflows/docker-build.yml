@@ -13,36 +13,33 @@ on:
       image_version:
         description: "Docker tag"
         value: ${{ jobs.docker_build_and_push.outputs.image_version }}
-      ubi_image_version:
-        description: "Docker UBI tag"
-        value: ${{ jobs.docker_build_and_push.outputs.ubi_image_version }}
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
-  IMAGE_NAME: heartexlabs/label-studio
-  PREFLIGHT_REPO: quay.io/opdev/preflight:stable
-  DOCKER_CONFIG_PATH: /home/runner/.docker/config.json
+  IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
   DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"
 
 jobs:
   docker_build_and_push:
     name: "Docker image"
-    timeout-minutes: 30
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     outputs:
       image_version: ${{ steps.version.outputs.image_version }}
-      ubi_image_version: ${{ steps.version.outputs.ubi_image_version }}
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          submodules: 'recursive'
           ref: ${{ inputs.sha }}
+          fetch-depth: 0
 
       - name: Calculate version
         id: version
-        shell: bash
+        env:
+          BRANCH_NAME: ${{ inputs.branch_name }}
         run: |
           set -x
           sha="$(git rev-parse HEAD)"
@@ -55,9 +52,27 @@ jobs:
           fi
           echo "image_version=${image_version}" >> $GITHUB_OUTPUT
           echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
+          
+          pretty_branch_name="$(echo -n "${BRANCH_NAME#refs/heads/}" | sed 's#/#-#g' | sed 's#_#-#g'| sed 's#\.#-#g' | tr '[:upper:]' '[:lower:]')"
+          echo "pretty_branch_name=$pretty_branch_name" >> $GITHUB_OUTPUT
+          current_time="$(date +'%Y%m%d.%H%M%S')"
+          branch="-${pretty_branch_name}"
+          short_sha="$(git rev-parse --short HEAD)"
+          long_sha="$(git rev-parse HEAD)"
+          echo "sha=$long_sha" >> $GITHUB_OUTPUT
+          short_sha_length="$(echo $short_sha | awk '{print length}')"
+          current_time_length="$(echo $current_time | awk '{print length}')"
+          version="${current_time}$(echo $branch | cut -c1-$((50 - short_sha_length - current_time_length)))-${short_sha}"
+          echo "build_version=$version" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.2.1
+        uses: docker/setup-buildx-action@v2.9.1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2.2.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -65,11 +80,14 @@ jobs:
           python-version: '3.10'
 
       - name: Create version_.py
+        env:
+          BRANCH_OVERRIDE: ${{ inputs.branch_name }}
+          VERSION_OVERRIDE: ${{ steps.version.outputs.build_version }}
         run: |
           python3 $(pwd)/label_studio/core/version.py
           cat $(pwd)/label_studio/core/version_.py
 
-      - name: Download feature flags
+      - name: Download LaunchDarkly Community config
         env:
           LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
           LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
@@ -89,51 +107,20 @@ jobs:
             exit 1
           fi
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2.1.0
-        with:
-          username: heartexlabs
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-      - name: Build and push ubuntu
-        uses: docker/build-push-action@v3.2.0
-        id: docker_build_and_push_ubuntu
+      - name: Push Docker image
+        uses: docker/build-push-action@v4.1.1
+        id: docker_build_and_push
         with:
           context: .
           file: Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.image_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Login to RedHat Registry
-        uses: docker/login-action@v2.1.0
-        with:
-          registry: quay.io
-          username: ${{ secrets.REDHAT_REGISTRY_LOGIN }}
-          password: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
-
-      - name: Build and push ubi
-        uses: docker/build-push-action@v3.2.0
-        id: docker_build_and_push_ubi
-        with:
-          context: .
-          file: Dockerfile.redhat
-          push: true
-          tags: quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }}:${{ steps.version.outputs.image_version }},${{ env.IMAGE_NAME }}:${{ steps.version.outputs.ubi_image_version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Run preflight and submit validation results to RedHat
-        run: |
-          docker pull ${{ env.PREFLIGHT_REPO }}
-          docker run --rm -v ${{ env.DOCKER_CONFIG_PATH }}:${{ env.DOCKER_CONFIG_PATH }} \
-          --env PFLT_DOCKERCONFIG=${{ env.DOCKER_CONFIG_PATH }} \
-          --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
-          --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
-          ${{ env.PREFLIGHT_REPO }} \
-          check container quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }}:${{ steps.version.outputs.image_version }} \
-          --submit
 
       - name: Create Docker image tag Check
         uses: actions/github-script@v6
@@ -141,8 +128,9 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const details = {
+              "branch": "${{ inputs.branch_name }}",
+              "pretty_branch_name": "${{ steps.version.outputs.pretty_branch_name }}",
               "image_version": "${{ steps.version.outputs.image_version }}",
-              "ubi_image_version": "${{ steps.version.outputs.ubi_image_version }}",
               "sha": "${{ steps.version.outputs.sha }}"
             }
             const { data: check } = await github.rest.checks.create({

@@ -131,12 +131,24 @@ def extract_data_types(label_config):
         if not match.get('name'):
             continue
         name = match.get('value')
-        if len(name) > 1 and name[0] == '$':
+
+        # simple one
+        if len(name) > 1 and (name[0] == '$'):
             name = name[1:]
             # video has highest priority, e.g.
             # for <Video value="url"/> <Audio value="url"> it must be data_type[url] = Video
             if data_type.get(name) != 'Video':
                 data_type[name] = match.tag
+
+        # regex
+        else:
+            pattern = r'\$\w+'  # simple one: r'\$\w+'
+            regex = re.findall(pattern, name)
+            first = regex[0][1:] if len(regex) > 0 else ''
+
+            if first:
+                if data_type.get(first) != 'Video':
+                    data_type[first] = match.tag
 
     return data_type
 
@@ -261,7 +273,9 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
         elif value == 'video' and p.tag == 'HyperText':
             task[value] = examples.get('$videoHack')
-
+        # List with a matching Ranker tag pair 
+        elif p.tag == 'List':
+            task[value] = examples.get('List')
         elif p.tag == 'Paragraphs':
             # Paragraphs special case - replace nameKey/textKey if presented
             name_key = p.get('nameKey') or p.get('namekey') or 'author'

@@ -1,11 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
-import io
 import uuid
 import logging
 import pandas as pd
-import htmlmin
 from collections import Counter
 try:
     import ujson as json
@@ -34,6 +32,7 @@ class FileUpload(models.Model):
     file = models.FileField(upload_to=upload_name_generator)
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @property
@@ -111,8 +110,7 @@ class FileUpload(models.Model):
 
     def read_task_from_hypertext_body(self):
         logger.debug('Read 1 task from hypertext file {}'.format(self.file.name))
-        data = self.content
-        body = htmlmin.minify(data, remove_all_empty_space=True)
+        body = self.content
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: body}}]
         return tasks
 
