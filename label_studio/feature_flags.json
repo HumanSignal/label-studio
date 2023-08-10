@@ -3498,6 +3498,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short": {
+      "key": "fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "439816e9dbcc4c27b600cc97c9a25e6b",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_back_lsdv_4648_annotator_filter_29052023_short": {
       "key": "fflag_fix_back_lsdv_4648_annotator_filter_29052023_short",
       "on": false,
@@ -3714,8 +3741,8 @@
       "version": 2,
       "deleted": false
     },
-    "fflag_fix_back_lsdv_5425_1_kill_permissions_restrictions_for_annotators_short": {
-      "key": "fflag_fix_back_lsdv_5425_1_kill_permissions_restrictions_for_annotators_short",
+    "fflag_fix_back_lsdv_5425_1_enable_permissions_restrictions_for_annotators_long": {
+      "key": "fflag_fix_back_lsdv_5425_1_enable_permissions_restrictions_for_annotators_long",
       "on": false,
       "prerequisites": [],
       "targets": [],
@@ -3734,7 +3761,7 @@
         "usingEnvironmentId": false
       },
       "clientSide": false,
-      "salt": "9bf5f3be29614a22b3250c8783d56cd4",
+      "salt": "b7efe0dcbda547e9937a2340e40b13d4",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,

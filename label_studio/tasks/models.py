@@ -33,6 +33,7 @@ from core.utils.common import (
     string_is_url,
     temporary_disconnect_list_signal,
 )
+from core.utils.db import should_run_bulk_update_in_transaction
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from core.current_request import get_current_request
@@ -897,9 +898,8 @@ def bulk_update_stats_project_tasks(tasks, project=None):
         project = tasks[0].project
 
     with conditional_atomic(
-        predicate=flag_set,
-        predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short'],
-        predicate_kwargs={'user': project.organization.created_by},
+        predicate=should_run_bulk_update_in_transaction,
+        predicate_args=[project.organization.created_by],
     ):
         use_overlap = project._can_use_overlap()
         maximum_annotations = project.maximum_annotations
