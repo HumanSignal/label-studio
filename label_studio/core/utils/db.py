@@ -23,8 +23,8 @@ def fast_first(queryset: QuerySet[ModelType]) -> Optional[ModelType]:
     queryset.first() works slowly in some cases
     """
 
-    if queryset[:1]:
-        return queryset[0]
+    if result := queryset[:1]:
+        return result[0]
     return None
 
 
