@@ -18,6 +18,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
 | toName | <code>string</code> |  | Name of the element that you want to classify |
+| [apiUrl] | <code>string</code> |  | URL to fetch taxonomy from remote source; API should accept optional array `path` param: `apiUrl?path[]=root&path[]=child1` to return only nested children of `child1` node |
 | [leafsOnly] | <code>boolean</code> | <code>false</code> | Allow annotators to select only leaf nodes of taxonomy |
 | [showFullPath] | <code>boolean</code> | <code>false</code> | Whether to show the full path of selected items |
 | [pathSeparator] | <code>string</code> | <code>&quot;/&quot;</code> | Separator to show in the full path |
