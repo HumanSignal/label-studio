@@ -21,6 +21,7 @@ from core.utils.common import (
     load_func,
     merge_labels_counters,
 )
+from core.utils.db import should_run_bulk_update_in_transaction
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     validate_label_config,
@@ -854,9 +855,8 @@ class Project(ProjectMixin, models.Model):
             task.total_predictions = task.new_total_predictions
             objs.append(task)
         with conditional_atomic(
-            predicate=flag_set,
-            predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short'],
-            predicate_kwargs={'user': self.organization.created_by},
+            predicate=should_run_bulk_update_in_transaction,
+            predicate_args=[self.organization.created_by],
         ):
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
         return len(objs)
@@ -874,9 +874,8 @@ class Project(ProjectMixin, models.Model):
 
         while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
             with conditional_atomic(
-                predicate=flag_set,
-                predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short'],
-                predicate_kwargs={'user': organization_created_by},
+                predicate=should_run_bulk_update_in_transaction,
+                predicate_args=[organization_created_by],
             ):
                 # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
                 # will roll back. NB: as part of LSDV-5289, we are considering eliminating this transaction
