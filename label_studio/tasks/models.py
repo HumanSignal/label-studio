@@ -358,7 +358,6 @@ class Task(TaskMixin, models.Model):
                     prepared_filename
                 ):
                     # permission check: resolve uploaded files to the project only
-                    file_upload = None
                     file_upload = fast_first(
                         FileUpload.objects.filter(
                             project=project, file=prepared_filename
