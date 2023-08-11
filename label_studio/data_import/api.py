@@ -327,7 +327,11 @@ class ImportPredictionsAPI(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         # check project permissions
         project = self.get_object()
-        tasks_ids = set(Task.objects.filter(project=project).values_list('id', flat=True))
+
+        tasks_ids_and_project_ids = set(Task.objects.filter(project=project).values_list('id', 'project_id'))
+        tasks_ids = {task_id_and_project_id[0] for task_id_and_project_id in tasks_ids_and_project_ids}
+        task_to_project_mapping = {task_id: project_id for task_id, project_id in tasks_ids_and_project_ids}
+
         logger.debug(f'Importing {len(self.request.data)} predictions to project {project} with {len(tasks_ids)} tasks')
         predictions = []
         for item in self.request.data:
@@ -337,6 +341,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                     f'from project {project} tasks')
             predictions.append(Prediction(
                 task_id=item['task'],
+                project_id=task_to_project_mapping[item['task']],
                 result=Prediction.prepare_prediction_result(item.get('result'), project),
                 score=item.get('score'),
                 model_version=item.get('model_version', 'undefined')

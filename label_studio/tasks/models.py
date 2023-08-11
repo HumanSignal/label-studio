@@ -638,6 +638,7 @@ class Prediction(models.Model):
     mislabeling = models.FloatField(_('mislabeling'), default=0.0, help_text='Related task mislabeling score')
 
     task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='predictions')
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='predictions', null=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
@@ -706,6 +707,10 @@ class Prediction(models.Model):
         self.task.save(update_fields=update_fields)
 
     def save(self, *args, **kwargs):
+        if self.project_id is None and self.task_id:
+            logger.warning('project_id is not set for prediction, project_id being set in save method')
+            self.project_id = Task.objects.only('project_id').get(pk=self.task_id).project_id
+
         # "result" data can come in different forms - normalize them to JSON
         self.result = self.prepare_prediction_result(self.result, self.task.project)
         # set updated_at field of task to now()
@@ -831,7 +836,7 @@ def remove_predictions_from_project(sender, instance, **kwargs):
 @receiver(post_save, sender=Prediction)
 def save_predictions_to_project(sender, instance, **kwargs):
     """Add predictions counters"""
-    instance.task.total_predictions = instance.task.predictions.all().count()
+    instance.task.total_predictions = instance.task.predictions.all().count() # yuck
     instance.task.save(update_fields=['total_predictions'])
     logger.debug(f"Updated total_predictions for {instance.task.id}.")
 
