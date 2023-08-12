@@ -6,7 +6,6 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0019_project_project_pinned__a39ccb_idx'),
         ('projects', '0020_labelstreamhistory_unique_history'),
     ]
 
