@@ -30,6 +30,10 @@ frontend-watch:
 frontend-build:
 	cd label_studio/frontend && yarn install --frozen-lockfile && yarn run build:production
 
+# Check static types with mypy
+mypy-all:
+	PYTHONPATH=$(CURDIR)/label_studio MYPYPATH=$(dir $(CURDIR)) mypy label_studio
+
 # Run tests
 test:
 	cd label_studio && DJANGO_DB=sqlite pytest -v -m "not integration_tests"

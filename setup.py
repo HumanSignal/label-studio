@@ -29,6 +29,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/heartexlabs/label-studio',
     packages=setuptools.find_packages(),
+    package_data={"label-studio": ["label_studio/py.typed"]},
     include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3',
