@@ -257,7 +257,17 @@ class Project(ProjectMixin, models.Model):
         return self.tasks.count()
 
     def get_current_predictions(self):
-        return Prediction.objects.filter(Q(task__project=self.id) & Q(model_version=self.model_version))
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            return Prediction.objects.filter(
+                Q(project=self.id) & Q(model_version=self.model_version)
+            )
+        else:
+            return Prediction.objects.filter(
+                Q(task__project=self.id) & Q(model_version=self.model_version)
+            )
 
     @property
     def num_predictions(self):
@@ -277,7 +287,13 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def has_any_predictions(self):
-        return Prediction.objects.filter(Q(task__project=self.id)).exists()
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            return Prediction.objects.filter(Q(project=self.id)).exists()
+        else:
+            return Prediction.objects.filter(Q(task__project=self.id)).exists()
 
     @property
     def business(self):
@@ -580,7 +596,13 @@ class Project(ProjectMixin, models.Model):
         return self.label_config != self.__original_label_config
 
     def delete_predictions(self):
-        predictions = Prediction.objects.filter(task__project=self)
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            predictions = Prediction.objects.filter(project=self)
+        else:
+            predictions = Prediction.objects.filter(task__project=self)
         count = predictions.count()
         predictions.delete()
         return {'deleted_predictions': count}
@@ -800,7 +822,13 @@ class Project(ProjectMixin, models.Model):
         Dict or list
         {model_version: count_predictions}, [model_versions]
         """
-        predictions = Prediction.objects.filter(task__project=self)
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            predictions = Prediction.objects.filter(project=self)
+        else:
+            predictions = Prediction.objects.filter(task__project=self)
         # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
         model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
         output = {r['model_version']: r['count'] for r in model_versions}

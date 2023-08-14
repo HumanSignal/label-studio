@@ -2,7 +2,6 @@
 """
 import logging
 import ujson as json
-import numbers
 
 from django.db import transaction, IntegrityError
 from django.conf import settings
@@ -20,7 +19,6 @@ from tasks.validation import TaskValidator
 from tasks.exceptions import AnnotationDuplicateError
 from core.utils.common import retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
-from core.feature_flags import flag_set
 from users.serializers import UserSerializer
 from users.models import User
 from core.utils.common import load_func
@@ -31,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 class PredictionQuerySerializer(serializers.Serializer):
     task = serializers.IntegerField(required=False, help_text='Task ID to filter predictions')
-    task__project = serializers.IntegerField(required=False, help_text='Project ID to filter predictions')
+    project = serializers.IntegerField(required=False, help_text='Project ID to filter predictions')
 
 
 class PredictionSerializer(ModelSerializer):
@@ -403,14 +401,28 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                         prediction_score = None
 
                 last_model_version = prediction.get('model_version', 'undefined')
-                db_predictions.append(
-                    Prediction(
-                        task=self.db_tasks[i],
-                        result=result,
-                        score=prediction_score,
-                        model_version=last_model_version
+                if flag_set(
+                    'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+                    user='auto',
+                ):
+                    db_predictions.append(
+                        Prediction(
+                            task=self.db_tasks[i],
+                            project=self.db_tasks[i].project,
+                            result=result,
+                            score=prediction_score,
+                            model_version=last_model_version,
+                        )
                     )
-                )
+                else:
+                    db_predictions.append(
+                        Prediction(
+                            task=self.db_tasks[i],
+                            result=result,
+                            score=prediction_score,
+                            model_version=last_model_version,
+                        )
+                    )
 
         # predictions: DB bulk create
         self.db_predictions = Prediction.objects.bulk_create(db_predictions, batch_size=settings.BATCH_SIZE)
