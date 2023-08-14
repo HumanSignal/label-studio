@@ -22,7 +22,7 @@ from core.utils.common import (
     string_is_url,
     temporary_disconnect_list_signal,
 )
-from core.utils.db import should_run_bulk_update_in_transaction
+from core.utils.db import fast_first, should_run_bulk_update_in_transaction
 from core.utils.params import get_env
 from data_import.models import FileUpload
 from data_manager.managers import PreparedTaskManager, TaskManager
@@ -189,13 +189,15 @@ class Task(TaskMixin, models.Model):
         """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
         lock = None
         if project is not None:
-            lock = TaskLock.objects.filter(
-                user=user, expire_at__gt=now(), task__project=project
-            ).first()
+            lock = fast_first(
+                TaskLock.objects.filter(
+                    user=user, expire_at__gt=now(), task__project=project
+                )
+            )
         elif tasks is not None:
-            locked_task = tasks.filter(
-                locks__user=user, locks__expire_at__gt=now()
-            ).first()
+            locked_task = fast_first(
+                tasks.filter(locks__user=user, locks__expire_at__gt=now())
+            )
             if locked_task:
                 return locked_task
         else:
@@ -365,10 +367,11 @@ class Task(TaskMixin, models.Model):
                     prepared_filename
                 ):
                     # permission check: resolve uploaded files to the project only
-                    file_upload = None
-                    file_upload = FileUpload.objects.filter(
-                        project=project, file=prepared_filename
-                    ).first()
+                    file_upload = fast_first(
+                        FileUpload.objects.filter(
+                            project=project, file=prepared_filename
+                        )
+                    )
                     if file_upload is not None:
                         if flag_set(
                             "ff_back_dev_2915_storage_nginx_proxy_26092022_short",
