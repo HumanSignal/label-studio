@@ -1,9 +1,9 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, TypeVar
 import logging
 
 from core.feature_flags import flag_set
 from django.db import models
-from django.db.models import Subquery
+from django.db.models import Model, QuerySet, Subquery
 
 if TYPE_CHECKING:
     from users.models import User
@@ -16,14 +16,16 @@ class SQCount(Subquery):
     output_field = models.IntegerField()
 
 
-def fast_first(queryset):
+ModelType = TypeVar('ModelType', bound=Model)
+
+def fast_first(queryset: QuerySet[ModelType]) -> Optional[ModelType]:
     """Replacement for queryset.first() when you don't need ordering,
     queryset.first() works slowly in some cases
     """
-    try:
-        return queryset.all()[0]
-    except IndexError:
-        return None
+
+    if result := queryset[:1]:
+        return result[0]
+    return None
 
 
 def should_run_bulk_update_in_transaction(organization_created_by_user: "User") -> bool:
