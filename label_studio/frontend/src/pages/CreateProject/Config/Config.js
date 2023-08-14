@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
 import { Button, ToggleItems } from '../../../components';
 import { Form } from '../../../components/Form';
-import { cn } from '../../../utils/bem';
+import { Block, cn, Elem } from '../../../utils/bem';
 import { Palette } from '../../../utils/colors';
 import { colorNames } from './colors';
 import './Config.styl';
@@ -300,6 +300,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
   const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
 
   // config update is debounced because of user input
   const [configToCheck, setConfigToCheck] = React.useState();
@@ -385,7 +386,10 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
 
     setWaiting(false);
 
-    if (res !== true) {
+    if (res === true) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+    } else {
       setError(res);
     }
   };
@@ -430,6 +434,11 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
         </div>
         {disableSaveButton !== true && onSaveClick && (
           <Form.Actions size="small" extra={configure === "code" && extra} valid>
+            {saved && (
+              <Block name="form-indicator">
+                <Elem tag="span" mod={{ type: 'success' }} name="item">Saved!</Elem>
+              </Block>
+            )}
             <Button look="primary" size="compact" style={{ width: 120 }} onClick={onSave} waiting={waiting}>
               {waiting ? "Saving..." : "Save"}
             </Button>
