@@ -34,7 +34,7 @@ class S3ImportStorageSerializer(ImportStorageSerializer):
             for key, value in data.items():
                 setattr(storage, key, value)
         else:
-            storage = S3ImportStorage(**data)
+            storage = self.Meta.model(**data)
         try:
             storage.validate_connection()
         except ParamValidationError:

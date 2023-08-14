@@ -22,7 +22,7 @@ from core.utils.common import (
     string_is_url,
     temporary_disconnect_list_signal,
 )
-from core.utils.db import should_run_bulk_update_in_transaction
+from core.utils.db import fast_first, should_run_bulk_update_in_transaction
 from core.utils.params import get_env
 from data_import.models import FileUpload
 from data_manager.managers import PreparedTaskManager, TaskManager
@@ -189,13 +189,15 @@ class Task(TaskMixin, models.Model):
         """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
         lock = None
         if project is not None:
-            lock = TaskLock.objects.filter(
-                user=user, expire_at__gt=now(), task__project=project
-            ).first()
+            lock = fast_first(
+                TaskLock.objects.filter(
+                    user=user, expire_at__gt=now(), task__project=project
+                )
+            )
         elif tasks is not None:
-            locked_task = tasks.filter(
-                locks__user=user, locks__expire_at__gt=now()
-            ).first()
+            locked_task = fast_first(
+                tasks.filter(locks__user=user, locks__expire_at__gt=now())
+            )
             if locked_task:
                 return locked_task
         else:
@@ -205,7 +207,11 @@ class Task(TaskMixin, models.Model):
             return lock.task
 
     def has_lock(self, user=None):
-        """Check whether current task has been locked by some user"""
+        """
+            Check whether current task has been locked by some user
+
+            Also has workaround for fixing not consistent is_labeled flag state
+        """
         from projects.functions.next_task import get_next_task_logging_level
 
         SkipQueue = self.project.SkipQueue
@@ -236,6 +242,11 @@ class Task(TaskMixin, models.Model):
                     num_annotations=num_annotations,
                 ),
             )
+            # TODO: remove this workaround after fixing the bug with inconsistent is_labeled flag
+            if self.is_labeled == False:
+                self.update_is_labeled()
+                if self.is_labeled == True:
+                    self.save(update_fields=['is_labeled'])
         result = bool(num >= self.overlap)
         logger.log(
             get_next_task_logging_level(user),
@@ -356,10 +367,11 @@ class Task(TaskMixin, models.Model):
                     prepared_filename
                 ):
                     # permission check: resolve uploaded files to the project only
-                    file_upload = None
-                    file_upload = FileUpload.objects.filter(
-                        project=project, file=prepared_filename
-                    ).first()
+                    file_upload = fast_first(
+                        FileUpload.objects.filter(
+                            project=project, file=prepared_filename
+                        )
+                    )
                     if file_upload is not None:
                         if flag_set(
                             "ff_back_dev_2915_storage_nginx_proxy_26092022_short",
