@@ -589,14 +589,29 @@ class Project(ProjectMixin, models.Model):
         outputs = self.get_parsed_config(autosave_cache=False)
         control_weights = {}
         exclude_control_types = ('Filter',)
+
+        def get_label(label):
+            label_value = self.control_weights.get(control_name, {}).get('labels', {}).get(label)
+            return label_value if label_value is not None else 1.0
+
+        def get_overall(name):
+            weights = self.control_weights.get(name, None)
+            if not weights:
+                return 1.0
+            else:
+                weight = weights.get('overall', None)
+                return weight if weight is not None else 1.0
+
+
         for control_name in outputs:
             control_type = outputs[control_name]['type']
             if control_type in exclude_control_types:
                 continue
+
             control_weights[control_name] = {
-                'overall': self.control_weights.get(control_name, {}).get('overall') or 1.0,
+                'overall': get_overall(control_name),
                 'type': control_type,
-                'labels': {label: self.control_weights.get(control_name, {}).get('labels', {}).get(label) or 1.0 for label in outputs[control_name].get('labels', [])},
+                'labels': {label: get_label(label) for label in outputs[control_name].get('labels', [])},
             }
         return control_weights
 
