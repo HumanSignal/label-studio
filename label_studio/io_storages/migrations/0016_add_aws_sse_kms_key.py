@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('io_storages', '0014_init_statuses'),
+        ('io_storages', '0015_auto_20230804_1732'),
     ]
 
     operations = [
