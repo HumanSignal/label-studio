@@ -4443,6 +4443,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation": {
+      "key": "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "b8d2f22bf42b45729a9f42bb76043a00",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fix-backend-dev-3134-exclude-deactivated-users": {
       "key": "fix-backend-dev-3134-exclude-deactivated-users",
       "on": false,
