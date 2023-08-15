@@ -16,7 +16,9 @@ from unittest.mock import MagicMock
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
-from datetime import timedelta
+from datetime import datetime, timedelta
+from freezegun import freeze_time
+
 
 from django.conf import settings
 from projects.models import Project
@@ -28,7 +30,7 @@ from botocore.exceptions import ClientError
 
 from label_studio.core.utils.params import get_bool_env, get_env
 
-# if we haven't this package, pytest.ini::env doesn't work 
+# if we haven't this package, pytest.ini::env doesn't work
 try:
     import pytest_env.plugin
 except ImportError:
@@ -398,7 +400,7 @@ class URLS:
 def project_ranker():
     label = '''<View>
          <HyperText name="hypertext_markup" value="$markup"></HyperText>
-         <List name="ranker" value="$replies" elementValue="$text" elementTag="Text" 
+         <List name="ranker" value="$replies" elementValue="$text" elementTag="Text"
                ranked="true" sortedHighlightColor="#fcfff5"></List>
         </View>'''
     return {'label_config': label, 'title': 'test'}
@@ -408,7 +410,7 @@ def project_dialog():
     """ Simple project with dialog configs
 
     :return: config of project with task
-    """    
+    """
     label = '''<View>
       <TextEditor>
         <Text name="dialog" value="$dialog"></Text>
@@ -437,7 +439,7 @@ def project_choices():
       <Choice value="Guitar"></Choice>
       <Choice value="None"/>
     </Choices>
-    
+
     <Image name="xxx" value="$image"></Image>
     </View>"""
     return {'label_config': label, 'title': 'test'}
@@ -704,7 +706,6 @@ def local_files_document_root_subdir(settings):
 
 @pytest.fixture(name="testing_session_timeouts")
 def set_testing_session_timeouts(settings):
-    # TODO: functional tests should not rely on exact timings
     settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=6).total_seconds()))
     settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))
 
@@ -733,3 +734,34 @@ def mock_ml_backend_auto_update_disabled():
 
         ])
         yield m
+
+
+freezer = None
+now = None
+
+
+@pytest.fixture(name="freeze_clock")
+def freeze_clock():
+    global freezer
+    global now
+
+    now = datetime.now()
+    freezer = freeze_time(now)
+    freezer.start()
+
+    yield
+
+    # teardown steps after yield
+
+    freezer.stop()
+    freezer = None
+    now = None
+
+
+def tick_clock(_, seconds: int = 1) -> None:
+    global freezer
+    global now
+    freezer.stop()
+    now += timedelta(seconds=seconds)
+    freezer = freeze_time(now)
+    freezer.start()

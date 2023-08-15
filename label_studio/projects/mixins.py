@@ -1,4 +1,5 @@
 from core.redis import start_job_async_or_sync
+from django.utils.functional import cached_property
 
 
 class ProjectMixin:
@@ -71,3 +72,11 @@ class ProjectMixin:
         :return:
         """
         return True
+
+    @cached_property
+    def all_members(self):
+        """
+        Returns all members of project
+        :return:
+        """
+        return self.organization.members.values_list('user__id', flat=True)
