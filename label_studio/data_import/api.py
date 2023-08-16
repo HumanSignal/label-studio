@@ -30,12 +30,18 @@ from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.redis import start_job_async_or_sync
 from core.feature_flags import flag_set
 from users.models import User
-from projects.models import Project, ProjectImport
+from projects.models import Project, ProjectImport, ProjectReimport
 from tasks.models import Task, Prediction
 from .uploader import load_tasks, create_file_uploads
 from .serializers import ImportApiSerializer, FileUploadSerializer, PredictionSerializer
 from .models import FileUpload
-from .functions import async_import_background, set_import_background_failure, reformat_predictions
+from .functions import (
+    async_import_background,
+    set_import_background_failure,
+    reformat_predictions,
+    async_reimport_background,
+    set_reimport_background_failure,
+)
 
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
@@ -348,28 +354,11 @@ class TasksBulkCreateAPI(ImportAPI):
 class ReImportAPI(ImportAPI):
     permission_required = all_permissions.projects_change
 
-    @retry_database_locked()
-    def create(self, request, *args, **kwargs):
+    def sync_reimport(self, project, file_upload_ids, files_as_tasks_list):
         start = time.time()
-        files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
-        file_upload_ids = self.request.data.get('file_upload_ids')
-
-        # check project permissions
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
-        
-        if not file_upload_ids:
-            return Response({
-                'task_count': 0,
-                'annotation_count': 0,
-                'prediction_count': 0,
-                'duration': 0,
-                'file_upload_ids': [],
-                'found_formats': {},
-                'data_columns': []
-            }, status=status.HTTP_200_OK)
-
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
-            project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)
+            project, file_upload_ids, files_as_tasks_list=files_as_tasks_list
+        )
 
         with transaction.atomic():
             project.remove_tasks_by_file_uploads(file_upload_ids)
@@ -379,36 +368,91 @@ class ReImportAPI(ImportAPI):
         # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
         # single operation as counters affect bulk is_labeled update
         project.update_tasks_counters_and_task_states(
-            tasks_queryset=tasks, maximum_annotations_changed=False,
+            tasks_queryset=tasks,
+            maximum_annotations_changed=False,
             overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True)
+            tasks_number_changed=True,
+        )
         logger.info('Tasks bulk_update finished')
 
         project.summary.update_data_columns(tasks)
         # TODO: project.summary.update_created_annotations_and_labels
 
-        return Response({
-            'task_count': len(tasks),
-            'annotation_count': len(serializer.db_annotations),
-            'prediction_count': len(serializer.db_predictions),
-            'duration': duration,
-            'file_upload_ids': file_upload_ids,
-            'found_formats': found_formats,
-            'data_columns': data_columns
-        }, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                'task_count': len(tasks),
+                'annotation_count': len(serializer.db_annotations),
+                'prediction_count': len(serializer.db_predictions),
+                'duration': duration,
+                'file_upload_ids': file_upload_ids,
+                'found_formats': found_formats,
+                'data_columns': data_columns,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    def async_reimport(self, project, file_upload_ids, files_as_tasks_list, organization_id):
+
+        project_reimport = ProjectReimport.objects.create(
+            project=project, file_upload_ids=file_upload_ids, files_as_tasks_list=files_as_tasks_list
+        )
+
+        start_job_async_or_sync(
+            async_reimport_background,
+            project_reimport.id,
+            organization_id,
+            self.request.user,
+            on_failure=set_reimport_background_failure,
+            project_id=project.id,
+        )
+
+        response = {"reimport": project_reimport.id}
+        return Response(response, status=status.HTTP_201_CREATED)
+
+    @retry_database_locked()
+    def create(self, request, *args, **kwargs):
+        files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
+        file_upload_ids = self.request.data.get('file_upload_ids')
+
+        # check project permissions
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+
+        if not file_upload_ids:
+            return Response(
+                {
+                    'task_count': 0,
+                    'annotation_count': 0,
+                    'prediction_count': 0,
+                    'duration': 0,
+                    'file_upload_ids': [],
+                    'found_formats': {},
+                    'data_columns': [],
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        if (
+            flag_set('fflag_fix_all_lsdv_4971_async_reimport_09052023_short', request.user)
+            and settings.VERSION_EDITION != 'Community'
+        ):
+            return self.async_reimport(project, file_upload_ids, files_as_tasks_list, request.user.active_organization_id)
+        else:
+            return self.sync_reimport(project, file_upload_ids, files_as_tasks_list)
 
     @swagger_auto_schema(
         auto_schema=None,
         operation_summary='Re-import tasks',
         operation_description="""
         Re-import tasks using the specified file upload IDs for a specific project.
-        """
+        """,
     )
     def post(self, *args, **kwargs):
         return super(ReImportAPI, self).post(*args, **kwargs)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Get files list',
         manual_parameters=[

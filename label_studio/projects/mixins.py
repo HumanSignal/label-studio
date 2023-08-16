@@ -1,4 +1,5 @@
 from core.redis import start_job_async_or_sync
+from django.utils.functional import cached_property
 
 
 class ProjectMixin:
@@ -25,7 +26,7 @@ class ProjectMixin:
         # get only id from queryset to decrease data size in job
         if not (isinstance(tasks_queryset, set) or isinstance(tasks_queryset, list)):
             tasks_queryset = set(tasks_queryset.values_list('id', flat=True))
-        start_job_async_or_sync(self._update_tasks_counters_and_is_labeled, tasks_queryset, from_scratch=from_scratch)
+        start_job_async_or_sync(self._update_tasks_counters_and_is_labeled, list(tasks_queryset), from_scratch=from_scratch)
 
     def update_tasks_counters_and_task_states(self, tasks_queryset, maximum_annotations_changed,
                                             overlap_cohort_percentage_changed, tasks_number_changed, from_scratch=True):
@@ -71,3 +72,11 @@ class ProjectMixin:
         :return:
         """
         return True
+
+    @cached_property
+    def all_members(self):
+        """
+        Returns all members of project
+        :return:
+        """
+        return self.organization.members.values_list('user__id', flat=True)

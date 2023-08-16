@@ -48,20 +48,21 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
     m.post(f'{url}/train', text=json.dumps({'status': 'ok', 'job_id': train_job_id}))
     m.post(f'{url}/predict', text=json.dumps(predictions or {}))
     m.post(f'{url}/webhook', text=json.dumps({}))
-    m.post(f'{url}/versions', text=json.dumps({'versions': ["1", "2"]}))
+    m.get(f'{url}/versions', text=json.dumps({'versions': ["1", "2"]}))
     return m
 
 
 @contextmanager
 def import_from_url_mock(**kwargs):
-    with requests_mock.Mocker(real_http=True) as m:
-        url='https://data.heartextest.net'
+    with mock.patch('data_import.uploader.validate_upload_url'):
+        with requests_mock.Mocker(real_http=True) as m:
+            url='https://data.heartextest.net'
 
-        with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
-            matcher = re.compile('data.heartextest.net/test_1.csv')
+            with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
+                matcher = re.compile('data\.heartextest\.net/test_1\.csv')
 
-            m.get(matcher, body=f, headers={'Content-Length': '100'})
-            yield m
+                m.get(matcher, body=f, headers={'Content-Length': '100'})
+                yield m
 
 
 class _TestJob(object):
@@ -145,6 +146,8 @@ def azure_client_mock():
             print(f'String {string} uploaded to bucket {self.container_name}')
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.container_name}/{self.key}'
+        def content_as_text(self):
+            return json.dumps({'str_field': str(self.key), 'int_field': 123, 'dict_field': {'one': 'wow', 'two': 456}})
 
     class DummyAzureContainer:
         def __init__(self, container_name, **kwargs):
@@ -168,6 +171,9 @@ def azure_client_mock():
                 deleted=False,
                 version='1.0.0'
             )
+
+        def download_blob(self, key):
+            return DummyAzureBlob(self.name, key)
 
 
     class DummyAzureClient():
@@ -294,20 +300,9 @@ def _client_is_annotator(client):
 
 
 def save_response(response):
-    filename = 'tavern-output.json'
-    with open(filename, 'w') as f:
+    fp = os.path.join(settings.TEST_DATA_ROOT, 'tavern-output.json')
+    with open(fp, 'w') as f:
         json.dump(response.json(), f)
-
-
-def check_response_with_json_file(response, json_file):
-    response = response.json()
-    filename = 'tavern-output.json'
-    with open(filename, 'w') as f:
-        json.dump(response, f, indent=4)
-
-    with open(json_file, 'r') as f:
-        true = json.load(f)
-        assert response == true
 
 
 def os_independent_path(_, path, add_tempdir=False):

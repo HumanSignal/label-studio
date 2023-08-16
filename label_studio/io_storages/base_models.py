@@ -228,6 +228,9 @@ class Storage(StorageInfo):
     description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 
+    synchronizable = models.BooleanField(_('synchronizable'), default=True,
+                                          help_text='If storage can be synced')
+
     def validate_connection(self, client=None):
         raise NotImplementedError('validate_connection is not implemented')
 

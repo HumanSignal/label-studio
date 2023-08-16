@@ -39,12 +39,11 @@
     "hexo-server": "^3.0.0",
     "hexo-tag-details": "^0.1.7",
     "node-html-parser": "^6.1.4",
-    "notion-to-md": "https://github.com/huguestennier/notion-to-md.git",
+    "notion-to-md": "https://github.com/huguestennier/notion-to-md",
     "save": "^2.4.0"
   },
   "resolutions": {
     "hexo-footnote/hexo-util": "3.0.1",
-    "hexo-tag-details/hexo-util": "3.0.1",
     "markdown-it": "13.0.1"
   },
   "scripts": {
