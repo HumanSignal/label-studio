@@ -16,7 +16,7 @@ class SkipField(Exception):
 
 
 _DATA_TYPES = {
-    'Text': [str, int, float],
+    'Text': [str, int, float, list],
     'Header': [str, int, float],
     'HyperText': [str],
     'Image': [str, list],
