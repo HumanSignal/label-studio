@@ -1,6 +1,6 @@
 {
-  "message": "docs: LSDV-5343: Docs for visibleWhen; remove FF_DEV_1372",
-  "commit": "36b729ab5cab84fb75fa897b75d7277cb49262da",
-  "branch": "master",
-  "date": "2023/08/17 13:30:10"
+  "message": "fix: LEAP-16: Add validation to contextual scrolling",
+  "commit": "fd117a02f055175c3573426eb11e3a53d59f4878",
+  "branch": "fb-leap-16",
+  "date": "2023/08/17 19:09:02"
 }
