@@ -2580,6 +2580,33 @@
       "version": 5,
       "deleted": false
     },
+    "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short": {
+      "key": "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "ea02c8fb80a34239a5aedc42049069df",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 5,
+      "deleted": false
+    },
     "fflag_feat_front_dev_4081_magic_wand_tool": {
       "key": "fflag_feat_front_dev_4081_magic_wand_tool",
       "on": true,
