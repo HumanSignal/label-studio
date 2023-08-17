@@ -34,7 +34,13 @@ def backwards(apps, schema_editor):
 class Migration(migrations.Migration):
     atomic = False
 
-    dependencies = [('data_manager', '0007_auto_20220708_0832'), ('tasks', '0023_auto_20220620_1007'), ('core', '0001_initial'), ('projects', '0017_project_pinned_at')]
+    dependencies = [
+        ('data_manager', '0007_auto_20220708_0832'),
+        ('tasks', '0023_auto_20220620_1007'),
+        ('core', '0001_initial'),
+        ('projects', '0017_project_pinned_at'),
+        ('organizations', '0004_organization_contact_info'),
+    ]
 
     operations = [
         migrations.RunPython(forwards, backwards),
