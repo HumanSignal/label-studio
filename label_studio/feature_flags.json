@@ -2769,33 +2769,6 @@
       "version": 2,
       "deleted": false
     },
-    "fflag_feat_front_lsdv_3028_audio_v3_multichannel_default_17022023_short": {
-      "key": "fflag_feat_front_lsdv_3028_audio_v3_multichannel_default_17022023_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "74c3fe7eea954c88a56b37772e88947a",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "fflag_feat_front_lsdv_4583_6_images_preloading_short": {
       "key": "fflag_feat_front_lsdv_4583_6_images_preloading_short",
       "on": false,
@@ -3118,6 +3091,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 5,
+      "deleted": false
+    },
+    "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short": {
+      "key": "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "3e7648d6922e412a9e512fbfed2074c9",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
       "deleted": false
     },
     "fflag_feat_front_prod_281_project_list_search_19072023_short": {
