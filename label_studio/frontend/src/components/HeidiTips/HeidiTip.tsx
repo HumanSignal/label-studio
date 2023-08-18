@@ -1,11 +1,11 @@
-import { FC, MouseEvent, useCallback } from "react";
+import { FC, MouseEvent, useCallback, useMemo } from "react";
 import { Block, Elem } from "../../utils/bem";
 // @ts-ignore-next-line
 import { LsCross } from "../../assets/icons";
 import "./HeidiTip.styl";
 import { Button } from "../Button/Button";
 import { HeidiSpeaking } from "../../assets/images";
-import { HeidiTipProps } from "./types";
+import { HeidiTipProps, Tip } from "./types";
 import { Tooltip } from "../Tooltip/Tooltip"
 
 export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
@@ -34,15 +34,35 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
         </Elem>
         <Elem name="text">
           {tip.content}
-          { /* @ts-ignore-next-line */}
-          <Elem name="link" tag="a" href={tip.link.url}>
-            {tip.link.label}
-          </Elem>
+          <HeidiLink link={tip.link} />
         </Elem>
       </Elem>
       <Elem name="heidi">
         <HeidiSpeaking />
       </Elem>
     </Block>
+  );
+}
+
+const HeidiLink: FC<{ link: Tip["link"] }> = ({
+  link
+}) => {
+  const url = useMemo(() => {
+    const base = new URL(link.url);
+    Object.keys(link.params ?? {}).forEach((key) => {
+      const value = link.params?.[key];
+      if (value) base.searchParams.set(key, value);
+    });
+
+    /* if needed, add server ID here */
+
+    return base.toString();
+  }, [link]);
+
+  return (
+    /* @ts-ignore-next-line */
+    <Elem name="link" tag="a" href={url} target="_blank">
+      {link.label}
+    </Elem>
   );
 }
