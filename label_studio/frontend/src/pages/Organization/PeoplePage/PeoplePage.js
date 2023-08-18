@@ -9,6 +9,7 @@ import { Space } from "../../../components/Space/Space";
 import { useAPI } from "../../../providers/ApiProvider";
 import { useConfig } from "../../../providers/ConfigProvider";
 import { Block, Elem } from "../../../utils/bem";
+import { FF_LSDV_E_297, isFF } from "../../../utils/feature-flags";
 import { copyText } from "../../../utils/helpers";
 import "./PeopleInvitation.styl";
 import { PeopleList } from "./PeopleList";
@@ -133,7 +134,7 @@ export const PeoplePage = () => {
             user={selectedUser}
             onClose={() => selectUser(null)}
           />
-        ) : (
+        ) : isFF(FF_LSDV_E_297) && (
           <HeidiTips collection="organizationPage" />
         )}
       </Elem>
