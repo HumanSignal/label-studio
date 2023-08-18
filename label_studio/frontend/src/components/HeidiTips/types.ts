@@ -7,6 +7,7 @@ export type Tip = {
   link: {
     url: string,
     label: string,
+    params?: Record<string, string>
   },
 }
 
