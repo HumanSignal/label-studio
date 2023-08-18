@@ -1,12 +1,11 @@
 import { FC, MouseEvent, useCallback, useMemo } from "react";
 import { Block, Elem } from "../../utils/bem";
-// @ts-ignore-next-line
 import { LsCross } from "../../assets/icons";
 import "./HeidiTip.styl";
 import { Button } from "../Button/Button";
 import { HeidiSpeaking } from "../../assets/images";
 import { HeidiTipProps, Tip } from "./types";
-import { Tooltip } from "../Tooltip/Tooltip"
+import { Tooltip } from "../Tooltip/Tooltip";
 
 export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
   const handleClick = useCallback((event: MouseEvent) => {
@@ -42,15 +41,17 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
       </Elem>
     </Block>
   );
-}
+};
 
 const HeidiLink: FC<{ link: Tip["link"] }> = ({
-  link
+  link,
 }) => {
   const url = useMemo(() => {
     const base = new URL(link.url);
+
     Object.keys(link.params ?? {}).forEach((key) => {
       const value = link.params?.[key];
+
       if (value) base.searchParams.set(key, value);
     });
 
@@ -65,4 +66,4 @@ const HeidiLink: FC<{ link: Tip["link"] }> = ({
       {link.label}
     </Elem>
   );
-}
+};

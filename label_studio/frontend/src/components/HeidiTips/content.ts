@@ -7,47 +7,77 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects"
-    }
+      url: "https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects",
+      params: {
+        experiment: "placeholder",
+        treatment: "placeholder",
+        server_id: "placeholder",
+      },
+    },
   }, {
     title: "Unlock faster access provisioning",
     content: "Streamline assigning staff to multiple projects by assigning them to workspaces in Label Studio Enterprise.",
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://docs.humansignal.com/guide/manage_projects#Add-or-remove-members-to-a-workspace"
-    }
+      url: "https://docs.humansignal.com/guide/manage_projects#Add-or-remove-members-to-a-workspace",
+      params: {
+        experiment: "placeholder",
+        treatment: "placeholder",
+        server_id: "placeholder",
+      },
+    },
   }, {
     title: "Did you know?",
     content: "Users with the Manager role can supervise a set of projects by assigning them to workspaces in Label Studio Enterprise.",
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise"
-    }
+      url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise",
+      params: {
+        experiment: "placeholder",
+        treatment: "placeholder",
+        server_id: "placeholder",
+      },
+    },
   }, {
     title: "Did you know?",
     content: "You can control access to specific projects and workspaces for internal team members and external annotators using Label Studio Enterprise.",
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise"
-    }
+      url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise",
+      params: {
+        experiment: "placeholder",
+        treatment: "placeholder",
+        server_id: "placeholder",
+      },
+    },
   }, {
     title: "Did you know?",
     content: "You can use or modify dozens or templates to configure your labeling UI, or create a custom configuration from scratch using simple XML-like tag",
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://labelstud.io/guide/setup"
-    }
+      url: "https://labelstud.io/guide/setup",
+      params: {
+        experiment: "placeholder",
+        treatment: "placeholder",
+        server_id: "placeholder",
+      },
+    },
   }, {
     title: "Did you know?",
     content: "You can label tasks with collaborators by setting the minimum number of annotations to more than one. ",
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://labelstud.io/guide/labeling#Label-with-collaborators"
-    }
-  }]
-}
+      url: "https://labelstud.io/guide/labeling#Label-with-collaborators",
+      params: {
+        experiment: "placeholder",
+        treatment: "placeholder",
+        server_id: "placeholder",
+      },
+    },
+  }],
+};

@@ -40,12 +40,12 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
       <div className="field field--wide">
         <label>
           Workspace
-        <EnterpriseBadge />
+          <EnterpriseBadge />
         </label>
         <Select placeholder="Select an option" disabled options={[]} />
         <Caption>
           Simplify project management by organizing projects into workspaces.
-        <a href="#">Learn more</a>
+          <a href="#">Learn more</a>
         </Caption>
         <HeidiTips collection="projectCreation" />
       </div>
@@ -90,6 +90,7 @@ export const CreateProject = ({ onClose }) => {
 
   const onCreate = React.useCallback(async () => {
     const imported = await finishUpload();
+
     if (!imported) return;
 
     setWaitingStatus(true);
@@ -99,6 +100,7 @@ export const CreateProject = ({ onClose }) => {
       },
       body: projectBody,
     });
+
     setWaitingStatus(false);
 
     if (response !== null) {
@@ -116,8 +118,10 @@ export const CreateProject = ({ onClose }) => {
         title: name,
       },
     });
+
     if (res.ok) return;
     const err = await res.json();
+
     setError(err.validation_errors?.title);
   };
 
