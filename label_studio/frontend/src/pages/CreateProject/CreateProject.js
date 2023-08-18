@@ -3,6 +3,8 @@ import { useHistory } from 'react-router';
 import { Button, ToggleItems } from '../../components';
 import { Modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
+import { HeidiTips } from '../../components/HeidiTips/HeidiTips';
+import { TipsCollection } from '../../components/HeidiTips/content';
 import { useAPI } from '../../providers/ApiProvider';
 import { cn } from '../../utils/bem';
 import { ConfigPage } from './Config/Config';
@@ -10,9 +12,11 @@ import "./CreateProject.styl";
 import { ImportPage } from './Import/Import';
 import { useImportPage } from './Import/useImportPage';
 import { useDraftProject } from './utils/useDraftProject';
+import { Select } from '../../components/Form';
+import { EnterpriseBadge } from '../../components/Badges/Enterprise';
 
 
-const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null :(
+const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null : (
   <form className={cn("project-name")} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
     <div className="field field--wide">
       <label htmlFor="project_name">Project Name</label>
@@ -29,6 +33,18 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         value={description}
         onChange={e => setDescription(e.target.value)}
       />
+    </div>
+    <div className="field field--wide">
+      <label>
+        Workspace
+        <EnterpriseBadge />
+      </label>
+      <Select placeholder="Select an option" disabled options={[]} />
+      <p className={cn("project-name").elem("caption")}>
+        Simplify project management by organizing projects into workspaces.
+        <a href="#">Learn more</a>
+      </p>
+      <HeidiTips tips={TipsCollection.projectCreation} />
     </div>
   </form>
 );
@@ -73,7 +89,7 @@ export const CreateProject = ({ onClose }) => {
     if (!imported) return;
 
     setWaitingStatus(true);
-    const response = await api.callApi('updateProject',{
+    const response = await api.callApi('updateProject', {
       params: {
         pk: project.id,
       },
