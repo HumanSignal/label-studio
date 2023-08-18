@@ -7,6 +7,31 @@ import { HeidiSpeaking } from "../../assets/images";
 import { HeidiTipProps, Tip } from "./types";
 import { Tooltip } from "../Tooltip/Tooltip";
 
+const HeidiLink: FC<{ link: Tip["link"] }> = ({
+  link,
+}) => {
+  const url = useMemo(() => {
+    const base = new URL(link.url);
+
+    Object.keys(link.params ?? {}).forEach((key) => {
+      const value = link.params?.[key];
+
+      if (value) base.searchParams.set(key, value);
+    });
+
+    /* if needed, add server ID here */
+
+    return base.toString();
+  }, [link]);
+
+  return (
+  /* @ts-ignore-next-line */
+    <Elem name="link" tag="a" href={url} target="_blank">
+      {link.label}
+    </Elem>
+  );
+};
+
 export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
   const handleClick = useCallback((event: MouseEvent) => {
     event.preventDefault();
@@ -40,30 +65,5 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
         <HeidiSpeaking />
       </Elem>
     </Block>
-  );
-};
-
-const HeidiLink: FC<{ link: Tip["link"] }> = ({
-  link,
-}) => {
-  const url = useMemo(() => {
-    const base = new URL(link.url);
-
-    Object.keys(link.params ?? {}).forEach((key) => {
-      const value = link.params?.[key];
-
-      if (value) base.searchParams.set(key, value);
-    });
-
-    /* if needed, add server ID here */
-
-    return base.toString();
-  }, [link]);
-
-  return (
-    /* @ts-ignore-next-line */
-    <Elem name="link" tag="a" href={url} target="_blank">
-      {link.label}
-    </Elem>
   );
 };
