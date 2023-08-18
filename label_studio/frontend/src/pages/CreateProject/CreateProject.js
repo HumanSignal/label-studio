@@ -44,7 +44,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         Simplify project management by organizing projects into workspaces.
         <a href="#">Learn more</a>
       </p>
-      <HeidiTips tips={TipsCollection.projectCreation} />
+      <HeidiTips collection="projectCreation" />
     </div>
   </form>
 );

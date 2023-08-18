@@ -1,3 +1,5 @@
+import { TipsCollection } from "./content"
+
 export type Tip = {
   title: string,
   content: string,
@@ -9,9 +11,10 @@ export type Tip = {
 }
 
 export type HeidiTipsProps = {
-  tips: Tip[],
+  collection: keyof typeof TipsCollection
 }
 
 export type HeidiTipProps = {
   tip: Tip,
+  onDismiss: () => void
 }

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, MouseEvent, useCallback } from "react";
 import { Block, Elem } from "../../utils/bem";
 // @ts-ignore-next-line
 import { LsCross } from "../../assets/icons";
@@ -8,7 +8,13 @@ import { HeidiSpeaking } from "../../assets/images";
 import { HeidiTipProps } from "./types";
 import { Tooltip } from "../Tooltip/Tooltip"
 
-export const HeidiTip: FC<HeidiTipProps> = ({ tip }) => {
+export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
+  const handleClick = useCallback((event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onDismiss();
+  }, []);
+
   return (
     <Block name="heidy-tip">
       <Elem name="content">
@@ -20,7 +26,7 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip }) => {
             /* @ts-ignore-next-line */
             <Tooltip title="Don't show">
               { /* @ts-ignore-next-line */}
-              <Elem name="dismiss" tag={Button} type="text">
+              <Elem name="dismiss" tag={Button} type="text" onClick={handleClick}>
                 <LsCross />
               </Elem>
             </Tooltip>

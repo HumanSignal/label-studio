@@ -1,18 +1,20 @@
-import { FC } from "react";
-import { Tip, HeidiTipsProps } from './types';
+import { FC, memo, useState } from "react";
+import { HeidiTipsProps } from './types';
 import { HeidiTip } from "./HeidiTip"
+import { dismissTip, getRandomTip } from "./utils";
 
-function getRandomTip(tips: Tip[]): Tip {
-  const length = tips.length - 1;
-  const randomIndex = Math.floor(Math.random() * length + 1)
-  const item = tips[randomIndex];
-
-  return item;
-}
-
-export const HeidiTips: FC<HeidiTipsProps> = ({
-  tips
+export const HeidiTips: FC<HeidiTipsProps> = memo(({
+  collection
 }) => {
-  const tip = getRandomTip(tips);
-  return <HeidiTip tip={tip} />;
-}
+  const [result, setResult] = useState(getRandomTip(collection));
+
+  return result && (
+    <HeidiTip
+      tip={result.tip}
+      onDismiss={() => {
+        dismissTip(collection, result.index)
+        setResult(null);
+      }}
+    />
+  );
+});
