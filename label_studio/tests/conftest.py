@@ -9,7 +9,6 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
-from unittest import mock
 from unittest.mock import MagicMock
 
 import boto3

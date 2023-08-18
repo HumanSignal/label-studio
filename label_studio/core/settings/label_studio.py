@@ -1,7 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import json
 
-from core.settings.base import *
+from core.settings.base import * # noqa
 
 DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
 DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}

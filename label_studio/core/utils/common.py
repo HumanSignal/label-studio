@@ -32,7 +32,16 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, Paginator
 from django.core.validators import URLValidator
 from django.db import models, transaction
-from django.db.models.signals import *
+from django.db.models.signals import (
+    post_delete,
+    post_init,
+    post_migrate,
+    post_save,
+    pre_delete,
+    pre_init,
+    pre_migrate,
+    pre_save,
+)
 from django.db.utils import OperationalError
 from django.utils.module_loading import import_string
 from django_filters.rest_framework import DjangoFilterBackend
