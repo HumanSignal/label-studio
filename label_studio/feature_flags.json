@@ -3819,7 +3819,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 5,
       "deleted": false
     },
     "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short": {
