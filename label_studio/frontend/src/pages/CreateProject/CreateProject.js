@@ -45,7 +45,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <Select placeholder="Select an option" disabled options={[]} />
         <Caption>
           Simplify project management by organizing projects into workspaces.
-          <a href="#">Learn more</a>
+          <a href={`https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects?experiment=project_creation_dropdown&treatment=simplify_project_management&server_id=${`placeholder`}&user_id=${`placeholder`}`}>Learn more</a>
         </Caption>
         <HeidiTips collection="projectCreation" />
       </div>
