@@ -3,6 +3,7 @@ import { LsPlus } from "../../../assets/icons";
 import { Button } from "../../../components";
 import { Description } from "../../../components/Description/Description";
 import { Input } from "../../../components/Form";
+import { HeidiTips } from "../../../components/HeidiTips/HeidiTips";
 import { modal } from "../../../components/Modal/Modal";
 import { Space } from "../../../components/Space/Space";
 import { useAPI } from "../../../providers/ApiProvider";
@@ -60,7 +61,7 @@ export const PeoplePage = () => {
     title: "Invite people",
     style: { width: 640, height: 472 },
     body: () => (
-      <InvitationModal link={link}/>
+      <InvitationModal link={link} />
     ),
     footer: () => {
       const [copied, setCopied] = useState(false);
@@ -114,7 +115,7 @@ export const PeoplePage = () => {
           <Space></Space>
 
           <Space>
-            <Button icon={<LsPlus/>} primary onClick={showInvitationModal}>
+            <Button icon={<LsPlus />} primary onClick={showInvitationModal}>
               Add People
             </Button>
           </Space>
@@ -127,11 +128,13 @@ export const PeoplePage = () => {
           onSelect={(user) => selectUser(user)}
         />
 
-        {selectedUser && (
+        {selectedUser ? (
           <SelectedUser
             user={selectedUser}
             onClose={() => selectUser(null)}
           />
+        ) : (
+          <HeidiTips collection="organizationPage" />
         )}
       </Elem>
     </Block>
