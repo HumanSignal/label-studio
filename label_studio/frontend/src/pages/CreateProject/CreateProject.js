@@ -15,6 +15,7 @@ import { useDraftProject } from './utils/useDraftProject';
 import { Select } from '../../components/Form';
 import { EnterpriseBadge } from '../../components/Badges/Enterprise';
 import { Caption } from '../../components/Caption/Caption';
+import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
 
 
 const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null : (
@@ -35,18 +36,20 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         onChange={e => setDescription(e.target.value)}
       />
     </div>
-    <div className="field field--wide">
-      <label>
-        Workspace
+    {isFF(FF_LSDV_E_297) && (
+      <div className="field field--wide">
+        <label>
+          Workspace
         <EnterpriseBadge />
-      </label>
-      <Select placeholder="Select an option" disabled options={[]} />
-      <Caption>
-        Simplify project management by organizing projects into workspaces.
+        </label>
+        <Select placeholder="Select an option" disabled options={[]} />
+        <Caption>
+          Simplify project management by organizing projects into workspaces.
         <a href="#">Learn more</a>
-      </Caption>
-      <HeidiTips collection="projectCreation" />
-    </div>
+        </Caption>
+        <HeidiTips collection="projectCreation" />
+      </div>
+    )}
   </form>
 );
 
