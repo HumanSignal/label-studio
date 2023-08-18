@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-6: Splitchannel audio render option",
-  "commit": "999a946f92895318d01f842e70de642067252a86",
-  "branch": "master",
-  "date": "2023/08/17 19:45:21"
+  "message": "fix: OPTIC-7: sum lead time from previous draft on annotation submission",
+  "commit": "8615bc993375ccb9538521b8fa34863269f68931",
+  "branch": "fb-optic-7/draft-lead-time-added",
+  "date": "2023/08/18 09:55:55"
 }
