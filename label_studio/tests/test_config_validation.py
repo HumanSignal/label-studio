@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
     ],
 )
 @pytest.mark.django_db
-def test_change_label_config_repeater(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_change_label_config_repeater(tasks_count, annotations_count, predictions_count, business_client, project_id):  # noqa: F811
     # Change label config to Repeater
     payload = {'label_config': '<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">       <Label value="Header" hotkey="1"/> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
     response = business_client.patch(
@@ -118,7 +118,7 @@ def test_parse_all_configs():
 
 
 @pytest.mark.django_db
-def test_config_validation_for_choices_workaround(business_client, project_id):
+def test_config_validation_for_choices_workaround(business_client, project_id):  # noqa: F811
     """
     Validate Choices tag for 1 choice with workaround
     Example bug DEV-3635
@@ -148,7 +148,7 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
 
 
 @pytest.mark.django_db
-def test_parse_wrong_xml(business_client, project_id):
+def test_parse_wrong_xml(business_client, project_id):  # noqa: F811
     # Change label config to Repeater
     payload = {
         'label_config': '<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">       <Label value="Header" hotkey="1"/> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
@@ -169,7 +169,7 @@ def test_parse_wrong_xml(business_client, project_id):
     assert response.status_code == 400
 
 @pytest.mark.django_db
-def test_label_config_versions(business_client, project_id):
+def test_label_config_versions(business_client, project_id):  # noqa: F811
     with io.open(os.path.join(os.path.dirname(__file__), 'test_data/data_for_test_label_config_matrix.yml')) as f:
         test_suites = yaml.safe_load(f)
     for test_name, test_content in test_suites.items():

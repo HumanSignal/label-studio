@@ -29,7 +29,7 @@ from label_studio.core.utils.params import get_env
 
 # if we haven't this package, pytest.ini::env doesn't work
 try:
-    import pytest_env.plugin
+    import pytest_env.plugin  # noqa: F401
 except ImportError:
     print('\n\n !!! Please, pip install pytest-env \n\n')
     exit(-100)

@@ -26,7 +26,7 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
         storage = RedisImportStorage(**data)
         try:
             storage.validate_connection()
-        except:
+        except:  # noqa: E722
             raise ValidationError("Can't connect to Redis server.")
         return data
 

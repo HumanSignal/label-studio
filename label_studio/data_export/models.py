@@ -101,7 +101,7 @@ class DataExport(object):
         annotation_number = Annotation.objects.filter(project=project).count()
         try:
             platform_version = version.get_git_version()
-        except:
+        except:  # noqa: E722
             platform_version = 'none'
             logger.error('Version is not detected in save_export_files()')
         info = {

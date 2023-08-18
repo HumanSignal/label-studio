@@ -81,7 +81,7 @@ class ContextLog(object):
     def _get_response_content(self, response):
         try:
             return json.loads(response.content)
-        except:
+        except:  # noqa: E722
             return
 
     def _assert_field_in_test(self, field, payload, view_name):
@@ -273,11 +273,11 @@ class ContextLog(object):
     def send_job(self, request, response, body):
         try:
             payload = self.create_payload(request, response, body)
-        except:
+        except:  # noqa: E722
             pass
         else:
             try:
                url = 'https://tele.labelstud.io'
                requests.post(url=url, json=payload, timeout=3.0)
-            except:
+            except:  # noqa: E722
                 pass

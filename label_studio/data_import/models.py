@@ -9,7 +9,7 @@ import pandas as pd
 
 try:
     import ujson as json
-except:
+except:  # noqa: E722
     import json
 
 from core.feature_flags import flag_set
@@ -59,7 +59,7 @@ class FileUpload(models.Model):
         file_format = None
         try:
             file_format = os.path.splitext(filepath)[-1]
-        except:
+        except:  # noqa: E722
             pass
         finally:
             logger.debug('Get file format ' + str(file_format))

@@ -30,7 +30,7 @@ def initials(val, jn=""):
         
 
 @register.filter
-def get_at_index(l, index):
+def get_at_index(l, index):  # noqa: E741
     return l[index]
 
 

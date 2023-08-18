@@ -359,7 +359,7 @@ def test_webhooks_for_action_delete_tasks_annotations(configured_project, busine
 
 # ACTION: DELETE TASKS
 @pytest.mark.django_db
-def test_webhooks_for_action_delete_tasks_annotations(configured_project, business_client, organization_webhook):
+def test_webhooks_for_action_delete_tasks_annotations(configured_project, business_client, organization_webhook):  # noqa: F811
     webhook = organization_webhook
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)

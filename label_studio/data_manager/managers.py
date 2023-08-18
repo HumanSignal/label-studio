@@ -203,7 +203,7 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
         try:
             value = json.loads(_filter.value)
-        except:
+        except:  # noqa: E722
             return 'exit'
 
         q = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result=value)))

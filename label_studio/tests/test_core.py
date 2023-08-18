@@ -29,7 +29,7 @@ def test_core_bool_from_request(param, result):
         error = False
         try:
             bool_from_request(params, 'test', 0)
-        except:
+        except:  # noqa: E722
             error = True
 
         assert error

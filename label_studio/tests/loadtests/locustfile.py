@@ -54,7 +54,7 @@ class UserWorksWithProject(TaskSet):
         self.client.get('/projects/%i/experts' % self.project_id, name='/projects/<id>/experts')
 
     @task(5)
-    def expert_page(self):
+    def expert_page(self):  # noqa: F811
         self.client.get('/projects/%i/experts' % self.project_id, name='/projects/<id>/experts')
 
     @task(5)

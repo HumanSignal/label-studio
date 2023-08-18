@@ -267,7 +267,7 @@ class Task(TaskMixin, models.Model):
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
 
-    def has_permission(self, user: "User") -> bool:
+    def has_permission(self, user: "User") -> bool:  # noqa: F821
         mixin_has_permission = cast(bool, super().has_permission(user))
 
         user.project = self.project  # link for activity log
@@ -675,7 +675,7 @@ class Annotation(AnnotationMixin, models.Model):
 
         return len(res)
 
-    def has_permission(self, user: "User") -> bool:
+    def has_permission(self, user: "User") -> bool:  # noqa: F821
         mixin_has_permission = cast(bool, super().has_permission(user))
 
         user.project = self.project  # link for activity log

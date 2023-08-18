@@ -40,7 +40,7 @@ from ..utils import make_annotation, make_annotator, make_prediction, make_task,
     ],
 )
 @pytest.mark.django_db
-def test_views_ordering(ordering, element_index, undefined, business_client, project_id):
+def test_views_ordering(ordering, element_index, undefined, business_client, project_id):  # noqa: F811
 
     payload = dict(
         project=project_id,
@@ -297,7 +297,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
     ],
 )
 @pytest.mark.django_db
-def test_views_filters(filters, ids, business_client, project_id):
+def test_views_filters(filters, ids, business_client, project_id):  # noqa: F811
     project = Project.objects.get(pk=project_id)
     ann1 = make_annotator({'email': 'ann1@testheartex.com'}, project)
     ann2 = make_annotator({'email': 'ann2@testheartex.com'}, project)

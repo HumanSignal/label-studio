@@ -114,10 +114,10 @@ class ContextLogMiddleware(CommonMiddleware):
         body = None
         try:
             body = json.loads(request.body)
-        except:
+        except:  # noqa: E722
             try:
                 body = request.body.decode('utf-8')
-            except:
+            except:  # noqa: E722
                 pass
         response = self.get_response(request)
         self.log.send(request=request, response=response, body=body)

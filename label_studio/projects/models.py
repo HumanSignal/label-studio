@@ -94,7 +94,7 @@ class ProjectManager(models.Manager):
         else:
             to_annotate = {field: available_fields[field] for field in fields if field in available_fields}
 
-        for _, annotate_func in to_annotate.items():
+        for _, annotate_func in to_annotate.items():  # noqa: F402
             queryset = annotate_func(queryset)
 
         return queryset
@@ -577,7 +577,7 @@ class Project(ProjectMixin, models.Model):
             # check if labels from is subset if config labels
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
-                diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
+                diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)  # noqa: E741
                 if (strict is True) and ((control_tag_from_data not in dynamic_label_from_config) and
                         (not check_control_in_config_by_regex(config_string, control_tag_from_data, filter=dynamic_label_from_config.keys()))):
                     # raise error if labels not dynamic and not in regex rules

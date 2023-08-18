@@ -74,7 +74,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         if isinstance(value, str):
             try:
                 data = json.loads(value)
-            except:
+            except:  # noqa: E722
                 raise ValueError('annotation "result" can\'t be parse from str to JSON')
 
         # check result is list

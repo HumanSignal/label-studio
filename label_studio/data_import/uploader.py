@@ -10,7 +10,7 @@ import requests
 
 try:
     import ujson as json
-except:
+except:  # noqa: E722
     import json
 
 from core.utils.common import timeit

@@ -9,7 +9,7 @@ from ..utils import make_annotation, make_prediction, make_task, project_id  # n
 
 
 @pytest.mark.django_db
-def test_views_tasks_api(business_client, project_id):
+def test_views_tasks_api(business_client, project_id):  # noqa: F811
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -99,7 +99,7 @@ def test_views_tasks_api(business_client, project_id):
     ],
 )
 @pytest.mark.django_db
-def test_views_total_counters(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_views_total_counters(tasks_count, annotations_count, predictions_count, business_client, project_id):  # noqa: F811
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(

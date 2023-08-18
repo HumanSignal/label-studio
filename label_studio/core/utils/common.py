@@ -458,7 +458,7 @@ def collect_versions(force=False):
         with open(os.path.join(settings.EDITOR_ROOT, 'version.json')) as f:
             lsf = json.load(f)
         result['label-studio-frontend'] = lsf
-    except:
+    except:  # noqa: E722
         pass
 
     # data manager
@@ -466,7 +466,7 @@ def collect_versions(force=False):
         with open(os.path.join(settings.DM_ROOT, 'version.json')) as f:
             dm = json.load(f)
         result['dm2'] = dm
-    except:
+    except:  # noqa: E722
         pass
 
     # converter
@@ -611,7 +611,7 @@ class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
 
 
 def batch(iterable, n=1):
-    l = len(iterable)
+    l = len(iterable)  # noqa: E741
     for ndx in range(0, l, n):
         yield iterable[ndx : min(ndx + n, l)]
 
