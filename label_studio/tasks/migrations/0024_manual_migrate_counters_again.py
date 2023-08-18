@@ -1,5 +1,5 @@
-import sys
 import logging
+import sys
 
 from django.db import migrations
 
@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 def forwards(apps, schema_editor):
-    from tasks.functions import calculate_stats_all_orgs
     from django.conf import settings
+    from tasks.functions import calculate_stats_all_orgs
 
     if settings.VERSION_EDITION == 'Community':
         run_command = 'label-studio calculate_stats_all_orgs'

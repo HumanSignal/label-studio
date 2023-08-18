@@ -1,17 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
-import requests_mock
 from unittest import mock
 
+import pytest
+import requests_mock
+from projects.models import Project
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
-from .utils import ml_backend_mock
+from tasks.models import Annotation
 
-from projects.models import Project
-from ml.models import MLBackendTrainJob
-from tasks.models import Annotation, Task
+from .utils import ml_backend_mock
 
 
 @pytest.fixture

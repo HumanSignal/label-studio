@@ -1,20 +1,17 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-
 from datetime import datetime
-from django.conf import settings
+
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
-from projects.models import Project
-
-from tasks.models import (
-    Annotation, Prediction, Task
-)
-from webhooks.utils import emit_webhooks_for_instance
-from webhooks.models import WebhookAction
 from data_manager.functions import evaluate_predictions
+from django.conf import settings
+from projects.models import Project
+from tasks.models import Annotation, Prediction, Task
+from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)

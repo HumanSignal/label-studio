@@ -2,10 +2,6 @@
 """
 from django.conf import settings
 
-from .azure_blob.models import AzureBlobImportStorage, AzureBlobImportStorageLink, AzureBlobExportStorage, AzureBlobExportStorageLink
-from .s3.models import S3ImportStorage, S3ImportStorageLink, S3ExportStorage, S3ExportStorageLink
-from .gcs.models import GCSImportStorage, GCSImportStorageLink, GCSExportStorage, GCSExportStorageLink
-from .redis.models import RedisImportStorage, RedisImportStorageLink, RedisExportStorage, RedisExportStorageLink
 from label_studio.core.utils.common import load_func
 
 

@@ -1,35 +1,38 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
 import io
-import sys
 import json
 import logging
-import pandas as pd
-import posixpath
 import mimetypes
-
+import os
+import posixpath
+import sys
 from pathlib import Path
-from django.utils._os import safe_join
-from django.conf import settings
-from django.contrib.auth import logout
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import redirect, reverse
-from django.template import loader
-from ranged_fileresponse import RangedFileResponse
-from django.http import JsonResponse
 from wsgiref.util import FileWrapper
-from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
-from django.db.models import Value, F, CharField
 
+import pandas as pd
 from core import utils
-from core.utils.io import find_file
+from core.feature_flags import all_flags, get_feature_file_path
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
+from core.utils.io import find_file
+from django.conf import settings
+from django.contrib.auth import logout
+from django.db.models import CharField, F, Value
+from django.http import (
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseServerError,
+    JsonResponse,
+)
+from django.shortcuts import redirect, reverse
+from django.template import loader
+from django.utils._os import safe_join
+from drf_yasg.utils import swagger_auto_schema
 from io_storages.localfiles.models import LocalFilesImportStorage
-from core.feature_flags import all_flags, get_feature_file_path
-
+from ranged_fileresponse import RangedFileResponse
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 

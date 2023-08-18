@@ -4,7 +4,6 @@
 Main module with the bulk_update function.
 """
 import itertools
-
 from collections import defaultdict
 
 from django.db import connections, models

@@ -1,5 +1,5 @@
-from typing import TYPE_CHECKING, Optional, TypeVar
 import logging
+from typing import TYPE_CHECKING, Optional, TypeVar
 
 from core.feature_flags import flag_set
 from django.db import models

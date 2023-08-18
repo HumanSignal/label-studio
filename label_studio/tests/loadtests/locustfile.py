@@ -2,9 +2,9 @@
 """
 import json
 import random
-
 from uuid import uuid4
-from locust import HttpUser, TaskSet, task, between
+
+from locust import HttpUser, TaskSet, between, task
 
 
 class UserWorksWithProject(TaskSet):
@@ -106,7 +106,7 @@ class WebsiteUser(HttpUser):
             'password': '12345678',
             'title': username.upper()
         }
-        r = self.client.post('/user/signup', payload, headers={'X-CSRFToken': csrftoken})
+        self.client.post('/user/signup', payload, headers={'X-CSRFToken': csrftoken})
         response = self.client.get('/api/current-user/token').json()
         self.client.token = response['detail']
         self.client.name = username

@@ -1,18 +1,20 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import logging
 import os
 import uuid
-import logging
-import pandas as pd
 from collections import Counter
+
+import pandas as pd
+
 try:
     import ujson as json
 except:
     import json
 
-from django.db import models
 from core.feature_flags import flag_set
 from django.conf import settings
+from django.db import models
 from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)

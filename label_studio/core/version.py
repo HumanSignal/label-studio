@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 """ Version Lib
@@ -10,11 +11,12 @@ If 'git desc' is fail it will read __version__.py:git_version.
 
 ATTENTION: do not include version_.py to git! It will affect git commit always!
 """
-from subprocess import STDOUT, CalledProcessError, check_output as run
+import json
+import logging
 import os
 import sys
-import logging
-import json
+from subprocess import STDOUT, CalledProcessError
+from subprocess import check_output as run
 
 VERSION_FILE = 'version_.py'
 LS_VERSION_FILE = 'ls-version_.py'

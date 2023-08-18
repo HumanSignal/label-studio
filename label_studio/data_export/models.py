@@ -20,7 +20,6 @@ from django.utils.translation import gettext_lazy as _
 from label_studio_converter import Converter
 from tasks.models import Annotation
 
-
 logger = logging.getLogger(__name__)
 
 

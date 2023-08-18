@@ -3,17 +3,22 @@
 import json
 import logging
 
-from django.db.models import Q, Avg, Count, Sum, Value, BooleanField, Case, When
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-from django.db.models import JSONField
-from django.core.validators import MinLengthValidator, MaxLengthValidator
-from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
-
-from data_manager.managers import TaskQuerySet
-from projects.functions.utils import make_queryset_from_iterable
-from tasks.models import Task, Prediction, Annotation, AnnotationDraft, Q_task_finished_annotations, bulk_update_stats_project_tasks
+from core.bulk_update_utils import bulk_update
+from core.label_config import (
+    check_control_in_config_by_regex,
+    check_toname_in_config_by_regex,
+    config_line_stipped,
+    extract_data_types,
+    get_all_control_tag_tuples,
+    get_all_labels,
+    get_all_object_tag_names,
+    get_all_types,
+    get_annotation_tuple,
+    get_original_fromname_by_regex,
+    get_sample_task,
+    validate_label_config,
+)
 from core.utils.common import (
     conditional_atomic,
     create_hash,
@@ -23,27 +28,33 @@ from core.utils.common import (
 )
 from core.utils.db import should_run_bulk_update_in_transaction
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
-from core.label_config import (
-    validate_label_config,
-    extract_data_types,
-    get_all_object_tag_names,
-    config_line_stipped,
-    get_sample_task,
-    get_all_labels,
-    get_all_control_tag_tuples,
-    get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
-    get_original_fromname_by_regex, get_all_types,
-)
-from core.feature_flags import flag_set
-from core.bulk_update_utils import bulk_update
+from data_manager.managers import TaskQuerySet
+from django.conf import settings
+from django.core.validators import MaxLengthValidator, MinLengthValidator
+from django.db import models, transaction
+from django.db.models import Avg, BooleanField, Case, Count, JSONField, Q, Sum, Value, When
+from django.utils.translation import gettext_lazy as _
 from label_studio_tools.core.label_config import parse_config
-from projects.functions import (
-    annotate_task_number, annotate_finished_task_number, annotate_total_predictions_number,
-    annotate_total_annotations_number, annotate_num_tasks_with_annotations,
-    annotate_useful_annotation_number, annotate_ground_truth_number, annotate_skipped_annotations_number
-)
 from labels_manager.models import Label
-
+from projects.functions import (
+    annotate_finished_task_number,
+    annotate_ground_truth_number,
+    annotate_num_tasks_with_annotations,
+    annotate_skipped_annotations_number,
+    annotate_task_number,
+    annotate_total_annotations_number,
+    annotate_total_predictions_number,
+    annotate_useful_annotation_number,
+)
+from projects.functions.utils import make_queryset_from_iterable
+from tasks.models import (
+    Annotation,
+    AnnotationDraft,
+    Prediction,
+    Q_task_finished_annotations,
+    Task,
+    bulk_update_stats_project_tasks,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -492,7 +503,7 @@ class Project(ProjectMixin, models.Model):
         # validate data columns consistency
         fields_from_config = get_all_object_tag_names(config_string)
         if not fields_from_config:
-            logger.debug(f'Data fields not found in labeling config')
+            logger.debug('Data fields not found in labeling config')
             return
 
         #TODO: DEV-2939 Add validation for fields addition in label config
@@ -516,7 +527,7 @@ class Project(ProjectMixin, models.Model):
         # validate annotations consistency
         annotations_from_config = set(get_all_control_tag_tuples(config_string))
         if not annotations_from_config:
-            logger.debug(f'Annotation schema is not found in config')
+            logger.debug('Annotation schema is not found in config')
             return
         annotations_from_data = set(self.summary.created_annotations)
         if annotations_from_data and not annotations_from_data.issubset(annotations_from_config):

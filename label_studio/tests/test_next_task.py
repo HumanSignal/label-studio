@@ -1,22 +1,24 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
-import threading
 import time
-
 from unittest import mock
-from functools import partial
 
+import pytest
+from core.redis import redis_healthcheck
 from django.apps import apps
 from django.db.models import Q
 from projects.models import Project
-from tasks.models import Task, Annotation, Prediction
+from tasks.models import Annotation, Prediction, Task
+
 from .utils import (
-    ml_backend_mock, make_project, make_task, make_annotator,
-    invite_client_to_project, make_annotation, _client_is_annotator
+    _client_is_annotator,
+    invite_client_to_project,
+    make_annotation,
+    make_annotator,
+    make_project,
+    make_task,
 )
-from core.redis import redis_healthcheck
 
 _project_for_text_choices_onto_A_B_classes = dict(
     title='Test',
@@ -695,9 +697,9 @@ def test_breadth_first_overlap_3(business_client):
         annotator.post(f'/api/tasks/{task_id}/annotations/', data={'task': task_id, 'result': annotation_result})
         return task_id
 
-    id1 = make_task({'data': {'text': 'aaa'}}, project).id
-    id2 = make_task({'data': {'text': 'bbb'}}, project).id
-    id3 = make_task({'data': {'text': 'ccc'}}, project).id
+    make_task({'data': {'text': 'aaa'}}, project).id
+    make_task({'data': {'text': 'bbb'}}, project).id
+    make_task({'data': {'text': 'ccc'}}, project).id
 
     ann1 = make_annotator({'email': 'ann1@testbreadthfirstoverlap3.com'}, project, True)
     ann2 = make_annotator({'email': 'ann2@testbreadthfirstoverlap3.com'}, project, True)
@@ -1260,7 +1262,7 @@ def test_with_bad_annotation_result(business_client):
                 make_annotation({'result': [bad_result] * 10 + [good_result] * 10, 'completed_by': anns[i].annotator}, task.id)
 
     # create uncompleted task
-    uncompleted_task = make_task({'data': {'image': f'https://data.s3.amazonaws.com/image/uncompleted.jpg'}}, project)
+    uncompleted_task = make_task({'data': {'image': 'https://data.s3.amazonaws.com/image/uncompleted.jpg'}}, project)
 
     print('ann1 takes any task with bad annotation and complete it')
     r = anns[0].get(f'/api/projects/{project.id}/next')
@@ -1270,7 +1272,7 @@ def test_with_bad_annotation_result(business_client):
     def make_async_annotation_submit(new_ann=None):
         print('Async annotation submit')
         if new_ann is None:
-            new_ann = make_annotator({'email': f'new_ann@testwithbadannotationresult.com'}, project, True)
+            new_ann = make_annotator({'email': 'new_ann@testwithbadannotationresult.com'}, project, True)
         new_ann.post(
             f'/api/tasks/{task_id}/annotations/',
             data={'task': task_id, 'result': json.dumps([good_result])},

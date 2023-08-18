@@ -2,19 +2,18 @@
 """
 import json
 import logging
+
 import lxml.etree
+from core.label_config import get_sample_task
+from core.utils.common import get_organization_from_request
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from rest_framework import status, generics
-from rest_framework.exceptions import ValidationError
-from projects.models import Project
-
-from core.label_config import get_sample_task
-from core.utils.common import get_organization_from_request
-
 from organizations.models import Organization
+from projects.models import Project
+from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 

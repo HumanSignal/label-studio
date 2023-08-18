@@ -1,35 +1,31 @@
-from datetime import datetime
-from functools import reduce
 import hashlib
-import io
 import json
 import logging
 import pathlib
 import shutil
+from datetime import datetime
+from functools import reduce
 
+import django_rq
+from core.redis import redis_connected
+from core.utils.common import batch
+from core.utils.io import (
+    SerializableGenerator,
+    get_all_dirs_from_dir,
+    get_all_files_from_dir,
+    get_temp_dir,
+    read_bytes_stream,
+)
+from data_manager.models import View
+from django.conf import settings
 from django.core.files import File
 from django.core.files import temp as tempfile
 from django.db import transaction
 from django.db.models import Prefetch
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
-import django_rq
 from label_studio_converter import Converter
-from django.conf import settings
-
-from core.redis import redis_connected
-from core.utils.common import batch
-from core.utils.io import (
-    get_all_files_from_dir,
-    get_temp_dir,
-    read_bytes_stream,
-    get_all_dirs_from_dir,
-    SerializableGenerator,
-)
-from data_manager.models import View
-from projects.models import Project
 from tasks.models import Annotation, Task
-
 
 ONLY = 'only'
 EXCLUDE = 'exclude'
@@ -185,7 +181,6 @@ class ExportMixin:
             # TODO: make counters from queryset
             # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
             self.counters = {'task_number': 0}
-            result = []
             all_tasks = self.project.tasks
             logger.debug('Tasks filtration')
             task_ids = (
@@ -259,7 +254,7 @@ class ExportMixin:
             self.status = self.Status.COMPLETED
             self.save(update_fields=['status'])
 
-        except Exception as exc:
+        except Exception:
             self.status = self.Status.FAILED
             self.save(update_fields=['status'])
             logger.exception('Export was failed')
@@ -277,7 +272,7 @@ class ExportMixin:
 
         if redis_connected():
             queue = django_rq.get_queue('default')
-            job = queue.enqueue(
+            queue.enqueue(
                 export_background,
                 self.id,
                 task_filter_options,
