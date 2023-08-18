@@ -14,6 +14,7 @@ import { useImportPage } from './Import/useImportPage';
 import { useDraftProject } from './utils/useDraftProject';
 import { Select } from '../../components/Form';
 import { EnterpriseBadge } from '../../components/Badges/Enterprise';
+import { Caption } from '../../components/Caption/Caption';
 
 
 const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null : (
@@ -40,10 +41,10 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <EnterpriseBadge />
       </label>
       <Select placeholder="Select an option" disabled options={[]} />
-      <p className={cn("project-name").elem("caption")}>
+      <Caption>
         Simplify project management by organizing projects into workspaces.
         <a href="#">Learn more</a>
-      </p>
+      </Caption>
       <HeidiTips collection="projectCreation" />
     </div>
   </form>
