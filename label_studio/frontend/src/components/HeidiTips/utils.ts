@@ -52,7 +52,8 @@ export function createURL(url: string, params?: Record<string, string>): string 
     base.searchParams.set(key, value);
   });
 
-  const { server_id: serverID, user_id: userID } = APP_SETTINGS;
+  const userID = APP_SETTINGS.user?.id;
+  const serverID = APP_SETTINGS.server_id;
 
   if (serverID) base.searchParams.set("server_id", serverID);
   if (userID) base.searchParams.set("user_id", userID);
