@@ -77,6 +77,10 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/active_learning.html#Set-up-task-sampling-with-prediction-scores",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "prediction_score"
+      }
     },
   }, {
     title: "Did you know?",
@@ -85,6 +89,10 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/quality",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "quality_and_agreement"
+      }
     },
   }, {
     title: "Did you know?",
@@ -93,11 +101,23 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/active_learning",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "active_learning"
+      }
     },
   }, {
     title: "Did you know?",
     content: "You can save time managing infrastructure and upgrades, plus access more features for automation, quality, and team management, by using the Enterprise cloud service.",
     closable: true,
+    link: {
+      label: "Learn more",
+      url: "",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "infrastructure_and_upgrades"
+      }
+    }
   }, {
     title: "Did you know?",
     content: "You can connect ML models using the backend SDK to save time with pre-labeling or active learning.",
@@ -105,6 +125,10 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://labelstud.io/guide/ml",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "connect_ml_models"
+      }
     },
   }, {
     title: "Faster image labeling",
@@ -112,10 +136,10 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://labelstud.io/guide/labeling#Label-with-collaborators",
+      url: "https://labelstud.io/guide/labeling#Faster-image-labeling",
       params: {
-        experiment: "project_creation_tip",
-        treatment: "label_with_collaborators",
+        experiment: "project_settings_tip",
+        treatment: "two_clicks",
       },
     },
   }],
