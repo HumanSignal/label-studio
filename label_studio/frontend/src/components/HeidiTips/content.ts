@@ -8,6 +8,10 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects",
+      params: {
+        experiment: "project_creation_tip",
+        treatment: "find_and_manage_projects",
+      },
     },
   }, {
     title: "Unlock faster access provisioning",
@@ -16,6 +20,10 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/manage_projects#Add-or-remove-members-to-a-workspace",
+      params: {
+        experiment: "project_creation_tip",
+        treatment: "faster_provisioning",
+      },
     },
   }, {
     title: "Did you know?",
@@ -24,6 +32,10 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise",
+      params: {
+        experiment: "project_creation_tip",
+        treatment: "supervise_projects",
+      },
     },
   }, {
     title: "Did you know?",
@@ -32,14 +44,22 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise",
+      params: {
+        experiment: "project_creation_tip",
+        treatment: "access_to_projects",
+      },
     },
   }, {
     title: "Did you know?",
-    content: "You can use or modify dozens or templates to configure your labeling UI, or create a custom configuration from scratch using simple XML-like tag",
+    content: "You can use or modify dozens or templates to configure your labeling UI, or create a custom configuration from scratch using simple XML-like tag.",
     closable: true,
     link: {
       label: "Learn more",
       url: "https://labelstud.io/guide/setup",
+      params: {
+        experiment: "project_creation_tip",
+        treatment: "templates",
+      },
     },
   }, {
     title: "Did you know?",
@@ -58,7 +78,7 @@ export const TipsCollection: Record<string, Tip[]> = {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/active_learning.html#Set-up-task-sampling-with-prediction-scores",
     },
-  },{
+  }, {
     title: "Did you know?",
     content: "You can increase the quality of your labeled data with reviewer workflows and task agreement scores using Label Studio Enterprise.",
     closable: true,
@@ -66,7 +86,7 @@ export const TipsCollection: Record<string, Tip[]> = {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/quality",
     },
-  },{
+  }, {
     title: "Did you know?",
     content: "You can minimize the number of tasks to be labeled by setting up an automated active learning loop in Label Studio Enterprise.",
     closable: true,
@@ -74,15 +94,11 @@ export const TipsCollection: Record<string, Tip[]> = {
       label: "Learn more",
       url: "https://docs.humansignal.com/guide/active_learning",
     },
-  },{
+  }, {
     title: "Did you know?",
     content: "You can save time managing infrastructure and upgrades, plus access more features for automation, quality, and team management, by using the Enterprise cloud service.",
     closable: true,
-    link: {
-      label: "Learn more",
-      url: "",
-    },
-  },{
+  }, {
     title: "Did you know?",
     content: "You can connect ML models using the backend SDK to save time with pre-labeling or active learning.",
     closable: true,
@@ -90,13 +106,17 @@ export const TipsCollection: Record<string, Tip[]> = {
       label: "Learn more",
       url: "https://labelstud.io/guide/ml",
     },
-  },{
+  }, {
     title: "Faster image labeling",
     content: "You can add a rectangle or an ellipse to your image with just two clicks, or double click to create a polygon, rectangle, or ellipse.",
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://labelstud.io/guide/labeling#Faster-image-labeling",
+      url: "https://labelstud.io/guide/labeling#Label-with-collaborators",
+      params: {
+        experiment: "project_creation_tip",
+        treatment: "label_with_collaborators",
+      },
     },
   }],
 };

@@ -1,6 +1,5 @@
 import { FC, MouseEvent, useCallback, useMemo } from "react";
 import { Block, Elem } from "../../utils/bem";
-// @ts-ignore-next-line
 import { LsCross } from "../../assets/icons";
 import "./HeidiTip.styl";
 import { Button } from "../Button/Button";
@@ -9,7 +8,7 @@ import { HeidiTipProps, Tip } from "./types";
 import { Tooltip } from "../Tooltip/Tooltip";
 import { createURL } from "./utils";
 
-const HeidiLink: FC<{ link: Tip["link"] }> = ({
+const HeidiLink: FC<{ link: Exclude<Tip["link"], undefined> }> = ({
   link,
 }) => {
   const url = useMemo(() => {
@@ -53,7 +52,7 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
         </Elem>
         <Elem name="text">
           {tip.content}
-          <HeidiLink link={tip.link} />
+          {tip.link && <HeidiLink link={tip.link} />}
         </Elem>
       </Elem>
       <Elem name="heidi">

@@ -1,10 +1,10 @@
 import { FC, memo, useCallback, useState } from "react";
 import { HeidiTipsProps } from './types';
-import { HeidiTip } from "./HeidiTip"
+import { HeidiTip } from "./HeidiTip";
 import { dismissTip, getRandomTip, isTipDismissed } from "./utils";
 
 export const HeidiTips: FC<HeidiTipsProps> = memo(({
-  collection
+  collection,
 }) => {
   const [tip, setTip] = useState(getRandomTip(collection));
   const dismiss = useCallback(() => {
