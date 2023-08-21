@@ -228,6 +228,27 @@ stages:
       status: "completed"
       traceback: null
 
+- name: Patch storage with synchronizable false
+  request:
+    headers:
+      content-type: application/json
+    json:
+      synchronizable: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/s3/{storage_pk}'
+  response:
+    status_code: 200
+    json:
+      status: "completed"
+      traceback: null
+
+- name: Try to Sync S3 storage with synchronizable false
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
+  response:
+    status_code: 400
+
 ---
 test_name: test_import_from_s3_storage_recursive_scan
 strict: false
@@ -409,7 +430,26 @@ stages:
       data:
         image_url: !re_match "https://storage.googleapis.com/test-gs-bucket/.+"
     status_code: 200
+- name: Patch storage with synchronizable false
+  request:
+    headers:
+      content-type: application/json
+    json:
+      synchronizable: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/gcs/{storage_pk}'
+  response:
+    status_code: 200
+    json:
+      status: "completed"
+      traceback: null
 
+- name: Try to Sync GCS storage with synchronizable false
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/gcs/{storage_pk}/sync'
+  response:
+    status_code: 400
 
 ---
 test_name: test_invalidate_gcs_storage
@@ -724,6 +764,27 @@ stages:
     url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={project_pk}'
   response:
     status_code: 200
+
+- name: Patch storage with synchronizable false
+  request:
+    headers:
+      content-type: application/json
+    json:
+      synchronizable: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/export/s3/{storage_pk}'
+  response:
+    status_code: 200
+    json:
+      status: "completed"
+      traceback: null
+
+- name: Try to Sync S3 storage with synchronizable false
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/export/s3/{storage_pk}/sync'
+  response:
+    status_code: 400
 ---
 
 test_name: test_export_s3_storage_with_sse
@@ -732,6 +793,8 @@ marks:
 - usefixtures:
   - django_live_url
   - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on
+  - mock_s3_resource_aes
 stages:
 - id: signup
   type: ref
@@ -801,7 +864,6 @@ stages:
       json:
         annotation_pk: id
     status_code: 201
-
 - name: Sync with target storage
   request:
     method: POST
@@ -815,7 +877,98 @@ stages:
   response:
     status_code: 200
 ---
+test_name: test_export_s3_storage_with_kms
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on
+  - mock_s3_resource_kms
+stages:
+- id: signup
+  type: ref
 
+- name: Create a project
+  request:
+    data:
+      is_published: true
+      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_s3_storage
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+
+- name: Create a storage with kms SSE enabled
+  request:
+    data:
+      bucket: pytest-export-s3-bucket-with-kms
+      project: '{project_pk}'
+      title: Testing Export S3 storage (bucket from conftest.py)
+      aws_sse_kms_key_id: 'test-key-id'
+    method: POST
+    url: '{django_live_url}/api/storages/export/s3'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+
+- name: Create a task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image_url: http://test.heartex.com/my_super_image.jpg
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
+    save:
+      json:
+        task_pk: id
+    status_code: 201
+
+- name: Create an annotation
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+      result:
+      - from_name: label
+        to_name: image
+        type: choices
+        origin: manual
+        value:
+          choices:
+          - pos
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_pk}/annotations'
+  response:
+    save:
+      json:
+        annotation_pk: id
+    status_code: 201
+- name: Sync with target storage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/export/s3/{storage_pk}/sync'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={project_pk}'
+  response:
+    status_code: 200
+
+---
 test_name: test_export_gcs_storage
 strict: false
 marks:
@@ -911,6 +1064,26 @@ stages:
     url: '{django_live_url}/api/storages/export/gcs/{storage_pk}/sync'
   response:
     status_code: 200
+- name: Patch storage with synchronizable false
+  request:
+    headers:
+      content-type: application/json
+    json:
+      synchronizable: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/export/gcs/{storage_pk}'
+  response:
+    status_code: 200
+    json:
+      status: "completed"
+      traceback: null
+
+- name: Try to Sync GCS storage with synchronizable false
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/export/gcs/{storage_pk}/sync'
+  response:
+    status_code: 400
 ---
 test_name: test_empty_storage_list
 strict: false
@@ -1072,6 +1245,26 @@ stages:
     url: '{django_live_url}/api/storages'
   response:
     status_code: 200
+- name: Patch storage with synchronizable false
+  request:
+    headers:
+      content-type: application/json
+    json:
+      synchronizable: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/azure/{storage_pk}'
+  response:
+    status_code: 200
+    json:
+      status: "completed"
+      traceback: null
+
+- name: Try to Sync Azure storage with synchronizable false
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/azure/{storage_pk}/sync'
+  response:
+    status_code: 400
 
 ---
 test_name: test_export_azure_storage
@@ -1154,6 +1347,26 @@ stages:
       json:
         annotation_pk: id
     status_code: 201
+- name: Patch storage with synchronizable false
+  request:
+    headers:
+      content-type: application/json
+    json:
+      synchronizable: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/export/azure/{storage_pk}'
+  response:
+    status_code: 200
+    json:
+      status: "completed"
+      traceback: null
+
+- name: Try to Sync Azure storage with synchronizable false
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/export/azure/{storage_pk}/sync'
+  response:
+    status_code: 400
 
 ---
 test_name: test_import_jsons_from_s3

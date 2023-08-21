@@ -108,6 +108,11 @@ def get_all_columns(project, *_):
             'project_defined': False,
         }]
 
+    if flag_set('fflag_fix_back_lsdv_4648_annotator_filter_29052023_short', user=project.organization.created_by):
+        project_members = project.all_members.values_list('id', flat=True)
+    else:
+        project_members = project.organization.members.values_list('user__id', flat=True)
+
     result['columns'] += [
         {
             'id': 'completed_at',
@@ -163,7 +168,7 @@ def get_all_columns(project, *_):
             'type': 'List',
             'target': 'tasks',
             'help': 'All users who completed the task',
-            'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
+            'schema': {'items': project_members},
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
@@ -285,7 +290,7 @@ def get_all_columns(project, *_):
             'type': 'List',
             'target': 'tasks',
             'help': 'User who did the last task update',
-            'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
+            'schema': {'items': project_members},
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False

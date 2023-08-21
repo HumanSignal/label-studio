@@ -5,10 +5,7 @@ import json
 import requests_mock
 import requests
 from django.urls import reverse
-from organizations.models import Organization
 from projects.models import Project
-from io import BytesIO
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 from webhooks.models import Webhook, WebhookAction
 from webhooks.utils import emit_webhooks, emit_webhooks_for_instance, run_webhook
@@ -41,13 +38,15 @@ def test_run_webhook(setup_project_dialog, organization_webhook):
     webhook = organization_webhook
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
-        run_webhook(organization_webhook, WebhookAction.PROJECT_CREATED, {'data': 'test'})
+        run_webhook(organization_webhook,
+                    WebhookAction.PROJECT_CREATED, {'data': 'test'})
 
     request_history = m.request_history
     assert len(request_history) == 1
     assert request_history[0].method == 'POST'
     assert request_history[0].url == organization_webhook.url
-    TestCase().assertDictEqual(request_history[0].json(), {'action': WebhookAction.PROJECT_CREATED, 'data': 'test'})
+    TestCase().assertDictEqual(request_history[0].json(), {
+        'action': WebhookAction.PROJECT_CREATED, 'data': 'test'})
 
 
 @pytest.mark.django_db
@@ -55,13 +54,15 @@ def test_emit_webhooks(setup_project_dialog, organization_webhook):
     webhook = organization_webhook
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
-        emit_webhooks(webhook.organization, webhook.project, WebhookAction.PROJECT_CREATED, {'data': 'test'})
+        emit_webhooks(webhook.organization, webhook.project,
+                      WebhookAction.PROJECT_CREATED, {'data': 'test'})
 
     request_history = m.request_history
     assert len(request_history) == 1
     assert request_history[0].method == 'POST'
     assert request_history[0].url == webhook.url
-    TestCase().assertDictEqual(request_history[0].json(), {'action': WebhookAction.PROJECT_CREATED, 'data': 'test'})
+    TestCase().assertDictEqual(request_history[0].json(), {
+        'action': WebhookAction.PROJECT_CREATED, 'data': 'test'})
 
 
 @pytest.mark.django_db
@@ -86,7 +87,8 @@ def test_emit_webhooks_for_instance(setup_project_dialog, organization_webhook):
 def test_exception_catch(organization_webhook):
     webhook = organization_webhook
     with requests_mock.Mocker(real_http=True) as m:
-        m.register_uri('POST', webhook.url, exc=requests.exceptions.ConnectTimeout)
+        m.register_uri('POST', webhook.url,
+                       exc=requests.exceptions.ConnectTimeout)
         result = run_webhook(webhook, WebhookAction.PROJECT_CREATED)
     assert result is None
 
@@ -103,7 +105,8 @@ def test_webhooks_for_projects(configured_project, business_client, organization
         response = business_client.post(reverse('projects:api:project-list'))
 
     assert response.status_code == 201
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.PROJECT_CREATED
@@ -119,7 +122,8 @@ def test_webhooks_for_projects(configured_project, business_client, organization
         )
 
     assert response.status_code == 200
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.PROJECT_UPDATED
@@ -132,9 +136,11 @@ def test_webhooks_for_projects(configured_project, business_client, organization
             reverse('projects:api:project-detail', kwargs={'pk': project_id}),
         )
     assert response.status_code == 204
-    assert len(list(filter(lambda x: x.url == organization_webhook.url, m.request_history))) == 1
+    assert len(list(filter(lambda x: x.url ==
+               organization_webhook.url, m.request_history))) == 1
 
-    r = list(filter(lambda x: x.url == organization_webhook.url, m.request_history))[0]
+    r = list(filter(lambda x: x.url ==
+             organization_webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.PROJECT_DELETED
     assert r.json()['project']['id'] == project_id
 
@@ -158,7 +164,8 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
             content_type="application/json",
         )
     assert response.status_code == 201
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.TASKS_CREATED
@@ -170,10 +177,12 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
     url = webhook.url
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', url)
-        response = business_client.delete(reverse('tasks:api:task-detail', kwargs={'pk': task_id}))
+        response = business_client.delete(
+            reverse('tasks:api:task-detail', kwargs={'pk': task_id}))
 
     assert response.status_code == 204
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.TASKS_DELETED
@@ -191,7 +200,8 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
     IMPORT_CSV = "tests/test_suites/samples/test_5.csv"
 
     with open(IMPORT_CSV, 'rb') as file_:
-        data = SimpleUploadedFile('test_5.csv', file_.read(), content_type='multipart/form-data')
+        data = SimpleUploadedFile(
+            'test_5.csv', file_.read(), content_type='multipart/form-data')
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
         response = business_client.post(
@@ -202,7 +212,8 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
     assert response.status_code == 201
     assert response.json()['task_count'] == 3
 
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.TASKS_CREATED
@@ -244,7 +255,8 @@ def test_webhooks_for_annotation(configured_project, business_client, organizati
         )
 
     assert response.status_code == 201
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.ANNOTATION_CREATED
@@ -284,7 +296,8 @@ def test_webhooks_for_annotation(configured_project, business_client, organizati
         )
         assert response.status_code == 200
 
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 2
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 2
 
     for r in list(filter(lambda x: x.url == webhook.url, m.request_history)):
         assert r.json()['action'] == WebhookAction.ANNOTATION_UPDATED
@@ -301,7 +314,8 @@ def test_webhooks_for_annotation(configured_project, business_client, organizati
             content_type="application/json",
         )
     assert response.status_code == 204
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.ANNOTATIONS_DELETED
@@ -337,7 +351,8 @@ def test_webhooks_for_action_delete_tasks_annotations(configured_project, busine
         )
 
     assert response.status_code == 200
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.ANNOTATIONS_DELETED
@@ -360,7 +375,8 @@ def test_webhooks_for_action_delete_tasks_annotations(configured_project, busine
             content_type="application/json",
         )
     assert response.status_code == 200
-    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+    assert len(
+        list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.TASKS_DELETED
