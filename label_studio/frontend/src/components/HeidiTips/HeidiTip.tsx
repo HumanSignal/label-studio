@@ -6,26 +6,20 @@ import { Button } from "../Button/Button";
 import { HeidiSpeaking } from "../../assets/images";
 import { HeidiTipProps, Tip } from "./types";
 import { Tooltip } from "../Tooltip/Tooltip";
+import { createURL } from "./utils";
 
 const HeidiLink: FC<{ link: Tip["link"] }> = ({
   link,
 }) => {
   const url = useMemo(() => {
-    const base = new URL(link.url);
-
-    Object.keys(link.params ?? {}).forEach((key) => {
-      const value = link.params?.[key];
-
-      if (value) base.searchParams.set(key, value);
-    });
-
+    const params = link.params ?? {};
     /* if needed, add server ID here */
 
-    return base.toString();
+    return createURL(link.url, params);
   }, [link]);
 
   return (
-  /* @ts-ignore-next-line */
+    /* @ts-ignore-next-line */
     <Elem name="link" tag="a" href={url} target="_blank">
       {link.label}
     </Elem>

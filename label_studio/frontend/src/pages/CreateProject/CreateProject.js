@@ -4,7 +4,6 @@ import { Button, ToggleItems } from '../../components';
 import { Modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
 import { HeidiTips } from '../../components/HeidiTips/HeidiTips';
-import { TipsCollection } from '../../components/HeidiTips/content';
 import { useAPI } from '../../providers/ApiProvider';
 import { cn } from '../../utils/bem';
 import { ConfigPage } from './Config/Config';
@@ -16,6 +15,7 @@ import { Select } from '../../components/Form';
 import { EnterpriseBadge } from '../../components/Badges/Enterprise';
 import { Caption } from '../../components/Caption/Caption';
 import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
+import { createURL } from '../../components/HeidiTips/utils';
 
 
 const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null : (
@@ -45,7 +45,13 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <Select placeholder="Select an option" disabled options={[]} />
         <Caption>
           Simplify project management by organizing projects into workspaces.
-          <a href={`https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects?experiment=project_creation_dropdown&treatment=simplify_project_management&server_id=${`placeholder`}&user_id=${`placeholder`}`}>Learn more</a>
+          <a href={createURL('https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects', {
+          user_id: `placeholder`,
+          experiment: "project_creation_dropdown",
+          treatment: "simplify_project_management",
+          server_id: 'placeholder',
+          user_id: 'placeholder'
+        })} target="_blank">Learn more</a>
         </Caption>
         <HeidiTips collection="projectCreation" />
       </div>
@@ -165,3 +171,4 @@ export const CreateProject = ({ onClose }) => {
     </Modal>
   );
 };
+

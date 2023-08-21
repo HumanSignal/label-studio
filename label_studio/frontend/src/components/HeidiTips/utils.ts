@@ -37,9 +37,20 @@ export function dismissTip(collection: string) {
   document.cookie = cookieString;
 }
 
+
 export function isTipDismissed(collection: string) {
   const cookies = Object.fromEntries(document.cookie.split(";").map(item => item.trim().split('=')));
   const finalKey = getKey(collection);
 
   return cookies[finalKey] === 'true';
+}
+
+export function createURL(url: string, params?: Record<string, string>): string {
+  const base = new URL(url);
+
+  Object.entries(params ?? {}).forEach(([key, value]) => {
+    base.searchParams.set(key, value);
+  });
+
+  return base.toString()
 }
