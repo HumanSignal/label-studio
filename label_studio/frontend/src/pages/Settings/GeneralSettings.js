@@ -64,8 +64,6 @@ export const GeneralSettings = () => {
                 <Select placeholder="Select an option" disabled options={[]} />
                 <Block tag="p" name="settings-caption">
                   Simplify project management by organizing projects into workspaces. <a target="_blank" href={createURL("https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects", {
-                  user_id: 'placeholder',
-                  server_id: 'placeholder',
                   experiment: 'project_settings_tip',
                   treatment: 'simplify_project_management',
                 })}>Learn more</a>
