@@ -40,17 +40,14 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
       <div className="field field--wide">
         <label>
           Workspace
-        <EnterpriseBadge />
+          <EnterpriseBadge />
         </label>
         <Select placeholder="Select an option" disabled options={[]} />
         <Caption>
           Simplify project management by organizing projects into workspaces.
           <a href={createURL('https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects', {
-          user_id: `placeholder`,
           experiment: "project_creation_dropdown",
           treatment: "simplify_project_management",
-          server_id: 'placeholder',
-          user_id: 'placeholder'
         })} target="_blank">Learn more</a>
         </Caption>
         <HeidiTips collection="projectCreation" />
@@ -96,6 +93,7 @@ export const CreateProject = ({ onClose }) => {
 
   const onCreate = React.useCallback(async () => {
     const imported = await finishUpload();
+
     if (!imported) return;
 
     setWaitingStatus(true);
@@ -105,6 +103,7 @@ export const CreateProject = ({ onClose }) => {
       },
       body: projectBody,
     });
+
     setWaitingStatus(false);
 
     if (response !== null) {
@@ -122,8 +121,10 @@ export const CreateProject = ({ onClose }) => {
         title: name,
       },
     });
+
     if (res.ok) return;
     const err = await res.json();
+
     setError(err.validation_errors?.title);
   };
 

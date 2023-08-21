@@ -1,6 +1,5 @@
 import { FC, MouseEvent, useCallback, useMemo } from "react";
 import { Block, Elem } from "../../utils/bem";
-// @ts-ignore-next-line
 import { LsCross } from "../../assets/icons";
 import "./HeidiTip.styl";
 import { Button } from "../Button/Button";
@@ -62,4 +61,3 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
     </Block>
   );
 }
-
