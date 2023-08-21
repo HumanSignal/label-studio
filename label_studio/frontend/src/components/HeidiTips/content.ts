@@ -80,7 +80,11 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise"
+      url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise",
+      params: {
+        experiment: "organization_page_tip",
+        treatment: "team_growing",
+      },
     }
   }, {
     title: "Want to simplify and secure logging in?",
@@ -88,7 +92,11 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://docs.humansignal.com/guide/auth_setup"
+      url: "https://docs.humansignal.com/guide/auth_setup",
+      params: {
+        experiment: "organization_page_tip",
+        treatment: "enable_sso",
+      },
     }
   }, {
     title: "Want to improve your labeling team’s efficiency?",
@@ -96,7 +104,11 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://docs.humansignal.com/guide/dashboards"
+      url: "https://docs.humansignal.com/guide/dashboards",
+      params: {
+        experiment: "organization_page_tip",
+        treatment: "project_performance",
+      },
     }
   }, {
     title: "Want to automate task distribution?",
@@ -104,7 +116,11 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Learn more",
-      url: "https://docs.humansignal.com/guide/setup_project#Set-up-annotation-settings-for-your-project"
+      url: "https://docs.humansignal.com/guide/setup_project#Set-up-annotation-settings-for-your-project",
+      params: {
+        experiment: "organization_page_tip",
+        treatment: "automate_distribution",
+      },
     }
   }, {
     title: "Share knowledge with the community",
@@ -112,7 +128,11 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Join the community",
-      url: "https://label-studio.slack.com"
+      url: "https://label-studio.slack.com",
+      params: {
+        experiment: "organization_page_tip",
+        treatment: "share_knowledge",
+      },
     }
   }, {
     title: "Did you know?",
@@ -120,7 +140,11 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Check out the integrations directory",
-      url: "https://labelstud.io/integrations/"
+      url: "https://labelstud.io/integrations/",
+      params: {
+        experiment: "organization_page_tip",
+        treatment: "integration_points",
+      },
     }
   }]
 }
