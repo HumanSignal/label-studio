@@ -24,7 +24,7 @@ class AzureBlobImportStorageSerializer(ImportStorageSerializer):
 
     def validate(self, data):
         data = super(AzureBlobImportStorageSerializer, self).validate(data)
-        storage = AzureBlobImportStorage(**data)
+        storage = self.Meta.model(**data)
         try:
             storage.validate_connection()
         except Exception as exc:

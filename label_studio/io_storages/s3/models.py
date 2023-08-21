@@ -55,6 +55,9 @@ class S3StorageMixin(models.Model):
     aws_session_token = models.TextField(
         _('aws_session_token'), null=True, blank=True,
         help_text='AWS_SESSION_TOKEN')
+    aws_sse_kms_key_id = models.TextField(
+        _('aws_sse_kms_key_id'), null=True, blank=True,
+        help_text='AWS SSE KMS Key ID')
     region_name = models.TextField(
         _('region_name'), null=True, blank=True,
         help_text='AWS Region')
@@ -204,8 +207,15 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
 
         # put object into storage
         additional_params = {}
-        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user='auto'):
-            additional_params = {'ServerSideEncryption': 'AES256'}
+
+        self.cached_user = getattr(self, 'cached_user', annotation.task.project.organization.created_by)
+        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user=self.cached_user):
+            if self.aws_sse_kms_key_id:
+                additional_params['SSEKMSKeyId'] = self.aws_sse_kms_key_id
+                additional_params['ServerSideEncryption'] = 'aws:kms'
+            else:
+                additional_params['ServerSideEncryption'] = 'AES256'
+
         s3.Object(self.bucket, key).put(
             Body=json.dumps(ser_annotation),
             **additional_params
