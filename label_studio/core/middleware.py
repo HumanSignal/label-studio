@@ -121,6 +121,9 @@ class ContextLogMiddleware(CommonMiddleware):
             except:
                 pass
 
+        if 'server_id' not in request:
+            setattr(request, 'server_id', self.log._get_server_id())
+
         response = self.get_response(request)
         self.log.send(request=request, response=response, body=body)
 
