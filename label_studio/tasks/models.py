@@ -7,8 +7,9 @@ import os
 import datetime
 import numbers
 import time
+import base64
 
-from urllib.parse import urljoin, quote
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -249,7 +250,11 @@ class Task(TaskMixin, models.Model):
             protected_data = {}
             for key, value in task_data.items():
                 if isinstance(value, str) and string_is_url(value):
-                    path = reverse('projects-file-proxy', kwargs={'pk': project.pk}) + '?url=' + quote(value)
+                    path = (
+                        reverse('projects-file-proxy', kwargs={'pk': project.pk})
+                        + '?url='
+                        + base64.urlsafe_b64encode(value.encode()).decode()
+                    )
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
             return protected_data
