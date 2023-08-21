@@ -18,7 +18,7 @@ export const ChangeLabelName = () => {
   const history = useHistory();
   const [selectedLabel, setSelectedLabel] = useState('');
   const [newLabel, setNewLabel] = useState('');
-  const [nbOfAnnotations, setNbOfAnnotations] = useState(0);
+  const [nbOfTasks, setNbOfTasks] = useState(0);
   const [nbOfTasksChanged, setNbOfTasksChanged] = useState(0);
   const [availableLabels, setAvailableLabels] = useState([]);
   const [functionRunning, setFunctionRunning] = useState(false);
@@ -40,8 +40,8 @@ export const ChangeLabelName = () => {
         if (response.data.changing) {
           setFunctionRunning(true);
         }
-        if (response.data.annotations) {
-          setNbOfAnnotations(response.data.annotations);
+        if (response.data.tasks) {
+          setNbOfTasks(response.data.tasks);
         }
         if (response.data.nb_of_tasks_changed) {
           setNbOfTasksChanged(response.data.nb_of_tasks_changed);
@@ -128,7 +128,7 @@ export const ChangeLabelName = () => {
         <button disabled={functionRunning} type="submit">Submit</button>
         {functionRunning ? 
           <div>
-            <p>Please wait until all labels are changed. Tasks renamed: {nbOfTasksChanged}/{nbOfAnnotations} (Task renaming is done 20 at a time)</p>
+            <p>Please wait until all labels are changed. Tasks renamed: {nbOfTasksChanged}/{nbOfTasks} (Task renaming is done 20 at a time)</p>
             <p style={{color: 'red'}}>If the function is stuck on a certain number for a long period (more than 1 minute) of time or you face any difficulty please contact the developers.</p>
           </div> :
           <div>

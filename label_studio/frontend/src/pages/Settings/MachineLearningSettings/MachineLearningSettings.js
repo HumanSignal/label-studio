@@ -162,6 +162,7 @@ export const MachineLearningSettings = () => {
         if (response.data.message) {
           Swal.fire("Error", response.data.message, 'error');
         } else {
+          console.log(response.data);
           const decodedData = atob(response.data.model);
           const arrayBuffer = new ArrayBuffer(decodedData.length);
           const uint8Array = new Uint8Array(arrayBuffer);
