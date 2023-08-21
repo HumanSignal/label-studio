@@ -55,7 +55,7 @@ export const TipsCollection: Record<string, Tip[]> = {
     },
   }, {
     title: "Did you know?",
-    content: "You can use or modify dozens or templates to configure your labeling UI, or create a custom configuration from scratch using simple XML-like tag",
+    content: "You can use or modify dozens or templates to configure your labeling UI, or create a custom configuration from scratch using simple XML-like tag.",
     closable: true,
     link: {
       label: "Learn more",
