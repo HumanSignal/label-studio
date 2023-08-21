@@ -8,6 +8,7 @@ import { EnterpriseBadge } from '../../components/Badges/Enterprise';
 import './settings.styl';
 import { HeidiTips } from '../../components/HeidiTips/HeidiTips';
 import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
+import { createURL } from '../../components/HeidiTips/utils';
 
 export const GeneralSettings = () => {
   const { project, fetchProject } = useContext(ProjectContext);
@@ -57,19 +58,24 @@ export const GeneralSettings = () => {
             {isFF(FF_LSDV_E_297) && (
               <div className="field field--wide">
                 <label>
-                Workspace
+                  Workspace
                   <EnterpriseBadge />
                 </label>
                 <Select placeholder="Select an option" disabled options={[]} />
                 <Block tag="p" name="settings-caption">
-                Simplify project management by organizing projects into workspaces. <a target="_blank" href="https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects">Learn more</a>
+                  Simplify project management by organizing projects into workspaces. <a target="_blank" href={createURL("https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects", {
+                  user_id: 'placeholder',
+                  server_id: 'placeholder',
+                  experiment: 'project_settings_tip',
+                  treatment: 'simplify_project_management',
+                })}>Learn more</a>
                 </Block>
               </div>
             )}
             <RadioGroup name="color" label="Color" size="large" labelProps={{ size: "large" }}>
               {colors.map(color => (
                 <RadioGroup.Button key={color} value={color}>
-                  <Block name="color" style={{ '--background': color }}/>
+                  <Block name="color" style={{ '--background': color }} />
                 </RadioGroup.Button>
               ))}
             </RadioGroup>
@@ -86,7 +92,7 @@ export const GeneralSettings = () => {
               {isFF(FF_LSDV_E_297) && (
                 <Block name="disabled-field">
                   <Elem name="label">
-                    <input type="radio" value="test" disabled/>
+                    <input type="radio" value="test" disabled />
                   </Elem>
                   <Elem name="label-wrapper">
                     <Elem name="title">Uncertainty sampling <EnterpriseBadge /></Elem>
