@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5451: LSDV-5452: Improved Taxonomy",
-  "commit": "d0dd212bf7b12cb7f4469c9c2aa32dfe166f5abe",
+  "message": "fix: OPTIC-6: Splitchannel audio render option",
+  "commit": "999a946f92895318d01f842e70de642067252a86",
   "branch": "master",
-  "date": "2023/08/16 18:48:29"
+  "date": "2023/08/17 19:45:21"
 }
