@@ -1,3 +1,5 @@
+{% load filters %}
+
 <script>
   const dataTips = [
     {
@@ -50,6 +52,8 @@
     }
   ];
 
+  const SERVER_ID = {{ request.server_id|json_dumps_ensure_ascii|safe }};
+
   function createURL(url, params) {
     const base = new URL(url);
 
@@ -57,10 +61,7 @@
       base.searchParams.set(key, value);
     });
 
-    const userID = APP_SETTINGS.user?.id;
-    const serverID = APP_SETTINGS.server_id;
-
-    if (serverID) base.searchParams.set("server_id", serverID);
+    if (SERVER_ID) base.searchParams.set("server_id", SERVER_ID);
 
     return base.toString()
   }
