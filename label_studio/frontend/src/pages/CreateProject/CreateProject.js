@@ -49,8 +49,6 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
           user_id: `placeholder`,
           experiment: "project_creation_dropdown",
           treatment: "simplify_project_management",
-          server_id: 'placeholder',
-          user_id: 'placeholder'
         })} target="_blank">Learn more</a>
         </Caption>
         <HeidiTips collection="projectCreation" />
