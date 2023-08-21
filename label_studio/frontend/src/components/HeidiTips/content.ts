@@ -11,7 +11,6 @@ export const TipsCollection: Record<string, Tip[]> = {
       params: {
         experiment: "project_creation_tip",
         treatment: "find_and_manage_projects",
-        server_id: "placeholder",
       },
     },
   }, {
@@ -24,7 +23,6 @@ export const TipsCollection: Record<string, Tip[]> = {
       params: {
         experiment: "project_creation_tip",
         treatment: "faster_provisioning",
-        server_id: "placeholder",
       },
     },
   }, {
@@ -37,7 +35,6 @@ export const TipsCollection: Record<string, Tip[]> = {
       params: {
         experiment: "project_creation_tip",
         treatment: "supervise_projects",
-        server_id: "placeholder",
       },
     },
   }, {
@@ -50,7 +47,6 @@ export const TipsCollection: Record<string, Tip[]> = {
       params: {
         experiment: "project_creation_tip",
         treatment: "access_to_projects",
-        server_id: "placeholder",
       },
     },
   }, {
@@ -63,7 +59,6 @@ export const TipsCollection: Record<string, Tip[]> = {
       params: {
         experiment: "project_creation_tip",
         treatment: "templates",
-        server_id: "placeholder",
       },
     },
   }, {
@@ -76,7 +71,6 @@ export const TipsCollection: Record<string, Tip[]> = {
       params: {
         experiment: "project_creation_tip",
         treatment: "label_with_collaborators",
-        server_id: "placeholder",
       },
     },
   }],
