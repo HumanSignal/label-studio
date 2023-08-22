@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-6: Splitchannel audio render option",
-  "commit": "999a946f92895318d01f842e70de642067252a86",
-  "branch": "master",
-  "date": "2023/08/17 19:45:21"
+  "message": "feat: Optic-1: Convert submit button into drop down",
+  "commit": "f096a9499b940dea1dc61a2fc909ca3481d1edf8",
+  "branch": "fb-optic-1/labeling-submit-dropdown",
+  "date": "2023/08/22 08:46:37"
 }
