@@ -69,7 +69,12 @@ def _migrate_tasks(project_path, project):
             # migrate predictions
             predictions_data = task_data.get('predictions', [])
             for prediction in predictions_data:
-                task_prediction = Prediction(result=prediction['result'], task=task, score=prediction.get('score'))
+                task_prediction = Prediction(
+                    result=prediction['result'],
+                    task=task,
+                    score=prediction.get('score'),
+                    project=task.project,
+                )
                 with suppress_autotime(task_prediction, ['created_at']):
                     task_prediction.created_at = datetime.datetime.fromtimestamp(
                         prediction['created_at'], tz=datetime.datetime.now().astimezone().tzinfo

@@ -449,7 +449,9 @@ def test_next_task_with_active_learning(mocker,
 
     for task, prediction, annotation in zip(tasks, predictions, annotations):
         task = make_task(task, project)
-        Prediction.objects.create(task=task, model_version=project.model_version, **prediction)
+        Prediction.objects.create(
+            task=task, project=task.project, model_version=project.model_version, **prediction
+        )
         if annotation is not None:
             completed_by = any_client.annotator if num_annotators == 1 else annotator2_client.annotator
             Annotation.objects.create(task=task, completed_by=completed_by, project=project, **annotation)
