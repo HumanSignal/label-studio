@@ -83,8 +83,8 @@ export const TipsCollection: Record<string, Tip[]> = {
       url: "https://docs.humansignal.com/guide/active_learning.html#Set-up-task-sampling-with-prediction-scores",
       params: {
         experiment: "project_settings_tip",
-        treatment: "prediction_score"
-      }
+        treatment: "prediction_score",
+      },
     },
   }, {
     title: "Did you know?",
@@ -95,8 +95,8 @@ export const TipsCollection: Record<string, Tip[]> = {
       url: "https://docs.humansignal.com/guide/quality",
       params: {
         experiment: "project_settings_tip",
-        treatment: "quality_and_agreement"
-      }
+        treatment: "quality_and_agreement",
+      },
     },
   }, {
     title: "Did you know?",
@@ -107,8 +107,8 @@ export const TipsCollection: Record<string, Tip[]> = {
       url: "https://docs.humansignal.com/guide/active_learning",
       params: {
         experiment: "project_settings_tip",
-        treatment: "active_learning"
-      }
+        treatment: "active_learning",
+      },
     },
   }, {
     title: "Did you know?",
@@ -116,12 +116,12 @@ export const TipsCollection: Record<string, Tip[]> = {
     closable: true,
     link: {
       label: "Learn more",
-      url: "",
+      url: "https://humansignal.com/platform/",
       params: {
         experiment: "project_settings_tip",
-        treatment: "infrastructure_and_upgrades"
-      }
-    }
+        treatment: "infrastructure_and_upgrades",
+      },
+    },
   }, {
     title: "Did you know?",
     content: "You can connect ML models using the backend SDK to save time with pre-labeling or active learning.",
@@ -131,8 +131,8 @@ export const TipsCollection: Record<string, Tip[]> = {
       url: "https://labelstud.io/guide/ml",
       params: {
         experiment: "project_settings_tip",
-        treatment: "connect_ml_models"
-      }
+        treatment: "connect_ml_models",
+      },
     },
   }, {
     title: "Faster image labeling",
