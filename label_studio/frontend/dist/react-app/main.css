@@ -3535,6 +3535,21 @@ body {
   margin: 0 0 0 40px;
   max-width: 500px;
 }
+.ls-general-settings .ls-label__text {
+  padding: 0;
+}
+.ls-general-settings .ls-radio-group__buttons .ls-label__content {
+  padding: 0 16px;
+}
+.ls-workspace-placeholder__badge-wrapper {
+  display: flex;
+  margin-bottom: 16px;
+}
+.ls-workspace-placeholder__title {
+  font-size: 16px;
+  color: #3a3a3a;
+  font-weight: 500;
+}
 .ls-settings-caption {
   color: #1f1f1f;
   font-size: 12px;
