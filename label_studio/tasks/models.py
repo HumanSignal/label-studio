@@ -7,7 +7,8 @@ import numbers
 import os
 import time
 import uuid
-from urllib.parse import quote, urljoin
+import base64
+from urllib.parse import urljoin
 
 import ujson as json
 from core.bulk_update_utils import bulk_update
@@ -351,7 +352,7 @@ class Task(TaskMixin, models.Model):
                     path = (
                         reverse("projects-file-proxy", kwargs={"pk": project.pk})
                         + "?url="
-                        + quote(value)
+                        + base64.urlsafe_b64encode(value.encode()).decode()
                     )
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value

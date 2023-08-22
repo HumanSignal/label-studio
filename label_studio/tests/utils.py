@@ -294,6 +294,9 @@ def login(client, email, password):
 def signin(client, email, password):
     return client.post(f'/user/login/', data={'email': email, 'password': password})
 
+def signout(client):
+    return client.get('/logout')
+
 
 def _client_is_annotator(client):
     return 'annotator' in client.user.email

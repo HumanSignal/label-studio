@@ -8,7 +8,7 @@ import { HeidiTipProps, Tip } from "./types";
 import { Tooltip } from "../Tooltip/Tooltip";
 import { createURL } from "./utils";
 
-const HeidiLink: FC<{ link: Exclude<Tip["link"], undefined> }> = ({
+const HeidiLink: FC<{ link: Tip["link"] }> = ({
   link,
 }) => {
   const url = useMemo(() => {
@@ -52,7 +52,7 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
         </Elem>
         <Elem name="text">
           {tip.content}
-          {tip.link && <HeidiLink link={tip.link} />}
+          <HeidiLink link={tip.link} />
         </Elem>
       </Elem>
       <Elem name="heidi">
@@ -60,5 +60,4 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
       </Elem>
     </Block>
   );
-}
-
+};

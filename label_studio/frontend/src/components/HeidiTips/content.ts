@@ -68,6 +68,10 @@ export const TipsCollection: Record<string, Tip[]> = {
     link: {
       label: "Learn more",
       url: "https://labelstud.io/guide/labeling#Label-with-collaborators",
+      params: {
+        experiment: "project_creation_tip",
+        treatment: "label_with_collaborators",
+      },
     },
   }],
   projectSettings: [{

@@ -4,7 +4,7 @@ export type Tip = {
   title: string,
   content: string,
   closable?: boolean,
-  link?: {
+  link: {
     url: string,
     label: string,
     params?: Record<string, string>
