@@ -12,7 +12,7 @@ from data_export.models import DataExport
 from data_export.serializers import ExportDataSerializer
 from organizations.models import Organization
 from projects.models import Project
-from tasks.models import Task, Annotation
+from tasks.models import Task, Annotation, Prediction
 from data_export.mixins import ExportMixin
 
 
@@ -136,4 +136,17 @@ def fill_annotations_project():
         start_job_async_or_sync(_fill_annotations_project, project.id)
 
     logger.info('Finished filling project field for Annotation model')
+
+
+def _fill_predictions_project(project_id):
+    Prediction.objects.filter(task__project_id=project_id).update(project_id=project_id)
+
+
+def fill_predictions_project():
+    logger.info('Start filling project field for Prediction model')
+    projects = Project.objects.all()
+    for project in projects:
+        start_job_async_or_sync(_fill_predictions_project, project.id)
+
+    logger.info('Finished filling project field for Prediction model')
 

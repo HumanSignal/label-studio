@@ -246,9 +246,9 @@ def make_annotation(config, task_id):
 
 
 def make_prediction(config, task_id):
-    from tasks.models import Prediction
-
-    return Prediction.objects.create(task_id=task_id, **config)
+    from tasks.models import Prediction, Task
+    task = Task.objects.get(pk=task_id)
+    return Prediction.objects.create(task_id=task_id, project=task.project, **config)
 
 
 def make_annotator(config, project, login=False, client=None):
