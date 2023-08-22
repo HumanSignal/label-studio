@@ -35,7 +35,7 @@ export const GeneralSettings = () => {
 
   return (
     <Block name="general-settings">
-      <div style={{ width: 488 }}>
+      <Elem name={'wrapper'}>
         <Form
           action="updateProject"
           formData={{ ...project }}
@@ -113,7 +113,7 @@ export const GeneralSettings = () => {
             <Button type="submit" look="primary" style={{ width: 120 }}>Save</Button>
           </Form.Actions>
         </Form>
-      </div>
+      </Elem>
       {isFF(FF_LSDV_E_297) && (
         <HeidiTips collection="projectSettings" />
       )}
