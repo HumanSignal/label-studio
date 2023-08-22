@@ -122,20 +122,20 @@ task_create_response_scheme = {
         ],
         operation_summary='Import tasks',
         operation_description="""
-            Import data as labeling tasks in bulk using this API endpoint. You can use this API endpoint to import multiple tasks. 
+            Import data as labeling tasks in bulk using this API endpoint. You can use this API endpoint to import multiple tasks.
             One POST request is limited at 250K tasks and 200 MB.
-            
+
             **Note:** Imported data is verified against a project *label_config* and must
             include all variables that were used in the *label_config*. For example,
             if the label configuration has a *$text* variable, then each item in a data object
             must include a "text" field.
             <br>
-            
+
             ## POST requests
             <hr style="opacity:0.3">
-            
+
             There are three possible ways to import tasks with this endpoint:
-            
+
             ### 1\. **POST with data**
             Send JSON tasks as POST data. Only JSON is supported for POSTing files directly.
             Update this example to specify your authorization token and Label Studio instance host, then run the following from
@@ -145,15 +145,15 @@ task_create_response_scheme = {
             curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
             -X POST '{host}/api/projects/1/import' --data '[{{"text": "Some text 1"}}, {{"text": "Some text 2"}}]'
             ```
-            
+
             ### 2\. **POST with files**
             Send tasks as files. You can attach multiple files with different names.
-            
+
             - **JSON**: text files in JavaScript object notation format
             - **CSV**: text files with tables in Comma Separated Values format
             - **TSV**: text files with tables in Tab Separated Value format
             - **TXT**: simple text files are similar to CSV with one column and no header, supported for projects with one source only
-            
+
             Update this example to specify your authorization token, Label Studio instance host, and file name and path,
             then run the following from the command line:
 
@@ -161,16 +161,16 @@ task_create_response_scheme = {
             curl -H 'Authorization: Token abc123' \\
             -X POST '{host}/api/projects/1/import' -F ‘file=@path/to/my_file.csv’
             ```
-            
+
             ### 3\. **POST with URL**
             You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
-            
+
             ```bash
             curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
             -X POST '{host}/api/projects/1/import' \\
             --data '[{{"url": "http://example.com/test1.csv"}}, {{"url": "http://example.com/test2.csv"}}]'
             ```
-            
+
             <br>
         """.format(host=(settings.HOSTNAME or 'https://localhost:8080'))
     ))
@@ -217,11 +217,18 @@ class ImportAPI(generics.CreateAPIView):
             task_count = len(tasks)
             annotation_count = len(serializer.db_annotations)
             prediction_count = len(serializer.db_predictions)
+
+            recalculate_stats_counts = {
+                'task_count': task_count,
+                'annotation_count': annotation_count,
+                'prediction_count': prediction_count,
+            }
+
             # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
             # single operation as counters affect bulk is_labeled update
             project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
                                                           overlap_cohort_percentage_changed=False,
-                                                          tasks_number_changed=True)
+                                                          tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
             logger.info('Tasks bulk_update finished')
 
             project.summary.update_data_columns(parsed_data)
@@ -368,6 +375,10 @@ class ReImportAPI(ImportAPI):
             tasks, serializer = self._save(tasks)
         duration = time.time() - start
 
+        task_count = len(tasks)
+        annotation_count = len(serializer.db_annotations)
+        prediction_count = len(serializer.db_predictions)
+
         # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
         # single operation as counters affect bulk is_labeled update
         project.update_tasks_counters_and_task_states(
@@ -375,6 +386,11 @@ class ReImportAPI(ImportAPI):
             maximum_annotations_changed=False,
             overlap_cohort_percentage_changed=False,
             tasks_number_changed=True,
+            recalculate_stats_counts={
+                'task_count': task_count,
+                'annotation_count': annotation_count,
+                'prediction_count': prediction_count,
+            },
         )
         logger.info('Tasks bulk_update finished')
 
@@ -383,9 +399,9 @@ class ReImportAPI(ImportAPI):
 
         return Response(
             {
-                'task_count': len(tasks),
-                'annotation_count': len(serializer.db_annotations),
-                'prediction_count': len(serializer.db_predictions),
+                'task_count': task_count,
+                'annotation_count': annotation_count,
+                'prediction_count': prediction_count,
                 'duration': duration,
                 'file_upload_ids': file_upload_ids,
                 'found_formats': found_formats,
@@ -677,5 +693,3 @@ class PresignStorageData(APIView):
         response.headers['Cache-Control'] = f"no-store, max-age={max_age}"
 
         return response
-
-
