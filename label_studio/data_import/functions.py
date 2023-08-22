@@ -66,7 +66,7 @@ def async_import_background(import_id, user_id, recalculate_stats_func : Optiona
         project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
                                                       overlap_cohort_percentage_changed=False,
                                                       tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
-        logger.info('Tasks bulk_update finished')
+        logger.info('Tasks bulk_update finished (async import)')
 
         project.summary.update_data_columns(tasks)
         # TODO: project.summary.update_created_annotations_and_labels
@@ -168,7 +168,7 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
         tasks_queryset=tasks, maximum_annotations_changed=False,
         overlap_cohort_percentage_changed=False,
         tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
-    logger.info('Tasks bulk_update finished')
+    logger.info('Tasks bulk_update finished (async reimport)')
 
     project.summary.update_data_columns(tasks)
     # TODO: project.summary.update_created_annotations_and_labels

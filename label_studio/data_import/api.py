@@ -229,7 +229,7 @@ class ImportAPI(generics.CreateAPIView):
             project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
                                                           overlap_cohort_percentage_changed=False,
                                                           tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
-            logger.info('Tasks bulk_update finished')
+            logger.info('Tasks bulk_update finished (sync import)')
 
             project.summary.update_data_columns(parsed_data)
             # TODO: project.summary.update_created_annotations_and_labels
@@ -392,7 +392,7 @@ class ReImportAPI(ImportAPI):
                 'prediction_count': prediction_count,
             },
         )
-        logger.info('Tasks bulk_update finished')
+        logger.info('Tasks bulk_update finished (sync reimport)')
 
         project.summary.update_data_columns(tasks)
         # TODO: project.summary.update_created_annotations_and_labels
