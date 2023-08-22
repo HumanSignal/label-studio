@@ -72,7 +72,7 @@ export const TipsCollection: Record<string, Tip[]> = {
         experiment: "project_creation_tip",
         treatment: "label_with_collaborators",
       },
-    }
+    },
   }],
   organizationPage: [{
     title: "It looks like your team is growing!",
@@ -147,4 +147,4 @@ export const TipsCollection: Record<string, Tip[]> = {
       },
     }
   }]
-}
+};
