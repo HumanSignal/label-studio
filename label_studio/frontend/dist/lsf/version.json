@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4600: Lead time for TextArea",
-  "commit": "74fbeb2f32929e5c7c01edc9ca1b0876f74c0cea",
+  "message": "fix: OPTIC-6: Splitchannel audio render option",
+  "commit": "999a946f92895318d01f842e70de642067252a86",
   "branch": "master",
-  "date": "2023/08/14 16:08:50"
+  "date": "2023/08/17 19:45:21"
 }
