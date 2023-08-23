@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-6: Splitchannel audio render option",
-  "commit": "999a946f92895318d01f842e70de642067252a86",
-  "branch": "master",
-  "date": "2023/08/17 19:45:21"
+  "message": "feat: LSDV-5518: Add snap prop to snap polygon to image pixels",
+  "commit": "815cd726f410b2490f36ef53002ab639b102b051",
+  "branch": "fb-lsdv-5518",
+  "date": "2023/08/23 15:00:29"
 }
