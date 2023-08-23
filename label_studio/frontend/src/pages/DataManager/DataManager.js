@@ -130,7 +130,7 @@ export const DataManagerPage = ({ ...props }) => {
             return response.data.result;
           }
 
-          return [];
+          return null;
         });
       });
     }
