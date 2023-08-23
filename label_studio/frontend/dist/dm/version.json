@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-348: Image should fit viewport regardless of its height",
-  "commit": "568c0be973c66f89e0407c99bfe7f8fbde4704ed",
-  "branch": "master",
-  "date": "2023/08/03 09:59:30"
+  "message": "fix: LOPS-379: [FE] Search input box should be hidden and appropriate message should be displayed for non-synced datasets",
+  "commit": "eac1acbd9ba89444e563308191ecdcb6205d2ffb",
+  "branch": "fb-lops-379/force-sync-complete",
+  "date": "2023/08/23 16:03:47"
 }
