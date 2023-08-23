@@ -38,7 +38,6 @@ class Migration(migrations.Migration):
         ('tasks', '0023_auto_20220620_1007'),
         ('core', '0001_initial'),
         ('projects', '0017_project_pinned_at'),
-        ('organizations', '0004_organization_contact_info'),
     ]
 
     operations = [
