@@ -3336,6 +3336,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_all_optic_18_dashboard_label_distribution_chart_async_22082023_short": {
+      "key": "fflag_fix_all_optic_18_dashboard_label_distribution_chart_async_22082023_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "9d72a066d0444d80815883d0208996dc",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short": {
       "key": "fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short",
       "on": true,

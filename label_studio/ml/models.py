@@ -262,6 +262,7 @@ class MLBackend(models.Model):
                 score=safe_float(score),
                 model_version=self.model_version,
                 task_id=task_id,
+                project=task.project,
                 cluster=prediction_response.get('cluster'),
                 neighbors=prediction_response.get('neighbors'),
                 mislabeling=safe_float(prediction_response.get('mislabeling', 0)),
