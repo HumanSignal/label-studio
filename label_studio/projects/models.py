@@ -411,7 +411,7 @@ class Project(ProjectMixin, models.Model):
         all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
-        logger.info(f"Starting _update_tasks_states with params: Project {str(self)} maximum_annotations "
+        logger.info(f"Starting _rearrange_overlap_cohort with params: Project {str(self)} maximum_annotations "
                     f"{max_annotations} and percentage {self.overlap_cohort_percentage}")
         tasks_with_max_annotations = all_project_tasks.annotate(
             anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))
