@@ -74,4 +74,77 @@ export const TipsCollection: Record<string, Tip[]> = {
       },
     },
   }],
+  projectSettings: [{
+    title: "Did you know?",
+    content: "You can automatically label and sort tasks by prediction score to maximize labeling efficiency in Label Studio Enterprise.",
+    closable: true,
+    link: {
+      label: "Learn more",
+      url: "https://docs.humansignal.com/guide/active_learning.html#Set-up-task-sampling-with-prediction-scores",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "prediction_score",
+      },
+    },
+  }, {
+    title: "Did you know?",
+    content: "You can increase the quality of your labeled data with reviewer workflows and task agreement scores using Label Studio Enterprise.",
+    closable: true,
+    link: {
+      label: "Learn more",
+      url: "https://docs.humansignal.com/guide/quality",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "quality_and_agreement",
+      },
+    },
+  }, {
+    title: "Did you know?",
+    content: "You can minimize the number of tasks to be labeled by setting up an automated active learning loop in Label Studio Enterprise.",
+    closable: true,
+    link: {
+      label: "Learn more",
+      url: "https://docs.humansignal.com/guide/active_learning",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "active_learning",
+      },
+    },
+  }, {
+    title: "Did you know?",
+    content: "You can save time managing infrastructure and upgrades, plus access more features for automation, quality, and team management, by using the Enterprise cloud service.",
+    closable: true,
+    link: {
+      label: "Learn more",
+      url: "https://humansignal.com/platform/",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "infrastructure_and_upgrades",
+      },
+    },
+  }, {
+    title: "Did you know?",
+    content: "You can connect ML models using the backend SDK to save time with pre-labeling or active learning.",
+    closable: true,
+    link: {
+      label: "Learn more",
+      url: "https://labelstud.io/guide/ml",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "connect_ml_models",
+      },
+    },
+  }, {
+    title: "Faster image labeling",
+    content: "You can add a rectangle or an ellipse to your image with just two clicks, or double click to create a polygon, rectangle, or ellipse.",
+    closable: true,
+    link: {
+      label: "Learn more",
+      url: "https://labelstud.io/guide/labeling#Faster-image-labeling",
+      params: {
+        experiment: "project_settings_tip",
+        treatment: "two_clicks",
+      },
+    },
+  }],
 };
