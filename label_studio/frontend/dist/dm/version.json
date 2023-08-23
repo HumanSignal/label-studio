@@ -1,6 +1,6 @@
 {
   "message": "fix: OPTIC-7: Sum lead time from previous draft on annotation submission",
-  "commit": "d29e5624feb5ed8c6ca43ef8c0250b38283565c9",
+  "commit": "96c376ce2b9ded257e38cf0702135ea92aa25069",
   "branch": "fb-optic-7/draft-lead-time-added",
-  "date": "2023/08/23 09:52:50"
+  "date": "2023/08/23 09:54:17"
 }
