@@ -88,7 +88,7 @@ export const TipsCollection: Record<string, Tip[]> = {
     }
   }, {
     title: "Want to simplify and secure logging in?",
-    content: "Enable Single-Sign On for your team using SAML, SCIM2 or LDAP with Label Studio Enterprise.",
+    content: "Enable Single Sign-On for your team using SAML, SCIM2 or LDAP with Label Studio Enterprise.",
     closable: true,
     link: {
       label: "Learn more",
@@ -112,7 +112,7 @@ export const TipsCollection: Record<string, Tip[]> = {
     }
   }, {
     title: "Want to automate task distribution?",
-    content: "Create rules, automate how tasks are distributed to annotators, and only show tasks assigned to each annotator in their view.",
+    content: "Create rules, automate how tasks are distributed to annotators, and only show tasks assigned to each annotator in their view.and control task visibility for each annotator.",
     closable: true,
     link: {
       label: "Learn more",
@@ -124,7 +124,7 @@ export const TipsCollection: Record<string, Tip[]> = {
     }
   }, {
     title: "Share knowledge with the community",
-    content: "Have questions, or a tip to share with other Label Studio users. Join the community slack channel for the latest updates. ",
+    content: "Have questions or a tip to share with other Label Studio users? Join the community slack channel for the latest updates. ",
     closable: true,
     link: {
       label: "Join the community",
