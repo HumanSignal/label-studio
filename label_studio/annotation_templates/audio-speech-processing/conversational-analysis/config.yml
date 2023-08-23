@@ -15,7 +15,8 @@ config: |
                   layout="dialogue"
                   textKey="text"
                   nameKey="author"
-                  granularity="paragraph"/>
+                  granularity="paragraph"
+                  contextscroll="true" />
        <View style="position: sticky">
         <Header value="Sentiment Labels"/>
         <ParagraphLabels name="label" toName="text">
