@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-6: Splitchannel audio render option",
-  "commit": "999a946f92895318d01f842e70de642067252a86",
-  "branch": "master",
-  "date": "2023/08/17 19:45:21"
+  "message": "fix: LEAP-25: Eliminate memory leaks introduces by React 17 by upgrading to React 18",
+  "commit": "fdfef8efa3feaf1f9b52f1fea4433c590ab315b2",
+  "branch": "fb-leap-25/upgrade-react",
+  "date": "2023/08/23 14:49:45"
 }
