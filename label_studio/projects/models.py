@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import Optional, Mapping
 import json
 import logging
 
@@ -90,6 +91,10 @@ class ProjectManager(models.Manager):
 
 
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
+
+
+# LSE recalculate all stats
+recalculate_all_stats = load_func(settings.RECALCULATE_ALL_STATS)
 
 
 class Project(ProjectMixin, models.Model):
@@ -194,7 +199,7 @@ class Project(ProjectMixin, models.Model):
     )
 
     control_weights = JSONField(_('control weights'), null=True, default=dict, help_text="Dict of weights for each control tag in metric calculation. Each control tag (e.g. label or choice) will "
-                                                                                         "have it's own key in control weight dict with weight for each label and overall weight." 
+                                                                                         "have it's own key in control weight dict with weight for each label and overall weight."
                                                                                          "For example, if bounding box annotation with control tag named my_bbox should be included with 0.33 weight in agreement calculation, "
                                                                                          "and the first label Car should be twice more important than Airplaine, then you have to need the specify: "
                                                                                          "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}")
@@ -406,7 +411,7 @@ class Project(ProjectMixin, models.Model):
         all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
-        logger.info(f"Starting _update_tasks_states with params: Project {str(self)} maximum_annotations "
+        logger.info(f"Starting _rearrange_overlap_cohort with params: Project {str(self)} maximum_annotations "
                     f"{max_annotations} and percentage {self.overlap_cohort_percentage}")
         tasks_with_max_annotations = all_project_tasks.annotate(
             anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))
@@ -903,7 +908,7 @@ class Project(ProjectMixin, models.Model):
 
     def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,
                                                overlap_cohort_percentage_changed, tasks_number_changed,
-                                               from_scratch=True):
+                                               from_scratch=True, recalculate_stats_counts : Optional[Mapping[str, int]] = None):
         """
         Update tasks counters and update tasks states (rearrange and\or is_labeled)
         :param queryset: Tasks to update queryset
@@ -913,6 +918,10 @@ class Project(ProjectMixin, models.Model):
         queryset = make_queryset_from_iterable(queryset)
         objs = self._update_tasks_counters(queryset, from_scratch)
         self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
+
+        if recalculate_all_stats and recalculate_stats_counts:
+            recalculate_all_stats(self.id, **recalculate_stats_counts)
+
         return objs
 
     def __str__(self):
