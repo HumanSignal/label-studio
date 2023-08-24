@@ -23,7 +23,7 @@ from core.utils.common import (
     string_is_url,
     temporary_disconnect_list_signal,
 )
-from core.utils.db import fast_first, should_run_bulk_update_in_transaction
+from core.utils.db import fast_first
 from core.utils.params import get_env
 from data_import.models import FileUpload
 from data_manager.managers import PreparedTaskManager, TaskManager
@@ -1157,10 +1157,7 @@ def bulk_update_stats_project_tasks(tasks, project=None):
     if project is None:
         project = tasks[0].project
 
-    with conditional_atomic(
-        predicate=should_run_bulk_update_in_transaction,
-        predicate_args=[project.organization.created_by],
-    ):
+    with transaction.atomic():
         use_overlap = project._can_use_overlap()
         maximum_annotations = project.maximum_annotations
         # update filters if we can use overlap
