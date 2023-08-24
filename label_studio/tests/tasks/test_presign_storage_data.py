@@ -61,7 +61,7 @@ class TestPresignStorageData:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_task_not_found(self, view, task, project, user, monkeypatch):  # noqa: F811
+    def test_task_not_found(self, view, task, project, user, monkeypatch):
         task.resolve_storage_uri.return_value = None
         project.has_permission.return_value = True
         task.project = project

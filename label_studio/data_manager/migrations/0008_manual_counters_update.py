@@ -1,5 +1,5 @@
-import logging
 import sys
+import logging
 
 from django.db import migrations
 
@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 def forwards(apps, schema_editor):
-    from django.conf import settings
     from tasks.functions import calculate_stats_all_orgs
+    from django.conf import settings
 
     if settings.VERSION_EDITION == 'Community':
         run_command = 'label-studio calculate_stats_all_orgs'
@@ -34,7 +34,12 @@ def backwards(apps, schema_editor):
 class Migration(migrations.Migration):
     atomic = False
 
-    dependencies = [('data_manager', '0007_auto_20220708_0832'), ('tasks', '0023_auto_20220620_1007'), ('core', '0001_initial'), ('projects', '0017_project_pinned_at')]
+    dependencies = [
+        ('data_manager', '0007_auto_20220708_0832'),
+        ('tasks', '0023_auto_20220620_1007'),
+        ('core', '0001_initial'),
+        ('projects', '0017_project_pinned_at'),
+    ]
 
     operations = [
         migrations.RunPython(forwards, backwards),

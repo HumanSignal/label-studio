@@ -16,7 +16,7 @@ from ..utils import make_annotation, make_prediction, make_task, project_id  # n
     ],
 )
 @pytest.mark.django_db
-def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_count, business_client, project_id):  # noqa: F811
+def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_count, business_client, project_id):
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -51,7 +51,7 @@ def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_cou
     ],
 )
 @pytest.mark.django_db
-def test_action_delete_all_annotations(tasks_count, annotations_count, predictions_count, business_client, project_id):  # noqa: F811
+def test_action_delete_all_annotations(tasks_count, annotations_count, predictions_count, business_client, project_id):
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(

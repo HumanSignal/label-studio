@@ -227,7 +227,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         # config changes can break view, so we need to reset them
         if label_config:
             try:
-                config_essential_data_has_changed(label_config, project.label_config)
+                has_changes = config_essential_data_has_changed(label_config, project.label_config)  # noqa
             except KeyError:
                 pass
 

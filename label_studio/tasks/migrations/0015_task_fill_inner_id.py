@@ -3,6 +3,12 @@
 import logging
 
 from django.db import migrations
+from django.db.models import F, Window
+from django.db.models.functions import RowNumber
+from django.db.utils import NotSupportedError
+from core.bulk_update_utils import bulk_update
+from core.feature_flags import flag_set
+from django.contrib.auth.models import AnonymousUser
 
 logger = logging.getLogger(__name__)
 
