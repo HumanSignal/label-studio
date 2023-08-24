@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-348: Image should fit viewport regardless of its height",
-  "commit": "568c0be973c66f89e0407c99bfe7f8fbde4704ed",
-  "branch": "master",
-  "date": "2023/08/03 09:59:30"
+  "message": "feat: OPTIC-3: Enable users to submit and pause their lead time by returning to the dm list",
+  "commit": "7c41152167c002537aa3b7907e8ca514cc4faf6e",
+  "branch": "fb-optic-3/submit-and-exit",
+  "date": "2023/08/24 00:49:36"
 }
