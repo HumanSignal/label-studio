@@ -1,7 +1,7 @@
-from typing import Optional, Callable
 import logging
 import time
 import traceback
+from typing import Callable, Optional
 
 from core.utils.common import load_func
 from django.conf import settings

@@ -1,13 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import base64
 import datetime
 import logging
 import numbers
 import os
 import uuid
-import base64
 from typing import cast
-from urllib.parse import quote, urljoin
+from urllib.parse import urljoin
 
 import ujson as json
 from core.bulk_update_utils import bulk_update

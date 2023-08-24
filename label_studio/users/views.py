@@ -2,6 +2,7 @@
 """
 import logging
 
+from core.feature_flags import flag_set
 from core.middleware import enforce_csrf_checks
 from core.utils.common import load_func
 from django.conf import settings
@@ -14,7 +15,6 @@ from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
 from rest_framework.authtoken.models import Token
 from users import forms
-from core.feature_flags import flag_set
 from users.functions import login, proceed_registration
 
 logger = logging.getLogger()

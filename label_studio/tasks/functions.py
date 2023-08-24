@@ -12,7 +12,7 @@ from data_export.serializers import ExportDataSerializer
 from django.conf import settings
 from organizations.models import Organization
 from projects.models import Project
-from tasks.models import Annotation, Task, Prediction
+from tasks.models import Annotation, Prediction, Task
 
 logger = logging.getLogger(__name__)
 

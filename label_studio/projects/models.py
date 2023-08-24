@@ -1,8 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from typing import Optional, Mapping
 import json
 import logging
+from typing import Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
 from core.bulk_update_utils import bulk_update
