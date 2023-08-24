@@ -54,7 +54,7 @@ FEATURE_FLAGS_DEFAULT_VALUE = True
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)  # noqa: F405
 
-FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')  # noqa: F405
+FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 FEATURE_FLAGS_FROM_FILE = True
 try:
     from core.utils.io import find_node
