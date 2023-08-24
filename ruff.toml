@@ -43,6 +43,7 @@ exclude = [
     "dist",
     "node_modules",
     "venv",
+    "**/migrations/*.py",
 ]
 
 # Same as Black.
