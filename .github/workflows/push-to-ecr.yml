@@ -1,0 +1,31 @@
+name: Deploy Label Studio
+
+# Continuous LDSDK jobs on all branches but feature branches. In feature branches, they will get triggered by pull request
+on:
+  push:
+    branches:
+      - 'feature/*'
+  workflow_dispatch:
+    inputs:
+      BuildPushImage:
+        type: boolean
+        description: 'Build & Push Image to ECR'
+        required: true
+        default: "true"      
+
+jobs:
+  DeployLabelStudio:
+    runs-on: [self-hosted, macOS, Mac04Agent]
+    if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.BuildPushImage == 'true')) ||
+         github.event_name == 'push'
+    steps:
+      - name: Configure AWS Credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::626309225955:role/AssumeRoleLabelStudioRepo
+          output-credentials: true
+      - name: Get Caller Identity
+        run: |
+          aws sts get-caller-identity
