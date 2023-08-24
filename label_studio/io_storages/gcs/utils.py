@@ -255,7 +255,7 @@ class GCS(object):
             json_data = cls._try_read_json(blob_str)
             if not isinstance(json_data, dict):
                 raise ValueError(
-                    f"Error on key {key}: For {cls.__name__} your JSON file must be a dictionary with one task.")  # noqa
+                    f"Error on key {key}: For {cls.__name__} your JSON file must be a dictionary with one task.")
             return json_data
         elif convert_to == cls.ConvertBlobTo.BASE64:
             return base64.b64encode(blob_str)

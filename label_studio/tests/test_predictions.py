@@ -660,7 +660,7 @@ def test_predictions_with_partially_predicted_tasks(
     with requests_mock.Mocker() as m:
         m.register_uri(
             'POST', 'http://localhost:8999/setup', text=json.dumps({'model_version': setup_returns_model_version})
-        )  # noqa
+        )
         m.register_uri(
             'POST',
             'http://localhost:8999/predict',

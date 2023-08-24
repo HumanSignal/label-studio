@@ -40,7 +40,7 @@ def async_import_background(import_id, user_id, **kwargs):
     tasks, file_upload_ids, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
 
     if project_import.preannotated_from_fields:
-        # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
+        # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]
         tasks = reformat_predictions(tasks, project_import.preannotated_from_fields)
 
     if project_import.commit_to_project:

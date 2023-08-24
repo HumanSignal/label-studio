@@ -129,7 +129,7 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
         blob_str = blob.content_as_text()
         value = json.loads(blob_str)
         if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")  # noqa
+            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")
         return value
 
     def scan_and_create_links(self):

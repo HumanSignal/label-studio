@@ -52,7 +52,7 @@ versions = collect_versions()
 # in Label Studio Community version, feature flags are always ON
 FEATURE_FLAGS_DEFAULT_VALUE = True
 # or if file is not set, default is using offline mode
-FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)  # noqa: F405
+FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 
 FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 FEATURE_FLAGS_FROM_FILE = True

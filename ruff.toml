@@ -57,3 +57,4 @@ target-version = "py310"
 [per-file-ignores]
 # Ignore deleting imports in __init__.py files as they're actually being used.
 "__init__.py" = ["F401"]
+"**/settings/label_studio.py" = ["F405"]

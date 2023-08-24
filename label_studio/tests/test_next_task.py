@@ -229,7 +229,7 @@ def test_next_task(
             200, [{'some': 'prediction C'}]
     ),
 
-    # first task annotation, forth task is chosen due to active learning (though task with lowest score exists but in the same cluster)  # noqa
+    # first task annotation, forth task is chosen due to active learning (though task with lowest score exists but in the same cluster)
     (
             dict(
                 title='Test',
@@ -379,7 +379,7 @@ def test_next_task(
             1,
             200, [{'some': 'prediction C'}]
     ),
-    # when some of the tasks are partially labeled, regardless scores sampling operates on depth-first (try to complete all tasks asap)  # noqa
+    # when some of the tasks are partially labeled, regardless scores sampling operates on depth-first (try to complete all tasks asap)
     (
             dict(
                 title='Test',
@@ -1253,7 +1253,7 @@ def test_with_bad_annotation_result(business_client):
     for i in range(num_annotators):
         anns.append(make_annotator({'email': f'ann{i}@testwithbadannotationresult.com'}, project, True))
 
-    # create one heavy task with many annotations - it's statistic recalculation should not be done after completing another task  # noqa
+    # create one heavy task with many annotations - it's statistic recalculation should not be done after completing another task
     # turn off statistics calculations for now
     with mock.patch('tasks.models.update_project_summary_annotations_and_is_labeled'):
         for i in range(10):
@@ -1286,7 +1286,7 @@ def test_with_bad_annotation_result(business_client):
     make_async_annotation_submit(anns[0])
     # TODO: measuring response time is not a good way to do that,
     #  but dunno how to emulate async requests or timeouts for Django test client
-    assert (time.time() - t) < 1, 'Time of annotation.submit() increases - that might be caused by redundant computations over the rest of the tasks - check that only a single task is affected by /api/tasks/<task_id>/annotations'  # noqa
+    assert (time.time() - t) < 1, 'Time of annotation.submit() increases - that might be caused by redundant computations over the rest of the tasks - check that only a single task is affected by /api/tasks/<task_id>/annotations'
 
     assert uncompleted_task.has_lock()  # Task has lock since it has annotation
 
@@ -1367,8 +1367,8 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
     for i in range(expected_tasks_with_overlap):
         complete_task(ann1), complete_task(ann2)
 
-    all_tasks_with_overlap_are_labeled = all(t.is_labeled for t in Task.objects.filter(Q(project_id=project.id) & Q(overlap__gt=1)))  # noqa
-    all_tasks_without_overlap_are_not_labeled = all(not t.is_labeled for t in Task.objects.filter(Q(project_id=project.id) & Q(overlap=1)))  # noqa
+    all_tasks_with_overlap_are_labeled = all(t.is_labeled for t in Task.objects.filter(Q(project_id=project.id) & Q(overlap__gt=1)))
+    all_tasks_without_overlap_are_not_labeled = all(not t.is_labeled for t in Task.objects.filter(Q(project_id=project.id) & Q(overlap=1)))
 
     if show_overlap_first:
         assert all_tasks_with_overlap_are_labeled

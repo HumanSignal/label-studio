@@ -88,7 +88,7 @@ class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
                 f"perhaps you've forgot to enable \"Treat every bucket object as a source file\" option?")
 
         if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
+            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")
         return value
 
     def scan_and_create_links(self):

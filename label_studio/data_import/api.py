@@ -205,7 +205,7 @@ class ImportAPI(generics.CreateAPIView):
         parsed_data, file_upload_ids, could_be_tasks_list, found_formats, data_columns = load_tasks(request, project)
 
         if preannotated_from_fields:
-            # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
+            # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]
             parsed_data = reformat_predictions(parsed_data, preannotated_from_fields)
 
         if commit_to_project:

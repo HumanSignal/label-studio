@@ -908,7 +908,7 @@ class Prediction(models.Model):
                     ]
 
         elif isinstance(result, (str, numbers.Integral)):
-            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
+            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)
             for tag, tag_info in project.get_parsed_config().items():
                 tag_type = tag_info["type"].lower()
                 if tag_type in SINGLE_VALUED_TAGS and isinstance(

@@ -986,7 +986,7 @@ class LabelStreamHistory(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='histories', help_text='User ID'
-    )  # noqa
+    )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='histories', help_text='Project ID')
     data = models.JSONField(default=list)
 
@@ -1000,7 +1000,7 @@ class ProjectMember(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='project_memberships', help_text='User ID'
-    )  # noqa
+    )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members', help_text='Project ID')
     enabled = models.BooleanField(default=True, help_text='Project member is enabled')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -1026,7 +1026,7 @@ class ProjectSummary(models.Model):
         null=True,
         default=dict,
         help_text='Unique annotation types identified by tuple (from_name, to_name, type)',
-    )  # noqa
+    )
     # { from_name: {label1: task_count_with_label1, label2: task_count_with_label2} }
     created_labels = JSONField(_('created labels'), null=True, default=dict, help_text='Unique labels')
     created_labels_drafts = JSONField(_('created labels in drafts'), null=True, default=dict, help_text='Unique drafts labels')
