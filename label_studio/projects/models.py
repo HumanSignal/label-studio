@@ -16,7 +16,6 @@ from data_manager.managers import TaskQuerySet
 from projects.functions.utils import make_queryset_from_iterable
 from tasks.models import Task, Prediction, Annotation, AnnotationDraft, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import (
-    conditional_atomic,
     create_hash,
     get_attr_or_item,
     load_func,
