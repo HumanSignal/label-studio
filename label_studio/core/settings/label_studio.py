@@ -4,40 +4,40 @@ import json
 
 from core.settings.base import *  # noqa
 
-DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)  # noqa: F405
-DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}  # noqa: F405
+DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
+DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
 
-MIDDLEWARE.append('organizations.middleware.DummyGetSessionMiddleware')  # noqa: F405
-MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')  # noqa: F405
-if INACTIVITY_SESSION_TIMEOUT_ENABLED:  # noqa: F405
-    MIDDLEWARE.append('core.middleware.InactivitySessionTimeoutMiddleWare')  # noqa: F405
+MIDDLEWARE.append('organizations.middleware.DummyGetSessionMiddleware')
+MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
+if INACTIVITY_SESSION_TIMEOUT_ENABLED:
+    MIDDLEWARE.append('core.middleware.InactivitySessionTimeoutMiddleWare')
 
 ADD_DEFAULT_ML_BACKENDS = False
 
-LOGGING['root']['level'] = get_env('LOG_LEVEL', 'WARNING')  # noqa: F405
+LOGGING['root']['level'] = get_env('LOG_LEVEL', 'WARNING')
 
-DEBUG = get_bool_env('DEBUG', False)  # noqa: F405
+DEBUG = get_bool_env('DEBUG', False)
 
-DEBUG_PROPAGATE_EXCEPTIONS = get_bool_env('DEBUG_PROPAGATE_EXCEPTIONS', False)  # noqa: F405
+DEBUG_PROPAGATE_EXCEPTIONS = get_bool_env('DEBUG_PROPAGATE_EXCEPTIONS', False)
 
-SESSION_COOKIE_SECURE = get_bool_env('SESSION_COOKIE_SECURE', False)  # noqa: F405
+SESSION_COOKIE_SECURE = get_bool_env('SESSION_COOKIE_SECURE', False)
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 RQ_QUEUES = {}
 
-SENTRY_DSN = get_env(  # noqa: F405
+SENTRY_DSN = get_env(
     'SENTRY_DSN',
     'https://68b045ab408a4d32a910d339be8591a4@o227124.ingest.sentry.io/5820521'
 )
-SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'opensource')  # noqa: F405
+SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'opensource')
 
-FRONTEND_SENTRY_DSN = get_env(  # noqa: F405
+FRONTEND_SENTRY_DSN = get_env(
     'FRONTEND_SENTRY_DSN',
     'https://5f51920ff82a4675a495870244869c6b@o227124.ingest.sentry.io/5838868')
-FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'opensource')  # noqa: F405
+FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'opensource')
 
-EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))  # noqa: F405
+EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
 
 from label_studio import __version__
 from label_studio.core.utils import sentry
@@ -62,4 +62,4 @@ try:
 except IOError:
     FEATURE_FLAGS_FROM_FILE = False
 
-STORAGE_PERSISTENCE = get_bool_env('STORAGE_PERSISTENCE', True)  # noqa: F405
+STORAGE_PERSISTENCE = get_bool_env('STORAGE_PERSISTENCE', True)
