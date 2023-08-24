@@ -15,7 +15,7 @@ on:
 
 jobs:
   DeployLabelStudio:
-    runs-on: [self-hosted, macOS, Mac04Agent]
+    runs-on: [self-hosted, macOS]
     if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.BuildPushImage == 'true')) ||
          github.event_name == 'push'
     steps:
