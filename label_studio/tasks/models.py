@@ -5,6 +5,7 @@ import logging
 import numbers
 import os
 import uuid
+import base64
 from typing import cast
 from urllib.parse import quote, urljoin
 
@@ -15,13 +16,12 @@ from core.feature_flags import flag_set
 from core.label_config import SINGLE_VALUED_TAGS
 from core.redis import start_job_async_or_sync
 from core.utils.common import (
-    conditional_atomic,
     find_first_one_to_one_related_field_by_prefix,
     load_func,
     string_is_url,
     temporary_disconnect_list_signal,
 )
-from core.utils.db import fast_first, should_run_bulk_update_in_transaction
+from core.utils.db import fast_first
 from core.utils.params import get_env
 from data_import.models import FileUpload
 from data_manager.managers import PreparedTaskManager, TaskManager
@@ -350,7 +350,7 @@ class Task(TaskMixin, models.Model):
                     path = (
                         reverse("projects-file-proxy", kwargs={"pk": project.pk})
                         + "?url="
-                        + quote(value)
+                        + base64.urlsafe_b64encode(value.encode()).decode()
                     )
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
@@ -863,6 +863,7 @@ class Prediction(models.Model):
     task = models.ForeignKey(
         "tasks.Task", on_delete=models.CASCADE, related_name="predictions"
     )
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='predictions', null=True)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
@@ -939,6 +940,10 @@ class Prediction(models.Model):
         self.task.save(update_fields=update_fields)
 
     def save(self, *args, **kwargs):
+        if self.project_id is None and self.task_id:
+            logger.warning('project_id is not set for prediction, project_id being set in save method')
+            self.project_id = Task.objects.only('project_id').get(pk=self.task_id).project_id
+
         # "result" data can come in different forms - normalize them to JSON
         self.result = self.prepare_prediction_result(self.result, self.task.project)
         # set updated_at field of task to now()
@@ -1149,10 +1154,7 @@ def bulk_update_stats_project_tasks(tasks, project=None):
     if project is None:
         project = tasks[0].project
 
-    with conditional_atomic(
-        predicate=should_run_bulk_update_in_transaction,
-        predicate_args=[project.organization.created_by],
-    ):
+    with transaction.atomic():
         use_overlap = project._can_use_overlap()
         maximum_annotations = project.maximum_annotations
         # update filters if we can use overlap

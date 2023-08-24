@@ -654,7 +654,7 @@ def test_predictions_with_partially_predicted_tasks(
         if annotation is not None:
             Annotation.objects.create(task=task_obj, **annotation)
         if prediction is not None:
-            Prediction.objects.create(task=task_obj, **prediction)
+            Prediction.objects.create(task=task_obj, project=task_obj.project, **prediction)
 
     # run prediction
     with requests_mock.Mocker() as m:

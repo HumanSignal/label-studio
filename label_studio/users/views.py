@@ -14,10 +14,10 @@ from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
 from rest_framework.authtoken.models import Token
 from users import forms
+from core.feature_flags import flag_set
 from users.functions import login, proceed_registration
 
 logger = logging.getLogger()
-
 
 @login_required
 def logout(request):
@@ -66,6 +66,14 @@ def user_signup(request):
             if redirect_response:
                 return redirect_response
 
+    if flag_set("fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short"):
+        return render(request, 'users/new-ui/user_signup.html', {
+                'user_form': user_form,
+                'organization_form': organization_form,
+                'next': next_page,
+                'token': token,
+            })
+
     return render(request, 'users/user_signup.html', {
         'user_form': user_form,
         'organization_form': organization_form,
@@ -106,6 +114,12 @@ def user_login(request):
             user.active_organization_id = org_pk
             user.save(update_fields=['active_organization'])
             return redirect(next_page)
+
+    if flag_set("fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short"):
+        return render(request, 'users/new-ui/user_login.html', {
+            'form': form,
+            'next': next_page
+        })
 
     return render(request, 'users/user_login.html', {
         'form': form,

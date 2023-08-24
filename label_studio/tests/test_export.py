@@ -140,7 +140,8 @@ def test_export_with_predictions(
         Annotation.objects.create(task=task, result=result, completed_by=business_client.admin)
     if predictions:
         for task in tasks:
-            Prediction.objects.create(task=task, result=predictions['result'], score=predictions['score'])
+            Prediction.objects.create(task=task, project=task.project, result=predictions['result'],
+                                      score=predictions['score'])
 
     r = business_client.get(f'/api/projects/{configured_project.id}/results/', data={
         'finished': finished,

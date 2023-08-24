@@ -1,3 +1,4 @@
+from typing import Optional, Callable
 import logging
 import time
 import traceback
@@ -17,7 +18,7 @@ from .uploader import load_tasks_for_async_import
 logger = logging.getLogger(__name__)
 
 
-def async_import_background(import_id, user_id, **kwargs):
+def async_import_background(import_id, user_id, recalculate_stats_func : Optional[Callable[..., None]] = None, **kwargs):
     with transaction.atomic():
         try:
             project_import = ProjectImport.objects.get(id=import_id)
@@ -55,10 +56,17 @@ def async_import_background(import_id, user_id, **kwargs):
         prediction_count = len(serializer.db_predictions)
         # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
         # single operation as counters affect bulk is_labeled update
+
+        recalculate_stats_counts = {
+            'task_count': task_count,
+            'annotation_count': annotation_count,
+            'prediction_count': prediction_count,
+        }
+
         project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
                                                       overlap_cohort_percentage_changed=False,
-                                                      tasks_number_changed=True)
-        logger.info('Tasks bulk_update finished')
+                                                      tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
+        logger.info('Tasks bulk_update finished (async import)')
 
         project.summary.update_data_columns(tasks)
         # TODO: project.summary.update_created_annotations_and_labels
@@ -144,20 +152,30 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
         tasks = serializer.save(project_id=project.id)
         emit_webhooks_for_instance(organization_id, project, WebhookAction.TASKS_CREATED, tasks)
 
+    task_count = len(tasks)
+    annotation_count = len(serializer.db_annotations)
+    prediction_count = len(serializer.db_predictions)
+
+    recalculate_stats_counts = {
+        'task_count': task_count,
+        'annotation_count': annotation_count,
+        'prediction_count': prediction_count,
+    }
+
     # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
     # single operation as counters affect bulk is_labeled update
     project.update_tasks_counters_and_task_states(
         tasks_queryset=tasks, maximum_annotations_changed=False,
         overlap_cohort_percentage_changed=False,
-        tasks_number_changed=True)
-    logger.info('Tasks bulk_update finished')
+        tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
+    logger.info('Tasks bulk_update finished (async reimport)')
 
     project.summary.update_data_columns(tasks)
     # TODO: project.summary.update_created_annotations_and_labels
 
-    reimport.task_count = len(tasks)
-    reimport.annotation_count = len(serializer.db_annotations)
-    reimport.prediction_count = len(serializer.db_predictions)
+    reimport.task_count = task_count
+    reimport.annotation_count = annotation_count
+    reimport.prediction_count = prediction_count
     reimport.found_formats = found_formats
     reimport.data_columns = list(data_columns)
     reimport.status = ProjectReimport.Status.COMPLETED

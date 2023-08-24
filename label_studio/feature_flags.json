@@ -3201,6 +3201,33 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_feat_front_prod_e_111_annotator_workflow_control_short": {
+      "key": "fflag_feat_front_prod_e_111_annotator_workflow_control_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 1
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "074763288e054841990bbe990ea51091",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short": {
       "key": "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short",
       "on": true,
@@ -3307,6 +3334,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_all_optic_18_dashboard_label_distribution_chart_async_22082023_short": {
+      "key": "fflag_fix_all_optic_18_dashboard_label_distribution_chart_async_22082023_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "9d72a066d0444d80815883d0208996dc",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short": {
@@ -3819,7 +3873,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 5,
       "deleted": false
     },
     "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short": {

@@ -12,7 +12,7 @@ from users.serializers import UserSerializer
 class OrganizationIdSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'contact_info']
 
 
 class OrganizationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

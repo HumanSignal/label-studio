@@ -59,6 +59,8 @@ class Organization(OrganizationMixin, models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
+    contact_info = models.EmailField(_('contact info'), blank=True, null=True)
+
     def __str__(self):
         return self.title + ', id=' + str(self.pk)
 
