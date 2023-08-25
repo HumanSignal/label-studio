@@ -59,7 +59,7 @@ export const ProjectsPage = () => {
 
     const data = await api.callApi("projects", {
       params: requestParams,
-      ...!(isFF(FF_DEV_2575) ? {
+      ...(isFF(FF_DEV_2575) ? {
         signal: abortController.controller.current.signal,
         errorFilter: (e) => e.error.includes('aborted'), 
       } : null),
@@ -68,8 +68,9 @@ export const ProjectsPage = () => {
     setTotalItems(data?.count ?? 1);
     setProjectsList(data.results ?? []);
     setNetworkState('loaded');
-
-    if (isFF(FF_DEV_2575) && data?.results?.length) {
+    console.log(FF_DEV_2575);
+    console.log(data.results.length);
+  if (isFF(FF_DEV_2575) && data?.results?.length) {
       const additionalData = await api.callApi("projects", {
         params: {
           ids: data?.results?.map(({ id }) => id).join(','),

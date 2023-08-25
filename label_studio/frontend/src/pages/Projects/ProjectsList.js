@@ -8,6 +8,7 @@ import { Block, Elem } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
 
 export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
+  console.log(projects.length);
   return (
     <>
       <Elem name="list">
