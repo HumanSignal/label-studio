@@ -5,8 +5,9 @@ from rest_framework.exceptions import ValidationError
 
 
 env = environ.Env()
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-environ.Env.read_env(os.path.join(base_dir, '..', '..', '.env'))
+data_dir = os.environ.get('LABEL_STUDIO_DATA_DIR', os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data'))
+env_file = os.path.join(data_dir, '.env')
+environ.Env.read_env(env_file)
 
 def cast_bool_from_str(value):
     if isinstance(value, str):

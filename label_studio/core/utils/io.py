@@ -1,4 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
 """
 import os
 import socket
@@ -17,7 +18,7 @@ from tempfile import mkstemp, mkdtemp
 
 from django.conf import settings
 from django.core.management.utils import get_random_secret_key
-from label_studio.core.utils.params import env, base_dir
+from label_studio.core.utils.params import env, env_file
 from appdirs import user_config_dir, user_data_dir, user_cache_dir
 
 # full path import results in unit test failures
@@ -217,7 +218,6 @@ def generate_key_if_missing(key):
         print(f'Warning: {key} not found in environment variables will generate a random key')
         value = get_random_secret_key()
         try:
-            env_file = os.path.join(base_dir, '..', '..', '.env')
             with open(env_file, 'a') as f:
                 f.write(f'\n{key}={value}')
         except Exception as e:
