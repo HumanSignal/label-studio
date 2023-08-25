@@ -1920,7 +1920,7 @@
     },
     "fflag_feat_all_dev_3121_analytics_dashboards_short": {
       "key": "fflag_feat_all_dev_3121_analytics_dashboards_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -1942,7 +1942,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 5,
       "deleted": false
     },
     "fflag_feat_all_lops_315_temp_datasets_limitations_short": {
@@ -3095,13 +3095,27 @@
     },
     "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short": {
       "key": "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
+      "targets": [
+        {
+          "contextKind": "user",
+          "variation": 0,
+          "values": [
+            "test@heartex.e2e"
+          ]
+        }
+      ],
+      "contextTargets": [
+        {
+          "contextKind": "user",
+          "variation": 0,
+          "values": []
+        }
+      ],
       "rules": [],
       "fallthrough": {
-        "variation": 0
+        "variation": 1
       },
       "offVariation": 1,
       "variations": [
@@ -3117,7 +3131,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_front_prod_281_project_list_search_19072023_short": {
