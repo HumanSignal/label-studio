@@ -16,15 +16,17 @@ on:
 jobs:
   DeployLabelStudio:
     runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: read
     if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.BuildPushImage == 'true')) || github.event_name == 'push'
     steps:
       - name: Configure AWS Credentials
-        id: creds
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          aws-region: us-east-1
           role-to-assume: arn:aws:iam::626309225955:role/AssumeRoleLabelStudioRepo
-          output-credentials: true
+          aws-region: us-east-1
       - name: Get Caller Identity
         run: aws sts get-caller-identity
       - name: Login to Amazon ECR
