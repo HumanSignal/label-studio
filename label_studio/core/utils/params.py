@@ -1,6 +1,12 @@
 import os
+import environ
+
 from rest_framework.exceptions import ValidationError
 
+
+env = environ.Env()
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+environ.Env.read_env(os.path.join(base_dir, '..', '..', '.env'))
 
 def cast_bool_from_str(value):
     if isinstance(value, str):

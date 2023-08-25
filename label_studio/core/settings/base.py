@@ -74,7 +74,7 @@ LOGGING = {
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 
-from label_studio.core.utils.io import get_data_dir
+from label_studio.core.utils.io import get_data_dir, generate_key_if_missing
 from label_studio.core.utils.params import get_bool_env, get_env, get_env_list_int
 
 logger = logging.getLogger(__name__)
@@ -105,7 +105,7 @@ if HOSTNAME:
 INTERNAL_PORT = '8080'
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env('SECRET_KEY', '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n')
+SECRET_KEY = generate_key_if_missing('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
