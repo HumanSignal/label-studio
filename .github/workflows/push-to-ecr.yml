@@ -42,6 +42,6 @@ jobs:
           REPOSITORY: im-label-studio
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ../../Dockerfile
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
