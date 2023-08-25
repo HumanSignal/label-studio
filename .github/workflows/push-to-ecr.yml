@@ -39,7 +39,7 @@ jobs:
       - name: LS
         run: ls -la
       - name: LS backwards
-        run: ls -la ../
+        run: ls -la ../label-studio/
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
