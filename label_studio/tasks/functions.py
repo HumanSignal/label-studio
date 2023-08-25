@@ -141,13 +141,12 @@ def fill_annotations_project():
 
 
 def _fill_predictions_project(project_id):
-    Prediction.objects.filter(task__project_id=project_id).update(project_id=project_id)
+    projects = Project.objects.all()
+    for project in projects:
+        Prediction.objects.filter(task__project_id=project_id).update(project_id=project._id)
 
 
 def fill_predictions_project():
     logger.info('Start filling project field for Prediction model')
-    projects = Project.objects.all()
-    for project in projects:
-        start_job_async_or_sync(_fill_predictions_project, project.id)
-
+    start_job_async_or_sync(_fill_predictions_project,)
     logger.info('Finished filling project field for Prediction model')
