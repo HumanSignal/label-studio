@@ -38,12 +38,14 @@ jobs:
           mask-password: 'true'
       - name: LS
         run: ls -la
+      - name: LS backwards
+        run: ls -la ../
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: im-label-studio
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG Dockerfile
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ${GITHUB_WORKSPACE}/Dockerfile
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
