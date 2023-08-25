@@ -60,4 +60,4 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
       </Elem>
     </Block>
   );
-};
+}
