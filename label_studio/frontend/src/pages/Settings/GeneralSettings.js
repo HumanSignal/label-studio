@@ -102,20 +102,6 @@ export const GeneralSettings = () => {
                     </>
                   )}
                 />
-                // <Block name="disabled-field">
-                //   <Elem name="label">
-                //     <input type="radio" value="test" disabled />
-                //   </Elem>
-                //   <Elem name="label-wrapper">
-                //     <Elem name="title">Uncertainty sampling <EnterpriseBadge /></Elem>
-                //     <Elem name="description">
-                //       <p>Tasks are chosen according to model uncertainty score (active learning mode). <a target="_blank" href={createURL("https://docs.humansignal.com/guide/active_learning", {
-                //         experiment: 'project_settings_workspace',
-                //         treatment: 'workspaces',
-                //       })}>Learn more</a></p>
-                //     </Elem>
-                //   </Elem>
-                // </Block>
               )}
             </RadioGroup>
           </Form.Row>
