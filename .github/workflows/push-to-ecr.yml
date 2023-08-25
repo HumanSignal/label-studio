@@ -1,6 +1,6 @@
 name: Deploy Label Studio
 
-# Continuous LDSDK jobs on all branches but feature branches. In feature branches, they will get triggered by pull request
+# Deploy Label Studio to ECR on push to main branch or manually via workflow_dispatch
 on:
   push:
     branches:
@@ -15,9 +15,8 @@ on:
 
 jobs:
   DeployLabelStudio:
-    runs-on: [self-hosted]
-    if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.BuildPushImage == 'true')) ||
-         github.event_name == 'push'
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.BuildPushImage == 'true')) || github.event_name == 'push'
     steps:
       - name: Configure AWS Credentials
         id: creds
@@ -27,5 +26,18 @@ jobs:
           role-to-assume: arn:aws:iam::626309225955:role/AssumeRoleLabelStudioRepo
           output-credentials: true
       - name: Get Caller Identity
+        run: aws sts get-caller-identity
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+      - name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: im-label-studio
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          aws sts get-caller-identity
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
