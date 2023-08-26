@@ -4,7 +4,7 @@ from django.db import migrations
 from tasks.functions import fill_predictions_project
 
 def forward(apps, schema_editor):
-    fill_predictions_project()
+    fill_predictions_project('0043_auto_20230825')
 
 
 def backwards(apps, schema_editor):
