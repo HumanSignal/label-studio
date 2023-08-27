@@ -188,7 +188,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_rq',
     'django_filters',
-    'rules',
+    'rules.apps.AutodiscoverRulesConfig',
     'annoying',
     'rest_framework',
     'rest_framework_swagger',
@@ -216,6 +216,7 @@ MIDDLEWARE = [
     'core.middleware.DisableCSRF',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'core.middleware.CustomHeaderMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
     'core.middleware.CommonMiddleware',
@@ -231,6 +232,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'core.authentication.CustomHeaderAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'core.api_permissions.HasObjectPermission',
@@ -262,8 +264,14 @@ ALLOWED_HOSTS = ['*']
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
-AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend', ]
+AUTHENTICATION_BACKENDS = [
+    'rules.permissions.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.RemoteUserBackend',
+]
 USE_USERNAME_FOR_LOGIN = False
+
+CUSTOM_HEADER = get_env('CUSTOM_HEADER', 'REMOTE_USER')
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
 
