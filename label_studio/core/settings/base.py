@@ -191,7 +191,6 @@ INSTALLED_APPS = [
     'rules',
     'annoying',
     'rest_framework',
-    'rest_framework_swagger',
     'rest_framework.authtoken',
     'drf_generators',
     'core',
