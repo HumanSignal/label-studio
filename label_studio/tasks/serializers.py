@@ -406,6 +406,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 db_predictions.append(
                     Prediction(
                         task=self.db_tasks[i],
+                        project=self.db_tasks[i].project,
                         result=result,
                         score=prediction_score,
                         model_version=last_model_version
