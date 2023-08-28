@@ -16,13 +16,11 @@ from data_manager.managers import TaskQuerySet
 from projects.functions.utils import make_queryset_from_iterable
 from tasks.models import Task, Prediction, Annotation, AnnotationDraft, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import (
-    conditional_atomic,
     create_hash,
     get_attr_or_item,
     load_func,
     merge_labels_counters,
 )
-from core.utils.db import should_run_bulk_update_in_transaction
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     validate_label_config,
@@ -874,10 +872,7 @@ class Project(ProjectMixin, models.Model):
             task.cancelled_annotations = task.new_cancelled_annotations
             task.total_predictions = task.new_total_predictions
             objs.append(task)
-        with conditional_atomic(
-            predicate=should_run_bulk_update_in_transaction,
-            predicate_args=[self.organization.created_by],
-        ):
+        with transaction.atomic():
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
         return len(objs)
 
@@ -890,16 +885,11 @@ class Project(ProjectMixin, models.Model):
         """
         num_tasks_updated = 0
         page_idx = 0
-        organization_created_by = self.organization.created_by
 
         while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
-            with conditional_atomic(
-                predicate=should_run_bulk_update_in_transaction,
-                predicate_args=[organization_created_by],
-            ):
+            with transaction.atomic():
                 # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
-                # will roll back. NB: as part of LSDV-5289, we are considering eliminating this transaction
-                # behavior for performance reasons (see conditional_atomic call above).
+                # will roll back.
                 queryset = make_queryset_from_iterable(task_ids_slice)
                 num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
                 bulk_update_stats_project_tasks(queryset, self)

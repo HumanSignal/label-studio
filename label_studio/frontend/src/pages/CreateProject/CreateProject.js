@@ -141,7 +141,14 @@ export const CreateProject = ({ onClose }) => {
   }, [project]);
 
   return (
-    <Modal onHide={onDelete} fullscreen visible bare closeOnClickOutside={false}>
+    <Modal
+      onHide={onDelete}
+      closeOnClickOutside={false}
+      allowToInterceptEscape
+      fullscreen
+      visible
+      bare
+    >
       <div className={rootClass}>
         <Modal.Header>
           <h1>Create Project</h1>
