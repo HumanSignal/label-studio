@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5544: Fix RichText tag in non-Chromium browsers",
-  "commit": "d29f38505b09bd5729f2215e91e67dcb2e100416",
-  "branch": "master",
-  "date": "2023/08/28 17:20:58"
+  "message": "fix: LSDV-5523, LSDV-5071: Check tag has context scroll true to show the toggle, secure secret key",
+  "commit": "a5c93babe9c2566d3808f02dd940cd5451c7b060",
+  "branch": "fb-cherrypick-ls-release-1.8.2-fixes-08282023",
+  "date": "2023/08/24 16:42:48"
 }
