@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import Optional, Mapping
 import json
 import logging
 
@@ -14,7 +15,12 @@ from annoying.fields import AutoOneToOneField
 from data_manager.managers import TaskQuerySet
 from projects.functions.utils import make_queryset_from_iterable
 from tasks.models import Task, Prediction, Annotation, AnnotationDraft, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, get_attr_or_item, load_func, merge_labels_counters
+from core.utils.common import (
+    create_hash,
+    get_attr_or_item,
+    load_func,
+    merge_labels_counters,
+)
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     validate_label_config,
@@ -27,6 +33,7 @@ from core.label_config import (
     get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
     get_original_fromname_by_regex, get_all_types,
 )
+from core.feature_flags import flag_set
 from core.bulk_update_utils import bulk_update
 from label_studio_tools.core.label_config import parse_config
 from projects.functions import (
@@ -82,6 +89,10 @@ class ProjectManager(models.Manager):
 
 
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
+
+
+# LSE recalculate all stats
+recalculate_all_stats = load_func(settings.RECALCULATE_ALL_STATS)
 
 
 class Project(ProjectMixin, models.Model):
@@ -186,7 +197,7 @@ class Project(ProjectMixin, models.Model):
     )
 
     control_weights = JSONField(_('control weights'), null=True, default=dict, help_text="Dict of weights for each control tag in metric calculation. Each control tag (e.g. label or choice) will "
-                                                                                         "have it's own key in control weight dict with weight for each label and overall weight." 
+                                                                                         "have it's own key in control weight dict with weight for each label and overall weight."
                                                                                          "For example, if bounding box annotation with control tag named my_bbox should be included with 0.33 weight in agreement calculation, "
                                                                                          "and the first label Car should be twice more important than Airplaine, then you have to need the specify: "
                                                                                          "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}")
@@ -398,7 +409,7 @@ class Project(ProjectMixin, models.Model):
         all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
-        logger.info(f"Starting _update_tasks_states with params: Project {str(self)} maximum_annotations "
+        logger.info(f"Starting _rearrange_overlap_cohort with params: Project {str(self)} maximum_annotations "
                     f"{max_annotations} and percentage {self.overlap_cohort_percentage}")
         tasks_with_max_annotations = all_project_tasks.annotate(
             anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))
@@ -581,14 +592,29 @@ class Project(ProjectMixin, models.Model):
         outputs = self.get_parsed_config(autosave_cache=False)
         control_weights = {}
         exclude_control_types = ('Filter',)
+
+        def get_label(label):
+            label_value = self.control_weights.get(control_name, {}).get('labels', {}).get(label)
+            return label_value if label_value is not None else 1.0
+
+        def get_overall(name):
+            weights = self.control_weights.get(name, None)
+            if not weights:
+                return 1.0
+            else:
+                weight = weights.get('overall', None)
+                return weight if weight is not None else 1.0
+
+
         for control_name in outputs:
             control_type = outputs[control_name]['type']
             if control_type in exclude_control_types:
                 continue
+
             control_weights[control_name] = {
-                'overall': self.control_weights.get(control_name, {}).get('overall') or 1.0,
+                'overall': get_overall(control_name),
                 'type': control_type,
-                'labels': {label: self.control_weights.get(control_name, {}).get('labels', {}).get(label) or 1.0 for label in outputs[control_name].get('labels', [])},
+                'labels': {label: get_label(label) for label in outputs[control_name].get('labels', [])},
             }
         return control_weights
 
@@ -788,6 +814,10 @@ class Project(ProjectMixin, models.Model):
         else:
             return list(output)
 
+    def get_active_ml_backends(self):
+        from ml.models import MLBackend, MLBackendState
+        return MLBackend.objects.filter(project=self, state=MLBackendState.CONNECTED)
+
     def get_all_storage_objects(self, type_='import'):
         from io_storages.models import get_storage_classes
 
@@ -842,7 +872,6 @@ class Project(ProjectMixin, models.Model):
             task.cancelled_annotations = task.new_cancelled_annotations
             task.total_predictions = task.new_total_predictions
             objs.append(task)
-
         with transaction.atomic():
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
         return len(objs)
@@ -869,7 +898,7 @@ class Project(ProjectMixin, models.Model):
 
     def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,
                                                overlap_cohort_percentage_changed, tasks_number_changed,
-                                               from_scratch=True):
+                                               from_scratch=True, recalculate_stats_counts : Optional[Mapping[str, int]] = None):
         """
         Update tasks counters and update tasks states (rearrange and\or is_labeled)
         :param queryset: Tasks to update queryset
@@ -879,6 +908,10 @@ class Project(ProjectMixin, models.Model):
         queryset = make_queryset_from_iterable(queryset)
         objs = self._update_tasks_counters(queryset, from_scratch)
         self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
+
+        if recalculate_all_stats and recalculate_stats_counts:
+            recalculate_all_stats(self.id, **recalculate_stats_counts)
+
         return objs
 
     def __str__(self):

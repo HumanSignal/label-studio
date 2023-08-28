@@ -11,6 +11,7 @@ from tasks.models import Task
 
 class ImportStorageSerializer(serializers.ModelSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    synchronizable = serializers.BooleanField(required=False, default=True)
 
     class Meta:
         model = ImportStorage
@@ -19,6 +20,7 @@ class ImportStorageSerializer(serializers.ModelSerializer):
 
 class ExportStorageSerializer(serializers.ModelSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    synchronizable = serializers.BooleanField(required=False, default=True)
 
     class Meta:
         model = ExportStorage

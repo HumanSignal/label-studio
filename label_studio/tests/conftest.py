@@ -12,10 +12,13 @@ import shutil
 import tempfile
 
 from unittest import mock
+from unittest.mock import MagicMock
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
-from datetime import timedelta
+from datetime import datetime, timedelta
+from freezegun import freeze_time
+
 
 from django.conf import settings
 from projects.models import Project
@@ -23,10 +26,11 @@ from tasks.models import Task
 from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
+from botocore.exceptions import ClientError
 
 from label_studio.core.utils.params import get_bool_env, get_env
 
-# if we haven't this package, pytest.ini::env doesn't work 
+# if we haven't this package, pytest.ini::env doesn't work
 try:
     import pytest_env.plugin
 except ImportError:
@@ -223,6 +227,122 @@ def s3_export_bucket_sse(s3):
 
 
 @pytest.fixture(autouse=True)
+def s3_export_bucket_kms(s3):
+    bucket_name = 'pytest-export-s3-bucket-with-kms'
+    s3.create_bucket(Bucket=bucket_name)
+
+    # Set the bucket policy
+    policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:x-amz-server-side-encryption": "aws:kms"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Null": {
+                        "s3:x-amz-server-side-encryption": "true"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:*",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Bool": {
+                        "aws:SecureTransport": "false"
+                    }
+                }
+            }
+        ]
+    }
+
+    s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
+
+    yield s3
+
+
+def mock_put_aes(*args, **kwargs):
+    if 'ServerSideEncryption' not in kwargs or kwargs['ServerSideEncryption'] != 'AES256':
+        raise ClientError(
+            error_response={
+                'Error': {
+                    'Code': 'AccessDenied',
+                    'Message': 'Access Denied'
+                }
+            },
+            operation_name='PutObject'
+        )
+
+
+@pytest.fixture()
+def mock_s3_resource_aes(mocker):
+    mock_object = MagicMock()
+    mock_object.put = mock_put_aes
+
+    mock_object_constructor = MagicMock()
+    mock_object_constructor.return_value = mock_object
+
+    mock_s3_resource = MagicMock()
+    mock_s3_resource.Object = mock_object_constructor
+
+    # Patch boto3.Session.resource to return the mock s3 resource
+    mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
+
+
+def mock_put_kms(*args, **kwargs):
+    if 'ServerSideEncryption' not in kwargs or kwargs[
+        'ServerSideEncryption'] != 'aws:kms' or 'SSEKMSKeyId' not in kwargs:
+        raise ClientError(
+            error_response={
+                'Error': {
+                    'Code': 'AccessDenied',
+                    'Message': 'Access Denied'
+                }
+            },
+            operation_name='PutObject'
+        )
+
+
+@pytest.fixture()
+def mock_s3_resource_kms(mocker):
+    mock_object = MagicMock()
+    mock_object.put = mock_put_kms
+
+    mock_object_constructor = MagicMock()
+    mock_object_constructor.return_value = mock_object
+
+    mock_s3_resource = MagicMock()
+    mock_s3_resource.Object = mock_object_constructor
+
+    # Patch boto3.Session.resource to return the mock s3 resource
+    mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
+
+
+@pytest.fixture(autouse=True)
 def gcs_client():
     with gcs_client_mock():
         yield
@@ -280,7 +400,7 @@ class URLS:
 def project_ranker():
     label = '''<View>
          <HyperText name="hypertext_markup" value="$markup"></HyperText>
-         <List name="ranker" value="$replies" elementValue="$text" elementTag="Text" 
+         <List name="ranker" value="$replies" elementValue="$text" elementTag="Text"
                ranked="true" sortedHighlightColor="#fcfff5"></List>
         </View>'''
     return {'label_config': label, 'title': 'test'}
@@ -290,7 +410,7 @@ def project_dialog():
     """ Simple project with dialog configs
 
     :return: config of project with task
-    """    
+    """
     label = '''<View>
       <TextEditor>
         <Text name="dialog" value="$dialog"></Text>
@@ -319,7 +439,7 @@ def project_choices():
       <Choice value="Guitar"></Choice>
       <Choice value="None"/>
     </Choices>
-    
+
     <Image name="xxx" value="$image"></Image>
     </View>"""
     return {'label_config': label, 'title': 'test'}
@@ -527,6 +647,17 @@ def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
     with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
         yield
 
+@pytest.fixture(name="fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on")
+def fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on():
+    from core.feature_flags import flag_set
+
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short':
+            return True
+        return flag_set(*args, **kwargs)
+    with mock.patch('io_storages.s3.models.flag_set', wraps=fake_flag_set):
+        yield
+
 
 @pytest.fixture(name="fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on")
 def fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on():
@@ -575,6 +706,62 @@ def local_files_document_root_subdir(settings):
 
 @pytest.fixture(name="testing_session_timeouts")
 def set_testing_session_timeouts(settings):
-    # TODO: functional tests should not rely on exact timings
     settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=6).total_seconds()))
     settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))
+
+@pytest.fixture
+def mock_ml_auto_update(name="mock_ml_auto_update"):
+    url = 'http://localhost:9090'
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', f'{url}/setup', [
+            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': 'version2', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': 'version3', 'status': 'ok'}, 'status_code': 200},
+
+
+        ])
+        m.get(f'{url}/health', text=json.dumps({'status': 'UP'}))
+        yield m
+
+@pytest.fixture(name="mock_ml_backend_auto_update_disabled")
+def mock_ml_backend_auto_update_disabled():
+    with ml_backend_mock(setup_model_version='version1') as m:
+        m.register_uri('GET', f'http://localhost:9090/setup', [
+            {'json': {'model_version': '', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': '2', 'status': 'ok'}, 'status_code': 200},
+
+        ])
+        yield m
+
+
+freezer = None
+now = None
+
+
+@pytest.fixture(name="freeze_clock")
+def freeze_clock():
+    global freezer
+    global now
+
+    now = datetime.now()
+    freezer = freeze_time(now)
+    freezer.start()
+
+    yield
+
+    # teardown steps after yield
+
+    freezer.stop()
+    freezer = None
+    now = None
+
+
+def tick_clock(_, seconds: int = 1) -> None:
+    global freezer
+    global now
+    freezer.stop()
+    now += timedelta(seconds=seconds)
+    freezer = freeze_time(now)
+    freezer.start()

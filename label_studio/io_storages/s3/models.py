@@ -24,6 +24,8 @@ from io_storages.base_models import (
     ProjectStorageMixin
 )
 
+from label_studio.io_storages.s3.utils import AWS
+
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
@@ -53,6 +55,9 @@ class S3StorageMixin(models.Model):
     aws_session_token = models.TextField(
         _('aws_session_token'), null=True, blank=True,
         help_text='AWS_SESSION_TOKEN')
+    aws_sse_kms_key_id = models.TextField(
+        _('aws_sse_kms_key_id'), null=True, blank=True,
+        help_text='AWS SSE KMS Key ID')
     region_name = models.TextField(
         _('region_name'), null=True, blank=True,
         help_text='AWS Region')
@@ -174,6 +179,12 @@ class S3ImportStorageBase(S3StorageMixin, ImportStorage):
     def generate_http_url(self, url):
         return resolve_s3_url(url, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
 
+    def get_blob_metadata(self, key):
+        return AWS.get_blob_metadata(key, self.bucket, aws_access_key_id=self.aws_access_key_id,
+                                     aws_secret_access_key=self.aws_secret_access_key,
+                                     aws_session_token=self.aws_session_token, region_name=self.region_name,
+                                     s3_endpoint=self.s3_endpoint)
+
     class Meta:
         abstract = True
 
@@ -196,8 +207,15 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
 
         # put object into storage
         additional_params = {}
-        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user='auto'):
-            additional_params = {'ServerSideEncryption': 'AES256'}
+
+        self.cached_user = getattr(self, 'cached_user', annotation.task.project.organization.created_by)
+        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user=self.cached_user):
+            if self.aws_sse_kms_key_id:
+                additional_params['SSEKMSKeyId'] = self.aws_sse_kms_key_id
+                additional_params['ServerSideEncryption'] = 'aws:kms'
+            else:
+                additional_params['ServerSideEncryption'] = 'AES256'
+
         s3.Object(self.bucket, key).put(
             Body=json.dumps(ser_annotation),
             **additional_params

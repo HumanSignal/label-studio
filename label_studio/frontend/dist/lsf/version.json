@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5295: Scroll management of paragraph transcriptions",
-  "commit": "083ca0a0232ef8c6cd1eaabd40efab8eecf456d0",
+  "message": "fix: LSDV-5523: Check tag has context scroll true to show the toggle",
+  "commit": "3f8c90df983b9929c19115279306bac7ec272276",
   "branch": "master",
-  "date": "2023/07/12 11:50:26"
+  "date": "2023/08/24 16:42:48"
 }

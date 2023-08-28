@@ -12,7 +12,7 @@ from data_export.models import DataExport
 from data_export.serializers import ExportDataSerializer
 from organizations.models import Organization
 from projects.models import Project
-from tasks.models import Task, Annotation
+from tasks.models import Task, Annotation, Prediction
 from data_export.mixins import ExportMixin
 
 
@@ -21,7 +21,9 @@ logger = logging.getLogger(__name__)
 
 def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters'):
     logger = logging.getLogger(__name__)
-    organizations = Organization.objects.order_by('-id')
+    # Don't load the contact_info field bc this function is called by migrations
+    # that run before the field was added
+    organizations = Organization.objects.defer('contact_info').order_by('-id')
 
     for org in organizations:
         logger.debug(f"Start recalculating stats for Organization {org.id}")
@@ -54,7 +56,7 @@ def redis_job_for_calculation(org, from_scratch, migration_name='0018_manual_mig
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    
+
     projects = Project.objects.filter(organization=org).order_by('-updated_at')
     for project in projects:
         migration = AsyncMigrationStatus.objects.create(
@@ -137,3 +139,15 @@ def fill_annotations_project():
 
     logger.info('Finished filling project field for Annotation model')
 
+
+def _fill_predictions_project(project_id):
+    Prediction.objects.filter(task__project_id=project_id).update(project_id=project_id)
+
+
+def fill_predictions_project():
+    logger.info('Start filling project field for Prediction model')
+    projects = Project.objects.all()
+    for project in projects:
+        start_job_async_or_sync(_fill_predictions_project, project.id)
+
+    logger.info('Finished filling project field for Prediction model')

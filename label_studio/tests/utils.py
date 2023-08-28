@@ -48,7 +48,7 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
     m.post(f'{url}/train', text=json.dumps({'status': 'ok', 'job_id': train_job_id}))
     m.post(f'{url}/predict', text=json.dumps(predictions or {}))
     m.post(f'{url}/webhook', text=json.dumps({}))
-    m.post(f'{url}/versions', text=json.dumps({'versions': ["1", "2"]}))
+    m.get(f'{url}/versions', text=json.dumps({'versions': ["1", "2"]}))
     return m
 
 
@@ -146,6 +146,8 @@ def azure_client_mock():
             print(f'String {string} uploaded to bucket {self.container_name}')
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.container_name}/{self.key}'
+        def content_as_text(self):
+            return json.dumps({'str_field': str(self.key), 'int_field': 123, 'dict_field': {'one': 'wow', 'two': 456}})
 
     class DummyAzureContainer:
         def __init__(self, container_name, **kwargs):
@@ -169,6 +171,9 @@ def azure_client_mock():
                 deleted=False,
                 version='1.0.0'
             )
+
+        def download_blob(self, key):
+            return DummyAzureBlob(self.name, key)
 
 
     class DummyAzureClient():
@@ -241,9 +246,9 @@ def make_annotation(config, task_id):
 
 
 def make_prediction(config, task_id):
-    from tasks.models import Prediction
-
-    return Prediction.objects.create(task_id=task_id, **config)
+    from tasks.models import Prediction, Task
+    task = Task.objects.get(pk=task_id)
+    return Prediction.objects.create(task_id=task_id, project=task.project, **config)
 
 
 def make_annotator(config, project, login=False, client=None):
@@ -288,6 +293,9 @@ def login(client, email, password):
 
 def signin(client, email, password):
     return client.post(f'/user/login/', data={'email': email, 'password': password})
+
+def signout(client):
+    return client.get('/logout')
 
 
 def _client_is_annotator(client):
