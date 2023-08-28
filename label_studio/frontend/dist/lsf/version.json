@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5523, LSDV-5071: Check tag has context scroll true to show the toggle, secure secret key",
-  "commit": "a5c93babe9c2566d3808f02dd940cd5451c7b060",
-  "branch": "fb-ls-release-1.8.2-fixes-08282023",
-  "date": "2023/08/24 16:42:48"
+  "commit": "eeeccc91bb803005ddb1a639382b44e6ef007f2b",
+  "branch": "ls-release/1.8.2",
+  "date": "2023/08/28 18:10:19"
 }
