@@ -9,6 +9,7 @@ import './settings.styl';
 import { HeidiTips } from '../../components/HeidiTips/HeidiTips';
 import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
 import { createURL } from '../../components/HeidiTips/utils';
+import { Caption } from '../../components/Caption/Caption';
 
 export const GeneralSettings = () => {
   const { project, fetchProject } = useContext(ProjectContext);
@@ -62,12 +63,12 @@ export const GeneralSettings = () => {
                   <EnterpriseBadge />
                 </Elem>
                 <Select placeholder="Select an option" disabled options={[]} />
-                <Block tag="p" name="settings-caption">
+                <Caption>
                   Simplify project management by organizing projects into workspaces. <a target="_blank" href={createURL("https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects", {
                   experiment: 'project_settings_tip',
                   treatment: 'simplify_project_management',
                 })}>Learn more</a>
-                </Block>
+                </Caption>
               </Block>
             )}
             <RadioGroup name="color" label="Color" size="large" labelProps={{ size: "large" }}>
