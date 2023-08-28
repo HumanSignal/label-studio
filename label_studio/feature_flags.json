@@ -1756,6 +1756,33 @@
       "version": 5,
       "deleted": false
     },
+    "fflag-feat-dia-407-accept-multiple-search-queries-short": {
+      "key": "fflag-feat-dia-407-accept-multiple-search-queries-short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "4be5602f9f9445b2bfc21a8bad9d8392",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag-feat-front-dev-2395-consistent-working-area-for-all-image-sizes": {
       "key": "fflag-feat-front-dev-2395-consistent-working-area-for-all-image-sizes",
       "on": false,
@@ -3095,24 +3122,10 @@
     },
     "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short": {
       "key": "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short",
-      "on": true,
+      "on": false,
       "prerequisites": [],
-      "targets": [
-        {
-          "contextKind": "user",
-          "variation": 0,
-          "values": [
-            "test@heartex.e2e"
-          ]
-        }
-      ],
-      "contextTargets": [
-        {
-          "contextKind": "user",
-          "variation": 0,
-          "values": []
-        }
-      ],
+      "targets": [],
+      "contextTargets": [],
       "rules": [],
       "fallthrough": {
         "variation": 1
@@ -3131,7 +3144,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 12,
       "deleted": false
     },
     "fflag_feat_front_prod_281_project_list_search_19072023_short": {
