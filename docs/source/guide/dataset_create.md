@@ -3,7 +3,6 @@ title: Create a Dataset
 short: Create a Dataset
 date: 2023-08-16 11:52:38
 tier: enterprise
-type: guide
 order: 0
 order_enterprise: 405
 meta_title: Create a Dataset to use with data discovery in Label Studio Enterprise

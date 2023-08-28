@@ -2,7 +2,6 @@
 title: Semantic Search with Datasets
 short: Semantic Search
 tier: enterprise
-type: guide
 order: 0
 order_enterprise: 412
 meta_title: Semantic Search with Datasets

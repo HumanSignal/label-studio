@@ -2,7 +2,6 @@
 title: Manage Datasets
 short: Manage Datasets
 tier: enterprise
-type: guide
 order: 0
 order_enterprise: 408
 meta_title: Manage a Dataset in Label Studio Enterprise
