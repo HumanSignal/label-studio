@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5544: Fix RichText tag in non-Chromium browsers",
-  "commit": "da307c0c84429290e15a5e9f722e2969a222f13e",
+  "commit": "258e818fafaab9911d075d9d0fbd2c2780c5c9d9",
   "branch": "fb-lsdv-5544",
-  "date": "2023/08/24 03:17:32"
+  "date": "2023/08/28 13:53:43"
 }
