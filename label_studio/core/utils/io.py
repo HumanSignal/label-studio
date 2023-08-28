@@ -15,14 +15,10 @@ import pkg_resources
 import ujson as json
 import yaml
 from appdirs import user_cache_dir, user_config_dir, user_data_dir
-from urllib3.util import parse_url
-from contextlib import contextmanager
-from tempfile import mkstemp, mkdtemp
-
-from django.conf import settings
 from django.core.management.utils import get_random_secret_key
+from urllib3.util import parse_url
+
 from label_studio.core.utils.params import env, env_file
-from appdirs import user_config_dir, user_data_dir, user_cache_dir
 
 # full path import results in unit test failures
 from .exceptions import InvalidUploadUrlError
