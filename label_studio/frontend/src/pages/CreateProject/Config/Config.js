@@ -444,6 +444,8 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
                   },
                   hintOptions: { schemaInfo: tags },
                 }}
+                // don't close modal with Escape while editing config
+                onKeyDown={(editor, e) => { if (e.code === 'Escape') e.stopPropagation(); }}
                 onChange={(editor, data, value) => onChange(value)}
               />
             </div>

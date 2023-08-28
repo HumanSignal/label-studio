@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5523: Check tag has context scroll true to show the toggle",
-  "commit": "3f8c90df983b9929c19115279306bac7ec272276",
+  "message": "fix: LSDV-5544: Fix RichText tag in non-Chromium browsers",
+  "commit": "d29f38505b09bd5729f2215e91e67dcb2e100416",
   "branch": "master",
-  "date": "2023/08/24 16:42:48"
+  "date": "2023/08/28 17:20:58"
 }

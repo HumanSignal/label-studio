@@ -1,4 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
 """
 import glob
 import io
@@ -15,6 +16,13 @@ import ujson as json
 import yaml
 from appdirs import user_cache_dir, user_config_dir, user_data_dir
 from urllib3.util import parse_url
+from contextlib import contextmanager
+from tempfile import mkstemp, mkdtemp
+
+from django.conf import settings
+from django.core.management.utils import get_random_secret_key
+from label_studio.core.utils.params import env, env_file
+from appdirs import user_config_dir, user_data_dir, user_cache_dir
 
 # full path import results in unit test failures
 from .exceptions import InvalidUploadUrlError
@@ -204,4 +212,20 @@ def validate_upload_url(url, block_local_urls=True):
     for subnet in local_subnets:
         if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
             raise InvalidUploadUrlError
+
+def generate_key_if_missing(key):
+    value = env.str(key, "")
+
+    if value == "":
+        print(f'Warning: {key} not found in environment variables will generate a random key.')
+        value = get_random_secret_key()
+        try:
+            with open(env_file, 'a') as f:
+                f.write(f'\n{key}={value}\n')
+        except Exception as e:
+            print(f'Warning: failed to write {key} to .env file: {e}, new key will be regenerated on every server restart. If this key is used for signing, it will invalidate all existing sessions or tokens. Please set {key} in your environment variables to avoid this warning.')
+
+        os.environ[key] = value
+
+    return value
 
