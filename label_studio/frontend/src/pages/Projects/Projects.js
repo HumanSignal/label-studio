@@ -68,8 +68,6 @@ export const ProjectsPage = () => {
     setTotalItems(data?.count ?? 1);
     setProjectsList(data.results ?? []);
     setNetworkState('loaded');
-    console.log(FF_DEV_2575);
-    console.log(data.results.length);
   if (isFF(FF_DEV_2575) && data?.results?.length) {
       const additionalData = await api.callApi("projects", {
         params: {
