@@ -7,7 +7,6 @@ order: 0
 order_enterprise: 412
 meta_title: Semantic Search with Datasets
 meta_description: Use semantic search to refine your datasets. 
-section: "Data Discovery"
 date: 2023-08-23 12:18:50
 hide_sidebar: true
 ---

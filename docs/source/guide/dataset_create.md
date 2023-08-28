@@ -8,7 +8,6 @@ order: 0
 order_enterprise: 405
 meta_title: Create a Dataset to use with data discovery in Label Studio Enterprise
 meta_description: How to create a Dataset in Label Studio Enterprise using Google Cloud, Azure, or AWS.
-section: "Data Discovery"
 hide_sidebar: true
 ---
 
