@@ -11,7 +11,7 @@ hide_sidebar: true
 ---
 
 !!! note
-    At this time, we only support building datasets from unstructured data, meaning that the data must be in individual files rather than a structured format such as CSV or JSON.
+    At this time, we only support building datasets from a bucket of unstructured data, meaning that the data must be in individual files rather than a structured format such as CSV or JSON.
 
 !!! note
     To create a new Dataset, your [user role](manage_users#Roles-in-Label-Studio-Enterprise) must have Owner or Administrator permissions. 
