@@ -16,14 +16,24 @@
     line-height 22px
     color $black_40
 
+    a
+      color #096DD9
+
+      &:hover
+        text-decoration underline
+
   &__field
     line-height 0
+
+  &__label
+    display flex
+    align-items center
 
   &_size_large &__text
     font-weight 500
     font-size 16px
     line-height 22px
-    margin-bottom 16px
+    margin-bottom 8px
 
   &_flat &__text
     padding 0
@@ -38,11 +48,12 @@
   &_large &__text
     font-size 16px
     font-weight 500
-    margin-bottom 16px
+    margin-bottom 8px
 
   &_placement_right
     display inline-flex
     flex-direction row-reverse
+
   &_placement_left
     display inline-flex
 
@@ -63,3 +74,6 @@
   &_placement_right&_withDescription &__field
   &_placement_left&_withDescription &__field
     margin-top 5px
+
+    input[type=radio]
+      margin-top 0
