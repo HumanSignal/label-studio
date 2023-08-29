@@ -25,6 +25,7 @@ Django==3.2.20
 django-storages==1.12.3
 django_annoying==0.10.6
 django_debug_toolbar==3.2.1
+django-environ==0.10.0
 django_filter==2.4.0
 django_model_utils==4.1.1
 django_rq==2.5.1
