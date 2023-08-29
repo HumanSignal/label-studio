@@ -118,7 +118,7 @@ os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = generate_secret_key_if_missing(BASE_DATA_DIR, 'SECRET_KEY')
+SECRET_KEY = generate_secret_key_if_missing(BASE_DATA_DIR)
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
