@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5544: Fix RichText tag in non-Chromium browsers",
-  "commit": "d29f38505b09bd5729f2215e91e67dcb2e100416",
+  "message": "ci: Fix several vulnerabilities from dependabot",
+  "commit": "5857f671b8dfcb7b526f5ed04e813ccb67006c60",
   "branch": "master",
-  "date": "2023/08/28 17:20:58"
+  "date": "2023/08/29 11:13:11"
 }
