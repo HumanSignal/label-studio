@@ -1,6 +1,6 @@
 {
   "message": "fix: LOPS-379: [FE] Search input box should be hidden and appropriate message should be displayed for non-synced datasets",
-  "commit": "eac1acbd9ba89444e563308191ecdcb6205d2ffb",
+  "commit": "d7c723fa41b0523706552d81d4ea18abe006e512",
   "branch": "fb-lops-379/force-sync-complete",
-  "date": "2023/08/23 16:03:47"
+  "date": "2023/08/29 07:39:19"
 }
