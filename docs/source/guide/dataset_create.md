@@ -1,6 +1,6 @@
 ---
-title: Create a Dataset
-short: Create a Dataset
+title: Create a dataset
+short: Create a dataset
 date: 2023-08-16 11:52:38
 tier: enterprise
 order: 0
@@ -138,7 +138,7 @@ The private key is automatically downloaded. This is the only time you can downl
 
 5. Provide a name for your dataset column and select a type. The data type you select instructs Label Studio on how to index your data in a vector database, so that it can be searched using an AI-powered semantic search.
 
-    [Select dataset column](/guide/images/data_discovery/dataset_column.png)
+    ![Select dataset column](/guide/images/data_discovery/dataset_column.png)
 
 6. Click **Create Dataset**. 
 
