@@ -1,6 +1,6 @@
 {
-  "message": "ci: Fix several vulnerabilities from dependabot",
-  "commit": "ba8373ec42dee5f42e7874f39ed46c94c44a8352",
+  "message": "fix: LOPS-379: [FE] Search input box should be hidden and appropriate message should be displayed for non-synced datasets",
+  "commit": "a973ff0c0ec4c210c975ca75fc25f44826e9fc31",
   "branch": "master",
-  "date": "2023/08/29 01:45:47"
+  "date": "2023/08/29 07:39:27"
 }
