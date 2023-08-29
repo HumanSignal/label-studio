@@ -1756,6 +1756,33 @@
       "version": 5,
       "deleted": false
     },
+    "fflag-feat-dia-407-accept-multiple-search-queries-short": {
+      "key": "fflag-feat-dia-407-accept-multiple-search-queries-short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "4be5602f9f9445b2bfc21a8bad9d8392",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag-feat-front-dev-2395-consistent-working-area-for-all-image-sizes": {
       "key": "fflag-feat-front-dev-2395-consistent-working-area-for-all-image-sizes",
       "on": false,
@@ -1920,7 +1947,7 @@
     },
     "fflag_feat_all_dev_3121_analytics_dashboards_short": {
       "key": "fflag_feat_all_dev_3121_analytics_dashboards_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -1942,7 +1969,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 5,
       "deleted": false
     },
     "fflag_feat_all_lops_315_temp_datasets_limitations_short": {
@@ -3101,7 +3128,7 @@
       "contextTargets": [],
       "rules": [],
       "fallthrough": {
-        "variation": 0
+        "variation": 1
       },
       "offVariation": 1,
       "variations": [
@@ -3117,7 +3144,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 12,
       "deleted": false
     },
     "fflag_feat_front_prod_281_project_list_search_19072023_short": {
@@ -4522,6 +4549,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_front_lsdv_5248_double_click_delay_280823_short": {
+      "key": "fflag_fix_front_lsdv_5248_double_click_delay_280823_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "5a2504d41af64236bccd1d46d2cea36e",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 4,
       "deleted": false
     },
     "fflag_fix_front_lsdv_5436_dashboard_members_page_async_24072023_short": {
