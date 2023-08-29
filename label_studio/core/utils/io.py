@@ -1,4 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
 """
 import os
 import socket
@@ -15,7 +16,6 @@ from urllib3.util import parse_url
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp
 
-from django.conf import settings
 from appdirs import user_config_dir, user_data_dir, user_cache_dir
 
 # full path import results in unit test failures
@@ -207,4 +207,3 @@ def validate_upload_url(url, block_local_urls=True):
     for subnet in local_subnets:
         if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
             raise InvalidUploadUrlError
-

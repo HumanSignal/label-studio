@@ -246,9 +246,9 @@ def make_annotation(config, task_id):
 
 
 def make_prediction(config, task_id):
-    from tasks.models import Prediction
-
-    return Prediction.objects.create(task_id=task_id, **config)
+    from tasks.models import Prediction, Task
+    task = Task.objects.get(pk=task_id)
+    return Prediction.objects.create(task_id=task_id, project=task.project, **config)
 
 
 def make_annotator(config, project, login=False, client=None):
@@ -293,6 +293,9 @@ def login(client, email, password):
 
 def signin(client, email, password):
     return client.post(f'/user/login/', data={'email': email, 'password': password})
+
+def signout(client):
+    return client.get('/logout')
 
 
 def _client_is_annotator(client):

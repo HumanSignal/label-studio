@@ -7,7 +7,7 @@ import { aroundTransition } from '../../utils/transition';
 import { Button } from '../Button/Button';
 import "./Modal.styl";
 
-const {Block, Elem} = BemWithSpecifiContext();
+const { Block, Elem } = BemWithSpecifiContext();
 
 const ModalContext = createContext();
 
@@ -32,11 +32,13 @@ export class Modal extends React.Component {
       setTimeout(() => this.show(), 30);
     }
 
-    document.addEventListener('keydown', this.closeOnEscape, {capture: true});
+    // with `allowToInterceptEscape` we can prevent closing modal on escape
+    // by handling it inside modal, before event will be bubbled here
+    document.addEventListener('keydown', this.closeOnEscape, { capture: !this.props.allowToInterceptEscape });
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', this.closeOnEscape, {capture: true});
+    document.removeEventListener('keydown', this.closeOnEscape, { capture: !this.props.allowToInterceptEscape });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -71,7 +73,7 @@ export class Modal extends React.Component {
     });
   }
 
-  render () {
+  render() {
     if (!this.state.visible) return null;
 
     const bare = this.props.bare;
@@ -105,7 +107,7 @@ export class Modal extends React.Component {
                   )}
                 </Modal.Header>
               )}
-              <Elem name="body" mod={{bare}}>
+              <Elem name="body" mod={{ bare }}>
                 {this.body}
               </Elem>
               {this.props.footer && (
@@ -124,7 +126,7 @@ export class Modal extends React.Component {
 
   onClickOutside = (e) => {
     if (!this.modalRef.current) return;
-    const {closeOnClickOutside} = this.props;
+    const { closeOnClickOutside } = this.props;
     const allowClose = this.props.allowClose !== false;
     const isInModal = this.modalRef.current.contains(e.target);
     const content = cn('modal').elem('content').closest(e.target);
@@ -180,6 +182,7 @@ export class Modal extends React.Component {
   get body() {
     if (this.state.body) {
       const Content = this.state.body;
+
       return Content instanceof Function ? <Content/> : Content;
     } else {
       return this.props.children;
@@ -189,6 +192,7 @@ export class Modal extends React.Component {
   get footer() {
     if (this.state.footer) {
       const Content = this.state.footer;
+
       return Content instanceof Function ? <Content/> : Content;
     }
 
@@ -197,13 +201,13 @@ export class Modal extends React.Component {
 }
 
 Modal.Header = ({ children, divided }) => (
-  <Elem name="header" mod={{divided}}>
+  <Elem name="header" mod={{ divided }}>
     {children}
   </Elem>
 );
 
 Modal.Footer = ({ children, bare }) => (
-  <Elem name="footer" mod={{bare}}>
+  <Elem name="footer" mod={{ bare }}>
     {children}
   </Elem>
 );
