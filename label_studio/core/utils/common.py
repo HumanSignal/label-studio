@@ -302,7 +302,7 @@ def db_is_not_sqlite() -> bool:
 
 @contextlib.contextmanager
 def conditional_atomic(
-        predicate: Callable[..., bool] = db_is_not_sqlite,
+        predicate: Callable[..., bool],
         predicate_args: Optional[Iterable[Any]] = None,
         predicate_kwargs: Optional[Mapping[str, Any]] = None,
     ) -> Generator[None, None, None]:
@@ -310,7 +310,6 @@ def conditional_atomic(
 
     Params:
         predicate: function taking any combination of args and kwargs
-          defaults to `db_is_not_sqlite` for historical/compatibility reasons.
         predicate_args: optional array of positional args for the predicate
         predicate_kwargs: optional map of keyword args for the predicate
     """

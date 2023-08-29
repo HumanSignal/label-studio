@@ -19,7 +19,7 @@ export const ProjectModelVersionSelector = ({
 
   useEffect(() => {
     setVersion(project?.[valueName] || null);
-  }, [project?.[valueName]]);
+  }, [project?.[valueName], versions]);
 
   const resetMLVersion = useCallback(async (e) => {
     e.preventDefault();
