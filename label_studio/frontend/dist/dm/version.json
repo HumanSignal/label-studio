@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-382: [FE] We are using 'Tasks' rather than 'Items' when user selects x items in dataset",
-  "commit": "facbe44c42c6b8bf9406dcfebd8322807b823750",
-  "branch": "master",
-  "date": "2023/08/29 08:53:44"
+  "message": "feat: OPTIC-2: Save draft on leave",
+  "commit": "b0df5154bca4db02b87626afe9bbae29158cdc41",
+  "branch": "fb-optic-2/save-draft-on-leave",
+  "date": "2023/08/29 17:40:39"
 }
