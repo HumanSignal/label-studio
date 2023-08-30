@@ -6,6 +6,7 @@ from core.utils.common import db_is_not_sqlite
 from tasks.models import Task, Annotation, Prediction, bulk_update_stats_project_tasks
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.django_db
 def test_export(business_client, configured_project):
     task_query = Task.objects.filter(project=configured_project.id)

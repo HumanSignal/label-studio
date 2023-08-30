@@ -771,6 +771,7 @@ def test_interactive_annotating_failing(business_client, configured_project):
     assert 'errors' in result
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.django_db
 def test_interactive_annotating_with_drafts(business_client, configured_project):
     """

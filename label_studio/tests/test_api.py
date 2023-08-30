@@ -176,6 +176,7 @@ def test_delete_annotations(business_client, configured_project):
 
 # --- TaskAPI ---
 
+@pytest.mark.skip_nplusone
 @pytest.mark.parametrize('response, status_code', [
     # status OK
     (
@@ -208,6 +209,7 @@ def test_get_task(client_and_token, configured_project, response, status_code):
         assert r.json() == response
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.parametrize('payload, response, status_code', [
     # status OK
     (

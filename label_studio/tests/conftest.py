@@ -18,6 +18,7 @@ from copy import deepcopy
 from pathlib import Path
 from datetime import datetime, timedelta
 from freezegun import freeze_time
+from nplusone.core.profiler import Profiler
 
 
 from django.conf import settings
@@ -765,3 +766,13 @@ def tick_clock(_, seconds: int = 1) -> None:
     now += timedelta(seconds=seconds)
     freezer = freeze_time(now)
     freezer.start()
+
+
+@pytest.fixture(autouse=True)
+def _raise_nplusone(request):
+    """ Automatically enable the NPlusOne Profiler for tests that are not marked with 'skip_nplusone' """
+    if request.node.get_closest_marker("skip_nplusone"):
+        yield
+    else:
+        with Profiler():
+            yield

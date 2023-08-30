@@ -5,6 +5,8 @@ import pytest
 from data_import.models import FileUpload
 from django.conf import settings
 
+
+@pytest.mark.skip_nplusone
 @pytest.mark.django_db
 def test_svg_upload_sanitize(setup_project_dialog):
     """ Upload malicious SVG file - remove harmful content"""
@@ -36,6 +38,7 @@ def test_svg_upload_sanitize(setup_project_dialog):
     assert "".join(expected.split()) == "".join(actual.decode('UTF-8').split())
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.django_db
 def test_svg_upload_invalid_format(setup_project_dialog):
     """ Upload invalid SVG file - still accepted"""
@@ -61,6 +64,7 @@ def test_svg_upload_invalid_format(setup_project_dialog):
     assert "".join(expected.split()) == "".join(actual.decode('UTF-8').split())
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.django_db
 def test_svg_upload_do_not_sanitize(setup_project_dialog):
     """ Upload SVG file - do not sanitize file content"""

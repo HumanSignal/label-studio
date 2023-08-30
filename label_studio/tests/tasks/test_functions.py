@@ -47,6 +47,7 @@ class TestExportProject:
     def project(self, configured_project):
         return configured_project
 
+    @pytest.mark.skip_nplusone
     def test_export_project(self, mocker, generate_export_file, project):
         data = ExportDataSerializer(
             project.tasks.all(),

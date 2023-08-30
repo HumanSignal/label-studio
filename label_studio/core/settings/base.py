@@ -223,6 +223,10 @@ MIDDLEWARE = [
     'core.current_request.ThreadLocalMiddleware',
 ]
 
+if DEBUG:
+    INSTALLED_APPS += ['nplusone.ext.django']
+    MIDDLEWARE += ['nplusone.ext.django.NPlusOneMiddleware']
+
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': (
