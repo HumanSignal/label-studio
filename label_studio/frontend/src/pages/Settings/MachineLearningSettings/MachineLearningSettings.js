@@ -131,7 +131,6 @@ export const MachineLearningSettings = () => {
       Swal.fire('Success', `Tensorboard is ready, view your model information in: ${data.ip}`, 'success');
   });
 } 
- }
   async function onDeleteModel(model_version) {
 
     console.log('delete model')
