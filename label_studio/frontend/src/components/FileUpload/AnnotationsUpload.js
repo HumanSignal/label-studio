@@ -76,15 +76,23 @@ project
       icon: 'info',
     })
     formData.append('file', file);
-    formData.append('project_id', project.id)
+    formData.append('project_id', project.id);
       try {
         const response = await axios.post( webhook_url + `/import_annotations?id=${project.id}&format=${selectedOption}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
-    
-        if (response.data.saved === false) {
+        if (response.data.annotations.message){
+          Swal.fire(
+            {
+              title: 'Warning', 
+              text: response.data.annotations.message,
+              icon: 'info'
+            }
+          )
+        }
+        else if (response.data.saved === false) {
           Swal.fire({
             title: 'Error',
             text: "This file is already in the project directory. If you wish to upload it again, please change its name",
