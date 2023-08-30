@@ -4551,6 +4551,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_front_lsdv_5248_double_click_delay_280823_short": {
+      "key": "fflag_fix_front_lsdv_5248_double_click_delay_280823_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "5a2504d41af64236bccd1d46d2cea36e",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 4,
+      "deleted": false
+    },
     "fflag_fix_front_lsdv_5436_dashboard_members_page_async_24072023_short": {
       "key": "fflag_fix_front_lsdv_5436_dashboard_members_page_async_24072023_short",
       "on": false,

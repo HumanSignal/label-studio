@@ -23,7 +23,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [apiUrl] | <code>string</code> |  | URL to fetch taxonomy from remote source; API should accept optional array `path` param: `apiUrl?path[]=root&path[]=child1` to return only nested children of `child1` node[^2] |
 | [leafsOnly] | <code>boolean</code> | <code>false</code> | Allow annotators to select only leaf nodes of taxonomy |
 | [showFullPath] | <code>boolean</code> | <code>false</code> | Whether to show the full path of selected items |
-| [pathSeparator] | <code>string</code> | <code>&quot;/&quot;</code> | Separator to show in the full path |
+| [pathSeparator] | <code>string</code> | <code>&quot;/&quot;</code> | Separator to show in the full path (default is " / ") |
 | [maxUsages] | <code>number</code> |  | Maximum number of times a choice can be selected per task |
 | [maxWidth] | <code>number</code> |  | Maximum width for dropdown |
 | [minWidth] | <code>number</code> |  | Minimum width for dropdown |
