@@ -12,6 +12,7 @@ from projects.models import Project
 from ..utils import make_annotation, make_annotator, make_prediction, make_task, project_id  # noqa
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.parametrize(
     "ordering, element_index, undefined",
     [
@@ -83,6 +84,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
     assert response_data["tasks"][0]["id"] == task_ids[element_index]
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.parametrize(
     "filters, ids",
     [

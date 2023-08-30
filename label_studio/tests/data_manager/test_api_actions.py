@@ -9,6 +9,7 @@ from projects.models import Project
 from ..utils import make_annotation, make_prediction, make_task, project_id  # noqa
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.parametrize(
     "tasks_count, annotations_count, predictions_count",
     [
