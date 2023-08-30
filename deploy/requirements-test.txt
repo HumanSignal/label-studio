@@ -13,3 +13,4 @@ pytest-xdist~=2.5.0
 importlib-metadata==4.13.0;python_version < '3.8'
 psutil==5.9.4
 freezegun~=1.2.2
+pre-commit==3.3.3
