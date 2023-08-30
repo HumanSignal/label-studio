@@ -125,8 +125,9 @@ export const MachineLearningSettings = () => {
   }
   async function onViewInfo(model_version) {
     console.log("viewing info on tensorboard");
-    axios.post(webhook_url + '/viewInfoTensorboard?id=' + project.id + '&model_version=' + model_version)
-    .then((data) => {
+    axios.post(webhook_url + '/view_model_info_tensorboard?id=' + project.id + '&model_version=' + model_version)
+    .then((response) => {
+      const data = response.data
     if (data.success == true)
       Swal.fire('Success', `Tensorboard is ready, view your model information in: ${data.ip}`, 'success');
   });
