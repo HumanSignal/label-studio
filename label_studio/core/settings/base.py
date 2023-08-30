@@ -76,7 +76,6 @@ if not logging.getLogger().hasHandlers():
 
 from label_studio.core.utils.io import get_data_dir
 from label_studio.core.utils.params import get_bool_env, get_env, get_env_list_int
-from label_studio.core.utils.secret_key import generate_secret_key_if_missing
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -116,9 +115,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = generate_secret_key_if_missing(BASE_DATA_DIR)
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
