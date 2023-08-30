@@ -1012,6 +1012,18 @@ main {
   padding: 0.6em;
 }
 
+.content-markdown .noheader table thead {
+  display: none;
+}
+
+.content-markdown .rowheader td:first-child {
+    font-weight: bold;
+}
+
+.content-markdown .noheader table tbody {
+    border-top: 1px var(--color-gray-200) solid;
+}
+
 .content-markdown img {
   max-width: 100%;
   height: auto;

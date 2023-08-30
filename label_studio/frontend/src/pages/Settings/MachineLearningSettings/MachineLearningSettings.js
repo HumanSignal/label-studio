@@ -170,7 +170,7 @@ export const MachineLearningSettings = () => {
           </div>
         </Form.Row>
 
-        {!isFF(FF_DEV_1682) && (
+        {(!isFF(FF_DEV_1682) || !backends.length ) && (
           <ProjectModelVersionSelector />
         )}
 
