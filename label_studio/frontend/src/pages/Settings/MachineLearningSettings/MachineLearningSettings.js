@@ -123,6 +123,15 @@ export const MachineLearningSettings = () => {
       }
     })
   }
+  async function onViewInfo(model_version) {
+    console.log("viewing info on tensorboard");
+    axios.post(webhook_url + '/viewInfoTensorboard?id=' + project.id + '&model_version=' + model_version)
+    .then((data) => {
+    if (data.success == true)
+      Swal.fire('Success', `Tensorboard is ready, view your model information in: ${data.ip}`, 'success');
+  });
+} 
+ }
   async function onDeleteModel(model_version) {
 
     console.log('delete model')
@@ -537,8 +546,9 @@ export const MachineLearningSettings = () => {
                       </div>:<div>You have no information about this model</div>}</div>}
                       <div style={{ marginTop: 20 }}>
                             <button style={{ marginRight: 10 }} onClick={() => onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
-                    {/* {modelsType == 'object_detection' && modelsPrecisions[model.label]["model_type"]== "tao" ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''} */}
                     {currentlyTrainingModel == model.label ? <button onClick={() => onAbortTraining(model.value)} className='btn btn-outline-warning'>Abort Training</button> : ""}
+                    <button style={{ marginLeft: 10 }} onClick={() => onViewInfo(model.value)} className='btn btn-outline-warning'>View Tensorboard</button>
+
                             <button style={{ marginLeft: 10 }} onClick={() => onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
             </div>
           </Card>
