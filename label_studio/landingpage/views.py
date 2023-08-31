@@ -7,6 +7,9 @@ from rest_framework.authtoken.models import Token
 def landingpage(request):
     return render(request, 'landingpage.html')
 
+def workinprogress(request):
+    return render(request, 'workinprogress.html')
+
 def createProject(request):
     if request.method == 'POST':
         createprojectform = CreateProject(request.POST)

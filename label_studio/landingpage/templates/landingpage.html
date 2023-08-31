@@ -11,24 +11,27 @@
 <body>
     <h1>Project overview</h1>
     <ol>
-        <li><a href="/landingpage/create_project">Name project</a></li>
+        <li><a href="/landingpage/create_project">Create project</a></li>
+        Create your project.
         <li><a href="/sensormodel/sensor">Manage sensors</a></li>
+        Manage your project sensors here. Add cameras or IMU sensors to your projects.
         <li><a href="/sensormodel/subject">Manage subjects</a></li>
+        Manage your project subjects here. Here, you can add and edit the subjects used in your projects.
         <li><a href="/sensormodel/deployment">Manage deployments</a></li>
+        Manage your project deployments here. This gives an overview of the deployments of your sensors to your subjects.
         <li><a href="/sensordata/">Manage data</a></li>
+        Manage your experimental data here. Here you can add zip files with your IMU or camera data to the project.
         <li><a href="/sensordata/offset">Synchronize sensors</a></li>
-        <li><a href="/subjectannotation/">Annotate videos</a></li>
-        <li><a href="/projects/">Add labels</a></li>
-        <li>Annotate</li>
-        <li>Export annotations</li>
+        Here you can add the offset between the camera data and the IMU data.
+        <li><a href="/subjectannotation/">Annotate subject presence</a></li>
+        Here you can annotate the subject presence in your videos. The videos can be annotated with your subjects as labels.
+        <li><a href="/landingpage/workinprogress">Add labels</a></li>
+        Here the different activity labels of the subjects can be stored. These labels will later be used to annotate your data.
+        <li><a href="/landingpage/workinprogress">Annotate</a></li>
+        Annotate the data using the activity labels. It is only data with subjects present.
+        <li><a href="/landingpage/workinprogress">Export annotations</a></li>
+        Export your subject and activity annotations.
     </ol>
-
-    {% comment %} <script>
-      function refreshPage(event) {
-        event.preventDefault();
-        window.location.href = event.target.getAttribute('href');
-      }
-    </script> {% endcomment %}
 </body>
 
 {% endblock %}

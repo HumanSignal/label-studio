@@ -5,5 +5,6 @@ app_name = 'landingpage'
 
 urlpatterns = [
     path('', views.landingpage, name = 'landingpage'),
-    path('create_project', views.createProject, name='Create project')
+    path('create_project', views.createProject, name='Create project'),
+    path('workinprogress', views.workinprogress, name='workinprogress'),
 ]
