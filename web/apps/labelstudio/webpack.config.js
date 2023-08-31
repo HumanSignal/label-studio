@@ -41,7 +41,11 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Nx plugins for webpack.
-module.exports = composePlugins(withNx(), withReact(), (config) => {
+module.exports = composePlugins(withNx({
+  nx: {
+    svgr: true,
+  },
+}), withReact({ svgr: true }), (config) => {
   // Update the webpack config as needed here.
   // e.g. `config.plugins.push(new MyPlugin())`
 
@@ -88,10 +92,13 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
   });
 
 
+
   config.module.rules.push({
     test: /\.svg$/,
-    use: ['@svgr/webpack'],
-  },);
+    use: [
+      '@svgr/webpack',
+    ]
+  });
 
   // update the stylus loader to include an import of a global file
   return merge(config, {

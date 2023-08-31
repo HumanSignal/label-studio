@@ -75,8 +75,8 @@ const Footer = () => {
   return (
     <Modal.Footer>
       <IconInfo className={importClass.elem("info-icon")} width="20" height="20" />
-      See the&nbsp;documentation to <a target="_blank" href="https://labelstud.io/guide/predictions.html">import preannotated data</a>{" "}
-      or&nbsp;to <a target="_blank" href="https://labelstud.io/guide/storage.html">sync data from a&nbsp;database or&nbsp;cloud storage</a>.
+      See the&nbsp;documentation to <a target="_blank" href="https://labelstud.io/guide/predictions.html" rel="noreferrer">import preannotated data</a>{" "}
+      or&nbsp;to <a target="_blank" href="https://labelstud.io/guide/storage.html" rel="noreferrer">sync data from a&nbsp;database or&nbsp;cloud storage</a>.
     </Modal.Footer>
   );
 };
@@ -240,7 +240,7 @@ export const ImportPage = ({
     onStart();
     onWaiting?.(true);
     files = [...files]; // they can be array-like object
-    const fd = new FormData;
+    const fd = new FormData();
 
     for (let f of files) {
       if (!allSupportedExtensions.includes(getFileExtension(f.name))) {
@@ -343,7 +343,7 @@ export const ImportPage = ({
                 </dl>
                 <b>
                    * – Support depends on the browser<br/>
-                   * – Use <a href="https://labelstud.io/guide/storage.html" target="_blank">
+                   * – Use <a href="https://labelstud.io/guide/storage.html" target="_blank" rel="noreferrer">
                   Cloud Storages</a> if you want to import a large number of files
                 </b>
               </div>
