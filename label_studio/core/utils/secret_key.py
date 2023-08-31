@@ -1,10 +1,19 @@
 import logging
 import os
+import sys
+
 import environ
 from django.core.management.utils import get_random_secret_key
 
-
 logger = logging.getLogger(__name__)
+
+
+def is_collectstatic() -> bool:
+    for arg in sys.argv:
+        if 'collectstatic' in arg:
+            return True
+
+    return False
 
 
 def generate_secret_key_if_missing(data_dir: str) -> str:
@@ -18,6 +27,11 @@ def generate_secret_key_if_missing(data_dir: str) -> str:
 
     logger.warning(f'Warning: {env_key} not found in environment variables. Will generate a random key.')
     new_secret = get_random_secret_key()
+
+    if is_collectstatic():
+        logger.info('Random SECRET_KEY was generated, but it is not being persisted because this is a collectstatic run')
+        return new_secret
+
     try:
         with open(env_filepath, 'a') as f:
             f.write(f'\n{env_key}={new_secret}\n') # nosec
