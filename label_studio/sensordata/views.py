@@ -13,6 +13,13 @@ from sensormodel.models import SensorType
 from rest_framework.authtoken.models import Token
 import requests
 from tempfile import NamedTemporaryFile
+from django.conf import settings
+import os
+import io
+import csv
+import fnmatch
+import zipfile
+from django.http import HttpResponseBadRequest
 
 
 UNITS = {'days': 86400, 'hours': 3600, 'minutes': 60, 'seconds':1, 'milliseconds':0.001}
@@ -32,34 +39,39 @@ def addsensordata(request):
             project = sensordataform.cleaned_data['project']
             sensor = sensordataform.cleaned_data.get('sensor')
 
-            # Django typically stores files smaller than 5MB as a InMemoryUploadedInstance, if this is not the case create a NamedTemporaryFile object
-            if isinstance(uploaded_file, InMemoryUploadedFile):
-                # Write the contents of the file to a temporary file on disk
-                file = NamedTemporaryFile(delete=False)
-                file.write(uploaded_file.read())
-                file.close()
-                # Access file path of newly created file
-                file_path = file.name
-            else:
-                # If file is not InMemoryUploaded you can use temporary_file_path
-                file_path = uploaded_file.temporary_file_path()
+            # Check if the uploaded file is a zip file
+            if zipfile.is_zipfile(uploaded_file):
+                # Process the zip file
+                with zipfile.ZipFile(uploaded_file, 'r') as zip_ref:
+                    for file_name in zip_ref.namelist():
+                        if (file_name.lower().endswith('.csv') or file_name.lower().endswith('.mp4')):  # Check if the file is a CSV or MP4 file
+                            # Extract each file from the zip to a temporary location
+                            temp_file_path = zip_ref.extract(file_name)
+                            # Process the individual file
+                            process_sensor_file(request, temp_file_path, sensor, name, project)
+                            # Delete the temporary file
+                            os.remove(temp_file_path)
+                
+                return redirect('sensordata:sensordatapage')
 
-            
-            # Retrieve sensortype
-            sensortype = sensor.sensortype
-            # For every sensortype (IMU, Camera) there is a different parse and upload process
-            match sensortype.sensortype:
-                # Parse and upload the data
-                case 'I':
-                    parse_IMU(request=request, file_path=file_path,sensor=sensor,name=name,project=project)
-                case 'C':
-                    parse_camera(request=request, file_path=file_path,sensor=sensor,name=name,project=project)
-                case 'M':
-                    pass
-        return redirect('sensordata:sensordatapage')
+            # Raise an exception if the uploaded file is not a zip file
+            raise ValueError("Uploaded file must be a zip file.")
+
     else:
         sensordataform = SensorDataForm()
-        return render(request, 'addsensordata.html', {'sensordataform':sensordataform})
+
+    return render(request, 'addsensordata.html', {'sensordataform': sensordataform})
+
+def process_sensor_file(request, file_path, sensor, name, project):
+    # Process the sensor file based on its type
+    sensortype = sensor.sensortype
+    if sensortype.sensortype == 'I':  # IMU sensor type
+        parse_IMU(request=request, file_path=file_path,sensor=sensor,name=name,project=project)
+    elif sensortype.sensortype == 'C':  # Camera sensor type
+        parse_camera(request=request, file_path=file_path,sensor=sensor,name=name,project=project)
+    elif sensortype.sensortype == 'M':  # Other sensor type (add handling logic here)
+        pass
+    # Add handling for other sensor types as needed
 
 def offset(request):
     sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
@@ -102,7 +114,7 @@ def adjust_offset(request, id):
     return render(request, 'editOffset.html', {'offsetform':offsetform})
 
 def parse_IMU(request, file_path, sensor, name, project):
-    sensortype = SensorType.objects.get(id=sensor.sensortype)
+    sensortype = SensorType.objects.get(id=sensor.sensortype.id)
     # Parse data
 
     project_controller = ProjectController()
@@ -155,7 +167,7 @@ def parse_camera(request, file_path, sensor, name, project):
     # Upload video to project
     upload_sensor_data(request=request, name=name, file_path=file_path ,project=project)
     # Get sensortype config
-    sensortype = SensorType.objects.get(id=sensor.sensortype)
+    sensortype = SensorType.objects.get(id=sensor.sensortype.id)
     sensor_timezone = sensortype.timezone
     # Parse video meta data
     videometadata = VideoMetaData(file_path=file_path,sensor_timezone=sensor_timezone)
@@ -175,7 +187,7 @@ def upload_sensor_data(request, name, file_path, project):
     user = request.user
     token = Token.objects.get(user=user)
     # Get url for importing data to the correct project
-    import_url = request.build_absolute_uri(reverse('data_import:api-projects:project-import',kwargs={'pk':project}))
+    import_url = request.build_absolute_uri(reverse('data_import:api-projects:project-import',kwargs={'pk':project.id}))
     # Get temporary file URL from the form
     files = {f'{name}': open(file_path, 'rb')}
     # Import the video to the correct project
