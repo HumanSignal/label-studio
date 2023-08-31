@@ -2374,13 +2374,6 @@ hexo-server@^3.0.0:
     picocolors "^1.0.0"
     serve-static "^1.14.1"
 
-hexo-tag-details@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/hexo-tag-details/-/hexo-tag-details-0.1.7.tgz#dcc2ff00157abc07f1a9421db89853271fdc6080"
-  integrity sha512-wjt5OLJKvhaqnjj3HaOWVRrRaAlLeV/YWq5CpyRzIqZ+K7lvuWXf4dTjzzb46NrENaiRLE4saENyDVK0jOWUbw==
-  dependencies:
-    hexo-util "^0.6.3"
-
 hexo-util@3.0.1, hexo-util@^0.6.3:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/hexo-util/-/hexo-util-3.0.1.tgz#9dc20a9ceac971e512e69bdab3d60800d76fad97"
@@ -3261,9 +3254,9 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-"notion-to-md@https://github.com/huguestennier/notion-to-md":
+"notion-to-md@https://github.com/huguestennier/notion-to-md.git":
   version "2.5.5"
-  resolved "https://github.com/huguestennier/notion-to-md#28f2b7c827e783316cb588636314ce3a251c7edf"
+  resolved "https://github.com/huguestennier/notion-to-md.git#28f2b7c827e783316cb588636314ce3a251c7edf"
   dependencies:
     markdown-table "^2.0.0"
 
