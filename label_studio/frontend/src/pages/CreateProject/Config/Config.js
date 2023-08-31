@@ -2,42 +2,24 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/xml/xml';
 import React, { useEffect, useState } from 'react';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
+import CM from 'codemirror';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/show-hint.css';
+
 import { Button, ToggleItems } from '../../../components';
 import { Form } from '../../../components/Form';
-import { cn } from '../../../utils/bem';
+import { useAPI } from '../../../providers/ApiProvider';
+import { Block, cn, Elem } from '../../../utils/bem';
 import { Palette } from '../../../utils/colors';
 import { colorNames } from './colors';
 import './Config.styl';
 import { Preview } from './Preview';
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from './Template';
 import { TemplatesList } from './TemplatesList';
-import { useAPI } from '../../../providers/ApiProvider';
 
-// don't do this, kids
-const formatXML = (xml) => {
-  // don't use formatting if the config has new lines
-  if (xml.indexOf("\n") >= 0) {
-    return xml;
-  }
-
-  let depth = 0;
-
-  try {
-    return xml.replace(/<(\/)?.*?(\/)?>[\s\n]*/g, (tag, close1, close2) => {
-      if (!close1) {
-        const res = "  ".repeat(depth) + tag.trim() + "\n";
-
-        if (!close2) depth++;
-        return res;
-      } else {
-        depth--;
-        return "  ".repeat(depth) + tag.trim() + "\n";
-      }
-    });
-  } catch (e) {
-    return xml;
-  }
-};
+import './codemirror.css';
+import './config-hint';
+import tags from './schema.json';
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
@@ -66,7 +48,12 @@ const Label = ({ label, template, color }) => {
         />
       </label>
       <span>{value}</span>
-      <button type="button" className={configClass.elem("delete-label")} onClick={() => template.removeLabel(label)}>
+      <button
+        type="button"
+        className={configClass.elem("delete-label")}
+        onClick={() => template.removeLabel(label)}
+        aria-label="delete label"
+      >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="red" strokeWidth="2" strokeLinecap="square" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 12L12 2"/>
           <path d="M12 12L2 2"/>
@@ -99,6 +86,7 @@ const ConfigureControl = ({ control, template }) => {
     <div className={configClass.elem("labels")}>
       <form className={configClass.elem("add-labels")} action="">
         <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
+        <span>Use new line as a separator to add multiple labels</span>
         <textarea name="labels" id="" cols="30" rows="5" ref={refLabels} onKeyPress={onKeyPress}></textarea>
         <input type="button" value="Add" onClick={onAddLabels} />
       </form>
@@ -300,6 +288,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
   const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
 
   // config update is debounced because of user input
   const [configToCheck, setConfigToCheck] = React.useState();
@@ -385,10 +374,35 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
 
     setWaiting(false);
 
-    if (res !== true) {
+    if (res === true) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+    } else {
       setError(res);
     }
   };
+
+  function completeAfter(cm, pred) {
+    if (!pred || pred()) {
+      setTimeout(function() {
+        if (!cm.state.completionActive)
+          cm.showHint({ completeSingle: false });
+      }, 100);
+    }
+    return CM.Pass;
+  }
+
+  function completeIfInTag(cm) {
+    return completeAfter(cm, function() {
+      const token = cm.getTokenAt(cm.getCursor());
+
+      if (token.type === "string" && (!/['"]$/.test(token.string) || token.string.length === 1)) return false;
+
+      const inner = CM.innerMode(cm.getMode(), token.state).state;
+
+      return inner.tagName;
+    });
+  }
 
   const extra = (
     <p className={configClass.elem('tags-link')}>
@@ -412,9 +426,26 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
               <CodeMirror
                 name="code"
                 id="edit_code"
-                value={formatXML(config)}
+                value={config}
+                autoCloseTags={true}
+                smartIndent={true}
                 detach
-                options={{ mode: "xml", theme: "default", lineNumbers: true }}
+                extensions={["hint", "xml-hint"]}
+                options={{
+                  mode: "xml",
+                  theme: "default",
+                  lineNumbers: true,
+                  extraKeys: {
+                    "'<'": completeAfter,
+                    // "'/'": completeIfAfterLt,
+                    "' '": completeIfInTag,
+                    "'='": completeIfInTag,
+                    "Ctrl-Space": "autocomplete",
+                  },
+                  hintOptions: { schemaInfo: tags },
+                }}
+                // don't close modal with Escape while editing config
+                onKeyDown={(editor, e) => { if (e.code === 'Escape') e.stopPropagation(); }}
                 onChange={(editor, data, value) => onChange(value)}
               />
             </div>
@@ -430,6 +461,11 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
         </div>
         {disableSaveButton !== true && onSaveClick && (
           <Form.Actions size="small" extra={configure === "code" && extra} valid>
+            {saved && (
+              <Block name="form-indicator">
+                <Elem tag="span" mod={{ type: 'success' }} name="item">Saved!</Elem>
+              </Block>
+            )}
             <Button look="primary" size="compact" style={{ width: 120 }} onClick={onSave} waiting={waiting}>
               {waiting ? "Saving..." : "Save"}
             </Button>
