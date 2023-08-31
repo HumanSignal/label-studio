@@ -20,4 +20,5 @@ urlpatterns = [
     path('deployment/delete/<int:id>', views.delete_deployment, name='delete_deployment'),
     path('sensor/delete/<int:id>', views.delete_sensor, name='delete_sensor'),
     path('subject/delete/<int:id>', views.delete_subject, name='delete_subject') ,
+    path('sensor/sensortype/delete/<int:id>', views.delete_sensortype, name='delete_sensortype') ,
 ]

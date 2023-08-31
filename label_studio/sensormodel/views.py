@@ -102,6 +102,16 @@ def delete_sensor(request, id):
     else:
         # Go to delete confirmation page
         return render(request, 'deleteSensor.html')
+    
+def delete_sensortype(request, id):
+    sensortype = SensorType.objects.get(id=id)
+    if request.method == 'POST':
+        # Send POST to delete a sensor
+        sensortype.delete()
+        return redirect('sensormodel:sensor')
+    else:
+        # Go to delete confirmation page
+        return render(request, 'deleteSensorType.html')
 
 
 def delete_subject(request, id):
@@ -148,5 +158,3 @@ def sync_sensor_parser_templates(request):
                     config = json.loads(config)
                     SensorType.objects.create(manufacturer=manufacturer,name=name, version=version, **config).save()
     return redirect('sensormodel:sensor')
-
-

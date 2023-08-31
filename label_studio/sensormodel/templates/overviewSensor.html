@@ -93,6 +93,7 @@
                 <th>Name</th>
                 <th>Version</th>
                 <th>ID</th>
+                <th></th>
             </tr>
             {% for sensortype in sensortypes %}
             <tr>
@@ -100,6 +101,7 @@
                 <td>{{ sensortype.name }}</td> 
                 <td>{{ sensortype.version }}</td>
                 <td>{{ sensortype.id }}</td>
+                <td><a href="{% url 'sensormodel:delete_sensortype' sensortype.id %}">[Delete]</a></td>
             </tr> 
            {% endfor %} 
         </table>
