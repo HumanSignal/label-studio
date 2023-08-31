@@ -1,6 +1,6 @@
 {
   "message": "fix: LOPS-380: [FE] 'Hang tight' message is missing when there is no tasks synced yet and sync is in progress",
-  "commit": "ae94cc2beaf46f239b8d7d7684f63e2896881c62",
+  "commit": "4601477c9374241a62909dd90a0dd2ab5dfbf87a",
   "branch": "fb-lops-380/update-dataset",
-  "date": "2023/08/29 10:08:28"
+  "date": "2023/08/31 09:23:19"
 }
