@@ -1,7 +1,7 @@
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/xml/xml';
 import React, { useEffect, useState } from 'react';
-import { UnControlled as CodeMirror } from 'react-codemirror2';
+import { UnControlled as CodeMirror } from 'react-codemirror2-react-17';
 import { Button, ToggleItems } from '../../../components';
 import { Form } from '../../../components/Form';
 import { cn } from '../../../utils/bem';

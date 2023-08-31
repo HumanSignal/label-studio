@@ -76,7 +76,7 @@
     "node-fetch": "^2.6.1",
     "puppeteer": "^19.9.1",
     "react": "^17.0.1",
-    "react-codemirror2": "^7.2.1",
+    "react-codemirror2-react-17": "^1.0.0",
     "react-dom": "^17.0.1",
     "react-icons": "^4.2.0",
     "react-router": "^5.2.0",
