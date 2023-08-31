@@ -1,6 +1,5 @@
 from django import forms
-from sensormodel import models as sensormodelmodels
+from projects.models import Project
 
 class SubjectAnnotationForm(forms.Form):
-    deployment = forms.ModelChoiceField(sensormodelmodels.Deployment.objects.all())
-    file = forms.FileField()
+    project = forms.ModelChoiceField(Project.objects.filter(title__endswith='_dataimport'), label='Choose your project')
