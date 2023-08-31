@@ -4,6 +4,10 @@ import os
 import pathlib
 
 from core.settings.base import *
+from core.utils.secret_key import generate_secret_key_if_missing
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = generate_secret_key_if_missing(BASE_DATA_DIR)
 
 DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
 DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}

@@ -37,7 +37,6 @@
     "hexo-renderer-marked": "^6.1.0",
     "hexo-renderer-stylus": "^0.3.3",
     "hexo-server": "^3.0.0",
-    "hexo-tag-details": "^0.1.7",
     "node-html-parser": "^6.1.4",
     "notion-to-md": "https://github.com/huguestennier/notion-to-md",
     "save": "^2.4.0"

@@ -9,6 +9,7 @@ import './settings.styl';
 import { HeidiTips } from '../../components/HeidiTips/HeidiTips';
 import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
 import { createURL } from '../../components/HeidiTips/utils';
+import { Caption } from '../../components/Caption/Caption';
 
 export const GeneralSettings = () => {
   const { project, fetchProject } = useContext(ProjectContext);
@@ -62,12 +63,12 @@ export const GeneralSettings = () => {
                   <EnterpriseBadge />
                 </Elem>
                 <Select placeholder="Select an option" disabled options={[]} />
-                <Block tag="p" name="settings-caption">
+                <Caption>
                   Simplify project management by organizing projects into workspaces. <a target="_blank" href={createURL("https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects", {
-                    experiment: 'project_settings_tip',
-                    treatment: 'simplify_project_management',
-                  })}>Learn more</a>
-                </Block>
+                  experiment: 'project_settings_tip',
+                  treatment: 'simplify_project_management',
+                })}>Learn more</a>
+                </Caption>
               </Block>
             )}
             <RadioGroup name="color" label="Color" size="large" labelProps={{ size: "large" }}>
@@ -88,20 +89,20 @@ export const GeneralSettings = () => {
                 />
               ))}
               {isFF(FF_LSDV_E_297) && (
-                <Block name="disabled-field">
-                  <Elem name="label">
-                    <input type="radio" value="test" disabled />
-                  </Elem>
-                  <Elem name="label-wrapper">
-                    <Elem name="title">Uncertainty sampling <EnterpriseBadge /></Elem>
-                    <Elem name="description">
-                      <p>Tasks are chosen according to model uncertainty score (active learning mode). <a target="_blank" href={createURL("https://docs.humansignal.com/guide/active_learning", {
-                        experiment: 'project_settings_workspace',
-                        treatment: 'workspaces',
-                      })}>Learn more</a></p>
-                    </Elem>
-                  </Elem>
-                </Block>
+                <RadioGroup.Button
+                  key="uncertainty-sampling"
+                  value=""
+                  label={<>Uncertainty sampling <EnterpriseBadge /></>}
+                  disabled
+                  description={(
+                    <>
+                      Tasks are chosen according to model uncertainty score (active learning mode). <a target="_blank" href={createURL("https://docs.humansignal.com/guide/active_learning", {
+                      experiment: 'project_settings_workspace',
+                      treatment: 'workspaces',
+                    })}>Learn more</a>
+                    </>
+                  )}
+                />
               )}
             </RadioGroup>
           </Form.Row>
