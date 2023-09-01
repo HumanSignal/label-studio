@@ -191,6 +191,7 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
 
 
 # TASK CREATE on IMPORT
+@pytest.mark.skip_nplusone
 @pytest.mark.django_db
 def test_webhooks_for_tasks_import(configured_project, business_client, organization_webhook):
     from django.core.files.uploadedfile import SimpleUploadedFile
