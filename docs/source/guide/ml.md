@@ -51,6 +51,9 @@ To start an example machine learning backend with Docker Compose, complete the f
 
 You can access the machine learning backend server at `http://localhost:9090`. You can also use this URL to add the machine learning backend to Label Studio (see below).
 
+!!! note
+    `localhost` is a special domain name that loops back directly to your local environment. In the instance of Docker-hosted containers, this loops back to the container itself, and not the computer the container is hosted on. Docker provides a special domain as a workaround for this, docker.host.internal. If you're hosting Label Studio and your ML Backend inside of Docker, try using that domain instead of localhost. (`http://host.docker.internal:9090`)
+
 For information on creating a custom ML backend, see [Write your own ML backend](ml_create). 
 
 
