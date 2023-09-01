@@ -30,12 +30,17 @@ export const ProjectsPage = () => {
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
   const defaultPageSize = parseInt(localStorage.getItem('pages:projects-list') ?? 30);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  
+
+
 
   const [modal, setModal] = React.useState(false);
   const openModal = setModal.bind(null, true);
   const closeModal = setModal.bind(null, false);
 
-  const fetchProjects = async (page  = currentPage, pageSize = defaultPageSize) => {
+  const fetchProjects = async (page = currentPage, pageSize = defaultPageSize) => {
     setNetworkState('loading');
     abortController.renew(); // Cancel any in flight requests
 
@@ -46,10 +51,10 @@ export const ProjectsPage = () => {
         'id',
         'title',
         'created_by',
-        'created_at', 
-        'color', 
-        'is_published', 
-        'assignment_settings', 
+        'created_at',
+        'color',
+        'is_published',
+        'assignment_settings',
       ].join(',');
     }
 
@@ -57,7 +62,7 @@ export const ProjectsPage = () => {
       params: requestParams,
       ...(isFF(FF_DEV_2575) ? {
         signal: abortController.controller.current.signal,
-        errorFilter: (e) => e.error.includes('aborted'), 
+        errorFilter: (e) => e.error.includes('aborted'),
       } : null),
     });
 
@@ -83,7 +88,7 @@ export const ProjectsPage = () => {
           page_size: pageSize,
         },
         signal: abortController.controller.current.signal,
-        errorFilter: (e) => e.error.includes('aborted'), 
+        errorFilter: (e) => e.error.includes('aborted'),
       });
 
       if (additionalData?.results?.length) {
@@ -116,24 +121,50 @@ export const ProjectsPage = () => {
     setContextProps({ openModal, showButton: projectsList.length > 0 });
   }, [projectsList.length]);
 
+  const pageTitle = "Create a New Projects";
+  const pageDescription = "Set up tasks and import photos, videos, text, and audio to annotate";
+  const showCreateButton = projectsList.length > 0;
+
+  
+
   return (
     <Block name="projects-page">
       <Oneof value={networkState}>
         <Elem name="loading" case="loading">
-          <Spinner size={64}/>
+          <Spinner size={64} />
         </Elem>
         <Elem name="content" case="loaded">
-          {projectsList.length ? (
-            <ProjectsList
-              projects={projectsList}
-              currentPage={currentPage}
-              totalItems={totalItems}
-              loadNextPage={loadNextPage}
-              pageSize={defaultPageSize}
-            />
-          ) : (
-            <EmptyProjectsList openModal={openModal} />
-          )}
+
+          {/* Title */}
+          <Elem name="title-container">
+            <Elem name="title-info">
+              <h3>{pageTitle}</h3>
+              <p>{pageDescription}</p>
+            </Elem>
+            {showCreateButton && (
+              <Elem name="create-project-button">
+                <Button onClick={openModal} look="primary" size="compact">
+                  + Create Project
+                </Button>
+              </Elem>
+            )}
+          </Elem>
+
+
+          {/* Projects List Container */}
+          <Elem name="projects-list-container">
+            {projectsList.length ? (
+              <ProjectsList
+                projects={projectsList}
+                currentPage={currentPage}
+                totalItems={totalItems}
+                loadNextPage={loadNextPage}
+                pageSize={defaultPageSize}
+              />
+            ) : (
+              <EmptyProjectsList openModal={openModal} />
+            )}
+          </Elem>
           {modal && <CreateProject onClose={closeModal} />}
         </Elem>
       </Oneof>
@@ -141,18 +172,29 @@ export const ProjectsPage = () => {
   );
 };
 
-ProjectsPage.title = "Projects";
+ProjectsPage.context = ({ openModal, showButton }) => {
+  if (!showButton) return null;
+  return (
+    <div className="context-area">
+      {/* Search Box */}
+      <input
+        type="text"
+        placeholder="Search..."
+      />
+    </div>
+  );
+};
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
 ProjectsPage.routes = ({ store }) => [
   {
-    title: () => store.project?.title,
+    title: store.project?.title,
     path: "/:id(\\d+)",
     exact: true,
     component: () => {
       const params = useRouterParams();
 
-      return <Redirect to={`/projects/${params.id}/data`}/>;
+      return <Redirect to={`/projects/${params.id}/data`} />;
     },
     pages: {
       DataManagerPage,
@@ -160,7 +202,4 @@ ProjectsPage.routes = ({ store }) => [
     },
   },
 ];
-ProjectsPage.context = ({ openModal, showButton }) => {
-  if (!showButton) return null;
-  return <Button onClick={openModal} look="primary" size="compact">Create</Button>;
-};
+

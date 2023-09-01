@@ -17,19 +17,19 @@ import './MenuSidebar.styl';
 
 export const MenubarContext = createContext();
 
-const LeftContextMenu = ({className}) => (
+const LeftContextMenu = ({ className }) => (
   <StaticContent
     id="context-menu-left"
     className={className}
   >{(template) => <Breadcrumbs fromTemplate={template} />}</StaticContent>
 );
 
-const RightContextMenu = ({className, ...props}) => {
-  const {ContextComponent, contextProps} = useContextComponent();
+const RightContextMenu = ({ className, ...props }) => {
+  const { ContextComponent, contextProps } = useContextComponent();
 
   return ContextComponent ? (
     <div className={className}>
-      <ContextComponent {...props} {...(contextProps ?? {})}/>
+      <ContextComponent {...props} {...(contextProps ?? {})} />
     </div>
   ) : (
     <StaticContent
@@ -83,7 +83,7 @@ export const Menubar = ({
   const providerValue = useMemo(() => ({
     PageContext,
 
-    setContext(ctx){
+    setContext(ctx) {
       setTimeout(() => {
         setPageContext({
           ...PageContext,
@@ -122,28 +122,29 @@ export const Menubar = ({
             closeOnClickOutside={!sidebarPinned}
           >
             <div className={`${menubarClass.elem('trigger')} main-menu-trigger`}>
-              <img src={absoluteURL("/static/icons/logo-black.svg")} alt="Label Studio Logo" height="22"/>
-              <Hamburger opened={sidebarOpened}/>
+              <img src={absoluteURL("/static/icons/slack.jpg")} alt="Label Studio Logo" height="22" />
+              <span>Data Studio</span>
+              <Hamburger opened={sidebarOpened} />
             </div>
           </Dropdown.Trigger>
 
           <div className={menubarContext}>
-            <LeftContextMenu className={contextItem.mod({left: true})}/>
+            <LeftContextMenu className={contextItem.mod({ left: true })} />
 
-            <RightContextMenu className={contextItem.mod({right: true})}/>
+            <RightContextMenu className={contextItem.mod({ right: true })} />
           </div>
 
           <Dropdown.Trigger ref={useMenuRef} align="right" content={(
             <Menu>
               <Menu.Item
-                icon={<LsSettings/>}
+                icon={<LsSettings />}
                 label="Account &amp; Settings"
                 href="/user/account"
                 data-external
               />
               {/* <Menu.Item label="Dark Mode"/> */}
               <Menu.Item
-                icon={<LsDoor/>}
+                icon={<LsDoor />}
                 label="Log Out"
                 href={absoluteURL("/logout")}
                 data-external
@@ -164,10 +165,15 @@ export const Menubar = ({
             </Menu>
           )}>
             <div title={config.user.email} className={menubarClass.elem('user')}>
-              <Userpic user={config.user}/>
+              <Userpic user={config.user} />
               {showNewsletterDot && (
                 <div className={menubarClass.elem('userpic-badge')} />
               )}
+              {
+                config.user.name && (
+                  <span>{config.user.name}</span>
+                )
+              }
             </div>
           </Dropdown.Trigger>
         </div>
@@ -181,65 +187,65 @@ export const Menubar = ({
               onToggle={sidebarToggle}
               onVisibilityChanged={() => window.dispatchEvent(new Event('resize'))}
               visible={sidebarOpened}
-              className={[sidebarClass, sidebarClass.mod({floating: !sidebarPinned})].join(" ")}
-              style={{width: 240}}
+              className={[sidebarClass, sidebarClass.mod({ floating: !sidebarPinned })].join(" ")}
+              style={{ width: 240 }}
             >
               <Menu>
                 <Menu.Item
                   label="Projects"
                   to="/projects"
-                  icon={<IconFolder/>}
+                  icon={<IconFolder />}
                   data-external
                   exact
                 />
                 <Menu.Item
                   label="Organization"
                   to="/organization"
-                  icon={<IconPersonInCircle/>}
+                  icon={<IconPersonInCircle />}
                   data-external
                   exact
                 />
 
-                <Menu.Spacer/>
+                <Menu.Spacer />
 
-                <VersionNotifier showNewVersion/>
+                <VersionNotifier showNewVersion />
 
                 <Menu.Item
                   label="API"
                   href="/docs/api"
-                  icon={<IconTerminal/>}
+                  icon={<IconTerminal />}
                   target="_blank"
                 />
                 <Menu.Item
                   label="Docs"
                   href="https://labelstud.io/guide"
-                  icon={<IconBook/>}
+                  icon={<IconBook />}
                   target="_blank"
                 />
                 <Menu.Item
                   label="GitHub"
                   href="https://github.com/heartexlabs/label-studio"
-                  icon={<LsGitHub/>}
+                  icon={<LsGitHub />}
                   target="_blank"
                 />
                 <Menu.Item
                   label="Slack Community"
                   href="https://slack.labelstud.io/?source=product-menu"
-                  icon={<LsSlack/>}
+                  icon={<LsSlack />}
                   target="_blank"
                 />
 
-                <VersionNotifier showCurrentVersion/>
+                <VersionNotifier showCurrentVersion />
 
-                <Menu.Divider/>
+                <Menu.Divider />
 
                 <Menu.Item
-                  icon={<IconPin/>}
+                  icon={<IconPin />}
                   className={sidebarClass.elem('pin')}
                   onClick={sidebarPin}
                   active={sidebarPinned}
                 >
-                  {sidebarPinned ?  "Unpin menu" : "Pin menu"}
+                  {sidebarPinned ? "Unpin menu" : "Pin menu"}
                 </Menu.Item>
 
               </Menu>
@@ -247,7 +253,7 @@ export const Menubar = ({
           )}
 
           <MenubarContext.Provider value={providerValue}>
-            <div className={contentClass.elem('content').mod({withSidebar: sidebarPinned && sidebarOpened})}>
+            <div className={contentClass.elem('content').mod({ withSidebar: sidebarPinned && sidebarOpened })}>
               {children}
             </div>
           </MenubarContext.Provider>

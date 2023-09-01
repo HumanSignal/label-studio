@@ -1,6 +1,6 @@
 .projects-page
   min-height calc(100vh - var(--header-height))
-  background-color #FAFAFA
+  background-color #cecece
 
   &__loading
     width 100%
@@ -8,16 +8,59 @@
     display flex
     align-items center
     justify-content center
-    min-height calc(100vh - var(--header-height))
+
+  &__title-container 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius 10px;
+    background-color: #FAFAFA;
+    max-width 90%;
+    height 20%;
+    margin: 20px auto 0;
+    
+
+  &__h3 
+    margin: 5px;
+    color: #000000;
+    font-size: 24px;
+    font-weight: 700;
+  
+  &__p
+    margin: 5px;
+    color: #000000;
+    font-size: 16px;
+    font-weight: 400;
+
+
+  &__create-project-button 
+    margin: 10px;
+
+  &__context-area
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+
+
+
+  &__projects-container
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 90%;
+    height: 80%;
+    border-radius: 10px;
+    background-color: #FAFAFA;
+    margin: 20px auto 0;
 
   &__list
-    padding 40px
-    display grid
-    grid-autoflow columns
-    box-sizing border-box
-    grid-gap 32px
-    grid-auto-rows 1fr
-    grid-template-columns repeat(4, 1fr)
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-gap: 20px; 
+    box-sizing: border-box;
+    width: 100%;
+    justify-items: center;
 
   &__link
     color #000
@@ -40,7 +83,7 @@
 
   @media (min-width 1200px)
     &__list
-      grid-template-columns repeat(3, 1fr)
+      grid-template-columns repeat(2, 1fr)
 
   @media (min-width 1360px)
     &__list
@@ -102,13 +145,22 @@
     font-weight 500
     margin-bottom 5px
     line-height 22px
-    align-items center
-
+    align-items flex-start
+  
     &-text
       max-width 250px
       white-space nowrap
       overflow hidden
       text-overflow ellipsis
+
+    &-created-by
+    display flex
+    flex-direction row-reverse  
+    align-items center
+
+    .userpic {
+      margin-left 78px;  
+    }
 
   &__summary
     flex 1
@@ -117,6 +169,7 @@
 
   &__total
     opacity 0.6
+
 
   &__annotation
     display flex

@@ -238,7 +238,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
 
       {pageSizeOptions?.length > 0 && (
         <Elem name="page-size">
-          <Select
+          <Select name="select-class" 
             value={pageSize}
             options={pageSizeOptions.map(v => ({ label: `${v} per page`, value: v }))}
             onChange={(e: any) => {
