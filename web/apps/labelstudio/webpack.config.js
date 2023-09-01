@@ -91,13 +91,28 @@ module.exports = composePlugins(withNx({
     }
   });
 
-
-
   config.module.rules.push({
     test: /\.svg$/,
-    use: [
-      '@svgr/webpack',
-    ]
+    use: [{
+      loader: '@svgr/webpack',
+      options: {
+        ref: true,
+        // svgo: false,
+        svgoConfig: {
+          plugins: [
+            {
+              name: "preset-default",
+              params: {
+                overrides: {
+                  removeViewBox: false,
+                  removeUnknownsAndDefaults: false,
+                }
+              }
+            }
+          ],
+        },
+      },
+    }],
   });
 
   // update the stylus loader to include an import of a global file
