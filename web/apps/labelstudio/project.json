@@ -15,9 +15,7 @@
         "baseHref": "/",
         "main": "apps/labelstudio/src/main.tsx",
         "tsConfig": "apps/labelstudio/tsconfig.app.json",
-        "assets": [
-          "apps/labelstudio/src/assets"
-        ],
+        "assets": [],
         "styles": [],
         "scripts": [],
         "isolatedConfig": true,

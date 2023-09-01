@@ -2,6 +2,12 @@
   "name": "@humansignal/source",
   "version": "0.0.0",
   "license": "MIT",
+  "scripts": {
+    "dev:watch": "nx run labelstudio:build:development --watch",
+    "dev": "nx run labelstudio:build:development",
+    "build": "nx run labelstudio:build:production",
+    "test": "nx run labelstudio:test:ci"
+  },
   "private": true,
   "dependencies": {
     "@babel/plugin-transform-private-property-in-object": "^7.22.11",

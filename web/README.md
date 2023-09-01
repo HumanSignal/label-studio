@@ -14,14 +14,14 @@ To build and run the frontend, please follow these steps:
 # Install all the necessary modules
 yarn install --frozen-lockfile
 
-# Run webpack
-npx webpack
+# Run nx
+npm run dev
 ```
 
 It's also possible to compile frontend on the fly:
 
 ```bash
-npx webpack --watch
+npm run dev:watch
 ```
 
 ## Creating pages
@@ -38,15 +38,15 @@ To create a page using Django is simple and straightforward: select an app withi
 
 **Important notice:** you still have to add url to `urls.py` under one of the Django apps so the backend won't throw a 404. It's up to you where to add it.
 
-All the pages live under `frontend/src/pages` and are self-hosted. It means every page defines it's route, title, breadcrumb item and content.
+All the pages live under `apps/labelstudio/src/pages` and are self-hosted. It means every page defines it's route, title, breadcrumb item and content.
 
-Pages organized as page sets: every folder under `frontend/src/pages` is a page set that can contain one or more pages.
+Pages organized as page sets: every folder under `apps/labelstudio/src/pages` is a page set that can contain one or more pages.
 
 To add a new page follow these steps:
 
 ##### Choose existing page set or create a new one
 
-Let's say we're creating page set from scratch. To do that we need a directory: `frontend/src/pages/MyPageSet`
+Let's say we're creating page set from scratch. To do that we need a directory: `apps/labelstudio/src/pages/MyPageSet`
 
 ##### Create a component file under a page set directory
 
@@ -69,7 +69,7 @@ MyNewPage.path = "/my_page_path"
 
 ##### Create a page set
 
-If you're creating a new page set there's an additional step: you need to create an `index.js` file in the root of your page set. A path would be `frontend/src/pages/MyPageSet/index.js`
+If you're creating a new page set there's an additional step: you need to create an `index.js` file in the root of your page set. A path would be `apps/labelstudio/src/pages/MyPageSet/index.js`
 
 This is necessary to group all the pages under the page set. Content of that file would be:
 
