@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-382: [FE] We are using 'Tasks' rather than 'Items' when user selects x items in dataset",
-  "commit": "facbe44c42c6b8bf9406dcfebd8322807b823750",
-  "branch": "master",
-  "date": "2023/08/29 08:53:44"
+  "message": "fix: LOPS-370: We could improve grid view for textual dataset",
+  "commit": "deedff3babab2d56c97236691d7600bbed156db5",
+  "branch": "fb-lops-370/fetch-text",
+  "date": "2023/09/01 06:39:12"
 }
