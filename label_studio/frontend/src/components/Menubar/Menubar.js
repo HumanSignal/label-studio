@@ -163,17 +163,17 @@ export const Menubar = ({
               )}
             </Menu>
           )}>
-            <div title={config.user.email} className={menubarClass.elem('user')}>
+            <div title={config.user.name} className={menubarClass.elem('user')}>
               <Userpic user={config.user} />
               <span className={menubarClass.elem('user-name')}>{config.Username}</span>
               {showNewsletterDot && (
                 <div className={menubarClass.elem('userpic-badge')} />
               )}
-              {/* {
+              {
                 config.user.name && (
                   <span>{config.user.name}</span>
                 )
-              } */}
+              }
             </div>
           </Dropdown.Trigger>
         </div>
