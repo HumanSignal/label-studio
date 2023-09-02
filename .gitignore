@@ -72,4 +72,4 @@ docker-compose.override.yml
 .python_history
 .viminfo
 .bash_history
-
+name_of_environment
