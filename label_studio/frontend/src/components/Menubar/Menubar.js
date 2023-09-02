@@ -122,16 +122,15 @@ export const Menubar = ({
             closeOnClickOutside={!sidebarPinned}
           >
             <div className={`${menubarClass.elem('trigger')} main-menu-trigger`}>
-              <img src={absoluteURL("/static/icons/slack.jpg")} alt="Label Studio Logo" height="22" />
-              <span>Data Studio</span>
-              <Hamburger opened={sidebarOpened} />
+              <img src={absoluteURL("/static/icons/slack.jpg")} alt="Data Studio Logo" height="42" style={{ marginRight: '10px' }} />
+              <span style={{ marginLeft: '5px', fontWeight: 'bold' }}>Data Studio</span>
+              {/* <Hamburger opened={sidebarOpened} /> */}
             </div>
           </Dropdown.Trigger>
 
           <div className={menubarContext}>
-            <LeftContextMenu className={contextItem.mod({ left: true })} />
-
-            <RightContextMenu className={contextItem.mod({ right: true })} />
+            <LeftContextMenu className={contextItem} />
+            <RightContextMenu className={contextItem} />
           </div>
 
           <Dropdown.Trigger ref={useMenuRef} align="right" content={(
@@ -166,14 +165,15 @@ export const Menubar = ({
           )}>
             <div title={config.user.email} className={menubarClass.elem('user')}>
               <Userpic user={config.user} />
+              <span className={menubarClass.elem('user-name')}>{config.Username}</span>
               {showNewsletterDot && (
                 <div className={menubarClass.elem('userpic-badge')} />
               )}
-              {
+              {/* {
                 config.user.name && (
                   <span>{config.user.name}</span>
                 )
-              }
+              } */}
             </div>
           </Dropdown.Trigger>
         </div>

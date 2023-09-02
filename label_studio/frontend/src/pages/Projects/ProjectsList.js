@@ -7,7 +7,7 @@ import { Button, Dropdown, Menu, Pagination, Userpic } from '../../components';
 import { Block, Elem } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
 
-export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
+export const ProjectsList = ({ projects, currentPage, totalItems, totalPages, loadNextPage, pageSize }) => {
   return (
     <>
       <Elem name="projects-container">
@@ -101,7 +101,7 @@ const ProjectCard = ({ project }) => {
                       <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
                     </Menu>
                   )}>
-                    <Button size="small" type="text" icon={<LsEllipsis />} />
+                    <Button size="large" type="text" icon={<LsEllipsis />} />
                   </Dropdown.Trigger>
                 </Elem>
               </Elem>

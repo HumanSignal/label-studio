@@ -14,6 +14,7 @@ import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
 import './Projects.styl';
 import { EmptyProjectsList, ProjectsList } from './ProjectsList';
+import { BiSearch } from 'react-icons/bi';
 
 const getCurrentPage = () => {
   const pageNumberFromURL = new URLSearchParams(location.search).get("page");
@@ -30,15 +31,10 @@ export const ProjectsPage = () => {
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
   const defaultPageSize = parseInt(localStorage.getItem('pages:projects-list') ?? 30);
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  
-
-
-
   const [modal, setModal] = React.useState(false);
   const openModal = setModal.bind(null, true);
   const closeModal = setModal.bind(null, false);
+  //const [searchQuery, setSearchQuery] = useState('');
 
   const fetchProjects = async (page = currentPage, pageSize = defaultPageSize) => {
     setNetworkState('loading');
@@ -125,7 +121,11 @@ export const ProjectsPage = () => {
   const pageDescription = "Set up tasks and import photos, videos, text, and audio to annotate";
   const showCreateButton = projectsList.length > 0;
 
-  
+  // Inside the render method
+
+  // const filteredProjects = projectsList.filter((project) =>
+  //   project.title.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   return (
     <Block name="projects-page">
@@ -175,11 +175,20 @@ export const ProjectsPage = () => {
 ProjectsPage.context = ({ openModal, showButton }) => {
   if (!showButton) return null;
   return (
-    <div className="context-area">
+    <div className="context-area" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       {/* Search Box */}
       <input
         type="text"
         placeholder="Search..."
+        style={{
+          width: '600px', // Adjust the width as needed
+          borderRadius: '10px', // Adjust the border radius as needed
+          padding: '10px', // Add some padding for spacing
+        }}
+        // value={searchQuery}
+        // onChange={(e) => setSearchQuery(e.target.value)}
+        
+      
       />
     </div>
   );
@@ -188,7 +197,9 @@ ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
 ProjectsPage.routes = ({ store }) => [
   {
-    title: store.project?.title,
+    // title: store.project?.title,
+    // set the title to empty string to remove the route title from the page
+    title: "",
     path: "/:id(\\d+)",
     exact: true,
     component: () => {
