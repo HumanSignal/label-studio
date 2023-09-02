@@ -21,42 +21,51 @@
     display flex
     padding 0 20px
     align-items center
-    justify-content space-between
+    justify-content center
 
   &__context-item
-    &_left, &_right
-      height 100%
-      display flex
-      align-items center
+    height 100%
+    display flex
+    align-items center
 
   &__trigger
     display flex
-    padding 0 20px
+    padding 0 48px
     cursor pointer
     align-items center
     justify-content space-between
     min-width 240px
     max-width 240px
     box-sizing border-box
-    box-shadow 1px 0 0 0 rgba(0, 0, 0, 0.1)
+    
 
   &__user
-    display flex
-    margin 0 20px
-    align-self center
-    cursor pointer
-    position relative
-    align-items center
-    justify-content center
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    width: 80px;
+    height: 35px; 
+    background: #fff; 
+    border: 1px solid rgba(0, 0, 0, 0.1); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
   &__userpic-badge
-    position absolute
-    top 0
-    right 0
-    width 50px
-    height 8px
-    border-radius 5%
-    background #09f
+    position: absolute;
+    margin-right: 40px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #d1d1d1;
+    right: 5px;
+    top: 5px;
+
+  &__user-name
+    margin-top: 5px;
+    font-size: 14px;
+    
+  
 
 .newsletter-menu-item
   width 200px

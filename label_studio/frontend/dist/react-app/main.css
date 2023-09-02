@@ -1022,42 +1022,48 @@
   display: flex;
   padding: 0 20px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
-.ls-menu-header__context-item_left,
-.ls-menu-header__context-item_right {
+.ls-menu-header__context-item {
   height: 100%;
   display: flex;
   align-items: center;
 }
 .ls-menu-header__trigger {
   display: flex;
-  padding: 0 20px;
+  padding: 0 48px;
   cursor: pointer;
   align-items: center;
   justify-content: space-between;
   min-width: 240px;
   max-width: 240px;
   box-sizing: border-box;
-  box-shadow: 1px 0 0 0 rgba(0,0,0,0.1);
 }
 .ls-menu-header__user {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  width: 80px;
+  height: 35px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
   display: flex;
-  margin: 0 20px;
-  align-self: center;
-  cursor: pointer;
-  position: relative;
   align-items: center;
   justify-content: center;
 }
 .ls-menu-header__userpic-badge {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 50px;
-  height: 8px;
-  border-radius: 5%;
-  background: #09f;
+  margin-right: 40px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d1d1d1;
+  right: 5px;
+  top: 5px;
+}
+.ls-menu-header__user-name {
+  margin-top: 5px;
+  font-size: 14px;
 }
 .ls-newsletter-menu-item {
   width: 200px;
@@ -3891,17 +3897,17 @@ body {
   height: 20%;
   margin: 20px auto 0;
 }
-.ls-projects-page__h3 {
-  margin: 5px;
+.ls-projects-page__title-container h3 {
+  margin-left: 20px;
   color: #000;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
 }
-.ls-projects-page__p {
-  margin: 5px;
+.ls-projects-page__title-container p {
+  margin-left: 20px;
   color: #000;
-  font-size: 16px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 50;
 }
 .ls-projects-page__create-project-button {
   margin: 10px;
@@ -3910,25 +3916,26 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 .ls-projects-page__projects-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-between;
   max-width: 90%;
   height: 80%;
   border-radius: 10px;
   background-color: #fafafa;
-  margin: 20px auto 0;
+  margin: 20px auto 10px;
+  gap: 20px;
 }
 .ls-projects-page__list {
   padding: 40px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
   box-sizing: border-box;
   width: 100%;
-  justify-items: center;
+  justify-content: space-between;
 }
 .ls-projects-page__link {
   color: #000;
@@ -3989,7 +3996,9 @@ body {
 }
 .ls-project-card {
   --text-color: #000;
-  flex: 1;
+  flex: 0 0 calc(100% - 4px);
+  width: 500px;
+  margin: 10px;
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -4011,8 +4020,8 @@ body {
   --button-color: var(--text-color);
 }
 .ls-project-card__menu .ls-button__icon {
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
 }
 .ls-project-card__title {
   display: flex;
@@ -4033,7 +4042,7 @@ body {
 .ls-project-card__title flex-direction row-reverse,
 .ls-project-card__title align-items center,
 .ls-project-card__title .ls-userpic {
-  margin-left: 78px;
+  margin-left: 65%;
 }
 .ls-project-card__summary {
   flex: 1;
@@ -4050,7 +4059,7 @@ body {
 .ls-project-card__detail {
   display: grid;
   grid-auto-flow: column;
-  grid-gap: 16px;
+  grid-gap: 30px;
   grid-auto-columns: max-content;
 }
 .ls-project-card__detail-item {
@@ -4078,7 +4087,7 @@ body {
   opacity: 0.6;
   font-size: 16px;
   line-height: 22px;
-  padding: 12px 16px 0;
+  padding: 0px 0px 0;
   overflow: hidden;
   color: rgba(0,0,0,0.6);
   text-overflow: ellipsis;
