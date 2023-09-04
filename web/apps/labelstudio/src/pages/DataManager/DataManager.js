@@ -15,6 +15,7 @@ import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
+import DM from "@humansignal/datamanager";
 import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
@@ -48,7 +49,7 @@ const initializeDataManager = async (root, props, params) => {
     ...settings,
   };
 
-  return new window.DataManager(dmConfig);
+  return new DM(dmConfig);
 };
 
 const buildLink = (path, params) => {

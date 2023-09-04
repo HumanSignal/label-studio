@@ -53,8 +53,8 @@ module.exports = composePlugins(withNx({
     ...config.output,
     uniqueName: "labelstudio",
     publicPath: "auto",
-    scriptType: 'text/javascript'
-  }
+    scriptType: 'text/javascript',
+  };
 
   config.optimization = {
     splitChunks: false,
@@ -65,6 +65,7 @@ module.exports = composePlugins(withNx({
       rule.oneOf.forEach(loader => {
         if (loader.use) {
           const cssLoader = loader.use.find(use => use.loader && use.loader.includes('css-loader'));
+
           if (cssLoader && cssLoader.options) {
             cssLoader.options.modules = {
               localIdentName: 'ls-[local]', // Customize this format
@@ -75,9 +76,11 @@ module.exports = composePlugins(withNx({
     }
 
     if (rule.test.toString().includes('styl')) {
-      const r = rule.oneOf.filter((r) => r.use && r.use.find((u) => u.loader && u.loader.includes('stylus-loader')))
+      const r = rule.oneOf.filter((r) => r.use && r.use.find((u) => u.loader && u.loader.includes('stylus-loader')));
+
       r.forEach(_r => {
-        const l = _r.use.filter((u) => u.loader && u.loader.includes('stylus-loader'))
+        const l = _r.use.filter((u) => u.loader && u.loader.includes('stylus-loader'));
+
         l.forEach(_l => {
           _l.options = {
             ..._l.options,
@@ -85,9 +88,9 @@ module.exports = composePlugins(withNx({
               ..._l.options.stylusOptions,
               import: [path.resolve(__dirname, './src/themes/default/variables.styl')],
             },
-          }
-        })
-      })
+          };
+        });
+      });
     }
   });
 
@@ -106,9 +109,9 @@ module.exports = composePlugins(withNx({
                 overrides: {
                   removeViewBox: false,
                   removeUnknownsAndDefaults: false,
-                }
-              }
-            }
+                },
+              },
+            },
           ],
         },
       },
@@ -117,9 +120,9 @@ module.exports = composePlugins(withNx({
 
   // update the stylus loader to include an import of a global file
   return merge(config, {
-    devtool: devtool,
+    devtool,
     mode: process.env.NODE_ENV || 'development',
-    plugins: plugins,
+    plugins,
     optimization: optimizer,
   });
 });
