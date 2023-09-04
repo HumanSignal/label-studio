@@ -1017,6 +1017,18 @@
   justify-content: space-evenly;
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+.ls-menu-header__help-button {
+  margin-top: 14px;
+  margin-right: 50px;
+  padding: 5px;
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+}
 .ls-menu-header__context {
   flex: 1;
   display: flex;
@@ -1040,19 +1052,20 @@
   box-sizing: border-box;
 }
 .ls-menu-header__user {
-  position: absolute;
-  top: 5px;
+  position: relative;
+  top: 4.5px;
   right: 20px;
   width: 80px;
-  height: 35px;
+  height: 38px;
   background: #fff;
   border: 1px solid rgba(0,0,0,0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 4px;
 }
 .ls-menu-header__userpic-badge {
-  position: absolute;
+  position: relative;
   margin-right: 40px;
   width: 20px;
   height: 20px;
@@ -3878,7 +3891,7 @@ body {
 
 .ls-projects-page {
   min-height: calc(100vh - var(--header-height));
-  background-color: #cecece;
+  background-color: #e8e8e8;
 }
 .ls-projects-page__loading {
   width: 100%;
@@ -3917,6 +3930,12 @@ body {
   justify-content: center;
   align-items: center;
   height: 100%;
+}
+.ls-projects-page__context-area__input-container {
+  width: 600px;
+  border-radius: 10px;
+  margin-right: 100px;
+  padding: 10px;
 }
 .ls-projects-page__projects-container {
   display: flex;
@@ -4041,8 +4060,10 @@ body {
 .ls-project-card__title display flex,
 .ls-project-card__title flex-direction row-reverse,
 .ls-project-card__title align-items center,
+.ls-project-card__title position relative,
 .ls-project-card__title .ls-userpic {
-  margin-left: 65%;
+  position: absolute;
+  margin-left: 36%;
 }
 .ls-project-card__summary {
   flex: 1;

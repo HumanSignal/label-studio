@@ -7,13 +7,16 @@ import { cn } from '../../utils/bem';
 import { absoluteURL, isDefined } from '../../utils/helpers';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 import { Dropdown } from "../Dropdown/Dropdown";
-import { Hamburger } from "../Hamburger/Hamburger";
+//import { Hamburger } from "../Hamburger/Hamburger";
 import { Menu } from '../Menu/Menu';
 import { Userpic } from '../Userpic/Userpic';
+import { UserInfo } from '../Userpic/UserInfo';
 import { VersionNotifier, VersionProvider } from '../VersionNotifier/VersionNotifier';
 import './Menubar.styl';
 import './MenuContent.styl';
 import './MenuSidebar.styl';
+
+import { IconQuestion } from '../../assets/icons';
 
 export const MenubarContext = createContext();
 
@@ -70,12 +73,14 @@ export const Menubar = ({
     e.preventDefault();
 
     const newState = !sidebarPinned;
+
     setSidebarPinned(newState);
     onSidebarPin?.(newState);
   }, [sidebarPinned]);
 
   const sidebarToggle = useCallback((visible) => {
     const newState = visible;
+
     setSidebarOpened(newState);
     onSidebarToggle?.(newState);
   }, [sidebarOpened]);
@@ -128,9 +133,18 @@ export const Menubar = ({
             </div>
           </Dropdown.Trigger>
 
+
           <div className={menubarContext}>
             <LeftContextMenu className={contextItem} />
             <RightContextMenu className={contextItem} />
+          </div>
+          <div className="menubar-help-button-box">
+            {/* Help Button */}
+            <div className={menubarClass.elem('help-button')}>
+              <button className='help-icon'>
+                <IconQuestion />
+              </button>
+            </div>
           </div>
 
           <Dropdown.Trigger ref={useMenuRef} align="right" content={(
@@ -163,19 +177,18 @@ export const Menubar = ({
               )}
             </Menu>
           )}>
-            <div title={config.user.email} className={menubarClass.elem('user')}>
-              <Userpic user={config.user} />
-              <span className={menubarClass.elem('user-name')}>{config.Username}</span>
-              {showNewsletterDot && (
-                <div className={menubarClass.elem('userpic-badge')} />
-              )}
-              {/* {
-                config.user.name && (
-                  <span>{config.user.name}</span>
-                )
-              } */}
-            </div>
+            <>
+              <div title={config.user.email} className={menubarClass.elem('user')}>
+                <Userpic user={config.user} />
+                <UserInfo user={config.user} />
+                {showNewsletterDot && (
+                  <div className={menubarClass.elem('userpic-badge')} />
+                )}
+
+              </div>
+            </>
           </Dropdown.Trigger>
+
         </div>
       )}
 

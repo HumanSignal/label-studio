@@ -14,7 +14,8 @@ import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
 import './Projects.styl';
 import { EmptyProjectsList, ProjectsList } from './ProjectsList';
-import { BiSearch } from 'react-icons/bi';
+
+
 
 const getCurrentPage = () => {
   const pageNumberFromURL = new URLSearchParams(location.search).get("page");
@@ -30,17 +31,32 @@ export const ProjectsPage = () => {
   const [currentPage, setCurrentPage] = useState(getCurrentPage());
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
-  const defaultPageSize = parseInt(localStorage.getItem('pages:projects-list') ?? 30);
+  //const defaultPageSize = parseInt(localStorage.getItem('pages:projects-list') ?? 10);
+  const defaultPageSize = 10;
   const [modal, setModal] = React.useState(false);
   const openModal = setModal.bind(null, true);
   const closeModal = setModal.bind(null, false);
-  //const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+
+
+
+
+
 
   const fetchProjects = async (page = currentPage, pageSize = defaultPageSize) => {
     setNetworkState('loading');
     abortController.renew(); // Cancel any in flight requests
 
-    const requestParams = { page, page_size: pageSize };
+
+    const requestParams = {
+      page,
+      page_size: pageSize,
+    };
+
+
+
+
 
     if (isFF(FF_DEV_2575)) {
       requestParams.include = [
@@ -107,6 +123,11 @@ export const ProjectsPage = () => {
     await fetchProjects(page, pageSize);
   };
 
+  // Filter projects based on the search query
+  const filteredProjects = projectsList.filter((project) =>
+    project.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   React.useEffect(() => {
     fetchProjects();
   }, []);
@@ -120,12 +141,16 @@ export const ProjectsPage = () => {
   const pageTitle = "Create a New Projects";
   const pageDescription = "Set up tasks and import photos, videos, text, and audio to annotate";
   const showCreateButton = projectsList.length > 0;
-
+  // const pageSize = 11;
+  // const totalPages = Math.ceil(projectsList.length / pageSize);
   // Inside the render method
 
   // const filteredProjects = projectsList.filter((project) =>
   //   project.title.toLowerCase().includes(searchQuery.toLowerCase())
   // );
+
+
+
 
   return (
     <Block name="projects-page">
@@ -136,26 +161,28 @@ export const ProjectsPage = () => {
         <Elem name="content" case="loaded">
 
           {/* Title */}
-          <Elem name="title-container">
-            <Elem name="title-info">
-              <h3>{pageTitle}</h3>
-              <p>{pageDescription}</p>
-            </Elem>
-            {showCreateButton && (
+          {showCreateButton && (
+            <Elem name="title-container">
+              <Elem name="title-info">
+                <h3>{pageTitle}</h3>
+                <p>{pageDescription}</p>
+              </Elem>
+
               <Elem name="create-project-button">
                 <Button onClick={openModal} look="primary" size="compact">
                   + Create Project
                 </Button>
               </Elem>
-            )}
-          </Elem>
+
+            </Elem>
+          )}
 
 
           {/* Projects List Container */}
           <Elem name="projects-list-container">
-            {projectsList.length ? (
+            {filteredProjects.length ? (
               <ProjectsList
-                projects={projectsList}
+                projects={filteredProjects}
                 currentPage={currentPage}
                 totalItems={totalItems}
                 loadNextPage={loadNextPage}
@@ -172,27 +199,44 @@ export const ProjectsPage = () => {
   );
 };
 
-ProjectsPage.context = ({ openModal, showButton }) => {
+ProjectsPage.context = ({ showButton, searchQuery, setSearchQuery }) => {
   if (!showButton) return null;
   return (
     <div className="context-area" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       {/* Search Box */}
       <input
+        className='input-context'
         type="text"
         placeholder="Search..."
-        style={{
-          width: '600px', // Adjust the width as needed
-          borderRadius: '10px', // Adjust the border radius as needed
-          padding: '10px', // Add some padding for spacing
-        }}
-        // value={searchQuery}
-        // onChange={(e) => setSearchQuery(e.target.value)}
-        
-      
+        style={{ width: '500px', borderRadius: '10px', marginRight: '100px', padding: '10px' }}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
     </div>
   );
 };
+
+
+// ProjectsPage.context = ({ showButton }) => {
+//   const [searchQuery, setSearchQuery] = useState('');
+
+//   if (!showButton) return null;
+//   return (
+//     <div className="context-area" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+//       {/* Search Box */}
+//       <input
+//         className='input-context'
+//         type="text"
+//         placeholder="Search..."
+//         style={{ width: '600px', borderRadius: '10px', marginright: '100px', padding: '10px' }}
+//         value={searchQuery}
+//         onChange={(e) => console.log(e.target.value)}
+//       />
+//     </div>
+
+//   );
+// };
+
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
 ProjectsPage.routes = ({ store }) => [
@@ -205,7 +249,12 @@ ProjectsPage.routes = ({ store }) => [
     component: () => {
       const params = useRouterParams();
 
-      return <Redirect to={`/projects/${params.id}/data`} />;
+
+      return (
+        <>
+          <Redirect to={`/projects/${params.id}/data`} />
+        </>
+      );
     },
     pages: {
       DataManagerPage,

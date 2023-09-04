@@ -1,6 +1,6 @@
 .projects-page
   min-height calc(100vh - var(--header-height))
-  background-color #cecece
+  background-color #e8e8e8
 
   &__loading
     width 100%
@@ -42,6 +42,12 @@
     align-items: center; 
     height: 100%;
 
+    &__input-container
+      width: 600px;
+      border-radius: 10px;
+      margin-right: 100px;
+      padding: 10px;
+
 
 
   &__projects-container
@@ -81,6 +87,7 @@
     justify-content flex-end
     box-sizing border-box
     background-color #fafafa
+
 
   @media (min-width 1200px)
     &__list
@@ -160,9 +167,11 @@
     display flex
     flex-direction row-reverse  
     align-items center
+    position relative
 
     .userpic {
-      margin-left 65%;  
+      position: absolute;
+      margin-left: 36%; 
     }
 
   &__summary
