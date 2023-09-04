@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5248: BBoxes optimizations",
-  "commit": "1d6dd4ccb0db577d222c067cb72ea10ecc2f2aa2",
+  "commit": "05f5ee6a631ef75e7a86d34fe50b6ed3971e370b",
   "branch": "fb-lsdv-5248/bbox-optimization",
-  "date": "2023/09/04 13:27:29"
+  "date": "2023/09/04 14:38:56"
 }
