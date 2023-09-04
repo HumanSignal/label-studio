@@ -35,7 +35,8 @@ export const Userpic = forwardRef(({
         setFinalUsername(username);
       } else if (first_name && last_name) {
         setFinalUsername(`${first_name[0]}${last_name[0]}`);
-      } else if (email) {
+      } 
+      else if (email) {
         setFinalUsername(email.substring(0, 2));
       }
 
