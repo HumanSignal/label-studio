@@ -73,3 +73,6 @@ docker-compose.override.yml
 .viminfo
 .bash_history
 name_of_environment
+label_studio/frontend/dist/react-app/index.js
+label_studio/frontend/dist/react-app/index.js
+label_studio/frontend/dist/react-app/main.css

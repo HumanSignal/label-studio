@@ -1,0 +1,28 @@
+/* custom.css */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.border-teal {
+    border-color: teal;
+}
+
+.border-t-12 {
+    border-top-width: 12px;
+}
+
+.rounded-lg {
+    border-radius: 12px;
+}
+
+.shadow-lg {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ... add more styles as needed ... */
