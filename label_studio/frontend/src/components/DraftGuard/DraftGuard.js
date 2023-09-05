@@ -11,7 +11,7 @@ export const DraftGuard = () => {
   const history = useHistory();
 
   useEffect(async () => {
-    if (nextLocation, isFF(FF_OPTIC_7)) {
+    if (nextLocation && isFF(FF_OPTIC_7)) {
       const selected = window.Htx?.annotationStore?.selected;
       const hasChanges = !!selected?.history.undoIdx;
   
