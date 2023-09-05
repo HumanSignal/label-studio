@@ -1055,7 +1055,7 @@
   position: relative;
   top: 4.5px;
   right: 20px;
-  width: 80px;
+  width: 109px;
   height: 38px;
   background: #fff;
   border: 1px solid rgba(0,0,0,0.1);
@@ -3949,7 +3949,7 @@ body {
   gap: 20px;
 }
 .ls-projects-page__list {
-  padding: 40px;
+  padding: 0px;
   display: flex;
   flex-wrap: wrap;
   box-sizing: border-box;
@@ -3961,6 +3961,12 @@ body {
   display: block;
   display: flex;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  width: 45%;
+  margin: 10px auto;
 }
 .ls-projects-page__link:hover {
   color: #000;
@@ -4015,20 +4021,25 @@ body {
 }
 .ls-project-card {
   --text-color: #000;
-  flex: 0 0 calc(100% - 4px);
-  width: 500px;
-  margin: 10px;
+  flex: 1;
   display: flex;
   flex-direction: column;
   background: #fff;
-  box-shadow: 0px 1px 2px rgba(0,0,0,0.15);
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
   border-radius: 4px;
+  padding: 20px;
   overflow: hidden;
+  margin: 10px;
+  width: 70%;
   color: var(--text-color);
 }
 .ls-project-card__header {
   padding: 12px 16px;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+  background-color: #e8e8e8;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
 }
 .ls-project-card__menu {
   margin-left: auto;
@@ -4063,7 +4074,7 @@ body {
 .ls-project-card__title position relative,
 .ls-project-card__title .ls-userpic {
   position: absolute;
-  margin-left: 36%;
+  margin-left: 30.5%;
 }
 .ls-project-card__summary {
   flex: 1;

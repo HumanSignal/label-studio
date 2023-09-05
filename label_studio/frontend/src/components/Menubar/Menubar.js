@@ -62,6 +62,17 @@ export const Menubar = ({
     props: {},
   });
 
+  // const getInitials = (name) => {
+  //   const parts = name.split(' ');
+
+  //   if (parts.length === 1) return parts[0][0];
+  //   return parts[0][0] + parts[parts.length - 1][0];
+  // };
+
+  // const userInitials = getInitials(config.user.name || "");
+
+
+
   const menubarClass = cn('menu-header');
   const menubarContext = menubarClass.elem('context');
   const sidebarClass = cn('sidebar');
@@ -177,16 +188,14 @@ export const Menubar = ({
               )}
             </Menu>
           )}>
-            <>
-              <div title={config.user.email} className={menubarClass.elem('user')}>
-                <Userpic user={config.user} />
-                <UserInfo user={config.user} />
-                {showNewsletterDot && (
-                  <div className={menubarClass.elem('userpic-badge')} />
-                )}
+            <div title={config.user.email} className={menubarClass.elem('user')}>
+              <Userpic user={config.user} />
+              <UserInfo user={config.user} />
+              {showNewsletterDot && (
+                <div className={menubarClass.elem('userpic-badge')} />
+              )}
 
-              </div>
-            </>
+            </div>
           </Dropdown.Trigger>
 
         </div>

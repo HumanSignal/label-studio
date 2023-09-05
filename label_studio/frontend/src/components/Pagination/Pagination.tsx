@@ -238,19 +238,25 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
 
       {pageSizeOptions?.length > 0 && (
         <Elem name="page-size">
-          <Select name="select-class" 
-            value={pageSize}
-            options={pageSizeOptions.map(v => ({ label: `${v} per page`, value: v }))}
-            onChange={(e: any) => {
-              const newPageSize = parseInt(e.target.value);
-
-              setPageSize(newPageSize);
-
-              if (props.name) {
-                setStoredPageSize(props.name, newPageSize);
-              }
-            }}
-          />
+          <Select
+          name="select-class" 
+          value={pageSize}
+          options={pageSizeOptions.map(v => ({ label: `${v} per page`, value: v }))}
+          onChange={(e: any) => {
+            const newPageSize = parseInt(e.target.value);
+            setPageSize(newPageSize);
+            if (props.name) {
+              setStoredPageSize(props.name, newPageSize);
+            }
+          }}
+          label="Page Size"
+          className=""  // You can replace this with a suitable class if needed
+          validate={(value: number) => pageSizeOptions.includes(value)}  // Basic validation
+          required={true}
+          skip={false}
+          labelProps={{}}
+          ghost={false}
+        />
         </Elem>
       )}
     </Block>
