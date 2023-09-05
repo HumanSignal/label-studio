@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-380: [FE] 'Hang tight' message is missing when there is no tasks synced yet and sync is in progress",
-  "commit": "66797de8bcf7a7bc8ae401ab7975f589cd439ee7",
+  "message": "fix: LOPS-382: [FE] We are using 'Tasks' rather than 'Items' when user selects x items in dataset",
+  "commit": "facbe44c42c6b8bf9406dcfebd8322807b823750",
   "branch": "master",
-  "date": "2023/09/05 09:47:24"
+  "date": "2023/08/29 08:53:44"
 }
