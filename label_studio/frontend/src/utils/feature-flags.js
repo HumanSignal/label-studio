@@ -16,6 +16,10 @@ export const FF_DEV_2575 = "ff_front_dev_2575_projects_list_performance_280622_s
 export const FF_LSDV_4711 = "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short";
 // Enables "Enterprise Awareness" features
 export const FF_LSDV_E_297 = "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short";
+/**
+ * Improve load time performance of Dashboard Members page
+ */
+export const FF_OPTIC_7 = "fflag_feat_front_optic_7_optic_integration_short";
 
 export function isFF(id) {
   if (id in FEATURE_FLAGS) {
