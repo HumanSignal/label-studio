@@ -5,6 +5,7 @@ from rest_framework import serializers
 from ml.models import MLBackend
 from core.utils.io import validate_upload_url
 
+
 class MLBackendSerializer(serializers.ModelSerializer):
     def validate_url(self, value):
         validate_upload_url(value, block_local_urls=settings.ML_BLOCK_LOCAL_IP)
