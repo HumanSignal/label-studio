@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5248: BBoxes optimizations",
-  "commit": "e888b2df9e16dbffb39f39529fa7de9dba0d92c7",
-  "branch": "master",
-  "date": "2023/09/04 18:41:01"
+  "message": "fix: LEAP-36: Taxonomy alias + other important fixes",
+  "commit": "0c9a7cf410aa74ff88639250e87e64affe745eb5",
+  "branch": "fb-leap-36/taxonomy-alias",
+  "date": "2023/09/06 00:02:49"
 }
