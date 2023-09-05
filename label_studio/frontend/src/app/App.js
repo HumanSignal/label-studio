@@ -12,6 +12,7 @@ import { LibraryProvider } from '../providers/LibraryProvider';
 import { MultiProvider } from '../providers/MultiProvider';
 import { ProjectProvider } from '../providers/ProjectProvider';
 import { RoutesProvider } from '../providers/RoutesProvider';
+import { DraftGuard } from "../components/DraftGuard/DraftGuard";
 import './App.styl';
 import { AsyncPage } from './AsyncPage/AsyncPage';
 import ErrorBoundary from './ErrorBoundary';
@@ -53,6 +54,7 @@ const App = ({content}) => {
           <ProjectProvider key="project"/>,
         ]}>
           <AsyncPage>
+            <DraftGuard />
             <RootPage content={content}/>
           </AsyncPage>
         </MultiProvider>
