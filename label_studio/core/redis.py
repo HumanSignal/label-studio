@@ -2,6 +2,7 @@
 """
 from datetime import timedelta
 from functools import partial
+from django.conf import settings
 
 import sys
 import redis
@@ -97,7 +98,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     if 'job_timeout' in kwargs:
         job_timeout = kwargs['job_timeout']
         del kwargs['job_timeout']
-    if redis:
+    if redis and not settings.TESTING_SYNC:
         logger.info(f"Start async job {job.__name__} on queue {queue_name}.")
         queue = django_rq.get_queue(queue_name)
         enqueue_method = queue.enqueue
