@@ -2,6 +2,7 @@ import os
 
 from rest_framework.exceptions import ValidationError
 
+
 def cast_bool_from_str(value):
     if isinstance(value, str):
         if value.lower() in ['true', 'yes', 'on', '1']:
