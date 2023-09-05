@@ -81,7 +81,7 @@ def get_fields_for_filter_ordering(prepare_params):
     return result
 
 
-def get_fields_for_evaluation(prepare_params, user):
+def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
     """ Collecting field names to annotate them
 
     :param prepare_params: structure with filters and ordering
@@ -111,9 +111,10 @@ def get_fields_for_evaluation(prepare_params, user):
     result = set(result)
 
     # we don't need to annotate regular model fields, so we skip them
-    skipped_fields = [field.attname for field in Task._meta.fields]
-    skipped_fields.append("id")
-    result = [f for f in result if f not in skipped_fields]
+    if skip_regular:
+        skipped_fields = [field.attname for field in Task._meta.fields]
+        skipped_fields.append("id")
+        result = [f for f in result if f not in skipped_fields]
     result = [f for f in result if not f.startswith("data.")]
 
     return result
