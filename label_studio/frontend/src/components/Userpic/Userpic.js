@@ -4,7 +4,8 @@ import { Tooltip } from '../Tooltip/Tooltip';
 import './Userpic.styl';
 
 const FALLBACK_IMAGE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-
+let First_name;
+let Last_name;
 export const Userpic = forwardRef(({
   username,
   size,
@@ -28,13 +29,14 @@ export const Userpic = forwardRef(({
   useEffect(() => {
     if (user) {
       const {first_name, last_name, email, initials, username} = user;
-
+      First_name = first_name;
+      Last_name = last_name;
       if (initials) {
         setFinalUsername(initials);
       } else if (username) {
         setFinalUsername(username);
       } else if (first_name && last_name) {
-        setFinalUsername(`${first_name[0]}${last_name[0]}`);
+        setFinalUsername(`${first_name} ${last_name}`);
       } 
       else if (email) {
         setFinalUsername(email.substring(0, 2));
@@ -42,7 +44,7 @@ export const Userpic = forwardRef(({
 
       if (user.avatar) setFinalSrc(user.avatar);
     } else {
-      setFinalUsername(username);
+      setFinalUsername(first_name && last_name )
       setFinalSrc(src);
     }
   }, [user]);
@@ -73,13 +75,19 @@ export const Userpic = forwardRef(({
   );
 
   const userFullName = useMemo(() => {
-    if (user?.first_name || user?.last_name) {
+    if (First_name || Last_name) {
+      return `${First_name ?? ''} ${Last_name ?? ''}`.trim();
+    } 
+    else if (user?.first_name || user?.last_name) {
       return `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim();
-    } else if (user?.email) {
+    } 
+    else if (user?.email) {
       return user.email;
-    } else {
+    }
+     else {
       return username;
     }
+    
   }, [user, username]);
 
   return (showUsername && userFullName) ? (

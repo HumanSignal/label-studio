@@ -175,7 +175,7 @@ export const Menubar = ({
           )}>
             <div title={config.user.email} className={menubarClass.elem('user')}>
               <Userpic user={config.user} />
-              <span className={menubarClass.elem('full-name')}>{config.user.username}</span>
+              <span className={menubarClass.elem('full-name')}> {config.user.name} </span>
               {showNewsletterDot && (
                 <div className={menubarClass.elem('userpic-badge')} />
               )}
