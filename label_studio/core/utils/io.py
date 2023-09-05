@@ -171,6 +171,7 @@ class SerializableGenerator(list):
     def __iter__(self):
         return itertools.chain(self._head, *self[:1])
 
+
 def validate_upload_url(url, block_local_urls=True):
     """Utility function for defending against SSRF attacks. Raises
         - InvalidUploadUrlError if the url is not HTTP[S], or if block_local_urls is enabled
