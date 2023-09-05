@@ -19,13 +19,57 @@ export const ProjectsList = ({ projects, currentPage, totalItems, totalPages, lo
         <Elem name="pages">
           <Pagination
             name="projects-list"
-            label="Projects"
+            //label="Projects"
             page={currentPage}
             totalItems={totalItems}
             urlParamName="page"
             pageSize={pageSize}
-            pageSizeOptions={[10, 30, 50, 100]}
+            //pageSizeOptions={[10, 30, 50, 100]}
             onPageLoad={(page, pageSize) => loadNextPage(page, pageSize)}
+            totalPages={totalPages}
+            customRender={() => (
+              <div className="project-container">
+                <div className="project-list">
+                  {projects.map(project => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </div>
+                <div className="pagination-container">
+                  <button
+                    className="pagination-button"
+                    onClick={() => loadNextPage(1)}
+                    disabled={currentPage === 1}
+                  > 
+                    &lt;&lt;
+                  </button>
+                  <button
+                    className="pagination-button"
+                    onClick={() => loadNextPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    &lt;
+                  </button>
+                  <span className="pagination-text">
+                    {currentPage} of {totalPages} page
+                  </span>
+                  <button
+                    className="pagination-button"
+                    onClick={() => loadNextPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    &gt; 
+                  </button>
+                  <button
+                    className="pagination-button"
+                    onClick={() => loadNextPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                  >
+                    &gt;&gt;
+                  </button>
+                </div>
+              </div>
+            )}
+
           />
         </Elem>
       </Elem>
@@ -111,9 +155,7 @@ const ProjectCard = ({ project }) => {
               {format(new Date(project.created_at), "dd/MM/yyyy 'at' HH:mm")}
             </Elem>
           </Elem>
-
         </Elem>
-
       </Block>
     </Elem>
 
