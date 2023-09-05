@@ -5,7 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-import rules
+import rules  # noqa: I001
 
 logger = logging.getLogger(__name__)
 
