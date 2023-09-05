@@ -1,0 +1,87 @@
+$check-icon = "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' viewBox='0 0 13 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M1.5 4.5L5 8L11 2' stroke='currentColor' stroke-width='2' stroke-linecap='square'/%3e%3c/svg%3e"
+
+.checkbox
+  display inline-flex
+  align-items center
+  justify-content center
+  color #000
+
+  &__box
+    overflow hidden
+    position relative
+    white-space nowrap
+    display inline-block
+    max-width 18px
+    max-height 18px
+    cursor pointer
+    margin 2px
+
+  &__input
+    top 0
+    left 0
+    margin 0
+    padding 0
+    opacity 0
+    width 100%
+    z-index 10
+    height 100%
+    border none
+    position absolute
+
+  &__check
+    width 18px
+    height 18px
+    background #fff
+    will-change all
+    border-radius 4px
+    position relative
+    display inline-block
+    transition all 80ms ease
+    box-shadow inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15)
+
+  &__check::before,
+  &__check::after
+    top 0
+    left 0
+    bottom 0
+    right 0
+    display block
+    content ''
+    opacity 0
+    position absolute
+
+  &__check::before
+    background-image url($check-icon)
+    background-repeat no-repeat
+    background-position center
+    transition all 120ms ease
+
+  &__check::after
+    top 4px
+    left 4px
+    bottom 4px
+    right 4px
+    border-radius 2px
+    background-color #000
+
+  &__check
+    &_checked::before
+      opacity 1
+
+    &_indeterminate::after
+      opacity 1
+
+  &__label
+    width 100%
+    display flex
+    align-items center
+
+  &:hover &__check
+    background-color #efefef
+
+  &__input:checked + &__check::before
+    opacity 1
+
+  &_withLabel &__box
+    margin-right 5px
+
