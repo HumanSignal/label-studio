@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5248: BBoxes optimizations",
-  "commit": "e888b2df9e16dbffb39f39529fa7de9dba0d92c7",
-  "branch": "master",
-  "date": "2023/09/04 18:41:01"
+  "message": "fix: LSDV-5044: Add queTotal to lsfProperties from project",
+  "commit": "a68c13adf6d9da4420739a5218e9f8732577719f",
+  "branch": "fb-lsdv-5044/task-count-total",
+  "date": "2023/09/06 10:15:09"
 }
