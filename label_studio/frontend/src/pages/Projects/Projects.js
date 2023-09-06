@@ -38,26 +38,14 @@ export const ProjectsPage = () => {
   const closeModal = setModal.bind(null, false);
   const [searchQuery, setSearchQuery] = useState('');
   
-
-
-
-
-
-
-
   const fetchProjects = async () => {
     setNetworkState('loading');
     abortController.renew(); // Cancel any in flight requests
-
 
     const requestParams = {
       page: 1,
       page_size: 9999,
     };
-
-
-
-
 
     if (isFF(FF_DEV_2575)) {
       requestParams.include = [
@@ -142,23 +130,7 @@ export const ProjectsPage = () => {
   const pageTitle = "Create a New Projects";
   const pageDescription = "Set up tasks and import photos, videos, text, and audio to annotate";
   const showCreateButton = projectsList.length > 0;
-  // const pageSize = 11;
-  // const totalPages = Math.ceil(projectsList.length / pageSize);
-  // Inside the render method
-
-  // const filteredProjects = projectsList.filter((project) =>
-  //   project.title.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
-
-  // Debugging: Console log statements
-  console.log('Search Query:', searchQuery);
-  console.log('Filtered Projects:', filteredProjects);
-  console.log('Projects List:', projectsList);
   
-
-
-
-
   return (
     <Block name="projects-page">
       <Oneof value={networkState}>
@@ -223,27 +195,6 @@ ProjectsPage.context = ({ showButton, searchQuery, setSearchQuery }) => {
   );
 };
 
-
-// ProjectsPage.context = ({ showButton }) => {
-//   const [searchQuery, setSearchQuery] = useState('');
-
-//   if (!showButton) return null;
-//   return (
-//     <div className="context-area" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-//       {/* Search Box */}
-//       <input
-//         className='input-context'
-//         type="text"
-//         placeholder="Search..."
-//         style={{ width: '600px', borderRadius: '10px', marginright: '100px', padding: '10px' }}
-//         value={searchQuery}
-//         onChange={(e) => console.log(e.target.value)}
-//       />
-//     </div>
-
-//   );
-// };
-
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
 ProjectsPage.routes = ({ store }) => [
@@ -255,8 +206,7 @@ ProjectsPage.routes = ({ store }) => [
     exact: true,
     component: () => {
       const params = useRouterParams();
-
-
+      
       return (
         <>
           <Redirect to={`/projects/${params.id}/data`} />
