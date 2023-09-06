@@ -147,6 +147,7 @@ def test_webhooks_for_projects(configured_project, business_client, organization
 
 # TASK CREATE/DELETE API
 # WE DON'T SUPPORT UPDATE FOR TASK
+@pytest.mark.skip_nplusone
 @pytest.mark.django_db
 def test_webhooks_for_tasks(configured_project, business_client, organization_webhook):
     webhook = organization_webhook
