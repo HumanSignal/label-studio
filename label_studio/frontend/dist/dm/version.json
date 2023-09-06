@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-380: [FE] 'Hang tight' message is missing when there is no tasks synced yet and sync is in progress",
-  "commit": "66797de8bcf7a7bc8ae401ab7975f589cd439ee7",
-  "branch": "master",
-  "date": "2023/09/05 09:47:24"
+  "message": "fix: LSDV-5044: Add queTotal to lafProperties from project",
+  "commit": "002d95496e8eeac73c69386b1abf45169224e146",
+  "branch": "fb-lsdv-5044/task-count-total",
+  "date": "2023/09/06 10:23:48"
 }
