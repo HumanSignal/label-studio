@@ -28,3 +28,5 @@ export { default as LsPencil } from './pencil.svg';
 export { default as IconInfoOutline } from './info-outline.svg';
 export { default as IconSpark } from './spark.svg';
 export { default as IconQuestion } from './question.svg';
+export { default as IconDone } from './done.svg';
+export { default as IconTime } from './time.svg';

@@ -258,7 +258,7 @@
 .ls-space_stretch.ls-space_direction_horizontal {
   grid-auto-columns: 1fr;
 }
-.ls-space_stretch.ls-space_direction_horizontal {
+.ls-space_stretch.ls-space_direction_vertical {
   grid-auto-rows: 1fr;
 }
 .ls-space_size_large {
@@ -2838,6 +2838,9 @@ div[class^=App_menu]>div {
   line-height: 1em;
   min-width: 100px;
 }
+.ls-create-project > .ls-modal__header .ls-save-button {
+  margin-left: auto;
+}
 .ls-create-project > .ls-modal__header .ls-toggle-items {
   width: 500px;
   margin-right: auto;
@@ -4083,6 +4086,8 @@ body {
 }
 .ls-project-card__total {
   opacity: 0.6;
+  display: flex;
+  align-items: center;
 }
 .ls-project-card__annotation {
   display: flex;
@@ -4137,6 +4142,8 @@ body {
 .ls-project-card__created-date {
   color: rgba(0,0,0,0.4);
   font-size: 90%;
+  display: flex;
+  align-items: center;
 }
 .ls-project-card__created-date > span {
   font-weight: 500;

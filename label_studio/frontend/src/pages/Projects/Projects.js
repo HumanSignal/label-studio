@@ -37,6 +37,7 @@ export const ProjectsPage = () => {
   const openModal = setModal.bind(null, true);
   const closeModal = setModal.bind(null, false);
   const [searchQuery, setSearchQuery] = useState('');
+  
 
 
 
@@ -44,14 +45,14 @@ export const ProjectsPage = () => {
 
 
 
-  const fetchProjects = async (page = currentPage, pageSize = defaultPageSize) => {
+  const fetchProjects = async () => {
     setNetworkState('loading');
     abortController.renew(); // Cancel any in flight requests
 
 
     const requestParams = {
-      page,
-      page_size: pageSize,
+      page: 1,
+      page_size: 9999,
     };
 
 
@@ -97,7 +98,7 @@ export const ProjectsPage = () => {
             'ground_truth_number',
             'finished_task_number',
           ].join(','),
-          page_size: pageSize,
+          page_size: data.count,
         },
         signal: abortController.controller.current.signal,
         errorFilter: (e) => e.error.includes('aborted'),
@@ -135,8 +136,8 @@ export const ProjectsPage = () => {
   React.useEffect(() => {
     // there is a nice page with Create button when list is empty
     // so don't show the context button in that case
-    setContextProps({ openModal, showButton: projectsList.length > 0 });
-  }, [projectsList.length]);
+    setContextProps({ openModal, showButton: projectsList.length > 0, searchQuery, setSearchQuery });
+  }, [projectsList.length, searchQuery, setSearchQuery]);
 
   const pageTitle = "Create a New Projects";
   const pageDescription = "Set up tasks and import photos, videos, text, and audio to annotate";
@@ -148,6 +149,12 @@ export const ProjectsPage = () => {
   // const filteredProjects = projectsList.filter((project) =>
   //   project.title.toLowerCase().includes(searchQuery.toLowerCase())
   // );
+
+  // Debugging: Console log statements
+  console.log('Search Query:', searchQuery);
+  console.log('Filtered Projects:', filteredProjects);
+  console.log('Projects List:', projectsList);
+  
 
 
 

@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "stylus": "^0.60.0",
     "webpack-cli": "^5.1.4"
   }
 }

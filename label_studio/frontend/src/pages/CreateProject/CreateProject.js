@@ -16,6 +16,8 @@ import { EnterpriseBadge } from '../../components/Badges/Enterprise';
 import { Caption } from '../../components/Caption/Caption';
 import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
 import { createURL } from '../../components/HeidiTips/utils';
+import { TiMinus, TiPlus } from 'react-icons/ti';
+
 
 
 const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null : (
@@ -46,9 +48,9 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <Caption>
           Simplify project management by organizing projects into workspaces.
           <a href={createURL('https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects', {
-          experiment: "project_creation_dropdown",
-          treatment: "simplify_project_management",
-        })} target="_blank">Learn more</a>
+            experiment: "project_creation_dropdown",
+            treatment: "simplify_project_management",
+          })} target="_blank">Learn more</a>
         </Caption>
         <HeidiTips collection="projectCreation" />
       </div>
@@ -74,11 +76,17 @@ export const CreateProject = ({ onClose }) => {
   const { columns, uploading, uploadDisabled, finishUpload, pageProps } = useImportPage(project);
 
   const rootClass = cn("create-project");
+  //const tabClass = rootClass.elem("tab");
+
+  const toggleForm = (formName) => {
+    setStep(formName); // Update the currently active form
+  };
+
   const tabClass = rootClass.elem("tab");
   const steps = {
-    name: <span className={tabClass.mod({ disabled: !!error })}>Project Name</span>,
-    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Data Import</span>,
-    config: "Labeling Setup",
+    name: <span className={tabClass.mod({ disabled: !!error })}>Project Information</span>,
+    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Import Files</span>,
+    config: "Config Template",
   };
 
   // name intentionally skipped from deps:
@@ -143,7 +151,7 @@ export const CreateProject = ({ onClose }) => {
   return (
     <Modal
       onHide={onDelete}
-      closeOnClickOutside={false}
+      closeOnClickOutside={true}
       allowToInterceptEscape
       fullscreen
       visible
@@ -152,27 +160,96 @@ export const CreateProject = ({ onClose }) => {
       <div className={rootClass}>
         <Modal.Header>
           <h1>Create Project</h1>
-          <ToggleItems items={steps} active={step} onSelect={setStep} />
-
-          <Space>
-            <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>Delete</Button>
-            <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={!project || uploadDisabled || error}>Save</Button>
+          <Space direction="horizontal"
+            size="large"
+            className="space-container"
+            align="start spread">
+            <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>
+              Delete
+            </Button>
+            <Button
+              look="primary"
+              size="compact"
+              onClick={onCreate}
+              waiting={waiting || uploading}
+              disabled={!project || uploadDisabled || error}
+              className="save-button"
+            >
+              Save
+            </Button>
           </Space>
         </Modal.Header>
-        <ProjectName
-          name={name}
-          setName={setName}
-          error={error}
-          onSaveName={onSaveName}
-          onSubmit={onCreate}
-          description={description}
-          setDescription={setDescription}
-          show={step === "name"}
-        />
-        <ImportPage project={project} show={step === "import"} {...pageProps} />
-        <ConfigPage project={project} onUpdate={setConfig} show={step === "config"} columns={columns} disableSaveButton={true} />
+        <div className="toggle" style={{
+          position: 'relative',
+          maxWidth: '100%',
+          height: '100%',
+          display: 'grid',
+          borderRadius: '16px',
+          gridTemplateColumns: 'repeat(1, 1fr)',
+          boxSizing: 'border-box',
+        }}>
+          {Object.entries(steps).map(([stepKey, stepValue], index) => (
+            <div className="project-step" key={index} style={{
+              border: '1px solid #ccc',
+              borderRadius: '8px',
+              padding: '0px',
+              backgroundColor: '#fff',
+              width: '80%',
+              margin: '10px 10%',
+            }}>
+              <div className="project-create" onClick={() => toggleForm(stepKey)} style={{
+                backgroundColor: '#5a585800',
+                padding: '10px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+                width: '93%',
+                margin: '0 3%',
+              }}>
+                <h4>{stepValue}</h4>
+                {step === stepKey ? <TiMinus className='expand-icon' /> : <TiPlus className='expand-icon' />}
+              </div>
+              {step === stepKey && (
+                <div className="form-content" style={{ width: '50%', margin: '0 4%' }}>
+                  {stepKey === 'name' && (
+                    <div className='project-naming' style={{ textAlign: 'left', marginBottom: '30px' }}>
+                      <ProjectName
+                        name={name}
+                        setName={setName}
+                        error={error}
+                        onSaveName={onSaveName}
+                        onSubmit={onCreate}
+                        description={description}
+                        setDescription={setDescription}
+                        show={step === "name"}
+                      />
+                    </div>
+                  )}
+                  {stepKey === 'import' && (
+                    <div >
+                      <ImportPage project={project} show={step === "import"} {...pageProps} />
+                    </div>
+                  )}
+
+                  {stepKey === 'config' && (
+                    <div>
+                      <ConfigPage
+                        project={project}
+                        onUpdate={setConfig}
+                        show={step === "config"}
+                        columns={columns}
+                        disableSaveButton={true}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
       </div>
-    </Modal>
+    </Modal >
   );
 };
-

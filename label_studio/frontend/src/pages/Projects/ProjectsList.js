@@ -2,7 +2,7 @@ import chr from 'chroma-js';
 import { format } from 'date-fns';
 import React, { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LsBulb, LsCheck, LsEllipsis, LsMinus } from '../../assets/icons';
+import { IconDone, IconTime, LsBulb, LsCheck, LsEllipsis, LsMinus } from '../../assets/icons';
 import { Button, Dropdown, Menu, Pagination, Userpic } from '../../components';
 import { Block, Elem } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
@@ -120,7 +120,7 @@ const ProjectCard = ({ project }) => {
           <Elem name="summary">
             <Elem name="annotation">
               <Elem name="total">
-                {project.finished_task_number} of {project.task_number} tasks completed
+                <IconDone/>{project.finished_task_number} of {project.task_number} tasks completed
               </Elem>
               <Elem name="detail">
                 <Elem name="detail-item" mod={{ type: "completed" }}>
@@ -152,7 +152,7 @@ const ProjectCard = ({ project }) => {
 
             </Elem>
             <Elem name="created-date">
-              {format(new Date(project.created_at), "dd/MM/yyyy 'at' HH:mm")}
+              <IconTime/>{format(new Date(project.created_at), "dd/MM/yyyy 'at' HH:mm")}
             </Elem>
           </Elem>
         </Elem>
