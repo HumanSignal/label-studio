@@ -24,7 +24,7 @@ from django.views.generic.base import RedirectView
 
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 from core import views
 from core.utils.static_serve import serve
@@ -41,7 +41,7 @@ schema_view = get_schema_view(
         x_logo={"url": "../../static/icons/logo-black.svg"}
     ),
     public=True,
-    permission_classes=(AllowAny,),
+    permission_classes=(IsAuthenticated,),
 )
 
 urlpatterns = [
