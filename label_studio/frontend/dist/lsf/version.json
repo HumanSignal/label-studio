@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5487: Keep the labeling interface settings after change page",
-  "commit": "e9ad15b3ce43054026a67978ca865c5977ea9f90",
-  "branch": "fb-lsdv-5487",
-  "date": "2023/08/28 17:53:43"
+  "commit": "5f2eb6ad691dc53c0a448a1b677c49f2af500de6",
+  "branch": "master",
+  "date": "2023/09/06 12:41:22"
 }
