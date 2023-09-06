@@ -1039,6 +1039,7 @@ main {
   border: 1px var(--color-gray-100) solid;
 }
 
+
 .content-markdown .admonition {
   --color-border: var(--color-gray-200);
   --color-title: var(--color-gray-900);
@@ -1083,6 +1084,13 @@ main {
   --color-title: var(--color-white);
   --color-title-background: var(--color-yellow-100);
   --color-background: var(--color-yellow-5);
+}
+
+.content-markdown .admonition.info {
+  --color-border: #45e167;
+  --color-title: var(--color-white);
+  --color-title-background: #45e167;
+  --color-background: #FF676705;
 }
 
 .content-markdown .admonition.enterprise {
