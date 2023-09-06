@@ -31,13 +31,12 @@ django_model_utils==4.1.1
 django_rq==2.5.1
 django-cors-headers==3.6.0
 django-extensions==3.1.0
-django-rest-swagger==2.2.0
 django-user-agents==0.4.0
 django-ranged-fileresponse>=0.1.2
 drf_dynamic_fields==0.3.0
 djangorestframework==3.13.1
 drf-flex-fields==0.9.5
-drf_yasg==1.20.0
+-e git+https://github.com/HumanSignal/drf-yasg#egg=drf-yasg
 drf-generators==0.3.0
 htmlmin==0.1.12
 jsonschema==3.2.0
