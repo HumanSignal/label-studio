@@ -838,6 +838,17 @@ main {
   color: var(--color-white);
 }
 
+.Tertiary {
+  background-color: #fff;
+  color: var(--color-gray-900);
+  border: 0;
+}
+
+.Tertiary:hover {
+  background-color: var(--color-gray-900);
+  color: var(--color-white);
+}
+
 .WithIcon {
   padding: 0.65em 1em;
 }
@@ -878,8 +889,6 @@ main {
   padding: 2em;
   width: var(--toc-size);
   flex-shrink: 0;
-  position: sticky;
-  top: 100px;
 }
 
 .toc h3 {
@@ -928,16 +937,33 @@ main {
   padding-left: 1em;
 }
 
+.page-rightsidebar {
+  position: sticky;
+  top: 100px;
+}
+
 @media (max-width: 1150px) {
-  .toc {
+  .page-rightsidebar {
     display: none;
   }
 }
 
-.toc-ent-trial {
-  margin-top: 1em;
-  padding-top: 1em;
-  border-top: 1px var(--color-gray-900) solid;
+.toc-enterprise-cta {
+  margin-top: 2em;
+  padding: 1.5em 2em;
+  color: #fff;
+  background: url("/images/gradient.svg");
+  background-size: cover;
+  width: var(--toc-size);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.toc-enterprise-cta-copy {
+  max-width: 15ch;
 }
 
 /****************************
