@@ -1087,9 +1087,9 @@ main {
 }
 
 .content-markdown .admonition.info {
-  --color-border: #45e167;
+  --color-border: #2EC4B6;
   --color-title: var(--color-white);
-  --color-title-background: #45e167;
+  --color-title-background: #2EC4B6;
   --color-background: #FF676705;
 }
 
