@@ -600,6 +600,9 @@ class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
     def get_filter_parameters(self, filter_backend):
         if isinstance(filter_backend, DjangoFilterBackend):
             result = super(DjangoFilterDescriptionInspector, self).get_filter_parameters(filter_backend)
+            if not isinstance(result, Iterable):
+                return result
+
             for param in result:
                 if not param.get('description', ''):
                     param.description = "Filter the returned list by {field_name}".format(field_name=param.name)
