@@ -1087,10 +1087,10 @@ main {
 }
 
 .content-markdown .admonition.info {
-  --color-border: #2EC4B6;
+  --color-border: #DD7DFF;
   --color-title: var(--color-white);
-  --color-title-background: #2EC4B6;
-  --color-background: #FF676705;
+  --color-title-background: #DD7DFF;
+  --color-background: #FDF6FF;
 }
 
 .content-markdown .admonition.enterprise {
