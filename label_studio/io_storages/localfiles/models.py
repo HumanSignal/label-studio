@@ -3,8 +3,8 @@
 import json
 import logging
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 from urllib.parse import quote
 
 from django.conf import settings
@@ -12,16 +12,15 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import ValidationError
-
-from tasks.models import Annotation
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
     ImportStorage,
     ImportStorageLink,
-    ProjectStorageMixin
+    ProjectStorageMixin,
 )
+from rest_framework.exceptions import ValidationError
+from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +88,7 @@ class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
                 f"perhaps you've forgot to enable \"Treat every bucket object as a source file\" option?")
 
         if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
+            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")
         return value
 
     def scan_and_create_links(self):

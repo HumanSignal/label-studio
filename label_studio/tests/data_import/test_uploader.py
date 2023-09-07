@@ -1,11 +1,9 @@
-import pytest
 from unittest import mock
 
+import pytest
+from data_import.uploader import check_tasks_max_file_size, load_tasks, validate_upload_url
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
-
-from core.utils.exceptions import InvalidUploadUrlError
-from data_import.uploader import load_tasks, check_tasks_max_file_size, validate_upload_url
 
 pytestmark = pytest.mark.django_db
 
@@ -69,10 +67,6 @@ class TestTasksFileChecks:
         with pytest.raises(ValidationError) as e:
             check_tasks_max_file_size(value)
 
-        correct_error_message = (
-            f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
-            f'current size is {value} bytes'
-        )
         assert (
             f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes'
             in str(e.value)

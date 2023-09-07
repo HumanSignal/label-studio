@@ -1,19 +1,17 @@
-import logging
 
+import django_filters
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-import django_filters
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from projects import models as project_models
 from rest_framework import generics
-from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Webhook, WebhookAction
 from .serializers import WebhookSerializer, WebhookSerializerForUpdate
-from projects import models as project_models
 
 
 class WebhookFilterSet(django_filters.FilterSet):

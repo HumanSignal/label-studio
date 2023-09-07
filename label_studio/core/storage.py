@@ -3,17 +3,15 @@
 import logging
 import os
 import threading
+from urllib.parse import unquote, urlsplit, urlunsplit
+
 import google.auth
-
-from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
-from django.conf import settings
-from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
-
 from core.feature_flags import flag_set
-from storages.backends.s3boto3 import S3Boto3Storage
+from django.conf import settings
+from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 from storages.backends.azure_storage import AzureStorage
-from storages.backends.gcloud import _quote, clean_name, GoogleCloudStorage
-
+from storages.backends.gcloud import GoogleCloudStorage, _quote, clean_name
+from storages.backends.s3boto3 import S3Boto3Storage
 
 logger = logging.getLogger(__name__)
 

@@ -1,29 +1,28 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import json
+import logging
 import re
-
-from core.redis import start_job_async_or_sync
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from django.db.models.signals import post_save
 
-from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from azure.core.exceptions import ResourceNotFoundError
-from django.dispatch import receiver
+from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas
+from core.redis import start_job_async_or_sync
 from core.utils.params import get_env
-from tasks.models import Annotation
+from django.conf import settings
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
     ImportStorage,
     ImportStorageLink,
-    ProjectStorageMixin
+    ProjectStorageMixin,
 )
+from tasks.models import Annotation
 
 from label_studio.io_storages.azure_blob.utils import AZURE
 
@@ -130,7 +129,7 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
         blob_str = blob.content_as_text()
         value = json.loads(blob_str)
         if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")  # noqa
+            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")
         return value
 
     def scan_and_create_links(self):
