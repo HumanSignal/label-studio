@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
-import json
 
 from .settings.base import EXPORT_DIR
 from .utils.io import find_file
@@ -12,7 +11,6 @@ def parse_input_args(input_args):
 
     :return: config dict
     """
-    import sys
     import argparse
 
     def valid_filepath(filepath):
@@ -102,9 +100,9 @@ def parse_input_args(input_args):
 
     # init sub-command parser
 
-    parser_version = subparsers.add_parser('version', help='Print version info', parents=[root_parser])
+    subparsers.add_parser('version', help='Print version info', parents=[root_parser])
 
-    parser_user = subparsers.add_parser('user', help='Print user info', parents=[root_parser])
+    subparsers.add_parser('user', help='Print user info', parents=[root_parser])
 
     parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
@@ -129,9 +127,9 @@ def parse_input_args(input_args):
 
     # reset_password sub-command parser
 
-    parser_reset_password = subparsers.add_parser('reset_password', help='Reset password for a specific username', parents=[root_parser])
+    subparsers.add_parser('reset_password', help='Reset password for a specific username', parents=[root_parser])
 
-    parser_shell = subparsers.add_parser('shell', help='Run django shell', parents=[root_parser])
+    subparsers.add_parser('shell', help='Run django shell', parents=[root_parser])
 
     calculate_stats_all_orgs = subparsers.add_parser(
         'calculate_stats_all_orgs', help='Calculate task counters and statistics', parents=[root_parser]
@@ -152,7 +150,7 @@ def parse_input_args(input_args):
         default=default_params
     )
 
-    annotation_fill_updated_by = subparsers.add_parser(
+    subparsers.add_parser(
         'annotations_fill_updated_by', help='Fill the updated_by field for Annotations', parents=[root_parser]
     )
 

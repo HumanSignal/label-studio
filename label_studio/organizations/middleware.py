@@ -4,7 +4,6 @@ import logging
 
 from organizations.models import Organization
 
-
 logger = logging.getLogger(__name__)
 
 

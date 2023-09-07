@@ -1,9 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
-import pathlib
+import json
 
-from core.settings.base import *
+from core.settings.base import *  # noqa
 from core.utils.secret_key import generate_secret_key_if_missing
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -46,10 +45,12 @@ EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
 
 from label_studio import __version__
 from label_studio.core.utils import sentry
+
 sentry.init_sentry(release_name='label-studio', release_version=__version__)
 
 # we should do it after sentry init
 from label_studio.core.utils.common import collect_versions
+
 versions = collect_versions()
 
 # in Label Studio Community version, feature flags are always ON
@@ -57,7 +58,6 @@ FEATURE_FLAGS_DEFAULT_VALUE = True
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 
-from core.utils.io import find_file
 FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 FEATURE_FLAGS_FROM_FILE = True
 try:

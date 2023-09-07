@@ -1,17 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
-import django
 import json
 import os
-from unittest import mock
 
-from django.urls import get_resolver
-from django.shortcuts import reverse
+import django
+import pytest
 from django.core.management import call_command
-from tasks.models import Annotation
-from tasks.models import Task
-
+from django.shortcuts import reverse
+from django.urls import get_resolver
+from tasks.models import Annotation, Task
 
 owner_statuses = {
     '/tasks/1000/label': {'get': 200, 'post': 200, 'put': 405, 'patch': 405, 'delete': 405},
@@ -431,7 +428,6 @@ def test_all_urls_other_business(setup_project_choices, business_client):
 @pytest.mark.django_db
 def test_urls_mismatch_with_registered(tmpdir):
     from core.utils.io import find_file
-    from core.utils.params import get_bool_env
 
     all_urls_file = find_file('all_urls.json')
     with open(all_urls_file) as f:

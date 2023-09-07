@@ -1,14 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from rest_framework import serializers
-from rest_flex_fields import FlexFieldsModelSerializer
-from rest_framework.serializers import SerializerMethodField
 import bleach
-from users.serializers import UserSimpleSerializer
-
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
-
-from projects.models import Project, ProjectOnboarding, ProjectSummary, ProjectImport, ProjectReimport
+from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectReimport, ProjectSummary
+from rest_flex_fields import FlexFieldsModelSerializer
+from rest_framework import serializers
+from rest_framework.serializers import SerializerMethodField
+from users.serializers import UserSimpleSerializer
 
 
 class CreatedByFromContext:

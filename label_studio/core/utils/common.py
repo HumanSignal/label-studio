@@ -2,52 +2,57 @@
 """
 from __future__ import unicode_literals
 
-from typing import Generator, Iterable, Mapping, Callable, Optional, Any
-
-import os
-import io
-import time
-import copy
-import logging
-import hashlib
-import requests
-import random
 import calendar
-import uuid
-import pytz
-import pkg_resources
-import ujson as json
-import traceback as tb
-import drf_yasg.openapi as openapi
 import contextlib
-
-from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
-
-import label_studio
+import copy
+import hashlib
+import logging
+import os
+import random
 import re
-
-from django.db import models, transaction
-from django.utils.module_loading import import_string
-from django.core.paginator import Paginator, EmptyPage
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
-from django.conf import settings
-from django.db.utils import OperationalError
-from django.db.models.signals import *
-from rest_framework.views import Response, exception_handler
-from rest_framework import status
-from rest_framework.exceptions import ErrorDetail
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
+import time
+import traceback as tb
+import uuid
 from collections import defaultdict
-from django.contrib.postgres.operations import TrigramExtension, BtreeGinExtension
-
-from core.utils.params import get_env
 from datetime import datetime
 from functools import wraps
-from pkg_resources import parse_version
-from colorama import Fore
+from typing import Any, Callable, Generator, Iterable, Mapping, Optional
+
+import drf_yasg.openapi as openapi
+import pkg_resources
+import pytz
+import requests
+import ujson as json
 from boxing import boxing
+from colorama import Fore
+from core.utils.params import get_env
+from django.conf import settings
+from django.contrib.postgres.operations import BtreeGinExtension, TrigramExtension
+from django.core.exceptions import ValidationError
+from django.core.paginator import EmptyPage, Paginator
+from django.core.validators import URLValidator
+from django.db import models, transaction
+from django.db.models.signals import (
+    post_delete,
+    post_init,
+    post_migrate,
+    post_save,
+    pre_delete,
+    pre_init,
+    pre_migrate,
+    pre_save,
+)
+from django.db.utils import OperationalError
+from django.utils.module_loading import import_string
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
+from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
+from pkg_resources import parse_version
+from rest_framework import status
+from rest_framework.exceptions import ErrorDetail
+from rest_framework.views import Response, exception_handler
+
+import label_studio
 
 try:
     from sentry_sdk import capture_exception, set_tag
@@ -362,7 +367,7 @@ def get_latest_version():
         data = json.loads(response)
         latest_version = data['info']['version']
         upload_time = data.get('releases', {}).get(latest_version, [{}])[-1].get('upload_time', None)
-    except Exception as exc:
+    except Exception:
         logger.warning("Can't get latest version", exc_info=True)
     else:
         return {'latest_version': latest_version, 'upload_time': upload_time}
@@ -452,7 +457,7 @@ def collect_versions(force=False):
         with open(os.path.join(settings.EDITOR_ROOT, 'version.json')) as f:
             lsf = json.load(f)
         result['label-studio-frontend'] = lsf
-    except:
+    except:  # noqa: E722
         pass
 
     # data manager
@@ -460,21 +465,21 @@ def collect_versions(force=False):
         with open(os.path.join(settings.DM_ROOT, 'version.json')) as f:
             dm = json.load(f)
         result['dm2'] = dm
-    except:
+    except:  # noqa: E722
         pass
 
     # converter
     try:
         import label_studio_converter
         result['label-studio-converter'] = {'version': label_studio_converter.__version__}
-    except Exception as e:
+    except Exception:
         pass
 
     # ml
     try:
         import label_studio_ml
         result['label-studio-ml'] = {'version': label_studio_ml.__version__}
-    except Exception as e:
+    except Exception:
         pass
 
     result.update(settings.COLLECT_VERSIONS(result=result))
@@ -608,7 +613,7 @@ class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
 
 
 def batch(iterable, n=1):
-    l = len(iterable)
+    l = len(iterable)  # noqa: E741
     for ndx in range(0, l, n):
         yield iterable[ndx : min(ndx + n, l)]
 
