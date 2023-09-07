@@ -1,8 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from rest_framework.exceptions import APIException, ValidationError
 from rest_framework import status
-from lxml.etree import XMLSyntaxError
+from rest_framework.exceptions import APIException, ValidationError
 
 
 class LabelStudioError(Exception):

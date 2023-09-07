@@ -1,50 +1,54 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import drf_yasg.openapi as openapi
 import logging
-import pathlib
 import os
+import pathlib
 
-from django.db import IntegrityError
+import drf_yasg.openapi as openapi
+from core.filters import ListFilter
+from core.label_config import config_essential_data_has_changed
+from core.mixins import GetParentObjectMixin
+from core.permissions import ViewClassPermission, all_permissions
+from core.utils.common import paginator, paginator_help, temporary_disconnect_all_signals
+from core.utils.exceptions import LabelStudioDatabaseException, ProjectExistException
+from core.utils.io import find_dir, find_file, read_yaml
+from data_manager.functions import filters_ordering_selected_items_exist, get_prepared_queryset
 from django.conf import settings
+from django.db import IntegrityError
 from django.db.models import F
-from drf_yasg.utils import swagger_auto_schema
+from django.http import Http404
 from django.utils.decorators import method_decorator
+from django_filters import CharFilter, FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import FilterSet, CharFilter
-from rest_framework import generics, status, filters
-from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
+from drf_yasg.utils import swagger_auto_schema
+from projects.functions.next_task import get_next_task
+from projects.functions.stream_history import get_label_stream_history
+from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
+from projects.serializers import (
+    GetFieldsSerializer,
+    ProjectImportSerializer,
+    ProjectLabelConfigSerializer,
+    ProjectReimportSerializer,
+    ProjectSerializer,
+    ProjectSummarySerializer,
+)
+from rest_framework import filters, generics, status
+from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import ValidationError as RestValidationError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
-from django.http import Http404
-
-from core.utils.common import temporary_disconnect_all_signals
-from core.mixins import GetParentObjectMixin
-from core.label_config import config_essential_data_has_changed
-from projects.models import (
-    Project, ProjectSummary, ProjectManager, ProjectImport, ProjectReimport
-)
-from projects.serializers import (
-    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer, ProjectImportSerializer, ProjectReimportSerializer
-)
-from projects.functions.next_task import get_next_task
 from tasks.models import Task
-from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer, NextTaskSerializer
-from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
+from tasks.serializers import (
+    NextTaskSerializer,
+    TaskSerializer,
+    TaskSimpleSerializer,
+    TaskWithAnnotationsAndPredictionsAndDraftsSerializer,
+)
 from webhooks.models import WebhookAction
-
-from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import (paginator, paginator_help)
-from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
-from core.utils.io import find_dir, find_file, read_yaml
-from core.filters import ListFilter
-from projects.functions.stream_history import get_label_stream_history
-
-from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
-from data_manager.models import View
+from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +159,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
 
     def perform_create(self, ser):
         try:
-            project = ser.save(organization=self.request.user.active_organization)
+            ser.save(organization=self.request.user.active_organization)
         except IntegrityError as e:
             if str(e) == 'UNIQUE constraint failed: project.title, project.created_by_id':
                 raise ProjectExistException('Project with the same name already exists: {}'.
@@ -223,7 +227,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         # config changes can break view, so we need to reset them
         if label_config:
             try:
-                has_changes = config_essential_data_has_changed(label_config, project.label_config)
+                _has_changes = config_essential_data_has_changed(label_config, project.label_config)
             except KeyError:
                 pass
 

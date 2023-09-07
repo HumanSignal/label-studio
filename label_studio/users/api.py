@@ -1,26 +1,22 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+
 import drf_yasg.openapi as openapi
-
-from drf_yasg.utils import swagger_auto_schema
+from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
-from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import MethodNotAllowed
-
-from core.permissions import all_permissions, ViewClassPermission
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from users.functions import check_avatar
 from users.models import User
 from users.serializers import UserSerializer, UserSerializerUpdate
-from users.functions import check_avatar
-
 
 logger = logging.getLogger(__name__)
 

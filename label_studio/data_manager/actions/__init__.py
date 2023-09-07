@@ -5,18 +5,16 @@
     Data manager uses settings.DATA_MANAGER_ACTIONS to know the list of available actions,
     they are called by entry_points from settings.DATA_MANAGER_ACTIONS dict items.
 """
-import os
 import copy
 import logging
+import os
 import traceback as tb
-
 from importlib import import_module
 
+from core.feature_flags import flag_set
+from data_manager.functions import DataManagerException
 from django.conf import settings
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
-
-from data_manager.functions import DataManagerException
-from core.feature_flags import flag_set
 
 logger = logging.getLogger('django')
 
