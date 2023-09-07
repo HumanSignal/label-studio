@@ -1,10 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 
-from .models import Organization, OrganizationMember
+from django.forms import CharField, HiddenInput, ModelForm
 
-
-from django.forms import Textarea, ModelForm, TextInput, Form, FileField, Select, HiddenInput, CharField
+from .models import Organization
 
 
 class OrganizationForm(ModelForm):

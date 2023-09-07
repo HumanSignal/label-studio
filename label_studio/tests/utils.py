@@ -1,34 +1,30 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import ujson as json
-
-import json
-import re
-import io
-import pytest
-import requests_mock
-import requests
-import tempfile
 import os.path
-
+import re
+import tempfile
 from contextlib import contextmanager
-from unittest import mock
-from types import SimpleNamespace
-from box import Box
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
-from django.test import Client
+import pytest
+import requests
+import requests_mock
+import ujson as json
+from box import Box
+from data_export.models import ConvertedFormat, Export
 from django.apps import apps
-from projects.models import Project
-from ml.models import MLBackend
-from tasks.serializers import TaskWithAnnotationsSerializer
-from organizations.models import Organization
-from users.models import User
-from data_export.models import Export, ConvertedFormat
 from django.conf import settings
+from django.test import Client
+from ml.models import MLBackend
+from organizations.models import Organization
+from projects.models import Project
+from tasks.serializers import TaskWithAnnotationsSerializer
+from users.models import User
 
 try:
-    from businesses.models import Business, BillingPlan
+    from businesses.models import BillingPlan, Business
 except ImportError:
     BillingPlan = Business = None
 
@@ -56,7 +52,6 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
 def import_from_url_mock(**kwargs):
     with mock.patch('data_import.uploader.validate_upload_url'):
         with requests_mock.Mocker(real_http=True) as m:
-            url='https://data.heartextest.net'
 
             with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
                 matcher = re.compile('data\.heartextest\.net/test_1\.csv')
@@ -79,8 +74,9 @@ def email_mock():
 
 @contextmanager
 def gcs_client_mock():
-    from google.cloud import storage as google_storage
     from collections import namedtuple
+
+    from google.cloud import storage as google_storage
 
     File = namedtuple('File', ['name'])
 
@@ -131,8 +127,9 @@ def gcs_client_mock():
 
 @contextmanager
 def azure_client_mock():
-    from io_storages.azure_blob import models 
     from collections import namedtuple
+
+    from io_storages.azure_blob import models
 
     File = namedtuple('File', ['name'])
 
@@ -284,15 +281,15 @@ def invite_client_to_project(client, project):
 
 def login(client, email, password):
     if User.objects.filter(email=email).exists():
-        r = client.post(f'/user/login/', data={'email': email, 'password': password})
+        r = client.post('/user/login/', data={'email': email, 'password': password})
         assert r.status_code == 302, r.status_code
     else:
-        r = client.post(f'/user/signup/', data={'email': email, 'password': password, 'title': 'Whatever'})
+        r = client.post('/user/signup/', data={'email': email, 'password': password, 'title': 'Whatever'})
         assert r.status_code == 302, r.status_code
 
 
 def signin(client, email, password):
-    return client.post(f'/user/login/', data={'email': email, 'password': password})
+    return client.post('/user/login/', data={'email': email, 'password': password})
 
 def signout(client):
     return client.get('/logout')
@@ -352,7 +349,7 @@ def save_convert_file_path(response, export_id=None):
     converted = ConvertedFormat.objects.get(id=convert['id'])
 
     dir_path = os.path.join(settings.MEDIA_ROOT, settings.DELAYED_EXPORT_DIR)
-    files = os.listdir(dir_path)
+    os.listdir(dir_path)
     try:
         file_path = converted.file.path
         return Box({'convert_file_path': file_path})

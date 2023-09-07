@@ -1,23 +1,21 @@
-import pathlib
 import contextlib
 import datetime
-import os
 import io
 import json
+import os
+import pathlib
 
-
-from tasks.models import Task, Annotation, Prediction
-from projects.models import Project
-from data_import.models import FileUpload
 from core.utils.io import get_data_dir
-from data_manager.models import View, FilterGroup, Filter
-from django.core.files.base import File
-from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
-from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExportStorage
-from io_storages.s3.models import S3ImportStorage, S3ExportStorage
-from io_storages.redis.models import RedisImportStorage, RedisExportStorage
-from ml.models import MLBackend
 from core.utils.params import get_env
+from data_import.models import FileUpload
+from data_manager.models import Filter, FilterGroup, View
+from django.core.files.base import File
+from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImportStorage
+from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
+from io_storages.redis.models import RedisExportStorage, RedisImportStorage
+from io_storages.s3.models import S3ExportStorage, S3ImportStorage
+from ml.models import MLBackend
+from tasks.models import Annotation, Prediction, Task
 
 
 @contextlib.contextmanager

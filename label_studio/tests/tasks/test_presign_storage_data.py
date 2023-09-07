@@ -1,14 +1,14 @@
-import pytest
 import base64
-from unittest.mock import patch
+from unittest.mock import MagicMock
+
+import pytest
+from data_import.api import PresignStorageData
 from django.urls import reverse
+from projects.models import Project
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
-from unittest.mock import MagicMock
-from data_import.api import PresignStorageData
-from users.models import User
 from tasks.models import Task
-from projects.models import Project
+from users.models import User
 
 
 @pytest.mark.django_db

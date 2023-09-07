@@ -2,10 +2,9 @@
 """
 import logging
 
-from django.utils.timezone import now
-
 from core.permissions import AllPermissions
-from tasks.models import Prediction, Annotation, Task
+from django.utils.timezone import now
+from tasks.models import Annotation, Prediction, Task
 from tasks.serializers import TaskSerializerBulk
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance

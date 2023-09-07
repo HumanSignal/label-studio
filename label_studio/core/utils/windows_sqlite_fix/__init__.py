@@ -1,16 +1,16 @@
+import logging
 import os
 import sys
-import colorama
-import logging
-import requests
 
+import colorama
+import requests
 
 logger = logging.getLogger('main')
 
 
 def start_fix():
-    import zipfile
     import platform
+    import zipfile
 
     print(f'Copying sqlite3.dll to the current directory: {os.getcwd()} ... ', end='')
 
@@ -76,7 +76,7 @@ def windows_dll_fix():
               f"This Python version uses SQLite "
               f"{colorama.Fore.LIGHTRED_EX}{v[0]}.{v[1]}.{v[2]} " +
               colorama.Fore.LIGHTYELLOW_EX +
-              f"which does not support JSON Field.\n" +
+              "which does not support JSON Field.\n" +
               'Read more about this issue: ' +
               colorama.Fore.LIGHTWHITE_EX +
               'https://code.djangoproject.com/wiki/JSON1Extension [Windows section]\n')

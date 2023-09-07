@@ -4,7 +4,7 @@ import json
 import random
 import string
 
-from locust import HttpUser, TaskSet, task, between
+from locust import HttpUser, TaskSet, between, task
 
 
 def randomString(stringLength):
@@ -74,4 +74,4 @@ class WebsiteUser(HttpUser):
             'email': f'collab_{random.randint(0, num_collabs)}@loadtests.me',
             'password': '123456789'
         }
-        r = self.client.post('/annotator/login', payload, headers={'X-CSRFToken': csrftoken})
+        self.client.post('/annotator/login', payload, headers={'X-CSRFToken': csrftoken})

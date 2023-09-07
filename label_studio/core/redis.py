@@ -1,17 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import logging
+import sys
 from datetime import timedelta
 from functools import partial
 
-import sys
-import redis
-import logging
 import django_rq
-
+import redis
 from django_rq import get_connection
-from rq.registry import StartedJobRegistry
 from rq.command import send_stop_job_command
 from rq.exceptions import InvalidJobOperation
+from rq.registry import StartedJobRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ try:
     _redis = get_connection()
     _redis.ping()
     logger.debug('=> Redis is connected successfully.')
-except:
+except:  # noqa: E722
     logger.debug('=> Redis is not connected.')
     _redis = None
 

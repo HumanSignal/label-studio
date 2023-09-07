@@ -2,13 +2,11 @@
 """
 import logging
 
-from django.db import models, transaction
+from core.utils.common import create_hash, load_func
 from django.conf import settings
-from django.db.models import Q, Count
-
+from django.db import models, transaction
+from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
-
-from core.utils.common import create_hash, get_organization_from_request, load_func
 
 logger = logging.getLogger(__name__)
 
