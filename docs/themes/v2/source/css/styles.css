@@ -1090,7 +1090,7 @@ main {
 .content-markdown .admonition.info {
   --color-border: #DD7DFF;
   --color-title: var(--color-white);
-  --color-title-background: #DD7DFF;
+  --color-title-background: var(--color-purple-90);
   --color-background: #FDF6FF;
 }
 
