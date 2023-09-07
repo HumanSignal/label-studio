@@ -1,8 +1,7 @@
-from django.db import transaction
 from django.conf import settings
-
+from django.db import transaction
 from projects.models import LabelStreamHistory
-from tasks.models import Task, Annotation
+from tasks.models import Annotation, Task
 
 TASK_ID_KEY = 'taskId'
 ANNOTATION_ID_KEY = 'annotationId'

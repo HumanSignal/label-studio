@@ -1,19 +1,19 @@
-from typing import Optional, Callable
 import logging
-import traceback
 import time
+import traceback
+from typing import Callable, Optional
 
-from django.db import transaction
-
-from projects.models import ProjectImport, ProjectReimport
-from .serializers import ImportApiSerializer
-from .uploader import load_tasks_for_async_import
-from users.models import User
 from core.utils.common import load_func
 from django.conf import settings
-from webhooks.utils import emit_webhooks_for_instance
+from django.db import transaction
+from projects.models import ProjectImport, ProjectReimport
+from users.models import User
 from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
+
 from .models import FileUpload
+from .serializers import ImportApiSerializer
+from .uploader import load_tasks_for_async_import
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ def async_import_background(import_id, user_id, recalculate_stats_func : Optiona
     tasks, file_upload_ids, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
 
     if project_import.preannotated_from_fields:
-        # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
+        # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]
         tasks = reformat_predictions(tasks, project_import.preannotated_from_fields)
 
     if project_import.commit_to_project:

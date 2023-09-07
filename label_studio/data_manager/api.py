@@ -2,29 +2,27 @@
 """
 import logging
 
-from django_filters.rest_framework import DjangoFilterBackend
+from core.permissions import ViewClassPermission, all_permissions
+from core.utils.common import int_from_request, load_func
+from core.utils.params import bool_from_request
+from data_manager.actions import get_all_actions, perform_action
+from data_manager.functions import evaluate_predictions, get_prepare_params, get_prepared_queryset
+from data_manager.managers import get_fields_for_evaluation
+from data_manager.models import View
+from data_manager.serializers import DataManagerTaskSerializer, ViewResetSerializer, ViewSerializer
+from django.conf import settings
 from django.utils.decorators import method_decorator
-from rest_framework import viewsets, generics
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from projects.models import Project
+from projects.serializers import ProjectSerializer
+from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-from django.conf import settings
-
-from core.utils.common import int_from_request, load_func
-from core.utils.params import bool_from_request
-from core.permissions import all_permissions, ViewClassPermission
-from projects.models import Project
-from projects.serializers import ProjectSerializer
-from tasks.models import Task, Annotation, Prediction
-
-from data_manager.functions import get_prepared_queryset, evaluate_predictions, get_prepare_params
-from data_manager.models import View
-from data_manager.managers import get_fields_for_evaluation
-from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, ViewResetSerializer
-from data_manager.actions import get_all_actions, perform_action
+from tasks.models import Annotation, Prediction, Task
 
 logger = logging.getLogger(__name__)
 

@@ -1,19 +1,18 @@
-import re
-import logging
-from json import JSONDecodeError
-
-import json
 import base64
+import json
+import logging
+import re
+from datetime import timedelta
+from enum import Enum
+from json import JSONDecodeError
+from typing import Union
+from urllib.parse import urlparse
+
 import google.auth
 import google.cloud.storage as gcs
-
-from enum import Enum
-from urllib.parse import urlparse
-from datetime import timedelta
-from typing import Union
-from google.oauth2 import service_account
-from google.auth.exceptions import DefaultCredentialsError
 from django.conf import settings
+from google.auth.exceptions import DefaultCredentialsError
+from google.oauth2 import service_account
 
 logger = logging.getLogger(__name__)
 
@@ -256,7 +255,7 @@ class GCS(object):
             json_data = cls._try_read_json(blob_str)
             if not isinstance(json_data, dict):
                 raise ValueError(
-                    f"Error on key {key}: For {cls.__name__} your JSON file must be a dictionary with one task.")  # noqa
+                    f"Error on key {key}: For {cls.__name__} your JSON file must be a dictionary with one task.")
             return json_data
         elif convert_to == cls.ConvertBlobTo.BASE64:
             return base64.b64encode(blob_str)

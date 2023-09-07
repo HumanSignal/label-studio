@@ -1,4 +1,5 @@
 from typing import Mapping, Optional
+
 from core.redis import start_job_async_or_sync
 from django.utils.functional import cached_property
 

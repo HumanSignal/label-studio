@@ -9,8 +9,8 @@ with random label_choices
 to be bulk imported in project
 """
 
-import random as r
 import os
+import random as r
 
 from django.conf import settings
 

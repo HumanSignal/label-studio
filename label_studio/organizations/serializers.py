@@ -1,13 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import ujson as json
-
-from rest_framework import serializers
-from drf_dynamic_fields import DynamicFieldsMixin
-
-from organizations.models import Organization, OrganizationMember
-from users.serializers import UserSerializer
 from collections import OrderedDict
+
+import ujson as json
+from drf_dynamic_fields import DynamicFieldsMixin
+from organizations.models import Organization, OrganizationMember
+from rest_framework import serializers
+from users.serializers import UserSerializer
 
 
 class OrganizationIdSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

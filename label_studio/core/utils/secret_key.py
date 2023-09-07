@@ -36,7 +36,9 @@ def generate_secret_key_if_missing(data_dir: str) -> str:
         with open(env_filepath, 'a') as f:
             f.write(f'\n{env_key}={new_secret}\n') # nosec
     except Exception as e:
-        logger.warning(f'Warning: failed to write {env_key} to .env file: {e}, new key will be regenerated on every server restart. If this key is used for signing, it will invalidate all existing sessions or tokens. Please set {key} in your environment variables to avoid this warning.')
+        logger.warning(f'Warning: failed to write {env_key} to .env file: {e}, new key will be regenerated on every '
+                       f'server restart. If this key is used for signing, it will invalidate all existing sessions '
+                       f'or tokens. Please set {env_key} in your environment variables to avoid this warning.')
 
     os.environ[env_key] = new_secret
     return new_secret

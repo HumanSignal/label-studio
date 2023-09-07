@@ -1,11 +1,10 @@
-from django.db import transaction
 from django.conf import settings
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-
+from django.db import transaction
 from organizations.models import Organization
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from users.models import User
 
 from .models import Label, LabelLink

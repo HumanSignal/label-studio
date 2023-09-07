@@ -1,21 +1,20 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from django.conf import settings
-from label_studio_tools.core.label_config import is_video_object_tracking
-from rest_flex_fields import FlexFieldsModelSerializer
-from rest_framework import serializers
-
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
+from data_export.models import DataExport
+from django.conf import settings
+from label_studio_tools.core.label_config import is_video_object_tracking
+from label_studio_tools.postprocessing.video import extract_key_frames
 from ml.mixins import InteractiveMixin
+from rest_flex_fields import FlexFieldsModelSerializer
+from rest_framework import serializers
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
-from data_export.models import DataExport
 from users.serializers import UserSimpleSerializer
-from label_studio_tools.postprocessing.video import extract_key_frames
 
-from .models import Export, ConvertedFormat
+from .models import ConvertedFormat, Export
 
 
 class CompletedBySerializer(serializers.ModelSerializer):

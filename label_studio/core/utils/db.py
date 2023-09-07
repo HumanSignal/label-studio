@@ -1,9 +1,8 @@
-from typing import Optional, TypeVar
 import logging
+from typing import Optional, TypeVar
 
 from django.db import models
 from django.db.models import Model, QuerySet, Subquery
-
 
 logger = logging.getLogger(__name__)
 
