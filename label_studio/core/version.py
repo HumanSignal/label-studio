@@ -60,13 +60,11 @@ def _read_py(ls=False):
         version_module = import_version_module(LS_VERSION_FILE if ls else VERSION_FILE)
 
         if not version_module and ls:
-            logging.warning(f"Can't read version file: {LS_VERSION_FILE}. Fall back to: {VERSION_FILE}")
             version_module = import_version_module(VERSION_FILE)
 
         if version_module:
             return version_module.info
         else:
-            logging.warning(f"Can't read version file: {VERSION_FILE}")
             return {}
     finally:
         os.chdir(cwd)  # back to current dir
