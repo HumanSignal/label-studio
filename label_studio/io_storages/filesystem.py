@@ -1,13 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import ujson as json
-import os
 import logging
-
+import os
 from copy import deepcopy
-from core.utils.io import json_load, delete_dir_content, iter_files, remove_file_or_dir
-from .base import BaseStorage, BaseForm, CloudStorage
 
+import ujson as json
+from core.utils.io import delete_dir_content, iter_files, json_load, remove_file_or_dir
+
+from .base import BaseForm, BaseStorage, CloudStorage
 
 logger = logging.getLogger(__name__)
 

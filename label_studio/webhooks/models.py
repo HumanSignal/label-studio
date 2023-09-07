@@ -1,18 +1,15 @@
-import logging
 
-import requests
 from core.utils.common import load_func
 from core.validators import JSONSchemaValidator
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from labels_manager.models import LabelLink
 from projects.models import Project
 from tasks.models import Annotation, Task
-from labels_manager.models import LabelLink
+
 # from labels_manager.serializers import LabelLinkSerializer, LabelSerializer
-
-
 from .serializers_for_hooks import (
     OnlyIDWebhookSerializer,
 )

@@ -15,20 +15,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.apps import apps
+from core import views
+from core.utils.common import collect_versions
+from core.utils.static_serve import serve
 from django.conf import settings
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
 from django.views.generic.base import RedirectView
-
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
-from rest_framework.permissions import AllowAny
-
-from core import views
-from core.utils.static_serve import serve
-from core.utils.common import collect_versions
+from rest_framework.permissions import IsAuthenticated
 
 handler500 = 'core.views.custom_500'
 
@@ -41,7 +38,7 @@ schema_view = get_schema_view(
         x_logo={"url": "../../static/icons/logo-black.svg"}
     ),
     public=True,
-    permission_classes=(AllowAny,),
+    permission_classes=(IsAuthenticated,),
 )
 
 urlpatterns = [

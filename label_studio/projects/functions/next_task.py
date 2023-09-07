@@ -1,17 +1,13 @@
-from collections import Counter
 import logging
+from collections import Counter
 
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
-from django.db.models.fields import DecimalField
-from django.utils.timezone import now
-from django.conf import settings
 from core.feature_flags import flag_set
-import numpy as np
-
 from core.utils.common import conditional_atomic, db_is_not_sqlite
-from tasks.models import Annotation, Task
-from projects.models import LabelStreamHistory
+from django.conf import settings
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, Value, When
+from django.db.models.fields import DecimalField
 from projects.functions.stream_history import add_stream_history
+from tasks.models import Annotation, Task
 
 logger = logging.getLogger(__name__)
 
@@ -222,7 +218,7 @@ def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
             next_task = _get_first_unlocked(postponed_tasks, user)
             if next_task is not None:
                 next_task.allow_postpone = False
-            queue_info = f'Postponed draft queue'
+            queue_info = 'Postponed draft queue'
 
     return next_task, queue_info
 

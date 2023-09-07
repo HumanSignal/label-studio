@@ -7,14 +7,14 @@ import posixpath
 from pathlib import Path
 
 from django.http import (
-    FileResponse, Http404, HttpResponseNotModified,
+    Http404,
+    HttpResponseNotModified,
 )
-from ranged_fileresponse import RangedFileResponse
-
 from django.utils._os import safe_join
 from django.utils.http import http_date
 from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
+from ranged_fileresponse import RangedFileResponse
 
 
 def serve(request, path, document_root=None, show_indexes=False):

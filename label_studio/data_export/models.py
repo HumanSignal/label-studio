@@ -20,7 +20,6 @@ from django.utils.translation import gettext_lazy as _
 from label_studio_converter import Converter
 from tasks.models import Annotation
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -102,7 +101,7 @@ class DataExport(object):
         annotation_number = Annotation.objects.filter(project=project).count()
         try:
             platform_version = version.get_git_version()
-        except:
+        except:  # noqa: E722
             platform_version = 'none'
             logger.error('Version is not detected in save_export_files()')
         info = {

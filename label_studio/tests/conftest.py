@@ -1,45 +1,49 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
-import pytest
-import mock
-import ujson as json
-import requests_mock
-import re
-import boto3
 import logging
+import os
+import re
 import shutil
 import tempfile
-
-from unittest import mock
-from unittest.mock import MagicMock
-from moto import mock_s3
 from copy import deepcopy
-from pathlib import Path
 from datetime import datetime, timedelta
-from freezegun import freeze_time
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import MagicMock
 
-
+import boto3
+import mock
+import pytest
+import requests_mock
+import ujson as json
+from botocore.exceptions import ClientError
 from django.conf import settings
+from freezegun import freeze_time
+from moto import mock_s3
+from organizations.models import Organization
 from projects.models import Project
 from tasks.models import Task
 from users.models import User
-from organizations.models import Organization
-from types import SimpleNamespace
-from botocore.exceptions import ClientError
 
-from label_studio.core.utils.params import get_bool_env, get_env
+from label_studio.core.utils.params import get_env
 
 # if we haven't this package, pytest.ini::env doesn't work
 try:
-    import pytest_env.plugin
+    import pytest_env.plugin  # noqa: F401
 except ImportError:
     print('\n\n !!! Please, pip install pytest-env \n\n')
     exit(-100)
 
 from .utils import (
-    create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock,
-    redis_client_mock, make_project, import_from_url_mock
+    azure_client_mock,
+    create_business,
+    gcs_client_mock,
+    import_from_url_mock,
+    make_project,
+    ml_backend_mock,
+    redis_client_mock,
+    register_ml_backend_mock,
+    signin,
 )
 
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
@@ -477,7 +481,7 @@ def setup_project(client, project_template, do_auth=True):
             m.register_uri('GET', re.compile(r'ml\.heartex\.net/\d+/health'), text=json.dumps({'status': 'UP'}))
             r = client.post(urls.project_create, data=project_config)
             print('Project create with status code:', r.status_code)
-            assert r.status_code == 201, f'Create project result should be redirect to the next page'
+            assert r.status_code == 201, 'Create project result should be redirect to the next page'
 
         # get project id and prepare url
         project = Project.objects.filter(title=project_config['title']).first()
@@ -546,7 +550,7 @@ def annotator_client(client):
     user = User.objects.create(email=email)
     user.set_password(password)  # set password without hash
     user.save()
-    business = create_business(user)
+    create_business(user)
     Organization.create_organization(created_by=user, title=user.first_name)
     if signin(client, email, password).status_code != 302:
         print(f'User {user} failed to login!')
@@ -564,7 +568,7 @@ def annotator2_client(client):
     user = User.objects.create(email=email)
     user.set_password(password)  # set password without hash
     user.save()
-    business = create_business(user)
+    create_business(user)
     Organization.create_organization(created_by=user, title=user.first_name)
     if signin(client, email, password).status_code != 302:
         print(f'User {user} failed to login!')
@@ -728,7 +732,7 @@ def mock_ml_auto_update(name="mock_ml_auto_update"):
 @pytest.fixture(name="mock_ml_backend_auto_update_disabled")
 def mock_ml_backend_auto_update_disabled():
     with ml_backend_mock(setup_model_version='version1') as m:
-        m.register_uri('GET', f'http://localhost:9090/setup', [
+        m.register_uri('GET', 'http://localhost:9090/setup', [
             {'json': {'model_version': '', 'status': 'ok'}, 'status_code': 200},
             {'json': {'model_version': '2', 'status': 'ok'}, 'status_code': 200},
 

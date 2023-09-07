@@ -1,22 +1,20 @@
 import logging
 
-from django.db.models import CharField, Count, F, Q
+from core.permissions import ViewClassPermission, all_permissions
+from django.db.models import CharField, Count, Q
 from django.db.models.functions import Cast
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import views, viewsets
-from rest_framework import views, viewsets
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-
-from core.permissions import ViewClassPermission, all_permissions
 from labels_manager.serializers import (
     LabelBulkUpdateSerializer,
     LabelCreateSerializer,
     LabelLinkSerializer,
     LabelSerializer,
 )
+from rest_framework import views, viewsets
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 from webhooks.utils import api_webhook, api_webhook_for_delete
 
 from .functions import bulk_update_label
