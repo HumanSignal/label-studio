@@ -91,6 +91,15 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
+  ruff:
+    name: "Ruff Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: ./.github/workflows/ruff.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
   build-frontend:
     name: "Build"
     needs:
