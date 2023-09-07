@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Spinner } from '../../components';
@@ -15,6 +15,8 @@ import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
+import { ToastContext } from '../../components/Toast/Toast';
+
 import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
@@ -75,6 +77,8 @@ export const DataManagerPage = ({ ...props }) => {
     if (!project?.id) return;
     if (dataManagerRef.current) return;
 
+    const toast = useContext(ToastContext);
+    
     const mlBackends = await api.callApi("mlBackends", {
       params: { project: project.id },
     });
@@ -109,6 +113,10 @@ export const DataManagerPage = ({ ...props }) => {
 
     dataManager.on("error", response => {
       api.handleError(response);
+    });
+
+    dataManager.on("toast", ({ message, type }) => {
+      toast.show({ message, type });
     });
 
     if (interactiveBacked) {
