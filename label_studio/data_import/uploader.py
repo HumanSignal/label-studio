@@ -1,25 +1,25 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
-import io
 import csv
-import requests
+import io
 import logging
 import mimetypes
+import os
+
+import requests
 
 try:
     import ujson as json
-except:
+except:  # noqa: E722
     import json
 
-from rest_framework.exceptions import ValidationError
+from core.utils.common import timeit
+from core.utils.io import validate_upload_url
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from rest_framework.exceptions import ValidationError
 
 from .models import FileUpload
-from core.utils.io import validate_upload_url
-from core.utils.common import timeit
-from core.feature_flags import flag_set
 
 logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)

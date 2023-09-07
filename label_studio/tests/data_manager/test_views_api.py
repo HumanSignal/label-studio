@@ -1,11 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import json
-import pytest
 
+import pytest
 from rest_framework import status
 
-from ..utils import project_id
+from ..utils import project_id  # noqa
 
 pytestmark = pytest.mark.django_db
 
@@ -49,7 +49,7 @@ def test_views_api(business_client, project_id):
 
     # reset
     response = business_client.delete(
-        f"/api/dm/views/reset",
+        "/api/dm/views/reset",
         data=json.dumps(dict(project=project_id)),
         content_type="application/json",
     )
@@ -97,7 +97,7 @@ def test_views_api_filter_project(business_client):
 
     # filtered reset
     response = business_client.delete(
-        f"/api/dm/views/reset/",
+        "/api/dm/views/reset/",
         data=json.dumps(dict(project=project1_id)),
         content_type="application/json",
     )

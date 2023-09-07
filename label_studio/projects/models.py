@@ -1,20 +1,25 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from typing import Optional, Mapping
 import json
 import logging
+from typing import Mapping, Optional
 
-from django.db.models import Q, Avg, Count, Sum, Value, BooleanField, Case, When
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-from django.db.models import JSONField
-from django.core.validators import MinLengthValidator, MaxLengthValidator
-from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
-
-from data_manager.managers import TaskQuerySet
-from projects.functions.utils import make_queryset_from_iterable
-from tasks.models import Task, Prediction, Annotation, AnnotationDraft, Q_task_finished_annotations, bulk_update_stats_project_tasks
+from core.bulk_update_utils import bulk_update
+from core.label_config import (
+    check_control_in_config_by_regex,
+    check_toname_in_config_by_regex,
+    config_line_stipped,
+    extract_data_types,
+    get_all_control_tag_tuples,
+    get_all_labels,
+    get_all_object_tag_names,
+    get_all_types,
+    get_annotation_tuple,
+    get_original_fromname_by_regex,
+    get_sample_task,
+    validate_label_config,
+)
 from core.utils.common import (
     create_hash,
     get_attr_or_item,
@@ -22,27 +27,33 @@ from core.utils.common import (
     merge_labels_counters,
 )
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
-from core.label_config import (
-    validate_label_config,
-    extract_data_types,
-    get_all_object_tag_names,
-    config_line_stipped,
-    get_sample_task,
-    get_all_labels,
-    get_all_control_tag_tuples,
-    get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
-    get_original_fromname_by_regex, get_all_types,
-)
-from core.feature_flags import flag_set
-from core.bulk_update_utils import bulk_update
+from data_manager.managers import TaskQuerySet
+from django.conf import settings
+from django.core.validators import MaxLengthValidator, MinLengthValidator
+from django.db import models, transaction
+from django.db.models import Avg, BooleanField, Case, Count, JSONField, Q, Sum, Value, When
+from django.utils.translation import gettext_lazy as _
 from label_studio_tools.core.label_config import parse_config
-from projects.functions import (
-    annotate_task_number, annotate_finished_task_number, annotate_total_predictions_number,
-    annotate_total_annotations_number, annotate_num_tasks_with_annotations,
-    annotate_useful_annotation_number, annotate_ground_truth_number, annotate_skipped_annotations_number
-)
 from labels_manager.models import Label
-
+from projects.functions import (
+    annotate_finished_task_number,
+    annotate_ground_truth_number,
+    annotate_num_tasks_with_annotations,
+    annotate_skipped_annotations_number,
+    annotate_task_number,
+    annotate_total_annotations_number,
+    annotate_total_predictions_number,
+    annotate_useful_annotation_number,
+)
+from projects.functions.utils import make_queryset_from_iterable
+from tasks.models import (
+    Annotation,
+    AnnotationDraft,
+    Prediction,
+    Q_task_finished_annotations,
+    Task,
+    bulk_update_stats_project_tasks,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +93,7 @@ class ProjectManager(models.Manager):
         else:
             to_annotate = {field: available_fields[field] for field in fields if field in available_fields}
 
-        for _, annotate_func in to_annotate.items():
+        for _, annotate_func in to_annotate.items():  # noqa: F402
             queryset = annotate_func(queryset)
 
         return queryset
@@ -495,7 +506,7 @@ class Project(ProjectMixin, models.Model):
         # validate data columns consistency
         fields_from_config = get_all_object_tag_names(config_string)
         if not fields_from_config:
-            logger.debug(f'Data fields not found in labeling config')
+            logger.debug('Data fields not found in labeling config')
             return
 
         #TODO: DEV-2939 Add validation for fields addition in label config
@@ -519,7 +530,7 @@ class Project(ProjectMixin, models.Model):
         # validate annotations consistency
         annotations_from_config = set(get_all_control_tag_tuples(config_string))
         if not annotations_from_config:
-            logger.debug(f'Annotation schema is not found in config')
+            logger.debug('Annotation schema is not found in config')
             return
         annotations_from_data = set(self.summary.created_annotations)
         if annotations_from_data and not annotations_from_data.issubset(annotations_from_config):
@@ -569,7 +580,7 @@ class Project(ProjectMixin, models.Model):
             # check if labels from is subset if config labels
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
-                diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
+                diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)  # noqa: E741
                 if (strict is True) and ((control_tag_from_data not in dynamic_label_from_config) and
                         (not check_control_in_config_by_regex(config_string, control_tag_from_data, filter=dynamic_label_from_config.keys()))):
                     # raise error if labels not dynamic and not in regex rules
@@ -974,7 +985,7 @@ class LabelStreamHistory(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='histories', help_text='User ID'
-    )  # noqa
+    )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='histories', help_text='Project ID')
     data = models.JSONField(default=list)
 
@@ -988,7 +999,7 @@ class ProjectMember(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='project_memberships', help_text='User ID'
-    )  # noqa
+    )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members', help_text='Project ID')
     enabled = models.BooleanField(default=True, help_text='Project member is enabled')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -1014,7 +1025,7 @@ class ProjectSummary(models.Model):
         null=True,
         default=dict,
         help_text='Unique annotation types identified by tuple (from_name, to_name, type)',
-    )  # noqa
+    )
     # { from_name: {label1: task_count_with_label1, label2: task_count_with_label2} }
     created_labels = JSONField(_('created labels'), null=True, default=dict, help_text='Unique labels')
     created_labels_drafts = JSONField(_('created labels in drafts'), null=True, default=dict, help_text='Unique drafts labels')

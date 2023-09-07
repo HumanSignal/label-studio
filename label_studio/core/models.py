@@ -1,8 +1,8 @@
 import logging
 
-from django.utils.translation import gettext_lazy as _
-from django.db.models import JSONField
 from django.db import models
+from django.db.models import JSONField
+from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
 

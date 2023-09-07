@@ -1,15 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import sys
-import logging
-import socket
-import pathlib
-import os
+import getpass
 import io
 import json
-import getpass
+import logging
+import os
+import pathlib
+import socket
+import sys
 
-from colorama import init, Fore
+from colorama import Fore, init
 
 if sys.platform == 'win32':
     init(convert=True)
@@ -21,7 +21,7 @@ windows_dll_fix()
 
 from django.core.management import call_command
 from django.core.wsgi import get_wsgi_application
-from django.db import connections, DEFAULT_DB_ALIAS, IntegrityError
+from django.db import DEFAULT_DB_ALIAS, IntegrityError, connections
 from django.db.backends.signals import connection_created
 from django.db.migrations.executor import MigrationExecutor
 
@@ -37,7 +37,7 @@ DEFAULT_USERNAME = 'default_user@localhost'
 def _setup_env():
     sys.path.insert(0, LS_PATH)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "label_studio.core.settings.label_studio")
-    application = get_wsgi_application()
+    get_wsgi_application()
 
 
 def _app_run(host, port):
@@ -74,8 +74,8 @@ def _get_config(config_path):
 
 
 def _create_project(title, user, label_config=None, sampling=None, description=None, ml_backends=None):
-    from projects.models import Project
     from organizations.models import Organization
+    from projects.models import Project
 
     project = Project.objects.filter(title=title).first()
     if project is not None:
@@ -129,8 +129,8 @@ def _get_user_info(username):
 
 
 def _create_user(input_args, config):
-    from users.models import User
     from organizations.models import Organization
+    from users.models import User
 
     username = input_args.username or config.get('username') or get_env('USERNAME')
     password = input_args.password or config.get('password') or get_env('PASSWORD')
@@ -350,8 +350,9 @@ def main():
 
     # start with migrations from old projects, '.' project_name means 'label-studio start' without project name
     elif input_args.command == 'start' and input_args.project_name != '.':
-        from label_studio.core.old_ls_migration import migrate_existing_project
         from projects.models import Project
+
+        from label_studio.core.old_ls_migration import migrate_existing_project
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
 

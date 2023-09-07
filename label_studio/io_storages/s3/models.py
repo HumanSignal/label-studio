@@ -1,28 +1,27 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import re
-import logging
 import json
+import logging
+import re
+
 import boto3
-
-from core.redis import start_job_async_or_sync
-from django.db import models
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_delete
-
-from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
-from tasks.validation import ValidationError as TaskValidationError
-from tasks.models import Annotation
 from core.feature_flags import flag_set
+from core.redis import start_job_async_or_sync
+from django.conf import settings
+from django.db import models
+from django.db.models.signals import post_save, pre_delete
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
     ImportStorage,
     ImportStorageLink,
-    ProjectStorageMixin
+    ProjectStorageMixin,
 )
+from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
+from tasks.models import Annotation
+from tasks.validation import ValidationError as TaskValidationError
 
 from label_studio.io_storages.s3.utils import AWS
 
