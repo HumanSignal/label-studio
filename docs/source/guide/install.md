@@ -84,7 +84,7 @@ label-studio
 The default web browser will automatically open at [http://localhost:8080](http://localhost:8080) with Label Studio. Please refer to [start Label Studio](start.html) for more options when starting Label Studio.
 
 !!! note
-If you've previously installed the brew tap from the now-deprecated organization name `heartexlabs/tap`, we've got good news. You don't have to worry about migrating immediately. The deprecated tap has been set up as a mirror for `humansignal/tap`. This ensures continuity and minimizes disruptions for existing users.
+    If you've previously installed the brew tap from the now-deprecated organization name `heartexlabs/tap`, we've got good news. You don't have to worry about migrating immediately. The deprecated tap has been set up as a mirror for `humansignal/tap`. This ensures continuity and minimizes disruptions for existing users.
 
 ## Install with Docker
 
@@ -255,7 +255,7 @@ Upgrade Docker Engine to the latest available version(>= [20.10.12](https://docs
 ### PermissionError: [Errno 13] Permission denied: `/label-studio/data/media`
 
 !!! warning
-Starting with Label Studio 1.7.0 release, the application run using a non-root docker user with ID `1001`.
+    Starting with Label Studio 1.7.0 release, the application run using a non-root docker user with ID `1001`.
 
 You may already be aware that Docker containers generally operate with root privileges by default. This unrestricted container management permits actions like installing system packages, modifying configuration files, and binding privileged ports, which are all beneficial for development purposes. However, this can lead to significant risks when containers are deployed in a production environment.
 
