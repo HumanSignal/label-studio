@@ -1091,7 +1091,7 @@ main {
   --color-border: var(--color-purple-90);
   --color-title: var(--color-white);
   --color-title-background: var(--color-purple-90);
-  --color-background: #FDF6FF;
+  --color-background: var(--color-purple-0);
 }
 
 .content-markdown .admonition.enterprise {
