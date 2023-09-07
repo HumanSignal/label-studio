@@ -10,6 +10,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.core.handlers.base import BaseHandler
 from django.core.exceptions import MiddlewareNotUsed
 from django.middleware.common import CommonMiddleware
+from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth import logout
 from django.conf import settings
 
@@ -207,3 +208,6 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
         request.session.set_expiry(
             settings.MAX_TIME_BETWEEN_ACTIVITY if request.session.get('keep_me_logged_in', True) else 0
         )
+
+class CustomHeaderMiddleware(RemoteUserMiddleware):
+    header = settings.CUSTOM_HEADER
