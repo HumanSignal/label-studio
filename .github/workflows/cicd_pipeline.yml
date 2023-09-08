@@ -385,3 +385,21 @@ jobs:
       ref: ${{ github.ref_name }}
       release-id: ${{ needs.draft-release.outputs.id }}
     secrets: inherit
+
+  check_gate:
+    name: "Ready to merge"
+    if: always()
+    needs:
+      - gitleaks
+      - bandit
+      - pytest
+      - migrations
+      - conda-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          allowed-failures:
+          allowed-skips: gitleaks, bandit, pytest, migrations, conda-test
+          jobs: ${{ toJSON(needs) }}
