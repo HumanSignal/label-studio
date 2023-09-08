@@ -1,15 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
-import requests_mock
 import json
 
-from projects.models import Project
-from ml.models import MLBackend
-from tasks.models import Task, Prediction, Annotation, AnnotationDraft
-from users.models import User
-from .utils import make_project
+import pytest
+import requests_mock
 from core.redis import redis_healthcheck
+from ml.models import MLBackend
+from projects.models import Project
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from users.models import User
+
+from .utils import make_project
 
 _project_for_text_choices_onto_A_B_classes = dict(
     title='Test',
@@ -659,7 +660,7 @@ def test_predictions_with_partially_predicted_tasks(
     with requests_mock.Mocker() as m:
         m.register_uri(
             'POST', 'http://localhost:8999/setup', text=json.dumps({'model_version': setup_returns_model_version})
-        )  # noqa
+        )
         m.register_uri(
             'POST',
             'http://localhost:8999/predict',

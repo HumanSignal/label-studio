@@ -2,11 +2,11 @@ import logging
 from functools import wraps
 
 import requests
+from core.feature_flags import flag_set
+from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
 from django.conf import settings
 from django.db.models import Q
-from core.feature_flags import flag_set
-from core.redis import start_job_async_or_sync
 
 from .models import Webhook, WebhookAction
 

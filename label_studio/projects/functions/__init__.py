@@ -1,8 +1,7 @@
-from django.db.models import Count, Q, OuterRef
-
-from core.utils.db import SQCount
-from tasks.models import Annotation, Task, Prediction
 from core.feature_flags import flag_set
+from core.utils.db import SQCount
+from django.db.models import Count, OuterRef, Q
+from tasks.models import Annotation, Prediction, Task
 
 
 def annotate_task_number(queryset):

@@ -2,19 +2,20 @@
 """
 import logging
 import os
-import requests
 import urllib
-import attr
-from django.contrib.auth.models import AnonymousUser
 
-from django.db.models import Q, F, Count
-from django.conf import settings
-from requests.adapters import HTTPAdapter
-from core.version import get_git_version
-from data_export.serializers import ExportDataSerializer
-from label_studio.core.utils.params import get_env
+import attr
+import requests
 from core.feature_flags import flag_set
 from core.utils.common import load_func
+from core.version import get_git_version
+from data_export.serializers import ExportDataSerializer
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.db.models import Count
+from requests.adapters import HTTPAdapter
+
+from label_studio.core.utils.params import get_env
 
 version = get_git_version()
 logger = logging.getLogger(__name__)

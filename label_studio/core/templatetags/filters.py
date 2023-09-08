@@ -1,12 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import re
 import json
-from django import template
+import re
 from datetime import datetime
-from django.utils.html import format_html
+
+from django import template
 from django.conf import settings
-from django.template.loader_tags import do_include
+from django.utils.html import format_html
 
 register = template.Library()
 
@@ -30,7 +30,7 @@ def initials(val, jn=""):
         
 
 @register.filter
-def get_at_index(l, index):
+def get_at_index(l, index):  # noqa: E741
     return l[index]
 
 

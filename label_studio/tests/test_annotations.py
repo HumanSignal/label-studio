@@ -1,15 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
-import requests_mock
-import math
 
+import pytest
+import requests_mock
 from django.apps import apps
 from django.urls import reverse
-from tasks.models import Task, Annotation
 from projects.models import Project
-from .utils import invite_client_to_project, _client_is_annotator
+from tasks.models import Annotation, Task
+
+from .utils import _client_is_annotator, invite_client_to_project
 
 
 @pytest.fixture
