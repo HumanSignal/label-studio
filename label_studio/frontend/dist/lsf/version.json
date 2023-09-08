@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5248: BBoxes optimizations",
-  "commit": "e888b2df9e16dbffb39f39529fa7de9dba0d92c7",
+  "message": "fix: LSDV-5487: Keep the labeling interface settings after change page",
+  "commit": "5f2eb6ad691dc53c0a448a1b677c49f2af500de6",
   "branch": "master",
-  "date": "2023/09/04 18:41:01"
+  "date": "2023/09/06 12:41:22"
 }
