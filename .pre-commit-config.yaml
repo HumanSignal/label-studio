@@ -9,6 +9,6 @@ repos:
 -   repo: https://github.com/grantjenks/blue
     rev: v0.9.1
     hooks:
-    - id: blue
-      args: [ --check, --diff, --color ]
-      exclude: (migrations)
+      - id: blue
+        args: [ --check, --diff, --color ]
+        exclude: (migrations)
