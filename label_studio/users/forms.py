@@ -68,7 +68,7 @@ class UserSignupForm(forms.Form):
         if len(password) < PASS_MIN_LENGTH:
             raise forms.ValidationError(PASS_LENGTH_ERR)
         return password
-
+    
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if username and User.objects.filter(username=username.lower()).exists():
