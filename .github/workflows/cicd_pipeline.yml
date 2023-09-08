@@ -91,6 +91,15 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
+  ruff:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: ./.github/workflows/ruff.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
   build-frontend:
     name: "Build"
     needs:
@@ -392,6 +401,7 @@ jobs:
     needs:
       - gitleaks
       - bandit
+      - ruff
       - pytest
       - migrations
       - conda-test
@@ -401,5 +411,5 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           allowed-failures:
-          allowed-skips: gitleaks, bandit, pytest, migrations, conda-test
+          allowed-skips: gitleaks, bandit, ruff, pytest, migrations, conda-test
           jobs: ${{ toJSON(needs) }}
