@@ -69,8 +69,7 @@ line-length = 119
 
 include = 'label_studio/.*\.py$'
 
-# Exclude a variety of commonly ignored directories, as well as anything that
-# is not a python file within the label_studio directory.
+# Exclude a variety of commonly ignored directories, as well as all migrations files.
 force-exclude = '''
 /(
     \.bzr
