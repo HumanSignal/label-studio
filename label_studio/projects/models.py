@@ -594,8 +594,8 @@ class Project(ProjectMixin, models.Model):
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(
-                    f'{l} ({labels_from_data[l]} annotations)' for l in different_labels
-                )  # noqa: E741
+                    f'{l} ({labels_from_data[l]} annotations)' for l in different_labels  # noqa: E741
+                )
                 if (strict is True) and (
                     (control_tag_from_data not in dynamic_label_from_config)
                     and (
