@@ -36,7 +36,7 @@ djangorestframework==3.13.1
 drf-dynamic-fields==0.3.0
 drf-flex-fields==0.9.5
 drf-generators==0.3.0
-https://github.com/HumanSignal/drf-yasg/releases/download/1.21.7/drf_yasg-1.21.8.dev1+gda9d765-py3-none-any.whl
+drf-yasg @ https://github.com/HumanSignal/drf-yasg/releases/download/1.21.7/drf_yasg-1.21.8.dev1+gda9d765-py3-none-any.whl
 expiringdict==1.2.2
 google-api-core==2.11.0
 google-auth==2.14.1
