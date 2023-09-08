@@ -1,13 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from typing import cast
+import base64
 import datetime
 import logging
 import numbers
 import os
-import time
 import uuid
-import base64
+from typing import cast
 from urllib.parse import urljoin
 
 import ujson as json
@@ -243,9 +242,9 @@ class Task(TaskMixin, models.Model):
                 ),
             )
             # TODO: remove this workaround after fixing the bug with inconsistent is_labeled flag
-            if self.is_labeled == False:
+            if self.is_labeled is False:
                 self.update_is_labeled()
-                if self.is_labeled == True:
+                if self.is_labeled is True:
                     self.save(update_fields=['is_labeled'])
         result = bool(num >= self.overlap)
         logger.log(
@@ -268,7 +267,7 @@ class Task(TaskMixin, models.Model):
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
 
-    def has_permission(self, user: "User") -> bool:
+    def has_permission(self, user: "User") -> bool:  # noqa: F821
         mixin_has_permission = cast(bool, super().has_permission(user))
 
         user.project = self.project  # link for activity log
@@ -417,7 +416,6 @@ class Task(TaskMixin, models.Model):
 
     def _get_storage_by_url(self, url, storage_objects):
         """Find the first compatible storage and returns pre-signed URL"""
-        from io_storages.models import get_storage_classes
 
         for storage_object in storage_objects:
             # check url is string because task can have int, float, dict, list
@@ -677,7 +675,7 @@ class Annotation(AnnotationMixin, models.Model):
 
         return len(res)
 
-    def has_permission(self, user: "User") -> bool:
+    def has_permission(self, user: "User") -> bool:  # noqa: F821
         mixin_has_permission = cast(bool, super().has_permission(user))
 
         user.project = self.project  # link for activity log
@@ -890,7 +888,7 @@ class Prediction(models.Model):
             for item in result:
                 if not isinstance(item, dict):
                     raise ValidationError(
-                        f"Each item in prediction result should be dict"
+                        "Each item in prediction result should be dict"
                     )
             # TODO: check consistency with project.label_config
             return result
@@ -911,7 +909,7 @@ class Prediction(models.Model):
                     ]
 
         elif isinstance(result, (str, numbers.Integral)):
-            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
+            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)
             for tag, tag_info in project.get_parsed_config().items():
                 tag_type = tag_info["type"].lower()
                 if tag_type in SINGLE_VALUED_TAGS and isinstance(
@@ -1178,7 +1176,7 @@ def bulk_update_stats_project_tasks(tasks, project=None):
                 bulk_update(
                     tasks, update_fields=["is_labeled"], batch_size=settings.BATCH_SIZE
                 )
-            except OperationalError as exp:
+            except OperationalError:
                 logger.error(
                     "Operational error while updating tasks: {exc}", exc_info=True
                 )

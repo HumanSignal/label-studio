@@ -1,8 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from enum import Enum
-from typing import List, Optional, Union, Any
-from pydantic import BaseModel, StrictInt, StrictFloat, StrictStr, StrictBool, ConstrainedList
+from typing import Any, List, Optional, Union
+
+from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
 
 
 class FilterIn(BaseModel):

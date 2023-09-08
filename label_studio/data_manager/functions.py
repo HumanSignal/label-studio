@@ -1,18 +1,17 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import ujson as json
-
 from collections import OrderedDict
+from urllib.parse import unquote
+
+import ujson as json
+from core.feature_flags import flag_set
+from core.utils.common import int_from_request
+from data_manager.models import View
+from data_manager.prepare_params import PrepareParams
 from django.conf import settings
 from rest_framework.generics import get_object_or_404
-
-from core.utils.common import int_from_request
-from data_manager.prepare_params import PrepareParams
-from data_manager.models import View
 from tasks.models import Task
-from urllib.parse import unquote
-from core.feature_flags import flag_set
 
 TASKS = 'tasks:'
 logger = logging.getLogger(__name__)

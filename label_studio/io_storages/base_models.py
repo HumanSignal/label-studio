@@ -1,34 +1,31 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import base64
-import rq
 import json
 import logging
-import django_rq
-import rq.exceptions
 import traceback as tb
-
-from rq.job import Job
-from django_rq import job
+from datetime import datetime
 from urllib.parse import urljoin
 
-from django.utils import timezone
-from django.db import models, transaction
-from django.shortcuts import reverse
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from django.db.models import JSONField
-from django.contrib.auth.models import AnonymousUser
-from datetime import datetime
-
-from tasks.models import Task, Annotation
-from tasks.serializers import PredictionSerializer, AnnotationSerializer
-from data_export.serializers import ExportDataSerializer
-from core.redis import is_job_in_queue, redis_connected, is_job_on_worker
-from core.utils.common import load_func
+import django_rq
+import rq
+import rq.exceptions
 from core.feature_flags import flag_set
+from core.redis import is_job_in_queue, is_job_on_worker, redis_connected
+from core.utils.common import load_func
+from data_export.serializers import ExportDataSerializer
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.db import models, transaction
+from django.db.models import JSONField
+from django.shortcuts import reverse
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django_rq import job
 from io_storages.utils import get_uri_via_regex
-
+from rq.job import Job
+from tasks.models import Annotation, Task
+from tasks.serializers import AnnotationSerializer, PredictionSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -250,7 +247,7 @@ class ImportStorage(Storage):
 
     def can_resolve_url(self, url):
         # TODO: later check to the full prefix like "url.startswith(self.path_full)"
-        # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"  # noqa
+        # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
         _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
         if prefix == self.url_scheme:
             return True
@@ -297,7 +294,7 @@ class ImportStorage(Storage):
                     http_url = self.generate_http_url(extracted_uri)
 
                 return uri.replace(extracted_uri, http_url)
-            except Exception as exc:
+            except Exception:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
     def _scan_and_create_links_v2(self):

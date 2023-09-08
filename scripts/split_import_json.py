@@ -1,8 +1,8 @@
 """ This script splits IMPORT json with array into CHUNKS.
     This can be useful to avoid problems with a large json file during the import step.
 """
-import sys
 import json
+import sys
 
 INPUT = 'import.json' if len(sys.argv) <= 1 else sys.argv[1]
 OUTPUT = 'output' if len(sys.argv) <= 2 else sys.argv[2]
