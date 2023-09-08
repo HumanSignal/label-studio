@@ -12,7 +12,6 @@ If 'git desc' is fail it will read __version__.py:git_version.
 ATTENTION: do not include version_.py to git! It will affect git commit always!
 """
 import json
-import logging
 import os
 import sys
 from subprocess import STDOUT, CalledProcessError
