@@ -195,18 +195,20 @@ ProjectsPage.context = ({ showButton, searchQuery, setSearchQuery }) => {
   );
 };
 
+
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
 ProjectsPage.routes = ({ store }) => [
   {
-    // title: store.project?.title,
+    //title: store.project?.title,
     // set the title to empty string to remove the route title from the page
     title: "",
     path: "/:id(\\d+)",
     exact: true,
     component: () => {
       const params = useRouterParams();
-      
+
+
       return (
         <>
           <Redirect to={`/projects/${params.id}/data`} />

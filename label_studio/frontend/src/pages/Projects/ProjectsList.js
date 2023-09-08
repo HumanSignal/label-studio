@@ -80,8 +80,8 @@ export const ProjectsList = ({ projects, currentPage, totalItems, totalPages, lo
 export const EmptyProjectsList = ({ openModal }) => {
   return (
     <Block name="empty-projects-page">
-      <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
-      <Elem name="header" tag="h1">Heidi doesn’t see any projects here</Elem>
+      <Elem name="heidi" tag="img" src={absoluteURL("/static/icons/slack.jpg")} />
+      <Elem name="header" tag="h1">Data Studio doesn’t see any projects here</Elem>
       <p>Create one and start labeling your data</p>
       <Elem name="action" tag={Button} onClick={openModal} look="primary">Create New Project</Elem>
     </Block>

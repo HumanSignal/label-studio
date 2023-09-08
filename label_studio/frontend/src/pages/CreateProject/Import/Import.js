@@ -3,7 +3,7 @@ import { Modal } from '../../../components/Modal/Modal';
 import { cn } from '../../../utils/bem';
 import { unique } from '../../../utils/helpers';
 import "./Import.styl";
-import { IconError, IconInfo, IconUpload } from '../../../assets/icons';
+import { IconDoneimport, IconError, IconGreentech, IconInfo, IconLink, IconUpload, IconUploadfiles } from '../../../assets/icons';
 import { useAPI } from '../../../providers/ApiProvider';
 
 const importClass = cn("upload_page");
@@ -71,15 +71,15 @@ function getFiles(files) {
   });
 }
 
-const Footer = () => {
-  return (
-    <Modal.Footer>
-      <IconInfo className={importClass.elem("info-icon")} width="20" height="20" />
-      See the&nbsp;documentation to <a target="_blank" href="https://labelstud.io/guide/predictions.html">import preannotated data</a>{" "}
-      or&nbsp;to <a target="_blank" href="https://labelstud.io/guide/storage.html">sync data from a&nbsp;database or&nbsp;cloud storage</a>.
-    </Modal.Footer>
-  );
-};
+// const Footer = () => {
+//   return (
+//     <Modal.Footer>
+//       <IconInfo className={importClass.elem("info-icon")} width="20" height="20" />
+//       See the&nbsp;documentation to <a target="_blank" href="https://labelstud.io/guide/predictions.html">import preannotated data</a>{" "}
+//       or&nbsp;to <a target="_blank" href="https://labelstud.io/guide/storage.html">sync data from a&nbsp;database or&nbsp;cloud storage</a>.
+//     </Modal.Footer>
+//   );
+// };
 
 const Upload = ({ children, sendFiles }) => {
   const [hovered, setHovered] = useState(false);
@@ -102,7 +102,7 @@ const Upload = ({ children, sendFiles }) => {
       onDragOver={onHover}
       onDragLeave={onLeave}
       onDrop={onDrop}
-      // {...getRootProps}
+    // {...getRootProps}
     >
       {children}
     </div>
@@ -296,83 +296,262 @@ export const ImportPage = ({
     onChange: e => setCsvHandling(e.target.value),
   };
 
+  const handlePasteFromClipboard = () => {
+    // Access the clipboard data
+    navigator.clipboard.readText()
+      .then((clipboardData) => {
+        // Assuming "urlRef" is a React ref to the input field
+        if (urlRef.current) {
+          // Set the clipboard data (URL) into the input field
+          urlRef.current.value = clipboardData;
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to read clipboard data:', error);
+      });
+  };
+
+
+
   return (
     <div className={importClass}>
-      {highlightCsvHandling && <div className={importClass.elem("csv-splash")}/>}
-      <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }}/>
+      {highlightCsvHandling && <div className={importClass.elem("csv-splash")} />}
+      <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }} />
 
       <header>
-        <form className={importClass.elem("url-form") + " inline"} method="POST" onSubmit={onLoadURL}>
-          <input placeholder="Dataset URL" name="url" ref={urlRef} />
-          <button type="submit">Add URL</button>
-        </form>
-        <span>or</span>
-        <button onClick={() => document.getElementById('file-input').click()} className={importClass.elem("upload-button")}>
-          <IconUpload width="16" height="16" className={importClass.elem("upload-icon")} />
-          Upload {files.uploaded.length ? "More " : ""}Files
-        </button>
-        <div className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}>
-          <span>Treat CSV/TSV as</span>
-          <label><input {...csvProps} value="tasks" checked={csvHandling === "tasks"}/> List of tasks</label>
-          <label><input {...csvProps} value="ts" checked={csvHandling === "ts"}/> Time Series or Whole Text File</label>
+        <div className={`${importClass.elem("upload-container")}`}>
+          {/* Upload Files section */}
+          <div className="upload-files" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <IconUploadfiles />
+            <h2>Drag and drop files here</h2>
+            <p>Text, Audio, Video, Image, HTML, and more</p>
+            <button onClick={() => document.getElementById('file-input').click()} className={importClass.elem("upload-button")}>
+              <IconUpload width="16" height="16" className={importClass.elem("upload-icon")} />
+              Browse Local {files.uploaded.length ? "More " : ""}Device
+            </button>
+          </div>
+          <div className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}>
+            <span>Treat CSV/TSV as</span>
+            <label><input {...csvProps} value="tasks" checked={csvHandling === "tasks"} /> List of tasks</label>
+            <label><input {...csvProps} value="ts" checked={csvHandling === "ts"} /> Time Series or Whole Text File</label>
+          </div>
         </div>
+
+        <div className={importClass.elem("url-container")}>
+          {/* URL section */}
+          <form className={importClass.elem("url-form")} method="POST" onSubmit={onLoadURL}>
+            <div className={importClass.elem("button-container")}>
+              <button type="button" onClick={handlePasteFromClipboard}><IconLink /></button>
+            </div>
+            <input placeholder="Enter Dataset URL" name="url" ref={urlRef} />
+            <div className={importClass.elem("button-container")}>
+              <button type="submit">+ Add URL</button>
+            </div>
+          </form>
+        </div>
+
         <div className={importClass.elem("status")}>
-          {files.uploaded.length
-            ? `${files.uploaded.length} files uploaded`
-            : ""}
+          {files.uploaded.length ? `${files.uploaded.length} files uploaded` : null}
         </div>
       </header>
+
+
 
       <ErrorMessage error={error} />
 
       <main>
         <Upload sendFiles={sendFiles} project={project}>
           {!showList && (
-            <label htmlFor="file-input">
-              <div className={dropzoneClass.elem("content")}>
-                <header>Drag & drop files here<br/>or click to browse</header>
-                <IconUpload height="64" className={dropzoneClass.elem("icon")} />
-                <dl>
-                  <dt>Text</dt><dd>{supportedExtensions.text.join(', ')}</dd>
-                  <dt>Audio</dt><dd>{supportedExtensions.audio.join(', ')}</dd>
-                  <dt>Video</dt><dd>mpeg4/H.264 webp, webm* {/* Keep in sync with supportedExtensions.video */}</dd>
-                  <dt>Images</dt><dd>{supportedExtensions.image.join(', ')}</dd>
-                  <dt>HTML</dt><dd>{supportedExtensions.html.join(', ')}</dd>
-                  <dt>Time Series</dt><dd>{supportedExtensions.timeSeries.join(', ')}</dd>
-                  <dt>Common Formats</dt><dd>{supportedExtensions.common.join(', ')}</dd>
-                </dl>
-                <b>
-                   * – Support depends on the browser<br/>
-                   * – Use <a href="https://labelstud.io/guide/storage.html" target="_blank">
-                  Cloud Storages</a> if you want to import a large number of files
-                </b>
+            // <label htmlFor="file-input">
+            //   <div className={dropzoneClass.elem("content")}>
+            //     <dl>
+            //       <dt>Text</dt><dd>{supportedExtensions.text.join(', ')}</dd>
+            //       <dt>Audio</dt><dd>{supportedExtensions.audio.join(', ')}</dd>
+            //       <dt>Video</dt><dd>mpeg4/H.264 webp, webm* {/* Keep in sync with supportedExtensions.video */}</dd>
+            //       <dt>Images</dt><dd>{supportedExtensions.image.join(', ')}</dd>
+            //       <dt>HTML</dt><dd>{supportedExtensions.html.join(', ')}</dd>
+            //       <dt>Time Series</dt><dd>{supportedExtensions.timeSeries.join(', ')}</dd>
+            //       <dt>Common Formats</dt><dd>{supportedExtensions.common.join(', ')}</dd>
+            //     </dl>
+            //   </div>
+            // </label>
+            <div className="table-container" style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'flex-start',
+              gap: '20px',
+            }}>
+              <div className="table-left">
+
+                <div className={dropzoneClass.elem("content")}>
+                  <h4 style={{ display: 'flex', alignItems: 'baseline', marginRight: '200px', fontWeight: 'bold' }}><IconDoneimport style={{ verticalAlign: 'middle' }} /> Support File Formats</h4>
+                  <dl>
+                    <dt>Common Formats</dt><dd>{supportedExtensions.common.join(', ')}</dd>
+                    <dt>Text</dt><dd>{supportedExtensions.text.join(', ')}</dd>
+                    <dt>Audio</dt><dd>{supportedExtensions.audio.join(', ')}</dd>
+                    <dt>Video</dt><dd>mpeg4/H.264 webp, webm* {/* Keep in sync with supportedExtensions.video */}</dd>
+                    <dt>Images</dt><dd>{supportedExtensions.image.join(', ')}</dd>
+                    <dt>HTML</dt><dd>{supportedExtensions.html.join(', ')}</dd>
+                    <dt>Time Series</dt><dd>{supportedExtensions.timeSeries.join(', ')}</dd>
+                  </dl>
+                </div>
               </div>
-            </label>
+
+              <div className="table-right">
+
+                {/* Add the second table here */}
+                <div className={dropzoneClass.elem("content")}>
+                  <h4 style={{ display: 'flex', alignItems: 'baseline', marginRight: '330px', fontWeight: 'bold' }}><IconGreentech style={{ verticalAlign: 'middle' }} /> Import File Guideline</h4>
+                  <dl>
+                    <dt>• Make sure you upload or import files according to your configured template</dt><dd></dd>
+                    <dt>• Use cloud storages for importing a large number of files</dt><dd></dd>
+                    <dt>* Video files support depends on the browser</dt><dd></dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+
           )}
 
           {showList && (
-            <table>
+          // <table>
+          //   <tbody>
+          //     {files.uploading.map((file, idx) => (
+          //       <tr key={`${idx}-${file.name}`}>
+          //         <td>{file.name}</td>
+          //         <td><span className={importClass.elem("file-status").mod({ uploading: true })} /></td>
+          //       </tr>
+          //     ))}
+          //     {files.uploaded.map(file => (
+          //       <tr key={file.file}>
+          //         <td>{file.file}</td>
+          //         <td><span className={importClass.elem("file-status")} /></td>
+          //         <td>{file.size}</td>
+          //       </tr>
+          //     ))}
+          //   </tbody>
+          // </table>
+
+            <table style={{ width: '140%', marginTop: '30px' }}>
+              <thead>
+                <tr>
+                  <th style={{ 
+                    fontWeight: 'normal',
+                    fontSize: '1em',
+                    padding: '8px',
+                    textAlign: 'left',
+                    borderBottom: '2px solid #e5e5e5',
+                    backgroundColor: '#F2F2F2',
+                  }}>File Name</th>
+                  <th style={{ 
+                    fontWeight: 'normal',
+                    fontSize: '1em',
+                    padding: '8px',
+                    textAlign: 'left',
+                    borderBottom: '2px solid #e5e5e5',
+                    backgroundColor: '#F2F2F2',
+                  }}>File Type</th>
+                  <th style={{ 
+                    fontWeight: 'normal',
+                    fontSize: '1em',
+                    padding: '8px',
+                    textAlign: 'left',
+                    borderBottom: '2px solid #e5e5e5',
+                    backgroundColor: '#F2F2F2',
+                  }}>Status</th>
+                  <th style={{ 
+                    fontWeight: 'normal',
+                    fontSize: '1em',
+                    padding: '8px',
+                    textAlign: 'left',
+                    borderBottom: '2px solid #e5e5e5',
+                    backgroundColor: '#F2F2F2',
+                  }}>File Preview</th>
+                  <th style={{ 
+                    fontWeight: 'normal',
+                    fontSize: '1em',
+                    padding: '8px',
+                    textAlign: 'left',
+                    borderBottom: '2px solid #e5e5e5',
+                    backgroundColor: '#F2F2F2',
+                  }}>Action</th>
+                </tr>
+              </thead>
               <tbody>
                 {files.uploading.map((file, idx) => (
                   <tr key={`${idx}-${file.name}`}>
-                    <td>{file.name}</td>
-                    <td><span className={importClass.elem("file-status").mod({ uploading: true })} /></td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>{file.name}</td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>{getFileExtension(file.name)}</td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>
+                      <span className={importClass.elem("file-status").mod({ uploading: true })} />
+                    </td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>File Preview Here</td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>
+                      {/* <button onClick={() => handleDeleteFile(file)}>Delete</button> */}
+                      <button>Delete</button>
+                    </td>
                   </tr>
                 ))}
                 {files.uploaded.map(file => (
                   <tr key={file.file}>
-                    <td>{file.file}</td>
-                    <td><span className={importClass.elem("file-status")} /></td>
-                    <td>{file.size}</td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>{file.file}</td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>{getFileExtension(file.file)}</td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>Imported</td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>File Preview Here</td>
+                    <td style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #e5e5e5',
+                      textAlign: 'left',
+                    }}>
+                      <button>Delete</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
           )}
         </Upload>
       </main>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

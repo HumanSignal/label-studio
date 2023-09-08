@@ -38,24 +38,67 @@ body {
     padding: 0 32px
   button
     line-height: 1em
+    border-width: 2px;
+    border-color: deepskyblue
+    color: deepskyblue
   > header
     font-size: 14px
     padding: 24px 32px
     background: white
-    // border-bottom: 1px solid rgba(0, 0, 0, 0.05)
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05)
     display: flex
+    margin: 0px 85%
+    flex-direction: column
+
     align-items: center
     &.overlay
       box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1)
+
+  &__upload-container
+    display: flex
+    align-items: center
+    border: 1px solid #e5e5e5
+    border-radius: 5px
+    padding: 10px
+    will-change: width
+    width: 900px
+    height: 300px
+    margin-bottom: 30px
+    justify-content: center
+    border-radius: 5px 5px 5px 5px
+    border-width: 3px
+    border-style: dotted
+    border-color: dimgrey
+
+  &__url-container
+    display: flex
+    align-items: center
+    border: 1px solid #e5e5e5
+    border-radius: 5px
+    padding: 10px
+    will-change: width
+    width: 900px
+    margin-bottom: 30px
+    justify-content: center
+  
+  &__button-container
+    display: flex
+    align-items: center
+    margin: 5px
   &__url-form
     display: flex
+    align-items: center
     input
       line-height: 1em
-      width: 320px
+      width: 672px
       border-radius: 5px 0 0 5px
     button
-      margin-left: -1px
-      border-radius: 0 5px 5px 0
+      border-radius: 5px 5px 5px 5px
+      border-color: cornflowerblue
+      border-width: 2px
+      border-style: outset
+      color: cornflowerblue
+      margin-left:  10px
     & + span
       margin: 0 16px
       color: $grey_7
@@ -75,9 +118,23 @@ body {
     background-size: 100% 20px, 100% 5px;
     background-attachment: local, scroll;
 
-  table
-    td
-      padding: 8px 32px 8px 0
+  &__table
+    width: 140%
+    marginTop: 30px
+
+  &__th
+    font-weight: normal;
+    font-size: 1em;
+    padding: 8px;
+    text-align: left;
+    border-bottom: 2px solid #e5e5e5;
+    background-color: #F2F2F2;
+
+  &__td
+    padding: 8px;
+    border-bottom: 1px solid #e5e5e5;
+    text-align: left;
+
   &__file-status
     background: $green_4
     border: 1px solid $green_6
@@ -155,10 +212,17 @@ body {
 /* Import files via dropzone */
 
 .dropzone
-  padding: 32px
+  padding: 0px
   margin: 0
   min-height: 100%
-  position: relative
+  max-width: 100%
+  position: absolute
+
+  &__table-container
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 20px;
 
   &_hovered
     opacity: 0.5
@@ -182,7 +246,7 @@ body {
     display: flex
     flex-direction: column
     align-items: center
-    opacity: 0.7
+    opacity: 1.7
 
     > *:not(:first-child)
       margin-top: 32px
@@ -205,7 +269,7 @@ body {
 
       dt:last-of-type,
       dd:last-of-type
-        margin-top: 20px
+        margin-top: 0px
 
 /* Loading */
 

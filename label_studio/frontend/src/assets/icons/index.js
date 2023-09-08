@@ -30,3 +30,8 @@ export { default as IconSpark } from './spark.svg';
 export { default as IconQuestion } from './question.svg';
 export { default as IconDone } from './done.svg';
 export { default as IconTime } from './time.svg';
+export { default as IconWarning } from './warning.svg';
+export { default as IconUploadfiles } from './uploadfiles.svg';
+export { default as IconLink } from './link.svg';
+export { default as IconGreentech } from './greentech.svg';
+export { default as IconDoneimport } from './doneimport.svg';

@@ -77,10 +77,10 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
         {!templates && <Spinner style={{ width: "100%", height: 200 }} />}
         <TemplatesInGroup templates={templates || []} group={selected} onSelectRecipe={onSelectRecipe} />
       </main>
-      <footer>
+      {/* <footer>
         <IconInfo className={listClass.elem("info-icon")} width="20" height="20" />
         See the documentation to <a href="https://labelstud.io/guide" target="_blank">contribute a template</a>.
-      </footer>
+      </footer> */}
     </div>
   );
 };

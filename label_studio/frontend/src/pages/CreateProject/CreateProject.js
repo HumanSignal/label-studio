@@ -17,6 +17,7 @@ import { Caption } from '../../components/Caption/Caption';
 import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
 import { createURL } from '../../components/HeidiTips/utils';
 import { TiMinus, TiPlus } from 'react-icons/ti';
+import { IconWarning } from '../../assets/icons';
 
 
 
@@ -25,10 +26,13 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
     <div className="field field--wide">
       <label htmlFor="project_name">Project Name</label>
       <input name="name" id="project_name" value={name} onChange={e => setName(e.target.value)} onBlur={onSaveName} />
+      <p style={{ fontSize: 'xx-small', color: 'tomato', display: 'flex', alignItems: 'center' }}>
+        <IconWarning style={{ fontSize: 'xx-small', verticalAlign: 'middle' }} /> Project names should be unique
+      </p>
       {error && <span className="error">{error}</span>}
     </div>
     <div className="field field--wide">
-      <label htmlFor="project_description">Description</label>
+      <label htmlFor="project_description">Projet Description (Optional)</label>
       <textarea
         name="description"
         id="project_description"
@@ -62,6 +66,9 @@ export const CreateProject = ({ onClose }) => {
   const [step, setStep] = React.useState("name"); // name | import | config
   const [waiting, setWaitingStatus] = React.useState(false);
 
+
+
+
   const project = useDraftProject();
   const history = useHistory();
   const api = useAPI();
@@ -85,8 +92,8 @@ export const CreateProject = ({ onClose }) => {
   const tabClass = rootClass.elem("tab");
   const steps = {
     name: <span className={tabClass.mod({ disabled: !!error })}>Project Information</span>,
-    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Import Files</span>,
     config: "Config Template",
+    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Import Files</span>,
   };
 
   // name intentionally skipped from deps:
@@ -199,7 +206,7 @@ export const CreateProject = ({ onClose }) => {
             }}>
               <div className="project-create" onClick={() => toggleForm(stepKey)} style={{
                 backgroundColor: '#5a585800',
-                padding: '10px',
+                padding: '1px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -207,7 +214,7 @@ export const CreateProject = ({ onClose }) => {
                 width: '93%',
                 margin: '0 3%',
               }}>
-                <h4>{stepValue}</h4>
+                <h4 style={{ fontSize: 'large' }}>{stepValue}</h4>
                 {step === stepKey ? <TiMinus className='expand-icon' /> : <TiPlus className='expand-icon' />}
               </div>
               {step === stepKey && (
@@ -226,12 +233,6 @@ export const CreateProject = ({ onClose }) => {
                       />
                     </div>
                   )}
-                  {stepKey === 'import' && (
-                    <div >
-                      <ImportPage project={project} show={step === "import"} {...pageProps} />
-                    </div>
-                  )}
-
                   {stepKey === 'config' && (
                     <div>
                       <ConfigPage
@@ -241,6 +242,13 @@ export const CreateProject = ({ onClose }) => {
                         columns={columns}
                         disableSaveButton={true}
                       />
+                    </div>
+
+                  )}
+
+                  {stepKey === 'import' && (
+                    <div >
+                      <ImportPage project={project} show={step === "import"} {...pageProps} />
                     </div>
                   )}
                 </div>

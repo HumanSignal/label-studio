@@ -8,6 +8,7 @@ export const useDraftProject = () => {
   const fetchDraftProject = React.useCallback(async () => {
     const response = await api.callApi('projects');
 
+
     // always create the new one
     const projects = response?.results ?? [];
     const lastIndex = projects.length;
