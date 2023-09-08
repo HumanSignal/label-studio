@@ -1,13 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import types
-from core.utils.common import int_from_request
-from core.utils.params import bool_from_request
-from core.utils.io import validate_upload_url
-from core.utils.exceptions import InvalidUploadUrlError
-from core.utils.exceptions import LabelStudioAPIException
 
+import pytest
+from core.utils.common import int_from_request
+from core.utils.exceptions import InvalidUploadUrlError, LabelStudioAPIException
+from core.utils.io import validate_upload_url
+from core.utils.params import bool_from_request
 from rest_framework.exceptions import ValidationError
 
 
@@ -30,7 +29,7 @@ def test_core_bool_from_request(param, result):
         error = False
         try:
             bool_from_request(params, 'test', 0)
-        except:
+        except:  # noqa: E722
             error = True
 
         assert error
@@ -69,7 +68,7 @@ def test_core_int_from_request(param, result):
 
 @pytest.mark.django_db
 def test_user_info(business_client):
-    from label_studio.server import _get_user_info, _create_user
+    from label_studio.server import _create_user, _get_user_info
 
     user_data = _get_user_info(business_client.admin.email)
     assert 'token' in user_data
@@ -184,5 +183,5 @@ def test_core_validate_upload_url(url, block_local_urls, raises_exc):
         assert validate_upload_url(url, block_local_urls=block_local_urls) is None
         return
 
-    with pytest.raises(raises_exc) as e:
+    with pytest.raises(raises_exc):
         validate_upload_url(url, block_local_urls=block_local_urls)

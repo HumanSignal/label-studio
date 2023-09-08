@@ -4,7 +4,6 @@
 Main module with the bulk_update function.
 """
 import itertools
-
 from collections import defaultdict
 
 from django.db import connections, models
@@ -37,11 +36,11 @@ def _as_sql(obj, field, query, compiler, connection):
     return value, placeholder
 
 
-def flatten(l, types=(list, float)):
+def flatten(l, types=(list, float)):  # noqa: E741
     """
     Flat nested list of lists into a single list.
     """
-    l = [item if isinstance(item, types) else [item] for item in l]
+    l = [item if isinstance(item, types) else [item] for item in l]  # noqa: E741
     return [item for sublist in l for item in sublist]
 
 

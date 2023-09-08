@@ -1,13 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
-import os
 import datetime
+import os
 
-from users.models import User
-from projects.models import Project
-from label_studio.tests.test_data.gen_tasks_and_annotations import gen_tasks
+import pytest
 from django.conf import settings
+from projects.models import Project
+from users.models import User
+
+from label_studio.tests.test_data.gen_tasks_and_annotations import gen_tasks
 
 
 @pytest.mark.django_db

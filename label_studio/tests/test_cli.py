@@ -1,10 +1,10 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import pytest
-
 from server import _create_user
+from tests.utils import make_annotation, make_project, make_task
+
 from label_studio.core.argparser import parse_input_args
-from tests.utils import make_project, make_task, make_annotation
 
 
 @pytest.mark.django_db

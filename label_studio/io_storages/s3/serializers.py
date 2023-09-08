@@ -2,12 +2,11 @@
 """
 import os
 
-from rest_framework.exceptions import ValidationError
+from botocore.exceptions import ClientError, ParamValidationError
+from io_storages.s3.models import S3ExportStorage, S3ImportStorage
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
-from rest_framework.mixins import UpdateModelMixin
-from botocore.exceptions import ParamValidationError, ClientError
-from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
-from io_storages.s3.models import S3ImportStorage, S3ExportStorage
+from rest_framework.exceptions import ValidationError
 
 
 class S3ImportStorageSerializer(ImportStorageSerializer):

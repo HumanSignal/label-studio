@@ -1,50 +1,47 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import base64
-import time
-import requests
-import logging
-import drf_yasg.openapi as openapi
 import json
+import logging
 import mimetypes
+import time
+from urllib.parse import unquote, urlparse
 
-
+import drf_yasg.openapi as openapi
+from core.feature_flags import flag_set
+from core.permissions import ViewClassPermission, all_permissions
+from core.redis import start_job_async_or_sync
+from core.utils.common import retry_database_locked, timeit
+from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
+from core.utils.params import bool_from_request, list_of_strings_from_request
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect
-from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
+from projects.models import Project, ProjectImport, ProjectReimport
+from ranged_fileresponse import RangedFileResponse
 from rest_framework import generics, status
-from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 from rest_framework.views import APIView
-from urllib.parse import unquote, urlparse
-from ranged_fileresponse import RangedFileResponse
-
-from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import retry_database_locked, timeit
-from core.utils.params import list_of_strings_from_request, bool_from_request
-from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
-from core.redis import start_job_async_or_sync
-from core.feature_flags import flag_set
+from tasks.models import Prediction, Task
 from users.models import User
-from projects.models import Project, ProjectImport, ProjectReimport
-from tasks.models import Task, Prediction
-from .uploader import load_tasks, create_file_uploads
-from .serializers import ImportApiSerializer, FileUploadSerializer, PredictionSerializer
-from .models import FileUpload
+from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
+
 from .functions import (
     async_import_background,
-    set_import_background_failure,
-    reformat_predictions,
     async_reimport_background,
+    reformat_predictions,
+    set_import_background_failure,
     set_reimport_background_failure,
 )
-
-from webhooks.utils import emit_webhooks_for_instance
-from webhooks.models import WebhookAction
+from .models import FileUpload
+from .serializers import FileUploadSerializer, ImportApiSerializer, PredictionSerializer
+from .uploader import create_file_uploads, load_tasks
 
 logger = logging.getLogger(__name__)
 
@@ -208,7 +205,7 @@ class ImportAPI(generics.CreateAPIView):
         parsed_data, file_upload_ids, could_be_tasks_list, found_formats, data_columns = load_tasks(request, project)
 
         if preannotated_from_fields:
-            # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
+            # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]
             parsed_data = reformat_predictions(parsed_data, preannotated_from_fields)
 
         if commit_to_project:

@@ -1,14 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import ujson as json
-
 from functools import reduce
 from operator import getitem
 from urllib.parse import urlparse
-from django.conf import settings
-from rest_framework.exceptions import ValidationError
+
+import ujson as json
 from core.label_config import replace_task_data_undefined_with_config_field
+from rest_framework.exceptions import ValidationError
 
 
 class SkipField(Exception):

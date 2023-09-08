@@ -1,21 +1,20 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import ujson as json
-import time
 import logging
-
+import time
 from uuid import uuid4
-from django.http import HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
-from django.core.handlers.base import BaseHandler
-from django.core.exceptions import MiddlewareNotUsed
-from django.middleware.common import CommonMiddleware
-from django.contrib.auth import logout
-from django.conf import settings
 
+import ujson as json
+from core.utils.contextlog import ContextLog
+from django.conf import settings
+from django.contrib.auth import logout
+from django.core.exceptions import MiddlewareNotUsed
+from django.core.handlers.base import BaseHandler
+from django.http import HttpResponsePermanentRedirect
+from django.middleware.common import CommonMiddleware
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import escape_leading_slashes
 from rest_framework.permissions import SAFE_METHODS
-from core.utils.contextlog import ContextLog
 
 logger = logging.getLogger(__name__)
 
@@ -115,10 +114,10 @@ class ContextLogMiddleware(CommonMiddleware):
         body = None
         try:
             body = json.loads(request.body)
-        except:
+        except:  # noqa: E722
             try:
                 body = request.body.decode('utf-8')
-            except:
+            except:  # noqa: E722
                 pass
 
         if 'server_id' not in request:

@@ -1,20 +1,18 @@
+import json
+import logging
 import os
 import sys
-import logging
-import json
-
-from django.conf import settings
 
 from core.models import AsyncMigrationStatus
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
+from data_export.mixins import ExportMixin
 from data_export.models import DataExport
 from data_export.serializers import ExportDataSerializer
+from django.conf import settings
 from organizations.models import Organization
 from projects.models import Project
-from tasks.models import Task, Annotation, Prediction
-from data_export.mixins import ExportMixin
-
+from tasks.models import Annotation, Prediction, Task
 
 logger = logging.getLogger(__name__)
 
@@ -140,14 +138,24 @@ def fill_annotations_project():
     logger.info('Finished filling project field for Annotation model')
 
 
-def _fill_predictions_project(project_id):
-    Prediction.objects.filter(task__project_id=project_id).update(project_id=project_id)
-
-
-def fill_predictions_project():
-    logger.info('Start filling project field for Prediction model')
+def _fill_predictions_project(migration_name='0043_auto_20230825'):
     projects = Project.objects.all()
     for project in projects:
-        start_job_async_or_sync(_fill_predictions_project, project.id)
+        migration = AsyncMigrationStatus.objects.create(
+            project=project,
+            name=migration_name,
+            status=AsyncMigrationStatus.STATUS_STARTED,
+        )
 
+        updated_count = Prediction.objects.filter(task__project_id=project.id).update(project_id=project.id)
+
+        migration.status = AsyncMigrationStatus.STATUS_FINISHED
+        migration.meta = {'predictions_processed': updated_count, 'total_project_predictions': project.predictions.count()}
+        migration.save()
+
+
+
+def fill_predictions_project(migration_name):
+    logger.info('Start filling project field for Prediction model')
+    start_job_async_or_sync(_fill_predictions_project, migration_name=migration_name)
     logger.info('Finished filling project field for Prediction model')

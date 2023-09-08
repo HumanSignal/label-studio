@@ -6,6 +6,7 @@ html {
   --color-purple-100: #D660FF;
   --color-purple-90: #DD7DFF;
   --color-purple-30: #F5D8FF;
+  --color-purple-0: #FBF2FC;
 
   --color-orange-90: #FF8267;
   --color-orange-30: #FFDAD1;
@@ -1012,6 +1013,18 @@ main {
   padding: 0.6em;
 }
 
+.content-markdown .noheader table thead {
+  display: none;
+}
+
+.content-markdown .rowheader td:first-child {
+    font-weight: bold;
+}
+
+.content-markdown .noheader table tbody {
+    border-top: 1px var(--color-gray-200) solid;
+}
+
 .content-markdown img {
   max-width: 100%;
   height: auto;
@@ -1026,6 +1039,7 @@ main {
   margin: 3em 0;
   border: 1px var(--color-gray-100) solid;
 }
+
 
 .content-markdown .admonition {
   --color-border: var(--color-gray-200);
@@ -1071,6 +1085,13 @@ main {
   --color-title: var(--color-white);
   --color-title-background: var(--color-yellow-100);
   --color-background: var(--color-yellow-5);
+}
+
+.content-markdown .admonition.info {
+  --color-border: var(--color-purple-90);
+  --color-title: var(--color-white);
+  --color-title-background: var(--color-purple-90);
+  --color-background: var(--color-purple-0);
 }
 
 .content-markdown .admonition.enterprise {

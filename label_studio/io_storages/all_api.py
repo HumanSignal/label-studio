@@ -2,20 +2,19 @@
 """
 import logging
 
-from django.conf import settings
-from rest_framework import generics
-from rest_framework.views import APIView
 from core.permissions import all_permissions
+from django.conf import settings
+from django.utils.decorators import method_decorator
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from rest_framework.views import APIView
 
 from label_studio.core.utils.common import load_func
-from .azure_blob.serializers import AzureBlobImportStorageSerializer
-from .gcs.serializers import GCSImportStorageSerializer
-from .localfiles.api import LocalFilesImportStorageListAPI, LocalFilesExportStorageListAPI
+
+from .localfiles.api import LocalFilesExportStorageListAPI, LocalFilesImportStorageListAPI
 
 logger = logging.getLogger(__name__)
 # TODO: replace hardcoded apps lists with search over included storage apps
@@ -90,9 +89,9 @@ class AllImportStorageListAPI(generics.ListAPIView):
             response = view(request._request, *args, **kwargs)
             payload = response.data
             if not isinstance(payload, list):
-                raise ValueError(f'Response is not list')
+                raise ValueError('Response is not list')
             return response.data
-        except Exception as exc:
+        except Exception:
             logger.error(f"Can't process {api.__class__.__name__}", exc_info=True)
             return []
 
