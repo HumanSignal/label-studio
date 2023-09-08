@@ -103,7 +103,7 @@ jobs:
                     return [true, `${submodule.repo}: ${before} from ${targetBranch} is not found in submodule ${submoduleBranch} branch`]
                 }
             
-                return [compare.behind_by > 0, `${after} is ${compare.ahead_by} ahead and ${compare.behind_by} behind ${before}: ${compare.html_url}`]
+                return [compare.behind_by === 0, `${after} is ${compare.ahead_by} ahead and ${compare.behind_by} behind ${before}: ${compare.html_url}`]
             }
             
             const strictCheck = strictCheckBranchPrefixes.some(e => targetBranch.startsWith(e))
