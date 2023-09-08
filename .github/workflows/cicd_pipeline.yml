@@ -91,6 +91,15 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
+  ruff:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: ./.github/workflows/ruff.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
   build-frontend:
     name: "Build"
     needs:
@@ -385,3 +394,22 @@ jobs:
       ref: ${{ github.ref_name }}
       release-id: ${{ needs.draft-release.outputs.id }}
     secrets: inherit
+
+  check_gate:
+    name: "Ready to merge"
+    if: always()
+    needs:
+      - gitleaks
+      - bandit
+      - ruff
+      - pytest
+      - migrations
+      - conda-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          allowed-failures:
+          allowed-skips: gitleaks, bandit, ruff, pytest, migrations, conda-test
+          jobs: ${{ toJSON(needs) }}
