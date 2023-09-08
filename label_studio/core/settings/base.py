@@ -9,13 +9,13 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import json
+import logging
 import os
 import re
-import logging
-import json
-
 from datetime import timedelta
-from label_studio.core.utils.params import get_bool_env, get_env
+
+from label_studio.core.utils.params import get_bool_env
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -75,7 +75,7 @@ if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 
 from label_studio.core.utils.io import get_data_dir
-from label_studio.core.utils.params import get_bool_env, get_env, get_env_list_int
+from label_studio.core.utils.params import get_bool_env, get_env
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -169,7 +169,7 @@ if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
             'client': client,
         }
         LOGGING['root']['handlers'].append('google_cloud_logging')
-    except GoogleAuthError as e:
+    except GoogleAuthError:
         logger.exception('Google Cloud Logging handler could not be setup.')
 
 INSTALLED_APPS = [
@@ -188,7 +188,6 @@ INSTALLED_APPS = [
     'rules',
     'annoying',
     'rest_framework',
-    'rest_framework_swagger',
     'rest_framework.authtoken',
     'drf_generators',
     'core',

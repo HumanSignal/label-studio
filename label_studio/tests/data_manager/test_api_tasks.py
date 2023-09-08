@@ -1,10 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
 
-from ..utils import make_task, make_annotation, make_prediction, project_id
+import pytest
 from projects.models import Project
+
+from ..utils import make_annotation, make_prediction, make_task, project_id  # noqa
 
 
 @pytest.mark.django_db

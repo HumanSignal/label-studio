@@ -2,20 +2,18 @@
 """
 import datetime
 
-from django.utils import timezone
+from core.utils.common import load_func
 from django.conf import settings
-from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django.utils.translation import gettext_lazy as _
-from django.dispatch import receiver
+from django.db import models
 from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from organizations.models import Organization
 from rest_framework.authtoken.models import Token
-
-from organizations.models import OrganizationMember, Organization
 from users.functions import hash_upload
-from core.utils.common import load_func
-from projects.models import Project
 
 YEAR_START = 1980
 YEAR_CHOICES = []

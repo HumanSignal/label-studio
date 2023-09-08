@@ -2,9 +2,9 @@
 """
 import json
 import random
-
 from uuid import uuid4
-from locust import HttpUser, TaskSet, task, between
+
+from locust import HttpUser, TaskSet, between, task
 
 
 class UserWorksWithProject(TaskSet):
@@ -54,7 +54,7 @@ class UserWorksWithProject(TaskSet):
         self.client.get('/projects/%i/experts' % self.project_id, name='/projects/<id>/experts')
 
     @task(5)
-    def expert_page(self):
+    def expert_page(self):  # noqa: F811
         self.client.get('/projects/%i/experts' % self.project_id, name='/projects/<id>/experts')
 
     @task(5)
@@ -106,7 +106,7 @@ class WebsiteUser(HttpUser):
             'password': '12345678',
             'title': username.upper()
         }
-        r = self.client.post('/user/signup', payload, headers={'X-CSRFToken': csrftoken})
+        self.client.post('/user/signup', payload, headers={'X-CSRFToken': csrftoken})
         response = self.client.get('/api/current-user/token').json()
         self.client.token = response['detail']
         self.client.name = username

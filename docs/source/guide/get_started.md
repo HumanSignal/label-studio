@@ -24,7 +24,7 @@ Label Studio is an open source data labeling tool that supports multiple project
 
 - Integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html).
 
-Label Studio is also available an [Enterprise cloud service](https://heartex.com/) with enhanced security (SSO, RBAC, SOC2), team management features, analytics & reporting, and support SLAs. A [free trial is available](https://heartex.com/free-trial) to get started quickly and explore the enterprise cloud product.
+Label Studio is also available an [Enterprise cloud service](https://heartex.com/) with enhanced security (SSO, RBAC, SOC2), team management features, analytics & reporting, and support SLAs. A [free trial is available](https://humansignal.com/free-trial) to get started quickly and explore the enterprise cloud product.
 
 <div class="opensource-only">
 

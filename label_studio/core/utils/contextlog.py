@@ -1,21 +1,22 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import calendar
+import io
+import json
 import logging
 import os
-import sys
-import io
-import requests
-import calendar
-import threading
-import json
 import platform
-
+import sys
+import threading
 from datetime import datetime
 from uuid import uuid4
-from .common import get_app_version, get_client_ip
-from .params import get_bool_env
-from .io import get_config_dir, find_file
+
+import requests
 from django.conf import settings
+
+from .common import get_app_version, get_client_ip
+from .io import find_file, get_config_dir
+from .params import get_bool_env
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ class ContextLog(object):
     def _get_response_content(self, response):
         try:
             return json.loads(response.content)
-        except:
+        except:  # noqa: E722
             return
 
     def _assert_field_in_test(self, field, payload, view_name):
@@ -201,7 +202,7 @@ class ContextLog(object):
             if get_bool_env('TEST_ENVIRONMENT', False):
                 pass
             elif get_bool_env('DEBUG_CONTEXTLOG', False):
-                logger.debug(f'In DEBUG mode, contextlog is not sent.')
+                logger.debug('In DEBUG mode, contextlog is not sent.')
                 logger.debug(json.dumps(payload, indent=2))
             else:
                 thread = threading.Thread(target=self.send_job, args=(request, response, body))
@@ -272,11 +273,11 @@ class ContextLog(object):
     def send_job(self, request, response, body):
         try:
             payload = self.create_payload(request, response, body)
-        except:
+        except:  # noqa: E722
             pass
         else:
             try:
                url = 'https://tele.labelstud.io'
                requests.post(url=url, json=payload, timeout=3.0)
-            except:
+            except:  # noqa: E722
                 pass
