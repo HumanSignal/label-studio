@@ -1,15 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
 import logging
 
-from datetime import datetime
 from django import forms
-from django.contrib import auth
 from django.conf import settings
-
+from django.contrib import auth
 from users.models import User
-
 
 EMAIL_MAX_LENGTH = 256
 PASS_MAX_LENGTH = 64

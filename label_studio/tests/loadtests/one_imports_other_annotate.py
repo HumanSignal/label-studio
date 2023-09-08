@@ -1,11 +1,11 @@
 import os
 import random
 import string
-import pandas as pd
-import numpy as np
-
 from uuid import uuid4
-from locust import HttpUser, between, constant, task, tag, events
+
+import numpy as np
+import pandas as pd
+from locust import HttpUser, between, constant, events, tag, task
 
 
 def get_project_id(client):

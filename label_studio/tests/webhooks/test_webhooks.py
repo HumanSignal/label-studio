@@ -1,12 +1,11 @@
+import json
 from unittest import TestCase
 
 import pytest
-import json
-import requests_mock
 import requests
+import requests_mock
 from django.urls import reverse
 from projects.models import Project
-
 from webhooks.models import Webhook, WebhookAction
 from webhooks.utils import emit_webhooks, emit_webhooks_for_instance, run_webhook
 
@@ -68,7 +67,7 @@ def test_emit_webhooks(setup_project_dialog, organization_webhook):
 @pytest.mark.django_db
 def test_emit_webhooks_for_instance(setup_project_dialog, organization_webhook):
     webhook = organization_webhook
-    project_title = f'Projects 1'
+    project_title = 'Projects 1'
     project = Project.objects.create(title=project_title)
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)

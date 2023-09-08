@@ -1,13 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from os.path import join
+
 from django.conf import settings
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.urls import path, re_path
 from django.views.static import serve
 from rest_framework import routers
-
-from users import views, api
+from users import api, views
 
 router = routers.DefaultRouter()
 router.register(r'users', api.UserAPI, basename='user')

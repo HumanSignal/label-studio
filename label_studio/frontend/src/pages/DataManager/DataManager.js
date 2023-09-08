@@ -114,7 +114,7 @@ export const DataManagerPage = ({ ...props }) => {
     if (interactiveBacked) {
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
-        const ids = group.map(r => r.id);
+        const ids = group.map(r => r.cleanId);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
         const suggestionsRequest = api.callApi("mlInteractive", {
@@ -130,7 +130,7 @@ export const DataManagerPage = ({ ...props }) => {
             return response.data.result;
           }
 
-          return [];
+          return null;
         });
       });
     }
