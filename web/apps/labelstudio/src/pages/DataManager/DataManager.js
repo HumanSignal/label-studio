@@ -16,6 +16,7 @@ import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
 import DM from "@humansignal/datamanager";
+import Editor from "@humansignal/editor";
 import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
@@ -62,8 +63,8 @@ export const DataManagerPage = ({ ...props }) => {
   const history = useHistory();
   const api = useAPI();
   const { project } = useProject();
-  const LabelStudio = useLibrary('lsf');
-  const DataManager = useLibrary('dm');
+  const LabelStudio = Editor;
+  const DataManager = DM;
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const dataManagerRef = useRef();

@@ -1,11 +1,4 @@
 {
-  "extends": [
-    "plugin:@nx/react", "../../.eslintrc.json",
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "ignorePatterns": ["!**/*"],
   "env": {
     "browser": true,
     "es2021": true
@@ -15,6 +8,12 @@
     "__dirname": true,
     "APP_SETTINGS": true
   },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "../../.eslintrc.json"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -89,19 +88,5 @@
       "named": "never",
       "asyncArrow": "always"
     }]
-  },
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.ts", "*.tsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.js", "*.jsx"],
-      "rules": {}
-    }
-  ]
+  }
 }
