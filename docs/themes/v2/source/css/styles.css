@@ -870,15 +870,10 @@ main {
   color: var(--color-white);
 }
 
-.Tertiary {
-  background-color: #fff;
-  color: var(--color-gray-900);
-  border: 0;
-}
-
 .Tertiary:hover {
-  background-color: var(--color-gray-900);
-  color: var(--color-white);
+  background-color: var(--color-white);
+  color: var(--color-gray-900);
+  border-color: var(--color-gray-900);
 }
 
 .WithIcon {
@@ -995,7 +990,7 @@ main {
 }
 
 .toc-enterprise-cta-copy {
-  max-width: 12ch;
+  max-width: 16ch;
 }
 
 /****************************
