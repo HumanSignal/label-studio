@@ -37,26 +37,15 @@ export const ProjectsPage = () => {
   const openModal = setModal.bind(null, true);
   const closeModal = setModal.bind(null, false);
   const [searchQuery, setSearchQuery] = useState('');
-
-
-
-
-
-
-
-  const fetchProjects = async (page = currentPage, pageSize = defaultPageSize) => {
+  
+  const fetchProjects = async () => {
     setNetworkState('loading');
     abortController.renew(); // Cancel any in flight requests
 
-
     const requestParams = {
-      page,
-      page_size: pageSize,
+      page: 1,
+      page_size: 9999,
     };
-
-
-
-
 
     if (isFF(FF_DEV_2575)) {
       requestParams.include = [
@@ -97,7 +86,7 @@ export const ProjectsPage = () => {
             'ground_truth_number',
             'finished_task_number',
           ].join(','),
-          page_size: pageSize,
+          page_size: data.count,
         },
         signal: abortController.controller.current.signal,
         errorFilter: (e) => e.error.includes('aborted'),
@@ -135,23 +124,13 @@ export const ProjectsPage = () => {
   React.useEffect(() => {
     // there is a nice page with Create button when list is empty
     // so don't show the context button in that case
-    setContextProps({ openModal, showButton: projectsList.length > 0 });
-  }, [projectsList.length]);
+    setContextProps({ openModal, showButton: projectsList.length > 0, searchQuery, setSearchQuery });
+  }, [projectsList.length, searchQuery, setSearchQuery]);
 
   const pageTitle = "Create a New Projects";
   const pageDescription = "Set up tasks and import photos, videos, text, and audio to annotate";
   const showCreateButton = projectsList.length > 0;
-  // const pageSize = 11;
-  // const totalPages = Math.ceil(projectsList.length / pageSize);
-  // Inside the render method
-
-  // const filteredProjects = projectsList.filter((project) =>
-  //   project.title.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
-
-
-
-
+  
   return (
     <Block name="projects-page">
       <Oneof value={networkState}>
@@ -216,27 +195,6 @@ ProjectsPage.context = ({ showButton, searchQuery, setSearchQuery }) => {
   );
 };
 
-
-// ProjectsPage.context = ({ showButton }) => {
-//   const [searchQuery, setSearchQuery] = useState('');
-
-//   if (!showButton) return null;
-//   return (
-//     <div className="context-area" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-//       {/* Search Box */}
-//       <input
-//         className='input-context'
-//         type="text"
-//         placeholder="Search..."
-//         style={{ width: '600px', borderRadius: '10px', marginright: '100px', padding: '10px' }}
-//         value={searchQuery}
-//         onChange={(e) => console.log(e.target.value)}
-//       />
-//     </div>
-
-//   );
-// };
-
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
 ProjectsPage.routes = ({ store }) => [
@@ -248,8 +206,7 @@ ProjectsPage.routes = ({ store }) => [
     exact: true,
     component: () => {
       const params = useRouterParams();
-
-
+      
       return (
         <>
           <Redirect to={`/projects/${params.id}/data`} />

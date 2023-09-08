@@ -13,7 +13,7 @@ ApiContext.displayName = 'ApiContext';
 let apiLocked = false;
 
 const errorFormatter = (result) => {
-  const {response} = result;
+  const { response } = result;
   const isShutdown = String(response?.detail ?? result?.error) === 'Failed to fetch';
 
   return {
@@ -38,7 +38,7 @@ const handleError = async (response, showModal = true) => {
     return;
   }
 
-  const {isShutdown, ...formattedError} = errorFormatter(result);
+  const { isShutdown, ...formattedError } = errorFormatter(result);
 
   if (showModal) {
 
@@ -61,7 +61,7 @@ const handleError = async (response, showModal = true) => {
   return isShutdown;
 };
 
-export const ApiProvider = forwardRef(({children}, ref) => {
+export const ApiProvider = forwardRef(({ children }, ref) => {
   const [error, setError] = useState(null);
 
   const callApi = useCallback(async (method, { params = {}, errorFilter, ...rest } = {}) => {
