@@ -1,22 +1,62 @@
-{% extends 'users/new-ui/user_base.html' %}
+{% extends 'user_base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
 
-{% block user_content %}
-  <form id="login-form" action="{% url 'user-login' %}{% if next %}?next={{ next }}{% endif %}" method="post">
-    {% csrf_token %}
-    <p><input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}"></p>
-    <p><input type="password" class="ls-input" name="password" id="password" placeholder="Password"></p>
-    {% if form.non_field_errors %}
-      {% for error in form.non_field_errors %}
-        <p class="error">
-          {{ error }}
-        </p>
-      {% endfor %}
-    {% endif %}
-    <p>
-      <input type="checkbox" id="persist_session" name="persist_session" class="ls-checkbox" checked="checked" style="width: auto;" />
-      <label for="persist_session">Keep me logged in this browser</label>
-    </p>
-    <p><button type="submit" aria-label="Log In" class="ls-button ls-button_look_primary">Log in</button></p>
-  </form>
+{% block content %}
+<div class="container mx-auto h-full flex flex-col justify-center items-center">
+    <!-- Toggle Links -->
+    <div class="w-1/3 text-center mb-6">
+        {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+            <a href="{{ settings.HOSTNAME }}/user/signup" class="{% if 'signup' in request.path %}active{% endif %} mr-4">Sign up</a>
+            <a href="{{ settings.HOSTNAME }}/user/login" class="{% if 'login' in request.path %}active{% endif %}">Log in</a>
+        {% endif %}
+    </div>
 
+    <!-- Login Card -->
+    <div class="w-one-third">
+        <h1 class="font-hairline mb-6 text-center">Data Studio</h1>
+        <div class="border-teal p-8 border-t-12 bg-white mb-6 rounded-lg shadow-lg">
+            <div class="mb-4">
+                <label class="font-bold text-grey-darker block mb-2">Login to Your Data Studio Account</label>
+            </div>
+            <form id="login-form" action="{% url 'user-login' %}?{% if next %}&next={{ next }}{% endif %}{% if token %}&token={{ token }}{% endif %}" method="post">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="font-bold text-grey-darker block mb-2">Email</label>
+                    <input type="text" class="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow" name="email" id="email" placeholder="Your email" value="{{ form.data.email }}">
+                    {% if user_form.errors.email %}
+                        <ul class="field_errors">
+                            {% for error in user_form.errors.email %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="mb-4">
+                    <label class="font-bold text-grey-darker block mb-2">Password</label>
+                    <input type="password" class="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow" name="password" id="password" placeholder="Password">
+                    {% if user_form.errors.password %}
+                        <ul class="field_errors">
+                            {% for error in user_form.errors.password %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="flex mt-4">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" aria-label="Login">
+                        Log In
+                    </button>
+                </div>
+                <div class="mt-4">
+                    <p class="text-sm">By proceeding, you agree to the <a href="#" class="underline">Terms and Conditions</a> and <a href="#" class="underline">Privacy Policy</a>.</p>
+                </div>
+            </form>
+        </div>
+        <div class="text-center">
+            <p class="text-grey-dark text-sm">Don't have an account? <a href="{{ settings.HOSTNAME }}/user/signup" class="no-underline text-blue font-bold">Sign Up</a>.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

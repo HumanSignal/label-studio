@@ -10,7 +10,7 @@
 {% block content %}
 <div class="ls-global-error">
   <h1>Authentication Error</h1>
-  <img class="ls-global-error__heidi" src="{{ settings.HOSTNAME }}{% static 'images/opossum_broken.svg' %}" height="111" alt="Heidi's down" />
+  <img class="ls-global-error__heidi" src="{{ settings.HOSTNAME }}{% static 'images/slack.jpg' %}" height="111" alt="Heidi's down" />
   <h2>Authentication credentials were not provided</h2>
   {% autoescape off %}
   <div class="ls-global-error__details">{{ exception }}</div>

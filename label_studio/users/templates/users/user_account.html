@@ -151,7 +151,7 @@
       </header>
 
       <table>
-        <tr><td style="{% if user.allow_newsletters is None %}border: 1px red solid; border-radius: 5px{% endif %}">
+        <tr><td style="{% if user.allow_newsletters is None %} border: 1px red solid; border-radius: 5px {% endif %}">
 
           <input name="email" type="hidden" value="{{ user.email }}">
           <input name="first_name" type="hidden" value="{{ user.first_name }}">

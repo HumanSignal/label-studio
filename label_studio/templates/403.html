@@ -10,7 +10,7 @@
 {% block content %}
 <div class="ls-global-error">
   <h1>Server error</h1>
-  <img class="ls-global-error__heidi" src="{{ settings.HOSTNAME }}{% static 'images/opossum_broken.svg' %}" height="111" alt="Heidi's down" />
+  <img class="ls-global-error__heidi" src="{{ settings.HOSTNAME }}{% static 'images/slack.jpg' %}" height="111" alt="Heidi's down" />
   <h2>403 Forbidden</h2>
   {% autoescape off %}
   <div class="ls-global-error__details">{{ exception }}</div>

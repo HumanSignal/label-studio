@@ -13,6 +13,7 @@
   <meta name="theme-color" content="#272727"> <!-- Chrome, Firefox OS and Opera -->
   <meta name="msapplication-navbutton-color" content="#272727">  <!-- Windows Phone -->
   <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
   <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
   <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet"/>
@@ -22,7 +23,7 @@
   {% endblock %}
 </head>
 
-<body>
+<body class="bg-gray-100 h-screen font-sans">
 {% block content %}
 {% endblock %}
 
