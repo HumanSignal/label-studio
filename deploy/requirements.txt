@@ -36,7 +36,7 @@ djangorestframework==3.13.1
 drf-dynamic-fields==0.3.0
 drf-flex-fields==0.9.5
 drf-generators==0.3.0
--e git+https://github.com/HumanSignal/drf-yasg#egg=drf-yasg
+https://github.com/HumanSignal/drf-yasg/releases/download/1.21.7/drf_yasg-1.21.8.dev1+gda9d765-py3-none-any.whl
 expiringdict==1.2.2
 google-api-core==2.11.0
 google-auth==2.14.1
@@ -61,7 +61,6 @@ Jinja2==3.1.2
 jmespath==0.10.0
 joblib==1.3.2
 jsonschema==3.2.0
--e git+https://github.com/HumanSignal/label-studio.git@46b3fdef3c0e478bd9b72d5a58162bbacf2be33f#egg=label_studio
 label-studio-converter==0.0.54rc0
 label-studio-tools==0.0.3
 launchdarkly-server-sdk==7.5.0
