@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5526: Fix duplication of classifications in LLM scenario",
-  "commit": "15267194e255c5770a6be5a59ab5e3a0d451d498",
-  "branch": "master",
-  "date": "2023/09/08 01:47:14"
+  "message": "fix: LEAP-33: Fixes for labels by Taxonomy",
+  "commit": "db922ba6acd05e720dac03f56ea0b3a31d4eb639",
+  "branch": "fb-leap-33/taxonomy-labels",
+  "date": "2023/09/08 18:13:11"
 }
