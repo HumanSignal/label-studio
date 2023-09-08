@@ -36,7 +36,7 @@ django-ranged-fileresponse>=0.1.2
 drf_dynamic_fields==0.3.0
 djangorestframework==3.13.1
 drf-flex-fields==0.9.5
-https://github.com/HumanSignal/drf-yasg/archive/refs/tags/1.21.7.tar.gz
+git+https://github.com/HumanSignal/drf-yasg#egg=drf-yasg
 drf-generators==0.3.0
 htmlmin==0.1.12
 jsonschema==3.2.0
