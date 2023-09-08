@@ -23,7 +23,7 @@ venv/
 .env
 .envrc
 # web/static
-
+label_studio/frontend/dist/react-app
 deploy/license.txt
 deploy/logs/
 deploy/redis-data/
@@ -76,3 +76,7 @@ name_of_environment
 label_studio/frontend/dist/react-app/index.js
 label_studio/frontend/dist/react-app/index.js
 label_studio/frontend/dist/react-app/main.css
+label_studio/frontend/dist/react-app/index.js
+label_studio/frontend/dist/react-app/index.js.map
+label_studio/frontend/dist/react-app/main.css
+label_studio/frontend/dist/react-app/index.js

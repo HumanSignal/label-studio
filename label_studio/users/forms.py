@@ -59,6 +59,9 @@ class UserSignupForm(forms.Form):
     password = forms.CharField(max_length=PASS_MAX_LENGTH,
                                error_messages={'required': PASS_LENGTH_ERR},
                                widget=forms.TextInput(attrs={'type': 'password'}))
+    # re_password = forms.CharField(max_length=PASS_MAX_LENGTH,
+    #                                 error_messages={'required': PASS_LENGTH_ERR},
+    #                                 widget=forms.TextInput(attrs={'type': 'password'}))
     first_name = forms.CharField(max_length=30, required=True, label="First Name")
     last_name = forms.CharField(max_length=30, required=True, label="Last Name")
     allow_newsletters = forms.BooleanField(required=False)
@@ -67,8 +70,22 @@ class UserSignupForm(forms.Form):
         password = self.cleaned_data['password']
         if len(password) < PASS_MIN_LENGTH:
             raise forms.ValidationError(PASS_LENGTH_ERR)
+        # if password != self.cleaned_data['re_password']:
+        #     raise forms.ValidationError('Passwords do not match')
         return password
     
+    def clean_first_name(self):
+        first_name = self.cleaned_data['first_name']
+        if len(first_name) > DISPLAY_NAME_LENGTH:
+            raise forms.ValidationError(DISPLAY_NAME_LENGTH_ERR)
+        return first_name
+    
+    def clean_last_name(self):
+        last_name = self.cleaned_data['last_name']
+        if len(last_name) > DISPLAY_NAME_LENGTH:
+            raise forms.ValidationError(DISPLAY_NAME_LENGTH_ERR)
+        return last_name
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if username and User.objects.filter(username=username.lower()).exists():

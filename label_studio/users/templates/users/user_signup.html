@@ -41,45 +41,45 @@
               <label class="font-bold text-grey-darker block mb-2"
               >First Name</label
               >
+              {% if user_form.errors.first_name %}
+              <ul class="field_errors">
+                {% for error in user_form.errors.first_name %}
+                <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+
               <input
               type="text"
               class="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow"
               name="first_name"
               placeholder="First name"
               />
-              {% if "first_name" in user_form.errors %}
+              
               <ul class="field_errors">
-                {% for error in user_form.errors.first_name %}
+                
                 <li>{{ error }}</li>
-                {% endfor %}
-            {% else %}
-                user: {
-                    id: {{user.id}},
-                    firstName: "{{user.first_name}}",
-                }
-            {% endif %}
+                
         </div>
           <div class="w-1/2 ml-1">
             <label class="font-bold text-grey-darker block mb-2"
               >Last Name</label
             >
+            {% if user_form.errors.last_name %}
+            <ul class="field_errors">
+              {% for error in user_form.errors.last_name %}
+              <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
             <input
               type="text"
               class="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow"
               name="last_name"
               placeholder="Last name"
             />
-            {% if "last_name" in user_form.errors %}
+            
             <ul class="field_errors">
-              {% for error in user_form.errors.last_name %}
-              <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-            {% else %}
-            user: {
-                lastName: "{{user.last_name}}",
-            }
-            {% endif %}
           </div>
         </div>
         <div class="mb-4">
@@ -100,20 +100,15 @@
           {% endif %}
         </div>
         <div class="mb-4">
+          <label class="font-bold text-grey-darker block mb-2"
+            >Re-enter Password</label
+          >
             <input
             type="password"
             class="block appearance-none w-full bg-white border border-grey-light hover:border-grey px-2 py-2 rounded shadow"
             name="re_password"
             placeholder="Confirm Password"
             />
-            {% if user_form.data.password != user_form.data.re_password %}
-            <ul class="field_errors">
-              <li>Passwords do not match!</li>
-            </ul>
-            {% endif %}
-            <label class="font-bold text-grey-darker block mb-2"
-              >Re-enter Password</label
-            >
         </div>
         <div class="flex mt-4">
           <button
