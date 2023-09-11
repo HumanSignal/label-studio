@@ -90,14 +90,17 @@ class S3StorageMixin(models.Model):
         logger.debug('validate_connection')
         if client is None:
             client = self.get_client()
-        # we need to check path existence for Import storages only
-        if self.prefix and 'Export' not in self.__class__.__name__:
-            logger.debug(f'Test connection to bucket {self.bucket} with prefix {self.prefix}')
+        # TODO(jo): add check for write access for .*Export.* classes
+        is_export = 'Export' in self.__class__.__name__
+        if self.prefix:
+            logger.debug(f'[Class {self.__class__.__name__}]: Test connection to bucket {self.bucket} with prefix {self.prefix} using ListObjectsV2 operation')
             result = client.list_objects_v2(Bucket=self.bucket, Prefix=self.prefix, MaxKeys=1)
-            if not result.get('KeyCount'):
+            # We expect 1 key with the prefix for imports. For exports it's okay if there are 0 with the prefix.
+            expected_keycount = 0 if is_export else 1
+            if (keycount := result.get('KeyCount')) is None or keycount < expected_keycount:
                 raise KeyError(f'{self.url_scheme}://{self.bucket}/{self.prefix} not found.')
         else:
-            logger.debug(f'Test connection to bucket {self.bucket}')
+            logger.debug(f'[Class {self.__class__.__name__}]: Test connection to bucket {self.bucket} using HeadBucket operation')
             client.head_bucket(Bucket=self.bucket)
 
     @property
