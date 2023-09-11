@@ -405,11 +405,12 @@ jobs:
       - pytest
       - migrations
       - conda-test
+      - build-docker
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
           allowed-failures:
-          allowed-skips: gitleaks, bandit, ruff, pytest, migrations, conda-test
+          allowed-skips: gitleaks, bandit, ruff, pytest, migrations, conda-test, build-docker
           jobs: ${{ toJSON(needs) }}
