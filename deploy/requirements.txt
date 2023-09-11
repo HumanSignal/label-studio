@@ -64,4 +64,10 @@ sentry-sdk>=1.1.0
 launchdarkly-server-sdk==7.5.0
 python-json-logger==2.0.4
 
-label-studio-converter==0.0.54rc0
+# label-studio-converter==0.0.54rc0
+
+# For production setup in Docker, install the library directly from the GitHub repository.
+# For local development:
+# 1. Manually clone the 'label-studio-converter' repository.
+# 2. Install the library in "editable" mode using: pip install -e path/to/label-studio-converter
+-e git+https://github.com/manigandanp/label-studio-converter.git
