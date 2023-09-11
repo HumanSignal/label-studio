@@ -1,3 +1,14 @@
+## Custom Version - Changes Summary and Other instructions/notes
+
+## label-studio-converter
+- For production setup in Docker, install the library directly from the GitHub repository. (See `requirements.txt` in deploy folder)
+```git+https://github.com/manigandanp/label-studio-converter.git```
+
+- For local development:
+  1. Manually clone the 'label-studio-converter' repository.
+  2. Install the library in "editable" mode using: ```pip install -e path/to/label-studio-converter```
+
+  
 <img src="https://user-images.githubusercontent.com/12534576/192582340-4c9e4401-1fe6-4dbb-95bb-fdbba5493f61.png"/>
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)
