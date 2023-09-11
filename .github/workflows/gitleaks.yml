@@ -36,7 +36,7 @@ jobs:
             | sudo tar xzf - -C /usr/local/bin
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ inputs.head_sha }}
