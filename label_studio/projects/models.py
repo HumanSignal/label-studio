@@ -6,6 +6,7 @@ from typing import Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
 from core.bulk_update_utils import bulk_update
+from core.feature_flags import flag_set
 from core.label_config import (
     check_control_in_config_by_regex,
     check_toname_in_config_by_regex,
