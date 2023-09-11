@@ -1,12 +1,26 @@
-name: Ruff
-on: [ pull_request ]
+name: "Ruff"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
 jobs:
   ruff:
+    name: Ruff
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - uses: actions/checkout@v4
       - uses: chartboost/ruff-action@v1
         with:
           src: "./label_studio"
           version: 0.0.285
-

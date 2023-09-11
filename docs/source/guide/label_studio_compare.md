@@ -9,9 +9,9 @@ meta_title: Label Studio Community and Enterprise Features
 meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects.
 ---
 
-Label Studio is available as open source software, as well as an [Enterprise cloud service](https://heartex.com/) with enhanced security (SSO, RBAC, SOC2), team management, analytics & reporting, and uptime & support SLAs. A [free trial is available](https://heartex.com/free-trial) to get started quickly and explore the enterprise cloud product.
+Label Studio is available as open source software, as well as an [Enterprise cloud service](https://heartex.com/) with enhanced security (SSO, RBAC, SOC2), team management, analytics & reporting, and uptime & support SLAs. A [free trial is available](https://humansignal.com/free-trial) to get started quickly and explore the enterprise cloud product.
 
-<a class="Button" href="https://heartex.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
+<a class="Button" href="https://humansignal.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
 
 <table>
   <tr>
