@@ -162,7 +162,7 @@ class ExportAPI(generics.RetrieveAPIView):
         query_serializer.is_valid(raise_exception=True)
 
         export_type = query_serializer.validated_data.get('exportType') or query_serializer.validated_data['export_type']
-        only_finished = not query_serializer.validated_data['download_all_tasks']
+        only_finished = False #not query_serializer.validated_data['download_all_tasks']
         download_resources = query_serializer.validated_data['download_resources']
         interpolate_key_frames = query_serializer.validated_data['interpolate_key_frames']
 
