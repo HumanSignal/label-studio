@@ -19,7 +19,7 @@ export const FF_LSDV_E_297 = "fflag_feat_front_lsdv_e_297_increase_oss_to_enterp
 /**
  * Improve load time performance of Dashboard Members page
  */
-export const FF_OPTIC_7 = "fflag_feat_front_optic_7_optic_integration_short";
+export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
 
 export function isFF(id) {
   if (id in FEATURE_FLAGS) {

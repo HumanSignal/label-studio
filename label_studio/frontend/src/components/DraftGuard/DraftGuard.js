@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ToastContext } from '../Toast/Toast';
-import { FF_OPTIC_7, isFF } from '../../utils/feature-flags';
+import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
 
 
 export const DraftGuard = () => {
@@ -11,7 +11,7 @@ export const DraftGuard = () => {
   const history = useHistory();
 
   useEffect(async () => {
-    if (nextLocation && isFF(FF_OPTIC_7)) {
+    if (nextLocation && isFF(FF_OPTIC_2)) {
       const selected = window.Htx?.annotationStore?.selected;
       const hasChanges = !!selected?.history.undoIdx;
   
@@ -34,7 +34,7 @@ export const DraftGuard = () => {
   useEffect(() => {
     const unListen = history.listen((location) => {
 
-      if (isFF(FF_OPTIC_7)) {
+      if (isFF(FF_OPTIC_2)) {
         const selected = window.Htx?.annotationStore?.selected;
         const newLocation = location.pathname;
         const hasChanges = !!selected?.history.undoIdx;
