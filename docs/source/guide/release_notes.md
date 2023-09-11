@@ -1,27 +1,79 @@
 ---
 NOTE: Don't change release_notes.md manually, it's automatically built from onprem/*.md files on hexo server run!   
 
-title: On-Premise Release Notes for Label Studio Enterprise
-short: On-Premise Release Notes
+title: On-Premises Release Notes for Label Studio Enterprise
+short: On-Prem Release Notes
 type: guide
 tier: enterprise
 order: 221
 order_enterprise: 142
 section: "Reference"
-meta_title: On-premise Release notes for Label Studio Enterprise
-meta_description: Discover what's new and improved, and review bug fixes, in the release notes and changelog for Label Studio Enterprise.
+meta_title: On-premises release notes for Label Studio Enterprise
+meta_description: Review new features, enhancements, and bug fixes for on-premises Label Studio Enterprise installations. 
 ---
 
-!!! info 
-    The release notes for Label Studio Community Edition are available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
+!!! note 
+    The release notes for Label Studio Community Edition are available from the <a href="https://github.com/HumanSignal/label-studio/releases">Label Studio GitHub repository</a>.
 
 ## New helm chart
 
-A common chart for LS and LSE has been released and is available as of LSE version 2.3.x. The chart can be accessed at the following repository: https://github.com/heartexlabs/charts/tree/master/heartex/label-studio.
+A common chart for LS and LSE has been released and is available as of LSE version 2.3.x. The chart can be accessed at the following repository: https://github.com/HumanSignal/charts/tree/master/heartex/label-studio.
 
 ### Migration Process
 
-The migration process can be performed without any downtime. The steps required to carry out the migration are documented in the migration guide, available at: https://github.com/heartexlabs/charts/blob/master/heartex/label-studio/FAQs.md#label-studio-enterprise-upgrade-from-decommissioned-label-studio-enterprise-helm-chart.
+The migration process can be performed without any downtime. The steps required to carry out the migration are documented in the migration guide, available at: https://github.com/HumanSignal/charts/blob/master/heartex/label-studio/FAQs.md#label-studio-enterprise-upgrade-from-decommissioned-label-studio-enterprise-helm-chart.
+
+
+<a name="249-7md"></a>
+
+*Aug 22, 2023*
+
+## Label Studio Enterprise 2.4.9-7
+### Bug Fix
+- Fixed double encoding issue with file-proxy urls [LSDV-5486](https://labelstudio.aha.io/features/LSDV-5486)
+
+### Security
+- GH 4483 (in Label Studio repo) made existing SSRF defenses more robust [LSDV-5348](https://labelstudio.aha.io/features/LSDV-5348)
+
+
+
+<a name="249-6md"></a>
+
+*Aug 21, 2023*
+
+## Label Studio Enterprise 2.4.9-6
+### Customer Bug Fix
+- Fixed the splitchannel audio option [OPTIC-6](https://labelstudio.aha.io/features/OPTIC-6)
+
+### Bug Fix
+- Fixes SCIM group push so workspaces are not created from groups if role to group mappings already exist [LSDV-5472](https://labelstudio.aha.io/features/LSDV-5472)
+
+
+
+<a name="249-5md"></a>
+
+*Aug 11, 2023*
+
+## Label Studio Enterprise 2.4.9-5
+### Customer Bug Fix
+- Fixed an issue where pre-signed urls could become double encoded and break signatures [LSDV-5337](https://labelstudio.aha.io/features/LSDV-5337)
+
+
+
+<a name="249-4md"></a>
+
+*Aug 04, 2023*
+
+## Label Studio Enterprise 2.4.9-4
+<!-- Release notes generated using configuration in .github/release.yml at lse-release/2.4.9 -->
+
+## What's Changed
+
+* fix: LSDV-5430: Fix TLS for old LDAP
+* feat: Add Draft Column to the Data Manager
+
+
+**Full Changelog**: https://github.com/HumanSignal/label-studio-enterprise/compare/2.4.9-3...2.4.9-4
 
 
 <a name="249-2md"></a>
@@ -344,6 +396,96 @@ The migration process can be performed without any downtime. The steps required 
 - Region is selected when user drag the region [LSDV-1140](https://labelstudio.aha.io/features/LSDV-1140)
 - Saving model version on Machine Learning settings doesn't work [LSDV-966](https://labelstudio.aha.io/features/LSDV-966)
 
+
+<a name="2410md"></a>
+
+## Label Studio Enterprise 2.4.10
+
+*September 5, 2023*
+
+### New Features
+
+- Contextual scrolling allows you to sync your text transcripts with their corresponding audio or video. When enabled, the text transcript automatically scrolls to the new listening point as the media plays. This is now the default mode for the Conversation Analysis template.
+    
+    For more information, see the [Contextual Scrolling template documentation](https://docs.humansignal.com/templates/contextual_scrolling).
+    
+    ![Screenshot of an audio file with contextual scrolling](/images/releases/2-4-10-scrolling.png)
+    
+- There is a new search field on the Projects page. You can use this field to search project titles. It can also be used with the project filters. For more information, see [Search projects](https://docs.humansignal.com/guide/manage_projects#Search-projects). 
+    
+    ![Screenshot of the search field on the Projects page](/images/releases/2-4-10-search.png)
+    
+- When working with the labeling configuration code editor, you will now see an autocomplete prompt that lists and defines possible tag parameters.
+    
+    ![Screenshot of the autocomplete feature in action](/images/releases/2-4-10-autocomplete.png)
+    
+- You can now use the API to filter [projects by title](https://app.heartex.com/docs/api/#tag/Projects/operation/api_projects_list). 
+- There is a new **Drafts** column available in the Data Manager. You can also filter and sort by this column.
+    
+    ![Screenshot of the Drafts column in the Data Manager](/images/releases/2-4-10-drafts.png)
+    
+
+### Enhancements
+
+- When using an LLM-based ML backend, the `<TextArea>` tag now supports chat mode. You can send a prompt and receive a response to populate your TextArea inputs. 
+- New tooltips throughout the UI provide guidance on advanced features and configurations to improve labeling efficiency and quality. 
+- Label distribution now shows the number of labels instead of the percentage. 
+- Deactivated user pages now include contact information. 
+- For organizations using SSO, you can now disable regular logins for your users. 
+- The project migration script has been improved to ensure that annotation history, annotation reviews, and drafts are migrated appropriately. 
+- You should see improved performance in multiple API calls due to optimization work related to data handling and loading.  
+- Improved exact frames matching, including adjusting BBox impact weight and improved basic matching for more accurate consensus scores. 
+- Several design improvements to project dashboards:
+    - Progress bars are now clearer. 
+    - Task Pending Review and Annotated Tasks indicators now have labels for better clarity. 
+
+### Security
+
+This release addresses a vulnerability regarding how SECRET_KEY is set.
+
+The SECRET_KEY is now configurable through an environment variable. **Users are strongly encouraged to set SECRET_KEY to a random secret of their choosing.** A fallback SECRET_KEY is specified by default, but will be removed in a future version.
+
+Older versions also included a vulnerability in which the secret key could be leaked via identity provider callbacks. This release patches that vulnerability.
+
+### Bug fixes
+
+- Fixed an issue where all users in an organization were listed in the drop-down filter for annotators, rather than just users within that project. 
+- Fixed an issue where when saving a labeling configuration, users were redirected to the Data Manager. 
+- Fixed an issue where some users were unable to log in via LDAP due to TLS cypher settings. 
+- Fixed an issue where FileProxy was blocking local IPs. 
+- Fixed an issue where labels were missing from the Outliner UI when labels from different tags were applied to the same text span.
+- Fixed an issue that was preventing users from changing labels. 
+- Fixed an issue affecting split channel audio. 
+- Fixed an issue where the show/hide icon was not appearing when working in regions that were grouped by tools. 
+- Fixed an issue where the number of completed tasks listed on the All Projects page displayed an incorrect value in situations where the project is duplicated. 
+- Fixed an issue where the Project page was making unnecessary API calls. 
+- Fixed an issue where `is_labeled` was being miscalculated. 
+- Fixed an issue where filtering by annotation results in the Data Manager was causing errors. 
+- Fixed an issue with RichText tags when using non-Chromium browsers. 
+- Fixed an issue that occurred when users selected keypoints and polygons within the same annotation. 
+- Fixed an issue where users were able to import unsupported file types.
+- Fixed an issue where there wasn’t sufficient spacing between the Author filter and the first paragraph. 
+- Fixed a double encoding issue with file-proxy URLs. 
+- Fixed an issue where the Move and Pan icons were missing in the Create Project preview. 
+- Fixed an issue where the workspace overflow menus were visible even when the user was not hovering over the workspace name. 
+- Fixed an issue where DB deadlocks were occurring due to lengthy transactions. 
+- Fixed an issue where pushing a SCIM group would automatically create a workspace named after that group, which should not happen in cases where a role to group mapping already exists. 
+- Fixed an issue where the date picker on project dashboards was being incorrectly calculated. 
+- Fixed an issue where a large empty space was appearing at the bottom of the Workspaces page. 
+- Fixed an issue where users were unable to edit label configurations for Natural Language Processing groups. 
+- Fixed an issue with column naming collisions in certain API responses. 
+- Fixed an issue where the model version drop-down menu was not available when an ML backend was connected. 
+- Fixed an issue where, when using an ML backend, the model version was not displaying in the Data Manager despite being explicitly set. 
+- Fixed an issue where pressing Escape would not close the Create Project modal. 
+- Fixed an issue where annotators were able to archive workspaces. This should be restricted to owners, managers, and admins. 
+- Fixed issues to ensure more robust and uniform SSRF defenses.
+- Fixed an issue where organization names were improperly appearing in error logs. 
+- Fixed numerous issues related to Text and HyperText that affected performance and usability. 
+- Fixed several issues to improve region tree responsiveness. 
+- Fixed an issue where clicking an annotator’s profile picture would throw an error due to `displayName` being undefined or when user references were stale. 
+- Fixed an issue where roles were not being checked for task assignments. 
+- Fixed an issue where annotators were able to access tasks to which they were not assigned. 
+- Fixed an issue causing deadlocks on task import when running parallel jobs. 
 
 <a name="241md"></a>
 
