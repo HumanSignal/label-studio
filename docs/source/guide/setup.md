@@ -46,9 +46,9 @@ The autocomplete includes prompts for both tags and the parameters that are avai
 
 ![Animated gif of code autocomplete in action](/images/label/autocomplete.gif)
 
-Tag suggestions appear after you type the opening angle bracket `<`. Parameter after adding a blank space within the tag. 
+Tag suggestions appear after you type the opening angle bracket `<`. Parameter suggestions appear after adding a blank space within the tag. 
 
-To accept a suggestion, you can click to select it in the window that appears, or press the Tab key while the suggestion is highlighted.  
+To accept a suggestion, you can click to select it, or press the Tab key while the suggestion is highlighted.  
 
 ## Customize a template
 
