@@ -1,26 +1,24 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 
 """
-import os
-import socket
-import ipaddress
-import pkg_resources
-import shutil
 import glob
 import io
-import ujson as json
+import ipaddress
 import itertools
-import yaml
-
-from urllib3.util import parse_url
+import os
+import shutil
+import socket
 from contextlib import contextmanager
-from tempfile import mkstemp, mkdtemp
+from tempfile import mkdtemp, mkstemp
 
-from appdirs import user_config_dir, user_data_dir, user_cache_dir
+import pkg_resources
+import ujson as json
+import yaml
+from appdirs import user_cache_dir, user_config_dir, user_data_dir
+from urllib3.util import parse_url
 
 # full path import results in unit test failures
 from .exceptions import InvalidUploadUrlError
-
 
 _DIR_APP_NAME = 'label-studio'
 
@@ -170,6 +168,7 @@ class SerializableGenerator(list):
 
     def __iter__(self):
         return itertools.chain(self._head, *self[:1])
+
 
 def validate_upload_url(url, block_local_urls=True):
     """Utility function for defending against SSRF attacks. Raises

@@ -1,25 +1,21 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import random
 import logging
+import random
+from collections import defaultdict
+
 import ujson as json
-
+from core.label_config import replace_task_data_undefined_with_config_field
+from core.permissions import AllPermissions
+from data_manager.actions.basic import delete_tasks
+from data_manager.functions import DataManagerException
 from django.conf import settings
-from django.db.models import Count
-
+from io_storages.azure_blob.models import AzureBlobImportStorageLink
+from io_storages.gcs.models import GCSImportStorageLink
+from io_storages.localfiles.models import LocalFilesImportStorage
+from io_storages.s3.models import S3ImportStorageLink
 from tasks.models import Annotation, Task
 from tasks.serializers import TaskSerializerBulk
-from data_manager.functions import DataManagerException
-from data_manager.actions.basic import delete_tasks
-from core.permissions import AllPermissions
-from core.label_config import replace_task_data_undefined_with_config_field
-from collections import defaultdict
-from core.redis import start_job_async_or_sync
-
-from io_storages.s3.models import S3ImportStorageLink
-from io_storages.gcs.models import GCSImportStorageLink
-from io_storages.azure_blob.models import AzureBlobImportStorageLink
-from io_storages.localfiles.models import LocalFilesImportStorage
 
 logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
@@ -250,7 +246,7 @@ def rename_labels_form(user, project):
 
 
 def add_data_field(project, queryset, **kwargs):
-    from django.db.models import F, Func, Value, JSONField
+    from django.db.models import F, Func, JSONField, Value
 
     request = kwargs['request']
     value_name = request.data.get('value_name')

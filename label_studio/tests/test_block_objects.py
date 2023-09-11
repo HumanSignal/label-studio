@@ -1,9 +1,9 @@
+import threading
 import time
 
 import pytest
-import threading
 from core.utils.common import db_is_not_sqlite
-from tasks.models import Task, Annotation, Prediction, bulk_update_stats_project_tasks
+from tasks.models import Task, bulk_update_stats_project_tasks
 
 
 @pytest.mark.django_db

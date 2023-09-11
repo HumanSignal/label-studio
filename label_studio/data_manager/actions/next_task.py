@@ -2,12 +2,11 @@
 """
 import logging
 
-from rest_framework.exceptions import NotFound
+from core.permissions import all_permissions
 from data_manager.functions import filters_ordering_selected_items_exist
 from projects.functions.next_task import get_next_task
-from core.permissions import all_permissions
+from rest_framework.exceptions import NotFound
 from tasks.serializers import NextTaskSerializer
-
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,6 @@
 import logging
 
-from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
-from azure.core.exceptions import ResourceNotFoundError
-
+from azure.storage.blob import BlobServiceClient
 from core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
