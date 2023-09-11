@@ -211,7 +211,7 @@ jobs:
         uses: docker/setup-qemu-action@v2
 
       - name: Build and Push Release Ubuntu Docker image
-        uses: docker/build-push-action@v4.1.1
+        uses: docker/build-push-action@v4.2.1
         id: docker_build
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
