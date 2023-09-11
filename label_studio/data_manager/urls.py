@@ -1,9 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from data_manager import api, views
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-
-from data_manager import api, views
 
 app_name = "data_manager"
 router = DefaultRouter()

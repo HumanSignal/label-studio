@@ -1,16 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from core.models import AsyncMigrationStatus
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.conf import settings
 from django.contrib.auth.models import Group
-
-from users.models import User
-from projects.models import Project
 from ml.models import MLBackend, MLBackendTrainJob
-from tasks.models import Task, Annotation, Prediction
 from organizations.models import Organization, OrganizationMember
-from core.models import AsyncMigrationStatus
+from projects.models import Project
+from tasks.models import Annotation, Prediction, Task
+from users.models import User
 
 
 class UserAdminShort(UserAdmin):

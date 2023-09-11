@@ -2,28 +2,27 @@
 """
 import logging
 
+import drf_yasg.openapi as openapi
+from core.feature_flags import flag_set
+from core.mixins import GetParentObjectMixin
+from core.permissions import ViewClassPermission, all_permissions
+from core.utils.common import DjangoFilterDescriptionInspector
+from core.utils.params import bool_from_request
+from data_manager.api import TaskListAPI as DMTaskListAPI
+from data_manager.functions import evaluate_predictions
+from data_manager.models import PrepareParams
+from data_manager.serializers import DataManagerTaskSerializer
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-import drf_yasg.openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, viewsets, views
+from projects.functions.stream_history import fill_history_annotation
+from projects.models import Project
+from rest_framework import generics, viewsets
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-
-from core.feature_flags import flag_set
-from core.permissions import ViewClassPermission, all_permissions
-from core.utils.common import DjangoFilterDescriptionInspector
-from core.utils.params import bool_from_request
-from core.mixins import GetParentObjectMixin
-from data_manager.api import TaskListAPI as DMTaskListAPI
-from data_manager.functions import evaluate_predictions
-from data_manager.models import PrepareParams
-from data_manager.serializers import DataManagerTaskSerializer
-from projects.models import Project
-from projects.functions.stream_history import fill_history_annotation
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from tasks.serializers import (
     AnnotationDraftSerializer,

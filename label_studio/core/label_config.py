@@ -1,24 +1,23 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import json
-import pandas as pd
-import numpy as np
-import os
-import xmljson
-import jsonschema
+import logging
 import re
-
+from collections import OrderedDict, defaultdict
 from urllib.parse import urlencode
-from collections import OrderedDict
+
 import defusedxml.ElementTree as etree
-from collections import defaultdict
+import jsonschema
+import numpy as np
+import pandas as pd
+import xmljson
 from django.conf import settings
-from label_studio.core.utils.io import find_file
-from label_studio.core.utils.exceptions import (
-    LabelStudioValidationErrorSentryIgnored, LabelStudioXMLSyntaxErrorSentryIgnored
-)
 from label_studio_tools.core import label_config
+
+from label_studio.core.utils.exceptions import (
+    LabelStudioValidationErrorSentryIgnored,
+)
+from label_studio.core.utils.io import find_file
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +82,7 @@ def _fix_choices(config):
 def parse_config_to_json(config_string):
     try:
         xml = etree.fromstring(config_string, forbid_dtd=False)
-    except TypeError as error:
+    except TypeError:
         raise etree.ParseError('can only parse strings')
     if xml is None:
         raise etree.ParseError('xml is empty or incorrect')
@@ -210,7 +209,7 @@ def get_task_from_labeling_config(config):
         try:
             logger.debug('Parse ' + config[start:start + end])
             body = json.loads(config[start:start + end])
-        except Exception as exc:
+        except Exception:
             logger.error("Can't parse task from labeling config", exc_info=True)
             pass
         else:

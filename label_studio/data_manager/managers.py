@@ -1,25 +1,22 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import re
-import ujson as json
 import logging
-
-from pydantic import BaseModel
-
-from django.db import models
-from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value, Exists, When, Case
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.postgres.fields.jsonb import KeyTextTransform
-from django.db.models.functions import Coalesce
-from django.conf import settings
-from django.db.models.functions import Cast
-from django.db.models import FloatField, Count
+import re
 from datetime import datetime
 
-from data_manager.prepare_params import ConjunctionEnum
-from label_studio.core.utils.params import cast_bool_from_str
-from label_studio.core.utils.common import load_func
+import ujson as json
 from core.feature_flags import flag_set
+from data_manager.prepare_params import ConjunctionEnum
+from django.conf import settings
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.contrib.postgres.fields.jsonb import KeyTextTransform
+from django.db import models
+from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, Value, When
+from django.db.models.functions import Cast, Coalesce
+from pydantic import BaseModel
+
+from label_studio.core.utils.common import load_func
+from label_studio.core.utils.params import cast_bool_from_str
 
 logger = logging.getLogger(__name__)
 
@@ -88,8 +85,8 @@ def get_fields_for_evaluation(prepare_params, user):
     :param user: user
     :return: list of field names
     """
-    from tasks.models import Task
     from projects.models import Project
+    from tasks.models import Task
 
     result = []
     result += get_fields_for_filter_ordering(prepare_params)
@@ -206,7 +203,7 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
         try:
             value = json.loads(_filter.value)
-        except:
+        except:  # noqa: E722
             return 'exit'
 
         q = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result=value)))

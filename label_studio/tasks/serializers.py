@@ -1,28 +1,25 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+
 import ujson as json
-
-from django.db import transaction, IntegrityError
+from core.feature_flags import flag_set
+from core.label_config import replace_task_data_undefined_with_config_field
+from core.utils.common import load_func, retry_database_locked
 from django.conf import settings
-
-from rest_framework import serializers, generics
-from rest_framework.serializers import ModelSerializer
+from django.db import IntegrityError, transaction
+from projects.models import Project
+from rest_flex_fields import FlexFieldsModelSerializer
+from rest_framework import generics, serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField
+from rest_framework.serializers import ModelSerializer
 from rest_framework.settings import api_settings
-from rest_flex_fields import FlexFieldsModelSerializer
-
-from projects.models import Project
-from tasks.models import Task, Annotation, AnnotationDraft, Prediction
-from tasks.validation import TaskValidator
 from tasks.exceptions import AnnotationDuplicateError
-from core.utils.common import retry_database_locked
-from core.label_config import replace_task_data_undefined_with_config_field
-from users.serializers import UserSerializer
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from tasks.validation import TaskValidator
 from users.models import User
-from core.utils.common import load_func
-from core.feature_flags import flag_set
+from users.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +74,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         if isinstance(value, str):
             try:
                 data = json.loads(value)
-            except:
+            except:  # noqa: E722
                 raise ValueError('annotation "result" can\'t be parse from str to JSON')
 
         # check result is list
@@ -239,7 +236,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             # resolve annotators by email
             elif isinstance(completed_by, dict):
                 if 'email' not in completed_by:
-                    raise ValidationError(f"It's expected to have 'email' field in 'completed_by' data in annotations")
+                    raise ValidationError("It's expected to have 'email' field in 'completed_by' data in annotations")
 
                 email = completed_by['email']
                 if email not in members_email_to_id:
@@ -394,35 +391,22 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 if prediction_score is not None:
                     try:
                         prediction_score = float(prediction_score)
-                    except ValueError as exc:
+                    except ValueError:
                         logger.error(
-                            f'Can\'t upload prediction score: should be in float format.'
-                            f'Fallback to score=None')
+                            'Can\'t upload prediction score: should be in float format.'
+                            'Fallback to score=None')
                         prediction_score = None
 
                 last_model_version = prediction.get('model_version', 'undefined')
-                if flag_set(
-                    'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
-                    user='auto',
-                ):
-                    db_predictions.append(
-                        Prediction(
-                            task=self.db_tasks[i],
-                            project=self.db_tasks[i].project,
-                            result=result,
-                            score=prediction_score,
-                            model_version=last_model_version,
-                        )
+                db_predictions.append(
+                    Prediction(
+                        task=self.db_tasks[i],
+                        project=self.db_tasks[i].project,
+                        result=result,
+                        score=prediction_score,
+                        model_version=last_model_version
                     )
-                else:
-                    db_predictions.append(
-                        Prediction(
-                            task=self.db_tasks[i],
-                            result=result,
-                            score=prediction_score,
-                            model_version=last_model_version,
-                        )
-                    )
+                )
 
         # predictions: DB bulk create
         self.db_predictions = Prediction.objects.bulk_create(db_predictions, batch_size=settings.BATCH_SIZE)

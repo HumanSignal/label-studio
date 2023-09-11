@@ -1,21 +1,19 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-from django.db import models
 
-from django.utils.translation import gettext_lazy as _
-from django.dispatch import receiver
-from django.db.models.signals import post_save
+from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func, safe_float
 from django.conf import settings
+from django.db import models
 from django.db.models import Count, Q
-
-from core.utils.common import safe_float, conditional_atomic, load_func, db_is_not_sqlite
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from ml.api_connector import MLApi
 from projects.models import Project
 from tasks.models import Prediction
-from tasks.serializers import TaskSimpleSerializer, PredictionSerializer
-from webhooks.serializers import WebhookSerializer, Webhook
+from tasks.serializers import PredictionSerializer, TaskSimpleSerializer
+from webhooks.serializers import Webhook, WebhookSerializer
 
 logger = logging.getLogger(__name__)
 

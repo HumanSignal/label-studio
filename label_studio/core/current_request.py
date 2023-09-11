@@ -1,8 +1,8 @@
 from threading import local
-from django.middleware.common import CommonMiddleware
+
 from django.core.signals import request_finished
 from django.dispatch import receiver
-
+from django.middleware.common import CommonMiddleware
 
 _thread_locals = local()
 

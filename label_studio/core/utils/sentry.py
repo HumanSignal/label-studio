@@ -1,4 +1,4 @@
-from django.conf import *
+from django.conf import settings
 
 
 def event_processor(event, hint):

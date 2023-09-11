@@ -1,16 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import io
 import copy
-import pytest
+import io
 import zipfile
-import ujson as json
+
+import pytest
 import requests_mock
-
-from rest_framework.authtoken.models import Token
-
-from tasks.models import Task, Annotation, Prediction
+import ujson as json
 from projects.models import Project
+from rest_framework.authtoken.models import Token
+from tasks.models import Annotation, Prediction, Task
 
 
 def post_data_as_format(setup, format_type, body, archive, multiply_files):
