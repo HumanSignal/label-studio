@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
-from nplusone.core.profiler import Profiler
 
 import boto3
 import mock
@@ -21,6 +20,7 @@ from botocore.exceptions import ClientError
 from django.conf import settings
 from freezegun import freeze_time
 from moto import mock_s3
+from nplusone.core.profiler import Profiler
 from organizations.models import Organization
 from projects.models import Project
 from tasks.models import Task

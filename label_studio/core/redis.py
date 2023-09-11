@@ -4,10 +4,10 @@ import logging
 import sys
 from datetime import timedelta
 from functools import partial
-from django.conf import settings
 
 import django_rq
 import redis
+from django.conf import settings
 from django_rq import get_connection
 from rq.command import send_stop_job_command
 from rq.exceptions import InvalidJobOperation
