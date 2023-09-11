@@ -1,16 +1,17 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
-import json
-import os
 import glob
 import io
-import yaml
+import json
 import logging
+import os
 
-from core.label_config import parse_config, validate_label_config, parse_config_to_json
-from label_studio.tests.utils import make_task, make_annotation, make_prediction, project_id
+import pytest
+import yaml
+from core.label_config import parse_config, parse_config_to_json, validate_label_config
 from projects.models import Project
+
+from label_studio.tests.utils import make_annotation, make_prediction, make_task, project_id  # noqa
 
 logger = logging.getLogger(__name__)
 

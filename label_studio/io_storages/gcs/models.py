@@ -1,24 +1,23 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import json
+import logging
 
 from core.redis import start_job_async_or_sync
-from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.dispatch import receiver
+from django.db import models
 from django.db.models.signals import post_save
-
-from io_storages.gcs.utils import GCS
-from tasks.models import Annotation
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
     ImportStorage,
     ImportStorageLink,
-    ProjectStorageMixin
+    ProjectStorageMixin,
 )
+from io_storages.gcs.utils import GCS
+from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 

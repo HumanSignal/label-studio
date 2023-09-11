@@ -1,13 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import base64
-import boto3
-
-from botocore.exceptions import ClientError
+import logging
 from urllib.parse import urlparse
-from core.utils.params import get_env
 
+import boto3
+from botocore.exceptions import ClientError
+from core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
 

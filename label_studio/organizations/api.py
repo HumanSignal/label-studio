@@ -2,27 +2,28 @@
 """
 import logging
 
-from django.urls import reverse
+from core.feature_flags import flag_set
 from django.conf import settings
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework import generics
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
-
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from django.urls import reverse
 from django.utils.decorators import method_decorator
-
-from label_studio.core.permissions import all_permissions, ViewClassPermission
-from label_studio.core.utils.params import bool_from_request
-
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from organizations.models import Organization
 from organizations.serializers import (
-    OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer, OrganizationInviteSerializer,
-    OrganizationsParamsSerializer
+    OrganizationIdSerializer,
+    OrganizationInviteSerializer,
+    OrganizationMemberUserSerializer,
+    OrganizationSerializer,
+    OrganizationsParamsSerializer,
 )
-from core.feature_flags import flag_set
+from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from label_studio.core.permissions import ViewClassPermission, all_permissions
+from label_studio.core.utils.params import bool_from_request
 
 logger = logging.getLogger(__name__)
 

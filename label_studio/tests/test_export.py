@@ -1,13 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
-import copy
 
-from django.db import transaction
-from tasks.models import Task, Annotation, Prediction
-from tasks.serializers import AnnotationSerializer
+import pytest
 from django.apps import apps
+from tasks.models import Annotation, Prediction, Task
+from tasks.serializers import AnnotationSerializer
 
 
 @pytest.mark.skip(reason='HTX-868')

@@ -1,17 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
-import requests_mock
 from unittest import mock
 
+import pytest
+import requests_mock
+from projects.models import Project
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
-from .utils import ml_backend_mock
+from tasks.models import Annotation
 
-from projects.models import Project
-from ml.models import MLBackendTrainJob
-from tasks.models import Annotation, Task
+from .utils import ml_backend_mock
 
 
 @pytest.fixture
@@ -40,20 +39,20 @@ def any_api_client(request, client_and_token, business_client):
 @pytest.mark.parametrize('payload, response, status_code', [
     # status OK
     (
-        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
+        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
         None,
         201
     ),
     # invalid label config: unexisted toName
     (
-        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"unexisted\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
+        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"unexisted\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
         {"label_config": ["toName=\"unexisted\" not found in names: ['my_class', 'my_text']"]},
         400
     ),
     # invalid label config: missed toName
     (
-        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
-        {'label_config': ["Validation failed on : 'toName' is a required property"]},  # noqa
+        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
+        {'label_config': ["Validation failed on : 'toName' is a required property"]},
         400
     ),
     # empty label config
@@ -86,7 +85,7 @@ def test_create_project(client_and_token, payload, response, status_code):
 @pytest.mark.parametrize('payload, response, status_code', [
     # status OK
     (
-        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
+        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
         None,
         200
     ),
@@ -94,20 +93,20 @@ def test_create_project(client_and_token, payload, response, status_code):
     # invalid column
     # (
     #     {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
-    #     # noqa
+    #
     #     {'label_config': ['These fields are not found in data: text']},
     #     400
     # ),
     # invalid label config: unexisted toName
     (
-        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"unexisted\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
+        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"unexisted\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
         {"label_config": ["toName=\"unexisted\" not found in names: ['my_class', 'my_text']"]},
         400
     ),
     # invalid label config: missed toName
     (
-        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"}, # noqa
-        {'label_config': ["Validation failed on : 'toName' is a required property"]},  # noqa
+        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
+        {'label_config': ["Validation failed on : 'toName' is a required property"]},
         400
     )
 ])

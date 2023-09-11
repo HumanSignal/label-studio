@@ -1,16 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
+
 import ujson as json
-from django.db.models import Avg
-
-from rest_framework import serializers
+from data_manager.models import Filter, FilterGroup, View
 from django.db import transaction
-
-from data_manager.models import View, Filter, FilterGroup
-from tasks.models import Task
-from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
 from projects.models import Project
+from rest_framework import serializers
+from tasks.models import Task
+from tasks.serializers import AnnotationDraftSerializer, AnnotationSerializer, PredictionSerializer, TaskSerializer
+
 from label_studio.core.utils.common import round_floats
 
 

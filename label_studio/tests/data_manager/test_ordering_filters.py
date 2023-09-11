@@ -1,14 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
 
-from ..utils import make_task, make_annotation, make_prediction, project_id, make_annotator
-from projects.models import Project
+import pytest
 from data_import.models import FileUpload
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from projects.models import Project
+
+from ..utils import make_annotation, make_annotator, make_prediction, make_task, project_id  # noqa
 
 
 @pytest.mark.skip_nplusone
@@ -351,7 +352,7 @@ def test_views_filters(filters, ids, business_client, project_id):
             else:
                 item['value'] = task_ids[int(item['value'])]
 
-    updated_payload = dict(
+    dict(
         data={"filters": filters},
     )
     response = business_client.patch(

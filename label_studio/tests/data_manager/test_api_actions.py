@@ -1,12 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
 
+import pytest
 from django.db import transaction
-
-from ..utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
+
+from ..utils import make_annotation, make_prediction, make_task, project_id  # noqa
 
 
 @pytest.mark.skip_nplusone
@@ -27,7 +27,7 @@ def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_cou
     )
 
     assert response.status_code == 201, response.content
-    view_id = response.json()["id"]
+    response.json()["id"]
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
@@ -62,7 +62,7 @@ def test_action_delete_all_annotations(tasks_count, annotations_count, predictio
     )
 
     assert response.status_code == 201, response.content
-    view_id = response.json()["id"]
+    response.json()["id"]
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):

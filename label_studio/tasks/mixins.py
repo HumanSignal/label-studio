@@ -1,6 +1,6 @@
 
 class TaskMixin:
-    def has_permission(self, user: "User") -> bool:
+    def has_permission(self, user: "User") -> bool:  # noqa: F821
         """Called by Task#has_permission"""
         return True
 
@@ -17,6 +17,6 @@ class TaskMixin:
 
 
 class AnnotationMixin:
-    def has_permission(self, user: "User") -> bool:
+    def has_permission(self, user: "User") -> bool:  # noqa: F821
         """Called by Annotation#has_permission"""
         return True

@@ -1,22 +1,21 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import drf_yasg.openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
-from django.utils.decorators import method_decorator
-from django.conf import settings
 
+import drf_yasg.openapi as openapi
+from core.feature_flags import flag_set
+from core.permissions import ViewClassPermission, all_permissions
+from django.conf import settings
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
+from ml.models import MLBackend
+from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
+from projects.models import Project, Task
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.views import APIView
 from rest_framework.response import Response
-
-from core.feature_flags import flag_set
-from core.permissions import all_permissions, ViewClassPermission
-from projects.models import Project, Task
-from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
-from ml.models import MLBackend
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
