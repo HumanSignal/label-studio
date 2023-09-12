@@ -872,8 +872,15 @@ class Prediction(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            user.project = self.project  # link for activity log
+            return self.project.has_permission(user)
+        else:
+            user.project = self.task.project  # link for activity log
+            return self.task.project.has_permission(user)
 
     @classmethod
     def prepare_prediction_result(cls, result, project):
@@ -945,7 +952,13 @@ class Prediction(models.Model):
             self.project_id = Task.objects.only('project_id').get(pk=self.task_id).project_id
 
         # "result" data can come in different forms - normalize them to JSON
-        self.result = self.prepare_prediction_result(self.result, self.task.project)
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            self.result = self.prepare_prediction_result(self.result, self.project)
+        else:
+            self.result = self.prepare_prediction_result(self.result, self.task.project)
         # set updated_at field of task to now()
         self.update_task()
         return super(Prediction, self).save(*args, **kwargs)
