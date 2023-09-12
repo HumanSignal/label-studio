@@ -57,7 +57,7 @@ To manage access to Label Studio Enterprise, add the application to your SCIM pr
 6. Click **Edit** in the right corner.
 
 Fill in the fields:
- - **SCIM connector base URL**: https://{LABEL_STUDIO_BASE_URL}/scim/v2/ where `{LABEL_STUDIO_BASE_URL}` is the base URL of your Label Studio Enterprise instance.
+ - **SCIM connector base URL**: `https://<LABEL_STUDIO_BASE_URL>/scim/v2/` where `<LABEL_STUDIO_BASE_URL>` is the base URL of your Label Studio Enterprise instance.
  - **Unique identifier field for users**: Leave `userName`. Label Studio Enterprise uses email as user identifier in this field.
  - **Supported provisioning actions**: Select the following items:
    - Import New Users and Profile Updates
@@ -115,7 +115,7 @@ The most convenient way to manage access to the application is via groups. You c
         Select an existing workspace or create a new one. You can map multiple groups to the same workspace.  
     * **Projects to Groups Mapping**---Map groups to roles at the project level. Project-level roles can be **Annotator**, **Reviewer**, or **Inherit**. You can map multiple groups to the same roles and the same projects. For more information on roles, see [Roles in Label Studio Enterprise](manage_users#Roles-in-Label-Studio-Enterprise). 
     
-        If you select **Inherit**, the group will inherit the role set above under **Organization Roles to Groups Mapping.** If the group is inheriting the **Not Activated** role, they are still added to the project, but they cannot be assigned tasks. 
+        If you select **Inherit**, the group will inherit the role set above under **Organization Roles to Groups Mapping.** If the group is inheriting the Not Activated role, the users are mapped to the project, but they are not actually assigned to the project until the group is synced (meaning that the user authenticates with SSO). 
 
 
 
@@ -139,7 +139,7 @@ After saving the group assignment, the update will be queued and sent to Label S
 
 ## Unassigning the application for groups
 
-To unassign a group from the application, follow the steps for [Unassigning the application for users](#Unassigning the application for users).
+To unassign a group from the application, follow the steps for [Unassigning the application for users](#Unassigning-the-application-for-users).
 
 1. On the **application** page, navigate to the **Assignments** tab.
 2. Select **Group** in the left menu.
