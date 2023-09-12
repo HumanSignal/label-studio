@@ -10,18 +10,16 @@ boto3~=1.16.28
 botocore~=1.19.28
 bleach~=5.0.0
 
-google-api-core>=2.11.0
-google-auth>=2.10.0
-google-cloud-appengine-logging>=1.0.0
-google-cloud-audit-log>=0.2.0
-google-cloud-core>=2.1.2
-google-cloud-storage>=2.0.0
-google-cloud-logging>=2.0.0
-google-resumable-media>=2.0.0
-googleapis-common-protos>=1.0.0
-grpc-google-iam-v1>=0.12.4
-
-
+google-api-core==2.11.0
+google-auth==2.14.1
+google-cloud-appengine-logging==1.1.0
+google-cloud-audit-log==0.2.0
+google-cloud-core==2.3.2
+google-cloud-storage~=2.5.0
+google-cloud-logging~=2.7.0
+google-resumable-media==2.3.3
+googleapis-common-protos==1.56.4
+grpc-google-iam-v1==0.12.4
 
 Django==3.2.20
 django-storages==1.12.3
@@ -67,3 +65,6 @@ launchdarkly-server-sdk==7.5.0
 python-json-logger==2.0.4
 
 label-studio-converter==0.0.55
+
+
+
