@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-198: [FE] 'txt' option is missing in data_type dropdown",
-  "commit": "e975898215c8b5fa77c694dce1722323ba33b5da",
+  "commit": "843ff988b43531c68cd82c906c39bd283ba64711",
   "branch": "fb-dia-198/txt-cell",
-  "date": "2023/09/08 15:52:02"
+  "date": "2023/09/12 11:00:08"
 }
