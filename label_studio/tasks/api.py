@@ -369,7 +369,11 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
 
     def delete_draft(self, draft_id, annotation_id):
-        return AnnotationDraft.objects.filter(id=draft_id).delete()
+        try:
+            draft = AnnotationDraft.objects.get(id=draft_id)
+            draft.delete()
+        except AnnotationDraft.DoesNotExist:
+            pass
 
     def perform_create(self, ser):
         task = self.get_parent_object()
