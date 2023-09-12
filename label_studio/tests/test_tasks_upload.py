@@ -128,7 +128,7 @@ def test_json_task_predictions(setup_project_dialog, tasks, status_code, task_co
     assert r.status_code == status_code, 'Upload one task with prediction failed'
 
     # predictions
-    predictions = Prediction.objects.filter(task__project=setup_project_dialog.project.id)
+    predictions = Prediction.objects.filter(project=setup_project_dialog.project.id)
     assert predictions.count() == prediction_count
     for i, predictions in enumerate(predictions):
         assert predictions.model_version == 'test'
