@@ -1,6 +1,6 @@
 {
   "message": "fix: LOPS-370: We could improve grid view for textual dataset",
-  "commit": "190377ab811b8eb2d5a1351473fd297439612387",
+  "commit": "cbd3a93c28d7daafce1f335690d766d5e2abad0e",
   "branch": "fb-lops-370/fetch-text",
-  "date": "2023/09/12 10:47:22"
+  "date": "2023/09/12 17:38:58"
 }
