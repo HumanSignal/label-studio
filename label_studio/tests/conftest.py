@@ -20,6 +20,7 @@ from botocore.exceptions import ClientError
 from django.conf import settings
 from freezegun import freeze_time
 from moto import mock_s3
+from nplusone.core.profiler import Profiler
 from organizations.models import Organization
 from projects.models import Project
 from tasks.models import Task
@@ -769,3 +770,13 @@ def tick_clock(_, seconds: int = 1) -> None:
     now += timedelta(seconds=seconds)
     freezer = freeze_time(now)
     freezer.start()
+
+
+@pytest.fixture(autouse=True)
+def _raise_nplusone(request):
+    """ Automatically enable the NPlusOne Profiler for tests that are not marked with 'skip_nplusone' """
+    if request.node.get_closest_marker("skip_nplusone"):
+        yield
+    else:
+        with Profiler():
+            yield

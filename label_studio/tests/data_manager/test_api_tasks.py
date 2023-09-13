@@ -8,6 +8,7 @@ from projects.models import Project
 from ..utils import make_annotation, make_prediction, make_task, project_id  # noqa
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.django_db
 def test_views_tasks_api(business_client, project_id):
     # create
@@ -89,6 +90,7 @@ def test_views_tasks_api(business_client, project_id):
     assert response_data["tasks"][0]["total_predictions"] == 0
 
 
+@pytest.mark.skip_nplusone
 @pytest.mark.parametrize(
     "tasks_count, annotations_count, predictions_count",
     [

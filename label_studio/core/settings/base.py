@@ -116,6 +116,8 @@ BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
+TESTING_SYNC = get_env('TESTING_SYNC', False, True)
+
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_MYSQL = 'mysql'
@@ -221,6 +223,11 @@ MIDDLEWARE = [
     'core.middleware.DatabaseIsLockedRetryMiddleware',
     'core.current_request.ThreadLocalMiddleware',
 ]
+
+# adds n+1 and eager loading query profiling to logs
+if DEBUG:
+    INSTALLED_APPS += ['nplusone.ext.django']
+    MIDDLEWARE += ['nplusone.ext.django.NPlusOneMiddleware']
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
