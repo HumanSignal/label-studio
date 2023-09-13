@@ -8,6 +8,8 @@ from django.shortcuts import render
 
 @login_required
 def task_page(request, pk):
-    response = {'version': get_short_version()}
+    response = {
+        'version': get_short_version()
+    }
     response.update(find_editor_files())
     return render(request, 'base.html', response)

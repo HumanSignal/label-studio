@@ -8,8 +8,8 @@ from .models import FileUpload
 
 
 class ImportApiSerializer(TaskSerializer):
-    """Tasks serializer for Import API (TaskBulkCreateAPI)"""
-
+    """ Tasks serializer for Import API (TaskBulkCreateAPI)
+    """
     annotations = AnnotationSerializer(many=True, default=[])
     predictions = PredictionSerializer(many=True, default=[])
 
@@ -25,3 +25,4 @@ class FileUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileUpload
         fields = ['id', 'file']
+

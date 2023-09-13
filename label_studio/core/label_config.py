@@ -24,10 +24,13 @@ logger = logging.getLogger(__name__)
 
 _DATA_EXAMPLES = None
 _LABEL_TAGS = {'Label', 'Choice', 'Relation'}
-SINGLE_VALUED_TAGS = {'choices': str, 'rating': int, 'number': float, 'textarea': str}
-_NOT_CONTROL_TAGS = {
-    'Filter',
+SINGLE_VALUED_TAGS = {
+    'choices': str,
+    'rating': int,
+    'number': float,
+    'textarea': str
 }
+_NOT_CONTROL_TAGS = {'Filter',}
 # TODO: move configs in right place
 _LABEL_CONFIG_SCHEMA = find_file('label_config_schema.json')
 with open(_LABEL_CONFIG_SCHEMA) as f:
@@ -49,15 +52,15 @@ def parse_config(config_string):
             "labels": ["Label1", "Label2", "Label3"] // taken from "alias" if exists or "value"
     }
     """
-    logger.warning('Using deprecated method - switch to label_studio.tools.label_config.parse_config!')
+    logger.warning("Using deprecated method - switch to label_studio.tools.label_config.parse_config!")
     return label_config.parse_config(config_string)
 
 
 def _fix_choices(config):
-    """
+    '''
     workaround for single choice
     https://github.com/heartexlabs/label-studio/issues/1259
-    """
+    '''
     if 'Choices' in config:
         # for single Choices tag in View
         if 'Choice' in config['Choices'] and not isinstance(config['Choices']['Choice'], list):
@@ -97,9 +100,7 @@ def validate_label_config(config_string):
         raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
-        error_message = 'Validation failed on {}: {}'.format(
-            '/'.join(map(str, exc.path)), error_message.replace('@', '')
-        )
+        error_message = 'Validation failed on {}: {}'.format('/'.join(map(str, exc.path)), error_message.replace('@', ''))
         raise LabelStudioValidationErrorSentryIgnored(error_message)
 
     # unique names in config # FIXME: 'name =' (with spaces) won't work
@@ -189,14 +190,14 @@ def config_line_stipped(c):
         p = c.getparent()
         if p is not None:
             p.remove(c)
-        c = etree.tostring(tree, method='html').decode('utf-8')
+        c = etree.tostring(tree, method='html').decode("utf-8")
 
     return c.replace('\n', '').replace('\r', '')
 
 
 def get_task_from_labeling_config(config):
-    """Get task, annotations and predictions from labeling config comment,
-    it must start from "<!-- {" and end as "} -->"
+    """ Get task, annotations and predictions from labeling config comment,
+        it must start from "<!-- {" and end as "} -->"
     """
     # try to get task data, annotations & predictions from config comment
     task_data, annotations, predictions = {}, None, None
@@ -206,8 +207,8 @@ def get_task_from_labeling_config(config):
     end = config[start:].find('-->') if start >= 0 else -1
     if 3 < start < start + end:
         try:
-            logger.debug('Parse ' + config[start : start + end])
-            body = json.loads(config[start : start + end])
+            logger.debug('Parse ' + config[start:start + end])
+            body = json.loads(config[start:start + end])
         except Exception:
             logger.error("Can't parse task from labeling config", exc_info=True)
             pass
@@ -221,7 +222,8 @@ def get_task_from_labeling_config(config):
 
 
 def data_examples(mode):
-    """Data examples for editor preview and task upload examples"""
+    """ Data examples for editor preview and task upload examples
+    """
     global _DATA_EXAMPLES
 
     if _DATA_EXAMPLES is None:
@@ -238,7 +240,8 @@ def data_examples(mode):
 
 
 def generate_sample_task_without_check(label_config, mode='upload', secure_mode=False):
-    """Generate sample task only"""
+    """ Generate sample task only
+    """
     # load config
     xml = etree.fromstring(label_config, forbid_dtd=False)
     if xml is None:
@@ -269,7 +272,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
         elif value == 'video' and p.tag == 'HyperText':
             task[value] = examples.get('$videoHack')
-        # List with a matching Ranker tag pair
+        # List with a matching Ranker tag pair 
         elif p.tag == 'List':
             task[value] = examples.get('List')
         elif p.tag == 'Paragraphs':
@@ -313,9 +316,9 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
                 task[value] = examples['HyperText']
         elif p.tag.lower().endswith('labels'):
             task[value] = examples['Labels']
-        elif p.tag.lower() == 'choices':
-            allow_nested = p.get('allowNested') or p.get('allownested') or 'false'
-            if allow_nested == 'true':
+        elif p.tag.lower() == "choices":
+            allow_nested = p.get('allowNested') or p.get('allownested') or "false"
+            if allow_nested == "true":
                 task[value] = examples['NestedChoices']
             else:
                 task[value] = examples['Choices']
@@ -350,10 +353,13 @@ def _is_strftime_string(s):
 
 
 def generate_time_series_json(time_column, value_columns, time_format=None):
-    """Generate sample for time series"""
+    """ Generate sample for time series
+    """
     n = 100
     if time_format is not None and not _is_strftime_string(time_format):
-        time_fmt_map = {'yyyy-MM-dd': '%Y-%m-%d'}
+        time_fmt_map = {
+            'yyyy-MM-dd': '%Y-%m-%d'
+        }
         time_format = time_fmt_map.get(time_format)
 
     if time_format is None:
@@ -367,7 +373,8 @@ def generate_time_series_json(time_column, value_columns, time_format=None):
 
 
 def get_sample_task(label_config, secure_mode=False):
-    """Get sample task from labeling config and combine it with generated sample task"""
+    """ Get sample task from labeling config and combine it with generated sample task
+    """
     predefined_task, annotations, predictions = get_task_from_labeling_config(label_config)
     generated_task = generate_sample_task_without_check(label_config, mode='editor_preview', secure_mode=secure_mode)
     if predefined_task is not None:
@@ -376,7 +383,8 @@ def get_sample_task(label_config, secure_mode=False):
 
 
 def config_essential_data_has_changed(new_config_str, old_config_str):
-    """Detect essential changes of the labeling config"""
+    """ Detect essential changes of the labeling config
+    """
     new_config = parse_config(new_config_str)
     old_config = parse_config(old_config_str)
 
@@ -393,7 +401,8 @@ def config_essential_data_has_changed(new_config_str, old_config_str):
 
 
 def replace_task_data_undefined_with_config_field(data, project, first_key=None):
-    """Use first key is passed (for speed up) or project.data.types.keys()[0]"""
+    """ Use first key is passed (for speed up) or project.data.types.keys()[0]
+    """
     # assign undefined key name from data to the first key from config, e.g. for txt loading
     if settings.DATA_UNDEFINED_NAME in data and (first_key or project.data_types.keys()):
         key = first_key or list(project.data_types.keys())[0]

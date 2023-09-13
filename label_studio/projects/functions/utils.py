@@ -23,6 +23,6 @@ def make_queryset_from_iterable(tasks_list):
             elif isinstance(task, int):
                 ids.append(task)
             else:
-                raise ValueError(f'Unknown object type: {str(task)}')
+                raise ValueError(f"Unknown object type: {str(task)}")
         queryset = Task.objects.filter(id__in=ids)
     return queryset

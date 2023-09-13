@@ -21,3 +21,4 @@ class DummyGetSessionMiddleware:
             request.session['organization_pk'] = org.id
         response = self.get_response(request)
         return response
+

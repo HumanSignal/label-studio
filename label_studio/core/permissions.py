@@ -37,6 +37,7 @@ class AllPermissions(BaseModel):
     labels_delete = 'labels.delete'
 
 
+
 all_permissions = AllPermissions()
 
 

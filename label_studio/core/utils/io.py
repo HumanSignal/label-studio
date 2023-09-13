@@ -1,4 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
 """
 import glob
 import io
@@ -47,7 +48,9 @@ def find_node(package_name, node_path, node_type):
         elif node_path in nodes:
             return os.path.join(path, node_path)
     else:
-        raise IOError('Could not find "%s" at package "%s"' % (node_path, basedir))
+        raise IOError(
+            'Could not find "%s" at package "%s"' % (node_path, basedir)
+        )
 
 
 def find_file(file):
@@ -187,7 +190,6 @@ def validate_upload_url(url, block_local_urls=True):
         ip = socket.gethostbyname(domain)
     except socket.error:
         from core.utils.exceptions import LabelStudioAPIException
-
         raise LabelStudioAPIException(f"Can't resolve hostname {domain}")
 
     if not block_local_urls:

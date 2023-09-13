@@ -10,14 +10,9 @@ def event_processor(event, hint):
     exceptions = event.get('exception', {}).get('values', [{}])
     last = exceptions[-1]
     if last.get('type') in [
-        'Http404',
-        'NotAuthenticated',
-        'AuthenticationFailed',
-        'NotFound',
-        'XMLSyntaxError',
+        'Http404', 'NotAuthenticated', 'AuthenticationFailed', 'NotFound', 'XMLSyntaxError',
         'FileUpload.DoesNotExist',
-        'Forbidden',
-        'KeyboardInterrupt',
+        'Forbidden', 'KeyboardInterrupt'
     ]:
         return None
 
@@ -33,7 +28,7 @@ def event_processor(event, hint):
             'could not connect to server',
             'the database system is shutting down',
             'remaining connection slots are reserved for non-replication superuser connections',
-            'unable to open database file',
+            'unable to open database file'
         ]
         for message in messages:
             if message in value:
@@ -53,13 +48,9 @@ def event_processor(event, hint):
         return None
 
     # skip transactions by urls
-    if event.get('transaction') in [
-        '/static/{path}',
-        '/dm/{path}',
-        '/react-app/{path}',
-        '/label-studio-frontend/{path}',
-        '/favicon.ico',
-        '/health',
+    if event.get("transaction") in [
+        '/static/{path}', '/dm/{path}', '/react-app/{path}', '/label-studio-frontend/{path}', '/favicon.ico',
+        '/health'
     ]:
         return None
 
@@ -74,7 +65,6 @@ def init_sentry(release_name, release_version):
         if settings.SENTRY_REDIS_ENABLED:
             from sentry_sdk.integrations.redis import RedisIntegration
             from sentry_sdk.integrations.rq import RqIntegration
-
             advanced = [RedisIntegration(), RqIntegration()]
         else:
             advanced = []
@@ -88,5 +78,5 @@ def init_sentry(release_name, release_version):
             traces_sample_rate=settings.SENTRY_RATE,
             send_default_pii=True,
             environment=settings.SENTRY_ENVIRONMENT,
-            release=release_name + '@' + str(release_version),
+            release=release_name + '@' + str(release_version)
         )
