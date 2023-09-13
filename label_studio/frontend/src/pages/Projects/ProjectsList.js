@@ -8,12 +8,45 @@ import { Block, Elem } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
 
 export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
+  const projectsNotStarted = projects.filter(project => {
+    return project.finished_task_number === 0;
+  });
+
+  const projectsInProgress = projects.filter(project => {
+    return project.finished_task_number < project.task_number && project.finished_task_number > 0;
+  });
+
+  const projectsCompleted = projects.filter(project => {
+    return project.finished_task_number === project.task_number && project.task_number !== 0;
+  });
+
   return (
     <>
-      <Elem name="list">
-        {projects.map(project => (
-          <ProjectCard key={project.id} project={project}/>
-        ))}
+      <Elem name='lists-wrap'>
+        <Elem name="list-wrap-not-started">
+          <Elem name='list-header-not-started'>Not Started</Elem>
+          <Elem name="list">
+            {projectsNotStarted.map(project => (
+              <ProjectCard key={project.id} project={project}/>
+            ))}
+          </Elem>
+        </Elem>
+        <Elem name="list-wrap-in-progress">
+          <Elem name='list-header-in-progress'>In Progress</Elem>
+          <Elem name="list">
+            {projectsInProgress.map(project => (
+              <ProjectCard key={project.id} project={project}/>
+            ))}
+          </Elem>
+        </Elem>
+        <Elem name="list-wrap-completed">
+          <Elem name='list-header-completed'>Completed</Elem>
+          <Elem name="list">
+            {projectsCompleted.map(project => (
+              <ProjectCard key={project.id} project={project}/>
+            ))}
+          </Elem>
+        </Elem>
       </Elem>
       <Elem name="pages">
         <Pagination

@@ -1,3 +1,15 @@
+list-wrap-styles()
+  border 1px solid #e1e1e1
+  margin-right: 10px
+  flex 1
+
+list-header-styles()
+  text-align center
+  font-weight 500
+  padding 20px
+  font-size: 16px;
+  color: rgba(0,0,0,0.5);
+
 .projects-page
   min-height calc(100vh - var(--header-height))
   background-color #FAFAFA
@@ -10,20 +22,51 @@
     justify-content center
     min-height calc(100vh - var(--header-height))
 
+  &__lists-wrap
+    display flex
+    padding: 20px;
+
+  &__list-wrap-not-started
+    list-wrap-styles()
+    background-color #fff9f5
+  
+  &__list-wrap-in-progress
+    list-wrap-styles()
+    background-color #f3f9ff
+
+  &__list-wrap-completed
+    list-wrap-styles()
+    background-color #fafff7
+    margin-right 0
+
+  &__list-header-not-started
+    list-header-styles()
+    background-color #fbe5d7
+
+  &__list-not-started
+    list-styles()
+    background-color #fff8f4
+
+  &__list-header-in-progress
+    list-header-styles()
+    background-color #deeaf6
+
+  &__list-header-completed
+    list-header-styles()
+    background-color #e2f0d9
+
   &__list
-    padding 40px
-    display grid
-    grid-autoflow columns
-    box-sizing border-box
-    grid-gap 32px
-    grid-auto-rows 1fr
-    grid-template-columns repeat(4, 1fr)
+    padding 20px
+    display flex
+    flex-direction column
+    height: calc(100% - 80px);
 
   &__link
     color #000
     display block
     display flex
     text-decoration none
+    margin-bottom: 20px;
 
     &:hover
       color #000
@@ -37,18 +80,6 @@
     justify-content flex-end
     box-sizing border-box
     background-color #fafafa
-
-  @media (min-width 1200px)
-    &__list
-      grid-template-columns repeat(3, 1fr)
-
-  @media (min-width 1360px)
-    &__list
-      grid-template-columns repeat(4, 1fr)
-
-  @media (min-width 1460px)
-    &__list
-      grid-template-columns repeat(5, 1fr)
 
 .empty-projects-page
   color $grey_8
