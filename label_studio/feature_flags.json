@@ -1918,33 +1918,6 @@
       "version": 2,
       "deleted": false
     },
-    "fflag-feat-front-dev-3088-import-annotations-in-project-duplication-short": {
-      "key": "fflag-feat-front-dev-3088-import-annotations-in-project-duplication-short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "65ee8bdf712e4d8e8c40b9931c6cc756",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag-feat-frontend-dev-2504-image-enhancements-zoom-center": {
       "key": "fflag-feat-frontend-dev-2504-image-enhancements-zoom-center",
       "on": true,
