@@ -689,7 +689,7 @@ def test_predictions_with_partially_predicted_tasks(
         assert len(list(filter(lambda h: h.url.endswith('predict'), m.request_history))) == prediction_call_count
 
         assert Prediction.objects.filter(
-            task__project=project.id, model_version=setup_returns_model_version
+            project=project.id, model_version=setup_returns_model_version
         ).count() == len(tasks)
         assert MLBackend.objects.get(url='http://localhost:8999').model_version == setup_returns_model_version
 
