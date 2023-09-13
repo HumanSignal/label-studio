@@ -138,17 +138,17 @@ class ExportMixin:
         return options
 
     def get_task_queryset(self, ids, annotation_filter_options):
-        annotations_qs = self._get_filtered_annotations_queryset(
-            annotation_filter_options=annotation_filter_options
+        annotations_qs = self._get_filtered_annotations_queryset(annotation_filter_options=annotation_filter_options)
+        return (
+            Task.objects.filter(id__in=ids)
+            .prefetch_related(
+                Prefetch(
+                    'annotations',
+                    queryset=annotations_qs,
+                )
+            )
+            .prefetch_related('predictions', 'drafts')
         )
-        return Task.objects.filter(id__in=ids).prefetch_related(
-            Prefetch(
-                "annotations",
-                queryset=annotations_qs,
-            )
-        ).prefetch_related(
-                'predictions', 'drafts'
-            )
 
     def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """
@@ -217,9 +217,7 @@ class ExportMixin:
     def save_file(self, file, md5):
         now = datetime.now()
         file_name = f'project-{self.project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
-        file_path = (
-            f'{self.project.id}/{file_name}'
-        )  # finally file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
+        file_path = f'{self.project.id}/{file_name}'  # finally file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
         file_ = File(file, name=file_path)
         self.file.save(file_path, file_)
         self.md5 = md5
@@ -242,7 +240,7 @@ class ExportMixin:
                     )
                 )
             )
-            with tempfile.NamedTemporaryFile(suffix=".export.json", dir=settings.FILE_UPLOAD_TEMP_DIR) as file:
+            with tempfile.NamedTemporaryFile(suffix='.export.json', dir=settings.FILE_UPLOAD_TEMP_DIR) as file:
                 for chunk in iter_json:
                     encoded_chunk = chunk.encode('utf-8')
                     file.write(encoded_chunk)
