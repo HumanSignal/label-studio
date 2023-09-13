@@ -4,6 +4,7 @@ import logging
 import re
 from datetime import timedelta
 from enum import Enum
+from functools import lru_cache
 from json import JSONDecodeError
 from typing import Union
 from urllib.parse import urlparse
@@ -29,6 +30,22 @@ class GCS(object):
         JSON = 2
         JSON_DICT = 3
         BASE64 = 4
+
+    @classmethod
+    @lru_cache(maxsize=1)
+    def get_bucket(
+        cls,
+        google_project_id: str = None,
+        google_application_credentials: Union[str, dict] = None,
+        bucket_name: str = None,
+    ) -> gcs.Bucket:
+
+        client = cls.get_client(
+            google_project_id=google_project_id,
+            google_application_credentials=google_application_credentials
+        )
+
+        return client.get_bucket(bucket_name)
 
     @classmethod
     def get_client(
@@ -186,11 +203,12 @@ class GCS(object):
         this if you are using Application Default Credentials from Google Compute
         Engine or from the Google Cloud SDK.
         """
-        client = cls.get_client(
+        bucket = cls.get_bucket(
             google_application_credentials=google_application_credentials,
-            google_project_id=google_project_id
+            google_project_id=google_project_id,
+            bucket_name=bucket_name
         )
-        bucket = client.get_bucket(bucket_name)
+
         blob = bucket.blob(blob_name)
 
         # this flag should be OFF, maybe we need to enable it for 1-2 customers, we have to check it
