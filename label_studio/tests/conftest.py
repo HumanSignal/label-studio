@@ -70,7 +70,7 @@ def debug_modal_exceptions_false(settings):
     settings.DEBUG_MODAL_EXCEPTIONS = False
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope='function')
 def enable_sentry():
     settings.SENTRY_RATE = 0
     # it's disabled key, but this is correct
@@ -127,7 +127,7 @@ def s3_remove_bucket():
     _s3.delete_object(Bucket=bucket_name, Key='subdir/image2.jpg')
     _s3.delete_object(Bucket=bucket_name, Key='subdir/another/image2.jpg')
     _s3.delete_bucket(Bucket=bucket_name)
-    return ""
+    return ''
 
 
 @pytest.fixture(autouse=True)
@@ -142,19 +142,25 @@ def s3_with_jsons(s3):
 def s3_with_hypertext_s3_links(s3):
     bucket_name = 'pytest-s3-jsons-hypertext'
     s3.create_bucket(Bucket=bucket_name)
-    s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({
-        'text': "<a href=\"s3://hypertext-bucket/file with /spaces and' / ' / quotes.jpg\"/>"
-    }))
+    s3.put_object(
+        Bucket=bucket_name,
+        Key='test.json',
+        Body=json.dumps({'text': '<a href="s3://hypertext-bucket/file with /spaces and\' / \' / quotes.jpg"/>'}),
+    )
     yield s3
+
 
 @pytest.fixture(autouse=True)
 def s3_with_partially_encoded_s3_links(s3):
     bucket_name = 'pytest-s3-json-partially-encoded'
     s3.create_bucket(Bucket=bucket_name)
-    s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({
-        'text': "<a href=\"s3://hypertext-bucket/file with /spaces and' / ' / %2Bquotes%3D.jpg\"/>"
-    }))
+    s3.put_object(
+        Bucket=bucket_name,
+        Key='test.json',
+        Body=json.dumps({'text': '<a href="s3://hypertext-bucket/file with /spaces and\' / \' / %2Bquotes%3D.jpg"/>'}),
+    )
     yield s3
+
 
 @pytest.fixture(autouse=True)
 def s3_with_unexisted_links(s3):
@@ -178,51 +184,30 @@ def s3_export_bucket_sse(s3):
 
     # Set the bucket policy
     policy = {
-        "Version": "2012-10-17",
-        "Statement": [
+        'Version': '2012-10-17',
+        'Statement': [
             {
-                "Effect": "Deny",
-                "Principal": "*",
-                "Action": "s3:PutObject",
-                "Resource": [
-                    f"arn:aws:s3:::{bucket_name}",
-                    f"arn:aws:s3:::{bucket_name}/*"
-                ],
-                "Condition": {
-                    "StringNotEquals": {
-                        "s3:x-amz-server-side-encryption": "AES256"
-                    }
-                }
+                'Effect': 'Deny',
+                'Principal': '*',
+                'Action': 's3:PutObject',
+                'Resource': [f'arn:aws:s3:::{bucket_name}', f'arn:aws:s3:::{bucket_name}/*'],
+                'Condition': {'StringNotEquals': {'s3:x-amz-server-side-encryption': 'AES256'}},
             },
             {
-                "Effect": "Deny",
-                "Principal": "*",
-                "Action": "s3:PutObject",
-                "Resource": [
-                    f"arn:aws:s3:::{bucket_name}",
-                    f"arn:aws:s3:::{bucket_name}/*"
-                ],
-                "Condition": {
-                    "Null": {
-                        "s3:x-amz-server-side-encryption": "true"
-                    }
-                }
+                'Effect': 'Deny',
+                'Principal': '*',
+                'Action': 's3:PutObject',
+                'Resource': [f'arn:aws:s3:::{bucket_name}', f'arn:aws:s3:::{bucket_name}/*'],
+                'Condition': {'Null': {'s3:x-amz-server-side-encryption': 'true'}},
             },
             {
-                "Effect": "Deny",
-                "Principal": "*",
-                "Action": "s3:*",
-                "Resource": [
-                    f"arn:aws:s3:::{bucket_name}",
-                    f"arn:aws:s3:::{bucket_name}/*"
-                ],
-                "Condition": {
-                    "Bool": {
-                        "aws:SecureTransport": "false"
-                    }
-                }
-            }
-        ]
+                'Effect': 'Deny',
+                'Principal': '*',
+                'Action': 's3:*',
+                'Resource': [f'arn:aws:s3:::{bucket_name}', f'arn:aws:s3:::{bucket_name}/*'],
+                'Condition': {'Bool': {'aws:SecureTransport': 'false'}},
+            },
+        ],
     }
 
     s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
@@ -237,51 +222,30 @@ def s3_export_bucket_kms(s3):
 
     # Set the bucket policy
     policy = {
-        "Version": "2012-10-17",
-        "Statement": [
+        'Version': '2012-10-17',
+        'Statement': [
             {
-                "Effect": "Deny",
-                "Principal": "*",
-                "Action": "s3:PutObject",
-                "Resource": [
-                    f"arn:aws:s3:::{bucket_name}",
-                    f"arn:aws:s3:::{bucket_name}/*"
-                ],
-                "Condition": {
-                    "StringNotEquals": {
-                        "s3:x-amz-server-side-encryption": "aws:kms"
-                    }
-                }
+                'Effect': 'Deny',
+                'Principal': '*',
+                'Action': 's3:PutObject',
+                'Resource': [f'arn:aws:s3:::{bucket_name}', f'arn:aws:s3:::{bucket_name}/*'],
+                'Condition': {'StringNotEquals': {'s3:x-amz-server-side-encryption': 'aws:kms'}},
             },
             {
-                "Effect": "Deny",
-                "Principal": "*",
-                "Action": "s3:PutObject",
-                "Resource": [
-                    f"arn:aws:s3:::{bucket_name}",
-                    f"arn:aws:s3:::{bucket_name}/*"
-                ],
-                "Condition": {
-                    "Null": {
-                        "s3:x-amz-server-side-encryption": "true"
-                    }
-                }
+                'Effect': 'Deny',
+                'Principal': '*',
+                'Action': 's3:PutObject',
+                'Resource': [f'arn:aws:s3:::{bucket_name}', f'arn:aws:s3:::{bucket_name}/*'],
+                'Condition': {'Null': {'s3:x-amz-server-side-encryption': 'true'}},
             },
             {
-                "Effect": "Deny",
-                "Principal": "*",
-                "Action": "s3:*",
-                "Resource": [
-                    f"arn:aws:s3:::{bucket_name}",
-                    f"arn:aws:s3:::{bucket_name}/*"
-                ],
-                "Condition": {
-                    "Bool": {
-                        "aws:SecureTransport": "false"
-                    }
-                }
-            }
-        ]
+                'Effect': 'Deny',
+                'Principal': '*',
+                'Action': 's3:*',
+                'Resource': [f'arn:aws:s3:::{bucket_name}', f'arn:aws:s3:::{bucket_name}/*'],
+                'Condition': {'Bool': {'aws:SecureTransport': 'false'}},
+            },
+        ],
     }
 
     s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
@@ -292,13 +256,7 @@ def s3_export_bucket_kms(s3):
 def mock_put_aes(*args, **kwargs):
     if 'ServerSideEncryption' not in kwargs or kwargs['ServerSideEncryption'] != 'AES256':
         raise ClientError(
-            error_response={
-                'Error': {
-                    'Code': 'AccessDenied',
-                    'Message': 'Access Denied'
-                }
-            },
-            operation_name='PutObject'
+            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
         )
 
 
@@ -318,16 +276,13 @@ def mock_s3_resource_aes(mocker):
 
 
 def mock_put_kms(*args, **kwargs):
-    if 'ServerSideEncryption' not in kwargs or kwargs[
-        'ServerSideEncryption'] != 'aws:kms' or 'SSEKMSKeyId' not in kwargs:
+    if (
+        'ServerSideEncryption' not in kwargs
+        or kwargs['ServerSideEncryption'] != 'aws:kms'
+        or 'SSEKMSKeyId' not in kwargs
+    ):
         raise ClientError(
-            error_response={
-                'Error': {
-                    'Code': 'AccessDenied',
-                    'Message': 'Access Denied'
-                }
-            },
-            operation_name='PutObject'
+            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
         )
 
 
@@ -378,7 +333,9 @@ def import_from_url():
 
 @pytest.fixture(autouse=True)
 def ml_backend_1(ml_backend):
-    register_ml_backend_mock(ml_backend, url='https://test.heartex.mlbackend.com:9090', setup_model_version='Fri Feb 19 17:10:44 2021')
+    register_ml_backend_mock(
+        ml_backend, url='https://test.heartex.mlbackend.com:9090', setup_model_version='Fri Feb 19 17:10:44 2021'
+    )
     register_ml_backend_mock(ml_backend, url='https://test.heartex.mlbackend.com:9091', health_connect_timeout=True)
     register_ml_backend_mock(ml_backend, url='http://localhost:8999', predictions={'results': []})
     yield ml_backend
@@ -390,8 +347,8 @@ def pytest_configure():
 
 
 class URLS:
-    """ This class keeps urls with api
-    """
+    """This class keeps urls with api"""
+
     def __init__(self):
         self.project_create = '/api/projects/'
         self.task_bulk = None
@@ -402,26 +359,26 @@ class URLS:
 
 
 def project_ranker():
-    label = '''<View>
+    label = """<View>
          <HyperText name="hypertext_markup" value="$markup"></HyperText>
          <List name="ranker" value="$replies" elementValue="$text" elementTag="Text"
                ranked="true" sortedHighlightColor="#fcfff5"></List>
-        </View>'''
+        </View>"""
     return {'label_config': label, 'title': 'test'}
 
 
 def project_dialog():
-    """ Simple project with dialog configs
+    """Simple project with dialog configs
 
     :return: config of project with task
     """
-    label = '''<View>
+    label = """<View>
       <TextEditor>
         <Text name="dialog" value="$dialog"></Text>
         <Header name="header" value="Your answer is:"></Header>
         <TextArea name="answer"></TextArea>
       </TextEditor>
-    </View>'''
+    </View>"""
 
     return {'label_config': label, 'title': 'test'}
 
@@ -450,7 +407,7 @@ def project_choices():
 
 
 def setup_project(client, project_template, do_auth=True):
-    """ Create new test@gmail.com user, login via client, create test project.
+    """Create new test@gmail.com user, login via client, create test project.
     Project configs are thrown over params and automatically grabs from functions names started with 'project_'
 
     :param client: fixture with http client (from pytest-django package) and simulation of http server
@@ -458,8 +415,8 @@ def setup_project(client, project_template, do_auth=True):
     :param do_auth: make authorization for creating user
     """
     client = deepcopy(client)
-    email = "test@gmail.com"
-    password = "test"
+    email = 'test@gmail.com'
+    password = 'test'
     urls = URLS()
     project_config = project_template()
 
@@ -589,7 +546,7 @@ def any_client(request, business_client, annotator_client):
 def configured_project(business_client, annotator_client):
     _project_for_text_choices_onto_A_B_classes = dict(
         title='Test',
-        label_config='''
+        label_config="""
             <View>
               <Text name="meta_info" value="$meta_info"></Text>
               <Text name="text" value="$text"></Text>
@@ -597,11 +554,11 @@ def configured_project(business_client, annotator_client):
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
-            </View>'''
+            </View>""",
     )
     _2_tasks_with_textA_and_textB = [
         {'meta_info': 'meta info A', 'text': 'text A'},
-        {'meta_info': 'meta info B', 'text': 'text B'}
+        {'meta_info': 'meta info B', 'text': 'text B'},
     ]
 
     # get user to be owner
@@ -614,44 +571,51 @@ def configured_project(business_client, annotator_client):
     return project
 
 
-@pytest.fixture(name="django_live_url")
+@pytest.fixture(name='django_live_url')
 def get_server_url(live_server):
     yield live_server.url
 
 
-@pytest.fixture(name="async_import_off", autouse=True)
+@pytest.fixture(name='async_import_off', autouse=True)
 def async_import_off():
     from core.feature_flags import flag_set
+
     def fake_flag_set(*args, **kwargs):
         if args[0] == 'fflag_feat_all_lsdv_4915_async_task_import_13042023_short':
             return False
         return flag_set(*args, **kwargs)
+
     with mock.patch('data_import.api.flag_set', wraps=fake_flag_set):
         yield
 
 
-@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
+@pytest.fixture(name='fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on')
 def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on():
     from core.feature_flags import flag_set
+
     def fake_flag_set(*args, **kwargs):
         if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
             return True
         return flag_set(*args, **kwargs)
+
     with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
         yield
 
 
-@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off")
+@pytest.fixture(name='fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off')
 def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
     from core.feature_flags import flag_set
+
     def fake_flag_set(*args, **kwargs):
         if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
             return False
         return flag_set(*args, **kwargs)
+
     with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
         yield
 
-@pytest.fixture(name="fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on")
+
+@pytest.fixture(name='fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on')
 def fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on():
     from core.feature_flags import flag_set
 
@@ -659,33 +623,38 @@ def fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on
         if args[0] == 'fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short':
             return True
         return flag_set(*args, **kwargs)
+
     with mock.patch('io_storages.s3.models.flag_set', wraps=fake_flag_set):
         yield
 
 
-@pytest.fixture(name="fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on")
+@pytest.fixture(name='fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on')
 def fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on():
     from core.feature_flags import flag_set
+
     def fake_flag_set(*args, **kwargs):
         if args[0] == 'fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short':
             return True
         return flag_set(*args, **kwargs)
+
     with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
         yield
 
 
-@pytest.fixture(name="ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on")
+@pytest.fixture(name='ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on')
 def ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on():
     from core.feature_flags import flag_set
+
     def fake_flag_set(*args, **kwargs):
         if args[0] == 'ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short':
             return True
         return flag_set(*args, **kwargs)
+
     with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
         yield
 
 
-@pytest.fixture(name="local_files_storage")
+@pytest.fixture(name='local_files_storage')
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True
     tempdir = Path(tempfile.gettempdir()) / Path('files')
@@ -696,47 +665,56 @@ def local_files_storage(settings):
     shutil.copyfile(str(test_image), str(subdir / Path('test_image2.png')))
 
 
-@pytest.fixture(name="local_files_document_root_tempdir")
+@pytest.fixture(name='local_files_document_root_tempdir')
 def local_files_document_root_tempdir(settings):
     tempdir = Path(tempfile.gettempdir())
     settings.LOCAL_FILES_DOCUMENT_ROOT = tempdir.root
 
 
-@pytest.fixture(name="local_files_document_root_subdir")
+@pytest.fixture(name='local_files_document_root_subdir')
 def local_files_document_root_subdir(settings):
     tempdir = Path(tempfile.gettempdir()) / Path('files')
     settings.LOCAL_FILES_DOCUMENT_ROOT = str(tempdir)
 
 
-@pytest.fixture(name="testing_session_timeouts")
+@pytest.fixture(name='testing_session_timeouts')
 def set_testing_session_timeouts(settings):
     settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=6).total_seconds()))
-    settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))
+    settings.MAX_TIME_BETWEEN_ACTIVITY = int(
+        get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds())
+    )
+
 
 @pytest.fixture
-def mock_ml_auto_update(name="mock_ml_auto_update"):
+def mock_ml_auto_update(name='mock_ml_auto_update'):
     url = 'http://localhost:9090'
     with requests_mock.Mocker(real_http=True) as m:
-        m.register_uri('POST', f'{url}/setup', [
-            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
-            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
-            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
-            {'json': {'model_version': 'version2', 'status': 'ok'}, 'status_code': 200},
-            {'json': {'model_version': 'version3', 'status': 'ok'}, 'status_code': 200},
-
-
-        ])
+        m.register_uri(
+            'POST',
+            f'{url}/setup',
+            [
+                {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+                {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+                {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+                {'json': {'model_version': 'version2', 'status': 'ok'}, 'status_code': 200},
+                {'json': {'model_version': 'version3', 'status': 'ok'}, 'status_code': 200},
+            ],
+        )
         m.get(f'{url}/health', text=json.dumps({'status': 'UP'}))
         yield m
 
-@pytest.fixture(name="mock_ml_backend_auto_update_disabled")
+
+@pytest.fixture(name='mock_ml_backend_auto_update_disabled')
 def mock_ml_backend_auto_update_disabled():
     with ml_backend_mock(setup_model_version='version1') as m:
-        m.register_uri('GET', 'http://localhost:9090/setup', [
-            {'json': {'model_version': '', 'status': 'ok'}, 'status_code': 200},
-            {'json': {'model_version': '2', 'status': 'ok'}, 'status_code': 200},
-
-        ])
+        m.register_uri(
+            'GET',
+            'http://localhost:9090/setup',
+            [
+                {'json': {'model_version': '', 'status': 'ok'}, 'status_code': 200},
+                {'json': {'model_version': '2', 'status': 'ok'}, 'status_code': 200},
+            ],
+        )
         yield m
 
 
@@ -744,7 +722,7 @@ freezer = None
 now = None
 
 
-@pytest.fixture(name="freeze_clock")
+@pytest.fixture(name='freeze_clock')
 def freeze_clock():
     global freezer
     global now

@@ -1,4 +1,4 @@
-name: "Ruff"
+name: Blue
 
 on:
   workflow_call:
@@ -8,8 +8,8 @@ on:
         type: string
 
 jobs:
-  ruff:
-    name: Ruff
+  blue:
+    name: Blue
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -19,4 +19,4 @@ jobs:
     - uses: actions/setup-python@v3
     - uses: pre-commit/action@v3.0.0
       with:
-        extra_args: ruff --all-files --hook-stage pre-push
+        extra_args: blue --all-files --hook-stage pre-push

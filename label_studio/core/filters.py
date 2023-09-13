@@ -6,6 +6,6 @@ class ListFilter(Filter):
     def filter(self, qs, value):
         if value in EMPTY_VALUES:
             return qs
-        value_list = value.split(",")
+        value_list = value.split(',')
         qs = super().filter(qs, value_list)
         return qs
