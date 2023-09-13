@@ -4,7 +4,10 @@ jobs:
   blue:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.head_sha }}
     - uses: actions/setup-python@v3
     - uses: pre-commit/action@v3.0.0
       with:
