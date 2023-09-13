@@ -69,8 +69,8 @@ class Admin(HttpUser):
             '/api/projects/%i/import' % self.project_id,
             name='/api/projects/<pk>/import',
             files={'csv': open('data.csv', 'rb')},
+            # headers={'content-type': 'multipart/form-data'})
         )
-        # headers={'content-type': 'multipart/form-data'})
 
 
 class Annotator(HttpUser):
