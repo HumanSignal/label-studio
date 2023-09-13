@@ -1,7 +1,15 @@
 name: Blue
-on: [ pull_request ]
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
 jobs:
   blue:
+    name: Blue
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
