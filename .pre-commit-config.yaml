@@ -4,7 +4,7 @@ repos:
     rev: v0.0.285
     hooks:
       - id: ruff
-        args: [ --fix, --show-fixes, --exit-non-zero-on-fix ]
+        args: [ --no-fix, --show-fixes, --show-source ]
 -   repo: https://github.com/grantjenks/blue
     rev: v0.9.1
     hooks:

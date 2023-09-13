@@ -24,3 +24,4 @@ jobs:
         with:
           src: "./label_studio"
           version: 0.0.285
+          args: --no-fix --show-source --show-fixes
