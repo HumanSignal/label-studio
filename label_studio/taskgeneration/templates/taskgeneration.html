@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+<head>
+    <title>Generate activity annotation tasks </title>
+</head>
+<body>
+    <div class="forms">
+        <h2>Generate activity annotation tasks</h2>
+        <form enctype="multipart/form-data" action="/taskgeneration/generate/" method="post">
+            {{ taskgenerationform }}
+            <input type="submit" value="Generate">
+        </form>
+
+    </div>
+</body>
+
+
+{% endblock %}

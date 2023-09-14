@@ -50,3 +50,6 @@ col_names_row :  7  #0-…
 
 # ; , #, / (Optional)
 comment_style :
+
+# Select timezone (Default='UTC')
+timezone : 'UTC'

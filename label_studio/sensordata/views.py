@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.apps import apps
 from .forms import SensorDataForm, SensorOffsetForm
 from .models import SensorData, SensorOffset
 from .parsing.sensor_data import SensorDataParser
@@ -10,6 +11,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import json
 from datetime import timedelta
 from sensormodel.models import SensorType
+from data_import.models import FileUpload
 from rest_framework.authtoken.models import Token
 import requests
 from tempfile import NamedTemporaryFile
@@ -42,6 +44,7 @@ def addsensordata(request, project_id):
             project = project
             sensor = sensordataform.cleaned_data.get('sensor')
 
+
             # Check if the uploaded file is a zip file
             if zipfile.is_zipfile(uploaded_file):
                 # Process the zip file
@@ -59,7 +62,6 @@ def addsensordata(request, project_id):
 
             # Raise an exception if the uploaded file is not a zip file
             raise ValueError("Uploaded file must be a zip file.")
-
     else:
         sensordataform = SensorDataForm()
 
@@ -126,7 +128,7 @@ def parse_IMU(request, file_path, sensor, name, project):
     # Parse data
 
     project_controller = ProjectController()
-    sensor_data = SensorDataParser(project_controller, Path(file_path),sensortype.id)
+    sensor_data = SensorDataParser(project_controller=project_controller, file_path=Path(file_path),sensor_model_id= sensortype.id)
     # Get parsed data
     sensor_df = sensor_data.get_data()
     # Now that the sensordata has been parsed it has to be transformed back to a .csv file and uploaded to the correct project
@@ -138,7 +140,9 @@ def parse_IMU(request, file_path, sensor, name, project):
 
     # Upload parsed sensor(IMU) data to corresponding project
     upload_sensor_data(request=request, name=name, file_path=file_path ,project=project)
- 
+    # Retrieve id of the FileUpload object that just got created. This is the latest created instance of the class FileUpload
+    fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
+    file_upload = fileupload_model.objects.latest('id')
     # Parse to JSON to get begin and end datetime   
     sensor_data_json_string = sensor_df.to_json()
     sensor_data_json = json.loads(sensor_data_json_string)
@@ -166,14 +170,20 @@ def parse_IMU(request, file_path, sensor, name, project):
         # end_datetime = begin_datetime + end_time
 
     # Create SensorData object with parsed data
-    SensorData.objects.create(name=name, sensor=sensor,\
-        begin_datetime=begin_datetime, end_datetime=end_datetime, project=project).save()
+    sensordata = SensorData.objects.create(name=name, sensor=sensor,\
+        begin_datetime=begin_datetime, end_datetime=end_datetime, project=project,file_upload=file_upload)
     
 
 
 def parse_camera(request, file_path, sensor, name, project):
     # Upload video to project
     upload_sensor_data(request=request, name=name, file_path=file_path ,project=project)
+    # Retrieve id of the FileUpload object that just got created. This is the latest created instance of the class FileUpload
+    fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
+    file_upload = fileupload_model.objects.latest('id')
+    
+
+    
     # Get sensortype config
     sensortype = SensorType.objects.get(id=sensor.sensortype.id)
     sensor_timezone = sensortype.timezone
@@ -188,8 +198,8 @@ def parse_camera(request, file_path, sensor, name, project):
     end_datetime =  begin_datetime + delta
 
     # Create SensorData object with parsed data
-    SensorData.objects.create(name=name, sensor=sensor,\
-        begin_datetime=begin_datetime, end_datetime=end_datetime, project=project).save()
+    sensordata = SensorData.objects.create(name=name, sensor=sensor,\
+        begin_datetime=begin_datetime, end_datetime=end_datetime, project=project, file_upload=file_upload)
     
 def upload_sensor_data(request, name, file_path, project):
     user = request.user
@@ -199,7 +209,7 @@ def upload_sensor_data(request, name, file_path, project):
     # Get temporary file URL from the form
     files = {f'{name}': open(file_path, 'rb')}
     # Import the video to the correct project
-    requests.post(import_url, headers={'Authorization': f'Token {token}'}, files=files) 
+    import_req = requests.post(import_url, headers={'Authorization': f'Token {token}'}, files=files)
 
 
 def deletesensordata(request, project_id, id):

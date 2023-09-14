@@ -91,7 +91,8 @@ urlpatterns = [
     path('sensormodel/', include('sensormodel.urls')),
     path('subjectannotation/', include('subjectannotation.urls')),
     path('sensordata/', include('sensordata.urls')),
-    path('landingpage/', include('landingpage.urls'))
+    path('landingpage/', include('landingpage.urls')),
+    path('taskgeneration/', include('taskgeneration.urls'))
 ]
 
 if settings.DEBUG:

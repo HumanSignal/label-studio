@@ -132,7 +132,6 @@ def delete_subject(request, project_id, id):
 def sync_sensor_parser_templates(request):
     # Search sensortypes repo for (new) config .yaml files and add them to DB
     if request.method == 'POST':
-
         # # Reset the sensortypes
         # SensorType.objects.all().delete()
         

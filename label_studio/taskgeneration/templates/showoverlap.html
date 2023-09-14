@@ -44,48 +44,44 @@
     input[type=submit]:hover {
         background-color: #45a049;
     }
-
 </style>
+
 <head>
-    <title>Sensor mapping</title>
+    <title>Deployment overview</title>
 </head>
 <body>
     <div class="buttons">
-        <form action="{% url 'landingpage:landingpage' project.id %}">
-            <input type="submit" value="Go back to landing page" style="background-color: #c4862b; width:25%"/>
-        </form>
-        <form action="{% url 'sensordata:addsensordata' project.id %}">
-            <input type="submit" value="Add sensor data file" style="background-color: #c4862b; width:25%"/>
+        <form action="/landingpage/">
+            <input type="submit" value="Go back to landingpage" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
-    <div class="sensordata">
-        <h2>Sensor data</h2>
+    <div class="overlap">
+        <h2>Overlap</h2>
         <table class="tables">
             <tr>
-                <th>Sensor data name</th>
-                <th>Begin Date Time</th>
-                <th>End Date Time</th>
-                <th>Project</th>
-                <th>Sensor type</th>
-                <th></th>
+                <th>vid</th>
+                <th>imu</th>
+                <th>project</th>
+                <th>subject</th>
+                <th>start vid in sec</th>
+                <th>end vid in sec</th>
+                <th>start imu in sec</th>
+                <th>end imu in sec</th>
             </tr>
-            {% for sendata in sensordata %}
+            {% for ol in overlap %}
             <tr>
-                <td>{{ sendata.name }}</td>
-                <td>{{ sendata.begin_datetime|date:"F d, Y, H:i:s" }}</td>
-                <td>{{ sendata.end_datetime|date:"F d, Y, H:i:s" }}</td>
-                <td>{{ sendata.project}} </td>
-                <td>{{ sendata.sensor}} </td>
-                <td><a href="{% url 'sensordata:delete' sendata.id %}">[Delete]</a></td>
-
+                <td>{{ ol.video }}</td>
+                <td>{{ ol.imu }}</td>
+                <td>{{ ol.project }}</td> 
+                <td>{{ ol.subject}} </td>
+                <td>{{ ol.start_video }}</td>
+                <td>{{ ol.end_video }}</td>
+                <td>{{ ol.start_imu }}</td>
+                <td>{{ ol.end_imu}}</td>
             </tr> 
             {% endfor %} 
-        </table>
-        
-        
+        </table>  
     </div>
-
 </body>
-
 
 {% endblock %}
