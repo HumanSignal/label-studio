@@ -27,19 +27,16 @@ class Label(models.Model):
         return self.organization_id == user.active_organization_id
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['title', 'organization'], name='unique_title')
-        ]
+        constraints = [models.UniqueConstraint(fields=['title', 'organization'], name='unique_title')]
 
 
 class LabelLink(models.Model):
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE, related_name='links')
     from_name = models.CharField(_('Tag name'), max_length=2048, help_text='Tag name')
+
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['project', 'label'], name='unique_label_project')
-        ]
+        constraints = [models.UniqueConstraint(fields=['project', 'label'], name='unique_label_project')]
 
     def has_permission(self, user):
         user.project = self.project  # link for activity log

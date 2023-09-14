@@ -33,7 +33,7 @@ def _load_log_payloads():
     for item in log_payloads:
         out[item['name']] = {
             'exclude_from_logs': item.get('exclude_from_logs', False),
-            'log_payloads': item.get('log_payloads')
+            'log_payloads': item.get('log_payloads'),
         }
     return out
 
@@ -71,8 +71,9 @@ class ContextLog(object):
     def _is_docker(self):
         path = '/proc/self/cgroup'
         return (
-            os.path.exists('/.dockerenv') or
-            os.path.isfile(path) and any('docker' in line for line in open(path, encoding='utf-8'))
+            os.path.exists('/.dockerenv')
+            or os.path.isfile(path)
+            and any('docker' in line for line in open(path, encoding='utf-8'))
         )
 
     def _get_timestamp_now(self):
@@ -117,8 +118,28 @@ class ContextLog(object):
             self._assert_type_in_test(dict, payload['response'], view_name)
             new_response = {}
             self._assert_field_in_test('drafts', payload['response'], view_name)
-            new_response['drafts'] = len(payload['response']['drafts']) if isinstance(payload['response']['drafts'], list) else payload['response']['drafts']
-            for key in ["id", "inner_id", "cancelled_annotations", "total_annotations", "total_predictions", "updated_by", "created_at", "updated_at", "overlap", "comment_count", "unresolved_comment_count", "last_comment_updated_at", "project", "comment_authors", "queue"]:
+            new_response['drafts'] = (
+                len(payload['response']['drafts'])
+                if isinstance(payload['response']['drafts'], list)
+                else payload['response']['drafts']
+            )
+            for key in [
+                'id',
+                'inner_id',
+                'cancelled_annotations',
+                'total_annotations',
+                'total_predictions',
+                'updated_by',
+                'created_at',
+                'updated_at',
+                'overlap',
+                'comment_count',
+                'unresolved_comment_count',
+                'last_comment_updated_at',
+                'project',
+                'comment_authors',
+                'queue',
+            ]:
                 self._assert_field_in_test(key, payload['response'], view_name)
                 new_response[key] = payload['response'][key]
             payload['response'] = new_response
@@ -149,10 +170,12 @@ class ContextLog(object):
             payload['response'] = [item.get('title') for item in payload['response']]
             return
 
-        if (view_name == 'tasks:api:task-annotations' and payload['method'] in 'POST') or \
-            (view_name == 'tasks:api-annotations:annotation-detail' and payload['method'] == 'PATCH') or \
-            (view_name == 'tasks:api:task-annotations-drafts' and payload['method'] == 'POST') or \
-            (view_name == 'tasks:api-drafts:draft-detail' and payload['method'] == 'PATCH'):
+        if (
+            (view_name == 'tasks:api:task-annotations' and payload['method'] in 'POST')
+            or (view_name == 'tasks:api-annotations:annotation-detail' and payload['method'] == 'PATCH')
+            or (view_name == 'tasks:api:task-annotations-drafts' and payload['method'] == 'POST')
+            or (view_name == 'tasks:api-drafts:draft-detail' and payload['method'] == 'PATCH')
+        ):
             self._assert_field_in_test('lead_time', payload['json'], view_name)
             self._assert_field_in_test('result', payload['json'], view_name)
             self._assert_type_in_test(list, payload['json']['result'], view_name)
@@ -210,8 +233,12 @@ class ContextLog(object):
 
     @staticmethod
     def browser_exists(request):
-        return hasattr(request, 'user_agent') and request.user_agent and \
-               hasattr(request.user_agent, 'browser') and request.user_agent.browser
+        return (
+            hasattr(request, 'user_agent')
+            and request.user_agent
+            and hasattr(request.user_agent, 'browser')
+            and request.user_agent.browser
+        )
 
     def create_payload(self, request, response, body):
         advanced_json = None
@@ -246,25 +273,29 @@ class ContextLog(object):
             'advanced_json': advanced_json,
             'language': request.LANGUAGE_CODE,
             'content_type': request.content_type,
-            'content_length': int(request.environ.get('CONTENT_LENGTH')) if request.environ.get('CONTENT_LENGTH') else None,
+            'content_length': int(request.environ.get('CONTENT_LENGTH'))
+            if request.environ.get('CONTENT_LENGTH')
+            else None,
             'status_code': response.status_code,
-            'response': self._get_response_content(response)
+            'response': self._get_response_content(response),
         }
         if self.browser_exists(request):
-            payload.update({
-                'is_mobile': request.user_agent.is_mobile,
-                'is_tablet': request.user_agent.is_tablet,
-                'is_touch_capable': request.user_agent.is_touch_capable,
-                'is_pc': request.user_agent.is_pc,
-                'is_bot': request.user_agent.is_bot,
-                'browser': request.user_agent.browser.family,
-                'browser_version': request.user_agent.browser.version_string,
-                'os': request.user_agent.os.family,
-                'platform_system': platform.system(),
-                'platform_release': platform.release(),
-                'os_version': request.user_agent.os.version_string,
-                'device': request.user_agent.device.family,
-            })
+            payload.update(
+                {
+                    'is_mobile': request.user_agent.is_mobile,
+                    'is_tablet': request.user_agent.is_tablet,
+                    'is_touch_capable': request.user_agent.is_touch_capable,
+                    'is_pc': request.user_agent.is_pc,
+                    'is_bot': request.user_agent.is_bot,
+                    'browser': request.user_agent.browser.family,
+                    'browser_version': request.user_agent.browser.version_string,
+                    'os': request.user_agent.os.family,
+                    'platform_system': platform.system(),
+                    'platform_release': platform.release(),
+                    'os_version': request.user_agent.os.version_string,
+                    'device': request.user_agent.device.family,
+                }
+            )
         self._secure_data(payload, request)
         for key in ('json', 'response', 'values', 'env'):
             payload[key] = payload[key] or None
@@ -277,7 +308,7 @@ class ContextLog(object):
             pass
         else:
             try:
-               url = 'https://tele.labelstud.io'
-               requests.post(url=url, json=payload, timeout=3.0)
+                url = 'https://tele.labelstud.io'
+                requests.post(url=url, json=payload, timeout=3.0)
             except:  # noqa: E722
                 pass

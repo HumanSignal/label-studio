@@ -26,10 +26,8 @@ _api_urlpattens = [
 urlpatterns = [
     path('organization/', views.simple_view, name='organization-simple'),
     path('organization/webhooks', views.simple_view, name='organization-simple-webhooks'),
-
     path('people/', include(_urlpatterns)),
     path('api/organizations/', include((_api_urlpattens, app_name), namespace='api')),
-
     # invite
     path('api/invite', api.OrganizationInviteAPI.as_view(), name='organization-invite'),
     path('api/invite/reset-token', api.OrganizationResetTokenAPI.as_view(), name='organization-reset-token'),
