@@ -70,9 +70,9 @@ The migration process can be performed without any downtime. The steps required 
 
 This release addresses a vulnerability regarding how SECRET_KEY is set.
 
-The SECRET_KEY is now configurable through an environment variable. **Users are strongly encouraged to set SECRET_KEY to a random secret of their choosing.** A fallback SECRET_KEY is specified by default, but will be removed in a future version.
-
-Older versions also included a vulnerability in which the secret key could be leaked via identity provider callbacks. This release patches that vulnerability.
+- The SECRET_KEY is now configurable through an environment variable. **Users are strongly encouraged to set SECRET_KEY to a random secret of their choosing.** A fallback SECRET_KEY is specified by default, but will be removed in a future version.
+- Older versions also included a vulnerability in which the secret key could be leaked via identity provider callbacks. This release patches that vulnerability.
+- **Helm Chart update**: Version 1.2.0 is now available. This version includes automatic generation of a random SECRET_KEY, which also populates a Kubernetes secret. No manual setting required. [See the full changelog here](https://github.com/HumanSignal/charts/blob/master/heartex/label-studio/CHANGELOG.md). 
 
 ### Bug fixes
 
@@ -863,6 +863,24 @@ Label Studio 2.3.1 includes the following bug fixes:
 - Updated swagger docs for `AllStorage` APIs.
 - Added example output for `HyperTextLabels` in the Label Studio documentation suite.
 
+<a name="2210md"></a>
+
+## Label Studio Enterprise 2.2.10
+
+This section highlights the bug fixes in Label Studio Enterprise 2.2.10.
+
+### Bug fixes
+Label Studio 2.2.10 includes the following bug fixes:
+
+#### Backend
+- Per label score for `Choices` was calculated when `no Choice` was selected.
+- Fixed an error for actions with ordering by **joined** field.
+- Fixed auto-generated docs for `api/tasks`.
+
+#### Frontend
+- Fixed an issue when the Safari browser stopped working.
+- Fixed scrollable area in **Review** mode.
+
 <a name="229md"></a>
 
 ## Label Studio Enterprise 2.2.9
@@ -1011,14 +1029,14 @@ Label Studio 2.2.8 includes the following bug fixes:
 
 <a name="22md"></a>
 
-## Label Studio Enterprise 2.2 Final
+## Label Studio Enterprise 2.2.0
 
-This section highlights the new features and enhancements in Label Studio Enterprise 2.2.
+This section highlights the new features and enhancements in Label Studio Enterprise 2.2.0.
 
 ### New features and enhancements 
-Label Studio Enterprise 2.2 introduces the following new features and enhancements.
+Label Studio Enterprise 2.2.0 introduces the following new features and enhancements.
 
-- Label Studio Enterprise 2.2 introduces the System for Cross-domain Identity Management (SCIM) version 2.0 standard. System for Cross-domain Identity Management (SCIM) is a popular protocol to manage access for services and applications across an organization. Use the [SCIM guide](scim_setup.html) to set up SCIM integration to manage access to Label Studio Enterprise in your organization.
+- Label Studio Enterprise 2.2.0 introduces the System for Cross-domain Identity Management (SCIM) version 2.0 standard. System for Cross-domain Identity Management (SCIM) is a popular protocol to manage access for services and applications across an organization. Use the [SCIM guide](scim_setup.html) to set up SCIM integration to manage access to Label Studio Enterprise in your organization.
 
 
    <i>Check the following video tutorial about SCIM and Okta setup.</i>
@@ -1062,20 +1080,3 @@ Label Studio Enterprise 2.2 introduces the following new features and enhancemen
     <br>
     <div style="margin:auto; text-align:center;"><img src="/images/lead-time.png" style="opacity: 0.8"/></div>
     <i>Figure 5: Lead Time column in Data Manager. </i>
-    
-
-## Label Studio Enterprise 2.2.10 
-
-This section highlights the bug fixes in Label Studio Enterprise 2.2.10.
-
-### Bug fixes
-Label Studio 2.2.10 includes the following bug fixes:
-
-#### Backend 
-- Per label score for `Choices` was calculated when `no Choice` was selected.
-- Fixed an error for actions with ordering by **joined** field.
-- Fixed auto-generated docs for `api/tasks`.
-
-#### Frontend
-- Fixed an issue when the Safari browser stopped working.
-- Fixed scrollable area in **Review** mode.
