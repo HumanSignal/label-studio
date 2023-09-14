@@ -30,6 +30,7 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
             raise ValidationError("Can't connect to Redis server.")
         return data
 
+
 class RedisExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 

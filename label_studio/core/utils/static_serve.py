@@ -36,19 +36,18 @@ def serve(request, path, document_root=None, show_indexes=False):
     path = posixpath.normpath(path).lstrip('/')
     fullpath = Path(safe_join(document_root, path))
     if fullpath.is_dir():
-        raise Http404(_("Directory indexes are not allowed here."))
+        raise Http404(_('Directory indexes are not allowed here.'))
     if not fullpath.exists():
         raise Http404(_('“%(path)s” does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
     statobj = fullpath.stat()
-    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-                              statobj.st_mtime, statobj.st_size):
+    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(str(fullpath))
     content_type = content_type or 'application/octet-stream'
 
     response = RangedFileResponse(request, fullpath.open('rb'), content_type=content_type)
-    response["Last-Modified"] = http_date(statobj.st_mtime)
+    response['Last-Modified'] = http_date(statobj.st_mtime)
     if encoding:
-        response["Content-Encoding"] = encoding
+        response['Content-Encoding'] = encoding
     return response
