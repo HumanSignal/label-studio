@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5044: Add queTotal to lsfProperties from project",
-  "commit": "a68c13adf6d9da4420739a5218e9f8732577719f",
+  "message": "fix: LSDV-5044: Add queueTotal to lsfProperties from project",
+  "commit": "53ccdaf92cea9fbbb5567739289ada69e46721b4",
   "branch": "fb-lsdv-5044/task-count-total",
-  "date": "2023/09/06 10:15:09"
+  "date": "2023/09/14 16:35:42"
 }
