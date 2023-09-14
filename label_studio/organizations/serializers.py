@@ -43,11 +43,10 @@ class UserSerializerWithProjects(UserSerializer):
             return None
 
         current_user = self.context['request'].user
-        projects = user.annotations\
-            .filter(project__organization=current_user.active_organization)\
-            .values('project__id', 'project__title')
-        contributed_to = [(json.dumps({'id': p['project__id'], 'title': p['project__title']}), 0)
-                          for p in projects]
+        projects = user.annotations.filter(project__organization=current_user.active_organization).values(
+            'project__id', 'project__title'
+        )
+        contributed_to = [(json.dumps({'id': p['project__id'], 'title': p['project__title']}), 0) for p in projects]
         contributed_to = OrderedDict(contributed_to)  # remove duplicates without ordering losing
         return [json.loads(key) for key in contributed_to]
 
@@ -57,6 +56,7 @@ class UserSerializerWithProjects(UserSerializer):
 
 class OrganizationMemberUserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Adds all user properties"""
+
     user = UserSerializerWithProjects()
 
     class Meta:
