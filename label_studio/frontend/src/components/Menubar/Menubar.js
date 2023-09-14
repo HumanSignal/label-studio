@@ -17,6 +17,10 @@ import './MenuSidebar.styl';
 
 export const MenubarContext = createContext();
 
+const handleLandingpageItemClick = () => {
+  window.location.href = '/landingpage/homepage';
+};
+
 const LeftContextMenu = ({className}) => (
   <StaticContent
     id="context-menu-left"
@@ -183,29 +187,8 @@ export const Menubar = ({
                   exact
                 />
                 <Menu.Item
-                  label="Landingpage"
-                  to="/landingpage/"
-                  icon={<IconBook/>}
-                  data-external
-                  exact
-                />
-                <Menu.Item
-                  label="Sensor Model"
-                  to="/sensormodel/"
-                  icon={<IconBook/>}
-                  data-external
-                  exact
-                />
-                <Menu.Item
-                  label="Sensor Data"
-                  to="/sensordata/"
-                  icon={<IconBook/>}
-                  data-external
-                  exact
-                />
-                <Menu.Item
-                  label="Subject Annotation"
-                  to="/subjectannotation/"
+                  label="Homepage"
+                  to="/landingpage/homepage"
                   icon={<IconBook/>}
                   data-external
                   exact

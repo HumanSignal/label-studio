@@ -10,14 +10,13 @@
 </head>
 <body>
     <div class="buttons">
-        <form action="/landingpage/">
+        <form action="{% url 'landingpage:landingpage' project.id %}">
             <input type="submit" value="Go back to landing page" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
     <div class="forms">
         <h2>Create Project</h2>
-        <form enctype="multipart/form-data" action="/landingpage/export_project" method="post">
-            {{ exportprojectform }}
+        <form enctype="multipart/form-data" action="{% url 'landingpage:export-project' project.id %}" method="post">
             <input type="submit" value="Export Project">
         </form>
     </div>

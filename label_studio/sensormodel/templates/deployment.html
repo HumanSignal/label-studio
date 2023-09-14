@@ -35,7 +35,7 @@ input[type=submit]:hover {
 </head>
 <body>
     <div class="buttons">
-        <form action="/sensormodel/deployment">
+        <form action="{% url 'sensormodel:deployment' project.id %}">
             <input type="submit" value="Go back to deployment page" />
         </form>
     </div>

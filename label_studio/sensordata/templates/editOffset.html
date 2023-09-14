@@ -35,7 +35,7 @@ input[type=submit]:hover {
 </head>
 <body>
     <div class="buttons">
-        <form action="/sensordata/offset">
+        <form action="{% url 'sensordata:offset' project.id %}">
             <input type="submit" value="Go back to sensor offset page" />
         </form>
     </div>

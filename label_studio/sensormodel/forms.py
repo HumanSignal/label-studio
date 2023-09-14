@@ -1,6 +1,6 @@
 from django import forms
 from . import models
-from .models import Deployment
+from .models import Deployment, Sensor, Subject
 
 class SensorForm(forms.ModelForm):
     class Meta:
@@ -16,6 +16,17 @@ class DeploymentForm(forms.ModelForm):
     class Meta:
         model = models.Deployment
         fields = ['name','begin_datetime','end_datetime','location','sensor','subject']
+
+    def __init__(self, project=None, *args, **kwargs):
+        super(DeploymentForm, self).__init__(*args, **kwargs)
+
+        # Filter the sensor queryset based on the provided project
+        if project:
+            self.fields['sensor'].queryset = Sensor.objects.filter(project=project)
+
+        # Filter the subject queryset based on the provided project
+        if project:
+            self.fields['subject'].queryset = Subject.objects.filter(project=project)
 
     def clean(self):
         # Function used for form validation

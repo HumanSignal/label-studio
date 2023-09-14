@@ -51,13 +51,13 @@
 </head>
 <body>
     <div class="buttons">
-        <form action="/landingpage/">
+        <form action="{% url 'landingpage:landingpage' project.id %}">
             <input type="submit" value="Go back to landingpage" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
     <div class="forms">
         <h2>Add subject</h2>
-        <form action="/sensormodel/subject" method="post">
+        <form action="{% url 'sensormodel:subject' project.id %}" method="post">
             <table>
             {{ subjectform.as_table }}
             </table>
@@ -81,8 +81,8 @@
                 <td>{{ subject.color }}</td> 
                 <td>{{ subject.size }}</td>
                 <td>{{ subject.extra_info }}</td>
-                <td><a href="{% url 'sensormodel:adjust_subject' subject.id %}"> [Edit] </a></td>
-                <td><a href="{% url 'sensormodel:delete_subject' subject.id %}">[Delete]</a></td>
+                <td><a href="{% url 'sensormodel:adjust_subject' project.id subject.id %}"> [Edit] </a></td>
+                <td><a href="{% url 'sensormodel:delete_subject' project.id subject.id %}">[Delete]</a></td>
             </tr> 
            {% endfor %} 
         </table>

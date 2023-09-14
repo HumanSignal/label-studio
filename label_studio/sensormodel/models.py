@@ -36,6 +36,7 @@ class Sensor(models.Model):
     description = models.TextField(max_length=100, blank=True)
     sensor_hash = models.CharField(max_length=10,blank=True)
     sensortype = models.ForeignKey(SensorType,on_delete=models.CASCADE, null=True, blank=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return 'Sensor: ' + str(self.sensor_id)
@@ -46,6 +47,7 @@ class Subject(models.Model):
     color = models.CharField(max_length=50)
     size = models.CharField(max_length=50)
     extra_info = models.TextField(max_length=100, blank=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     
     def __str__(self):
         return 'Subject: ' + self.name
@@ -66,6 +68,3 @@ class Deployment(models.Model):
         
     def __str__(self):
         return 'Deployment: ' + self.name
-
-
-

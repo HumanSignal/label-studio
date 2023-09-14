@@ -44,47 +44,38 @@
     input[type=submit]:hover {
         background-color: #45a049;
     }
-
 </style>
+
 <head>
-    <title>Sensor mapping</title>
+    <title>Home</title>
 </head>
 <body>
+    <h1>Welcome</h1>
     <div class="buttons">
-        <form action="{% url 'landingpage:landingpage' project.id %}">
-            <input type="submit" value="Go back to landing page" style="background-color: #c4862b; width:25%"/>
-        </form>
-        <form action="{% url 'sensordata:addsensordata' project.id %}">
-            <input type="submit" value="Add sensor data file" style="background-color: #c4862b; width:25%"/>
+        <form action="/landingpage/create_project">
+            <input type="submit" value="Create new project" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
-    <div class="sensordata">
-        <h2>Sensor data</h2>
+    <div class="projects">
+        <h2>Projects</h2>
         <table class="tables">
             <tr>
-                <th>Sensor data name</th>
-                <th>Begin Date Time</th>
-                <th>End Date Time</th>
-                <th>Project</th>
-                <th>Sensor type</th>
+                <th>Name</th>
+                <th>ID</th>
+                <th></th>
                 <th></th>
             </tr>
-            {% for sendata in sensordata %}
             <tr>
-                <td>{{ sendata.name }}</td>
-                <td>{{ sendata.begin_datetime }}</td>
-                <td>{{ sendata.end_datetime }}</td> 
-                <td>{{ sendata.project}} </td>
-                <td>{{ sendata.sensor.sensor_id}} </td>
-                <td><a href="{% url 'sensordata:delete' project.id sendata.id %}">[Delete]</a></td>
+            {% for project in projects %}
+            <tr>
+                <td>{{ project.name }}</td>
+                <td>{{ project.project_id }}</td>
+                <td><a href="{% url 'landingpage:landingpage' project.project_id %}">Go to project landingpage</a></td>
+                <td><a href="{% url 'landingpage:delete-project' project.project_id %}">[Delete]</a></td>
             </tr> 
-            {% endfor %} 
+           {% endfor %} 
         </table>
-        
-        
     </div>
-
 </body>
-
 
 {% endblock %}

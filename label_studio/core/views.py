@@ -45,7 +45,7 @@ def main(request):
             return redirect(reverse('user-login'))
 
         # business mode access
-        return redirect(reverse('landingpage:landingpage'))
+        return redirect(reverse('landingpage:homepage'))
 
     # not authenticated
     return redirect(reverse('user-login'))

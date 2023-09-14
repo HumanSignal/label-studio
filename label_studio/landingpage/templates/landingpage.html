@@ -9,27 +9,30 @@
     <title>Landingpage</title>
 </head>
 <body>
-    <h1>Project overview</h1>
+  <div class="buttons">
+    <form action="/landingpage/homepage">
+      <input type="submit" value="Go back to home" style="background-color: #c4862b; width:25%"/>
+    </form>
+  </div>
+    <h1>{{ main_project }} - overview</h1>
     <ol>
-        <li><a href="/landingpage/create_project">Create project</a></li>
-        Create your project.
-        <li><a href="/sensormodel/sensor">Manage sensors</a></li>
+        <li><a href="{% url 'sensormodel:sensor' main_project.project_id %}">Manage sensors</a></li>
         Manage your project sensors here. Add cameras or IMU sensors to your projects.
-        <li><a href="/sensormodel/subject">Manage subjects</a></li>
+        <li><a href="{% url 'sensormodel:subject' main_project.project_id %}">Manage subjects</a></li>
         Manage your project subjects here. Here, you can add and edit the subjects used in your projects.
-        <li><a href="/sensormodel/deployment">Manage deployments</a></li>
+        <li><a href="{% url 'sensormodel:deployment' main_project.project_id %}">Manage deployments</a></li>
         Manage your project deployments here. This gives an overview of the deployments of your sensors to your subjects.
-        <li><a href="/sensordata/">Manage data</a></li>
+        <li><a href="{% url 'sensordata:sensordatapage' main_project.project_id %}">Manage data</a></li>
         Manage your experimental data here. Here you can add zip files with your IMU or camera data to the project.
-        <li><a href="/sensordata/offset">Synchronize sensors</a></li>
+        <li><a href="{% url 'sensordata:offset' main_project.project_id %}">Synchronize sensors</a></li>
         Here you can add the offset between the camera data and the IMU data.
-        <li><a href="/subjectannotation/">Annotate subject presence</a></li>
+        <li><a href="{% url 'subjectannotation:annotationtaskpage' main_project.project_id %}">Annotate subject presence</a></li>
         Here you can annotate the subject presence in your videos. The videos can be annotated with your subjects as labels.
-        <li><a href="/landingpage/workinprogress">Add labels</a></li>
+        <li><a href="{% url 'landingpage:workinprogress' main_project.project_id %}">Add labels</a></li>
         Here the different activity labels of the subjects can be stored. These labels will later be used to annotate your data.
-        <li><a href="/landingpage/workinprogress">Annotate</a></li>
+        <li><a href="{% url 'landingpage:workinprogress' main_project.project_id %}">Annotate</a></li>
         Annotate the data using the activity labels. It is only data with subjects present.
-        <li><a href="/landingpage/export_project">Export annotations</a></li>
+        <li><a href="{% url 'landingpage:export-project' main_project.project_id %}">Export annotations</a></li>
         Export your subject and activity annotations.
     </ol>
 </body>

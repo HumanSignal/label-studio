@@ -51,13 +51,13 @@
 </head>
 <body>
     <div class="buttons">
-        <form action="/landingpage/">
+        <form action="{% url 'landingpage:landingpage' project.id %}">
             <input type="submit" value="Go back to landingpage" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
     <div class="forms">
         <h2>Add deployment</h2>
-        <form action="/sensormodel/deployment" method="post">
+        <form action="{% url 'sensormodel:deployment' project.id %}" method="post">
             <table>
             {{ deploymentform.as_table }}
             </table>
@@ -85,8 +85,8 @@
                 <td>{{ deployment.location}} </td>
                 <td>{{ deployment.sensor }}</td>
                 <td>{{ deployment.subject }}</td>
-                <td><a href="{% url 'sensormodel:adjust_deployment' deployment.id %}">[Edit]</a></td>
-                <td><a href="{% url 'sensormodel:delete_deployment' deployment.id %}">[Delete]</a></td>
+                <td><a href="{% url 'sensormodel:adjust_deployment' project.id deployment.id %}">[Edit]</a></td>
+                <td><a href="{% url 'sensormodel:delete_deployment' project.id deployment.id %}">[Delete]</a></td>
             </tr> 
             {% endfor %} 
         </table>  

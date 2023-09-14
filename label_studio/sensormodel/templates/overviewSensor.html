@@ -51,13 +51,13 @@
 </head>
 <body>
     <div class="buttons">
-        <form action="/landingpage/">
+        <form action="{% url 'landingpage:landingpage' project.id %}">
             <input type="submit" value="Go back to landingpage" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
     <div class="forms">
         <h2>Add sensor</h2>
-        <form action="/sensormodel/sensor" method="post">
+        <form action="{% url 'sensormodel:sensor' project.id %}" method="post">
             <table>
             {{ sensorform.as_table }}
             </table>
@@ -79,8 +79,8 @@
                 <td>{{ sensor.sensor_id }}</td>
                 <td>{{ sensor.description }}</td> 
                 <td>{{ sensor.sensortype }}</td>
-                <td><a href="{% url 'sensormodel:adjust_sensor' sensor.id %}"> [Edit] </a></td>
-                <td><a href="{% url 'sensormodel:delete_sensor' sensor.id %}">[Delete]</a></td>
+                <td><a href="{% url 'sensormodel:adjust_sensor' project.id sensor.id %}"> [Edit] </a></td>
+                <td><a href="{% url 'sensormodel:delete_sensor' project.id sensor.id %}">[Delete]</a></td>
             </tr> 
            {% endfor %} 
         </table>
@@ -93,7 +93,6 @@
                 <th>Name</th>
                 <th>Version</th>
                 <th>ID</th>
-                <th></th>
             </tr>
             {% for sensortype in sensortypes %}
             <tr>
@@ -101,7 +100,6 @@
                 <td>{{ sensortype.name }}</td> 
                 <td>{{ sensortype.version }}</td>
                 <td>{{ sensortype.id }}</td>
-                <td><a href="{% url 'sensormodel:delete_sensortype' sensortype.id %}">[Delete]</a></td>
             </tr> 
            {% endfor %} 
         </table>

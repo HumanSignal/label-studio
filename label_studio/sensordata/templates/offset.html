@@ -52,13 +52,13 @@
 </head>
 <body>
     <div class="buttons">
-        <form action="/landingpage/">
+        <form action="{% url 'landingpage:landingpage' project.id %}">
             <input type="submit" value="Go back to landing page" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
     <div class="forms">
         <h2>Add sensor offset</h2>
-        <form action="/sensordata/offset/" method="post">
+        <form action="{% url 'sensordata:offset' project.id %}" method="post">
             {{ sensoroffsetform }}
             <input type="submit" value="Add sensor offset">
         </form>
@@ -82,8 +82,8 @@
                     <td>{{ senoffset.imu }}</td>
                     <td>{{ senoffset.offset }}</td> 
                     <td>{{ senoffset.offset_Date}} </td>
-                    <td><a href="{% url 'sensordata:adjust_offset' senoffset.id %}"> [Edit] </a></td>
-                    <td><a href="{% url 'sensordata:delete_offset' senoffset.id %}"> [Delete] </a></td>
+                    <td><a href="{% url 'sensordata:adjust_offset' project.id senoffset.id %}"> [Edit] </a></td>
+                    <td><a href="{% url 'sensordata:delete_offset' project.id senoffset.id %}"> [Delete] </a></td>
                 </tr> 
             {% endfor %}
         </table>

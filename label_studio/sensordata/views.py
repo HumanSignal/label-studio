@@ -20,23 +20,26 @@ import csv
 import fnmatch
 import zipfile
 from django.http import HttpResponseBadRequest
+from projects.models import Project
 
 
 UNITS = {'days': 86400, 'hours': 3600, 'minutes': 60, 'seconds':1, 'milliseconds':0.001}
 
 # Create your views here.
-def sensordatapage(request):
-    sensordata = SensorData.objects.all().order_by('project')
-    return render(request, 'sensordatapage.html', {'sensordata':sensordata})
+def sensordatapage(request, project_id):
+    project = Project.objects.get(id=project_id)
+    sensordata = SensorData.objects.filter(project=project).order_by('project')
+    return render(request, 'sensordatapage.html', {'sensordata':sensordata, 'project':project})
 
-def addsensordata(request):
+def addsensordata(request, project_id):
+    project = Project.objects.get(id=project_id)
     if request.method =='POST':
         sensordataform = SensorDataForm(request.POST, request.FILES)
         if sensordataform.is_valid():
             # Get form data
             name = sensordataform.cleaned_data['name']
             uploaded_file = sensordataform.cleaned_data['file']
-            project = sensordataform.cleaned_data['project']
+            project = project
             sensor = sensordataform.cleaned_data.get('sensor')
 
             # Check if the uploaded file is a zip file
@@ -52,7 +55,7 @@ def addsensordata(request):
                             # Delete the temporary file
                             os.remove(temp_file_path)
                 
-                return redirect('sensordata:sensordatapage')
+                return redirect('sensordata:sensordatapage', project_id=project_id)
 
             # Raise an exception if the uploaded file is not a zip file
             raise ValueError("Uploaded file must be a zip file.")
@@ -60,20 +63,23 @@ def addsensordata(request):
     else:
         sensordataform = SensorDataForm()
 
-    return render(request, 'addsensordata.html', {'sensordataform': sensordataform})
+    return render(request, 'addsensordata.html', {'sensordataform': sensordataform, 'project':project})
 
 def process_sensor_file(request, file_path, sensor, name, project):
     # Process the sensor file based on its type
+    subjectannotation_project = Project.objects.get(id=project.id+1)
     sensortype = sensor.sensortype
     if sensortype.sensortype == 'I':  # IMU sensor type
         parse_IMU(request=request, file_path=file_path,sensor=sensor,name=name,project=project)
     elif sensortype.sensortype == 'C':  # Camera sensor type
         parse_camera(request=request, file_path=file_path,sensor=sensor,name=name,project=project)
+        parse_camera(request=request, file_path=file_path,sensor=sensor,name=name, project=subjectannotation_project)
     elif sensortype.sensortype == 'M':  # Other sensor type (add handling logic here)
         pass
     # Add handling for other sensor types as needed
 
-def offset(request):
+def offset(request, project_id):
+    project = Project.objects.get(id=project_id)
     sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
     if request.method == 'POST':
         sensoroffsetform = SensorOffsetForm(request.POST)
@@ -85,33 +91,35 @@ def offset(request):
             # create and save the new SensorOffset instance
             sensoroffsetform.save()
             # redirect to the offset view and pass the sensoroffset queryset to the context
-            return redirect('sensordata:offset')
+            return redirect('sensordata:offset', project_id=project_id)
     else:
-        sensoroffsetform = SensorOffsetForm()
-    return render(request, 'offset.html', {'sensoroffsetform':sensoroffsetform, 'sensoroffset':sensoroffset})
+        sensoroffsetform = SensorOffsetForm(project=project)
+    return render(request, 'offset.html', {'sensoroffsetform':sensoroffsetform, 'sensoroffset':sensoroffset, 'project':project})
 
-def delete_offset(request, id):
+def delete_offset(request, project_id, id):
+    project = Project.objects.get(id=project_id)
     offset = SensorOffset.objects.get(id=id)
     if request.method == 'POST':
         # Send POST to delete a sensor
         offset.delete()
-        return redirect('sensordata:offset')
+        return redirect('sensordata:offset', project_id=project_id)
     else:
         # Go to delete confirmation page
-        return render(request, 'deleteOffset.html')
+        return render(request, 'deleteOffset.html', {'project':project})
 
-def adjust_offset(request, id):
+def adjust_offset(request, project_id, id):
+    project = Project.objects.get(id=project_id)
     offset = SensorOffset.objects.get(id=id)
     if request.method == 'POST':
         # Send POST to adjust a subject
         offsetform = SensorOffsetForm(request.POST, instance=offset)
         if offsetform.is_valid():
             offsetform.save()
-            return redirect('sensordata:offset')
+            return redirect('sensordata:offset', project_id=project_id)
     else:
         # Go to subject adjustment page
         offsetform = SensorOffsetForm(instance=offset)
-    return render(request, 'editOffset.html', {'offsetform':offsetform})
+    return render(request, 'editOffset.html', {'offsetform':offsetform, 'project':project})
 
 def parse_IMU(request, file_path, sensor, name, project):
     sensortype = SensorType.objects.get(id=sensor.sensortype.id)
@@ -194,13 +202,14 @@ def upload_sensor_data(request, name, file_path, project):
     requests.post(import_url, headers={'Authorization': f'Token {token}'}, files=files) 
 
 
-def deletesensordata(request, id):
+def deletesensordata(request, project_id, id):
+    project = Project.objects.get(id=project_id)
     sensordata = SensorData.objects.get(id=id)           
     if request.method == 'POST':
         # Send POST to delete a sensor
         
         sensordata.delete()
-        return redirect('sensordata:sensordatapage')
+        return redirect('sensordata:sensordatapage', project_id=project_id)
     else:
         # Go to delete confirmation page
-        return render(request, 'deleteconfirmation.html')             
+        return render(request, 'deleteconfirmation.html', {'project':project})             

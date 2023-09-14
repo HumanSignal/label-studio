@@ -7,122 +7,127 @@ from pathlib import Path
 import yaml
 from yaml.loader import SafeLoader
 import json
+from projects.models import Project
 
-def deployment(request):
-    deployments = Deployment.objects.all().order_by('begin_datetime')
+def deployment(request, project_id):
+    project = Project.objects.get(id=project_id)
+    deployments = Deployment.objects.filter(project=project).order_by('begin_datetime')
     if request.method == 'POST':
         deploymentform = forms.DeploymentForm(request.POST)
         if deploymentform.is_valid():
-            deploymentform.save()
-            return redirect('sensormodel:deployment')
+            deployment = deploymentform.save(commit=False)
+            deployment.project = project
+            deployment.save()
+            return redirect('sensormodel:deployment', project_id=project_id)
     else:
-        deploymentform = forms.DeploymentForm(request.POST)
-    return render(request, 'overviewDeployment.html', {'deploymentform':deploymentform, 'deployments': deployments})
+        deploymentform = forms.DeploymentForm(project=project)
+    return render(request, 'overviewDeployment.html', {'deploymentform':deploymentform, 'deployments': deployments, 'project':project})
 
-def sensor(request):
-    sensors = Sensor.objects.all().order_by('sensor_id')
+def sensor(request, project_id):
+    project = Project.objects.get(id=project_id)
+    sensors = Sensor.objects.filter(project=project).order_by('sensor_id')
     sensortypes = SensorType.objects.all().order_by('manufacturer')
     if request.method =='POST':
         sensorform = forms.SensorForm(request.POST)
         if sensorform.is_valid():
-            sensorform.save()
-            return redirect('sensormodel:sensor')
+            sensor = sensorform.save(commit=False)
+            sensor.project = project
+            sensor.save()
+            return redirect('sensormodel:sensor', project_id = project_id)
     else:
         sensorform = forms.SensorForm(request.POST)
-    return render(request, 'overviewSensor.html', {'sensorform':sensorform, 'sensors':sensors, 'sensortypes':sensortypes})
+    return render(request, 'overviewSensor.html', {'sensorform':sensorform, 'sensors':sensors, 'sensortypes':sensortypes, 'project': project})
 
-
-def subject(request):
-    subjects = Subject.objects.all().order_by('name')
+def subject(request, project_id):
+    project = Project.objects.get(id=project_id)
+    subjects = Subject.objects.filter(project=project).order_by('name')
     if request.method == 'POST':
         subjectform = forms.SubjectForm(request.POST)
         if subjectform.is_valid():
-            subjectform.save()
-            return redirect('sensormodel:subject')
+            subject = subjectform.save(commit=False)
+            subject.project = project
+            subject.save()
+            return redirect('sensormodel:subject', project_id = project_id)
     else:
         subjectform = forms.SubjectForm(request.POST)
-    return render(request, 'overviewSubject.html', {'subjectform':subjectform, 'subjects':subjects})
+    return render(request, 'overviewSubject.html', {'subjectform':subjectform, 'subjects':subjects, 'project':project})
 
-def adjust_deployment(request, id):
+def adjust_deployment(request, project_id, id):
     deployment = Deployment.objects.get(id=id)
+    project = Project.objects.get(id=project_id)
     if request.method == 'POST':
         # Send POST to adjust a deployment
         deploymentform = forms.DeploymentForm2(request.POST, instance=deployment)
         if deploymentform.is_valid():
             deploymentform.save()
-            return redirect('sensormodel:deployment')
+            return redirect('sensormodel:deployment', project_id = project_id)
     else:
         # Go to deployment adjustment page
         deploymentform = forms.DeploymentForm2(instance=deployment)
-    return render(request, 'deployment.html', {'deploymentform':deploymentform})
+    return render(request, 'deployment.html', {'deploymentform':deploymentform, 'project':project})
     
-def adjust_sensor(request, id):
+def adjust_sensor(request, project_id, id):
     sensor = Sensor.objects.get(id=id)
+    project = Project.objects.get(id=project_id)
     if request.method == 'POST':
         # Send POST to adjust a sensor
         sensorform = forms.SensorForm(request.POST,instance=sensor)
         if sensorform.is_valid():
             sensorform.save()
-            return redirect('sensormodel:sensor')
+            return redirect('sensormodel:sensor', project_id = project_id)
     else:
         # Go to sensor adjustment page
         sensorform = forms.SensorForm(instance=sensor)
-    return render(request, 'sensor.html', {'sensorform':sensorform})
+    return render(request, 'sensor.html', {'sensorform':sensorform, 'project':project})
 
 
-def adjust_subject(request, id):
+def adjust_subject(request, project_id, id):
     subject = Subject.objects.get(id=id)
+    project = Project.objects.get(id=project_id)
     if request.method == 'POST':
         # Send POST to adjust a subject
         subjectform = forms.SubjectForm(request.POST, instance=subject)
         if subjectform.is_valid():
             subjectform.save()
-            return redirect('sensormodel:subject')
+            return redirect('sensormodel:subject', project_id = project_id)
     else:
         # Go to subject adjustment page
         subjectform = forms.SubjectForm(instance=subject)
-    return render(request, 'subject.html', {'subjectform':subjectform})
+    return render(request, 'subject.html', {'subjectform':subjectform, 'project':project})
     
-def delete_deployment(request, id):
+def delete_deployment(request, project_id, id):
     deployment = Deployment.objects.get(id=id)
+    project = Project.objects.get(id=project_id)
     if request.method == 'POST':
         # Send POST to delete a deployment
         deployment.delete()
-        return redirect('sensormodel:deployment')
+        return redirect('sensormodel:deployment', project_id = project_id)
     else:
         # Go to delete confirmation page
-        return render(request, 'deleteDeployment.html')
+        return render(request, 'deleteDeployment.html', {'project':project})
     
-def delete_sensor(request, id):
+def delete_sensor(request, project_id, id):
     sensor = Sensor.objects.get(id=id)
+    project = Project.objects.get(id=project_id)
     if request.method == 'POST':
         # Send POST to delete a sensor
         sensor.delete()
-        return redirect('sensormodel:sensor')
+        return redirect('sensormodel:sensor', project_id = project_id)
     else:
         # Go to delete confirmation page
-        return render(request, 'deleteSensor.html')
-    
-def delete_sensortype(request, id):
-    sensortype = SensorType.objects.get(id=id)
-    if request.method == 'POST':
-        # Send POST to delete a sensor
-        sensortype.delete()
-        return redirect('sensormodel:sensor')
-    else:
-        # Go to delete confirmation page
-        return render(request, 'deleteSensorType.html')
+        return render(request, 'deleteSensor.html', {'project':project})
 
 
-def delete_subject(request, id):
+def delete_subject(request, project_id, id):
     subject = Subject.objects.get(id=id)
+    project = Project.objects.get(id=project_id)
     if request.method == 'POST':
         # Send POST to delete a subject
         subject.delete()
-        return redirect('sensormodel:subject')
+        return redirect('sensormodel:subject', project_id = project_id)
     else:
         # Go to delete confirmation page
-        return render(request, 'deleteSubject.html')
+        return render(request, 'deleteSubject.html', {'project':project})
 
 def sync_sensor_parser_templates(request):
     # Search sensortypes repo for (new) config .yaml files and add them to DB

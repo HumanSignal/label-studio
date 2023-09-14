@@ -31,7 +31,7 @@
 <form action="" method="post">
     <input type="submit" value="Delete">
 </form>
-<form action="/sensormodel/subject"> 
+<form action="{% url 'sensormodel:sensor' project.id %}">
     <input type="submit" value="No, go back to subject page!" />
 </form>
 

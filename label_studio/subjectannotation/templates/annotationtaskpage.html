@@ -9,14 +9,13 @@
 </head>
 <body>
     <div class="buttons">
-        <form action="/landingpage/">
+        <form action="{% url 'landingpage:landingpage' project.id %}">
             <input type="submit" value="Go back to landing page" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
     <div class="forms">
         <h2>Create subject annotation task</h2>
-        <form enctype="multipart/form-data" action="/subjectannotation/create/" method="post">
-            {{ subjectannotationform }}
+        <form enctype="multipart/form-data" action="{% url 'subjectannotation:create' project.id %}" method="post">
             <input type="submit" value="Create annotation task">
         </form>
     </div>
