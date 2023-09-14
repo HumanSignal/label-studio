@@ -7,18 +7,18 @@ from .models import Organization
 
 
 class OrganizationForm(ModelForm):
-    """
-    """
+    """ """
+
     org_update = CharField(widget=HiddenInput(), required=False)
-    
+
     class Meta:
         model = Organization
         fields = ('title',)
 
 
 class OrganizationSignupForm(ModelForm):
-    """
-    """
+    """ """
+
     class Meta:
         model = Organization
         fields = ('title',)

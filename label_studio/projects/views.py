@@ -31,15 +31,14 @@ def project_settings(request, pk, sub_path):
 def playground_replacements(request, task_data):
     if request.GET.get('playground', '0') == '1':
         for key in task_data:
-            if "/samples/time-series.csv" in task_data[key]:
-                task_data[key] = "https://app.heartex.ai" + task_data[key]
+            if '/samples/time-series.csv' in task_data[key]:
+                task_data[key] = 'https://app.heartex.ai' + task_data[key]
     return task_data
 
 
 @require_http_methods(['GET', 'POST'])
 def upload_example_using_config(request):
-    """ Generate upload data example by config only
-    """
+    """Generate upload data example by config only"""
     config = request.GET.get('label_config', '')
     if not config:
         config = request.POST.get('label_config', '')
