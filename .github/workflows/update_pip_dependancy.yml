@@ -19,7 +19,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ github.event.repository.default_branch }}

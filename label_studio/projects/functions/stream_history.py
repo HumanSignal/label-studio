@@ -1,8 +1,7 @@
-from django.db import transaction
 from django.conf import settings
-
+from django.db import transaction
 from projects.models import LabelStreamHistory
-from tasks.models import Task, Annotation
+from tasks.models import Annotation, Task
 
 TASK_ID_KEY = 'taskId'
 ANNOTATION_ID_KEY = 'annotationId'
@@ -20,7 +19,7 @@ def add_stream_history(next_task, user, project):
                 if next_task.id not in task_ids:
                     history.data.append(new_history_data)
                 if len(task_ids) + 1 > settings.LABEL_STREAM_HISTORY_LIMIT:
-                    history.data = history.data[-settings.LABEL_STREAM_HISTORY_LIMIT:]
+                    history.data = history.data[-settings.LABEL_STREAM_HISTORY_LIMIT :]
             history.save()
 
 
@@ -59,4 +58,3 @@ def get_label_stream_history(user, project):
         history.save(update_fields=['data'])
 
     return result
-

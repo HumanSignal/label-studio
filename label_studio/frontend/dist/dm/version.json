@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-380: [FE] 'Hang tight' message is missing when there is no tasks synced yet and sync is in progress",
-  "commit": "66797de8bcf7a7bc8ae401ab7975f589cd439ee7",
+  "message": "feat: LOPS-134: [FE] find similar CandidateTasks",
+  "commit": "b7ba76a391744daa056d957826bb80fa2318dd4b",
   "branch": "master",
-  "date": "2023/09/05 09:47:24"
+  "date": "2023/09/15 10:24:21"
 }
