@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-370: We could improve grid view for textual dataset",
-  "commit": "98e5c9eaa8b014ae720cb079dbf3176e2c1258ec",
+  "message": "feat: LOPS-134: [FE] find similar CandidateTasks",
+  "commit": "b7ba76a391744daa056d957826bb80fa2318dd4b",
   "branch": "master",
-  "date": "2023/09/15 09:26:14"
+  "date": "2023/09/15 10:24:21"
 }
