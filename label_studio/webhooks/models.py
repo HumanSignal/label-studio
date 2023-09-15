@@ -1,4 +1,3 @@
-
 from core.utils.common import load_func
 from core.validators import JSONSchemaValidator
 from django.conf import settings
@@ -15,12 +14,12 @@ from .serializers_for_hooks import (
 )
 
 HEADERS_SCHEMA = {
-    "type": "object",
-    "patternProperties": {
-        "^[a-zA-Z0-9-_]+$": {"type": "string"},
+    'type': 'object',
+    'patternProperties': {
+        '^[a-zA-Z0-9-_]+$': {'type': 'string'},
     },
-    "maxProperties": 10,
-    "additionalProperties": False,
+    'maxProperties': 10,
+    'additionalProperties': False,
 }
 
 
@@ -39,24 +38,26 @@ class Webhook(models.Model):
     url = models.URLField(_('URL of webhook'), max_length=2048, help_text=_('URL of webhook'))
 
     send_payload = models.BooleanField(
-        _("does webhook send the payload"), default=True, help_text=('If value is False send only action'),
+        _('does webhook send the payload'),
+        default=True,
+        help_text=('If value is False send only action'),
     )
 
     send_for_all_actions = models.BooleanField(
-        _("Use webhook for all actions"),
+        _('Use webhook for all actions'),
         default=True,
         help_text='If value is False - used only for actions from WebhookAction',
     )
 
     headers = models.JSONField(
-        _("request extra headers of webhook"),
+        _('request extra headers of webhook'),
         validators=[JSONSchemaValidator(HEADERS_SCHEMA)],
         default=dict,
         help_text='Key Value Json of headers',
     )
 
     is_active = models.BooleanField(
-        _("is webhook active"),
+        _('is webhook active'),
         default=True,
         help_text=('If value is False the webhook is disabled'),
     )
@@ -108,7 +109,6 @@ class WebhookAction(models.Model):
     LABEL_LINK_CREATED = 'LABEL_LINK_CREATED'
     LABEL_LINK_UPDATED = 'LABEL_LINK_UPDATED'
     LABEL_LINK_DELETED = 'LABEL_LINK_DELETED'
-
 
     ACTIONS = {
         PROJECT_CREATED: {
@@ -236,7 +236,7 @@ class WebhookAction(models.Model):
                     'field': 'label',
                     'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label']),
                 },
-            }
+            },
         },
         LABEL_LINK_DELETED: {
             'name': _('Label link deleted'),
@@ -247,7 +247,6 @@ class WebhookAction(models.Model):
             'serializer': OnlyIDWebhookSerializer,
             'project-field': 'project',
         },
-
     }
 
     webhook = models.ForeignKey(Webhook, on_delete=models.CASCADE, related_name='actions')
