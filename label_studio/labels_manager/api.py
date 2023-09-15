@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Create labels',
-        operation_description='Add labels to your project without updating the labeling configuration.'
+        operation_description='Add labels to your project without updating the labeling configuration.',
     ),
 )
 @method_decorator(
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Remove labels',
-        operation_description='Remove labels from your project without updating the labeling configuration.'
+        operation_description='Remove labels from your project without updating the labeling configuration.',
     ),
 )
 @method_decorator(
@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Update labels',
-        operation_description='Update labels used for your project without updating the labeling configuration.'
+        operation_description='Update labels used for your project without updating the labeling configuration.',
     ),
 )
 @method_decorator(
@@ -52,9 +52,9 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Get label',
-        operation_description='''
+        operation_description="""
         Retrieve a specific custom label used for your project by its ID.
-        '''
+        """,
     ),
 )
 @method_decorator(
@@ -62,7 +62,7 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='List labels',
-        operation_description='List all custom labels added to your project separately from the labeling configuration.'
+        operation_description='List all custom labels added to your project separately from the labeling configuration.',
     ),
 )
 @method_decorator(name='update', decorator=swagger_auto_schema(auto_schema=None))
@@ -77,7 +77,7 @@ class LabelAPI(viewsets.ModelViewSet):
     )
 
     def get_serializer(self, *args, **kwargs):
-        '''POST request is bulk by default'''
+        """POST request is bulk by default"""
         if self.action == 'create':
             kwargs['many'] = True
         return super().get_serializer(*args, **kwargs)
@@ -100,7 +100,7 @@ class LabelAPI(viewsets.ModelViewSet):
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Create label links',
-        operation_description='Create label links to link new custom labels to your project labeling configuration.'
+        operation_description='Create label links to link new custom labels to your project labeling configuration.',
     ),
 )
 @method_decorator(
@@ -108,21 +108,21 @@ class LabelAPI(viewsets.ModelViewSet):
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Remove label link',
-        operation_description='''
+        operation_description="""
         Remove a label link that links custom labels to your project labeling configuration. If you remove a label link,
         the label stops being available for the project it was linked to. You can add a new label link at any time. 
-        '''
-        ),
+        """,
+    ),
 )
 @method_decorator(
     name='partial_update',
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Update label link',
-        operation_description='''
+        operation_description="""
         Update a label link that links custom labels to a project labeling configuration, for example if the fromName,  
         toName, or name parameters for a tag in the labeling configuration change. 
-        '''
+        """,
     ),
 )
 @method_decorator(
@@ -130,7 +130,7 @@ class LabelAPI(viewsets.ModelViewSet):
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Get label link',
-        operation_description='Get label links for a specific project configuration. '
+        operation_description='Get label links for a specific project configuration. ',
     ),
 )
 @method_decorator(
@@ -138,7 +138,7 @@ class LabelAPI(viewsets.ModelViewSet):
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='List label links',
-        operation_description='List label links for a specific label and project.'
+        operation_description='List label links for a specific label and project.',
     ),
 )
 @method_decorator(name='update', decorator=swagger_auto_schema(auto_schema=None))
@@ -182,9 +182,9 @@ class LabelLinkAPI(viewsets.ModelViewSet):
     decorator=swagger_auto_schema(
         tags=['Labels'],
         operation_summary='Bulk update labels',
-        operation_description='''
+        operation_description="""
         If you want to update the labels in saved annotations, use this endpoint.
-        '''
+        """,
     ),
 )
 class LabelBulkUpdateAPI(views.APIView):
