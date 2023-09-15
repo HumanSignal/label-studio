@@ -21,17 +21,17 @@ def test_user_active_organization_counters():
     user = _create_user(input_args, {})
 
     project_config = dict(
-            title='Test',
-            is_published=True,
-            label_config='''
+        title='Test',
+        is_published=True,
+        label_config="""
                 <View>
                   <Text name="location" value="$location"></Text>
                   <Choices name="text_class" choice="single">
                     <Choice value="class_A"></Choice>
                     <Choice value="class_B"></Choice>
                   </Choices>
-                </View>'''
-        )
+                </View>""",
+    )
 
     def make_test_project():
         project = make_project(project_config, user, False, org=user.active_organization)
@@ -47,5 +47,3 @@ def test_user_active_organization_counters():
 
     assert user.active_organization_annotations().count() == 9
     assert user.active_organization_contributed_project_number() == 3
-
-

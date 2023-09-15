@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-380: [FE] 'Hang tight' message is missing when there is no tasks synced yet and sync is in progress",
-  "commit": "66797de8bcf7a7bc8ae401ab7975f589cd439ee7",
+  "message": "fix: LOPS-370: We could improve grid view for textual dataset",
+  "commit": "98e5c9eaa8b014ae720cb079dbf3176e2c1258ec",
   "branch": "master",
-  "date": "2023/09/05 09:47:24"
+  "date": "2023/09/15 09:26:14"
 }

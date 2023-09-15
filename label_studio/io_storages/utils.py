@@ -37,4 +37,4 @@ def get_uri_via_regex(data, prefixes=('s3', 'gs')):
         if r_match is None:
             logger.warning("Can't parse task.data to match URI. Reason: Match is not found.")
             return None, None
-    return r_match.group("uri"), r_match.group("storage")
+    return r_match.group('uri'), r_match.group('storage')

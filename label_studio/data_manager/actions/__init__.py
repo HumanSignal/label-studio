@@ -20,8 +20,7 @@ logger = logging.getLogger('django')
 
 
 def check_permissions(user, action):
-    """ Actions must have permissions, if only one is in the user role then the action is allowed
-    """
+    """Actions must have permissions, if only one is in the user role then the action is allowed"""
     if 'permission' not in action:
         logger.error('Action must have "permission" field: %s', str(action))
         return False
@@ -30,7 +29,7 @@ def check_permissions(user, action):
 
 
 def get_all_actions(user, project):
-    """ Return dict with registered actions
+    """Return dict with registered actions
 
     :param user: list with user permissions
     :param project: current project
@@ -41,13 +40,13 @@ def get_all_actions(user, project):
     actions = sorted(actions, key=lambda x: x['order'])
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
-        for action in actions if not action.get('hidden', False)
-        and check_permissions(user, action)
+        for action in actions
+        if not action.get('hidden', False) and check_permissions(user, action)
     ]
     # remove experimental features if they are disabled
     if not (
-            flag_set('ff_back_experimental_features', user=project.organization.created_by)
-            or settings.EXPERIMENTAL_FEATURES
+        flag_set('ff_back_experimental_features', user=project.organization.created_by)
+        or settings.EXPERIMENTAL_FEATURES
     ):
         actions = [action for action in actions if not action.get('experimental', False)]
 
@@ -61,8 +60,8 @@ def get_all_actions(user, project):
 
 
 def register_action(entry_point, title, order, **kwargs):
-    """ Register action in global _action instance,
-        action_id will be automatically extracted from entry_point function name
+    """Register action in global _action instance,
+    action_id will be automatically extracted from entry_point function name
     """
     action_id = entry_point.__name__
     if action_id in settings.DATA_MANAGER_ACTIONS:
@@ -73,19 +72,18 @@ def register_action(entry_point, title, order, **kwargs):
         'title': title,
         'order': order,
         'entry_point': entry_point,
-        **kwargs
+        **kwargs,
     }
 
 
 def register_actions_from_dir(base_module, action_dir):
-    """ Find all python files nearby this file and try to load 'actions' from them
-    """
+    """Find all python files nearby this file and try to load 'actions' from them"""
     for path in os.listdir(action_dir):
         # skip non module files
         if '__init__' in path or '__pycache' in path or path.startswith('.'):
             continue
 
-        name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
+        name = path[0 : path.find('.py')]  # get only module name to read *.py and *.pyc
         try:
             module = import_module(f'{base_module}.{name}')
             if not hasattr(module, 'actions'):
@@ -101,8 +99,7 @@ def register_actions_from_dir(base_module, action_dir):
 
 
 def perform_action(action_id, project, queryset, user, **kwargs):
-    """ Perform action using entry point from actions
-    """
+    """Perform action using entry point from actions"""
     if action_id not in settings.DATA_MANAGER_ACTIONS:
         raise DataManagerException("Can't find '" + action_id + "' in registered actions")
 
@@ -111,7 +108,6 @@ def perform_action(action_id, project, queryset, user, **kwargs):
     # check user permissions for this action
     if not check_permissions(user, action):
         raise DRFPermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
-
 
     try:
         result = action['entry_point'](project, queryset, **kwargs)

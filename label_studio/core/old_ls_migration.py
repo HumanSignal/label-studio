@@ -20,8 +20,7 @@ from tasks.models import Annotation, Prediction, Task
 
 @contextlib.contextmanager
 def suppress_autotime(model, fields):
-    """ allow to keep original created_at value for auto_now_add=True field
-    """
+    """allow to keep original created_at value for auto_now_add=True field"""
     _original_values = {}
     for field in model._meta.local_fields:
         if field.name in fields:
@@ -38,7 +37,7 @@ def suppress_autotime(model, fields):
 
 
 def _migrate_tasks(project_path, project):
-    """ Migrate tasks from json file to database objects"""
+    """Migrate tasks from json file to database objects"""
     tasks_path = project_path / 'tasks.json'
     with io.open(os.path.abspath(tasks_path), encoding='utf-8') as t:
         tasks_data = json.load(t)
@@ -97,14 +96,14 @@ def _migrate_tabs(project_path, project):
                 filters = tab.pop('filters', None)
                 if filters is not None:
                     filter_group = FilterGroup.objects.create(conjunction=filters.get('conjunction', 'and'))
-                    if "items" in filters:
-                        for f in filters["items"]:
+                    if 'items' in filters:
+                        for f in filters['items']:
                             view_filter = Filter.objects.create(
                                 **{
-                                    "column": f.get("filter", ""),
-                                    "operator": f.get("operator", ""),
-                                    "type": f.get("type", ""),
-                                    "value": f.get("value", {}),
+                                    'column': f.get('filter', ''),
+                                    'operator': f.get('operator', ''),
+                                    'type': f.get('type', ''),
+                                    'value': f.get('value', {}),
                                 }
                             )
                             filter_group.filters.add(view_filter)
@@ -243,4 +242,3 @@ def migrate_existing_project(project_path, project, config):
     _migrate_storages(project, config)
     _migrate_ml_backends(project, config)
     _migrate_uploaded_files(project, project_path)
-
