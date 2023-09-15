@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-431: [FE] We are using 'Tasks' rather than 'Records' on 'Create project with selected tasks' modal",
-  "commit": "902651ee3ad20c2fe63d9a87e07fe1fd14e750cd",
+  "commit": "333eb77b6abf79cf5ac4e10712f3056731dbedcd",
   "branch": "fb-dia-431/modal-title",
-  "date": "2023/09/15 07:56:09"
+  "date": "2023/09/15 08:16:10"
 }
