@@ -3144,7 +3144,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short": {
@@ -3338,13 +3338,13 @@
     },
     "fflag_feat_front_prod_e_111_annotator_workflow_control_short": {
       "key": "fflag_feat_front_prod_e_111_annotator_workflow_control_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
       "rules": [],
       "fallthrough": {
-        "variation": 1
+        "variation": 0
       },
       "offVariation": 1,
       "variations": [
@@ -3360,12 +3360,12 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 6,
       "deleted": false
     },
     "fflag_feat_optic_2_ensure_draft_saved_short": {
       "key": "fflag_feat_optic_2_ensure_draft_saved_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -3387,7 +3387,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 5,
       "deleted": false
     },
     "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short": {
@@ -3522,7 +3522,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short": {
