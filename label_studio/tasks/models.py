@@ -171,6 +171,7 @@ class Task(TaskMixin, models.Model):
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
+            models.Index(fields=['project', 'id']),
         ]
 
     @property
@@ -619,6 +620,7 @@ class Annotation(AnnotationMixin, models.Model):
             models.Index(fields=['last_action']),
             models.Index(fields=['project', 'ground_truth']),
             models.Index(fields=['project', 'was_cancelled']),
+            models.Index(fields=['project', 'id']),
         ]
 
     def created_ago(self):
