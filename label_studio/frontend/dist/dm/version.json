@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-134: [FE] find similar CandidateTasks",
-  "commit": "b7ba76a391744daa056d957826bb80fa2318dd4b",
+  "message": "fix: DIA-431: [FE] We are using 'Tasks' rather than 'Records' on 'Create project with selected tasks' modal",
+  "commit": "dfc22ea8eb0c32b467f30da2c7f292a70b2b839a",
   "branch": "master",
-  "date": "2023/09/15 10:24:21"
+  "date": "2023/09/15 16:21:34"
 }
