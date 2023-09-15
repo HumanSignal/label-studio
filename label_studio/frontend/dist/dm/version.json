@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-134: [FE] find similar CandidateTasks",
-  "commit": "ecf5f7c0c02f35317238fed4f4fb6419e1752bd9",
+  "commit": "599f5e61d8c2caab593bd9300224314c8ee2e0a3",
   "branch": "fb-lops-134/similarity",
-  "date": "2023/09/12 08:12:16"
+  "date": "2023/09/15 10:22:06"
 }
