@@ -48,7 +48,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: "${{ matrix.python-version }}"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install OS dependencies
         run: |
@@ -189,7 +189,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: "${{ matrix.python-version }}"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install OS dependencies
         run: |
@@ -269,8 +269,6 @@ jobs:
         python-version:
           - '3.8'
           - '3.9'
-          - '3.10'
-          - '3.11'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -296,7 +294,15 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: "${{ matrix.python-version }}"
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/cache@v3
+        name: Configure pip cache
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install dependencies
         run: |

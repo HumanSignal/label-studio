@@ -65,6 +65,3 @@ launchdarkly-server-sdk==7.5.0
 python-json-logger==2.0.4
 
 label-studio-converter==0.0.55
-
-
-
