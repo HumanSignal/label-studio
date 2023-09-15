@@ -236,6 +236,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         return Response(result)
 
     def patch(self, request, *args, **kwargs):
+        self.task = self.get_object()
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
     @api_webhook_for_delete(WebhookAction.TASKS_DELETED)
@@ -244,6 +245,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
+        self.task = self.get_object()
         return super(TaskAPI, self).put(request, *args, **kwargs)
 
 
