@@ -18,7 +18,9 @@ from .uploader import load_tasks_for_async_import
 logger = logging.getLogger(__name__)
 
 
-def async_import_background(import_id, user_id, recalculate_stats_func : Optional[Callable[..., None]] = None, **kwargs):
+def async_import_background(
+    import_id, user_id, recalculate_stats_func: Optional[Callable[..., None]] = None, **kwargs
+):
     with transaction.atomic():
         try:
             project_import = ProjectImport.objects.get(id=import_id)
@@ -63,9 +65,13 @@ def async_import_background(import_id, user_id, recalculate_stats_func : Optiona
             'prediction_count': prediction_count,
         }
 
-        project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
-                                                      overlap_cohort_percentage_changed=False,
-                                                      tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
+        project.update_tasks_counters_and_task_states(
+            tasks_queryset=tasks,
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True,
+            recalculate_stats_counts=recalculate_stats_counts,
+        )
         logger.info('Tasks bulk_update finished (async import)')
 
         project.summary.update_data_columns(tasks)
@@ -92,13 +98,10 @@ def async_import_background(import_id, user_id, recalculate_stats_func : Optiona
     project_import.save()
 
 
-
 def set_import_background_failure(job, connection, type, value, _):
     import_id = job.args[0]
     ProjectImport.objects.filter(id=import_id).update(
-        status=ProjectImport.Status.FAILED,
-        traceback=traceback.format_exc(),
-        error=str(value)
+        status=ProjectImport.Status.FAILED, traceback=traceback.format_exc(), error=str(value)
     )
 
 
@@ -117,11 +120,9 @@ def reformat_predictions(tasks, preannotated_from_fields):
         if 'data' in task:
             task = task['data']
         predictions = [{'result': task.pop(field)} for field in preannotated_from_fields]
-        new_tasks.append({
-            'data': task,
-            'predictions': predictions
-        })
+        new_tasks.append({'data': task, 'predictions': predictions})
     return new_tasks
+
 
 post_process_reimport = load_func(settings.POST_PROCESS_REIMPORT)
 
@@ -143,7 +144,8 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
     project = reimport.project
 
     tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
-        reimport.project, reimport.file_upload_ids,  files_as_tasks_list=reimport.files_as_tasks_list)
+        reimport.project, reimport.file_upload_ids, files_as_tasks_list=reimport.files_as_tasks_list
+    )
 
     with transaction.atomic():
         project.remove_tasks_by_file_uploads(reimport.file_upload_ids)
@@ -165,9 +167,12 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
     # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
     # single operation as counters affect bulk is_labeled update
     project.update_tasks_counters_and_task_states(
-        tasks_queryset=tasks, maximum_annotations_changed=False,
+        tasks_queryset=tasks,
+        maximum_annotations_changed=False,
         overlap_cohort_percentage_changed=False,
-        tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
+        tasks_number_changed=True,
+        recalculate_stats_counts=recalculate_stats_counts,
+    )
     logger.info('Tasks bulk_update finished (async reimport)')
 
     project.summary.update_data_columns(tasks)

@@ -12,15 +12,11 @@ jobs:
     name: Ruff
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.head_sha }}
-
-      - uses: actions/checkout@v4
-      - uses: chartboost/ruff-action@v1
-        with:
-          src: "./label_studio"
-          version: 0.0.285
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.head_sha }}
+    - uses: actions/setup-python@v3
+    - uses: pre-commit/action@v3.0.0
+      with:
+        extra_args: ruff --all-files --hook-stage pre-push

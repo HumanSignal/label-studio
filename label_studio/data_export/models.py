@@ -200,7 +200,7 @@ class ConvertedFormat(models.Model):
         Export,
         related_name='converted_formats',
         on_delete=models.CASCADE,
-        help_text='Export snapshot for this converted file'
+        help_text='Export snapshot for this converted file',
     )
     file = models.FileField(
         upload_to=settings.DELAYED_EXPORT_DIR,
@@ -211,14 +211,8 @@ class ConvertedFormat(models.Model):
         choices=Status.choices,
         default=Status.CREATED,
     )
-    traceback = models.TextField(
-        null=True,
-        blank=True,
-        help_text='Traceback report in case of errors'
-    )
-    export_type = models.CharField(
-        max_length=64
-    )
+    traceback = models.TextField(null=True, blank=True, help_text='Traceback report in case of errors')
+    export_type = models.CharField(max_length=64)
     created_at = models.DateTimeField(
         _('created at'),
         null=True,
