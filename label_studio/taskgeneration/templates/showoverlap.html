@@ -70,14 +70,14 @@
             </tr>
             {% for ol in overlap %}
             <tr>
-                <td>{{ ol.video }}</td>
-                <td>{{ ol.imu }}</td>
+                <td>{{ ol.sensordata_A }}</td>
+                <td>{{ ol.sensordata_A }}</td>
                 <td>{{ ol.project }}</td> 
                 <td>{{ ol.subject}} </td>
-                <td>{{ ol.start_video }}</td>
-                <td>{{ ol.end_video }}</td>
-                <td>{{ ol.start_imu }}</td>
-                <td>{{ ol.end_imu}}</td>
+                <td>{{ ol.start_A }}</td>
+                <td>{{ ol.end_A }}</td>
+                <td>{{ ol.start_B }}</td>
+                <td>{{ ol.end_B}}</td>
             </tr> 
             {% endfor %} 
         </table>  
