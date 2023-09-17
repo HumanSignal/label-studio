@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('sensormodel', '0019_deployment_project'),
-        ('sensordata', '0009_auto_20230721_1504'),
+        ('sensordata', '0009_auto_20230721_1723'),
     ]
 
     operations = [
