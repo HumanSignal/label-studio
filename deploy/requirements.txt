@@ -36,7 +36,7 @@ django-ranged-fileresponse>=0.1.2
 drf_dynamic_fields==0.3.0
 djangorestframework==3.13.1
 drf-flex-fields==0.9.5
--e git+https://github.com/HumanSignal/drf-yasg#egg=drf-yasg
+drf-yasg @ https://github.com/HumanSignal/drf-yasg/releases/download/1.21.7/drf_yasg-1.21.8.dev1+gda9d765-py3-none-any.whl
 drf-generators==0.3.0
 htmlmin==0.1.12
 jsonschema==3.2.0
@@ -46,7 +46,7 @@ defusedxml>=0.7.1
 numpy==1.24.3
 ordered_set==4.0.2
 pandas>=0.24.0
-protobuf>=3.15.5
+protobuf>=3.15.5,<4.0.0
 psycopg2-binary==2.9.6
 pydantic>=1.7.3,<=1.11.0
 python_dateutil>=2.8.1
