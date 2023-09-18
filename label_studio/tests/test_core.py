@@ -10,16 +10,19 @@ from core.utils.params import bool_from_request
 from rest_framework.exceptions import ValidationError
 
 
-@pytest.mark.parametrize('param, result', [
-    ('True', True),
-    ('Yes', True),
-    ('1', True),
-    ('False', False),
-    ('no', False),
-    ('0', False),
-    ('test', None),
-    (None, False)
-])
+@pytest.mark.parametrize(
+    'param, result',
+    [
+        ('True', True),
+        ('Yes', True),
+        ('1', True),
+        ('False', False),
+        ('no', False),
+        ('0', False),
+        ('test', None),
+        (None, False),
+    ],
+)
 @pytest.mark.django_db
 def test_core_bool_from_request(param, result):
     params = {'test': param} if param is not None else {}
@@ -39,14 +42,7 @@ def test_core_bool_from_request(param, result):
         assert bool_from_request(params, 'test', 0) == result
 
 
-@pytest.mark.parametrize('param, result', [
-    ('', None),
-    ('0', 0),
-    ('1', 1),
-    ('10', 10),
-    ('test', None),
-    (None, None)
-])
+@pytest.mark.parametrize('param, result', [('', None), ('0', 0), ('1', 1), ('10', 10), ('test', None), (None, None)])
 @pytest.mark.django_db
 def test_core_int_from_request(param, result):
     params = {'test': param}
@@ -91,17 +87,17 @@ def test_user_info(business_client):
     assert user is not None
 
 
-@pytest.mark.parametrize('command_line, result', [
-    (['label-studio', 'user', '--username', 'test@test.com', '--password', '12345678'], None),
-])
+@pytest.mark.parametrize(
+    'command_line, result',
+    [
+        (['label-studio', 'user', '--username', 'test@test.com', '--password', '12345678'], None),
+    ],
+)
 @pytest.mark.django_db
 def test_main(mocker, command_line, result):
     from server import main
 
-    mocker.patch(
-        "sys.argv",
-        command_line
-    )
+    mocker.patch('sys.argv', command_line)
     output = main()
 
     assert output == result
@@ -138,44 +134,48 @@ def test_start_browser():
     assert start_browser('http://localhost:8080', True) is None
     assert start_browser('http://localhost:8080', False) is None
 
-@pytest.mark.parametrize('url, block_local_urls, raises_exc', [
-    ('http://0.0.0.0', True, InvalidUploadUrlError),
-    ('http://0.0.0.0', False, None),
-    ('https://0.0.0.0', True, InvalidUploadUrlError),
-    ('https://0.0.0.0', False, None),
-    # Non-http[s] schemes
-    ('ftp://example.org', True, InvalidUploadUrlError),
-    ('ftp://example.org', False, InvalidUploadUrlError),
-    ('FILE:///etc/passwd', True, InvalidUploadUrlError),
-    ('file:///etc/passwd', False, InvalidUploadUrlError),
-    # Start and end of 127.0.0.0/8
-    ('https://127.0.0.0', True, InvalidUploadUrlError),
-    ('https://127.255.255.255', True, InvalidUploadUrlError),
-    # Start and end of 10.0.0.0/8
-    ('http://10.0.0.0', True, InvalidUploadUrlError),
-    ('https://10.255.255.255', True, InvalidUploadUrlError),
-    # Start and end of 172.16.0.0/12
-    ('https://172.16.0.0', True, InvalidUploadUrlError),
-    ('https://172.31.255.255', True, InvalidUploadUrlError),
-    # Start and end of 192.168.0.0/16
-    ('https://192.168.0.0', True, InvalidUploadUrlError),
-    ('https://192.168.255.255', True, InvalidUploadUrlError),
-    # Valid external IPs
-    ('https://4.4.4.4', True, None),
-    ('https://8.8.8.8', True, None),
-    ('http://8.8.8.8', False, None),
-    # Valid external websites
-    ('https://example.org', True, None),
-    ('http://example.org', False, None),
-    # Space prepended to otherwise valid external IP
-    (' http://8.8.8.8', False, InvalidUploadUrlError),
-    # Host that doesn't resolve
-    ('http://example', False, LabelStudioAPIException),
-    ('http://example', True, LabelStudioAPIException),
-    # localhost
-    ('http://localhost', True, InvalidUploadUrlError),
-    ('http://localhost', False, None),
- ])
+
+@pytest.mark.parametrize(
+    'url, block_local_urls, raises_exc',
+    [
+        ('http://0.0.0.0', True, InvalidUploadUrlError),
+        ('http://0.0.0.0', False, None),
+        ('https://0.0.0.0', True, InvalidUploadUrlError),
+        ('https://0.0.0.0', False, None),
+        # Non-http[s] schemes
+        ('ftp://example.org', True, InvalidUploadUrlError),
+        ('ftp://example.org', False, InvalidUploadUrlError),
+        ('FILE:///etc/passwd', True, InvalidUploadUrlError),
+        ('file:///etc/passwd', False, InvalidUploadUrlError),
+        # Start and end of 127.0.0.0/8
+        ('https://127.0.0.0', True, InvalidUploadUrlError),
+        ('https://127.255.255.255', True, InvalidUploadUrlError),
+        # Start and end of 10.0.0.0/8
+        ('http://10.0.0.0', True, InvalidUploadUrlError),
+        ('https://10.255.255.255', True, InvalidUploadUrlError),
+        # Start and end of 172.16.0.0/12
+        ('https://172.16.0.0', True, InvalidUploadUrlError),
+        ('https://172.31.255.255', True, InvalidUploadUrlError),
+        # Start and end of 192.168.0.0/16
+        ('https://192.168.0.0', True, InvalidUploadUrlError),
+        ('https://192.168.255.255', True, InvalidUploadUrlError),
+        # Valid external IPs
+        ('https://4.4.4.4', True, None),
+        ('https://8.8.8.8', True, None),
+        ('http://8.8.8.8', False, None),
+        # Valid external websites
+        ('https://example.org', True, None),
+        ('http://example.org', False, None),
+        # Space prepended to otherwise valid external IP
+        (' http://8.8.8.8', False, InvalidUploadUrlError),
+        # Host that doesn't resolve
+        ('http://example', False, LabelStudioAPIException),
+        ('http://example', True, LabelStudioAPIException),
+        # localhost
+        ('http://localhost', True, InvalidUploadUrlError),
+        ('http://localhost', False, None),
+    ],
+)
 @pytest.mark.django_db
 def test_core_validate_upload_url(url, block_local_urls, raises_exc):
 

@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-380: [FE] 'Hang tight' message is missing when there is no tasks synced yet and sync is in progress",
-  "commit": "66797de8bcf7a7bc8ae401ab7975f589cd439ee7",
+  "message": "fix: DIA-198: [FE] 'txt' option is missing in data_type dropdown",
+  "commit": "46a69312a72aaf5b9553fa9e5f078a15def871a6",
   "branch": "master",
-  "date": "2023/09/05 09:47:24"
+  "date": "2023/09/15 16:25:07"
 }
