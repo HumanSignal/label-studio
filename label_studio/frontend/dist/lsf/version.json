@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-187: Seek Video to region start on select",
-  "commit": "768656a214f9e3be8dd75931f608e16950185fef",
+  "message": "feat: LEAP-187: Skip Video to region start on select",
+  "commit": "593a0f5ae8cb0baa5aeee9fbaf4b4cad9caa8a17",
   "branch": "fb-leap-187/seek_video_on_select",
-  "date": "2023/09/18 23:48:52"
+  "date": "2023/09/19 00:48:15"
 }
