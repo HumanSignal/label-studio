@@ -208,7 +208,7 @@ jobs:
           EOF
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Build and Push Release Ubuntu Docker image
         uses: docker/build-push-action@v5.0.0
