@@ -31,24 +31,16 @@ logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(l
 
 
 class AzureBlobStorageMixin(models.Model):
-    container = models.TextField(
-        _('container'), null=True, blank=True,
-        help_text='Azure blob container')
-    prefix = models.TextField(
-        _('prefix'), null=True, blank=True,
-        help_text='Azure blob prefix name')
+    container = models.TextField(_('container'), null=True, blank=True, help_text='Azure blob container')
+    prefix = models.TextField(_('prefix'), null=True, blank=True, help_text='Azure blob prefix name')
     regex_filter = models.TextField(
-        _('regex_filter'), null=True, blank=True,
-        help_text='Cloud storage regex for filtering objects')
+        _('regex_filter'), null=True, blank=True, help_text='Cloud storage regex for filtering objects'
+    )
     use_blob_urls = models.BooleanField(
-        _('use_blob_urls'), default=False,
-        help_text='Interpret objects as BLOBs and generate URLs')
-    account_name = models.TextField(
-        _('account_name'), null=True, blank=True,
-        help_text='Azure Blob account name')
-    account_key = models.TextField(
-        _('account_key'), null=True, blank=True,
-        help_text='Azure Blob account key')
+        _('use_blob_urls'), default=False, help_text='Interpret objects as BLOBs and generate URLs'
+    )
+    account_name = models.TextField(_('account_name'), null=True, blank=True, help_text='Azure Blob account name')
+    account_key = models.TextField(_('account_key'), null=True, blank=True, help_text='Azure Blob account key')
 
     def get_account_name(self):
         return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
@@ -60,10 +52,17 @@ class AzureBlobStorageMixin(models.Model):
         account_name = self.get_account_name()
         account_key = self.get_account_key()
         if not account_name or not account_key:
-            raise ValueError('Azure account name and key must be set using '
-                             'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY')
-        connection_string = "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
-                            ";AccountKey=" + account_key + ";EndpointSuffix=core.windows.net"
+            raise ValueError(
+                'Azure account name and key must be set using '
+                'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY'
+            )
+        connection_string = (
+            'DefaultEndpointsProtocol=https;AccountName='
+            + account_name
+            + ';AccountKey='
+            + account_key
+            + ';EndpointSuffix=core.windows.net'
+        )
         client = BlobServiceClient.from_connection_string(conn_str=connection_string)
         container = client.get_container_client(str(self.container))
         return client, container
@@ -95,12 +94,9 @@ class AzureBlobStorageMixin(models.Model):
 class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
     url_scheme = 'azure-blob'
 
-    presign = models.BooleanField(
-        _('presign'), default=True,
-        help_text='Generate presigned URLs')
+    presign = models.BooleanField(_('presign'), default=True, help_text='Generate presigned URLs')
     presign_ttl = models.PositiveSmallIntegerField(
-        _('presign_ttl'), default=1,
-        help_text='Presigned URLs TTL (in minutes)'
+        _('presign_ttl'), default=1, help_text='Presigned URLs TTL (in minutes)'
     )
 
     def iterkeys(self):
@@ -129,7 +125,9 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
         blob_str = blob.content_as_text()
         value = json.loads(blob_str)
         if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")
+            raise ValueError(
+                f'Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task'
+            )
         return value
 
     def scan_and_create_links(self):
@@ -142,16 +140,22 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
 
         expiry = datetime.utcnow() + timedelta(minutes=self.presign_ttl)
 
-        sas_token = generate_blob_sas(account_name=self.get_account_name(),
-                                      container_name=container,
-                                      blob_name=blob,
-                                      account_key=self.get_account_key(),
-                                      permission=BlobSasPermissions(read=True),
-                                      expiry=expiry)
-        return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
+        sas_token = generate_blob_sas(
+            account_name=self.get_account_name(),
+            container_name=container,
+            blob_name=blob,
+            account_key=self.get_account_key(),
+            permission=BlobSasPermissions(read=True),
+            expiry=expiry,
+        )
+        return (
+            'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
+        )
 
     def get_blob_metadata(self, key):
-        return AZURE.get_blob_metadata(key, self.container, account_name=self.account_name, account_key=self.account_key)
+        return AZURE.get_blob_metadata(
+            key, self.container, account_name=self.account_name, account_key=self.account_key
+        )
 
     class Meta:
         abstract = True
@@ -163,7 +167,6 @@ class AzureBlobImportStorage(ProjectStorageMixin, AzureBlobImportStorageBase):
 
 
 class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: order is important!
-
     def save_annotation(self, annotation):
         container = self.get_container()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
