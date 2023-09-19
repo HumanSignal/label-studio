@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-36: Taxonomy alias + other important fixes",
-  "commit": "4f4a382254b4dd781af5ad8cdbe35b015f780a4c",
+  "message": "feat: LEAP-187: Skip Video to region start on select",
+  "commit": "55e11d40341d76a34d4bedf2a21d3e6a75f21b07",
   "branch": "master",
-  "date": "2023/09/08 19:20:48"
+  "date": "2023/09/19 12:55:10"
 }
