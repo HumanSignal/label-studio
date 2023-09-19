@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from subjectannotation.views import parse_subject_presence_annotations
-from timeset import TimeRange
 from datetime import timedelta
 
 from sensormodel.models import Deployment
