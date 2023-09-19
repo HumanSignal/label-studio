@@ -6,7 +6,7 @@ from datetime import timedelta
 from enum import Enum
 from functools import lru_cache
 from json import JSONDecodeError
-from typing import Union
+from typing import Optional, Union
 from urllib.parse import urlparse
 
 import google.auth
@@ -35,9 +35,9 @@ class GCS(object):
     @lru_cache(maxsize=1)
     def get_bucket(
         cls,
-        google_project_id: str = None,
-        google_application_credentials: Union[str, dict] = None,
-        bucket_name: str = None,
+        google_project_id: Optional[str] = None,
+        google_application_credentials: Optional[Union[str, dict]] = None,
+        bucket_name: Optional[str] = None,
     ) -> gcs.Bucket:
 
         client = cls.get_client(
