@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-187: Skip Video to region start on select",
-  "commit": "55e11d40341d76a34d4bedf2a21d3e6a75f21b07",
+  "message": "fix: LSDV-5547: Support HTML in Instructions modal",
+  "commit": "c49bba65917790e9dd9eb655965abf47564a4c7b",
   "branch": "master",
-  "date": "2023/09/19 12:55:10"
+  "date": "2023/09/19 16:46:22"
 }
