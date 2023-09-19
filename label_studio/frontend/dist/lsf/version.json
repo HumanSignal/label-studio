@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-187: Skip Video to region start on select",
-  "commit": "55e11d40341d76a34d4bedf2a21d3e6a75f21b07",
-  "branch": "master",
-  "date": "2023/09/19 12:55:10"
+  "message": "perf: LEAP-32: Improve performance of zooming at Image Segmentation",
+  "commit": "a1a09370834b7fd35311b51d23bfd1e1e43ffe40",
+  "branch": "fb-leap-32/zoom-perf",
+  "date": "2023/09/19 14:34:22"
 }
