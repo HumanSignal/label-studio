@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5547: Support HTML in Instructions modal",
-  "commit": "35c2ab6429395627aede7d10338aa55f5e55d41d",
-  "branch": "fb-lsdv-5547/instructions-html",
-  "date": "2023/09/18 19:53:08"
+  "commit": "c49bba65917790e9dd9eb655965abf47564a4c7b",
+  "branch": "master",
+  "date": "2023/09/19 16:46:22"
 }
