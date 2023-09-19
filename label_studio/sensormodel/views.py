@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect 
+from django.urls import reverse
 from .models import Sensor, Deployment,  Subject, SensorType
 from . import forms
 from .utils.validate_config_json import validateConfigJSON
@@ -12,8 +13,9 @@ from projects.models import Project
 def deployment(request, project_id):
     project = Project.objects.get(id=project_id)
     deployments = Deployment.objects.filter(project=project).order_by('begin_datetime')
+    
     if request.method == 'POST':
-        deploymentform = forms.DeploymentForm(request.POST)
+        deploymentform = forms.DeploymentForm(request.POST, project=project)  # Provide the project argument only once
         if deploymentform.is_valid():
             deployment = deploymentform.save(commit=False)
             deployment.project = project
@@ -21,7 +23,9 @@ def deployment(request, project_id):
             return redirect('sensormodel:deployment', project_id=project_id)
     else:
         deploymentform = forms.DeploymentForm(project=project)
-    return render(request, 'overviewDeployment.html', {'deploymentform':deploymentform, 'deployments': deployments, 'project':project})
+    
+    return render(request, 'overviewDeployment.html', {'deploymentform': deploymentform, 'deployments': deployments, 'project': project})
+
 
 def sensor(request, project_id):
     project = Project.objects.get(id=project_id)
@@ -129,7 +133,7 @@ def delete_subject(request, project_id, id):
         # Go to delete confirmation page
         return render(request, 'deleteSubject.html', {'project':project})
 
-def sync_sensor_parser_templates(request):
+def sync_sensor_parser_templates(request, project_id):
     # Search sensortypes repo for (new) config .yaml files and add them to DB
     if request.method == 'POST':
         # # Reset the sensortypes
@@ -161,4 +165,4 @@ def sync_sensor_parser_templates(request):
                     # If the config is valid add to DB
                     config = json.loads(config)
                     SensorType.objects.create(manufacturer=manufacturer,name=name, version=version, **config).save()
-    return redirect('sensormodel:sensor')
+    return redirect(reverse('sensormodel:sensor',kwargs={'project_id':project_id}))

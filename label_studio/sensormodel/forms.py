@@ -15,9 +15,10 @@ class SubjectForm(forms.ModelForm):
 class DeploymentForm(forms.ModelForm):
     class Meta:
         model = models.Deployment
-        fields = ['name','project','begin_datetime','end_datetime','location','sensor','subject']
+        fields = ['name','begin_datetime','end_datetime','location','sensor','subject']
 
-    def __init__(self, project=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project', None)  # Remove 'project' from kwargs
         super(DeploymentForm, self).__init__(*args, **kwargs)
 
         # Filter the sensor queryset based on the provided project
@@ -83,7 +84,7 @@ class DeploymentForm2(DeploymentForm):
             if  begin_datetime >= end_datetime:
                 self.add_error('begin_datetime','Begin date time must be before end date time.')
 
-        sensors = cleaned_data.get('sensor')
-        deployments = Deployment.objects.all()
+        #sensors = cleaned_data.get('sensor')
+        #deployments = Deployment.objects.all()  
         
         return cleaned_data
