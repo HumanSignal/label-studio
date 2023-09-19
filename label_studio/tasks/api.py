@@ -371,6 +371,10 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
     def delete_draft(self, draft_id, annotation_id):
         try:
             draft = AnnotationDraft.objects.get(id=draft_id)
+            # We call delete on the individual draft object because 
+            # AnnotationDraft#delete has special behavior (updating created_labels_drafts). 
+            # This special behavior won't be triggered if we call delete on the queryset.
+            # Only for drafts with empty annotation_id, other ones deleted by signal
             draft.delete()
         except AnnotationDraft.DoesNotExist:
             pass
