@@ -21,6 +21,7 @@ from drf_yasg.utils import swagger_auto_schema
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
@@ -411,12 +412,15 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
             extra_args['completed_by'] = self.request.user
 
         draft_id = self.request.data.get('draft_id')
+        draft = AnnotationDraft.objects.filter(id=draft_id).first()
+        if draft:
+            # draft permission check
+            if draft.task_id != task.id or not draft.has_permission(user) or draft.user_id != user.id:
+                raise PermissionDenied(f'You have no permission to draft id:{draft_id}')
 
-        if draft_id is not None and flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):
+        if draft is not None and flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):
             # if the annotation will be created from draft - get created_at from draft to keep continuity of history
-            draft = AnnotationDraft.objects.filter(id=draft_id).first()
-            if draft is not None:
-                extra_args['draft_created_at'] = draft.created_at
+            extra_args['draft_created_at'] = draft.created_at
 
         # create annotation
         logger.debug(f'User={self.request.user}: save annotation')
