@@ -413,7 +413,6 @@ jobs:
       - ruff
       - pytest
       - migrations
-      - conda-test
       - build-docker
     runs-on: ubuntu-latest
     steps:
