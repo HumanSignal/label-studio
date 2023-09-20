@@ -4,7 +4,6 @@ from . import views
 app_name = 'taskgeneration'
 
 urlpatterns = [
-    path('', views.task_generation_page, name= 'taskgenerationpage'),
-    path('generate/', views.generate_activity_tasks, name='generateactivitytasks'),
-    path('taskpair/',views.create_task_pairs,name='pairs')
+    path('<int:project_id>', views.generate_taskgen_form, name= 'generate_form'),
+    path('<int:project_id>/generate/', views.task_generation_page, name='generateactivitytasks'),
 ]

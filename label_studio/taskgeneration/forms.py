@@ -2,7 +2,7 @@ from django import forms
 from projects.models import Project
 from sensormodel.models import Subject
 
-class TaskGenerationForm(forms.Form):
+class TaskGenerationForm_dead(forms.Form):
     project = forms.ModelChoiceField(Project.objects.all(),
                                      help_text="Choose the subject annotation project",
                                      label="Subject annotation project")
@@ -12,3 +12,19 @@ class TaskGenerationForm(forms.Form):
     segment_duration = forms.IntegerField(min_value=1,
                                           help_text="Choose the duration of each annotation segment",
                                           label="Segment duration")
+    
+class TaskGenerationForm(forms.Form):
+    def __init__(self, column_names_choices, *args, **kwargs):
+        super(TaskGenerationForm, self).__init__(*args, **kwargs)
+        self.fields['column_name'].choices = column_names_choices
+
+    subject = forms.ModelChoiceField(Subject.objects.all(),
+                                     help_text="Choose the subject for which tasks should be generated",
+                                     label="Subject",
+                                     required=True)
+    segment_duration = forms.IntegerField(min_value=1,
+                                          help_text="Choose the duration of each annotation segment",
+                                          label="Segment duration",
+                                          required=True)
+    
+    column_name = forms.ChoiceField(choices=(), required=True)

@@ -7,6 +7,7 @@ from sensordata.views import upload_sensor_data
 from django.conf import settings
 from django.apps import apps
 from django.http import HttpResponse
+from django.urls import reverse
 
 import subprocess
 import os
@@ -14,15 +15,15 @@ import pandas as pd
 import json
 
 from projects.models import Project
-from sensormodel.models import Deployment
+from sensormodel.models import Deployment, Sensor
 from sensordata.models import SensorData, SensorOffset
 from subjectannotation.models import SubjectPresence
 from taskgeneration.models import SensorOverlap
 from taskgeneration.forms import TaskGenerationForm
 
 
-def task_generation_page(request):
-    taskgenerationform = TaskGenerationForm()
+def task_generation_page(request,taskform):
+    taskgenerationform = taskform
     return render(request, 'taskgeneration.html', {'taskgenerationform':taskgenerationform})
 
 def create_task_pairs(request, project, subject, sensortype_B):
@@ -90,7 +91,7 @@ def create_task_pairs(request, project, subject, sensortype_B):
                     
         
 
-def create_annotation_data_chunks(request, project, subject, duration):
+def create_annotation_data_chunks(request, project, subject, duration,column_name):
     # Get all overlap for given subject and video
     sensor_overlap = SensorOverlap.objects.filter(project=project, subject=subject)
     # Find distinct video sensordata in all the overlap
@@ -168,7 +169,7 @@ def create_annotation_data_chunks(request, project, subject, duration):
 
                     activity_annotation_project = Project.objects.get(id=project.id+2)
                     task_json_template = {
-                        "csv": f"{imu_file_upload.file.url}?time=time_column&values=first_column",
+                        "csv": f"{imu_file_upload.file.url}?time={timestamp_column}&values={column_name}",
                         "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.time_column;v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),300); console.log('video is loaded, starting to sync with time series')}}, 3000); \" />"
                     }
                     with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
@@ -181,29 +182,44 @@ def create_annotation_data_chunks(request, project, subject, duration):
         else:
             return HttpResponse('Sensor combination not yet supported ', content_type='text/plain')
 
-def generate_activity_tasks(request):
+def generate_taskgen_form(request,project_id):
+    project = Project.objects.get(id=project_id)
+    parse_subject_presence_annotations(request= request,project=project)
+    fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
+    sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
+    sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first()
+    if sensortype_B.sensortype == 'I':
+        sensor_instance = Sensor.objects.filter(project=project,sensortype=sensortype_B).first()
+        imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
+        timestamp_column = sensortype_B.timestamp_column
+        imu_df = pd.read_csv(imu_file_path, engine='python')
+        column_names = imu_df.columns.to_list()
+        columns_names_choices = []
+        for i, column_name in enumerate(column_names):
+            columns_names_choices.append((i,column_name))
+        taskgenerationform = TaskGenerationForm(column_names_choices=columns_names_choices)
+        redirect(reverse('taskgeneration:taskgenerationpage',kwargs={'taskform':taskgenerationform}))
+    else:
+        # Not yet supported
+        pass    
+    
+
+def generate_activity_tasks(request,project_id):
+    project = Project.objects.get(id=project_id)
     if request.method == 'POST':
         taskgenerationform = TaskGenerationForm(request.POST)
-        if taskgenerationform.is_valid() and request.session['']==True:
+        if taskgenerationform.is_valid():
             # Get data from Form
-            project = taskgenerationform.cleaned_data.get("project")
             subject = taskgenerationform.cleaned_data.get("subject")
             duration = taskgenerationform.cleaned_data.get("segment_duration")
-            sensortype_B = taskgenerationform.cleaned_data.get("sensortype_B")
-            if sensortype_B.sensortype == 'I':
-                # Step 1: Get columns names of sensortype
-                # Step 2: Go to new page where the user can select one of the column names in a dropdown
-                # Step 3: Save column name as variable
-
-                pass
-            # Fill SubjectPresence objects
-            parse_subject_presence_annotations(request= request,project=project)
+            column_name = taskgenerationform.cleaned_data.get("column_name")
+            fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
+            sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
+            sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first()
             # Fill VideoImuOverlap objects
             create_task_pairs(request= request,project=project, subject=subject,sensortype_B=sensortype_B)
             # Create annotation data chunks (video and imu), this automatically creates tasks
-            create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration)
-            
-    overlap = SensorOverlap.objects.all()      
+            create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,column_name=column_name)
+                
+        overlap = SensorOverlap.objects.all()      
     return render(request, 'showoverlap.html', {'overlap':overlap})    
-
-    
