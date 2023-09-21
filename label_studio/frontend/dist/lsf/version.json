@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5547: Support HTML in Instructions modal",
-  "commit": "c49bba65917790e9dd9eb655965abf47564a4c7b",
+  "message": "feat: LSDV-5518: Add snap prop to snap polygon to image pixels",
+  "commit": "2d9a66e882839d66729e6f7417a37ace88b60120",
   "branch": "master",
-  "date": "2023/09/19 16:46:22"
+  "date": "2023/09/21 10:02:19"
 }
