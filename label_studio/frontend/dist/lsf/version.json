@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-36: Taxonomy alias + other important fixes",
-  "commit": "4f4a382254b4dd781af5ad8cdbe35b015f780a4c",
+  "message": "fix: LSDV-5547: Support HTML in Instructions modal",
+  "commit": "c49bba65917790e9dd9eb655965abf47564a4c7b",
   "branch": "master",
-  "date": "2023/09/08 19:20:48"
+  "date": "2023/09/19 16:46:22"
 }
