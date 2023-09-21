@@ -114,7 +114,7 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
         skipped_fields = [field.attname for field in Task._meta.fields]
         skipped_fields.append('id')
         result = [f for f in result if f not in skipped_fields]
-    result = [f for f in result if not f.startswith('data.')]
+        result = [f for f in result if not f.startswith('data.')]
 
     return result
 
