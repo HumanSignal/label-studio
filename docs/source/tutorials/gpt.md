@@ -19,9 +19,7 @@ Follow this installation guide and then play around with the results. Generate y
 
 1. Install ML backend:
     ```bash
-    pip install -r label_studio_ml/examples/huggingface/requirements.txt
-    label-studio-ml init my-ml-backend --from label_studio_ml/examples/huggingface/gpt.py
-    label-studio-ml start my-ml-backend
+    docker-compose up
     ```
 
 2. Start Label Studio and create a new project.
@@ -32,7 +30,7 @@ Follow this installation guide and then play around with the results. Generate y
 
 5. Open the **Machine Learning** settings and click **Add Model**. 
 
-6. Add the URL `http://localhost:9090` and save the model as an ML backend.
+6. Add the URL `http://localhost:9091` and save the model as an ML backend.
 
 
 You can import your chat dialogs in the input format of [`<Paragraphs>` object tag](/tags/paragraphs.html), or use a sample task import just to give it a try.
@@ -41,14 +39,7 @@ After you import data, you'll see text boxes with generated answers.
 
 ## Tweaking parameters
 
-You can control some model parameters when you start the ML backend:
-
-For example, you can specify the model that you want to use, and the number of responses returned by the model:
-```bash
-label-studio-ml start my-ml-backend --with \
-model=microsoft/DialoGPT-small \
-num_responses=5
-```
+You can control some model parameters in `docker-compose.yml`. For example, `MODEL_NAME=microsoft/DialoGPT-medium`
 
 #### model
 Model name from [HuggingFace model hub](https://huggingface.co/models?filter=gpt2)
