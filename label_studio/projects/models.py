@@ -1286,7 +1286,7 @@ class ProjectSummary(models.Model):
                 for label in self._get_labels(result):
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
-        logger.debug(f'summary.created_labels = {labels}')
+        logger.debug(f'update summary.created_labels_drafts = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
 
@@ -1310,7 +1310,7 @@ class ProjectSummary(models.Model):
                             labels[from_name].pop(label)
                 if not labels[from_name]:
                     labels.pop(from_name)
-        logger.debug(f'summary.created_labels = {labels}')
+        logger.debug(f'summary.created_labels_drafts = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
 

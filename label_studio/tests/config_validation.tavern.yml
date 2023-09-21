@@ -68,7 +68,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  
+
 stages:
 - # Signup to the system
   id: signup
@@ -608,6 +608,317 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/validate'
   response:
     status_code: 200
+
+
+---
+test_name: delete_annotations_from_data_manager_deletes_task_drafts_and_correctly_updates_project_summary
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+
+- id: signup
+  type: ref
+
+- name: stage
+  request:
+    data:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View> '
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example 1
+    - text: Example 2
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+
+- # Submit a draft for the task
+  name: submit draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - 1
+          from_name: label
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+    save:
+      json:
+        draft_pk: id
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      filters:
+        conjunction: and
+        items: []
+      ordering: []
+      project: '{pk}'
+      selectedItems:
+        all: true
+        excluded: []
+    method: POST
+    url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={pk}'
+  response:
+    status_code: 200
+
+# Submit another draft for the task, with a different choice. This is required because
+# if the project had no drafts or annotations in it, and we tried to validate, the
+# summary would be reset and we'd get a pass regardless of what we tried to remove
+# from the config.
+- name: submit task draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - 2
+          from_name: label
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+
+# It should now be possible to delete choice value 1, which was
+# the choice from the first task draft created (and deleted).
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+# ...but it should not be possible to delete choice 2.
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+
+
+---
+test_name: delete_annotations_from_data_manager_deletes_annotation_drafts_and_correctly_updates_project_summary
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+
+- id: signup
+  type: ref
+
+- name: stage
+  request:
+    data:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View> '
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example 1
+    - text: Example 2
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+
+# Submit an annotation for the task
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '1'
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/annotations'
+  response:
+    save:
+      json:
+        annotation_id: id
+    status_code: 201
+
+- name: Create draft over previously created annotation
+  request:
+    url: "{django_live_url}/api/tasks/{task_id}/annotations/{annotation_id}/drafts"
+    method: POST
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '2'
+  response:
+    status_code: 201
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      filters:
+        conjunction: and
+        items: []
+      ordering: []
+      project: '{pk}'
+      selectedItems:
+        all: true
+        excluded: []
+    method: POST
+    url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={pk}'
+  response:
+    status_code: 200
+
+# Submit a draft for the task (not annotation). This is required because if the project had
+# no drafts or annotations in it, and we tried to validate, the summary would be reset
+# and we'd get a pass regardless of what we tried to remove from the config.
+- name: submit task draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - '1'
+          from_name: label
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+
+# It should now be possible to delete choice value 2, which was
+# the choice from the previously created annotation draft.
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+# ...but it should not be possible to delete choice 1.
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
 
 
 ---
