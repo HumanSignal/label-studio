@@ -15,9 +15,7 @@ export const DraftGuard = () => {
 
   useEffect(() => {
     if (isFF(FF_OPTIC_2)) {
-      console.log("DraftGuard: enabled", history);
       const unblock = history.block(() => {
-        console.log("DraftGuard: block");
         const selected = window.Htx?.annotationStore?.selected;
         const submissionInProgress = !!selected?.submissionStarted;
         const hasChanges = !!selected?.history.undoIdx && !submissionInProgress;
@@ -28,7 +26,6 @@ export const DraftGuard = () => {
 
             if (status === 200 || status === 201) {
               toast.show({ message: "Draft saved successfully",  type: "info" });
-              console.log("DraftGuard: resolve");
               draftGuardCallback.current?.(true);
               draftGuardCallback.current = null;
             } else if (status !== undefined) {
@@ -43,7 +40,6 @@ export const DraftGuard = () => {
       return () => {
         draftGuardCallback.current = null;
         unblock();
-        console.log("DraftGuard: unblock");
       };
     }
   }, []);
