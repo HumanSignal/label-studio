@@ -43,35 +43,37 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: fix after switch to api/tasks from api/dm/tasks
-@method_decorator(name='post', decorator=swagger_auto_schema(
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
-        request_body=TaskSerializer))
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Tasks'],
-    operation_summary='Get tasks list',
-    operation_description="""
+        request_body=TaskSerializer,
+    ),
+)
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Tasks'],
+        operation_summary='Get tasks list',
+        operation_description="""
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
     """,
-    manual_parameters=[
-        openapi.Parameter(
-            name='view',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='View ID'),
-        openapi.Parameter(
-            name='project',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='Project ID'),
-        openapi.Parameter(
-            name='resolve_uri',
-            type=openapi.TYPE_BOOLEAN,
-            in_=openapi.IN_QUERY,
-            description='Resolve task data URIs using Cloud Storage'),
-    ],
-))
+        manual_parameters=[
+            openapi.Parameter(name='view', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='View ID'),
+            openapi.Parameter(
+                name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
+            ),
+            openapi.Parameter(
+                name='resolve_uri',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Resolve task data URIs using Cloud Storage',
+            ),
+        ],
+    ),
+)
 class TaskListAPI(DMTaskListAPI):
     serializer_class = TaskSerializer
     permission_required = ViewClassPermission(
@@ -96,49 +98,47 @@ class TaskListAPI(DMTaskListAPI):
         project_id = self.request.data.get('project')
         project = generics.get_object_or_404(Project, pk=project_id)
         instance = serializer.save(project=project)
-        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
+        emit_webhooks_for_instance(
+            self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance]
+        )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Get task',
         operation_description="""
         Get task data, metadata, annotations and other attributes for a specific labeling task by task ID.
         """,
         manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                description='Task ID'
-            ),
-        ]))
-@method_decorator(name='patch', decorator=swagger_auto_schema(
+            openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
+        ],
+    ),
+)
+@method_decorator(
+    name='patch',
+    decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Update task',
         operation_description='Update the attributes of an existing labeling task.',
         manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                description='Task ID'
-            ),
+            openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        request_body=TaskSimpleSerializer))
-@method_decorator(name='delete', decorator=swagger_auto_schema(
+        request_body=TaskSimpleSerializer,
+    ),
+)
+@method_decorator(
+    name='delete',
+    decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Delete task',
         operation_description='Delete a task in Label Studio. This action cannot be undone!',
         manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                description='Task ID'
-            ),
+            openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        ))
+    ),
+)
 class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
@@ -151,13 +151,17 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     @staticmethod
     def prefetch(queryset):
         return queryset.prefetch_related(
-            'annotations', 'predictions', 'annotations__completed_by', 'project',
+            'annotations',
+            'predictions',
+            'annotations__completed_by',
+            'project',
             'io_storages_azureblobimportstoragelink',
             'io_storages_gcsimportstoragelink',
             'io_storages_localfilesimportstoragelink',
             'io_storages_redisimportstoragelink',
             'io_storages_s3importstoragelink',
-            'file_upload', 'project__ml_backends'
+            'file_upload',
+            'project__ml_backends',
         )
 
     def get_retrieve_serializer_context(self, request):
@@ -168,7 +172,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             'predictions': 'predictions' in fields,
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,
-            'request': request
+            'request': request,
         }
 
     def get(self, request, pk):
@@ -178,12 +182,15 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         context['project'] = project = self.task.project
 
         # get prediction
-        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
-                and not self.task.predictions.exists():
+        if (
+            project.evaluate_predictions_automatically or project.show_collab_predictions
+        ) and not self.task.predictions.exists():
             evaluate_predictions([self.task])
             self.task.refresh_from_db()
 
-        serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])
+        serializer = self.get_serializer_class()(
+            self.task, many=False, context=context, expand=['annotations.completed_by']
+        )
         data = serializer.data
         return Response(data)
 
@@ -191,11 +198,9 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         task_id = self.request.parser_context['kwargs'].get('pk')
         task = generics.get_object_or_404(Task, pk=task_id)
         review = bool_from_request(self.request.GET, 'review', False)
-        selected = {"all": False, "included": [self.kwargs.get("pk")]}
+        selected = {'all': False, 'included': [self.kwargs.get('pk')]}
         if review:
-            kwargs = {
-                'fields_for_evaluation': ['annotators', 'reviewed']
-            }
+            kwargs = {'fields_for_evaluation': ['annotators', 'reviewed']}
         else:
             kwargs = {'all_fields': True}
         project = self.request.query_params.get('project') or self.request.data.get('project')
@@ -203,9 +208,9 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             project = task.project.id
         return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),
-                **kwargs
-            ))
+                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request), **kwargs
+            )
+        )
 
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
@@ -215,7 +220,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         # POST, PATCH, PUT
         else:
             return TaskSimpleSerializer
-    
+
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
         project = task.project
@@ -243,21 +248,31 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         return super(TaskAPI, self).put(request, *args, **kwargs)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Get annotation by its ID',
         operation_description='Retrieve a specific annotation for a task using the annotation result ID.',
-        ))
-@method_decorator(name='patch', decorator=swagger_auto_schema(
+    ),
+)
+@method_decorator(
+    name='patch',
+    decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Update annotation',
         operation_description='Update existing attributes on an annotation.',
-        request_body=AnnotationSerializer))
-@method_decorator(name='delete', decorator=swagger_auto_schema(
+        request_body=AnnotationSerializer,
+    ),
+)
+@method_decorator(
+    name='delete',
+    decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Delete annotation',
-        operation_description='Delete an annotation. This action can\'t be undone!',
-        ))
+        operation_description="Delete an annotation. This action can't be undone!",
+    ),
+)
 class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
@@ -308,19 +323,20 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         return super(AnnotationAPI, self).delete(request, *args, **kwargs)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Get all task annotations',
         operation_description='List all annotations for a task.',
         manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='Task ID'),
+            openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        ))
-@method_decorator(name='post', decorator=swagger_auto_schema(
+    ),
+)
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Create annotation',
         operation_description="""
@@ -340,14 +356,11 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         ```
         """,
         manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='Task ID'),
+            openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        request_body=AnnotationSerializer
-        ))
+        request_body=AnnotationSerializer,
+    ),
+)
 class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
@@ -400,10 +413,7 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
                 logger.debug(f'User={self.request.user}: there are no predictions for task={task}')
                 prediction_ser = {}
             # serialize annotation
-            extra_args.update({
-                'prediction': prediction_ser,
-                'updated_by': user
-            })
+            extra_args.update({'prediction': prediction_ser, 'updated_by': user})
 
         if 'was_cancelled' in self.request.GET:
             extra_args['was_cancelled'] = bool_from_request(self.request.GET, 'was_cancelled', False)
@@ -467,11 +477,7 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
         annotation_id = self.kwargs.get('annotation_id')
         user = self.request.user
         logger.debug(f'User {user} is going to create draft for task={task_id}, annotation={annotation_id}')
-        serializer.save(
-            task_id=self.kwargs['pk'],
-            annotation_id=annotation_id,
-            user=self.request.user
-        )
+        serializer.save(task_id=self.kwargs['pk'], annotation_id=annotation_id, user=self.request.user)
 
 
 class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -488,85 +494,94 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     swagger_schema = None
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(
-    tags=['Predictions'],
-    operation_summary="List predictions",
-    filter_inspectors=[DjangoFilterDescriptionInspector],
-    operation_description="List all predictions and their IDs.",
-))
-@method_decorator(name='create', decorator=swagger_auto_schema(
-    tags=['Predictions'],
-    operation_summary="Create prediction",
-    operation_description="Create a prediction for a specific task.",
-))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(
-    tags=['Predictions'],
-    operation_summary="Get prediction details",
-    operation_description="Get details about a specific prediction by its ID.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Prediction ID'),
-    ],
-))
-@method_decorator(name='update', decorator=swagger_auto_schema(
-    tags=['Predictions'],
-    operation_summary="Put prediction",
-    operation_description="Overwrite prediction data by prediction ID.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Prediction ID'),
-    ],
-))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(
-    tags=['Predictions'],
-    operation_summary="Update prediction",
-    operation_description="Update prediction data by prediction ID.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Prediction ID'),
-    ],
-))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(
-    tags=['Predictions'],
-    operation_summary="Delete prediction",
-    operation_description="Delete a prediction by prediction ID.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Prediction ID'),
-    ],
-))
+@method_decorator(
+    name='list',
+    decorator=swagger_auto_schema(
+        tags=['Predictions'],
+        operation_summary='List predictions',
+        filter_inspectors=[DjangoFilterDescriptionInspector],
+        operation_description='List all predictions and their IDs.',
+    ),
+)
+@method_decorator(
+    name='create',
+    decorator=swagger_auto_schema(
+        tags=['Predictions'],
+        operation_summary='Create prediction',
+        operation_description='Create a prediction for a specific task.',
+    ),
+)
+@method_decorator(
+    name='retrieve',
+    decorator=swagger_auto_schema(
+        tags=['Predictions'],
+        operation_summary='Get prediction details',
+        operation_description='Get details about a specific prediction by its ID.',
+        manual_parameters=[
+            openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
+        ],
+    ),
+)
+@method_decorator(
+    name='update',
+    decorator=swagger_auto_schema(
+        tags=['Predictions'],
+        operation_summary='Put prediction',
+        operation_description='Overwrite prediction data by prediction ID.',
+        manual_parameters=[
+            openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
+        ],
+    ),
+)
+@method_decorator(
+    name='partial_update',
+    decorator=swagger_auto_schema(
+        tags=['Predictions'],
+        operation_summary='Update prediction',
+        operation_description='Update prediction data by prediction ID.',
+        manual_parameters=[
+            openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
+        ],
+    ),
+)
+@method_decorator(
+    name='destroy',
+    decorator=swagger_auto_schema(
+        tags=['Predictions'],
+        operation_summary='Delete prediction',
+        operation_description='Delete a prediction by prediction ID.',
+        manual_parameters=[
+            openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
+        ],
+    ),
+)
 class PredictionAPI(viewsets.ModelViewSet):
     serializer_class = PredictionSerializer
     permission_required = all_permissions.predictions_any
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['task', 'task__project']
+    filterset_fields = ['task', 'task__project', 'project']
 
     def get_queryset(self):
-        return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            return Prediction.objects.filter(project__organization=self.request.user.active_organization)
+        else:
+            return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
-@method_decorator(name='post', decorator=swagger_auto_schema(
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Convert annotation to draft',
         operation_description='Convert annotation to draft',
-        ))
+    ),
+)
 class AnnotationConvertAPI(generics.RetrieveAPIView):
-    permission_required = ViewClassPermission(
-        POST=all_permissions.annotations_change
-    )
+    permission_required = ViewClassPermission(POST=all_permissions.annotations_change)
     queryset = Annotation.objects.all()
 
     def process_intermediate_state(self, annotation, draft):
@@ -596,4 +611,3 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
         emit_webhooks_for_instance(organization, project, WebhookAction.ANNOTATIONS_DELETED, [pk])
         data = AnnotationDraftSerializer(instance=draft).data
         return Response(status=201, data=data)
-

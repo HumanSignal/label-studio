@@ -40,11 +40,13 @@ class S3ImportStorageSerializer(ImportStorageSerializer):
             raise ValidationError('Wrong credentials for S3 {bucket_name}'.format(bucket_name=storage.bucket))
         except ClientError as e:
             if '403' == e.response.get('Error').get('Code'):
-                raise ValidationError('Cannot connect to S3 {bucket_name} with specified AWS credentials'.format(
-                    bucket_name=storage.bucket))
+                raise ValidationError(
+                    'Cannot connect to S3 {bucket_name} with specified AWS credentials'.format(
+                        bucket_name=storage.bucket
+                    )
+                )
             if '404' in e.response.get('Error').get('Code'):
-                raise ValidationError('Cannot find bucket {bucket_name} in S3'.format(
-                    bucket_name=storage.bucket))
+                raise ValidationError('Cannot find bucket {bucket_name} in S3'.format(bucket_name=storage.bucket))
         except TypeError as e:
             raise ValidationError(f'It seems access keys are incorrect: {e}')
         return data

@@ -269,8 +269,6 @@ jobs:
         python-version:
           - '3.8'
           - '3.9'
-          - '3.10'
-          - '3.11'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio

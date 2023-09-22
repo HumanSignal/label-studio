@@ -7,14 +7,11 @@ from django.conf import settings as django_settings
 
 def sentry_fe(request):
     # return the value you want as a dictionary, you may add multiple values in there
-    return {
-        'SENTRY_FE': django_settings.SENTRY_FE
-    }
+    return {'SENTRY_FE': django_settings.SENTRY_FE}
 
 
 def settings(request):
-    """ Make available django settings on each template page
-    """
+    """Make available django settings on each template page"""
     versions = collect_versions()
 
     # django templates can't access names with hyphens
@@ -34,8 +31,4 @@ def settings(request):
     if hasattr(request, 'user'):
         feature_flags = all_flags(request.user)
 
-    return {
-        'settings': django_settings,
-        'versions': versions,
-        'feature_flags': feature_flags
-    }
+    return {'settings': django_settings, 'versions': versions, 'feature_flags': feature_flags}

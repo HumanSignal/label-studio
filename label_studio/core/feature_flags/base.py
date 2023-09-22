@@ -35,9 +35,8 @@ if settings.FEATURE_FLAGS_FROM_FILE:
     logger.info(f'Read flags from file {feature_flags_file}')
     data_source = Files.new_data_source(paths=[feature_flags_file])
     config = Config(
-        sdk_key=settings.FEATURE_FLAGS_API_KEY or 'whatever',
-        update_processor_class=data_source,
-        send_events=False)
+        sdk_key=settings.FEATURE_FLAGS_API_KEY or 'whatever', update_processor_class=data_source, send_events=False
+    )
     ldclient.set_config(config)
     client = ldclient.get()
 elif settings.FEATURE_FLAGS_OFFLINE:
@@ -49,14 +48,11 @@ else:
     if hasattr(settings, 'REDIS_LOCATION'):
         logger.debug(f'Set LaunchDarkly config with Redis feature store at {settings.REDIS_LOCATION}')
         store = Redis.new_feature_store(
-            url=settings.REDIS_LOCATION,
-            prefix='feature-flags',
-            caching=CacheConfig(expiration=30))
-        ldclient.set_config(Config(
-            settings.FEATURE_FLAGS_API_KEY,
-            feature_store=store,
-            http=HTTPConfig(connect_timeout=5)
-        ))
+            url=settings.REDIS_LOCATION, prefix='feature-flags', caching=CacheConfig(expiration=30)
+        )
+        ldclient.set_config(
+            Config(settings.FEATURE_FLAGS_API_KEY, feature_store=store, http=HTTPConfig(connect_timeout=5))
+        )
     else:
         logger.debug('Set LaunchDarkly config without Redis...')
         ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY, http=HTTPConfig(connect_timeout=5)))
