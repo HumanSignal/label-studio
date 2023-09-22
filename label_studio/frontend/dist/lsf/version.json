@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5518: Add snap prop to snap polygon to image pixels",
-  "commit": "2d9a66e882839d66729e6f7417a37ace88b60120",
+  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
+  "commit": "688ba577fdc3a6b87ca24e94f27c7b2aac511b2a",
   "branch": "master",
-  "date": "2023/09/21 10:02:19"
+  "date": "2023/09/22 11:06:17"
 }
