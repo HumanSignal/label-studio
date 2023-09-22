@@ -1,8 +1,8 @@
 {
   "segments": {},
   "flags": {
-    "feat_all_optic_e_3_dashboard_multiple_labeling_group_support_v1_01092023_short": {
-      "key": "feat_all_optic_e_3_dashboard_multiple_labeling_group_support_v1_01092023_short",
+    "feat_all_optic_71_dashboard_multiple_labeling_group_support_v1_01092023_short": {
+      "key": "feat_all_optic_71_dashboard_multiple_labeling_group_support_v1_01092023_short",
       "on": false,
       "prerequisites": [],
       "targets": [],
@@ -21,11 +21,11 @@
         "usingEnvironmentId": false
       },
       "clientSide": false,
-      "salt": "5d8a0be8abc8477bb397a14089afa9db",
+      "salt": "8d390bd4d06a4a739d720491669e99ec",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 4,
       "deleted": false
     },
     "feat_front_dev_1752_notification_links_in_label_and_review_streams": {
@@ -1972,6 +1972,33 @@
       "version": 5,
       "deleted": false
     },
+    "fflag_feat_all_dia_13_structured_data_support_short": {
+      "key": "fflag_feat_all_dia_13_structured_data_support_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "411e8d48dcd84acc80ddcccb4f93e4e3",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_all_lops_315_temp_datasets_limitations_short": {
       "key": "fflag_feat_all_lops_315_temp_datasets_limitations_short",
       "on": false,
@@ -3603,7 +3630,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short": {
