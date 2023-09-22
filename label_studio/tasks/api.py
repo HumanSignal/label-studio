@@ -385,8 +385,8 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
     def delete_draft(self, draft_id, annotation_id):
         try:
             draft = AnnotationDraft.objects.get(id=draft_id)
-            # We call delete on the individual draft object because 
-            # AnnotationDraft#delete has special behavior (updating created_labels_drafts). 
+            # We call delete on the individual draft object because
+            # AnnotationDraft#delete has special behavior (updating created_labels_drafts).
             # This special behavior won't be triggered if we call delete on the queryset.
             # Only for drafts with empty annotation_id, other ones deleted by signal
             draft.delete()
@@ -428,7 +428,9 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
             if draft.task_id != task.id or not draft.has_permission(user) or draft.user_id != user.id:
                 raise PermissionDenied(f'You have no permission to draft id:{draft_id}')
 
-        if draft is not None and flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):
+        if draft is not None and flag_set(
+            'fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'
+        ):
             # if the annotation will be created from draft - get created_at from draft to keep continuity of history
             extra_args['draft_created_at'] = draft.created_at
 
