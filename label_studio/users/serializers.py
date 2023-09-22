@@ -20,7 +20,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         return user.get_initials()
 
     def to_representation(self, instance):
-        """ Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars """
+        """Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars"""
 
         uid = instance.id
         key = 'user_cache'
@@ -45,7 +45,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             'initials',
             'phone',
             'active_organization',
-            'allow_newsletters'
+            'allow_newsletters',
         )
 
 

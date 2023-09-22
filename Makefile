@@ -46,3 +46,23 @@ docker-testing-shell:
 # Update urls
 update-urls:
 	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py show_urls --format pretty-json > ./label_studio/core/all_urls.json
+
+# Format changed files on branch
+fmt:
+	pre-commit run --config .pre-commit-dev.yaml --hook-stage manual
+
+# Format all files in repo
+fmt-all:
+	pre-commit run --config .pre-commit-dev.yaml --hook-stage manual --all-files
+
+# Check for lint issues on this branch
+fmt-check:
+	pre-commit run --hook-stage pre-push
+
+# Check for lint issues in entire repo
+fmt-check-all:
+	pre-commit run --hook-stage pre-push --all-files
+
+# Configure pre-push hook using pre-commit
+configure-hooks:
+	pre-commit install --hook-type pre-push

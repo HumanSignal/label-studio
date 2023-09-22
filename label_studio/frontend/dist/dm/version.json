@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-2: Save draft on leave",
-  "commit": "f892132f1a00b18b69b4961e31049dc23eba1894",
+  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
+  "commit": "c9758b2fb911f789d6ba3c4b1dd8a44528eea5d0",
   "branch": "master",
-  "date": "2023/09/13 15:37:14"
+  "date": "2023/09/22 11:06:45"
 }

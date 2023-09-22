@@ -47,7 +47,7 @@ exclude = [
     "**/migrations/*.py",
 ]
 
-# Same as Black.
+# Same as Blue.
 line-length = 119
 
 # Allow unused variables when underscore-prefixed.
@@ -61,3 +61,42 @@ target-version = "py38"
 "__init__.py" = ["F401"]
 "**/settings/label_studio.py" = ["F405"]
 "test*.py" = ["F811"]
+
+
+[tool.blue]
+
+line-length = 119
+
+include = 'label_studio/.*\.py$'
+
+# Exclude a variety of commonly ignored directories, as well as all migrations files.
+force-exclude = '''
+/(
+    \.bzr
+  | \.direnv
+  | \.eggs
+  | \.git
+  | \.github
+  | \.git-rewrite
+  | \.hg
+  | \.mypy_cache
+  | \.nox
+  | \.pants.d
+  | \.pytype
+  | \.ruff_cache
+  | \.svn
+  | \.tox
+  | \.venv
+  | \.hg
+  | _build
+  | buck-out
+  | build
+  | dist
+  | node_modules
+  | migrations
+  | venv
+  | __pycache__
+)/
+'''
+
+target-version = ['py38']

@@ -9,7 +9,7 @@ from django.conf import settings
 
 @pytest.mark.django_db
 def test_svg_upload_sanitize(setup_project_dialog):
-    """ Upload malicious SVG file - remove harmful content"""
+    """Upload malicious SVG file - remove harmful content"""
     settings.SVG_SECURITY_CLEANUP = True
 
     xml_dirty = """<?xml version="1.0" standalone="no"?>
@@ -26,21 +26,20 @@ def test_svg_upload_sanitize(setup_project_dialog):
 
     assert r.status_code == 201
 
-    expected = '''<svg version="1.1" baseprofile="full" xmlns="http://www.w3.org/2000/svg">
+    expected = """<svg version="1.1" baseprofile="full" xmlns="http://www.w3.org/2000/svg">
     <polygon id="triangle" points="0,0 0,50 50,0" fill="#009900" stroke="#004400"></polygon>\n
-    </svg>\n'''
+    </svg>\n"""
 
-    actual = FileUpload.objects.filter(
-            id=r.data['file_upload_ids'][0]).last().file.read()
+    actual = FileUpload.objects.filter(id=r.data['file_upload_ids'][0]).last().file.read()
 
-    assert len("".join(actual.decode('UTF-8').split())) > 100 # confirm not empty
+    assert len(''.join(actual.decode('UTF-8').split())) > 100   # confirm not empty
 
-    assert "".join(expected.split()) == "".join(actual.decode('UTF-8').split())
+    assert ''.join(expected.split()) == ''.join(actual.decode('UTF-8').split())
 
 
 @pytest.mark.django_db
 def test_svg_upload_invalid_format(setup_project_dialog):
-    """ Upload invalid SVG file - still accepted"""
+    """Upload invalid SVG file - still accepted"""
     settings.SVG_SECURITY_CLEANUP = True
 
     xml_dirty = """<?xml version="1.0" standalone="no"?>
@@ -53,19 +52,18 @@ def test_svg_upload_invalid_format(setup_project_dialog):
 
     assert r.status_code == 201
 
-    expected = '''
+    expected = """
     <svgversion="1.1"baseprofile="full"xmlns="http://www.w3.org/2000/svg">gibberish</svg>
-    '''
+    """
 
-    actual = FileUpload.objects.filter(
-            id=r.data['file_upload_ids'][0]).last().file.read()
+    actual = FileUpload.objects.filter(id=r.data['file_upload_ids'][0]).last().file.read()
 
-    assert "".join(expected.split()) == "".join(actual.decode('UTF-8').split())
+    assert ''.join(expected.split()) == ''.join(actual.decode('UTF-8').split())
 
 
 @pytest.mark.django_db
 def test_svg_upload_do_not_sanitize(setup_project_dialog):
-    """ Upload SVG file - do not sanitize file content"""
+    """Upload SVG file - do not sanitize file content"""
     settings.SVG_SECURITY_CLEANUP = False
 
     xml_dirty = """<?xml version="1.0" standalone="no"?>
@@ -82,7 +80,6 @@ def test_svg_upload_do_not_sanitize(setup_project_dialog):
 
     assert r.status_code == 201
 
-    actual = FileUpload.objects.filter(
-            id=r.data['file_upload_ids'][0]).last().file.read()
+    actual = FileUpload.objects.filter(id=r.data['file_upload_ids'][0]).last().file.read()
 
-    assert "".join(xml_dirty.split()) == "".join(actual.decode('UTF-8').replace("\n", "").split())
+    assert ''.join(xml_dirty.split()) == ''.join(actual.decode('UTF-8').replace('\n', '').split())

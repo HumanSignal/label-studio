@@ -26,22 +26,19 @@ DEBUG_PROPAGATE_EXCEPTIONS = get_bool_env('DEBUG_PROPAGATE_EXCEPTIONS', False)
 
 SESSION_COOKIE_SECURE = get_bool_env('SESSION_COOKIE_SECURE', False)
 
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 RQ_QUEUES = {}
 
-SENTRY_DSN = get_env(
-    'SENTRY_DSN',
-    'https://68b045ab408a4d32a910d339be8591a4@o227124.ingest.sentry.io/5820521'
-)
+SENTRY_DSN = get_env('SENTRY_DSN', 'https://68b045ab408a4d32a910d339be8591a4@o227124.ingest.sentry.io/5820521')
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'opensource')
 
 FRONTEND_SENTRY_DSN = get_env(
-    'FRONTEND_SENTRY_DSN',
-    'https://5f51920ff82a4675a495870244869c6b@o227124.ingest.sentry.io/5838868')
+    'FRONTEND_SENTRY_DSN', 'https://5f51920ff82a4675a495870244869c6b@o227124.ingest.sentry.io/5838868'
+)
 FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'opensource')
 
-EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
+EDITOR_KEYMAP = json.dumps(get_env('EDITOR_KEYMAP'))
 
 from label_studio import __version__
 from label_studio.core.utils import sentry
@@ -62,6 +59,7 @@ FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 FEATURE_FLAGS_FROM_FILE = True
 try:
     from core.utils.io import find_node
+
     find_node('label_studio', FEATURE_FLAGS_FILE, 'file')
 except IOError:
     FEATURE_FLAGS_FROM_FILE = False

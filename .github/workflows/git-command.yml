@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Checkout on chat command
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}

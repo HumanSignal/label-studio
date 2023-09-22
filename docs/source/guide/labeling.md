@@ -101,6 +101,13 @@ After you relate two annotation regions, you can modify the relation in the **Re
 ### Skipping a task
 When annotators skip a task, the task no longer appears in the labeling queue for that annotator. Other annotators still see the task in their labeling queue. 
 
+### Exiting a labeling flow 
+When annotators are not finished with their annotation work but would like to exit their labeling flow to, for example, pause the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation on their annotations, they can click the drop-down menu next to **Submit** and then select **Submit and Exit** (or **Update and Exit**). This will submit the current annotation and redirect them to the Projects page. 
+
+If they are not done with their annotation, then they can simply check to make sure their draft was saved in the history panel and then navigate to the Projects page to stop the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation from running. 
+
+<img src="../images/submit-and-exit.png" class="gif-border">
+
 
 ## Label with collaborators
 
