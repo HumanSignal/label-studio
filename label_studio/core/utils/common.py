@@ -744,3 +744,8 @@ def timeit(func):
 
 def empty(*args, **kwargs):
     pass
+
+
+def get_ttl_hash(seconds=60):
+    """Return the same value withing `seconds` time period"""
+    return round(time.time() / seconds)

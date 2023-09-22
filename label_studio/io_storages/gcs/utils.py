@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 
 import google.auth
 import google.cloud.storage as gcs
+from core.utils.common import get_ttl_hash
 from django.conf import settings
 from google.auth.exceptions import DefaultCredentialsError
 from google.oauth2 import service_account
@@ -38,6 +39,7 @@ class GCS(object):
         google_project_id: Optional[str] = None,
         google_application_credentials: Optional[Union[str, dict]] = None,
         bucket_name: Optional[str] = None,
+        ttl_hash=None,
     ) -> gcs.Bucket:
 
         client = cls.get_client(
@@ -199,6 +201,7 @@ class GCS(object):
             google_application_credentials=google_application_credentials,
             google_project_id=google_project_id,
             bucket_name=bucket_name,
+            ttl_hash=get_ttl_hash(),
         )
 
         blob = bucket.blob(blob_name)
