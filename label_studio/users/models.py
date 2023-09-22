@@ -100,7 +100,8 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     is_deleted = models.BooleanField(
         _('deleted'),
         default=False,
-        help_text=_('Designates whether to treat this user as deleted. Unselect this instead of deleting accounts.'),
+        db_index=True,
+        help_text=_('Designates whether to treat this user as deleted. Select this instead of deleting accounts.'),
     )
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
