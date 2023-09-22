@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5518: Add snap prop to snap polygon to image pixels",
-  "commit": "2d9a66e882839d66729e6f7417a37ace88b60120",
-  "branch": "master",
-  "date": "2023/09/21 10:02:19"
+  "message": "fix: LEAP-208: Make Labeling Settings clickable",
+  "commit": "d36027e5bd63483ef2611949599342bf5ddebf49",
+  "branch": "fb-leap-208/clickable-settings",
+  "date": "2023/09/22 13:28:05"
 }
