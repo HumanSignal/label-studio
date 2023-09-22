@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
-  "commit": "c9758b2fb911f789d6ba3c4b1dd8a44528eea5d0",
-  "branch": "master",
-  "date": "2023/09/22 11:06:45"
+  "message": "fix: DIA-554: [FE] Sometimes only a subset of Dataset tasks are displ…",
+  "commit": "ed0151f4aa9f39e88347a3eeaaf3b7a49513f9ee",
+  "branch": "fb-dia-554/scroll-threshold",
+  "date": "2023/09/22 12:33:53"
 }
