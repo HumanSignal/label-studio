@@ -1,55 +1,52 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ToastContext } from '../Toast/Toast';
 import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
 
+export const DRAFT_GUARD_KEY = "DRAFT_GUARD";
+
+export const draftGuardCallback = {
+  current: null,
+};
 
 export const DraftGuard = () => {
-  const [currentLocation, setCurrentLocation] = useState(null);
-  const [nextLocation, setNextLocation] = useState(null);
   const toast = useContext(ToastContext);
   const history = useHistory();
 
-  useEffect(async () => {
-    if (nextLocation && isFF(FF_OPTIC_2)) {
-      const selected = window.Htx?.annotationStore?.selected;
-      const hasChanges = !!selected?.history.undoIdx;
-  
-      if (!hasChanges || !selected) return;
-      const res = await selected?.saveDraftImmediatelyWithResults();
-      const status = res?.$meta?.status;
-
-      if (status === 200 || status === 201) {
-        toast.show({ message: "Draft saved successfully",  type: "info" });
-        history.replace(nextLocation);
-        setCurrentLocation(nextLocation);
-        setNextLocation(null);
-      } else {
-        toast.show({ message: "There was an error saving your draft", type: "error" });
-        setNextLocation(null);
-      }
-    }
-  }, [nextLocation]);
-
   useEffect(() => {
-    const unListen = history.listen((location) => {
-
-      if (isFF(FF_OPTIC_2)) {
+    if (isFF(FF_OPTIC_2)) {
+      console.log("DraftGuard: enabled", history);
+      const unblock = history.block(() => {
+        console.log("DraftGuard: block");
         const selected = window.Htx?.annotationStore?.selected;
-        const newLocation = location.pathname;
-        const hasChanges = !!selected?.history.undoIdx;
+        const submissionInProgress = !!selected?.submissionStarted;
+        const hasChanges = !!selected?.history.undoIdx && !submissionInProgress;
 
-        if (hasChanges && newLocation !== currentLocation) {
-          setNextLocation(newLocation);
-          history.replace(currentLocation || "/");
-        } else {
-          setCurrentLocation(newLocation);
+        if (hasChanges) {
+          selected.saveDraftImmediatelyWithResults()?.then((res) => {
+            const status = res?.$meta?.status;
+
+            if (status === 200 || status === 201) {
+              toast.show({ message: "Draft saved successfully",  type: "info" });
+              console.log("DraftGuard: resolve");
+              draftGuardCallback.current?.(true);
+              draftGuardCallback.current = null;
+            } else if (status !== undefined) {
+              toast.show({ message: "There was an error saving your draft", type: "error" });
+            }
+          });
+
+          return DRAFT_GUARD_KEY;
         }
-      }
-    });
+      });
 
-    return () => unListen();
-  }, [currentLocation]);
+      return () => {
+        draftGuardCallback.current = null;
+        unblock();
+        console.log("DraftGuard: unblock");
+      };
+    }
+  }, []);
 
   return <></>;
 };

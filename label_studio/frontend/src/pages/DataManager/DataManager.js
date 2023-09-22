@@ -16,6 +16,7 @@ import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
 import { ToastContext } from '../../components/Toast/Toast';
+import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
 
 import "./DataManager.styl";
 
@@ -58,6 +59,7 @@ const buildLink = (path, params) => {
 };
 
 export const DataManagerPage = ({ ...props }) => {
+  const toast = useContext(ToastContext);
   const root = useRef();
   const params = useParams();
   const history = useHistory();
@@ -77,8 +79,6 @@ export const DataManagerPage = ({ ...props }) => {
     if (!project?.id) return;
     if (dataManagerRef.current) return;
 
-    const toast = useContext(ToastContext);
-    
     const mlBackends = await api.callApi("mlBackends", {
       params: { project: project.id },
     });
@@ -210,11 +210,13 @@ DataManagerPage.context = ({ dmRef }) => {
       deleteAction(dmPath);
       deleteCrumb('dm-crumb');
     } else {
-      addAction(dmPath, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dmRef?.store?.closeLabeling?.();
-      });
+      if (!isFF(FF_OPTIC_2)) {
+        addAction(dmPath, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dmRef?.store?.closeLabeling?.();
+        });
+      }
       addCrumb({
         key: "dm-crumb",
         title: "Labeling",
