@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-208: Make Labeling Settings clickable",
-  "commit": "13fa60b00d9da1d43334b06721fb7cbf2b0fc9c5",
+  "commit": "d36027e5bd63483ef2611949599342bf5ddebf49",
   "branch": "fb-leap-208/clickable-settings",
-  "date": "2023/09/20 16:23:59"
+  "date": "2023/09/22 13:28:05"
 }
