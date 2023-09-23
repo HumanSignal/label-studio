@@ -56,7 +56,6 @@ class UserSignupForm(forms.Form):
         error_messages={'required': PASS_LENGTH_ERR},
         widget=forms.TextInput(attrs={'type': 'password'}),
     )
-    allow_newsletters = forms.BooleanField(required=False)
 
     def clean_password(self):
         password = self.cleaned_data['password']
@@ -84,9 +83,8 @@ class UserSignupForm(forms.Form):
         cleaned = self.cleaned_data
         password = cleaned['password']
         email = cleaned['email'].lower()
-        allow_newsletters = None
-        if 'allow_newsletters' in cleaned:
-            allow_newsletters = cleaned['allow_newsletters']
+        allow_newsletters = False
+
         user = User.objects.create_user(email, password, allow_newsletters=allow_newsletters)
         return user
 

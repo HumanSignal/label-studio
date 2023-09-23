@@ -25,7 +25,7 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Task
-
+from core.mixins import PermissionCheckMixin
 from .models import ConvertedFormat, DataExport, Export
 from .serializers import (
     ExportConvertSerializer,
@@ -65,7 +65,7 @@ logger = logging.getLogger(__name__)
         },
     ),
 )
-class ExportFormatsListAPI(generics.RetrieveAPIView):
+class ExportFormatsListAPI(PermissionCheckMixin, generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
 
     def get_queryset(self):
@@ -153,7 +153,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         },
     ),
 )
-class ExportAPI(generics.RetrieveAPIView):
+class ExportAPI(PermissionCheckMixin, generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
 
     def get_queryset(self):
@@ -166,10 +166,11 @@ class ExportAPI(generics.RetrieveAPIView):
         project = self.get_object()
         query_serializer = ExportParamSerializer(data=request.GET)
         query_serializer.is_valid(raise_exception=True)
-
         export_type = (
             query_serializer.validated_data.get('exportType') or query_serializer.validated_data['export_type']
         )
+
+
         only_finished = not query_serializer.validated_data['download_all_tasks']
         download_resources = query_serializer.validated_data['download_resources']
         interpolate_key_frames = query_serializer.validated_data['interpolate_key_frames']
@@ -218,7 +219,7 @@ class ExportAPI(generics.RetrieveAPIView):
         """,
     ),
 )
-class ProjectExportFiles(generics.RetrieveAPIView):
+class ProjectExportFiles(PermissionCheckMixin, generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
     swagger_schema = None  # hide export files endpoint from swagger
 
@@ -240,7 +241,7 @@ class ProjectExportFiles(generics.RetrieveAPIView):
         return Response({'export_files': items}, status=status.HTTP_200_OK)
 
 
-class ProjectExportFilesAuthCheck(APIView):
+class ProjectExportFilesAuthCheck(PermissionCheckMixin, APIView):
     """Check auth for nginx auth_request (/api/auth/export/)"""
 
     swagger_schema = None
@@ -297,7 +298,7 @@ class ProjectExportFilesAuthCheck(APIView):
         ],
     ),
 )
-class ExportListAPI(generics.ListCreateAPIView):
+class ExportListAPI(PermissionCheckMixin, generics.ListCreateAPIView):
     queryset = Export.objects.all().order_by('-created_at')
     project_model = Project
     serializer_class = ExportSerializer
@@ -394,7 +395,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         ],
     ),
 )
-class ExportDetailAPI(generics.RetrieveDestroyAPIView):
+class ExportDetailAPI(PermissionCheckMixin, generics.RetrieveDestroyAPIView):
     queryset = Export.objects.all()
     project_model = Project
     serializer_class = ExportSerializer
@@ -469,7 +470,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
         ],
     ),
 )
-class ExportDownloadAPI(generics.RetrieveAPIView):
+class ExportDownloadAPI(PermissionCheckMixin, generics.RetrieveAPIView):
     queryset = Export.objects.all()
     project_model = Project
     serializer_class = None
@@ -607,7 +608,7 @@ def set_convert_background_failure(job, connection, type, value, traceback_obj):
         ],
     ),
 )
-class ExportConvertAPI(generics.RetrieveAPIView):
+class ExportConvertAPI(PermissionCheckMixin, generics.RetrieveAPIView):
     queryset = Export.objects.all()
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change

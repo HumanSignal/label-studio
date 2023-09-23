@@ -49,6 +49,7 @@ from tasks.serializers import (
 )
 from webhooks.models import WebhookAction
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
+from rules.contrib.views import PermissionRequiredMixin
 
 logger = logging.getLogger(__name__)
 
@@ -270,7 +271,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()},
     ),
 )  # leaving this method decorator info in case we put it back in swagger API docs
-class ProjectNextTaskAPI(generics.RetrieveAPIView):
+class ProjectNextTaskAPI(PermissionRequiredMixin, generics.RetrieveAPIView):
 
     permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
@@ -299,7 +300,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         return Response(response)
 
 
-class LabelStreamHistoryAPI(generics.RetrieveAPIView):
+class LabelStreamHistoryAPI(PermissionRequiredMixin, generics.RetrieveAPIView):
     permission_required = all_permissions.tasks_view
     queryset = Project.objects.all()
     swagger_schema = None  # this endpoint doesn't need to be in swagger API docs
@@ -322,7 +323,7 @@ class LabelStreamHistoryAPI(generics.RetrieveAPIView):
         request_body=ProjectLabelConfigSerializer,
     ),
 )
-class LabelConfigValidateAPI(generics.CreateAPIView):
+class LabelConfigValidateAPI(PermissionRequiredMixin, generics.CreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (AllowAny,)
     serializer_class = ProjectLabelConfigSerializer
@@ -362,7 +363,7 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         request_body=ProjectLabelConfigSerializer,
     ),
 )
-class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
+class ProjectLabelConfigValidateAPI(PermissionRequiredMixin, generics.RetrieveAPIView):
     """Validate label config"""
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -386,7 +387,7 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
         return super(ProjectLabelConfigValidateAPI, self).get(request, *args, **kwargs)
 
 
-class ProjectSummaryAPI(generics.RetrieveAPIView):
+class ProjectSummaryAPI(PermissionRequiredMixin, generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
     serializer_class = ProjectSummarySerializer
     permission_required = all_permissions.projects_view
@@ -413,7 +414,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         ],
     ),
 )
-class ProjectImportAPI(generics.RetrieveAPIView):
+class ProjectImportAPI(PermissionRequiredMixin, generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
     serializer_class = ProjectImportSerializer
     permission_required = all_permissions.projects_change
@@ -437,7 +438,7 @@ class ProjectImportAPI(generics.RetrieveAPIView):
         ],
     ),
 )
-class ProjectReimportAPI(generics.RetrieveAPIView):
+class ProjectReimportAPI(PermissionRequiredMixin, generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
     serializer_class = ProjectReimportSerializer
     permission_required = all_permissions.projects_change
@@ -544,7 +545,7 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
         return instance
 
 
-class TemplateListAPI(generics.ListAPIView):
+class TemplateListAPI(PermissionRequiredMixin, generics.ListAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_view
     swagger_schema = None
@@ -568,7 +569,7 @@ class TemplateListAPI(generics.ListAPIView):
         return Response({'templates': configs, 'groups': groups})
 
 
-class ProjectSampleTask(generics.RetrieveAPIView):
+class ProjectSampleTask(PermissionRequiredMixin, generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
     queryset = Project.objects.all()
     permission_required = all_permissions.projects_view
@@ -584,7 +585,7 @@ class ProjectSampleTask(generics.RetrieveAPIView):
         return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
 
 
-class ProjectModelVersions(generics.RetrieveAPIView):
+class ProjectModelVersions(PermissionRequiredMixin, generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
     swagger_schema = None
     permission_required = all_permissions.projects_view

@@ -11,6 +11,7 @@ from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from label_studio.core.utils.common import load_func
 
@@ -50,7 +51,7 @@ _common_storage_list = _get_common_storage_list()
         responses={'200': "A list of import storages types {'name': name, 'title': title}."},
     ),
 )
-class AllImportStorageTypesAPI(APIView):
+class AllImportStorageTypesAPI(PermissionRequiredMixin, APIView):
     permission_required = all_permissions.projects_change
 
     def get(self, request, **kwargs):
@@ -66,7 +67,7 @@ class AllImportStorageTypesAPI(APIView):
         responses={'200': "A list of export storages types {'name': name, 'title': title}."},
     ),
 )
-class AllExportStorageTypesAPI(APIView):
+class AllExportStorageTypesAPI(PermissionRequiredMixin, APIView):
     permission_required = all_permissions.projects_change
 
     def get(self, request, **kwargs):
@@ -90,7 +91,7 @@ class AllExportStorageTypesAPI(APIView):
         responses={200: 'List of ImportStorageSerializer'},
     ),
 )
-class AllImportStorageListAPI(generics.ListAPIView):
+class AllImportStorageListAPI(PermissionRequiredMixin, generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
@@ -131,7 +132,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
         responses={200: 'List of ExportStorageSerializer'},
     ),
 )
-class AllExportStorageListAPI(generics.ListAPIView):
+class AllExportStorageListAPI(PermissionRequiredMixin, generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change

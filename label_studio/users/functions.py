@@ -11,12 +11,11 @@ from django.core.files.images import get_image_dimensions
 from django.shortcuts import redirect
 from django.urls import reverse
 from organizations.models import Organization
-
+from django.contrib.auth.models import Group
 
 def hash_upload(instance, filename):
     filename = str(uuid.uuid4())[0:8] + '-' + filename
     return settings.AVATAR_PATH + '/' + filename
-
 
 def check_avatar(files):
     images = list(files.items())
@@ -46,10 +45,17 @@ def check_avatar(files):
     return avatar
 
 
+
 def save_user(request, next_page, user_form):
     """Save user instance to DB"""
     user = user_form.save()
     user.username = user.email.split('@')[0]
+
+    grp = Group.objects.get(name="Etiquetador")
+   
+
+    user.groups.add(grp)
+
     user.save()
 
     if Organization.objects.exists():
@@ -57,13 +63,14 @@ def save_user(request, next_page, user_form):
         org.add_user(user)
     else:
         org = Organization.create_organization(created_by=user, title='Label Studio')
+    
     user.active_organization = org
-    user.save(update_fields=['active_organization'])
 
+    user.save(update_fields=['active_organization'])
     request.advanced_json = {
         'email': user.email,
-        'allow_newsletters': user.allow_newsletters,
-        'update-notifications': 1,
+        'allow_newsletters': False,
+        'update-notifications': 0,
         'new-user': 1,
     }
     redirect_url = next_page if next_page else reverse('projects:project-index')
