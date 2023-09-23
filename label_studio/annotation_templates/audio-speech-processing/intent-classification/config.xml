@@ -3,7 +3,7 @@
     <Label value="Segment" />
   </Labels>
 
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
 
   <Choices name="intent" toName="audio" perRegion="true" required="true">
     <Choice value="Question" />

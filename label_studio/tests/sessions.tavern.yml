@@ -1,0 +1,134 @@
+---
+test_name: sessions
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - testing_session_timeouts
+  - freeze_clock
+stages:
+- id: signup
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+
+- id: login
+  name: Login
+  request:
+    url: "{django_live_url}/user/login"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+
+# A request right after login should be sucessful
+- name: get_projects
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+    # hack to let us call a function after each stage
+    verify_response_with:
+      - function: label_studio.tests.conftest:tick_clock
+        extra_kwargs:
+          seconds: 2
+
+# After MAX_TIME_BETWEEN_ACTIVITY has passed, the session will be over and requests will be denied
+- name: get_projects
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 401
+
+# login again
+- id: login
+  name: Login
+  request:
+    url: "{django_live_url}/user/login"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    verify_response_with:
+      function: label_studio.tests.conftest:tick_clock
+
+# make another request within MAX_TIME_BETWEEN_ACTIVITY
+- name: get_projects_1
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+    verify_response_with:
+      function: label_studio.tests.conftest:tick_clock
+
+# and five more
+- name: get_projects_2
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+    verify_response_with:
+      function: label_studio.tests.conftest:tick_clock
+
+- name: get_projects_3
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+    verify_response_with:
+      function: label_studio.tests.conftest:tick_clock
+
+- name: get_projects_4
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+    verify_response_with:
+      - function: label_studio.tests.conftest:tick_clock
+        extra_kwargs:
+          seconds: 3
+
+# and by now we reach MAX_SESSION_AGE and hte session end even if we were active
+- name: get_projects_5
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 401

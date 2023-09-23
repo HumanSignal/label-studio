@@ -11,7 +11,7 @@ on:
         type: string
 
 env:
-  GIT_GITLEAKS_VERSION: 8.8.7
+  GIT_GITLEAKS_VERSION: 8.16.3
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
     name: "Gitleaks"
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Configure gitleaks binary cache
         id: cache
@@ -36,7 +36,7 @@ jobs:
             | sudo tar xzf - -C /usr/local/bin
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ inputs.head_sha }}

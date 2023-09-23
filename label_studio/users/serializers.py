@@ -1,13 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from rest_framework import serializers
+from core.utils.common import load_func
 from django.conf import settings
+from rest_flex_fields import FlexFieldsModelSerializer
+from rest_framework import serializers
 
 from .models import User
-from core.utils.common import load_func
 
 
-class BaseUserSerializer(serializers.ModelSerializer):
+class BaseUserSerializer(FlexFieldsModelSerializer):
     # short form for user presentation
     initials = serializers.SerializerMethodField(default='?', read_only=True)
     avatar = serializers.SerializerMethodField(read_only=True)
@@ -19,7 +20,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         return user.get_initials()
 
     def to_representation(self, instance):
-        """ Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars """
+        """Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars"""
 
         uid = instance.id
         key = 'user_cache'
@@ -44,8 +45,13 @@ class BaseUserSerializer(serializers.ModelSerializer):
             'initials',
             'phone',
             'active_organization',
-            'allow_newsletters'
+            'allow_newsletters',
         )
+
+
+class BaseUserSerializerUpdate(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        read_only_fields = ('email',)
 
 
 class UserSimpleSerializer(BaseUserSerializer):
@@ -55,3 +61,4 @@ class UserSimpleSerializer(BaseUserSerializer):
 
 
 UserSerializer = load_func(settings.USER_SERIALIZER)
+UserSerializerUpdate = load_func(settings.USER_SERIALIZER_UPDATE)

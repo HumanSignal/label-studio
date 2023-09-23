@@ -1,32 +1,36 @@
 ---
 title: Python SDK Tutorial for Label Studio
-short: Python SDK Tutorial 
+short: Backend SDK Python Tutorial 
 type: guide
-order: 675
+tier: all
+order: 215
+order_enterprise: 121
 meta_title: Label Studio Python SDK Tutorial
-meta_description: Tutorial documentation for the Label Studio Python SDK that covers how and why to use the SDK to easily include data labeling project creation and annotated task parsing in your data pipeline python scripts for data science and machine learning projects. 
+meta_description: Tutorial documentation for the Label Studio Python SDK. How and why to use the SDK for data labeling project creation and annotated task parsing.
+section: "Integration and Development"
+
 ---
 
 You can use the Label Studio Python SDK to make annotating data a more integrated part of your data science and machine learning pipelines. This software development kit (SDK) lets you call the Label Studio API directly from scripts using predefined classes and methods. 
 
 With the Label Studio Python SDK, you can perform the following tasks in a Python script:
-- [Authenticate to the Label Studio API](#Start-using-the-Label-Studio-Python-SDK)
+- [Authenticate to the Label Studio API](#Start-using-the-Label-Studio-Python-SDK).
 - [Create a Label Studio project](#Create-a-project-with-the-Label-Studio-Python-SDK), including setting up a labeling configuration. 
 - [Import tasks](#Import-tasks-with-the-Label-Studio-Python-SDK).
 - [Manage pre-annotated tasks and model predictions](#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK).
 - [Connect to a cloud storage provider](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/annotate_data_from_gcs/annotate_data_from_gcs.ipynb), such as Amazon S3, Microsoft Azure, or Google Cloud Services (GCS), to retrieve unlabeled tasks and store annotated tasks.
-- [Modify project settings](/sdk/project.html#label_studio_sdk.project.Project.set_params), such as task sampling or the model version used to display predictions. 
+- [Modify project settings](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.set_params), such as task sampling or the model version used to display predictions. 
 
-See the [full SDK reference documentation for all available modules](/sdk/index.html), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
+See the [full SDK reference documentation for all available modules](https://labelstud.io/sdk/), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
 
 ## Start using the Label Studio Python SDK
 
 1. Install the SDK:
    `pip install label-studio-sdk`
 2. In your Python script, do the following:
-   1. Import the SDK.
-   2. Define your API key and Label Studio URL (API key is available at _Account_ page).
-   3. Connect to the API.
+   - Import the SDK.
+   - Define your API key and Label Studio URL (API key is available at _Account_ page).
+   - Connect to the API.
 ```python
 # Define the URL where Label Studio is accessible and the API key for your user account
 LABEL_STUDIO_URL = 'http://localhost:8080'
@@ -60,7 +64,7 @@ project = ls.start_project(
 )
 ```
 
-For more about what you can do with the project module of the SDK, see the [project module SDK reference](/sdk/project.html). 
+For more about what you can do with the project module of the SDK, see the [project module SDK reference](https://labelstud.io/sdk/project.html). 
 
 ## Import tasks with the Label Studio Python SDK
 

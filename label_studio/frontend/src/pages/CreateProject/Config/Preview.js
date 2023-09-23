@@ -36,7 +36,7 @@ export const Preview = ({ config, data, error, loading }) => {
       return new window.LabelStudio(rootRef.current, {
         config,
         task,
-        interfaces: ["side-column"],
+        interfaces: ["side-column", "annotations:comments"],
         onLabelStudioLoad(LS) {
           LS.settings.bottomSidePanel = true;
 
@@ -112,7 +112,7 @@ export const Preview = ({ config, data, error, loading }) => {
         </div>
       )}
       {!data && loading && <Spinner style={{ width: "100%", height: "50vh" }} />}
-      <div id="label-studio" ref={rootRef}></div>
+      <div id="label-studio" className={configClass.elem("preview-ui")} ref={rootRef}></div>
     </div>
   );
 };

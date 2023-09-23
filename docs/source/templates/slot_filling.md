@@ -73,6 +73,6 @@ The `choice="single"` parameter restricts the annotators to one choice selection
 ## Related tags
 
 - [ParagraphLabels](/tags/paragraphlabels.html)
-- [Label](tags/label.html)
+- [Label](/tags/label.html)
 - [Paragraphs](/tags/paragraphs.html)
 - [Choices](/tags/choices.html)

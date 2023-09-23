@@ -1,25 +1,21 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import drf_yasg.openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
-from django.utils.decorators import method_decorator
-from django.conf import settings
 
+import drf_yasg.openapi as openapi
+from core.feature_flags import flag_set
+from core.permissions import ViewClassPermission, all_permissions
+from django.conf import settings
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
+from ml.models import MLBackend
+from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
+from projects.models import Project, Task
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.views import APIView
 from rest_framework.response import Response
-
-from core.feature_flags import flag_set
-from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import get_object_with_check_and_log
-from projects.models import Project, Task
-from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
-from ml.models import MLBackend
-from ml.api_connector import MLApi
-from core.utils.common import bool_from_request
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
@@ -41,14 +37,8 @@ logger = logging.getLogger(__name__)
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'project': openapi.Schema(
-                    type=openapi.TYPE_INTEGER,
-                    description='Project ID'
-                ),
-                'url': openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description='ML backend URL'
-                ),
+                'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
+                'url': openapi.Schema(type=openapi.TYPE_STRING, description='ML backend URL'),
             },
         ),
     ),
@@ -68,12 +58,11 @@ logger = logging.getLogger(__name__)
         ),
         manual_parameters=[
             openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_QUERY,
-                description='Project ID'),
+                name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
+            ),
         ],
-    ))
+    ),
+)
 class MLBackendListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
@@ -82,11 +71,11 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     )
     serializer_class = MLBackendSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["is_interactive"]
+    filterset_fields = ['is_interactive']
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ml_backends = MLBackend.objects.filter(project_id=project.id)
         for mlb in ml_backends:
@@ -176,7 +165,8 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this ML backend.'),
+                description='A unique integer value identifying this ML backend.',
+            ),
         ],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -205,7 +195,7 @@ class MLBackendTrainAPI(APIView):
     permission_required = all_permissions.projects_change
 
     def post(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
 
         ml_backend.train()
@@ -220,14 +210,15 @@ class MLBackendTrainAPI(APIView):
         operation_description="""
         Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
         predicted region based on annotator input. 
-        See [set up machine learning](labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
+        See [set up machine learning](https://labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
         """,
         manual_parameters=[
             openapi.Parameter(
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this ML backend.'),
+                description='A unique integer value identifying this ML backend.',
+            ),
         ],
         request_body=MLInteractiveAnnotatingRequest,
         responses={
@@ -240,13 +231,13 @@ class MLBackendInteractiveAnnotating(APIView):
     permission_required = all_permissions.tasks_view
 
     def post(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
         serializer = MLInteractiveAnnotatingRequest(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        task = get_object_with_check_and_log(request, Task, pk=validated_data['task'], project=ml_backend.project)
+        task = generics.get_object_or_404(Task, pk=validated_data['task'], project=ml_backend.project)
         context = validated_data.get('context')
 
         if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
@@ -267,7 +258,7 @@ class MLBackendInteractiveAnnotating(APIView):
         tags=['Machine Learning'],
         operation_summary='Get model versions',
         operation_description='Get available versions of the model.',
-        responses={"200": "List of available versions."},
+        responses={'200': 'List of available versions.'},
     ),
 )
 class MLBackendVersionsAPI(generics.RetrieveAPIView):
@@ -275,11 +266,11 @@ class MLBackendVersionsAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
 
     def get(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
         versions_response = ml_backend.get_versions()
         if versions_response.status_code == 200:
-            result = {'versions': versions_response.response.get("versions", [])}
+            result = {'versions': versions_response.response.get('versions', [])}
             return Response(data=result, status=200)
         elif versions_response.status_code == 404:
             result = {'versions': [ml_backend.model_version], 'message': 'Upgrade your ML backend version to latest.'}

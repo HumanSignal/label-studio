@@ -9,6 +9,6 @@ config: |
       <Label value="Event A" background="red"/>
       <Label value="Event B" background="green"/>
     </Labels>
-    <AudioPlus name="audio" value="$audio"/>
+    <Audio name="audio" value="$audio"/>
   </View>
 

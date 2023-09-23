@@ -10,11 +10,6 @@
   "logo": "https://labelstud.io/images/opossum/heartex_icon_opossum_green.svg",
   "stack": "container",
   "env": {
-    "LABEL_STUDIO_ONE_CLICK_DEPLOY": {
-      "description": "Label Studio One Click Deploy Environmental Flag",
-      "value": "1",
-      "required": false
-    },
     "DISABLE_SIGNUP_WITHOUT_LINK": {
       "description": "Disable signup for users without invite link",
       "value": "0",

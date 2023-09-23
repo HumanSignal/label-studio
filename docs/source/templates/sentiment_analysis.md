@@ -125,6 +125,8 @@ Don't forget to close the original [View](/tags/view.html) tag:
 </View>
 ```
 
+<!-- md nested-classification.md -->
+
 ## Related tags
 - [Text](/tags/text.html)
 - [Choices](/tags/choices.html)

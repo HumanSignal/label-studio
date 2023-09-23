@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2519: Choices selected by default",
-  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
+  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
+  "commit": "c9758b2fb911f789d6ba3c4b1dd8a44528eea5d0",
   "branch": "master",
-  "date": "2022/08/10 15:51:21"
+  "date": "2023/09/22 11:06:45"
 }

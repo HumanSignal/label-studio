@@ -2,29 +2,25 @@
 """
 import logging
 
-from django.db import models, transaction
+from core.utils.common import create_hash, load_func
 from django.conf import settings
-from django.db.models import Q, Count
-
+from django.db import models, transaction
+from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
-
-from core.utils.common import create_hash, get_object_with_check_and_log, get_organization_from_request, load_func
 
 logger = logging.getLogger(__name__)
 
 
 class OrganizationMember(models.Model):
-    """
-    """
+    """ """
+
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='om_through',
-        help_text='User ID'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='om_through', help_text='User ID'
     )
     organization = models.ForeignKey(
-        'organizations.Organization', on_delete=models.CASCADE,
-        help_text='Organization ID'
+        'organizations.Organization', on_delete=models.CASCADE, help_text='Organization ID'
     )
-    
+
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
@@ -47,36 +43,35 @@ OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)
 
 
 class Organization(OrganizationMixin, models.Model):
-    """
-    """
+    """ """
+
     title = models.CharField(_('organization title'), max_length=1000, null=False)
 
     token = models.CharField(_('token'), max_length=256, default=create_hash, unique=True, null=True, blank=True)
 
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="organizations", through=OrganizationMember)
-        
-    created_by = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
-                                      null=True, related_name="organization", verbose_name=_('created_by'))
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='organizations', through=OrganizationMember)
+
+    created_by = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='organization',
+        verbose_name=_('created_by'),
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    contact_info = models.EmailField(_('contact info'), blank=True, null=True)
 
     def __str__(self):
         return self.title + ', id=' + str(self.pk)
 
     @classmethod
-    def from_request(cls, request):
-        if 'organization_pk' not in request.session:
-            logger.debug('"organization_pk" is missed in request.session: can\'t get Organization')
-            return
-        pk = get_organization_from_request(request)
-        return get_object_with_check_and_log(request, Organization, pk=pk)
-
-    @classmethod
     def create_organization(cls, created_by=None, title='Your Organization'):
         _create_organization = load_func(settings.CREATE_ORGANIZATION)
         return _create_organization(title=title, created_by=created_by)
-    
+
     @classmethod
     def find_by_user(cls, user):
         memberships = OrganizationMember.objects.filter(user=user).prefetch_related('organization')
@@ -90,7 +85,7 @@ class Organization(OrganizationMixin, models.Model):
         if len(token):
             return Organization.objects.get(token=token)
         else:
-            raise KeyError(f'Can\'t find Organization by welcome URL: {url}')
+            raise KeyError(f"Can't find Organization by welcome URL: {url}")
 
     def has_user(self, user):
         return self.users.filter(pk=user.pk).exists()
@@ -112,25 +107,32 @@ class Organization(OrganizationMixin, models.Model):
             om = OrganizationMember(user=user, organization=self)
             om.save()
 
-            return om    
-    
+            return om
+
+    def remove_user(self, user):
+        OrganizationMember.objects.filter(user=user, organization=self).delete()
+        if user.active_organization_id == self.id:
+            user.active_organization = user.organizations.first()
+            user.save(update_fields=['active_organization'])
+
     def reset_token(self):
         self.token = create_hash()
         self.save()
 
     def check_max_projects(self):
-        """This check raise an exception if the projects limit is hit
-        """
+        """This check raise an exception if the projects limit is hit"""
         pass
 
     def projects_sorted_by_created_at(self):
-        return self.projects.all().order_by('-created_at').annotate(
-            tasks_count=Count('tasks'),
-            labeled_tasks_count=Count('tasks', filter=Q(tasks__is_labeled=True))
-        ).prefetch_related('created_by')
+        return (
+            self.projects.all()
+            .order_by('-created_at')
+            .annotate(tasks_count=Count('tasks'), labeled_tasks_count=Count('tasks', filter=Q(tasks__is_labeled=True)))
+            .prefetch_related('created_by')
+        )
 
     def created_at_prettify(self):
-        return self.created_at.strftime("%d %b %Y %H:%M:%S")
+        return self.created_at.strftime('%d %b %Y %H:%M:%S')
 
     def per_project_invited_users(self):
         from users.models import User

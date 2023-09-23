@@ -292,7 +292,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='project',
             name='title',
-            field=models.CharField(help_text='Project name, lenth is from 3 to 50 chars', max_length=50, validators=[django.core.validators.MinLengthValidator(3), django.core.validators.MaxLengthValidator(50)], verbose_name='name'),
+            field=models.CharField(help_text='Project name, length is from 3 to 50 chars', max_length=50, validators=[django.core.validators.MinLengthValidator(3), django.core.validators.MaxLengthValidator(50)], verbose_name='name'),
         ),
         migrations.AddField(
             model_name='project',

@@ -1,8 +1,8 @@
 node_modules
-*.lock
 *.pyc
 *.ipynb
 __pycache__
+.local/
 
 # docs
 __generated__
@@ -39,7 +39,6 @@ label_studio/core/export
 label_studio/core/static_build
 label_studio/core/version_.py
 label_studio/core/core
-label_studio/tests/test_data/tasks_and_annotations.json
 
 archive
 
@@ -67,9 +66,10 @@ deploy/pgsql/certs/*
 *.swn
 1/*
 */*/1/*
-label_studio/tavern-output.json
 docker-compose.override.yml
 
 .config/*
 .python_history
 .viminfo
+.bash_history
+

@@ -26,9 +26,11 @@ Example data for this config you can see below.
 
 ```xml
 <View>
-  <View style="margin:5px;      width:575px;      border-radius:30px;      border:1px solid #dcdcdc;             height:45px;      width:500px;      font-size:16px;             display: flex;             justify-content: center;             padding: 8px;      outline: none;             background-image: url('https://htx-pub.s3.amazonaws.com/samples/google-search-magnifying-glass-icon-5.jpeg');             background-position: left center;             background-size: 24px;             background-repeat: no-repeat;             background-origin: content-box;                ">
-    <Text name="text" value="$text"/>
-  </View>
+  
+  <Header value="Search request" size="5"/> 
+  <Text name="text" value="$text"/>
+ 
+  <Header value="Generated responses" size="5"/> 
   <View className="dynamic_choices">
     <Choices name="dynamic_choices" toName="text" selection="checkbox" value="$options" layout="vertical" choice="multiple" allownested="true"/>
   </View>
@@ -45,6 +47,7 @@ Example data for this config you can see below.
       </Choices>
     </View>
   </View>
+  
   <Style>
   .searchresultsarea {
     margin-left: 10px;

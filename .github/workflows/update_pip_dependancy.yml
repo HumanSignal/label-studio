@@ -16,10 +16,10 @@ jobs:
     name: Sync PR
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ github.event.repository.default_branch }}
@@ -39,15 +39,15 @@ jobs:
           git checkout develop
 
           branch='fb-bump-${{ github.event.client_payload.dependency_name }}-version-${{ github.event.client_payload.version }}'
-          echo "::set-output name=branch::${branch}"
+          echo "branch=${branch}" >> $GITHUB_OUTPUT
           git checkout -b "${branch}"
 
           sed -i "s/^${{ github.event.client_payload.dependency_name }}==.*/${{ github.event.client_payload.dependency_name }}==${{ github.event.client_payload.version }}/g" ${{ env.PYTHON_VERSION_FILE }}
 
           git add ${{ env.PYTHON_VERSION_FILE }}
-          git commit --message "chore: Bump ${{ github.event.client_payload.dependency_name }} version to ${{ github.event.client_payload.version }}"
+          git commit -m "chore: Bump ${{ github.event.client_payload.dependency_name }} version to ${{ github.event.client_payload.version }}" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
 
-          echo "::set-output name=commit::$(git rev-parse HEAD)"
+          echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
           git push origin HEAD:refs/heads/${branch}
 
       - name: Create PR to 'develop'

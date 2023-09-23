@@ -1,0 +1,62 @@
+title: Conversational Analysis
+type: community
+group: Audio/Speech Processing
+image: /static/templates/thumbnail-conversation-sentiment.png
+details: <h1>Analyse dialogue utterances and markup facts and sentiment aspects</h1>
+config: |
+  <View>
+      <Audio name="audio" value="$audio"
+             hotkey="space" sync="text"/>
+      <Header value="Transcript"/>
+      <Paragraphs audioUrl="$audio"
+                  sync="audio"
+                  name="text"
+                  value="$text"
+                  layout="dialogue"
+                  textKey="text"
+                  nameKey="author"
+                  granularity="paragraph"
+                  contextscroll="true" />
+       <View style="position: sticky">
+        <Header value="Sentiment Labels"/>
+        <ParagraphLabels name="label" toName="text">
+          <Label value="Positive1" background="#00ff00"/>
+          <Label value="Negative" background="#ff0000"/>
+        </ParagraphLabels>
+      </View>
+  </View>
+  <!-- { "data": {
+    "text": [
+      {
+        "end": 1.5,
+        "text": "Dont you hate that?",
+        "start": 0,
+        "author": "Mia Wallace"
+      },
+      {
+        "text": "Hate what?",
+        "start": 1.5,
+        "author": "Vincent Vega:",
+        "duration": 3
+      },
+      {
+        "end": 7,
+        "text": "Uncomfortable silences. Why do we feel its necessary to yak about nonsense in order to be comfortable?",
+        "start": 4.5,
+        "author": "Mia Wallace:"
+      },
+      {
+        "end": 10,
+        "text": "I dont know. Thats a good question.",
+        "start": 8,
+        "author": "Vincent Vega:"
+      },
+      {
+        "text": "Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.",
+        "start": 10,
+        "author": "Mia Wallace:"
+      }
+    ],
+    "audio": "/static/samples/game.wav"
+  }}
+  -->

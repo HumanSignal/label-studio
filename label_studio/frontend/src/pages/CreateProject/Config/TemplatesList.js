@@ -1,5 +1,3 @@
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/xml/xml';
 import React from 'react';
 import { Spinner } from '../../../components';
 import { useAPI } from '../../../providers/ApiProvider';
@@ -21,6 +19,7 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe }) => {
     .filter(recipe => recipe.group === group)
     // templates without `order` go to the end of the list
     .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+
   return (
     <ul>
       {picked.map(recipe => (
@@ -44,8 +43,10 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
 
   React.useEffect(async () => {
     const res = await api.callApi('configTemplates');
+
     if (!res) return;
     const { templates, groups } = res;
+
     setTemplates(templates);
     setGroups(groups);
   }, []);

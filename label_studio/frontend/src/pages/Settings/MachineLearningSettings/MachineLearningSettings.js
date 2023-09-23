@@ -28,7 +28,7 @@ export const MachineLearningSettings = () => {
     });
 
     if (models) setBackends(models);
-  }, [api, project, setBackends]);
+  }, [project, setBackends]);
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
@@ -170,7 +170,7 @@ export const MachineLearningSettings = () => {
           </div>
         </Form.Row>
 
-        {!isFF(FF_DEV_1682) && (
+        {(!isFF(FF_DEV_1682) || !backends.length ) && (
           <ProjectModelVersionSelector />
         )}
 

@@ -110,6 +110,7 @@
     editor_keymap: JSON.parse({{ settings.EDITOR_KEYMAP|safe }}),
     feature_flags: {{ feature_flags|json_dumps_ensure_ascii|safe }},
     feature_flags_default_value: {{ settings.FEATURE_FLAGS_DEFAULT_VALUE|json_dumps_ensure_ascii|safe }},
+    server_id: {{ request.server_id|json_dumps_ensure_ascii|safe }},
 
     {% block app_more_settings %}
       flags: {
@@ -134,12 +135,13 @@
   {% block bottomjs %}
   {% endblock %}
 
-  {% block storate-persistence %}
+  {% block storage-persistence %}
   <script>
     {# storage persistence #}
     {% if not settings.STORAGE_PERSISTENCE %}
     new Toast({
-      message: 'Data persistence not configured',
+      message: `Data will be persisted on the node running this container,<br>
+                but all data will be lost if this node goes away.<br>`,
       type: 'danger'
     });
     {% endif %}

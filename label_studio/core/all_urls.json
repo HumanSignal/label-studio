@@ -1,0 +1,1676 @@
+[
+    {
+        "url": "/",
+        "module": "core.views.main",
+        "name": "main",
+        "decorators": ""
+    },
+    {
+        "url": "/sw\\.js",
+        "module": "core.views.serve_file",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/sw-fallback\\.js",
+        "module": "core.views.serve_file",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/favicon\\.ico",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/label-studio-frontend/<path>",
+        "module": "core.utils.static_serve.serve",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/dm/<path>",
+        "module": "core.utils.static_serve.serve",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/react-app/<path>",
+        "module": "core.utils.static_serve.serve",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/static/fonts/roboto/roboto.css",
+        "module": "core.views.serve_file",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/static/<path>",
+        "module": "core.utils.static_serve.serve",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/organization/",
+        "module": "organizations.views.simple_view",
+        "name": "organizations:organization-simple",
+        "decorators": ""
+    },
+    {
+        "url": "/organization/webhooks",
+        "module": "organizations.views.simple_view",
+        "name": "organizations:organization-simple-webhooks",
+        "decorators": ""
+    },
+    {
+        "url": "/people/",
+        "module": "organizations.views.organization_people_list",
+        "name": "organizations:organization-index",
+        "decorators": ""
+    },
+    {
+        "url": "/api/organizations/",
+        "module": "organizations.api.OrganizationListAPI",
+        "name": "organizations:api:organization-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/organizations/<int:pk>",
+        "module": "organizations.api.OrganizationAPI",
+        "name": "organizations:api:organization-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/organizations/<int:pk>/memberships",
+        "module": "organizations.api.OrganizationMemberListAPI",
+        "name": "organizations:api:organization-memberships-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/invite",
+        "module": "organizations.api.OrganizationInviteAPI",
+        "name": "organizations:organization-invite",
+        "decorators": ""
+    },
+    {
+        "url": "/api/invite/reset-token",
+        "module": "organizations.api.OrganizationResetTokenAPI",
+        "name": "organizations:organization-reset-token",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/",
+        "module": "projects.views.project_list",
+        "name": "projects:project-index",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/<int:pk>/settings/",
+        "module": "projects.views.project_settings",
+        "name": "projects:project-settings",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/<int:pk>/settings/<sub_path>",
+        "module": "projects.views.project_settings",
+        "name": "projects:project-settings-anything",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/upload-example/",
+        "module": "projects.views.upload_example_using_config",
+        "name": "projects:project-upload-example-using-config",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/",
+        "module": "projects.api.ProjectListAPI",
+        "name": "projects:api:project-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/",
+        "module": "projects.api.ProjectAPI",
+        "name": "projects:api:project-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/next/",
+        "module": "projects.api.ProjectNextTaskAPI",
+        "name": "projects:api:project-next",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/label-stream-history/",
+        "module": "projects.api.LabelStreamHistoryAPI",
+        "name": "projects:api:label-stream-history",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/validate/",
+        "module": "projects.api.LabelConfigValidateAPI",
+        "name": "projects:api:label-config-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/validate/",
+        "module": "projects.api.ProjectLabelConfigValidateAPI",
+        "name": "projects:api:project-label-config-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/summary/",
+        "module": "projects.api.ProjectSummaryAPI",
+        "name": "projects:api:project-summary",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/imports/<int:import_pk>/",
+        "module": "projects.api.ProjectImportAPI",
+        "name": "projects:api:project-imports",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/reimports/<int:reimport_pk>/",
+        "module": "projects.api.ProjectReimportAPI",
+        "name": "projects:api:project-reimports",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/tasks/",
+        "module": "projects.api.ProjectTaskListAPI",
+        "name": "projects:api:project-tasks-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/sample-task/",
+        "module": "projects.api.ProjectSampleTask",
+        "name": "projects:api:project-sample-task",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/model-versions/",
+        "module": "projects.api.ProjectModelVersions",
+        "name": "projects:api:project-model-versions",
+        "decorators": ""
+    },
+    {
+        "url": "/api/templates/",
+        "module": "projects.api.TemplateListAPI",
+        "name": "projects:api-templates:template-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/import/file-upload/<int:pk>",
+        "module": "data_import.api.FileUploadAPI",
+        "name": "data_import:api:file-upload-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/tasks/bulk/",
+        "module": "data_import.api.TasksBulkCreateAPI",
+        "name": "data_import:api-projects:project-tasks-bulk-upload",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/import",
+        "module": "data_import.api.ImportAPI",
+        "name": "data_import:api-projects:project-import",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/import/predictions",
+        "module": "data_import.api.ImportPredictionsAPI",
+        "name": "data_import:api-projects:project-import-predictions",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/reimport",
+        "module": "data_import.api.ReImportAPI",
+        "name": "data_import:api-projects:project-reimport",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/file-uploads",
+        "module": "data_import.api.FileUploadListAPI",
+        "name": "data_import:api-projects:project-file-upload-list",
+        "decorators": ""
+    },
+    {
+        "url": "/data/upload/<path:filename>",
+        "module": "data_import.api.UploadedFileResponse",
+        "name": "data_import:data-upload",
+        "decorators": ""
+    },
+    {
+        "url": "/storage-data/uploaded/",
+        "module": "data_import.api.DownloadStorageData",
+        "name": "data_import:storage-data-upload",
+        "decorators": ""
+    },
+    {
+        "url": "/tasks/<int:task_id>/presign/",
+        "module": "data_import.api.PresignStorageData",
+        "name": "data_import:storage-data-presign",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/views/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/views\\.<format>/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/views/reset/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-reset",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/views/reset\\.<format>/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-reset",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/views/<pk>/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/views/<pk>\\.<format>/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "data_manager:api:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/\\.<format>/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "data_manager:api:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/columns/",
+        "module": "data_manager.api.ProjectColumnsAPI",
+        "name": "data_manager:dm-columns",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/project/",
+        "module": "data_manager.api.ProjectStateAPI",
+        "name": "data_manager:dm-project",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/actions/",
+        "module": "data_manager.api.ProjectActionsAPI",
+        "name": "data_manager:dm-actions",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/<int:pk>/",
+        "module": "data_manager.views.task_page",
+        "name": "data_manager:project-data",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/<int:pk>/data/",
+        "module": "data_manager.views.task_page",
+        "name": "data_manager:project-data",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/<int:pk>/data/import",
+        "module": "data_manager.views.task_page",
+        "name": "data_manager:project-import",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/<int:pk>/data/export",
+        "module": "data_manager.views.task_page",
+        "name": "data_manager:project-export",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/export",
+        "module": "data_export.api.ExportAPI",
+        "name": "data_export:api-projects:project-export",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/export/formats",
+        "module": "data_export.api.ExportFormatsListAPI",
+        "name": "data_export:api-projects:project-export-formats",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/export/files",
+        "module": "data_export.api.ProjectExportFiles",
+        "name": "data_export:api-projects:project-export-files",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/exports/",
+        "module": "data_export.api.ExportListAPI",
+        "name": "data_export:api-projects:project-exports-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/exports/<int:export_pk>",
+        "module": "data_export.api.ExportDetailAPI",
+        "name": "data_export:api-projects:project-exports-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/exports/<int:export_pk>/download",
+        "module": "data_export.api.ExportDownloadAPI",
+        "name": "data_export:api-projects:project-exports-download",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/exports/<int:export_pk>/convert",
+        "module": "data_export.api.ExportConvertAPI",
+        "name": "data_export:api-projects:project-exports-convert",
+        "decorators": ""
+    },
+    {
+        "url": "/api/auth/export/",
+        "module": "data_export.api.ProjectExportFilesAuthCheck",
+        "name": "data_export:project-export-files-auth-check",
+        "decorators": ""
+    },
+    {
+        "url": "/api/users/",
+        "module": "users.api.UserAPI",
+        "name": "user-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/users\\.<format>/",
+        "module": "users.api.UserAPI",
+        "name": "user-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/users/<pk>/",
+        "module": "users.api.UserAPI",
+        "name": "user-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/users/<pk>\\.<format>/",
+        "module": "users.api.UserAPI",
+        "name": "user-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/users/<pk>/avatar/",
+        "module": "users.api.UserAPI",
+        "name": "user-avatar",
+        "decorators": ""
+    },
+    {
+        "url": "/api/users/<pk>/avatar\\.<format>/",
+        "module": "users.api.UserAPI",
+        "name": "user-avatar",
+        "decorators": ""
+    },
+    {
+        "url": "/api/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/\\.<format>/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/user/login/",
+        "module": "core.middleware.wrapper",
+        "name": "user-login",
+        "decorators": ""
+    },
+    {
+        "url": "/user/signup/",
+        "module": "core.middleware.wrapper",
+        "name": "user-signup",
+        "decorators": ""
+    },
+    {
+        "url": "/user/account/",
+        "module": "users.views.user_account",
+        "name": "user-account",
+        "decorators": ""
+    },
+    {
+        "url": "/logout/",
+        "module": "users.views.logout",
+        "name": "logout",
+        "decorators": ""
+    },
+    {
+        "url": "/data/avatars/<path>",
+        "module": "django.views.static.serve",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/api/current-user/reset-token/",
+        "module": "users.api.UserResetTokenAPI",
+        "name": "current-user-reset-token",
+        "decorators": ""
+    },
+    {
+        "url": "/api/current-user/token",
+        "module": "users.api.UserGetTokenAPI",
+        "name": "current-user-token",
+        "decorators": ""
+    },
+    {
+        "url": "/api/current-user/whoami",
+        "module": "users.api.UserWhoAmIAPI",
+        "name": "current-user-whoami",
+        "decorators": ""
+    },
+    {
+        "url": "/api/tasks/",
+        "module": "tasks.api.TaskListAPI",
+        "name": "tasks:api:task-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/tasks/<int:pk>/",
+        "module": "tasks.api.TaskAPI",
+        "name": "tasks:api:task-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/tasks/<int:pk>/annotations/",
+        "module": "tasks.api.AnnotationsListAPI",
+        "name": "tasks:api:task-annotations",
+        "decorators": ""
+    },
+    {
+        "url": "/api/tasks/<int:pk>/drafts",
+        "module": "tasks.api.AnnotationDraftListAPI",
+        "name": "tasks:api:task-drafts",
+        "decorators": ""
+    },
+    {
+        "url": "/api/tasks/<int:pk>/annotations/<int:annotation_id>/drafts",
+        "module": "tasks.api.AnnotationDraftListAPI",
+        "name": "tasks:api:task-annotations-drafts",
+        "decorators": ""
+    },
+    {
+        "url": "/api/annotations/<int:pk>/",
+        "module": "tasks.api.AnnotationAPI",
+        "name": "tasks:api-annotations:annotation-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/annotations/<int:pk>/convert-to-draft",
+        "module": "tasks.api.AnnotationConvertAPI",
+        "name": "tasks:api-annotations:annotation-convert-to-draft",
+        "decorators": ""
+    },
+    {
+        "url": "/api/drafts/<int:pk>/",
+        "module": "tasks.api.AnnotationDraftAPI",
+        "name": "tasks:api-drafts:draft-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/predictions/",
+        "module": "tasks.api.PredictionAPI",
+        "name": "tasks:api-predictions:prediction-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/predictions\\.<format>/",
+        "module": "tasks.api.PredictionAPI",
+        "name": "tasks:api-predictions:prediction-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/predictions/<pk>/",
+        "module": "tasks.api.PredictionAPI",
+        "name": "tasks:api-predictions:prediction-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/predictions/<pk>\\.<format>/",
+        "module": "tasks.api.PredictionAPI",
+        "name": "tasks:api-predictions:prediction-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "tasks:api-predictions:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/\\.<format>/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "tasks:api-predictions:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/",
+        "module": "io_storages.all_api.AllImportStorageListAPI",
+        "name": "storages:api:storage-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export",
+        "module": "io_storages.all_api.AllExportStorageListAPI",
+        "name": "storages:api:export-storage-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/types",
+        "module": "io_storages.all_api.AllImportStorageTypesAPI",
+        "name": "storages:api:storage-types",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/types",
+        "module": "io_storages.all_api.AllExportStorageTypesAPI",
+        "name": "storages:api:export-storage-types",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/s3/",
+        "module": "io_storages.s3.api.S3ImportStorageListAPI",
+        "name": "storages:api:storage-s3-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/s3/<int:pk>",
+        "module": "io_storages.s3.api.S3ImportStorageDetailAPI",
+        "name": "storages:api:storage-s3-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/s3/<int:pk>/sync",
+        "module": "io_storages.s3.api.S3ImportStorageSyncAPI",
+        "name": "storages:api:storage-s3-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/s3/validate",
+        "module": "io_storages.s3.api.S3ImportStorageValidateAPI",
+        "name": "storages:api:storage-s3-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/s3/form",
+        "module": "io_storages.s3.api.S3ImportStorageFormLayoutAPI",
+        "name": "storages:api:storage-s3-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/s3",
+        "module": "io_storages.s3.api.S3ExportStorageListAPI",
+        "name": "storages:api:export-storage-s3-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/s3/<int:pk>",
+        "module": "io_storages.s3.api.S3ExportStorageDetailAPI",
+        "name": "storages:api:export-storage-s3-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/s3/<int:pk>/sync",
+        "module": "io_storages.s3.api.S3ExportStorageSyncAPI",
+        "name": "storages:api:export-storage-s3-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/s3/validate",
+        "module": "io_storages.s3.api.S3ExportStorageValidateAPI",
+        "name": "storages:api:export-storage-s3-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/s3/form",
+        "module": "io_storages.s3.api.S3ExportStorageFormLayoutAPI",
+        "name": "storages:api:export-storage-s3-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure/",
+        "module": "io_storages.azure_blob.api.AzureBlobImportStorageListAPI",
+        "name": "storages:api:storage-azure-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure/<int:pk>",
+        "module": "io_storages.azure_blob.api.AzureBlobImportStorageDetailAPI",
+        "name": "storages:api:storage-azure-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure/<int:pk>/sync",
+        "module": "io_storages.azure_blob.api.AzureBlobImportStorageSyncAPI",
+        "name": "storages:api:storage-azure-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure/validate",
+        "module": "io_storages.azure_blob.api.AzureBlobImportStorageValidateAPI",
+        "name": "storages:api:storage-azure-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure/form",
+        "module": "io_storages.azure_blob.api.AzureBlobImportStorageFormLayoutAPI",
+        "name": "storages:api:storage-azure-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure",
+        "module": "io_storages.azure_blob.api.AzureBlobExportStorageListAPI",
+        "name": "storages:api:export-storage-azure-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure/<int:pk>",
+        "module": "io_storages.azure_blob.api.AzureBlobExportStorageDetailAPI",
+        "name": "storages:api:export-storage-azure-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure/<int:pk>/sync",
+        "module": "io_storages.azure_blob.api.AzureBlobExportStorageSyncAPI",
+        "name": "storages:api:export-storage-azure-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure/validate",
+        "module": "io_storages.azure_blob.api.AzureBlobExportStorageValidateAPI",
+        "name": "storages:api:export-storage-azure-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure/form",
+        "module": "io_storages.azure_blob.api.AzureBlobExportStorageFormLayoutAPI",
+        "name": "storages:api:export-storage-azure-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/gcs/",
+        "module": "io_storages.gcs.api.GCSImportStorageListAPI",
+        "name": "storages:api:storage-gcs-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/gcs/<int:pk>",
+        "module": "io_storages.gcs.api.GCSImportStorageDetailAPI",
+        "name": "storages:api:storage-gcs-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/gcs/<int:pk>/sync",
+        "module": "io_storages.gcs.api.GCSImportStorageSyncAPI",
+        "name": "storages:api:storage-gcs-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/gcs/validate",
+        "module": "io_storages.gcs.api.GCSImportStorageValidateAPI",
+        "name": "storages:api:storage-gcs-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/gcs/form",
+        "module": "io_storages.gcs.api.GCSImportStorageFormLayoutAPI",
+        "name": "storages:api:storage-gcs-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/gcs",
+        "module": "io_storages.gcs.api.GCSExportStorageListAPI",
+        "name": "storages:api:export-storage-gcs-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/gcs/<int:pk>",
+        "module": "io_storages.gcs.api.GCSExportStorageDetailAPI",
+        "name": "storages:api:export-storage-gcs-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/gcs/<int:pk>/sync",
+        "module": "io_storages.gcs.api.GCSExportStorageSyncAPI",
+        "name": "storages:api:export-storage-gcs-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/gcs/validate",
+        "module": "io_storages.gcs.api.GCSExportStorageValidateAPI",
+        "name": "storages:api:export-storage-gcs-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/gcs/form",
+        "module": "io_storages.gcs.api.GCSExportStorageFormLayoutAPI",
+        "name": "storages:api:export-storage-gcs-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/redis/",
+        "module": "io_storages.redis.api.RedisImportStorageListAPI",
+        "name": "storages:api:storage-redis-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/redis/<int:pk>",
+        "module": "io_storages.redis.api.RedisImportStorageDetailAPI",
+        "name": "storages:api:storage-redis-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/redis/<int:pk>/sync",
+        "module": "io_storages.redis.api.RedisImportStorageSyncAPI",
+        "name": "storages:api:storage-redis-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/redis/validate",
+        "module": "io_storages.redis.api.RedisImportStorageValidateAPI",
+        "name": "storages:api:storage-redis-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/redis/form",
+        "module": "io_storages.redis.api.RedisImportStorageFormLayoutAPI",
+        "name": "storages:api:storage-redis-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/redis",
+        "module": "io_storages.redis.api.RedisExportStorageListAPI",
+        "name": "storages:api:export-storage-redis-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/redis/<int:pk>",
+        "module": "io_storages.redis.api.RedisExportStorageDetailAPI",
+        "name": "storages:api:export-storage-redis-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/redis/<int:pk>/sync",
+        "module": "io_storages.redis.api.RedisExportStorageSyncAPI",
+        "name": "storages:api:export-storage-redis-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/redis/validate",
+        "module": "io_storages.redis.api.RedisExportStorageValidateAPI",
+        "name": "storages:api:export-storage-redis-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/redis/form",
+        "module": "io_storages.redis.api.RedisExportStorageFormLayoutAPI",
+        "name": "storages:api:export-storage-redis-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/localfiles/",
+        "module": "io_storages.localfiles.api.LocalFilesImportStorageListAPI",
+        "name": "storages:api:storage-localfiles-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/localfiles/<int:pk>",
+        "module": "io_storages.localfiles.api.LocalFilesImportStorageDetailAPI",
+        "name": "storages:api:storage-localfiles-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/localfiles/<int:pk>/sync",
+        "module": "io_storages.localfiles.api.LocalFilesImportStorageSyncAPI",
+        "name": "storages:api:storage-localfiles-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/localfiles/validate",
+        "module": "io_storages.localfiles.api.LocalFilesImportStorageValidateAPI",
+        "name": "storages:api:storage-localfiles-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/localfiles/form",
+        "module": "io_storages.localfiles.api.LocalFilesImportStorageFormLayoutAPI",
+        "name": "storages:api:storage-localfiles-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/localfiles",
+        "module": "io_storages.localfiles.api.LocalFilesExportStorageListAPI",
+        "name": "storages:api:export-storage-localfiles-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/localfiles/<int:pk>",
+        "module": "io_storages.localfiles.api.LocalFilesExportStorageDetailAPI",
+        "name": "storages:api:export-storage-localfiles-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/localfiles/<int:pk>/sync",
+        "module": "io_storages.localfiles.api.LocalFilesExportStorageSyncAPI",
+        "name": "storages:api:export-storage-localfiles-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/localfiles/validate",
+        "module": "io_storages.localfiles.api.LocalFilesExportStorageValidateAPI",
+        "name": "storages:api:export-storage-localfiles-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/localfiles/form",
+        "module": "io_storages.localfiles.api.LocalFilesExportStorageFormLayoutAPI",
+        "name": "storages:api:export-storage-localfiles-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/ml/",
+        "module": "ml.api.MLBackendListAPI",
+        "name": "ml:api:ml-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/ml/<int:pk>",
+        "module": "ml.api.MLBackendDetailAPI",
+        "name": "ml:api:ml-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/ml/<int:pk>/train",
+        "module": "ml.api.MLBackendTrainAPI",
+        "name": "ml:api:ml-train",
+        "decorators": ""
+    },
+    {
+        "url": "/api/ml/<int:pk>/interactive-annotating",
+        "module": "ml.api.MLBackendInteractiveAnnotating",
+        "name": "ml:api:ml-interactive-annotating",
+        "decorators": ""
+    },
+    {
+        "url": "/api/ml/<int:pk>/versions",
+        "module": "ml.api.MLBackendVersionsAPI",
+        "name": "ml:api:ml-versions",
+        "decorators": ""
+    },
+    {
+        "url": "/api/webhooks/",
+        "module": "webhooks.api.WebhookListAPI",
+        "name": "webhooks:api:webhook-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/webhooks/<int:pk>/",
+        "module": "webhooks.api.WebhookAPI",
+        "name": "webhooks:api:webhook-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/webhooks/info/",
+        "module": "webhooks.api.WebhookInfoAPI",
+        "name": "webhooks:api:webhook-info",
+        "decorators": ""
+    },
+    {
+        "url": "/api/labels/",
+        "module": "labels_manager.api.LabelAPI",
+        "name": "labels_manager:api-labels:label-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/labels\\.<format>/",
+        "module": "labels_manager.api.LabelAPI",
+        "name": "labels_manager:api-labels:label-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/labels/<pk>/",
+        "module": "labels_manager.api.LabelAPI",
+        "name": "labels_manager:api-labels:label-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/labels/<pk>\\.<format>/",
+        "module": "labels_manager.api.LabelAPI",
+        "name": "labels_manager:api-labels:label-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/label_links/",
+        "module": "labels_manager.api.LabelLinkAPI",
+        "name": "labels_manager:api-labels:label_link-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/label_links\\.<format>/",
+        "module": "labels_manager.api.LabelLinkAPI",
+        "name": "labels_manager:api-labels:label_link-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/label_links/<pk>/",
+        "module": "labels_manager.api.LabelLinkAPI",
+        "name": "labels_manager:api-labels:label_link-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/label_links/<pk>\\.<format>/",
+        "module": "labels_manager.api.LabelLinkAPI",
+        "name": "labels_manager:api-labels:label_link-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "labels_manager:api-labels:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/\\.<format>/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "labels_manager:api-labels:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/labels/bulk",
+        "module": "labels_manager.api.LabelBulkUpdateAPI",
+        "name": "labels_manager:api-labels-bulk",
+        "decorators": ""
+    },
+    {
+        "url": "/data/local-files/",
+        "module": "core.views.localfiles_data",
+        "name": "localfiles_data",
+        "decorators": ""
+    },
+    {
+        "url": "/version/",
+        "module": "core.views.version_page",
+        "name": "version",
+        "decorators": ""
+    },
+    {
+        "url": "/api/version/",
+        "module": "core.views.version_page",
+        "name": "api-version",
+        "decorators": ""
+    },
+    {
+        "url": "/health/",
+        "module": "core.views.health",
+        "name": "health",
+        "decorators": ""
+    },
+    {
+        "url": "/metrics/",
+        "module": "core.views.metrics",
+        "name": "metrics",
+        "decorators": ""
+    },
+    {
+        "url": "/trigger500/",
+        "module": "core.views.TriggerAPIError",
+        "name": "metrics",
+        "decorators": ""
+    },
+    {
+        "url": "/samples/time-series.csv",
+        "module": "core.views.samples_time_series",
+        "name": "static_time_series",
+        "decorators": ""
+    },
+    {
+        "url": "/samples/paragraphs.json",
+        "module": "core.views.samples_paragraphs",
+        "name": "samples_paragraphs",
+        "decorators": ""
+    },
+    {
+        "url": "/swagger<format>",
+        "module": "drf_yasg.views.SchemaView",
+        "name": "schema-json",
+        "decorators": ""
+    },
+    {
+        "url": "/swagger/",
+        "module": "drf_yasg.views.SchemaView",
+        "name": "schema-swagger-ui",
+        "decorators": ""
+    },
+    {
+        "url": "/docs/api/",
+        "module": "drf_yasg.views.SchemaView",
+        "name": "schema-redoc",
+        "decorators": ""
+    },
+    {
+        "url": "/docs/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "docs-redirect",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/",
+        "module": "django.contrib.admin.sites.index",
+        "name": "admin:index",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/login/",
+        "module": "django.contrib.admin.sites.login",
+        "name": "admin:login",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/logout/",
+        "module": "django.contrib.admin.sites.logout",
+        "name": "admin:logout",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/password_change/",
+        "module": "django.contrib.admin.sites.password_change",
+        "name": "admin:password_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/password_change/done/",
+        "module": "django.contrib.admin.sites.password_change_done",
+        "name": "admin:password_change_done",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/autocomplete/",
+        "module": "django.contrib.admin.sites.autocomplete_view",
+        "name": "admin:autocomplete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/jsi18n/",
+        "module": "django.contrib.admin.sites.i18n_javascript",
+        "name": "admin:jsi18n",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/r/<int:content_type_id>/<path:object_id>/",
+        "module": "django.contrib.contenttypes.views.shortcut",
+        "name": "admin:view_on_site",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/authtoken/tokenproxy/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:authtoken_tokenproxy_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/authtoken/tokenproxy/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:authtoken_tokenproxy_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/authtoken/tokenproxy/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:authtoken_tokenproxy_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/authtoken/tokenproxy/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:authtoken_tokenproxy_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/authtoken/tokenproxy/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:authtoken_tokenproxy_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/authtoken/tokenproxy/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/users/user/<id>/password/",
+        "module": "django.contrib.auth.admin.user_change_password",
+        "name": "admin:auth_user_password_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/users/user/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:users_user_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/users/user/add/",
+        "module": "django.contrib.auth.admin.add_view",
+        "name": "admin:users_user_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/users/user/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:users_user_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/users/user/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:users_user_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/users/user/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:users_user_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/users/user/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/projects/project/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:projects_project_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/projects/project/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:projects_project_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/projects/project/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:projects_project_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/projects/project/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:projects_project_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/projects/project/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:projects_project_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/projects/project/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackend/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:ml_mlbackend_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackend/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:ml_mlbackend_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackend/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:ml_mlbackend_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackend/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:ml_mlbackend_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackend/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:ml_mlbackend_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackend/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackendtrainjob/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:ml_mlbackendtrainjob_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackendtrainjob/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:ml_mlbackendtrainjob_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackendtrainjob/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:ml_mlbackendtrainjob_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackendtrainjob/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:ml_mlbackendtrainjob_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackendtrainjob/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:ml_mlbackendtrainjob_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/ml/mlbackendtrainjob/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/task/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:tasks_task_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/task/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:tasks_task_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/task/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:tasks_task_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/task/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:tasks_task_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/task/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:tasks_task_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/task/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/annotation/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:tasks_annotation_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/annotation/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:tasks_annotation_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/annotation/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:tasks_annotation_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/annotation/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:tasks_annotation_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/annotation/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:tasks_annotation_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/annotation/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/prediction/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:tasks_prediction_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/prediction/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:tasks_prediction_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/prediction/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:tasks_prediction_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/prediction/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:tasks_prediction_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/prediction/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:tasks_prediction_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/tasks/prediction/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organization/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:organizations_organization_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organization/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:organizations_organization_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organization/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:organizations_organization_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organization/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:organizations_organization_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organization/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:organizations_organization_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organization/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organizationmember/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:organizations_organizationmember_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organizationmember/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:organizations_organizationmember_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organizationmember/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:organizations_organizationmember_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organizationmember/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:organizations_organizationmember_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organizationmember/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:organizations_organizationmember_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/organizations/organizationmember/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/core/asyncmigrationstatus/",
+        "module": "django.contrib.admin.options.changelist_view",
+        "name": "admin:core_asyncmigrationstatus_changelist",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/core/asyncmigrationstatus/add/",
+        "module": "django.contrib.admin.options.add_view",
+        "name": "admin:core_asyncmigrationstatus_add",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/core/asyncmigrationstatus/<path:object_id>/history/",
+        "module": "django.contrib.admin.options.history_view",
+        "name": "admin:core_asyncmigrationstatus_history",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/core/asyncmigrationstatus/<path:object_id>/delete/",
+        "module": "django.contrib.admin.options.delete_view",
+        "name": "admin:core_asyncmigrationstatus_delete",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/core/asyncmigrationstatus/<path:object_id>/change/",
+        "module": "django.contrib.admin.options.change_view",
+        "name": "admin:core_asyncmigrationstatus_change",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/core/asyncmigrationstatus/<path:object_id>/",
+        "module": "django.views.generic.base.RedirectView",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/<app_label>/",
+        "module": "django.contrib.admin.sites.app_index",
+        "name": "admin:app_list",
+        "decorators": ""
+    },
+    {
+        "url": "/admin/<url>",
+        "module": "django.contrib.admin.sites.catch_all_view",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/",
+        "module": "django_rq.views.stats",
+        "name": "rq_home",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/stats.json/<token>/",
+        "module": "django_rq.views.stats_json",
+        "name": "rq_home_json",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/",
+        "module": "django_rq.views.jobs",
+        "name": "rq_jobs",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/workers/<queue_index>/",
+        "module": "django_rq.views.workers",
+        "name": "rq_workers",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/workers/<queue_index>/<key>/",
+        "module": "django_rq.views.worker_details",
+        "name": "rq_worker_details",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/finished/",
+        "module": "django_rq.views.finished_jobs",
+        "name": "rq_finished_jobs",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/failed/",
+        "module": "django_rq.views.failed_jobs",
+        "name": "rq_failed_jobs",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/scheduled/",
+        "module": "django_rq.views.scheduled_jobs",
+        "name": "rq_scheduled_jobs",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/started/",
+        "module": "django_rq.views.started_jobs",
+        "name": "rq_started_jobs",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/deferred/",
+        "module": "django_rq.views.deferred_jobs",
+        "name": "rq_deferred_jobs",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/empty/",
+        "module": "django_rq.views.clear_queue",
+        "name": "rq_clear",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/requeue-all/",
+        "module": "django_rq.views.requeue_all",
+        "name": "rq_requeue_all",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/<job_id>/",
+        "module": "django_rq.views.job_detail",
+        "name": "rq_job_detail",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/<job_id>/delete/",
+        "module": "django_rq.views.delete_job",
+        "name": "rq_delete_job",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/confirm-action/<queue_index>/",
+        "module": "django_rq.views.confirm_action",
+        "name": "rq_confirm_action",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/actions/<queue_index>/",
+        "module": "django_rq.views.actions",
+        "name": "rq_actions",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/<job_id>/requeue/",
+        "module": "django_rq.views.requeue_job_view",
+        "name": "rq_requeue_job",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<queue_index>/<job_id>/enqueue/",
+        "module": "django_rq.views.enqueue_job",
+        "name": "rq_enqueue_job",
+        "decorators": ""
+    },
+    {
+        "url": "/feature-flags/",
+        "module": "core.views.feature_flags",
+        "name": "feature_flags",
+        "decorators": ""
+    },
+    {
+        "url": "/api-auth/login/",
+        "module": "django.contrib.auth.views.LoginView",
+        "name": "rest_framework:login",
+        "decorators": ""
+    },
+    {
+        "url": "/api-auth/logout/",
+        "module": "django.contrib.auth.views.LogoutView",
+        "name": "rest_framework:logout",
+        "decorators": ""
+    }
+]

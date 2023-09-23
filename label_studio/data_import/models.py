@@ -1,19 +1,20 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
-import io
-import uuid
 import logging
-import pandas as pd
-import htmlmin
+import os
+import uuid
 from collections import Counter
+
+import pandas as pd
+
 try:
     import ujson as json
-except:
+except:  # noqa: E722
     import json
 
-from django.db import models
+from core.feature_flags import flag_set
 from django.conf import settings
+from django.db import models
 from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ class FileUpload(models.Model):
     file = models.FileField(upload_to=upload_name_generator)
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @property
@@ -42,7 +44,10 @@ class FileUpload(models.Model):
     @property
     def url(self):
         if settings.HOSTNAME and settings.CLOUD_FILE_STORAGE_ENABLED:
-            return settings.HOSTNAME + self.file.url
+            if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+                return self.file.url
+            else:
+                return settings.HOSTNAME + self.file.url
         elif settings.FORCE_SCRIPT_NAME:
             return settings.FORCE_SCRIPT_NAME + '/' + self.file.url.lstrip('/')
         else:
@@ -54,7 +59,7 @@ class FileUpload(models.Model):
         file_format = None
         try:
             file_format = os.path.splitext(filepath)[-1]
-        except:
+        except:  # noqa: E722
             pass
         finally:
             logger.debug('Get file format ' + str(file_format))
@@ -107,8 +112,7 @@ class FileUpload(models.Model):
 
     def read_task_from_hypertext_body(self):
         logger.debug('Read 1 task from hypertext file {}'.format(self.file.name))
-        data = self.content
-        body = htmlmin.minify(data, remove_all_empty_space=True)
+        body = self.content
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: body}}]
         return tasks
 
@@ -141,7 +145,8 @@ class FileUpload(models.Model):
             elif not self.project.one_object_in_label_config:
                 raise ValidationError(
                     'Your label config has more than one data key and direct file upload supports only '
-                    'one data key. To import data with multiple data keys, use a JSON or CSV file.')
+                    'one data key. To import data with multiple data keys, use a JSON or CSV file.'
+                )
 
             # file as a single asset
             elif file_format in ('.html', '.htm', '.xml'):
@@ -154,7 +159,9 @@ class FileUpload(models.Model):
         return tasks
 
     @classmethod
-    def load_tasks_from_uploaded_files(cls, project, file_upload_ids=None, formats=None, files_as_tasks_list=True, trim_size=None):
+    def load_tasks_from_uploaded_files(
+        cls, project, file_upload_ids=None, formats=None, files_as_tasks_list=True, trim_size=None
+    ):
         tasks = []
         fileformats = []
         common_data_fields = set()
@@ -200,14 +207,19 @@ def _old_vs_new_data_keys_inconsistency_message(new_data_keys, old_data_keys, cu
     if new_data_keys_list == old_data_keys_list:
         return ''
     elif new_data_keys_list == settings.DATA_UNDEFINED_NAME:
-        return common_prefix + "uploading a single file {0} " \
-                               "clashes with data key(s) found from other files:\n\"{1}\"".format(
-                                current_file, old_data_keys_list)
+        return (
+            common_prefix + 'uploading a single file {0} '
+            'clashes with data key(s) found from other files:\n"{1}"'.format(current_file, old_data_keys_list)
+        )
     elif old_data_keys_list == settings.DATA_UNDEFINED_NAME:
-        return common_prefix + "uploading tabular data from {0} with data key(s) {1}, " \
-                               "clashes with other raw binary files (images, audios, etc.)".format(
-                                current_file, new_data_keys_list)
+        return (
+            common_prefix + 'uploading tabular data from {0} with data key(s) {1}, '
+            'clashes with other raw binary files (images, audios, etc.)'.format(current_file, new_data_keys_list)
+        )
     else:
-        return common_prefix + "uploading tabular data from \"{0}\" with data key(s) \"{1}\", " \
-                               "clashes with data key(s) found from other files:\n\"{2}\"".format(
-                                current_file, new_data_keys_list, old_data_keys_list)
+        return (
+            common_prefix + 'uploading tabular data from "{0}" with data key(s) "{1}", '
+            'clashes with data key(s) found from other files:\n"{2}"'.format(
+                current_file, new_data_keys_list, old_data_keys_list
+            )
+        )

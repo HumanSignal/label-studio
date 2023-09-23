@@ -5,7 +5,7 @@ if bash ${SCRIPT_DIR}/../deploy/prebuild.sh; then
 fi
 
 if [ $? -eq 0 ]; then
-    docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
+    docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest
 else
     echo "Docker build failed."
 fi

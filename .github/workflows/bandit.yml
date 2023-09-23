@@ -8,7 +8,7 @@ on:
         type: string
 
 env:
-  BANDIT_VERSION: 1.7.4
+  BANDIT_VERSION: 1.7.5
   PROJECT_PATH: 'label_studio/'
   REPORT_PATH: 'bandit_results/bandit_security_report.txt'
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
@@ -16,20 +16,20 @@ env:
 jobs:
   bandit:
     name: "Bandit"
-    timeout-minutes: 2
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.head_sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.7'
+          python-version: '3.10'
 
       - name: Install Bandit
         run: |

@@ -1,0 +1,1 @@
+../common/20-wait-for-db.sh

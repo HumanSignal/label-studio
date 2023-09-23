@@ -1,10 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
+
+from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
-from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
 
 
 class GCSImportStorageSerializer(ImportStorageSerializer):
@@ -21,13 +22,13 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
         return result
 
     def validate(self, data):
-        data = super(GCSImportStorageSerializer, self).validate(data)
+        data = super().validate(data)
         storage = self.instance
         if storage:
             for key, value in data.items():
                 setattr(storage, key, value)
         else:
-            storage = GCSImportStorage(**data)
+            storage = self.Meta.model(**data)
         try:
             storage.validate_connection()
         except Exception as exc:

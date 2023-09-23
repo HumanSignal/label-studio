@@ -106,7 +106,13 @@
         </textarea>
         <p class="actions">
           <button type="button" class="blinking-status ls-button" data-copy="example_fetch">Copy</button>
-          <a class="ls-button" href="https://labelstud.io/guide/api.html" target="_blank">Documentation</a>
+          <a class="ls-button"
+             {% if settings.VERSION_EDITION == 'Enterprise' %}
+             href="https://docs.heartex.com/guide/api.html"
+             {% else %}
+             href="https://labelstud.io/guide/api.html"
+             {% endif %} target="_blank">Documentation
+          </a>
         </p>
       </div>
     </form>
@@ -176,9 +182,9 @@
   <script>
     (() => {
       {% if settings.HOSTNAME %}
-      const CURL_TEMPLATE = "curl -X GET {{ settings.HOSTNAME }}/api/projects/ -H 'Authorization: Token'"
+      const hostname = '{{ settings.HOSTNAME }}';
       {% else %}
-      const CURL_TEMPLATE = "curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token'"
+      const hostname = 'http://localhost:8080';
       {% endif %}
 
       document.querySelectorAll('[data-copy]').forEach(button => {
@@ -202,7 +208,7 @@
           .then(res => res.json())
           .then(res => {
             input.value = res.token;
-            example.value = `${CURL_TEMPLATE} ${res.token}`
+            example.value = `curl -X GET ${hostname}/api/projects/ -H 'Authorization: Token ${res.token}'`
             button.classList.add('blink');
             setTimeout(() => button.classList.remove('blink'))
           });

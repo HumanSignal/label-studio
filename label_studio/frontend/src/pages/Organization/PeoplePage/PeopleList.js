@@ -7,7 +7,7 @@ import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/helpers";
 import { useUpdateEffect } from "../../../utils/hooks";
 import './PeopleList.styl';
-import { CopyableTooltip } from '../../../components/CopyableTooltip/CopyableTooltip'
+import { CopyableTooltip } from '../../../components/CopyableTooltip/CopyableTooltip';
 
 export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
   const api = useAPI();
@@ -32,7 +32,7 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
       setUsersList(response.results);
       setTotalItems(response.count);
     }
-  }, [api]);
+  }, []);
 
   const selectUser = useCallback((user) => {
     if (selectedUser?.id === user.id) {

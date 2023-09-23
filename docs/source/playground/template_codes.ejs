@@ -37,7 +37,7 @@
     <Label value="Anticipation" background="#ffa953" />
   </Labels>
 
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
 </View>
 </script>
 
@@ -48,7 +48,7 @@
     <Label value="Speaker 1" />
     <Label value="Speaker 2" />
   </Labels>
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
 </View>
 </script>
 
@@ -59,7 +59,7 @@
     <Label value="Speaker 1" />
     <Label value="Speaker 2" />
   </Labels>
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
 
   <View visibleWhen="region-selected">
     <Header value="Provide Transcription" />
@@ -860,7 +860,7 @@ it will be marked as `"instant": true` in the results.
       <Label value="Speaker 2" />
     </Labels>
 
-    <AudioPlus name="audio" value="$audio"/>
+    <Audio name="audio" value="$audio"/>
     <View style="padding: 10px 20px; margin-top: 2em; box-shadow: 2px 2px 8px #AAA; margin-right: 1em;"
           visibleWhen="region-selected">
       <Header value="Provide Transcription" />
@@ -1064,14 +1064,14 @@ it will be marked as `"instant": true` in the results.
 
 
 <script data-template-pk="49" type="text"><View>
-  <Header value="Video timeline segmentation via AudioPlus sync trick"/>
+  <Header value="Video timeline segmentation via Audio sync trick"/>
   <HyperText name="video" value="$video"/>
   <Labels name="tricks" toName="audio" choice="multiple">
     <Label value="Kickflip" background="#1BB500" />
     <Label value="360 Flip" background="#FFA91D" />
     <Label value="Trick" background="#358EF3" />
   </Labels>
-  <AudioPlus name="audio" value="$videoSource" speed="false"/>
+  <Audio name="audio" value="$videoSource" speed="false"/>
 </View>
 
 <!--

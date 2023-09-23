@@ -210,7 +210,7 @@ After you set up your project and import the results from Tesseract, start label
 
 1. Click **Label all Tasks** and start correcting the recognized text regions. 
 2. Locate a region in the sidebar and click to update the text.
-   <img src="/images/ocr-blog/OCR-correct-single-region.gif" alt="Gif of updating the recognized text for a region to match teh text on the image in the Label Studio UI." class="gif-border" width="800px" height="500px"/>
+   <img src="/images/ocr-blog/OCR-correct-single-region.gif" alt="Gif of updating the recognized text for a region to match the text on the image in the Label Studio UI." class="gif-border" width="800px" height="500px"/>
 3. Click a label to identify the region as Text, a Product Name, or a Price.
 3. If needed, add additional regions.
    <img src="/images/ocr-blog/OCR-add-and-label-new-regions.gif" alt="Gif of adding new regions to the image and transcribing and labeling the text in the Label Studio UI." class="gif-border" width="800px" height="511px" />

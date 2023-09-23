@@ -40,6 +40,7 @@ strict: false
 marks:
   - usefixtures:
       - django_live_url
+      - fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on
 stages:
   - id: signup
     type: ref
@@ -102,6 +103,22 @@ stages:
     request:
       url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/download"
       method: GET
+    response:
+      status_code: 200
+  - name: download export CSV
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/download"
+      method: GET
+      params:
+        exportType: CSV
+    response:
+      status_code: 404
+  - name: make conversion
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/convert"
+      method: POST
+      json:
+        export_type: "CSV"
     response:
       status_code: 200
   - name: download export CSV
@@ -232,3 +249,179 @@ stages:
       save:
         json:
           export_id: id
+---
+test_name: export csv with non-existing columns
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    name: create_project
+    request:
+      data:
+        label_config: <View><Text value="pdf" name="pdf" /><DateTime name="publication_date" toName="pdf" only="date" /><DateTime name="effective_date" toName="pdf" only="date" /></View>
+        title: Test Draft 1
+        show_collab_predictions: true
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: create_task
+    request:
+      json:
+        data:
+          text: 'Test text'
+        project: '{project_pk}'
+      method: POST
+      url: '{django_live_url}/api/tasks'
+    response:
+      save:
+        json:
+          first_task_pk: id
+      status_code: 201
+  - name: create_task
+    request:
+      json:
+        data:
+          text: 'Test text'
+        project: '{project_pk}'
+      method: POST
+      url: '{django_live_url}/api/tasks'
+    response:
+      save:
+        json:
+          second_task_pk: id
+      status_code: 201
+  - name: create_annotation_second_task
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 12.34
+        result:
+        - from_name: publication_date
+          to_name: pdf
+          origin: manual
+          type: datetime
+          value:
+            datetime: "2022-11-17"
+      method: POST
+      url: '{django_live_url}/api/tasks/{first_task_pk}/annotations'
+    response:
+      status_code: 201
+  - name: create_annotation_second_task
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 12.34
+        result:
+        - from_name: effective_date
+          to_name: pdf
+          origin: manual
+          type: datetime
+          value:
+            datetime: "2022-11-17"
+      method: POST
+      url: '{django_live_url}/api/tasks/{second_task_pk}/annotations'
+    response:
+      status_code: 201
+  - name: export_csv
+    request:
+      headers:
+        content-type: application/json
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/export?exportType=CSV'
+    response:
+      status_code: 200
+  - name: export_tsv
+    request:
+      headers:
+        content-type: application/json
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/export?exportType=TSV'
+    response:
+      status_code: 200
+  - name: export_json_min
+    request:
+      headers:
+        content-type: application/json
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/export?exportType=JSON_MIN'
+    response:
+      status_code: 200
+
+---
+test_name: export_delete
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+      - ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on
+stages:
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - id: create_task
+    type: ref
+
+  - name: create export
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: POST
+      json:
+        task_filter_options:
+          only_with_annotations: true
+    response:
+      status_code: 201
+      save:
+        $ext:
+          function: label_studio.tests.utils:save_export_file_path
+        json:
+          export_id: id
+      verify_response_with:
+        function: label_studio.tests.utils:file_exists_in_storage
+
+  - name: make conversion
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/convert"
+      method: POST
+      json:
+        export_type: "CSV"
+    response:
+      status_code: 200
+    delay_after: 2
+
+  - name: get exports list
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        $ext:
+          function: label_studio.tests.utils:save_convert_file_path
+
+  - name: delete export
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}"
+      method: DELETE
+      json:
+        task_filter_options:
+          only_with_annotations: true
+    response:
+      status_code: 204
+      verify_response_with:
+        function: label_studio.tests.utils:file_exists_in_storage
+        extra_kwargs:
+          exists: false
+          file_path: "{convert_file_path}"

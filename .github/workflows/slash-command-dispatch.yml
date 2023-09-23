@@ -7,6 +7,7 @@ env:
   commands_list: |
     help
     frontend
+    ff
     git
 
 jobs:
@@ -15,7 +16,7 @@ jobs:
     timeout-minutes: 1
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: 'Validate command'
         id: determine_command
@@ -32,10 +33,10 @@ jobs:
             commandArray = body.split(/\s+/)
             const contextCommand = commandArray[0].split('/')[1].trim();
             console.log("contextCommand: " + contextCommand)
-            console.log("::set-output name=command_state::known")
+            core.setOutput('command_state', 'known')
             if (! commands_list.includes(contextCommand)) {
-              console.log("::set-output name=command_state::unknown")
-              console.log(`::set-output name=command::${contextCommand}`)
+              core.setOutput('command_state', 'unknown')
+              core.setOutput('command', contextCommand)
             }
 
       - name: Slash Command Dispatch
@@ -50,7 +51,7 @@ jobs:
 
       - name: Edit comment with error message
         if: ${{ steps.determine_command.outputs.command_state == 'unknown' }}
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           comment-id: ${{ github.event.comment.id }}
           body: |

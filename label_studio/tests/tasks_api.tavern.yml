@@ -25,3 +25,37 @@ stages:
     url: '{django_live_url}/api/tasks/{task_pk}?project={project_pk}'
   response:
     status_code: 200
+
+---
+test_name: tasks_api_not_found
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: create_task
+  type: ref
+- id: create_annotation
+  type: ref
+- name: get task by id from data manager
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{task_pk}?project={project_pk}'
+  response:
+    status_code: 200
+- name: get task by id from data manager
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{task_pk}'
+  response:
+    status_code: 200
+- name: get task by id with 404
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{task_pk}{task_pk}'
+  response:
+    status_code: 404

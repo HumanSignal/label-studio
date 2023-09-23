@@ -1,0 +1,102 @@
+[tool.ruff]
+# Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = [
+    # Pyflakes
+    "F",
+    # Pycodestyle
+    "E",
+    # isort
+    "I001"
+]
+ignore = [
+    "E501",
+    "E402", # ignores: Module level import not at top of file.  (isort takes care of this and if not, there is usually a good reason)
+]
+
+
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "**/migrations/*.py",
+]
+
+# Same as Blue.
+line-length = 119
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.8 at a minimum
+target-version = "py38"
+
+[tool.ruff.per-file-ignores]
+# Ignore deleting imports in __init__.py files as they're actually being used.
+"__init__.py" = ["F401"]
+"**/settings/label_studio.py" = ["F405"]
+"test*.py" = ["F811"]
+
+
+[tool.blue]
+
+line-length = 119
+
+include = 'label_studio/.*\.py$'
+
+# Exclude a variety of commonly ignored directories, as well as all migrations files.
+force-exclude = '''
+/(
+    \.bzr
+  | \.direnv
+  | \.eggs
+  | \.git
+  | \.github
+  | \.git-rewrite
+  | \.hg
+  | \.mypy_cache
+  | \.nox
+  | \.pants.d
+  | \.pytype
+  | \.ruff_cache
+  | \.svn
+  | \.tox
+  | \.venv
+  | \.hg
+  | _build
+  | buck-out
+  | build
+  | dist
+  | node_modules
+  | migrations
+  | venv
+  | __pycache__
+)/
+'''
+
+target-version = ['py38']

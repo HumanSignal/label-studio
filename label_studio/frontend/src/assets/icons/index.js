@@ -25,3 +25,5 @@ export { default as LsThumbsDown } from './thumbs-down.svg';
 export { default as LsThumbsUp } from './thumbs-up.svg';
 export { default as IconUpload } from './upload.svg';
 export { default as LsPencil } from './pencil.svg';
+export { default as IconInfoOutline } from './info-outline.svg';
+export { default as IconSpark } from './spark.svg'

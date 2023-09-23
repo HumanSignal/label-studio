@@ -3,12 +3,13 @@ name: "Tests"
 on:
   workflow_call:
     inputs:
-      ref:
+      head_sha:
         required: true
         type: string
 
 env:
-  NODE: '14'
+  NODE: '18'
+  CACHE_NAME_PREFIX: v1
 
 jobs:
   run_pytest_sqlite:
@@ -18,15 +19,18 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.7
-          - 3.8
-          - 3.9
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
-      collect_analytics: false
+      collect_analytics: true
+      DEBUG_CONTEXTLOG: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
@@ -34,26 +38,40 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
+
       - uses: actions/cache@v3
         name: Configure pip cache
         id: pip-cache
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}/bin/*
+            ${{ env.pythonLocation }}/include
+            ${{ env.pythonLocation }}/lib/python*/site-packages/*
+            !${{ env.pythonLocation }}/bin/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
+          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
 
       - name: Install dependencies
         run: |
@@ -70,7 +88,7 @@ jobs:
 
       - name: Get npm cache directory
         id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Configure npm cache
@@ -95,11 +113,13 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v3.1.4
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
           verbose: true
+          name: codecov-python-${{ matrix.python-version }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -107,7 +127,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8 ]
+        python-version: [ '3.10' ]
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       DJANGO_DB: default
@@ -115,7 +135,9 @@ jobs:
       PYTHONPATH: .
       LOG_LEVEL: ERROR
       LOG_DIR: pytest_logs
-      collect_analytics: false
+      collect_analytics: true
+      DEBUG_CONTEXTLOG: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
       SENTRY_RATE: 0
       JSON_LOG: 0
@@ -126,7 +148,7 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres:11.5
+        image: postgres:13.8
         # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
@@ -157,12 +179,12 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -172,16 +194,25 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
+          sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
       - uses: actions/cache@v3
         name: Configure pip cache
         id: pip-cache
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}/bin/*
+            ${{ env.pythonLocation }}/include
+            ${{ env.pythonLocation }}/lib/python*/site-packages/*
+            !${{ env.pythonLocation }}/bin/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
+          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
 
       - name: Install pip dependencies
         run: |
@@ -196,7 +227,7 @@ jobs:
 
       - name: Get npm cache directory
         id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Configure npm cache
@@ -221,11 +252,13 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v3.1.4
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
           verbose: true
+          name: codecov-python-${{ matrix.python-version }}-postgresql
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   windows_label_studio:
     name: LS SQLite Windows
@@ -234,15 +267,16 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.7
-          - 3.8
-          - 3.9
+          - '3.8'
+          - '3.9'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
-      collect_analytics: false
+      collect_analytics: true
+      DEBUG_CONTEXTLOG: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
@@ -250,12 +284,12 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -281,7 +315,7 @@ jobs:
           pip install -e .
 
       - name: Fix sqlite.dll for python < 3.9
-        if: ${{ matrix.python-version < '3.9' }}
+        if: ${{ contains(matrix.python-version, '3.8') }}
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8

@@ -1,44 +1,25 @@
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/xml/xml';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
+import CM from 'codemirror';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/show-hint.css';
+
 import { Button, ToggleItems } from '../../../components';
 import { Form } from '../../../components/Form';
-import { Oneof } from '../../../components/Oneof/Oneof';
-import { cn } from '../../../utils/bem';
+import { useAPI } from '../../../providers/ApiProvider';
+import { Block, cn, Elem } from '../../../utils/bem';
 import { Palette } from '../../../utils/colors';
 import { colorNames } from './colors';
 import './Config.styl';
 import { Preview } from './Preview';
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from './Template';
 import { TemplatesList } from './TemplatesList';
-import { useAPI } from '../../../providers/ApiProvider';
 
-// don't do this, kids
-const formatXML = (xml) => {
-  // don't use formatting if the config has new lines
-  if (xml.indexOf("\n") >= 0) {
-    return xml;
-  }
-
-  let depth = 0;
-
-  try {
-    return xml.replace(/<(\/)?.*?(\/)?>[\s\n]*/g, (tag, close1, close2) => {
-      if (!close1) {
-        const res = "  ".repeat(depth) + tag.trim() + "\n";
-
-        if (!close2) depth++;
-        return res;
-      } else {
-        depth--;
-        return "  ".repeat(depth) + tag.trim() + "\n";
-      }
-    });
-  } catch (e) {
-    return xml;
-  }
-};
+import './codemirror.css';
+import './config-hint';
+import tags from './schema.json';
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
@@ -67,7 +48,12 @@ const Label = ({ label, template, color }) => {
         />
       </label>
       <span>{value}</span>
-      <button type="button" className={configClass.elem("delete-label")} onClick={() => template.removeLabel(label)}>
+      <button
+        type="button"
+        className={configClass.elem("delete-label")}
+        onClick={() => template.removeLabel(label)}
+        aria-label="delete label"
+      >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="red" strokeWidth="2" strokeLinecap="square" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 12L12 2"/>
           <path d="M12 12L2 2"/>
@@ -100,6 +86,7 @@ const ConfigureControl = ({ control, template }) => {
     <div className={configClass.elem("labels")}>
       <form className={configClass.elem("add-labels")} action="">
         <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
+        <span>Use new line as a separator to add multiple labels</span>
         <textarea name="labels" id="" cols="30" rows="5" ref={refLabels} onKeyPress={onKeyPress}></textarea>
         <input type="button" value="Add" onClick={onAddLabels} />
       </form>
@@ -202,14 +189,81 @@ const ConfigureSettings = ({ template }) => {
   );
 };
 
-const ConfigureColumns = ({ columns, template }) => {
-  const updateValue = obj => e => {
-    const attrName = e.target.value.replace(/^\$/, "");
+// configure value source for `obj` object tag
+const ConfigureColumn = ({ template, obj, columns }) => {
+  const value = obj.getAttribute("value")?.replace(/^\$/, "");
+  // if there is a value set already and it's not in the columns
+  // or data was not uploaded yet
+  const [isManual, setIsManual] = useState(!!value && !columns?.includes(value));
+  // value is stored in state to make input conrollable
+  // changes will be sent by Enter and blur
+  const [newValue, setNewValue] = useState("$" + value);
 
-    obj.setAttribute("value", "$" + attrName);
+  // update local state when external value changes
+  useEffect(() => setNewValue("$" + value), [value]);
+
+  const updateValue = value => {
+    const newValue = value.replace(/^\$/, "");
+
+    obj.setAttribute("value", "$" + newValue);
     template.render();
   };
 
+  const selectValue = e => {
+    const value = e.target.value;
+
+    if (value === "-") {
+      setIsManual(true);
+      return;
+    } else if (isManual) {
+      setIsManual(false);
+    }
+
+    updateValue(value);
+  };
+
+  const handleChange = e => {
+    const newValue = e.target.value.replace(/^\$/, "");
+
+    setNewValue("$" + newValue);
+  };
+
+  const handleBlur = () => {
+    updateValue(newValue);
+  };
+
+  const handleKeyDown = e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      updateValue(e.target.value);
+    }
+  };
+
+  return (
+    <p>
+      Use {obj.tagName.toLowerCase()}
+      {template.objects > 1 && ` for ${obj.getAttribute("name")}`}
+      {" from "}
+      {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && "field "}
+      <select onChange={selectValue} value={isManual ? "-" : value}>
+        {columns?.map(column => (
+          <option key={column} value={column}>
+            {column === DEFAULT_COLUMN ? "<imported file>" : `$${column}`}
+          </option>
+        ))}
+        {!columns?.length && (
+          <option value={value}>{"<imported file>"}</option>
+        )}
+        <option value="-">{"<set manually>"}</option>
+      </select>
+      {isManual && (
+        <input value={newValue} onChange={handleChange} onBlur={handleBlur} onKeyDown={handleKeyDown}/>
+      )}
+    </p>
+  );
+};
+
+const ConfigureColumns = ({ columns, template }) => {
   if (!template.objects.length) return null;
 
   return (
@@ -224,35 +278,28 @@ const ConfigureColumns = ({ columns, template }) => {
         </p>
       )}
       {template.objects.map(obj => (
-        <p key={obj.getAttribute("name")}>
-          Use {obj.tagName.toLowerCase()}
-          {template.objects > 1 && ` for ${obj.getAttribute("name")}`}
-          {" from "}
-          {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && "field "}
-          <select onChange={updateValue(obj)} value={obj.getAttribute("value")?.replace(/^\$/, "")}>
-            {columns?.map(column => (
-              <option key={column} value={column}>
-                {column === DEFAULT_COLUMN ? "<imported file>" : `$${column}`}
-              </option>
-            ))}
-            {!columns?.length && (
-              <option value={obj.getAttribute("value")?.replace(/^\$/, "")}>{"<imported file>"}</option>
-            )}
-          </select>
-        </p>
+        <ConfigureColumn key={obj.getAttribute("name")} {...{ obj, template, columns }} />
       ))}
     </div>
   );
 };
 
-const Configurator = ({ columns, config, project, template, setTemplate, onBrowse, onSaveClick, onValidate, disableSaveButton }) => {
+const Configurator = ({ columns, config, project, template, setTemplate, onBrowse, onSaveClick, onValidate, disableSaveButton, warning }) => {
   const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState();
+  const [saved, setSaved] = React.useState(false);
+
+  // config update is debounced because of user input
   const [configToCheck, setConfigToCheck] = React.useState();
+  // then we wait for validation and sample data for this config
+  const [error, setError] = React.useState();
+  const [parserError, setParserError] = React.useState();
   const [data, setData] = React.useState();
+  const [loading, setLoading] = useState(false);
+  // and only with them we'll update config in preview
+  const [configToDisplay, setConfigToDisplay] = React.useState(config);
+
   const debounceTimer = React.useRef();
   const api = useAPI();
 
@@ -291,6 +338,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     setLoading(false);
     if (sample && !sample.error) {
       setData(sample.sample_task);
+      setConfigToDisplay(configToCheck);
     } else {
       // @todo validation can be done in this place,
       // @todo but for now it's extremely slow in /sample-task endpoint
@@ -298,7 +346,6 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     }
   }, [configToCheck]);
 
-  React.useEffect(() => { setError(null); }, [template, config]);
 
   // code should be reloaded on every render because of uncontrolled codemirror
   // visuals should be always rendered after first render
@@ -308,16 +355,54 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     if (value === "visual") loadVisual(true);
   };
 
+  const onChange = React.useCallback((config) => {
+    try {
+      setParserError(null);
+      setTemplate(config);
+    } catch(e) {
+      setParserError({
+        detail: `Parser error`,
+        validation_errors: [e.message],
+      });
+    }
+  }, [setTemplate]);
+
   const onSave = async () => {
     setError(null);
     setWaiting(true);
     const res = await onSaveClick();
 
     setWaiting(false);
-    if (res !== true) {
+
+    if (res === true) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+    } else {
       setError(res);
     }
   };
+
+  function completeAfter(cm, pred) {
+    if (!pred || pred()) {
+      setTimeout(function() {
+        if (!cm.state.completionActive)
+          cm.showHint({ completeSingle: false });
+      }, 100);
+    }
+    return CM.Pass;
+  }
+
+  function completeIfInTag(cm) {
+    return completeAfter(cm, function() {
+      const token = cm.getTokenAt(cm.getCursor());
+
+      if (token.type === "string" && (!/['"]$/.test(token.string) || token.string.length === 1)) return false;
+
+      const inner = CM.innerMode(cm.getMode(), token.state).state;
+
+      return inner.tagName;
+    });
+  }
 
   const extra = (
     <p className={configClass.elem('tags-link')}>
@@ -341,10 +426,27 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
               <CodeMirror
                 name="code"
                 id="edit_code"
-                value={formatXML(config)}
+                value={config}
+                autoCloseTags={true}
+                smartIndent={true}
                 detach
-                options={{ mode: "xml", theme: "default", lineNumbers: true }}
-                onChange={(editor, data, value) => setTemplate(value)}
+                extensions={["hint", "xml-hint"]}
+                options={{
+                  mode: "xml",
+                  theme: "default",
+                  lineNumbers: true,
+                  extraKeys: {
+                    "'<'": completeAfter,
+                    // "'/'": completeIfAfterLt,
+                    "' '": completeIfInTag,
+                    "'='": completeIfInTag,
+                    "Ctrl-Space": "autocomplete",
+                  },
+                  hintOptions: { schemaInfo: tags },
+                }}
+                // don't close modal with Escape while editing config
+                onKeyDown={(editor, e) => { if (e.code === 'Escape') e.stopPropagation(); }}
+                onChange={(editor, data, value) => onChange(value)}
               />
             </div>
           )}
@@ -359,18 +461,32 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
         </div>
         {disableSaveButton !== true && onSaveClick && (
           <Form.Actions size="small" extra={configure === "code" && extra} valid>
+            {saved && (
+              <Block name="form-indicator">
+                <Elem tag="span" mod={{ type: 'success' }} name="item">Saved!</Elem>
+              </Block>
+            )}
             <Button look="primary" size="compact" style={{ width: 120 }} onClick={onSave} waiting={waiting}>
-              Save
+              {waiting ? "Saving..." : "Save"}
             </Button>
           </Form.Actions>
         )}
       </div>
-      <Preview config={config} data={data} error={error} loading={loading} />
+      <Preview config={configToDisplay} data={data} loading={loading} error={parserError || error || (configure === "code" && warning)} />
     </div>
   );
 };
 
-export const ConfigPage = ({ config: initialConfig = "", columns: externalColumns, project, onUpdate, onSaveClick, onValidate, disableSaveButton, show = true }) => {
+export const ConfigPage = ({
+  config: initialConfig = "",
+  columns: externalColumns,
+  project,
+  onUpdate,
+  onSaveClick,
+  onValidate,
+  disableSaveButton,
+  show = true,
+}) => {
   const [config, _setConfig] = React.useState("");
   const [mode, setMode] = React.useState("list"); // view | list
   const [selectedGroup, setSelectedGroup] = React.useState(null);
@@ -395,7 +511,10 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
 
   React.useEffect(() => { if (externalColumns?.length) setColumns(externalColumns); }, [externalColumns]);
 
+  const [warning, setWarning] = React.useState();
+
   React.useEffect(async () => {
+    if (externalColumns) return; // we are in Create Project dialog, so this request is useless
     if (!project || columns) return;
     const res = await api.callApi("dataSummary", {
       params: { pk: project.id },
@@ -407,12 +526,6 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
       setColumns(res.common_data_columns);
     }
   }, [columns, project]);
-
-  React.useEffect(() => {
-    if (columns?.length && template) {
-      template.fixColumns(columns);
-    }
-  }, [columns, template]);
 
   const onSelectRecipe = React.useCallback(recipe => {
     if (!recipe) {
@@ -441,7 +554,7 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
 
   return (
     <div className={wizardClass} data-mode="list" id="config-wizard">
-      <Oneof value={mode}>
+      {mode ==="list" && (
         <TemplatesList
           case="list"
           selectedGroup={selectedGroup}
@@ -450,6 +563,8 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
           onSelectRecipe={onSelectRecipe}
           onCustomTemplate={onCustomTemplate}
         />
+      )}
+      {mode === "view" && (
         <Configurator
           case="view"
           columns={columns}
@@ -462,8 +577,9 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
           onValidate={onValidate}
           disableSaveButton={disableSaveButton}
           onSaveClick={onSaveClick}
+          warning={warning}
         />
-      </Oneof>
+      )}
     </div>
   );
 };

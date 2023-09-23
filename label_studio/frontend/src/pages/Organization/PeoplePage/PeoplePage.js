@@ -3,11 +3,13 @@ import { LsPlus } from "../../../assets/icons";
 import { Button } from "../../../components";
 import { Description } from "../../../components/Description/Description";
 import { Input } from "../../../components/Form";
+import { HeidiTips } from "../../../components/HeidiTips/HeidiTips";
 import { modal } from "../../../components/Modal/Modal";
 import { Space } from "../../../components/Space/Space";
 import { useAPI } from "../../../providers/ApiProvider";
 import { useConfig } from "../../../providers/ConfigProvider";
 import { Block, Elem } from "../../../utils/bem";
+import { FF_LSDV_E_297, isFF } from "../../../utils/feature-flags";
 import { copyText } from "../../../utils/helpers";
 import "./PeopleInvitation.styl";
 import { PeopleList } from "./PeopleList";
@@ -60,7 +62,7 @@ export const PeoplePage = () => {
     title: "Invite people",
     style: { width: 640, height: 472 },
     body: () => (
-      <InvitationModal link={link}/>
+      <InvitationModal link={link} />
     ),
     footer: () => {
       const [copied, setCopied] = useState(false);
@@ -114,7 +116,7 @@ export const PeoplePage = () => {
           <Space></Space>
 
           <Space>
-            <Button icon={<LsPlus/>} primary onClick={showInvitationModal}>
+            <Button icon={<LsPlus />} primary onClick={showInvitationModal}>
               Add People
             </Button>
           </Space>
@@ -127,11 +129,13 @@ export const PeoplePage = () => {
           onSelect={(user) => selectUser(user)}
         />
 
-        {selectedUser && (
+        {selectedUser ? (
           <SelectedUser
             user={selectedUser}
             onClose={() => selectUser(null)}
           />
+        ) : isFF(FF_LSDV_E_297) && (
+          <HeidiTips collection="organizationPage" />
         )}
       </Elem>
     </Block>

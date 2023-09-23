@@ -1,0 +1,22 @@
+<% const pageContainsHeadings = page.content.includes("<h2") %>
+<% const tocPageTypes = page.type === "guide" || page.type === "blog" || page.type === "templates" || page.type === "tags" %>
+
+<% const showToc = pageContainsHeadings && tocPageTypes %>
+
+<div class="notion-grid">
+  <div>
+    <% if(page.type && page.parent !== undefined) { %>
+      <%- breadcrumb({pageType: page.type, parentPage: page.parent, currentPage: page.title }) %>
+    <% } %>
+    <% if (page.title.trim()) { %>
+      <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
+    <% } %>
+    <div class="notion-toc">
+      <%- partial("component/text", {text: "In this article", tag: "h3", size: "Eyebrow"}) %>
+      <%- toc(page.content, {max_depth: 6, list_number: false, class: "toc-list"}) %>
+    </div>
+    <div class="content-markdown">
+      <%- page.content %>
+    </div>
+  </div>
+</div>
