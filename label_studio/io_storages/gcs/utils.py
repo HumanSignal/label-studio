@@ -39,7 +39,7 @@ class GCS(object):
         google_project_id: Optional[str] = None,
         google_application_credentials: Optional[Union[str, dict]] = None,
         bucket_name: Optional[str] = None,
-        ttl_hash=None,
+        ttl_hash: Optional[int] = None,
     ) -> gcs.Bucket:
 
         client = cls.get_client(
