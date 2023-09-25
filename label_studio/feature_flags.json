@@ -2202,6 +2202,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_optic_114_soft_delete_for_churned_employees": {
+      "key": "fflag_feat_all_optic_114_soft_delete_for_churned_employees",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "3524597ca06e446b949d5cad65db2cf0",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_back_dev_3756_queue_enrollment_min_short": {
       "key": "fflag_feat_back_dev_3756_queue_enrollment_min_short",
       "on": false,

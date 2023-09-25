@@ -576,6 +576,19 @@ def get_server_url(live_server):
     yield live_server.url
 
 
+@pytest.fixture(name='ff_front_dev_1682_model_version_dropdown_070622_short_off', autouse=True)
+def ff_front_dev_1682_model_version_dropdown_070622_short_off():
+    from core.feature_flags import flag_set
+
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'ff_front_dev_1682_model_version_dropdown_070622_short':
+            return False
+        return flag_set(*args, **kwargs)
+
+    with mock.patch('tasks.serializers.flag_set', wraps=fake_flag_set):
+        yield
+
+
 @pytest.fixture(name='async_import_off', autouse=True)
 def async_import_off():
     from core.feature_flags import flag_set
