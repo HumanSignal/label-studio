@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-554: [FE] Sometimes only a subset of Dataset tasks are displ…",
-  "commit": "ed0151f4aa9f39e88347a3eeaaf3b7a49513f9ee",
+  "message": "fix: DIA-554: [FE] Sometimes only a subset of Dataset tasks are displayed on Data Explorer open",
+  "commit": "0e4729916a190d2fe6a88b92ae1c298a8ad2ae3b",
   "branch": "fb-dia-554/scroll-threshold",
-  "date": "2023/09/22 12:33:53"
+  "date": "2023/09/25 13:18:25"
 }
