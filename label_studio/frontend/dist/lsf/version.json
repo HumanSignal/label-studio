@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5560: Fix plus and minus hotkeys",
-  "commit": "b8364087cad88f8db1136fe224e407a83034176c",
+  "commit": "ebe43e5633c0b1dce094df068ee1ad3d562d9e37",
   "branch": "fb-lsdv-5560/zoom-hotkeys",
-  "date": "2023/09/14 16:15:10"
+  "date": "2023/09/25 22:06:07"
 }
