@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
-  "commit": "688ba577fdc3a6b87ca24e94f27c7b2aac511b2a",
-  "branch": "master",
-  "date": "2023/09/22 11:06:17"
+  "message": "chore: 2.5.0 sync - OPTIC-109 and Azure Storages fix",
+  "commit": "eeab2cf199e7cfb8f2d116ef553d36a74cc5417f",
+  "branch": "fb-lse-release-2.5.0-sync",
+  "date": "2023/09/25 10:20:42"
 }
