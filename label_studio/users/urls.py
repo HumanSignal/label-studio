@@ -19,14 +19,18 @@ urlpatterns = [
     path('user/signup/', views.user_signup, name='user-signup'),
     path('user/account/', views.user_account, name='user-account'),
     url(r'^logout/?$', views.logout, name='logout'),
-    # avatars
-    re_path(
-        r'^data/' + settings.AVATAR_PATH + '/(?P<path>.*)$',
-        serve,
-        kwargs={'document_root': join(settings.MEDIA_ROOT, settings.AVATAR_PATH)},
-    ),
     # Token
     path('api/current-user/reset-token/', api.UserResetTokenAPI.as_view(), name='current-user-reset-token'),
     path('api/current-user/token', api.UserGetTokenAPI.as_view(), name='current-user-token'),
     path('api/current-user/whoami', api.UserWhoAmIAPI.as_view(), name='current-user-whoami'),
 ]
+
+if not settings.CLOUD_FILE_STORAGE_ENABLED:
+    urlpatterns += [
+        # avatars
+        re_path(
+            r'^data/' + settings.AVATAR_PATH + '/(?P<path>.*)$',
+            serve,
+            kwargs={'document_root': join(settings.MEDIA_ROOT, settings.AVATAR_PATH)},
+        ),
+    ]

@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os
 import uuid
 from time import time
 
@@ -33,9 +34,16 @@ def check_avatar(files):
     if w > max_width or h > max_height:
         raise forms.ValidationError('Please use an image that is %s x %s pixels or smaller.' % (max_width, max_height))
 
+    valid_extensions = ['jpeg', 'jpg', 'gif', 'png']
+
+    # check file extension
+    ext = os.path.splitext(filename)[1].lstrip('.').lower()
+    if ext not in valid_extensions:
+        raise forms.ValidationError('Please upload a valid image file with extensions: JPEG, JPG, GIF, or PNG.')
+
     # validate content type
     main, sub = avatar.content_type.split('/')
-    if not (main == 'image' and sub.lower() in ['jpeg', 'jpg', 'gif', 'png']):
+    if not (main == 'image' and sub.lower() in valid_extensions):
         raise forms.ValidationError('Please use a JPEG, GIF or PNG image.')
 
     # validate file size
