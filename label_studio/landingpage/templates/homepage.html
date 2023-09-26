@@ -70,7 +70,7 @@
             <tr>
                 <td>{{ project.name }}</td>
                 <td>{{ project.project_id }}</td>
-                <td><a href="{% url 'landingpage:landingpage' project.project_id %}">Go to project landingpage</a></td>
+                <td><a href="{% url 'landingpage:landingpage' project.project_id %}">Go to project page</a></td>
                 <td><a href="{% url 'landingpage:delete-project' project.project_id %}">[Delete]</a></td>
             </tr> 
            {% endfor %} 

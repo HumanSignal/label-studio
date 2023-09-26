@@ -226,7 +226,7 @@ export const Menubar = ({
                   exact
                 />
                 <Menu.Item
-                  label="Homepage"
+                  label="Dashboard"
                   to="/landingpage/homepage"
                   icon={<IconBook/>}
                   data-external
