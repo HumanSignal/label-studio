@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from organizations.models import Organization
 from rest_framework.authtoken.models import Token
 from users.functions import hash_upload
+from users.mixins import UserRelatedManagerMixin
 
 YEAR_START = 1980
 YEAR_CHOICES = []
@@ -23,7 +24,7 @@ for r in range(YEAR_START, (datetime.datetime.now().year + 1)):
 year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 
-class UserManager(BaseUserManager):
+class UserManager(UserRelatedManagerMixin, BaseUserManager):
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
