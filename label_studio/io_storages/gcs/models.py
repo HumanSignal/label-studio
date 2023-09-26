@@ -1,52 +1,48 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import json
+import logging
 
 from core.redis import start_job_async_or_sync
-from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.dispatch import receiver
+from django.db import models
 from django.db.models.signals import post_save
-
-from io_storages.gcs.utils import GCS
-from tasks.models import Annotation
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
     ImportStorage,
     ImportStorageLink,
-    ProjectStorageMixin
+    ProjectStorageMixin,
 )
+from io_storages.gcs.utils import GCS
+from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
 
 class GCSStorageMixin(models.Model):
-    bucket = models.TextField(
-        _('bucket'), null=True, blank=True,
-        help_text='GCS bucket name')
-    prefix = models.TextField(
-        _('prefix'), null=True, blank=True,
-        help_text='GCS bucket prefix')
+    bucket = models.TextField(_('bucket'), null=True, blank=True, help_text='GCS bucket name')
+    prefix = models.TextField(_('prefix'), null=True, blank=True, help_text='GCS bucket prefix')
     regex_filter = models.TextField(
-        _('regex_filter'), null=True, blank=True,
-        help_text='Cloud storage regex for filtering objects')
+        _('regex_filter'), null=True, blank=True, help_text='Cloud storage regex for filtering objects'
+    )
     use_blob_urls = models.BooleanField(
-        _('use_blob_urls'), default=False,
-        help_text='Interpret objects as BLOBs and generate URLs')
+        _('use_blob_urls'), default=False, help_text='Interpret objects as BLOBs and generate URLs'
+    )
     google_application_credentials = models.TextField(
-        _('google_application_credentials'), null=True, blank=True,
-        help_text='The content of GOOGLE_APPLICATION_CREDENTIALS json file')
-    google_project_id = models.TextField(
-        _('Google Project ID'), null=True, blank=True,
-        help_text='Google project ID')
+        _('google_application_credentials'),
+        null=True,
+        blank=True,
+        help_text='The content of GOOGLE_APPLICATION_CREDENTIALS json file',
+    )
+    google_project_id = models.TextField(_('Google Project ID'), null=True, blank=True, help_text='Google project ID')
 
     def get_client(self):
         return GCS.get_client(
             google_project_id=self.google_project_id,
-            google_application_credentials=self.google_application_credentials
+            google_application_credentials=self.google_application_credentials,
         )
 
     def get_bucket(self, client=None, bucket_name=None):
@@ -60,19 +56,16 @@ class GCSStorageMixin(models.Model):
             self.google_project_id,
             self.google_application_credentials,
             # we don't need to validate path for export storage, it will be created automatically
-            None if 'Export' in self.__class__.__name__ else self.prefix
+            None if 'Export' in self.__class__.__name__ else self.prefix,
         )
 
 
 class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
     url_scheme = 'gs'
 
-    presign = models.BooleanField(
-        _('presign'), default=True,
-        help_text='Generate presigned URLs')
+    presign = models.BooleanField(_('presign'), default=True, help_text='Generate presigned URLs')
     presign_ttl = models.PositiveSmallIntegerField(
-        _('presign_ttl'), default=1,
-        help_text='Presigned URLs TTL (in minutes)'
+        _('presign_ttl'), default=1, help_text='Presigned URLs TTL (in minutes)'
     )
 
     def iterkeys(self):
@@ -81,25 +74,22 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
             bucket_name=self.bucket,
             prefix=self.prefix,
             regex_filter=self.regex_filter,
-            return_key=True
+            return_key=True,
         )
 
     def get_data(self, key):
         if self.use_blob_urls:
             return {settings.DATA_UNDEFINED_NAME: GCS.get_uri(self.bucket, key)}
         return GCS.read_file(
-            client=self.get_client(),
-            bucket_name=self.bucket,
-            key=key,
-            convert_to=GCS.ConvertBlobTo.JSON_DICT
+            client=self.get_client(), bucket_name=self.bucket, key=key, convert_to=GCS.ConvertBlobTo.JSON_DICT
         )
-        
+
     def generate_http_url(self, url):
         return GCS.generate_http_url(
             url=url,
             google_application_credentials=self.google_application_credentials,
             google_project_id=self.google_project_id,
-            presign_ttl=self.presign_ttl
+            presign_ttl=self.presign_ttl,
         )
 
     def scan_and_create_links(self):
@@ -109,7 +99,7 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
         return GCS.get_blob_metadata(
             url=key,
             google_application_credentials=self.google_application_credentials,
-            google_project_id=self.google_project_id
+            google_project_id=self.google_project_id,
         )
 
     class Meta:
@@ -122,7 +112,6 @@ class GCSImportStorage(ProjectStorageMixin, GCSImportStorageBase):
 
 
 class GCSExportStorage(GCSStorageMixin, ExportStorage):
-
     def save_annotation(self, annotation):
         bucket = self.get_bucket()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')

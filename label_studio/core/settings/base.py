@@ -9,13 +9,13 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import json
+import logging
 import os
 import re
-import logging
-import json
-
 from datetime import timedelta
-from label_studio.core.utils.params import get_bool_env, get_env
+
+from label_studio.core.utils.params import get_bool_env
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -55,9 +55,9 @@ LOGGING = {
             # 'propagate': True,
         },
         'django_auth_ldap': {'level': os.environ.get('LOG_LEVEL', 'DEBUG')},
-        "rq.worker": {
-            "handlers": ["console"],
-            "level": os.environ.get('LOG_LEVEL', 'INFO'),
+        'rq.worker': {
+            'handlers': ['console'],
+            'level': os.environ.get('LOG_LEVEL', 'INFO'),
         },
         'ddtrace': {
             'handlers': ['console'],
@@ -75,7 +75,7 @@ if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 
 from label_studio.core.utils.io import get_data_dir
-from label_studio.core.utils.params import get_bool_env, get_env, get_env_list_int
+from label_studio.core.utils.params import get_bool_env, get_env
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -85,11 +85,11 @@ HOSTNAME = get_env('HOST', '')
 if HOSTNAME:
     if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
         logger.info(
-            "! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s", HOSTNAME
+            '! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s', HOSTNAME
         )
         HOSTNAME = ''
     else:
-        logger.info("=> Hostname correctly is set to: %s", HOSTNAME)
+        logger.info('=> Hostname correctly is set to: %s', HOSTNAME)
         if HOSTNAME.endswith('/'):
             HOSTNAME = HOSTNAME[0:-1]
 
@@ -100,12 +100,9 @@ if HOSTNAME:
             match = pattern.match(HOSTNAME)
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
-                logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
+                logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
 
 INTERNAL_PORT = '8080'
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
@@ -172,7 +169,7 @@ if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
             'client': client,
         }
         LOGGING['root']['handlers'].append('google_cloud_logging')
-    except GoogleAuthError as e:
+    except GoogleAuthError:
         logger.exception('Google Cloud Logging handler could not be setup.')
 
 INSTALLED_APPS = [
@@ -191,7 +188,6 @@ INSTALLED_APPS = [
     'rules',
     'annoying',
     'rest_framework',
-    'rest_framework_swagger',
     'rest_framework.authtoken',
     'drf_generators',
     'core',
@@ -242,7 +238,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100,
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination'
 }
-SILENCED_SYSTEM_CHECKS += ["rest_framework.W001"]
+SILENCED_SYSTEM_CHECKS += ['rest_framework.W001']
 
 # CORS & Host settings
 INTERNAL_IPS = [  # django debug toolbar for django==2.2 requirement
@@ -262,7 +258,10 @@ ALLOWED_HOSTS = ['*']
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
-AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend', ]
+AUTHENTICATION_BACKENDS = [
+    'rules.permissions.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
@@ -331,18 +330,16 @@ SWAGGER_SETTINGS = {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header',
-            'description':
-                'The token (or API key) must be passed as a request header. '
-                'You can find your user token on the User Account page in Label Studio. Example: '
-                '<br><pre><code class="language-bash">'
-                'curl https://label-studio-host/api/projects -H "Authorization: Token [your-token]"'
-                '</code></pre>'
+            'description': 'The token (or API key) must be passed as a request header. '
+            'You can find your user token on the User Account page in Label Studio. Example: '
+            '<br><pre><code class="language-bash">'
+            'curl https://label-studio-host/api/projects -H "Authorization: Token [your-token]"'
+            '</code></pre>',
         }
     },
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
     'OPERATIONS_SORTER': 'alpha',
-
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -446,6 +443,7 @@ os.makedirs(os.path.join(BASE_DATA_DIR, MEDIA_ROOT, DELAYED_EXPORT_DIR), exist_o
 
 # file / task size limits
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))
+DATA_UPLOAD_MAX_NUMBER_FILES = int(get_env('DATA_UPLOAD_MAX_NUMBER_FILES', 100))
 TASKS_MAX_NUMBER = 1000000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
@@ -522,6 +520,7 @@ TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
+RECALCULATE_ALL_STATS = None
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
@@ -555,16 +554,16 @@ WEBHOOK_SERIALIZERS = {
     'label_link': 'labels_manager.serializers.LabelLinkSerializer',
 }
 
-EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
+EDITOR_KEYMAP = json.dumps(get_env('EDITOR_KEYMAP'))
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes
 
-mimetypes.add_type("application/javascript", ".js", True)
-mimetypes.add_type("image/png", ".png", True)
+mimetypes.add_type('application/javascript', '.js', True)
+mimetypes.add_type('image/png', '.png', True)
 
 # fields name was used in DM api before
-REST_FLEX_FIELDS = {"FIELDS_PARAM": "include"}
+REST_FLEX_FIELDS = {'FIELDS_PARAM': 'include'}
 
 INTERPOLATE_KEY_FRAMES = get_env('INTERPOLATE_KEY_FRAMES', False)
 
@@ -595,7 +594,7 @@ BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
 
 FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
 FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
-STORAGE_IN_PROGRESS_TIMER = get_env('STORAGE_IN_PROGRESS_TIMER', 5.0)
+STORAGE_IN_PROGRESS_TIMER = float(get_env('STORAGE_IN_PROGRESS_TIMER', 5.0))
 
 USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)
 
@@ -612,7 +611,7 @@ if get_env('MINIO_STORAGE_ENDPOINT') and not get_bool_env('MINIO_SKIP', False):
     AWS_S3_URL_PROTOCOL = 'http:' if HOSTNAME.startswith('http://') else 'https:'
     AWS_S3_CUSTOM_DOMAIN = HOSTNAME.replace('http://', '').replace('https://', '') + '/data'
 
-if get_env('STORAGE_TYPE') == "s3":
+if get_env('STORAGE_TYPE') == 's3':
     CLOUD_FILE_STORAGE_ENABLED = True
     DEFAULT_FILE_STORAGE = 'core.storage.CustomS3Boto3Storage'
     if get_env('STORAGE_AWS_ACCESS_KEY_ID'):
@@ -631,7 +630,7 @@ if get_env('STORAGE_TYPE') == "s3":
     if AWS_S3_VERIFY == 'false' or AWS_S3_VERIFY == 'False' or AWS_S3_VERIFY == '0':
         AWS_S3_VERIFY = False
 
-if get_env('STORAGE_TYPE') == "azure":
+if get_env('STORAGE_TYPE') == 'azure':
     CLOUD_FILE_STORAGE_ENABLED = True
     DEFAULT_FILE_STORAGE = 'core.storage.CustomAzureStorage'
     AZURE_ACCOUNT_NAME = get_env('STORAGE_AZURE_ACCOUNT_NAME')
@@ -640,7 +639,7 @@ if get_env('STORAGE_TYPE') == "azure":
     AZURE_URL_EXPIRATION_SECS = int(get_env('STORAGE_AZURE_URL_EXPIRATION_SECS', '86400'))
     AZURE_LOCATION = get_env('STORAGE_AZURE_FOLDER', default='')
 
-if get_env('STORAGE_TYPE') == "gcs":
+if get_env('STORAGE_TYPE') == 'gcs':
     CLOUD_FILE_STORAGE_ENABLED = True
     # DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
     DEFAULT_FILE_STORAGE = 'core.storage.AlternativeGoogleCloudStorage'
@@ -652,7 +651,7 @@ if get_env('STORAGE_TYPE') == "gcs":
 
 CSRF_TRUSTED_ORIGINS = get_env('CSRF_TRUSTED_ORIGINS', [])
 if CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS.split(",")
+    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS.split(',')
 
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)

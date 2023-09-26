@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-348: Image should fit viewport regardless of its height",
-  "commit": "568c0be973c66f89e0407c99bfe7f8fbde4704ed",
+  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
+  "commit": "c9758b2fb911f789d6ba3c4b1dd8a44528eea5d0",
   "branch": "master",
-  "date": "2023/08/03 09:59:30"
+  "date": "2023/09/22 11:06:45"
 }

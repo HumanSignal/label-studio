@@ -1,9 +1,10 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from django.conf import settings
-from rest_framework import serializers
-from ml.models import MLBackend
 from core.utils.io import validate_upload_url
+from django.conf import settings
+from ml.models import MLBackend
+from rest_framework import serializers
+
 
 class MLBackendSerializer(serializers.ModelSerializer):
     def validate_url(self, value):
