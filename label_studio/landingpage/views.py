@@ -2,16 +2,41 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 import requests
 from .forms import CreateProject
+from .forms import CreateProject
 from rest_framework.authtoken.models import Token
+from projects.models import Project
+from .models import MainProject
+from django.http import HttpResponse
 from projects.models import Project
 from .models import MainProject
 from django.http import HttpResponse
 import json
 import zipfile
 
+from django.http import JsonResponse, HttpResponseNotFound
+from .models import MainProject
+
 def landingpage(request, project_id):
-    main_project = MainProject.objects.get(project_id=project_id)
+    try:
+        main_project = MainProject.objects.get(project_id=project_id)
+        # ... Your existing code for rendering the landing page ...
+    except MainProject.DoesNotExist:
+        # Handle the case where MainProject does not exist
+        while project_id > 1:
+            project_id -= 1
+            try:
+                main_project = MainProject.objects.get(project_id=project_id)
+                # ... Your existing code for rendering the landing page ...
+                break  # Exit the loop if a project is found
+            except MainProject.DoesNotExist:
+                continue  # Continue looping to try the previous project_id
+
+        if project_id == 1:
+            # Handle the case where no existing project is found
+            return HttpResponseNotFound('No existing project found for any project_id')
+
     return render(request, 'landingpage.html', {'main_project': main_project})
+
 
 def workinprogress(request, project_id):
     project = Project.objects.get(id=project_id)

@@ -64,7 +64,8 @@ def createannotationtask(request, project_id):
 
 
 def parse_subject_presence_annotations(request, project):
-    annotations = Annotation.objects.filter(project= project)
+    subj_anno_proj = Project.objects.get(id=project.id+1)
+    annotations = Annotation.objects.filter(project= subj_anno_proj)
     for annotation in annotations:
         file_upload = Task.objects.get(id=annotation.task_id).file_upload
         results= annotation.result
@@ -79,5 +80,3 @@ def parse_subject_presence_annotations(request, project):
                     SubjectPresence.objects.create(file_upload=file_upload,project=project,subject=subject,
                                                  start_time=start_time,end_time=end_time)
                 
-
-
