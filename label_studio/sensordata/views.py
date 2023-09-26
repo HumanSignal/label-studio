@@ -54,7 +54,7 @@ def addsensordata(request, project_id):
                             # Extract each file from the zip to a temporary location
                             temp_file_path = zip_ref.extract(file_name)
                             # Process the individual file
-                            process_sensor_file(request, temp_file_path, sensor, name, project)
+                            process_sensor_file(request, temp_file_path, sensor, file_name, project)
                             # Delete the temporary file
                             os.remove(temp_file_path)
                 
@@ -133,7 +133,7 @@ def parse_IMU(request, file_path, sensor, name, project):
     sensor_df = sensor_data.get_data()
     # Now that the sensordata has been parsed it has to be transformed back to a .csv file and uploaded to the correct project
     # Create NamedTemporary file of type csv
-    with NamedTemporaryFile(suffix='.csv', prefix=('IMU_sensor_'+ str(name)) ,mode='w', delete=False) as csv_file:
+    with NamedTemporaryFile(suffix='.csv', prefix=(str(name)) ,mode='w', delete=False) as csv_file:
         # Write the dataframe to the temporary file
         sensor_df.to_csv(csv_file.name, index=False)
         file_path=csv_file.name
