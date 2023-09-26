@@ -1,11 +1,10 @@
-from django.db import transaction
 from django.conf import settings
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-
+from django.db import transaction
 from organizations.models import Organization
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from users.models import User
 
 from .models import Label, LabelLink
@@ -18,9 +17,9 @@ class LabelListSerializer(serializers.ListSerializer):
         return items
 
     def create(self, validated_data):
-        ''' Bulk creation objects of Label model with related LabelLink
+        """Bulk creation objects of Label model with related LabelLink
         reusing already existing labels
-        '''
+        """
         from webhooks.utils import emit_webhooks_for_instance
 
         with transaction.atomic():
@@ -55,7 +54,6 @@ class LabelListSerializer(serializers.ListSerializer):
                 else:
                     created_labels = {label.title: label for label in Label.objects.bulk_create(labels_create)}
 
-
             # connect existing and created labels to project with LabelLink
             links = []
             result = []
@@ -82,7 +80,9 @@ class LabelListSerializer(serializers.ListSerializer):
             label_ids = [label.id for label in result]
             links = LabelLink.objects.filter(label_id__in=label_ids, project=project).all()
             if links:
-                emit_webhooks_for_instance(self.context['request'].user.active_organization, links[0].project, 'LABEL_LINK_CREATED', links)
+                emit_webhooks_for_instance(
+                    self.context['request'].user.active_organization, links[0].project, 'LABEL_LINK_CREATED', links
+                )
 
         return result
 
@@ -101,6 +101,7 @@ class LabelCreateSerializer(serializers.ModelSerializer):
 
 class LabelLinkSerializer(FlexFieldsModelSerializer):
     annotations_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = LabelLink
         fields = '__all__'

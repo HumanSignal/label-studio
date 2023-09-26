@@ -1,11 +1,9 @@
-import pytest
 from unittest import mock
 
+import pytest
+from data_import.uploader import check_tasks_max_file_size, load_tasks, validate_upload_url
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
-
-from core.utils.exceptions import InvalidUploadUrlError
-from data_import.uploader import load_tasks, check_tasks_max_file_size, validate_upload_url
 
 pytestmark = pytest.mark.django_db
 
@@ -18,11 +16,11 @@ class MockedRequest:
 
     @property
     def content_type(self):
-        return "application/x-www-form-urlencoded"
+        return 'application/x-www-form-urlencoded'
 
     @property
     def data(self):
-        return {"url": self.url}
+        return {'url': self.url}
 
     @property
     def user(self):
@@ -36,7 +34,7 @@ class TestUploader:
 
     class TestLoadTasks:
         @mock.patch('data_import.uploader.validate_upload_url', wraps=validate_upload_url)
-        @pytest.mark.parametrize("url", ("file:///etc/passwd", "ftp://example.org"))
+        @pytest.mark.parametrize('url', ('file:///etc/passwd', 'ftp://example.org'))
         def test_raises_for_unsafe_urls(self, validate_upload_url_mock, url, project):
             request = MockedRequest(url=url)
 
@@ -59,7 +57,7 @@ class TestUploader:
 
 
 class TestTasksFileChecks:
-    @pytest.mark.parametrize("value", (0, settings.TASKS_MAX_FILE_SIZE - 1))
+    @pytest.mark.parametrize('value', (0, settings.TASKS_MAX_FILE_SIZE - 1))
     def test_check_tasks_max_file_size_does_not_raise_for_correct_value(self, value):
         check_tasks_max_file_size(value)
 
@@ -69,11 +67,4 @@ class TestTasksFileChecks:
         with pytest.raises(ValidationError) as e:
             check_tasks_max_file_size(value)
 
-        correct_error_message = (
-            f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
-            f'current size is {value} bytes'
-        )
-        assert (
-            f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes'
-            in str(e.value)
-        )
+        assert f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes' in str(e.value)

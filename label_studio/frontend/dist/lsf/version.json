@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-14: Fixes for New Taxonomy",
-  "commit": "391591737ed2bbbb9af95e0d12e4ff6d3598dd0a",
+  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
+  "commit": "688ba577fdc3a6b87ca24e94f27c7b2aac511b2a",
   "branch": "master",
-  "date": "2023/08/29 20:03:40"
+  "date": "2023/09/22 11:06:17"
 }

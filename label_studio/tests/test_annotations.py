@@ -1,15 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
-import requests_mock
-import math
 
+import pytest
+import requests_mock
 from django.apps import apps
 from django.urls import reverse
-from tasks.models import Task, Annotation
 from projects.models import Project
-from .utils import invite_client_to_project, _client_is_annotator
+from tasks.models import Annotation, Task
+
+from .utils import _client_is_annotator, invite_client_to_project
 
 
 @pytest.fixture
@@ -22,11 +22,29 @@ def configured_project_min_annotations_1(configured_project):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('result, logtext, ml_upload_called', [
-    (json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'type': 'labels', 'value': {'labels': ['class_A'], 'start': 0, 'end': 1}}]), None, True),
-    (json.dumps([]), None, True),
-])
-def test_create_annotation(caplog, any_client, configured_project_min_annotations_1, result, logtext, ml_upload_called):
+@pytest.mark.parametrize(
+    'result, logtext, ml_upload_called',
+    [
+        (
+            json.dumps(
+                [
+                    {
+                        'from_name': 'text_class',
+                        'to_name': 'text',
+                        'type': 'labels',
+                        'value': {'labels': ['class_A'], 'start': 0, 'end': 1},
+                    }
+                ]
+            ),
+            None,
+            True,
+        ),
+        (json.dumps([]), None, True),
+    ],
+)
+def test_create_annotation(
+    caplog, any_client, configured_project_min_annotations_1, result, logtext, ml_upload_called
+):
     task = Task.objects.first()
     if _client_is_annotator(any_client):
         assert invite_client_to_project(any_client, task.project).status_code == 200
@@ -71,13 +89,17 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
     webhook_called = not client_is_annotator
     ground_truth = {
         'task': task.id,
-        'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'value': {'labels': ['class_A'], 'start': 0, 'end': 1}}]),
-        'ground_truth': True
+        'result': json.dumps(
+            [{'from_name': 'text_class', 'to_name': 'text', 'value': {'labels': ['class_A'], 'start': 0, 'end': 1}}]
+        ),
+        'ground_truth': True,
     }
 
     annotation = {
         'task': task.id,
-        'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'value': {'labels': ['class_B'], 'start': 0, 'end': 1}}])
+        'result': json.dumps(
+            [{'from_name': 'text_class', 'to_name': 'text', 'value': {'labels': ['class_B'], 'start': 0, 'end': 1}}]
+        ),
     }
 
     with requests_mock.Mocker() as m:
@@ -116,20 +138,31 @@ def annotations():
     return {
         'class_A': {
             'task': task.id,
-            'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'type': 'labels', 'value': {
-                'labels': ['class_A'], 'start': 0, 'end': 10
-            }}])
+            'result': json.dumps(
+                [
+                    {
+                        'from_name': 'text_class',
+                        'to_name': 'text',
+                        'type': 'labels',
+                        'value': {'labels': ['class_A'], 'start': 0, 'end': 10},
+                    }
+                ]
+            ),
         },
         'class_B': {
             'task': task.id,
-            'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'type': 'labels', 'value': {
-                'labels': ['class_B'], 'start': 0, 'end': 10
-            }}])
+            'result': json.dumps(
+                [
+                    {
+                        'from_name': 'text_class',
+                        'to_name': 'text',
+                        'type': 'labels',
+                        'value': {'labels': ['class_B'], 'start': 0, 'end': 10},
+                    }
+                ]
+            ),
         },
-        'empty': {
-            'task': task.id,
-            'result': json.dumps([])
-        }
+        'empty': {'task': task.id, 'result': json.dumps([])},
     }
 
 
@@ -140,35 +173,41 @@ def project_with_max_annotations_2(configured_project):
     configured_project.save()
 
 
-@pytest.mark.parametrize('annotations_sequence, accuracy, is_labeled', [
-    ([], None, False),
-    ([('class_A', 'business')], 1, False),
-    ([('class_A', 'annotator')], 1, False),
-    ([('class_A', 'business'), ('class_A', 'business')], 1, True),
-    ([('class_A', 'business'), ('class_A', 'annotator')], 1, True),
-    ([('class_A', 'annotator'), ('class_A', 'business')], 1, True),
-    ([('class_A', 'business'), ('class_B', 'business')], 0.5, True),
-    ([('class_A', 'business'), ('class_B', 'annotator')], 0.5, True),
-    ([('class_A', 'annotator'), ('class_B', 'business')], 0.5, True),
-    ([('empty', 'annotator'), ('empty', 'business')], 1, True),
-    ([('class_A', 'annotator'), ('empty', 'business')], 0.5, True)
-])
+@pytest.mark.parametrize(
+    'annotations_sequence, accuracy, is_labeled',
+    [
+        ([], None, False),
+        ([('class_A', 'business')], 1, False),
+        ([('class_A', 'annotator')], 1, False),
+        ([('class_A', 'business'), ('class_A', 'business')], 1, True),
+        ([('class_A', 'business'), ('class_A', 'annotator')], 1, True),
+        ([('class_A', 'annotator'), ('class_A', 'business')], 1, True),
+        ([('class_A', 'business'), ('class_B', 'business')], 0.5, True),
+        ([('class_A', 'business'), ('class_B', 'annotator')], 0.5, True),
+        ([('class_A', 'annotator'), ('class_B', 'business')], 0.5, True),
+        ([('empty', 'annotator'), ('empty', 'business')], 1, True),
+        ([('class_A', 'annotator'), ('empty', 'business')], 0.5, True),
+    ],
+)
 @pytest.mark.django_db
 def test_accuracy(
-        business_client, annotator_client, project_with_max_annotations_2, annotations, annotations_sequence,
-        accuracy, is_labeled
+    business_client,
+    annotator_client,
+    project_with_max_annotations_2,
+    annotations,
+    annotations_sequence,
+    accuracy,
+    is_labeled,
 ):
-    client = {
-        'business': business_client,
-        'annotator': annotator_client
-    }
+    client = {'business': business_client, 'annotator': annotator_client}
     task_id = next(iter(annotations.values()))['task']
     task = Task.objects.get(id=task_id)
     invite_client_to_project(annotator_client, task.project)
 
     for annotation_key, client_key in annotations_sequence:
         r = client[client_key].post(
-            reverse('tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotations[annotation_key])
+            reverse('tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotations[annotation_key]
+        )
         assert r.status_code == 201
     task = Task.objects.get(id=task_id)
     assert task.is_labeled == is_labeled
