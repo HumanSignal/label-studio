@@ -13,9 +13,7 @@ class SensorData(models.Model):
     sensor = models.ForeignKey(Sensor,on_delete=models.CASCADE, null=True)
 
 class SensorOffset(models.Model):
-    camera = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='SensorA_offsets')
-    imu = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='SensorB_offsets')
-    camera = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='Camera_offsets')
-    imu = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='Imu_offsets')
+    sensor_A = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='SensorA_offsets')
+    sensor_B = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='SensorB_offsets')
     offset = models.IntegerField(blank=True, null=True)
     offset_Date = models.DateTimeField(blank=True, null=True)

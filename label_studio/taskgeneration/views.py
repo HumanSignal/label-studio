@@ -22,15 +22,18 @@ from taskgeneration.models import SensorOverlap
 from taskgeneration.forms import TaskGenerationForm
 
 
-def task_generation_page(request,taskform):
-    taskgenerationform = taskform
-    return render(request, 'taskgeneration.html', {'taskgenerationform':taskgenerationform})
+def task_generation_page(request,project_id):
+    project = Project.objects.get(id=project_id)
+    columns_names_choices = request.session.get('choices', None)
+    taskform = TaskGenerationForm(column_names_choices=columns_names_choices)
+    return render(request, 'taskgeneration.html', {'taskgenerationform':taskform, 'project':project})
 
 def create_task_pairs(request, project, subject, sensortype_B):
+    subj_anno_proj = Project.objects.get(id=project.id+1)
     # Load data for given project and subject
     subject_presences = SubjectPresence.objects.filter(project=project, subject=subject)
     distinct_file_uploads = subject_presences.values('file_upload').distinct() # Get all unique files that contain subject
-    sensor_A_sensordata = SensorData.objects.filter(project=project,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
+    sensor_A_sensordata = SensorData.objects.filter(project=subj_anno_proj,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
     # Load IMU deployments in the project that contain the subject
     sensor_B_deployments = Deployment.objects.filter(project=project,subject=subject,sensor__sensortype__sensortype=sensortype_B.sensortype)
     sensor_B_sensordata = SensorData.objects.filter(sensor__in=sensor_B_deployments.values('sensor')) # find all sensordata (type B) that has a sensor in sensor_B_deployments
@@ -115,7 +118,7 @@ def create_annotation_data_chunks(request, project, subject, duration,column_nam
             amount_of_segments = int(longest_duration // duration) + (longest_duration % duration > 0)
             for i, segment in enumerate(range(amount_of_segments)):
                 # Determine start and end of segment in seconds for both sensors
-                if i == amount_of_segments: # Remaining segment
+                if i == amount_of_segments-1: # Remaining segment
                     begin_segment_A = longest_overlap.start_A+ duration*segment
                     end_segment_A = longest_overlap.end_A
                     begin_segment_B = longest_overlap.start_B+ duration*segment
@@ -139,7 +142,8 @@ def create_annotation_data_chunks(request, project, subject, duration,column_nam
                     "-to", str(end_segment_A),
                     "-c:v", "copy",
                     "-c:a", "copy",
-                    temp_video.name
+                    "-loglevel","quiet",
+                    temp_video.name,
                     ]
                     subprocess.run(ffmpeg_command, shell=True)
                     
@@ -185,9 +189,11 @@ def create_annotation_data_chunks(request, project, subject, duration,column_nam
 def generate_taskgen_form(request,project_id):
     project = Project.objects.get(id=project_id)
     parse_subject_presence_annotations(request= request,project=project)
+    
     fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
     sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
-    sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first()
+    sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
+
     if sensortype_B.sensortype == 'I':
         sensor_instance = Sensor.objects.filter(project=project,sensortype=sensortype_B).first()
         imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
@@ -197,17 +203,19 @@ def generate_taskgen_form(request,project_id):
         columns_names_choices = []
         for i, column_name in enumerate(column_names):
             columns_names_choices.append((i,column_name))
-        taskgenerationform = TaskGenerationForm(column_names_choices=columns_names_choices)
-        redirect(reverse('taskgeneration:taskgenerationpage',kwargs={'taskform':taskgenerationform}))
+        request.session['choices'] = columns_names_choices
+        return redirect('taskgeneration:taskgeneration_form', project_id=project_id)
     else:
-        # Not yet supported
-        pass    
+        return redirect(reverse('landingpage:workinprogess'))
+            
     
 
 def generate_activity_tasks(request,project_id):
     project = Project.objects.get(id=project_id)
     if request.method == 'POST':
-        taskgenerationform = TaskGenerationForm(request.POST)
+        column_choices = request.session['choices']
+        del request.session['choices']
+        taskgenerationform = TaskGenerationForm(request.POST,column_names_choices=column_choices)
         if taskgenerationform.is_valid():
             # Get data from Form
             subject = taskgenerationform.cleaned_data.get("subject")
@@ -215,11 +223,9 @@ def generate_activity_tasks(request,project_id):
             column_name = taskgenerationform.cleaned_data.get("column_name")
             fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
             sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
-            sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first()
+            sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
             # Fill VideoImuOverlap objects
             create_task_pairs(request= request,project=project, subject=subject,sensortype_B=sensortype_B)
             # Create annotation data chunks (video and imu), this automatically creates tasks
-            create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,column_name=column_name)
-                
-        overlap = SensorOverlap.objects.all()      
-    return render(request, 'showoverlap.html', {'overlap':overlap})    
+            create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,column_name=column_name)          
+    return redirect('landingpage:landingpage', project_id=project_id)    

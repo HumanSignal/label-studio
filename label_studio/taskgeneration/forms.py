@@ -14,9 +14,11 @@ class TaskGenerationForm_dead(forms.Form):
                                           label="Segment duration")
     
 class TaskGenerationForm(forms.Form):
-    def __init__(self, column_names_choices, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        column_names_choices = kwargs.pop('column_names_choices', None)
         super(TaskGenerationForm, self).__init__(*args, **kwargs)
-        self.fields['column_name'].choices = column_names_choices
+        if column_names_choices:
+            self.fields['column_name'].choices = column_names_choices
 
     subject = forms.ModelChoiceField(Subject.objects.all(),
                                      help_text="Choose the subject for which tasks should be generated",

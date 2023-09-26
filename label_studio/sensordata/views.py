@@ -36,7 +36,7 @@ def sensordatapage(request, project_id):
 def addsensordata(request, project_id):
     project = Project.objects.get(id=project_id)
     if request.method =='POST':
-        sensordataform = SensorDataForm(request.POST, request.FILES)
+        sensordataform = SensorDataForm(request.POST, request.FILES, project=project)
         if sensordataform.is_valid():
             # Get form data
             name = sensordataform.cleaned_data['name']
@@ -86,10 +86,6 @@ def offset(request, project_id):
     if request.method == 'POST':
         sensoroffsetform = SensorOffsetForm(request.POST)
         if sensoroffsetform.is_valid():
-            camera = sensoroffsetform.cleaned_data['camera']
-            imu = sensoroffsetform.cleaned_data['imu']
-            offset = sensoroffsetform.cleaned_data['offset']
-            offset_date = sensoroffsetform.cleaned_data['offset_Date']
             # create and save the new SensorOffset instance
             sensoroffsetform.save()
             # redirect to the offset view and pass the sensoroffset queryset to the context

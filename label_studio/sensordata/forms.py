@@ -11,13 +11,16 @@ class SensorDataForm(forms.Form):
 class SensorOffsetForm(forms.ModelForm):
     class Meta:
         model = SensorOffset
-        fields = ['camera', 'imu', 'offset', 'offset_Date']
+        fields = ['sensor_A', 'sensor_B', 'offset', 'offset_Date']
 
-    def __init__(self, project=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project', None)  # Remove 'project' from kwarg
         super().__init__(*args, **kwargs)
 
         # Filter camera choices to show only sensors with sensortype 'C'
-        self.fields['camera'].queryset = Sensor.objects.filter(sensortype__sensortype='C', project=project)
+        if project:
+            self.fields['sensor_A'].queryset = Sensor.objects.filter(project=project)
 
         # Filter imu choices to show only sensors with sensortype 'I'
-        self.fields['imu'].queryset = Sensor.objects.filter(sensortype__sensortype='I', project=project)
+        if project:
+            self.fields['sensor_B'].queryset = Sensor.objects.filter(project=project)
