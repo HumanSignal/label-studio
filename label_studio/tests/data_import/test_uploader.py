@@ -1,4 +1,5 @@
 from unittest import mock
+from unittest.mock import Mock
 
 import pytest
 from data_import.uploader import check_tasks_max_file_size, load_tasks, validate_upload_url
@@ -54,6 +55,21 @@ class TestUploader:
                 assert 'The provided URL was not valid.' in e.value
 
             validate_upload_url_mock.assert_called_once_with('http://0.0.0.0', block_local_urls=True)
+
+        def test_local_url_after_redirect(project, settings):
+            settings.SSRF_PROTECTION_ENABLED = True
+            request = MockedRequest(url='http://validurl.com')
+
+            # Mock the necessary parts of the response object
+            mock_response = Mock()
+            mock_response.raw._connection.sock.getpeername.return_value = ('127.0.0.1', 8080)
+
+            # Patch the requests.get call in the data_import.uploader module
+            with mock.patch('data_import.uploader.requests.get', return_value=mock_response), pytest.raises(
+                ValidationError
+            ) as e:
+                load_tasks(request, project)
+            assert 'The provided URL was not valid.' in str(e.value)
 
 
 class TestTasksFileChecks:

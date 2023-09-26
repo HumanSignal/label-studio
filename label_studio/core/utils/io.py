@@ -190,17 +190,26 @@ def validate_upload_url(url, block_local_urls=True):
 
         raise LabelStudioAPIException(f"Can't resolve hostname {domain}")
 
-    if not block_local_urls:
-        return
+    if block_local_urls:
+        validate_ip(ip)
+
+
+def validate_ip(ip):
+    """Checks if an IP is local/private.
+
+    :param ip: IP address to be checked.
+    """
 
     if ip == '0.0.0.0':  # nosec
         raise InvalidUploadUrlError
+
     local_subnets = [
         '127.0.0.0/8',
         '10.0.0.0/8',
         '172.16.0.0/12',
         '192.168.0.0/16',
     ]
+
     for subnet in local_subnets:
         if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
             raise InvalidUploadUrlError
