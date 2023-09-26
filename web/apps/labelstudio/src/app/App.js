@@ -1,10 +1,10 @@
-/* global APP_SETTINGS */
+/* global Sentry */
 
 import { createBrowserHistory } from 'history';
-import { StrictMode } from 'react';
-import * as ReactDOM from 'react-dom/client';
+import React from 'react';
+import { render } from 'react-dom';
 import { Router } from 'react-router-dom';
-import { initSentry } from '../config/Sentry';
+import { initSentry } from "../config/Sentry";
 import { ApiProvider } from '../providers/ApiProvider';
 import { AppStoreProvider } from '../providers/AppStoreProvider';
 import { ConfigProvider } from '../providers/ConfigProvider';
@@ -17,17 +17,17 @@ import { AsyncPage } from './AsyncPage/AsyncPage';
 import ErrorBoundary from './ErrorBoundary';
 import { RootPage } from './RootPage';
 
-const baseURL = new URL(APP_SETTINGS.hostname || window.location.origin);
+const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
 
 const browserHistory = createBrowserHistory({
-  basename: baseURL.pathname || '/',
+  basename: baseURL.pathname || "/",
 });
 
 window.LSH = browserHistory;
 
 initSentry(browserHistory);
 
-const App = ({ content }) => {
+const App = ({content}) => {
   const libraries = {
     lsf: {
       scriptSrc: window.EDITOR_JS,
@@ -44,18 +44,16 @@ const App = ({ content }) => {
   return (
     <ErrorBoundary>
       <Router history={browserHistory}>
-        <MultiProvider
-          providers={[
-            <AppStoreProvider key="app-store" />,
-            <ApiProvider key="api" />,
-            <ConfigProvider key="config" />,
-            <LibraryProvider key="lsf" libraries={libraries} />,
-            <RoutesProvider key="rotes" />,
-            <ProjectProvider key="project" />,
-          ]}
-        >
+        <MultiProvider providers={[
+          <AppStoreProvider key="app-store"/>,
+          <ApiProvider key="api"/>,
+          <ConfigProvider key="config"/>,
+          <LibraryProvider key="lsf" libraries={libraries}/>,
+          <RoutesProvider key="rotes"/>,
+          <ProjectProvider key="project"/>,
+        ]}>
           <AsyncPage>
-            <RootPage content={content} />
+            <RootPage content={content}/>
           </AsyncPage>
         </MultiProvider>
       </Router>
@@ -63,11 +61,7 @@ const App = ({ content }) => {
   );
 };
 
-const root = ReactDOM.createRoot(document.querySelector('.app-wrapper'));
+const root = document.querySelector('.app-wrapper');
 const content = document.querySelector('#main-content');
 
-root.render(
-  <StrictMode>
-    <App content={content.innerHTML} />
-  </StrictMode>
-);
+render(<App content={content.innerHTML}/>, root);

@@ -1,7 +1,7 @@
 import { FC } from "react";
+import { IconSpark } from "../../assets/icons";
 import { Block, Elem } from "../../utils/bem";
 import "./Enterprise.styl";
-import { IconSpark } from "../../assets/icons";
 
 export const EnterpriseBadge: FC<{
   filled?: boolean

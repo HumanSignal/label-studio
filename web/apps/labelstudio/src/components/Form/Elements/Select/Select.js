@@ -33,7 +33,7 @@ const Select = ({ label = undefined, className = undefined, options = [], valida
               value={value}
               onChange={(e) => {
                 setValue(e.target.value),
-                  props.onChange?.(e);
+                props.onChange?.(e);
               }}
               ref={ref}
               className={rootClass.elem('list')}

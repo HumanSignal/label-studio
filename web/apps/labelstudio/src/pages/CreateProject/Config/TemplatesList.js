@@ -41,18 +41,14 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
   const [templates, setTemplates] = React.useState();
   const api = useAPI();
 
-  React.useEffect(() => {
-    const asyncEffect = async () => {
-      const res = await api.callApi('configTemplates');
+  React.useEffect(async () => {
+    const res = await api.callApi('configTemplates');
 
-      if (!res) return;
-      const { templates, groups } = res;
+    if (!res) return;
+    const { templates, groups } = res;
 
-      setTemplates(templates);
-      setGroups(groups);
-    }
-
-    asyncEffect();
+    setTemplates(templates);
+    setGroups(groups);
   }, []);
 
   const selected = selectedGroup || groups[0];
@@ -83,7 +79,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
       </main>
       <footer>
         <IconInfo className={listClass.elem("info-icon")} width="20" height="20" />
-        See the documentation to <a href="https://labelstud.io/guide" target="_blank" rel="noreferrer">contribute a template</a>.
+        See the documentation to <a href="https://labelstud.io/guide" target="_blank">contribute a template</a>.
       </footer>
     </div>
   );
