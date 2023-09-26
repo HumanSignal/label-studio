@@ -16,6 +16,7 @@ class UserRelatedManagerMixin:
     @cached_property
     def get_all_field_names(self):
         return [field.name for field in self.model._meta.fields]
+
     def get_queryset(self):
         qs = super().get_queryset()
         if 'is_deleted' in self.get_all_field_names:
