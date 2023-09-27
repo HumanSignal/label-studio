@@ -4,54 +4,62 @@ import {
   createContext,
   createElement,
   CSSProperties,
-  DOMAttributes,
+  FC,
   forwardRef,
   FunctionComponent,
   ReactHTML,
   ReactSVG,
   useContext
 } from 'react';
-import { isDefined, isEmptyString } from './helpers';
 
 interface CNMod {
-  [key: string]: unknown
+  [key: string]: unknown;
 }
 
-interface CN {
-  block: (name: string) => CN
-  elem: (name: string) => CN
-  mod: (mods?: CNMod) => CN
-  mix: (...mix: CNMix[] | undefined[]) => CN
-  select: (root: Document | Element) => Element | null
-  selectAll: (root: Document | Element) => NodeList | null
-  closest: (target: Element) => Element | null
-  toString: () => string
-  toClassName: () => string
-  toCSSSelector: () => string
+export interface CN {
+  block: (name: string) => CN;
+  elem: (name: string) => CN;
+  mod: (mods?: CNMod) => CN;
+  mix: (...mix: CNMix[] | undefined[]) => CN;
+  select: (root: Document | Element) => Element | null;
+  selectAll: (root: Document | Element) => NodeList | null;
+  closest: (target: Element) => Element | null;
+  toString: () => string;
+  toClassName: () => string;
+  toCSSSelector: () => string;
 }
 
 type CNMix = string | CN | undefined
 
 interface CNOptions {
-  elem?: string,
-  mod?: Record<string, unknown>,
-  mix?: CNMix | CNMix[] | undefined | undefined
+  elem?: string;
+  mod?: Record<string, unknown>;
+  mix?: CNMix | CNMix[] | undefined | undefined;
 }
 
-type CNTagName = keyof ReactHTML | keyof ReactSVG | ComponentClass<unknown, unknown> | FunctionComponent<unknown> | string
+type ComponentType = FC<any> | ComponentClass<unknown, unknown> | FunctionComponent<unknown>
+type TagNameType = keyof ReactHTML | keyof ReactSVG | string
+type TagNames = keyof JSX.IntrinsicElements;
+type TagAttrs<T extends keyof JSX.IntrinsicElements> = JSX.IntrinsicElements[T];
 
-type CNComponentProps = {
-  name: string
-  tag?: CNTagName
-  block?: string
-  mod?: CNMod
-  mix?: CNMix | CNMix[]
-  className?: string
-  component?: CNTagName
-  style?: CSSProperties
-} & DOMAttributes<HTMLElement>
+export type CNTagName = ComponentType | TagNameType;
 
-export type BemComponent = FunctionComponent<CNComponentProps>
+type WrappedComponentProps<CN extends FC<any>, TN extends TagNames> = {
+  component?: CN,
+  tag?: TN | CN | string,
+} & {
+  name: string,
+  block?: string,
+  mod?: CNMod,
+  mix?: CNMix | CNMix[],
+  className?: string,
+  style?: CSSProperties,
+  component?: FC | CNTagName,
+} & ({
+  [key in keyof TagAttrs<TN>]: TagAttrs<TN>[key]
+} & {
+  [key in keyof Parameters<CN>[0]]: Parameters<CN>[0][key]
+})
 
 const CSS_PREFIX = process.env.CSS_PREFIX ?? 'dm-';
 
@@ -84,7 +92,13 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
     const mixes = Array.isArray(mix) ? mix : [mix];
     const mixMap = ([] as CNMix[])
       .concat(...mixes)
-      .filter(m => isDefined(m) && m !== "")
+      .filter(m => {
+        if (typeof m === 'string') {
+          return m.trim() !== '';
+        } else {
+          return m !== undefined && m !== null;
+        }
+      })
       .map(m => {
         if (typeof m === 'string') {
           return m;
@@ -94,7 +108,7 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
       })
       .reduce((res, cls) => [...res, ...cls!.split(/\s+/)], [] as string[]);
 
-    finalClass.push(...mixMap);
+    finalClass.push(...Array.from(new Set(mixMap)));
   }
 
   const attachNamespace = (cls: string) => {
@@ -102,7 +116,7 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
     else return `${CSS_PREFIX}${cls}`;
   };
 
-  return finalClass.filter(cls => !isEmptyString(cls)).map(attachNamespace).join(" ");
+  return finalClass.map(attachNamespace).join(' ');
 };
 
 const BlockContext = createContext<CN | null>(null);
@@ -126,8 +140,8 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
       return cn(block ?? blockName, { elem, mix, mod: stateOverride });
     },
 
-    mix(...mixes) {
-      return cn(block, { elem, mix: mixes, mod });
+    mix(...mix) {
+      return cn(block, { elem, mix, mod });
     },
 
     select(root = document) {
@@ -163,38 +177,47 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
   Object.defineProperty(classNameBuilder, 'Block', { value: Block });
   Object.defineProperty(classNameBuilder, 'Elem', { value: Elem });
   Object.defineProperty(classNameBuilder, '__class', { value: {
-    block,
-    elem,
-    mix,
-    mod,
-  } });
+      block,
+      elem,
+      mix,
+      mod,
+    } });
 
   return classNameBuilder;
 };
 
-export const BemWithSpecifiContext = (context: Context<CN | null>) => {
-  const LocalContext = context ?? createContext<CN|null>(null);
+export const BemWithSpecifiContext = (context?: Context<CN | null>) => {
+  const Context = context ?? createContext<CN|null>(null);
 
-  const Block: BemComponent = forwardRef(({ tag = 'div', name, mod, mix, ...rest }, ref) => {
+  const Block = forwardRef(<T extends FC<any>, D extends TagNames>({
+                                                                     tag = 'div',
+                                                                     name,
+                                                                     mod,
+                                                                     mix,
+                                                                     ...rest
+                                                                   }: WrappedComponentProps<T, D>, ref: any) => {
     const rootClass = cn(name);
-    const finalMix = ([] as [ CNMix? ]).concat(mix).filter(cnm => !!cnm);
+    const finalMix = ([] as [ CNMix? ]).concat(mix).filter(cn => !!cn);
     const className = rootClass.mod(mod).mix(...(finalMix as CNMix[]), rest.className).toClassName();
     const finalProps = { ...rest, ref, className } as any;
 
-    return (
-      <LocalContext.Provider value={rootClass}>
-        {createElement(tag, finalProps)}
-      </LocalContext.Provider>
-    );
+    return createElement(Context.Provider, {
+      value: rootClass,
+    }, createElement(tag, finalProps));
   });
 
-  Block.displayName = 'Block';
+  const Elem = forwardRef(<T extends FC<any>, D extends TagNames>({
+                                                                    tag = 'div',
+                                                                    component,
+                                                                    block,
+                                                                    name,
+                                                                    mod,
+                                                                    mix,
+                                                                    ...rest
+                                                                  }: WrappedComponentProps<T, D>, ref: any) => {
+    const blockCtx = useContext(Context);
 
-  const Elem: BemComponent = forwardRef(({ component, block, name, mod, mix, ...rest }, ref) => {
-    const blockCtx = useContext(LocalContext);
-
-    const finalMix = ([] as [ CNMix? ]).concat(mix).filter(cnm => !!cnm);
-    const finalTag = rest.tag ?? 'div';
+    const finalMix = ([] as [ CNMix? ]).concat(mix).filter(cn => !!cn);
 
     const className = (block ? cn(block) : blockCtx)!
       .elem(name)
@@ -204,15 +227,21 @@ export const BemWithSpecifiContext = (context: Context<CN | null>) => {
 
     const finalProps: any = { ...rest, ref, className };
 
-    if (typeof finalTag !== 'string') finalProps.block = blockCtx;
+    if (typeof tag !== 'string') finalProps.block = blockCtx;
+    if (component) finalProps.tag = tag;
 
-    return createElement(component ?? finalTag, finalProps);
+    return createElement(component ?? tag, finalProps);
   });
+
+  Block.displayName = 'Block';
 
   Elem.displayName = 'Elem';
 
-  return { Block, Elem, Context: LocalContext };
+  return { Block, Elem, Context };
 };
 
 export const { Block, Elem } = BemWithSpecifiContext(BlockContext);
 
+export const useBEM = () => {
+  return useContext(BlockContext)!;
+};
