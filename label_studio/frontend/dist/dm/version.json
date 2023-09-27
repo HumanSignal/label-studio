@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-198: [FE] 'txt' option is missing in data_type dropdown",
-  "commit": "46a69312a72aaf5b9553fa9e5f078a15def871a6",
+  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
+  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
   "branch": "master",
-  "date": "2023/09/15 16:25:07"
+  "date": "2023/09/26 10:39:21"
 }
