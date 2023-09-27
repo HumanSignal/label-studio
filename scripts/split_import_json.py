@@ -1,8 +1,8 @@
-""" This script splits IMPORT json with array into CHUNKS.
-    This can be useful to avoid problems with a large json file during the import step.
+"""This script splits IMPORT json with array into CHUNKS.
+This can be useful to avoid problems with a large json file during the import step.
 """
-import sys
 import json
+import sys
 
 INPUT = 'import.json' if len(sys.argv) <= 1 else sys.argv[1]
 OUTPUT = 'output' if len(sys.argv) <= 2 else sys.argv[2]
@@ -21,9 +21,9 @@ if __name__ == '__main__':
     count = 0
     while start < len(j):
         filename = OUTPUT + str(count) + '.json'
-        print(filename, '<=', INPUT, '[', start, ':', start+chunk_size, ']')
+        print(filename, '<=', INPUT, '[', start, ':', start + chunk_size, ']')
         with open(filename, 'w') as out:
-            json.dump(j[start:start+chunk_size], out)
+            json.dump(j[start : start + chunk_size], out)
 
         start += chunk_size
         count += 1

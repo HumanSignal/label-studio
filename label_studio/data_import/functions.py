@@ -1,23 +1,26 @@
 import logging
-import traceback
 import time
+import traceback
+from typing import Callable, Optional
 
-from django.db import transaction
-
-from projects.models import ProjectImport, ProjectReimport
-from .serializers import ImportApiSerializer
-from .uploader import load_tasks_for_async_import
-from users.models import User
 from core.utils.common import load_func
 from django.conf import settings
-from webhooks.utils import emit_webhooks_for_instance
+from django.db import transaction
+from projects.models import ProjectImport, ProjectReimport
+from users.models import User
 from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
+
 from .models import FileUpload
+from .serializers import ImportApiSerializer
+from .uploader import load_tasks_for_async_import
 
 logger = logging.getLogger(__name__)
 
 
-def async_import_background(import_id, user_id, **kwargs):
+def async_import_background(
+    import_id, user_id, recalculate_stats_func: Optional[Callable[..., None]] = None, **kwargs
+):
     with transaction.atomic():
         try:
             project_import = ProjectImport.objects.get(id=import_id)
@@ -40,7 +43,7 @@ def async_import_background(import_id, user_id, **kwargs):
     tasks, file_upload_ids, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
 
     if project_import.preannotated_from_fields:
-        # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
+        # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]
         tasks = reformat_predictions(tasks, project_import.preannotated_from_fields)
 
     if project_import.commit_to_project:
@@ -55,10 +58,21 @@ def async_import_background(import_id, user_id, **kwargs):
         prediction_count = len(serializer.db_predictions)
         # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
         # single operation as counters affect bulk is_labeled update
-        project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
-                                                      overlap_cohort_percentage_changed=False,
-                                                      tasks_number_changed=True)
-        logger.info('Tasks bulk_update finished')
+
+        recalculate_stats_counts = {
+            'task_count': task_count,
+            'annotation_count': annotation_count,
+            'prediction_count': prediction_count,
+        }
+
+        project.update_tasks_counters_and_task_states(
+            tasks_queryset=tasks,
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True,
+            recalculate_stats_counts=recalculate_stats_counts,
+        )
+        logger.info('Tasks bulk_update finished (async import)')
 
         project.summary.update_data_columns(tasks)
         # TODO: project.summary.update_created_annotations_and_labels
@@ -84,13 +98,10 @@ def async_import_background(import_id, user_id, **kwargs):
     project_import.save()
 
 
-
 def set_import_background_failure(job, connection, type, value, _):
     import_id = job.args[0]
     ProjectImport.objects.filter(id=import_id).update(
-        status=ProjectImport.Status.FAILED,
-        traceback=traceback.format_exc(),
-        error=str(value)
+        status=ProjectImport.Status.FAILED, traceback=traceback.format_exc(), error=str(value)
     )
 
 
@@ -109,11 +120,9 @@ def reformat_predictions(tasks, preannotated_from_fields):
         if 'data' in task:
             task = task['data']
         predictions = [{'result': task.pop(field)} for field in preannotated_from_fields]
-        new_tasks.append({
-            'data': task,
-            'predictions': predictions
-        })
+        new_tasks.append({'data': task, 'predictions': predictions})
     return new_tasks
+
 
 post_process_reimport = load_func(settings.POST_PROCESS_REIMPORT)
 
@@ -135,7 +144,8 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
     project = reimport.project
 
     tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
-        reimport.project, reimport.file_upload_ids,  files_as_tasks_list=reimport.files_as_tasks_list)
+        reimport.project, reimport.file_upload_ids, files_as_tasks_list=reimport.files_as_tasks_list
+    )
 
     with transaction.atomic():
         project.remove_tasks_by_file_uploads(reimport.file_upload_ids)
@@ -144,20 +154,33 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
         tasks = serializer.save(project_id=project.id)
         emit_webhooks_for_instance(organization_id, project, WebhookAction.TASKS_CREATED, tasks)
 
+    task_count = len(tasks)
+    annotation_count = len(serializer.db_annotations)
+    prediction_count = len(serializer.db_predictions)
+
+    recalculate_stats_counts = {
+        'task_count': task_count,
+        'annotation_count': annotation_count,
+        'prediction_count': prediction_count,
+    }
+
     # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
     # single operation as counters affect bulk is_labeled update
     project.update_tasks_counters_and_task_states(
-        tasks_queryset=tasks, maximum_annotations_changed=False,
+        tasks_queryset=tasks,
+        maximum_annotations_changed=False,
         overlap_cohort_percentage_changed=False,
-        tasks_number_changed=True)
-    logger.info('Tasks bulk_update finished')
+        tasks_number_changed=True,
+        recalculate_stats_counts=recalculate_stats_counts,
+    )
+    logger.info('Tasks bulk_update finished (async reimport)')
 
     project.summary.update_data_columns(tasks)
     # TODO: project.summary.update_created_annotations_and_labels
 
-    reimport.task_count = len(tasks)
-    reimport.annotation_count = len(serializer.db_annotations)
-    reimport.prediction_count = len(serializer.db_predictions)
+    reimport.task_count = task_count
+    reimport.annotation_count = annotation_count
+    reimport.prediction_count = prediction_count
     reimport.found_formats = found_formats
     reimport.data_columns = list(data_columns)
     reimport.status = ProjectReimport.Status.COMPLETED

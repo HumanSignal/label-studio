@@ -5,7 +5,7 @@
   force = true
 
 [[redirects]]
-  from = "https://docs.heartex.com/api/*"
+  from = "https://docs.humansignal.com/api/*"
   to = "https://app.heartex.com/docs/api/:splat"
   status = 301
   force = true

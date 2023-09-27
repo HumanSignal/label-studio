@@ -17,7 +17,7 @@ Install Label Studio on premises or in the cloud. Choose the installation method
 - [Install with Anaconda](#Install-with-Anaconda)
 - [Upgrade Label Studio](#Upgrade-Label-Studio)
 
-Label Studio is also available an [enterprise product](https://heartex.com/), which you can explore instantly through a [free trial](https://heartex.com/free-trial).
+Label Studio is also available an [enterprise product](https://heartex.com/), which you can explore instantly through a [free trial](https://humansignal.com/free-trial).
 
 <!-- md deploy.md -->
 
@@ -66,14 +66,13 @@ To install Label Studio with Brew, you need to have Brew package manager install
 Execute the following command to add the Heartexlabs tap:
 
 ```bash
-brew tap heartexlabs/tap
+brew tap humansignal/tap
 ```
 
 Execute the following command to install Label Studio:
 
 ```bash
-brew install heartexlabs/tap/label-studio
-
+brew install humansignal/tap/label-studio
 ```
 
 After you install Label Studio, initiate the server using the following command:
@@ -83,6 +82,9 @@ label-studio
 ```
 
 The default web browser will automatically open at [http://localhost:8080](http://localhost:8080) with Label Studio. Please refer to [start Label Studio](start.html) for more options when starting Label Studio.
+
+!!! note
+    If you've previously installed the brew tap from the now-deprecated organization name `heartexlabs/tap`, we've got good news. You don't have to worry about migrating immediately. The deprecated tap has been set up as a mirror for `humansignal/tap`. This ensures continuity and minimizes disruptions for existing users.
 
 ## Install with Docker
 

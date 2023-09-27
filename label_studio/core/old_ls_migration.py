@@ -1,29 +1,26 @@
-import pathlib
 import contextlib
 import datetime
-import os
 import io
 import json
+import os
+import pathlib
 
-
-from tasks.models import Task, Annotation, Prediction
-from projects.models import Project
-from data_import.models import FileUpload
 from core.utils.io import get_data_dir
-from data_manager.models import View, FilterGroup, Filter
-from django.core.files.base import File
-from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
-from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExportStorage
-from io_storages.s3.models import S3ImportStorage, S3ExportStorage
-from io_storages.redis.models import RedisImportStorage, RedisExportStorage
-from ml.models import MLBackend
 from core.utils.params import get_env
+from data_import.models import FileUpload
+from data_manager.models import Filter, FilterGroup, View
+from django.core.files.base import File
+from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImportStorage
+from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
+from io_storages.redis.models import RedisExportStorage, RedisImportStorage
+from io_storages.s3.models import S3ExportStorage, S3ImportStorage
+from ml.models import MLBackend
+from tasks.models import Annotation, Prediction, Task
 
 
 @contextlib.contextmanager
 def suppress_autotime(model, fields):
-    """ allow to keep original created_at value for auto_now_add=True field
-    """
+    """allow to keep original created_at value for auto_now_add=True field"""
     _original_values = {}
     for field in model._meta.local_fields:
         if field.name in fields:
@@ -40,7 +37,7 @@ def suppress_autotime(model, fields):
 
 
 def _migrate_tasks(project_path, project):
-    """ Migrate tasks from json file to database objects"""
+    """Migrate tasks from json file to database objects"""
     tasks_path = project_path / 'tasks.json'
     with io.open(os.path.abspath(tasks_path), encoding='utf-8') as t:
         tasks_data = json.load(t)
@@ -69,7 +66,12 @@ def _migrate_tasks(project_path, project):
             # migrate predictions
             predictions_data = task_data.get('predictions', [])
             for prediction in predictions_data:
-                task_prediction = Prediction(result=prediction['result'], task=task, score=prediction.get('score'))
+                task_prediction = Prediction(
+                    result=prediction['result'],
+                    task=task,
+                    score=prediction.get('score'),
+                    project=task.project,
+                )
                 with suppress_autotime(task_prediction, ['created_at']):
                     task_prediction.created_at = datetime.datetime.fromtimestamp(
                         prediction['created_at'], tz=datetime.datetime.now().astimezone().tzinfo
@@ -94,14 +96,14 @@ def _migrate_tabs(project_path, project):
                 filters = tab.pop('filters', None)
                 if filters is not None:
                     filter_group = FilterGroup.objects.create(conjunction=filters.get('conjunction', 'and'))
-                    if "items" in filters:
-                        for f in filters["items"]:
+                    if 'items' in filters:
+                        for f in filters['items']:
                             view_filter = Filter.objects.create(
                                 **{
-                                    "column": f.get("filter", ""),
-                                    "operator": f.get("operator", ""),
-                                    "type": f.get("type", ""),
-                                    "value": f.get("value", {}),
+                                    'column': f.get('filter', ''),
+                                    'operator': f.get('operator', ''),
+                                    'type': f.get('type', ''),
+                                    'value': f.get('value', {}),
                                 }
                             )
                             filter_group.filters.add(view_filter)
@@ -240,4 +242,3 @@ def migrate_existing_project(project_path, project, config):
     _migrate_storages(project, config)
     _migrate_ml_backends(project, config)
     _migrate_uploaded_files(project, project_path)
-

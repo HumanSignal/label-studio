@@ -1,13 +1,73 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from django.urls import path, include
-
-from .s3.api import *
-from .azure_blob.api import *
-from .gcs.api import *
-from .redis.api import *
-from .localfiles.api import *
-from .all_api import *
+from django.conf import settings
+from django.urls import include, path
+from io_storages.all_api import (
+    AllExportStorageListAPI,
+    AllExportStorageTypesAPI,
+    AllImportStorageListAPI,
+    AllImportStorageTypesAPI,
+)
+from io_storages.azure_blob.api import (
+    AzureBlobExportStorageDetailAPI,
+    AzureBlobExportStorageFormLayoutAPI,
+    AzureBlobExportStorageListAPI,
+    AzureBlobExportStorageSyncAPI,
+    AzureBlobExportStorageValidateAPI,
+    AzureBlobImportStorageDetailAPI,
+    AzureBlobImportStorageFormLayoutAPI,
+    AzureBlobImportStorageListAPI,
+    AzureBlobImportStorageSyncAPI,
+    AzureBlobImportStorageValidateAPI,
+)
+from io_storages.gcs.api import (
+    GCSExportStorageDetailAPI,
+    GCSExportStorageFormLayoutAPI,
+    GCSExportStorageListAPI,
+    GCSExportStorageSyncAPI,
+    GCSExportStorageValidateAPI,
+    GCSImportStorageDetailAPI,
+    GCSImportStorageFormLayoutAPI,
+    GCSImportStorageListAPI,
+    GCSImportStorageSyncAPI,
+    GCSImportStorageValidateAPI,
+)
+from io_storages.localfiles.api import (
+    LocalFilesExportStorageDetailAPI,
+    LocalFilesExportStorageFormLayoutAPI,
+    LocalFilesExportStorageListAPI,
+    LocalFilesExportStorageSyncAPI,
+    LocalFilesExportStorageValidateAPI,
+    LocalFilesImportStorageDetailAPI,
+    LocalFilesImportStorageFormLayoutAPI,
+    LocalFilesImportStorageListAPI,
+    LocalFilesImportStorageSyncAPI,
+    LocalFilesImportStorageValidateAPI,
+)
+from io_storages.redis.api import (
+    RedisExportStorageDetailAPI,
+    RedisExportStorageFormLayoutAPI,
+    RedisExportStorageListAPI,
+    RedisExportStorageSyncAPI,
+    RedisExportStorageValidateAPI,
+    RedisImportStorageDetailAPI,
+    RedisImportStorageFormLayoutAPI,
+    RedisImportStorageListAPI,
+    RedisImportStorageSyncAPI,
+    RedisImportStorageValidateAPI,
+)
+from io_storages.s3.api import (
+    S3ExportStorageDetailAPI,
+    S3ExportStorageFormLayoutAPI,
+    S3ExportStorageListAPI,
+    S3ExportStorageSyncAPI,
+    S3ExportStorageValidateAPI,
+    S3ImportStorageDetailAPI,
+    S3ImportStorageFormLayoutAPI,
+    S3ImportStorageListAPI,
+    S3ImportStorageSyncAPI,
+    S3ImportStorageValidateAPI,
+)
 
 app_name = 'storages'
 
