@@ -25,6 +25,8 @@ urlpatterns = [
     path('api/current-user/whoami', api.UserWhoAmIAPI.as_view(), name='current-user-whoami'),
 ]
 
+# When CLOUD_FILE_STORAGE_ENABLED is set, avatars are uploaded to cloud storage with a different URL pattern.
+# This local serving pattern is unnecessary for environments with cloud storage enabled.
 if not settings.CLOUD_FILE_STORAGE_ENABLED:
     urlpatterns += [
         # avatars
