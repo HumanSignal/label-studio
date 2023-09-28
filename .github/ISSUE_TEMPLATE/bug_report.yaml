@@ -1,0 +1,47 @@
+name: Bug Report
+description: File a bug report
+title: 'bug: '
+labels: 'issue: bug'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to fill out this bug report. To help us address this issue effectively, please provide us with the following information. Anything you can provide to help us to reproduce the issue will make it easier to verify and solve the underlying problem.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What appened?
+      description: Please give us a concise description of the problem, and what you expected to happen.
+      placeholder: Something unexpected happened!
+  - type: textarea
+    id: ls-version
+    attributes:
+      label: What version of Label Studio are you using?
+      placeholder: 1.x.y
+  - type: textarea
+    id: ls-host
+    attributes:
+      label: What environment are you hosting Label Studio in?
+      description: Which OS are you using? Did you install with pip or Docker? Local or cloud?
+      placeholder: OS, installation method, cloud/local
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: What are the steps to reproduce the bug?
+      description: You can also attach screenshots that demonstrate the issue.
+      placeholder: Go to ..., click on ..., scroll down to ...
+  - type: textarea
+    id: labeling-configuration
+    attributes:
+      label: Your labeling configuration
+      description: Please include your labeling configuration
+      placeholder: <view></view>
+  - type: textarea
+    id: stacktrack
+    attributes
+      label: Error stacktrace
+      description: Did Label Studio give you a stacktrace? Please copy and paste it here.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Is there any other context or information you'd like to share?
