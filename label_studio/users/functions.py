@@ -24,7 +24,7 @@ def check_avatar(files):
     if not images:
         return None
 
-    filename, avatar = list(files.items())[0]  # get first file
+    _, avatar = list(files.items())[0]  # get first file
     w, h = get_image_dimensions(avatar)
     if not w or not h:
         raise forms.ValidationError("Can't read image, try another one")
@@ -36,6 +36,7 @@ def check_avatar(files):
 
     valid_extensions = ['jpeg', 'jpg', 'gif', 'png']
 
+    filename = avatar.name
     # check file extension
     ext = os.path.splitext(filename)[1].lstrip('.').lower()
     if ext not in valid_extensions:
