@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
-  "commit": "688ba577fdc3a6b87ca24e94f27c7b2aac511b2a",
+  "message": "fix: LSDV-5560: Fix plus and minus hotkeys",
+  "commit": "d34cf03f9e80085857f228c6766ec1f76b0e7770",
   "branch": "master",
-  "date": "2023/09/22 11:06:17"
+  "date": "2023/09/28 15:09:56"
 }
