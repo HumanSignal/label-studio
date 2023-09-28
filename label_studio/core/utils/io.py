@@ -194,7 +194,7 @@ def validate_upload_url(url, block_local_urls=True):
         validate_ip(ip)
 
 
-def validate_ip(ip):
+def validate_ip(ip: str) -> None:
     """Checks if an IP is local/private.
 
     :param ip: IP address to be checked.
