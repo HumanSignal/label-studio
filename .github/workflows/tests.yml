@@ -75,7 +75,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
+          python -m pip install --upgrade pip setuptools
+          pip install --upgrade cython
+          pip install -U pip==20.2
           pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
           pip install -e .
 
@@ -214,7 +216,7 @@ jobs:
 
       - name: Install pip dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
+          pip install -U pip==20.2
           pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
           pip install -e .
 
@@ -265,8 +267,8 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.10'
-          - '3.11'
+          - '3.8'
+          - '3.9'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -304,7 +306,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
+          python -m pip install --upgrade pip setuptools
+          pip install --upgrade cython
           if (Test-Path -Path '.\deploy\requirements.txt' -PathType Leaf)
           {pip install -r deploy\requirements.txt}
           if (Test-Path -Path '.\deploy\requirements-test.txt' -PathType Leaf)
