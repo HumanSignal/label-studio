@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
-  "commit": "688ba577fdc3a6b87ca24e94f27c7b2aac511b2a",
-  "branch": "master",
-  "date": "2023/09/22 11:06:17"
+  "message": "feat: DEV-3132: improve Brush experience on iPad [test2]",
+  "commit": "7a873f6a1d53602fd094bf62c4b9e14c6ce44614",
+  "branch": "fb-dev-3132-brush-ipad",
+  "date": "2023/09/23 01:50:57"
 }
