@@ -55,4 +55,5 @@ const getVersion = () => {
   return version ? version : process.env.RELEASE_NAME;
 };
 
+// @ts-ignore
 export const SentryRoute = ReactSentry.withSentryRouting(Route);

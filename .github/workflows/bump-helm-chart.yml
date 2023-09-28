@@ -33,7 +33,7 @@ jobs:
           git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: "${{ github.repository_owner }}/${{ env.HELM_CHART_REPO_NAME }}"
           token: ${{ secrets.GIT_PAT }}

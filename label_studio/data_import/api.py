@@ -1,50 +1,47 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import base64
-import time
-import requests
-import logging
-import drf_yasg.openapi as openapi
 import json
+import logging
 import mimetypes
+import time
+from urllib.parse import unquote, urlparse
 
-
+import drf_yasg.openapi as openapi
+from core.feature_flags import flag_set
+from core.permissions import ViewClassPermission, all_permissions
+from core.redis import start_job_async_or_sync
+from core.utils.common import retry_database_locked, timeit
+from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
+from core.utils.params import bool_from_request, list_of_strings_from_request
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect
-from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
+from projects.models import Project, ProjectImport, ProjectReimport
+from ranged_fileresponse import RangedFileResponse
 from rest_framework import generics, status
-from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 from rest_framework.views import APIView
-from urllib.parse import unquote, urlparse
-from ranged_fileresponse import RangedFileResponse
-
-from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import retry_database_locked, timeit
-from core.utils.params import list_of_strings_from_request, bool_from_request
-from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
-from core.redis import start_job_async_or_sync
-from core.feature_flags import flag_set
+from tasks.models import Prediction, Task
 from users.models import User
-from projects.models import Project, ProjectImport, ProjectReimport
-from tasks.models import Task, Prediction
-from .uploader import load_tasks, create_file_uploads
-from .serializers import ImportApiSerializer, FileUploadSerializer, PredictionSerializer
-from .models import FileUpload
+from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
+
 from .functions import (
     async_import_background,
-    set_import_background_failure,
-    reformat_predictions,
     async_reimport_background,
+    reformat_predictions,
+    set_import_background_failure,
     set_reimport_background_failure,
 )
-
-from webhooks.utils import emit_webhooks_for_instance
-from webhooks.models import WebhookAction
+from .models import FileUpload
+from .serializers import FileUploadSerializer, ImportApiSerializer, PredictionSerializer
+from .uploader import create_file_uploads, load_tasks
 
 logger = logging.getLogger(__name__)
 
@@ -58,59 +55,52 @@ task_create_response_scheme = {
             type=openapi.TYPE_OBJECT,
             properties={
                 'task_count': openapi.Schema(
-                    title='task_count',
-                    description='Number of tasks added',
-                    type=openapi.TYPE_INTEGER
+                    title='task_count', description='Number of tasks added', type=openapi.TYPE_INTEGER
                 ),
                 'annotation_count': openapi.Schema(
-                    title='annotation_count',
-                    description='Number of annotations added',
-                    type=openapi.TYPE_INTEGER
+                    title='annotation_count', description='Number of annotations added', type=openapi.TYPE_INTEGER
                 ),
                 'predictions_count': openapi.Schema(
-                    title='predictions_count',
-                    description='Number of predictions added',
-                    type=openapi.TYPE_INTEGER
+                    title='predictions_count', description='Number of predictions added', type=openapi.TYPE_INTEGER
                 ),
                 'duration': openapi.Schema(
-                    title='duration',
-                    description='Time in seconds to create',
-                    type=openapi.TYPE_NUMBER
+                    title='duration', description='Time in seconds to create', type=openapi.TYPE_NUMBER
                 ),
                 'file_upload_ids': openapi.Schema(
                     title='file_upload_ids',
                     description='Database IDs of uploaded files',
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(title="File Upload IDs", type=openapi.TYPE_INTEGER)
+                    items=openapi.Schema(title='File Upload IDs', type=openapi.TYPE_INTEGER),
                 ),
                 'could_be_tasks_list': openapi.Schema(
                     title='could_be_tasks_list',
                     description='Whether uploaded files can contain lists of tasks, like CSV/TSV files',
-                    type=openapi.TYPE_BOOLEAN
+                    type=openapi.TYPE_BOOLEAN,
                 ),
                 'found_formats': openapi.Schema(
                     title='found_formats',
                     description='The list of found file formats',
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(title="File format", type=openapi.TYPE_STRING)
+                    items=openapi.Schema(title='File format', type=openapi.TYPE_STRING),
                 ),
                 'data_columns': openapi.Schema(
                     title='data_columns',
                     description='The list of found data columns',
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(title="Data column name", type=openapi.TYPE_STRING)
-                )
-            })
+                    items=openapi.Schema(title='Data column name', type=openapi.TYPE_STRING),
+                ),
+            },
+        ),
     ),
     400: openapi.Schema(
-        title='Incorrect task data',
-        description="String with error description",
-        type=openapi.TYPE_STRING
-    )
+        title='Incorrect task data', description='String with error description', type=openapi.TYPE_STRING
+    ),
 }
 
 
-@method_decorator(name='post', decorator=swagger_auto_schema(
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
         tags=['Import'],
         responses=task_create_response_scheme,
         manual_parameters=[
@@ -118,7 +108,8 @@ task_create_response_scheme = {
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.'),
+                description='A unique integer value identifying this project.',
+            ),
         ],
         operation_summary='Import tasks',
         operation_description="""
@@ -172,8 +163,11 @@ task_create_response_scheme = {
             ```
 
             <br>
-        """.format(host=(settings.HOSTNAME or 'https://localhost:8080'))
-    ))
+        """.format(
+            host=(settings.HOSTNAME or 'https://localhost:8080')
+        ),
+    ),
+)
 # Import
 class ImportAPI(generics.CreateAPIView):
     permission_required = all_permissions.projects_change
@@ -197,7 +191,9 @@ class ImportAPI(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         task_instances = serializer.save(project_id=self.kwargs['pk'])
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
-        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, task_instances)
+        emit_webhooks_for_instance(
+            self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, task_instances
+        )
         return task_instances, serializer
 
     def sync_import(self, request, project, preannotated_from_fields, commit_to_project, return_task_ids):
@@ -208,7 +204,7 @@ class ImportAPI(generics.CreateAPIView):
         parsed_data, file_upload_ids, could_be_tasks_list, found_formats, data_columns = load_tasks(request, project)
 
         if preannotated_from_fields:
-            # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
+            # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]
             parsed_data = reformat_predictions(parsed_data, preannotated_from_fields)
 
         if commit_to_project:
@@ -226,9 +222,13 @@ class ImportAPI(generics.CreateAPIView):
 
             # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
             # single operation as counters affect bulk is_labeled update
-            project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
-                                                          overlap_cohort_percentage_changed=False,
-                                                          tasks_number_changed=True, recalculate_stats_counts=recalculate_stats_counts)
+            project.update_tasks_counters_and_task_states(
+                tasks_queryset=tasks,
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True,
+                recalculate_stats_counts=recalculate_stats_counts,
+            )
             logger.info('Tasks bulk_update finished (sync import)')
 
             project.summary.update_data_columns(parsed_data)
@@ -249,7 +249,7 @@ class ImportAPI(generics.CreateAPIView):
             'file_upload_ids': file_upload_ids,
             'could_be_tasks_list': could_be_tasks_list,
             'found_formats': found_formats,
-            'data_columns': data_columns
+            'data_columns': data_columns,
         }
         if tasks and return_task_ids:
             response['task_ids'] = [task.id for task in tasks]
@@ -303,9 +303,7 @@ class ImportAPI(generics.CreateAPIView):
             organization_id=request.user.active_organization.id,
         )
 
-        response = {
-            "import": project_import.id
-        }
+        response = {'import': project_import.id}
         return Response(response, status=status.HTTP_201_CREATED)
 
     def create(self, request, *args, **kwargs):
@@ -316,8 +314,10 @@ class ImportAPI(generics.CreateAPIView):
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
 
-        if (flag_set('fflag_feat_all_lsdv_4915_async_task_import_13042023_short', request.user) and
-            settings.VERSION_EDITION != 'Community'):
+        if (
+            flag_set('fflag_feat_all_lsdv_4915_async_task_import_13042023_short', request.user)
+            and settings.VERSION_EDITION != 'Community'
+        ):
             return self.async_import(request, project, preannotated_from_fields, commit_to_project, return_task_ids)
         else:
             return self.sync_import(request, project, preannotated_from_fields, commit_to_project, return_task_ids)
@@ -337,20 +337,25 @@ class ImportPredictionsAPI(generics.CreateAPIView):
 
         tasks_ids = set(Task.objects.filter(project=project).values_list('id', flat=True))
 
-        logger.debug(f'Importing {len(self.request.data)} predictions to project {project} with {len(tasks_ids)} tasks')
+        logger.debug(
+            f'Importing {len(self.request.data)} predictions to project {project} with {len(tasks_ids)} tasks'
+        )
         predictions = []
         for item in self.request.data:
             if item.get('task') not in tasks_ids:
                 raise LabelStudioValidationErrorSentryIgnored(
                     f'{item} contains invalid "task" field: corresponding task ID couldn\'t be retrieved '
-                    f'from project {project} tasks')
-            predictions.append(Prediction(
-                task_id=item['task'],
-                project_id=project.id,
-                result=Prediction.prepare_prediction_result(item.get('result'), project),
-                score=item.get('score'),
-                model_version=item.get('model_version', 'undefined')
-            ))
+                    f'from project {project} tasks'
+                )
+            predictions.append(
+                Prediction(
+                    task_id=item['task'],
+                    project_id=project.id,
+                    result=Prediction.prepare_prediction_result(item.get('result'), project),
+                    score=item.get('score'),
+                    model_version=item.get('model_version', 'undefined'),
+                )
+            )
         predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
         project.update_tasks_counters(Task.objects.filter(id__in=tasks_ids))
         return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
@@ -425,7 +430,7 @@ class ReImportAPI(ImportAPI):
             project_id=project.id,
         )
 
-        response = {"reimport": project_reimport.id}
+        response = {'reimport': project_reimport.id}
         return Response(response, status=status.HTTP_201_CREATED)
 
     @retry_database_locked()
@@ -454,7 +459,9 @@ class ReImportAPI(ImportAPI):
             flag_set('fflag_fix_all_lsdv_4971_async_reimport_09052023_short', request.user)
             and settings.VERSION_EDITION != 'Community'
         ):
-            return self.async_reimport(project, file_upload_ids, files_as_tasks_list, request.user.active_organization_id)
+            return self.async_reimport(
+                project, file_upload_ids, files_as_tasks_list, request.user.active_organization_id
+            )
         else:
             return self.sync_reimport(project, file_upload_ids, files_as_tasks_list)
 
@@ -479,28 +486,32 @@ class ReImportAPI(ImportAPI):
                 name='all',
                 type=openapi.TYPE_BOOLEAN,
                 in_=openapi.IN_QUERY,
-                description='Set to "true" if you want to retrieve all file uploads'),
+                description='Set to "true" if you want to retrieve all file uploads',
+            ),
             openapi.Parameter(
                 name='ids',
                 type=openapi.TYPE_ARRAY,
                 in_=openapi.IN_QUERY,
-                items=openapi.Schema(title="File upload ID", type=openapi.TYPE_INTEGER),
-                description='Specify the list of file upload IDs to retrieve, e.g. ids=[1,2,3]'),
+                items=openapi.Schema(title='File upload ID', type=openapi.TYPE_INTEGER),
+                description='Specify the list of file upload IDs to retrieve, e.g. ids=[1,2,3]',
+            ),
         ],
         operation_description="""
         Retrieve the list of uploaded files used to create labeling tasks for a specific project.
-        """
-        ))
-@method_decorator(name='delete', decorator=swagger_auto_schema(
+        """,
+    ),
+)
+@method_decorator(
+    name='delete',
+    decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Delete files',
         operation_description="""
         Delete uploaded files for a specific project.
-        """
-        ))
-class FileUploadListAPI(generics.mixins.ListModelMixin,
-                        generics.mixins.DestroyModelMixin,
-                        generics.GenericAPIView):
+        """,
+    ),
+)
+class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyModelMixin, generics.GenericAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = FileUploadSerializer
     permission_required = ViewClassPermission(
@@ -525,7 +536,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user),  pk=self.kwargs['pk'])
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         ids = self.request.data.get('file_upload_ids')
         if ids is None:
             deleted, _ = FileUpload.objects.filter(project=project).delete()
@@ -536,24 +547,34 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
         return Response({'deleted': deleted}, status=status.HTTP_200_OK)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Get file upload',
-        operation_description='Retrieve details about a specific uploaded file.'
-    ))
-@method_decorator(name='patch', decorator=swagger_auto_schema(
+        operation_description='Retrieve details about a specific uploaded file.',
+    ),
+)
+@method_decorator(
+    name='patch',
+    decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Update file upload',
         operation_description='Update a specific uploaded file.',
-        request_body=FileUploadSerializer
-    ))
-@method_decorator(name='delete', decorator=swagger_auto_schema(
+        request_body=FileUploadSerializer,
+    ),
+)
+@method_decorator(
+    name='delete',
+    decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Delete file upload',
-        operation_description='Delete a specific uploaded file.'))
+        operation_description='Delete a specific uploaded file.',
+    ),
+)
 class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     serializer_class = FileUploadSerializer
     queryset = FileUpload.objects.all()
 
@@ -572,7 +593,7 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UploadedFileResponse(generics.RetrieveAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
@@ -596,15 +617,14 @@ class UploadedFileResponse(generics.RetrieveAPIView):
 
 
 class DownloadStorageData(APIView):
-    """ Check auth for nginx auth_request
-    """
+    """Check auth for nginx auth_request"""
+
     swagger_schema = None
     http_method_names = ['get']
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        """ Get export files list
-        """
+        """Get export files list"""
         request = self.request
         filepath = request.GET.get('filepath')
         if filepath is None:
@@ -640,15 +660,14 @@ class DownloadStorageData(APIView):
 
 
 class PresignStorageData(APIView):
-    """ A file proxy to presign storage urls.
-    """
+    """A file proxy to presign storage urls."""
+
     swagger_schema = None
     http_method_names = ['get']
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        """ Get the presigned url for a given fileuri
-        """
+        """Get the presigned url for a given fileuri"""
         request = self.request
         task_id = kwargs.get('task_id')
         fileuri = request.GET.get('fileuri')
@@ -690,6 +709,6 @@ class PresignStorageData(APIView):
 
         # Proxy to presigned url
         response = HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
-        response.headers['Cache-Control'] = f"no-store, max-age={max_age}"
+        response.headers['Cache-Control'] = f'no-store, max-age={max_age}'
 
         return response

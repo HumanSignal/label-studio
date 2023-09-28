@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.urls import include, path
-
 from organizations import api, views
 
 app_name = 'organizations'
@@ -27,10 +26,8 @@ _api_urlpattens = [
 urlpatterns = [
     path('organization/', views.simple_view, name='organization-simple'),
     path('organization/webhooks', views.simple_view, name='organization-simple-webhooks'),
-
     path('people/', include(_urlpatterns)),
     path('api/organizations/', include((_api_urlpattens, app_name), namespace='api')),
-
     # invite
     path('api/invite', api.OrganizationInviteAPI.as_view(), name='organization-invite'),
     path('api/invite/reset-token', api.OrganizationResetTokenAPI.as_view(), name='organization-reset-token'),

@@ -6,8 +6,8 @@ pyyaml>=5.3.1
 azure-storage-blob>=12.6.0
 
 boto~=2.49.0
-boto3~=1.16.28
-botocore~=1.19.28
+boto3==1.16.28
+botocore==1.19.28
 bleach~=5.0.0
 
 google-api-core==2.11.0
@@ -31,13 +31,12 @@ django_model_utils==4.1.1
 django_rq==2.5.1
 django-cors-headers==3.6.0
 django-extensions==3.1.0
-django-rest-swagger==2.2.0
 django-user-agents==0.4.0
 django-ranged-fileresponse>=0.1.2
 drf_dynamic_fields==0.3.0
 djangorestframework==3.13.1
 drf-flex-fields==0.9.5
-drf_yasg==1.20.0
+drf-yasg @ https://github.com/HumanSignal/drf-yasg/releases/download/1.21.7/drf_yasg-1.21.8.dev1+gda9d765-py3-none-any.whl
 drf-generators==0.3.0
 htmlmin==0.1.12
 jsonschema==3.2.0
@@ -47,10 +46,10 @@ defusedxml>=0.7.1
 numpy==1.24.3
 ordered_set==4.0.2
 pandas>=0.24.0
-protobuf>=3.15.5
+protobuf>=3.15.5,<4.0.0
 psycopg2-binary==2.9.6
 pydantic>=1.7.3,<=1.11.0
-python_dateutil==2.8.1
+python_dateutil>=2.8.1
 pytz ~=2022.1
 requests==2.31.0
 urllib3==1.26.16
