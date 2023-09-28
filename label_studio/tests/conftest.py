@@ -270,9 +270,43 @@ def mock_s3_resource_aes(mocker):
 
     mock_s3_resource = MagicMock()
     mock_s3_resource.Object = mock_object_constructor
+    resource = boto3.Session.resource
 
     # Patch boto3.Session.resource to return the mock s3 resource
     mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
+
+    yield
+
+    boto3.Session.resource = resource
+
+
+def mock_put_kms(*args, **kwargs):
+    if (
+        'ServerSideEncryption' not in kwargs
+        or kwargs['ServerSideEncryption'] != 'aws:kms'
+        or 'SSEKMSKeyId' not in kwargs
+    ):
+        raise ClientError(
+            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
+        )
+
+
+@pytest.fixture()
+def mock_s3_resource_kms(mocker):
+    mock_object = MagicMock()
+    mock_object.put = mock_put_kms
+
+    mock_object_constructor = MagicMock()
+    mock_object_constructor.return_value = mock_object
+
+    mock_s3_resource = MagicMock()
+    mock_s3_resource.Object = mock_object_constructor
+    resource = boto3.Session.resource
+    mocker.patch('boto3.Session.resource', new=MagicMock(return_value=mock_s3_resource))
+
+    yield
+
+    boto3.Session.resource = resource
 
 
 @pytest.fixture(autouse=True)
