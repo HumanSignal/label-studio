@@ -27,6 +27,7 @@ setuptools.setup(
     author_email='hello@heartex.ai',
     description='Label Studio annotation tool',
     long_description=long_description,
+    license_files=('LICENSE',),
     long_description_content_type='text/markdown',
     url='https://github.com/heartexlabs/label-studio',
     packages=setuptools.find_packages(),
