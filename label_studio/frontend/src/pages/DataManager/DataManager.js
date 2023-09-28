@@ -119,6 +119,12 @@ export const DataManagerPage = ({ ...props }) => {
       toast.show({ message, type });
     });
 
+    dataManager.on("navigate", (route) => {
+      const target = route.replace(/^projects/, "");
+
+      history.push(buildLink(target, { id: params.id }));
+    });
+
     if (interactiveBacked) {
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
