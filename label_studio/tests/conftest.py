@@ -304,7 +304,6 @@ def mock_s3_resource_kms(mocker):
     patcher.stop()
 
 
-
 @pytest.fixture(autouse=True)
 def gcs_client():
     with gcs_client_mock():
