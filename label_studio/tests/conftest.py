@@ -296,12 +296,12 @@ def mock_s3_resource_kms(mocker):
 
     mock_s3_resource = MagicMock()
     mock_s3_resource.Object = mock_object_constructor
-
-    patcher = mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
+    resource = boto3.Session.resource
+    mocker.patch('boto3.Session.resource', new=MagicMock(return_value=mock_s3_resource))
 
     yield
 
-    patcher.stop()
+    boto3.Session.resource = resource
 
 
 @pytest.fixture(autouse=True)
