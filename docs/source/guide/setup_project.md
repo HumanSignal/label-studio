@@ -88,7 +88,7 @@ Select how you want to distribute tasks to annotators for labeling. Different fr
 Your changes save automatically.
 
 !!! note
-You can't assign annotators to tasks unless you select the **Manual** option.
+    You can't assign annotators to tasks unless you select the **Manual** option.
 
 </div>
 
