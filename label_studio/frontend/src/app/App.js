@@ -12,22 +12,32 @@ import { LibraryProvider } from '../providers/LibraryProvider';
 import { MultiProvider } from '../providers/MultiProvider';
 import { ProjectProvider } from '../providers/ProjectProvider';
 import { RoutesProvider } from '../providers/RoutesProvider';
+import { DRAFT_GUARD_KEY, DraftGuard, draftGuardCallback } from "../components/DraftGuard/DraftGuard";
 import './App.styl';
 import { AsyncPage } from './AsyncPage/AsyncPage';
 import ErrorBoundary from './ErrorBoundary';
 import { RootPage } from './RootPage';
+import { FF_OPTIC_2, isFF } from '../utils/feature-flags';
+import { ToastProvider, ToastViewport } from '../components/Toast/Toast';
 
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
 
 const browserHistory = createBrowserHistory({
   basename: baseURL.pathname || "/",
+  getUserConfirmation: (message, callback) => {
+    if (isFF(FF_OPTIC_2) && message === DRAFT_GUARD_KEY) {
+      draftGuardCallback.current = callback;
+    } else {
+      callback(window.confirm(message));
+    }
+  },
 });
 
 window.LSH = browserHistory;
 
 initSentry(browserHistory);
 
-const App = ({content}) => {
+const App = ({ content }) => {
   const libraries = {
     lsf: {
       scriptSrc: window.EDITOR_JS,
@@ -51,9 +61,12 @@ const App = ({content}) => {
           <LibraryProvider key="lsf" libraries={libraries}/>,
           <RoutesProvider key="rotes"/>,
           <ProjectProvider key="project"/>,
+          <ToastProvider key="toast"/>,
         ]}>
           <AsyncPage>
+            <DraftGuard />
             <RootPage content={content}/>
+            <ToastViewport />
           </AsyncPage>
         </MultiProvider>
       </Router>
