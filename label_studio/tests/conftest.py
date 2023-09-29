@@ -270,14 +270,10 @@ def mock_s3_resource_aes(mocker):
 
     mock_s3_resource = MagicMock()
     mock_s3_resource.Object = mock_object_constructor
-    resource = boto3.Session.resource
 
     # Patch boto3.Session.resource to return the mock s3 resource
-    mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
-
-    yield
-
-    boto3.Session.resource = resource
+    with mocker.patch('boto3.Session.resource', return_value=mock_s3_resource) as mock_resource:
+        yield mock_resource
 
 
 def mock_put_kms(*args, **kwargs):
@@ -301,12 +297,8 @@ def mock_s3_resource_kms(mocker):
 
     mock_s3_resource = MagicMock()
     mock_s3_resource.Object = mock_object_constructor
-    resource = boto3.Session.resource
-    mocker.patch('boto3.Session.resource', new=MagicMock(return_value=mock_s3_resource))
-
-    yield
-
-    boto3.Session.resource = resource
+    with mocker.patch('boto3.Session.resource', new=MagicMock(return_value=mock_s3_resource)) as mock_resource:
+        yield mock_resource
 
 
 @pytest.fixture(autouse=True)
