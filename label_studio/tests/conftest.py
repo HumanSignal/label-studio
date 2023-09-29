@@ -27,8 +27,6 @@ from users.models import User
 
 from label_studio.core.utils.params import get_env
 
-BOTO_SESSION_RESOURCE = boto3.Session.resource
-
 # if we haven't this package, pytest.ini::env doesn't work
 try:
     import pytest_env.plugin  # noqa: F401
@@ -264,7 +262,6 @@ def mock_put_aes(*args, **kwargs):
 
 @pytest.fixture()
 def mock_s3_resource_aes(mocker):
-    global BOTO_SESSION_RESOURCE
     mock_object = MagicMock()
     mock_object.put = mock_put_aes
 
@@ -276,10 +273,6 @@ def mock_s3_resource_aes(mocker):
 
     # Patch boto3.Session.resource to return the mock s3 resource
     mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
-
-    yield
-
-    boto3.Session.resource = BOTO_SESSION_RESOURCE
 
 
 def mock_put_kms(*args, **kwargs):
@@ -295,8 +288,6 @@ def mock_put_kms(*args, **kwargs):
 
 @pytest.fixture()
 def mock_s3_resource_kms(mocker):
-    global BOTO_SESSION_RESOURCE
-
     mock_object = MagicMock()
     mock_object.put = mock_put_kms
 
@@ -305,11 +296,9 @@ def mock_s3_resource_kms(mocker):
 
     mock_s3_resource = MagicMock()
     mock_s3_resource.Object = mock_object_constructor
-    mocker.patch('boto3.Session.resource', new=MagicMock(return_value=mock_s3_resource))
 
-    yield
-
-    boto3.Session.resource = BOTO_SESSION_RESOURCE
+    # Patch boto3.Session.resource to return the mock s3 resource
+    mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
 
 
 @pytest.fixture(autouse=True)
@@ -774,7 +763,9 @@ def tick_clock(_, seconds: int = 1) -> None:
 
 
 def pytest_collection_modifyitems(config, items):
-    # Separate the items into two lists: one for tests that use the mock, and one for tests that don't
+    # This function is called by pytest after the collection of tests has been completed to modify their order
+    # it is being used as a workaround for the fact the kms and aes mocks resist teardown and cause other test failures
+
     mock_tests = []
     other_tests = []
     for item in items:
@@ -783,5 +774,4 @@ def pytest_collection_modifyitems(config, items):
         else:
             other_tests.append(item)
 
-    # Now set the order of items to have the non-mock tests first, followed by the mock tests
     items[:] = other_tests + mock_tests
