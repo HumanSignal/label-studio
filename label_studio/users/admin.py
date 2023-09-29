@@ -22,7 +22,15 @@ class UserAdminShort(UserAdmin):
     def __init__(self, *args, **kwargs):
         super(UserAdminShort, self).__init__(*args, **kwargs)
 
-        self.list_display = ('email', 'username', 'active_organization', 'organization', 'is_staff', 'is_superuser', 'is_deleted')
+        self.list_display = (
+            'email',
+            'username',
+            'active_organization',
+            'organization',
+            'is_staff',
+            'is_superuser',
+            'is_deleted',
+        )
         self.list_filter = ('is_staff', 'is_superuser', 'is_active', 'is_deleted')
         self.search_fields = (
             'username',
