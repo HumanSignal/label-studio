@@ -253,17 +253,25 @@ def s3_export_bucket_kms(s3):
     yield s3
 
 
-def mock_put_aes(*args, **kwargs):
-    if 'ServerSideEncryption' not in kwargs or kwargs['ServerSideEncryption'] != 'AES256':
-        raise ClientError(
-            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
-        )
+def mock_put(*args, **kwargs):
+    client_error = ClientError(
+        error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
+    )
+    if kwargs['ServerSideEncryption'] == 'AES256':
+        if 'ServerSideEncryption' not in kwargs:
+            raise client_error
+    elif kwargs['ServerSideEncryption'] == 'aws:kms':
+        if 'ServerSideEncryption' not in kwargs or 'SSEKMSKeyId' not in kwargs:
+            raise client_error
+
+    else:
+        raise client_error
 
 
 @pytest.fixture()
 def mock_s3_resource_aes(mocker):
     mock_object = MagicMock()
-    mock_object.put = mock_put_aes
+    mock_object.put = mock_put
 
     mock_object_constructor = MagicMock()
     mock_object_constructor.return_value = mock_object
@@ -275,21 +283,10 @@ def mock_s3_resource_aes(mocker):
     mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
 
 
-def mock_put_kms(*args, **kwargs):
-    if (
-        'ServerSideEncryption' not in kwargs
-        or kwargs['ServerSideEncryption'] != 'aws:kms'
-        or 'SSEKMSKeyId' not in kwargs
-    ):
-        raise ClientError(
-            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
-        )
-
-
 @pytest.fixture()
 def mock_s3_resource_kms(mocker):
     mock_object = MagicMock()
-    mock_object.put = mock_put_kms
+    mock_object.put = mock_put
 
     mock_object_constructor = MagicMock()
     mock_object_constructor.return_value = mock_object
