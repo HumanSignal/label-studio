@@ -91,7 +91,7 @@ module.exports = composePlugins(withNx({
 
           if (cssLoader && cssLoader.options) {
             cssLoader.options.modules = {
-              localIdentName: 'ls-[local]', // Customize this format
+              localIdentName: 'lss-[local]', // Customize this format
             };
           }
         }

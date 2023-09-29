@@ -18,7 +18,8 @@ ProjectContext.displayName = 'ProjectContext';
 
 const projectCache = new Map<number, APIProject>();
 
-export const ProjectProvider: React.FunctionComponent<any> = ({ children }) => {
+// @ts-ignore
+export const ProjectProvider: React.FunctionComponent = ({ children }) => {
   const api = useAPI();
   const params = useParams();
   const { update: updateStore } = useAppStore();

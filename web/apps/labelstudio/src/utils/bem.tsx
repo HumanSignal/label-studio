@@ -245,4 +245,3 @@ export const { Block, Elem } = BemWithSpecifiContext(BlockContext);
 export const useBEM = () => {
   return useContext(BlockContext)!;
 };
-

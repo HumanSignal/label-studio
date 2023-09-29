@@ -1,8 +1,11 @@
 export const formDataToJPO = (formData: FormData) => {
   if (formData instanceof FormData) {
-    const entries = (formData as any).entries() as IterableIterator<[string, any]>
+    // @ts-ignore
+    const entries = formData.entries();
 
+    // @ts-ignore
     return Array.from(entries).reduce((res, [key, value]) => {
+      // @ts-ignore
       return { ...res, [key]: value };
     }, {});
   }

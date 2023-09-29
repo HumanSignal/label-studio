@@ -250,6 +250,9 @@ Set up role-based access control in Label Studio by using [organizations and wor
 
 Only people with the Administrator and Owner roles can invite people to Label Studio and manage their role membership.
 
+!!! note
+    If you are using SSO/SAML or SCIM, you can map groups to roles on the organization level and the project level. For more information, see [Set up authentication for Label Studio](auth_setup). 
+
 ### Invite users to Label Studio Enterprise
 
 Invite users to your organization by doing the following:

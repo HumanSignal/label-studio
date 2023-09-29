@@ -2,7 +2,7 @@
 
 import { createBrowserHistory } from 'history';
 import { StrictMode } from 'react';
-import * as ReactDOM from 'react-dom/client';
+import { render } from 'react-dom';
 import { Router } from 'react-router-dom';
 import { initSentry } from '../config/Sentry';
 import { ApiProvider } from '../providers/ApiProvider';
@@ -63,11 +63,7 @@ const App = ({ content }) => {
   );
 };
 
-const root = ReactDOM.createRoot(document.querySelector('.app-wrapper'));
+const root = document.querySelector('.app-wrapper');
 const content = document.querySelector('#main-content');
 
-root.render(
-  <StrictMode>
-    <App content={content.innerHTML} />
-  </StrictMode>
-);
+render(<App content={content.innerHTML}/>, root);

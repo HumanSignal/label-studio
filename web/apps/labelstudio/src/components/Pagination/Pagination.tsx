@@ -163,9 +163,13 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
     return () => window.removeEventListener('popstate', popStateHandler);
   }, [props.urlParamName]);
 
-  return (totalPages > 1) ? (
-    <Block name="pagination" mod={{ disabled, size, waiting }} style={props.style}>
-      {(props.label && isDefined(pageSize)) && (
+  return totalPages > 1 ? (
+    <Block
+      name="pagination"
+      mod={{ disabled, size, waiting }}
+      style={props.style}
+    >
+      {props.label && isDefined(pageSize) && (
         <Elem name="label">
           {props.label}: {visibleItems.start}-{visibleItems.end}
         </Elem>
@@ -198,7 +202,10 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
                   setInputMode(false);
                 } else if (e.code === 'Enter') {
                   applyPageNumberFromEvent(e);
-                } else if (e.code.match(/[0-9]/) === null && !isSystemEvent(e)) {
+                } else if (
+                  e.code.match(/[0-9]/) === null &&
+                  !isSystemEvent(e)
+                ) {
                   e.preventDefault();
                   e.stopPropagation();
                 }
@@ -214,8 +221,12 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
                 if (allowInput) setInputMode(true);
               }}
             >
-              {currentPage}{" "}<span>of {totalPages}</span>
-              <div onClick={() => { /*  */ }}></div>
+              {currentPage} <span>of {totalPages}</span>
+              <div
+                onClick={() => {
+                  /*  */
+                }}
+              ></div>
             </Elem>
           )}
         </Elem>
@@ -240,7 +251,10 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
         <Elem name="page-size">
           <Select
             value={pageSize}
-            options={pageSizeOptions.map(v => ({ label: `${v} per page`, value: v }))}
+            options={pageSizeOptions.map((v) => ({
+              label: `${v} per page`,
+              value: v,
+            }))}
             onChange={(e: any) => {
               const newPageSize = parseInt(e.target.value);
 
@@ -250,6 +264,13 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
                 setStoredPageSize(props.name, newPageSize);
               }
             }}
+            label={undefined}
+            className={undefined}
+            validate={undefined}
+            required={undefined}
+            skip={undefined}
+            labelProps={undefined}
+            ghost={undefined}
           />
         </Elem>
       )}

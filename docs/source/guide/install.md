@@ -17,7 +17,7 @@ Install Label Studio on premises or in the cloud. Choose the installation method
 - [Install with Anaconda](#Install-with-Anaconda)
 - [Upgrade Label Studio](#Upgrade-Label-Studio)
 
-Label Studio is also available an [enterprise product](https://heartex.com/), which you can explore instantly through a [free trial](https://heartex.com/free-trial).
+Label Studio is also available an [enterprise product](https://heartex.com/), which you can explore instantly through a [free trial](https://humansignal.com/free-trial).
 
 <!-- md deploy.md -->
 

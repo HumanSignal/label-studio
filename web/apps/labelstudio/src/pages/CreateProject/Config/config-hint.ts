@@ -2,9 +2,8 @@
  * Highly improved version of CodeMirror's XML hint addon
  * https://codemirror.net/5/addon/hint/xml-hint.js
  */
-
 // @ts-ignore
-import CM from "codemirror";
+import CM from 'codemirror';
 
 const Pos = CM.Pos;
 const topTags = ["View"];
@@ -116,7 +115,6 @@ function getHints(cm: any, options: CMHintOptions) {
     token.end = cur.ch;
     token.string = token.string.slice(0, cur.ch - token.start);
   }
-
   let inner = CM.innerMode(cm.getMode(), token.state);
 
   if (!inner.mode.xmlCurrentTag) return;

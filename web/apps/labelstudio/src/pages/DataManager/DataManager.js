@@ -6,7 +6,6 @@ import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
 import { useAPI } from '../../providers/ApiProvider';
-import { useLibrary } from '../../providers/LibraryProvider';
 import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
 import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
@@ -50,7 +49,7 @@ const initializeDataManager = async (root, props, params) => {
     ...settings,
   };
 
-  return new DM(dmConfig);
+  return new window.DataManager(dmConfig);
 };
 
 const buildLink = (path, params) => {
@@ -118,6 +117,8 @@ export const DataManagerPage = ({ ...props }) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
         const ids = group.map(r => r.id);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
+
+        console.log(dataManager.lsf);
 
         const suggestionsRequest = api.callApi("mlInteractive", {
           params: { pk: interactiveBacked.id },

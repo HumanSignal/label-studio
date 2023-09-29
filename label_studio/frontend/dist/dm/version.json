@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-382: [FE] We are using 'Tasks' rather than 'Items' when user selects x items in dataset",
-  "commit": "facbe44c42c6b8bf9406dcfebd8322807b823750",
+  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
+  "commit": "c9758b2fb911f789d6ba3c4b1dd8a44528eea5d0",
   "branch": "master",
-  "date": "2023/08/29 08:53:44"
+  "date": "2023/09/22 11:06:45"
 }
