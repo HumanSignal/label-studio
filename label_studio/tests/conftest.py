@@ -771,3 +771,17 @@ def tick_clock(_, seconds: int = 1) -> None:
     now += timedelta(seconds=seconds)
     freezer = freeze_time(now)
     freezer.start()
+
+
+def pytest_collection_modifyitems(config, items):
+    # Separate the items into two lists: one for tests that use the mock, and one for tests that don't
+    mock_tests = []
+    other_tests = []
+    for item in items:
+        if "mock_s3_resource_kms" in item.fixturenames or "mock_s3_resource_aes" in item.fixturenames:
+            mock_tests.append(item)
+        else:
+            other_tests.append(item)
+
+    # Now set the order of items to have the non-mock tests first, followed by the mock tests
+    items[:] = other_tests + mock_tests
