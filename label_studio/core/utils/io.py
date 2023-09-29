@@ -11,9 +11,11 @@ from contextlib import contextmanager
 from tempfile import mkdtemp, mkstemp
 
 import pkg_resources
+import requests
 import ujson as json
 import yaml
 from appdirs import user_cache_dir, user_config_dir, user_data_dir
+from django.conf import settings
 from urllib3.util import parse_url
 
 # full path import results in unit test failures
@@ -213,3 +215,16 @@ def validate_ip(ip: str) -> None:
     for subnet in local_subnets:
         if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
             raise InvalidUploadUrlError
+
+
+def ssrf_safe_get(url, *args, **kwargs):
+    validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)
+    # Reason for #nosec: url has been validated as SSRF safe by the
+    # validation check above.
+    response = requests.get(url, *args, **kwargs)   # nosec
+
+    # second check for SSRF for prevent redirect and dns rebinding attacks
+    if settings.SSRF_PROTECTION_ENABLED:
+        response_ip = response.raw._connection.sock.getpeername()[0]
+        validate_ip(response_ip)
+    return response
