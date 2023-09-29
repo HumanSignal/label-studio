@@ -51,6 +51,8 @@ jobs:
               - 'setup.py'
               - '.github/workflows/bandit.yml'
               - '.github/workflows/tests.yml'
+              - '.github/workflows/test_conda.yml'
+              - '.github/workflows/test_migrations.yml'
             frontend:
               - 'label_studio/frontend/**'
               - '.github/workflows/frontend-build.yml'

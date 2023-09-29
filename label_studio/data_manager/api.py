@@ -2,6 +2,8 @@
 """
 import logging
 
+from asgiref.sync import async_to_sync, sync_to_async
+from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
@@ -135,10 +137,25 @@ class TaskPagination(PageNumberPagination):
     total_predictions = 0
     max_page_size = settings.TASK_API_PAGE_SIZE_MAX
 
-    def paginate_queryset(self, queryset, request, view=None):
+    @async_to_sync
+    async def async_paginate_queryset(self, queryset, request, view=None):
+        predictions_count_qs = Prediction.objects.filter(task_id__in=queryset)
+        self.total_predictions = await sync_to_async(predictions_count_qs.count, thread_sensitive=True)()
+
+        annotations_count_qs = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False)
+        self.total_annotations = await sync_to_async(annotations_count_qs.count, thread_sensitive=True)()
+        return await sync_to_async(super().paginate_queryset, thread_sensitive=True)(queryset, request, view)
+
+    def sync_paginate_queryset(self, queryset, request, view=None):
         self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
         self.total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
         return super().paginate_queryset(queryset, request, view)
+
+    def paginate_queryset(self, queryset, request, view=None):
+        if flag_set('fflag_fix_back_leap_24_tasks_api_optimization_05092023_short'):
+            return self.async_paginate_queryset(queryset, request, view)
+        else:
+            return self.sync_paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
         return Response(
@@ -244,7 +261,15 @@ class TaskListAPI(generics.ListCreateAPIView):
                 evaluate_predictions(tasks_for_predictions)
                 [tasks_by_ids[_id].refresh_from_db() for _id in ids]
 
-            serializer = self.task_serializer_class(page, many=True, context=context)
+            if flag_set('fflag_fix_back_leap_24_tasks_api_optimization_05092023_short'):
+                serializer = self.task_serializer_class(
+                    page,
+                    many=True,
+                    context=context,
+                    include=get_fields_for_evaluation(prepare_params, request.user, skip_regular=False),
+                )
+            else:
+                serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
         # all tasks
         if project.evaluate_predictions_automatically:

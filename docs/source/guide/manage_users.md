@@ -283,7 +283,7 @@ To activate a user account and assign a role, do the following:
 ### Statuses of user accounts
 
 !!! note
-`NOT_ACTIVATED` status is equal to `Pending` status.
+    `NOT_ACTIVATED` status is equal to `Pending` status.
 
 If a user is in `Pending` status then it means he was invited and signed up for the account, but his role is not defined by administrator.
 

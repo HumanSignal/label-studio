@@ -16,3 +16,4 @@ freezegun~=1.2.2
 pre-commit==3.3.3
 responses==0.13.0
 s3transfer==0.3.4
+https://github.com/HumanSignal/label-studio-sdk/archive/3c1e0513cba426ab8ada2259ca4e368dd1086baf.zip
