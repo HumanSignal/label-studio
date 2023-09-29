@@ -340,29 +340,6 @@ kubectl rollout restart deployment/<RELEASE_NAME>-ls-rqworker
 kubectl rollout restart deployment/<RELEASE_NAME>-ls-app
 ```
 
-## Upgrade Label Studio Enterprise using Helm
-To upgrade Label Studio Enterprise using Helm, do the following.
-
-1. Determine the latest tag version of Label Studio Enterprise and add/replace the following in your `ls-values.yaml` file: 
-   ```yaml
-   global:
-     image:
-       tag: "20210914.154442-d2d1935"
-   ```
-2. After updating the values file, retrieve the latest updates for the Helm chart:
-   ```shell
-   helm repo update heartex
-   ```
-3. Run the following from the command line to upgrade your deployment:
-   ```shell
-   helm upgrade <RELEASE_NAME> heartex/label-studio -f ls-values.yaml
-   ```
-   If you want, you can specify a version from the command line:
-   ```shell
-   helm upgrade <RELEASE_NAME> heartex/label-studio -f ls-values.yaml --set global.image.tag=20210914.154442-d2d1935
-   ```
-   This command overrides the tag value stored in `ls-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
-
 
 ## Uninstall Label Studio Enterprise using Helm
 
