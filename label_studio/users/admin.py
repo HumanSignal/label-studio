@@ -15,11 +15,15 @@ class UserAdminShort(UserAdmin):
 
     add_fieldsets = ((None, {'fields': ('email', 'password1', 'password2')}),)
 
+    def get_queryset(self, request):
+        # Use the with_deleted method to include soft-deleted users in the queryset
+        return User.objects.with_deleted()
+
     def __init__(self, *args, **kwargs):
         super(UserAdminShort, self).__init__(*args, **kwargs)
 
-        self.list_display = ('email', 'username', 'active_organization', 'organization', 'is_staff', 'is_superuser')
-        self.list_filter = ('is_staff', 'is_superuser', 'is_active')
+        self.list_display = ('email', 'username', 'active_organization', 'organization', 'is_staff', 'is_superuser', 'is_deleted')
+        self.list_filter = ('is_staff', 'is_superuser', 'is_active', 'is_deleted')
         self.search_fields = (
             'username',
             'first_name',
@@ -27,6 +31,7 @@ class UserAdminShort(UserAdmin):
             'email',
             'organization__title',
             'active_organization__title',
+            'is_deleted',
         )
         self.ordering = ('email',)
 
@@ -40,6 +45,7 @@ class UserAdminShort(UserAdmin):
                         'is_active',
                         'is_staff',
                         'is_superuser',
+                        'is_deleted',
                     )
                 },
             ),
