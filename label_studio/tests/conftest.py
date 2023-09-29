@@ -778,7 +778,7 @@ def pytest_collection_modifyitems(config, items):
     mock_tests = []
     other_tests = []
     for item in items:
-        if "mock_s3_resource_kms" in item.fixturenames or "mock_s3_resource_aes" in item.fixturenames:
+        if 'mock_s3_resource_kms' in item.fixturenames or 'mock_s3_resource_aes' in item.fixturenames:
             mock_tests.append(item)
         else:
             other_tests.append(item)
