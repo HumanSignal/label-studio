@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
-  "commit": "c9758b2fb911f789d6ba3c4b1dd8a44528eea5d0",
+  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
+  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
   "branch": "master",
-  "date": "2023/09/22 11:06:45"
+  "date": "2023/09/26 10:39:21"
 }
