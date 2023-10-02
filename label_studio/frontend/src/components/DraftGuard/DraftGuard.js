@@ -15,7 +15,21 @@ export const DraftGuard = () => {
 
   useEffect(() => {
     if (isFF(FF_OPTIC_2)) {
-      const unblock = history.block(() => {
+      const unblock = () => {
+        draftGuardCallback.current?.(true);
+        draftGuardCallback.current = null;
+      };
+
+      /**
+       * The version of Router History that is in use does not currently support
+       * the `block` method fully. This is a workaround to allow us to block navigation
+       * when there are unsaved changes. The draftGuardCallback allows the unblock callback to be captured from the
+       * history callback `getUserConfirmation` that is triggered by returning a string message from history.block, allowing the user to
+       * confirm they want to leave the page. Here we send through a constant message
+       * to signify that we aren't looking for user confirmation but to utilize this to enable navigation blocking based on 
+       * unsuccessful draft saves.
+       */
+      const unsubscribe = history.block(() => {
         const selected = window.Htx?.annotationStore?.selected;
         const submissionInProgress = !!selected?.submissionStarted;
         const hasChanges = !!selected?.history.undoIdx && !submissionInProgress;
@@ -26,10 +40,11 @@ export const DraftGuard = () => {
 
             if (status === 200 || status === 201) {
               toast.show({ message: "Draft saved successfully",  type: "info" });
-              draftGuardCallback.current?.(true);
-              draftGuardCallback.current = null;
+              unblock();
             } else if (status !== undefined) {
               toast.show({ message: "There was an error saving your draft", type: "error" });
+            } else {
+              unblock();
             }
           });
 
@@ -38,8 +53,8 @@ export const DraftGuard = () => {
       });
 
       return () => {
-        draftGuardCallback.current = null;
         unblock();
+        unsubscribe();
       };
     }
   }, []);
