@@ -47,6 +47,12 @@ jobs:
                     file_path: 'label_studio/frontend/dist/dm/version.json',
                     regexp: '"commit": "(.*)",',
                 },
+                {
+                    owner: owner,
+                    repo: 'label-studio-sdk',
+                    file_path: 'deploy/requirements-test.txt',
+                    regexp: 'https://github.com/HumanSignal/label-studio-sdk/archive/(.*).zip',
+                },
             ];
             
             async function getSubmoduleVersion(submodule, sha) {
