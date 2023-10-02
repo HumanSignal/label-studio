@@ -1,0 +1,274 @@
+$border-thin: 1px solid rgba(137, 128, 152, 0.16);
+
+.phrase {
+  background: #e8ffd0;
+  padding: 0.5em;
+  border-radius: 5px;
+  margin-right: 5px;
+  margin-bottom: 10px;
+  display: table;
+
+  &.numbered::before {
+    counter-increment: phrase;
+    content: counter(phrase);
+    margin-right: 4px;
+  }
+}
+
+.name {
+  background: transparent !important;
+  margin-right: 5px;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently */
+}
+
+.name span {
+  background: transparent !important;
+  padding: 0px !important;
+}
+
+.text {
+  // should contain some style to be added to element
+  zoom: 1;
+}
+
+.dialoguename {
+  font-weight: bold;
+  background: white;
+  border-radius: 5px;
+  padding: 5px;
+  margin-right: 10px;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently */
+}
+
+.dialoguename span {
+  background: white !important;
+  padding: 0px !important;
+}
+
+.dialoguetext {
+  // should contain some style to be added to element
+  zoom: 1;
+  cursor: text;
+}
+
+.scroll_container {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  counter-reset: phrase;
+  border: $border-thin;
+  padding: 8px;
+}
+
+.wrapper_header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  align-items: center;
+
+  &__buttons {
+    display: flex;
+    align-items: center;
+
+    &:only-child {
+      margin-left: auto;
+    }
+  }
+}
+
+.container {
+  position: relative;
+  overflow: auto;
+  counter-reset: phrase;
+  margin-top: 16px;
+}
+
+.withAudio {
+  margin-left: 36px;
+}
+
+.collapsed {
+  display: block;
+  max-width: max-content;
+  height: 1px;
+  padding: 2px;
+  user-select: none;
+
+  & > * {
+    visibility: hidden !important;
+    opacity: 0;
+    height: 1px;
+    user-select: none;
+  }
+}
+
+.authorFilter {
+  width: 100%;
+  min-width: 320px;
+  max-width: max-content;
+
+  &__showall {
+    display: inline-flex;
+    font-size: 14px;
+    line-height: 32px;
+  }
+  &__placeholder {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+  }
+  &__search {
+    min-width: 318px;
+
+    &__input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+      font-size: 14px;
+      line-height: 22px;
+      background: #fafafa;
+      outline: none;
+    }
+  }
+  &__select {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &__item {
+      color: initial;
+      background-color: #ffffff;
+      display: inline-flex;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 16px;
+      border-radius: 4px;
+      padding: 3px 4px;
+    }
+  }
+}
+
+.audio {
+  height: 32px;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.playNewUi {
+  user-select: none;
+  cursor: pointer;
+  position: absolute;
+  left: 5px;
+  margin-top: -0.3em;
+  font-size: inherit;
+
+  &:hover, &:active, &:focus {
+    background: none;
+  }
+}
+
+.play {
+  user-select: none;
+  position: absolute;
+  left: 0;
+  margin-top: -0.3em;
+  font-size: inherit;
+
+  // highlight play/pause buttons on interactions
+  &:active path {
+    fill: #1890ff;
+  }
+
+  // only the circle of play button highlighted
+  &:focus path:first-child {
+    fill: #1890ff;
+  }
+}
+
+.newUI {
+  transition: all .1s ease-out;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  width: calc(100% - 36px);
+
+  &.collapsed {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--highlight-color);
+  }
+
+  &:not(.collapsed) {
+    background-color: var(--background-color);
+    border-left: 4px solid var(--highlight-color);
+    border-top: 1px solid rgba(137, 128, 152, 0.16);
+    border-bottom: 1px solid rgba(137, 128, 152, 0.16);
+    border-right: 1px solid rgba(137, 128, 152, 0.16);
+    padding: 8px 12px 8px 12px;
+  }
+
+  .dialoguename {
+    transition: all .1s ease-out;
+    background: none;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+    padding: 0
+  }
+
+  .dialoguetext {
+    transition: all .1s ease-out;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: #1F1F1F;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .titleWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    .time {
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 16px;
+      letter-spacing: 0.5px;
+      color: #898098;
+    }
+  }
+
+  .wrapperText {
+    position: relative;
+
+    .readingLine {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      pointer-events: none;
+    }
+  }
+}

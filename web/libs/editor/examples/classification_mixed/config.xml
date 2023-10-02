@@ -1,0 +1,28 @@
+<View>
+  <Labels name="label" toName="text">
+    <Label value="Simple" />
+    <Label value="Complex" />
+  </Labels>
+  <Text name="text" value="Just some random text to label"></Text>
+
+  <Number name="num" toName="text" min="1" max="10"/>
+  <DateTime name="dt" toName="text" showDate="true" showTime="true"/>
+  <TextArea name="txt" toName="text" editable="true"/>
+  <View visibleWhen="region-selected">
+    <Header size="3">per-region TextArea</Header>
+    <TextArea name="txt2" toName="text" editable="true" perRegion="true"/>
+  </View>
+
+  <Choices name="choices" toName="text">
+    <Choice value="Choice 1" background="#5b5"/>
+    <Choice value="Choice 2" background="#55f"/>
+  </Choices>
+
+  <Taxonomy name="taxonomy" toName="text">
+    <Choice value="Choice 1" background="#5b5"/>
+    <Choice value="Choice 2" background="#55f">
+      <Choice value="Choice 2.1" background="#5b5"/>
+      <Choice value="Choice 2.2" background="#55f"/>
+    </Choice>
+  </Taxonomy>
+</View>

@@ -1,0 +1,57 @@
+.input:not([type=checkbox]):not([type=radio]),
+.textarea
+  height 32px
+  width 100%
+  background #FAFAFA
+  font-size 14px
+  border 1px solid $black_15
+  box-sizing border-box
+  border-radius 5px
+  padding 0 16px
+  transition box-shadow 80ms ease
+
+.input:not([type=checkbox]):not([type=radio])
+  &_size
+    &_compact
+      height 32px
+
+    &_small
+      height 24px
+      font-size 12px
+      padding 0 5px
+
+    &_large
+      height 40px
+      font-size 16px
+
+.textarea
+  padding 12px 16px
+  min-height 50px
+
+.input:not([type=checkbox]):not([type=radio]):focus,
+.textarea:focus
+  outline none
+  box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
+  border-color rgba($accent_color, 0.2)
+
+.input[type=checkbox],
+.input[type=radio]
+  width 16px
+  height 16px
+
+.input
+  &__spinner
+    width 16px
+    height 16px
+    border-radius 100%;
+    box-sizing border-box
+    border 2px solid #FFD666
+    border-right-color transparent
+    animation waiting-spin 1s linear infinite
+
+@keyframes waiting-spin
+  0%
+    transform rotate(0deg)
+
+  100%
+    transform rotate(360deg)

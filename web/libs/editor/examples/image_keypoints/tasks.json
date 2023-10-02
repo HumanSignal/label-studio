@@ -1,0 +1,30 @@
+[
+    {
+        "data": {
+            "image": "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg"
+        },
+        "predictions": [
+            {
+                "model_version": "model 1",
+                "created_ago": "3 hours",
+                "result": [
+                    {
+                        "id": "hqudA4A3U4",
+                        "from_name": "tag",
+                        "to_name": "img",
+                        "source": "$image",
+                        "type": "keypointlabels",
+                        "value": {
+                            "x": 49.6,
+                            "y": 52.340425531914896,
+                            "width": 0.6666666666666666,
+                            "keypointlabels": [
+                                "Hello"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

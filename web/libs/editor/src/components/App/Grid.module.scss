@@ -1,0 +1,59 @@
+/* Grid (View All mode) */
+@import "../../assets/styles/global.scss";
+
+$gap: 30px;
+
+.grid {
+  flex-grow: 1;
+  display: grid;
+  grid-auto-columns: calc(50% - 15px);
+  @include respond("tablet") {
+    grid-auto-columns: 100%;
+  }
+  grid-auto-flow: column;
+  grid-column-gap: $gap;
+  margin: 0 30px;
+  overflow: auto;
+  position: relative;
+}
+
+.grid > div > h4 {
+  cursor: pointer;
+}
+
+.container {
+  position: relative;
+  flex-grow: 1;
+  min-width: 0; // famous flex hack to prevent block from growing enormously
+}
+
+.container > button {
+  position: absolute;
+  top: 0;
+  width: $gap;
+  height: 100%;
+
+  &:hover {
+    background: #eee;
+  }
+}
+
+.container > button.left {
+  left: 0;
+}
+
+.container > button.right {
+  right: 0;
+}
+
+.grid > div:global(.hover) {
+  background: #eee;
+  h4 {
+    color: #1890ff;
+  }
+}
+
+/* don't let the empty blocks to break the nice grid */
+.grid > div:empty {
+  display: none;
+}

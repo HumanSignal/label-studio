@@ -1,0 +1,14 @@
+<View>
+  <Header value="Audio transcription:"></Header>
+  <Audio name="audio" value="$url" height="46"></Audio>
+  <TextArea name="answer" toName="audio" transcription="true" rows="3" maxSubmissions="1"></TextArea>
+
+
+  <Style>
+  [dataneedsupdate]{display:flex;align-items:center}
+  [dataneedsupdate]>div:first-child{flex-grow:1;order:2}
+  [dataneedsupdate]>div:last-child{margin-top:0 !important;margin-right:1em}
+  [dataneedsupdate] button{height:46px}
+  [dataneedsupdate] button span:nth-child(2){display:none}
+  </Style>
+</View>

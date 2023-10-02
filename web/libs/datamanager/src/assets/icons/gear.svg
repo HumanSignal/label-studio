@@ -1,0 +1,15 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g opacity="0.23">
+<path d="M2.15195 10.2635L21.8481 13.7365" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<path d="M21.3969 8.5798L2.60307 15.4202" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<path d="M18.4279 4.33956L5.57214 19.6604" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<path d="M8.57984 2.60307L15.4202 21.3969" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<path d="M4.33956 5.57212L19.6604 18.4279" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<path d="M13.7365 2.15192L10.2635 21.8481" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<circle cx="12" cy="12" r="8" transform="rotate(10 12 12)" fill="white" stroke="black" stroke-width="2"/>
+<path d="M12.0191 11.993L2.60308 15.4202" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<path d="M12.026 12.0218L19.6605 18.4279" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<path d="M13.7365 2.15192L12 12" stroke="black" stroke-width="2" stroke-linecap="square"/>
+<circle cx="12" cy="12" r="2" transform="rotate(10 12 12)" fill="white" stroke="black" stroke-width="2"/>
+</g>
+</svg>

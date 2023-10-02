@@ -1,0 +1,107 @@
+.detailed-region
+  &__icon
+    width 24px
+    height 24px
+    margin-right 8px
+    flex-shrink 0
+
+  &__head
+    display flex
+    margin 8px 0
+    padding 0 8px
+    align-items center
+    justify-content space-between
+    gap 8px
+
+  &__title
+    & + span
+      color #000
+
+      &:before
+        opacity 0.6
+        content "ID "
+
+  &__title
+    display flex
+    align-items flex-start
+    word-break break-word
+
+  &__result
+    padding 0 8px
+
+  &__meta-text
+    width calc(100% - 16px)
+    border 1px solid transparent
+    margin 0 8px
+    padding 4px 8px
+    min-height 64px
+    border-radius 4px
+    outline none
+    background-color rgba(#000, 0.05)
+    transition-property background-color, border-color
+    transition-duration 80ms
+    transition-timing-function ease
+
+    textarea&:hover
+      border-color #E5E5E5
+      background-color #fff
+
+    textarea&:focus
+      background-color #fff
+      border-color $accent_color
+      box-shadow 0 0 0 1px $accent_color
+
+    &:not(textarea)
+      white-space pre-wrap
+      word-break break-all
+
+  &_compact &__head
+    margin -5px 0
+
+  &__warning
+    box-sizing border-box
+    display flex
+    flex-direction row
+    align-items center
+    padding 8px
+    gap 8px
+    background rgba(255, 183, 122, 0.16)
+    border 1px solid rgba(137, 128, 152, 0.16)
+    border-radius 4px
+    margin 0 16px 8px
+    flex none
+    order 0
+    flex-grow 1
+    svg
+      width 20px
+      height 17px
+      fill var(--incomplete-warning-color, #FA8C16)
+
+.region-meta
+  &__content
+    margin 8px 0
+
+    &_type
+      &_text
+        padding 3px 6px
+        border-radius 4px
+        background-color rgba(#000, 0.06)
+        white-space pre-wrap
+        line-break loose
+        word-break break-all
+
+  &__result
+    display grid
+    grid-template-columns auto 1fr
+    grid-column-gap 10px
+
+  &__value
+    p
+      padding 0
+      margin-bottom 4px
+
+      &::before
+        padding-right 4px
+        display inline-block
+        content attr(data-counter)
+        opacity 0.6

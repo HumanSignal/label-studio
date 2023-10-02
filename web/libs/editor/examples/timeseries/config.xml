@@ -1,0 +1,13 @@
+<View>
+  <Header value="Select regions:"></Header>
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Beat"></Label>
+    <Label value="Voice"></Label>
+    <Label value="Guitar"></Label>
+    <Label value="Other"></Label>
+  </TimeSeriesLabels>
+  <TimeSeries name="ts" value="$timeseries" valueType="json" timeColumn="time" format="date" overviewChannels="two">
+    <Channel units="Hz" displayFormat=",.1f" strokeColor="#1f77b4" legend="Sensor 1" column="one" />
+    <Channel units="Hz" displayFormat=",.1f" strokeColor="#ff7f0e" legend="Sensor 2" column="two" />
+  </TimeSeries>
+</View>

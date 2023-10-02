@@ -1,0 +1,11 @@
+<View>
+  <Video name="video" value="$video" sync="audio"></Video>
+
+  <Labels name="tricks" toName="audio" choice="multiple">
+    <Label value="Kickflip" background="#1BB500"/>
+    <Label value="360 Flip" background="#FFA91D"/>
+    <Label value="Trick" background="#358EF3"/>
+  </Labels>
+
+  <Audio name="audio" value="$video" sync="video" zoom="true" speed="true" volume="true"/>
+</View>
