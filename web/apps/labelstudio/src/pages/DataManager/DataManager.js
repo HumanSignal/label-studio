@@ -118,8 +118,6 @@ export const DataManagerPage = ({ ...props }) => {
         const ids = group.map(r => r.id);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
-        console.log(dataManager.lsf);
-
         const suggestionsRequest = api.callApi("mlInteractive", {
           params: { pk: interactiveBacked.id },
           body: {
