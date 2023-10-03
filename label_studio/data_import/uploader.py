@@ -13,9 +13,9 @@ try:
 except:  # noqa: E722
     import json
 
+from core.feature_flags import flag_set
 from core.utils.common import timeit
 from core.utils.io import validate_upload_url
-from core.feature_flags import flag_set
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.exceptions import ValidationError
@@ -136,7 +136,11 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
         # validation check above.
 
         should_verify = settings.VERIFY_SSL_CERTS
-        if flag_set('fflag_back_leap_182_dont_verify_ssl_certs', user=project.organization.created_by, override_system_default=False):
+        if flag_set(
+            'fflag_back_leap_182_dont_verify_ssl_certs',
+            user=project.organization.created_by,
+            override_system_default=False,
+        ):
             should_verify = False
 
         response = requests.get(url, verify=should_verify, headers={'Accept-Encoding': None})  # nosec
