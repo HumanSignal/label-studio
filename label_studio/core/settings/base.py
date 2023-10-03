@@ -108,6 +108,10 @@ INTERNAL_PORT = '8080'
 DEBUG = get_bool_env('DEBUG', True)
 DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
 
+# Whether to verify SSL certs when making external requests, eg in the uploader
+# ⚠️ Turning this off means assuming risk. ⚠️
+VERIFY_SSL_CERTS = get_bool_env('VERIFY_SSL_CERTS', True)
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

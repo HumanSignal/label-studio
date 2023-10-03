@@ -4,6 +4,7 @@ import sys
 
 import colorama
 import requests
+from django.conf import settings
 
 logger = logging.getLogger('main')
 
@@ -26,7 +27,7 @@ def start_fix():
     src = os.path.join(work_dir, 'sqlite.zip')
     try:
         with open(src, 'wb') as f_out:
-            resp = requests.get(url, verify=False)  # nosec
+            resp = requests.get(url, settings.VERIFY_SSL_CERTS)  # nosec
             f_out.write(resp.content)
     except Exception as e:
         print(
