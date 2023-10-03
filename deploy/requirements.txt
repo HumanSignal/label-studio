@@ -2,12 +2,12 @@ wheel>=0.38.1,<=0.40.0
 appdirs>=1.4.3
 attr==0.3.1
 attrs>=19.2.0
-pyyaml>=5.3.1
+pyyaml>=6.0.0
 azure-storage-blob>=12.6.0
 
 boto~=2.49.0
-boto3==1.16.28
-botocore==1.19.28
+boto3==1.28.58
+botocore==1.31.58
 bleach~=5.0.0
 
 google-api-core==2.11.0
