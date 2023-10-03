@@ -18,7 +18,7 @@ import './MenuSidebar.styl';
 export const MenubarContext = createContext();
 
 const handleHomepageItemClick = () => {
-  window.location.href = '/landingpage/homepage';
+  window.location.href = '/landingpage/dashboard';
 };
 
 const LeftContextMenu = ({className}) => (
@@ -83,7 +83,7 @@ export const Menubar = ({
       window.location.href = landingpageURL;
     } else {
       // If project_id is null, navigate to a default URL
-      window.location.href = '/landingpage/homepage';
+      window.location.href = '/landingpage/dashboard';
     }
   };
   
@@ -227,7 +227,7 @@ export const Menubar = ({
                 />
                 <Menu.Item
                   label="Dashboard"
-                  to="/landingpage/homepage"
+                  to="/landingpage/dashboard"
                   icon={<IconBook/>}
                   data-external
                   exact

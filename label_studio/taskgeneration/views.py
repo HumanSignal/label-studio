@@ -94,7 +94,7 @@ def create_task_pairs(request, project, subject, sensortype_B):
                     
         
 
-def create_annotation_data_chunks(request, project, subject, duration,column_name):
+def create_annotation_data_chunks(request, project, subject, duration,value_column):
     # Get all overlap for given subject and video
     sensor_overlap = SensorOverlap.objects.filter(project=project, subject=subject)
     # Find distinct video sensordata in all the overlap
@@ -153,6 +153,8 @@ def create_annotation_data_chunks(request, project, subject, duration,column_nam
                     imu_file_path = longest_overlap.sensordata_B.file_upload.file.path
                     timestamp_column = longest_overlap.sensordata_B.sensor.sensortype.timestamp_column
                     imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
+                    timestamp_column_name = imu_df.columns[timestamp_column]
+                    value_column_name = imu_df.columns[int(value_column)]
                     # Convert all time entries to float
                     imu_df.iloc[:-1,timestamp_column] = imu_df.iloc[:-1,timestamp_column].astype(float)
                     # Find the indeces of the timestamp instances closest to begin and end of segment
@@ -173,7 +175,7 @@ def create_annotation_data_chunks(request, project, subject, duration,column_nam
 
                     activity_annotation_project = Project.objects.get(id=project.id+2)
                     task_json_template = {
-                        "csv": f"{imu_file_upload.file.url}?time={timestamp_column}&values={column_name}",
+                        "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",
                         "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.time_column;v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),300); console.log('video is loaded, starting to sync with time series')}}, 3000); \" />"
                     }
                     with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
@@ -220,12 +222,12 @@ def generate_activity_tasks(request,project_id):
             # Get data from Form
             subject = taskgenerationform.cleaned_data.get("subject")
             duration = taskgenerationform.cleaned_data.get("segment_duration")
-            column_name = taskgenerationform.cleaned_data.get("column_name")
+            value_column = taskgenerationform.cleaned_data.get("column_name")
             fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
             sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
             # Fill VideoImuOverlap objects
             create_task_pairs(request= request,project=project, subject=subject,sensortype_B=sensortype_B)
             # Create annotation data chunks (video and imu), this automatically creates tasks
-            create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,column_name=column_name)          
+            create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,value_column=value_column)          
     return redirect('landingpage:landingpage', project_id=project_id)    

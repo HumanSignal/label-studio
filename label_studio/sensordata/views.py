@@ -36,7 +36,7 @@ def sensordatapage(request, project_id):
 def addsensordata(request, project_id):
     project = Project.objects.get(id=project_id)
     if request.method =='POST':
-        sensordataform = SensorDataForm(request.POST, request.FILES, project=project)
+        sensordataform = SensorDataForm(request.POST, request.FILES)
         if sensordataform.is_valid():
             # Get form data
             name = sensordataform.cleaned_data['name']
@@ -129,11 +129,10 @@ def parse_IMU(request, file_path, sensor, name, project):
     sensor_df = sensor_data.get_data()
     # Now that the sensordata has been parsed it has to be transformed back to a .csv file and uploaded to the correct project
     # Create NamedTemporary file of type csv
-    with NamedTemporaryFile(suffix='.csv', prefix=(str(name)) ,mode='w', delete=False) as csv_file:
+    with NamedTemporaryFile(suffix='.csv', prefix=(str(name).split('/')[-1]) ,mode='w', delete=False) as csv_file:
         # Write the dataframe to the temporary file
         sensor_df.to_csv(csv_file.name, index=False)
         file_path=csv_file.name
-
     # Upload parsed sensor(IMU) data to corresponding project
     upload_sensor_data(request=request, name=name, file_path=file_path ,project=project)
     # Retrieve id of the FileUpload object that just got created. This is the latest created instance of the class FileUpload

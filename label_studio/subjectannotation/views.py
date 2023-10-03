@@ -65,7 +65,8 @@ def createannotationtask(request, project_id):
 
 def parse_subject_presence_annotations(request, project):
     subj_anno_proj = Project.objects.get(id=project.id+1)
-    annotations = Annotation.objects.filter(project= subj_anno_proj)
+    tasks = Task.objects.filter(project= subj_anno_proj)
+    annotations = Annotation.objects.filter(task__in= tasks)
     for annotation in annotations:
         file_upload = Task.objects.get(id=annotation.task_id).file_upload
         results= annotation.result
@@ -74,7 +75,7 @@ def parse_subject_presence_annotations(request, project):
             start_time = result['value']['start']
             end_time = result['value']['end']
             for label in labels:
-                subject = Subject.objects.get(name=label.replace('Subject: ',''))
+                subject = Subject.objects.get(project= project, name=label.replace('Subject: ',''))
                 if not SubjectPresence.objects.filter(file_upload=file_upload,project=project,subject=subject,
                                                  start_time=start_time,end_time=end_time).exists():
                     SubjectPresence.objects.create(file_upload=file_upload,project=project,subject=subject,
