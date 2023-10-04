@@ -196,8 +196,8 @@ const callback = () => {
 labelStudio.off("event", callback);
 ```
 
-!!! info
-To be able to unsubscribe from an event, you must pass the same callback function reference to the `off` method.
+!!! note
+    To be able to unsubscribe from an event, you must pass the same callback function reference to the `off` method.
 
 ## Available events
 
