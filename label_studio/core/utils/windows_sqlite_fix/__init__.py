@@ -22,12 +22,12 @@ def start_fix():
         else 'sqlite-dll-win32-x86-3350500.zip'
     )
 
-    url = 'https://www.sqlite.org/2021/' + filename
+    url = settings.WINDOWS_SQLITE_BINARY_HOST_PREFIX + filename
 
     src = os.path.join(work_dir, 'sqlite.zip')
     try:
         with open(src, 'wb') as f_out:
-            resp = requests.get(url, settings.VERIFY_SSL_CERTS)  # nosec
+            resp = requests.get(url, verify=settings.VERIFY_SSL_CERTS)  # nosec
             f_out.write(resp.content)
     except Exception as e:
         print(

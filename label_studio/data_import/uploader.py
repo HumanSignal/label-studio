@@ -13,7 +13,6 @@ try:
 except:  # noqa: E722
     import json
 
-from core.feature_flags import flag_set
 from core.utils.common import timeit
 from core.utils.io import validate_upload_url
 from django.conf import settings
@@ -135,15 +134,9 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
         # Reason for #nosec: url has been validated as SSRF safe by the
         # validation check above.
 
-        should_verify = settings.VERIFY_SSL_CERTS
-        if flag_set(
-            'fflag_back_leap_182_dont_verify_ssl_certs',
-            user=project.organization.created_by,
-            override_system_default=False,
-        ):
-            should_verify = False
-
-        response = requests.get(url, verify=should_verify, headers={'Accept-Encoding': None})  # nosec
+        response = requests.get(
+            url, verify=project.organization.should_verify_ssl_certs(), headers={'Accept-Encoding': None}
+        )  # nosec
         file_content = response.content
         check_tasks_max_file_size(int(response.headers['content-length']))
         file_upload = create_file_upload(user, project, SimpleUploadedFile(filename, file_content))

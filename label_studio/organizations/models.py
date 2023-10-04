@@ -64,6 +64,13 @@ class Organization(OrganizationMixin, models.Model):
 
     contact_info = models.EmailField(_('contact info'), blank=True, null=True)
 
+    verify_ssl_certs = models.BooleanField(
+        _('verify ssl certs'),
+        blank=True,
+        null=True,
+        help_text='organization-level override of settings.VERIFY_SSL_CERTS',
+    )
+
     def __str__(self):
         return self.title + ', id=' + str(self.pk)
 
@@ -140,6 +147,11 @@ class Organization(OrganizationMixin, models.Model):
         invited_ids = self.projects.values_list('members__user__pk', flat=True).distinct()
         per_project_invited_users = User.objects.filter(pk__in=invited_ids)
         return per_project_invited_users
+
+    def should_verify_ssl_certs(self) -> bool:
+        if self.verify_ssl_certs is not None:
+            return self.verify_ssl_certs
+        return settings.VERIFY_SSL_CERTS
 
     @property
     def secure_mode(self):
