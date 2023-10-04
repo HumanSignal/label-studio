@@ -30,6 +30,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if uid not in self.context[key]:
             self.context[key][uid] = super().to_representation(instance)
 
+        if instance.is_deleted:
+            for field in ['username', 'first_name', 'last_name', 'email']:
+                if field == 'last_name':
+                    self.context[key][uid][field] = 'USER'
+                else:
+                    self.context[key][uid][field] = 'DELETED'
+
         return self.context[key][uid]
 
     class Meta:
