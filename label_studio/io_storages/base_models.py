@@ -337,6 +337,7 @@ class ImportStorage(Storage):
             logger.debug(f'Create {len(predictions)} predictions for task={task}')
             for prediction in predictions:
                 prediction['task'] = task.id
+                prediction['project'] = project.id
             prediction_ser = PredictionSerializer(data=predictions, many=True)
             if prediction_ser.is_valid(raise_exception=raise_exception):
                 prediction_ser.save()
@@ -345,6 +346,7 @@ class ImportStorage(Storage):
             logger.debug(f'Create {len(annotations)} annotations for task={task}')
             for annotation in annotations:
                 annotation['task'] = task.id
+                annotation['project'] = project.id
             annotation_ser = AnnotationSerializer(data=annotations, many=True)
             if annotation_ser.is_valid(raise_exception=raise_exception):
                 annotation_ser.save()

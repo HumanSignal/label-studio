@@ -253,17 +253,25 @@ def s3_export_bucket_kms(s3):
     yield s3
 
 
-def mock_put_aes(*args, **kwargs):
-    if 'ServerSideEncryption' not in kwargs or kwargs['ServerSideEncryption'] != 'AES256':
-        raise ClientError(
-            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
-        )
+def mock_put(*args, **kwargs):
+    client_error = ClientError(
+        error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
+    )
+    if kwargs['ServerSideEncryption'] == 'AES256':
+        if 'ServerSideEncryption' not in kwargs:
+            raise client_error
+    elif kwargs['ServerSideEncryption'] == 'aws:kms':
+        if 'ServerSideEncryption' not in kwargs or 'SSEKMSKeyId' not in kwargs:
+            raise client_error
+
+    else:
+        raise client_error
 
 
 @pytest.fixture()
 def mock_s3_resource_aes(mocker):
     mock_object = MagicMock()
-    mock_object.put = mock_put_aes
+    mock_object.put = mock_put
 
     mock_object_constructor = MagicMock()
     mock_object_constructor.return_value = mock_object
@@ -275,21 +283,10 @@ def mock_s3_resource_aes(mocker):
     mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
 
 
-def mock_put_kms(*args, **kwargs):
-    if (
-        'ServerSideEncryption' not in kwargs
-        or kwargs['ServerSideEncryption'] != 'aws:kms'
-        or 'SSEKMSKeyId' not in kwargs
-    ):
-        raise ClientError(
-            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
-        )
-
-
 @pytest.fixture()
 def mock_s3_resource_kms(mocker):
     mock_object = MagicMock()
-    mock_object.put = mock_put_kms
+    mock_object.put = mock_put
 
     mock_object_constructor = MagicMock()
     mock_object_constructor.return_value = mock_object
@@ -576,6 +573,19 @@ def get_server_url(live_server):
     yield live_server.url
 
 
+@pytest.fixture(name='ff_front_dev_1682_model_version_dropdown_070622_short_off', autouse=True)
+def ff_front_dev_1682_model_version_dropdown_070622_short_off():
+    from core.feature_flags import flag_set
+
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'ff_front_dev_1682_model_version_dropdown_070622_short':
+            return False
+        return flag_set(*args, **kwargs)
+
+    with mock.patch('tasks.serializers.flag_set', wraps=fake_flag_set):
+        yield
+
+
 @pytest.fixture(name='async_import_off', autouse=True)
 def async_import_off():
     from core.feature_flags import flag_set
@@ -747,3 +757,18 @@ def tick_clock(_, seconds: int = 1) -> None:
     now += timedelta(seconds=seconds)
     freezer = freeze_time(now)
     freezer.start()
+
+
+def pytest_collection_modifyitems(config, items):
+    # This function is called by pytest after the collection of tests has been completed to modify their order
+    # it is being used as a workaround for the fact the kms and aes mocks resist teardown and cause other test failures
+
+    mock_tests = []
+    other_tests = []
+    for item in items:
+        if 'mock_s3_resource_kms' in item.fixturenames or 'mock_s3_resource_aes' in item.fixturenames:
+            mock_tests.append(item)
+        else:
+            other_tests.append(item)
+
+    items[:] = other_tests + mock_tests
