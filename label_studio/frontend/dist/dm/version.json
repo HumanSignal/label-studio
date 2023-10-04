@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
-  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
+  "message": "fix: DIA-554: [FE] Sometimes only a subset of Dataset tasks are displ…",
+  "commit": "a24e53907bb4e7491329bd2a8d9332a138c7af91",
   "branch": "master",
-  "date": "2023/09/26 10:39:21"
+  "date": "2023/10/02 07:25:15"
 }
