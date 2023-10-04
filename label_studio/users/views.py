@@ -13,9 +13,17 @@ from django.shortcuts import redirect, render, reverse
 from django.utils.http import is_safe_url
 from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
+from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from users import forms
 from users.functions import login, proceed_registration
+from users.models import User
+from users.serializers import UserSerializer
+
+HasObjectPermission = load_func(settings.USER_PERM)
 
 logger = logging.getLogger()
 
@@ -149,3 +157,27 @@ def user_account(request):
         'users/user_account.html',
         {'settings': settings, 'user': user, 'user_profile_form': form, 'token': token},
     )
+
+
+class UserSoftDeleteView(generics.RetrieveDestroyAPIView):
+    queryset = User.objects.with_deleted().all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated, HasObjectPermission)
+
+    def get_object(self):
+        pk = self.kwargs[self.lookup_field]
+        user = self.queryset.filter(active_organization=self.request.user.active_organization).get(pk=pk)
+
+        return user
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+
+        self.check_object_permissions(self.request, user)
+        if self.kwargs[self.lookup_field] == self.request.user.pk:
+            raise MethodNotAllowed('User cannot delete self')
+
+        user.is_deleted = True
+        user.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

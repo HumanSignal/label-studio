@@ -83,3 +83,96 @@ stages:
       status_code: 302
       headers:
         location: "/projects/" # redirect to projects page rather than malicious.com
+
+---
+test_name: test_users_soft_delete
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: get_my_user
+  type: ref
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/users'
+  response:
+    status_code: 200
+- name: get_active_organization
+  request:
+    method: GET
+    url: '{django_live_url}/api/users/{user_pk}'
+  response:
+    status_code: 200
+    save:
+      json:
+        org_pk: active_organization
+- name: signup_new_user_under_active_organization
+  request:
+    json:
+      email: test_user@heartextest.com
+      username: test user
+      active_organization: !int '{org_pk}'
+      password: 12345678
+    method: POST
+    url: '{django_live_url}/api/users'
+  response:
+    save:
+      json:
+        new_user_pk: id
+    status_code: 201
+- name: verify_new_user
+  request:
+    method: GET
+    url: '{django_live_url}/api/users/{new_user_pk}'
+  response:
+    status_code: 200
+- name: signup_second_new_user_under_active_organization
+  request:
+    json:
+      email: test_second_user@heartextest.com
+      username: test seconduser
+      active_organization: !int '{org_pk}'
+      password: 12345678
+    method: POST
+    url: '{django_live_url}/api/users'
+  response:
+    save:
+      json:
+        second_new_user_pk: id
+    status_code: 201
+- name: verify_new_user
+  request:
+    method: GET
+    url: '{django_live_url}/api/users/{new_user_pk}'
+  response:
+    status_code: 200
+- name: login_as_second_new_user
+  request:
+    url: "{django_live_url}/user/login"
+    data:
+      email: test_second_user@heartextest.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+- name: soft_delete_user_succeeds
+  request:
+    url: "{django_live_url}/users/{new_user_pk}/soft-delete"
+    method: DELETE
+  response:
+    status_code: 204
+- id: logout
+  type: ref
+- name: login_as_new_user_soft_deleted_fails
+  request:
+    url: "{django_live_url}/user/login/"
+    data:
+      email: test_user@heartextest.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 200 # 302 would redirect on a successful login, 200 actually indicates a login failure
