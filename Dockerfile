@@ -2,11 +2,12 @@
 FROM node:18 AS frontend-builder
 
 ENV NPM_CACHE_LOCATION=$HOME/.cache/yarn/v6 \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    NX_REJECT_UNKNOWN_LOCAL_CACHE=0
 
-WORKDIR /label-studio/label_studio/frontend
+WORKDIR /label-studio/web
 
-COPY --chown=1001:0 label_studio/frontend .
+COPY --chown=1001:0 web .
 COPY --chown=1001:0 label_studio/__init__.py /label-studio/label_studio/__init__.py
 
 # Fix Docker Arm64 Build
@@ -14,8 +15,9 @@ RUN yarn config set registry https://registry.npmjs.org/
 RUN yarn config set network-timeout 1200000 # HTTP timeout used when downloading packages, set to 20 minutes
 
 RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
-    yarn install --frozen-lockfile \
- && yarn run build:production
+    npm install -g node-gyp \
+    && yarn install --frozen-lockfile \
+    && yarn run build
 
 FROM ubuntu:22.04
 
@@ -72,8 +74,8 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
     chown -R 1001:0 $LS_DIR && \
     chmod -R g=u $LS_DIR
 
-RUN rm -rf ./label_studio/frontend
-COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
+RUN rm -rf ./label_studio/web
+COPY --chown=1001:0 --from=frontend-builder /label-studio/web/dist ./label_studio/web/dist
 
 RUN python3 label_studio/manage.py collectstatic --no-input && \
     chown -R 1001:0 $LS_DIR && \
