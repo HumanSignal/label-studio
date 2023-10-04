@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q
-from subjectannotation.views import parse_subject_presence_annotations
 from datetime import timedelta
 from tempfile import NamedTemporaryFile
 from sensordata.views import upload_sensor_data
@@ -8,11 +7,14 @@ from django.conf import settings
 from django.apps import apps
 from django.http import HttpResponse
 from django.urls import reverse
+from rest_framework.authtoken.models import Token
 
 import subprocess
 import os
 import pandas as pd
 import json
+import re
+import requests
 
 from projects.models import Project
 from sensormodel.models import Deployment, Sensor
@@ -20,7 +22,8 @@ from sensordata.models import SensorData, SensorOffset
 from subjectannotation.models import SubjectPresence
 from taskgeneration.models import SensorOverlap
 from taskgeneration.forms import TaskGenerationForm
-
+from taskgeneration.utils.annotation_template import create_activity_annotation_template
+from subjectannotation.views import parse_subject_presence_annotations
 
 def task_generation_page(request,project_id):
     project = Project.objects.get(id=project_id)
@@ -113,9 +116,28 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
         sensortype_A = longest_overlap.sensordata_A.sensor.sensortype.sensortype
         sensortype_B = longest_overlap.sensordata_B.sensor.sensortype.sensortype
         if sensortype_A == 'C' and sensortype_B == 'I':
-
             # Determine amount of segments that fit inside overlap
             amount_of_segments = int(longest_duration // duration) + (longest_duration % duration > 0)
+            # Load data from SensorType and the csv file
+            imu_file_path = longest_overlap.sensordata_B.file_upload.file.path
+            timestamp_column = longest_overlap.sensordata_B.sensor.sensortype.timestamp_column
+            imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
+            # Remove non-letters from column names
+            imu_df.columns = [re.sub(r'[^a-zA-Z]', '', col) for col in imu_df.columns]
+            # Get column names for showing in LS
+            timestamp_column_name = imu_df.columns[timestamp_column]
+            value_column_name = imu_df.columns[int(value_column)]
+            # Update labeling set up in activity annotion project
+            # Create a XML markup for annotating
+            template = create_activity_annotation_template(timestamp_column_name=timestamp_column_name,value_column_name=value_column_name)
+            # Get url for displaying project detail
+            project_detail_url = request.build_absolute_uri(reverse('projects:api:project-detail', args=[project.id+1]))
+            # Update labeling set up
+            token = Token.objects.get(user=request.user)
+            requests.patch(project_detail_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template})
+            # Convert all time entries to float
+            imu_df.iloc[:-1,timestamp_column] = imu_df.iloc[:-1,timestamp_column].astype(float)
+
             for i, segment in enumerate(range(amount_of_segments)):
                 # Determine start and end of segment in seconds for both sensors
                 if i == amount_of_segments-1: # Remaining segment
@@ -149,14 +171,6 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     
                     
                     ### Cut out csv file using pandas ### 
-                    # Load data from SensorType and the csv file
-                    imu_file_path = longest_overlap.sensordata_B.file_upload.file.path
-                    timestamp_column = longest_overlap.sensordata_B.sensor.sensortype.timestamp_column
-                    imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
-                    timestamp_column_name = imu_df.columns[timestamp_column]
-                    value_column_name = imu_df.columns[int(value_column)]
-                    # Convert all time entries to float
-                    imu_df.iloc[:-1,timestamp_column] = imu_df.iloc[:-1,timestamp_column].astype(float)
                     # Find the indeces of the timestamp instances closest to begin and end of segment
                     start_index = imu_df[imu_df.iloc[:, timestamp_column]>= begin_segment_B].index[0] # First timestamp after begin_segment
                     end_index = imu_df[imu_df.iloc[:, timestamp_column] > end_segment_B].index[1] # First timestamp after end_segment
