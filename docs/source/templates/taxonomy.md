@@ -115,7 +115,7 @@ In this example, you are using `children` to specify child nodes. All values are
                 },
                 {
                     "alias": "eukarya01_b2",
-                    "value": "Oppossum"
+                    "value": "Opossum"
                 },
                 {
                     "alias": "eukarya01_b3",
