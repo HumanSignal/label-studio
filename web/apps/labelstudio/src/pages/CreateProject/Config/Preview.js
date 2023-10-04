@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Spinner } from '../../../components';
-import Editor from "@humansignal/editor";
+import { useLibrary } from '../../../providers/LibraryProvider';
 import { cn } from '../../../utils/bem';
 import './Config.styl';
 import { EMPTY_CONFIG } from './Template';
@@ -8,7 +8,7 @@ import { EMPTY_CONFIG } from './Template';
 const configClass = cn("configure");
 
 export const Preview = ({ config, data, error, loading }) => {
-  const LabelStudio = Editor;
+  const LabelStudio = useLibrary('lsf');
   const lsf = useRef(null);
   const rootRef = useRef();
 

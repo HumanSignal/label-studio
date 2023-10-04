@@ -217,6 +217,7 @@ def find_editor_files():
     # find editor files to include in html
     editor_js = [prefix + f for f in os.listdir(editor_dir) if f.endswith('.js')]
     editor_css = [prefix + f for f in os.listdir(editor_dir) if f.endswith('.css')]
+
     return {'editor_js': editor_js, 'editor_css': editor_css}
 
 

@@ -5,6 +5,7 @@ import { Spinner } from '../../components';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
+import { useLibrary } from '../../providers/LibraryProvider';
 import { useAPI } from '../../providers/ApiProvider';
 import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
@@ -14,8 +15,6 @@ import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
-import DM from "@humansignal/datamanager";
-import Editor from "@humansignal/editor";
 import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
@@ -62,8 +61,8 @@ export const DataManagerPage = ({ ...props }) => {
   const history = useHistory();
   const api = useAPI();
   const { project } = useProject();
-  const LabelStudio = Editor;
-  const DataManager = DM;
+  const LabelStudio = useLibrary('lsf');
+  const DataManager = useLibrary('dm');
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const dataManagerRef = useRef();
