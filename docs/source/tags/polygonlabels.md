@@ -25,7 +25,6 @@ Use with the following data types: image.
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of stroke |
 | [pointSize] | <code>small</code> \| <code>medium</code> \| <code>large</code> | <code>medium</code> | Size of polygon handle points |
 | [pointStyle] | <code>rectangle</code> \| <code>circle</code> | <code>rectangle</code> | Style of points |
-| [snap] | <code>pixel</code> \| <code>none</code> | <code>none</code> | Snap polygon to image pixels |
 
 ### Sample Results JSON
 

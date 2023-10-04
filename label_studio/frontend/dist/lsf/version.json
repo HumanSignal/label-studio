@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-133: Blank draft submitted with annotation when using hotkey submit",
-  "commit": "d34cf03f9e80085857f228c6766ec1f76b0e7770",
-  "branch": "master",
-  "date": "2023/09/28 15:09:56"
+  "message": "docs: Small fixes for tag params doc",
+  "commit": "25242aa39065f3c4c0063e951cd67aad2290bffe",
+  "branch": "fb-docs/fix-params",
+  "date": "2023/10/02 09:25:25"
 }

@@ -24,7 +24,6 @@ Use with the following data types: image.
 | [pointStyle] | <code>rectangle</code> \| <code>circle</code> | <code>circle</code> | Style of points |
 | [smart] | <code>boolean</code> |  | Show smart tool for interactive pre-annotations |
 | [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
-| [snap] | <code>pixel</code> \| <code>none</code> | <code>none</code> | Snap polygon to image pixels |
 
 ### Example
 
