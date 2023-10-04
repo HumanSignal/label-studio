@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                 'db_table': 'htx_user',
             },
             managers=[
-                ('objects', users.models.UserManager()),
+                ('objects', users.models.UserManager(disable_is_deleted_filter=True)),
             ],
         ),
         migrations.RunPython(add_tokens),

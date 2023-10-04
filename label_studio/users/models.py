@@ -14,7 +14,6 @@ from django.utils.translation import gettext_lazy as _
 from organizations.models import Organization
 from rest_framework.authtoken.models import Token
 from users.functions import hash_upload
-from users.mixins import UserRelatedManagerMixin
 
 YEAR_START = 1980
 YEAR_CHOICES = []
@@ -24,8 +23,12 @@ for r in range(YEAR_START, (datetime.datetime.now().year + 1)):
 year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 
-class UserManager(UserRelatedManagerMixin, BaseUserManager):
+class UserManager(BaseUserManager):
     use_in_migrations = True
+
+    def __init__(self, disable_is_deleted_filter=False, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.disable_is_deleted_filter = disable_is_deleted_filter
 
     def _create_user(self, email, password, **extra_fields):
         """
@@ -41,6 +44,16 @@ class UserManager(UserRelatedManagerMixin, BaseUserManager):
         user.save(using=self._db)
 
         return user
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.disable_is_deleted_filter:
+            qs = qs.filter(is_deleted=False)
+        return qs
+
+    def with_deleted(self):
+        return super().get_queryset()
+
 
     def create_user(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
