@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
-  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
-  "branch": "master",
-  "date": "2023/09/26 10:39:21"
+  "message": "fix: DIA-548: Grid view in DD does not auto-load next records when us…",
+  "commit": "3436c8c0b7fbf19cba9cf8b815469d57c4d0b411",
+  "branch": "fb-dia-548/grid-scroll",
+  "date": "2023/10/04 11:37:49"
 }
