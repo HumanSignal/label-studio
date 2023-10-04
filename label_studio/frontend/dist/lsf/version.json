@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-1476: Fix selected=true for Taxonomy",
-  "commit": "dd776473575787723297ea1e4cdd619f6f910e2b",
-  "branch": "fb-lsdv-1476/preselected-taxonomy",
-  "date": "2023/10/02 15:17:39"
+  "commit": "c71c229b2d8fc4dfe09687259ee86f5624452a72",
+  "branch": "master",
+  "date": "2023/10/04 14:24:40"
 }
