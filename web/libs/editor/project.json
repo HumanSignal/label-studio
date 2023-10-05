@@ -9,7 +9,7 @@
       "executor": "@nx/webpack:webpack",
       "options": {
         "compiler": "babel",
-        "webpackConfig": "libs/editor/webpack.config.js",
+        "webpackConfig": "webpack.config.js",
         "tsConfig": "libs/editor/tsconfig.lib.json",
         "main": "libs/editor/src/index.ts",
         "outputPath": "dist/libs/editor/js",

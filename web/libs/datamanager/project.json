@@ -9,7 +9,7 @@
       "executor": "@nx/webpack:webpack",
       "options": {
         "compiler": "babel",
-        "webpackConfig": "libs/datamanager/webpack.config.js",
+        "webpackConfig": "webpack.config.js",
         "tsConfig": "libs/datamanager/tsconfig.lib.json",
         "main": "libs/datamanager/src/index.ts",
         "outputPath": "dist/libs/datamanager",

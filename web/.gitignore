@@ -41,6 +41,7 @@ Thumbs.db
 report.*.json
 .env*
 !.env.example
+!.env.build
 !*.lock
 
 

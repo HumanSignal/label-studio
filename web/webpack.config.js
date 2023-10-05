@@ -11,11 +11,11 @@ const { EnvironmentPlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
-const RELEASE = require('../../release').getReleaseName();
+const RELEASE = require('./release').getReleaseName();
 
 const LOCAL_ENV = {
   NODE_ENV: 'development',
-  CSS_PREFIX: 'ls-',
+  CSS_PREFIX: process.env.CSS_PREFIX,
   RELEASE_NAME: RELEASE,
 };
 
@@ -91,7 +91,7 @@ module.exports = composePlugins(withNx({
 
           if (cssLoader && cssLoader.options) {
             cssLoader.options.modules = {
-              localIdentName: 'ls-[local]', // Customize this format
+              localIdentName: process.env.CSS_PREFIX + '[local]', // Customize this format
             };
           }
         }
@@ -109,7 +109,7 @@ module.exports = composePlugins(withNx({
             ..._l.options,
             stylusOptions: {
               ..._l.options.stylusOptions,
-              import: [path.resolve(__dirname, './src/themes/default/variables.styl')],
+              import: [path.resolve(__dirname, 'apps/labelstudio/src/themes/default/variables.styl')],
             },
           };
         });
