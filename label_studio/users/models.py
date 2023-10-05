@@ -154,7 +154,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     @property
     def own_organization(self):
-        return Organization.objects.get(created_by=self)
+         return Organization.objects.filter(created_by=self).first()
 
     @property
     def has_organization(self):
@@ -187,6 +187,12 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         if token.exists():
             token.delete()
         return Token.objects.create(user=self)
+
+    def soft_delete(self):
+        self.is_deleted = True
+        token = Token.objects.filter(user=self)
+        if token.exists():
+            token.delete()
 
     def get_initials(self):
         initials = '?'

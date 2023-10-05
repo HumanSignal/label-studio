@@ -177,7 +177,5 @@ class UserSoftDeleteView(generics.RetrieveDestroyAPIView):
         if self.kwargs[self.lookup_field] == self.request.user.pk:
             raise MethodNotAllowed('User cannot delete self')
 
-        user.is_deleted = True
-        user.save()
-
+        user.soft_delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
