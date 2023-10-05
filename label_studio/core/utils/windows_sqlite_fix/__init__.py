@@ -18,12 +18,8 @@ def start_fix():
     print(f'Copying sqlite3.dll to the current directory: {os.getcwd()} ... ', end='')
 
     work_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = (
-        'sqlite-dll-win64-x64-3350500.zip'
-        if platform.architecture()[0] == '64bit'
-        else 'sqlite-dll-win32-x86-3350500.zip'
-    )
-
+    arch = 'x64' if platform.architecture()[0] == '64bit' else 'x86'
+    filename = f'sqlite-dll-win64-{arch}-3430100.zip'
     url = WINDOWS_SQLITE_BINARY_HOST_PREFIX + filename
 
     src = os.path.join(work_dir, 'sqlite.zip')

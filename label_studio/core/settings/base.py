@@ -113,7 +113,7 @@ DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
 # Overridable at organization level via Organization#verify_ssl_certs
 VERIFY_SSL_CERTS = get_bool_env('VERIFY_SSL_CERTS', True)
 
-# 'sqlite-dll-win64-x64-3350500.zip' and 'sqlite-dll-win32-x86-3350500.zip' should be hosted at this prefix
+# 'sqlite-dll-win64-<arch>-<version>.zip' should be hosted at this prefix
 WINDOWS_SQLITE_BINARY_HOST_PREFIX = get_env('WINDOWS_SQLITE_BINARY_HOST_PREFIX', 'https://www.sqlite.org/2021/')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

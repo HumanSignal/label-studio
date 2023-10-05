@@ -64,13 +64,6 @@ class Organization(OrganizationMixin, models.Model):
 
     contact_info = models.EmailField(_('contact info'), blank=True, null=True)
 
-    verify_ssl_certs = models.BooleanField(
-        _('verify ssl certs'),
-        blank=True,
-        null=True,
-        help_text='organization-level override of settings.VERIFY_SSL_CERTS',
-    )
-
     def __str__(self):
         return self.title + ', id=' + str(self.pk)
 
@@ -149,8 +142,8 @@ class Organization(OrganizationMixin, models.Model):
         return per_project_invited_users
 
     def should_verify_ssl_certs(self) -> bool:
-        if self.verify_ssl_certs is not None:
-            return self.verify_ssl_certs
+        if hasattr(self, 'billing') and (org_verify := self.billing.verify_ssl_certs()) is not None:
+            return org_verify
         return settings.VERIFY_SSL_CERTS
 
     @property
