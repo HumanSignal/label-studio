@@ -95,12 +95,6 @@ stages:
   type: ref
 - id: get_my_user
   type: ref
-- name: stage
-  request:
-    method: GET
-    url: '{django_live_url}/api/users'
-  response:
-    status_code: 200
 - name: get_active_organization
   request:
     method: GET
@@ -110,69 +104,78 @@ stages:
     save:
       json:
         org_pk: active_organization
+- type: ref
+  id: get_invite_url
+- type: ref
+  id: logout
+# signup 2 new users
 - name: signup_new_user_under_active_organization
   request:
-    json:
+    url: "{django_live_url}{invite_url}"
+    data:
       email: test_user@heartextest.com
-      username: test user
-      active_organization: !int '{org_pk}'
       password: 12345678
     method: POST
-    url: '{django_live_url}/api/users'
   response:
-    save:
-      json:
-        new_user_pk: id
-    status_code: 201
-- name: verify_new_user
-  request:
-    method: GET
-    url: '{django_live_url}/api/users/{new_user_pk}'
-  response:
-    status_code: 200
+    status_code: 302
+- type: ref
+  id: logout
 - name: signup_second_new_user_under_active_organization
   request:
-    json:
-      email: test_second_user@heartextest.com
-      username: test seconduser
-      active_organization: !int '{org_pk}'
-      password: 12345678
-    method: POST
-    url: '{django_live_url}/api/users'
-  response:
-    save:
-      json:
-        second_new_user_pk: id
-    status_code: 201
-- name: verify_new_user
-  request:
-    method: GET
-    url: '{django_live_url}/api/users/{new_user_pk}'
-  response:
-    status_code: 200
-- name: login_as_second_new_user
-  request:
-    url: "{django_live_url}/user/login"
+    url: "{django_live_url}{invite_url}"
     data:
       email: test_second_user@heartextest.com
       password: 12345678
     method: POST
   response:
     status_code: 302
-- name: soft_delete_user_succeeds
-  request:
-    url: "{django_live_url}/users/{new_user_pk}/soft-delete"
-    method: DELETE
-  response:
-    status_code: 204
+- id: get_my_user # get user_pk to use in soft-delete
+  type: ref
+- id: get_user_token
+  type: ref
 - id: logout
   type: ref
-- name: login_as_new_user_soft_deleted_fails
+- id: get_my_user_with_token
+  name: Get my user with token
   request:
-    url: "{django_live_url}/user/login/"
+    headers:
+      authorization: "Token {user_token}"
+    url: "{django_live_url}/api/current-user/whoami"
+    method: GET
+  response:
+    status_code: 200
+- name: login_as_first_new_user
+  request:
+    url: "{django_live_url}/user/login"
     data:
       email: test_user@heartextest.com
       password: 12345678
     method: POST
   response:
-    status_code: 200 # 302 would redirect on a successful login, 200 actually indicates a login failure
+    status_code: 302
+- name: soft_delete_user_fails_without_owner_logged_in
+  request:
+    url: "{django_live_url}/users/{user_pk}/soft-delete"
+    method: DELETE
+  response:
+    status_code: 403
+- id: logout
+  type: ref
+- id: login # as owner
+  type: ref
+- name: soft_delete_user_succeeds_as_owner
+  request:
+    url: "{django_live_url}/users/{user_pk}/soft-delete"
+    method: DELETE
+  response:
+    status_code: 204
+- id: logout
+  type: ref
+- name: get_my_user_with_token_fails_as_user_is_now_deleted
+  request:
+    headers:
+      authorization: "Token {user_token}"
+    url: "{django_live_url}/api/current-user/whoami"
+    method: GET
+  response:
+    status_code: 401
