@@ -21,7 +21,7 @@ You can approach your taxonomy definitions in several ways, including:
 
 In both options, the following tags are required:
 
-* The labeling configuration must be wrapped in [View](/tags/view.html) tags.
+* The labeling configuration must be wrapped in [`View`](/tags/view.html) tags.
 * Include the data type you are working with. The example template is classifying text, but the `Taxonomy` tag can also be used with audio, image, HTML, paragraphs, time series, and video.
   
     ```xml
@@ -34,7 +34,7 @@ In both options, the following tags are required:
 
 ## Taxonomies defined using nested `Choice` tags
 
-Use the [`Choice`](/tags/choice.html) tag to specify the taxonomy. Nest choices under [Choice](/tags/choice.html) tags to create layers in the taxonomy.
+Use the [`Choice`](/tags/choice.html) tag to specify the taxonomy. Nest choices under [`Choice`](/tags/choice.html) tags to create layers in the taxonomy.
 
 ```html
 <View>
@@ -56,7 +56,7 @@ Use the [`Choice`](/tags/choice.html) tag to specify the taxonomy. Nest choices 
 
 You can modify the template to call an external taxonomy. To do this, remove the `Choice` tags and specify the `apiUrl` parameter:
 
-```
+```xml
 <Taxonomy name="taxonomy" toName="text" apiUrl="<YOUR_TAXONOMY_URL>" />
 ```
 
@@ -130,9 +130,9 @@ In this example, you are using `children` to specify child nodes. All values are
 
 ### API taxonomies 
 
-When using this format, child nodes are only loaded when requested. Parent nodes are specified using `"isLeaf"=false` and child nodes are called through the `path` parameter.
+When using this format, child nodes are only loaded when requested. Parent nodes are specified using `"isLeaf": false` and child nodes are called through the `path` parameter.
 
-For example, `taxonomy_file?path=node1` where `node1` is the alias (if specified) or the value (if no alias is specified). Therefore you must ensure that your API supports the `path` parameter. 
+For example, `taxonomy_api_url?path=node1` where `node1` is the alias (if specified) or the value (if no alias is specified). Therefore you must ensure that your API supports the `path` parameter. 
 
 
 #### Taxonomy API spec
