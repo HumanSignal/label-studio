@@ -2,6 +2,7 @@
 """
 import datetime
 
+from core.feature_flags import flag_set
 from core.utils.common import load_func
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
@@ -204,8 +205,9 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     def get_initials(self):
         initials = '?'
 
-        if self.is_deleted:
-            return 'DU'
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user='auto'):
+            if self.is_deleted:
+                return 'DU'
 
         if not self.first_name and not self.last_name:
             initials = self.email[0:2]
