@@ -209,8 +209,8 @@ A Label Studio administrator sees all projects and workspaces that exist in the 
   </tr>
   <tr>
     <td>API access to equivalent Label Studio functionality</td>
-    <td></td>
-    <td></td>
+    <td style="text-align:center">✔️</td>
+    <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️ for own or workspace projects</td>
     <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>

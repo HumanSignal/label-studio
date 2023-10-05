@@ -413,6 +413,7 @@ jobs:
       - gitleaks
       - bandit
       - ruff
+      - blue
       - pytest
       - migrations
       - build-docker
@@ -422,5 +423,5 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           allowed-failures:
-          allowed-skips: gitleaks, bandit, ruff, pytest, migrations, conda-test, build-docker
+          allowed-skips: gitleaks, bandit, ruff, blue, pytest, migrations, conda-test, build-docker
           jobs: ${{ toJSON(needs) }}
