@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-33: Fixes for labels by Taxonomy",
-  "commit": "47636358cf4745294d4f556b7e3f441b04943a9d",
+  "commit": "695320336bd12d0ccbf2c796a2c8984fba34a032",
   "branch": "fb-leap-33/taxonomy-labels",
-  "date": "2023/10/04 15:27:11"
+  "date": "2023/10/05 14:30:07"
 }
