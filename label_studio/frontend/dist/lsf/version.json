@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-133: Blank draft submitted with annotation when using hotkey submit",
-  "commit": "d34cf03f9e80085857f228c6766ec1f76b0e7770",
+  "message": "fix: LSDV-1476: Fix selected=true for Taxonomy",
+  "commit": "c71c229b2d8fc4dfe09687259ee86f5624452a72",
   "branch": "master",
-  "date": "2023/09/28 15:09:56"
+  "date": "2023/10/04 14:24:40"
 }
