@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev:watch": "nx run labelstudio:build:development --watch",
+    "ls:watch": "nx run labelstudio:build:development --watch",
+    "lsf:watch": "nx run editor:build:development --watch",
+    "dm:watch": "nx run datamanager:build:development --watch",
     "dev": "nx run labelstudio:build:development",
     "build": "nx run labelstudio:build:production",
     "test": "nx run labelstudio:test:ci"
