@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-5357: Remove Taxonomy flags",
-  "commit": "5dd02b421f7d230c16411311d188ef90d3d227db",
+  "message": "chore: LEAP-221: Remove Taxonomy flags",
+  "commit": "d311b031127659dd543e68c1a5523fb3d3e4ac7e",
   "branch": "fb-lsdv-5357/taxonomy-flags",
-  "date": "2023/10/04 19:28:23"
+  "date": "2023/10/05 16:11:05"
 }
