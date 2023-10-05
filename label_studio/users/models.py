@@ -154,7 +154,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     @property
     def own_organization(self):
-         return Organization.objects.filter(created_by=self).first()
+        return Organization.objects.filter(created_by=self).first()
 
     @property
     def has_organization(self):
