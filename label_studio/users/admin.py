@@ -17,7 +17,7 @@ class UserAdminShort(UserAdmin):
 
     def get_queryset(self, request):
         # Use the with_deleted method to include soft-deleted users in the queryset
-        return User.objects.with_deleted()
+        return User.with_deleted.all()
 
     def __init__(self, *args, **kwargs):
         super(UserAdminShort, self).__init__(*args, **kwargs)

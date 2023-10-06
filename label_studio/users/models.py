@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import datetime
+from typing import Any
 
 from core.feature_flags import flag_set
 from core.utils.common import load_func
@@ -24,12 +25,8 @@ for r in range(YEAR_START, (datetime.datetime.now().year + 1)):
 year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 
-class UserManager(BaseUserManager):
-    use_in_migrations = True
-
-    def __init__(self, disable_is_deleted_filter=False, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.disable_is_deleted_filter = disable_is_deleted_filter
+class UserManagerWithDeleted(BaseUserManager):
+    use_in_migrations: bool = True
 
     def _create_user(self, email, password, **extra_fields):
         """
@@ -45,15 +42,6 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
 
         return user
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        if not self.disable_is_deleted_filter:
-            qs = qs.filter(is_deleted=False)
-        return qs
-
-    def with_deleted(self):
-        return super().get_queryset()
 
     def create_user(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
@@ -71,6 +59,12 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
+class UserManager(UserManagerWithDeleted):
+    use_in_migrations: bool = False
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(is_deleted=False)
+        return qs
 
 class UserLastActivityMixin(models.Model):
     last_activity = models.DateTimeField(_('last activity'), default=timezone.now, editable=False)
@@ -131,6 +125,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     )
 
     objects = UserManager()
+    with_deleted = UserManagerWithDeleted()
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
@@ -205,7 +200,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     def get_initials(self):
         initials = '?'
 
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user='auto'):
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self):
             if self.is_deleted:
                 return 'DU'
 

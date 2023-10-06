@@ -31,14 +31,10 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if uid not in self.context[key]:
             self.context[key][uid] = super().to_representation(instance)
 
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user='auto'):
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=instance):
             if instance.is_deleted:
                 for field in ['username', 'first_name', 'last_name', 'email']:
-                    if field == 'last_name':
-                        self.context[key][uid][field] = 'USER'
-                    else:
-                        self.context[key][uid][field] = 'DELETED'
-
+                    self.context[key][uid][field] = 'USER' if field == 'last_name' else 'DELETED'
         return self.context[key][uid]
 
     class Meta:
