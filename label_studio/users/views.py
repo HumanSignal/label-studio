@@ -4,6 +4,7 @@ import logging
 
 from core.feature_flags import flag_set
 from core.middleware import enforce_csrf_checks
+from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import load_func
 from django.conf import settings
 from django.contrib import auth
@@ -160,10 +161,12 @@ def user_account(request):
 
 
 class UserSoftDeleteView(generics.RetrieveDestroyAPIView):
-    queryset = User.objects.with_deleted().all()
+    permission_required = ViewClassPermission(
+        DELETE=all_permissions.organizations_change,
+    )
+    queryset = User.with_deleted.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, HasObjectPermission)
-
     def get_object(self):
         pk = self.kwargs[self.lookup_field]
         user = self.queryset.filter(active_organization=self.request.user.active_organization).get(pk=pk)
