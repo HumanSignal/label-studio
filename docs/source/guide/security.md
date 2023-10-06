@@ -61,6 +61,13 @@ If you're using Label Studio Enterprise, you can further secure user access in m
 
 Access to the REST API is restricted by user role and requires an access token that is specific to a user account. Access tokens can be reset at any time from the Label Studio UI or using the API.
 
+## Enable SSRF protection for production environments
+
+When deploying Label Studio into a production environment, set the `SSRF_PROTECTION_ENABLED` environment variable to `true`. 
+
+This variable is disabled by default to support users who are working with data in their local environments. However, it should be enabled in production usage. 
+
+
 ## Secure access to data in Label Studio
 
 Data in Label Studio is stored in one or two places, depending on your deployment configuration.
