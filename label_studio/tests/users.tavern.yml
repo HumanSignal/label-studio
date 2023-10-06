@@ -169,6 +169,12 @@ stages:
     method: DELETE
   response:
     status_code: 204
+- name: soft_delete_user_fails_second_deletion_attempt
+  request:
+    url: "{django_live_url}/users/{user_pk}/soft-delete"
+    method: DELETE
+  response:
+    status_code: 500
 - id: logout
   type: ref
 - name: get_my_user_with_token_fails_as_user_is_now_deleted

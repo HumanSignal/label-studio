@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+from typing import Any
 
 from core.feature_flags import flag_set
 from core.middleware import enforce_csrf_checks
@@ -18,6 +19,7 @@ from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from users import forms
 from users.functions import login, proceed_registration
@@ -164,17 +166,18 @@ class UserSoftDeleteView(generics.RetrieveDestroyAPIView):
     permission_required = ViewClassPermission(
         DELETE=all_permissions.organizations_change,
     )
-    queryset = User.with_deleted.all()
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, HasObjectPermission)
 
-    def get_object(self):
+    def get_object(self) -> User:
         pk = self.kwargs[self.lookup_field]
+        # only fetch & delete user if they are in the same organization as the calling user
         user = self.queryset.filter(active_organization=self.request.user.active_organization).get(pk=pk)
 
         return user
 
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         user = self.get_object()
 
         self.check_object_permissions(self.request, user)
