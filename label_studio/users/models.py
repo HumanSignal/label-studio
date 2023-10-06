@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import datetime
-from typing import Any
 
 from core.feature_flags import flag_set
 from core.utils.common import load_func
@@ -59,12 +58,15 @@ class UserManagerWithDeleted(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
+
 class UserManager(UserManagerWithDeleted):
     use_in_migrations: bool = False
+
     def get_queryset(self):
         qs = super().get_queryset()
         qs = qs.filter(is_deleted=False)
         return qs
+
 
 class UserLastActivityMixin(models.Model):
     last_activity = models.DateTimeField(_('last activity'), default=timezone.now, editable=False)
