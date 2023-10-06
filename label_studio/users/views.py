@@ -167,6 +167,7 @@ class UserSoftDeleteView(generics.RetrieveDestroyAPIView):
     queryset = User.with_deleted.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, HasObjectPermission)
+
     def get_object(self):
         pk = self.kwargs[self.lookup_field]
         user = self.queryset.filter(active_organization=self.request.user.active_organization).get(pk=pk)
