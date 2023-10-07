@@ -185,6 +185,12 @@ INSTALLED_APPS = [
     'io_storages',
     'ml',
     'webhooks',
+    'labels_manager',
+    'sensormodel',
+    'subjectannotation',
+    'sensordata',
+    'landingpage',
+    'taskgeneration',
 ]
 
 MIDDLEWARE = [
@@ -361,7 +367,7 @@ DELAYED_EXPORT_DIR = 'export'
 os.makedirs(os.path.join(BASE_DATA_DIR, MEDIA_ROOT, DELAYED_EXPORT_DIR), exist_ok=True)
 
 # file / task size limits
-DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 10000 * 1024 * 1024))
 TASKS_MAX_NUMBER = 1000000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+
+<style>
+    table {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    tr:nth-child(even){
+        background-color: #f2f2f2;
+    }
+    th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D !important;
+        color: white;
+    }
+    .tables {
+        margin: 1em;
+    }
+    input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 1em;
+    }
+
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome</h1>
+    <div class="buttons">
+        <form action="/landingpage/create_project">
+            <input type="submit" value="Create new project" style="background-color: #c4862b; width:25%"/>
+        </form>
+    </div>
+    <div class="projects">
+        <h2>Projects</h2>
+        <table class="tables">
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th></th>
+                <th></th>
+            </tr>
+            <tr>
+            {% for project in projects %}
+            <tr>
+                <td>{{ project.name }}</td>
+                <td>{{ project.project_id }}</td>
+                <td><a href="{% url 'landingpage:landingpage' project.project_id %}">Go to project page</a></td>
+                <td><a href="{% url 'landingpage:delete-project' project.project_id %}">[Delete]</a></td>
+            </tr> 
+           {% endfor %} 
+        </table>
+    </div>
+</body>
+
+{% endblock %}

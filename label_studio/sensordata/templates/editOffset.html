@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<style>
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+</style>
+<head>
+    <title></title>
+</head>
+<body>
+    <div class="buttons">
+        <form action="{% url 'sensordata:offset' project.id %}">
+            <input type="submit" value="Go back to sensor offset page" />
+        </form>
+    </div>
+    <div class="forms">
+        <p>Add the offset between the camera and the IMU. Since the internal time of both devices will never be fully synced there will always be an offset between the two.</p>
+        <p>Here this offset can be added in milliseconds to synchronize the data of the camera and the IMU.</p>
+        <form action="" method="post">
+            <table>
+            {{ offsetform.as_table }}
+            </table>
+            <input type="submit" value="Adjust sensor offset">
+        </form>
+    </div>
+
+</body>
+
+
+{% endblock %}

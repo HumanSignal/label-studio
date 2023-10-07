@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+<head>
+    <title>Landingpage</title>
+</head>
+<body>
+  <div class="buttons">
+    <form action="/landingpage/dashboard">
+      <input type="submit" value="Go back to dashboard" style="background-color: #c4862b; width:25%"/>
+    </form>
+  </div>
+    <h1>{{ main_project }} - overview</h1>
+    <ol>
+        <li><a href="{% url 'sensormodel:sensor' main_project.project_id %}">Manage sensors</a></li>
+        Manage your project sensors here. Add cameras or IMU sensors to your projects.
+        <li><a href="{% url 'sensormodel:subject' main_project.project_id %}">Manage subjects</a></li>
+        Manage your project subjects here. Here, you can add and edit the subjects used in your projects.
+        <li><a href="{% url 'sensormodel:deployment' main_project.project_id %}">Manage deployments</a></li>
+        Manage your project deployments here. This gives an overview of the deployments of your sensors to your subjects.
+        <li><a href="{% url 'sensordata:sensordatapage' main_project.project_id %}">Manage data</a></li>
+        Manage your experimental data here. Here you can add zip files with your IMU or camera data to the project.
+        <li><a href="{% url 'sensordata:offset' main_project.project_id %}">Synchronize sensors</a></li>
+        Here you can add the offset between the camera data and the IMU data.
+        <li><a href="{% url 'subjectannotation:annotationtaskpage' main_project.project_id %}">Annotate subject presence</a></li>
+        Here you can annotate the subject presence in your videos. The videos can be annotated with your subjects as labels.
+        <li><a href="{% url 'landingpage:workinprogress' main_project.project_id %}">Add labels</a></li>
+        Here the different activity labels of the subjects can be managed. These labels will later be used to annotate your data.
+        <li><a href="{% url 'taskgeneration:generate_form' main_project.project_id %}">Generate activity annotation tasks</a></li>
+        Here the tasks for a chosen subject can be generated.
+        <li><a href="{% url 'landingpage:workinprogress' main_project.project_id %}">Annotate</a></li>
+        Annotate the data using the activity labels. It is only data with subjects present.
+        <li><a href="{% url 'landingpage:export-project' main_project.project_id %}">Export annotations</a></li>
+        Export your subject and activity annotations.
+    </ol>
+</body>
+
+{% endblock %}

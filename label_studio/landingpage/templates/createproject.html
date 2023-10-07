@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+<head>
+    <title>Create Projects</title>
+</head>
+<body>
+    <div class="buttons">
+        <form action="/landingpage/dashboard">
+            <input type="submit" value="Go back to dashboard" style="background-color: #c4862b; width:25%"/>
+        </form>
+    </div>
+    <div class="forms">
+        <h2>Create Project</h2>
+        <form enctype="multipart/form-data" action="/landingpage/create_project" method="post">
+            {{ createprojectform }}
+            <input type="submit" value="Create Project">
+        </form>
+    </div>
+</body>
+
+{% endblock %}
