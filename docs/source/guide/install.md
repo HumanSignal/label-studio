@@ -99,7 +99,7 @@ docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/labe
 ```
 
 !!! attention "important"
-As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
+    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
 
 ### Install with Docker on Windows
 

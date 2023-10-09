@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
-  "commit": "688ba577fdc3a6b87ca24e94f27c7b2aac511b2a",
+  "message": "fix: LEAP-250: Fix maxUsages for New Taxonomy",
+  "commit": "9ce03a2f1e08e4d19b213652ba31a639272bb971",
   "branch": "master",
-  "date": "2023/09/22 11:06:17"
+  "date": "2023/10/09 15:36:16"
 }
