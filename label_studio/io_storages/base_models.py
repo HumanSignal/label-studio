@@ -403,6 +403,11 @@ class ImportStorage(Storage):
             tasks_for_webhook.append(task)
 
             # settings.WEBHOOK_BATCH_SIZE
+            # `WEBHOOK_BATCH_SIZE` sets the maximum number of tasks sent in a single webhook call, ensuring manageable payload sizes.
+            # When `tasks_for_webhook` accumulates tasks equal to/exceeding `WEBHOOK_BATCH_SIZE`, they're sent in a webhook via
+            # `emit_webhooks_for_instance`, and `tasks_for_webhook` is cleared for new tasks.
+            # If tasks remain in `tasks_for_webhook` at process end (less than `WEBHOOK_BATCH_SIZE`), they're sent in a final webhook
+            # call to ensure all tasks are processed and no task is left unreported in the webhook.
             if len(tasks_for_webhook) >= settings.WEBHOOK_BATCH_SIZE:
                 emit_webhooks_for_instance(
                     self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
