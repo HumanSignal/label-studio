@@ -108,6 +108,14 @@ INTERNAL_PORT = '8080'
 DEBUG = get_bool_env('DEBUG', True)
 DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
 
+# Whether to verify SSL certs when making external requests, eg in the uploader
+# ⚠️ Turning this off means assuming risk. ⚠️
+# Overridable at organization level via Organization#verify_ssl_certs
+VERIFY_SSL_CERTS = get_bool_env('VERIFY_SSL_CERTS', True)
+
+# 'sqlite-dll-<arch>-<version>.zip' should be hosted at this prefix
+WINDOWS_SQLITE_BINARY_HOST_PREFIX = get_env('WINDOWS_SQLITE_BINARY_HOST_PREFIX', 'https://www.sqlite.org/2023/')
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
