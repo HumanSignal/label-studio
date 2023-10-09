@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1476: Fix selected=true for Taxonomy",
-  "commit": "c71c229b2d8fc4dfe09687259ee86f5624452a72",
-  "branch": "master",
-  "date": "2023/10/04 14:24:40"
+  "message": "fix: LEAP-235: Fix the property showFullPath to work as it was working in the old taxonomy",
+  "commit": "d8d1f6f36fbe9ce07be0d98705c1615e074b5753",
+  "branch": "fb-leap-235",
+  "date": "2023/10/09 15:59:58"
 }
