@@ -209,8 +209,8 @@ A Label Studio administrator sees all projects and workspaces that exist in the 
   </tr>
   <tr>
     <td>API access to equivalent Label Studio functionality</td>
-    <td></td>
-    <td></td>
+    <td style="text-align:center">✔️</td>
+    <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️ for own or workspace projects</td>
     <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>
@@ -283,7 +283,7 @@ To activate a user account and assign a role, do the following:
 ### Statuses of user accounts
 
 !!! note
-`NOT_ACTIVATED` status is equal to `Pending` status.
+    `NOT_ACTIVATED` status is equal to `Pending` status.
 
 If a user is in `Pending` status then it means he was invited and signed up for the account, but his role is not defined by administrator.
 
