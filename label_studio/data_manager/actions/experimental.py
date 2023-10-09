@@ -390,11 +390,51 @@ def add_data_field_form(user, project):
     }]
 
 
+def dino_text_form(user, project):
+    return [
+        {
+            'columnCount': 1,
+            'fields': [
+                {'type': 'input', 'name': 'text_prompt', 'label': 'Input text prompt'},
+            ],
+        }
+    ]
+
+
+def dino_predictions(project, queryset, **kwargs):
+
+    request = kwargs['request']
+
+    text_prompt = request.data.get('text_prompt')
+
+    # evaluate_predictions(queryset)
+
+    context = {
+        'result': [
+                    {'value': {'text': [text_prompt]}, 'from_name': 'prompt', 'to_name': 'image', 'type': 'textarea', 'origin': 'manual'},
+                ],
+    }
+
+    """Call ML backend for prediction evaluation of the task queryset"""
+    tasks = queryset
+    if not tasks:
+        return
+    project = tasks[0].project
+
+    print(f"the tasks are {tasks}")
+
+
+    for ml_backend in project.ml_backends.all():
+        # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
+        ml_backend.predict_tasks(tasks=tasks, context=context)
+
+    return {'processed_items': queryset.count(), 'detail': 'Retrieved ' + str(queryset.count()) + ' predictions'}
+
 actions = [
     {
         'entry_point': add_data_field,
         'permission': all_permissions.projects_change,
-        'title': 'Add Or Modify Data Field',
+        'title': 'Add Or Modify Data Fields',
         'order': 1,
         'experimental': True,
         'dialog': {
@@ -403,6 +443,22 @@ actions = [
                     'You can use the following expressions: ' + add_data_field_examples,
             'type': 'confirm',
             'form': add_data_field_form,
+        }
+    },
+
+    {
+        'entry_point': dino_predictions,
+        'permission': all_permissions.projects_change,
+        'title': 'Add Text Prompt For Grounding DINO',
+        'order': 90, # check why this is the way it is
+        'experimental': True,
+        'dialog': {
+            'text': 'After selecting the images you want to annotate, enter in the text prompt for classes you want to select and submit this form.'
+            'Please confirm your action.',
+            'type': 'confirm',
+            # 'form': dino_text_form, # need a form because regular retrieve predictions doesn't
+            'form': dino_text_form, # need a form because regular retrieve predictions doesn't
+
         }
     },
 
@@ -426,7 +482,7 @@ actions = [
     {
         'entry_point': remove_duplicates,
         'permission': all_permissions.projects_change,
-        'title': 'Remove Duplicated Tasks',
+        'title': 'Remove Duplicated Task',
         'order': 1,
         'experimental': True,
         'dialog': {

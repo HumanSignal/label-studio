@@ -157,7 +157,7 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-    def predict_tasks(self, tasks):
+    def predict_tasks(self, tasks, context=None):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
@@ -174,8 +174,18 @@ class MLBackend(models.Model):
         if not tasks.exists():
             logger.debug(f'All tasks already have prediction from model version={self.model_version}')
             return
+        
+        if context:
+            TaskSimpleSerializer.context = context
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+
+        # changed this line
+        # ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+
+        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project, context=context)
+
+
+        # end of changes
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
