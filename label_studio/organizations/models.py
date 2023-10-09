@@ -141,6 +141,11 @@ class Organization(OrganizationMixin, models.Model):
         per_project_invited_users = User.objects.filter(pk__in=invited_ids)
         return per_project_invited_users
 
+    def should_verify_ssl_certs(self) -> bool:
+        if hasattr(self, 'billing') and (org_verify := self.billing.verify_ssl_certs()) is not None:
+            return org_verify
+        return settings.VERIFY_SSL_CERTS
+
     @property
     def secure_mode(self):
         return False

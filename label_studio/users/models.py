@@ -2,6 +2,7 @@
 """
 import datetime
 
+from core.feature_flags import flag_set
 from core.utils.common import load_func
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
@@ -23,8 +24,8 @@ for r in range(YEAR_START, (datetime.datetime.now().year + 1)):
 year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 
-class UserManager(BaseUserManager):
-    use_in_migrations = True
+class UserManagerWithDeleted(BaseUserManager):
+    use_in_migrations: bool = True
 
     def _create_user(self, email, password, **extra_fields):
         """
@@ -56,6 +57,15 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self._create_user(email, password, **extra_fields)
+
+
+class UserManager(UserManagerWithDeleted):
+    use_in_migrations: bool = False
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(is_deleted=False)
+        return qs
 
 
 class UserLastActivityMixin(models.Model):
@@ -117,6 +127,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     )
 
     objects = UserManager()
+    with_deleted = UserManagerWithDeleted()
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
@@ -190,6 +201,11 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     def get_initials(self):
         initials = '?'
+
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self):
+            if self.is_deleted:
+                return 'DU'
+
         if not self.first_name and not self.last_name:
             initials = self.email[0:2]
         elif self.first_name and not self.last_name:
