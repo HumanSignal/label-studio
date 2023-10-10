@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import datetime
+from typing import Optional
 
 from core.feature_flags import flag_set
 from core.utils.common import load_func
@@ -165,7 +166,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         return annotations.values_list('project').distinct().count()
 
     @property
-    def own_organization(self) -> Organization:
+    def own_organization(self) -> Optional[Organization]:
         return fast_first(Organization.objects.filter(created_by=self))
 
     @property

@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.shortcuts import redirect, render, reverse
 from django.utils.http import is_safe_url
 from organizations.forms import OrganizationSignupForm
@@ -173,7 +174,10 @@ class UserSoftDeleteView(generics.RetrieveDestroyAPIView):
     def get_object(self) -> User:
         pk = self.kwargs[self.lookup_field]
         # only fetch & delete user if they are in the same organization as the calling user
-        user = self.queryset.filter(active_organization=self.request.user.active_organization).get(pk=pk)
+        try:
+            user = self.queryset.filter(active_organization=self.request.user.active_organization).get(pk=pk)
+        except User.DoesNotExist:
+            raise Http404('User could not be found in organization')
 
         return user
 

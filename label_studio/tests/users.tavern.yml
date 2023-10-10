@@ -198,7 +198,7 @@ stages:
     url: "{django_live_url}/users/{user_pk}/soft-delete"
     method: DELETE
   response:
-    status_code: 500
+    status_code: 404
 
 - id: logout
   type: ref
