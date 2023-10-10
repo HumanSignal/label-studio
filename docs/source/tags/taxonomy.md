@@ -32,6 +32,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [placeholder=] | <code>string</code> |  | What to display as prompt on the input |
 | [perRegion] | <code>boolean</code> |  | Use this tag to classify specific regions instead of the whole object |
 | [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object[^1] |
+| [legacy] | <code>boolean</code> |  | Use this tag to display the legacy version of the Taxonomy[^2] |
 
 ### Example
 
