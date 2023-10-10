@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5044: Add queueTotal to lsfProperties from project",
-  "commit": "71cdecaec6a7ed5c069f2a739e99f3e00272882c",
-  "branch": "fb-lsdv-5044/task-count-total",
-  "date": "2023/10/04 13:55:49"
+  "message": "fix: LEAP-250: Fix maxUsages for New Taxonomy",
+  "commit": "9ce03a2f1e08e4d19b213652ba31a639272bb971",
+  "branch": "master",
+  "date": "2023/10/09 15:36:16"
 }

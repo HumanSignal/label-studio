@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5044: Add queTotal to lsfProperties from project",
-  "commit": "355b211d6a7f707d3dff78fe0aec137441ce2743",
+  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
+  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
   "branch": "master",
-  "date": "2023/10/05 11:27:32"
+  "date": "2023/09/26 10:39:21"
 }
