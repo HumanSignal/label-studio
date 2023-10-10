@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-250: Fix maxUsages for New Taxonomy",
-  "commit": "9ce03a2f1e08e4d19b213652ba31a639272bb971",
-  "branch": "master",
-  "date": "2023/10/09 15:36:16"
+  "message": "fix: LEAP-256: Include the 'legacy' property in the 'Taxonomy' tag",
+  "commit": "b4724db1f8e998db90d685d7e82330d25d817b51",
+  "branch": "fb-leap-256",
+  "date": "2023/10/10 16:09:11"
 }
