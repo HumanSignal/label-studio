@@ -130,9 +130,7 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
             # Update labeling set up in activity annotion project
             # Create a XML markup for annotating
             template = create_activity_annotation_template(timestamp_column_name=timestamp_column_name,value_column_name=value_column_name)
-            print(template)
             # Get url for displaying project detail
-            print(project.id+2)
             project_detail_url = request.build_absolute_uri(reverse('projects:api:project-detail', args=[project.id+2]))
             # Update labeling set up
             token = Token.objects.get(user=request.user)
@@ -192,7 +190,7 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     activity_annotation_project = Project.objects.get(id=project.id+2)
                     task_json_template = {
                         "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",
-                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),300); console.log('video is loaded, starting to sync with time series')}}, 3000); \" />"
+                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),100); console.log('video is loaded, starting to sync with time series')}}, 3000); \" />"
                     }
                     with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
                         json.dump(task_json_template,task_json_file,indent=4)
