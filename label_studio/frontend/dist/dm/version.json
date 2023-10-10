@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-548: Grid view in DD does not auto-load next records when us…",
-  "commit": "212d944bf8db597ed713b708733084369c528b86",
+  "message": "fix: DIA-548: Grid view in DD does not auto-load next records when user scrolls down",
+  "commit": "55b0047b5892977e3bca4b1f7f465e71722617ac",
   "branch": "fb-dia-548/grid-scroll",
-  "date": "2023/10/05 09:46:23"
+  "date": "2023/10/10 06:56:49"
 }
