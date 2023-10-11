@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-235: Fix the property showFullPath to work as it was working in the old taxonomy",
-  "commit": "1b8adb2e5f0c56ab32d7f6e5eaeaefea358e2d3b",
+  "commit": "89636014d3efa517e726a6b5ad2d25008a121aed",
   "branch": "fb-leap-235",
-  "date": "2023/10/11 15:02:47"
+  "date": "2023/10/11 15:27:55"
 }
