@@ -5,6 +5,9 @@ import sys
 import colorama
 import requests
 
+# NB: importing django.conf.settings did not work in this file
+from label_studio.core.settings.base import VERIFY_SSL_CERTS, WINDOWS_SQLITE_BINARY_HOST_PREFIX
+
 logger = logging.getLogger('main')
 
 
@@ -15,18 +18,14 @@ def start_fix():
     print(f'Copying sqlite3.dll to the current directory: {os.getcwd()} ... ', end='')
 
     work_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = (
-        'sqlite-dll-win64-x64-3350500.zip'
-        if platform.architecture()[0] == '64bit'
-        else 'sqlite-dll-win32-x86-3350500.zip'
-    )
-
-    url = 'https://www.sqlite.org/2021/' + filename
+    arch = 'win64-x64' if platform.architecture()[0] == '64bit' else 'win32-x86'
+    filename = f'sqlite-dll-{arch}-3430100.zip'
+    url = WINDOWS_SQLITE_BINARY_HOST_PREFIX + filename
 
     src = os.path.join(work_dir, 'sqlite.zip')
     try:
         with open(src, 'wb') as f_out:
-            resp = requests.get(url, verify=False)  # nosec
+            resp = requests.get(url, verify=VERIFY_SSL_CERTS)  # nosec
             f_out.write(resp.content)
     except Exception as e:
         print(

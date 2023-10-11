@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1476: Fix selected=true for Taxonomy",
-  "commit": "c71c229b2d8fc4dfe09687259ee86f5624452a72",
+  "message": "fix: LEAP-250: Fix maxUsages for New Taxonomy",
+  "commit": "9ce03a2f1e08e4d19b213652ba31a639272bb971",
   "branch": "master",
-  "date": "2023/10/04 14:24:40"
+  "date": "2023/10/09 15:36:16"
 }
