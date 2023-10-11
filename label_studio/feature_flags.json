@@ -3225,7 +3225,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short": {
@@ -3279,7 +3279,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_feat_front_lsdv_e_278_contextual_scrolling_short": {
@@ -3479,7 +3479,7 @@
       "contextTargets": [],
       "rules": [],
       "fallthrough": {
-        "variation": 1
+        "variation": 0
       },
       "offVariation": 1,
       "variations": [
@@ -3495,7 +3495,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 9,
+      "version": 10,
       "deleted": false
     },
     "fflag_feat_optic_67_drag_and_drop_charts": {
@@ -3846,7 +3846,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_back_lsdv_1044_check_annotations_24012023_short": {
@@ -4607,7 +4607,7 @@
     },
     "fflag_fix_front_leap_149_taxonomy_selected_true_short": {
       "key": "fflag_fix_front_leap_149_taxonomy_selected_true_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -4629,7 +4629,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 4,
       "deleted": false
     },
     "fflag_fix_front_leap_32_zoom_perf_190923_short": {
@@ -4980,7 +4980,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation": {
