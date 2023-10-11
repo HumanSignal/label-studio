@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-133: Blank draft submitted with annotation when using hotkey submit",
-  "commit": "d34cf03f9e80085857f228c6766ec1f76b0e7770",
+  "message": "fix: LEAP-250: Fix maxUsages for New Taxonomy",
+  "commit": "9ce03a2f1e08e4d19b213652ba31a639272bb971",
   "branch": "master",
-  "date": "2023/09/28 15:09:56"
+  "date": "2023/10/09 15:36:16"
 }
