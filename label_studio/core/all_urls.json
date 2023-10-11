@@ -432,6 +432,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/users/<int:pk>/soft-delete/",
+        "module": "users.views.UserSoftDeleteView",
+        "name": "user-soft-delete",
+        "decorators": ""
+    },
+    {
         "url": "/api/",
         "module": "rest_framework.routers.APIRootView",
         "name": "api-root",
@@ -491,13 +497,6 @@
         "name": "current-user-whoami",
         "decorators": ""
     },
-    {
-        "url": "/users/<int:pk>/soft-delete/",
-        "module": "users.views.UserSoftDeleteView",
-        "name": "user-soft-delete",
-        "decorators": ""
-    },
-
     {
         "url": "/api/tasks/",
         "module": "tasks.api.TaskListAPI",
