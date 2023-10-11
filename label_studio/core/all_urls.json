@@ -492,6 +492,13 @@
         "decorators": ""
     },
     {
+        "url": "/users/<int:pk>/soft-delete/",
+        "module": "users.views.UserSoftDeleteView",
+        "name": "user-soft-delete",
+        "decorators": ""
+    },
+
+    {
         "url": "/api/tasks/",
         "module": "tasks.api.TaskListAPI",
         "name": "tasks:api:task-list",
