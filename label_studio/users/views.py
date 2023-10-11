@@ -1,21 +1,33 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+from typing import Any
 
 from core.feature_flags import flag_set
 from core.middleware import enforce_csrf_checks
+from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import load_func
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.shortcuts import redirect, render, reverse
 from django.utils.http import is_safe_url
 from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
+from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
 from users import forms
 from users.functions import login, proceed_registration
+from users.models import User
+from users.serializers import UserSerializer
+
+HasObjectPermission = load_func(settings.USER_PERM)
 
 logger = logging.getLogger()
 
@@ -149,3 +161,32 @@ def user_account(request):
         'users/user_account.html',
         {'settings': settings, 'user': user, 'user_profile_form': form, 'token': token},
     )
+
+
+class UserSoftDeleteView(generics.RetrieveDestroyAPIView):
+    permission_required = ViewClassPermission(
+        DELETE=all_permissions.organizations_change,
+    )
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated, HasObjectPermission)
+
+    def get_object(self) -> User:
+        pk = self.kwargs[self.lookup_field]
+        # only fetch & delete user if they are in the same organization as the calling user
+        try:
+            user = self.queryset.filter(active_organization=self.request.user.active_organization).get(pk=pk)
+        except User.DoesNotExist:
+            raise Http404('User could not be found in organization')
+
+        return user
+
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        user = self.get_object()
+
+        self.check_object_permissions(self.request, user)
+        if self.kwargs[self.lookup_field] == self.request.user.pk:
+            raise MethodNotAllowed('User cannot delete self')
+
+        user.soft_delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
