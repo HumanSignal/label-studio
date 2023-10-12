@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-250: Fix maxUsages for New Taxonomy",
-  "commit": "9ce03a2f1e08e4d19b213652ba31a639272bb971",
+  "message": "fix: LEAP-33: Fixes for labels by Taxonomy",
+  "commit": "05b67ad284a8ebe2ced9cde38e4bedd4c5d74ca9",
   "branch": "master",
-  "date": "2023/10/09 15:36:16"
+  "date": "2023/10/12 10:55:01"
 }
