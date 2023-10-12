@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-25: Eliminate memory leaks introduces by React 17 by upgrading to React 18",
-  "commit": "541a270dd51e0714a0b9a6312beb41dd9e0e30cb",
+  "commit": "2b7557a4b018be54169db464c6b73122a61ce578",
   "branch": "fb-leap-25/upgrade-react",
-  "date": "2023/10/12 01:31:34"
+  "date": "2023/10/12 15:00:17"
 }
