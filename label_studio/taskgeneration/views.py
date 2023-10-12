@@ -12,6 +12,7 @@ from rest_framework.authtoken.models import Token
 import subprocess
 import os
 import pandas as pd
+import numpy as np
 import json
 import re
 import requests
@@ -124,6 +125,11 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
             imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
             # Remove non-letters from column names
             imu_df.columns = [re.sub(r'[^a-zA-Z]', '', col) for col in imu_df.columns]
+            # Add L2 norm of Ax,Ay,Az
+            try:
+                imu_df['A3D'] = np.sqrt(imu_df['Ax']**2 + imu_df['Ay']**2 + imu_df['Az']**2)
+            except KeyError as e:
+                print(print("No Ax, Ay or Az columns. ", e))
             # Get column names for showing in LS
             timestamp_column_name = imu_df.columns[timestamp_column]
             value_column_name = imu_df.columns[int(value_column)]
@@ -186,11 +192,12 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
                     video_file_upload = fileupload_model.objects.latest('id')
                     
-
+                    refresh_every = 10
+                    wait_before_sync = 3000
                     activity_annotation_project = Project.objects.get(id=project.id+2)
                     task_json_template = {
                         "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",
-                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),100); console.log('video is loaded, starting to sync with time series')}}, 3000); \" />"
+                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />"
                     }
                     with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
                         json.dump(task_json_template,task_json_file,indent=4)
@@ -219,6 +226,7 @@ def generate_taskgen_form(request,project_id):
         columns_names_choices = []
         for i, column_name in enumerate(column_names):
             columns_names_choices.append((i,column_name))
+        columns_names_choices.append((len(column_names),'A3D'))
         request.session['choices'] = columns_names_choices
         return redirect('taskgeneration:taskgeneration_form', project_id=project_id)
     else:
