@@ -488,6 +488,7 @@ def business_client(client):
     client.admin = user
     client.annotator = user
     client.user = user
+    client.api_key = user.reset_token().key
     client.organization = org
 
     if signin(client, email, password).status_code != 302:
