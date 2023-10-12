@@ -360,3 +360,33 @@ def test_webhooks_for_action_delete_tasks_annotations(configured_project, busine
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.TASKS_DELETED
+
+
+# CREATE TASKS FROM STORAGES
+@pytest.mark.django_db
+def test_webhooks_for_tasks_from_storages(configured_project, business_client, organization_webhook):
+    webhook = organization_webhook
+    # CREATE
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        add_url = '/api/storages/s3'
+        payload = {
+            'bucket': 'pytest-s3-images',
+            'project': configured_project.id,
+            'title': 'Testing S3 storage (bucket from conftest.py)',
+            'use_blob_urls': True,
+            'presign_ttl': 3600,
+        }
+        add_response = business_client.post(add_url, data=json.dumps(payload), content_type='application/json')
+        storage_pk = add_response.json()['id']
+
+        # Sync S3 Storage
+        sync_url = f'/api/storages/s3/{storage_pk}/sync'
+        business_client.post(sync_url)
+    # assert response.status_code == 201
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.TASKS_CREATED
+    assert 'tasks' in r.json()
+    assert 'project' in r.json()
