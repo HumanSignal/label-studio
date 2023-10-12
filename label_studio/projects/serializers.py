@@ -2,10 +2,12 @@
 """
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
+from django.db.models import Q
 from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectReimport, ProjectSummary
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
+from tasks.models import Task
 from users.serializers import UserSimpleSerializer
 
 
@@ -65,6 +67,16 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         default=None, read_only=True, help_text='Flag to detect is project ready for labeling'
     )
     finished_task_number = serializers.IntegerField(default=None, read_only=True, help_text='Finished tasks')
+
+    queue_total = serializers.SerializerMethodField()
+    queue_done = serializers.SerializerMethodField()
+
+    @property
+    def user_id(self):
+        try:
+            return self.context['request'].user.id
+        except KeyError:
+            return next(iter(self.context['user_cache']))
 
     @staticmethod
     def get_config_has_control_tags(project):
@@ -141,6 +153,8 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'reveal_preannotations_interactively',
             'pinned_at',
             'finished_task_number',
+            'queue_total',
+            'queue_done',
         ]
 
     def validate_label_config(self, value):
@@ -151,6 +165,27 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             # Existing project is updated
             self.instance.validate_config(value)
         return value
+
+    def get_queue_total(self, project):
+        remain = project.tasks.filter(
+            Q(is_labeled=False) & ~Q(annotations__completed_by_id=self.user_id)
+            | Q(annotations__completed_by_id=self.user_id)
+        ).distinct()
+        return remain.count()
+
+    def get_queue_done(self, project):
+        tasks_filter = {
+            'project': project,
+            'annotations__completed_by_id': self.user_id,
+        }
+
+        if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
+            tasks_filter['annotations__was_cancelled'] = False
+
+        already_done_tasks = Task.objects.filter(**tasks_filter)
+        result = already_done_tasks.distinct().count()
+
+        return result
 
 
 class ProjectOnboardingSerializer(serializers.ModelSerializer):

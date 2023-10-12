@@ -133,7 +133,10 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
         validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)
         # Reason for #nosec: url has been validated as SSRF safe by the
         # validation check above.
-        response = requests.get(url, verify=False, headers={'Accept-Encoding': None})  # nosec
+
+        response = requests.get(
+            url, verify=project.organization.should_verify_ssl_certs(), headers={'Accept-Encoding': None}
+        )  # nosec
         file_content = response.content
         check_tasks_max_file_size(int(response.headers['content-length']))
         file_upload = create_file_upload(user, project, SimpleUploadedFile(filename, file_content))
