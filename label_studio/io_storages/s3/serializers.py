@@ -39,8 +39,6 @@ class S3ImportStorageSerializer(ImportStorageSerializer):
         except ParamValidationError:
             raise ValidationError('Wrong credentials for S3 {bucket_name}'.format(bucket_name=storage.bucket))
         except ClientError as e:
-            print(e.response.get('Error').get('Code'))
-            print(e.response.get('ResponseMetadata').get('HTTPStatusCode'))
             if e.response.get('Error').get('Code') in ['SignatureDoesNotMatch', '403'] or \
                e.response.get('ResponseMetadata').get('HTTPStatusCode') == 403:
                 raise ValidationError(
