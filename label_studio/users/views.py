@@ -19,6 +19,7 @@ from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
 from rest_framework import status, views
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users import forms
 from users.functions import login, proceed_registration
@@ -161,6 +162,7 @@ def user_account(request):
 
 
 class UserSoftDeleteView(views.APIView):
+    permission_classes = (IsAuthenticated, HasObjectPermission)
     permission_required = all_permissions.organizations_change
 
     @swagger_auto_schema(
