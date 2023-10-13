@@ -528,6 +528,7 @@ TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
+USER_PERM = 'core.api_permissions.HasOwnerPermission'
 RECALCULATE_ALL_STATS = None
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
@@ -554,6 +555,7 @@ USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
 WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_BATCH_SIZE = int(get_env('WEBHOOK_BATCH_SIZE', 100))
 WEBHOOK_SERIALIZERS = {
     'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
     'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',

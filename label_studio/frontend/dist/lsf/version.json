@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-250: Fix maxUsages for New Taxonomy",
-  "commit": "9ce03a2f1e08e4d19b213652ba31a639272bb971",
+  "message": "fix: LEAP-252: Use standard error message for Async Taxonomy errors",
+  "commit": "210c03496fb08b66fecaa890c540a4260be717ea",
   "branch": "master",
-  "date": "2023/10/09 15:36:16"
+  "date": "2023/10/13 16:22:26"
 }
