@@ -317,6 +317,6 @@ To retrieve user IDs for the members of an organization, make a GET request to [
 
 3. A confirmation message appears. Click **Delete Member**. 
 
-Once deleted, any contributions the user made are listed as belonging to a "Deleted User."
+Once deleted, any completed work or changes that the user made will appear as belonging to a "Deleted User."
 
-If you want to add the user at a later date, you will need to re-invite them to the organization. 
+If you want to add the user again at a later date, you will need to re-invite them to the organization. 
