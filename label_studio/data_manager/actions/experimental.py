@@ -456,7 +456,6 @@ actions = [
             'text': 'After selecting the images you want to annotate, enter in the text prompt for classes you want to select and submit this form.'
             'Please confirm your action.',
             'type': 'confirm',
-            # 'form': dino_text_form, # need a form because regular retrieve predictions doesn't
             'form': dino_text_form, # need a form because regular retrieve predictions doesn't
 
         }
