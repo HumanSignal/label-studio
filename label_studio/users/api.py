@@ -100,7 +100,7 @@ class UserAPI(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
 
     def get_queryset(self):
-        return User.objects.filter(organizations=self.request.user.active_organization)
+        return User.with_deleted.filter(organizations=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None, methods=['delete', 'post'])
     @action(detail=True, methods=['delete', 'post'], permission_required=all_permissions.avatar_any)

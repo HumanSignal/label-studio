@@ -118,12 +118,17 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 
             # return only active users (exclude DISABLED and NOT_ACTIVATED)
             if active:
-                return org.active_members.order_by('user__username')
-
-            # organization page to show all members
-            return org.members.order_by('user__username')
+                org_members = org.active_members.order_by('user__username')
+            else:
+                # organization page to show all members
+                org_members = org.members.order_by('user__username')
         else:
-            return org.members.order_by('user__username')
+            org_members = org.members.order_by('user__username')
+
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', self.request.user):
+            org_members = org_members.filter(user__is_deleted=False)
+
+        return org_members
 
 
 @method_decorator(
