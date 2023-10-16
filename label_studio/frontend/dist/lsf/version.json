@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-255: Parse username and password from basic auth URL and use for API calls",
-  "commit": "1af7ec699e62e6e7c832b197730d7d36f6fbd567",
-  "branch": "fb-leap-255",
-  "date": "2023/10/13 15:30:45"
+  "commit": "e8fcdb746aac38218edf1e8dd5033141516c5075",
+  "branch": "master",
+  "date": "2023/10/16 13:05:26"
 }
