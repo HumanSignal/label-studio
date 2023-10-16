@@ -175,7 +175,7 @@ stages:
 
 - name: soft_delete_user_fails_without_owner_logged_in
   request:
-    url: "{django_live_url}/users/{user_pk}/soft-delete"
+    url: "{django_live_url}/api/users/{user_pk}/soft-delete"
     method: DELETE
   response:
     status_code: 403
@@ -188,14 +188,14 @@ stages:
 
 - name: soft_delete_user_succeeds_as_owner
   request:
-    url: "{django_live_url}/users/{user_pk}/soft-delete"
+    url: "{django_live_url}/api/users/{user_pk}/soft-delete"
     method: DELETE
   response:
     status_code: 204
 
 - name: soft_delete_user_fails_second_deletion_attempt
   request:
-    url: "{django_live_url}/users/{user_pk}/soft-delete"
+    url: "{django_live_url}/api/users/{user_pk}/soft-delete"
     method: DELETE
   response:
     status_code: 404
