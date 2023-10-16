@@ -2,9 +2,11 @@
 """
 import logging
 
+from core.utils.db import fast_first
 from django import forms
 from django.conf import settings
 from django.contrib import auth
+from django.db import IntegrityError
 from users.models import User
 
 EMAIL_MAX_LENGTH = 256
@@ -87,7 +89,16 @@ class UserSignupForm(forms.Form):
         allow_newsletters = None
         if 'allow_newsletters' in cleaned:
             allow_newsletters = cleaned['allow_newsletters']
-        user = User.objects.create_user(email, password, allow_newsletters=allow_newsletters)
+        try:
+            user = User.objects.create_user(email, password, allow_newsletters=allow_newsletters)
+        except IntegrityError:   # user already exists (often this means a soft deleted user is being reactivated)
+            user = fast_first(User.with_deleted.filter(email=email))
+            if user and user.is_deleted:
+                # reset password but don't save until user is verified to be reinstated in invite_user_to_organization
+                user.set_password(password)
+            else:
+                raise IntegrityError
+
         return user
 
 

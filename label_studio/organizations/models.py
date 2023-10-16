@@ -88,7 +88,8 @@ class Organization(OrganizationMixin, models.Model):
             raise KeyError(f"Can't find Organization by welcome URL: {url}")
 
     def has_user(self, user):
-        return self.users.filter(pk=user.pk).exists()
+        # need to query OrganizationMember directly to bypass user manager filtering out soft deleted users
+        return OrganizationMember.objects.filter(user_id=user.id, organization=self).exists()
 
     def has_project_member(self, user):
         return self.projects.filter(members__user=user).exists()
@@ -99,7 +100,8 @@ class Organization(OrganizationMixin, models.Model):
         return False
 
     def add_user(self, user):
-        if self.users.filter(pk=user.pk).exists():
+        # need to query OrganizationMember directly to bypass user manager filtering out soft deleted users
+        if OrganizationMember.objects.filter(user_id=user.id, organization=self).exists():
             logger.debug('User already exists in organization.')
             return
 
