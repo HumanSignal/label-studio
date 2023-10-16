@@ -55,31 +55,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v3
         with:
-          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}/bin/*
-            ${{ env.pythonLocation }}/include
-            ${{ env.pythonLocation }}/lib/python*/site-packages/*
-            !${{ env.pythonLocation }}/bin/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
-          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
+          python-version: ${{ matrix.python-version }}
+          cache: true
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip setuptools
-          pip install --upgrade cython
-          pip install -U pip==20.2
-          pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
-          pip install -e .
+          pdm sync -G test
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -105,12 +89,12 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
-        run: python label_studio/manage.py migrate
+        run: pdm run python label_studio/manage.py migrate
 
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --cov=. --cov-report=xml -vv -n auto
+          pdm run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.4
@@ -196,29 +180,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v3
         with:
-          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}/bin/*
-            ${{ env.pythonLocation }}/include
-            ${{ env.pythonLocation }}/lib/python*/site-packages/*
-            !${{ env.pythonLocation }}/bin/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
-          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
+          python-version: '3.10'
+          cache: true
 
-      - name: Install pip dependencies
+      - name: Install Python dependencies
         run: |
-          pip install -U pip==20.2
-          pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
-          pip install -e .
+          pdm sync -G test
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -244,12 +214,12 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
-        run: python label_studio/manage.py migrate
+        run: pdm run python label_studio/manage.py migrate
 
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --cov=. --cov-report=xml -vv -n auto
+          pdm run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.4
@@ -296,23 +266,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v3
         with:
-          path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+          python-version: ${{ matrix.python-version }}
+          cache: true
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip setuptools
-          pip install --upgrade cython
-          if (Test-Path -Path '.\deploy\requirements.txt' -PathType Leaf)
-          {pip install -r deploy\requirements.txt}
-          if (Test-Path -Path '.\deploy\requirements-test.txt' -PathType Leaf)
-          {pip install -r deploy/requirements-test.txt}
-          pip install -e .
+          pdm sync -G test
 
       - name: Fix sqlite.dll for python < 3.9
         if: ${{ contains(matrix.python-version, '3.8') }}
@@ -335,4 +297,4 @@ jobs:
           collect_analytics: 0
         run: |
           cd label_studio/
-          python -m pytest -vv -n auto
+          pdm run python -m pytest -vv -n auto
