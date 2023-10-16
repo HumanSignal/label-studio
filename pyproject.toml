@@ -101,6 +101,26 @@ force-exclude = '''
 
 target-version = ['py38']
 
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+test = [
+    "pytest==7.2.2",
+    "pytest-cov==2.12.1",
+    "pytest-django==4.1.0",
+    "pytest-mock==1.10.3",
+    "requests-mock==1.5.2",
+    "tavern==2.3.0",
+    "fakeredis==1.5.0",
+    "pytest-env==0.6.2",
+    "responses==0.13.0",
+    "pytest-xdist~=2.5.0",
+    "psutil==5.9.4",
+    "freezegun~=1.2.2",
+    "pre-commit==3.3.3",
+    "s3transfer==0.7.0",
+    "mock>=5.1.0",
+    "moto>=4.2.6",
+]
 [project]
 name = "label-studio"
 version = "1.9.2dev"
