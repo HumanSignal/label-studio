@@ -374,17 +374,65 @@ class Task(TaskMixin, models.Model):
         Delete Tasks queryset with switched off signals
         :param queryset: Tasks queryset
         """
+
+        data, storages = get_storages_for_delete(queryset)
         signals = [
             (post_delete, update_all_task_states_after_deleting_task, Task),
             (pre_delete, remove_data_columns, Task)
         ]
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
+            delete_local_storage(data, storages)
 
     @staticmethod
     def delete_tasks_without_signals_from_task_ids(task_ids):
         queryset = Task.objects.filter(id__in=task_ids)
         Task.delete_tasks_without_signals(queryset)
+
+
+def get_storages_for_delete(queryset):
+    """
+        Get list of storages and image path
+        :param queryset: Task queryset
+        :return data: list of paths
+        :return storages: set of storages
+    """
+    storages = []
+    data = []
+    for task in queryset:
+        print(f"task: {task}")
+        for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
+            if hasattr(task, link_name):
+                attr = getattr(task, link_name)
+                data.append(task.storage_filename)
+                storages.append(attr.storage)
+    storages = set(storages)
+    return data, storages
+
+
+def delete_local_storage(data, storages):
+    """
+        delete storages and images
+
+        :param data: list of paths
+        :param storages: list of storages
+    """
+    for path in data:
+        if os.path.exists(path):
+            print(f"Removed image from: {path}")
+            os.remove(path)
+        else:
+            print("The file does not exist")
+    for storage in storages:
+        if not storage.links.all():
+            if storage.title in storage.path:
+                for root, dirs, files in os.walk(storage.path, topdown=False):
+                    for name in dirs:
+                        os.rmdir(os.path.join(root, name))
+                os.rmdir(storage.path)
+                print("dir removed")
+            storage.delete()
+
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
