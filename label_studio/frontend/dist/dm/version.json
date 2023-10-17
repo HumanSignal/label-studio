@@ -1,6 +1,6 @@
 {
-  "message": "fix: optic-124: save and update have success/fail toast messages",
-  "commit": "9e25fcc2e652d9b150635091dac62750c84b89ba",
+  "message": "fix: OPTIC-124: Save and update have success/fail toast messages",
+  "commit": "763cccd65960d7acb4cca606577b349129745ab1",
   "branch": "fb-optic-124/save-and-update-toast",
-  "date": "2023/10/17 12:55:24"
+  "date": "2023/10/17 13:28:42"
 }
