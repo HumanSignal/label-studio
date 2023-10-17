@@ -37,6 +37,24 @@ export const PeoplePage = () => {
   const inviteModal = useRef();
   const config = useConfig();
   const [selectedUser, setSelectedUser] = useState(null);
+  const [usersList, setUsersList] = useState();
+  const [totalItems, setTotalItems] = useState(0);
+
+  const fetchUsers = useCallback(async (page, pageSize) => {
+    const response = await api.callApi('memberships', {
+      params: {
+        pk: 1,
+        contributed_to_projects: 1,
+        page,
+        page_size: pageSize,
+      },
+    });
+
+    if (response.results) {
+      setUsersList(response.results);
+      setTotalItems(response.count);
+    }
+  }, []);
 
   const [link, setLink] = useState();
 
@@ -124,14 +142,18 @@ export const PeoplePage = () => {
       </Elem>
       <Elem name="content">
         <PeopleList
+          usersList={usersList}
+          totalItems={totalItems}
           selectedUser={selectedUser}
           defaultSelected={defaultSelected}
+          fetchUsers={fetchUsers}
           onSelect={(user) => selectUser(user)}
         />
 
         {selectedUser ? (
           <SelectedUser
             user={selectedUser}
+            setUsersList={setUsersList}
             onClose={() => selectUser(null)}
           />
         ) : isFF(FF_LSDV_E_297) && (

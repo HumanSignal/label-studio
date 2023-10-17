@@ -5,6 +5,7 @@ export const API_CONFIG = {
     // Users
     users: "/users",
     me: "/current-user/whoami",
+    deleteUser: "DELETE:/users/:user_pk/soft-delete",
 
     // Organization
     memberships: "/organizations/:pk/memberships",
