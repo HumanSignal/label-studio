@@ -38,7 +38,7 @@ def user_signup(request):
     user = request.user
     next_page = request.GET.get('next')
     token = request.GET.get('token')
-    next_page = next_page if next_page else reverse('projects:project-index')
+    next_page = next_page if next_page else reverse('landingpage:homepage')
     user_form = forms.UserSignupForm()
     organization_form = OrganizationSignupForm()
 
@@ -74,7 +74,7 @@ def user_login(request):
     """
     user = request.user
     next_page = request.GET.get('next')
-    next_page = next_page if next_page else reverse('projects:project-index')
+    next_page = next_page if next_page else reverse('landingpage:homepage')
     login_form = load_func(settings.USER_LOGIN_FORM)
     form = login_form()
 
