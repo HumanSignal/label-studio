@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
-  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
-  "branch": "master",
-  "date": "2023/09/26 10:39:21"
+  "message": "feat: LEAP-58: Proxy URLs and pass callback to LSF",
+  "commit": "1debd97153a4e6f98c1f2f129effce4124c4be83",
+  "branch": "fb-leap-58/proxy-url",
+  "date": "2023/10/17 22:59:22"
 }
