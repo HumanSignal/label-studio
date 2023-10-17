@@ -125,11 +125,6 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
             imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
             # Remove non-letters from column names
             imu_df.columns = [re.sub(r'[^a-zA-Z]', '', col) for col in imu_df.columns]
-            # Add L2 norm of Ax,Ay,Az
-            try:
-                imu_df['A3D'] = np.sqrt(imu_df['Ax']**2 + imu_df['Ay']**2 + imu_df['Az']**2)
-            except KeyError as e:
-                print(print("No Ax, Ay or Az columns. ", e))
             # Get column names for showing in LS
             timestamp_column_name = imu_df.columns[timestamp_column]
             value_column_name = imu_df.columns[int(value_column)]
