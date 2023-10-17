@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/current-user/token', api.UserGetTokenAPI.as_view(), name='current-user-token'),
     path('api/current-user/whoami', api.UserWhoAmIAPI.as_view(), name='current-user-whoami'),
     # additional user actions
-    path('users/<int:pk>/soft-delete/', UserSoftDeleteView.as_view(), name='user-soft-delete'),
+    path('api/users/<int:pk>/soft-delete/', UserSoftDeleteView.as_view(), name='user-soft-delete'),
 ]
 
 # When CLOUD_FILE_STORAGE_ENABLED is set, avatars are uploaded to cloud storage with a different URL pattern.
