@@ -128,8 +128,9 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
     try:
         filename = url.rsplit('/', 1)[-1]
 
-        response = ssrf_safe_get(url, verify=False, stream=True, headers={'Accept-Encoding': None})
-
+        response = ssrf_safe_get(
+            url, verify=project.organization.should_verify_ssl_certs(), stream=True, headers={'Accept-Encoding': None}
+        )
         file_content = response.content
         check_tasks_max_file_size(int(response.headers['content-length']))
         file_upload = create_file_upload(user, project, SimpleUploadedFile(filename, file_content))

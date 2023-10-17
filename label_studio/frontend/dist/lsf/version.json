@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
-  "commit": "688ba577fdc3a6b87ca24e94f27c7b2aac511b2a",
+  "message": "fix: LEAP-255: Parse username and password from basic auth URL and use for API calls",
+  "commit": "e8fcdb746aac38218edf1e8dd5033141516c5075",
   "branch": "master",
-  "date": "2023/09/22 11:06:17"
+  "date": "2023/10/16 13:05:26"
 }
