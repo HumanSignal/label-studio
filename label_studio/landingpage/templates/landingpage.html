@@ -30,7 +30,7 @@
         Here you can annotate the subject presence in your videos. The videos can be annotated with your subjects as labels.
         <li><a href="{% url 'taskgeneration:generate_form' main_project.project_id %}">Generate activity annnotation tasks</a></li>
         Annotate the data using the activity labels. It is only data with subjects present.
-        <li><a href="{% url 'projects:project-index' main_project.project_id %}">Annotate</a></li>
+        <li><a href="{% url 'data_manager:project-data' main_project.project_id|add:2 %}">Annotate</a></li>
         Annotate the data using the activity labels. It is only data with subjects present.
         <li><a href="{% url 'landingpage:export-project' main_project.project_id %}">Export annotations</a></li>
         Export your subject and activity annotations.
