@@ -39,15 +39,23 @@
 <body>
     <div class="forms">
         <h2>Generate activity annotation tasks</h2>
-        <form action="{% url 'taskgeneration:generateactivitytasks' project.id %}" method="post">
+        <form id="taskgeneration-form" action="{% url 'taskgeneration:generateactivitytasks' project.id %}" method="post">
             {% csrf_token %}
             <table>
             {{ taskgenerationform.as_table }}
-            <table>
+            </table>
             <input type="submit" value="Generate">
         </form>
 
     </div>
+    <div id="taskgeneration-message">
+      <p>Generate activity annotation tasks! Please wait...</p>
+    </div>
+    <script>
+      document.getElementById('taskgeneration-form').addEventListener('submit',function() {
+        document.getElementById('taskgeneration-message').style.display = 'block';
+      });
+    </script>
 </body>
 
 

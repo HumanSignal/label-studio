@@ -15,12 +15,20 @@
     </div>
     <div class="forms">
         <h2>Add sensor data</h2>
-        <form enctype="multipart/form-data" action="{% url 'sensordata:addsensordata' project.id %}" method="post">
+        <form id="sensor-data-form" enctype="multipart/form-data" action="{% url 'sensordata:addsensordata' project.id %}" method="post">
             {{ sensordataform }}
             <input type="submit" value="Add sensor data file">
         </form>
-
     </div>
+    <div id="unpacking-message" style="display: none;">
+        <p>Unpacking the zip file! Please wait...</p>
+    </div>
+
+    <script>
+        document.getElementById('sensor-data-form').addEventListener('submit', function() {
+            document.getElementById('unpacking-message').style.display = 'block';
+        });
+    </script>
 </body>
 
 

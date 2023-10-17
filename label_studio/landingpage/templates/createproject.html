@@ -16,11 +16,20 @@
     </div>
     <div class="forms">
         <h2>Create Project</h2>
-        <form enctype="multipart/form-data" action="/landingpage/create_project" method="post">
+        <form id="create-project-form" enctype="multipart/form-data" action="/landingpage/create_project" method="post">
             {{ createprojectform }}
             <input type="submit" value="Create Project">
         </form>
     </div>
+    <div id="creating-message" style="display: none;">
+        <p>Creating new project! Please wait...</p>
+    </div>
+
+    <script>
+        document.getElementById('create-project-form').addEventListener('submit', function() {
+            document.getElementById('creating-message').style.display = 'block';
+        });
+    </script>
 </body>
 
 {% endblock %}
