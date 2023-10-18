@@ -232,10 +232,25 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_file_upload(task):
-        if hasattr(task, 'file_upload_field'):
-            file_upload = task.file_upload_field
-            return os.path.basename(task.file_upload_field) if file_upload else None
-        return None
+        try:
+            file_title = task.storage.title
+            upload_path = task.storage.path
+        except Exepiton:
+            file_title = None
+            upload_path = "Storage does not have title"
+        if file_title in upload_path:
+            upload_path = upload_path.replace("/images/" + file_title, "/upload_files")
+        else:
+            upload_path = upload_path.replace("/images", "/upload_files")
+
+        try:
+            file_path = next(os.path.join(upload_path, f) for f in os.listdir(upload_path) if f.startswith(file_title))
+            _, file_extension = os.path.splitext(file_path)
+            upload_path = f"{upload_path}/{file_title}{file_extension}"
+        except StopIteration:
+            upload_path = "File does not exist"
+
+        return upload_path
 
     @staticmethod
     def get_storage_filename(task):
