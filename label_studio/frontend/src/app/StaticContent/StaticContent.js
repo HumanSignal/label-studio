@@ -1,4 +1,5 @@
 import parseHTML from 'html-react-parser';
+import sanitizeHTML from 'sanitize-html';
 import React from 'react';
 import { reInsertScripts } from '../../utils/scripts';
 import { AsyncPageContext } from '../AsyncPage/AsyncPage';
@@ -12,8 +13,9 @@ const parseContent = (id, source, children, parse) => {
     const templateHTML = template.innerHTML ?? "";
 
     if (parse) {
-      const parsed = parseHTML(templateHTML);
+      const parsed = parseHTML(sanitizeHTML(templateHTML));
       const childResult = children instanceof Function ? children(parsed) : false;
+
       result = childResult || parsed;
     } else {
       const childResult = children instanceof Function ? children(template) : false;
@@ -65,7 +67,7 @@ const StaticContentDrawer = React.forwardRef(({
     ? <React.Fragment children={content.children}/>
     : React.createElement(tagName ?? 'div', {
       ...props,
-      ref: rootRef
+      ref: rootRef,
     });
 });
 
