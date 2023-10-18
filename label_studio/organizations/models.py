@@ -6,6 +6,7 @@ from core.utils.common import create_hash, load_func
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Count, Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,9 @@ class OrganizationMember(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
+    is_deleted = models.BooleanField(_('is deleted'), default=False)
+    deleted_at = models.DateTimeField(_('deleted at'), null=True)
+
     @classmethod
     def find_by_user(cls, user_or_user_pk, organization_pk):
         from users.models import User
@@ -37,6 +41,11 @@ class OrganizationMember(models.Model):
 
     class Meta:
         ordering = ['pk']
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save(update_fields=['is_deleted', 'deleted_at'])
 
 
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)

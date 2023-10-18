@@ -3,6 +3,7 @@
 from core.feature_flags import flag_set
 from core.utils.common import load_func
 from django.conf import settings
+from organizations.models import OrganizationMember
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 
@@ -18,7 +19,26 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         return user.avatar_url
 
     def get_initials(self, user):
-        return user.get_initials()
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=user):
+            return user.get_initials(self._is_deleted(user))
+        else:
+            return user.get_initials()
+
+    def _is_deleted(self, instance):
+        if organization_members := self.context.get('organization_members', None):
+            organization_member_for_user = next(
+                (
+                    organization_member
+                    for organization_member in organization_members
+                    if organization_member.user_id == instance.id
+                ),
+                None,
+            )
+        else:
+            organization_member_for_user = OrganizationMember.objects.get(
+                user_id=instance.id, organization_id=self.context['request'].user.active_organization_id
+            )
+        return organization_member_for_user.is_deleted
 
     def to_representation(self, instance):
         """Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars"""
@@ -32,7 +52,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             self.context[key][uid] = super().to_representation(instance)
 
         if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=instance):
-            if instance.is_deleted:
+            if self._is_deleted(instance):
                 for field in ['username', 'first_name', 'last_name', 'email']:
                     self.context[key][uid][field] = 'USER' if field == 'last_name' else 'DELETED'
         return self.context[key][uid]
@@ -51,7 +71,6 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             'phone',
             'active_organization',
             'allow_newsletters',
-            'is_deleted',
         )
 
 
