@@ -57,7 +57,7 @@ class TestUploader:
 
             validate_upload_url_mock.assert_called_once_with('http://0.0.0.0', block_local_urls=True)
 
-        def test_local_url_after_redirect(project, settings):
+        def test_local_url_after_redirect(self, project, settings):
             settings.SSRF_PROTECTION_ENABLED = True
             request = MockedRequest(url='http://validurl.com')
 
