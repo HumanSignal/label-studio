@@ -1,0 +1,15 @@
+<View>
+  <Video name="video" value="$video" sync="sync1" />
+  <Labels name="audio_label" toName="audio">
+    <Label value="Positive" background="red"></Label>
+    <Label value="Negative" background="green"></Label>
+    <Label value="Neutral" background="yellow"></Label>
+  </Labels>
+  <Audio name="audio" value="$video" hotkey="space" sync="sync1" />
+  <ParagraphLabels name="label" toName="text">
+    <Label value="Important Stuff"></Label>
+    <Label value="Random talk"></Label>
+  </ParagraphLabels>
+  <Paragraphs audioUrl="$video" name="text" value="$dialogue" layout="dialogue" savetextresult="yes" sync="sync1" />
+</View>
+

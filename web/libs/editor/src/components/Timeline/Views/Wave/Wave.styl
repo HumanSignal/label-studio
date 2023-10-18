@@ -1,0 +1,148 @@
+.wave
+  --container-edge-padding 24px
+  --border-color rgba(0, 0, 0, 0.1)
+
+  position relative
+  user-select none
+
+  &_compact
+    --border-color rgba(137, 128, 152, 0.16) 
+
+  &__loader
+    top 0
+    left 0
+    z-index 10
+    height 3px
+    width 100%
+    display flex
+    opacity 0.4
+    pointer-events none
+    align-items center
+    justify-content center
+    position absolute
+    border-radius 20px
+    box-shadow 0 5px 20px rgba($accent_color, 0.2)
+
+    waiting($accent_color)
+
+    span
+      display block
+      padding 0 6px
+      font-size 10px
+      font-weight bold
+      border-radius 10px
+      background-color rgba(#fff, 0.5)
+
+  &__wrapper
+    height 100%
+    display flex
+    align-items stretch
+    &_layout
+      &_stack
+        flex-direction column
+        width 100%
+        align-items flex-start
+    &_edge
+      &_relaxed
+        background-color #FAFAFA
+
+  &__scale
+    flex none
+    width 36px
+    height 100%
+    display flex
+    align-items center
+    justify-content center
+    background-color #fff
+
+  &__body
+    flex 1
+    position relative
+    background-color #FAFAFA
+    overflow hidden
+
+    ~/_with-playhead &
+      overflow revert
+    ~/__wrapper_layout_stack &
+      width 100%
+
+  &__cursor
+    top 0
+    left 150px
+    width 2px
+    height 100%
+    z-index 10
+    border-radius 2px
+    position absolute
+    pointer-events none
+    background-color #000
+    transform translate3d(-50%, 0, 0)
+    ~/_with-playhead &
+      pointer-events auto
+      border-radius 0
+      top -4px
+      height calc(100% + 4px)
+
+    ~/_with-playhead &::before
+      position absolute
+      top -16px
+      left -4px
+      content url("data:image/svg+xml,%3Csvg width='9' height='5' viewBox='0 0 9 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1C1 0.723858 1.22386 0.5 1.5 0.5H7.5C7.77614 0.5 8 0.723858 8 1V3.21922C8 3.44866 7.84385 3.64865 7.62127 3.70429L4.62127 4.4543C4.54165 4.4742 4.45835 4.4742 4.37873 4.45429L1.37873 3.70429L1.25746 4.18937L1.37873 3.70429C1.15615 3.64865 1 3.44866 1 3.21922V1Z' fill='%2340A9FF' stroke='%231F1F1F'/%3E%3C/svg%3E%0A")
+      width 9px
+      height 5px
+
+  &__controls
+    height 48px
+    padding 0 6px
+    display flex
+    align-items center
+    border-top 1px solid var(--border-color)
+    border-bottom 1px solid var(--border-color)
+
+  &__surfer
+    height 88px
+
+    ~/_compact &
+      height 60px
+
+    ~/_compact wave
+      overflow revert !important
+
+    ~/_compact showtitle
+      z-index 10 !important
+
+    showtitle div
+      left 8px
+      padding 0 8px
+      border-radius 4px
+      position relative
+      background-color #fff
+      box-shadow 0 4px 15px rgba(#000, 0.2)
+
+    ~/_compact showtitle div
+      background-color #000
+      color #fff
+      box-shadow none
+
+  &__timeline
+    bottom 0
+    left 0
+    width 100%
+    height 24px
+    position absolute
+    pointer-events none
+    ~/__wrapper_edge_relaxed &
+      background-color #fff
+    &_position
+      &_outside
+        pointer-events auto
+        height auto
+        position relative
+        border-top 1px solid var(--border-color)
+        border-bottom 1px solid var(--border-color)
+    &_placement
+      &_bottom
+        bottom 0
+      &_top
+        bottom revert
+        top 0

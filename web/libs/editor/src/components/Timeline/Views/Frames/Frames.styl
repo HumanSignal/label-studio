@@ -1,0 +1,121 @@
+.timeline-frames
+  --frame-size 10px
+  --view-size 0
+  --view-height 64px
+
+  width 100%
+  min-height var(--view-height)
+  position relative
+  overflow hidden
+  box-sizing content-box
+  background #FAFAFA
+
+  &__controls
+    height 0
+    width 100%
+
+  &__labels-bg
+    top 0
+    left 0
+    height 100%
+    z-index 3
+    background-color #FAFAFA
+    position absolute
+    box-shadow -1px 0px 0px rgba(0, 0, 0, 0.05)
+
+  &__filler
+    min-width 100%
+    min-height 100%
+    height min-content
+    white-space nowrap
+    width calc(var(--view-size) + var(--offset))
+
+  &__background
+    top 0
+    bottom 0
+    right 0
+    left var(--offset)
+    z-index 1
+    position absolute
+    background-color rgba(0,0,0,0.05)
+
+  &__scroll
+    z-index 3
+    width 100%
+    height var(--view-height)
+    overflow hidden
+    position relative
+    box-sizing content-box
+    padding-top 24px
+    border-top 1px solid rgba(#000, 0.1)
+    background-image repeating-linear-gradient(
+      90deg,
+      #fff,
+      #fff var(--frame-width),
+      transparent var(--frame-width),
+      transparent calc(var(--frame-width) + 1)
+    ), linear-gradient(0deg, #FAFAFA, transparent 50%)
+
+  &__indicator
+    top 0
+    left 0
+    bottom 0
+    z-index 2
+    position absolute
+    width var(--frame-size)
+    box-shadow inset 0 1px #000, inset 0 -1px #000
+    background linear-gradient(0deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), #FAFAFA;
+
+    &::before
+      top -5px
+      left -5px
+      right -5px
+      content ""
+      bottom -5px
+      display block
+      cursor col-resize
+      position absolute
+
+    &::after
+      top 100%
+      left 0
+      content ""
+      width 100%
+      height var(--view-height)
+      display block
+      position absolute
+      pointer-events none
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) -1.28%, rgba(0, 0, 0, 0.15) 69.21%, rgba(0, 0, 0, 0) 100%), rgba(#000, 0.05);
+
+  &__hover
+    top 0
+    bottom 0
+    left 0
+    z-index 2
+    width var(--frame-size)
+    position absolute
+    pointer-events none
+    background linear-gradient(0deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), #FAFAFA;
+
+    &::before
+      top 0
+      left: 50%
+      height 12px
+      color #fff
+      display flex
+      padding 0 4px
+      min-width 100%
+      font-size 10px
+      align-items center
+      justify-content center
+      width min-content
+      position absolute
+      content attr(data-frame)
+      transform translateX(-50%)
+      background-color rgba(#000, 0.3)
+
+  &__keyframes
+    width var(--view-size)
+
+  &__keypoints
+    position relative

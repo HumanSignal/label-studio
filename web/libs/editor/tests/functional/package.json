@@ -1,0 +1,32 @@
+{
+  "name": "functional",
+  "version": "1.0.0",
+  "description": "LSF test suite",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "cypress run --quiet --browser chrome",
+    "test:ui": "cypress open",
+    "test:with-coverage": "COLLECT_COVERAGE=true yarn test:parallel",
+    "test:parallel": "cypress-parallel -r spec -b -m -s test -t ${CPU_NUMBER:=2} -d ./specs/",
+    "test:reset": "rm -rf output && yarn run cvg:reset",
+    "cvg:reset": "rm -rf coverage .nyc_output",
+    "cvg:merge": "rm -rf coverage && nyc merge ./.nyc_output ./coverage/coverage.json --cwd=. --exclude-after-remap false",
+    "cvg:report": "nyc report --temp-dir=.nyc_output --report-dir=coverage --reporter=clover --reporter=text --reporter=json --cwd=. --exclude-after-remap false",
+    "cvg:summary": "nyc report --temp-dir=.nyc_output --reporter=text-summary --cwd=. --exclude-after-remap false"
+  },
+  "dependencies": {
+    "@heartexlabs/ls-test": "git+ssh://git@github.com/heartexlabs/ls-frontend-test#c5b8083cbaf25d279e5d4da7c1a4a7f8ebf1eb7b"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.2",
+    "webpack": "^5.77.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "resolutions": {
+    "@cypress/code-coverage/istanbul-lib-coverage": "^3.2.0"
+  }
+}

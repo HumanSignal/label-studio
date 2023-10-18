@@ -1,0 +1,184 @@
+.pagination
+  --button-color $accent_color
+  --border-radius 5px
+  --height 40px
+  --font-size 16px
+  --line-height 19px
+
+  height var(--height)
+  display flex
+  align-items center
+  width 100%
+  padding: 14px 0 0;
+  box-sizing: initial;
+  justify-content flex-end;
+
+  &_outline
+    border-top: 1px solid rgba(0,0,0,0.1);
+
+  &_align
+    &_left
+      justify-content flex-start
+
+    &_right
+      justify-content flex-end
+
+  &_noPadding
+    padding 0
+
+  &_size
+    &_small
+      --height 24px
+      --border-radius 3px
+      --font-size 12px
+      --line-height 15px
+
+  &_disabled
+    --button-color #ccc
+    background-color #efefef
+    pointer-events none
+
+  &__navigation
+    display flex
+    height 100%
+    align-items center
+    border-radius var(--border-radius, 5px)
+    background #fff
+    box-shadow inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15)
+
+  &__divider
+    width 1px
+    height 30px
+    background-color rgba(#000, 0.1)
+
+    ~/_size_small &
+      height 20px
+
+  &__btn
+    width 37px
+    height 100%
+    display flex
+    align-items center
+    justify-content center
+    user-select none
+    cursor pointer
+
+    ~/_size_small &
+      width 24px
+
+    &_disabled
+      pointer-events none
+      --button-color #ccc
+
+    &_arrow-left,
+    &_arrow-right
+      position relative
+
+      &:before,
+      &:after
+        content ''
+        display block
+        position absolute
+        left 50%
+        top 50%
+        width 9px
+        height 9px
+        border 2px solid var(--button-color)
+        border-bottom none
+        border-right none
+
+      &:after
+        display none
+
+      ~/_size_small &
+        &::before,
+        &::after
+          width 5px
+          height 5px
+
+    &_arrow-left
+      &:before,
+      &:after
+        transform translate3d(-50%, -50%, 0) rotate(-45deg)
+
+    &_arrow-right
+      &:before,
+      &:after
+        transform translate3d(-50%, -50%, 0) rotate(135deg)
+
+    &_arrow-left-double
+      &:after
+        display block
+        margin-left 7px
+
+    &_arrow-right-double
+      &:after
+        display block
+        margin-left -7px
+
+  &__input
+    width 100px
+    height calc(100% - 2px)
+    text-align center
+    display flex
+    align-items center
+    justify-content center
+    border 1px solid #D9D9D9
+    border-top none
+    border-bottom none
+    background #FAFAFA
+    margin 1px 0
+
+    ~/_size_small &
+      min-width 70px
+
+    input
+      width 100%
+      height calc(100% - 2px)
+      border none
+      margin 1px 0
+      padding 0
+      outline none
+      text-align center
+      background none
+      font-weight 500
+      font-size var(--font-size)
+      line-height var(--line-height)
+
+  &__page-indicator
+    flex 1
+    user-select none
+    font-weight 500
+    font-size var(--font-size)
+    line-height var(--line-height)
+
+    span
+      font-weight normal
+      opacity 0.4
+
+  &__page-size
+    min-width 170px
+    border 1px solid rgba(0,0,0,0.15)
+    border-radius 5px
+    position relative
+    background #fafafa
+    margin 0 0 0 16px
+    box-sizing border-box
+
+
+    ~/_size_small &
+      padding-left 8px
+      min-width 130px
+
+  select
+    height: 40px;
+    min-height: 40px;
+    font-size: 16px;
+    line-height: 22px;
+    box-sizing: border-box;
+    padding: 0 16px;
+    transition: box-shadow 80ms ease;
+    border none
+    outline none
+    background none
+    min-width 155px

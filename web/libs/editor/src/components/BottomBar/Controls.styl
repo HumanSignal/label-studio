@@ -1,0 +1,52 @@
+.bottombar
+  .controls
+    flex 1
+    height 100%
+    display grid
+    grid-auto-columns 1fr
+    column-gap 8px
+    grid-auto-flow column
+    justify-content flex-end
+    padding-right 8px
+    align-items center
+
+    .button
+      width 160px
+      height 40px
+      font-size 16px
+      line-height 24px
+      &_look_danger
+        border-color #e1e0e2
+
+    &__skipped-info
+      display flex
+      // background-color rgba(221, 0, 0, 0.18)
+      align-items center
+      justify-content center
+      font-weight 500
+      font-size 16px
+
+      svg
+        margin 0 8px 0 4px
+
+  .action-dialog
+    height 278px
+    width 319px // 320 sidebar width - 1ps border
+    padding 12px 16px
+    display flex
+    flex-direction column
+
+    &__input-title
+      margin-bottom 4px
+
+    &__input
+      resize none
+      flex 1 1 auto
+      margin-bottom 16px
+      background-color #FAFAFA
+      font-size 16px
+
+    &__footer
+      display flex
+      flex-direction row
+      justify-content end

@@ -1,0 +1,50 @@
+.comment-form
+    --primary-action-color #00A8FF
+    --primary-action-padding 4px
+    --primary-action-border-radius 4px
+    --primary-action-surface-color-hover rgba(9, 109, 217, 0.12)
+    --text-input-min-height 40px
+    --tooltip-text-color #F5222D
+
+    display grid
+    grid-template-columns: auto var(--text-input-min-height);
+    align-items center
+    gap 4px
+
+    &__primary-action
+        height 100%
+        width 100%
+        display flex
+        justify-content center
+        align-items start
+        flex-shrink 0
+        flex-grow 0
+
+        button
+            margin-top 4px
+            display flex
+            justify-content center
+            align-items center
+            flex-shrink 0
+            flex-grow 0
+            appearance none
+            border none
+            background-color transparent
+            color var(--primary-action-color)
+            border-radius var(--primary-action-border-radius)
+
+            &:hover
+                background-color var(--primary-action-surface-color-hover)
+
+            ~/_inline &
+                padding 0
+                height calc(var(--text-input-min-height) - 8px);
+                width calc(var(--text-input-min-height) - 8px);
+
+        ~/_inline &
+            grid-row 1 / 2
+            grid-column 2 / -1
+
+    &__tooltipMessage
+        color var(--tooltip-text-color)
+        font-size 0.9em

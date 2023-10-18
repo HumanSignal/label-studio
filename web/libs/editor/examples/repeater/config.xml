@@ -1,0 +1,15 @@
+<View>
+   <Repeater on="$utterances" indexFlag="{{idx}}">
+      <View>
+        <Text name="user_{{idx}}" value="$utterances[{{idx}}].text" />
+      </View>
+      <View>
+        <header value="Utterance Review"></header>
+        <Choices name="utterance_action_{{idx}}" showInline="true" toName="user_{{idx}}">
+          <Choice value="No Action" selected="true" />
+          <Choice value="Training" />
+          <Choice value="New Intent" />
+        </Choices>
+      </View>
+   </Repeater>
+</View>

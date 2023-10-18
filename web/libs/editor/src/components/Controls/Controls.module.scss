@@ -1,0 +1,65 @@
+@import "../../assets/styles/global.scss";
+
+.task {
+  opacity: 0.4;
+}
+
+.container {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+
+  & > button,
+  & > span {
+    margin: 0 10px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    @include respond("phone") {
+      margin-left: 0;
+      margin-bottom: 5px;
+    }
+  }
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  @include respond("phone") {
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-flow: column;
+  }
+}
+
+.block {
+  clear: both;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+
+  @include respond("phone") {
+    flex-flow: column;
+    align-items: flex-start;
+  }
+}
+
+.rewrite {
+  background: #73d13d;
+  border-color: #73d13d;
+
+  &:hover {
+    background: #95de64;
+    border-color: #95de64;
+  }
+}
