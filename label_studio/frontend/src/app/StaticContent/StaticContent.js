@@ -10,10 +10,10 @@ const parseContent = (id, source, children, parse) => {
 
   if (!children || children.length === 0 || children instanceof Function) {
     const template = source.querySelector(`template#${id}`);
-    const templateHTML = template.innerHTML ?? "";
+    const templateHTML = template.innerHTML ? sanitizeHTML(template.innerHTML) : "";
 
     if (parse) {
-      const parsed = parseHTML(sanitizeHTML(templateHTML));
+      const parsed = parseHTML(templateHTML);
       const childResult = children instanceof Function ? children(parsed) : false;
 
       result = childResult || parsed;
