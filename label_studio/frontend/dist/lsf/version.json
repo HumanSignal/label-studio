@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-255: Parse username and password from basic auth URL and use for API calls",
-  "commit": "e8fcdb746aac38218edf1e8dd5033141516c5075",
-  "branch": "master",
-  "date": "2023/10/16 13:05:26"
+  "message": "feat: LEAP-58: Proxy URL for Taxonomy if possible",
+  "commit": "1ab19ac8a83d04f06ffb49712cc122ab5db7207e",
+  "branch": "fb-leap-58/proxy-url",
+  "date": "2023/10/19 19:49:19"
 }
