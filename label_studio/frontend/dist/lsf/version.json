@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-255: Parse username and password from basic auth URL and use for API calls",
-  "commit": "e8fcdb746aac38218edf1e8dd5033141516c5075",
+  "message": "fix: LEAP-256: Include the 'legacy' property in the 'Taxonomy' tag",
+  "commit": "ce5217c8f2b7ba4dda598cec3cf447d37f2536ef",
   "branch": "master",
-  "date": "2023/10/16 13:05:26"
+  "date": "2023/10/19 20:38:16"
 }
