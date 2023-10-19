@@ -34,7 +34,8 @@ You can import many types of data, including text, timeseries, audio, and image 
 | [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
 | Video | .mp4, .webm, .avi |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstud.io/?source=docs-gdi). 
+If you don't see a supported data or file type that you want to import, please let us know by submitting an issue to the <a className="no-go" href="https://github.com/humansignal/label-studio/issues">Label Studio Repository</a>.
+
 
 ### How to import your data
 

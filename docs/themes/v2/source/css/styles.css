@@ -740,13 +740,20 @@ main {
   font-weight: normal;
 }
 
+/*
 .content-markdown ol li ul li {
   margin-top: 0;
 }
+*/
 
 .content-markdown ul li ul li {
   margin-top: 0;
 }
+
+.content-markdown ol li ol {
+    list-style: lower-alpha;
+  }
+  
 
 
 .Text.Large {

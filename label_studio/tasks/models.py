@@ -171,6 +171,7 @@ class Task(TaskMixin, models.Model):
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
+            models.Index(fields=['project', 'id']),
         ]
 
     @property
@@ -619,6 +620,7 @@ class Annotation(AnnotationMixin, models.Model):
             models.Index(fields=['last_action']),
             models.Index(fields=['project', 'ground_truth']),
             models.Index(fields=['project', 'was_cancelled']),
+            models.Index(fields=['project', 'id']),
         ]
 
     def created_ago(self):
@@ -1032,8 +1034,15 @@ def delete_draft(sender, instance, **kwargs):
     task = instance.task
     query_args = {'task': task, 'annotation': instance}
     drafts = AnnotationDraft.objects.filter(**query_args)
-    num_drafts = drafts.count()
-    drafts.delete()
+    num_drafts = 0
+    for draft in drafts:
+        # Delete each draft individually because deleting
+        # the whole queryset won't update `created_labels_drafts`
+        try:
+            draft.delete()
+            num_drafts += 1
+        except AnnotationDraft.DoesNotExist:
+            continue
     logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {instance}')
 
 

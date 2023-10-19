@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-36: Taxonomy alias + other important fixes",
-  "commit": "4f4a382254b4dd781af5ad8cdbe35b015f780a4c",
+  "message": "fix: LEAP-255: Parse username and password from basic auth URL and use for API calls",
+  "commit": "e8fcdb746aac38218edf1e8dd5033141516c5075",
   "branch": "master",
-  "date": "2023/09/08 19:20:48"
+  "date": "2023/10/16 13:05:26"
 }

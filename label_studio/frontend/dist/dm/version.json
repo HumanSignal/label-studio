@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-380: [FE] 'Hang tight' message is missing when there is no tasks synced yet and sync is in progress",
-  "commit": "66797de8bcf7a7bc8ae401ab7975f589cd439ee7",
+  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
+  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
   "branch": "master",
-  "date": "2023/09/05 09:47:24"
+  "date": "2023/09/26 10:39:21"
 }
