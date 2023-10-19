@@ -11,8 +11,10 @@ from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
 
+OrganizationMemberMixin = load_func(settings.ORGANIZATION_MEMBER_MIXIN)
 
-class OrganizationMember(models.Model):
+
+class OrganizationMember(OrganizationMemberMixin, models.Model):
     """ """
 
     user = models.ForeignKey(

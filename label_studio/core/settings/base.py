@@ -528,6 +528,7 @@ TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
+ORGANIZATION_MEMBER_MIXIN = 'organizations.mixins.OrganizationMemberMixin'
 USER_PERM = 'core.api_permissions.HasOwnerPermission'
 RECALCULATE_ALL_STATS = None
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
