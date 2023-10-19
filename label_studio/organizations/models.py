@@ -55,8 +55,13 @@ class OrganizationMember(models.Model):
         ordering = ['pk']
 
     def soft_delete(self):
-        self.deleted_at = timezone.now()
-        self.save(update_fields=['deleted_at'])
+        with transaction.atomic():
+            self.deleted_at = timezone.now()
+            self.save(update_fields=['deleted_at'])
+            self.user.active_organization = self.user.organizations.filter(
+                organizationmember__deleted_at__isnull=True
+            ).first()
+            self.user.save(update_fields=['active_organization'])
 
 
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)
