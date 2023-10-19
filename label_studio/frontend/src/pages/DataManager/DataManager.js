@@ -265,11 +265,7 @@ DataManagerPage.context = ({ dmRef }) => {
         <Button size="compact" onClick={() => {
           modal({
             title: "Instructions",
-            body: () => (
-              <div dangerouslySetInnerHTML={{
-                __html: project.expert_instruction,
-              }}/>
-            ),
+            body: () => <div dangerouslySetInnerHTML={{ __html: project.expert_instruction }}/>,
           });
         }}>
           Instructions
