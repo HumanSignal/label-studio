@@ -36,10 +36,10 @@ class GCS(object):
     @lru_cache(maxsize=1)
     def get_bucket(
         cls,
+        ttl_hash: int,
         google_project_id: Optional[str] = None,
         google_application_credentials: Optional[Union[str, dict]] = None,
         bucket_name: Optional[str] = None,
-        ttl_hash: Optional[int] = None,
     ) -> gcs.Bucket:
 
         client = cls.get_client(
@@ -198,10 +198,10 @@ class GCS(object):
         Engine or from the Google Cloud SDK.
         """
         bucket = cls.get_bucket(
+            ttl_hash=get_ttl_hash(),
             google_application_credentials=google_application_credentials,
             google_project_id=google_project_id,
             bucket_name=bucket_name,
-            ttl_hash=get_ttl_hash(),
         )
 
         blob = bucket.blob(blob_name)
