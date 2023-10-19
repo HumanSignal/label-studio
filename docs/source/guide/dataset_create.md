@@ -71,7 +71,13 @@ You can use or modify the following example:
 
 **Prerequisites:**
 
-- You must have the admin permissions in your AWS account to generate keys and create service accounts. 
+- You must have the admin permissions in your AWS account to generate keys and create service accounts.
+
+For more information on completing the following steps, see the following pages in the AWS user guides:
+
+[Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)  
+[Managing access keys for IAM users](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)  
+[Policies and permissions in IAM](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html)
 
 ###### Create a policy for the user
 
@@ -181,12 +187,12 @@ This user can be tied to a specific person or a group.
     | Bucket Name | Enter the name of the AWS S3 bucket. |
     | Bucket Prefix | Enter the folder name within the bucket that you would like to use.  For example, `data-set-1` or `data-set-1/subfolder-2`.  |
     | File Name Filter | Use glob format to filter which file types to sync. For example, to sync all JPG files, enter `*jpg`. To sync all JPG and PNG files, enter `**/**+(jpg\|png)`.<br><br>At this time, we support the following file types: .jpg, .jpeg, .png, .txt, .text |
-    | Region Name | By default, the region is `us-east-1`. If your bucket is located in a different region, enter it here.  |
+    | Region Name | By default, the region is `us-east-1`. If your bucket is located in a different region, overwrite the default and enter your region here. Otherwise, keep the default  |
     | S3 Endpoint | Enter an S3 endpoint if you want to override the URL created by S3 to access your bucket. |
-    | Access Key ID | Enter the ID for the access key you created in AWS. Ensure this access key has read permissions for the S3 bucket you are targeting (see "Create an AWS access key" above). |
-    | Secret Access Key | Enter the secret portion of the access key you created earlier. |
-    | Session Token | If you are using a session token as part of your authorization (for example, MFA), enter it here. |
-    | Treat every bucket object as a source file | **Enabled** - Each bucket object will be imported as a separate piece of data (unstructured data). This creates a URL for each bucket object.<br>You should leave this option enabled if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. <br><br>**Disabled** - Disable this option if you are using structured data, such as JSON or CSV files.<br><br>**NOTE:** At this time, we only support unstructured data. |
+    | Access Key ID | Enter the ID for the access key you created in AWS. Ensure this access key has read permissions for the S3 bucket you are targeting (see [Create an AWS access key](#Create-a-policy-for-the-user) above). |
+    | Secret Access Key | Enter the secret portion of the [access key](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) you created earlier. |
+    | Session Token | If you are using a session token as part of your authorization (for example, [MFA](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html)), enter it here. |
+    | Treat every bucket object as a source file | **Enabled** - Each object in the bucket will be imported as a separate record in the dataset.<br>You should leave this option enabled if you are importing a bucket of unstructured data files such as JPG, PNG, or TXT. <br><br>**Disabled** - Disable this option if you are importing structured data, such as JSON or CSV files.<br><br>**NOTE:** At this time, we only support unstructured data. Structured data support is coming soon.  |
     | Recursive scan | Perform recursive scans over the bucket contents if you have nested folders in your S3 bucket. |
     | Use pre-signed URLs | If your tasks contain `s3://…` links, they must be pre-signed in order to be displayed in the browser. |
     | Pre-signed URL counter | Adjust the counter for how many minutes the pre-signed URLs are valid. |
@@ -197,7 +203,7 @@ This user can be tied to a specific person or a group.
 
     ![Check Dataset connection](/images/data_discovery/dataset_check_connection_aws.png)
 
-5. Provide a name for your dataset column and select a type. The data type you select instructs Label Studio on how to index your data in a vector database, so that it can be searched using an AI-powered semantic search.
+5. Provide a name for your dataset column and select a data type. The data type that you select tells Label Studio how to store your data in a way that can be searched using an AI-powered semantic search.
 
     ![Select dataset column](/images/data_discovery/dataset_column_aws.png)
 
@@ -328,7 +334,7 @@ The private key is automatically downloaded. This is the only time you can downl
     | Bucket Name | Enter the name of the Google Cloud bucket. |
     | Bucket Prefix | Optionally, enter the folder name within the bucket that you would like to use.  For example, `data-set-1` or `data-set-1/subfolder-2`.  |
     | File Name Filter | Use glob format to filter which file types to sync. For example, to sync all JPG files, enter `*jpg`. To sync all JPG and PNG files, enter `**/**+(jpg\|png)`.<br>At this time, we support the following file types: .jpg, .jpeg, .png, .txt, .text |
-    | Treat every bucket object as a source file | **Enabled** - Each bucket object will be imported as a separate piece of data (unstructured data).<br>You should leave this option enabled if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This creates a URL for each bucket object, such as `gs://my-gcs-bucket/image.jpg`<br><br>**Disabled** - Disable this option if you are using structured data, such as JSON or CSV files.<br><br>**NOTE:** At this time, we only support unstructured data. |
+    | Treat every bucket object as a source file | **Enabled** - Each object in the bucket will be imported as a separate record in the dataset.<br>You should leave this option enabled if you are importing a bucket of unstructured data files such as JPG, PNG, or TXT. <br><br>**Disabled** - Disable this option if you are importing structured data, such as JSON or CSV files.<br><br>**NOTE:** At this time, we only support unstructured data. Structured data support is coming soon.  |
     | Use pre-signed URLs | If your tasks contain `gs://…` links, they must be pre-signed in order to be displayed in the browser. |
     | Pre-signed URL counter | Adjust the counter for how many minutes the pre-signed URLs are valid. |
     | Google Application Credentials | Copy and paste the full contents of the JSON file you downloaded when you created your service account key (see above).  |
@@ -340,7 +346,7 @@ The private key is automatically downloaded. This is the only time you can downl
 
     ![Check Dataset connection](/images/data_discovery/dataset_check_connection.png)
 
-5. Provide a name for your dataset column and select a type. The data type you select instructs Label Studio on how to index your data in a vector database, so that it can be searched using an AI-powered semantic search.
+5. Provide a name for your dataset column and select a data type. The data type that you select tells Label Studio how to store your data in a way that can be searched using an AI-powered semantic search.
 
     ![Select dataset column](/images/data_discovery/dataset_column.png)
 
