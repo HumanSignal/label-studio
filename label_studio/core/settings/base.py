@@ -665,4 +665,5 @@ if CSRF_TRUSTED_ORIGINS:
 
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
-PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
+PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', True)
+SWAGGER_ENABLED = get_bool_env('SWAGGER_ENABLED', False)
