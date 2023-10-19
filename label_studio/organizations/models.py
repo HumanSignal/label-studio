@@ -25,8 +25,16 @@ class OrganizationMember(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
-    is_deleted = models.BooleanField(_('is deleted'), default=False)
-    deleted_at = models.DateTimeField(_('deleted at'), null=True)
+    deleted_at = models.DateTimeField(
+        _('deleted at'),
+        default=None,
+        null=True,
+        db_index=True,
+        help_text='Timestamp indicating when the organization member was marked as deleted.  '
+                  'If NULL, the member is not considered deleted.',
+    )
+
+    # objects = OrganizationMemberQuerySet.as_manager()
 
     @classmethod
     def find_by_user(cls, user_or_user_pk, organization_pk):
@@ -36,6 +44,10 @@ class OrganizationMember(models.Model):
         return OrganizationMember.objects.get(user=user_pk, organization=organization_pk)
 
     @property
+    def is_deleted(self):
+        return bool(self.deleted_at)
+
+    @property
     def is_owner(self):
         return self.user.id == self.organization.created_by.id
 
@@ -43,9 +55,8 @@ class OrganizationMember(models.Model):
         ordering = ['pk']
 
     def soft_delete(self):
-        self.is_deleted = True
         self.deleted_at = timezone.now()
-        self.save(update_fields=['is_deleted', 'deleted_at'])
+        self.save(update_fields=['deleted_at'])
 
 
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)

@@ -38,7 +38,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             organization_member_for_user = OrganizationMember.objects.get(
                 user_id=instance.id, organization_id=self.context['request'].user.active_organization_id
             )
-        return organization_member_for_user.is_deleted
+        return bool(organization_member_for_user.deleted_at)
 
     def to_representation(self, instance):
         """Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars"""
