@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-256: Include the 'legacy' property in the 'Taxonomy' tag",
-  "commit": "ce5217c8f2b7ba4dda598cec3cf447d37f2536ef",
-  "branch": "master",
-  "date": "2023/10/19 20:38:16"
+  "message": "fix: OPTIC-113: Draft save on switch history",
+  "commit": "2a051b864730f9b2dce1dfeb9c29a9cdbac4c28f",
+  "branch": "fb-optic-113/draft-save-on-switch-history",
+  "date": "2023/10/19 14:58:38"
 }
