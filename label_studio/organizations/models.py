@@ -114,7 +114,7 @@ class Organization(OrganizationMixin, models.Model):
         return self.projects.filter(members__user=user).exists()
 
     def has_permission(self, user):
-        if self in user.organizations.all():
+        if self in user.organizations.filter(organizationmember__deleted_at__isnull=True):
             return True
         return False
 
@@ -132,7 +132,7 @@ class Organization(OrganizationMixin, models.Model):
     def remove_user(self, user):
         OrganizationMember.objects.filter(user=user, organization=self).delete()
         if user.active_organization_id == self.id:
-            user.active_organization = user.organizations.first()
+            user.active_organization = user.organizations.filter(organizationmember__deleted_at__isnull=True).first()
             user.save(update_fields=['active_organization'])
 
     def reset_token(self):
