@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1476: Fix selected=true for Taxonomy",
-  "commit": "c71c229b2d8fc4dfe09687259ee86f5624452a72",
+  "message": "fix: LEAP-255: Parse username and password from basic auth URL and use for API calls",
+  "commit": "e8fcdb746aac38218edf1e8dd5033141516c5075",
   "branch": "master",
-  "date": "2023/10/04 14:24:40"
+  "date": "2023/10/16 13:05:26"
 }
