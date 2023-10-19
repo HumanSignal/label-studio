@@ -31,7 +31,7 @@ class OrganizationMember(models.Model):
         null=True,
         db_index=True,
         help_text='Timestamp indicating when the organization member was marked as deleted.  '
-                  'If NULL, the member is not considered deleted.',
+        'If NULL, the member is not considered deleted.',
     )
 
     # objects = OrganizationMemberQuerySet.as_manager()
