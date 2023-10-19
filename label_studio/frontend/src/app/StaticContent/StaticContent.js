@@ -1,5 +1,4 @@
 import parseHTML from 'html-react-parser';
-import sanitizeHTML from 'sanitize-html';
 import React from 'react';
 import { reInsertScripts } from '../../utils/scripts';
 import { AsyncPageContext } from '../AsyncPage/AsyncPage';
@@ -10,7 +9,7 @@ const parseContent = (id, source, children, parse) => {
 
   if (!children || children.length === 0 || children instanceof Function) {
     const template = source.querySelector(`template#${id}`);
-    const templateHTML = template.innerHTML ? sanitizeHTML(template.innerHTML) : "";
+    const templateHTML = template.innerHTML ?? "";
 
     if (parse) {
       const parsed = parseHTML(templateHTML);
