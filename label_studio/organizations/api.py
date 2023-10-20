@@ -3,12 +3,14 @@
 import logging
 
 from core.feature_flags import flag_set
+from core.mixins import GetParentObjectMixin
+from core.utils.common import load_func
 from django.conf import settings
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from organizations.models import Organization
+from organizations.models import Organization, OrganizationMember
 from organizations.serializers import (
     OrganizationIdSerializer,
     OrganizationInviteSerializer,
@@ -16,16 +18,22 @@ from organizations.serializers import (
     OrganizationSerializer,
     OrganizationsParamsSerializer,
 )
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from users.models import User
 
 from label_studio.core.permissions import ViewClassPermission, all_permissions
 from label_studio.core.utils.params import bool_from_request
 
 logger = logging.getLogger(__name__)
+
+HasObjectPermission = load_func(settings.MEMBER_PERM)
 
 
 @method_decorator(
@@ -93,8 +101,7 @@ class OrganizationMemberPagination(PageNumberPagination):
         ],
     ),
 )
-class OrganizationMemberListAPI(generics.ListAPIView):
-
+class OrganizationMemberListAPI(GetParentObjectMixin, generics.ListAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.organizations_view,
@@ -102,8 +109,10 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         PATCH=all_permissions.organizations_change,
         DELETE=all_permissions.organizations_change,
     )
+    parent_queryset = Organization.objects.all()
     serializer_class = OrganizationMemberUserSerializer
     pagination_class = OrganizationMemberPagination
+    permission_classes = (IsAuthenticated, HasObjectPermission)
 
     def get_serializer_context(self):
         return {
@@ -126,6 +135,22 @@ class OrganizationMemberListAPI(generics.ListAPIView):
             return org.members.order_by('user__username')
         else:
             return org.members.order_by('user__username')
+
+    def delete(self, request, pk=None, user_pk=None):
+        org = self.get_parent_object()
+        if org != request.user.active_organization:
+            raise PermissionDenied('You can delete members only for your current active organization')
+
+        user = get_object_or_404(User, pk=user_pk)
+        member = get_object_or_404(OrganizationMember, user=user, organization=org)
+        if member.deleted_at is not None:
+            raise NotFound('Member not found')
+
+        if member.user_id == request.user.id:
+            return Response({'detail': 'User cannot soft delete self'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        member.soft_delete()
+        return Response(status=204)  # 204 No Content is a common HTTP status for successful delete requests
 
 
 @method_decorator(

@@ -6,6 +6,6 @@ class OrganizationMixin:
 
 class OrganizationMemberMixin:
     def has_permission(self, user):
-        if user.active_organization in self.organizations.filter(organizationmember__deleted_at__isnull=True):
+        if user.active_organization_id == self.organization_id:
             return True
         return False

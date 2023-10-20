@@ -6,8 +6,9 @@ class HasObjectPermission(BasePermission):
         return obj.has_permission(request.user)
 
 
-class HasOwnerPermission(BasePermission):
+class MemberHasOwnerPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
-        if not request.user.own_organization or obj.active_organization != request.user.active_organization:
+        if request.method == 'DELETE' and not request.user.own_organization:
             return False
+
         return obj.has_permission(request.user)

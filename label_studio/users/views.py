@@ -17,8 +17,6 @@ from rest_framework.authtoken.models import Token
 from users import forms
 from users.functions import login, proceed_registration
 
-HasObjectPermission = load_func(settings.USER_PERM)
-
 logger = logging.getLogger()
 
 
