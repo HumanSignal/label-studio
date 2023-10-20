@@ -162,39 +162,19 @@ class MLBackend(models.Model):
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
             return
-        
-        # result = {}
-        # options = {}
-        # if user:
-        #     options = {'user': user}
-        # if not self.is_interactive:
-        #     result['errors'] = ["Model is not set to be used for interactive preannotations"]
-        #     return result
-
-        print(f"the tasks are {tasks}")
 
         if isinstance(tasks, list):
             from tasks.models import Task
 
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
         
-        print(f"the tasks are {tasks}")
-
         # Filter tasks that already contain the current model version in predictions
         tasks = tasks.annotate(predictions_count=Count('predictions')).exclude(
             Q(predictions_count__gt=0) & Q(predictions__model_version=self.model_version))
         if not tasks.exists():
             logger.debug(f'All tasks already have prediction from model version={self.model_version}')
             return
-        
-        # if context:
-        #     TaskSimpleSerializer.context = context
-
-        # changing this too
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-
-        # tasks_ser = InteractiveAnnotatingDataSerializer(tasks, many=True, expand=['drafts', 'predictions', 'annotations'], context=context).data
-
 
         # changed this line
         # ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
@@ -219,6 +199,7 @@ class MLBackend(models.Model):
             logger.warning(f'ML backend returned empty prediction for project {self}')
             return
 
+        # add a true/false argument that allows you to surpass this
         # ML Backend doesn't support batch of tasks, do it one by one
         # elif len(responses) == 1 and len(tasks) != 1:
         #     logger.warning(
