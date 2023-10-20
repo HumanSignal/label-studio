@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
-  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
-  "branch": "master",
-  "date": "2023/09/26 10:39:21"
+  "message": "fix: OPTIC-113: Draft save on switch history and exit",
+  "commit": "4591db8c97c48fccae950784a991b5562f8ebce9",
+  "branch": "fb-optic-113/draft-switch-history-exit",
+  "date": "2023/10/19 15:14:08"
 }
