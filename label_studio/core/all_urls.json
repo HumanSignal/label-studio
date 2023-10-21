@@ -90,6 +90,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/organizations/<int:pk>/memberships/<int:user_pk>/",
+        "module": "organizations.api.OrganizationMemberDetailAPI",
+        "name": "organizations:api:organization-membership-detail",
+        "decorators": ""
+    },
+    {
         "url": "/api/invite",
         "module": "organizations.api.OrganizationInviteAPI",
         "name": "organizations:organization-invite",
@@ -489,12 +495,6 @@
         "url": "/api/current-user/whoami",
         "module": "users.api.UserWhoAmIAPI",
         "name": "current-user-whoami",
-        "decorators": ""
-    },
-    {
-        "url": "/api/users/<int:pk>/soft-delete/",
-        "module": "users.views.UserSoftDeleteView",
-        "name": "user-soft-delete",
         "decorators": ""
     },
     {

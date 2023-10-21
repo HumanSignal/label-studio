@@ -101,7 +101,7 @@ class OrganizationMemberPagination(PageNumberPagination):
         ],
     ),
 )
-class OrganizationMemberListAPI(GetParentObjectMixin, generics.ListAPIView):
+class OrganizationMemberListAPI(generics.ListAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.organizations_view,
@@ -109,10 +109,8 @@ class OrganizationMemberListAPI(GetParentObjectMixin, generics.ListAPIView):
         PATCH=all_permissions.organizations_change,
         DELETE=all_permissions.organizations_change,
     )
-    parent_queryset = Organization.objects.all()
     serializer_class = OrganizationMemberUserSerializer
     pagination_class = OrganizationMemberPagination
-    permission_classes = (IsAuthenticated, HasObjectPermission)
 
     def get_serializer_context(self):
         return {
@@ -135,6 +133,44 @@ class OrganizationMemberListAPI(GetParentObjectMixin, generics.ListAPIView):
             return org.members.order_by('user__username')
         else:
             return org.members.order_by('user__username')
+
+
+@method_decorator(
+    name='delete',
+    decorator=swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary='Soft delete an organization member',
+        operation_description='Soft delete a member from the organization.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='pk',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this organization.',
+            ),
+            openapi.Parameter(
+                name='user_pk',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying the user to be deleted from the organization.',
+            ),
+        ],
+        responses={
+            204: 'Member deleted successfully.',
+            405: 'User cannot soft delete self.',
+            404: 'Member not found',
+        },
+    )
+)
+class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroyAPIView):
+    permission_required = ViewClassPermission(
+        DELETE=all_permissions.organizations_change,
+    )
+    parent_queryset = Organization.objects.all()
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
+    permission_classes = (IsAuthenticated, HasObjectPermission)
+    serializer_class = OrganizationMemberUserSerializer  # Assuming this is the right serializer
+    http_method_names = ['delete']
 
     def delete(self, request, pk=None, user_pk=None):
         org = self.get_parent_object()

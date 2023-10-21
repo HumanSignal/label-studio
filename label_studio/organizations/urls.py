@@ -22,7 +22,7 @@ _api_urlpattens = [
     path('<int:pk>/memberships', api.OrganizationMemberListAPI.as_view(), name='organization-memberships-list'),
     path(
         '<int:pk>/memberships/<int:user_pk>/',
-        api.OrganizationMemberListAPI.as_view(),
+        api.OrganizationMemberDetailAPI.as_view(),
         name='organization-membership-detail',
     ),
 ]
