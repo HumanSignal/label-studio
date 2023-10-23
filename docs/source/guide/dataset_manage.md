@@ -15,7 +15,7 @@ hide_sidebar: true
 
 From the Datasets page, click the overflow menu next to dataset and select **Settings**.  
 
-![Overflow menu next to a dataset](/guide/images/data_discovery/dataset_settings.png)
+![Overflow menu next to a dataset](/images/data_discovery/dataset_settings.png)
 
 From here you can do the following:
 
