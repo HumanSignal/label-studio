@@ -23,5 +23,10 @@ urlpatterns = [
     # special endpoints for serving imported files
     path('data/upload/<path:filename>', api.UploadedFileResponse.as_view(), name='data-upload'),
     path('storage-data/uploaded/', api.DownloadStorageData.as_view(), name='storage-data-upload'),
-    path('tasks/<int:task_id>/presign/', api.PresignStorageData.as_view(), name='storage-data-presign'),
+    path('tasks/<int:task_id>/presign/', api.TaskPresignStorageData.as_view(), name='task-storage-data-presign'),
+    path(
+        'projects/<int:project_id>/presign/',
+        api.ProjectPresignStorageData.as_view(),
+        name='project-storage-data-presign',
+    ),
 ]

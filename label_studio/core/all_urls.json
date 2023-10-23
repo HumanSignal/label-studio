@@ -253,7 +253,7 @@
     },
     {
         "url": "/tasks/<int:task_id>/presign/",
-        "module": "data_import.api.PresignStorageData",
+        "module": "data_import.api.TaskPresignStorageData",
         "name": "data_import:storage-data-presign",
         "decorators": ""
     },
