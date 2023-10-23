@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-256: Include the 'legacy' property in the 'Taxonomy' tag",
-  "commit": "ce5217c8f2b7ba4dda598cec3cf447d37f2536ef",
-  "branch": "master",
-  "date": "2023/10/19 20:38:16"
+  "message": "fix: LEAP-218: Improve performance of search",
+  "commit": "c721203275057e720a95862dd1fe302cb313efea",
+  "branch": "fb-leap-218",
+  "date": "2023/10/23 16:52:40"
 }
