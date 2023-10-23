@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
-  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
-  "branch": "master",
-  "date": "2023/09/26 10:39:21"
+  "message": "feat: DIA-99: [FE] Create range slider frontend component and add to Semantic Search",
+  "commit": "dae330fa1b74cffd56a6ca6f3edd515c4ab04f0f",
+  "branch": "fb-dia-99/slider",
+  "date": "2023/10/23 10:41:37"
 }
