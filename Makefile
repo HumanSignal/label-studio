@@ -1,6 +1,6 @@
 # Run Django dev server with Sqlite
 run-dev:
-	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG fflag_fix_all_optic_79_task_count_is_wrong_short=false DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py runserver
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py runserver
 
 # Run Django dev migrations with Sqlite
 migrate-dev:
