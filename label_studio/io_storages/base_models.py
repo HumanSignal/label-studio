@@ -445,6 +445,7 @@ class ImportStorage(Storage):
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,
                     on_failure=storage_background_failure,
+                    job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 )
                 self.info_set_job(sync_job.id)
                 logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
