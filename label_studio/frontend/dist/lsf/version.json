@@ -1,6 +1,6 @@
 {
   "message": "feat: LEAP-58: Proxy URL for Taxonomy if possible",
-  "commit": "1ab19ac8a83d04f06ffb49712cc122ab5db7207e",
+  "commit": "dd48c42755f0aaf800eee4d4fdd44753d231f1a7",
   "branch": "fb-leap-58/proxy-url",
-  "date": "2023/10/19 19:49:19"
+  "date": "2023/10/23 18:03:41"
 }
