@@ -16,10 +16,10 @@ services:
     #      - NGINX_SSL_CERT=/certs/cert.pem
     #      - NGINX_SSL_CERT_KEY=/certs/cert.key
     volumes:
-      - ./mydata:/label-studio/data:rw
+      # - ./mydata:/label-studio/data:rw
       - ./deploy/nginx/certs:/certs:ro
     #   Optional: Override nginx default conf
-    #      - ./deploy/my.conf:/etc/nginx/nginx.conf
+      - ./deploy/default.conf:/etc/nginx/nginx.conf
     command: nginx
 
   app:
@@ -40,10 +40,12 @@ services:
       - POSTGRE_PORT=5432
       - POSTGRE_HOST=db
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
+      - DATA_UPLOAD_MAX_MEMORY_SIZE=367001600
+      - UWSGI_WORKER_HARAKIRI=300
       - JSON_LOG=1
     #      - LOG_LEVEL=DEBUG
-    volumes:
-      - ./mydata:/label-studio/data:rw
+    # volumes:
+      # - ./mydata:/label-studio/data:rw
     command: label-studio-uwsgi
 
   db:
