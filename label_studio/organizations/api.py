@@ -160,7 +160,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
             405: 'User cannot soft delete self.',
             404: 'Member not found',
         },
-    )
+    ),
 )
 class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroyAPIView):
     permission_required = ViewClassPermission(
