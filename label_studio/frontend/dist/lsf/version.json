@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-218: Improve performance of search",
-  "commit": "b87845762f1bdbdd4c2ab4752e49c44112497ed0",
+  "commit": "5018d89bcbca97cc35667719abe4f962c4c3d031",
   "branch": "fb-leap-218",
-  "date": "2023/10/24 17:04:18"
+  "date": "2023/10/24 18:49:18"
 }
