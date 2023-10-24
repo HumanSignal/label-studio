@@ -1,0 +1,53 @@
+FROM nvidia/cuda:11.3.1-cudnn8-devel-ubuntu18.04
+# RUN apt-get -y update
+# RUN apt-get update && apt-get install -y python3.9
+# RUN apt-get install -y python3.9-dev python3-pip
+
+# RUN apt-get install -y python3.9 python3-pip
+
+# Set environment variables to non-interactive (this prevents some prompts)
+ENV DEBIAN_FRONTEND=non-interactive
+
+# Run package updates and install packages
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    zlib1g-dev \
+    libncurses5-dev \
+    libgdbm-dev \
+    libnss3-dev \
+    libssl-dev \
+    libreadline-dev \
+    libffi-dev \
+    wget
+
+# Download and install Python 3.9
+RUN wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz && \
+    tar -xf Python-3.9.7.tgz && \
+    cd Python-3.9.7 && \
+    ./configure --enable-optimizations && \
+    make altinstall
+
+# Optionally, create a symlink to make this the default Python 3 version
+RUN ln -sf /usr/local/bin/python3.9 /usr/bin/python3
+
+RUN apt-get install -y wget
+RUN apt-get -y install git
+
+RUN python3 -m pip install --upgrade pip setuptools wheel
+RUN python3 -m pip install --upgrade Pillow
+RUN git clone https://github.com/open-mmlab/playground
+RUN pip3 install torch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1
+WORKDIR label_anything
+RUN pip install opencv-python pycocotools matplotlib onnxruntime onnx
+RUN pip install git+https://github.com/facebookresearch/segment-anything.git
+RUN pip install git+https://github.com/SysCV/sam-hq.git
+RUN wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth
+RUN pip install label-studio==1.7.3
+RUN pip install label-studio-ml==1.0.9
+RUN pip install numpy==1.23.0
+RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection
+WORKDIR /mmdetection
+RUN pip install --no-cache-dir -r requirements/build.txt
+RUN pip install --no-cache-dir -e .
+RUN pip install timm
