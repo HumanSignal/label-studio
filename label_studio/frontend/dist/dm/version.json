@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
-  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
-  "branch": "master",
-  "date": "2023/09/26 10:39:21"
+  "message": "fix: DIA-631: [FE] if associated projects dont get sent back the data-explorer breaks",
+  "commit": "c874d8bcd15c1182371061318cd14839606bd8af",
+  "branch": "fb-dia-631/associated-lists",
+  "date": "2023/10/24 17:47:59"
 }
