@@ -29,25 +29,31 @@ RUN wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz && \
     make altinstall
 
 # Optionally, create a symlink to make this the default Python 3 version
-RUN ln -sf /usr/local/bin/python3.9 /usr/bin/python3
+RUN ln -sf /usr/local/bin/python3.9 /usr/bin/python3 && \
+    ln -sf /usr/local/bin/python3.9 /usr/bin/python
 
 RUN apt-get install -y wget
 RUN apt-get -y install git
+
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 RUN python3 -m pip install --upgrade pip setuptools wheel
 RUN python3 -m pip install --upgrade Pillow
 RUN git clone https://github.com/open-mmlab/playground
 RUN pip3 install torch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1
-WORKDIR label_anything
-RUN pip install opencv-python pycocotools matplotlib onnxruntime onnx
+WORKDIR /playground/label_anything
+RUN pip install opencv-python==4.8.1.78 pycocotools matplotlib onnxruntime onnx
 RUN pip install git+https://github.com/facebookresearch/segment-anything.git
 RUN pip install git+https://github.com/SysCV/sam-hq.git
 RUN wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth
 RUN pip install label-studio==1.7.3
 RUN pip install label-studio-ml==1.0.9
 RUN pip install numpy==1.23.0
-RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection
-WORKDIR /mmdetection
-RUN pip install --no-cache-dir -r requirements/build.txt
-RUN pip install --no-cache-dir -e .
+WORKDIR /playground/
+RUN git clone https://github.com/open-mmlab/mmdetection.git
+WORKDIR mmdetection
+# RUN pip install --no-cache-dir -r requirements/build.txt
+# RUN pip install --no-cache-dir -e .
+RUN pip install -e .
+WORKDIR /playground
 RUN pip install timm
