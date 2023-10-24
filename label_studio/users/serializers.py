@@ -26,6 +26,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
 
     def _is_deleted(self, instance):
         if organization_members := self.context.get('organization_members', None):
+            # Finds the first organization_member matching the instance's id. If not found, set to None.
             organization_member_for_user = next(
                 (
                     organization_member
