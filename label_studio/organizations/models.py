@@ -121,9 +121,7 @@ class Organization(OrganizationMixin, models.Model):
         return self.projects.filter(members__user=user).exists()
 
     def has_permission(self, user):
-        if self in user.organizations.filter(organizationmember__deleted_at__isnull=True):
-            return True
-        return False
+        return OrganizationMember.objects.filter(user=user, organization=self, deleted_at__isnull=True).exists()
 
     def add_user(self, user):
         if self.users.filter(pk=user.pk).exists():

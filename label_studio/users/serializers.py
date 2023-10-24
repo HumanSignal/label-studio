@@ -15,14 +15,14 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
     initials = serializers.SerializerMethodField(default='?', read_only=True)
     avatar = serializers.SerializerMethodField(read_only=True)
 
-    def get_avatar(self, user):
-        return user.avatar_url
+    def get_avatar(self, instance):
+        return instance.avatar_url
 
-    def get_initials(self, user):
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=user):
-            return user.get_initials(self._is_deleted(user))
+    def get_initials(self, instance):
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=instance):
+            return instance.get_initials(self._is_deleted(instance))
         else:
-            return user.get_initials()
+            return instance.get_initials()
 
     def _is_deleted(self, instance):
         if organization_members := self.context.get('organization_members', None):
