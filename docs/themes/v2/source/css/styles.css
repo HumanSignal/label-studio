@@ -1091,7 +1091,7 @@ main {
   margin: 1em 0;
 }
 
-.content-markdown img.gif-border {
+.content-markdown img {
   border: 1px var(--color-gray-100) solid;
 }
 

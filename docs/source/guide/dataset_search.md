@@ -12,13 +12,13 @@ hide_sidebar: true
 
 Once your dataset is created, you can use an AI-powered semantic search to filter your data. This allows you to easily refine and categorize your data for a more efficient labeling experience. 
 
-Search using natural language strings to refine your 
+Search using natural language strings. Enter your search into the field above the the dataset. 
 
-![Animated gif showing search in action](/guide/images/data_discovery/semantic_search.gif)
+![Animated gif showing search in action](/images/data_discovery/semantic_search.gif)
 
 ## Add data to a project
 
 Select the data you want to annotate and then click **Tasks**. From here you can select a project or you can create a new project. The selected data is added to the project as new individual tasks.   
 
-![Screenshot of the button to add tasks to project](/guide/images/data_discovery/add_tasks.png)
+![Screenshot of the button to add tasks to project](/images/data_discovery/add_tasks.png)
 
