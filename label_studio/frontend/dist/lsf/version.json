@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-299: Show spinner while taxonomy's loading",
-  "commit": "206ffdf5808507fbb14aad3553a5a7a6922b6529",
+  "commit": "4e1cabddcd5febf15f41dbcbdfa18599b328f66b",
   "branch": "fb-leap-299/loading-spinner",
-  "date": "2023/10/24 23:57:08"
+  "date": "2023/10/25 00:52:23"
 }
