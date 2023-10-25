@@ -88,23 +88,11 @@ If the "Show predictions to annotators in the Label Stream and Quick View" toggl
 ### Specific examples for pre-annotations
 
 Refer to the following examples for sample pre-annotation formats:
-- [Prepare pre-annotations for Label Studio](#prepare-pre-annotations-for-label-studio)
-  - [JSON format for pre-annotations](#json-format-for-pre-annotations)
-    - [Specify the data object](#specify-the-data-object)
-    - [Add results to the predictions array](#add-results-to-the-predictions-array)
-  - [Predictions are read-only](#predictions-are-read-only)
-  - [Specific examples for pre-annotations](#specific-examples-for-pre-annotations)
-- [Import bbox and choice pre-annotations for images](#import-bbox-and-choice-pre-annotations-for-images)
-- [Import pre-annotated rectangle, polygon, ellipse \& keypoint regions without labels for images](#import-pre-annotated-rectangle-polygon-ellipse--keypoint-regions-without-labels-for-images)
-- [Import span pre-annotations for text](#import-span-pre-annotations-for-text)
-- [Import brush segmentation pre-annotations in RLE format](#import-brush-segmentation-pre-annotations-in-rle-format)
-- [Import OCR pre-annotations](#import-ocr-pre-annotations)
-- [Troubleshoot pre-annotations](#troubleshoot-pre-annotations)
-  - [Make sure the predictions are visible to annotators](#make-sure-the-predictions-are-visible-to-annotators)
-  - [Check the configuration values of the labeling configuration and tasks](#check-the-configuration-values-of-the-labeling-configuration-and-tasks)
-  - [Check the labels in your configuration and your tasks](#check-the-labels-in-your-configuration-and-your-tasks)
-  - [Check the IDs and toName values](#check-the-ids-and-toname-values)
-  - [Read only and hidden regions](#read-only-and-hidden-regions)
+- [Import bbox and choice pre-annotations for images](#Import-bbox-and-choice-pre-annotations-for-images)
+- [Import pre-annotated rectangle, polygon, ellipse & keypoint regions without labels for images](#Import-pre-annotated-rectangle-polygon-ellipse-amp-keypoint-regions-without-labels-for-images)
+- [Text pre-annotations with NER spans](#Import-span-pre-annotations-for-text)
+- [Brush pre-annotations for segmentation with masks](#Import-brush-segmentation-pre-annotations-in-RLE-format)
+- [OCR pre-annotations with bounding boxes, labels, and text transcriptions](#Import-OCR-pre-annotations)
 
 To format pre-annotations for Label Studio not represented in these examples, refer to the sample results JSON for the relevant object and control tags for your labeling configuration, such as the [Audio tag](/tags/audio.html) for audio classification tasks. Each tag must be represented in the JSON pre-annotations format to render predictions in the Label Studio UI. Not all object and control tags list sample results JSON. 
 
