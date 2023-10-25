@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-31: Fix functioning of auto annotations",
-  "commit": "33a80201f96e34daf52da8412876c7cd6682ea3e",
+  "commit": "57a432e81749d8510e5708c2a32e06c7d5e81261",
   "branch": "fb-leap-31/auto-annotation-fixes",
-  "date": "2023/10/25 06:30:01"
+  "date": "2023/10/25 07:15:55"
 }
