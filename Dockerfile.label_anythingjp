@@ -1,0 +1,58 @@
+FROM nvidia/cuda:11.3.1-cudnn8-devel-ubuntu18.04
+# RUN apt-get -y update
+# RUN apt-get update && apt-get install -y python3.9
+# RUN apt-get install -y python3.9-dev python3-pip
+
+# RUN apt-get install -y python3.9 python3-pip
+
+# Set environment variables to non-interactive (this prevents some prompts)
+ENV DEBIAN_FRONTEND=non-interactive
+
+# Run package updates and install packages
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    zlib1g-dev \
+    libncurses5-dev \
+    libgdbm-dev \
+    libnss3-dev \
+    libssl-dev \
+    libreadline-dev \
+    libffi-dev \
+    wget \
+    libsqlite3-dev \
+    libbz2-dev \
+    liblzma-dev \
+    lzma ffmpeg libsm6 libxext6 
+
+
+RUN bash -c "wget https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh && \
+    bash Anaconda3-2023.09-0-Linux-x86_64.sh -b && \
+    source /root/anaconda3/bin/activate && \
+conda create -n rtmdet-sam python=3.9 -y && \
+conda activate rtmdet-sam && \
+conda install git -y && \
+git clone https://github.com/open-mmlab/playground && \
+pip install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio==0.10.1 -f https://download.pytorch.org/whl/cu113/torch_stable.html && \
+cd playground/label_anything/ && \
+pip install opencv-python pycocotools matplotlib onnxruntime onnx && \
+pip install git+https://github.com/facebookresearch/segment-anything.git && \
+pip install segment-anything-hq && \
+wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth && \
+wget https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_b.pth && \
+wget https://raw.githubusercontent.com/ChaoningZhang/MobileSAM/master/weights/mobile_sam.pt  && \
+pip install label-studio==1.7.3 && \
+pip install label-studio-ml==1.0.9 && \
+pip install numpy==1.20.0"
+
+
+# source /root/anaconda3/bin/activate && conda activate rtmdet-sam && pip install timm && export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true && cd playground/label_anything && label-studio-ml start sam --port 8003 --with \
+  model_name=mobile_sam \
+  sam_config=vit_b \
+  sam_checkpoint_file=./sam_vit_b_01ec64.pth \
+  out_mask=True \
+  out_bbox=True \
+  device=cuda:0
+
+
+# source /root/anaconda3/bin/activate &&  conda activate rtmdet-sam && export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true && export ML_TIMEOUT_SETUP=40 && label-studio start
