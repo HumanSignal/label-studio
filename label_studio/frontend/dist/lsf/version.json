@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-306: Fix security vulnerabilities",
-  "commit": "eccf3c4d7ce1414474f9f3851a788e7b9d68b49c",
-  "branch": "fb-leap-306",
-  "date": "2023/10/25 16:47:31"
+  "commit": "b0fec9193795b416999e2a5c1daf78858c7c7653",
+  "branch": "master",
+  "date": "2023/10/25 19:35:24"
 }
