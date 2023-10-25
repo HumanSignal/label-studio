@@ -19,12 +19,16 @@ RUN apt-get update && \
     libssl-dev \
     libreadline-dev \
     libffi-dev \
-    wget
+    wget \
+    libsqlite3-dev \
+    libbz2-dev \
+    liblzma-dev \
+    lzma
 
 # Download and install Python 3.9
-RUN wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz && \
-    tar -xf Python-3.9.7.tgz && \
-    cd Python-3.9.7 && \
+RUN wget https://www.python.org/ftp/python/3.9.18/Python-3.9.18.tgz && \
+    tar -xf Python-3.9.18.tgz && \
+    cd Python-3.9.18 && \
     ./configure --enable-optimizations && \
     make altinstall
 
@@ -57,3 +61,8 @@ WORKDIR mmdetection
 RUN pip install -e .
 WORKDIR /playground
 RUN pip install timm
+RUN pip install dataManager
+WORKDIR /playground/label_anything
+# RUN apt-get install -y liblzma-dev
+# RUN apt-get install -y lzma
+# RUN pip install backports.lzma
