@@ -3,7 +3,7 @@ title: Semantic search with datasets
 short: Semantic search
 tier: enterprise
 order: 0
-order_enterprise: 412
+order_enterprise: 215
 meta_title: Semantic search with datasets
 meta_description: Use semantic search to refine your datasets. 
 date: 2023-08-23 12:18:50

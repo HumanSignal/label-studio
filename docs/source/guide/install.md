@@ -2,7 +2,8 @@
 title: Install and upgrade
 type: guide
 tier: opensource
-order: 103
+order: 55
+order_enterprise: 0
 meta_title: Install and Upgrade Label Studio
 meta_description: "Label Studio documentation: install and upgrade Label Studio with Docker, pip, and anaconda for your machine learning and data science projects."
 section: "Install"
