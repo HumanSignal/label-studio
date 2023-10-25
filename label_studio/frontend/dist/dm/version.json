@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-631: [FE] if associated projects dont get sent back the data-explorer breaks",
-  "commit": "c874d8bcd15c1182371061318cd14839606bd8af",
+  "commit": "bcd684110640ca9e9b7e718701a9d147eff7b073",
   "branch": "fb-dia-631/associated-lists",
-  "date": "2023/10/24 17:47:59"
+  "date": "2023/10/25 13:16:45"
 }
