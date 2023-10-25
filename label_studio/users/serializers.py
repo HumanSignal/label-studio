@@ -58,7 +58,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=instance):
             if self._is_deleted(instance):
                 for field in ['username', 'first_name', 'last_name', 'email']:
-                    self.context[key][uid][field] = 'USER' if field == 'last_name' else 'DELETED'
+                    self.context[key][uid][field] = 'User' if field == 'last_name' else 'Deleted'
         return self.context[key][uid]
 
     class Meta:

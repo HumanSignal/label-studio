@@ -100,11 +100,15 @@ class Organization(OrganizationMixin, models.Model):
         return _create_organization(title=title, created_by=created_by)
 
     @classmethod
-    def find_by_user(cls, user):
+    def find_by_user(cls, user, check_deleted=False):
         memberships = OrganizationMember.objects.filter(user=user).prefetch_related('organization')
         if not memberships.exists():
             raise ValueError(f'No memberships found for user {user}')
-        return memberships.first().organization
+        membership = memberships.first()
+        if check_deleted:
+            return (membership.organization, True) if membership.deleted_at else (membership.organization, False)
+
+        return membership.organization
 
     @classmethod
     def find_by_invite_url(cls, url):
