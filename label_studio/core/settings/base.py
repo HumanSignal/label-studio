@@ -639,6 +639,7 @@ if get_env('STORAGE_TYPE') == 's3':
     AWS_S3_VERIFY = get_env('STORAGE_AWS_S3_VERIFY', None)
     if AWS_S3_VERIFY == 'false' or AWS_S3_VERIFY == 'False' or AWS_S3_VERIFY == '0':
         AWS_S3_VERIFY = False
+    AWS_S3_SIGNATURE_VERSION = get_env('STORAGE_AWS_S3_SIGNATURE_VERSION', None)
 
 if get_env('STORAGE_TYPE') == 'azure':
     CLOUD_FILE_STORAGE_ENABLED = True
