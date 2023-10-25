@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-631: [FE] if associated projects dont get sent back the data-explorer breaks",
-  "commit": "b27dbf56693a8cd4ace04f1ec2ac2637c4cc3232",
-  "branch": "master",
-  "date": "2023/10/25 13:18:46"
+  "message": "fix: DIA-536: [FE] Show Records As They Are Imported",
+  "commit": "955a2b423b51ec09589522e9402148791903b459",
+  "branch": "fb-dia-536/hang-tight",
+  "date": "2023/10/25 14:58:02"
 }
