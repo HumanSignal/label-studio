@@ -24,11 +24,7 @@ Label Studio is also available an [enterprise product](https://heartex.com/), wh
 
 ### Web browser support
 
-Label Studio is tested with the latest version of Google Chrome and is expected to work in the latest versions of:
-
-- Google Chrome
-- Apple Safari
-- Mozilla Firefox
+Label Studio is tested with the latest version of Google Chrome.
 
 If using other web browsers, or older versions of supported web browsers, unexpected behavior could occur.
 
