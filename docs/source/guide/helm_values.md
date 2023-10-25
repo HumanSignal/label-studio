@@ -8,7 +8,8 @@ order_enterprise: 141
 meta_title: Available Helm values for Label Studio Helm Chart
 meta_description: For cases when you want to customize your Label Studio Kubernetes deployment, review these available Helm values that you can set in your Helm chart.
 section: "Install"
-
+parent: "install_k8s"
+parent_enterprise: "install_enterprise_k8s"
 ---
 
 <!-- Fix for long values in table cells -->
