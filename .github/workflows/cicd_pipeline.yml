@@ -51,6 +51,8 @@ jobs:
               - 'setup.py'
               - '.github/workflows/bandit.yml'
               - '.github/workflows/tests.yml'
+              - '.github/workflows/test_conda.yml'
+              - '.github/workflows/test_migrations.yml'
             frontend:
               - 'label_studio/frontend/**'
               - '.github/workflows/frontend-build.yml'
@@ -411,6 +413,7 @@ jobs:
       - gitleaks
       - bandit
       - ruff
+      - blue
       - pytest
       - migrations
       - build-docker
@@ -420,5 +423,5 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           allowed-failures:
-          allowed-skips: gitleaks, bandit, ruff, pytest, migrations, conda-test, build-docker
+          allowed-skips: gitleaks, bandit, ruff, blue, pytest, migrations, conda-test, build-docker
           jobs: ${{ toJSON(needs) }}

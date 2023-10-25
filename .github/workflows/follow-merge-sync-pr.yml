@@ -19,7 +19,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
 
 env:
-  DOWNSTREAM_REPO: label-studio-enterprise
+  DOWNSTREAM_REPOSITORY: "label-studio-enterprise"
+  DOWNSTREAM_EVENT_TYPE: "upstream_repo_update"
 
 jobs:
   sync:
@@ -59,7 +60,7 @@ jobs:
               body: [
                 'Hi @${{ github.actor }}!',
                 '',
-                `Unfortunately you don't have membership in ${owner} organization, your PR wasn't synced with ${owner}/${{ env.DOWNSTREAM_REPO }}.`
+                `Unfortunately you don't have membership in ${owner} organization, your PR wasn't synced with ${owner}/${{ env.DOWNSTREAM_REPOSITORY }}.`
               ].join('\n')
             });
 
@@ -69,16 +70,26 @@ jobs:
         id: sync-pr
         env:
           TITLE: ${{ github.event.pull_request.title }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+          PR_HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          DOWNSTREAM_REPOSITORY: ${{ env.DOWNSTREAM_REPOSITORY }}
+          DOWNSTREAM_EVENT_TYPE: ${{ env.DOWNSTREAM_EVENT_TYPE }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
-            const [pr_owner, pr_repo] = '${{ github.event.pull_request.head.repo.full_name || github.repository }}'.split('/');
-            let event_action = '${{ github.event.action }}'
-            let commit_sha = '${{ github.event.pull_request.head.sha }}'
+            const pr_head_repository = process.env.PR_HEAD_REPOSITORY;
+            const downstream_repository = process.env.DOWNSTREAM_REPOSITORY;
+            const downstream_event_type = process.env.DOWNSTREAM_EVENT_TYPE;
+            const [pr_owner, pr_repo] = pr_head_repository.split('/');
+            const head_ref = process.env.HEAD_REF;
+            const base_ref = process.env.BASE_REF;
+            let event_action = '${{ github.event.action }}';
+            let commit_sha = '${{ github.event.pull_request.head.sha }}';
             if (${{ github.event.pull_request.merged }}) {
-              event_action = 'merged'
-              commit_sha = '${{ github.sha }}'
+              event_action = 'merged';
+              commit_sha = '${{ github.sha }}';
             }
             const getCommitResponse = await github.rest.repos.getCommit({
               owner: pr_owner,
@@ -87,11 +98,11 @@ jobs:
             });
             const result = await github.rest.repos.createDispatchEvent({
               owner: owner,
-              repo: '${{ env.DOWNSTREAM_REPO }}',
-              event_type: 'upstream_repo_update',
+              repo: downstream_repository,
+              event_type: downstream_event_type,
               client_payload: {
-                branch_name: '${{ github.head_ref }}',
-                base_branch_name: '${{ github.base_ref }}',
+                branch_name: head_ref,
+                base_branch_name: base_ref,
                 repo_name: '${{ github.repository }}',
                 commit_sha : commit_sha,
                 title: process.env.TITLE,
