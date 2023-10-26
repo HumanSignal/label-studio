@@ -28,7 +28,7 @@ from subjectannotation.views import parse_subject_presence_annotations
 def task_generation_page(request,project_id):
     project = Project.objects.get(id=project_id)
     columns_names_choices = request.session.get('choices', None)
-    taskform = TaskGenerationForm(column_names_choices=columns_names_choices)
+    taskform = TaskGenerationForm(column_names_choices=columns_names_choices, project=project)
     return render(request, 'taskgeneration.html', {'taskgenerationform':taskform, 'project':project})
 
 def create_task_pairs(request, project, subject, sensortype_B):
@@ -236,7 +236,7 @@ def generate_activity_tasks(request,project_id):
     if request.method == 'POST':
         column_choices = request.session['choices']
         del request.session['choices']
-        taskgenerationform = TaskGenerationForm(request.POST,column_names_choices=column_choices)
+        taskgenerationform = TaskGenerationForm(request.POST,column_names_choices=column_choices, project=project)
         if taskgenerationform.is_valid():
             # Get data from Form
             subject = taskgenerationform.cleaned_data.get("subject")
