@@ -3,8 +3,8 @@ title: Deploy Label Studio on Kubernetes
 short: Kubernetes
 tier: opensource
 type: guide
-order: 106
-order_enterprise: 132
+order: 60
+order_enterprise: 0
 meta_title: Deploy Label Studio on Kubernetes
 meta_description: Deploy Label Studio on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment.
 section: "Install"
