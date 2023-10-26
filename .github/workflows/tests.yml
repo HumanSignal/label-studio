@@ -209,7 +209,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild_wo_frontend.sh
+        run: pdm run ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
@@ -281,7 +281,7 @@ jobs:
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
+          pdm run label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
           cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
         shell: cmd
 
@@ -289,7 +289,7 @@ jobs:
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          label-studio init my_project --username test@test.com --password testpwd
+          pdm run label-studio init my_project --username test@test.com --password testpwd
         shell: cmd
 
       - name: Test with pytest
