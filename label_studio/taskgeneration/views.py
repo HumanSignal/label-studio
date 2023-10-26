@@ -207,27 +207,38 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
         else:
             return HttpResponse('Sensor combination not yet supported ', content_type='text/plain')
 
-def generate_taskgen_form(request,project_id):
-    project = Project.objects.get(id=project_id)
-    parse_subject_presence_annotations(request= request,project=project)
-    
-    fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
-    sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
-    sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
+def generate_taskgen_form(request, project_id):
+    try:
+        project = Project.objects.get(id=project_id)
+        parse_subject_presence_annotations(request=request, project=project)
 
-    if sensortype_B.sensortype == 'I':
-        sensor_instance = Sensor.objects.filter(project=project,sensortype=sensortype_B).first()
-        imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
-        timestamp_column = sensortype_B.timestamp_column
-        imu_df = pd.read_csv(imu_file_path, engine='python')
-        column_names = imu_df.columns.to_list()
-        columns_names_choices = []
-        for i, column_name in enumerate(column_names):
-            columns_names_choices.append((i,column_name))
-        request.session['choices'] = columns_names_choices
-        return redirect('taskgeneration:taskgeneration_form', project_id=project_id)
-    else:
-        return redirect(reverse('landingpage:workinprogess'))
+        fileupload_instance = SubjectPresence.objects.filter(project=project).first()
+        
+        if fileupload_instance is not None:
+            sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance.file_upload).first().sensor.sensortype
+            sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
+
+            if sensortype_A is not None and sensortype_B is not None:
+                if sensortype_B.sensortype == 'I':
+                    sensor_instance = Sensor.objects.filter(project=project, sensortype=sensortype_B).first()
+                    imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
+                    timestamp_column = sensortype_B.timestamp_column
+                    imu_df = pd.read_csv(imu_file_path, engine='python')
+                    column_names = imu_df.columns.to_list()
+                    columns_names_choices = []
+                    for i, column_name in enumerate(column_names):
+                        columns_names_choices.append((i, column_name))
+                    request.session['choices'] = columns_names_choices
+                    return redirect('taskgeneration:taskgeneration_form', project_id=project_id)
+                else:
+                    return redirect(reverse('landingpage:workinprogress', project_id=project_id))
+            else:
+                return redirect('taskgeneration:exception', project_id=project_id)
+        else:
+            return redirect('taskgeneration:exception', project_id=project_id) 
+    except (SubjectPresence.DoesNotExist, SensorData.DoesNotExist, Sensor.DoesNotExist):
+        return redirect('taskgeneration:exception', project_id=project_id)
+
             
     
 
@@ -250,3 +261,7 @@ def generate_activity_tasks(request,project_id):
             # Create annotation data chunks (video and imu), this automatically creates tasks
             create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,value_column=value_column)          
     return redirect('landingpage:landingpage', project_id=project_id)    
+
+def exception(request, project_id):
+    project = Project.objects.get(id=project_id)
+    return render(request, 'exception.html', {'project':project})

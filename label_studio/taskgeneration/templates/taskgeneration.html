@@ -37,6 +37,11 @@
     <title>Generate activity annotation tasks </title>
 </head>
 <body>
+    <div class="buttons">
+      <form action="{% url 'landingpage:landingpage' project.id %}">
+          <input type="submit" value="Go back to project page" style="background-color: #c4862b; width:25%"/>
+      </form>
+    </div>
     <div class="forms">
         <h2>Generate activity annotation tasks</h2>
         <form id="taskgeneration-form" action="{% url 'taskgeneration:generateactivitytasks' project.id %}" method="post">
