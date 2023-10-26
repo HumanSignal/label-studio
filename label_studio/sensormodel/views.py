@@ -46,7 +46,7 @@ def subject(request, project_id):
     project = Project.objects.get(id=project_id)
     subjects = Subject.objects.filter(project=project).order_by('name')
     if request.method == 'POST':
-        subjectform = forms.SubjectForm(request.POST)
+        subjectform = forms.SubjectForm(request.POST, project=project)
         if subjectform.is_valid():
             subject = subjectform.save(commit=False)
             subject.project = project

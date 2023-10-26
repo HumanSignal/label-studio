@@ -11,6 +11,21 @@ class SubjectForm(forms.ModelForm):
     class Meta:
         model = models.Subject
         fields = ['name','color','size','extra_info']
+    
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project', None)
+        super(SubjectForm, self).__init__(*args, **kwargs)
+        self.instance.project = project
+    
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        project = self.instance.project
+        existing_subject = Subject.objects.filter(name=name, project=project)
+        if existing_subject.exists():
+            raise forms.ValidationError("A subject with this name already exists in the project.")
+
+        return name
+
 
 class DeploymentForm(forms.ModelForm):
     class Meta:
@@ -18,7 +33,7 @@ class DeploymentForm(forms.ModelForm):
         fields = ['name','begin_datetime','end_datetime','location','sensor','subject']
 
     def __init__(self, *args, **kwargs):
-        project = kwargs.pop('project', None)  # Remove 'project' from kwargs
+        project = kwargs.pop('project', None)  
         super(DeploymentForm, self).__init__(*args, **kwargs)
 
         # Filter the sensor queryset based on the provided project
