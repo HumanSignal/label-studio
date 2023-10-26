@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-295: Fix error styles in LS modals",
-  "commit": "f74dc78131bf8a28b6eee8c31902ad64c86af92d",
-  "branch": "fb-leap-295/error-styles",
-  "date": "2023/10/23 13:17:35"
+  "commit": "6f128ee10d460a1f28f1091c59472a8cf80ccdb3",
+  "branch": "master",
+  "date": "2023/10/26 21:09:41"
 }
