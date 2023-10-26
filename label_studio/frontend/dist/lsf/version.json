@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-256: Include the 'legacy' property in the 'Taxonomy' tag",
-  "commit": "ce5217c8f2b7ba4dda598cec3cf447d37f2536ef",
+  "message": "fix: LEAP-295: Fix error styles in LS modals",
+  "commit": "6f128ee10d460a1f28f1091c59472a8cf80ccdb3",
   "branch": "master",
-  "date": "2023/10/19 20:38:16"
+  "date": "2023/10/26 21:09:41"
 }
