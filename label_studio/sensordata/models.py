@@ -18,3 +18,4 @@ class SensorOffset(models.Model):
     sensor_B = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='SensorB_offsets')
     offset = models.IntegerField(blank=True, null=True)
     offset_Date = models.DateTimeField(blank=True, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)

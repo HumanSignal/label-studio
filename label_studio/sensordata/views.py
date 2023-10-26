@@ -83,12 +83,14 @@ def process_sensor_file(request, file_path, sensor, name, project):
 
 def offset(request, project_id):
     project = Project.objects.get(id=project_id)
-    sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
+    sensoroffset = SensorOffset.objects.filter(project=project).order_by('offset_Date')
     if request.method == 'POST':
         sensoroffsetform = SensorOffsetForm(request.POST)
         if sensoroffsetform.is_valid():
             # create and save the new SensorOffset instance
-            sensoroffsetform.save()
+            offset = sensoroffsetform.save(commit=False)
+            offset.project = project
+            offset.save()
             # redirect to the offset view and pass the sensoroffset queryset to the context
             return redirect('sensordata:offset', project_id=project_id)
     else:
