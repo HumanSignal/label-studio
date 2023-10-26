@@ -170,8 +170,6 @@ def parse_IMU(request, file_path, sensor, name, project):
     # Create SensorData object with parsed data
     sensordata = SensorData.objects.create(name=name, sensor=sensor,\
         begin_datetime=begin_datetime, end_datetime=end_datetime, project=project,file_upload=file_upload)
-    
-
 
 def parse_camera(request, file_path, sensor, name, project):
     subjectannotation_project = Project.objects.get(id=(project.id+1))

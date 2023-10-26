@@ -33,7 +33,7 @@ class VideoMetaData:
         self.video_framerate = parse_video_frame_rate(file_path)
         self.video_duration = parse_video_duration(file_path)
         # self.camera_name = parse_camera_name(file_path)
-        self.video_begin_time = parse_video_begin_time(file_path,sensor_timezone)
+        self.video_begin_time = parse_video_begin_time(file_path,pytz.timezone(sensor_timezone))
 
 
 def parse_video_frame_rate(file_path):
@@ -155,10 +155,14 @@ def parse_video_begin_time(file_path: Path, camera_timezone) -> datetime.datetim
     if parsed_dt is None:
         # TODO handle case where no start time for video was found
         # raise StartTimeNotParsedException
+        print('sdfn')
         parsed_dt = datetime.datetime.now()
-
+    
+    print(f'parsed_dt: {parsed_dt}')
+    print(f'camera_timezone: {camera_timezone}')
     # Verify if naive_dt is really naive. There are cases when the parsed time is not naive
     if parsed_dt.tzinfo is None:
+        print('snndfsd')
         ret = naive_to_utc(parsed_dt, camera_timezone) # change is made that it always localizes to UTC instead of to camera_timezone
     else:
         # return UTC time
