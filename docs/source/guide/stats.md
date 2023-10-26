@@ -3,8 +3,8 @@ title: Annotation agreement and how it is calculated
 short: Annotation agreement
 tier: enterprise
 type: guide
-order: 300
-order_enterprise: 114
+order: 0
+order_enterprise: 260
 meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
 section: "Quality control"
