@@ -120,6 +120,7 @@ test = [
     "s3transfer==0.7.0",
     "mock>=5.1.0",
     "moto>=4.2.6",
+    "label-studio-sdk @ https://github.com/HumanSignal/label-studio-sdk/archive/3c1e0513cba426ab8ada2259ca4e368dd1086baf.zip",
 ]
 [project]
 name = "label-studio"
