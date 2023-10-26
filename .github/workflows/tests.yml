@@ -84,7 +84,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild_wo_frontend.sh
+        run: pdm run ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
