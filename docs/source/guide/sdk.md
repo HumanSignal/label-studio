@@ -1,10 +1,10 @@
 ---
 title: Python SDK Tutorial for Label Studio
-short: Backend SDK Python Tutorial 
+short: SDK usage 
 type: guide
 tier: all
-order: 215
-order_enterprise: 121
+order: 410
+order_enterprise: 510
 meta_title: Label Studio Python SDK Tutorial
 meta_description: Tutorial documentation for the Label Studio Python SDK. How and why to use the SDK for data labeling project creation and annotated task parsing.
 section: "Integration and Development"
