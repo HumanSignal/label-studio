@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-256: Include the 'legacy' property in the 'Taxonomy' tag",
-  "commit": "ce5217c8f2b7ba4dda598cec3cf447d37f2536ef",
+  "message": "fix: LEAP-306: Fix security vulnerabilities",
+  "commit": "b0fec9193795b416999e2a5c1daf78858c7c7653",
   "branch": "master",
-  "date": "2023/10/19 20:38:16"
+  "date": "2023/10/25 19:35:24"
 }

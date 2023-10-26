@@ -3,8 +3,8 @@ title: Frontend builds
 short: Frontend builds
 type: guide
 tier: all
-order: 219
-order_enterprise: 126
+order: 430
+order_enterprise: 530
 meta_title: Customize User Interface
 meta_description: Label Studio documentation for integrating the Label Studio frontend interface into your own machine learning or data labeling application workflow.
 section: "Integration and Development"
