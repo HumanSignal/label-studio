@@ -37,7 +37,7 @@ def sensordatapage(request, project_id):
 def addsensordata(request, project_id):
     project = Project.objects.get(id=project_id)
     if request.method =='POST':
-        sensordataform = SensorDataForm(request.POST, request.FILES)
+        sensordataform = SensorDataForm(request.POST, request.FILES, project=project)
         if sensordataform.is_valid():
             # Get form data
             name = sensordataform.cleaned_data['name']
@@ -64,7 +64,7 @@ def addsensordata(request, project_id):
             # Raise an exception if the uploaded file is not a zip file
             raise ValueError("Uploaded file must be a zip file.")
     else:
-        sensordataform = SensorDataForm()
+        sensordataform = SensorDataForm(project=project)
 
     return render(request, 'addsensordata.html', {'sensordataform': sensordataform, 'project':project})
 

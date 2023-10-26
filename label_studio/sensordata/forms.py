@@ -8,6 +8,15 @@ class SensorDataForm(forms.Form):
     sensor = forms.ModelChoiceField(Sensor.objects.all())
     file = forms.FileField()
 
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project', None)  # Remove 'project' from kwargs
+        super(SensorDataForm, self).__init__(*args, **kwargs)
+
+        # Filter the sensor queryset based on the provided project
+        if project:
+            self.fields['sensor'].queryset = Sensor.objects.filter(project=project)
+
+
 class SensorOffsetForm(forms.ModelForm):
     class Meta:
         model = SensorOffset
