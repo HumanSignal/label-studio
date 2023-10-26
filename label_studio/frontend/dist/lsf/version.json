@@ -1,6 +1,6 @@
 {
   "message": "perf: LEAP-32: Improve performance of zooming at Image Segmentation",
-  "commit": "b54d6599e36dcb5963a1089d19026422123bb64d",
+  "commit": "dd912758eb3a42c1a6c00a8889dfcf80b9d0c247",
   "branch": "fb-leap-32/zoom-perf",
-  "date": "2023/10/26 09:19:10"
+  "date": "2023/10/26 09:55:08"
 }
