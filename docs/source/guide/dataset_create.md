@@ -4,7 +4,7 @@ short: Create a dataset
 date: 2023-08-16 11:52:38
 tier: enterprise
 order: 0
-order_enterprise: 405
+order_enterprise: 205
 meta_title: Create a Dataset to use with data discovery in Label Studio Enterprise
 meta_description: How to create a Dataset in Label Studio Enterprise using Google Cloud, Azure, or AWS.
 hide_sidebar: true
