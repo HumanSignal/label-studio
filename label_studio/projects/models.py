@@ -2,7 +2,7 @@
 """
 import json
 import logging
-from typing import Mapping, Optional
+from typing import Any, Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
 from core.bulk_update_utils import bulk_update
@@ -904,6 +904,18 @@ class Project(ProjectMixin, models.Model):
 
         self._storage_objects = storage_objects
         return storage_objects
+
+    def resolve_storage_uri(self, url: str) -> Optional[Mapping[str, Any]]:
+        from io_storages.functions import get_storage_by_url
+
+        storage_objects = self.get_all_storage_objects()
+        storage = get_storage_by_url(url, storage_objects)
+
+        if storage:
+            return {
+                'url': storage.generate_http_url(url),
+                'presign_ttl': storage.presign_ttl,
+            }
 
     def _update_tasks_counters(self, queryset, from_scratch=True):
         """
