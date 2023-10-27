@@ -3,7 +3,8 @@ title: Compare Community and Enterprise Features
 short: Enterprise vs Community
 type: guide
 tier: all
-order: 100
+order: 20
+order_enterprise: 15
 section: "Get started"
 meta_title: Label Studio Community and Enterprise Features
 meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects.
