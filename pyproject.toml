@@ -124,7 +124,7 @@ test = [
 ]
 [project]
 name = "label-studio"
-version = "1.9.2dev"
+version = "1.9.3dev"
 description = "Label Studio annotation tool"
 authors = [
     {name = "Heartex", email = "hello@heartex.ai"},
@@ -197,6 +197,19 @@ dependencies = [
 requires-python = ">=3.8"
 readme = "README.md"
 license = {text = "Apache 2.0 LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+[project.urls]
+Homepage = "https://github.com/heartexlabs/label-studio"
+[project.optional-dependencies]
+mysql = [
+    "mysqlclient",
+]
+[project.scripts]
+label-studio = "label_studio.server:main"
 
 [build-system]
 requires = ["pdm-backend"]
