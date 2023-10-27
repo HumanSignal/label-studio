@@ -6,6 +6,7 @@ from .forms import CreateProject
 from .forms import CreateProject
 from rest_framework.authtoken.models import Token
 from projects.models import Project
+from sensordata.models import SensorData
 from .models import MainProject
 from django.http import HttpResponse
 from projects.models import Project
@@ -142,6 +143,10 @@ def exportProject(request, project_id):
             params={'exportType': 'JSON'}
         )
         subject_annotations = subject_annotations_response.json()
+
+        # Export subject annotation data
+        subject_data = SensorData.objects.filter(project=project, file_upload_project2__isnull=False)
+        subject_data_paths = [file.file_upload_project2.file.path for file in subject_data]
 
         # Export activity annotations
         activityannotation_url = request.build_absolute_uri(reverse('data_export:api-projects:project-export', kwargs={'pk': activityannotation_id}))
