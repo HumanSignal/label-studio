@@ -1,9 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import datetime
+from typing import Optional
 
 from core.feature_flags import flag_set
 from core.utils.common import load_func
+from core.utils.db import fast_first
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -164,8 +166,8 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         return annotations.values_list('project').distinct().count()
 
     @property
-    def own_organization(self):
-        return Organization.objects.get(created_by=self)
+    def own_organization(self) -> Optional[Organization]:
+        return fast_first(Organization.objects.filter(created_by=self))
 
     @property
     def has_organization(self):
@@ -193,11 +195,14 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         """Return the short name for the user."""
         return self.first_name
 
-    def reset_token(self):
-        token = Token.objects.filter(user=self)
-        if token.exists():
-            token.delete()
+    def reset_token(self) -> Token:
+        Token.objects.filter(user=self).delete()
         return Token.objects.create(user=self)
+
+    def soft_delete(self) -> None:
+        self.is_deleted = True
+        Token.objects.filter(user=self).delete()
+        self.save(update_fields=['is_deleted'])
 
     def get_initials(self):
         initials = '?'

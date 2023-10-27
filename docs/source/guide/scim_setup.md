@@ -3,8 +3,8 @@ title: Set up SCIM2 for Label Studio
 short: Set up SCIM2
 tier: enterprise
 type: guide
-order: 113
-order_enterprise: 140
+order: 0
+order_enterprise: 490
 meta_title: System for Cross-domain Identity Management (SCIM) for Label Studio Enterprise
 meta_description: Label Studio Enterprise documentation for setting up SCIM2
 section: "Install"
@@ -113,7 +113,9 @@ The most convenient way to manage access to the application is via groups. You c
     * **Workspaces to Groups Mapping**---Add groups as members to workspaces. Users with Manager, Reviewer, or Annotator roles can only see workspaces after they've been added as a member to that workspace.
     
         Select an existing workspace or create a new one. You can map multiple groups to the same workspace.  
-    * **Projects to Groups Mapping**---Map groups to roles at the project level. Project-level roles can be **Annotator**, **Reviewer**, or **Inherit**. You can map multiple groups to the same roles and the same projects. For more information on roles, see [Roles in Label Studio Enterprise](manage_users#Roles-in-Label-Studio-Enterprise). 
+    * **Projects to Groups Mapping**---Map groups to roles at the project level. Project-level roles can be **Annotator**, **Reviewer**, or **Inherit**. 
+    
+        You can map a group to different roles across multiple projects. You can also map multiple groups to the same roles and the same projects. For more information on roles, see [Roles in Label Studio Enterprise](manage_users#Roles-in-Label-Studio-Enterprise). 
     
         If you select **Inherit**, the group will inherit the role set above under **Organization Roles to Groups Mapping.** If the group is inheriting the Not Activated role, the users are mapped to the project, but they are not actually assigned to the project until the group is synced (meaning that the user authenticates first). 
 

@@ -14,6 +14,7 @@ const parseContent = (id, source, children, parse) => {
     if (parse) {
       const parsed = parseHTML(templateHTML);
       const childResult = children instanceof Function ? children(parsed) : false;
+
       result = childResult || parsed;
     } else {
       const childResult = children instanceof Function ? children(template) : false;
@@ -65,7 +66,7 @@ const StaticContentDrawer = React.forwardRef(({
     ? <React.Fragment children={content.children}/>
     : React.createElement(tagName ?? 'div', {
       ...props,
-      ref: rootRef
+      ref: rootRef,
     });
 });
 

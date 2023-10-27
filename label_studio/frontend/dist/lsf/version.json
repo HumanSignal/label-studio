@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1476: Fix selected=true for Taxonomy",
-  "commit": "c71c229b2d8fc4dfe09687259ee86f5624452a72",
+  "message": "fix: LEAP-295: Fix error styles in LS modals",
+  "commit": "6f128ee10d460a1f28f1091c59472a8cf80ccdb3",
   "branch": "master",
-  "date": "2023/10/04 14:24:40"
+  "date": "2023/10/26 21:09:41"
 }
