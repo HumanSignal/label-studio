@@ -1,6 +1,6 @@
 {
   "message": "feat: LEAP-58: Proxy URLs and pass callback to LSF",
-  "commit": "0703eadaaaf8e02b0ecd28fce82f3f38d9e10075",
+  "commit": "5241e6e64eee8e0add76cc247380103e7d2d4eb9",
   "branch": "fb-leap-58/proxy-url",
-  "date": "2023/10/26 21:50:47"
+  "date": "2023/10/26 21:51:16"
 }
