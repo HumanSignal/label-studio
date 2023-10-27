@@ -121,6 +121,9 @@ class Organization(OrganizationMixin, models.Model):
     def has_user(self, user):
         return self.users.filter(pk=user.pk).exists()
 
+    def has_deleted(self, user):
+        return OrganizationMember.objects.filter(user=user, organization=self, deleted_at__isnull=False).exists()
+
     def has_project_member(self, user):
         return self.projects.filter(members__user=user).exists()
 
