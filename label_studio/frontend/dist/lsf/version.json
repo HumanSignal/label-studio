@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-295: Fix error styles in LS modals",
-  "commit": "6f128ee10d460a1f28f1091c59472a8cf80ccdb3",
+  "message": "chore: LEAP-221: Remove Taxonomy flags",
+  "commit": "fd0c33257fb5048cfce89cf36a12575120c1b4fe",
   "branch": "master",
-  "date": "2023/10/26 21:09:41"
+  "date": "2023/10/27 14:35:40"
 }
