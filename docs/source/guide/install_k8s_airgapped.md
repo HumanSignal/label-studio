@@ -3,8 +3,8 @@ title: Install Label Studio without public internet access
 short: Airgapped Server
 tier: all
 type: guide
-order: 112
-order_enterprise: 135
+order: 70
+order_enterprise: 460
 meta_title: Install Label Studio without public internet access
 meta_description: Install Label Studio without public internet access to create machine learning and data science projects in an airgapped environment. 
 section: "Install"
