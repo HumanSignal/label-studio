@@ -74,20 +74,15 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Configure pip cache
-        uses: actions/cache@v3
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v3
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pypi-${{ hashFiles('deploy/requirements-mw.txt') }}-${{ hashFiles('deploy/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pypi-
+          python-version: '3.10'
+          cache: true
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
-          pip install -r deploy/requirements.txt
-          pip install -e .
-          pip install twine
+          pdm sync -G build
 
       - name: Collect static
         run: |
@@ -116,7 +111,7 @@ jobs:
       - name: Package
         env:
           VERSION_OVERRIDE: ${{ inputs.version }}
-        run: python setup.py sdist bdist_wheel
+        run: pdm build
 
       - name: Upload to PYPI
         if: inputs.upload_to_pypi

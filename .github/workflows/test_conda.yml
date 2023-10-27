@@ -42,20 +42,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
           activate-environment: test-environment
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          path: ${{ matrix.pip-cache-path }}
-          key: Conda-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            Conda-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-${{ matrix.python-version }}-
 
-      - name: Install dependencies
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: true
+
+      - name: Install Python dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
-          pip install -r deploy/requirements.txt
-          pip install -e .
+          pdm sync -G test
 
       - name: Conda info
         shell: bash -el {0}
