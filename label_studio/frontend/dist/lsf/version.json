@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-306: Fix security vulnerabilities",
-  "commit": "b0fec9193795b416999e2a5c1daf78858c7c7653",
+  "message": "chore: LEAP-221: Remove Taxonomy flags",
+  "commit": "fd0c33257fb5048cfce89cf36a12575120c1b4fe",
   "branch": "master",
-  "date": "2023/10/25 19:35:24"
+  "date": "2023/10/27 14:35:40"
 }
