@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-256: Include the 'legacy' property in the 'Taxonomy' tag",
-  "commit": "ce5217c8f2b7ba4dda598cec3cf447d37f2536ef",
+  "message": "chore: LEAP-221: Remove Taxonomy flags",
+  "commit": "fd0c33257fb5048cfce89cf36a12575120c1b4fe",
   "branch": "master",
-  "date": "2023/10/19 20:38:16"
+  "date": "2023/10/27 14:35:40"
 }
