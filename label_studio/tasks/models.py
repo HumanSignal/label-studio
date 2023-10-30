@@ -716,10 +716,6 @@ class TaskLock(models.Model):
         help_text='User who locked this task',
     )
 
-    @classmethod
-    def release_locks_for_user(cls, user):
-        cls.objects.filter(user=user).delete()
-
 
 class AnnotationDraft(models.Model):
     result = JSONField(_('result'), help_text='Draft result in JSON format')
