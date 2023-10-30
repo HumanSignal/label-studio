@@ -8,6 +8,7 @@ from django.db import models, transaction
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from tasks.models import TaskLock
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,8 @@ class OrganizationMember(OrganizationMemberMixin, models.Model):
                 organizationmember__deleted_at__isnull=True
             ).first()
             self.user.save(update_fields=['active_organization'])
+
+        TaskLock.release_locks_for_user(self.user)
 
 
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)
