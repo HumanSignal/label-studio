@@ -131,44 +131,51 @@ def get_alt_field_name(field_name, project, enabled=False):
 
 def apply_ordering(queryset, ordering, project, request, view_data=None):
     if ordering:
-
-        preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
-        raw_field_name = ordering[0]
-        numeric_ordering = False
-        unsigned_field_name = raw_field_name.lstrip('-+')
-        if (
-            view_data is not None
-            and 'columnsDisplayType' in view_data
-            and unsigned_field_name in view_data['columnsDisplayType']
-            and view_data['columnsDisplayType'][unsigned_field_name] == 'Number'
-        ):
-            numeric_ordering = True
-        field_name, ascending = preprocess_field_name(
-            raw_field_name, only_undefined_field=project.only_undefined_field
+        handle_alt_fieldname = flag_set(
+            'fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short', user=request.user
         )
+        preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
 
-        if field_name.startswith('data__'):
-            # annotate task with data field for float/int/bool ordering support
+        raw_field_name = ordering[0]
+        unsigned_field_name = raw_field_name.lstrip('-+')
+
+        field_name, ascending = preprocess_field_name(raw_field_name, only_undefined_field=project.only_undefined_field)
+        alt_field_name = get_alt_field_name(field_name, project, handle_alt_fieldname)
+
+        numeric_ordering = view_data and 'columnsDisplayType' in view_data and unsigned_field_name in view_data['columnsDisplayType'] and view_data['columnsDisplayType'][unsigned_field_name] == 'Number'
+
+        def annotate_numeric_ordering(queryset, field_name):
             json_field = field_name.replace('data__', '')
-            numeric_ordering_applied = False
-            if numeric_ordering is True:
+            try:
                 queryset = queryset.annotate(
                     ordering_field=Cast(KeyTextTransform(json_field, 'data'), output_field=FloatField())
                 )
-                # for non numeric values we need fallback to string ordering
-                try:
-                    queryset.first()
-                    numeric_ordering_applied = True
-                except Exception as e:
-                    logger.warning(f'Failed to apply numeric ordering for field {json_field}: {e}')
-            if not numeric_ordering_applied:
-                queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
-            f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
+                queryset.first()  # trigger a query to test
+                return queryset, True
+            except Exception as e:
+                logger.warning(f'Failed to apply numeric ordering for field {json_field}: {e}')
+                return queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data')), False
 
+        if field_name.startswith('data__'):
+            if numeric_ordering:
+                queryset, numeric_ordering_applied = annotate_numeric_ordering(queryset, field_name)
+            else:
+                queryset = queryset.annotate(ordering_field=KeyTextTransform(field_name.replace('data__', ''), 'data'))
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
+            queryset = queryset.order_by(f)
 
-        queryset = queryset.order_by(f)
+        # Handle alt_field_name in a similar fashion
+        if alt_field_name:
+            if alt_field_name.startswith('data__'):
+                if numeric_ordering:
+                    queryset, _ = annotate_numeric_ordering(queryset, alt_field_name)
+                else:
+                    queryset = queryset.annotate(alt_ordering_field=KeyTextTransform(alt_field_name.replace('data__', ''), 'data'))
+            else:
+                f_alt = F(alt_field_name).asc(nulls_last=True) if alt_ascending else F(alt_field_name).desc(nulls_last=True)
+                queryset = queryset.order_by(f, f_alt)
+
     else:
         queryset = queryset.order_by('id')
 
