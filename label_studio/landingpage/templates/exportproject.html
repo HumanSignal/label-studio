@@ -6,7 +6,7 @@
 {% block content %}
 
 <head>
-    <title>Create Projects</title>
+    <title>Export Project</title>
 </head>
 <body>
     <div class="buttons">
@@ -15,11 +15,21 @@
         </form>
     </div>
     <div class="forms">
-        <h2>Create Project</h2>
-        <form enctype="multipart/form-data" action="{% url 'landingpage:export-project' project.id %}" method="post">
+        <h2>Export project</h2>
+        <form id="export-form" enctype="multipart/form-data" action="{% url 'landingpage:export-project' project.id %}" method="post">
             <input type="submit" value="Export Project">
         </form>
     </div>
+    <div id="exporting-message" style="display: none;">
+        <p>Preparing project export! Please wait...</p>
+    </div>
+
+    <script>
+        document.getElementById('export-form').addEventListener('submit', function() {
+            document.getElementById('exporting-message').style.display = 'block';
+        });
+    </script>
+    
 </body>
 
 {% endblock %}

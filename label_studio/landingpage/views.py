@@ -14,7 +14,7 @@ from .models import MainProject
 from django.http import HttpResponse
 import json
 import zipfile
-from tasks.models import Task
+from tasks.models import Task, Annotation
 import os, shutil
 
 from django.http import JsonResponse, HttpResponseNotFound
@@ -118,6 +118,8 @@ def deleteProject(request, project_id):
             # Get all tasks of the project
             tasks = Task.objects.filter(project=project)
             tasks.delete()
+            # annotations = Annotation.objects.filter(project=project)
+            # annotations.delete()
             project.delete()
         return redirect('landingpage:homepage')
     else:
@@ -144,6 +146,14 @@ def exportProject(request, project_id):
         )
         subject_annotations = subject_annotations_response.json()
 
+        # Modify the video_url field in the JSON to delete the folder structure
+        for annotation in subject_annotations:
+            if 'data' in annotation and 'video_url' in annotation['data']:
+                video_url = annotation['data']['video_url']
+                if video_url.startswith('/data/upload/'):
+                    video_url = os.path.basename(video_url)  
+                    annotation['data']['video_url'] = video_url
+
         # Export subject annotation data
         subject_data = SensorData.objects.filter(project=project, file_upload_project2__isnull=False)
         subject_data_paths = [file.file_upload_project2.file.path for file in subject_data]
@@ -164,8 +174,23 @@ def exportProject(request, project_id):
         response['Content-Disposition'] = f'attachment; filename="{project_title}_annotations.zip"'
 
         with zipfile.ZipFile(response, 'w') as zipf:
-            zipf.writestr('subject_annotations.json', json.dumps(subject_annotations))
-            zipf.writestr('activity_annotations.json', json.dumps(activity_annotations))
+            # Create the 'subject_annotations' folder and add the JSON file
+            with zipf.open('subject_annotations/subject_annotations.json', 'w') as subject_file:
+                subject_file.write(json.dumps(subject_annotations).encode('utf-8'))
+            
+            # Add subject data files to the 'subject_annotations' folder
+            for file_path in subject_data_paths:
+                file_name = os.path.basename(file_path)
+                with zipf.open(os.path.join('subject_annotations', file_name), 'w') as subject_data_file:
+                    with open(file_path, 'rb') as f:
+                        subject_data_file.write(f.read())
+
+                # Diagnostic message: print the file being added
+                print(f"Adding {file_name} to ZIP")
+
+            # Create the 'activity_annotation' folder and add the JSON file
+            with zipf.open('activity_annotations/activity_annotations.json', 'w') as activity_file:
+                activity_file.write(json.dumps(activity_annotations).encode('utf-8'))
 
         return response
     

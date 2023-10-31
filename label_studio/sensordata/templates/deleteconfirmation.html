@@ -27,11 +27,22 @@
 
 <p>Are you sure you want to delete this?</p>
 
-<form action="" method="post">
-    <input type="submit" value="Delete">
-</form>
-<form action="{% url 'sensordata:sensordatapage' project.id %}">
-    <input type="submit" value="No, go back to sensor data page" />
-</form>
+<div class="forms">
+    <form id="sensordata-form" action="" method="post">
+        <input type="submit" value="Delete">
+    </form>
+    <form action="{% url 'sensordata:sensordatapage' project.id %}">
+        <input type="submit" value="No, go back to sensor data page" />
+    </form>
+</div>
+<div id="deleting-message" style="display: none;">
+    <p>Deleting sensordata! Please wait...</p>
+</div>
+
+<script>
+    document.getElementById('sensordata-form').addEventListener('submit', function() {
+            document.getElementById('deleting-message').style.display = 'block';
+        });
+</script>
 
 {% endblock %}

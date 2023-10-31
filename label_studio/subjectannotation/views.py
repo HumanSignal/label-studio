@@ -21,7 +21,7 @@ def createannotationtask(request, project_id):
         subjects = Subject.objects.filter(project=project)
         
         # Create labels for subject annotation
-        labels = ", ".join([f"Subject: {subject.name}" for subject in subjects])
+        labels = ",".join([f"Subject: {subject.name}" for subject in subjects])
         
         # Get url for displaying all projects
         projects_url = request.build_absolute_uri(reverse('projects:api:project-list'))
@@ -75,9 +75,12 @@ def parse_subject_presence_annotations(request, project):
             start_time = result['value']['start']
             end_time = result['value']['end']
             for label in labels:
-                subject = Subject.objects.get(project= project, name=label.replace('Subject: ',''))
+                # print(f'label is {label}')
+                subject = Subject.objects.get(project=project, name=label.replace('Subject: ',''))
+                # print(f'subject is {subject}')
                 if not SubjectPresence.objects.filter(file_upload=file_upload,project=project,subject=subject,
-                                                 start_time=start_time,end_time=end_time).exists():
+                                                start_time=start_time,end_time=end_time).exists():
                     SubjectPresence.objects.create(file_upload=file_upload,project=project,subject=subject,
-                                                 start_time=start_time,end_time=end_time)
+                                                start_time=start_time,end_time=end_time)
+            
                 

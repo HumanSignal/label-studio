@@ -17,4 +17,5 @@ urlpatterns = [
     path('<int:project_id>/deployment/delete/<int:id>/', views.delete_deployment, name='delete_deployment'),
     path('<int:project_id>/sensor/delete/<int:id>/', views.delete_sensor, name='delete_sensor'),
     path('<int:project_id>/subject/delete/<int:id>/', views.delete_subject, name='delete_subject'),
+    path('<int:project_id>/sensortype/delete/<int:id>/', views.delete_sensortype, name='delete_sensortype'),
 ]
