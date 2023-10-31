@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-631: [FE] if associated projects dont get sent back the data-explorer breaks",
-  "commit": "b27dbf56693a8cd4ace04f1ec2ac2637c4cc3232",
+  "message": "feat: DIA-99: [FE] Create range slider frontend component and add to Semantic Search",
+  "commit": "17e7dcd654304403107e76a270d799a7c1e1fafb",
   "branch": "master",
-  "date": "2023/10/25 13:18:46"
+  "date": "2023/10/30 11:06:29"
 }
