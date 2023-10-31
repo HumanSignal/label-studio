@@ -877,8 +877,9 @@ def remove_predictions_from_project(sender, instance, **kwargs):
 @receiver(post_save, sender=Prediction)
 def save_predictions_to_project(sender, instance, **kwargs):
     """Add predictions counters"""
-    instance.task.total_predictions = instance.task.predictions.all().count()
-    instance.task.save(update_fields=['total_predictions'])
+    task_id = instance.task_id
+    predictions_count = Prediction.objects.filter(task_id=task_id).count()
+    Task.objects.filter(id=task_id).update(total_predictions=predictions_count + 1)
     logger.debug(f"Updated total_predictions for {instance.task.id}.")
 
 # =========== END OF PROJECT SUMMARY UPDATES ===========

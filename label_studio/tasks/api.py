@@ -559,14 +559,16 @@ class PredictionAPI(viewsets.ModelViewSet):
         predictions_array = request_data.get("result", [])
         tasks_array = request_data.get("task", [])
         predictions_to_create = []
+        tasks = Task.objects.select_related('project').in_bulk(tasks_array)
+        data = request_data.copy()
         for prediction, task_id in zip(predictions_array, tasks_array):
-            data = request_data.copy()
             data["result"] = prediction
-            data["task"] = Task.objects.get(id=task_id)
-            predictions_to_create.append(Prediction(**data))
-        predictions = Prediction.objects.bulk_create(predictions_to_create)
-        for prediction in predictions:
-            post_save.send(sender=Prediction, instance=prediction, creared=True)
+            data["task"] = tasks.get(task_id)
+            pred = Prediction(**data)
+            predictions_to_create.append(pred)
+            post_save.send(sender=Prediction, instance=pred, creared=True)
+
+        Prediction.objects.bulk_create(predictions_to_create)
         return Response(data={'success': 'Predictions created successfully.'}, status=status.HTTP_201_CREATED)
 
 @method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
