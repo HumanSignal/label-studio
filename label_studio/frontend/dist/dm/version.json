@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-631: [FE] if associated projects dont get sent back the data-explorer breaks",
-  "commit": "b27dbf56693a8cd4ace04f1ec2ac2637c4cc3232",
-  "branch": "master",
-  "date": "2023/10/25 13:18:46"
+  "message": "fix: LEAP-303: Fix github vulnerabilities",
+  "commit": "351afed406a0075a783eca294ccb19c4933b578b",
+  "branch": "fb-leap-303",
+  "date": "2023/10/31 15:39:11"
 }
