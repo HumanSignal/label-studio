@@ -7,6 +7,7 @@ from tasks.models import Task, Annotation
 from subjectannotation.models import SubjectPresence
 from sensormodel.models import Subject
 from projects.models import Project
+from sensordata.models import SensorData
 
 # Create your views here.
 def annotationtaskpage(request, project_id):
@@ -68,7 +69,8 @@ def parse_subject_presence_annotations(request, project):
     tasks = Task.objects.filter(project= subj_anno_proj)
     annotations = Annotation.objects.filter(task__in= tasks)
     for annotation in annotations:
-        file_upload = Task.objects.get(id=annotation.task_id).file_upload
+        file_upload_project2 = Task.objects.get(id=annotation.task_id).file_upload
+        file_upload = SensorData.objects.get(file_upload_project2=file_upload_project2).file_upload
         results= annotation.result
         for result in results:
             labels = result['value']['labels']
