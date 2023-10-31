@@ -1,6 +1,6 @@
 {
-  "message": "chore: LEAP-221: Remove Taxonomy flags",
-  "commit": "fd0c33257fb5048cfce89cf36a12575120c1b4fe",
+  "message": "fix: LEAP-218: Improve performance of search",
+  "commit": "52ec54db283538eaa7816cd71a478f1f082ea9e3",
   "branch": "master",
-  "date": "2023/10/27 14:35:40"
+  "date": "2023/10/31 13:23:49"
 }
