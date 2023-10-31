@@ -120,7 +120,12 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
 
 
 def get_alt_field_name(field_name, project, enabled=False):
-    if enabled_alt_fieldname and field_name.startswith('data__') and field_name != f'data__{settings.DATA_UNDEFINED_NAME}' and project.one_object_in_label_config:
+    if (
+        enabled
+        and field_name.startswith('data__')
+        and field_name != f'data__{settings.DATA_UNDEFINED_NAME}'
+        and project.one_object_in_label_config
+    ):
         return f'data__{settings.DATA_UNDEFINED_NAME}'
 
 
@@ -248,7 +253,17 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
         return 'continue'
 
 
-def process_field_filter(queryset, filters, project, request, filter_expressions, custom_filter_expressions, field_name, _filter, alt_field_name=None):
+def process_field_filter(
+    queryset,
+    filters,
+    project,
+    request,
+    filter_expressions,
+    custom_filter_expressions,
+    field_name,
+    _filter,
+    alt_field_name=None,
+):
     # filter pre-processing, value type conversion, etc..
     preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
     _filter = preprocess_filter(_filter, field_name)
@@ -313,18 +328,22 @@ def process_field_filter(queryset, filters, project, request, filter_expressions
     # annotate with cast to number if need
     if _filter.type == 'Number' and field_name.startswith('data__'):
         json_field = field_name.replace('data__', '')
-        filterable = Q(**{
+        filterable = Q(
+            **{
                 f'filter_{json_field.replace("$undefined$", "undefined")}': Cast(
                     KeyTextTransform(json_field, 'data'), output_field=FloatField()
                 )
-            })
+            }
+        )
         if alt_field_name:
             alt_json_field = alt_field_name.replace('data__', '')
-            filterable |= Q(**{
-                f'filter_{alt_json_field.replace("$undefined$", "undefined")}': Cast(
-                    KeyTextTransform(json_field, 'data'), output_field=FloatField()
-                )
-            })
+            filterable |= Q(
+                **{
+                    f'filter_{alt_json_field.replace("$undefined$", "undefined")}': Cast(
+                        KeyTextTransform(json_field, 'data'), output_field=FloatField()
+                    )
+                }
+            )
         queryset = queryset.annotate(filterable)
         clean_field_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
         alt_clean_field_name = f'filter_{alt_json_field.replace("$undefined$", "undefined")}'
@@ -397,11 +416,11 @@ def process_field_filter(queryset, filters, project, request, filter_expressions
     if _filter.operator == 'in':
         cast_value(_filter)
         q = Q(
-                **{
-                    f'{field_name}__gte': _filter.value.min,
-                    f'{field_name}__lte': _filter.value.max,
-                }
-            )
+            **{
+                f'{field_name}__gte': _filter.value.min,
+                f'{field_name}__lte': _filter.value.max,
+            }
+        )
         if alt_field_name:
             q |= Q(
                 **{
@@ -414,12 +433,12 @@ def process_field_filter(queryset, filters, project, request, filter_expressions
     # not in
     elif _filter.operator == 'not_in':
         cast_value(_filter)
-        q= ~Q(
-                **{
-                    f'{field_name}__gte': _filter.value.min,
-                    f'{field_name}__lte': _filter.value.max,
-                }
-            )
+        q = ~Q(
+            **{
+                f'{field_name}__gte': _filter.value.min,
+                f'{field_name}__lte': _filter.value.max,
+            }
+        )
         if alt_field_name:
             q &= ~Q(
                 **{
@@ -431,16 +450,16 @@ def process_field_filter(queryset, filters, project, request, filter_expressions
 
     # in list
     elif _filter.operator == 'in_list':
-        q = Q(**{f'{field_name}__in': _filter.value}),
+        q = (Q(**{f'{field_name}__in': _filter.value}),)
         if alt_field_name:
-            q |= Q(**{f'{alt_field_name}__in': _filter.value}),
+            q |= (Q(**{f'{alt_field_name}__in': _filter.value}),)
         filter_expressions.append(q)
 
     # not in list
     elif _filter.operator == 'not_in_list':
-        q = ~Q(**{f'{field_name}__in': _filter.value}),
+        q = (~Q(**{f'{field_name}__in': _filter.value}),)
         if alt_field_name:
-            q &= ~Q(**{f'{alt_field_name}__in': _filter.value}),
+            q &= (~Q(**{f'{alt_field_name}__in': _filter.value}),)
         filter_expressions.append(q)
 
     # empty
@@ -477,7 +496,9 @@ def apply_filters(queryset, filters, project, request):
     if not filters:
         return queryset
 
-    handle_alt_fieldname = flag_set('fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short', user=request.user)
+    handle_alt_fieldname = flag_set(
+        'fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short', user=request.user
+    )
 
     # convert conjunction to orm statement
     filter_expressions = []
@@ -509,7 +530,17 @@ def apply_filters(queryset, filters, project, request):
         # then we need to filter on both data__key1 and data__$undefined$.
         alt_field_name = get_alt_field_name(field_name, project, handle_alt_fieldname)
 
-        process_field_filter(queryset, filters, project, request, filter_expressions, custom_filter_expressions, field_name, _filter, alt_field_name)
+        process_field_filter(
+            queryset,
+            filters,
+            project,
+            request,
+            filter_expressions,
+            custom_filter_expressions,
+            field_name,
+            _filter,
+            alt_field_name,
+        )
 
     """WARNING: Stringifying filter_expressions will evaluate the (sub)queryset.
         Do not use a log in the following manner:
