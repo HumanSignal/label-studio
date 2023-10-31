@@ -254,7 +254,7 @@ def generate_activity_tasks(request,project_id):
             duration = taskgenerationform.cleaned_data.get("segment_duration")
             value_column = taskgenerationform.cleaned_data.get("column_name")
             fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
-            sensortype_A = SensorData.objects.filter(file_upload_project2=fileupload_instance.file_upload).first().sensor.sensortype
+            sensortype_A = SensorData.objects.filter(file_upload_project2=fileupload_instance).first().sensor.sensortype
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
             # Fill VideoImuOverlap objects
             create_task_pairs(request= request,project=project, subject=subject,sensortype_B=sensortype_B)
