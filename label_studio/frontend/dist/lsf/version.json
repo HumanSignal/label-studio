@@ -1,6 +1,6 @@
 {
-  "message": "chore: LEAP-221: Remove Taxonomy flags",
-  "commit": "fd0c33257fb5048cfce89cf36a12575120c1b4fe",
+  "message": "fix: LEAP-314: Fix Github vulnerabilities",
+  "commit": "bef0cbdb03eb659bb2a161ffa64be1a211444bbe",
   "branch": "master",
-  "date": "2023/10/27 14:35:40"
+  "date": "2023/10/31 17:28:15"
 }
