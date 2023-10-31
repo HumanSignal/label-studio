@@ -36,7 +36,7 @@ def create_task_pairs(request, project, subject, sensortype_B):
     # Load data for given project and subject
     subject_presences = SubjectPresence.objects.filter(project=project, subject=subject)
     distinct_file_uploads = subject_presences.values('file_upload').distinct() # Get all unique files that contain subject
-    sensor_A_sensordata = SensorData.objects.filter(project=subj_anno_proj,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
+    sensor_A_sensordata = SensorData.objects.filter(project=project,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
     # Load IMU deployments in the project that contain the subject
     sensor_B_deployments = Deployment.objects.filter(project=project,subject=subject,sensor__sensortype__sensortype=sensortype_B.sensortype)
     sensor_B_sensordata = SensorData.objects.filter(sensor__in=sensor_B_deployments.values('sensor')) # find all sensordata (type B) that has a sensor in sensor_B_deployments
@@ -154,8 +154,8 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     end_segment_B = begin_segment_B +duration
 
     
-                with NamedTemporaryFile(suffix=".mp4", delete=False, mode='w') as temp_video,\
-                    NamedTemporaryFile(suffix=".csv", delete=False, mode='w') as temp_imu:
+                with NamedTemporaryFile(prefix="CHUNK", suffix=".mp4", delete=False, mode='w') as temp_video,\
+                    NamedTemporaryFile(prefix="CHUNK", suffix=".csv", delete=False, mode='w') as temp_imu:
                     video_file_path = longest_overlap.sensordata_A.file_upload.file.path
                     ### Cut out video using ffmpeg ###
                     ffmpeg_command = [
@@ -215,10 +215,12 @@ def generate_taskgen_form(request, project_id):
         fileupload_instance = SubjectPresence.objects.filter(project=project).first()
         
         if fileupload_instance is not None:
-            sensortype_A = SensorData.objects.filter(file_upload_project2=fileupload_instance.file_upload).first().sensor.sensortype
+            sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance.file_upload).first().sensor.sensortype
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
 
             if sensortype_A is not None and sensortype_B is not None:
+
+
                 if sensortype_B.sensortype == 'I':
                     sensor_instance = Sensor.objects.filter(project=project, sensortype=sensortype_B).first()
                     imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
@@ -254,10 +256,10 @@ def generate_activity_tasks(request,project_id):
             duration = taskgenerationform.cleaned_data.get("segment_duration")
             value_column = taskgenerationform.cleaned_data.get("column_name")
             fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
-            sensortype_A = SensorData.objects.filter(file_upload_project2=fileupload_instance).first().sensor.sensortype
+            sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
             # Fill VideoImuOverlap objects
-            create_task_pairs(request= request,project=project, subject=subject,sensortype_B=sensortype_B)
+            create_task_pairs(request= request,project=project, subject=subject, sensortype_B=sensortype_B)
             # Create annotation data chunks (video and imu), this automatically creates tasks
             create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,value_column=value_column)          
     return redirect('landingpage:landingpage', project_id=project_id)    

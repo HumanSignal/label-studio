@@ -166,6 +166,31 @@ def exportProject(request, project_id):
             params={'exportType': 'JSON'}
         )
         activity_annotations = activity_annotations_response.json()
+        
+        # Modify data folder structure in JSON
+        for annotation in activity_annotations:
+            if 'data' in annotation and 'csv' in annotation['data']:
+                csv_url = annotation['data']['csv']
+                if csv_url.startswith('/data/upload/'):
+                    csv_url = os.path.basename(csv_url)
+                    annotation['data']['csv'] = csv_url 
+
+            
+            if 'data' in annotation and 'video' in annotation['data']:
+                video_source = annotation["data"]["video"]
+                if "src=" in video_source:
+                    src_start = video_source.index("src=") + 5
+                    src_end = video_source.index("'", src_start)
+                    video_url = video_source[src_start:src_end]
+                    if video_url.startswith('/data/upload/'):
+                        video_url = os.path.basename(video_url)
+                        annotation["data"]["video"] = video_source.replace(video_url, os.path.basename(video_url))
+
+        # Get all physical chunk files
+        # Get upload folder
+        project_upload_folder = os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR, str(project_id)) 
+        # Create a list of files with "_CHUNK_" in their name
+        chunk_files = [file for file in os.listdir(project_upload_folder) if "CHUNK" in file]
 
         project_title = project.title.replace('_dataimport', '')
 
@@ -191,6 +216,13 @@ def exportProject(request, project_id):
             # Create the 'activity_annotation' folder and add the JSON file
             with zipf.open('activity_annotations/activity_annotations.json', 'w') as activity_file:
                 activity_file.write(json.dumps(activity_annotations).encode('utf-8'))
+
+            # Add the chunk files to the 'activity_annotations' folder
+            for chunk_file in chunk_files:
+                chunk_file_path = os.path.join(project_upload_folder, chunk_file)
+                with zipf.open(os.path.join('activity_annotations', chunk_file), 'w') as chunk_data_file:
+                    with open(chunk_file_path, 'rb') as f:
+                        chunk_data_file.write(f.read())
 
         return response
     
