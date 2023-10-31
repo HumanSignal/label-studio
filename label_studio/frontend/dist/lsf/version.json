@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-218: Improve performance of search",
-  "commit": "52ec54db283538eaa7816cd71a478f1f082ea9e3",
-  "branch": "master",
-  "date": "2023/10/31 13:23:49"
+  "message": "fix: LEAP-314: Fix Github vulnerabilities",
+  "commit": "35336e8c1f2af9c4466d74ed422260f68fecae08",
+  "branch": "fb-leap-314",
+  "date": "2023/10/31 15:43:12"
 }
