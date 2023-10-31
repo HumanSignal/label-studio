@@ -21,7 +21,7 @@ def createannotationtask(request, project_id):
         subjects = Subject.objects.filter(project=project)
         
         # Create labels for subject annotation
-        labels = ", ".join([f"Subject: {subject.name}" for subject in subjects])
+        labels = ",".join([f"Subject: {subject.name}" for subject in subjects])
         
         # Get url for displaying all projects
         projects_url = request.build_absolute_uri(reverse('projects:api:project-list'))
