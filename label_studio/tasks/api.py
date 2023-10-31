@@ -9,9 +9,10 @@ from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 import drf_yasg.openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, viewsets, views
+from rest_framework import generics, viewsets, views, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
+from django.db.models.signals import post_save
 
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
@@ -545,6 +546,28 @@ class PredictionAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
 
+    def create(self, request, *args, **kwargs):
+        """
+        This method splits the request into individual Prediction objects and stores them in the database.
+        It also calls the post_save() signal to update the value in the Task model.
+        :param request:
+        :return:
+        """
+        request_data = request.data
+        if not request_data["model_version"]:
+            return Response({'error': 'Model name and date are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        predictions_array = request_data.get("result", [])
+        tasks_array = request_data.get("task", [])
+        predictions_to_create = []
+        for prediction, task_id in zip(predictions_array, tasks_array):
+            data = request_data.copy()
+            data["result"] = prediction
+            data["task"] = Task.objects.get(id=task_id)
+            predictions_to_create.append(Prediction(**data))
+        predictions = Prediction.objects.bulk_create(predictions_to_create)
+        for prediction in predictions:
+            post_save.send(sender=Prediction, instance=prediction, creared=True)
+        return Response(data={'success': 'Predictions created successfully.'}, status=status.HTTP_201_CREATED)
 
 @method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
 @method_decorator(name='post', decorator=swagger_auto_schema(
