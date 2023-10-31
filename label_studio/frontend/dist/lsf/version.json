@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-314: Fix Github vulnerabilities",
-  "commit": "35336e8c1f2af9c4466d74ed422260f68fecae08",
-  "branch": "fb-leap-314",
-  "date": "2023/10/31 15:43:12"
+  "commit": "bef0cbdb03eb659bb2a161ffa64be1a211444bbe",
+  "branch": "master",
+  "date": "2023/10/31 17:28:15"
 }
