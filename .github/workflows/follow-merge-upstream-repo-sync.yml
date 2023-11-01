@@ -6,7 +6,7 @@ on:
       - upstream_repo_update
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
+  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}
 
 env:
   NODE: 18
@@ -25,6 +25,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.1.0
+
+      - name: Details
+        id: details
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          case "${{ github.event.client_payload.repo_name }}" in
+            */dm2)
+              echo "frontend_module_dist=${{ env.STATIC_DIST }}/dm" >> $GITHUB_OUTPUT
+              ;;
+            */label-studio-frontend)
+              echo "frontend_module_dist=${{ env.STATIC_DIST }}/lsf" >> $GITHUB_OUTPUT
+              echo "build_lsf_docs=true" >> $GITHUB_OUTPUT
+              ;;
+            */label-studio-sdk)
+              echo "requirements_dist=deploy/requirements-test.txt" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo ':error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
+              exit 1
+              ;;
+          esac
 
       - name: Find or Create branch
         uses: actions/github-script@v6
@@ -90,14 +113,15 @@ jobs:
           git config --global user.email '${{ github.event.client_payload.author_email }}'
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 0
           ref: ${{ steps.get-branch.outputs.name }}
 
-      - name: Checkout module
-        uses: actions/checkout@v3
+      - name: "Frontend: Checkout module"
+        if: steps.details.outputs.frontend_module_dist
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.event.client_payload.repo_name }}
           path: tmp
@@ -105,33 +129,41 @@ jobs:
           fetch-depth: 1
           ref: ${{ github.event.client_payload.commit_sha }}
 
-      - uses: actions/setup-node@v3
+      - name: "Frontend: Setup nodejs"
+        uses: actions/setup-node@v4
+        if: steps.details.outputs.frontend_module_dist
         with:
           node-version: "${{ env.NODE }}"
 
-      - name: Upgrade Yarn
+      - name: "Frontend: Upgrade Yarn"
+        if: steps.details.outputs.frontend_module_dist
         run: npm install -g yarn@1.22
 
       - name: Get yarn cache directory path
+        if: steps.details.outputs.frontend_module_dist
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Configure yarn cache
+      - name: "Frontend: Configure yarn cache"
+        if: steps.details.outputs.frontend_module_dist
         uses: actions/cache@v3
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Print Yarn cache size
+      - name: "Frontend: Print Yarn cache size"
+        if: steps.details.outputs.frontend_module_dist
         run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
 
-      - name: Install dependencies
+      - name: "Frontend: Install Yarn dependencies"
+        if: steps.details.outputs.frontend_module_dist
         run: |
           rm package-lock.json || true
           yarn install
         working-directory: tmp
 
-      - name: Build module
+      - name: "Frontend: Build module"
+        if: steps.details.outputs.frontend_module_dist
         working-directory: tmp
         env:
           CI: false # on true webpack breaks on warnings, and we have them a lot
@@ -152,50 +184,55 @@ jobs:
           }
           EOF
 
-      - name: "LSF Docs: Cache node modules"
-        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
+      - name: "Frontend: LSF Docs: Cache node modules"
+        if: steps.details.outputs.build_lsf_docs
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
 
-      - name: "LSF Docs: Install NPM deps"
-        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
+      - name: "Frontend: LSF Docs: Install NPM deps"
+        if: steps.details.outputs.build_lsf_docs
         continue-on-error: true
         run: npm install -g jsdoc-to-markdown node-fetch
 
-      - name: "LSF Docs: Build"
+      - name: "Frontend: LSF Docs: Build"
         id: lsf-docs-build
-        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
+        if: steps.details.outputs.build_lsf_docs
         continue-on-error: true
         working-directory: tmp/scripts
         run: node create-docs.js
 
-      - name: Commit static
+      - name: "Frontend: Commit"
+        if: steps.details.outputs.frontend_module_dist
         shell: bash
         run: |
           set -xeuo pipefail
 
-          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
-            module_dist="${{ env.STATIC_DIST }}/dm"
-          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
-            module_dist="${{ env.STATIC_DIST }}/lsf"
-          else
-            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
-            exit 1
-          fi
-          
-          rm -rf "${module_dist}"
-          mkdir -p "${module_dist}"
-          cp -r tmp/build/static/* "${module_dist}"
+          rm -rf "${{ steps.details.outputs.frontend_module_dist }}"
+          mkdir -p "${{ steps.details.outputs.frontend_module_dist }}"
+          cp -r tmp/build/static/* "${{ steps.details.outputs.frontend_module_dist }}"
 
-          git add "${{ env.STATIC_DIST }}"
+          git add "${{ steps.details.outputs.frontend_module_dist }}"
           git status -s
           git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
-      - name: "LSF Docs: Commit"
-        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend') && steps.lsf-docs-build.conclusion == 'success'
+      - name: "Requirements: Commit"
+        if: steps.details.outputs.requirements_dist
+        shell: bash
+        run: |
+          set -xeuo pipefail
+
+          sed -i "s#https://github.com/${{ github.event.client_payload.repo_name }}/archive/.*#https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip#g" "${{ steps.details.outputs.requirements_dist }}"
+
+          git add "${{ steps.details.outputs.requirements_dist }}"
+          git status -s
+          git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
+
+      - name: "Frontend: LSF Docs: Commit"
+        if: steps.details.outputs.build_lsf_docs && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
           set -xeuo pipefail
@@ -267,7 +304,7 @@ jobs:
             const pr_header = [
               `Hi @${actor}!`,
               '',
-              'This PR was created in response to a PRs in upstream repo:',
+              'This PR was [created](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) in a response to PRs in upstream repos:',
             ].join('\n')
             
             const {data: listPulls} = await github.rest.pulls.list({

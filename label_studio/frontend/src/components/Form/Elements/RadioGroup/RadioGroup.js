@@ -5,9 +5,9 @@ import { FormField } from "../../FormField";
 import "./RadioGroup.styl";
 
 const RadioContext = createContext();
-const {Block, Elem} = BemWithSpecifiContext();
+const { Block, Elem } = BemWithSpecifiContext();
 
-export const RadioGroup = ({label, className, validate, required, skip, simple, labelProps, size, value, onChange, children, ...props }) => {
+export const RadioGroup = ({ label, className, validate, required, skip, simple, labelProps, size, value, onChange, children, ...props }) => {
   const [currentValue, setCurrentValue] = useState(value);
 
   const onRadioChange = (value) => {
@@ -37,8 +37,8 @@ export const RadioGroup = ({label, className, validate, required, skip, simple, 
             isSimple: simple === true,
           }}
         >
-          <Block name="radio-group" mod={{size, simple}} mix={className}>
-            <input ref={ref} name={props.name} type="hidden" defaultValue={currentValue}/>
+          <Block name="radio-group" mod={{ size, simple }} mix={className}>
+            <input ref={ref} name={props.name} type="hidden" defaultValue={currentValue} />
             <Elem name="buttons">
               {children}
             </Elem>
@@ -58,8 +58,9 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
   const clickHandler = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (disabled) return;
     onChange(value);
-  }, [value]);
+  }, [value, disabled]);
 
   useEffect(() => {
     if (props.checked) setValue(value);
@@ -69,7 +70,14 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
     <Elem name="button" mod={{ checked, disabled }} onClickCapture={clickHandler}>
       {isSimple ? (
         <Label placement="right" text={label} description={description}>
-          <input type="radio" value={value} checked={checked} readOnly style={{pointerEvents: 'none'}}/>
+          <input
+            type="radio"
+            value={value}
+            checked={checked}
+            disabled={disabled}
+            readOnly
+            style={{ pointerEvents: 'none' }}
+          />
         </Label>
       ) : children}
     </Elem>

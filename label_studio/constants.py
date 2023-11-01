@@ -44,7 +44,7 @@ SAFE_HTML_ATTRIBUTES = [
     'value',
     'vlink',
     'vspace',
-    'width'
+    'width',
 ]
 
 SAFE_HTML_TAGS = [
@@ -160,5 +160,5 @@ SAFE_HTML_TAGS = [
     'dialog',
     'summary',
     'slot',
-    'template'
+    'template',
 ]

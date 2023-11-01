@@ -2,8 +2,8 @@
 title: Secure Label Studio
 type: guide
 tier: all
-order: 101
-order_enterprise: 128
+order: 105
+order_enterprise: 405
 meta_title: Secure Label Studio
 meta_description: About the security and hardening processes used by various Label Studio editions, and how you can configure a more secure data labeling project.
 section: "Security and Privacy"
@@ -60,6 +60,13 @@ If you're using Label Studio Enterprise, you can further secure user access in m
 ## Secure API access to Label Studio
 
 Access to the REST API is restricted by user role and requires an access token that is specific to a user account. Access tokens can be reset at any time from the Label Studio UI or using the API.
+
+## Enable SSRF protection for production environments
+
+When deploying Label Studio into a production environment, set the `SSRF_PROTECTION_ENABLED` environment variable to `true`. 
+
+This variable is disabled by default to support users who are working with data in their local environments. However, it should be enabled in production usage. 
+
 
 ## Secure access to data in Label Studio
 

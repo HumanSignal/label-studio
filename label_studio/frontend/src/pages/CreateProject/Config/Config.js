@@ -444,6 +444,8 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
                   },
                   hintOptions: { schemaInfo: tags },
                 }}
+                // don't close modal with Escape while editing config
+                onKeyDown={(editor, e) => { if (e.code === 'Escape') e.stopPropagation(); }}
                 onChange={(editor, data, value) => onChange(value)}
               />
             </div>
@@ -470,7 +472,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
           </Form.Actions>
         )}
       </div>
-      <Preview config={configToDisplay} data={data} loading={loading} error={parserError || error || (configure === "code" && warning)} />
+      <Preview config={configToDisplay} data={data} project={project} loading={loading} error={parserError || error || (configure === "code" && warning)} />
     </div>
   );
 };

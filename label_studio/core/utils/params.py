@@ -1,4 +1,5 @@
 import os
+
 from rest_framework.exceptions import ValidationError
 
 
@@ -9,13 +10,12 @@ def cast_bool_from_str(value):
         elif value.lower() in ['false', 'no', 'not', 'off', '0']:
             value = False
         else:
-            raise ValueError(f'Incorrect bool value "{value}". '
-                             f'It should be one of [1, 0, true, false, yes, no]')
+            raise ValueError(f'Incorrect bool value "{value}". ' f'It should be one of [1, 0, true, false, yes, no]')
     return value
 
 
 def bool_from_request(params, key, default):
-    """ Get boolean value from request GET, POST, etc
+    """Get boolean value from request GET, POST, etc
 
     :param params: dict POST, GET, etc
     :param key: key to find
@@ -33,7 +33,7 @@ def bool_from_request(params, key, default):
 
 
 def int_from_request(params, key, default):
-    """ Get integer from request GET, POST, etc
+    """Get integer from request GET, POST, etc
 
     :param params: dict POST, GET, etc
     :param key: key to find
@@ -55,12 +55,13 @@ def int_from_request(params, key, default):
         return value
     # other
     else:
-        raise ValidationError({key: f'Incorrect value type in key "{key}" = "{value}". '
-                                    f'It should be digit string or integer.'})
+        raise ValidationError(
+            {key: f'Incorrect value type in key "{key}" = "{value}". ' f'It should be digit string or integer.'}
+        )
 
 
 def float_from_request(params, key, default):
-    """ Get float from request GET, POST, etc
+    """Get float from request GET, POST, etc
 
     :param params: dict POST, GET, etc
     :param key: key to find
@@ -80,12 +81,13 @@ def float_from_request(params, key, default):
         return float(value)
     # other
     else:
-        raise ValidationError({key: f'Incorrect value type in key "{key}" = "{value}". '
-                                    f'It should be digit string or float.'})
+        raise ValidationError(
+            {key: f'Incorrect value type in key "{key}" = "{value}". ' f'It should be digit string or float.'}
+        )
 
 
 def list_of_strings_from_request(params, key, default):
-    """ Get list of strings from request GET, POST, etc
+    """Get list of strings from request GET, POST, etc
 
     :param params: dict POST, GET, etc
     :param key: key to find
@@ -103,8 +105,9 @@ def list_of_strings_from_request(params, key, default):
                 return value.split(splitter)
         return [value]
     else:
-        raise ValidationError({key: f'Incorrect value type in key "{key}" = "{value}". '
-                                    f'It should be digit string or float.'})
+        raise ValidationError(
+            {key: f'Incorrect value type in key "{key}" = "{value}". ' f'It should be digit string or float.'}
+        )
 
 
 def get_env(name, default=None, is_bool=False):

@@ -8,7 +8,6 @@ on:
         type: string
 
 env:
-  NODE: '14'
   CACHE_NAME_PREFIX: v1
   PIP_VERSION: "20.2"
 
@@ -17,9 +16,10 @@ jobs:
     name: Conda
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ "ubuntu-latest", "windows-latest" ]
-        python-version: [ "3.9" ]
+        python-version: [ "3.10" ]
         include:
           - os: "ubuntu-latest"
             pip-cache-path: "~/.cache/pip"
@@ -30,7 +30,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           ref: ${{ inputs.head_sha }}
@@ -41,11 +41,6 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           activate-environment: test-environment
-
-      - name: Install dependencies
-        shell: bash -l {0}
-        run: |
-          conda install pip=${{ env.PIP_VERSION }} cython
 
       - uses: actions/cache@v3
         name: Configure pip cache

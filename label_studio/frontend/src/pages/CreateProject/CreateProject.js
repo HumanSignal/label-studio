@@ -3,6 +3,7 @@ import { useHistory } from 'react-router';
 import { Button, ToggleItems } from '../../components';
 import { Modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
+import { HeidiTips } from '../../components/HeidiTips/HeidiTips';
 import { useAPI } from '../../providers/ApiProvider';
 import { cn } from '../../utils/bem';
 import { ConfigPage } from './Config/Config';
@@ -10,9 +11,14 @@ import "./CreateProject.styl";
 import { ImportPage } from './Import/Import';
 import { useImportPage } from './Import/useImportPage';
 import { useDraftProject } from './utils/useDraftProject';
+import { Select } from '../../components/Form';
+import { EnterpriseBadge } from '../../components/Badges/Enterprise';
+import { Caption } from '../../components/Caption/Caption';
+import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
+import { createURL } from '../../components/HeidiTips/utils';
 
 
-const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null :(
+const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null : (
   <form className={cn("project-name")} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
     <div className="field field--wide">
       <label htmlFor="project_name">Project Name</label>
@@ -30,6 +36,23 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         onChange={e => setDescription(e.target.value)}
       />
     </div>
+    {isFF(FF_LSDV_E_297) && (
+      <div className="field field--wide">
+        <label>
+          Workspace
+          <EnterpriseBadge />
+        </label>
+        <Select placeholder="Select an option" disabled options={[]} />
+        <Caption>
+          Simplify project management by organizing projects into workspaces.
+          <a href={createURL('https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects', {
+          experiment: "project_creation_dropdown",
+          treatment: "simplify_project_management",
+        })} target="_blank">Learn more</a>
+        </Caption>
+        <HeidiTips collection="projectCreation" />
+      </div>
+    )}
   </form>
 );
 
@@ -70,15 +93,17 @@ export const CreateProject = ({ onClose }) => {
 
   const onCreate = React.useCallback(async () => {
     const imported = await finishUpload();
+
     if (!imported) return;
 
     setWaitingStatus(true);
-    const response = await api.callApi('updateProject',{
+    const response = await api.callApi('updateProject', {
       params: {
         pk: project.id,
       },
       body: projectBody,
     });
+
     setWaitingStatus(false);
 
     if (response !== null) {
@@ -96,8 +121,10 @@ export const CreateProject = ({ onClose }) => {
         title: name,
       },
     });
+
     if (res.ok) return;
     const err = await res.json();
+
     setError(err.validation_errors?.title);
   };
 
@@ -114,7 +141,14 @@ export const CreateProject = ({ onClose }) => {
   }, [project]);
 
   return (
-    <Modal onHide={onDelete} fullscreen visible bare closeOnClickOutside={false}>
+    <Modal
+      onHide={onDelete}
+      closeOnClickOutside={false}
+      allowToInterceptEscape
+      fullscreen
+      visible
+      bare
+    >
       <div className={rootClass}>
         <Modal.Header>
           <h1>Create Project</h1>
@@ -141,3 +175,4 @@ export const CreateProject = ({ onClose }) => {
     </Modal>
   );
 };
+

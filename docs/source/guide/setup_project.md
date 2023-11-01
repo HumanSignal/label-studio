@@ -3,8 +3,8 @@ title: Project setup
 short: Project setup
 type: guide
 tier: all
-order: 116
-order_enterprise: 103
+order: 155
+order_enterprise: 55
 section: "Project & Team Management"
 meta_title: Set up your labeling project
 meta_description: Set up data labeling and annotation projects in Label Studio to produce high-quality data for your machine learning and data science projects.
@@ -12,7 +12,11 @@ meta_description: Set up data labeling and annotation projects in Label Studio t
 
 All labeling activities in Label Studio occur in the context of a project.
 
-<div class="opensource-only">After you [start Label Studio](start.html) and [create an account](signup.html), create a project to start labeling your data.</div>
+<div class="opensource-only">
+
+After you [start Label Studio](start.html) and [create an account](signup.html), create a project to start labeling your data.
+   
+</div>
 
 1. [Create a project](#Create-a-project)
 2. [Import data](tasks.html).
@@ -88,7 +92,7 @@ Select how you want to distribute tasks to annotators for labeling. Different fr
 Your changes save automatically.
 
 !!! note
-You can't assign annotators to tasks unless you select the **Manual** option.
+    You can't assign annotators to tasks unless you select the **Manual** option.
 
 </div>
 

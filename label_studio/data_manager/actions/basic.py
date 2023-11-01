@@ -1,27 +1,24 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-
 from datetime import datetime
-from django.conf import settings
+
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
-from projects.models import Project
-
-from tasks.models import (
-    Annotation, Prediction, Task
-)
-from webhooks.utils import emit_webhooks_for_instance
-from webhooks.models import WebhookAction
 from data_manager.functions import evaluate_predictions
+from django.conf import settings
+from projects.models import Project
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
 
 
 def retrieve_tasks_predictions(project, queryset, **kwargs):
-    """ Retrieve predictions by tasks ids
+    """Retrieve predictions by tasks ids
 
     :param project: project instance
     :param queryset: filtered tasks db queryset
@@ -31,7 +28,7 @@ def retrieve_tasks_predictions(project, queryset, **kwargs):
 
 
 def delete_tasks(project, queryset, **kwargs):
-    """ Delete tasks by ids
+    """Delete tasks by ids
 
     :param project: project instance
     :param queryset: filtered tasks db queryset
@@ -54,9 +51,7 @@ def delete_tasks(project, queryset, **kwargs):
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
 
     project.update_tasks_states(
-        maximum_annotations_changed=False,
-        overlap_cohort_percentage_changed=False,
-        tasks_number_changed=True
+        maximum_annotations_changed=False, overlap_cohort_percentage_changed=False, tasks_number_changed=True
     )
     # emit webhooks for project
     emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)
@@ -67,12 +62,11 @@ def delete_tasks(project, queryset, **kwargs):
         project.views.all().delete()
         reload = True
 
-    return {'processed_items': count, 'reload': reload,
-            'detail': 'Deleted ' + str(count) + ' tasks'}
+    return {'processed_items': count, 'reload': reload, 'detail': 'Deleted ' + str(count) + ' tasks'}
 
 
 def delete_tasks_annotations(project, queryset, **kwargs):
-    """ Delete all annotations by tasks ids
+    """Delete all annotations and drafts by tasks ids
 
     :param project: project instance
     :param queryset: filtered tasks db queryset
@@ -86,7 +80,13 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations_ids = list(annotations.values('id'))
     # remove deleted annotations from project.summary
     project.summary.remove_created_annotations_and_labels(annotations)
+    # also remove drafts for the task. This includes task and annotation level
+    # drafts by design.
+    drafts = AnnotationDraft.objects.filter(task__id__in=task_ids)
+    project.summary.remove_created_drafts_and_labels(drafts)
+
     annotations.delete()
+    drafts.delete()  # since task-level annotation drafts will not have been deleted by CASCADE
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     request = kwargs['request']
 
@@ -101,12 +101,11 @@ def delete_tasks_annotations(project, queryset, **kwargs):
         tasks = Task.objects.filter(id__in=task_ids)
         postprocess(project, tasks, **kwargs)
 
-    return {'processed_items': count,
-            'detail': 'Deleted ' + str(count) + ' annotations'}
+    return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' annotations'}
 
 
 def delete_tasks_predictions(project, queryset, **kwargs):
-    """ Delete all predictions by tasks ids
+    """Delete all predictions by tasks ids
 
     :param project: project instance
     :param queryset: filtered tasks db queryset
@@ -136,12 +135,12 @@ actions = [
         'order': 90,
         'dialog': {
             'text': 'Send the selected tasks to all ML backends connected to the project.'
-                    'This operation might be abruptly interrupted due to a timeout. '
-                    'The recommended way to get predictions is to update tasks using the Label Studio API.'
-                    '<a href="https://labelstud.io/guide/ml.html>See more in the documentation</a>.'
-                    'Please confirm your action.',
-            'type': 'confirm'
-        }
+            'This operation might be abruptly interrupted due to a timeout. '
+            'The recommended way to get predictions is to update tasks using the Label Studio API.'
+            '<a href="https://labelstud.io/guide/ml.html>See more in the documentation</a>.'
+            'Please confirm your action.',
+            'type': 'confirm',
+        },
     },
     {
         'entry_point': delete_tasks,
@@ -151,8 +150,8 @@ actions = [
         'reload': True,
         'dialog': {
             'text': 'You are going to delete the selected tasks. Please confirm your action.',
-            'type': 'confirm'
-        }
+            'type': 'confirm',
+        },
     },
     {
         'entry_point': delete_tasks_annotations,
@@ -161,8 +160,8 @@ actions = [
         'order': 101,
         'dialog': {
             'text': 'You are going to delete all annotations from the selected tasks. Please confirm your action.',
-            'type': 'confirm'
-        }
+            'type': 'confirm',
+        },
     },
     {
         'entry_point': delete_tasks_predictions,
@@ -171,7 +170,7 @@ actions = [
         'order': 102,
         'dialog': {
             'text': 'You are going to delete all predictions from the selected tasks. Please confirm your action.',
-            'type': 'confirm'
-        }
-    }
+            'type': 'confirm',
+        },
+    },
 ]

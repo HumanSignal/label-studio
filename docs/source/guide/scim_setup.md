@@ -3,8 +3,8 @@ title: Set up SCIM2 for Label Studio
 short: Set up SCIM2
 tier: enterprise
 type: guide
-order: 113
-order_enterprise: 140
+order: 0
+order_enterprise: 490
 meta_title: System for Cross-domain Identity Management (SCIM) for Label Studio Enterprise
 meta_description: Label Studio Enterprise documentation for setting up SCIM2
 section: "Install"
@@ -57,7 +57,7 @@ To manage access to Label Studio Enterprise, add the application to your SCIM pr
 6. Click **Edit** in the right corner.
 
 Fill in the fields:
- - **SCIM connector base URL**: https://{LABEL_STUDIO_BASE_URL}/scim/v2/ where `{LABEL_STUDIO_BASE_URL}` is the base URL of your Label Studio Enterprise instance.
+ - **SCIM connector base URL**: `https://<LABEL_STUDIO_BASE_URL>/scim/v2/` where `<LABEL_STUDIO_BASE_URL>` is the base URL of your Label Studio Enterprise instance.
  - **Unique identifier field for users**: Leave `userName`. Label Studio Enterprise uses email as user identifier in this field.
  - **Supported provisioning actions**: Select the following items:
    - Import New Users and Profile Updates
@@ -99,8 +99,27 @@ The most convenient way to manage access to the application is via groups. You c
 
 ### Set up group mapping
 
-1. In Label Studio open SCIM settings (**Organization → SCIM**).
-2. Update roles and workplaces mapping. If a workplace does not exist it will be created with the name of Okta group.
+1. In Label Studio, click the menu in the upper left and select **Organization**. 
+
+    ![Screenshot of Organization in the Label Studio menu](/images/general/menu_organization.png)
+    
+    If you do not see the option to select **Organization**, you are not logged in with the appropriate role. 
+2. Select **SCIM** in the upper right. 
+3. Update roles and workspaces mapping. Ensure the group name you enter is the same as the group name being sent by your SCIM provider. 
+
+    * **Organization Roles to Groups Mapping**---Map groups to roles at the organization level. The role set at the organization level is the default role of the user and is automatically assigned to workspaces and projects. For more information on roles, see [Roles in Label Studio Enterprise](manage_users#Roles-in-Label-Studio-Enterprise). 
+
+        You can map multiple groups to the same role. Note that users who are **Not Activated** or **Deactivated** do not count towards the seat limit for your account. 
+    * **Workspaces to Groups Mapping**---Add groups as members to workspaces. Users with Manager, Reviewer, or Annotator roles can only see workspaces after they've been added as a member to that workspace.
+    
+        Select an existing workspace or create a new one. You can map multiple groups to the same workspace.  
+    * **Projects to Groups Mapping**---Map groups to roles at the project level. Project-level roles can be **Annotator**, **Reviewer**, or **Inherit**. 
+    
+        You can map a group to different roles across multiple projects. You can also map multiple groups to the same roles and the same projects. For more information on roles, see [Roles in Label Studio Enterprise](manage_users#Roles-in-Label-Studio-Enterprise). 
+    
+        If you select **Inherit**, the group will inherit the role set above under **Organization Roles to Groups Mapping.** If the group is inheriting the Not Activated role, the users are mapped to the project, but they are not actually assigned to the project until the group is synced (meaning that the user authenticates first). 
+
+
 
 ### Assign a group to the application
 
@@ -122,7 +141,7 @@ After saving the group assignment, the update will be queued and sent to Label S
 
 ## Unassigning the application for groups
 
-To unassign a group from the application, follow the steps for [Unassigning the application for users](#Unassigning the application for users).
+To unassign a group from the application, follow the steps for [Unassigning the application for users](#Unassigning-the-application-for-users).
 
 1. On the **application** page, navigate to the **Assignments** tab.
 2. Select **Group** in the left menu.

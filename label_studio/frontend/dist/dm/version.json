@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-348: Image should fit viewport regardless of its height",
-  "commit": "568c0be973c66f89e0407c99bfe7f8fbde4704ed",
+  "message": "feat: LEAP-58: Proxy URLs and pass callback to LSF",
+  "commit": "88e3e221d335786c9236c5bbf53430da46f0f93d",
   "branch": "master",
-  "date": "2023/08/03 09:59:30"
+  "date": "2023/11/01 22:06:59"
 }

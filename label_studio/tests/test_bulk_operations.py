@@ -1,13 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
-import os
 import datetime
+import os
 
-from users.models import User
-from projects.models import Project
-from label_studio.tests.test_data.gen_tasks_and_annotations import gen_tasks
+import pytest
 from django.conf import settings
+from projects.models import Project
+from users.models import User
+
+from label_studio.tests.test_data.gen_tasks_and_annotations import gen_tasks
 
 
 @pytest.mark.django_db
@@ -45,12 +46,12 @@ def test_load_tasks_and_annotations(business_client, annotator_client, configure
     filename = 'tasks_and_annotations.json'
     filepath = os.path.join(settings.TEST_DATA_ROOT, filename)
 
-    data = { filename: (open(filepath, 'rb'), filename) }
+    data = {filename: (open(filepath, 'rb'), filename)}
     url = '/api/projects/{}/tasks/bulk/'.format(project_id)
-    r = business_client.post( url, data=data, format='multipart')
+    r = business_client.post(url, data=data, format='multipart')
     assert r.status_code == 201, r.content
 
     dt2 = datetime.datetime.now()
     # time depends on aws machine cpu
     # around 15-30 secs for 1000 tasks each w 5 annotations
-    assert (dt2-dt1).seconds < 150
+    assert (dt2 - dt1).seconds < 150

@@ -3,8 +3,8 @@ title: Label Studio
 short: Overview
 type: guide
 tier: all
-order: 99
-order_enterprise: 99
+order: 5
+order_enterprise: 5
 section: "Get started"
 meta_title: Overview of Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
@@ -24,17 +24,11 @@ Label Studio is an open source data labeling tool that supports multiple project
 
 - Integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html).
 
-Label Studio is also available an [Enterprise cloud service](https://heartex.com/) with enhanced security (SSO, RBAC, SOC2), team management features, analytics & reporting, and support SLAs. A [free trial is available](https://heartex.com/free-trial) to get started quickly and explore the enterprise cloud product.
+Label Studio is also available an [Enterprise cloud service](https://heartex.com/) with enhanced security (SSO, RBAC, SOC2), team management features, analytics & reporting, and support SLAs. A [free trial is available](https://humansignal.com/free-trial) to get started quickly and explore the enterprise cloud product.
 
 <div class="opensource-only">
 
 ## Quick start
-
-> **NOTE:** For Label Studio 1.7.2 you have to to confirm the dependencies `libpq-dev` and `python3-dev` are installed. As an example, to install on a Debian-based distro:
->
-> ```bash
-> sudo apt install libpq-dev python3-dev
-> ```
 
 1. Install Label Studio:
 
