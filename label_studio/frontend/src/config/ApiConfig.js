@@ -18,6 +18,10 @@ export const API_CONFIG = {
     createProject: "POST:/projects",
     deleteProject: "DELETE:/projects/:pk",
 
+    // Presigning
+    presignUrlForTask: "/../tasks/:taskID/presign",
+    presignUrlForProject: "/../projects/:projectId/presign",
+
     // Config and Import
     configTemplates: "/templates",
     validateConfig: "POST:/projects/:pk/validate",
