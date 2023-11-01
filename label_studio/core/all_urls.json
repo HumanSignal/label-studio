@@ -259,8 +259,14 @@
     },
     {
         "url": "/tasks/<int:task_id>/presign/",
-        "module": "data_import.api.PresignStorageData",
-        "name": "data_import:storage-data-presign",
+        "module": "data_import.api.TaskPresignStorageData",
+        "name": "data_import:task-storage-data-presign",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/<int:project_id>/presign/",
+        "module": "data_import.api.ProjectPresignStorageData",
+        "name": "data_import:project-storage-data-presign",
         "decorators": ""
     },
     {
@@ -474,12 +480,6 @@
         "decorators": ""
     },
     {
-        "url": "/data/avatars/<path>",
-        "module": "django.views.static.serve",
-        "name": "",
-        "decorators": ""
-    },
-    {
         "url": "/api/current-user/reset-token/",
         "module": "users.api.UserResetTokenAPI",
         "name": "current-user-reset-token",
@@ -495,6 +495,18 @@
         "url": "/api/current-user/whoami",
         "module": "users.api.UserWhoAmIAPI",
         "name": "current-user-whoami",
+        "decorators": ""
+    },
+    {
+        "url": "/api/users/<int:pk>/soft-delete/",
+        "module": "users.views.UserSoftDeleteView",
+        "name": "user-soft-delete",
+        "decorators": ""
+    },
+    {
+        "url": "/data/avatars/<path>",
+        "module": "django.views.static.serve",
+        "name": "",
         "decorators": ""
     },
     {
