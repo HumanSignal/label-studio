@@ -139,12 +139,19 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
         raw_field_name = ordering[0]
         unsigned_field_name = raw_field_name.lstrip('-+')
 
-        field_name, ascending = preprocess_field_name(raw_field_name, only_undefined_field=project.only_undefined_field)
+        field_name, ascending = preprocess_field_name(
+            raw_field_name, only_undefined_field=project.only_undefined_field
+        )
         alt_field_name = get_alt_field_name(field_name, project, handle_alt_fieldname)
 
-        numeric_ordering = view_data and 'columnsDisplayType' in view_data and unsigned_field_name in view_data['columnsDisplayType'] and view_data['columnsDisplayType'][unsigned_field_name] == 'Number'
+        numeric_ordering = (
+            view_data
+            and 'columnsDisplayType' in view_data
+            and unsigned_field_name in view_data['columnsDisplayType']
+            and view_data['columnsDisplayType'][unsigned_field_name] == 'Number'
+        )
 
-        def annotate_numeric_ordering(queryset, field_name):
+        def annotate_numeric_ordering(queryset, field_name, skip_test=False):
             json_field = field_name.replace('data__', '')
             try:
                 queryset = queryset.annotate(
@@ -158,23 +165,23 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
 
         if field_name.startswith('data__'):
             if numeric_ordering:
-                queryset, numeric_ordering_applied = annotate_numeric_ordering(queryset, field_name)
+                queryset, applied_numeric_ordering = annotate_numeric_ordering(queryset, field_name)
+                if alt_field_name:
+                    if applied_numeric_ordering:
+                        queryset, applied_numeric_ordering = annotate_numeric_ordering(queryset, alt_field_name, True)
+                    else:
+                        queryset = queryset.annotate(
+                            alt_ordering_field=KeyTextTransform(alt_field_name.replace('data__', ''), 'data')
+                        )
             else:
                 queryset = queryset.annotate(ordering_field=KeyTextTransform(field_name.replace('data__', ''), 'data'))
+                if alt_field_name:
+                    queryset = queryset.annotate(
+                        alt_ordering_field=KeyTextTransform(alt_field_name.replace('data__', ''), 'data')
+                    )
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
             queryset = queryset.order_by(f)
-
-        # Handle alt_field_name in a similar fashion
-        if alt_field_name:
-            if alt_field_name.startswith('data__'):
-                if numeric_ordering:
-                    queryset, _ = annotate_numeric_ordering(queryset, alt_field_name)
-                else:
-                    queryset = queryset.annotate(alt_ordering_field=KeyTextTransform(alt_field_name.replace('data__', ''), 'data'))
-            else:
-                f_alt = F(alt_field_name).asc(nulls_last=True) if alt_ascending else F(alt_field_name).desc(nulls_last=True)
-                queryset = queryset.order_by(f, f_alt)
 
     else:
         queryset = queryset.order_by('id')
