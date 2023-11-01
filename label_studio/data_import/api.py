@@ -712,7 +712,7 @@ class TaskPresignStorageData(PresignAPIMixin, APIView):
         fileuri = request.GET.get('fileuri')
 
         if fileuri is None or task_id is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         try:
             task = Task.objects.get(pk=task_id)
@@ -736,7 +736,7 @@ class ProjectPresignStorageData(PresignAPIMixin, APIView):
         fileuri = request.GET.get('fileuri')
 
         if fileuri is None or project_id is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         try:
             project = Project.objects.get(pk=project_id)
