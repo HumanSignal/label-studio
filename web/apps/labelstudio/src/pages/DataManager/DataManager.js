@@ -5,8 +5,8 @@ import { Spinner } from '../../components';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
-import { useAPI } from '../../providers/ApiProvider';
 import { useLibrary } from '../../providers/LibraryProvider';
+import { useAPI } from '../../providers/ApiProvider';
 import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
 import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
@@ -15,7 +15,6 @@ import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
-import DM from "@humansignal/datamanager";
 import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
@@ -49,7 +48,7 @@ const initializeDataManager = async (root, props, params) => {
     ...settings,
   };
 
-  return new DM(dmConfig);
+  return new window.DataManager(dmConfig);
 };
 
 const buildLink = (path, params) => {
@@ -115,7 +114,7 @@ export const DataManagerPage = ({ ...props }) => {
     if (interactiveBacked) {
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
-        const ids = group.map(r => r.cleanId);
+        const ids = group.map(r => r.id);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
         const suggestionsRequest = api.callApi("mlInteractive", {
@@ -131,7 +130,7 @@ export const DataManagerPage = ({ ...props }) => {
             return response.data.result;
           }
 
-          return null;
+          return [];
         });
       });
     }

@@ -1,0 +1,70 @@
+.tooltip
+  --animation-duration 100ms
+  --animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
+  --animation-start: -10px;
+
+  top -1000px
+  left -1000px
+  color #fff
+  display none
+  z-index 10000
+  padding 4px 10px
+  position absolute
+  pointer-events none
+  background-color #000
+  border-radius 3px
+
+  &::before
+    left 50%
+    bottom 0
+    content ''
+    width 10px
+    height 10px
+    display block
+    position absolute
+    background-color #000
+    transform translate(-50%, 50%) rotate(45deg)
+
+  &.before-appear,
+  &.before-disappear
+    transition-property opacity, transform
+    transition-duration var(--animation-duration)
+    transition-iming-function var(--animation-curve)
+
+  // Animation transition handling
+  &.before-appear
+    opacity 0
+    display flex
+    transform translate3d(0, var(--animation-start), 0)
+
+  &.appear
+    opacity 1
+    transform translate3d(0, 0, 0)
+
+  &.visible
+    opacity 1
+    display flex
+
+  &.before-disappear
+    opacity 1
+    display flex
+    transform translate3d(0, 0, 0)
+
+  &.disappear
+    opacity 0
+    transform translate3d(0, var(--animation-start), 0)
+
+  &_align
+    &_top-center
+      --animation-start -10px
+
+      &::before
+        bottom 0
+        transform translate(-50%, 50%) rotate(45deg)
+
+    &_bottom-center
+      --animation-start 10px
+
+      &::before
+        top 0
+        transform translate(-50%, -50%) rotate(45deg)

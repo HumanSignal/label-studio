@@ -1,0 +1,87 @@
+.keypoints
+  --hover transparent
+
+  height 24px
+  display flex
+  background-color var(--hover)
+
+  &__label
+    left 0
+    flex none
+    width var(--offset)
+    height 24px
+    display flex
+    z-index 2
+    align-items center
+    position sticky
+    display flex
+    padding 0 8px
+    justify-content space-between
+    background linear-gradient(0deg, var(--hover), var(--hover) 100%), linear-gradient(0deg, #FAFAFA, #FAFAFA 100%)
+    box-shadow 1px 0px 0px rgba(0, 0, 0, 0.05)
+
+  &__data
+    display grid
+    text-align right
+    grid-auto-flow column
+    grid-auto-columns minmax(24px, 1fr)
+
+  &__data-item
+    &_faded
+      opacity 0.4
+
+  &__name
+    font-size 14px
+    width min-content
+    color var(--color)
+
+  &__keypoints
+    flex 1
+    z-index 1
+    height 100%
+    position relative
+
+  &__lifespan
+    top 50%
+    height 2px
+    width 100%
+    z-index 1
+    position absolute
+    transform translateY(-50%)
+    background-color var(--lifespan-color)
+
+    &_hidden
+      opacity 0.3
+
+  &__point
+    top 50%
+    width 9px
+    height 9px
+    z-index 2
+    position absolute
+    border-radius 2px
+    transform translate3d(-50%, -50%, 0) rotate(45deg)
+    background-color var(--point-color)
+
+  &__actions
+    display flex
+
+  &:hover, &_selected
+    --hover rgba(#000, 0.04)
+
+.region-action
+  margin 1px
+  margin-left 2px
+  height 18px
+  min-width 18px
+  cursor pointer
+  border-radius 3px
+  background #FFFFFF
+  box-shadow 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.15)
+
+  svg
+    width 18px
+    height 18px
+
+  &_danger
+    color $danger_color

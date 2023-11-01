@@ -19,7 +19,7 @@
         "styles": [],
         "scripts": [],
         "isolatedConfig": true,
-        "webpackConfig": "apps/labelstudio/webpack.config.js"
+        "webpackConfig": "webpack.config.js"
       },
       "configurations": {
         "development": {

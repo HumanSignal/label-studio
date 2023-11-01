@@ -1,6 +1,0 @@
-{
-  "message": "fix: OPTIC-109: Blank draft should not be created when an annotation is submitted",
-  "commit": "c9758b2fb911f789d6ba3c4b1dd8a44528eea5d0",
-  "branch": "master",
-  "date": "2023/09/22 11:06:45"
-}

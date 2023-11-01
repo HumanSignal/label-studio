@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link href="//fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <!--
+      manifest.json provides metadata used when your web app is added to the
+      homescreen on Android. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+
+    <!-- Label Studio Frontend -->
+    <!-- <link href="https://unpkg.com/label-studio@latest/build/static/css/main.css" rel="stylesheet">
+    <script src="https://unpkg.com/label-studio@latest/build/static/js/main.js"></script> -->
+
+    <!-- Local version downloaded by get-build.js -->
+    <link href="/static/lsf/css/main.css" rel="stylesheet">
+    <script src="/static/lsf/js/main.js"></script>
+
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+      -->
+    <title><%= htmlWebpackPlugin.options.title %></title>
+
+    <style>
+      body {
+        font-family: Roboto !important;
+        font-weight: normal;
+        font-size: 14px;
+        margin: 0;
+        overflow: hidden;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #app {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      td, th {
+          padding: 0.4em 2em;
+          border: 1px solid #ccc;
+      }
+
+      ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 8px rgba(178, 178, 178, 0.3) !important;
+        background-color: #F5F5F5 !important;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px !important;
+        height: 8px !important;
+        background-color: #F5F5F5 !important;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #c3c3c3 !important;
+        border: 8px solid #b4b4b4 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+
+    <div id="app" data-project-id="2"></div>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+.link {
+  color: #1890ff;
+  cursor: pointer;
+
+  &:hover {
+    color: #40a9ff;
+  }
+
+  &:focus {
+    color: #1890ff;
+  }
+}
