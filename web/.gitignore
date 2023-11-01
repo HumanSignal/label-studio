@@ -74,12 +74,8 @@ libs/editor/.env.production.local
 # Testing
 libs/editor/coverage/
 
-# Examples of local env
-libs/editor/src/examples
-
 # codecept screenshots
 libs/editor/e2e/output
-libs/editor/src/core/feature-flags/flags.json
 
 
 # datamanager ignored files

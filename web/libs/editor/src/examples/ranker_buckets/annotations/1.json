@@ -1,0 +1,20 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "result": [
+                {
+                    "from_name": "rank",
+                    "to_name": "results",
+                    "type": "ranker",
+                    "value": {
+                        "ranker": {
+                            "best": ["mdn"],
+                            "ads": ["blog"]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

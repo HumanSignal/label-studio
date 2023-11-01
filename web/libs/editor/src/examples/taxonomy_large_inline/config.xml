@@ -1,0 +1,585 @@
+<View>
+  <Header size="10" >Document ID: $document_id</Header>
+  <Repeater indexFlag="{{idx}}" on="$images" mode="pagination">
+    <View style="display: flex; margin-bottom: 10px;">
+      <View style="margin-right: 10px; width: 20em">
+        <Header value="Labels">
+        </Header>
+        <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">
+          <Label alias="title" value="Title">
+          </Label>
+          <Label alias="reference" value="Document reference">
+          </Label>
+        </RectangleLabels>
+        <RectangleLabels name="taxonomy_{{idx}}" toName="page_{{idx}}">
+          <Label alias="taxonomy" value="Taxonomy">
+          </Label>
+        </RectangleLabels>
+        <View>
+          <Taxonomy name="categories_{{idx}}" perRegion="true" toName="page_{{idx}}" visibleWhen="region-selected">
+            <Choice value="corpgov">
+              <Choice value="corpgov-actuary">
+                <Choice value="corpgov-actuary-actuarialaudit">
+                  <Choice value="corpgov-actuary-actuarialaudit-functions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-actuary-appointment">
+                  <Choice value="corpgov-actuary-appointment-process">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-actuary-other">
+                </Choice>
+                <Choice value="corpgov-actuary-removal">
+                  <Choice value="corpgov-actuary-removal-resignation">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-auditor">
+                <Choice value="corpgov-auditor-appointment">
+                  <Choice value="corpgov-auditor-appointment-process">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-auditor-audit">
+                  <Choice value="corpgov-auditor-audit-functions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-auditor-other">
+                </Choice>
+                <Choice value="corpgov-auditor-qualification">
+                  <Choice value="corpgov-auditor-qualification-appointment">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-auditor-remov">
+                  <Choice value="corpgov-auditor-remov-resignation">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-boardcommittees">
+                <Choice value="corpgov-boardcommittees-auditcommittee">
+                  <Choice value="corpgov-boardcommittees-auditcommittee-functions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcommittees-nominationcommittee">
+                  <Choice value="corpgov-boardcommittees-nominationcommittee-functions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcommittees-other">
+                </Choice>
+                <Choice value="corpgov-boardcommittees-remunerationcommittee">
+                  <Choice value="corpgov-boardcommittees-remunerationcommittee-functions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcommittees-riskmanagementcommittee">
+                  <Choice value="corpgov-boardcommittees-riskmanagementcommittee-functions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcommittees-specialisedcommittees">
+                  <Choice value="corpgov-boardcommittees-specialisedcommittees-functions">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-boardcomposition">
+                <Choice value="corpgov-boardcomposition-appoint">
+                  <Choice value="corpgov-boardcomposition-appoint-directors">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-approvalrequirement">
+                  <Choice value="corpgov-boardcomposition-approvalrequirement-appoint">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-chairman">
+                  <Choice value="corpgov-boardcomposition-chairman-appoint">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-directorships">
+                  <Choice value="corpgov-boardcomposition-directorships-appointmentcriteria">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-evaluation">
+                  <Choice value="corpgov-boardcomposition-evaluation-directors">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-fitproper">
+                  <Choice value="corpgov-boardcomposition-fitproper-seniormanagement">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-gender">
+                  <Choice value="corpgov-boardcomposition-gender-diversity">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-independentdirector">
+                  <Choice value="corpgov-boardcomposition-independentdirector-independence">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-other">
+                </Choice>
+                <Choice value="corpgov-boardcomposition-seniormanagement">
+                  <Choice value="corpgov-boardcomposition-seniormanagement-appoint">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-boardcomposition-tenure">
+                  <Choice value="corpgov-boardcomposition-tenure-servicerestrictions">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-complyorexplain">
+                <Choice value="corpgov-complyorexplain-boardofdirectors">
+                  <Choice value="corpgov-complyorexplain-boardofdirectors-committee">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-complyorexplain-code">
+                  <Choice value="corpgov-complyorexplain-code-genericprovisions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-complyorexplain-financialstatements">
+                  <Choice value="corpgov-complyorexplain-financialstatements-transparency">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-complyorexplain-other">
+                </Choice>
+                <Choice value="corpgov-complyorexplain-relatedpartytransactions">
+                  <Choice value="corpgov-complyorexplain-relatedpartytransactions-conflictofinterest">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-complyorexplain-remuneration">
+                  <Choice value="corpgov-complyorexplain-remuneration-directors">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-complyorexplain-riskmanagment">
+                  <Choice value="corpgov-complyorexplain-riskmanagment-internalcontrols">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-complyorexplain-shareholder">
+                  <Choice value="corpgov-complyorexplain-shareholder-rights">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-complyorexplain-stakeholders">
+                  <Choice value="corpgov-complyorexplain-stakeholders-interests">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-corporategovernanceobligations">
+                <Choice value="corpgov-corporategovernanceobligations-groupcompan">
+                  <Choice value="corpgov-corporategovernanceobligations-groupcompan-responsibilities">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-corporategovernanceobligations-grouplevel">
+                  <Choice value="corpgov-corporategovernanceobligations-grouplevel-transparency">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-corporategovernanceobligations-other">
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-definitions">
+                <Choice value="corpgov-definitions-bank">
+                  <Choice value="corpgov-definitions-bank-bankingbusiness">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-bankingbusiness">
+                  <Choice value="corpgov-definitions-bankingbusiness-bankholdingcompany">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-board">
+                  <Choice value="corpgov-definitions-board-directors">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-executivedirector">
+                  <Choice value="corpgov-definitions-executivedirector-wholetimedirector">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-financial">
+                  <Choice value="corpgov-definitions-financial-holdingcompany">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-independentdirector">
+                  <Choice value="corpgov-definitions-independentdirector-nonexecutive">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-insurance">
+                  <Choice value="corpgov-definitions-insurance-holdingcompany">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-insurer">
+                  <Choice value="corpgov-definitions-insurer-insurancecompany">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-other">
+                </Choice>
+                <Choice value="corpgov-definitions-relatedparties">
+                  <Choice value="corpgov-definitions-relatedparties-relatedpartytransactions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-definitions-seniormanagement">
+                  <Choice value="corpgov-definitions-seniormanagement-manager">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-directors">
+                <Choice value="corpgov-directors-disqualif">
+                  <Choice value="corpgov-directors-disqualif-process">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-directors-other">
+                </Choice>
+                <Choice value="corpgov-directors-remov">
+                  <Choice value="corpgov-directors-remov-process">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-directors-resign">
+                  <Choice value="corpgov-directors-resign-process">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-fiduciaryduty">
+                <Choice value="corpgov-fiduciaryduty-chairman">
+                  <Choice value="corpgov-fiduciaryduty-chairman-duties">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-fiduciaryduty-director">
+                  <Choice value="corpgov-fiduciaryduty-director-duties">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-fiduciaryduty-duties">
+                  <Choice value="corpgov-fiduciaryduty-duties-shareholders">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-fiduciaryduty-other">
+                </Choice>
+                <Choice value="corpgov-fiduciaryduty-responsibilites">
+                  <Choice value="corpgov-fiduciaryduty-responsibilites-stakeholders">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-fiduciaryduty-seniormanagement">
+                  <Choice value="corpgov-fiduciaryduty-seniormanagement-companysecretary">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-fiduciaryduty-transparency">
+                  <Choice value="corpgov-fiduciaryduty-transparency-boardmeetings">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-financial">
+                <Choice value="corpgov-financial-annualstatements">
+                  <Choice value="corpgov-financial-annualstatements-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-financial-audit">
+                  <Choice value="corpgov-financial-audit-accounting">
+                  </Choice>
+                  <Choice value="corpgov-financial-audit-auditorappointment">
+                  </Choice>
+                  <Choice value="corpgov-financial-audit-publicdisclosure">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-financial-corporategovernance">
+                  <Choice value="corpgov-financial-corporategovernance-statement">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-financial-exemption">
+                  <Choice value="corpgov-financial-exemption-criteria">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-financial-format">
+                  <Choice value="corpgov-financial-format-criteria">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-financial-interimstatements">
+                  <Choice value="corpgov-financial-interimstatements-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-financial-managementreport">
+                  <Choice value="corpgov-financial-managementreport-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-financial-other">
+                </Choice>
+                <Choice value="corpgov-financial-riskdisclosure">
+                  <Choice value="corpgov-financial-riskdisclosure-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-financial-timing">
+                  <Choice value="corpgov-financial-timing-criteria">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-issuer">
+                <Choice value="corpgov-issuer-majorshareholder">
+                  <Choice value="corpgov-issuer-majorshareholder-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-issuer-other">
+                </Choice>
+                <Choice value="corpgov-issuer-ownshares">
+                  <Choice value="corpgov-issuer-ownshares-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-issuer-publicnotification">
+                  <Choice value="corpgov-issuer-publicnotification-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-issuer-shareholdingpattern">
+                  <Choice value="corpgov-issuer-shareholdingpattern-obligation">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-materialevent">
+                <Choice value="corpgov-materialevent-acquisition">
+                  <Choice value="corpgov-materialevent-acquisition-disclosure">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-materialevent-general">
+                  <Choice value="corpgov-materialevent-general-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-materialevent-other">
+                </Choice>
+                <Choice value="corpgov-materialevent-significantacquisition">
+                  <Choice value="corpgov-materialevent-significantacquisition-dispositions">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-operational">
+                <Choice value="corpgov-operational-board">
+                  <Choice value="corpgov-operational-board-materialinterests">
+                  </Choice>
+                  <Choice value="corpgov-operational-board-shareownership">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-operational-capital">
+                  <Choice value="corpgov-operational-capital-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-operational-compensation">
+                  <Choice value="corpgov-operational-compensation-dividends">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-operational-other">
+                </Choice>
+                <Choice value="corpgov-operational-procedure">
+                  <Choice value="corpgov-operational-procedure-criteria">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-operational-publication">
+                  <Choice value="corpgov-operational-publication-stockexchange">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-operational-securities">
+                  <Choice value="corpgov-operational-securities-obligation">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-other">
+              </Choice>
+              <Choice value="corpgov-relatedpartytransactions">
+                <Choice value="corpgov-relatedpartytransactions-auditcommittee">
+                  <Choice value="corpgov-relatedpartytransactions-auditcommittee-approval">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-conflictofinterests">
+                  <Choice value="corpgov-relatedpartytransactions-conflictofinterests-disclos">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-disclos">
+                  <Choice value="corpgov-relatedpartytransactions-disclos-relatedpartydetails">
+                  </Choice>
+                  <Choice value="corpgov-relatedpartytransactions-disclos-relatedpartytransaction">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-exemption">
+                  <Choice value="corpgov-relatedpartytransactions-exemption-conflictofinterests">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-exemptions">
+                  <Choice value="corpgov-relatedpartytransactions-exemptions-armslength">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-indemnificationoflosses">
+                  <Choice value="corpgov-relatedpartytransactions-indemnificationoflosses-voidableRPTs">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-other">
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-relatedparty">
+                  <Choice value="corpgov-relatedpartytransactions-relatedparty-restrictedtransactions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-shareholderapproval">
+                  <Choice value="corpgov-relatedpartytransactions-shareholderapproval-exemption">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-relatedpartytransactions-shareholders">
+                  <Choice value="corpgov-relatedpartytransactions-shareholders-approval">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-remuneration">
+                <Choice value="corpgov-remuneration-board">
+                  <Choice value="corpgov-remuneration-board-director">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-remuneration-disclosures">
+                  <Choice value="corpgov-remuneration-disclosures-director">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-remuneration-obligation">
+                  <Choice value="corpgov-remuneration-obligation-management">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-remuneration-other">
+                </Choice>
+                <Choice value="corpgov-remuneration-restrictions">
+                  <Choice value="corpgov-remuneration-restrictions-seniormanagement">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-remuneration-seniormanagment">
+                  <Choice value="corpgov-remuneration-seniormanagment-maximumremuneration">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-seniormanagerregime">
+                <Choice value="corpgov-seniormanagerregime-code">
+                  <Choice value="corpgov-seniormanagerregime-code-conduct">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-seniormanagerregime-disqualif">
+                  <Choice value="corpgov-seniormanagerregime-disqualif-penalt">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-seniormanagerregime-fitproper">
+                  <Choice value="corpgov-seniormanagerregime-fitproper-seniormanager">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-seniormanagerregime-managementresponsibilitiesmap">
+                  <Choice value="corpgov-seniormanagerregime-managementresponsibilitiesmap-managementsturucture">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-seniormanagerregime-other">
+                </Choice>
+                <Choice value="corpgov-seniormanagerregime-responsibilities">
+                  <Choice value="corpgov-seniormanagerregime-responsibilities-seniormanager">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-seniormanagerregime-seniormanager">
+                  <Choice value="corpgov-seniormanagerregime-seniormanager-applicability">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-seniormanagerregime-statementofresponsibilities">
+                  <Choice value="corpgov-seniormanagerregime-statementofresponsibilities-disclos">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-shareholder">
+                <Choice value="corpgov-shareholder-aggregateholding">
+                  <Choice value="corpgov-shareholder-aggregateholding-exemption">
+                  </Choice>
+                  <Choice value="corpgov-shareholder-aggregateholding-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholder-content">
+                  <Choice value="corpgov-shareholder-content-criteria">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholder-disclosure">
+                  <Choice value="corpgov-shareholder-disclosure-groupnotif">
+                  </Choice>
+                  <Choice value="corpgov-shareholder-disclosure-materialshareholding">
+                  </Choice>
+                  <Choice value="corpgov-shareholder-disclosure-thirdcountry">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholder-financialinstruments">
+                  <Choice value="corpgov-shareholder-financialinstruments-obligation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholder-other">
+                </Choice>
+                <Choice value="corpgov-shareholder-procedure">
+                  <Choice value="corpgov-shareholder-procedure-criteria">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholder-shareholding">
+                  <Choice value="corpgov-shareholder-shareholding-shares">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholder-thresholdlimits">
+                  <Choice value="corpgov-shareholder-thresholdlimits-calculation">
+                  </Choice>
+                  <Choice value="corpgov-shareholder-thresholdlimits-material">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholder-timing">
+                  <Choice value="corpgov-shareholder-timing-criteria">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholder-votingrights">
+                  <Choice value="corpgov-shareholder-votingrights-obligation">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-shareholderactions">
+                <Choice value="corpgov-shareholderactions-derivativeactions">
+                  <Choice value="corpgov-shareholderactions-derivativeactions-classactions">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderactions-directactions">
+                  <Choice value="corpgov-shareholderactions-directactions-process">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderactions-other">
+                </Choice>
+                <Choice value="corpgov-shareholderactions-regulatoryactions">
+                  <Choice value="corpgov-shareholderactions-regulatoryactions-remedies">
+                  </Choice>
+                </Choice>
+              </Choice>
+              <Choice value="corpgov-shareholderrights">
+                <Choice value="corpgov-shareholderrights-additionalshares">
+                  <Choice value="corpgov-shareholderrights-additionalshares-approval">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderrights-extraordinarytransactions">
+                  <Choice value="corpgov-shareholderrights-extraordinarytransactions-approval">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderrights-minority">
+                  <Choice value="corpgov-shareholderrights-minority-equaltreatment">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderrights-other">
+                </Choice>
+                <Choice value="corpgov-shareholderrights-ownership">
+                  <Choice value="corpgov-shareholderrights-ownership-registeration">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderrights-participate">
+                  <Choice value="corpgov-shareholderrights-participate-amendments">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderrights-profit">
+                  <Choice value="corpgov-shareholderrights-profit-dividend">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderrights-relevant">
+                  <Choice value="corpgov-shareholderrights-relevant-materialinformation">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderrights-transferofshares">
+                  <Choice value="corpgov-shareholderrights-transferofshares-convey">
+                  </Choice>
+                </Choice>
+                <Choice value="corpgov-shareholderrights-voting">
+                  <Choice value="corpgov-shareholderrights-voting-shareholdermeetings">
+                  </Choice>
+                </Choice>
+              </Choice>
+            </Choice>
+          </Taxonomy>
+        </View>
+      </View>
+      <View style="width: 2048px">
+        <Image maxHeight="auto" name="page_{{idx}}" value="$images[{{idx}}].url">
+        </Image>
+      </View>
+    </View>
+  </Repeater>
+</View>
