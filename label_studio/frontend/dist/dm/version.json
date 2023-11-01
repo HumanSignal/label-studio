@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-303: Fix github vulnerabilities",
-  "commit": "633333e879752345dee4dfdadc3c696d02867525",
-  "branch": "master",
-  "date": "2023/10/31 17:14:31"
+  "message": "feat: LEAP-58: Proxy URLs and pass callback to LSF",
+  "commit": "5666015327bc796b9e7c53d2987e2c0b8ed55d29",
+  "branch": "fb-leap-58/proxy-url",
+  "date": "2023/11/01 17:23:08"
 }
