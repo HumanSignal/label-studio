@@ -33,7 +33,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
   const onPresignUrlForProject = async (_, url) => {
     const parsedUrl = new URL(url);
 
-    // return same url if http(s) or data
+    // return same url if http(s)
     if (["http:", "https:"].includes(parsedUrl.protocol)) return url;
 
     const projectId = project.id;
