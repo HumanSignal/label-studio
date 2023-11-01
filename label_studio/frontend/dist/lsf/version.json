@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-314: Fix Github vulnerabilities",
-  "commit": "bef0cbdb03eb659bb2a161ffa64be1a211444bbe",
-  "branch": "master",
-  "date": "2023/10/31 17:28:15"
+  "message": "feat: LEAP-58: Proxy URL for Taxonomy if possible",
+  "commit": "56a167eb97f79e77236a55617c2bff133683edcf",
+  "branch": "fb-leap-58/proxy-url",
+  "date": "2023/11/01 21:56:54"
 }
