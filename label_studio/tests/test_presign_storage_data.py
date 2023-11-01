@@ -45,7 +45,7 @@ class TestTaskPresignStorageData:
         force_authenticate(request, user)
         response = view(request)
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_task_not_found(self, view, user):
         request = APIRequestFactory().get(
@@ -230,7 +230,7 @@ class TestProjectPresignStorageData:
         force_authenticate(request, user)
         response = view(request)
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_project_not_found(self, view, user):
         request = APIRequestFactory().get(
