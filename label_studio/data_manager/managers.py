@@ -537,7 +537,7 @@ def apply_filters(queryset, filters, project, request):
         # then we need to filter on both data__key1 and data__$undefined$.
         alt_field_name = get_alt_field_name(field_name, project, handle_alt_fieldname)
 
-        process_field_filter(
+        result_qs = process_field_filter(
             queryset,
             filters,
             project,
@@ -548,6 +548,11 @@ def apply_filters(queryset, filters, project, request):
             _filter,
             alt_field_name,
         )
+
+        # If the processed field would throw an error or produce an empty queryset
+        # return the resulting queryset that was produced.
+        if result_qs is not None:
+            return result_qs
 
     """WARNING: Stringifying filter_expressions will evaluate the (sub)queryset.
         Do not use a log in the following manner:
