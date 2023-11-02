@@ -44,7 +44,10 @@ def forward(apps, _):
             )
             return
 
-    start_job_async_or_sync(_fill_annotations_updated_by)
+    if settings.IS_LSE_CI:
+        _fill_annotations_updated_by()
+    else:
+        start_job_async_or_sync(_fill_annotations_updated_by)
 
 
 def backward(apps, _):
