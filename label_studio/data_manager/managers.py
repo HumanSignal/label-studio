@@ -131,9 +131,6 @@ def get_alt_field_name(field_name, project, enabled=False):
 
 def apply_ordering(queryset, ordering, project, request, view_data=None):
     if ordering:
-        handle_alt_fieldname = flag_set(
-            'fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short', user=request.user
-        )
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
 
         raw_field_name = ordering[0]
@@ -142,7 +139,6 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
         field_name, ascending = preprocess_field_name(
             raw_field_name, only_undefined_field=project.only_undefined_field
         )
-        alt_field_name = get_alt_field_name(field_name, project, handle_alt_fieldname)
 
         numeric_ordering = (
             view_data
@@ -166,19 +162,8 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
         if field_name.startswith('data__'):
             if numeric_ordering:
                 queryset, applied_numeric_ordering = annotate_numeric_ordering(queryset, field_name)
-                if alt_field_name:
-                    if applied_numeric_ordering:
-                        queryset, applied_numeric_ordering = annotate_numeric_ordering(queryset, alt_field_name, True)
-                    else:
-                        queryset = queryset.annotate(
-                            alt_ordering_field=KeyTextTransform(alt_field_name.replace('data__', ''), 'data')
-                        )
             else:
                 queryset = queryset.annotate(ordering_field=KeyTextTransform(field_name.replace('data__', ''), 'data'))
-                if alt_field_name:
-                    queryset = queryset.annotate(
-                        alt_ordering_field=KeyTextTransform(alt_field_name.replace('data__', ''), 'data')
-                    )
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
             queryset = queryset.order_by(f)
