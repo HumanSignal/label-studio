@@ -52,5 +52,5 @@ class Migration(migrations.Migration):
             name='label_config_hash',
             field=models.BigIntegerField(default=None, null=True),
         ),
-        migrations.RunPython(forward, backwards),
+        # migrations.RunPython(forward, backwards),
     ]
