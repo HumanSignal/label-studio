@@ -52,6 +52,7 @@ def backward(apps, _):
 
 
 class Migration(migrations.Migration):
+    atomic = True
 
     dependencies = [
         ('tasks', '0032_annotation_updated_by')
