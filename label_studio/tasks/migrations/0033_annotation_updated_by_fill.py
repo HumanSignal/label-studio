@@ -32,6 +32,7 @@ def _fill_annotations_updated_by():
 
 
 def forward(apps, _):
+    return
     annotations = Annotation.objects.all()
 
     if settings.VERSION_EDITION == 'Community':
