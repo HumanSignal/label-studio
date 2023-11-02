@@ -31,6 +31,7 @@ def _fill_label_config_hash(migration_name):
 
 
 def fill_label_config_hash(migration_name):
+    return
     logger.info('Start filling label config hash')
     start_job_async_or_sync(_fill_label_config_hash, migration_name=migration_name)
     logger.info('Finished filling label config hash')
