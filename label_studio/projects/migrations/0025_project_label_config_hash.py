@@ -9,48 +9,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _fill_label_config_hash(migration_name):
-    projects = Project.objects.all()
-    for project in projects:
-        migration = AsyncMigrationStatus.objects.create(
-            project=project,
-            name=migration_name,
-            status=AsyncMigrationStatus.STATUS_STARTED,
-        )
-
-        project.label_config_hash = hash(str(project.parsed_label_config))
-        project.save()
-
-        migration.status = AsyncMigrationStatus.STATUS_FINISHED
-        migration.save()
-
-
-def fill_label_config_hash(migration_name):
-    logger.info('Start filling label config hash')
-    start_job_async_or_sync(_fill_label_config_hash, migration_name=migration_name)
-    logger.info('Finished filling label config hash')
-
-
-def forward(apps, schema_editor):
-    fill_label_config_hash('0025_project_label_config_hash')
-
-
-def backwards(apps, schema_editor):
-    pass
-
-
 class Migration(migrations.Migration):
-
     dependencies = [
         ('projects', '0024_merge_0023_merge_20230512_1333_0023_projectreimport'),
 
     ]
-
     operations = [
         migrations.AddField(
             model_name='project',
             name='label_config_hash',
             field=models.BigIntegerField(default=None, null=True),
         ),
-        # migrations.RunPython(forward, backwards),
     ]
