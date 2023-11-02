@@ -30,15 +30,12 @@ def _fill_label_config_hash(migration_name):
         migration.save()
 
 
-def fill_label_config_hash(migration_name):
-    return
+def forward(_, __):
+    # return
+    migration_name = '0025_project_label_config_hash'
     logger.info('Start filling label config hash')
     start_job_async_or_sync(_fill_label_config_hash, migration_name=migration_name)
     logger.info('Finished filling label config hash')
-
-
-def forward(apps, schema_editor):
-    fill_label_config_hash('0025_project_label_config_hash')
 
 
 def backwards(apps, schema_editor):
