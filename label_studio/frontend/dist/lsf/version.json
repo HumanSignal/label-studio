@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-58: Proxy URL for Taxonomy if possible",
-  "commit": "a1348801d84a45c61da3e9d6bd2c4d709f482c18",
+  "message": "fix: OPTIC-113: Draft save on switch history and exit",
+  "commit": "6f46b95a868cdfe8378c1be18bd48d75786c21a7",
   "branch": "master",
-  "date": "2023/11/01 22:44:23"
+  "date": "2023/11/02 16:05:24"
 }
