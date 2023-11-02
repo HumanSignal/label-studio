@@ -48,6 +48,7 @@ def _fill_label_config_hash(migration_name):
 
 
 def fill_label_config_hash(migration_name):
+    return
     logger.info('Start filling label config hash')
     if is_pytest() or is_local_test_run():
         _fill_label_config_hash(migration_name=migration_name)
