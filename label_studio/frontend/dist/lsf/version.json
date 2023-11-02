@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-314: Fix Github vulnerabilities",
-  "commit": "bef0cbdb03eb659bb2a161ffa64be1a211444bbe",
-  "branch": "master",
-  "date": "2023/10/31 17:28:15"
+  "message": "fix: OPTIC-113: Draft save on switch history and exit",
+  "commit": "906a74b01af1910050beda8bd88f3051a31d016d",
+  "branch": "fb-optic-113/draft-switch-history-exit",
+  "date": "2023/11/02 10:32:12"
 }
