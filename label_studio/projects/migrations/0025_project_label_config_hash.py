@@ -37,7 +37,6 @@ def fill_label_config_hash(migration_name):
 
 
 def forward(apps, schema_editor):
-    return
     fill_label_config_hash('0025_project_label_config_hash')
 
 
