@@ -21,7 +21,7 @@ google-resumable-media==2.3.3
 googleapis-common-protos==1.56.4
 grpc-google-iam-v1==0.12.4
 
-Django==3.2.20
+Django==3.2.23
 django-storages==1.12.3
 django_annoying==0.10.6
 django_debug_toolbar==3.2.1
