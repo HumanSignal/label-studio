@@ -1,6 +1,6 @@
 {
   "message": "fix: OPTIC-113: Draft save on switch history and exit",
-  "commit": "a50537708ff1f168f5296bbbcfab936c3d2164b7",
-  "branch": "fb-optic-113/draft-switch-history-exit",
-  "date": "2023/11/02 11:44:43"
+  "commit": "6f46b95a868cdfe8378c1be18bd48d75786c21a7",
+  "branch": "master",
+  "date": "2023/11/02 16:05:24"
 }
