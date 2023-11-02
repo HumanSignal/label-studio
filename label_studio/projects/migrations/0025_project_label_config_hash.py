@@ -46,7 +46,7 @@ def backwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
+    atomic = False
     dependencies = [
         ('projects', '0024_merge_0023_merge_20230512_1333_0023_projectreimport'),
 
