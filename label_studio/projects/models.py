@@ -152,7 +152,7 @@ class Project(ProjectMixin, models.Model):
         default=None,
         help_text='Parsed label config in JSON format. See more about it in documentation',
     )
-    label_config_hash = models.BigIntegerField(null=True, default=None)
+    # label_config_hash = models.BigIntegerField(null=True, default=None)
     expert_instruction = models.TextField(
         _('expert instruction'), blank=True, null=True, default='', help_text='Labeling instructions in HTML format'
     )
