@@ -152,7 +152,7 @@ class Project(ProjectMixin, models.Model):
         default=None,
         help_text='Parsed label config in JSON format. See more about it in documentation',
     )
-    # label_config_hash = models.BigIntegerField(null=True, default=None)
+    label_config_hash = models.BigIntegerField(null=True, default=None)
     expert_instruction = models.TextField(
         _('expert instruction'), blank=True, null=True, default='', help_text='Labeling instructions in HTML format'
     )
@@ -694,7 +694,7 @@ class Project(ProjectMixin, models.Model):
         if self._label_config_has_changed() or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
             self.parsed_label_config = parse_config(self.label_config)
-            # self.label_config_hash = hash(str(self.parsed_label_config))
+            self.label_config_hash = hash(str(self.parsed_label_config))
 
         if self.label_config and (self._label_config_has_changed() or not exists or not self.control_weights):
             self.control_weights = self.get_updated_weights()

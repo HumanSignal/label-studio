@@ -11,7 +11,12 @@ logger = logging.getLogger(__name__)
 
 def _fill_label_config_hash(migration_name):
     projects = Project.objects.all()
-    for project in projects:
+    for project in projects.iterator():
+        migration = AsyncMigrationStatus.objects.filter(project=project, name=migration_name).first()
+        if migration and migration.status == AsyncMigrationStatus.STATUS_FINISHED:
+            # Migration for this project already done
+            continue
+
         migration = AsyncMigrationStatus.objects.create(
             project=project,
             name=migration_name,
