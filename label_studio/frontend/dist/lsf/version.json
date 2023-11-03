@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-58: Proxy URL for Taxonomy if possible",
-  "commit": "a1348801d84a45c61da3e9d6bd2c4d709f482c18",
+  "message": "fix: LEAP-16: Add validation to contextual scrolling",
+  "commit": "2cc4b57342d860b7a9f3d81f0167fd2bf3270306",
   "branch": "master",
-  "date": "2023/11/01 22:44:23"
+  "date": "2023/11/03 01:20:54"
 }
