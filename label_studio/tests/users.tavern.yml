@@ -211,3 +211,148 @@ stages:
     method: GET
   response:
     status_code: 401
+---
+test_name: test_users_write_permission
+strict: False
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+
+- type: ref
+  id: get_my_user
+
+- name: get_owner_user_id
+  request:
+    url: "{django_live_url}/api/current-user/whoami"
+    method: GET
+  response:
+    status_code: 200
+    save:
+      json:
+        owner_pk: id
+
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/users'
+  response:
+    status_code: 200
+
+- name: get_active_organization
+  request:
+    method: GET
+    url: '{django_live_url}/api/users/{owner_pk}'
+  response:
+    status_code: 200
+    save:
+      json:
+        org_pk: active_organization
+
+- id: get_invite_url
+  type: ref
+
+- id: logout
+  type: ref
+
+- name: signup_annotator_under_active_organization
+  request:
+    url: "{django_live_url}/user/signup?token={invite_token}"
+    data:
+      email: test_fourth_user_anno@heartextest.com
+      username: test fourthuseranno
+      active_organization: !int '{org_pk}'
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+
+- name: login_as_new_user_anno
+  request:
+    url: "{django_live_url}/user/login"
+    data:
+      email: test_fourth_user_anno@heartextest.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+
+- name: get_anno_user_id
+  request:
+    url: "{django_live_url}/api/current-user/whoami"
+    method: GET
+  response:
+    status_code: 200
+    save:
+      json:
+        anno_pk: id
+
+- name: change_own_user_email_as_non_admin
+  request:
+    url: "{django_live_url}/api/users/{anno_pk}"
+    data:
+      email: some_other_email@heartextest.com
+    method: PATCH
+  response:
+    status_code: 405
+
+- id: logout
+  type: ref
+
+- name: login_as_owner
+  request:
+    url: "{django_live_url}/user/login"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+
+- name: get_owner_user_id
+  request:
+    url: "{django_live_url}/api/current-user/whoami"
+    method: GET
+  response:
+    status_code: 200
+    save:
+      json:
+        owner_pk: id
+
+- name: change_my_email_as_owner
+  request:
+    url: "{django_live_url}/api/users/{owner_pk}"
+    data:
+      email: some_other_email@heartextest.com
+    method: PATCH
+  response:
+    status_code: 405
+
+- name: check_my_email_did_not_change
+  request:
+    url: "{django_live_url}/api/users/{owner_pk}"
+    method: GET
+  response:
+    status_code: 200
+    json:
+      email: test_suites_user@heartex.com
+
+- name: change_anno_email_as_owner
+  request:
+    url: "{django_live_url}/api/users/{anno_pk}"
+    data:
+      email: some_other_email@heartextest.com
+    method: PATCH
+  response:
+    status_code: 405
+
+- name: check_anno_email_did_not_change
+  request:
+    url: "{django_live_url}/api/users/{anno_pk}"
+    method: GET
+  response:
+    status_code: 200
+    json:
+      email: test_fourth_user_anno@heartextest.com
