@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-58: Proxy URLs and pass callback to LSF",
-  "commit": "88e3e221d335786c9236c5bbf53430da46f0f93d",
+  "message": "fix: DIA-643: [FE] max threshold 1 makes it so we cant see results for semantic search",
+  "commit": "c5ce772f8189b0e59dbe42bbb705b17b9b011d97",
   "branch": "master",
-  "date": "2023/11/01 22:06:59"
+  "date": "2023/11/03 17:15:47"
 }
