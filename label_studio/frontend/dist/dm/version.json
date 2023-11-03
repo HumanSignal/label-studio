@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-643: [FE] max threshold 1 makes it so we cant see results for semantic search",
-  "commit": "61e2ba1b7f7baa66392eda49fbc169d0d0f78ea7",
-  "branch": "fb-dia-643",
-  "date": "2023/11/02 14:51:35"
+  "commit": "c5ce772f8189b0e59dbe42bbb705b17b9b011d97",
+  "branch": "master",
+  "date": "2023/11/03 17:15:47"
 }
