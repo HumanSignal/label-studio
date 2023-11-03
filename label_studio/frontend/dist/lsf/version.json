@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-314: Fix Github vulnerabilities",
-  "commit": "bef0cbdb03eb659bb2a161ffa64be1a211444bbe",
+  "message": "fix: LEAP-16: Add validation to contextual scrolling",
+  "commit": "2cc4b57342d860b7a9f3d81f0167fd2bf3270306",
   "branch": "master",
-  "date": "2023/10/31 17:28:15"
+  "date": "2023/11/03 01:20:54"
 }

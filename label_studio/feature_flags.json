@@ -3471,6 +3471,33 @@
       "version": 9,
       "deleted": false
     },
+    "fflag_feat_optic_198_multi_select_users_short": {
+      "key": "fflag_feat_optic_198_multi_select_users_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 1
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "b72849a234a64fcebdf78c6ed962e54f",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_optic_2_ensure_draft_saved_short": {
       "key": "fflag_feat_optic_2_ensure_draft_saved_short",
       "on": true,
