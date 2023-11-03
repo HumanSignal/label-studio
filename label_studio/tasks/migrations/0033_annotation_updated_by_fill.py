@@ -13,20 +13,20 @@ import logging
 
 
 def _fill_annotations_updated_by():
-    projects = Project.objects.only('id').all()
-    for project in projects.iterator():
-        migration = AsyncMigrationStatus.objects.filter(project_id=project.id, name='0033_annotation_updated_by_fill').first()
+    project_ids = Project.objects.values_list('id', flat=True)
+    for project_id in project_ids:
+        migration = AsyncMigrationStatus.objects.filter(project_id=project_id, name='0033_annotation_updated_by_fill').first()
         if migration and migration.status == AsyncMigrationStatus.STATUS_FINISHED:
             # Migration for this project already done
             continue
 
         migration = AsyncMigrationStatus.objects.create(
-                project_id=project.id,
+                project_id=project_id,
                 name='0033_annotation_updated_by_fill',
                 status=AsyncMigrationStatus.STATUS_STARTED,
         )
 
-        Annotation.objects.filter(project_id=project.id).update(updated_by=F('completed_by'))
+        Annotation.objects.filter(project_id=project_id).update(updated_by=F('completed_by'))
         migration.status = AsyncMigrationStatus.STATUS_FINISHED
         migration.save()
 
