@@ -131,47 +131,48 @@ def get_alt_field_name(field_name, project, enabled=False):
 
 def apply_ordering(queryset, ordering, project, request, view_data=None):
     if ordering:
+
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
-
         raw_field_name = ordering[0]
+        numeric_ordering = False
         unsigned_field_name = raw_field_name.lstrip('-+')
-
+        if (
+            view_data is not None
+            and 'columnsDisplayType' in view_data
+            and unsigned_field_name in view_data['columnsDisplayType']
+            and view_data['columnsDisplayType'][unsigned_field_name] == 'Number'
+        ):
+            numeric_ordering = True
         field_name, ascending = preprocess_field_name(
             raw_field_name, only_undefined_field=project.only_undefined_field
         )
 
-        numeric_ordering = (
-            view_data
-            and 'columnsDisplayType' in view_data
-            and unsigned_field_name in view_data['columnsDisplayType']
-            and view_data['columnsDisplayType'][unsigned_field_name] == 'Number'
-        )
-
-        def annotate_numeric_ordering(queryset, field_name, skip_test=False):
+        if field_name.startswith('data__'):
+            # annotate task with data field for float/int/bool ordering support
             json_field = field_name.replace('data__', '')
-            try:
+            numeric_ordering_applied = False
+            if numeric_ordering is True:
                 queryset = queryset.annotate(
                     ordering_field=Cast(KeyTextTransform(json_field, 'data'), output_field=FloatField())
                 )
-                queryset.first()  # trigger a query to test
-                return queryset, True
-            except Exception as e:
-                logger.warning(f'Failed to apply numeric ordering for field {json_field}: {e}')
-                return queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data')), False
+                # for non numeric values we need fallback to string ordering
+                try:
+                    queryset.first()
+                    numeric_ordering_applied = True
+                except Exception as e:
+                    logger.warning(f'Failed to apply numeric ordering for field {json_field}: {e}')
+            if not numeric_ordering_applied:
+                queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
+            f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
 
-        if field_name.startswith('data__'):
-            if numeric_ordering:
-                queryset, applied_numeric_ordering = annotate_numeric_ordering(queryset, field_name)
-            else:
-                queryset = queryset.annotate(ordering_field=KeyTextTransform(field_name.replace('data__', ''), 'data'))
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
-            queryset = queryset.order_by(f)
 
+        queryset = queryset.order_by(f)
     else:
         queryset = queryset.order_by('id')
 
-    return queryset
+        return 'continue'
 
 
 def cast_value(_filter):
