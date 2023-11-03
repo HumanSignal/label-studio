@@ -1,6 +1,6 @@
 {
-  "message": "perf: LEAP-32: Improve performance of zooming at Image Segmentation",
-  "commit": "5ae9ccbfa136781bedcb665b4b9581c7f82daaad",
-  "branch": "master",
-  "date": "2023/11/03 15:23:08"
+  "message": "fix: OPTIC-142: Submit and exit style update",
+  "commit": "143875835ddee039ba82290d872f340ca1c63a75",
+  "branch": "fb-optic-142/submit-exit-style-update",
+  "date": "2023/11/03 11:06:49"
 }
