@@ -498,12 +498,6 @@
         "decorators": ""
     },
     {
-        "url": "/api/users/<int:pk>/soft-delete/",
-        "module": "users.views.UserSoftDeleteView",
-        "name": "user-soft-delete",
-        "decorators": ""
-    },
-    {
         "url": "/data/avatars/<path>",
         "module": "django.views.static.serve",
         "name": "",
