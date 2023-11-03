@@ -36,11 +36,16 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
                 None,
             )
         else:
-            org_id = (
-                self.context['user'].active_organization_id
-                if 'user' in self.context
-                else self.context['request'].user.active_organization_id
-            )
+            if 'user' in self.context:
+                org_id = self.context['user'].active_organization_id
+            elif 'request' in self.context:
+                org_id = self.context['request'].user.active_organization_id
+            else:
+                org_id = None
+
+            if not org_id:
+                return False
+
             organization_member_for_user = OrganizationMember.objects.get(user_id=instance.id, organization_id=org_id)
         return bool(organization_member_for_user.deleted_at)
 
