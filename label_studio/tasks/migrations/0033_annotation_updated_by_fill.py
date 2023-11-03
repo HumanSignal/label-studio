@@ -13,7 +13,7 @@ import logging
 
 
 def _fill_annotations_updated_by():
-    projects = Project.objects.all()
+    projects = Project.objects.only('id')
     for project in projects.iterator():
         migration = AsyncMigrationStatus.objects.filter(project=project, name='0033_annotation_updated_by_fill').first()
         if migration and migration.status == AsyncMigrationStatus.STATUS_FINISHED:
@@ -32,7 +32,6 @@ def _fill_annotations_updated_by():
 
 
 def forward(apps, _):
-    return
     annotations = Annotation.objects.all()
 
     if settings.VERSION_EDITION == 'Community':
