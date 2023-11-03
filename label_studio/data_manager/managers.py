@@ -172,7 +172,7 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
     else:
         queryset = queryset.order_by('id')
 
-        return 'continue'
+    return queryset
 
 
 def cast_value(_filter):
