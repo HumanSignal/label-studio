@@ -328,28 +328,39 @@ def process_field_filter(
     # annotate with cast to number if need
     if _filter.type == 'Number' and field_name.startswith('data__'):
         json_field = field_name.replace('data__', '')
-        filterable = Q(
-            **{
-                f'filter_{json_field.replace("$undefined$", "undefined")}': Cast(
-                    KeyTextTransform(json_field, 'data'), output_field=FloatField()
-                )
-            }
+        alt_json_field = alt_field_name.replace('data__', '') if alt_field_name else None
+        filter_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
+
+        primary_cast = Cast(
+            KeyTextTransform(json_field, 'data'),
+            output_field=FloatField()
         )
-        if alt_field_name:
-            alt_json_field = alt_field_name.replace('data__', '')
-            filterable |= Q(
-                **{
-                    f'filter_{alt_json_field.replace("$undefined$", "undefined")}': Cast(
-                        KeyTextTransform(json_field, 'data'), output_field=FloatField()
-                    )
-                }
+
+        alt_cast = None
+        if alt_json_field:
+            alt_cast = Cast(
+                KeyTextTransform(alt_json_field, 'data'),
+                output_field=FloatField()
             )
-        queryset = queryset.annotate(filterable)
-        clean_field_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
-        alt_clean_field_name = f'filter_{alt_json_field.replace("$undefined$", "undefined")}'
+
+        if alt_cast:
+            # If the alternate cast is defined, we will annotate the queryset conditionally
+            queryset = queryset.annotate(**{
+                filter_name: Case(
+                    When(**{f'{json_field}__isnull': False}, then=primary_cast),
+                    default=alt_cast
+                )
+            })
+        else:
+            # If no alternate field, just annotate with the primary cast
+            queryset = queryset.annotate(**{
+                filter_name: primary_cast
+            })
+
+        clean_field_name = filter_name
+        alt_field_name = None
     else:
         clean_field_name = field_name
-        alt_clean_field_name = alt_field_name
 
     # special case: predictions, annotations, cancelled --- for them 0 is equal to is_empty=True
     if (
@@ -409,8 +420,6 @@ def process_field_filter(
 
     # append operator
     field_name = f"{clean_field_name}{operators.get(_filter.operator, '')}"
-    if alt_clean_field_name:
-        alt_field_name = f"{alt_clean_field_name}{operators.get(_filter.operator, '')}"
 
     # in
     if _filter.operator == 'in':
@@ -560,6 +569,7 @@ def apply_filters(queryset, filters, project, request):
         queryset = queryset.filter(result_filter)
     else:
         for filter_expression in filter_expressions:
+            print(filter_expression)
             queryset = queryset.filter(filter_expression)
     return queryset
 
