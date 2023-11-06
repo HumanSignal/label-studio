@@ -569,7 +569,6 @@ def apply_filters(queryset, filters, project, request):
         queryset = queryset.filter(result_filter)
     else:
         for filter_expression in filter_expressions:
-            print(filter_expression)
             queryset = queryset.filter(filter_expression)
     return queryset
 
