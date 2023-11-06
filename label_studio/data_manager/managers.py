@@ -345,12 +345,11 @@ def apply_filters(queryset, filters, project, request):
                 queryset = queryset.annotate(
                     **{
                         f'filter_{json_field.replace("$undefined$", "undefined")}': Case(
-                            When(**{f'{field_name}__isnull': False}, then=Cast(
-                                KeyTextTransform(json_field, 'data'), output_field=FloatField()
-                            )),
-                            default=Cast(
-                                KeyTextTransform(alt_json_field, 'data'), output_field=FloatField()
-                            )
+                            When(
+                                **{f'{field_name}__isnull': False},
+                                then=Cast(KeyTextTransform(json_field, 'data'), output_field=FloatField()),
+                            ),
+                            default=Cast(KeyTextTransform(alt_json_field, 'data'), output_field=FloatField()),
                         )
                     }
                 )
