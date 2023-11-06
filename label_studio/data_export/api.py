@@ -310,6 +310,11 @@ class ExportListAPI(generics.ListCreateAPIView):
             return ExportCreateSerializer
         return super().get_serializer_class()
 
+    def get_serializer_context(self):
+        context = super(ExportListAPI, self).get_serializer_context()
+        context['user'] = self.request.user
+        return context
+
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
