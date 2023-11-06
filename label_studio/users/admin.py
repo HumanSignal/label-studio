@@ -29,9 +29,8 @@ class UserAdminShort(UserAdmin):
             'organization',
             'is_staff',
             'is_superuser',
-            'is_deleted',
         )
-        self.list_filter = ('is_staff', 'is_superuser', 'is_active', 'is_deleted')
+        self.list_filter = ('is_staff', 'is_superuser', 'is_active')
         self.search_fields = (
             'username',
             'first_name',
@@ -39,7 +38,6 @@ class UserAdminShort(UserAdmin):
             'email',
             'organization__title',
             'active_organization__title',
-            'is_deleted',
         )
         self.ordering = ('email',)
 
@@ -53,7 +51,6 @@ class UserAdminShort(UserAdmin):
                         'is_active',
                         'is_staff',
                         'is_superuser',
-                        'is_deleted',
                     )
                 },
             ),
