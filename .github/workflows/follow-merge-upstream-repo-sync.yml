@@ -130,7 +130,7 @@ jobs:
           ref: ${{ github.event.client_payload.commit_sha }}
 
       - name: "Frontend: Setup nodejs"
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: steps.details.outputs.frontend_module_dist
         with:
           node-version: "${{ env.NODE }}"

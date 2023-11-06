@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-295: Fix error styles in LS modals",
-  "commit": "6f128ee10d460a1f28f1091c59472a8cf80ccdb3",
+  "message": "perf: LEAP-32: Improve performance of zooming at Image Segmentation",
+  "commit": "5ae9ccbfa136781bedcb665b4b9581c7f82daaad",
   "branch": "master",
-  "date": "2023/10/26 21:09:41"
+  "date": "2023/11/03 15:23:08"
 }
