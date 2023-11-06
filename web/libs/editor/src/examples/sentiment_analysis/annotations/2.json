@@ -1,0 +1,35 @@
+{
+    "annotations": [
+        {
+            "result": [
+                {
+                    "from_name": "sentiment",
+                    "id": "kY84RIG7y1",
+                    "to_name": "my_text",
+                    "type": "choices",
+                    "value": {
+                        "choices": [
+                            "Neutral"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "asin": "1384719342",
+        "helpful": [
+            1,
+            1
+        ],
+        "overall": 5,
+        "reviewText": "The goose neck needs a little coaxing",
+        "reviewTime": "08 28, 2013",
+        "reviewerID": "A195EZSQDW3E21",
+        "reviewerName": "Rick Bennette \"Rick Bennette\"",
+        "summary": "It Does The Job Well",
+        "unixReviewTime": 1377648000
+    },
+    "id": 2,
+    "task_path": "../examples/sentiment_analysis/tasks.json"
+}

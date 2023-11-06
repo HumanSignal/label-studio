@@ -101,20 +101,20 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
   } = {}) => {
     if (!props.urlParamName) return;
 
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(location.search);
 
     urlParams.set(props.urlParamName, page.toString());
 
     const historyArgs: [any, string, string] = [
       { page },
       "",
-      `${window.location.pathname}?${urlParams.toString()}`,
+      `${location.pathname}?${urlParams.toString()}`,
     ];
 
     if (options.replace) {
-      window.history.replaceState(...historyArgs);
+      history.replaceState(...historyArgs);
     } else {
-      window.history.pushState(...historyArgs);
+      history.pushState(...historyArgs);
     }
   }, [props.urlParamName]);
 
@@ -150,7 +150,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
     const popStateHandler = () => {
       if (!props.urlParamName) return;
 
-      const urlParams = new URLSearchParams(window.location.search);
+      const urlParams = new URLSearchParams(location.search);
       const pageNumberFromURL = parseInt(urlParams.get(props.urlParamName) ?? "");
 
       if (!isNaN(pageNumberFromURL) && pageNumberFromURL !== currentPage) {
@@ -163,13 +163,9 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
     return () => window.removeEventListener('popstate', popStateHandler);
   }, [props.urlParamName]);
 
-  return totalPages > 1 ? (
-    <Block
-      name="pagination"
-      mod={{ disabled, size, waiting }}
-      style={props.style}
-    >
-      {props.label && isDefined(pageSize) && (
+  return (totalPages > 1) ? (
+    <Block name="pagination" mod={{ disabled, size, waiting }} style={props.style}>
+      {(props.label && isDefined(pageSize)) && (
         <Elem name="label">
           {props.label}: {visibleItems.start}-{visibleItems.end}
         </Elem>
@@ -202,10 +198,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
                   setInputMode(false);
                 } else if (e.code === 'Enter') {
                   applyPageNumberFromEvent(e);
-                } else if (
-                  e.code.match(/[0-9]/) === null &&
-                  !isSystemEvent(e)
-                ) {
+                } else if (e.code.match(/[0-9]/) === null && !isSystemEvent(e)) {
                   e.preventDefault();
                   e.stopPropagation();
                 }
@@ -221,12 +214,8 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
                 if (allowInput) setInputMode(true);
               }}
             >
-              {currentPage} <span>of {totalPages}</span>
-              <div
-                onClick={() => {
-                  /*  */
-                }}
-              ></div>
+              {currentPage}{" "}<span>of {totalPages}</span>
+              <div onClick={() => { /*  */ }}></div>
             </Elem>
           )}
         </Elem>
@@ -251,10 +240,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
         <Elem name="page-size">
           <Select
             value={pageSize}
-            options={pageSizeOptions.map((v) => ({
-              label: `${v} per page`,
-              value: v,
-            }))}
+            options={pageSizeOptions.map(v => ({ label: `${v} per page`, value: v }))}
             onChange={(e: any) => {
               const newPageSize = parseInt(e.target.value);
 
@@ -264,13 +250,6 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
                 setStoredPageSize(props.name, newPageSize);
               }
             }}
-            label={undefined}
-            className={undefined}
-            validate={undefined}
-            required={undefined}
-            skip={undefined}
-            labelProps={undefined}
-            ghost={undefined}
           />
         </Elem>
       )}
@@ -293,7 +272,7 @@ const NavigationButton: FC<{
 };
 
 export const usePage = (paramName: string, initialValue = 1) => {
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(location.search);
   const urlValue = params.get(paramName);
 
   const [page, setPage] = useState(urlValue ? parseInt(urlValue) : initialValue);
@@ -302,7 +281,7 @@ export const usePage = (paramName: string, initialValue = 1) => {
 };
 
 export const usePageSize = (paramName: string, initialValue = 1) => {
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(location.search);
   const urlValue = params.get(paramName);
 
   const [pageSize, setPageSize] = useState(urlValue ? parseInt(urlValue) : initialValue);

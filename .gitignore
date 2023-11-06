@@ -15,7 +15,6 @@ yarn-error.log
 # mobile/builds
 db/
 logfile
-env/
 venv/
 .venv
 .vscode

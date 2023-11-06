@@ -48,7 +48,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
           <a href={createURL('https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects', {
           experiment: "project_creation_dropdown",
           treatment: "simplify_project_management",
-        })} target="_blank" rel="noreferrer">Learn more</a>
+        })} target="_blank">Learn more</a>
         </Caption>
         <HeidiTips collection="projectCreation" />
       </div>
@@ -83,9 +83,7 @@ export const CreateProject = ({ onClose }) => {
 
   // name intentionally skipped from deps:
   // this should trigger only once when we got project loaded
-  React.useEffect(() => {
-    project && !name && setName(project.title);
-  }, [project]);
+  React.useEffect(() => project && !name && setName(project.title), [project]);
 
   const projectBody = React.useMemo(() => ({
     title: name,
