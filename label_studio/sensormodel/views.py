@@ -145,6 +145,7 @@ def sync_sensor_parser_templates(request, project_id):
             name, ext = os.path.splitext(file)
             if ext == '.yaml':
                 parser_files.append(file)
+        # For each SensorType check if there still exists an config.yaml file for it, else delete it
         for sensortype in SensorType.objects.all():
             config_file_found = False
             for parser_file in parser_files:
@@ -166,12 +167,13 @@ def sync_sensor_parser_templates(request, project_id):
                     config = str(config).replace("\'", "\"")
                     config = config.replace("None", "\"\"")
             if validateConfigJSON(str(config)):
-                # If the config is valid add to DB
+                # Check if the config file is configured as expected
                 config = json.loads(config)
+                # If there already is a SensorType with this manu, name and version the config can still be updated. If this is the case, update SensorType
                 if SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
                     if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version, **config).exists():
                         SensorType.objects.get(manufacturer=manufacturer,name=name, version=version).update(**config)
-
+                # If SensorType doesn't exist, create it.
                 if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
                     SensorType.objects.create(manufacturer=manufacturer,name=name, version=version, **config).save()
             else:
