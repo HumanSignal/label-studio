@@ -2,6 +2,7 @@
 """
 import logging
 from collections import OrderedDict
+from typing import Tuple
 from urllib.parse import unquote
 
 import ujson as json
@@ -337,9 +338,21 @@ def preprocess_filter(_filter, *_):
     return _filter
 
 
-def preprocess_field_name(raw_field_name, only_undefined_field=False):
-    field_name = raw_field_name.replace('filter:', '')
-    field_name = field_name.replace('tasks:', '')
+def preprocess_field_name(raw_field_name, only_undefined_field=False) -> Tuple[str, bool]:
+    """Transform a field name (as specified in the datamanager views endpoint) to
+    a django ORM field name. Also handle dotted accesses to task.data.
+
+    Returns: Django ORM field name: str, Sort is ascending: bool
+    """
+
+    field_name = raw_field_name
+
+    # For security reasons, these must only replaced when they fall at the beginning of the string.
+    optional_prefixes = ['filter:', 'tasks:']
+    for prefix in optional_prefixes:
+        if field_name.startswith(prefix):
+            field_name = field_name[len(prefix) :]
+
     ascending = False if field_name[0] == '-' else True  # detect direction
     field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
     if field_name.startswith('data.'):
