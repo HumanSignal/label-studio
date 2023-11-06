@@ -136,9 +136,6 @@ def delete_subject(request, project_id, id):
 def sync_sensor_parser_templates(request, project_id):
     # Search sensortypes repo for (new) config .yaml files and add them to DB
     if request.method == 'POST':
-        # # Reset the sensortypes
-        # SensorType.objects.all().delete()
-        
         # Get submodule path
         path = Path(__file__).parents[2]/ 'sensortypes' # Path of subrepo
         # Extract file names and (temporarily) store only .yaml files
@@ -147,22 +144,36 @@ def sync_sensor_parser_templates(request, project_id):
         for file in files:
             name, ext = os.path.splitext(file)
             if ext == '.yaml':
-                parser_files.append(file) 
+                parser_files.append(file)
+        for sensortype in SensorType.objects.all():
+            config_file_found = False
+            for parser_file in parser_files:
+                # Each config file is name like: manufacturer_name_version.yaml
+                file_name = str(parser_file).split('.')[0]
+                manufacturer, name, version = file_name.split('_')
+                if sensortype.manufacturer==manufacturer and sensortype.name==name and sensortype.version==version:
+                    config_file_found = True
+                    break
+            if not config_file_found:
+                sensortype.delete()
+
         for parser_file in parser_files:
             # Each config file is name like: manufacturer_name_version.yaml
             file_name = str(parser_file).split('.')[0]
             manufacturer, name, version = file_name.split('_')
-            
-            if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
-                # If there does not yet exist such an config file in the repo, read the file and save in config
-                with open(path / str(parser_file)) as f:
+            with open(path / str(parser_file)) as f:
                     config = yaml.load(f, Loader=SafeLoader)
                     config = str(config).replace("\'", "\"")
                     config = config.replace("None", "\"\"")
-                    
-                    
-                if validateConfigJSON(str(config)):
-                    # If the config is valid add to DB
-                    config = json.loads(config)
+            if validateConfigJSON(str(config)):
+                # If the config is valid add to DB
+                config = json.loads(config)
+                if SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
+                    if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version, **config).exists():
+                        SensorType.objects.get(manufacturer=manufacturer,name=name, version=version).update(**config)
+
+                if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
                     SensorType.objects.create(manufacturer=manufacturer,name=name, version=version, **config).save()
+            else:
+                print(f'Invalid config file: \n{config}')
     return redirect(reverse('sensormodel:sensor',kwargs={'project_id':project_id}))
