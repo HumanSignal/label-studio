@@ -8,12 +8,9 @@ import { Form, Input, Label, TextArea, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
-import { MachineLearningList } from './MachineLearningList';
-import { ProjectModelVersionSelector } from './ProjectModelVersionSelector';
 import { ModelVersionSelector } from './ModelVersionSelector';
 import { FF_DEV_1682, isFF } from '../../../utils/feature-flags';
 import './MachineLearningSettings.styl';
-import Select from 'react-select';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'
 import Swal from 'sweetalert2'
@@ -52,7 +49,7 @@ export const MachineLearningSettings = () => {
         const training_types = response.data.training_types;
         setTrainingTypes(training_types);
         setSelectedTrainingType(training_types[0]);
-        if (training_types.indexOf("Tao Training") !== -1) { 
+        if (training_types.indexOf("Tao Training") !== -1) {
           setKeepChecks(true);
         }
     })
@@ -77,7 +74,7 @@ export const MachineLearningSettings = () => {
       .then((response) => {
         setAvailableProjects(response.data);
       })
-      
+
       await axios
       .get(webhook_url + '/get_currently_training_model?id=' + project.id)
         .then((response) => {
@@ -85,7 +82,7 @@ export const MachineLearningSettings = () => {
           if(response && response.data && response.data.model_version){
             const trainingModel = response.data.model_version;
             setCurrentlyTrainingModel(trainingModel);
-  
+
           }
       }).error(() => {
         console.log("error");
@@ -131,7 +128,7 @@ export const MachineLearningSettings = () => {
     if (data.success == true)
       Swal.fire('Success', `Tensorboard is ready, view your model information in: ${data.ip}`, 'success');
   });
-} 
+}
   async function onDeleteModel(model_version) {
 
     console.log('delete model')
@@ -143,7 +140,7 @@ export const MachineLearningSettings = () => {
       },
       buttonsStyling: false
     })
-    
+
     swalWithBootstrapButtons.fire({
       title: 'Are you sure? ',
       text: "Once deleted, you will not be able to recover this model!",
@@ -238,6 +235,93 @@ export const MachineLearningSettings = () => {
         })
   })
 
+  const showMLFormModal = useCallback((backend) => {
+    const action = backend ? "updateMLBackend" : "addMLBackend";
+
+    const modalProps = {
+      title: `${backend ? 'Edit' : 'Add'} model`,
+      style: { width: 760 },
+      closeOnClickOutside: false,
+      body: (
+          <Form
+              action={action}
+              formData={{ ...(backend ?? {}) }}
+              params={{ pk: backend?.id }}
+              onSubmit={async (response) => {
+                if (!response.error_message) {
+                  await fetchBackends();
+                  modalRef.close();
+                }
+              }}
+          >
+            <Input type="hidden" name="project" value={project.id}/>
+
+            <Form.Row columnCount={2}>
+              <Input name="title" label="Title" placeholder="ML Model"/>
+              <Input name="url" label="URL" required/>
+            </Form.Row>
+
+            <Form.Row columnCount={1}>
+              <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
+            </Form.Row>
+
+            {isFF(FF_DEV_1682) && !!backend && (
+                <Form.Row columnCount={2}>
+                  <ModelVersionSelector
+                      object={backend}
+                      apiName="modelVersions"
+                      label="Version"
+                  />
+                </Form.Row>
+            )}
+
+            {isFF(FF_DEV_1682) && (
+                <Form.Row columnCount={1}>
+                  <div>
+                    <Toggle
+                        name="auto_update"
+                        label="Allow version auto-update"
+                    />
+                  </div>
+                </Form.Row>
+            )}
+
+            <Form.Row columnCount={1}>
+              <div>
+                <Toggle
+                    name="is_interactive"
+                    label="Use for interactive preannotations"
+                />
+              </div>
+            </Form.Row>
+
+            <Form.Actions>
+              <Button type="submit" look="primary" onClick={() => setMLError(null)}>
+                Validate and Save
+              </Button>
+            </Form.Actions>
+
+            <Form.ResponseParser>{response => (
+                <>
+                  {response.error_message && (
+                      <ErrorWrapper error={{
+                        response: {
+                          detail: `Failed to ${backend ? 'save' : 'add new'} ML backend.`,
+                          exc_info: response.error_message,
+                        },
+                      }}/>
+                  )}
+                </>
+            )}</Form.ResponseParser>
+
+            <InlineError/>
+          </Form>
+      ),
+    };
+
+    const modalRef = modal(modalProps);
+  }, [project, fetchBackends, mlError]);
+
   const generatePredictionZipFile = async () => {
     Swal.fire({
       title: 'Prediction Tool',
@@ -257,7 +341,7 @@ export const MachineLearningSettings = () => {
         Swal.fire("Please wait", "We are currently generating the zip file, it will be downloaded shortly", "info");
         document.getElementById("generateButton").disabled = true;
         document.getElementById("generateButton").style.backgroundColor = 'gray';
-    
+
         await axios.post(webhook_url + "/prediction_tool?project_id="+project.id+"&all_tasks=" + allTasks).then((response) => {
           if (response.data.message) {
             Swal.fire("Error",response.data.message, "error");
@@ -275,7 +359,7 @@ export const MachineLearningSettings = () => {
             link.download = "predictionToolProject_"+project.id + '.zip';
             link.click();
           }
-    
+
         }).catch((error) => {
           Swal.fire("Error", "An error occured while trying to run the prediction, make sure that the processes are running (tao pyro, pvt, segmentation)", "error");
         }).finally(()=> {
@@ -299,7 +383,7 @@ export const MachineLearningSettings = () => {
       },
       buttonsStyling: false
     })
-    
+
     swalWithBootstrapButtons.fire({
       title: 'Model Directory',
       text: "Please choose the directory of your model",
@@ -329,7 +413,7 @@ export const MachineLearningSettings = () => {
         result.dismiss === Swal.DismissReason.cancel
       ) {
         const available_projects = availableProjects;
-      
+
         if(modelsType == "object_detection"){
           delete available_projects["Segmentation"]
         }
@@ -366,7 +450,7 @@ export const MachineLearningSettings = () => {
               resolve();
             })
           }
-        })   
+        })
     if (project) {
       Swal.fire(`Cloning Project ${project}`)
     }
@@ -458,7 +542,7 @@ export const MachineLearningSettings = () => {
           <label htmlFor="prediction-model">Model used to predict on: <strong>{modelToPredictOn}</strong>
             <Button onClick={() => changeModelToPredictOn()} look="primary" style={{ width: '10%', marginLeft: 10 }}>Change Model</Button>
           </label>
- 
+
               </div>
               <button id="generateButton" onClick={() => generatePredictionZipFile()} style={{ width: '20%', marginTop: 20, color: 'white', borderRadius: 5, backgroundColor: 'green' }}>Generate Prediction Zip File</button>
               <label>By clicking on this button, you will get a zip file containing predictions for the already annotated images in this project. The predictions will be divided into correct and incorrect folders (correct images are the ones where the number of objects detected is equal to the number of objects annotated)</label>
@@ -480,7 +564,7 @@ export const MachineLearningSettings = () => {
             {availableModels.map(model => (
               <div className='col-6' key={model.value} style={{marginBottom: 10}}>
               <Card  key={model.value}>
-                  Model Version: {model.label}     
+                  Model Version: {model.label}
                   {modelsType != 'segmentation' ?
                     <div>
                     {
@@ -489,7 +573,7 @@ export const MachineLearningSettings = () => {
                           <h4>Project Type: {modelsPrecisions[model.label]['model_type']}</h4>
                           <h5>Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label]['mAp']}</h5>
                           {modelsPrecisions[model.label]['model_type'] == "tao"?
-                          
+
                           <table>
                             <thead>
                               <tr><th style={{ paddingRight: 50 }}>Class Name</th>
@@ -530,7 +614,7 @@ export const MachineLearningSettings = () => {
                     </div>
                     :
                     <div>
-                      {Object.keys(modelsPrecisions).includes(model.label) ? 
+                      {Object.keys(modelsPrecisions).includes(model.label) ?
                         <div>
                           <table>
                             <thead>
@@ -554,8 +638,8 @@ export const MachineLearningSettings = () => {
           </Card>
         </div>
          ))}
-         </div> 
-          </div> 
+         </div>
+          </div>
           : ""}
 
           <Button onClick={saveInferencePath} type="submit" look="primary" style={{ width: 120 }}>Save</Button>

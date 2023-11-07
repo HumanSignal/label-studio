@@ -2,19 +2,20 @@
 """
 import logging
 import os
-import requests
 import urllib
-import attr
-from django.contrib.auth.models import AnonymousUser
 
-from django.db.models import Q, F, Count
-from django.conf import settings
-from requests.adapters import HTTPAdapter
-from core.version import get_git_version
-from data_export.serializers import ExportDataSerializer
-from label_studio.core.utils.params import get_env
+import attr
+import requests
 from core.feature_flags import flag_set
 from core.utils.common import load_func
+from core.version import get_git_version
+from data_export.serializers import ExportDataSerializer
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.db.models import Count
+from requests.adapters import HTTPAdapter
+
+from label_studio.core.utils.params import get_env
 
 version = get_git_version()
 logger = logging.getLogger(__name__)
@@ -117,7 +118,6 @@ class MLApiScheme(object):
 
 
 class MLApi(BaseHTTPAPI):
-
     def __init__(self, **kwargs):
         super(MLApi, self).__init__(**kwargs)
         self._validate_request_timeout = 10
@@ -145,7 +145,7 @@ class MLApi(BaseHTTPAPI):
         except requests.exceptions.RequestException as e:
             # Extending error details in case of failed request
             if flag_set('fix_back_dev_3351_ml_validation_error_extension_short', AnonymousUser):
-                error_string = str(e) + (" " + str(response.text) if response else "")
+                error_string = str(e) + (' ' + str(response.text) if response else '')
             else:
                 error_string = str(e)
             status_code = response.status_code if response is not None else 0
@@ -156,8 +156,12 @@ class MLApi(BaseHTTPAPI):
         except ValueError as e:
             # logger.warning(f'Error parsing JSON response from {url}. Response: {response.content}', exc_info=True)
             return MLApiResult(
-                url, request, {'error': str(e), 'response': response.content}, headers, 'error',
-                status_code=status_code
+                url,
+                request,
+                {'error': str(e), 'response': response.content},
+                headers,
+                'error',
+                status_code=status_code,
             )
         # if verbose:
         #     logger.info(f'Response from {url}: {json.dumps(response, indent=2)}')
@@ -174,7 +178,7 @@ class MLApi(BaseHTTPAPI):
         if flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', user):
             request = {
                 'action': 'PROJECT_UPDATED',
-                'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
+                'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data,
             }
             return self._request('webhook', request, verbose=False, timeout=TIMEOUT_PREDICT)
         else:
@@ -187,10 +191,7 @@ class MLApi(BaseHTTPAPI):
                 'annotations': tasks_ser,
                 'project': self._create_project_uid(project),
                 'label_config': project.label_config,
-                'params': {
-                    'login': project.task_data_login,
-                    'password': project.task_data_password
-                }
+                'params': {'login': project.task_data_login, 'password': project.task_data_password},
             }
             return self._request('train', request, verbose=False, timeout=TIMEOUT_PREDICT)
 
@@ -215,19 +216,27 @@ class MLApi(BaseHTTPAPI):
         return self._request('validate', request={'config': config}, timeout=self._validate_request_timeout)
 
     def setup(self, project, model_version=None):
-        return self._request('setup', request={
-            'project': self._create_project_uid(project),
-            'schema': project.label_config,
-            'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
-            'access_token': project.created_by.auth_token.key,
-            'model_version': model_version
-        }, timeout=TIMEOUT_SETUP)
+        return self._request(
+            'setup',
+            request={
+                'project': self._create_project_uid(project),
+                'schema': project.label_config,
+                'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
+                'access_token': project.created_by.auth_token.key,
+                'model_version': model_version,
+            },
+            timeout=TIMEOUT_SETUP,
+        )
 
     def duplicate_model(self, project_src, project_dst):
-        return self._request('duplicate_model', request={
-            'project_src': self._create_project_uid(project_src),
-            'project_dst': self._create_project_uid(project_dst)
-        }, timeout=TIMEOUT_DUPLICATE_MODEL)
+        return self._request(
+            'duplicate_model',
+            request={
+                'project_src': self._create_project_uid(project_src),
+                'project_dst': self._create_project_uid(project_dst),
+            },
+            timeout=TIMEOUT_DUPLICATE_MODEL,
+        )
 
     def delete(self, project):
         return self._request('delete', request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_DELETE)
@@ -236,9 +245,9 @@ class MLApi(BaseHTTPAPI):
         return self._request('job_status', request={'job': train_job.job_id}, timeout=TIMEOUT_TRAIN_JOB_STATUS)
 
     def get_versions(self, project):
-        return self._request('versions', request={
-            'project': self._create_project_uid(project)
-        }, timeout=TIMEOUT_SETUP, method='GET')
+        return self._request(
+            'versions', request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_SETUP, method='GET'
+        )
 
 
 def get_ml_api(project):
@@ -248,5 +257,5 @@ def get_ml_api(project):
         return None
     return MLApi(
         url=project.ml_backend_active_connection.ml_backend.url,
-        timeout=project.ml_backend_active_connection.ml_backend.timeout
+        timeout=project.ml_backend_active_connection.ml_backend.timeout,
     )

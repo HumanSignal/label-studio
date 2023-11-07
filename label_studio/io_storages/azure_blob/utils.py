@@ -1,8 +1,6 @@
 import logging
 
-from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
-from azure.core.exceptions import ResourceNotFoundError
-
+from azure.storage.blob import BlobServiceClient
 from core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
@@ -16,20 +14,23 @@ class AZURE(object):
         account_key = str(account_key) if account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')
         # check that both account name and key are set
         if not account_name or not account_key:
-            raise ValueError('Azure account name and key must be set using '
-                             'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY')
-        connection_string = "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
-                            ";AccountKey=" + account_key + ";EndpointSuffix=core.windows.net"
+            raise ValueError(
+                'Azure account name and key must be set using '
+                'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY'
+            )
+        connection_string = (
+            'DefaultEndpointsProtocol=https;AccountName='
+            + account_name
+            + ';AccountKey='
+            + account_key
+            + ';EndpointSuffix=core.windows.net'
+        )
         client = BlobServiceClient.from_connection_string(conn_str=connection_string)
         container = client.get_container_client(str(container))
         return client, container
 
     @classmethod
-    def get_blob_metadata(cls,
-                          url: str,
-                          container: str,
-                          account_name: str = None,
-                          account_key: str = None) -> dict:
+    def get_blob_metadata(cls, url: str, container: str, account_name: str = None, account_key: str = None) -> dict:
         """
         Get blob metadata by url
         :param url: Object key

@@ -1,7 +1,6 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.postgres.fields import ArrayField
 
 
 class Label(models.Model):
@@ -11,8 +10,8 @@ class Label(models.Model):
         settings.AUTH_USER_MODEL, related_name='labels', on_delete=models.CASCADE, help_text='User who made this label'
     )
     value = models.JSONField('value', null=False, help_text='Label value')
-    title = models.CharField(_('Title'), max_length=2048, help_text=f'Label title')
-    description = models.TextField(_('Description'), help_text=f'Label description', blank=True, null=True)
+    title = models.CharField(_('Title'), max_length=2048, help_text='Label title')
+    description = models.TextField(_('Description'), help_text='Label description', blank=True, null=True)
     approved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='labels_approved',
@@ -28,19 +27,16 @@ class Label(models.Model):
         return self.organization_id == user.active_organization_id
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['title', 'organization'], name='unique_title')
-        ]
+        constraints = [models.UniqueConstraint(fields=['title', 'organization'], name='unique_title')]
 
 
 class LabelLink(models.Model):
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE, related_name='links')
-    from_name = models.CharField(_('Tag name'), max_length=2048, help_text=f'Tag name')
+    from_name = models.CharField(_('Tag name'), max_length=2048, help_text='Tag name')
+
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['project', 'label'], name='unique_label_project')
-        ]
+        constraints = [models.UniqueConstraint(fields=['project', 'label'], name='unique_label_project')]
 
     def has_permission(self, user):
         user.project = self.project  # link for activity log

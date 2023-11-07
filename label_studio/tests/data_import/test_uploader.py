@@ -1,11 +1,11 @@
-import pytest
 from unittest import mock
+from unittest.mock import Mock
 
+import pytest
+from core.utils.io import validate_upload_url
+from data_import.uploader import check_tasks_max_file_size, load_tasks
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
-
-from core.utils.exceptions import InvalidUploadUrlError
-from data_import.uploader import load_tasks, check_tasks_max_file_size, validate_upload_url
 
 pytestmark = pytest.mark.django_db
 
@@ -18,11 +18,11 @@ class MockedRequest:
 
     @property
     def content_type(self):
-        return "application/x-www-form-urlencoded"
+        return 'application/x-www-form-urlencoded'
 
     @property
     def data(self):
-        return {"url": self.url}
+        return {'url': self.url}
 
     @property
     def user(self):
@@ -35,8 +35,8 @@ class TestUploader:
         return configured_project
 
     class TestLoadTasks:
-        @mock.patch('data_import.uploader.validate_upload_url', wraps=validate_upload_url)
-        @pytest.mark.parametrize("url", ("file:///etc/passwd", "ftp://example.org"))
+        @mock.patch('core.utils.io.validate_upload_url', wraps=validate_upload_url)
+        @pytest.mark.parametrize('url', ('file:///etc/passwd', 'ftp://example.org'))
         def test_raises_for_unsafe_urls(self, validate_upload_url_mock, url, project):
             request = MockedRequest(url=url)
 
@@ -46,7 +46,7 @@ class TestUploader:
 
             validate_upload_url_mock.assert_called_once_with(url, block_local_urls=False)
 
-        @mock.patch('data_import.uploader.validate_upload_url', wraps=validate_upload_url)
+        @mock.patch('core.utils.io.validate_upload_url', wraps=validate_upload_url)
         def test_raises_for_local_urls_with_ssrf_protection_enabled(self, validate_upload_url_mock, project, settings):
             settings.SSRF_PROTECTION_ENABLED = True
             request = MockedRequest(url='http://0.0.0.0')
@@ -57,9 +57,24 @@ class TestUploader:
 
             validate_upload_url_mock.assert_called_once_with('http://0.0.0.0', block_local_urls=True)
 
+        def test_local_url_after_redirect(self, project, settings):
+            settings.SSRF_PROTECTION_ENABLED = True
+            request = MockedRequest(url='http://validurl.com')
+
+            # Mock the necessary parts of the response object
+            mock_response = Mock()
+            mock_response.raw._connection.sock.getpeername.return_value = ('127.0.0.1', 8080)
+
+            # Patch the requests.get call in the data_import.uploader module
+            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
+                ValidationError
+            ) as e:
+                load_tasks(request, project)
+            assert 'The provided URL was not valid.' in str(e.value)
+
 
 class TestTasksFileChecks:
-    @pytest.mark.parametrize("value", (0, settings.TASKS_MAX_FILE_SIZE - 1))
+    @pytest.mark.parametrize('value', (0, settings.TASKS_MAX_FILE_SIZE - 1))
     def test_check_tasks_max_file_size_does_not_raise_for_correct_value(self, value):
         check_tasks_max_file_size(value)
 
@@ -69,11 +84,4 @@ class TestTasksFileChecks:
         with pytest.raises(ValidationError) as e:
             check_tasks_max_file_size(value)
 
-        correct_error_message = (
-            f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
-            f'current size is {value} bytes'
-        )
-        assert (
-            f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes'
-            in str(e.value)
-        )
+        assert f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes' in str(e.value)

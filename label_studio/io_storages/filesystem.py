@@ -1,13 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import ujson as json
-import os
 import logging
-
+import os
 from copy import deepcopy
-from core.utils.io import json_load, delete_dir_content, iter_files, remove_file_or_dir
-from .base import BaseStorage, BaseForm, CloudStorage
 
+import ujson as json
+from core.utils.io import delete_dir_content, iter_files, json_load, remove_file_or_dir
+
+from .base import BaseForm, BaseStorage, CloudStorage
 
 logger = logging.getLogger(__name__)
 
@@ -80,8 +80,9 @@ class JSONStorage(BaseStorage):
 
 
 def already_exists_error(what, path):
-    raise RuntimeError('{path} {what} already exists. Use "--force" option to recreate it.'.format(
-        path=path, what=what))
+    raise RuntimeError(
+        '{path} {what} already exists. Use "--force" option to recreate it.'.format(path=path, what=what)
+    )
 
 
 class DirJSONsStorage(BaseStorage):
@@ -165,8 +166,8 @@ class TasksJSONStorage(JSONStorage):
 
     def __init__(self, path, project_path, **kwargs):
         super(TasksJSONStorage, self).__init__(
-            project_path=project_path,
-            path=os.path.join(project_path, 'tasks.json'))
+            project_path=project_path, path=os.path.join(project_path, 'tasks.json')
+        )
 
 
 class ExternalTasksJSONStorage(CloudStorage):
@@ -184,7 +185,7 @@ class ExternalTasksJSONStorage(CloudStorage):
             regex=None,
             create_local_copy=False,
             sync_in_thread=False,
-            **kwargs
+            **kwargs,
         )
         # data is used as a local cache for tasks.json file
         self.data = {}
@@ -281,6 +282,5 @@ class AnnotationsDirStorage(DirJSONsStorage):
 
     def __init__(self, name, path, project_path, **kwargs):
         super(AnnotationsDirStorage, self).__init__(
-            name=name,
-            project_path=project_path,
-            path=os.path.join(project_path, 'annotations'))
+            name=name, project_path=project_path, path=os.path.join(project_path, 'annotations')
+        )

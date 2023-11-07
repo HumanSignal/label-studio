@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5446: Fix disappearing icons",
-  "commit": "8139d7b800560232b66157871d45c2d524a9f94f",
+  "message": "perf: LEAP-32: Improve performance of zooming at Image Segmentation",
+  "commit": "5ae9ccbfa136781bedcb665b4b9581c7f82daaad",
   "branch": "master",
-  "date": "2023/08/03 14:08:19"
+  "date": "2023/11/03 15:23:08"
 }

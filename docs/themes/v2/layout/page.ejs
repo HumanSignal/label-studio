@@ -3,6 +3,8 @@
 
 <% const showToc = pageContainsHeadings && tocPageTypes %>
 
+<% const formattedContent = removeContent(page.content) %>
+
 <div class="content-grid">
   <div class="content-markdown">
     <% if(page.type && page.parent !== undefined) { %>
@@ -11,15 +13,18 @@
     <% if (page.title.trim()) { %>
       <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
     <% } %>
-    <%- page.content %>
+    <%- formattedContent %>
   </div>
-  <% if (showToc) { %>
-    <div class="toc">
-      <%- partial("component/text", {text: "In this article", tag: "h3", size: "Eyebrow"}) %>
-      <%- toc(page.content, {max_depth: 2, list_number: false, class: "toc-list"}) %>
-      <div class="toc-ent-trial">
-        <a href="https://heartex.com/free-trial" class="toc-list-link" target="_blank">Try Enterprise Cloud</a>
+  <div class="page-rightsidebar">
+    <% if (showToc) { %>
+      <div class="toc">
+        <%- partial("component/text", {text: "In this article", tag: "h3", size: "Eyebrow"}) %>
+        <%- toc(formattedContent, {max_depth: 2, list_number: false, class: "toc-list"}) %>
       </div>
-    </div>
     <% } %>
+    <div class="toc-enterprise-cta">
+      <span class="toc-enterprise-cta-copy">Try Enterprise Cloud for free</span>
+      <%- partial("component/button", { url: "https://humansignal.com/free-trial", label: "Get Started", theme: "Tertiary" }) %>
+    </div>
+  </div>
 </div>

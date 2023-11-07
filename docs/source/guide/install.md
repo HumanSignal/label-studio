@@ -2,7 +2,8 @@
 title: Install and upgrade
 type: guide
 tier: opensource
-order: 103
+order: 55
+order_enterprise: 0
 meta_title: Install and Upgrade Label Studio
 meta_description: "Label Studio documentation: install and upgrade Label Studio with Docker, pip, and anaconda for your machine learning and data science projects."
 section: "Install"
@@ -17,17 +18,13 @@ Install Label Studio on premises or in the cloud. Choose the installation method
 - [Install with Anaconda](#Install-with-Anaconda)
 - [Upgrade Label Studio](#Upgrade-Label-Studio)
 
-Label Studio is also available an [enterprise product](https://heartex.com/), which you can explore instantly through a [free trial](https://heartex.com/free-trial).
+Label Studio is also available an [enterprise product](https://heartex.com/), which you can explore instantly through a [free trial](https://humansignal.com/free-trial).
 
 <!-- md deploy.md -->
 
 ### Web browser support
 
-Label Studio is tested with the latest version of Google Chrome and is expected to work in the latest versions of:
-
-- Google Chrome
-- Apple Safari
-- Mozilla Firefox
+Label Studio is tested with the latest version of Google Chrome.
 
 If using other web browsers, or older versions of supported web browsers, unexpected behavior could occur.
 
@@ -99,7 +96,7 @@ docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/labe
 ```
 
 !!! attention "important"
-As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
+    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
 
 ### Install with Docker on Windows
 

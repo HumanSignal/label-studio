@@ -3,8 +3,8 @@ title: Deploy Label Studio on Kubernetes
 short: Kubernetes
 tier: opensource
 type: guide
-order: 106
-order_enterprise: 132
+order: 60
+order_enterprise: 0
 meta_title: Deploy Label Studio on Kubernetes
 meta_description: Deploy Label Studio on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment.
 section: "Install"
@@ -150,9 +150,12 @@ global:
 
 4. Install or upgrade Label Studio using Helm.
 
-### Use Helm to install Label Studio on your Kubernetes cluster
+## Use Helm to install Label Studio on your Kubernetes cluster
 
 Use Helm to install Label Studio on your Kubernetes cluster. Provide your custom resource definitions YAML file. Specify any environment variables that you need to set for your Label Studio installation using the `--set` argument with the `helm install` command.
+
+!!! note
+    If you are deploying to a production environment, you should set the `SSRF_PROTECTION_ENABLED: true` environment variable. See [Secure Label Studio](security#Enable-SSRF-protection-for-production-environments).
 
 From the command line, run the following:
 

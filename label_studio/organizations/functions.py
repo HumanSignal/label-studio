@@ -1,6 +1,5 @@
-from django.db import transaction
-
 from core.utils.common import temporary_disconnect_all_signals
+from django.db import transaction
 from organizations.models import Organization, OrganizationMember
 from projects.models import Project
 

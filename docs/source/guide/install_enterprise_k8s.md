@@ -3,8 +3,8 @@ title: Deploy Label Studio Enterprise on Kubernetes
 short: Kubernetes
 tier: enterprise
 type: guide
-order: 108
-order_enterprise: 133
+order: 0
+order_enterprise: 455
 meta_title: Deploy Label Studio Enterprise on Kubernetes
 meta_description: Deploy Label Studio Enterprise on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment. 
 section: "Install"
@@ -309,9 +309,12 @@ global:
 
 4. Install or upgrade Label Studio Enterprise using Helm.
 
-### Use Helm to install Label Studio Enterprise on your Kubernetes cluster
+## Use Helm to install Label Studio Enterprise on your Kubernetes cluster
 
 Use Helm to install Label Studio Enterprise on your Kubernetes cluster. Provide your custom resource definitions YAML file. Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
+
+!!! note
+    If you are deploying to a production environment, you should set the `SSRF_PROTECTION_ENABLED: true` environment variable. See [Secure Label Studio](security#Enable-SSRF-protection-for-production-environments).
 
 From the command line, run the following:
 ```shell
@@ -339,29 +342,6 @@ kubectl rollout restart deployment/<RELEASE_NAME>-ls-rqworker
 ```shell
 kubectl rollout restart deployment/<RELEASE_NAME>-ls-app
 ```
-
-## Upgrade Label Studio Enterprise using Helm
-To upgrade Label Studio Enterprise using Helm, do the following.
-
-1. Determine the latest tag version of Label Studio Enterprise and add/replace the following in your `ls-values.yaml` file: 
-   ```yaml
-   global:
-     image:
-       tag: "20210914.154442-d2d1935"
-   ```
-2. After updating the values file, retrieve the latest updates for the Helm chart:
-   ```shell
-   helm repo update heartex
-   ```
-3. Run the following from the command line to upgrade your deployment:
-   ```shell
-   helm upgrade <RELEASE_NAME> heartex/label-studio -f ls-values.yaml
-   ```
-   If you want, you can specify a version from the command line:
-   ```shell
-   helm upgrade <RELEASE_NAME> heartex/label-studio -f ls-values.yaml --set global.image.tag=20210914.154442-d2d1935
-   ```
-   This command overrides the tag value stored in `ls-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
 
 
 ## Uninstall Label Studio Enterprise using Helm

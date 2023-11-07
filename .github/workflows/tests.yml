@@ -41,7 +41,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.head_sha }}
 
@@ -82,7 +82,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "${{ env.NODE }}"
 
@@ -182,7 +182,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.head_sha }}
 
@@ -221,7 +221,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 14
 
@@ -269,8 +269,6 @@ jobs:
         python-version:
           - '3.8'
           - '3.9'
-          - '3.10'
-          - '3.11'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -289,7 +287,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.head_sha }}
 

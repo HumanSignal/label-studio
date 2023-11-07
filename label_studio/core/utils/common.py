@@ -2,55 +2,61 @@
 """
 from __future__ import unicode_literals
 
-from typing import Generator, Iterable, Mapping, Callable, Optional, Any
-
-import os
-import io
-import time
-import copy
-import logging
-import hashlib
-import requests
-import random
 import calendar
-import uuid
-import pytz
-import pkg_resources
-import ujson as json
-import traceback as tb
-import drf_yasg.openapi as openapi
 import contextlib
-
-from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
-
-import label_studio
+import copy
+import hashlib
+import logging
+import os
+import random
 import re
-
-from django.db import models, transaction
-from django.utils.module_loading import import_string
-from django.core.paginator import Paginator, EmptyPage
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
-from django.conf import settings
-from django.db.utils import OperationalError
-from django.db.models.signals import *
-from rest_framework.views import Response, exception_handler
-from rest_framework import status
-from rest_framework.exceptions import ErrorDetail
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
+import time
+import traceback as tb
+import uuid
 from collections import defaultdict
-from django.contrib.postgres.operations import TrigramExtension, BtreeGinExtension
-
-from core.utils.params import get_env
 from datetime import datetime
 from functools import wraps
-from pkg_resources import parse_version
-from colorama import Fore
+from typing import Any, Callable, Generator, Iterable, Mapping, Optional
+
+import drf_yasg.openapi as openapi
+import pkg_resources
+import pytz
+import requests
+import ujson as json
 from boxing import boxing
+from colorama import Fore
+from core.utils.params import get_env
+from django.conf import settings
+from django.contrib.postgres.operations import BtreeGinExtension, TrigramExtension
+from django.core.exceptions import ValidationError
+from django.core.paginator import EmptyPage, Paginator
+from django.core.validators import URLValidator
+from django.db import models, transaction
+from django.db.models.signals import (
+    post_delete,
+    post_init,
+    post_migrate,
+    post_save,
+    pre_delete,
+    pre_init,
+    pre_migrate,
+    pre_save,
+)
+from django.db.utils import OperationalError
+from django.utils.module_loading import import_string
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
+from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
+from pkg_resources import parse_version
+from rest_framework import status
+from rest_framework.exceptions import ErrorDetail
+from rest_framework.views import Response, exception_handler
+
+import label_studio
 
 try:
     from sentry_sdk import capture_exception, set_tag
+
     sentry_sdk_loaded = True
 except (ModuleNotFoundError, ImportError):
     sentry_sdk_loaded = False
@@ -73,7 +79,7 @@ def _override_exceptions(exc):
 
 
 def custom_exception_handler(exc, context):
-    """ Make custom exception treatment in RestFramework
+    """Make custom exception treatment in RestFramework
 
     :param exc: Exception - you can check specific exception
     :param context: context
@@ -103,7 +109,9 @@ def custom_exception_handler(exc, context):
         # move validation errors to separate namespace
         else:
             response_data['detail'] = 'Validation error'
-            response_data['validation_errors'] = response.data if isinstance(response.data, dict) else {'non_field_errors': response.data}
+            response_data['validation_errors'] = (
+                response.data if isinstance(response.data, dict) else {'non_field_errors': response.data}
+            )
             response.data = response_data
 
     # non-standard exception
@@ -133,8 +141,9 @@ def create_hash():
     h.update(str(time.time()).encode('utf-8'))
     return h.hexdigest()[0:16]
 
+
 def paginator(objects, request, default_page=1, default_size=50):
-    """ DEPRECATED
+    """DEPRECATED
     TODO: change to standard drf pagination class
 
     Get from request page and page_size and return paginated objects
@@ -170,30 +179,36 @@ def paginator(objects, request, default_page=1, default_size=50):
 
 
 def paginator_help(objects_name, tag):
-    """ API help for paginator, use it with swagger_auto_schema
+    """API help for paginator, use it with swagger_auto_schema
 
     :return: dict
     """
     if settings.TASK_API_PAGE_SIZE_MAX:
         page_size_description = f'[or "length"] {objects_name} per page. Max value {settings.TASK_API_PAGE_SIZE_MAX}'
     else:
-        page_size_description = f'[or "length"] {objects_name} per page, use -1 to obtain all {objects_name} ' \
-                                 '(in this case "page" has no effect and this operation might be slow)'
-    return dict(tags=[tag], manual_parameters=[
-            openapi.Parameter(name='page', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
-                              description='[or "start"] current page'),
-            openapi.Parameter(name='page_size', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
-                              description=page_size_description)
+        page_size_description = (
+            f'[or "length"] {objects_name} per page, use -1 to obtain all {objects_name} '
+            '(in this case "page" has no effect and this operation might be slow)'
+        )
+    return dict(
+        tags=[tag],
+        manual_parameters=[
+            openapi.Parameter(
+                name='page', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='[or "start"] current page'
+            ),
+            openapi.Parameter(
+                name='page_size', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description=page_size_description
+            ),
         ],
         responses={
             200: openapi.Response(title='OK', description='')
             # 404: openapi.Response(title='', description=f'No more {objects_name} found')
-        })
+        },
+    )
 
 
 def find_editor_files():
-    """ Find label studio files
-    """
+    """Find label studio files"""
 
     # playground uses another LSF build
     prefix = '/label-studio/'
@@ -225,14 +240,14 @@ def safe_float(v, default=0):
 def sample_query(q, sample_size):
     n = q.count()
     if n == 0:
-        raise ValueError('Can\'t sample from empty query')
+        raise ValueError("Can't sample from empty query")
     ids = q.values_list('id', flat=True)
     random_ids = random.sample(list(ids), sample_size)
     return q.filter(id__in=random_ids)
 
 
 def get_client_ip(request):
-    """ Get IP address from django request
+    """Get IP address from django request
 
     :param request: django request
     :return: str with ip
@@ -283,6 +298,7 @@ def find_first_one_to_one_related_field_by_prefix(instance, prefix):
 def start_browser(ls_url, no_browser):
     import threading
     import webbrowser
+
     if no_browser:
         return
 
@@ -300,17 +316,17 @@ def db_is_not_sqlite() -> bool:
 
     return settings.DJANGO_DB != settings.DJANGO_DB_SQLITE
 
+
 @contextlib.contextmanager
 def conditional_atomic(
-        predicate: Callable[..., bool] = db_is_not_sqlite,
-        predicate_args: Optional[Iterable[Any]] = None,
-        predicate_kwargs: Optional[Mapping[str, Any]] = None,
-    ) -> Generator[None, None, None]:
+    predicate: Callable[..., bool],
+    predicate_args: Optional[Iterable[Any]] = None,
+    predicate_kwargs: Optional[Mapping[str, Any]] = None,
+) -> Generator[None, None, None]:
     """Use transaction if and only if the passed predicate function returns true
 
     Params:
         predicate: function taking any combination of args and kwargs
-          defaults to `db_is_not_sqlite` for historical/compatibility reasons.
         predicate_args: optional array of positional args for the predicate
         predicate_kwargs: optional map of keyword args for the predicate
     """
@@ -342,7 +358,9 @@ def retry_database_locked():
                     else:
                         raise
             return f(*args, **kwargs)
+
         return f_retry
+
     return deco_retry
 
 
@@ -355,15 +373,14 @@ def get_app_version():
 
 
 def get_latest_version():
-    """ Get version from pypi
-    """
+    """Get version from pypi"""
     pypi_url = 'https://pypi.org/pypi/%s/json' % label_studio.package_name
     try:
         response = requests.get(pypi_url, timeout=10).text
         data = json.loads(response)
         latest_version = data['info']['version']
         upload_time = data.get('releases', {}).get(latest_version, [{}])[-1].get('upload_time', None)
-    except Exception as exc:
+    except Exception:
         logger.warning("Can't get latest version", exc_info=True)
     else:
         return {'latest_version': latest_version, 'upload_time': upload_time}
@@ -376,8 +393,7 @@ def current_version_is_outdated(latest_version):
 
 
 def check_for_the_latest_version(print_message):
-    """ Check latest pypi version
-    """
+    """Check latest pypi version"""
     if not settings.LATEST_VERSION_CHECK:
         return
 
@@ -385,8 +401,7 @@ def check_for_the_latest_version(print_message):
 
     # prevent excess checks by time intervals
     current_time = time.time()
-    if label_studio.__latest_version_check_time__ and \
-       current_time - label_studio.__latest_version_check_time__ < 60:
+    if label_studio.__latest_version_check_time__ and current_time - label_studio.__latest_version_check_time__ < 60:
         return
     label_studio.__latest_version_check_time__ = current_time
 
@@ -400,10 +415,10 @@ def check_for_the_latest_version(print_message):
         update_command = Fore.CYAN + 'pip install -U ' + label_studio.package_name + Fore.RESET
         return boxing(
             'Update available {curr_version} → {latest_version}\nRun {command}'.format(
-                curr_version=label_studio.__version__,
-                latest_version=latest_version,
-                command=update_command
-            ), style='double')
+                curr_version=label_studio.__version__, latest_version=latest_version, command=update_command
+            ),
+            style='double',
+        )
 
     if outdated and print_message:
         print(update_package_message())
@@ -420,7 +435,7 @@ if settings.APP_WEBSERVER != 'uwsgi':
 
 
 def collect_versions(force=False):
-    """ Collect versions for all modules
+    """Collect versions for all modules
 
     :return: dict with sub-dicts of version descriptions
     """
@@ -442,10 +457,10 @@ def collect_versions(force=False):
             'short_version': '.'.join(label_studio.__version__.split('.')[:2]),
             'latest_version_from_pypi': label_studio.__latest_version__,
             'latest_version_upload_time': label_studio.__latest_version_upload_time__,
-            'current_version_is_outdated': label_studio.__current_version_is_outdated__
+            'current_version_is_outdated': label_studio.__current_version_is_outdated__,
         },
         # backend full git info
-        'label-studio-os-backend': version.get_git_commit_info(ls=True)
+        'label-studio-os-backend': version.get_git_commit_info(ls=True),
     }
 
     # label studio frontend
@@ -453,7 +468,7 @@ def collect_versions(force=False):
         with open(os.path.join(settings.EDITOR_ROOT, 'version.json')) as f:
             lsf = json.load(f)
         result['label-studio-frontend'] = lsf
-    except:
+    except:  # noqa: E722
         pass
 
     # data manager
@@ -461,21 +476,23 @@ def collect_versions(force=False):
         with open(os.path.join(settings.DM_ROOT, 'version.json')) as f:
             dm = json.load(f)
         result['dm2'] = dm
-    except:
+    except:  # noqa: E722
         pass
 
     # converter
     try:
         import label_studio_converter
+
         result['label-studio-converter'] = {'version': label_studio_converter.__version__}
-    except Exception as e:
+    except Exception:
         pass
 
     # ml
     try:
         import label_studio_ml
+
         result['label-studio-ml'] = {'version': label_studio_ml.__version__}
-    except Exception as e:
+    except Exception:
         pass
 
     result.update(settings.COLLECT_VERSIONS(result=result))
@@ -486,7 +503,8 @@ def collect_versions(force=False):
 
     if settings.SENTRY_DSN:
         import sentry_sdk
-        sentry_sdk.set_context("versions", copy.deepcopy(result))
+
+        sentry_sdk.set_context('versions', copy.deepcopy(result))
 
         for package in result:
             if 'version' in result[package]:
@@ -499,7 +517,7 @@ def collect_versions(force=False):
 
 
 def get_organization_from_request(request):
-    """Helper for backward compatibility with org_pk in session """
+    """Helper for backward compatibility with org_pk in session"""
     # TODO remove session logic in next release
     user = request.user
     if user and user.is_authenticated:
@@ -532,18 +550,19 @@ def import_from_string(func_string):
     try:
         return import_string(func_string)
     except ImportError:
-        msg = f"Could not import {func_string} from settings"
+        msg = f'Could not import {func_string} from settings'
         raise ImportError(msg)
 
 
 class temporary_disconnect_signal:
-    """ Temporarily disconnect a model from a signal
+    """Temporarily disconnect a model from a signal
 
-        Example:
-            with temporary_disconnect_all_signals(
-                signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
-                do_something()
+    Example:
+        with temporary_disconnect_all_signals(
+            signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
+            do_something()
     """
+
     def __init__(self, signal, receiver, sender, dispatch_uid=None):
         self.signal = signal
         self.receiver = receiver
@@ -551,28 +570,24 @@ class temporary_disconnect_signal:
         self.dispatch_uid = dispatch_uid
 
     def __enter__(self):
-        self.signal.disconnect(
-            receiver=self.receiver,
-            sender=self.sender,
-            dispatch_uid=self.dispatch_uid
-        )
+        self.signal.disconnect(receiver=self.receiver, sender=self.sender, dispatch_uid=self.dispatch_uid)
 
     def __exit__(self, type_, value, traceback):
-        self.signal.connect(
-            receiver=self.receiver,
-            sender=self.sender,
-            dispatch_uid=self.dispatch_uid
-        )
+        self.signal.connect(receiver=self.receiver, sender=self.sender, dispatch_uid=self.dispatch_uid)
 
 
 class temporary_disconnect_all_signals(object):
     def __init__(self, disabled_signals=None):
         self.stashed_signals = defaultdict(list)
         self.disabled_signals = disabled_signals or [
-            pre_init, post_init,
-            pre_save, post_save,
-            pre_delete, post_delete,
-            pre_migrate, post_migrate,
+            pre_init,
+            post_init,
+            pre_save,
+            post_save,
+            pre_delete,
+            post_delete,
+            pre_migrate,
+            post_migrate,
         ]
 
     def __enter__(self):
@@ -596,9 +611,12 @@ class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
     def get_filter_parameters(self, filter_backend):
         if isinstance(filter_backend, DjangoFilterBackend):
             result = super(DjangoFilterDescriptionInspector, self).get_filter_parameters(filter_backend)
+            if not isinstance(result, Iterable):
+                return result
+
             for param in result:
                 if not param.get('description', ''):
-                    param.description = "Filter the returned list by {field_name}".format(field_name=param.name)
+                    param.description = 'Filter the returned list by {field_name}'.format(field_name=param.name)
 
             return result
 
@@ -606,7 +624,7 @@ class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
 
 
 def batch(iterable, n=1):
-    l = len(iterable)
+    l = len(iterable)  # noqa: E741
     for ndx in range(0, l, n):
         yield iterable[ndx : min(ndx + n, l)]
 
@@ -622,14 +640,15 @@ def round_floats(o):
 
 
 class temporary_disconnect_list_signal:
-    """ Temporarily disconnect a list of signals
-        Each signal tuple: (signal_type, signal_method, object)
-        Example:
-            with temporary_disconnect_list_signal(
-                [(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation)]
-                ):
-                do_something()
+    """Temporarily disconnect a list of signals
+    Each signal tuple: (signal_type, signal_method, object)
+    Example:
+        with temporary_disconnect_list_signal(
+            [(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation)]
+            ):
+            do_something()
     """
+
     def __init__(self, signals):
         self.signals = signals
 
@@ -639,11 +658,7 @@ class temporary_disconnect_list_signal:
             receiver = signal[1]
             sender = signal[2]
             dispatch_uid = signal[3] if len(signal) > 3 else None
-            sig.disconnect(
-                receiver=receiver,
-                sender=sender,
-                dispatch_uid=dispatch_uid
-            )
+            sig.disconnect(receiver=receiver, sender=sender, dispatch_uid=dispatch_uid)
 
     def __exit__(self, type_, value, traceback):
         for signal in self.signals:
@@ -651,11 +666,7 @@ class temporary_disconnect_list_signal:
             receiver = signal[1]
             sender = signal[2]
             dispatch_uid = signal[3] if len(signal) > 3 else None
-            sig.connect(
-                receiver=receiver,
-                sender=sender,
-                dispatch_uid=dispatch_uid
-            )
+            sig.connect(receiver=receiver, sender=sender, dispatch_uid=dispatch_uid)
 
 
 def trigram_migration_operations(next_step):
@@ -665,9 +676,7 @@ def trigram_migration_operations(next_step):
     ]
     SKIP_TRIGRAM_EXTENSION = get_env('SKIP_TRIGRAM_EXTENSION', None)
     if SKIP_TRIGRAM_EXTENSION == '1' or SKIP_TRIGRAM_EXTENSION == 'yes' or SKIP_TRIGRAM_EXTENSION == 'true':
-        ops = [
-            next_step
-        ]
+        ops = [next_step]
     if SKIP_TRIGRAM_EXTENSION == 'full':
         ops = []
 
@@ -681,9 +690,7 @@ def btree_gin_migration_operations(next_step):
     ]
     SKIP_BTREE_GIN_EXTENSION = get_env('SKIP_BTREE_GIN_EXTENSION', None)
     if SKIP_BTREE_GIN_EXTENSION == '1' or SKIP_BTREE_GIN_EXTENSION == 'yes' or SKIP_BTREE_GIN_EXTENSION == 'true':
-        ops = [
-            next_step
-        ]
+        ops = [next_step]
     if SKIP_BTREE_GIN_EXTENSION == 'full':
         ops = []
 
@@ -729,10 +736,16 @@ def timeit(func):
         start = time.time()
         result = func(*args, **kwargs)
         end = time.time()
-        logging.debug(f"{func.__name__} execution time: {end-start} seconds")
+        logging.debug(f'{func.__name__} execution time: {end-start} seconds')
         return result
+
     return wrapper
 
 
 def empty(*args, **kwargs):
     pass
+
+
+def get_ttl_hash(seconds: int = 60) -> int:
+    """Return the same value within `seconds` time period"""
+    return round(time.time() / seconds)

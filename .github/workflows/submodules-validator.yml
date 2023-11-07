@@ -19,7 +19,7 @@ env:
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
 
 jobs:
-  validate_submodules_and_ls_dependencies:
+  validate_submodules_and_dependencies:
     name: "Submodules/deps"
     runs-on: ubuntu-latest
     steps:
@@ -33,94 +33,54 @@ jobs:
             const head_sha = '${{ github.event.pull_request.head.sha || github.event.after }}'
             const base_sha = '${{ github.event.pull_request.base.sha || github.event.before }}'
             const targetBranch = '${{ github.event.pull_request.base.ref || github.event.ref }}'.replace('refs/heads/', '')
-            const strictCheckBranchPrefixes = ['ls-release/']
-
-            let submodules = [
-                {owner: owner, repo: 'label-studio-frontend'},
-                {owner: owner, repo: 'dm2'}
-            ]
+            const strictCheckBranchPrefixes = ['ls-release/'];
+            const submodules = [
+                {
+                    owner: owner,
+                    repo: 'label-studio-frontend',
+                    file_path: 'label_studio/frontend/dist/lsf/version.json',
+                    regexp: '"commit": "(.*)",',
+                },
+                {
+                    owner: owner,
+                    repo: 'dm2',
+                    file_path: 'label_studio/frontend/dist/dm/version.json',
+                    regexp: '"commit": "(.*)",',
+                },
+                {
+                    owner: owner,
+                    repo: 'label-studio-sdk',
+                    file_path: 'deploy/requirements-test.txt',
+                    regexp: 'https://github.com/HumanSignal/label-studio-sdk/archive/(.*).zip',
+                },
+            ];
             
-            
-            async function getLSSubmoduleVersions(sha) {
-                let {data: lsTreeData} = await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: sha
-                })
-                lsTreeData = (await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'label_studio' && e.type === 'tree').sha
-                })).data
-                lsTreeData = (await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'frontend' && e.type === 'tree').sha
-                })).data
-                lsTreeData = (await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'dist' && e.type === 'tree').sha
-                })).data
-                const {data: lsDMTreeData} = await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'dm' && e.type === 'tree').sha
-                })
-                const {data: dmfVersion} = await github.rest.git.getBlob({
-                    owner,
-                    repo,
-                    file_sha: lsDMTreeData.tree.find(e => e.path === 'version.json' && e.type === 'blob').sha
-                })
-                const dmVersionContent = Buffer.from(dmfVersion.content, dmfVersion.encoding).toString("utf8")
-                const matchDM = dmVersionContent.match('"commit": "(.*)",')
-                const {data: lsLSFTreeData} = await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'lsf' && e.type === 'tree').sha
-                })
-                const {data: lsfVersion} = await github.rest.git.getBlob({
-                    owner,
-                    repo,
-                    file_sha: lsLSFTreeData.tree.find(e => e.path === 'version.json' && e.type === 'blob').sha
-                })
-                const lsfVersionContent = Buffer.from(lsfVersion.content, lsfVersion.encoding).toString("utf8")
-                const matchLSF = lsfVersionContent.match('"commit": "(.*)",')
-                return {
-                    'label-studio-frontend': matchLSF[1],
-                    'dm2': matchDM[1],
-                }
-            }
-            
-            let base_sha_redacted = base_sha
-            if (base_sha_redacted === '0000000000000000000000000000000000000000') {
-                console.log(`Branch creation event. Using head_sha (${head_sha}) parent as base_sha`)
-                const {data: commit} = await github.rest.git.getCommit({
-                    owner,
-                    repo,
-                    commit_sha: head_sha,
+            async function getSubmoduleVersion(submodule, sha) {
+                const response = await github.rest.repos.getContent({
+                    owner: owner,
+                    repo: repo,
+                    ref: sha,
+                    path: submodule.file_path,
                 });
-                console.log(commit.parents)
-                base_sha_redacted = commit.parents[0].sha
+                const content = Buffer.from(response.data.content, 'base64').toString('utf-8');
+                const match = content.match(submodule.regexp);
+                return match[1];
             }
             
-            const baseVersions = await getLSSubmoduleVersions(base_sha_redacted)
-            console.log(`before: ${base_sha_redacted}`)
-            console.log(baseVersions)
+            async function validateSubmodule(submodule, base_sha, head_sha) {
+                const before = await getSubmoduleVersion(submodule, base_sha);
+                const after = await getSubmoduleVersion(submodule, head_sha);
             
-            const headVersions = await getLSSubmoduleVersions(head_sha)
-            console.log(`after: ${head_sha}`)
-            console.log(headVersions)
-            
-            const strictCheck = strictCheckBranchPrefixes.some(e => targetBranch.startsWith(e))
-            console.log(`Strict check: ${strictCheck}`)
-            
-            let failed = []
-            for (let submodule of submodules) {
-                if (baseVersions[submodule.repo] === headVersions[submodule.repo] && !strictCheck) {
-                    console.log(`${submodule.repo}: Is not changed`)
-                    continue
+                if (before === after && !strictCheck) {
+                    return [true, 'Not changed']
                 }
+            
+                const {data: compare} = await github.rest.repos.compareCommits({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                    base: before,
+                    head: after,
+                });
             
                 const {data: submoduleRepo} = await github.rest.repos.get({
                     owner: submodule.owner,
@@ -131,42 +91,59 @@ jobs:
                     owner: submodule.owner,
                     repo: submodule.repo,
                     per_page: 100,
-                    sha: submoduleBranch
+                    sha: submoduleBranch,
                 });
             
                 const commits = listCommits.map(e => e.sha)
             
-                const headCommitNumber = commits.indexOf(headVersions[submodule.repo])
+                const headCommitNumber = commits.indexOf(after)
                 if (headCommitNumber === -1) {
-                    console.log(`${submodule.repo}: ${headVersions[submodule.repo]} from PR is not found in submodule ${submoduleBranch} branch`)
-                    failed.push(submodule.repo)
-                    continue
+                    return [false, `${after} from PR is not found in submodule ${submoduleBranch} branch`]
                 }
                 if (strictCheck && headCommitNumber !== 0) {
-                    console.log(`${submodule.repo}: For the release branch, submodule should be pointed to the latest commit in submodule corresponding release branch which is ${listCommits[0].html_url}`)
-                    failed.push(submodule.repo)
-                    continue
+                    return [false, `For the release branch, submodule should be pointed to the latest commit in submodule's corresponding release branch which is ${listCommits[0].html_url}`]
                 }
             
-                const baseCommitNumber = commits.indexOf(baseVersions[submodule.repo])
+                const baseCommitNumber = commits.indexOf(before)
                 if (baseCommitNumber === -1) {
-                    console.log(`${submodule.repo}: ${baseVersions[submodule.repo]} from ${targetBranch} is not found in submodule ${submoduleBranch} branch`)
-                    continue
+                    return [true, `${submodule.repo}: ${before} from ${targetBranch} is not found in submodule ${submoduleBranch} branch`]
                 }
             
-                const {data: compare} = await github.rest.repos.compareCommits({
-                    owner: submodule.owner,
-                    repo: submodule.repo,
-                    base: baseVersions[submodule.repo],
-                    head: headVersions[submodule.repo],
-                });
-                console.log(`${submodule.repo}: ${headVersions[submodule.repo]} is ${compare.ahead_by} ahead and ${compare.behind_by} behind ${baseVersions[submodule.repo]}: ${compare.html_url}`)
-                if (compare.behind_by > 0) {
-                    failed.push(submodule.repo)
-                    continue
-                }
+                return [compare.behind_by === 0, `${after} is ${compare.ahead_by} ahead and ${compare.behind_by} behind ${before}: ${compare.html_url}`]
             }
             
-            if (failed.length !== 0) {
-                throw `Versions for ${failed.toString()} are downgraded or not found`;
+            const strictCheck = strictCheckBranchPrefixes.some(e => targetBranch.startsWith(e))
+            console.log(`Strict check is ${strictCheck? 'on': 'off'}`)
+            
+            let base_sha_redacted = base_sha
+            if (base_sha === '0000000000000000000000000000000000000000') {
+                const {data: commit} = await github.rest.git.getCommit({
+                    owner,
+                    repo,
+                    commit_sha: head_sha,
+                });
+                base_sha_redacted = commit.parents[0].sha
+                console.log(`Branch creation event. Using head_sha (${base_sha_redacted}) parent as base_sha`)
+            }
+            
+            const {data: lsCompare} = await github.rest.repos.compareCommits({
+                owner: owner,
+                repo: repo,
+                base: base_sha_redacted,
+                head: head_sha,
+            });
+            
+            for (let submodule of submodules) {
+                let status = {}
+                if (lsCompare.files.some(e => e.filename === submodule.file_path)) {
+                    status = await validateSubmodule(submodule, base_sha, head_sha);
+                } else {
+                    status = [true, `Not changed`]
+                }
+            
+                if (status[0] === false) {
+                    core.setFailed(`${submodule.owner}/${submodule.repo}: ${status[1]}`)
+                } else {
+                    core.info(`${submodule.owner}/${submodule.repo}: ${status[1]}`)
+                }
             }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Spinner } from '../../components';
@@ -16,6 +16,9 @@ import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
+import { ToastContext } from '../../components/Toast/Toast';
+import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
+
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import "./DataManager.styl";
@@ -62,6 +65,7 @@ const buildLink = (path, params) => {
 
 export const DataManagerPage = ({ ...props }) => {
 
+  const toast = useContext(ToastContext);
   const root = useRef();
   const params = useParams();
   const history = useHistory();
@@ -117,10 +121,20 @@ export const DataManagerPage = ({ ...props }) => {
       api.handleError(response);
     });
 
+    dataManager.on("toast", ({ message, type }) => {
+      toast.show({ message, type });
+    });
+
+    dataManager.on("navigate", (route) => {
+      const target = route.replace(/^projects/, "");
+
+      history.push(buildLink(target, { id: params.id }));
+    });
+
     if (interactiveBacked) {
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
-        const ids = group.map(r => r.id);
+        const ids = group.map(r => r.cleanId);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
         const suggestionsRequest = api.callApi("mlInteractive", {
@@ -136,7 +150,7 @@ export const DataManagerPage = ({ ...props }) => {
             return response.data.result;
           }
 
-          return [];
+          return null;
         });
       });
     }
@@ -234,11 +248,13 @@ DataManagerPage.context = ({ dmRef }) => {
       deleteAction(dmPath);
       deleteCrumb('dm-crumb');
     } else {
-      addAction(dmPath, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dmRef?.store?.closeLabeling?.();
-      });
+      if (!isFF(FF_OPTIC_2)) {
+        addAction(dmPath, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dmRef?.store?.closeLabeling?.();
+        });
+      }
       addCrumb({
         key: "dm-crumb",
         title: "Labeling",
@@ -264,7 +280,7 @@ DataManagerPage.context = ({ dmRef }) => {
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
-  
+
   const exportData = async () => {
     const webhook_url = getWebhookUrl();
     console.log("Exporting data");
@@ -308,7 +324,7 @@ DataManagerPage.context = ({ dmRef }) => {
               });
             })
           }
-        })   
+        })
       }
       else{
         Swal.fire("Error", "Error retrieving options from the backend, please make sure that the webhook server is on", "error");
@@ -318,7 +334,7 @@ DataManagerPage.context = ({ dmRef }) => {
 
   }
 
-  
+
   useEffect(() => {
     if (dmRef) {
       dmRef.on('modeChanged', onDMModeChanged);
