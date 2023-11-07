@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-345: Fix taxonomy items collapsing when dropdown is closed",
-  "commit": "ef79df5a97d9301b1976358b946774b0e59faeb0",
-  "branch": "fb-leap-345",
-  "date": "2023/11/06 16:23:08"
+  "commit": "fcdc1df7b09877c684fb95c07625a0ad0bc1d58a",
+  "branch": "master",
+  "date": "2023/11/07 11:01:17"
 }
