@@ -493,7 +493,7 @@ def apply_filters(queryset, filters, project, request):
                 )
             filter_expressions.append(q)
 
-        # not_in
+        # not in
         elif _filter.operator == 'not_in':
             cast_value(_filter)
             # Base condition for field_name being outside the range
