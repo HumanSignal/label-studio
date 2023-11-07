@@ -469,13 +469,9 @@ def apply_filters(queryset, filters, project, request):
         # empty
         elif _filter.operator == 'empty':
             if cast_bool_from_str(_filter.value):
-                filter_expressions.append(
-                    Q(**{field_name: True})
-                )
+                filter_expressions.append(Q(**{field_name: True}))
             else:
-                filter_expressions.append(
-                    ~Q(**{field_name: True})
-                )
+                filter_expressions.append(~Q(**{field_name: True}))
 
         # starting from not_
         elif _filter.operator.startswith('not_'):
