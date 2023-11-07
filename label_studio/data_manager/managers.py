@@ -238,6 +238,16 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
         return 'continue'
 
 
+def create_storage_filename_querryset(task_ids):
+    """
+    Create a TaskQuerrySet object from array of task ids.
+    :param task_ids: array of tasks ids.
+    :return: filtered TaskQuerrySet
+    """
+    from tasks.models import Task
+    return Task.objects.filter(id__in=task_ids)
+
+
 def apply_filters(queryset, filters, project, request):
     logger.warning(queryset, filters, project, request)
     if not filters:
@@ -264,6 +274,13 @@ def apply_filters(queryset, filters, project, request):
         if filter_expression:
             filter_expressions.append(filter_expression)
             continue
+
+        if field_name == 'storage_filename':
+            task_ids = []
+            for task in queryset:
+                if _filter.value in task.storage_filename:
+                    task_ids.append(task.id)
+            return create_storage_filename_querryset(task_ids)
 
         # annotators
         result = add_user_filter(field_name == 'annotators', 'annotations__completed_by', _filter, filter_expressions)
