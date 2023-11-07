@@ -29,7 +29,7 @@ const EmptyConfigPlaceholder = () => (
     <p>Your labeling configuration is empty. It is required to label your data.</p>
     <p>
       Start from one of our predefined templates or create your own config on the Code panel.
-      The labeling config is XML-based and you can <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">read about the available tags in our documentation</a>.
+      The labeling config is XML-based and you can <a href="https://labelstud.io/tags/" target="_blank">read about the available tags in our documentation</a>.
     </p>
   </div>
 );
@@ -309,45 +309,41 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     return () => window.clearTimeout(debounceTimer.current);
   }, [config]);
 
-  React.useEffect(() => {
+  React.useEffect(async () => {
     if (!configToCheck) return;
 
     setLoading(true);
 
-    const awaitEffect = async () => {
-      const validation = await api.callApi(`validateConfig`, {
-        params: { pk: project.id },
-        body: { label_config: configToCheck },
-        errorFilter: () => true,
-      });
+    const validation = await api.callApi(`validateConfig`, {
+      params: { pk: project.id },
+      body: { label_config: configToCheck },
+      errorFilter: () => true,
+    });
 
-      if (validation?.error) {
-        setError(validation.response);
-        setLoading(false);
-        return;
-      }
-
-      setError(null);
-      onValidate?.(validation);
-
-      const sample = await api.callApi("createSampleTask", {
-        params: { pk: project.id },
-        body: { label_config: configToCheck },
-        errorFilter: () => true,
-      });
-
+    if (validation?.error) {
+      setError(validation.response);
       setLoading(false);
-      if (sample && !sample.error) {
-        setData(sample.sample_task);
-        setConfigToDisplay(configToCheck);
-      } else {
-        // @todo validation can be done in this place,
-        // @todo but for now it's extremely slow in /sample-task endpoint
-        setError(sample?.response);
-      }
+      return;
     }
 
-    awaitEffect();
+    setError(null);
+    onValidate?.(validation);
+
+    const sample = await api.callApi("createSampleTask", {
+      params: { pk: project.id },
+      body: { label_config: configToCheck },
+      errorFilter: () => true,
+    });
+
+    setLoading(false);
+    if (sample && !sample.error) {
+      setData(sample.sample_task);
+      setConfigToDisplay(configToCheck);
+    } else {
+      // @todo validation can be done in this place,
+      // @todo but for now it's extremely slow in /sample-task endpoint
+      setError(sample?.response);
+    }
   }, [configToCheck]);
 
 
@@ -412,7 +408,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     <p className={configClass.elem('tags-link')}>
       Configure the labeling interface with tags.
       <br/>
-      <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">See all available tags</a>
+      <a href="https://labelstud.io/tags/" target="_blank">See all available tags</a>
       .
     </p>
   );
@@ -517,23 +513,18 @@ export const ConfigPage = ({
 
   const [warning, setWarning] = React.useState();
 
-  React.useEffect(() => {
+  React.useEffect(async () => {
     if (externalColumns) return; // we are in Create Project dialog, so this request is useless
     if (!project || columns) return;
+    const res = await api.callApi("dataSummary", {
+      params: { pk: project.id },
+      // 404 is ok, and errors here don't matter
+      errorFilter: () => true,
+    });
 
-    const asyncEffect = async () => {
-      const res = await api.callApi("dataSummary", {
-        params: { pk: project.id },
-        // 404 is ok, and errors here don't matter
-        errorFilter: () => true,
-      });
-
-      if (res?.common_data_columns) {
-        setColumns(res.common_data_columns);
-      }
+    if (res?.common_data_columns) {
+      setColumns(res.common_data_columns);
     }
-
-    asyncEffect();
   }, [columns, project]);
 
   const onSelectRecipe = React.useCallback(recipe => {

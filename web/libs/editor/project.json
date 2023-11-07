@@ -12,7 +12,7 @@
         "webpackConfig": "webpack.config.js",
         "tsConfig": "libs/editor/tsconfig.lib.json",
         "main": "libs/editor/src/index.ts",
-        "outputPath": "dist/libs/editor/js",
+        "outputPath": "dist/libs/editor",
         "isolatedConfig": true
       }
     },

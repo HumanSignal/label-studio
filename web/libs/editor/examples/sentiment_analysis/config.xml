@@ -1,9 +1,0 @@
-<View>
-  <Header value="Choose text sentiment:"/>
-  <Text name="my_text" value="$reviewText"/>
-  <Choices name="sentiment" toName="my_text" choice="single" showInLine="true">
-    <Choice value="Positive"/>
-    <Choice value="Negative"/>
-    <Choice value="Neutral"/>
-  </Choices>
-</View>

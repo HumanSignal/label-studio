@@ -24,7 +24,7 @@ export const useSet = <T>(initialSet: Set<T> = new Set()) => {
   }, [setSet]);
 
   const utils = {
-    has: useCallback((item: any) => set.has(item), [set]),
+    has: useCallback((item) => set.has(item), [set]),
     ...stableActions,
   };
 
@@ -35,7 +35,7 @@ export const useRefresh = () => {
   const history = useHistory();
   const { pathname } = useFixedLocation();
 
-  const refresh = useCallback((redirectPath: string) => {
+  const refresh = useCallback((redirectPath) => {
     history.replace("/");
 
     setTimeout(() => {

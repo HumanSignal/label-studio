@@ -1,0 +1,26 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "lead_time": 15.053,
+            "result": [
+                {
+                    "from_name": "pw",
+                    "id": "Dx_aB91ISN",
+                    "to_name": "pw",
+                    "type": "pairwise",
+                    "value": {
+                        "selected": "right"
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "text1": "In a little while you will have forgotten everything; in a little while everything will have forgotten you.",
+        "text2": "Death remembered should be like a mirror, Who tells us life's but breath, to trust it error."
+    },
+    "id": 1,
+    "predictions": [],
+    "task_path": "../examples/pairwise/tasks.json"
+}

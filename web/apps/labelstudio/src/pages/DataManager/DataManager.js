@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Spinner } from '../../components';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
-import { useLibrary } from '../../providers/LibraryProvider';
 import { useAPI } from '../../providers/ApiProvider';
+import { useLibrary } from '../../providers/LibraryProvider';
 import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
 import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
@@ -15,6 +15,9 @@ import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
+import { ToastContext } from '../../components/Toast/Toast';
+import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
+
 import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
@@ -56,6 +59,7 @@ const buildLink = (path, params) => {
 };
 
 export const DataManagerPage = ({ ...props }) => {
+  const toast = useContext(ToastContext);
   const root = useRef();
   const params = useParams();
   const history = useHistory();
@@ -111,10 +115,20 @@ export const DataManagerPage = ({ ...props }) => {
       api.handleError(response);
     });
 
+    dataManager.on("toast", ({ message, type }) => {
+      toast.show({ message, type });
+    });
+
+    dataManager.on("navigate", (route) => {
+      const target = route.replace(/^projects/, "");
+
+      history.push(buildLink(target, { id: params.id }));
+    });
+
     if (interactiveBacked) {
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
-        const ids = group.map(r => r.id);
+        const ids = group.map(r => r.cleanId);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
         const suggestionsRequest = api.callApi("mlInteractive", {
@@ -130,7 +144,7 @@ export const DataManagerPage = ({ ...props }) => {
             return response.data.result;
           }
 
-          return [];
+          return null;
         });
       });
     }
@@ -202,11 +216,13 @@ DataManagerPage.context = ({ dmRef }) => {
       deleteAction(dmPath);
       deleteCrumb('dm-crumb');
     } else {
-      addAction(dmPath, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dmRef?.store?.closeLabeling?.();
-      });
+      if (!isFF(FF_OPTIC_2)) {
+        addAction(dmPath, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dmRef?.store?.closeLabeling?.();
+        });
+      }
       addCrumb({
         key: "dm-crumb",
         title: "Labeling",

@@ -2,7 +2,6 @@
  * Highly improved version of CodeMirror's XML hint addon
  * https://codemirror.net/5/addon/hint/xml-hint.js
  */
-// @ts-ignore
 import CM from 'codemirror';
 
 const Pos = CM.Pos;
