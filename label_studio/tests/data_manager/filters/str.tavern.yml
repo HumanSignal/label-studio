@@ -2,9 +2,9 @@
 test_name: str-empty
 strict: false
 marks:
-  - skip
   - usefixtures:
       - django_live_url
+      - fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short_on
 stages:
 
   - id: signup
@@ -87,11 +87,6 @@ stages:
           "data": {
             "text": null
           }
-        },
-        {
-          "data": {
-            "other": "o1"
-          }
         }
         ]
       }
@@ -108,7 +103,7 @@ stages:
             "conjunction": "and",
             "items": [
             {
-              "filter": "filter:tasks:data.other",
+              "filter": "filter:tasks:data.text",
               "operator": "regex",
               "type": "String",
               "value": "o.*"
@@ -137,11 +132,11 @@ stages:
         "total_predictions": 0,
         "total": 1,
         "tasks": [
-        {
-          "data": {
-            "other": "o1"
+          {
+            "data": {
+              "$undefined$": "o1"
+            }
           }
-        }
         ]
       }
       status_code: 200
@@ -157,7 +152,7 @@ stages:
             "conjunction": "and",
             "items": [
             {
-              "filter": "filter:tasks:data.other",
+              "filter": "filter:tasks:data.text",
               "operator": "regex",
               "type": "String",
               "value": "*"

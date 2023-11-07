@@ -664,6 +664,17 @@ def ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on():
     with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
         yield
 
+@pytest.fixture(name='fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short_on')
+def fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short_on():
+    from core.feature_flags import flag_set
+
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short':
+            return True
+        return flag_set(*args, **kwargs)
+
+    with mock.patch('data_manager.managers.flag_set', wraps=fake_flag_set):
+        yield
 
 @pytest.fixture(name='local_files_storage')
 def local_files_storage(settings):

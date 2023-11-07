@@ -389,29 +389,16 @@ def apply_filters(queryset, filters, project, request):
             value = cast_bool_from_str(_filter.value)
             if value:  # empty = true
                 q = Q(Q(**{field_name: None}) | Q(**{field_name + '__isnull': True}))
-                if alt_field_name:
-                    q |= Q(Q(**{alt_field_name: None}) | Q(**{alt_field_name + '__isnull': True}))
                 if value_type == 'str':
                     q |= Q(**{field_name: ''})
-                    if alt_field_name:
-                        q |= Q(**{alt_field_name: ''})
                 if value_type == 'list':
                     q = Q(**{field_name: [None]})
-                    if alt_field_name:
-                        q |= Q(**{alt_field_name: [None]})
-
             else:  # empty = false
                 q = Q(~Q(**{field_name: None}) & ~Q(**{field_name + '__isnull': True}))
-                if alt_field_name:
-                    q &= ~Q(**{alt_field_name: None}) & ~Q(**{alt_field_name + '__isnull': True})
                 if value_type == 'str':
                     q &= ~Q(**{field_name: ''})
-                    if alt_field_name:
-                        q &= ~Q(**{alt_field_name: ''})
                 if value_type == 'list':
                     q = ~Q(**{field_name: [None]})
-                    if alt_field_name:
-                        q &= ~Q(**{alt_field_name: [None]})
 
             filter_expressions.append(q)
             continue
@@ -482,15 +469,13 @@ def apply_filters(queryset, filters, project, request):
         # empty
         elif _filter.operator == 'empty':
             if cast_bool_from_str(_filter.value):
-                q = Q(**{field_name: True})
-                if alt_field_name:
-                    q |= Q(**{alt_field_name: True})
-                filter_expressions.append(q)
+                filter_expressions.append(
+                    Q(**{field_name: True})
+                )
             else:
-                q = ~Q(**{field_name: True})
-                if alt_field_name:
-                    q &= ~Q(**{alt_field_name: True})
-                filter_expressions.append(q)
+                filter_expressions.append(
+                    ~Q(**{field_name: True})
+                )
 
         # starting from not_
         elif _filter.operator.startswith('not_'):
