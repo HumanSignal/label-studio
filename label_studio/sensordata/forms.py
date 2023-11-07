@@ -1,4 +1,6 @@
 from django import forms
+import zipfile
+from django.core.exceptions import ValidationError
 from sensormodel.models import Sensor
 from sensordata.models import SensorOffset
 from projects.models import Project
@@ -15,6 +17,13 @@ class SensorDataForm(forms.Form):
         # Filter the sensor queryset based on the provided project
         if project:
             self.fields['sensor'].queryset = Sensor.objects.filter(project=project)
+    
+    def clean_file(self):
+        uploaded_file = self.cleaned_data.get('file')
+        if uploaded_file:
+            if not zipfile.is_zipfile(uploaded_file):
+                raise ValidationError("Uploaded file must be a valid zipfile!")
+        return uploaded_file
 
 
 class SensorOffsetForm(forms.ModelForm):
