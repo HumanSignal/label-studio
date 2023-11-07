@@ -351,15 +351,24 @@ def preprocess_field_name(raw_field_name, only_undefined_field=False) -> Tuple[s
     """
 
     field_name = raw_field_name
+    ascending = True
 
-    # For security reasons, these must only replaced when they fall at the beginning of the string.
+    # Descending marker `-` may come at the beginning of the string
+    if field_name.startswith('-'):
+        ascending = False
+        field_name = field_name[1:]
+
+    # For security reasons, these must only be removed when they fall at the beginning of the string (or after `-`).
     optional_prefixes = ['filter:', 'tasks:']
     for prefix in optional_prefixes:
         if field_name.startswith(prefix):
             field_name = field_name[len(prefix) :]
 
-    ascending = False if field_name[0] == '-' else True  # detect direction
-    field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+    # Descending marker may also come after other prefixes. Double negative is not allowed.
+    if ascending and field_name.startswith('-'):
+        ascending = False
+        field_name = field_name[1:]
+
     if field_name.startswith('data.'):
         if only_undefined_field:
             field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
