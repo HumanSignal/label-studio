@@ -677,6 +677,7 @@ def fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_shor
     with mock.patch('data_manager.managers.flag_set', wraps=fake_flag_set):
         yield
 
+
 @pytest.fixture(name='fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short_off')
 def fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short_off():
     from core.feature_flags import flag_set
