@@ -313,6 +313,9 @@ def apply_filters(queryset, filters, project, request):
             elif 'equal' in _filter.operator:
                 if not _filter.value.isdigit():
                     _filter.value = 0
+                elif handle_alt_fieldname:
+                    _filter.type = 'Number'
+                    _filter.value = int(_filter.value)
 
         # predictions model versions
         if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:
@@ -376,10 +379,18 @@ def apply_filters(queryset, filters, project, request):
             _filter.operator = 'equal' if cast_bool_from_str(_filter.value) else 'not_equal'
             _filter.value = 0
 
-        # get type of annotated field
-        value_type = 'str'
-        if queryset.exists():
-            value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
+        # When field is a comparison to an id and handle_alt_fieldname is True, treat value as an integer
+        if (
+            handle_alt_fieldname
+            and field_name == 'annotations__id'
+            and _filter.operator in ('equal', 'not_equal', 'empty')
+        ):
+            value_type = 'int'
+        else:
+            # get type of annotated field
+            value_type = 'str'
+            if queryset.exists():
+                value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
         if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
             raise Exception('Not supported filter type')
@@ -395,6 +406,8 @@ def apply_filters(queryset, filters, project, request):
                     base_condition = (
                         Q(**{field_name: []}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
                     )
+                elif value_type == 'int':
+                    base_condition = Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
                 else:
                     base_condition = (
                         Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
@@ -408,6 +421,8 @@ def apply_filters(queryset, filters, project, request):
                             | Q(**{alt_field_name: None})
                             | Q(**{alt_field_name + '__isnull': True})
                         )
+                    elif value_type == 'int':
+                        alt_condition = Q(**{alt_field_name: None}) | Q(**{alt_field_name + '__isnull': True})
                     else:
                         alt_condition = (
                             Q(**{alt_field_name: ''})
