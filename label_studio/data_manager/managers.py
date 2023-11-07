@@ -461,12 +461,14 @@ def apply_filters(queryset, filters, project, request):
         # in
         if _filter.operator == 'in':
             cast_value(_filter)
+            # Base condition for field_name being inside the range
             q = Q(
                 **{
                     f'{field_name}__gte': _filter.value.min,
                     f'{field_name}__lte': _filter.value.max,
                 }
             )
+            # If alt_field_name is set, ensure that records are included if either is inside the range
             if alt_field_name:
                 q |= Q(
                     **{
@@ -476,15 +478,17 @@ def apply_filters(queryset, filters, project, request):
                 )
             filter_expressions.append(q)
 
-        # not in
+        # not_in
         elif _filter.operator == 'not_in':
             cast_value(_filter)
+            # Base condition for field_name being outside the range
             q = ~Q(
                 **{
                     f'{field_name}__gte': _filter.value.min,
                     f'{field_name}__lte': _filter.value.max,
                 }
             )
+            # If alt_field_name is set, ensure that records are excluded if either is outside the range
             if alt_field_name:
                 q &= ~Q(
                     **{
@@ -492,20 +496,25 @@ def apply_filters(queryset, filters, project, request):
                         f'{alt_field_name}__lte': _filter.value.max,
                     }
                 )
+
             filter_expressions.append(q)
 
         # in list
         elif _filter.operator == 'in_list':
-            q = (Q(**{f'{field_name}__in': _filter.value}),)
+            # Base condition for field_name containing the value
+            q = Q(**{f'{field_name}__in': _filter.value})
+            # If alt_field_name is set, ensure that records are included if either contains the value
             if alt_field_name:
-                q |= (Q(**{f'{alt_field_name}__in': _filter.value}),)
+                q |= Q(**{f'{alt_field_name}__in': _filter.value})
             filter_expressions.append(q)
 
         # not in list
         elif _filter.operator == 'not_in_list':
-            q = (~Q(**{f'{field_name}__in': _filter.value}),)
+            # Base condition for field_name not containing the value
+            q = ~Q(**{f'{field_name}__in': _filter.value})
+            # If alt_field_name is set, ensure that records are excluded if either contains the value
             if alt_field_name:
-                q &= (~Q(**{f'{alt_field_name}__in': _filter.value}),)
+                q |= ~Q(**{f'{alt_field_name}__in': _filter.value})
             filter_expressions.append(q)
 
         # empty
@@ -515,12 +524,13 @@ def apply_filters(queryset, filters, project, request):
             else:
                 filter_expressions.append(~Q(**{field_name: True}))
 
-        # starting from not_
         elif _filter.operator.startswith('not_'):
             cast_value(_filter)
+            # Negate the condition for field_name
             q = ~Q(**{field_name: _filter.value})
             if alt_field_name:
-                q &= ~Q(**{alt_field_name: _filter.value})
+                # Ensure that records are excluded if either does not contain the value
+                q |= ~Q(**{alt_field_name: _filter.value})
             filter_expressions.append(q)
 
         # all others
@@ -528,6 +538,7 @@ def apply_filters(queryset, filters, project, request):
             cast_value(_filter)
             q = Q(**{field_name: _filter.value})
             if alt_field_name:
+                # Ensure that records are included if either contains the value
                 q |= Q(**{alt_field_name: _filter.value})
             filter_expressions.append(q)
 
