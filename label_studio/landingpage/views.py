@@ -172,19 +172,20 @@ def exportProject(request, project_id):
             if 'data' in annotation and 'csv' in annotation['data']:
                 csv_url = annotation['data']['csv']
                 if csv_url.startswith('/data/upload/'):
-                    csv_url = os.path.basename(csv_url)
-                    annotation['data']['csv'] = csv_url 
+                    csv_filename = os.path.basename(csv_url)
+                    annotation['data']['csv'] = csv_filename  
 
-            
             if 'data' in annotation and 'video' in annotation['data']:
                 video_source = annotation["data"]["video"]
-                if "src=" in video_source:
-                    src_start = video_source.index("src=") + 5
-                    src_end = video_source.index("'", src_start)
-                    video_url = video_source[src_start:src_end]
-                    if video_url.startswith('/data/upload/'):
-                        video_url = os.path.basename(video_url)
-                        annotation["data"]["video"] = video_source.replace(video_url, os.path.basename(video_url))
+                src_start = video_source.find("src='")  # Find the start of the src attribute
+                if src_start != -1:
+                    src_start += 5  # Move to the character after the single quote
+                    src_end = video_source.find("'", src_start)  
+                    if src_end != -1:
+                        video_url = video_source[src_start:src_end]
+                        if video_url.startswith('/data/upload/'):
+                            video_filename = os.path.basename(video_url)
+                            annotation["data"]["video"] = video_source.replace(video_url, video_filename)  
 
         # Get all physical chunk files
         # Get upload folder
