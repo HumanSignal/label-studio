@@ -384,21 +384,63 @@ def apply_filters(queryset, filters, project, request):
         if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
             raise Exception('Not supported filter type')
 
-        # special case: for strings empty is "" or null=True
-        if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
+        # When handle_alt_fieldname is True, this check will be canonical for empty operators of any type
+        # Otherwise it will default to the previous behavior
+        if _filter.operator == 'empty' and (handle_alt_fieldname or _filter.type in ('String', 'Unknown')):
             value = cast_bool_from_str(_filter.value)
+
+            if handle_alt_fieldname:
+                # Base condition for field_name
+                if value_type == 'list':
+                    base_condition = (
+                        Q(**{field_name: []}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+                    )
+                else:
+                    base_condition = (
+                        Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+                    )
+
+                # Include alt_field_name if it is provided
+                if alt_field_name:
+                    if value_type == 'list':
+                        alt_condition = (
+                            Q(**{alt_field_name: []})
+                            | Q(**{alt_field_name: None})
+                            | Q(**{alt_field_name + '__isnull': True})
+                        )
+                    else:
+                        alt_condition = (
+                            Q(**{alt_field_name: ''})
+                            | Q(**{alt_field_name: None})
+                            | Q(**{alt_field_name + '__isnull': True})
+                        )
+            else:
+                # Original conditions for strictly field_name
+                if value_type == 'str':
+                    base_condition = (
+                        Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+                    )
+                elif value_type == 'list':
+                    base_condition = (
+                        Q(**{field_name: []}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+                    )
+                else:
+                    base_condition = Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+
             if value:  # empty = true
-                q = Q(Q(**{field_name: None}) | Q(**{field_name + '__isnull': True}))
-                if value_type == 'str':
-                    q |= Q(**{field_name: ''})
-                if value_type == 'list':
-                    q = Q(**{field_name: [None]})
+                if alt_field_name:
+                    # Both field_name and alt_field_name should be empty
+                    q = base_condition & alt_condition
+                else:
+                    # Only field_name should be empty
+                    q = base_condition
             else:  # empty = false
-                q = Q(~Q(**{field_name: None}) & ~Q(**{field_name + '__isnull': True}))
-                if value_type == 'str':
-                    q &= ~Q(**{field_name: ''})
-                if value_type == 'list':
-                    q = ~Q(**{field_name: [None]})
+                if alt_field_name:
+                    # At least one of field_name or alt_field_name should not be empty
+                    q = ~base_condition | ~alt_condition
+                else:
+                    # field_name should not be empty
+                    q = ~base_condition
 
             filter_expressions.append(q)
             continue
