@@ -18,6 +18,9 @@ Navigate to your project’s Dashboard tab to discover the project’s progress 
 
 <img src="/images/FullDashboardPage.png" alt="" class="gif-border" />
 
+!!! info Tip
+    You can reorder charts using drag and drop. 
+
 ## Review dataset progress
 
 The dataset progress bar displays the number of tasks considered to be fully annotated for the project and the number of tasks remaining to be annotated. If the project requires a minimum annotation per task of more than one, some tasks might not appear as “annotated” because they are not yet fully annotated by the project standards. [Learn more](/guide/setup_project.html#Set-minimum-annotations-per-task) about minimum annotation and task overlap settings.
@@ -83,3 +86,8 @@ For example, if you notice a high discrepancy between tasks that have been revie
 View up to 30 labels that were used during annotation for the time period selected in a stacked bar chart to identify the distribution of labels at various levels of granularity over time. Use this chart to identify possible problems with your dataset distribution, such as an unbalanced dataset where some labels are overrepresented in an annotated dataset compared with others.
 
 For example, if you’re developing a dataset of OCR images, and 90% of your tasks have Text labels and 10% have Handwriting labels, you might want to increase the number of images of handwriting in your dataset, to improve the eventual accuracy of a machine learning model trained on this dataset.
+
+If you have a labeling configuration that contains multiple label groups, you will see a separate chart for each group showing the label counts within that group.
+
+!!! info Tip
+    From the menu in the upper right of each chart, select **Summary** to view a donut chart showing label distribution. 

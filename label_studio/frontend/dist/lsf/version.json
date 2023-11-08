@@ -1,6 +1,6 @@
 {
-  "message": "perf: LEAP-32: Improve performance of zooming at Image Segmentation",
-  "commit": "5ae9ccbfa136781bedcb665b4b9581c7f82daaad",
+  "message": "fix: LEAP-345: Fix taxonomy items collapsing when dropdown is closed",
+  "commit": "fcdc1df7b09877c684fb95c07625a0ad0bc1d58a",
   "branch": "master",
-  "date": "2023/11/03 15:23:08"
+  "date": "2023/11/07 11:01:17"
 }
