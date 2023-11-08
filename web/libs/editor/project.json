@@ -10,6 +10,7 @@
       "options": {
         "compiler": "babel",
         "webpackConfig": "webpack.config.js",
+        "index": "libs/editor/public/index.html",
         "tsConfig": "libs/editor/tsconfig.lib.json",
         "main": "libs/editor/src/index.ts",
         "outputPath": "dist/libs/editor",
@@ -21,6 +22,21 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/editor/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "serve": {
+      "executor": "@nx/webpack:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "assets": ["./public"],
+        "port": 8080,
+        "buildTarget": "editor:build",
+        "hmr": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "editor:build"
+        }
       }
     },
     "test": {
