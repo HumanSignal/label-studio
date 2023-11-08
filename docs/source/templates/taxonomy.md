@@ -60,9 +60,6 @@ You can modify the template to call an external taxonomy. To do this, remove the
 <Taxonomy name="taxonomy" toName="text" apiUrl="<YOUR_TAXONOMY_URL>" />
 ```
 
-!!! note
-    The URL must be accessible to Label Studio (it must be public or hosted on a local server).
-
 For example: 
 
 ```html
@@ -82,6 +79,18 @@ The remote taxonomy must use JSON with items in the following format:
 | [`children`] | Nested values within the taxonomy hierarchy. Use this when defining your taxonomy in a single JSON-formatted file. |
 | [`isLeaf`] | Boolean value. Use this instead of `children` when working with an API taxonomy. The default is `true`. When explicitly set to false, the node is treated as a parent node. [See below for more information](#API-taxonomies).  |
 | [`hint`] | This string will appear as a tooltip to the user when they hover their cursor over the value. |
+
+### Securing the taxonomy
+
+The `apiUrl` must be accessible to Label Studio. You can accomplish this in several ways:
+* The URL is public. 
+* The URL is hosted on a local server. 
+* The URL includes the username and password, for example `http://username:password@example.com/`. 
+
+    While in this case the taxonomy itself is not publicly accessible, anyone with access to view the project's labeling configuration would be able to see the credentials. Annotators would also be able to view the credentials through the Network tab in their browser's developer tools.   
+* The URL points to your private cloud environment. This is the most secure option. 
+
+    [Follow these instructions to set up cloud storage for Label Studio](storage). You can then format your `apiUrl` using the appropriate URL format for your cloud service provider: `gs://`, `s3://`, `azure-blob://`.
 
 
 ### Flat file format
