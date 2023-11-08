@@ -143,10 +143,6 @@ dependencies = [
     "boto3==1.28.58",
     "botocore==1.31.58",
     "bleach~=5.0.0",
-    "google-auth==2.14.1",
-    "google-cloud-storage~=2.5.0",
-    "google-resumable-media==2.3.3",
-    "grpc-google-iam-v1==0.12.4",
     "Django==3.2.20",
     "django-storages==1.12.3",
     "django-annoying==0.10.6",
@@ -190,6 +186,7 @@ dependencies = [
     "launchdarkly-server-sdk==7.5.0",
     "python-json-logger==2.0.4",
     "label-studio-converter==0.0.55",
+    "google-cloud-storage>=2.13.0",
 ]
 requires-python = ">=3.8"
 readme = "README.md"
