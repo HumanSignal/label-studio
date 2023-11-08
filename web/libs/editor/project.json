@@ -14,7 +14,14 @@
         "tsConfig": "libs/editor/tsconfig.lib.json",
         "main": "libs/editor/src/index.ts",
         "outputPath": "dist/libs/editor",
-        "isolatedConfig": true
+        "isolatedConfig": true,
+        "assets": [
+          {
+            "glob": "public",
+            "input": "libs/editor",
+            "output": "public/"
+          }
+        ]
       }
     },
     "lint": {
@@ -28,10 +35,11 @@
       "executor": "@nx/webpack:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "assets": ["./public"],
-        "port": 8080,
+        "port": 3000,
         "buildTarget": "editor:build",
-        "hmr": true
+        "hmr": true,
+        "watch": true,
+        "liveReload": true,
       },
       "configurations": {
         "development": {
