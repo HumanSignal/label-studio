@@ -2,15 +2,19 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Spinner } from '../../../components';
 import { useLibrary } from '../../../providers/LibraryProvider';
 import { cn } from '../../../utils/bem';
+import { FF_DEV_3617, isFF } from '../../../utils/feature-flags';
 import './Config.styl';
 import { EMPTY_CONFIG } from './Template';
+import { API_CONFIG } from '../../../config/ApiConfig';
+import { useAPI } from '../../../providers/ApiProvider';
 
 const configClass = cn("configure");
 
-export const Preview = ({ config, data, error, loading }) => {
+export const Preview = ({ config, data, error, loading, project }) => {
   const LabelStudio = useLibrary('lsf');
   const lsf = useRef(null);
   const rootRef = useRef();
+  const api = useAPI();
 
   const currentTask = useMemo(() => {
     return {
@@ -20,6 +24,24 @@ export const Preview = ({ config, data, error, loading }) => {
       data,
     };
   }, [data]);
+
+  /**
+   * Proxy urls to presign them if storage is connected
+   * @param {*} _ LS instance
+   * @param {string} url http/https are not proxied and returned as is
+   */
+  const onPresignUrlForProject = async (_, url) => {
+    const parsedUrl = new URL(url);
+
+    // return same url if http(s)
+    if (["http:", "https:"].includes(parsedUrl.protocol)) return url;
+
+    const projectId = project.id;
+
+    const fileuri = btoa(url);
+
+    return api.api.createUrl(API_CONFIG.endpoints.presignUrlForProject, { projectId, fileuri }).url;
+  };
 
   const currentConfig = useMemo(() => {
     // empty string causes error in LSF
@@ -33,19 +55,33 @@ export const Preview = ({ config, data, error, loading }) => {
     console.info("Initializing LSF preview", { config, task });
 
     try {
-      return new window.LabelStudio(rootRef.current, {
+      const lsf = new window.LabelStudio(rootRef.current, {
         config,
         task,
         interfaces: ["side-column", "annotations:comments"],
-        onLabelStudioLoad(LS) {
+        // with SharedStore we should use more late event
+        [isFF(FF_DEV_3617) ? 'onStorageInitialized' : 'onLabelStudioLoad'](LS) {
           LS.settings.bottomSidePanel = true;
 
-          const as = LS.annotationStore;
-          const c = as.createAnnotation();
+          const initAnnotation = () => {
+            const as = LS.annotationStore;
+            const c = as.createAnnotation();
 
-          as.selectAnnotation(c.id);
+            as.selectAnnotation(c.id);
+          };
+
+          if (isFF(FF_DEV_3617)) {
+            // and even then we need to wait a little even after the store is initialized
+            setTimeout(initAnnotation);
+          } else {
+            initAnnotation();
+          }
         },
       });
+
+      lsf.on('presignUrlForProject', onPresignUrlForProject);
+
+      return lsf;
     } catch (err) {
       console.error(err);
       return null;

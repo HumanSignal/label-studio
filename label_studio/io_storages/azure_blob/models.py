@@ -85,9 +85,12 @@ class AzureBlobStorageMixin(models.Model):
         if self.prefix and 'Export' not in self.__class__.__name__:
             logger.debug(f'Test connection to container {self.container} with prefix {self.prefix}')
             prefix = str(self.prefix)
-            blobs = list(container.list_blobs(name_starts_with=prefix, results_per_page=1))
+            try:
+                blob = next(container.list_blob_names(name_starts_with=prefix))
+            except StopIteration:
+                blob = None
 
-            if not blobs:
+            if not blob:
                 raise KeyError(f'{self.url_scheme}://{self.container}/{self.prefix} not found.')
 
 
