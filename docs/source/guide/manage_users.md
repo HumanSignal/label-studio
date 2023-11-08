@@ -3,8 +3,8 @@ title: Manage users to Label Studio Enterprise
 short: User management
 tier: enterprise
 type: guide
-order: 115
-order_enterprise: 102
+order: 0
+order_enterprise: 70
 meta_title: Manage Role-Based Access Control in Label Studio
 meta_description: Manage access and set up permissions with user roles, organizations, and project workspaces for your projects in Label Studio Enterprise.
 section: "Project & Team Management"
@@ -305,3 +305,18 @@ If you're not sure what the organization ID is, you can do the following:
 - If you have multiple organizations, make a GET request to the [`/api/organizations/`](/api#operation/api_organizations_read) endpoint.
 
 To retrieve user IDs for the members of an organization, make a GET request to [`/api/organizations/{id}/memberships`](/api#operation/api_organizations_memberships_list).
+
+
+## Delete users
+
+1. From the Organization page, select the user you want to delete. 
+
+2. Click **Delete**. 
+
+    ![Screenshot of the Delete action](/images/user_delete.png)
+
+3. A confirmation message appears. Click **Delete Member**. 
+
+Once deleted, any completed work or changes that the user made will appear as belonging to a "Deleted User."
+
+If you want to add the user again at a later date, you will need to re-invite them to the organization. 

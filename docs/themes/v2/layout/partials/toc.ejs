@@ -4,11 +4,11 @@
     <% if(isEnterpriseTheme) pages.forEach(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
     <% const orderedPages = pages.sort('order') %>
     <% const parentPages = orderedPages.filter(page => page.parent === undefined) %>
-    <% const childrenPages = orderedPages.filter(page => page.parent !== undefined) %>
+    <% const childrenPages = orderedPages.filter(page => page.parent_enterprise !== undefined || page.parent !== undefined ) %>
 
     <% const pagesArray = parentPages.map(page => {
       var fileName = page.path.replace(/^.+?\/([\w-]+)\.html/, '$1')
-      let childPages = childrenPages.filter(child => child.parent === fileName);
+      let childPages = childrenPages.filter(child => child.parent_enterprise === fileName || child.parent === fileName);
 
       return {
         page: page,

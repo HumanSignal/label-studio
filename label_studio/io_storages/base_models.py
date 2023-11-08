@@ -269,7 +269,7 @@ class ImportStorage(Storage):
                 if self.presign and task is not None:
                     proxy_url = urljoin(
                         settings.HOSTNAME,
-                        reverse('data_import:storage-data-presign', kwargs={'task_id': task.id})
+                        reverse('data_import:task-storage-data-presign', kwargs={'task_id': task.id})
                         + f'?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}',
                     )
                     return uri.replace(extracted_uri, proxy_url)
