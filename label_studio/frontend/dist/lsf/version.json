@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-345: Fix taxonomy items collapsing when dropdown is closed",
-  "commit": "fcdc1df7b09877c684fb95c07625a0ad0bc1d58a",
-  "branch": "master",
-  "date": "2023/11/07 11:01:17"
+  "message": "feat: LEAP-54: Move editor e2e tests to the new LS monorepo",
+  "commit": "d743c817330d5cab9e2bad5d6ae86fd3f26bbf82",
+  "branch": "fb-leap-54-2",
+  "date": "2023/11/09 20:33:15"
 }
