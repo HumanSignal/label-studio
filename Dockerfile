@@ -39,7 +39,7 @@ RUN set -eux \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop
+    pip3 install --upgrade pip setuptools && pip3 install pdm uwsgi uwsgitop
 
 # incapsulate nginx install & configure to a single layer
 RUN set -eux; \
@@ -57,25 +57,34 @@ RUN set -eux; \
     chown -R 1001:0 $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx
 
 # Copy and install middleware dependencies
-COPY --chown=1001:0 deploy/requirements-mw.txt .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements-mw.txt
+# COPY --chown=1001:0 deploy/requirements-mw.txt .
+# RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+#     pip3 install -r requirements-mw.txt
+
+COPY --chown=1001:0 ./pyproject.toml $LS_DIR
+COPY --chown=1001:0 ./pdm.lock $LS_DIR
+# pdm requires README
+COPY --chown=1001:0 ./README.md $LS_DIR
+RUN mkdir $LS_DIR/__pypackages__
+ENV PDM_CACHE_DIR=$LS_DIR/__pypackages__
 
 # Copy and install requirements.txt first for caching
-COPY --chown=1001:0 deploy/requirements.txt .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements.txt
+RUN pdm sync --prod --fail-fast
+
+# # Copy and install requirements.txt first for caching
+# COPY --chown=1001:0 deploy/requirements-test.txt .
+# RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+#     pip3 install -r requirements-test.txt
 
 COPY --chown=1001:0 . .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -e . && \
-    chown -R 1001:0 $LS_DIR && \
-    chmod -R g=u $LS_DIR
 
 RUN rm -rf ./label_studio/frontend
 COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
 
-RUN python3 label_studio/manage.py collectstatic --no-input && \
+# Needed for uwsgi worker to find django package
+ENV PYTHONPATH="$LS_DIR/__pypackages__/3.10/lib"
+
+RUN pdm run python3 label_studio/manage.py collectstatic --no-input && \
     chown -R 1001:0 $LS_DIR && \
     chmod -R g=u $LS_DIR
 
@@ -86,4 +95,4 @@ EXPOSE 8080
 USER 1001
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
-CMD ["label-studio"]
+CMD ["pdm run label-studio"]
