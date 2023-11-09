@@ -3,7 +3,7 @@ import React from 'react';
 import { FilterInput } from '../FilterInput';
 import { Common } from './Common';
 
-const BaseInput = observer(( props ) => {
+const BaseInput = observer((props) => {
   return (
     <FilterInput
       {...props}

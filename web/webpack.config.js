@@ -84,14 +84,17 @@ module.exports = composePlugins(withNx({
   }
 
   config.module.rules.forEach((rule) => {
-    if (rule.test.toString().includes('css')) {
+    if (rule.test.toString().includes('scss')) {
       rule.oneOf.forEach(loader => {
         if (loader.use) {
           const cssLoader = loader.use.find(use => use.loader && use.loader.includes('css-loader'));
 
           if (cssLoader && cssLoader.options) {
             cssLoader.options.modules = {
-              localIdentName: process.env.CSS_PREFIX + '[local]', // Customize this format
+              mode: "local",
+              auto: true,
+              namedExport: false,
+              localIdentName: "[local]--[hash:base64:5]"
             };
           }
         }
@@ -103,6 +106,14 @@ module.exports = composePlugins(withNx({
 
       r.forEach(_r => {
         const l = _r.use.filter((u) => u.loader && u.loader.includes('stylus-loader'));
+        const cssLoader = _r.use.find(use => use.loader && use.loader.includes('css-loader'));
+
+        if (cssLoader && cssLoader.options) {
+          cssLoader.options.modules = {
+            localIdentName: process.env.CSS_PREFIX + '[local]', // Customize this format
+          };
+        }
+
 
         l.forEach(_l => {
           _l.options = {

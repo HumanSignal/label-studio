@@ -2,7 +2,7 @@ import { FilterListInterface } from './FilterInterfaces';
 import { isDefined } from '../../utils/utilities';
 
 export const FilterItemsByOperation = (items: any[], filterItem: FilterListInterface) => {
-  if((!filterItem.value || filterItem.value === '') && filterItem.operation !== 'empty') return items;
+  if ((!filterItem.value || filterItem.value === '') && filterItem.operation !== 'empty') return items;
 
   switch (filterItem.operation) {
     case 'contains':
@@ -37,7 +37,7 @@ export const FilterItemsByOperation = (items: any[], filterItem: FilterListInter
 export const FilterItems = (items: any[], filterList: FilterListInterface[]) => {
   const _filteredList = [[...items]];
 
-  for(let i = 0; i < filterList.length; i++) {
+  for (let i = 0; i < filterList.length; i++) {
     if (!filterList[i].value && filterList[i].operation !== 'empty') continue;
 
     if (filterList[i].logic === 'and') { // 0 is equal to AND, 1 is equal to OR
@@ -175,14 +175,14 @@ const notbetween = (items: any[], filterItem: FilterListInterface) => {
 };
 
 const regex = (items: any[], filterItem: FilterListInterface) => {
-  try{
+  try {
     return items.filter((obj) => {
       const item = getFilteredPath(filterItem.path, obj);
       const regex = new RegExp(filterItem.value, 'g');
 
       return item.match(regex);
     });
-  } catch(e) {
+  } catch (e) {
     return items;
   }
 };
@@ -195,7 +195,7 @@ const empty = (items: any[], filterItem: FilterListInterface) => {
   });
 };
 
-const getFilteredPath = (path: string | string[], items: any[], separator='.') => {
+const getFilteredPath = (path: string | string[], items: any[], separator = '.') => {
   const properties = Array.isArray(path) ? path : path.split(separator);
 
   return properties.reduce((prev, curr) => prev?.[curr], items);

@@ -27,7 +27,7 @@ const RegionItemDesc = observer(({ item, setDraggable }) => {
   const controls = item.perRegionDescControls || [];
 
   return (
-    <Elem name="desc" tag="div" mod={{ collapsed, empty: !(controls?.length > 0)  }} onMouseEnter={()=>{setDraggable?.(false);}} onMouseLeave={()=>{setDraggable?.(true);}}>
+    <Elem name="desc" tag="div" mod={{ collapsed, empty: !(controls?.length > 0) }} onMouseEnter={() => { setDraggable?.(false); }} onMouseLeave={() => { setDraggable?.(true); }}>
       <Elem name="controls">
         {controls.map((tag, idx) => {
           const View = Registry.getPerRegionView(tag.type, PER_REGION_MODES.REGION_LIST);
@@ -45,7 +45,7 @@ const RegionItemDesc = observer(({ item, setDraggable }) => {
 const RegionItemContent = observer(({ idx, item, setDraggable }) => {
   const itemElRef = useRef();
 
-  useEffect(()=>{
+  useEffect(() => {
     if (item.selected) {
       const el = itemElRef.current;
 
@@ -56,7 +56,7 @@ const RegionItemContent = observer(({ idx, item, setDraggable }) => {
     }
   }, [item.selected]);
   return (
-    <Block ref={itemElRef} name="region-item" mod={{ hidden : item.hidden }} data-testid={`regionitem:selected=${item.selected}`}>
+    <Block ref={itemElRef} name="region-item" mod={{ hidden: item.hidden }} data-testid={`regionitem:selected=${item.selected}`}>
       <Elem name="header" tag="div">
         <Elem name="counter">{isDefined(idx) ? idx + 1 : ''}</Elem>
 
@@ -106,7 +106,7 @@ const RegionItemContent = observer(({ idx, item, setDraggable }) => {
 });
 
 export const RegionItem = observer(({ item, idx, flat, setDraggable, onClick }) => {
-  const getVars = useMemo(()=>{
+  const getVars = useMemo(() => {
     let vars;
 
     return () => {
@@ -134,7 +134,7 @@ export const RegionItem = observer(({ item, idx, flat, setDraggable, onClick }) 
     <List.Item
       key={item.id}
       className={classnames.join(' ')}
-      onClick={(e)=>{onClick(e, item);}}
+      onClick={(e) => { onClick(e, item); }}
       onMouseOver={() => item.setHighlight(true)}
       onMouseOut={() => item.setHighlight(false)}
       style={vars}

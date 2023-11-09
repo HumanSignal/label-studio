@@ -30,12 +30,6 @@ Scenario('Switching states at nested choices', async ({ I, LabelStudio })=>{
 
   I.amOnPage('/');
 
-  LabelStudio.setFeatureFlags({
-    ff_dev_2007_rework_choices_280322_short: true,
-    ff_dev_2100_preselected_choices_250422_short: true,
-    ff_front_dev_2244_nested_choices_des_107_160522_short: true,
-  });
-
   LabelStudio.init(params);
 
   {
@@ -99,12 +93,6 @@ Scenario('Nested choices states from the annotation', async ({ I, LabelStudio })
   };
 
   I.amOnPage('/');
-
-  LabelStudio.setFeatureFlags({
-    ff_dev_2007_rework_choices_280322_short: true,
-    ff_dev_2100_preselected_choices_250422_short: true,
-    ff_front_dev_2244_nested_choices_des_107_160522_short: true,
-  });
 
   // Load annotation with each type of selection for branches (fully checked, fully unchecked, partly checked)
   LabelStudio.init({

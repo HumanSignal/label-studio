@@ -309,6 +309,9 @@ const HtxEllipseView = ({ item, setShapeRef }) => {
   const stage = item.parent?.stageRef;
   const { suggestion } = useContext(ImageViewContext) ?? {};
 
+  if (!item.parent) return null;
+  if (!item.inViewPort) return null;
+
   return (
     <Fragment>
       <Ellipse
@@ -321,6 +324,8 @@ const HtxEllipseView = ({ item, setShapeRef }) => {
         stroke={regionStyles.strokeColor}
         strokeWidth={regionStyles.strokeWidth}
         strokeScaleEnabled={false}
+        perfectDrawEnabled={false}
+        shadowForStrokeEnabled={false}
         shadowBlur={0}
         scaleX={item.scaleX}
         scaleY={item.scaleY}

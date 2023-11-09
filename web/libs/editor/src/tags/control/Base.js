@@ -1,6 +1,7 @@
 import { types } from 'mobx-state-tree';
-import { FF_DEV_3391, isFF } from '../../utils/feature-flags';
+import { FF_DEV_3391, FF_SNAP_TO_PIXEL, isFF } from '../../utils/feature-flags';
 import { BaseTag } from '../TagBase';
+import { SNAP_TO_PIXEL_MODE } from '../../components/ImageView/Image';
 
 const ControlBase = types.model({
   ...(isFF(FF_DEV_3391)
@@ -13,7 +14,9 @@ const ControlBase = types.model({
   smart: true,
   smartonly: false,
   isControlTag: true,
-}).views(self => ({
+}).volatile(() => ({
+  snapMode: SNAP_TO_PIXEL_MODE.EDGE,
+})).views(self => ({
   // historically two "types" were used and we should keep that backward compatibility:
   // 1. name of control tag for describing labeled region;
   // 2. label type to attach corresponding value to this region.
@@ -42,6 +45,15 @@ const ControlBase = types.model({
 
   get result() {
     return self.annotation.results.find(r => r.from_name === self);
+  },
+
+  getSnappedPoint(point) {
+    if (!isFF(FF_SNAP_TO_PIXEL)) return point;
+
+    if (self.snap === 'pixel') {
+      return self.toNameTag.snapPointToPixel(point, self.snapMode);
+    }
+    return point;
   },
 }));
 

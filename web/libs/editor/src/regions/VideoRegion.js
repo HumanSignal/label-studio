@@ -1,10 +1,11 @@
 import { types } from 'mobx-state-tree';
 
+import { guidGenerator } from '../core/Helpers';
+import { AreaMixin } from '../mixins/AreaMixin';
 import NormalizationMixin from '../mixins/Normalization';
 import RegionsMixin from '../mixins/Regions';
 import { VideoModel } from '../tags/object/Video';
-import { guidGenerator } from '../core/Helpers';
-import { AreaMixin } from '../mixins/AreaMixin';
+import { FF_LEAP_187, isFF } from '../utils/feature-flags';
 
 export const onlyProps = (props, obj) => {
   return Object.fromEntries(props.map(prop => [
@@ -47,6 +48,14 @@ const Model = types
   .actions(self => ({
     updateShape() {
       throw new Error('Method updateShape must be implemented on a shape level');
+    },
+
+    onSelectInOutliner() {
+      if (isFF(FF_LEAP_187)) {
+        // skip video to the first frame of this region
+        // @todo hidden/disabled timespans?
+        self.object.setFrame(self.sequence[0].frame);
+      }
     },
 
     serialize() {

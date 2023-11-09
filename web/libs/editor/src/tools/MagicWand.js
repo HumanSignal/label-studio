@@ -408,7 +408,7 @@ const _Tool = types
      * once the user is done with the Magic Wand by releasing the mouse button.
      */
     initCurrentRegion() {
-      if (self.isFirstWand){
+      if (self.isFirstWand) {
         const regionOpts = {
           id: guidGenerator(),
           strokewidth: 1,

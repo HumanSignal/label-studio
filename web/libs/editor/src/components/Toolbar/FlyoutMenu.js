@@ -75,7 +75,7 @@ export const FlyoutMenu = ({
 
   useEffect(() => {
     const windowClickHandler = () => {
-      if(isClicked) {
+      if (isClicked) {
         setClicked(false);
       }
     };

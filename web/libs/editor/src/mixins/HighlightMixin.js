@@ -153,14 +153,8 @@ export const HighlightMixin = types
     updateSpans() {
       if (self._hasSpans || (isFF(FF_LSDV_4620_3) && self._spans?.length)) {
         const lastSpan = self._spans[self._spans.length - 1];
-        const label = self.getLabels();
 
-        // label is array, string or null, so check for length
-        if (!label?.length) {
-          lastSpan.removeAttribute('data-label');
-        } else {
-          lastSpan.setAttribute('data-label', label);
-        }
+        Utils.Selection.applySpanStyles(lastSpan, { label: self.getLabels() });
       }
     },
 
@@ -274,7 +268,7 @@ export const HighlightMixin = types
     },
 
     getLabels() {
-      return self.labeling?.mainValue ?? [];
+      return (self.labeling?.selectedLabels ?? []).map(label => label.value).join(',');
     },
 
     getLabelColor() {

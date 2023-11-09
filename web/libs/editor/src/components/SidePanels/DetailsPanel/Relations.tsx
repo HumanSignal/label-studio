@@ -36,8 +36,8 @@ const RelationsList: FC<RelationsListProps> = observer(({ relations }) => {
 const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
   const [hovered, setHovered] = useState(false);
 
-  const onMouseEnter= useCallback(() => {
-    if(!!relation.node1 && !!relation.node2){
+  const onMouseEnter = useCallback(() => {
+    if (!!relation.node1 && !!relation.node2) {
       setHovered(true);
       relation.toggleHighlight();
       relation.setSelfHighlight(true);
@@ -45,7 +45,7 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
   }, []);
 
   const onMouseLeave = useCallback(() => {
-    if(!!relation.node1 && !!relation.node2){
+    if (!!relation.node1 && !!relation.node2) {
       setHovered(false);
       relation.toggleHighlight();
       relation.setSelfHighlight(false);
@@ -89,7 +89,7 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
         </Elem>
         <Elem name="actions">
           <Elem name="action">
-            {(hovered || relation.showMeta) && relation.hasRelations  && (
+            {(hovered || relation.showMeta) && relation.hasRelations && (
               <Button
                 primary={relation.showMeta}
                 type={relation.showMeta ? undefined : 'text'}

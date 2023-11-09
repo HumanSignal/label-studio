@@ -332,7 +332,7 @@ export const Wave: FC<TimelineViewProps> = ({
             max={WS_ZOOM_X.max}
             minIcon={<IconZoomOut />}
             maxIcon={<IconZoomIn />}
-            onChange={value =>  setZoom(Number(value)) }
+            onChange={value => setZoom(Number(value)) }
           />
         </Space>
       </Elem>

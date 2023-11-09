@@ -10,6 +10,6 @@ class ResizeObserverFallback {
   }
 }
 
-const ResizeObserver =  window.ResizeObserver ?? ResizeObserverFallback;
+const ResizeObserver = window.ResizeObserver ?? ResizeObserverFallback;
 
 export default ResizeObserver;

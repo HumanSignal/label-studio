@@ -31,7 +31,7 @@ export const Slider: FC<SliderProps> = ({
   }, [value]);
 
   const changeBackgroundSize = () => {
-    if(sliderRef.current)
+    if (sliderRef.current)
       sliderRef.current.style.backgroundSize = ((value - min) * 100) / (max - min) + '% 100%';
   };
 
@@ -72,7 +72,7 @@ export const Slider: FC<SliderProps> = ({
           name="input"
           tag="input"
           type="text"
-          mod={(valueError !== undefined && (typeof valueError === 'string' || valueError > max || valueError < min)) && { error:'control' }}
+          mod={(valueError !== undefined && (typeof valueError === 'string' || valueError > max || valueError < min)) && { error: 'control' }}
           min={min}
           max={max}
           value={valueError === undefined ? value : valueError}

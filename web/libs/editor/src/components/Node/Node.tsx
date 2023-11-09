@@ -188,6 +188,9 @@ const NodeMinimal: FC<any> = observer(({ node }) => {
 });
 
 const useNodeName = (node: any) => {
+  // @todo sometimes node is control tag, not a region
+  // @todo and for new taxonomy it can be plain object
+  if (!node.$treenode) return null;
   return getType(node).name as keyof typeof NodeViews;
 };
 

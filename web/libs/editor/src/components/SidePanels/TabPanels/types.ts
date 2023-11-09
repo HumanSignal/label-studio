@@ -56,7 +56,7 @@ export enum JoinOrder {
 export interface PanelBBox {
   order: number;
   width: number;
-  height:  number;
+  height: number;
   left: number;
   top: number;
   relativeLeft: number;
@@ -75,7 +75,7 @@ export interface EventHandlers {
   onGroupHeightResize: (key: string, h: number, t: number) => void;
   onResizeStart: ()=> void;
   onResizeEnd: ()=> void;
-  onPositionChange: (key: string, t: number, l: number, detached: boolean, alignment: Side ) => void;
+  onPositionChange: (key: string, t: number, l: number, detached: boolean, alignment: Side) => void;
   onVisibilityChange: (key: string, visible: boolean) => void;
   onPositionChangeBegin: (key: string, x: number, y: number, side: Side, detached: boolean) => void;
   onSnap: (key: string) => void;

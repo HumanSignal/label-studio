@@ -96,8 +96,8 @@ export const AudioRegionModel = types
 
       const lastClassList = el.className.split(' ');
 
-      for(const obj in lastClassList){
-        if(lastClassList[obj].indexOf('htx-label') >= 0){
+      for (const obj in lastClassList) {
+        if (lastClassList[obj].indexOf('htx-label') >= 0) {
           lastClassList.splice(obj, 1);
         }
       }
@@ -213,7 +213,7 @@ export const AudioRegionModel = types
 
     toggleHidden(e) {
       self.hidden = !self.hidden;
-      self._ws_region.element.style.display = self.hidden ?  'none' : 'block';
+      self._ws_region.element.style.display = self.hidden ? 'none' : 'block';
       e?.stopPropagation();
     },
   }));

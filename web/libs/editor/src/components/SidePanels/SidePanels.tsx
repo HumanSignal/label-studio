@@ -25,7 +25,7 @@ interface SidePanelsProps {
 
 interface PanelBBox {
   width: number;
-  height:  number;
+  height: number;
   left: number;
   top: number;
   relativeLeft: number;
@@ -164,7 +164,7 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({
 
     if (left >= 0 && left <= snapTreshold && spaceFree('left')) {
       setSnap('left');
-    } else if (right <= parentWidth && right >= rightLimit  && spaceFree('right')) {
+    } else if (right <= parentWidth && right >= rightLimit && spaceFree('right')) {
       setSnap('right');
     } else {
       setSnap(undefined);
@@ -205,7 +205,7 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({
     setPanelData(patch);
   }, [panelData]);
 
-  const onPositionChange = useCallback((name: PanelType, t: number, l:  number, detached: boolean) => {
+  const onPositionChange = useCallback((name: PanelType, t: number, l: number, detached: boolean) => {
     const panel = panelData[name];
     const parentWidth = rootRef.current?.clientWidth ?? 0;
 
@@ -291,7 +291,7 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({
     if (isFF(FF_DEV_3873)) {
       const firstPanelOnNewSideName = findPanelsOnSameSide(localSnap.current).filter(panelName => panelName !== name)?.[0];
 
-      if(firstPanelOnNewSideName) {
+      if (firstPanelOnNewSideName) {
         bboxData.width = clamp(panelData[firstPanelOnNewSideName as PanelType]?.width, DEFAULT_PANEL_WIDTH, panelMaxWidth);
       }
     }
@@ -360,7 +360,7 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({
 
     const panels = Object.entries(panelData);
 
-    for(const [name, panelData] of panels) {
+    for (const [name, panelData] of panels) {
       const { alignment, detached } = panelData;
       const view = panelView[name as PanelType];
       const Component = view.component;

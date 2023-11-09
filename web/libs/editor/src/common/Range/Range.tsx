@@ -27,21 +27,21 @@ export interface RangeProps {
   onMaxIconClick?: (value: RangeValueType) => void;
 }
 
-const arrayReverse = <T extends any[] = any[]>(array: T, reverse=false) => {
+const arrayReverse = <T extends any[] = any[]>(array: T, reverse = false) => {
   return reverse ? [...array].reverse() : array;
 };
 
 export const Range: FC<RangeProps> = ({
   value,
   defaultValue,
-  multi=false,
-  reverse=false,
-  continuous=false,
-  min=0,
-  max=100,
-  step=1,
-  size=120,
-  align='horizontal',
+  multi = false,
+  reverse = false,
+  continuous = false,
+  min = 0,
+  max = 100,
+  step = 1,
+  size = 120,
+  align = 'horizontal',
   resetValue,
   minIcon,
   maxIcon,

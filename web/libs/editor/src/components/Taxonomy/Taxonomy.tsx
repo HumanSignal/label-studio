@@ -9,15 +9,15 @@ import React, {
 } from 'react';
 import { Dropdown, Menu } from 'antd';
 
-import { useToggle } from '../../hooks/useToggle';
-import { isArraysEqual } from '../../utils/utilities';
 import { LsChevron } from '../../assets/icons';
+import { Tooltip } from '../../common/Tooltip/Tooltip';
+import { useToggle } from '../../hooks/useToggle';
+import { CNTagName } from '../../utils/bem';
+import { FF_DEV_4075, FF_PROD_309, isFF } from '../../utils/feature-flags';
+import { isArraysEqual } from '../../utils/utilities';
 import TreeStructure from '../TreeStructure/TreeStructure';
 
 import styles from './Taxonomy.module.scss';
-import { FF_DEV_4075, FF_PROD_309, isFF } from '../../utils/feature-flags';
-import { Tooltip } from '../../common/Tooltip/Tooltip';
-import { CNTagName } from '../../utils/bem';
 
 type TaxonomyPath = string[];
 type onAddLabelCallback = (path: string[]) => any;
@@ -33,6 +33,7 @@ type TaxonomyItem = {
 };
 
 type TaxonomyOptions = {
+  canRemoveItems?: boolean,
   leafsOnly?: boolean,
   showFullPath?: boolean,
   pathSeparator?: string,
@@ -169,7 +170,7 @@ type HintTooltipProps = {
   children: JSX.Element,
 }
 
-export const HintTooltip: React.FC<HintTooltipProps>  = ({
+export const HintTooltip: React.FC<HintTooltipProps> = ({
   title,
   wrapper: Wrapper,
   children,
@@ -503,6 +504,10 @@ const Taxonomy = ({
   const contextValue: TaxonomySelectedContextValue = useMemo(() => {
     const setSelected = (path: TaxonomyPath, value: boolean) => {
       const newSelected = value ? [...selected, path] : selected.filter(current => !isArraysEqual(current, path));
+
+      // don't remove last item when taxonomy is used as labeling tool
+      // canRemoveItems is undefined when FF is off; false only when region is active
+      if (options.canRemoveItems === false && !newSelected.length) return;
 
       setInternalSelected(newSelected);
       onChange && onChange(null, newSelected);

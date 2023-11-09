@@ -303,7 +303,7 @@ class ChannelD3 extends React.Component {
         // all other space is taken by brushCreator
         group.selectAll('.overlay').style('pointer-events', 'none');
 
-        if(r.isReadOnly()) {
+        if (r.isReadOnly()) {
           group.selectAll('.handle').remove();
         }
 
@@ -316,7 +316,7 @@ class ChannelD3 extends React.Component {
         const group = d3.select(this);
         const selection = group.selectAll('.selection');
 
-        group.style('display', r.hidden ?  'none' : 'block');
+        group.style('display', r.hidden ? 'none' : 'block');
 
         const color = getRegionColor(r);
 
@@ -368,7 +368,7 @@ class ChannelD3 extends React.Component {
       })
       .on('end', this.newBrushHandler)
       // replacing default filter to allow ctrl-click action
-      .filter(()=>{
+      .filter(() => {
         return !d3.event.button;
       })
     );
@@ -384,7 +384,7 @@ class ChannelD3 extends React.Component {
 
     this.trackerX = dataX;
     this.tracker.attr('transform', `translate(${this.x(dataX) + 0.5},0)`);
-    this.trackerTime.text(`${this.formatTime(dataX)}${brushWidth === 0 ? '' :  ` [${this.formatDuration(brushWidth)}]`}`);
+    this.trackerTime.text(`${this.formatTime(dataX)}${brushWidth === 0 ? '' : ` [${this.formatDuration(brushWidth)}]`}`);
     this.trackerValue.text(this.formatValue(dataY) + ' ' + this.props.item.units);
     this.trackerPoint.attr('cy', this.y(dataY));
     this.tracker.attr('text-anchor', screenX > width - 100 ? 'end' : 'start');
@@ -848,7 +848,7 @@ class ChannelD3 extends React.Component {
   }
 
   render() {
-    this.props.ranges.map(r => fixMobxObserve(r.start, r.end,  r.selected, r.inSelection, r.highlighted, r.hidden, r.style?.fillcolor));
+    this.props.ranges.map(r => fixMobxObserve(r.start, r.end, r.selected, r.inSelection, r.highlighted, r.hidden, r.style?.fillcolor));
     fixMobxObserve(this.props.range.map(Number));
 
     return <div className="htx-timeseries-channel" ref={this.ref} />;

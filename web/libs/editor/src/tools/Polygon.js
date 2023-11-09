@@ -113,13 +113,15 @@ const _Tool = types
       },
 
       startDrawing(x, y) {
+        const point = self.control?.getSnappedPoint({ x, y });
+
         if (isFF(FF_DEV_2432)) {
           self.mode = 'drawing';
-          self.currentArea = self.createRegion(self.createRegionOptions({ x, y }), true);
+          self.currentArea = self.createRegion(self.createRegionOptions({ x: point.x, y: point.y }), true);
           self.setDrawing(true);
           self.applyActiveStates(self.currentArea);
         } else {
-          Super.startDrawing(x, y);
+          Super.startDrawing(point.x, point.y);
         }
       },
 

@@ -2,7 +2,7 @@
 import Tree from '../Tree';
 
 function createStore(utterances) {
-  return { task : { dataObj : { utterances } } };
+  return { task: { dataObj: { utterances } } };
 }
 
 it('Should repeat blocks based on store key', () => {
@@ -12,7 +12,7 @@ it('Should repeat blocks based on store key', () => {
           <Text name="user_{{idx}}" value="$utterances[{{idx}}].text" />
         </Repeater>
      </View>
-  `,  createStore(['hello', 'world']));
+  `, createStore(['hello', 'world']));
 
   expect(result.children[0].children).toHaveLength(2);
 });
@@ -24,7 +24,7 @@ it('Should have 0 children when wrong or invalid key is passed', () => {
           <Text name="user_{{idx}}" value="$utterances[{{idx}}].text" />
         </Repeater>
      </View>
-  `,  createStore(['hello', 'world']));
+  `, createStore(['hello', 'world']));
 
   // Repeater View -> null
   expect(result.children[0].children[0]).toBe(undefined);
@@ -37,7 +37,7 @@ it('Should replace child three {{idx}} with current itteration of index', () => 
           <Text name="user_{{idx}}" value="$utterances[{{idx}}].text" />
         </Repeater>
      </View>
-  `,  createStore(['hello', 'world']));
+  `, createStore(['hello', 'world']));
 
   const container = result.children[0];
   // Text[n] View -> Text
@@ -58,7 +58,7 @@ it('Should support custom index flags', () => {
           <Text name="user_{{Customidx}}" value="$utterances[{{Customidx}}].text" />
         </Repeater>
      </View>
-  `,  createStore(['hello', 'world']));
+  `, createStore(['hello', 'world']));
 
   // Repeater View -> Text[0] View -> Text
   const textTag = result.children[0].children[0].children[0];

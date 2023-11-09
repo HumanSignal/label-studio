@@ -1,9 +1,10 @@
+import React, { useMemo } from 'react';
 import { observer } from 'mobx-react';
-import { useMemo } from 'react';
 import { Button } from '../../common/Button/Button';
 import { Block, Elem } from '../../utils/bem';
 import { guidGenerator } from '../../utils/unique';
 import { isDefined } from '../../utils/utilities';
+import { FF_TASK_COUNT_FIX, isFF } from '../../common/Tooltip/Tooltip';
 import './CurrentTask.styl';
 
 
@@ -18,16 +19,22 @@ export const CurrentTask = observer(({ store }) => {
     && !store.canGoNextTask
     && !store.hasInterface('review')
     && store.hasInterface('postpone');
-
+  
   return (
     <Elem name="section">
       <Block name="current-task" mod={{ 'with-history': historyEnabled }}>
         <Elem name="task-id">
           {store.task.id ?? guidGenerator()}
           {historyEnabled && (
-            <Elem name="task-count">
-              {currentIndex} of {store.taskHistory.length}
-            </Elem>
+            isFF(FF_TASK_COUNT_FIX) ? (
+              <Elem name="task-count">
+                {store.queuePosition} of {store.queueTotal}
+              </Elem>
+            ) : (
+              <Elem name="task-count">
+                {currentIndex} of {store.taskHistory.length}
+              </Elem>
+            )
           )}
         </Elem>
         {historyEnabled && (

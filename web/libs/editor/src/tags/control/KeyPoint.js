@@ -6,6 +6,7 @@ import { customTypes } from '../../core/CustomTypes';
 import { AnnotationMixin } from '../../mixins/AnnotationMixin';
 import SeparatedControlMixin from '../../mixins/SeparatedControlMixin';
 import { ToolManagerMixin } from '../../mixins/ToolManagerMixin';
+import { SNAP_TO_PIXEL_MODE } from '../../components/ImageView/Image';
 
 /**
  * The `KeyPoint` tag is used to add a key point to an image without selecting a label. This can be useful when you have only one label to assign to the key point.
@@ -28,12 +29,15 @@ import { ToolManagerMixin } from '../../mixins/ToolManagerMixin';
  * @param {string=} [strokeColor=#8bad00] - Keypoint stroke color in hexadecimal
  * @param {boolean} [smart]              - Show smart tool for interactive pre-annotations
  * @param {boolean} [smartOnly]          - Only show smart tool for interactive pre-annotations
+ * @param {pixel|none} [snap=none]       - Snap keypoint to image pixels
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 
   opacity: types.optional(customTypes.range(), '0.9'),
   fillcolor: types.optional(customTypes.color, '#8bad00'),
+
+  snap: types.optional(types.string, 'none'),
 
   strokecolor: types.optional(customTypes.color, '#8bad00'),
   strokewidth: types.optional(types.string, '2'),
@@ -53,6 +57,7 @@ const Model = types
   }))
   .volatile(() => ({
     toolNames: ['KeyPoint'],
+    snapMode: SNAP_TO_PIXEL_MODE.CENTER,
   }));
 
 const KeyPointModel = types.compose('KeyPointModel',

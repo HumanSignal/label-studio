@@ -81,25 +81,25 @@ export class Playhead extends Events<PlayheadEvents> {
 
     this.setX(x);
 
-    if( this.isVisible && renderVisible) this.render();
+    if (this.isVisible && renderVisible) this.render();
   }
 
   private mouseDown = (e: MouseEvent) => {
-    if(this.isVisible && this.isHovered) {
+    if (this.isVisible && this.isHovered) {
       e.preventDefault();
       e.stopPropagation();
       this.isDragging = true;
       this.wf.cursor.set(CursorSymbol.grabbing, 'playhead');
 
       const handleMouseMove = (e: MouseEvent) => {
-        if(this.isDragging) {
+        if (this.isDragging) {
           e.preventDefault();
           e.stopPropagation();
           const parentOffset = (this.visualizer.container as HTMLElement).getBoundingClientRect();
           const cursorOffset = (e.clientX - parentOffset.left);
           const x = clamp(cursorOffset, 0, this.visualizer.width);
 
-          if(x !== this._x) {
+          if (x !== this._x) {
             this.setX(x);
             this.wf.currentTime = getCursorTime(e, this.visualizer, this.wf.duration);
             this.render();
@@ -108,7 +108,7 @@ export class Playhead extends Events<PlayheadEvents> {
       };
 
       const handleMouseUp = (e: MouseEvent) => {
-        if(this.isDragging) {
+        if (this.isDragging) {
           e.preventDefault();
           e.stopPropagation();
           this.isDragging = false;
@@ -126,7 +126,7 @@ export class Playhead extends Events<PlayheadEvents> {
   };
 
   private mouseEnter = () => {
-    if( this.isVisible && !this.isDragging ) {
+    if (this.isVisible && !this.isDragging) {
       if (!this.wf.cursor.hasFocus()) {
         this.wf.cursor.set(CursorSymbol.grab, 'playhead');
       }
@@ -136,7 +136,7 @@ export class Playhead extends Events<PlayheadEvents> {
   };
 
   private mouseLeave = () => {
-    if( this.isVisible && !this.isDragging ) {
+    if (this.isVisible && !this.isDragging) {
       this.isHovered = false;
       this.render();
       if (this.wf.cursor.isFocused('playhead')) {
@@ -146,7 +146,7 @@ export class Playhead extends Events<PlayheadEvents> {
   };
 
   private playing = (time: number, useClamp = true) => {
-    if( !this.isDragging ) {
+    if (!this.isDragging) {
       this.updatePositionFromTime(time, true, useClamp);
     }
   };
@@ -217,7 +217,7 @@ export class Playhead extends Events<PlayheadEvents> {
     const { color, fillColor, layer, _x, isHovered, width, hoveredStrokeMultiplier } = this;
     const { reservedSpace } = this.visualizer;
 
-    if(layer?.isVisible) {
+    if (layer?.isVisible) {
       layer.clear();
       layer.save();
       layer.fillStyle = fillColor.toString();
@@ -236,7 +236,7 @@ export class Playhead extends Events<PlayheadEvents> {
     const { layer, capWidth, capHeight, capPadding, visualizer } = this;
     const { height } = visualizer;
     const playheadCapY = y - capHeight - capPadding;
-    const halfCapWidth = capWidth/2;
+    const halfCapWidth = capWidth / 2;
 
     layer.moveTo(x - halfCapWidth, playheadCapY);
     layer.lineTo(x + halfCapWidth, playheadCapY);
@@ -252,7 +252,7 @@ export class Playhead extends Events<PlayheadEvents> {
   }
 
   setLayer(layer: Layer) {
-    if(this.layer) {
+    if (this.layer) {
       this.layer.off('layerUpdated', this.toggleVisibility);
     }
     this.layer = layer;

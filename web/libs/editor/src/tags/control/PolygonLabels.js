@@ -38,6 +38,7 @@ import ControlBase from './Base';
  * @param {number} [strokeWidth=1]                  - Width of stroke
  * @param {small|medium|large} [pointSize=medium]   - Size of polygon handle points
  * @param {rectangle|circle} [pointStyle=rectangle] - Style of points
+ * @param {pixel|none} [snap=none]                  - Snap polygon to image pixels
  */
 
 const Validation = types.model({

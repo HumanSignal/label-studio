@@ -36,6 +36,7 @@ const hotkeys = Hotkey('Polygons');
  * @param {rectangle|circle} [pointStyle=circle]  - Style of points
  * @param {boolean} [smart]                       - Show smart tool for interactive pre-annotations
  * @param {boolean} [smartOnly]                   - Only show smart tool for interactive pre-annotations
+ * @param {pixel|none} [snap=none]                - Snap polygon to image pixels
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
@@ -45,6 +46,8 @@ const TagAttrs = types.model({
 
   strokewidth: types.optional(types.string, '2'),
   strokecolor: types.optional(customTypes.color, '#f48a42'),
+
+  snap: types.optional(types.string, 'none'),
 
   pointsize: types.optional(types.string, 'small'),
   pointstyle: types.optional(types.string, 'circle'),
@@ -72,7 +75,7 @@ const Model = types
             if (self.annotation.isDrawing) self.annotation.undo();
           });
           hotkeys.addNamed('polygon:redo', () => {
-            if (self.annotation.isDrawing)  self.annotation.redo();
+            if (self.annotation.isDrawing) self.annotation.redo();
           });
         }
       },

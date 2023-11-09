@@ -101,7 +101,7 @@ export const SuggestionControls = observer(({ item, useLayer }) => {
 
     return useLayer ? (
       <Layer {...size} {...layerPosition}>{content}</Layer>
-    ): content;
+    ) : content;
   } else {
     return null;
   }
