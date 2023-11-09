@@ -263,7 +263,7 @@ def apply_filters(queryset, filters, project, request):
     preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
     preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
     handle_alt_fieldname = flag_set(
-        'fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short', user=request.user
+        'fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short', user='auto'
     )
 
     for _filter in filters.items:
