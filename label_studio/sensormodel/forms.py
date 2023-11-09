@@ -5,7 +5,21 @@ from .models import Deployment, Sensor, Subject
 class SensorForm(forms.ModelForm):
     class Meta:
         model = models.Sensor
-        fields = ['sensor_id','description','sensortype']
+        fields = ['name','parsable_sensor_id','sensortype']
+
+        def __init__(self, *args, **kwargs):
+            project = kwargs.pop('project', None)
+            super(SubjectForm, self).__init__(*args, **kwargs)
+            self.instance.project = project
+
+        def clean_name(self):
+            name = self.cleaned_data.get('name')
+            project = self.instance.project
+            existing_sensor = Sensor.objects.filter(name=name, project=project)
+            if existing_sensor.exists():
+                raise forms.ValidationError("A sensor with this name already exists in the project.")
+
+            return name
 
 class SubjectForm(forms.ModelForm):
     class Meta:

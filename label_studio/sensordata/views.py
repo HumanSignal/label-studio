@@ -40,7 +40,6 @@ def addsensordata(request, project_id):
         sensordataform = SensorDataForm(request.POST, request.FILES, project=project)
         if sensordataform.is_valid():
             # Get form data
-            name = sensordataform.cleaned_data['name']
             uploaded_file = sensordataform.cleaned_data['file']
             project = project
             sensor = sensordataform.cleaned_data.get('sensor')
