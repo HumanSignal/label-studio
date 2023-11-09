@@ -33,6 +33,8 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+.nx/
+migrations.json
 
 # System Files
 .DS_Store

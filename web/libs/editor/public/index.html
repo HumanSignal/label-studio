@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="./public/favicon.ico" />
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="//fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
     <link href="//fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
@@ -21,8 +21,14 @@
 
       In current functionality we create history record if we pass a result field. It doesn't let make a comment on review. Because we decided to relate comments to history.
       -->
-    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="./public/styles/main.css">
     <script>
+      window.addEventListener('error', function(e){
+        // prevent React's listener from firing
+        e.stopImmediatePropagation();
+        // prevent the browser's console error message
+        e.preventDefault();
+      });
       // window.APP_SETTINGS = {
       //   feature_flags: {},
       //   feature_flags_default_value: true,
@@ -37,12 +43,12 @@
 
     <div id="header">
       <a id="logo" href="/">
-        <img src="/images/ls_logo.svg" alt="label studio logo">
+        <img src="./public/images/ls_logo.svg" alt="label studio logo">
       </a>
       <ul id="nav">
         <li><a href="https://labelstud.io/guide">Docs</a></li>
         <li><a class="github-button" href="https://github.com/heartexlabs/label-studio"
-           data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub"><img src="./images/GitHub-Mark-64px.png" height="25" /></a></li>
+           data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub"><img src="./public/images/GitHub-Mark-64px.png" height="25" /></a></li>
       </ul>
     </div>
 
@@ -51,7 +57,7 @@
     </div>
     <footer class="footer">
       <span>
-        Made with <img src="/images/3nowhite.svg" height="16" /> by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco
+        Made with <img src="./public/images/3nowhite.svg" height="16" /> by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco
       </span>
     </footer>
 
