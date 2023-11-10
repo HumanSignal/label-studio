@@ -74,15 +74,12 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Set up PDM
-        uses: pdm-project/setup-pdm@v3
-        with:
-          python-version: '3.10'
-          cache: true
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
         run: |
-          pdm sync -G build
+          poetry install --with build
 
       - name: Collect static
         run: |
@@ -100,7 +97,7 @@ jobs:
             --retry-delay 10 \
             -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
             "https://sdk.launchdarkly.com/sdk/latest-all" >"$LAUNCHDARKLY_DOWNLOAD_PATH"
-          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then 
+          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then
             echo "feature_flags.json is valid"
           else
             echo "feature_flags.json is invalid"
@@ -111,7 +108,7 @@ jobs:
       - name: Package
         env:
           VERSION_OVERRIDE: ${{ inputs.version }}
-        run: pdm build
+        run: poetry build
 
       - name: Upload to PYPI
         if: inputs.upload_to_pypi

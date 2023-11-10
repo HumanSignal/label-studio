@@ -42,16 +42,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
           activate-environment: test-environment
 
-
-      - name: Set up PDM
-        uses: pdm-project/setup-pdm@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: true
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
         run: |
-          pdm sync -G test
+          poetry install --with test
 
       - name: Conda info
         shell: bash -el {0}

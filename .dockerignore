@@ -16,4 +16,4 @@
 !licenses/**
 !LICENSE
 !pyproject.toml
-!pdm.lock
+!poetry.lock

@@ -39,7 +39,7 @@ RUN set -eux \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install --upgrade pip setuptools && pip3 install pdm uwsgi uwsgitop
+    pip3 install --upgrade pip setuptools && pip3 install poetry uwsgi uwsgitop
 
 # incapsulate nginx install & configure to a single layer
 RUN set -eux; \
@@ -58,21 +58,22 @@ RUN set -eux; \
 
 # files required by PDM
 COPY --chown=1001:0 ./pyproject.toml $LS_DIR
-COPY --chown=1001:0 ./pdm.lock $LS_DIR
+COPY --chown=1001:0 ./poetry.lock $LS_DIR
 COPY --chown=1001:0 ./README.md $LS_DIR
+
+COPY --chown=1001:0 . .
 
 # Install the dependencies from the pdm lockfile, to the __pypackages__ folder
 # as well as the label-studio script from pyproject.toml
 #   --check causes a failure if the lockfile is out of date
-RUN mkdir $LS_DIR/__pypackages__ && pdm install --prod --fail-fast --check
+RUN poetry check --lock && POETRY_VIRTUALENVS_CREATE=false poetry install
 
 # Approach inspired by https://pdm-project.org/latest/usage/advanced/#use-pdm-in-a-multi-stage-dockerfile
 # Move the packages + binary installed by pdm to the folders where pip would install them
 # Then clean up __pypackages__
-RUN rsync -a $LS_DIR/__pypackages__/3.10/lib/ /usr/local/lib/python3.10/dist-packages
-RUN mv $LS_DIR/__pypackages__/3.10/bin/label-studio /usr/local/bin/
-RUN rm -rf $LS_DIR/__pypackages__
-COPY --chown=1001:0 . .
+# RUN rsync -a $LS_DIR/__pypackages__/3.10/lib/ /usr/local/lib/python3.10/dist-packages
+# RUN mv $LS_DIR/__pypackages__/3.10/bin/label-studio /usr/local/bin/
+# RUN rm -rf $LS_DIR/__pypackages__
 
 RUN rm -rf ./label_studio/frontend
 COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist

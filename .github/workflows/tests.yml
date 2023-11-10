@@ -55,15 +55,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
-      - name: Set up PDM
-        uses: pdm-project/setup-pdm@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: true
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
         run: |
-          pdm sync -G test
+          poetry install --with test
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -84,17 +81,17 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: pdm run ./deploy/prebuild_wo_frontend.sh
+        run: poetry run ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
-        run: pdm run python label_studio/manage.py migrate
+        run: poetry run python label_studio/manage.py migrate
 
       - name: Run functional tests
         run: |
           cd label_studio/
-          pdm run pytest --cov=. --cov-report=xml -vv -n auto
+          poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.4
@@ -180,15 +177,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
-      - name: Set up PDM
-        uses: pdm-project/setup-pdm@v3
-        with:
-          python-version: '3.10'
-          cache: true
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
         run: |
-          pdm sync -G test
+          poetry install --with test
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -209,17 +203,17 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: pdm run ./deploy/prebuild_wo_frontend.sh
+        run: poetry run ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
-        run: pdm run python label_studio/manage.py migrate
+        run: poetry run python label_studio/manage.py migrate
 
       - name: Run functional tests
         run: |
           cd label_studio/
-          pdm run pytest --cov=. --cov-report=xml -vv -n auto
+          poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.4
@@ -266,22 +260,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Set up PDM
-        uses: pdm-project/setup-pdm@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: true
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
         run: |
-          pdm sync -G test
+          poetry install --with test
 
       - name: Fix sqlite.dll for python < 3.9
         if: ${{ contains(matrix.python-version, '3.8') }}
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          pdm run label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
+          poetry run label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
           cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
         shell: cmd
 
@@ -289,7 +280,7 @@ jobs:
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          pdm run label-studio init my_project --username test@test.com --password testpwd
+          poetry run label-studio init my_project --username test@test.com --password testpwd
         shell: cmd
 
       - name: Test with pytest
@@ -297,4 +288,4 @@ jobs:
           collect_analytics: 0
         run: |
           cd label_studio/
-          pdm run python -m pytest -vv -n auto
+          poetry run python -m pytest -vv -n auto
