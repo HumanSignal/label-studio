@@ -78,7 +78,7 @@ jobs:
           python -m pip install --upgrade pip setuptools
           pip install --upgrade cython
           pip install -U pip==20.2
-          pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
+          pip install -r deploy/requirements-test.txt
           pip install -e .
 
       - name: Setup node
@@ -217,7 +217,7 @@ jobs:
       - name: Install pip dependencies
         run: |
           pip install -U pip==20.2
-          pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
+          pip install -r deploy/requirements-test.txt
           pip install -e .
 
       - name: Setup node
@@ -308,8 +308,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools
           pip install --upgrade cython
-          if (Test-Path -Path '.\deploy\requirements.txt' -PathType Leaf)
-          {pip install -r deploy\requirements.txt}
           if (Test-Path -Path '.\deploy\requirements-test.txt' -PathType Leaf)
           {pip install -r deploy/requirements-test.txt}
           pip install -e .

@@ -1,0 +1,15 @@
+fakeredis==1.5.0
+freezegun~=1.2.2
+importlib-metadata==4.13.0;python_version < '3.8'
+mock==5.1.0
+moto==4.2.6
+pre-commit==3.3.3
+psutil==5.9.4
+pytest-cov==2.12.1
+pytest-django==4.1.0
+pytest-env==0.6.2
+pytest-mock==1.10.3
+pytest-xdist~=2.5.0
+requests-mock==1.5.2
+tavern==2.3.0
+https://github.com/HumanSignal/label-studio-sdk/archive/3c1e0513cba426ab8ada2259ca4e368dd1086baf.zip

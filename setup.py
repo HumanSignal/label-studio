@@ -13,7 +13,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 # Module dependencies
 requirements, dependency_links = [], []
-with open('deploy/requirements.txt') as f:
+with open('deploy/requirements.in') as f:
     for line in f.read().splitlines():
         if line.startswith('-e git+'):
             dependency_links.append(line.replace('-e ', ''))
