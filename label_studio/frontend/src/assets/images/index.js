@@ -1,1 +1,1 @@
-export { default as HeidiSpeaking } from "./heidi-speaking.svg";
+export { ReactComponent as HeidiSpeaking } from "./heidi-speaking.svg";

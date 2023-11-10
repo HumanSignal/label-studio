@@ -1,4 +1,5 @@
 import os
+from typing import Callable, Optional, Sequence, TypeVar
 
 from rest_framework.exceptions import ValidationError
 
@@ -125,16 +126,27 @@ def get_bool_env(key, default):
     return get_env(key, default, is_bool=True)
 
 
-def get_env_list_int(key, default=None):
+T = TypeVar('T')
+
+
+def get_env_list(
+    key: str, default: Optional[Sequence[T]] = None, value_transform: Callable[[str], T] = str
+) -> Sequence[T]:
     """
-    "1,2,3" in env variable => [1, 2, 3] in python
+    "foo,bar,baz" in env variable => ["foo", "bar", "baz"] in python.
+    Use value_transform to convert the strings to any other type.
     """
     value = get_env(key)
     if not value:
         if default is None:
             return []
         return default
-    return [int(el) for el in value.split(',')]
+
+    return [value_transform(el) for el in value.split(',')]
+
+
+def get_env_list_int(key, default=None) -> Sequence[int]:
+    return get_env_list(key, default=default, value_transform=int)
 
 
 def get_all_env_with_prefix(prefix=None, is_bool=True, default_value=None):

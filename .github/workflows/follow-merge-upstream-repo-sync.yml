@@ -107,10 +107,13 @@ jobs:
 
       - name: Configure git
         shell: bash
+        env:
+          AUTHOR_USERNAME: ${{ github.event.client_payload.author_username }}
+          AUTHOR_EMAIL: ${{ github.event.client_payload.author_email }}
         run: |
           set -xeuo pipefail
-          git config --global user.name '${{ github.event.client_payload.author_username }}'
-          git config --global user.email '${{ github.event.client_payload.author_email }}'
+          git config --global user.name "${AUTHOR_USERNAME}"
+          git config --global user.email "${AUTHOR_EMAIL}"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -168,6 +171,7 @@ jobs:
         env:
           CI: false # on true webpack breaks on warnings, and we have them a lot
           NODE_ENV: 'production'
+          TITLE: ${{ github.event.client_payload.title }}
         run: |
           yarn run build:module
           if [[ "${{ github.event.client_payload.event_action }}" == 'merged' ]]; then 
@@ -177,7 +181,7 @@ jobs:
           fi
           cat << EOF > "build/static/version.json"
           {
-            "message": "${{ github.event.client_payload.title }}",
+            "message": "${TITLE}",
             "commit": "${{ github.event.client_payload.commit_sha }}",
             "branch": "${branch}",
             "date": "$(git log -1 --date=format:"%Y/%m/%d %T" --format="%ad" | cat)"
