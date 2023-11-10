@@ -34,7 +34,7 @@ RUN set -eux \
  && apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y \
     build-essential postgresql-client libmysqlclient-dev mysql-client python3-pip python3-dev \
-    git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release libpq-dev dnsutils vim && \
+    git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release libpq-dev dnsutils vim rsync && \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
@@ -69,12 +69,15 @@ RUN mkdir $LS_DIR/__pypackages__
 ENV PDM_CACHE_DIR=$LS_DIR/__pypackages__
 
 # Copy and install requirements.txt first for caching
-RUN pdm sync --prod --fail-fast
+RUN pdm install --prod --fail-fast --no-lock
 
 # # Copy and install requirements.txt first for caching
 # COPY --chown=1001:0 deploy/requirements-test.txt .
 # RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
 #     pip3 install -r requirements-test.txt
+
+RUN rsync -a $LS_DIR/__pypackages__/3.10/lib/ /usr/local/lib/python3.10/dist-packages
+RUN mv $LS_DIR/__pypackages__/3.10/bin/label-studio /usr/local/bin/
 
 COPY --chown=1001:0 . .
 
@@ -82,9 +85,9 @@ RUN rm -rf ./label_studio/frontend
 COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
 
 # Needed for uwsgi worker to find django package
-ENV PYTHONPATH="$LS_DIR/__pypackages__/3.10/lib"
+# ENV PYTHONPATH="$LS_DIR/__pypackages__/3.10/lib"
 
-RUN pdm run python3 label_studio/manage.py collectstatic --no-input && \
+RUN python3 label_studio/manage.py collectstatic --no-input && \
     chown -R 1001:0 $LS_DIR && \
     chmod -R g=u $LS_DIR
 
@@ -95,4 +98,4 @@ EXPOSE 8080
 USER 1001
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
-CMD ["pdm run label-studio"]
+CMD ["label-studio"]
