@@ -34,7 +34,7 @@ RUN set -eux \
  && apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y \
     build-essential postgresql-client libmysqlclient-dev mysql-client python3-pip python3-dev \
-    git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release libpq-dev dnsutils vim rsync && \
+    git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release libpq-dev dnsutils vim && \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
@@ -56,24 +56,11 @@ RUN set -eux; \
     mkdir -p $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx && \
     chown -R 1001:0 $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx
 
-# files required by PDM
-COPY --chown=1001:0 ./pyproject.toml $LS_DIR
-COPY --chown=1001:0 ./poetry.lock $LS_DIR
-COPY --chown=1001:0 ./README.md $LS_DIR
-
 COPY --chown=1001:0 . .
 
-# Install the dependencies from the pdm lockfile, to the __pypackages__ folder
-# as well as the label-studio script from pyproject.toml
-#   --check causes a failure if the lockfile is out of date
+# Ensure the poetry lockfile is up to date, then install all deps from it to
+# the system python. This includes label-studio itself.
 RUN poetry check --lock && POETRY_VIRTUALENVS_CREATE=false poetry install
-
-# Approach inspired by https://pdm-project.org/latest/usage/advanced/#use-pdm-in-a-multi-stage-dockerfile
-# Move the packages + binary installed by pdm to the folders where pip would install them
-# Then clean up __pypackages__
-# RUN rsync -a $LS_DIR/__pypackages__/3.10/lib/ /usr/local/lib/python3.10/dist-packages
-# RUN mv $LS_DIR/__pypackages__/3.10/bin/label-studio /usr/local/bin/
-# RUN rm -rf $LS_DIR/__pypackages__
 
 RUN rm -rf ./label_studio/frontend
 COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
