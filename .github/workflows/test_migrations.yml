@@ -56,7 +56,7 @@ jobs:
 
       - name: Test migrations
         run: |
-          output=$(python label_studio/manage.py makemigrations)
+          output=$(poetry run python label_studio/manage.py makemigrations)
           if ! grep 'No changes detected' <<< "${output}"; then
             error="${output}"
             error="${error//'%'/'%25'}"
