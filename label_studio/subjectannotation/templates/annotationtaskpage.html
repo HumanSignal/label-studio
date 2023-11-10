@@ -15,10 +15,18 @@
     </div>
     <div class="forms">
         <h2>Create subject annotation task</h2>
-        <form enctype="multipart/form-data" action="{% url 'subjectannotation:create' project.id %}" method="post">
+        <form id="subject-form" enctype="multipart/form-data" action="{% url 'subjectannotation:create' project.id %}" method="post">
             <input type="submit" value="Create annotation task">
         </form>
     </div>
+    <div id="subject-message" style="display: none;">
+        <p>Preparing subject presence annotation! Please wait...</p>
+    </div>
+    <script>
+        document.getElementById('subject-form').addEventListener('submit', function() {
+            document.getElementById('subject-message').style.display = 'block';
+        });
+    </script>
 </body>
 
 

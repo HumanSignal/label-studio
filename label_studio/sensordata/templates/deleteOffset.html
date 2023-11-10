@@ -27,12 +27,23 @@
 <h1>Delete confirmation</h1>
 
 <p>Are you sure you want to delete this?</p>
+<div class="forms">
+    <form id="offset-form" action="" method="post">
+        <input type="submit" value="Delete">
+    </form>
+    <form action="{% url 'sensordata:offset' project.id %}"> 
+        <input type="submit" value="No, go back to sensor offset page!" />
+    </form>
+</div>
 
-<form action="" method="post">
-    <input type="submit" value="Delete">
-</form>
-<form action="{% url 'sensordata:offset' project.id %}"> 
-    <input type="submit" value="No, go back to sensor offset page!" />
-</form>
+<div id="deleting-message" style="display: none;">
+    <p>Deleting offset! Please wait...</p>
+</div>
+
+<script>
+    document.getElementById('offset-form').addEventListener('submit', function() {
+        document.getElementById('deleting-message').style.display = 'block';
+    });
+</script>
 
 {% endblock %}

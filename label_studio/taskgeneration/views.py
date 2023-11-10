@@ -154,8 +154,8 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     end_segment_B = begin_segment_B +duration
 
     
-                with NamedTemporaryFile(suffix=".mp4", delete=False, mode='w') as temp_video,\
-                    NamedTemporaryFile(suffix=".csv", delete=False, mode='w') as temp_imu:
+                with NamedTemporaryFile(prefix="CHUNK", suffix=".mp4", delete=False, mode='w') as temp_video,\
+                    NamedTemporaryFile(prefix="CHUNK", suffix=".csv", delete=False, mode='w') as temp_imu:
                     video_file_path = longest_overlap.sensordata_A.file_upload.file.path
                     ### Cut out video using ffmpeg ###
                     ffmpeg_command = [

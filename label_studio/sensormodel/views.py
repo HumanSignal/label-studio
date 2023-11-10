@@ -179,3 +179,14 @@ def sync_sensor_parser_templates(request, project_id):
             else:
                 print(f'Invalid config file: \n{config}')
     return redirect(reverse('sensormodel:sensor',kwargs={'project_id':project_id}))
+
+def delete_sensortype(request, project_id, id):
+    sensortype = SensorType.objects.get(id=id)
+    project = Project.objects.get(id=project_id)
+    if request.method == 'POST':
+        # Send POST to delete a subject
+        sensortype.delete()
+        return redirect('sensormodel:sensor', project_id = project_id)
+    else:
+        # Go to delete confirmation page
+        return render(request, 'deleteSensorType.html', {'project':project})
