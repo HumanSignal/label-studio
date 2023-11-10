@@ -119,7 +119,7 @@ def gcs_client_mock():
             self.is_json = is_json
 
         def list_blobs(self, prefix, **kwargs):
-            if "fake" in prefix:
+            if 'fake' in prefix:
                 return []
             return [File('abc'), File('def'), File('ghi')]
 
