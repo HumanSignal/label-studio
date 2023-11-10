@@ -15,3 +15,5 @@
 !README.md
 !licenses/**
 !LICENSE
+!pyproject.toml
+!pdm.lock

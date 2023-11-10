@@ -56,36 +56,26 @@ RUN set -eux; \
     mkdir -p $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx && \
     chown -R 1001:0 $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx
 
-# Copy and install middleware dependencies
-# COPY --chown=1001:0 deploy/requirements-mw.txt .
-# RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-#     pip3 install -r requirements-mw.txt
-
+# files required by PDM
 COPY --chown=1001:0 ./pyproject.toml $LS_DIR
 COPY --chown=1001:0 ./pdm.lock $LS_DIR
-# pdm requires README
 COPY --chown=1001:0 ./README.md $LS_DIR
-RUN mkdir $LS_DIR/__pypackages__
-ENV PDM_CACHE_DIR=$LS_DIR/__pypackages__
 
-# Copy and install requirements.txt first for caching
-RUN pdm install --prod --fail-fast --no-lock
+# Install the dependencies from the pdm lockfile, to the __pypackages__ folder
+# as well as the label-studio script from pyproject.toml
+#   --check causes a failure if the lockfile is out of date
+RUN mkdir $LS_DIR/__pypackages__ && pdm install --prod --fail-fast --check
 
-# # Copy and install requirements.txt first for caching
-# COPY --chown=1001:0 deploy/requirements-test.txt .
-# RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-#     pip3 install -r requirements-test.txt
-
+# Approach inspired by https://pdm-project.org/latest/usage/advanced/#use-pdm-in-a-multi-stage-dockerfile
+# Move the packages + binary installed by pdm to the folders where pip would install them
+# Then clean up __pypackages__
 RUN rsync -a $LS_DIR/__pypackages__/3.10/lib/ /usr/local/lib/python3.10/dist-packages
 RUN mv $LS_DIR/__pypackages__/3.10/bin/label-studio /usr/local/bin/
-
+RUN rm -rf $LS_DIR/__pypackages__
 COPY --chown=1001:0 . .
 
 RUN rm -rf ./label_studio/frontend
 COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
-
-# Needed for uwsgi worker to find django package
-# ENV PYTHONPATH="$LS_DIR/__pypackages__/3.10/lib"
 
 RUN python3 label_studio/manage.py collectstatic --no-input && \
     chown -R 1001:0 $LS_DIR && \
