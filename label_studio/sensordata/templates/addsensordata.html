@@ -15,6 +15,7 @@
     </div>
     <div class="forms">
         <h2>Add sensor data</h2>
+        <p>Upload zip files only containing data files from the same sensor!</p>
         <form id="sensor-data-form" enctype="multipart/form-data" action="{% url 'sensordata:addsensordata' project.id %}" method="post">
             {{ sensordataform }}
             <input type="submit" value="Add sensor data file">

@@ -33,7 +33,7 @@ class SensorType(models.Model):
 
 class Sensor(models.Model):
     name = models.TextField(max_length=25)
-    parsable_sensor_id = models.IntegerField()
+    parsable_sensor_id = models.CharField(max_length=25, default=None, null=True, blank=True)
     sensor_hash = models.CharField(max_length=10,blank=True)
     sensortype = models.ForeignKey(SensorType,on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)

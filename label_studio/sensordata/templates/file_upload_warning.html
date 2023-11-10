@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+<style>
+    table {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 25%;
+    }
+    td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    tr:nth-child(even){
+        background-color: #f2f2f2;
+    }
+    th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D !important;
+        color: white;
+    }
+    .tables {
+        margin: 1em;
+    }
+    input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 1em;
+    }
+
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }
+
+</style>
+
+
+<head>
+    <title>Upload not completed</title>
+</head>
+<body>
+    <h2>The following files were not uploaded, since they do not belong to the chosen sensor!</h2>
+    <div class="files">
+        <table class="tables">
+            <tr>
+                <th>Incorrect files</th>
+            </tr>
+            {% for file_name in mismatched_files %}
+            <tr>
+                <td>{{ file_name }}</td>
+            </tr> 
+            {% endfor %} 
+        </table>
+    </div>
+
+    <div class="buttons">
+        <form action="{% url 'sensordata:sensordatapage' project.id %}">
+            <input type="submit" value="Go back to sensor data overview" style="background-color: #c4862b; width:25%; color: white"/>
+        </form>
+    </div>
+</body>
+
+{% endblock %}
