@@ -39,7 +39,7 @@
         "buildTarget": "editor:build",
         "hmr": true,
         "watch": true,
-        "liveReload": true,
+        "liveReload": true
       },
       "configurations": {
         "development": {
@@ -59,6 +59,15 @@
           "ci": true,
           "codeCoverage": true
         }
+      }
+    },
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "libs/editor/cypress.config.ts",
+        "testingType": "e2e",
+        "devServerTarget": "editor:serve:development",
+        "port": 3000
       }
     }
   }
