@@ -47,15 +47,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
-      - name: Set up PDM
-        uses: pdm-project/setup-pdm@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: true
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
         run: |
-          pdm sync -G test
+          poetry install --with test
 
       - name: Test migrations
         run: |

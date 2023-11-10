@@ -234,6 +234,12 @@ jobs:
           - '3.8'
           - '3.9'
 
+    # required for poetry action
+    # see https://github.com/marketplace/actions/install-poetry-action#running-on-windows
+    defaults:
+      run:
+        shell: bash
+
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
@@ -272,7 +278,7 @@ jobs:
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          poetry run label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
+          bash -c "poetry run label-studio init my_project --agree-fix-sqlite --force-fix-sqlite"
           cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
         shell: cmd
 
@@ -280,7 +286,7 @@ jobs:
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          poetry run label-studio init my_project --username test@test.com --password testpwd
+          bash -c "poetry run label-studio init my_project --username test@test.com --password testpwd"
         shell: cmd
 
       - name: Test with pytest
