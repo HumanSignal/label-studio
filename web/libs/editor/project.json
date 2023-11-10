@@ -61,13 +61,13 @@
         }
       }
     },
-    "e2e": {
+    "integration": {
       "executor": "@nx/cypress:cypress",
       "options": {
         "cypressConfig": "libs/editor/cypress.config.ts",
         "testingType": "e2e",
         "devServerTarget": "editor:serve:development",
-        "port": 3000
+        "port": 3001
       }
     }
   }

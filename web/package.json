@@ -6,7 +6,7 @@
     "ls:watch": "nx run labelstudio:build:development --watch",
     "lsf:watch": "nx run editor:build:development --watch",
     "lsf:serve": "nx run editor:serve:development",
-    "lsf:integration": "nx run editor:e2e",
+    "lsf:integration": "nx run editor:integration",
     "lsf:e2e": "cd libs/editor/tests/e2e && npm run test",
     "dm:watch": "nx run datamanager:build:development --watch",
     "build": "nx run editor:build:production && nx run datamanager:build:production && nx run labelstudio:build:production",
