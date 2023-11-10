@@ -14,10 +14,6 @@ The `Choices` tag can be used with any data types.
 
 [^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality.
 
-[^2]: `ff_dev_2007_dev_2008_dynamic_tag_children_250322_short` should be enabled to use dynamic options.
-
-[^3]: `ff_dev_2007_rework_choices_280322_short` should be enabled to use `html` attribute
-
 ### Parameters
 
 | Param | Type | Default | Description |
@@ -34,7 +30,7 @@ The `Choices` tag can be used with any data types.
 | [whenChoiceValue] | <code>string</code> |  | Use with visibleWhen ("choice-selected" or "choice-unselected") and whenTagName, both are required. Narrow down visibility by choice value |
 | [perRegion] | <code>boolean</code> |  | Use this tag to select a choice for a specific region instead of the entire task |
 | [perItem] | <code>boolean</code> |  | Use this tag to select a choice for a specific item inside the object instead of the whole object[^1] |
-| [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded choices (see example below)[^2] |
+| [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded choices (see example below) |
 | [allowNested] | <code>boolean</code> |  | Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one. |
 
 ### Example
@@ -54,8 +50,8 @@ Basic text classification labeling configuration
 ```
 **Example** *(This config with dynamic labels)*  
 
-`Choice`s can be loaded dynamically from task data[^2]. It should be an array of objects with attributes.
-  `html` can be used to show enriched content[^3], it has higher priority than `value`, however `value` will be used in the exported result.
+`Choice`s can be loaded dynamically from task data. It should be an array of objects with attributes.
+  `html` can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result.
 
 ```html
 <View>
