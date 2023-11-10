@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-345: Fix taxonomy items collapsing when dropdown is closed",
-  "commit": "fcdc1df7b09877c684fb95c07625a0ad0bc1d58a",
+  "message": "fix: OPTIC-142: Submit and exit style update",
+  "commit": "1a0ab1cb5cb0a3b169064f5f310b364c09c95ded",
   "branch": "master",
-  "date": "2023/11/07 11:01:17"
+  "date": "2023/11/09 19:51:35"
 }
