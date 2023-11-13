@@ -57,10 +57,20 @@
         </form>
     </div>
     <div class="forms">
-        <h2>Add sensor offset</h2>
-        <form action="{% url 'sensordata:offset' project.id %}" method="post">
-            {{ sensoroffsetform }}
+        <h2>Select the data that is intended for the syncronization of the sensors</h2>
+        <form action="{% url 'sensordata:generate_tasks' project.id %}" method="post">
+            {{ offsetannotationform }}
             <input type="submit" value="Add sensor offset">
+        </form>
+    </div>
+    <div class="buttons">
+        <form action="{% url 'data_manager:project-data' offset_project.id %}">
+            <input type="submit" value="Go to offset annotation project" style="background-color: #c4862b; width:50%"/>
+        </form>
+    </div>
+    <div class="buttons">
+        <form action="{% url 'sensordata:parse_offset' project.id %}">
+            <input type="submit" value="Parse offset annotations " style="background-color: #c4862b; width:50%"/>
         </form>
     </div>
     <div class="sensoroffset">

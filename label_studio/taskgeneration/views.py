@@ -14,7 +14,6 @@ import os
 import pandas as pd
 import numpy as np
 import json
-import re
 import requests
 
 from projects.models import Project
@@ -29,7 +28,7 @@ from subjectannotation.views import parse_subject_presence_annotations
 def task_generation_page(request,project_id):
     project = Project.objects.get(id=project_id)
     columns_names_choices = request.session.get('choices', None)
-    taskform = TaskGenerationForm(column_names_choices=columns_names_choices)
+    taskform = TaskGenerationForm(column_names_choices=columns_names_choices, project=project)
     return render(request, 'taskgeneration.html', {'taskgenerationform':taskform, 'project':project})
 
 def create_task_pairs(request, project, subject, sensortype_B):
@@ -37,7 +36,7 @@ def create_task_pairs(request, project, subject, sensortype_B):
     # Load data for given project and subject
     subject_presences = SubjectPresence.objects.filter(project=project, subject=subject)
     distinct_file_uploads = subject_presences.values('file_upload').distinct() # Get all unique files that contain subject
-    sensor_A_sensordata = SensorData.objects.filter(project=subj_anno_proj,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
+    sensor_A_sensordata = SensorData.objects.filter(project=project,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
     # Load IMU deployments in the project that contain the subject
     sensor_B_deployments = Deployment.objects.filter(project=project,subject=subject,sensor__sensortype__sensortype=sensortype_B.sensortype)
     sensor_B_sensordata = SensorData.objects.filter(sensor__in=sensor_B_deployments.values('sensor')) # find all sensordata (type B) that has a sensor in sensor_B_deployments
@@ -57,7 +56,7 @@ def create_task_pairs(request, project, subject, sensortype_B):
                 if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B):
                     # Take the latest instance of offset before the begin_datetime of the sendata_A 
                     offset = SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,
-                                                        offset_Date__lt=vid_beg_dt).order_by('-offset_Date').first().offset
+                                                        offset_Date__lte=vid_beg_dt).order_by('-offset_Date').first().offset
                 else:
                     # If there is no SensorOffset defined set offset=0
                     offset = 0
@@ -123,21 +122,20 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
             imu_file_path = longest_overlap.sensordata_B.file_upload.file.path
             timestamp_column = longest_overlap.sensordata_B.sensor.sensortype.timestamp_column
             imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
-            # Remove non-letters from column names
-            imu_df.columns = [re.sub(r'[^a-zA-Z]', '', col) for col in imu_df.columns]
             # Get column names for showing in LS
             timestamp_column_name = imu_df.columns[timestamp_column]
+            print(imu_df.columns)
             value_column_name = imu_df.columns[int(value_column)]
             # Update labeling set up in activity annotion project
             # Create a XML markup for annotating
-            template = create_activity_annotation_template(timestamp_column_name=timestamp_column_name,value_column_name=value_column_name)
+            template = create_activity_annotation_template(subject=subject,
+                                                           timestamp_column_name=timestamp_column_name,
+                                                           value_column_name=value_column_name)
             # Get url for displaying project detail
             project_detail_url = request.build_absolute_uri(reverse('projects:api:project-detail', args=[project.id+2]))
             # Update labeling set up
             token = Token.objects.get(user=request.user)
             requests.patch(project_detail_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template})
-            # Convert all time entries to float
-            imu_df.iloc[:-1,timestamp_column] = imu_df.iloc[:-1,timestamp_column].astype(float)
 
             for i, segment in enumerate(range(amount_of_segments)):
                 # Determine start and end of segment in seconds for both sensors
@@ -153,8 +151,8 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     end_segment_B = begin_segment_B +duration
 
     
-                with NamedTemporaryFile(suffix=".mp4", delete=False, mode='w') as temp_video,\
-                    NamedTemporaryFile(suffix=".csv", delete=False, mode='w') as temp_imu:
+                with NamedTemporaryFile(prefix="CHUNK", suffix=".mp4", delete=False, mode='w') as temp_video,\
+                    NamedTemporaryFile(prefix="CHUNK", suffix=".csv", delete=False, mode='w') as temp_imu:
                     video_file_path = longest_overlap.sensordata_A.file_upload.file.path
                     ### Cut out video using ffmpeg ###
                     ffmpeg_command = [
@@ -177,6 +175,8 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     end_index = imu_df[imu_df.iloc[:, timestamp_column] > end_segment_B].index[1] # First timestamp after end_segment
                     # Only keep the rows in between the obtained indeces
                     segment_imu_df = imu_df.iloc[start_index:end_index]
+                    # Add offset to every timestamp so that everthing shifts s.t. start time is 0
+                    segment_imu_df.iloc[:, timestamp_column] = segment_imu_df.iloc[:, timestamp_column] - segment_imu_df.iloc[0, timestamp_column]
                     # Create temporary file and save new csv to this file
                     segment_imu_df.to_csv(temp_imu, index=False)
                     
@@ -193,6 +193,7 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     task_json_template = {
                         "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",
                         "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />"
+                        "subject": f"{subject}"
                     }
                     with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
                         json.dump(task_json_template,task_json_file,indent=4)
@@ -204,28 +205,39 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
         else:
             return HttpResponse('Sensor combination not yet supported ', content_type='text/plain')
 
-def generate_taskgen_form(request,project_id):
-    project = Project.objects.get(id=project_id)
-    parse_subject_presence_annotations(request= request,project=project)
-    
-    fileupload_instance = SubjectPresence.objects.filter(project=project).first().file_upload
-    sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
-    sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
+def generate_taskgen_form(request, project_id):
+    try:
+        project = Project.objects.get(id=project_id)
+        SubjectPresence.objects.filter(project=project).delete()
+        parse_subject_presence_annotations(request=request, project=project)
 
-    if sensortype_B.sensortype == 'I':
-        sensor_instance = Sensor.objects.filter(project=project,sensortype=sensortype_B).first()
-        imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
-        timestamp_column = sensortype_B.timestamp_column
-        imu_df = pd.read_csv(imu_file_path, engine='python')
-        column_names = imu_df.columns.to_list()
-        columns_names_choices = []
-        for i, column_name in enumerate(column_names):
-            columns_names_choices.append((i,column_name))
-        columns_names_choices.append((len(column_names),'A3D'))
-        request.session['choices'] = columns_names_choices
-        return redirect('taskgeneration:taskgeneration_form', project_id=project_id)
-    else:
-        return redirect(reverse('landingpage:workinprogess'))
+        fileupload_instance = SubjectPresence.objects.filter(project=project).first()
+        
+        if fileupload_instance is not None:
+            sensortype_A = SensorData.objects.filter(project=project,file_upload=fileupload_instance.file_upload).first().sensor.sensortype
+            sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
+
+            if sensortype_A is not None and sensortype_B is not None:
+                if sensortype_B.sensortype == 'I':
+                    sensor_instance = Sensor.objects.filter(project=project, sensortype=sensortype_B).first()
+                    imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
+                    timestamp_column = sensortype_B.timestamp_column
+                    imu_df = pd.read_csv(imu_file_path, engine='python')
+                    column_names = imu_df.columns.to_list()
+                    columns_names_choices = []
+                    for i, column_name in enumerate(column_names):
+                        columns_names_choices.append((i, column_name))
+                    request.session['choices'] = columns_names_choices
+                    return redirect('taskgeneration:taskgeneration_form', project_id=project_id)
+                else:
+                    return redirect(reverse('landingpage:workinprogress', project_id=project_id))
+            else:
+                return redirect('taskgeneration:exception', project_id=project_id)
+        else:
+            return redirect('taskgeneration:exception', project_id=project_id) 
+    except (SubjectPresence.DoesNotExist, SensorData.DoesNotExist, Sensor.DoesNotExist):
+        return redirect('taskgeneration:exception', project_id=project_id)
+
             
     
 
@@ -234,7 +246,7 @@ def generate_activity_tasks(request,project_id):
     if request.method == 'POST':
         column_choices = request.session['choices']
         del request.session['choices']
-        taskgenerationform = TaskGenerationForm(request.POST,column_names_choices=column_choices)
+        taskgenerationform = TaskGenerationForm(request.POST,column_names_choices=column_choices, project=project)
         if taskgenerationform.is_valid():
             # Get data from Form
             subject = taskgenerationform.cleaned_data.get("subject")
@@ -244,7 +256,11 @@ def generate_activity_tasks(request,project_id):
             sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
             # Fill VideoImuOverlap objects
-            create_task_pairs(request= request,project=project, subject=subject,sensortype_B=sensortype_B)
+            create_task_pairs(request= request,project=project, subject=subject, sensortype_B=sensortype_B)
             # Create annotation data chunks (video and imu), this automatically creates tasks
             create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,value_column=value_column)          
     return redirect('landingpage:landingpage', project_id=project_id)    
+
+def exception(request, project_id):
+    project = Project.objects.get(id=project_id)
+    return render(request, 'exception.html', {'project':project})

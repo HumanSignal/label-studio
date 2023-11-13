@@ -28,11 +28,23 @@
 
 <p>Are you sure you want to delete this?</p>
 
-<form action="" method="post">
-    <input type="submit" value="Delete">
-</form>
-<form action="{% url 'sensormodel:deployment' project.id %}"> 
-    <input type="submit" value="No, go back to deployment page!" />
-</form>
+<div class="forms">
+    <form id="delete-form" action="" method="post">
+        <input type="submit" value="Delete">
+    </form>
+    <form action="{% url 'sensormodel:deployment' project.id %}"> 
+        <input type="submit" value="No, go back to deployment page!" />
+    </form>
+</div>
+<div id="deleting-message" style="display: none;">
+    <p>Deleting deployment! Please wait...</p>
+</div>
+
+<script>
+    document.getElementById('delete-form').addEventListener('submit', function() {
+        document.getElementById('deleting-message').style.display = 'block';
+    });
+</script>
+
 
 {% endblock %}

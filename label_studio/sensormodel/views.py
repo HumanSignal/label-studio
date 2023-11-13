@@ -15,7 +15,7 @@ def deployment(request, project_id):
     deployments = Deployment.objects.filter(project=project).order_by('begin_datetime')
     
     if request.method == 'POST':
-        deploymentform = forms.DeploymentForm(request.POST, project=project)  # Provide the project argument only once
+        deploymentform = forms.DeploymentForm(request.POST, project=project)  
         if deploymentform.is_valid():
             deployment = deploymentform.save(commit=False)
             deployment.project = project
@@ -29,7 +29,7 @@ def deployment(request, project_id):
 
 def sensor(request, project_id):
     project = Project.objects.get(id=project_id)
-    sensors = Sensor.objects.filter(project=project).order_by('sensor_id')
+    sensors = Sensor.objects.filter(project=project).order_by('name')
     sensortypes = SensorType.objects.all().order_by('manufacturer')
     if request.method =='POST':
         sensorform = forms.SensorForm(request.POST)
@@ -46,7 +46,7 @@ def subject(request, project_id):
     project = Project.objects.get(id=project_id)
     subjects = Subject.objects.filter(project=project).order_by('name')
     if request.method == 'POST':
-        subjectform = forms.SubjectForm(request.POST)
+        subjectform = forms.SubjectForm(request.POST, project=project)
         if subjectform.is_valid():
             subject = subjectform.save(commit=False)
             subject.project = project
@@ -136,9 +136,6 @@ def delete_subject(request, project_id, id):
 def sync_sensor_parser_templates(request, project_id):
     # Search sensortypes repo for (new) config .yaml files and add them to DB
     if request.method == 'POST':
-        # # Reset the sensortypes
-        # SensorType.objects.all().delete()
-        
         # Get submodule path
         path = Path(__file__).parents[2]/ 'sensortypes' # Path of subrepo
         # Extract file names and (temporarily) store only .yaml files
@@ -147,22 +144,49 @@ def sync_sensor_parser_templates(request, project_id):
         for file in files:
             name, ext = os.path.splitext(file)
             if ext == '.yaml':
-                parser_files.append(file) 
+                parser_files.append(file)
+        # For each SensorType check if there still exists an config.yaml file for it, else delete it
+        for sensortype in SensorType.objects.all():
+            config_file_found = False
+            for parser_file in parser_files:
+                # Each config file is name like: manufacturer_name_version.yaml
+                file_name = str(parser_file).split('.')[0]
+                manufacturer, name, version = file_name.split('_')
+                if sensortype.manufacturer==manufacturer and sensortype.name==name and sensortype.version==version:
+                    config_file_found = True
+                    break
+            if not config_file_found:
+                sensortype.delete()
+
         for parser_file in parser_files:
             # Each config file is name like: manufacturer_name_version.yaml
             file_name = str(parser_file).split('.')[0]
             manufacturer, name, version = file_name.split('_')
-            
-            if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
-                # If there does not yet exist such an config file in the repo, read the file and save in config
-                with open(path / str(parser_file)) as f:
+            with open(path / str(parser_file)) as f:
                     config = yaml.load(f, Loader=SafeLoader)
                     config = str(config).replace("\'", "\"")
                     config = config.replace("None", "\"\"")
-                    
-                    
-                if validateConfigJSON(str(config)):
-                    # If the config is valid add to DB
-                    config = json.loads(config)
+            if validateConfigJSON(str(config)):
+                # Check if the config file is configured as expected
+                config = json.loads(config)
+                # If there already is a SensorType with this manu, name and version the config can still be updated. If this is the case, update SensorType
+                if SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
+                    if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version, **config).exists():
+                        SensorType.objects.get(manufacturer=manufacturer,name=name, version=version).update(**config)
+                # If SensorType doesn't exist, create it.
+                if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
                     SensorType.objects.create(manufacturer=manufacturer,name=name, version=version, **config).save()
+            else:
+                print(f'Invalid config file: \n{config}')
     return redirect(reverse('sensormodel:sensor',kwargs={'project_id':project_id}))
+
+def delete_sensortype(request, project_id, id):
+    sensortype = SensorType.objects.get(id=id)
+    project = Project.objects.get(id=project_id)
+    if request.method == 'POST':
+        # Send POST to delete a subject
+        sensortype.delete()
+        return redirect('sensormodel:sensor', project_id = project_id)
+    else:
+        # Go to delete confirmation page
+        return render(request, 'deleteSensorType.html', {'project':project})

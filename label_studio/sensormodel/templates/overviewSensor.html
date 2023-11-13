@@ -68,16 +68,16 @@
         <h2>Sensors</h2>
         <table class=" tables">
             <tr>
-                <th>Sensor ID</th>
-                <th>Description</th>
+                <th>Sensor name</th>
+                <th>Parsable Sensor ID</th>
                 <th>Sensor type</th>
                 <th></th>
                 <th></th>
             </tr>
             {% for sensor in sensors %}
             <tr>
-                <td>{{ sensor.sensor_id }}</td>
-                <td>{{ sensor.description }}</td> 
+                <td>{{ sensor.name }}</td>
+                <td>{{ sensor.parsable_sensor_id }}</td> 
                 <td>{{ sensor.sensortype }}</td>
                 <td><a href="{% url 'sensormodel:adjust_sensor' project.id sensor.id %}"> [Edit] </a></td>
                 <td><a href="{% url 'sensormodel:delete_sensor' project.id sensor.id %}">[Delete]</a></td>
@@ -93,6 +93,7 @@
                 <th>Name</th>
                 <th>Version</th>
                 <th>ID</th>
+                <th></th>
             </tr>
             {% for sensortype in sensortypes %}
             <tr>
@@ -100,6 +101,7 @@
                 <td>{{ sensortype.name }}</td> 
                 <td>{{ sensortype.version }}</td>
                 <td>{{ sensortype.id }}</td>
+                <td><a href="{% url 'sensormodel:delete_sensortype' project.id sensortype.id %}">[Delete]</a></td>
             </tr> 
            {% endfor %} 
         </table>

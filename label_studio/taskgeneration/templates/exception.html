@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+<head>
+    <title>Work in progress</title>
+</head>
+<body>
+    <h1>First complete the work flow!</h1>
+    <div class="buttons">
+        <form action="{% url 'landingpage:landingpage' project.id %}">
+            <input type="submit" value="Go back to project page" style="background-color: #c4862b; width:25%"/>
+        </form>
+    </div>
+</body>
+
+{% endblock %}

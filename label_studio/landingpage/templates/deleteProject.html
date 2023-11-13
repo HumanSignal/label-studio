@@ -23,16 +23,27 @@
     }
 </style>
 
+<body>
+    <h1>Delete confirmation</h1>
 
-<h1>Delete confirmation</h1>
+    <p>Are you sure you want to delete project: {{ mainproject.name }}?</p>
+    <div class="forms">
+        <form id="delete-form" action="" method="post">
+            <input type="submit" value="Delete">
+        </form>
+        <form action="{% url 'landingpage:homepage' %}">
+            <input type="submit" value="No, go back to dashboard!" />
+        </form>
+    </div>
+    <div id="deleting-message" style="display: none;">
+        <p>Deleting project! Please wait...</p>
+    </div>
 
-<p>Are you sure you want to delete project: {{ mainproject.name }}?</p>
-
-<form action="" method="post">
-    <input type="submit" value="Delete">
-</form>
-<form action="{% url 'landingpage:homepage' %}">
-    <input type="submit" value="No, go back to dashboard!" />
-</form>
+    <script>
+        document.getElementById('delete-form').addEventListener('submit', function() {
+                document.getElementById('deleting-message').style.display = 'block';
+            });
+    </script>
+</body>
 
 {% endblock %}

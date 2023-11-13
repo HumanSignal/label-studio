@@ -32,14 +32,14 @@ class SensorType(models.Model):
         return self.manufacturer + '| ' + self.name + '| ' + self.version
 
 class Sensor(models.Model):
-    sensor_id = models.IntegerField()
-    description = models.TextField(max_length=100, blank=True)
+    name = models.TextField(max_length=25)
+    parsable_sensor_id = models.CharField(max_length=25, default=None, null=True, blank=True)
     sensor_hash = models.CharField(max_length=10,blank=True)
     sensortype = models.ForeignKey(SensorType,on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return 'Sensor: ' + str(self.sensor_id)
+        return 'Sensor: ' + str(self.name)
 
 
 class Subject(models.Model):
