@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-142: Submit and exit style update",
-  "commit": "1a0ab1cb5cb0a3b169064f5f310b364c09c95ded",
+  "message": "feat: LEAP-336: Collapsible cards in Ranker",
+  "commit": "da3030a3311928aab6c33aba47fbb9998f8dbe5b",
   "branch": "master",
-  "date": "2023/11/09 19:51:35"
+  "date": "2023/11/10 16:24:55"
 }
