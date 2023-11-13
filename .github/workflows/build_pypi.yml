@@ -79,8 +79,6 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pypi-${{ hashFiles('deploy/requirements-mw.txt') }}-${{ hashFiles('deploy/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pypi-
 
       - name: Install dependencies
         run: |

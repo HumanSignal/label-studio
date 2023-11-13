@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-345: Fix taxonomy items collapsing when dropdown is closed",
-  "commit": "fcdc1df7b09877c684fb95c07625a0ad0bc1d58a",
+  "message": "feat: LEAP-336: Collapsible cards in Ranker",
+  "commit": "da3030a3311928aab6c33aba47fbb9998f8dbe5b",
   "branch": "master",
-  "date": "2023/11/07 11:01:17"
+  "date": "2023/11/10 16:24:55"
 }
