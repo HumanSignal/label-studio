@@ -10,7 +10,7 @@ class TaskGenerationForm_dead(forms.Form):
                                      help_text="Choose the subject for which tasks should be generated",
                                      label="Subject")
     segment_duration = forms.IntegerField(min_value=1,
-                                          help_text="Choose the duration of each annotation segment",
+                                          help_text="Choose the duration of each annotation segment in seconds",
                                           label="Segment duration")
     
 class TaskGenerationForm(forms.Form):
