@@ -12,6 +12,7 @@ from rest_framework.authtoken.models import Token
 import subprocess
 import os
 import pandas as pd
+import numpy as np
 import json
 import requests
 
@@ -186,11 +187,12 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
                     video_file_upload = fileupload_model.objects.latest('id')
                     
-
+                    refresh_every = 10
+                    wait_before_sync = 3000
                     activity_annotation_project = Project.objects.get(id=project.id+2)
                     task_json_template = {
                         "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",
-                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),100); console.log('video is loaded, starting to sync with time series')}}, 3000); \" />",
+                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />"
                         "subject": f"{subject}"
                     }
                     with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
@@ -216,8 +218,6 @@ def generate_taskgen_form(request, project_id):
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
 
             if sensortype_A is not None and sensortype_B is not None:
-
-
                 if sensortype_B.sensortype == 'I':
                     sensor_instance = Sensor.objects.filter(project=project, sensortype=sensortype_B).first()
                     imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
