@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-336: Collapsible cards in Ranker",
-  "commit": "da3030a3311928aab6c33aba47fbb9998f8dbe5b",
-  "branch": "master",
-  "date": "2023/11/10 16:24:55"
+  "message": "fix: LEAP-364: Fix crosshair functionality",
+  "commit": "5073aaf6dc1e49f4eb182af3ceba0a3857aeb316",
+  "branch": "fb-leap-364/fix-crosshair",
+  "date": "2023/11/13 13:04:12"
 }
