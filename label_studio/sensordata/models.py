@@ -13,6 +13,9 @@ class SensorData(models.Model):
     file_hash = models.CharField(max_length=10,blank=True,null=True)
     sensor = models.ForeignKey(Sensor,on_delete=models.CASCADE, null=True)
 
+    def __str__(self):
+        return f'Name: {self.name} | Sensor: {self.sensor}' 
+
 class SensorOffset(models.Model):
     sensor_A = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='SensorA_offsets')
     sensor_B = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='SensorB_offsets')

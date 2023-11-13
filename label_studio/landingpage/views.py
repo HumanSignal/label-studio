@@ -70,7 +70,7 @@ def createProject(request):
             # Get url for displaying all projects
             projects_url = request.build_absolute_uri(reverse('projects:api:project-list'))
 
-            ### Create three projects from here
+            ### Create four projects from here
             # Create data import project
             dataimport_title = f'{name}_dataimport'
             dataimport_response = requests.post(
@@ -93,6 +93,14 @@ def createProject(request):
                 projects_url,
                 headers={'Authorization': f'Token {token}'},
                 data={'title': activityannotation_title}
+            )
+            
+            # Create offset annotation project
+            offsetannotation_title = f'{name}_offsetannotation'
+            offsetannotation_response = requests.post(
+                projects_url,
+                headers={'Authorization': f'Token {token}'},
+                data={'title': offsetannotation_title}
             )
 
             return redirect('landingpage:homepage')
