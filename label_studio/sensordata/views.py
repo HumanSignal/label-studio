@@ -115,7 +115,7 @@ def process_sensor_file(request, file_path, sensor, name, project):
 def offset(request, project_id):
     project = Project.objects.get(id=project_id)
     offset_annotation_project = Project.objects.get(id=project.id+3)
-    sensoroffset = SensorOffset.objects.all(project=project).order_by('offset_Date')
+    sensoroffset = SensorOffset.objects.filter(project=project).order_by('offset_Date')
     offsetannotationform = OffsetAnnotationForm(project=project)
     return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project, 'offset_project': offset_annotation_project})
 
