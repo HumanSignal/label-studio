@@ -24,6 +24,7 @@ import zipfile
 from django.http import HttpResponseBadRequest
 from projects.models import Project
 from tasks.models import Task
+from django.contrib import messages
 
 
 UNITS = {'days': 86400, 'hours': 3600, 'minutes': 60, 'seconds':1, 'milliseconds':0.001}
@@ -36,28 +37,36 @@ def sensordatapage(request, project_id):
 
 def addsensordata(request, project_id):
     project = Project.objects.get(id=project_id)
+    mismatched_files = []
     if request.method =='POST':
         sensordataform = SensorDataForm(request.POST, request.FILES, project=project)
         if sensordataform.is_valid():
             # Get form data
-            name = sensordataform.cleaned_data['name']
             uploaded_file = sensordataform.cleaned_data['file']
             project = project
             sensor = sensordataform.cleaned_data.get('sensor')
 
-
+            parsable_sensor_id = sensor.parsable_sensor_id
+            
             # Check if the uploaded file is a zip file
             if zipfile.is_zipfile(uploaded_file):
                 # Process the zip file
                 with zipfile.ZipFile(uploaded_file, 'r') as zip_ref:
                     for file_name in zip_ref.namelist():
                         if (file_name.lower().endswith('.csv') or file_name.lower().endswith('.mp4')):  # Check if the file is a CSV or MP4 file
-                            # Extract each file from the zip to a temporary location
-                            temp_file_path = zip_ref.extract(file_name)
-                            # Process the individual file
-                            process_sensor_file(request, temp_file_path, sensor, file_name, project)
-                            # Delete the temporary file
-                            os.remove(temp_file_path)
+                            if parsable_sensor_id is None or file_validation(zip_ref, file_name, sensor, parsable_sensor_id):
+                                # Extract each file from the zip to a temporary location
+                                temp_file_path = zip_ref.extract(file_name)
+                                # Process the individual file
+                                process_sensor_file(request, temp_file_path, sensor, file_name, project)
+                                # Delete the temporary file
+                                os.remove(temp_file_path)
+                            else:
+                                mismatched_files.append(file_name)
+                if mismatched_files:
+                    # Redirect to the mismatched files warning page
+                    request.session['mismatched_files'] = mismatched_files
+                    return redirect('sensordata:file-upload-warning', project_id=project_id)
                 
                 return redirect('sensordata:sensordatapage', project_id=project_id)
 
@@ -67,6 +76,26 @@ def addsensordata(request, project_id):
         sensordataform = SensorDataForm(project=project)
 
     return render(request, 'addsensordata.html', {'sensordataform': sensordataform, 'project':project})
+
+def file_validation(zip_ref, file_name, sensor, parsable_sensor_id):
+    # Find sensortype
+    sensor_type = sensor.sensortype
+    # Open the file
+    with zip_ref.open(file_name) as file:
+        for i, line in enumerate(file):
+                if i == sensor_type.sensor_id_row:
+                    sensor_id_column = sensor_type.sensor_id_column if sensor_type.sensor_id_column is not None else 0
+                    sensor_id = line.decode('utf-8').split(',')[sensor_id_column].strip()     
+                    if sensor_id == parsable_sensor_id:
+                        return True
+
+    return False
+
+def file_warning(request, project_id):
+    project = Project.objects.get(id=project_id)
+    mismatched_files = request.session.pop('mismatched_files', [])
+    return render(request, 'file_upload_warning.html', {'project':project, 'mismatched_files':mismatched_files})
+
 
 def process_sensor_file(request, file_path, sensor, name, project):
     # Process the sensor file based on its type

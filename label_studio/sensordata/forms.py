@@ -6,7 +6,6 @@ from sensordata.models import SensorOffset
 from projects.models import Project
 
 class SensorDataForm(forms.Form):
-    name = forms.CharField(max_length=100, required=False)
     sensor = forms.ModelChoiceField(Sensor.objects.all())
     file = forms.FileField()
 

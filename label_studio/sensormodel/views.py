@@ -29,7 +29,7 @@ def deployment(request, project_id):
 
 def sensor(request, project_id):
     project = Project.objects.get(id=project_id)
-    sensors = Sensor.objects.filter(project=project).order_by('sensor_id')
+    sensors = Sensor.objects.filter(project=project).order_by('name')
     sensortypes = SensorType.objects.all().order_by('manufacturer')
     if request.method =='POST':
         sensorform = forms.SensorForm(request.POST)
