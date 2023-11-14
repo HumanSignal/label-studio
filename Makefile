@@ -16,19 +16,15 @@ shell-dev:
 
 # Install modules
 frontend-setup:
-	cd label_studio/frontend && yarn install --frozen-lockfile && yarn run download:all;
-
-# Fetch DM and LSF
-frontend-fetch:
-	cd label_studio/frontend && yarn run download:all;
+	cd web && yarn install --frozen-lockfile;
 
 # Build frontend continuously on files changes
 frontend-watch:
-	cd label_studio/frontend && yarn start
+	cd web && yarn run ls:watch
 
 # Build production-ready optimized bundle
 frontend-build:
-	cd label_studio/frontend && yarn install --frozen-lockfile && yarn run build:production
+	cd web && yarn install --frozen-lockfile && yarn run build
 
 # Run tests
 test:
