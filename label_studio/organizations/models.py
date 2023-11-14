@@ -31,6 +31,7 @@ class OrganizationMember(OrganizationMemberMixin, models.Model):
         _('deleted at'),
         default=None,
         null=True,
+        blank=True,
         db_index=True,
         help_text='Timestamp indicating when the organization member was marked as deleted.  '
         'If NULL, the member is not considered deleted.',
