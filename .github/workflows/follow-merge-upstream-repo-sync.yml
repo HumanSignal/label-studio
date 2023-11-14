@@ -184,7 +184,7 @@ jobs:
             "message": "${TITLE}",
             "commit": "${{ github.event.client_payload.commit_sha }}",
             "branch": "${branch}",
-            "date": "$(git log -1 --date=format:"%Y/%m/%d %T" --format="%ad" | cat)"
+            "date": "$(git log -1 --date=format:"%Y-%m-%dT%TZ" --format="%ad" | cat)"
           }
           EOF
 

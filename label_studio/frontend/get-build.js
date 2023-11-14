@@ -131,7 +131,7 @@ async function get(projectName, ref = 'master') {
     });
   }
 
-  fs.writeFileSync(`${staticPath}/version.json`, JSON.stringify(info, null, 2));
+  fs.writeFileSync(`${staticPath}/version.json`, JSON.stringify(info, null, 2) + "\n");
   console.info('Version info written to static/version.json');
 
   // move build to target folder
