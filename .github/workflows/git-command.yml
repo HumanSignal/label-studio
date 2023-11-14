@@ -36,7 +36,7 @@ jobs:
         run: |
           set -xeuo pipefail
           if git merge-tree --name-only HEAD origin/$SLASH_COMMAND_ARG_BRANCH; then
-            echo "merge_conflict=false" >> $GITHUB_OUTPUT
+            echo "no merge conflict found"
           else
             echo "merge_conflict=true" >> $GITHUB_OUTPUT
           fi
