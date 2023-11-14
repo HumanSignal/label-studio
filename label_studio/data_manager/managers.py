@@ -406,12 +406,12 @@ def apply_filters(queryset, filters, project, request):
                     base_condition = (
                         Q(**{field_name: []}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
                     )
-                elif value_type == 'int':
-                    base_condition = Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
-                else:
+                elif value_type == 'str' or _filter.type == 'String':
                     base_condition = (
                         Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
                     )
+                else:
+                    base_condition = Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
 
                 # Include alt_field_name if it is provided
                 if alt_field_name:
@@ -421,14 +421,14 @@ def apply_filters(queryset, filters, project, request):
                             | Q(**{alt_field_name: None})
                             | Q(**{alt_field_name + '__isnull': True})
                         )
-                    elif value_type == 'int':
-                        alt_condition = Q(**{alt_field_name: None}) | Q(**{alt_field_name + '__isnull': True})
-                    else:
+                    elif value_type == 'str' or _filter.type == 'String':
                         alt_condition = (
                             Q(**{alt_field_name: ''})
                             | Q(**{alt_field_name: None})
                             | Q(**{alt_field_name + '__isnull': True})
                         )
+                    else:
+                        alt_condition = Q(**{alt_field_name: None}) | Q(**{alt_field_name + '__isnull': True})
             else:
                 # Original conditions for strictly field_name
                 if value_type == 'str':
