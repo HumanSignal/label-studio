@@ -66,8 +66,14 @@ jobs:
           PROVIDED_VERSION: ${{ inputs.version }}
         run: |
           set -x
+
+          wget https://github.com/gnprice/toml-cli/releases/download/v0.2.3/toml-0.2.3-x86_64-linux.tar.gz
+          tar -xzf toml-0.2.3-x86_64-linux.tar.gz
+          mv toml-0.2.3-x86_64-linux/toml toml
+          chmod +x toml
+
           version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
-          sed -i "s/^__version__[ ]*=.*/__version__ = '${version}'/g" label_studio/__init__.py
+          ./toml set pyproject.toml tool.poetry.version "$version" > pyproject.toml
 
       - name: Set up Python
         uses: actions/setup-python@v4
