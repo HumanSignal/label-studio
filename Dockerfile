@@ -56,11 +56,19 @@ RUN set -eux; \
     mkdir -p $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx && \
     chown -R 1001:0 $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx
 
-COPY --chown=1001:0 . .
+# Copy essential files for installing Label Studio and its dependencies
+COPY --chown=1001:0 pyproject.toml .
+COPY --chown=1001:0 poetry.lock .
+COPY --chown=1001:0 README.md .
+COPY --chown=1001:0 label_studio/__init__.py ./label_studio/__init__.py
 
 # Ensure the poetry lockfile is up to date, then install all deps from it to
-# the system python. This includes label-studio itself.
-RUN poetry check --lock && POETRY_VIRTUALENVS_CREATE=false poetry install
+# the system python. This includes label-studio itself. For caching purposes,
+# do this before copying the rest of the source code.
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    poetry check --lock && POETRY_VIRTUALENVS_CREATE=false poetry install
+
+COPY --chown=1001:0 . .
 
 RUN rm -rf ./label_studio/frontend
 COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
