@@ -73,7 +73,8 @@ jobs:
           chmod +x toml
 
           version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
-          ./toml set pyproject.toml tool.poetry.version "$version" > pyproject.toml
+          ./toml set pyproject.toml tool.poetry.version "$version" > pyproject.toml.new
+          mv -f pyproject.toml.new pyproject.toml
 
       - name: Set up Python
         uses: actions/setup-python@v4
