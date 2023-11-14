@@ -488,6 +488,7 @@ def business_client(client):
     client.admin = user
     client.annotator = user
     client.user = user
+    client.api_key = user.reset_token().key
     client.organization = org
 
     if signin(client, email, password).status_code != 302:
@@ -756,6 +757,13 @@ def tick_clock(_, seconds: int = 1) -> None:
     freezer.stop()
     now += timedelta(seconds=seconds)
     freezer = freeze_time(now)
+    freezer.start()
+
+
+def freeze_datetime(response, utc_time: str) -> None:
+    global freezer
+    freezer.stop()
+    freezer = freeze_time(utc_time)
     freezer.start()
 
 

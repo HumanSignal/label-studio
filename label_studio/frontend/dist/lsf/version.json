@@ -1,6 +1,6 @@
 {
-  "message": "docs: DOC-121: Update Taxonomy tag page for external taxonomy",
-  "commit": "dc100b99253af20d6fe19dcd715a35eda3169956",
-  "branch": "fb-docs/external-taxonomy",
-  "date": "2023/10/13 13:05:24"
+  "message": "feat: LEAP-336: Collapsible cards in Ranker",
+  "commit": "da3030a3311928aab6c33aba47fbb9998f8dbe5b",
+  "branch": "master",
+  "date": "2023/11/10 16:24:55"
 }

@@ -9,7 +9,6 @@ on:
 
 env:
   CACHE_NAME_PREFIX: v1
-  PIP_VERSION: "20.2"
 
 jobs:
   conda:
@@ -47,9 +46,7 @@ jobs:
         id: pip-cache
         with:
           path: ${{ matrix.pip-cache-path }}
-          key: Conda-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            Conda-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-${{ matrix.python-version }}-
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-conda-ls-python-${{ matrix.python-version }}-${{ hashFiles('deploy/requirements.txt', 'deploy/requirements-test.txt') }}
 
       - name: Install dependencies
         run: |

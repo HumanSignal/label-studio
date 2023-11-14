@@ -148,6 +148,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         DELETE=all_permissions.tasks_delete,
     )
 
+    def initial(self, request, *args, **kwargs):
+        self.task = self.get_object()
+        return super().initial(request, *args, **kwargs)
+
     @staticmethod
     def prefetch(queryset):
         return queryset.prefetch_related(
@@ -176,8 +180,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         }
 
     def get(self, request, pk):
-        self.task = self.get_object()
-
         context = self.get_retrieve_serializer_context(request)
         context['project'] = project = self.task.project
 

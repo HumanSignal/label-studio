@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
-  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
+  "message": "fix: OPTIC-124: Save and update have success/fail toast messages",
+  "commit": "c55f66fe64da5daf8dcd956f051ba95f1a079509",
   "branch": "master",
-  "date": "2023/09/26 10:39:21"
+  "date": "2023/11/09 19:50:04"
 }
