@@ -1,6 +1,6 @@
 {
-  "message": "docs: DOC-121: Update Taxonomy tag page for external taxonomy (#1577)",
-  "commit": "10d60d6626b9a405cc6ba9ccbbe4b54d77e18278",
+  "message": "fix: LEAP-364: Fix crosshair functionality (#1616)",
+  "commit": "4891f397096fe3a8773ec98ba7e56d0289810b82",
   "branch": "master",
-  "date": "2023-11-13T19:56:12Z"
+  "date": "2023-11-14T15:48:46Z"
 }
