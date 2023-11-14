@@ -46,6 +46,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
+        id: setup_python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -63,6 +64,7 @@ jobs:
           poetry install --with test
 
       - name: Setup node
+        id: setup_node
         uses: actions/setup-node@v4
         with:
           node-version: "${{ env.NODE }}"
@@ -76,9 +78,7 @@ jobs:
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json') }}-${{ hashFiles('label_studio/frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE }}-
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-npm-ls-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json', 'label_studio/frontend/package-lock.json') }}
 
       - name: Install LSF & set version.py
         run: poetry run ./deploy/prebuild_wo_frontend.sh
@@ -168,6 +168,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
+        id: setup_python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -185,9 +186,10 @@ jobs:
           poetry install --with test
 
       - name: Setup node
+        id: setup_node
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: "${{ env.NODE }}"
 
       - name: Get npm cache directory
         id: npm-cache-dir
@@ -198,9 +200,7 @@ jobs:
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json') }}-${{ hashFiles('label_studio/frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE }}-
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-npm-ls-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json', 'label_studio/frontend/package-lock.json') }}
 
       - name: Install LSF & set version.py
         run: poetry run ./deploy/prebuild_wo_frontend.sh
@@ -262,6 +262,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
+        id: setup_python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}

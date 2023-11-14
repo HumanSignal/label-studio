@@ -4,9 +4,9 @@
  * and places it to label_studio/static/<REPO>
 */
 const fs = require('fs');
-const { Readable } = require("stream")
-const { finished } = require('stream/promises')
-const { spawn } = require('child_process');
+const {Readable} = require("stream")
+const {finished} = require('stream/promises')
+const {spawn} = require('child_process');
 const path = require('path');
 
 const dir = path.resolve(__dirname, 'build-tmp');
@@ -48,7 +48,7 @@ async function get(projectName, ref = 'master') {
     const commitUrl = `https://api.github.com/repos/${REPO}/git/ref/heads/${ref}`;
 
     console.info(`Fetching ${commitUrl}`);
-    res = await fetch(commitUrl, { headers: { Authorization: `token ${TOKEN}` } });
+    res = await fetch(commitUrl, {headers: {Authorization: `token ${TOKEN}`}});
     json = await res.json();
 
     if (!json || !json.object) {
@@ -69,7 +69,7 @@ async function get(projectName, ref = 'master') {
   const artifactName = `LSF-${sha}`;
   const artifactsUrl = `https://api.github.com/repos/${REPO}/actions/artifacts?name=${artifactName}`;
 
-  res = await fetch(artifactsUrl, { headers: { Authorization: `token ${TOKEN}` } });
+  res = await fetch(artifactsUrl, {headers: {Authorization: `token ${TOKEN}`}});
   json = await res.json();
 
   const artifact = json.artifacts.at(0);
@@ -79,7 +79,7 @@ async function get(projectName, ref = 'master') {
 
   console.info('Found an artifact:', buildUrl);
 
-  res = await fetch(buildUrl, { headers: { Authorization: `token ${TOKEN}` } });
+  res = await fetch(buildUrl, {headers: {Authorization: `token ${TOKEN}`}});
 
   const filename = `${dir}/${sha}.zip`;
 
@@ -88,11 +88,11 @@ async function get(projectName, ref = 'master') {
 
   await new Promise(async (resolve, reject) => {
     try {
-      await finished(Readable.fromWeb(res.body).pipe(fileStream)) 
+      await finished(Readable.fromWeb(res.body).pipe(fileStream))
     } catch (err) {
       reject(err)
     }
-    
+
     console.info('Downloaded:', filename);
     const unzip = spawn('unzip', ['-d', dir, '-o', filename]);
 
@@ -102,7 +102,7 @@ async function get(projectName, ref = 'master') {
 
   const commitInfoUrl = `https://api.github.com/repos/${REPO}/git/commits/${sha}`;
 
-  res = await fetch(commitInfoUrl, { headers: { Authorization: `token ${TOKEN}` } });
+  res = await fetch(commitInfoUrl, {headers: {Authorization: `token ${TOKEN}`}});
   json = await res.json();
   const info = {
     message: json.message.split('\n')[0],
@@ -111,21 +111,39 @@ async function get(projectName, ref = 'master') {
     date: (json.author && json.author.date) || (json.committer && json.committer.date),
   };
 
-  fs.writeFileSync(`${dir}/static/version.json`, JSON.stringify(info, null, 2));
+  const files = fs.readdirSync(dir);
+  const tarFiles = files.filter(file => path.extname(file) === '.tar');
+  var staticPath = path.join(dir, 'static');
+  if (tarFiles.length > 0) {
+    staticPath = path.join(dir, 'build', 'static');
+  }
+
+  for (var tarFile of tarFiles) {
+    await new Promise(async (resolve, reject) => {
+
+      console.log(`Unpacking ${tarFile}`);
+      const unzip = spawn('tar', ['-xf', `${dir}/${tarFile}`, '-C', dir]);
+
+      unzip.stderr.on('data', reject);
+      unzip.on('close', resolve);
+    }).then(() => {
+      console.log(`${tarFile} unpacked`);
+    });
+  }
+
+  fs.writeFileSync(`${staticPath}/version.json`, JSON.stringify(info, null, 2));
   console.info('Version info written to static/version.json');
 
   // move build to target folder
-  var oldPath = path.join(dir, 'static');
-
   var newPath = path.join(__dirname, DIST_DIR, projectName);
 
-  fs.rmdirSync(newPath, { recursive: true });
-  fs.mkdirSync(newPath, { recursive: true });
+  fs.rmdirSync(newPath, {recursive: true});
+  fs.mkdirSync(newPath, {recursive: true});
 
-  fs.rename(oldPath, newPath, function(err) {
+  fs.rename(staticPath, newPath, function (err) {
     if (err) throw err;
     console.log(`Successfully renamed - AKA moved into ${newPath}`);
-    fs.rmdirSync(dir, { recursive: true });
+    fs.rmdirSync(dir, {recursive: true});
 
     if (projectName === 'lsf') {
       console.log("Copying chunk files to the root folder");

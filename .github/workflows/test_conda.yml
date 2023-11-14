@@ -9,7 +9,6 @@ on:
 
 env:
   CACHE_NAME_PREFIX: v1
-  PIP_VERSION: "20.2"
 
 jobs:
   conda:

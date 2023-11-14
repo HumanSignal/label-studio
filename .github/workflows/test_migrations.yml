@@ -38,6 +38,7 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Set up Python
+        id: setup_python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
