@@ -52,7 +52,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          poetry install --with test
+          poetry install
 
       - name: Test migrations
         run: |
