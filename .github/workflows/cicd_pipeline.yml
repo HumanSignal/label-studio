@@ -315,8 +315,6 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-gh-actions-
 
       - name: Install tools and dependencies
         run: |
