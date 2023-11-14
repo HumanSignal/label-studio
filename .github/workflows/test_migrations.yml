@@ -48,22 +48,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          path: ~/.cache/pip
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-ls-python-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('deploy/requirements.txt') }}
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
-          pip install -r deploy/requirements.txt
-          pip install -e .
+          poetry install
 
       - name: Test migrations
         run: |
-          output=$(python label_studio/manage.py makemigrations)
+          output=$(poetry run python label_studio/manage.py makemigrations)
           if ! grep 'No changes detected' <<< "${output}"; then
             error="${output}"
             error="${error//'%'/'%25'}"
