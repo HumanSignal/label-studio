@@ -1,9 +1,12 @@
 const fs = require('fs');
+const toml = require('toml');
 
-const packageFile = fs.readFileSync("../../label_studio/__init__.py").toString();
+const packageFile = fs.readFileSync("../../pyproject.toml").toString();
 
-const packageName = packageFile.match(/package_name(\s?)=(\s?)'([^']+)'/)[3];
-const versionNumber = packageFile.match(/__version__(\s?)=(\s?)'([^']+)'/)[3];
+const parsedToml = toml.parse(packageFile);
+
+const packageName = parsedToml.tool.poetry.name;
+const versionNumber = parsedToml.tool.poetry.version;
 
 module.exports.name = packageName;
 module.exports.version = versionNumber;

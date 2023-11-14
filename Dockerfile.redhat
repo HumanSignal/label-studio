@@ -7,7 +7,7 @@ ENV NPM_CACHE_LOCATION=$HOME/.cache/yarn/v6 \
 WORKDIR /label-studio/label_studio/frontend
 
 COPY --chown=1001:0 label_studio/frontend .
-COPY --chown=1001:0 label_studio/__init__.py /label-studio/label_studio/__init__.py
+COPY --chown=1001:0 pyproject.toml /label-studio
 
 RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
     npm install -g yarn

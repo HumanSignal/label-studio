@@ -6,8 +6,7 @@ import importlib.metadata
 package_name = 'label-studio'
 
 # Package version
-# TODO(jo): frontend/release.js reads this directly. find alternative approach
-__version__ = '1.9.3dev'
+__version__ = importlib.metadata.version(package_name)
 
 
 # pypi info

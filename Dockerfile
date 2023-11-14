@@ -7,7 +7,7 @@ ENV NPM_CACHE_LOCATION=$HOME/.cache/yarn/v6 \
 WORKDIR /label-studio/label_studio/frontend
 
 COPY --chown=1001:0 label_studio/frontend .
-COPY --chown=1001:0 label_studio/__init__.py /label-studio/label_studio/__init__.py
+COPY --chown=1001:0 pyproject.toml /label-studio
 
 # Fix Docker Arm64 Build
 RUN yarn config set registry https://registry.npmjs.org/
