@@ -22,6 +22,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive \
     LS_DIR=/label-studio \
     PIP_CACHE_DIR=$HOME/.cache \
+    POETRY_CACHE_DIR=$HOME/.poetry-cache \
     DJANGO_SETTINGS_MODULE=core.settings.label_studio \
     LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
     OPT_DIR=/opt/heartex/instance-data/etc \
@@ -65,7 +66,7 @@ COPY --chown=1001:0 label_studio/__init__.py ./label_studio/__init__.py
 # Ensure the poetry lockfile is up to date, then install all deps from it to
 # the system python. This includes label-studio itself. For caching purposes,
 # do this before copying the rest of the source code.
-RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR \
     poetry check --lock && POETRY_VIRTUALENVS_CREATE=false poetry install
 
 COPY --chown=1001:0 . .
