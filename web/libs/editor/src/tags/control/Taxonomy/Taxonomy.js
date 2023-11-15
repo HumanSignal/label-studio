@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { flow, types } from 'mobx-state-tree';
+import { flow, getRoot, types } from 'mobx-state-tree';
 import { Spin } from 'antd';
 
 import Infomodal from '../../../components/Infomodal/Infomodal';
@@ -8,6 +8,7 @@ import { NewTaxonomy } from '../../../components/NewTaxonomy/NewTaxonomy';
 import { Taxonomy } from '../../../components/Taxonomy/Taxonomy';
 import { guidGenerator } from '../../../core/Helpers';
 import Registry from '../../../core/Registry';
+import Tree from '../../../core/Tree';
 import Types from '../../../core/Types';
 import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
 import DynamicChildrenMixin from '../../../mixins/DynamicChildrenMixin';
@@ -19,11 +20,32 @@ import SelectedChoiceMixin from '../../../mixins/SelectedChoiceMixin';
 import { SharedStoreMixin } from '../../../mixins/SharedChoiceStore/mixin';
 import VisibilityMixin from '../../../mixins/Visibility';
 import { parseValue } from '../../../utils/data';
-import { FF_DEV_2007_DEV_2008, FF_DEV_3617, FF_LSDV_4583, FF_TAXONOMY_ASYNC, FF_TAXONOMY_LABELING, isFF } from '../../../utils/feature-flags';
+import {
+  FF_DEV_3617,
+  FF_LEAP_218,
+  FF_LSDV_4583,
+  FF_TAXONOMY_ASYNC,
+  FF_TAXONOMY_LABELING,
+  FF_TAXONOMY_SELECTED,
+  isFF
+} from '../../../utils/feature-flags';
 import ControlBase from '../Base';
 import ClassificationBase from '../ClassificationBase';
 
 import styles from './Taxonomy.styl';
+import messages from '../../../utils/messages';
+import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
+
+/**
+ * @typedef TaxonomyItem
+ * @property {string} label
+ * @property {string[]} path
+ * @property {number} depth
+ * @property {string} [hint]
+ * @property {string} [color]
+ * @property {TaxonomyItem[]} [children]
+ * @property {string} [alias]
+ */
 
 /**
  * The `Taxonomy` tag is used to create one or more hierarchical classifications, storing both choice selections and their ancestors in the results. Use for nested classification tasks with the `Choice` tag.
@@ -72,13 +94,15 @@ const TagAttrs = types.model({
   labeling: types.optional(types.boolean, false),
   leafsonly: types.optional(types.boolean, false),
   showfullpath: types.optional(types.boolean, false),
+  legacy: types.optional(types.boolean, false),
   pathseparator: types.optional(types.string, ' / '),
   apiurl: types.maybeNull(types.string),
   placeholder: '',
   minwidth: types.maybeNull(types.string),
   maxwidth: types.maybeNull(types.string),
+  dropdownwidth: types.maybeNull(types.string),
   maxusages: types.maybeNull(types.string),
-  ...(isFF(FF_DEV_2007_DEV_2008) ? { value: types.optional(types.string, '') } : {}),
+  value: types.optional(types.string, ''),
 });
 
 function traverse(root) {
@@ -102,6 +126,7 @@ function traverse(root) {
     const depth = parents.length;
     const obj = { label, path, depth, hint };
 
+    if (node.color) obj.color = node.color;
     if (node.children) {
       obj.children = visitUnique(node.children, path);
     }
@@ -110,7 +135,7 @@ function traverse(root) {
   };
 
   if (!root) return [];
-  if (isFF(FF_DEV_2007_DEV_2008) && !Array.isArray(root)) return visitUnique([root]);
+  if (!Array.isArray(root)) return visitUnique([root]);
   return visitUnique(root);
 }
 
@@ -140,6 +165,10 @@ const TaxonomyLabelingResult = types
 
       return self.annotation.results.find(r => r.from_name === self && r.area === area);
     },
+    get canRemoveItems() {
+      if (!self.isLabeling) return true;
+      return !self.result;
+    },
   }))
   .actions(self => {
     const Super = {
@@ -152,6 +181,35 @@ const TaxonomyLabelingResult = types
         if (self.result) {
           self.result.area.setValue(self);
         }
+      },
+
+      /**
+       * @param {string[]} path saved value from Taxonomy
+       * @returns quazi-label object to act as Label in most places
+       */
+      findLabel(path) {
+        let title = '';
+        let items = self.items;
+        let item;
+
+        for (const value of path) {
+          item = items?.find(item => item.path.at(-1) === value);
+
+          if (!item) return null;
+
+          items = item.children;
+          title = self.showfullpath && title ? title + self.pathseparator + item.label : item.label;
+        }
+
+        const label = { value: title, id: path.join(self.pathseparator) };
+
+        if (item.color) {
+          // to conform the current format of our Result#style (and it requires parent)
+          label.background = item.color;
+          label.parent = {};
+        }
+
+        return label;
       },
     };
   });
@@ -202,6 +260,14 @@ const Model = types
       return 'taxonomy';
     },
 
+    get tiedChildren() {
+      return Tree.filterChildrenOfType(self, 'ChoiceModel');
+    },
+
+    get preselectedValues() {
+      return self.tiedChildren.filter(c => c.selected === true && !c.isSkipped).map(c => c.resultValue);
+    },
+
     get isLoadedByApi() {
       return isFF(FF_TAXONOMY_ASYNC) && !!self.apiurl;
     },
@@ -229,6 +295,25 @@ const Model = types
       }
 
       return fromConfig;
+    },
+
+    get selectedItems() {
+      const full = self.selected.map(path => {
+        /** @type {TaxonomyItem[]} items */
+        let items = self.items;
+        const levels = [];
+
+        for (const value of path) {
+          const item = items.find(item => item.path.at(-1) === value);
+
+          levels.push({ label: item?.label ?? value, value });
+          items = item?.children ?? [];
+        }
+
+        return levels;
+      });
+
+      return full;
     },
 
     get defaultChildType() {
@@ -275,7 +360,14 @@ const Model = types
       const children = ChildrenSnapshots.get(self.name) ?? [];
 
       if (isFF(FF_DEV_3617) && self.store && children.length !== self.children.length) {
-        setTimeout(() => self.updateChildren());
+        if (isFF(FF_TAXONOMY_SELECTED)) {
+          // we have to update it during config parsing to let other code work
+          // with correctly added children.
+          // looks like there are no obstacles to do it in the same tick
+          self.updateChildren();
+        } else {
+          setTimeout(() => self.updateChildren());
+        }
       } else {
         self.loading = false;
       }
@@ -287,35 +379,62 @@ const Model = types
      */
     loadItems: flow(function * (path) {
       if (!self._api) return;
+      let requestOptions = {};
 
-      self.loading = true;
+      // will be used only to load children for nested items
+      // to check that item exists and requires loading
+      let item;
 
-      let item = { children: self.items };
-
+      // check that item exists
       if (path) {
+        item = { children: self.items };
         for (const level of path) {
           item = item.children?.find(ch => ch.path.at(-1) === level);
-          if (!item) {
-            self.loading = false;
-            return;
-          }
+          if (!item) return;
         }
       }
+
+      // Tree Select triggers this on every non-leaf node,
+      // so load only if this item really needs it
+      if (path && (item.isLeaf !== false || item.children)) return;
+
+      self.loading = true;
 
       // build url with `path` as array (path ['A', 'BC'] => path=A&path=BC)
       const url = new URL(self._api);
 
       path?.forEach(p => url.searchParams.append('path', p));
 
+      if (url.username && url.password) {
+        requestOptions = {
+          headers: new Headers({
+            'Authorization': `Basic ${btoa(`${url.username}:${url.password}`)}`,
+          }),
+        };
+
+        url.username = '';
+        url.password = '';
+      }
+
       try {
-        const res = yield fetch(url);
+        const res = yield fetch(url, requestOptions);
+        const { ok, status, statusText } = res;
+
+        if (!ok) throw new Error(`${status} ${statusText}`);
+
         const dataRaw = yield res.json();
         // @todo temporary to support deprecated API response format (just array, no items)
         const data = dataRaw.items ?? dataRaw;
         const prefix = path ?? [];
-        // @todo use aliases
-        // const items = data.map(({ alias, isLeaf, value }) => ({ label: value, path: [...prefix, alias ?? value], depth: 0, isLeaf }));
-        const items = data.map(({ isLeaf, value }) => ({ label: value, path: [...prefix, value], depth: 0, isLeaf }));
+        // recursive convertor to internal format
+        const convert = (items, path) => items.map(({ alias, children, isLeaf, value, ...rest }) => {
+          const item = { label: value, path: [...path, alias ?? value], depth: path.length, isLeaf, ...rest };
+
+          if (children) item.children = convert(children, item.path);
+
+          return item;
+        });
+        const items = convert(data, prefix);
 
         if (path) {
           item.children = items;
@@ -324,8 +443,11 @@ const Model = types
           self._items = items;
         }
       } catch (err) {
+        const message = messages.ERR_LOADING_HTTP({ attr: 'apiUrl', error: String(err), url: self.apiurl });
+
+        self.annotationStore.addErrors([errorBuilder.generalError(message)]);
+
         console.error(err);
-        Infomodal.error(`Failed to load taxonomy "${self.name}" from "${self.apiurl}" by path "${path}".`);
       }
 
       self.loading = false;
@@ -339,10 +461,22 @@ const Model = types
       const children = ChildrenSnapshots.get(self.name) ?? [];
 
       if (children.length) {
+        const root = getRoot(self);
+        // SharedChoiceStore doesn't call `updateValue()` because it's annotation agnostic,
+        // so call it here right after Taxonomy is attached
+        const updateChildrenValue = children => {
+          children?.map(child => {
+            child.updateValue?.(root);
+            updateChildrenValue(child.children);
+          });
+        };
+
         self._children = children;
         self.children = [...children];
         self.store.unlock();
         ChildrenSnapshots.delete(self.name);
+
+        updateChildrenValue(self.children);
       }
 
       self.loading = false;
@@ -363,6 +497,10 @@ const Model = types
     },
 
     onChange(_node, checked) {
+      // don't remove last label from region if region is selected (so canRemoveItems is false)
+      // should be checked only for Taxonomy as labbeling tool
+      if (self.canRemoveItems === false && !checked.length) return;
+
       self.selected = checked.map(s => s.path ?? s);
       self.maxUsagesReached = self.selected.length >= self.maxusages;
       self.updateResult();
@@ -411,6 +549,8 @@ const Model = types
         if (!self.isLoadedByApi) return Super.updateValue?.(store);
 
         self._api = parseValue(self.apiurl, store.task.dataObj);
+        // trying to presign this url if needed and if handler is passed into LSF
+        self._api = (yield store.presignUrlForProject(self._api)) ?? self._api;
 
         yield self.loadItems();
       }),
@@ -435,7 +575,7 @@ const TaxonomyModel = types.compose('TaxonomyModel',
   ControlBase,
   ClassificationBase,
   TagAttrs,
-  ...(isFF(FF_DEV_2007_DEV_2008) ? [DynamicChildrenMixin] : []),
+  DynamicChildrenMixin,
   AnnotationMixin,
   RequiredMixin,
   Model,
@@ -449,6 +589,12 @@ const TaxonomyModel = types.compose('TaxonomyModel',
 );
 
 const HtxTaxonomy = observer(({ item }) => {
+  // literal "taxonomy" class name is for external styling
+  const className = [
+    styles.taxonomy,
+    'taxonomy',
+    isFF(FF_TAXONOMY_ASYNC) ? styles.taxonomy__new : '',
+  ].filter(Boolean).join(' ');
   const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: 'none' };
   const options = {
     showFullPath: item.showfullpath,
@@ -457,39 +603,50 @@ const HtxTaxonomy = observer(({ item }) => {
     maxUsages: item.maxusages,
     maxWidth: item.maxwidth,
     minWidth: item.minwidth,
+    dropdownWidth: item.dropdownwidth,
     placeholder: item.placeholder,
+    canRemoveItems: item.canRemoveItems,
   };
 
+  // without full api there will be just one initial loading;
+  // with full api we should not block UI with spinner on nested requests —
+  // they are indicated by loading icon on the item itself
+  const firstLoad = item.isLoadedByApi ? !item.items.length : true;
+
+  if (item.loading && isFF(FF_DEV_3617) && firstLoad) {
+    return (
+      <div className={className} style={visibleStyle}>
+        <div className={styles.taxonomy__loading}>
+          <Spin size="small"/>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    // @todo use BEM class names + literal "taxonomy" for external styling
-    <div className={[styles.taxonomy, 'taxonomy'].join(' ')} style={{ ...visibleStyle }}>
-      {isFF(FF_TAXONOMY_ASYNC) ? (
+    <div className={className} style={visibleStyle}>
+      {(isFF(FF_TAXONOMY_ASYNC) && !item.legacy) ? (
         <NewTaxonomy
           items={item.items}
-          selected={item.selected}
+          selected={item.selectedItems}
           onChange={item.onChange}
           onLoadData={item.loadItems}
           onAddLabel={item.userLabels && item.onAddLabel}
           onDeleteLabel={item.userLabels && item.onDeleteLabel}
           options={options}
+          defaultSearch={!isFF(FF_LEAP_218)}
           isEditable={!item.isReadOnly()}
         />
       ) : (
-        item.loading && isFF(FF_DEV_3617) ? (
-          <div className={styles.taxonomy__loading}>
-            <Spin size="small"/>
-          </div>
-        ) : (
-          <Taxonomy
-            items={item.items}
-            selected={item.selected}
-            onChange={item.onChange}
-            onAddLabel={item.userLabels && item.onAddLabel}
-            onDeleteLabel={item.userLabels && item.onDeleteLabel}
-            options={options}
-            isEditable={!item.isReadOnly()}
-          />
-        )
+        <Taxonomy
+          items={item.items}
+          selected={item.selected}
+          onChange={item.onChange}
+          onAddLabel={item.userLabels && item.onAddLabel}
+          onDeleteLabel={item.userLabels && item.onDeleteLabel}
+          options={options}
+          isEditable={!item.isReadOnly()}
+        />
       )}
     </div>
   );

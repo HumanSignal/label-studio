@@ -122,7 +122,7 @@ export class Loader extends HTMLElement {
   }
 
   set total(value: number) {
-    this._total= value;
+    this._total = value;
   }
 
   get value() {

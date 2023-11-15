@@ -177,8 +177,8 @@ export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => 
   const result = [];
   let i,j;
 
-  for (i=0,j=source.length; i<j; i+=chunkSize) {
-    result.push(source.slice(i,i+chunkSize));
+  for (i = 0,j = source.length; i < j; i += chunkSize) {
+    result.push(source.slice(i,i + chunkSize));
   }
 
   return result;

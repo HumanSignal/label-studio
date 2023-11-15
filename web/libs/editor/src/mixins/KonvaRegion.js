@@ -1,5 +1,5 @@
 import { types } from 'mobx-state-tree';
-import { FF_DBLCLICK_DELAY, FF_DEV_3793, isFF } from '../utils/feature-flags';
+import { FF_DBLCLICK_DELAY, FF_DEV_3793, FF_ZOOM_OPTIM, isFF } from '../utils/feature-flags';
 export const KonvaRegionMixin = types.model({})
   .views((self) => {
     return {
@@ -11,6 +11,7 @@ export const KonvaRegionMixin = types.model({})
         const bbox = self.bboxCoords;
 
         if (!isFF(FF_DEV_3793)) return bbox;
+        if (!self.parent) return null;
 
         return {
           left: self.parent.internalToCanvasX(bbox.left),
@@ -18,6 +19,15 @@ export const KonvaRegionMixin = types.model({})
           right: self.parent.internalToCanvasX(bbox.right),
           bottom: self.parent.internalToCanvasY(bbox.bottom),
         };
+      },
+      get inViewPort() {
+        if (!isFF(FF_ZOOM_OPTIM)) return true;
+        return !!self && !!self.bboxCoordsCanvas && !!self.object && (
+          self.bboxCoordsCanvas.right >= self.object.viewPortBBoxCoords.left
+          && self.bboxCoordsCanvas.bottom >= self.object.viewPortBBoxCoords.top
+          && self.bboxCoordsCanvas.left <= self.object.viewPortBBoxCoords.right
+          && self.bboxCoordsCanvas.top <= self.object.viewPortBBoxCoords.bottom
+        );
       },
       get control() {
         // that's a little bit tricky, but it seems that having a tools field is necessary for the region-creating control tag and it's might be a clue
@@ -107,7 +117,7 @@ export const KonvaRegionMixin = types.model({})
 
           if (isDoubleClick) {
             self.onDoubleClickRegion();
-            return; 
+            return;
           }
         }
 

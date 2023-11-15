@@ -3,7 +3,7 @@ import React from 'react';
 import { FilterInput } from '../FilterInput';
 import { Common } from './Common';
 
-const NumberInput = observer(( props ) => {
+const NumberInput = observer((props) => {
   return (
     <FilterInput
       {...props}
@@ -15,7 +15,7 @@ const NumberInput = observer(( props ) => {
   );
 });
 
-const RangeInput = observer(( props ) => {
+const RangeInput = observer((props) => {
   const min = props.value?.min ?? null;
   const max = props.value?.max ?? null;
 

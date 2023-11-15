@@ -124,7 +124,7 @@ export const Select: SelectComponent<SelectProps> = ({
 
   const selected = useMemo(() => {
     if (isFF(FF_DEV_2669) && multiple && renderMultipleSelected) {
-      return renderMultipleSelected(Array.isArray(currentValue) ? currentValue : [currentValue||'']);
+      return renderMultipleSelected(Array.isArray(currentValue) ? currentValue : [currentValue || '']);
     }
     if (multiple && Array.isArray(currentValue) && currentValue?.length > 1) {
       return <>Multiple values selected</>;

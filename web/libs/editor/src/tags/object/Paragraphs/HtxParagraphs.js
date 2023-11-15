@@ -287,7 +287,7 @@ class HtxParagraphsView extends Component {
   }
 
   _disposeTimeout() {
-    if (this.scrollTimeout.length > 0){
+    if (this.scrollTimeout.length > 0) {
       this.scrollTimeout.forEach(timeout => clearTimeout(timeout));
       this.scrollTimeout = [];
     }
@@ -492,7 +492,7 @@ class HtxParagraphsView extends Component {
   }
 
   componentDidMount() {
-    if(isFF(FF_LSDV_E_278) && this.props.item.contextscroll) this._resizeObserver.observe(document.querySelector('.lsf-main-content'));
+    if (isFF(FF_LSDV_E_278) && this.props.item.contextscroll) this._resizeObserver.observe(document.querySelector('.lsf-main-content'));
     this._handleUpdate();
   }
 
@@ -522,7 +522,7 @@ class HtxParagraphsView extends Component {
             }, _timeoutDelay);
           }} />
         )}
-        {this.props.item.contextscroll && (
+        {item.contextscroll && (
           <div className={styles.wrapper_header__buttons}>
             <Toggle
               data-testid={'auto-scroll-toggle'}
@@ -583,7 +583,7 @@ class HtxParagraphsView extends Component {
           className={contextScroll ? styles.scroll_container : styles.container}
           onMouseUp={this.onMouseUp.bind(this)}
         >
-          <Phrases setIsInViewport={this.setIsInViewPort.bind(this)} item={item} playingId={item.playingId} {...(isFF(FF_LSDV_E_278) ? { activeRef: this.activeRef }: {})} />
+          <Phrases setIsInViewport={this.setIsInViewPort.bind(this)} item={item} playingId={item.playingId} {...(isFF(FF_LSDV_E_278) ? { activeRef: this.activeRef } : {})} />
         </div>
       </ObjectTag>
     );

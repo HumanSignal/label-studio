@@ -94,7 +94,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   }, []);
 
   useEffect(() => {
-    return ()=>{
+    return () => {
       resizeObserver?.disconnect();
       resizeObserver = null;
     };
@@ -118,32 +118,32 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   // It also doesn't work with nesting level more than 1
   const isPersistCollapseEnabled = isFF(FF_DEV_2755) && regions.group === 'label';
 
-  if( isFF(FF_DEV_2755) ) {
-    const [collapsedPos, setCollapsedPos] = useState( localStorage.getItem( localStoreName )?.split?.(',')?.filter( pos => !!pos ) ?? [] );
+  if (isFF(FF_DEV_2755)) {
+    const [collapsedPos, setCollapsedPos] = useState(localStorage.getItem(localStoreName)?.split?.(',')?.filter(pos => !!pos) ?? []);
 
-    const updateLocalStorage = ( collapsedPos: Array<string> ) => {
-      localStorage.setItem( localStoreName, collapsedPos.join(',') );
+    const updateLocalStorage = (collapsedPos: Array<string>) => {
+      localStorage.setItem(localStoreName, collapsedPos.join(','));
     };
 
-    const collapse = ( pos: string ) => {
+    const collapse = (pos: string) => {
       const newCollapsedPos = [...collapsedPos, pos];
 
-      setCollapsedPos( newCollapsedPos );
-      updateLocalStorage( newCollapsedPos );
+      setCollapsedPos(newCollapsedPos);
+      updateLocalStorage(newCollapsedPos);
     };
 
-    const expand = ( pos: string ) => {
-      const newCollapsedPos = collapsedPos.filter( cPos => cPos !== pos );
+    const expand = (pos: string) => {
+      const newCollapsedPos = collapsedPos.filter(cPos => cPos !== pos);
 
-      setCollapsedPos( newCollapsedPos );
-      updateLocalStorage( newCollapsedPos );
+      setCollapsedPos(newCollapsedPos);
+      updateLocalStorage(newCollapsedPos);
     };
 
-    expandedKeys = regionsTree.filter( (item: any) => !collapsedPos.includes( item.pos ) ).map( (item: any) => item.key ) ?? [];
+    expandedKeys = regionsTree.filter((item: any) => !collapsedPos.includes(item.pos)).map((item: any) => item.key) ?? [];
 
-    onExpand = ( internalExpandedKeys:Key[], { node }: {
+    onExpand = (internalExpandedKeys:Key[], { node }: {
       node: EventDataNode,
-    } ):void => {
+    }):void => {
       const region = regionsTree.find((region: any) => region.key === node.key);
       // pos is equal to label name
       const pos = region.pos;
@@ -293,6 +293,8 @@ const useEventHandlers = () => {
 
     if (wasNotSelected) {
       annotation.selectArea(self);
+      // post-select hook
+      self.onSelectInOutliner?.(wasNotSelected);
     } else {
       annotation.unselectAll();
     }
@@ -504,9 +506,9 @@ const RegionControls: FC<RegionControlsProps> = observer(({
   const onToggleHidden = useCallback(() => {
     if (type?.includes('region') || type?.includes('range')) {
       entity.toggleHidden();
-    } else if(!type || type.includes('label')) {
+    } else if (!type || type.includes('label')) {
       regionStore.setHiddenByLabel(!hidden, entity);
-    } else if(type?.includes('tool')) {
+    } else if (type?.includes('tool')) {
       regionStore.setHiddenByTool(!hidden, entity);
     }
   }, [item, item?.toggleHidden, hidden]);
@@ -613,7 +615,7 @@ const RegionItemDesc: FC<RegionItemOCSProps> = observer(({
   return (
     <Block
       name="ocr"
-      mod={{ collapsed, empty: !(controls?.length > 0)  }}
+      mod={{ collapsed, empty: !(controls?.length > 0) }}
       onClick={onClick}
       onDragStart={(e: any) => e.stopPropagation()}
     >
@@ -633,7 +635,7 @@ const RegionItemDesc: FC<RegionItemOCSProps> = observer(({
               color={css}
               outliner
             />
-          ): null;
+          ) : null;
         })}
       </Elem>
     </Block>

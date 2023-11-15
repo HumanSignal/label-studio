@@ -79,7 +79,7 @@ export const roundToStep = (
   step: number,
   roundFunction: 'floor' | 'ceil' | 'round' = 'round',
 ) => {
-  switch(roundFunction) {
+  switch (roundFunction) {
     case 'floor': return Math.floor(value / step) * step;
     case 'ceil': return Math.ceil(value / step) * step;
     case 'round': return Math.round(value / step) * step;
@@ -99,7 +99,7 @@ export const minmax = (array: ArrayLike<number>) => {
       const value = array[i];
 
       if (value > max) max = value;
-      else if(value < min) min = value;
+      else if (value < min) min = value;
 
       i++;
     }
@@ -211,5 +211,5 @@ export const getCursorTime = (e: MouseEvent, visualizer: Visualizer, duration: n
 
 export const isTimeSimilar = (a: number, b: number) => Math.abs(a - b) < TIME_TOLERANCE;
 export const isTimeRelativelySimilar = (a: number, b: number, observedDuration: number) =>
-  isTimeSimilar(a/observedDuration, b/observedDuration);
+  isTimeSimilar(a / observedDuration, b / observedDuration);
 

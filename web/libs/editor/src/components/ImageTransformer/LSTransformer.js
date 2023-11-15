@@ -75,7 +75,7 @@ class LSTransformer extends Konva.Transformer {
     for (const obj in rotateList) {
       const rotateButton = new Konva.Circle({
         radius: 20,
-        name:`rotate-${obj}`,
+        name: `rotate-${obj}`,
         dragDistance: 0,
         draggable: true,
         x: rotateList[obj].x,

@@ -1,6 +1,5 @@
-import React, { Component, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Button from 'antd/lib/button/index';
-import Form from 'antd/lib/form/index';
 import Radio from 'antd/lib/radio/index';
 import Checkbox from 'antd/lib/checkbox/index';
 import { inject, observer } from 'mobx-react';
@@ -13,7 +12,7 @@ import Tree from '../../core/Tree';
 import Types from '../../core/Types';
 import { AnnotationMixin } from '../../mixins/AnnotationMixin';
 import { TagParentMixin } from '../../mixins/TagParentMixin';
-import { FF_DEV_2007, FF_DEV_2244, FF_DEV_3391, FF_PROD_309, isFF } from '../../utils/feature-flags';
+import { FF_DEV_3391, FF_PROD_309, isFF } from '../../utils/feature-flags';
 import { Block, Elem } from '../../utils/bem';
 import './Choice/Choice.styl';
 import { LsChevron } from '../../assets/icons';
@@ -22,7 +21,6 @@ import { HintTooltip } from '../../components/Taxonomy/Taxonomy';
 /**
  * The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
  *
- * [^FF_DEV_2007]: `ff_dev_2007_rework_choices_280322_short` should be enabled to use `html` attribute
  * [^FF_PROD_309]: The `hint` attribute works only when `fflag_feat_front_prod_309_choice_hint_080523_short` is enabled
  *
  * @example
@@ -44,8 +42,9 @@ import { HintTooltip } from '../../components/Taxonomy/Taxonomy';
  * @param {string} [alias]     - Alias for the choice. If used, the alias replaces the choice value in the annotation results. Alias does not display in the interface.
  * @param {style} [style]      - CSS style of the checkbox element
  * @param {string} [hotkey]    - Hotkey for the selection
- * @param {string} [html]      - can be used to show enriched content[^FF_DEV_2007], it has higher priority than `value`, however `value` will be used in the exported result (should be properly escaped)
+ * @param {string} [html]      - Can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result (should be properly escaped)
  * @param {string} [hint]      - Hint for choice on hover[^FF_PROD_309]
+ * @param {string} [color]     - Color for Taxonomy item
  */
 const TagAttrs = types.model({
   ...(isFF(FF_DEV_3391) ? { id: types.identifier } : {}),
@@ -54,7 +53,8 @@ const TagAttrs = types.model({
   value: types.maybeNull(types.string),
   hotkey: types.maybeNull(types.string),
   style: types.maybeNull(types.string),
-  ...(isFF(FF_DEV_2007) ? { html: types.maybeNull(types.string) } : {}),
+  html: types.maybeNull(types.string),
+  color: types.maybeNull(types.string),
   ...(isFF(FF_PROD_309) ? { hint: types.maybeNull(types.string) } : {}),
 });
 
@@ -90,11 +90,11 @@ const Model = types
     },
 
     get sel() {
-      return !isFF(FF_DEV_2244) || self.isLeaf ? self._sel : self.children.every(child => child.sel === true);
+      return self.isLeaf ? self._sel : self.children.every(child => child.sel === true);
     },
 
     get indeterminate() {
-      return isFF(FF_DEV_2244) && (self.isLeaf ? false : !self.sel && self.children.some(child => child.sel === true));
+      return self.isLeaf ? false : !self.sel && self.children.some(child => child.sel === true);
     },
 
     get parentChoice() {
@@ -104,13 +104,13 @@ const Model = types
       return !self.nestedResults && !!self.parentChoice;
     },
     get nestedResults() {
-      return isFF(FF_DEV_2007) && self.parent?.allownested !== false;
+      return self.parent?.allownested !== false;
     },
     get _resultValue() {
       return self.alias ?? self._value;
     },
     get resultValue() {
-      if (isFF(FF_DEV_2007) && self.nestedResults) {
+      if (self.nestedResults) {
         const value = [];
         let choice = self;
 
@@ -167,66 +167,7 @@ const Model = types
     return {};
   });
 
-const ChoiceModel = types.compose('ChoiceModel', TagParentMixin, TagAttrs, Model, ProcessAttrsMixin, AnnotationMixin);
-
-function triggerElementGetter(el) {
-  return el?.input?.parentNode?.parentNode;
-}
-
-class HtxChoiceView extends Component {
-  render() {
-    const { item, store } = this.props;
-
-    let style = {};
-
-    if (item.style) style = Tree.cssConverter(item.style);
-
-    if (!item.visible) {
-      style['display'] = 'none';
-    }
-
-    const showHotkey =
-      (store.settings.enableTooltips || store.settings.enableLabelTooltips) &&
-      store.settings.enableHotkeys &&
-      item.hotkey;
-
-    const props = {
-      checked: item.sel,
-      disabled: item.parent?.isReadOnly(),
-      onChange: ev => {
-        if (item.isReadOnly()) return;
-        item.toggleSelected();
-        ev.nativeEvent.target.blur();
-      },
-    };
-
-    if (item.isCheckbox) {
-      const cStyle = Object.assign({ display: 'flex', alignItems: 'center', marginBottom: 0 }, style);
-
-      return (
-        <Form.Item style={cStyle}>
-          <HintTooltip title={item.hint} triggerElementGetter={triggerElementGetter}>
-            <Checkbox name={item._value} {...props} disabled={item.isReadOnly()}>
-              {item._value}
-              {showHotkey && <Hint>[{item.hotkey}]</Hint>}
-            </Checkbox>
-          </HintTooltip>
-        </Form.Item>
-      );
-    } else {
-      return (
-        <div style={style}>
-          <HintTooltip title={item.hint} triggerElementGetter={triggerElementGetter}>
-            <Radio value={item._value} style={{ display: 'inline-block', marginBottom: '0.5em' }} {...props}>
-              {item._value}
-              {showHotkey && <Hint>[{item.hotkey}]</Hint>}
-            </Radio>
-          </HintTooltip>
-        </div>
-      );
-    }
-  }
-}
+const ChoiceModel = types.compose('ChoiceModel', TagParentMixin, TagAttrs, ProcessAttrsMixin, Model, AnnotationMixin);
 
 // `name` can't be passed into bem components
 const nameWrapper = (Component, name) => {
@@ -285,14 +226,7 @@ const HtxNewChoiceView = ({ item, store }) => {
   );
 };
 
-const HtxOldChoice = inject('store')(observer(HtxChoiceView));
-const HtxNewChoice = inject('store')(observer(HtxNewChoiceView));
-
-const HtxChoice = (props) => {
-  const HtxChoiceComponent = !isFF(FF_DEV_2007) ? HtxOldChoice : HtxNewChoice;
-
-  return <HtxChoiceComponent {...props} />;
-};
+const HtxChoice = inject('store')(observer(HtxNewChoiceView));
 
 Registry.addTag('choice', ChoiceModel, HtxChoice);
 

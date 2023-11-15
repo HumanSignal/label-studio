@@ -15,9 +15,8 @@ import {
   FF_DEV_1284,
   FF_DEV_1598,
   FF_DEV_2100,
-  FF_DEV_2100_A,
   FF_DEV_2432,
-  FF_DEV_3391,
+  FF_DEV_3391, FF_LLM_EPIC,
   FF_LSDV_3009,
   FF_LSDV_4583,
   FF_LSDV_4832,
@@ -253,6 +252,7 @@ export const Annotation = types
     draftSelected: false,
     autosaveDelay: 5000,
     isDraftSaving: false,
+    submissionStarted: 0,
     versions: {},
     resultSnapshot: '',
   }))
@@ -596,9 +596,9 @@ export const Annotation = types
 
     setDefaultValues() {
       self.names.forEach(tag => {
-        if (isFF(FF_DEV_2100_A) && tag?.type === 'choices' && tag.preselectedValues?.length) {
+        if (['choices', 'taxonomy'].includes(tag?.type) && tag.preselectedValues?.length) {
           // <Choice selected="true"/>
-          self.createResult({}, { choices: tag.preselectedValues }, tag, tag.toname);
+          self.createResult({}, { [tag?.type]: tag.preselectedValues }, tag, tag.toname);
         }
       });
     },
@@ -665,7 +665,9 @@ export const Annotation = types
       onSnapshot(self.areas, self.autosave);
     }),
 
-    saveDraft(params) {
+    async saveDraft(params) {
+      // There is no draft to save as it was already saved as an annotation
+      if (self.submissionStarted) return;
       // if this is now a history item or prediction don't save it
       if (!self.editable) return;
 
@@ -677,12 +679,28 @@ export const Annotation = types
       self.setDraftSelected();
       self.versions.draft = result;
       self.setDraftSaving(true);
+      return self.store.submitDraft(self, params).then((res) => {
+        self.onDraftSaved(res);
 
-      return self.store.submitDraft(self, params).then(self.onDraftSaved);
+        return res;
+      });
+    },
+
+    submissionInProgress() {
+      self.submissionStarted = Date.now();
     },
 
     saveDraftImmediately() {
       if (self.autosave) self.autosave.flush();
+    },
+
+    async saveDraftImmediatelyWithResults() {
+      // There is no draft to save as it was already saved as an annotation
+      if (self.submissionStarted || self.isDraftSaving) return {};
+      self.setDraftSaving(true);
+      const res = await self.saveDraft(null);
+
+      return res;
     },
 
     pauseAutosave() {
@@ -732,13 +750,6 @@ export const Annotation = types
         // may come handy when you have a tag that acts or depends
         // on other elements in the tree.
         if (node.annotationAttached) node.annotationAttached();
-
-
-        // @todo special place to init such predefined values; `afterAttach` of the tag?
-        // preselected choices
-        if (!isFF(FF_DEV_2100_A) && !self.pk && node?.type === 'choices' && node.preselectedValues?.length) {
-          self.createResult({}, { choices: node.preselectedValues }, node, node.toname);
-        }
       });
 
       self.history.onUpdate(self.updateObjects);
@@ -1033,6 +1044,7 @@ export const Annotation = types
 
       self.suggestions.clear();
 
+      if (!rawSuggestions) return;
       self.deserializeResults(rawSuggestions, {
         suggestions: true,
       });
@@ -1274,12 +1286,41 @@ export const Annotation = types
 
     acceptSuggestion(id) {
       const item = self.suggestions.get(id);
+      let itemId = id;
+      const isGlobalClassification = item.classification;
 
-      self.areas.set(id, {
+      // this piece of code prevents from creating duplicated global classifications
+      if (isFF(FF_LLM_EPIC)) {
+        if (isGlobalClassification) {
+          const itemResult = item.results[0];
+          const areasIterator = self.areas.values();
+
+          for (const area of areasIterator) {
+            const areaResult = area.results[0];
+            const isFound = areaResult.from_name === itemResult.from_name
+              && areaResult.to_name === itemResult.to_name
+              && areaResult.item_index === itemResult.item_index;
+
+            if (isFound) {
+              itemId = area.id;
+              break;
+            }
+          }
+        } else {
+          const area = self.areas.get(item.cleanId);
+
+          if (area) {
+            itemId = area.id;
+          }
+        }
+      }
+
+      self.areas.set(itemId, {
         ...item.toJSON(),
+        id: itemId,
         fromSuggestion: true,
       });
-      const area = self.areas.get(id);
+      const area = self.areas.get(itemId);
       const activeStates = area.object.activeStates();
 
       activeStates.forEach(state => {
@@ -1290,8 +1331,10 @@ export const Annotation = types
       // hack to unlock sending textarea results
       // to the ML backen every time
       // it just sets `fromSuggestion` back to `false`
-      const isTextArea = area.results.findIndex(r => r.type === 'textarea') >= 0; 
+      const isTextArea = area.results.findIndex(r => r.type === 'textarea') >= 0;
 
+      // This is temporary exception until we find the way to do it right
+      // and this was done to keep notifications on prompt editing or fixing answer from ML backend
       if (isTextArea) area.revokeSuggestion();
     },
 

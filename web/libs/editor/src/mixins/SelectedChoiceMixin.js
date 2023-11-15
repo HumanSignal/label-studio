@@ -21,6 +21,19 @@ const SelectedChoiceMixin = types
 
       return isDefined(choice1) && isDefined(choice2) && choice1 === choice2;
     },
+    // @todo it's better to only take final values into account
+    // @todo (meaning alias only, not alias + value when alias is present)
+    // @todo so this should be the final and simpliest method
+    hasChoiceSelectionSimple(choiceValue) {
+      if (choiceValue?.length) {
+        // grab the string value; for taxonomy, it's the last value in the array
+        const selectedValues = self.selectedValues().map(s => Array.isArray(s) ? s.at(-1) : s);
+
+        return choiceValue.some(value => selectedValues.includes(value));
+      }
+
+      return self.isSelected;
+    },
     hasChoiceSelection(choiceValue, selectedValues = []) {
       if (choiceValue?.length) {
         // @todo Revisit this and make it more consistent, and refactor this

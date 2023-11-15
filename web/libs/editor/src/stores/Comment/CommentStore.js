@@ -70,7 +70,7 @@ export const CommentStore = types
       const serializedComments = getSnapshot(commentsFilter === 'queued' ? self.queuedComments : self.comments);
       
       return {
-        comments: queueComments ? serializedComments.map(comment => ({ id: comment.id > 0 ? comment.id * -1 : comment.id, ...comment })): serializedComments,
+        comments: queueComments ? serializedComments.map(comment => ({ id: comment.id > 0 ? comment.id * -1 : comment.id, ...comment })) : serializedComments,
       };
     }
 
@@ -106,11 +106,11 @@ export const CommentStore = types
       if (index > -1) {
         const snapshot = getSnapshot(comments[index]);
 
-        comments[index] = { ...snapshot, id : newComment.id || snapshot.id };
+        comments[index] = { ...snapshot, id: newComment.id || snapshot.id };
       }
     }
 
-    function removeCommentById(id)  {
+    function removeCommentById(id) {
       const comments = self.comments;
 
       const index = comments.findIndex(comment => comment.id === id);
@@ -145,7 +145,7 @@ export const CommentStore = types
             self.replaceId(comment.id, persistedComment);
           }
         }
-      } catch(err) {
+      } catch (err) {
         console.error(err);
       } finally {
         self.setLoading(null);
@@ -159,7 +159,7 @@ export const CommentStore = types
 
       const now = Date.now() * -1;
 
-      const comment =  {
+      const comment = {
         id: now,
         text,
         task: self.taskId,
@@ -208,10 +208,10 @@ export const CommentStore = types
             self.setCurrentComment('');
             if (refetchList) self.listComments();
           }
-        } catch(err) {
+        } catch (err) {
           self.removeCommentById(now);
           throw err;
-        } finally{ 
+        } finally { 
           self.setLoading(null);
         }
       } else {
@@ -267,7 +267,7 @@ export const CommentStore = types
               restoreIds.includes(comment.id) ? ({
                 id: comment.id > 0 ? comment.id * -1 : comment.id,
                 ...comment,
-              }): comment);
+              }) : comment);
           }
           self.setComments(restored.comments);
         }
@@ -297,7 +297,7 @@ export const CommentStore = types
         if (mounted.current && annotation === self.annotationId) {
           self.setComments(comments);
         }
-      } catch(err) {
+      } catch (err) {
         console.error(err);
       } finally {
         if (mounted.current) {

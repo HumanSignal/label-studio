@@ -24,12 +24,12 @@ class Item extends Component {
       return o.isReady
         ? Promise.resolve(o.isReady)
         : new Promise(resolve => {
-          const dispose = observe(o, 'isReady', ()=>{
+          const dispose = observe(o, 'isReady', () => {
             dispose();
             resolve();
           });
         });
-    })).then(()=>{
+    })).then(() => {
       // ~2 ticks for canvas to be rendered and resized completely
       setTimeout(this.props.onFinish, 32);
     });

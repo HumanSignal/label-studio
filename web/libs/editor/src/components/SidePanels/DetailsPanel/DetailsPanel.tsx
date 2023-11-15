@@ -181,7 +181,7 @@ const GeneralPanel: FC<any> = inject('store')(observer(({ store, currentEntity }
 
 GeneralPanel.displayName = 'GeneralPanel';
 
-const RegionsPanel: FC<{regions:  any}> = observer(({
+const RegionsPanel: FC<{regions: any}> = observer(({
   regions,
 }) => {
   return (

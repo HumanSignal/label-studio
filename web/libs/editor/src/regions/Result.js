@@ -140,19 +140,14 @@ const Result = types
       return self.mainValue?.join(joinstr) || '';
     },
 
+    // @todo check all usages of selectedLabels:
+    //       — check usages of non-array values (like `if selectedValues ...`)
+    //       - check empty labels, they should be returned as an array
     get selectedLabels() {
-      if (self.type === 'taxonomy') {
-        const sep = self.from_name.pathseparator;
-        const join = self.from_name.showfullpath;
-
-        return (self.mainValue || [])
-          .map(v => join ? v.join(sep) : v.at(-1))
-          .map(v => ({ value: v, id: v }));
-      }
       if (self.mainValue?.length === 0 && self.from_name.allowempty) {
         return self.from_name.findLabel(null);
       }
-      return self.mainValue?.map(value => self.from_name.findLabel(value)).filter(Boolean);
+      return self.mainValue?.map(value => self.from_name.findLabel(value)).filter(Boolean) ?? [];
     },
 
     /**
@@ -212,7 +207,7 @@ const Result = types
 
     get style() {
       if (!self.tag) return null;
-      const fillcolor = self.tag.background || self.tag.parent.fillcolor;
+      const fillcolor = self.tag.background || self.tag.parent?.fillcolor;
 
       if (!fillcolor) return null;
       const strokecolor = self.tag.background || self.tag.parent.strokecolor;

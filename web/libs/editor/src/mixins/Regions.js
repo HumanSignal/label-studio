@@ -228,7 +228,7 @@ const RegionsMixin = types
         self.perRegionFocusRequest = null;
       },
 
-      revokeSuggestion(){
+      revokeSuggestion() {
         self.fromSuggestion = false;
       }, 
 

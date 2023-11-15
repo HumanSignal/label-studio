@@ -3,13 +3,6 @@ const assert = require('assert');
 Feature('Dynamic choices').tag('@regress');
 
 Scenario('Hotkeys for dynamic choices', async ({ I, LabelStudio })=>{
-  LabelStudio.setFeatureFlags({
-    ff_dev_2007_rework_choices_280322_short: true,
-    ff_dev_2007_dev_2008_dynamic_tag_children_250322_short: true,
-    ff_dev_2100_preselected_choices_250422_short: true,
-    ff_front_dev_2244_nested_choices_des_107_160522_short: true,
-  });
-
   const params = {
     config: `
 <View>

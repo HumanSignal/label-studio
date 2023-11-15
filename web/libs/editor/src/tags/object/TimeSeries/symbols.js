@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 export const markerSymbol = (item, symbol, size, color) => {
-  switch(symbol) {
+  switch (symbol) {
     case 'circle': {
       item
         .append('path')

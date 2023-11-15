@@ -81,5 +81,5 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
         </Elem>
       )}
     </Block>
-  ): null;
+  ) : null;
 });

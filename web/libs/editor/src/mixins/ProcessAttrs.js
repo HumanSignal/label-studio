@@ -31,7 +31,7 @@ const ProcessAttrsMixin = types
     },
 
     updateValue(store) {
-      self._value = parseValue(self.value, store.task.dataObj);
+      self._value = parseValue(self.value, store?.task?.dataObj ?? {});
     },
 
     /**

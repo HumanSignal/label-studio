@@ -74,7 +74,7 @@ const BaseTool = types
     };
   })
   .actions((self) => {
-    return  {
+    return {
       afterCreate() {
         if (self.smart && self.control?.smart) {
           const currentEnv = getEnv(self);

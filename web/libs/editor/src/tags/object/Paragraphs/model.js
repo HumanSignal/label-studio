@@ -37,8 +37,8 @@ import styles from './Paragraphs.module.scss';
  * @param {string} name                   - Name of the element
  * @param {string} value                  - Data field containing the paragraph content
  * @param {json|url} [valueType=json]     - Whether the data is stored directly in uploaded JSON data or needs to be loaded from a URL
- * @param {string} audioUrl               - Audio to sync phrases with
- * @param {string} [sync]                 - object name to sync with
+ * @param {string} [audioUrl]             - Audio to sync phrases with
+ * @param {string} [sync]                 - Object name to sync with
  * @param {boolean} [showPlayer=false]    - Whether to show audio player above the paragraphs. Ignored if sync object is audio
  * @param {no|yes} [saveTextResult=yes]   - Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`
  * @param {none|dialogue} [layout=none]   - Whether to use a dialogue-style layout or not

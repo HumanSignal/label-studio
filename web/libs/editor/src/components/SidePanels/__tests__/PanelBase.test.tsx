@@ -26,7 +26,7 @@ describe('PanelBase', () => {
       'onResizeStart': () => {},
       'onResizeEnd': () => {},
       'onPositionChange': () => {},
-      'onVisibilityChange': (name: string, isExpanded) => {isCurrentlyExpanded = isExpanded;},
+      'onVisibilityChange': (name: string, isExpanded) => { isCurrentlyExpanded = isExpanded; },
       'onPositionChangeBegin': () => {},
       'onSnap': () => {},
       // eslint-disable-next-line

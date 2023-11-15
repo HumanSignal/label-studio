@@ -43,7 +43,7 @@ export const Userpic = forwardRef<any, UserpicProps>(({
   const [nameVisible, setNameVisible] = useState(true);
 
   if (isFF(FF_DEV_1507)) {
-    useEffect(()=>{
+    useEffect(() => {
       if (propsSrc !== finalSrc) {
         setFinalSrc(propsSrc);
         setImgVisible(false);

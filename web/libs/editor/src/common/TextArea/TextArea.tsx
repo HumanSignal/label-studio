@@ -72,7 +72,7 @@ export const TextArea: FC<TextAreaProps> = ({
 
     let newHeight: number;
 
-    if(textarea.scrollHeight > autoGrowRef.current.maxHeight){
+    if (textarea.scrollHeight > autoGrowRef.current.maxHeight) {
       textarea.style.overflowY = 'scroll';
       newHeight = autoGrowRef.current.maxHeight;
     } else {

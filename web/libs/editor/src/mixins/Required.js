@@ -44,7 +44,7 @@ const RequiredMixin = types
         const objectTag = self.toNameTag;
         const maxItemIndex = objectTag.maxItemIndex;
         const existingResultsIndexes = self.annotation.regions
-          .reduce((existingResultsIndexes, reg)=>{
+          .reduce((existingResultsIndexes, reg) => {
             const result = reg.results.find(s => s.from_name === self);
 
             if (result?.hasValue) {

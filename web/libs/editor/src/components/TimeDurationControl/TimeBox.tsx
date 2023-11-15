@@ -24,7 +24,7 @@ export const TimeBox: FC<TimerProps> = ({
   const [currentInputTime, setCurrentInputTime] = useState<string | number | undefined>(value);
 
   useEffect(() => {
-    if(inputRef.current) new MaskUtil(inputRef.current, '11:11:11:111',(data: string) => {
+    if (inputRef.current) new MaskUtil(inputRef.current, '11:11:11:111',(data: string) => {
       setCurrentInputTime(data);
     });
   }, []);
@@ -54,7 +54,7 @@ export const TimeBox: FC<TimerProps> = ({
     const splittedValue = value.split(':').reverse();
     let totalTime = 0;
 
-    if(value.indexOf('_') >= 0) return;
+    if (value.indexOf('_') >= 0) return;
 
     const calcs = [
       (x: number) => x / 1000,

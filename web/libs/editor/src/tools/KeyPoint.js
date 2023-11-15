@@ -39,8 +39,10 @@ const _Tool = types
       if (self.annotation.isReadOnly()) return;
 
       const keyPoint = self.createRegion({
-        x,
-        y,
+        ...self.control?.getSnappedPoint({
+          x,
+          y,
+        }),
         ...(isFF(FF_DEV_3793)
           ? {
             // strokeWidth is visual only, so it's in screen dimensions in config

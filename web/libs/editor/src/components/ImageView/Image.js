@@ -16,6 +16,14 @@ export const RELATIVE_STAGE_WIDTH = 100;
  */
 export const RELATIVE_STAGE_HEIGHT = 100;
 
+/**
+ * Mode of snapping to pixel
+ */
+export const SNAP_TO_PIXEL_MODE = {
+  EDGE: 'edge',
+  CENTER: 'center',
+};
+
 export const Image = observer(forwardRef(({
   imageEntity,
   imageTransform,

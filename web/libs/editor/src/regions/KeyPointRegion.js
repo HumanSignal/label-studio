@@ -47,11 +47,16 @@ const KeyPointRegionAbsoluteCoordsDEV3793 = types
     },
 
     setPosition(x, y) {
-      self.x = x;
-      self.y = y;
+      const point = self.control?.getSnappedPoint({
+        x: self.parent.canvasToInternalX(x),
+        y: self.parent.canvasToInternalY(y),
+      });
 
-      self.relativeX = (x / self.parent.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeY = (y / self.parent.stageHeight) * RELATIVE_STAGE_HEIGHT;
+      self.x = point.x;
+      self.y = point.y;
+
+      self.relativeX = (point.x / self.parent.stageWidth) * RELATIVE_STAGE_WIDTH;
+      self.relativeY = (point.y / self.parent.stageHeight) * RELATIVE_STAGE_HEIGHT;
     },
 
     updateImageSize(wp, hp, sw, sh) {
@@ -117,8 +122,13 @@ const Model = types
   }))
   .actions(self => ({
     setPosition(x, y) {
-      self.x = self.parent.canvasToInternalX(x);
-      self.y = self.parent.canvasToInternalY(y);
+      const point = self.control?.getSnappedPoint({
+        x: self.parent.canvasToInternalX(x),
+        y: self.parent.canvasToInternalY(y),
+      });
+
+      self.x = point.x;
+      self.y = point.y;
     },
 
     updateImageSize() {},
@@ -202,6 +212,9 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
 
   const stage = item.parent?.stageRef;
 
+  if (!item.parent) return null;
+  if (!item.inViewPort) return null;
+
   return (
     <Fragment>
       <Circle
@@ -227,6 +240,8 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
           const t = e.target;
 
           item.setPosition(t.getAttr('x'), t.getAttr('y'));
+          t.setAttr('x', item.canvasX);
+          t.setAttr('y', item.canvasY);
           item.annotation.history.unfreeze(item.id);
           item.notifyDrawingFinished();
         }}

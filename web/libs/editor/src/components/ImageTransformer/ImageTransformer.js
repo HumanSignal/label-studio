@@ -3,7 +3,7 @@ import { MIN_SIZE } from '../../tools/Base';
 import { getBoundingBoxAfterChanges } from '../../utils/image';
 import LSTransformer from './LSTransformer';
 import LSTransformerOld from './LSTransformerOld';
-import { FF_DEV_2671, isFF } from '../../utils/feature-flags';
+import { FF_DEV_2671, FF_ZOOM_OPTIM, isFF } from '../../utils/feature-flags';
 
 const EPSILON = 0.001;
 
@@ -91,14 +91,14 @@ export default class TransformerComponent extends Component {
     const [realX, realY] = [box.x - stage.x, box.y - stage.y];
 
     if (realX < 0) {
-      x = 0;
+      x = isFF(FF_ZOOM_OPTIM) ? stage.x : 0;
       width += realX;
     } else if (realX + box.width > stage.width) {
       width = stage.width - realX;
     }
 
     if (realY < 0) {
-      y = 0;
+      y = isFF(FF_ZOOM_OPTIM) ? stage.y : 0;
       height += realY;
     } else if (realY + box.height > stage.height) {
       height = stage.height - realY;
@@ -111,7 +111,11 @@ export default class TransformerComponent extends Component {
     const stage = this.transformer.getStage();
     const { stageWidth, stageHeight } = this.props.item;
 
-    const [scaledStageWidth, scaledStageHeight] = [stageWidth * stage.scaleX(), stageHeight * stage.scaleY()];
+    let [scaledStageWidth, scaledStageHeight] = [stageWidth * stage.scaleX(), stageHeight * stage.scaleY()];
+
+    if (isFF(FF_ZOOM_OPTIM) && this.props.item.isSideways) {
+      [scaledStageWidth, scaledStageHeight] = [scaledStageHeight, scaledStageWidth];
+    }
     const [stageX, stageY] = [stage.x(), stage.y()];
 
     return {
@@ -207,6 +211,10 @@ export default class TransformerComponent extends Component {
           dragBoundFunc={this.dragBoundFunc}
           onDragEnd={() => {
             this.unfreeze();
+            setTimeout(this.checkNode);
+          }}
+          onTransformEnd={() => {
+            setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}
         />
@@ -249,6 +257,10 @@ export default class TransformerComponent extends Component {
           dragBoundFunc={this.dragBoundFunc}
           onDragEnd={() => {
             this.unfreeze();
+            setTimeout(this.checkNode);
+          }}
+          onTransformEnd={() => {
+            setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}
         />

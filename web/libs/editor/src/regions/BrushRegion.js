@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Group, Image, Layer, Shape } from 'react-konva';
 import { observer } from 'mobx-react';
-import { getParent, getRoot, getType, hasParent, isAlive, types } from 'mobx-state-tree';
+import { getParent, getRoot, hasParent, isAlive, types } from 'mobx-state-tree';
 
 import Registry from '../core/Registry';
 import NormalizationMixin from '../mixins/Normalization';
@@ -663,11 +663,6 @@ const HtxBrushView = ({ item, setShapeRef }) => {
               item.onClickRegion(e);
               return;
             }
-
-            const tool = item.parent.getToolsManager().findSelectedTool();
-            const isMoveTool = tool && getType(tool).name === 'MoveTool';
-
-            if (tool && !isMoveTool) return;
 
             if (store.annotationStore.selected.relationMode) {
               stage.container().style.cursor = 'default';

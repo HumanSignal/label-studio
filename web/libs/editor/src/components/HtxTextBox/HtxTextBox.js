@@ -103,7 +103,7 @@ export class HtxTextBox extends React.Component {
       autoFocus: true,
       ref: this.inputRef,
       value,
-      onBlur: isFF(FF_DEV_1566) ? ()=>{
+      onBlur: isFF(FF_DEV_1566) ? () => {
         onChange(this.state.value);
       } : this.save,
       onFocus,
