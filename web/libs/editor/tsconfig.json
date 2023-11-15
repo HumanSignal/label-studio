@@ -23,6 +23,9 @@
     },
     {
       "path": "./cypress/tsconfig.json"
+    },
+    {
+      "path": "./tests/integration/tsconfig.json"
     }
   ],
   "extends": "../../tsconfig.base.json"
