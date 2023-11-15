@@ -20,10 +20,10 @@
         Manage your project sensors here. Add cameras or IMU sensors to your projects.
         <li><a href="{% url 'sensormodel:subject' main_project.project_id %}">Manage subjects</a></li>
         Manage your project subjects here. Here, you can add and edit the subjects used in your projects.
-        <li><a href="{% url 'sensormodel:deployment' main_project.project_id %}">Manage deployments</a></li>
-        Manage your project deployments here. This gives an overview of the deployments of your sensors to your subjects.
         <li><a href="{% url 'sensordata:sensordatapage' main_project.project_id %}">Manage data</a></li>
         Manage your experimental data here. Here you can add zip files with your IMU or camera data to the project.
+        <li><a href="{% url 'sensormodel:deployment' main_project.project_id %}">Manage deployments</a></li>
+        Manage your project deployments here. This gives an overview of the deployments of your sensors to your subjects.
         <li><a href="{% url 'sensordata:offset' main_project.project_id %}">Synchronize sensors</a></li>
         Here you can add the offset between the camera data and the IMU data.
         <li><a href="{% url 'subjectannotation:annotationtaskpage' main_project.project_id %}">Annotate subject presence</a></li>

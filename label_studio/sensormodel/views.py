@@ -12,7 +12,7 @@ from projects.models import Project
 
 def deployment(request, project_id):
     project = Project.objects.get(id=project_id)
-    deployments = Deployment.objects.filter(project=project).order_by('begin_datetime')
+    deployments = Deployment.objects.filter(project=project).order_by('sensor')
     
     if request.method == 'POST':
         deploymentform = forms.DeploymentForm(request.POST, project=project)  

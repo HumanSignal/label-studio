@@ -55,6 +55,32 @@
             <input type="submit" value="Go back to project page" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
+
+    <div class="deployments">
+        <h2>Deployments</h2>
+        <table class="tables">
+            <tr>
+                <th>Sensor</th>
+                <th>Subject</th>
+                <th>Begin Date Time</th>
+                <th>End Date Time</th>
+                <th>Location</th>
+                <th></th>
+                <th></th>
+            </tr>
+            {% for deployment in deployments %}
+            <tr>
+                <td>{{ deployment.sensor}}</td>
+                <td>{{ deployment.subject }}</td>
+                <td>{{ deployment.begin_datetime }}</td>
+                <td>{{ deployment.end_datetime }}</td> 
+                <td>{{ deployment.location}} </td>
+                <td><a href="{% url 'sensormodel:adjust_deployment' project.id deployment.id %}">[Edit/Add subject]</a></td>
+                <td><a href="{% url 'sensormodel:delete_deployment' project.id deployment.id %}">[Delete]</a></td>
+            </tr> 
+            {% endfor %} 
+        </table>  
+    </div>
     <div class="forms">
         <h2>Add deployment</h2>
         <form action="{% url 'sensormodel:deployment' project.id %}" method="post">
@@ -63,33 +89,6 @@
             </table>
             <input type="submit" value="Create deployment">
         </form>
-    </div>
-    <div class="deployments">
-        <h2>Deployments</h2>
-        <table class="tables">
-            <tr>
-                <th>Name</th>
-                <th>Begin Date Time</th>
-                <th>End Date Time</th>
-                <th>Location</th>
-                <th>Sensors</th>
-                <th>Subjects</th>
-                <th></th>
-                <th></th>
-            </tr>
-            {% for deployment in deployments %}
-            <tr>
-                <td>{{ deployment.name }}</td>
-                <td>{{ deployment.begin_datetime }}</td>
-                <td>{{ deployment.end_datetime }}</td> 
-                <td>{{ deployment.location}} </td>
-                <td>{{ deployment.sensor }}</td>
-                <td>{{ deployment.subject }}</td>
-                <td><a href="{% url 'sensormodel:adjust_deployment' project.id deployment.id %}">[Edit]</a></td>
-                <td><a href="{% url 'sensormodel:delete_deployment' project.id deployment.id %}">[Delete]</a></td>
-            </tr> 
-            {% endfor %} 
-        </table>  
     </div>
 </body>
 
