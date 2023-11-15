@@ -122,7 +122,7 @@ class FileUpload(models.Model):
     def format_could_be_tasks_list(self):
         return self.format in ('.csv', '.tsv', '.txt')
 
-    def read_tasks(self, file_as_tasks_list=True):
+    def read_tasks(self, file_as_tasks_list=False):
         file_format = self.format
         try:
             # file as tasks list
@@ -152,7 +152,7 @@ class FileUpload(models.Model):
         return tasks
 
     @classmethod
-    def load_tasks_from_uploaded_files(cls, project, file_upload_ids=None, formats=None, files_as_tasks_list=True, trim_size=None):
+    def load_tasks_from_uploaded_files(cls, project, file_upload_ids=None, formats=None, files_as_tasks_list=False, trim_size=None):
         tasks = []
         fileformats = []
         common_data_fields = set()
