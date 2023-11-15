@@ -7,7 +7,7 @@ __pycache__
 # docs
 __generated__
 \#$
-data/
+docs/data/
 etc/
 /src/
 yarn-error.log
