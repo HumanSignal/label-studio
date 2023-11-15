@@ -2,6 +2,7 @@ version: "3.9"
 services:
   nginx:
     build: .
+    tty: true # required
     image: heartexlabs/label-studio:latest
     restart: unless-stopped
     ports:
@@ -24,7 +25,7 @@ services:
 
   app:
     stdin_open: true
-    tty: true
+    tty: true # required
     build: .
     image: heartexlabs/label-studio:latest
     restart: unless-stopped
