@@ -23,7 +23,7 @@ frontend-watch:
 	cd web && yarn run ls:watch
 
 # Build production-ready optimized bundle
-frontend-build:
+frontend-build: frontend-setup
 	cd web && yarn install --frozen-lockfile && yarn run build
 
 # Run tests
