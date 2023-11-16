@@ -540,6 +540,8 @@ def annotate_predictions_score(queryset):
     # was modified accordingly
 
     project = queryset.project
+    if project is None:
+        return queryset
 
     # new approach with each ML backend contains it's version
     if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', project.organization.created_by):
