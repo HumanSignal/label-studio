@@ -406,7 +406,11 @@ def apply_filters(queryset, filters, project, request):
                     base_condition = (
                         Q(**{field_name: []}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
                     )
-                elif value_type == 'str' or value_type not in ('datetime', 'int') and _filter.type not in ('Datetime', 'Number'):
+                elif (
+                    value_type == 'str'
+                    or value_type not in ('datetime', 'int')
+                    and _filter.type not in ('Datetime', 'Number')
+                ):
                     base_condition = (
                         Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
                     )
@@ -421,7 +425,11 @@ def apply_filters(queryset, filters, project, request):
                             | Q(**{alt_field_name: None})
                             | Q(**{alt_field_name + '__isnull': True})
                         )
-                    elif value_type == 'str' or value_type not in ('datetime', 'int') and _filter.type not in ('Datetime', 'Number'):
+                    elif (
+                        value_type == 'str'
+                        or value_type not in ('datetime', 'int')
+                        and _filter.type not in ('Datetime', 'Number')
+                    ):
                         alt_condition = (
                             Q(**{alt_field_name: ''})
                             | Q(**{alt_field_name: None})
