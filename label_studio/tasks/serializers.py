@@ -676,14 +676,14 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         # new version of code with separate model version per ML backend
         if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', user=user or 'auto'):
             model_versions = self.project(task).get_selected_model_versions()
-            logger.debug(f"Get predictions from ML backend or project model versions: {model_versions}")
+            logger.debug(f'Get predictions from ML backend or project model versions: {model_versions}')
             if model_versions:
                 predictions = predictions.filter(model_version__in=model_versions)
 
         # old version of code
         else:
             model_version = self.project(task).model_version
-            logger.debug(f"Get predictions from project model version only: {model_version}")
+            logger.debug(f'Get predictions from project model version only: {model_version}')
             if model_version:
                 predictions = predictions.filter(model_version=model_version)
 
