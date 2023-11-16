@@ -18,6 +18,11 @@ shell-dev:
 frontend-setup:
 	cd web && yarn install --frozen-lockfile;
 
+# Keep it here for potential rollback
+## Fetch DM and LSF
+#frontend-fetch:
+#	cd label_studio/frontend && yarn run download:all;
+
 # Build frontend continuously on files changes
 frontend-watch:
 	cd web && yarn run ls:watch
