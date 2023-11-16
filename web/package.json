@@ -10,7 +10,6 @@
     "lsf:integration": "nx run editor:integration",
     "lsf:integration:watch": "nx run editor:integration --watch",
     "dm:watch": "nx run datamanager:build:development --watch",
-    "dev": "nx run labelstudio:build:development",
     "build": "nx run editor:build:production && nx run datamanager:build:production && nx run labelstudio:build:production",
     "test": "nx run labelstudio:test:ci"
   },
