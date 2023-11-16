@@ -175,7 +175,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
   renderPrimaryLabels(pixelsPerSecond: number) {
 
-    const { height: baseHeight, notchHeight, formatTimeCallback: formatTime, primaryColor, primaryFontColor, labelPadding, labelPlacement }  = this.params;
+    const { height: baseHeight, notchHeight, formatTimeCallback: formatTime, primaryColor, primaryFontColor, labelPadding, labelPlacement } = this.params;
 
     const primaryLabelInterval = this.intervalFnOrVal(
       this.params.primaryLabelInterval,
@@ -222,7 +222,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
   renderSecondaryLabels(pixelsPerSecond: number, primaryLabelInterval: number) {
 
-    const { height: baseHeight, notchHeight, formatTimeCallback: formatTime, secondaryColor, secondaryFontColor, labelPadding, labelPlacement }  = this.params;
+    const { height: baseHeight, notchHeight, formatTimeCallback: formatTime, secondaryColor, secondaryFontColor, labelPadding, labelPlacement } = this.params;
 
     const secondaryLabelInterval = this.intervalFnOrVal(
       this.params.secondaryLabelInterval,
@@ -243,7 +243,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
             this.setFillStyles(secondaryFontColor!);
             this.fillText(
               (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel  * pxRatio,
+              curPixel * pxRatio,
               height + Math.ceil(labelPadding! * 1.5),
               'center',
             );
@@ -267,7 +267,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   }
 
   renderTertiaryNotches(primaryLabelInterval: number, secondaryLabelInterval: number) {
-    const { height: _baseHeight, notchHeight, unlabeledNotchColor, notchPercentHeight, labelPlacement }  = this.params;
+    const { height: _baseHeight, notchHeight, unlabeledNotchColor, notchPercentHeight, labelPlacement } = this.params;
 
     const pxRatio = (this as any).pixelRatio;
 

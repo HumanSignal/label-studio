@@ -107,7 +107,7 @@ export const AudioUltraRegionModel = types
       setLocked(locked) {
         Super.setLocked(locked);
 
-        if(self._ws_region) self._ws_region.setLocked(self.locked);
+        if (self._ws_region) self._ws_region.setLocked(self.locked);
       },
 
       onMouseOver() {

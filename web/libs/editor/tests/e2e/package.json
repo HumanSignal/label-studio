@@ -45,5 +45,9 @@
     "v8-to-istanbul": "^9.0.0",
     "xml2js": "^0.4.23",
     "xmlbuilder": "^15.1.1"
+  },
+  "resolutions": {
+    "debug": "^4.3.1",
+    "electron": "^22.3.25"
   }
 }

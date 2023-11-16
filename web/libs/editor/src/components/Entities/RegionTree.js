@@ -18,7 +18,7 @@ export const RegionTree = observer(({ regionStore }) => {
   }, [renderNow]);
 
   const canDrag = useRef(true);
-  const setDraggable = useCallback((isDraggable)=>{
+  const setDraggable = useCallback((isDraggable) => {
     canDrag.current = isDraggable;
   }, []);
 
@@ -40,7 +40,7 @@ export const RegionTree = observer(({ regionStore }) => {
   const classifications = regionStore.classifications.map(item => ({
     classification: true,
     key: item.id,
-    title: <RegionItem item={item} flat  setDraggable={setDraggable} />,
+    title: <RegionItem item={item} flat setDraggable={setDraggable} />,
   }));
 
   const treeData = [...classifications, ...regions];

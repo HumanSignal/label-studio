@@ -13,7 +13,6 @@ import DynamicChildrenMixin from '../../../mixins/DynamicChildrenMixin';
 import LabelMixin from '../../../mixins/LabelMixin';
 import SelectedModelMixin from '../../../mixins/SelectedModel';
 import { Block } from '../../../utils/bem';
-import { FF_DEV_2007_DEV_2008, isFF } from '../../../utils/feature-flags';
 import ControlBase from '../Base';
 import '../Label';
 import './Labels.styl';
@@ -85,7 +84,7 @@ const TagAttrs = types.model({
   fillopacity: types.maybeNull(customTypes.range()),
   allowempty: types.optional(types.boolean, false),
 
-  ...(isFF(FF_DEV_2007_DEV_2008) ? { value: types.optional(types.string, '') } : {}),
+  value: types.optional(types.string, ''),
 });
 
 /**
@@ -141,7 +140,7 @@ const LabelsModel = types.compose(
   ModelAttrs,
   TagAttrs,
   AnnotationMixin,
-  ...(isFF(FF_DEV_2007_DEV_2008) ? [DynamicChildrenMixin] : []),
+  DynamicChildrenMixin,
   Model,
   SelectedModelMixin.props({ _child: 'LabelModel' }),
 );

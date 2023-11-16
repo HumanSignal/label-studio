@@ -48,7 +48,7 @@ describe('FilterItems', () => {
   });
 
   test('should filter items that value is between the specified values', () => {
-    const filterItem = { operation: 'in', path: 'item.value', value: { min:26, max:35 } };
+    const filterItem = { operation: 'in', path: 'item.value', value: { min: 26, max: 35 } };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([{
@@ -59,7 +59,7 @@ describe('FilterItems', () => {
   });
 
   test('should filter items that value is not between the specified values', () => {
-    const filterItem = { operation: 'not_in', path: 'item.value', value: { min:26, max:35 } };
+    const filterItem = { operation: 'not_in', path: 'item.value', value: { min: 26, max: 35 } };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([{

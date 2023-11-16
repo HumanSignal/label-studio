@@ -418,6 +418,9 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
 
   const eventHandlers = {};
 
+  if (!item.parent) return null;
+  if (!item.inViewPort) return null;
+
   if (!suggestion && !item.isReadOnly()) {
     eventHandlers.onTransform = ({ target }) => {
       // resetting the skew makes transformations weird but predictable
@@ -483,6 +486,8 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
         stroke={regionStyles.strokeColor}
         strokeWidth={regionStyles.strokeWidth}
         strokeScaleEnabled={false}
+        perfectDrawEnabled={false}
+        shadowForStrokeEnabled={false}
         shadowBlur={0}
         dash={suggestion ? [10, 10] : null}
         scaleX={item.scaleX}

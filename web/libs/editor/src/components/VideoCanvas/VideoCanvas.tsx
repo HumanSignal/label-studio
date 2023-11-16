@@ -160,7 +160,7 @@ export const VideoCanvas = memo(forwardRef<VideoRef, VideoProps>((props, ref) =>
           offsetLeft, offsetTop, resultWidth, resultHeight,
         );
       }
-    } catch(e) {
+    } catch (e) {
       console.log('Error rendering video', e);
     }
   }, [videoDimensions, zoom, pan, filters, canvasWidth, canvasHeight]);
@@ -320,19 +320,19 @@ export const VideoCanvas = memo(forwardRef<VideoRef, VideoProps>((props, ref) =>
   }, [props.pan, processPan]);
 
   useEffect(() => {
-    if (isDefined(props.brightness)){
+    if (isDefined(props.brightness)) {
       setBrightness(props.brightness);
     }
   }, [props.brightness]);
 
   useEffect(() => {
-    if (isDefined(props.contrast)){
+    if (isDefined(props.contrast)) {
       setContrast(props.contrast);
     }
   }, [props.contrast]);
 
   useEffect(() => {
-    if (isDefined(props.saturation)){
+    if (isDefined(props.saturation)) {
       setSaturation(props.saturation);
     }
   }, [props.saturation]);

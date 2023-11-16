@@ -297,7 +297,7 @@ export function getTransformedImageData(img,
 
     alert(msg);
     console.error(msg);
-    throw(msg);
+    throw (msg);
   }
 
   return [transformedData, canvas];

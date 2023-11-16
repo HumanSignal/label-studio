@@ -35,7 +35,7 @@ const RectanglePure: FC<RectProps> = ({
 
   const { realWidth: waWidth, realHeight: waHeight, scale: waScale } = workingArea;
 
-  const newBox = useMemo(()=>({
+  const newBox = useMemo(() => ({
     x: box.x * waWidth / 100,
     y: box.y * waHeight / 100,
     width: box.width * waWidth / 100,

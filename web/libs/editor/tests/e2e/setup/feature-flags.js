@@ -12,4 +12,5 @@ module.exports = {
   fflag_fix_front_lsdv_4620_memory_leaks_100723_short: true,
   fflag_feat_front_lsdv_4620_outliner_optimization_310723_short: true,
   fflag_fix_front_lsdv_5248_double_click_delay_280823_short: true,
+  fflag_fix_front_leap_32_zoom_perf_190923_short: true,
 };

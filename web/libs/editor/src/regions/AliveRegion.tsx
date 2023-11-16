@@ -52,6 +52,6 @@ export const AliveRegion = (
       <Wrapper {...wrapperProps}>
         <ObservableRegion item={item} {...rest} setShapeRef={setShapeRef} />
       </Wrapper>
-    ): null;
+    ) : null;
   });
 };

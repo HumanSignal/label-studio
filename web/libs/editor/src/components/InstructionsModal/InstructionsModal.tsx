@@ -12,6 +12,8 @@ export const InstructionsModal = ({
   visible: boolean,
   onCancel: () => void,
 }) => {
+  const contentStyle: Record<string, string> = { padding: '0 24px 24px', whiteSpace: 'pre-wrap' };
+
   return (
     <>
       <Modal
@@ -45,7 +47,14 @@ export const InstructionsModal = ({
         >
           {title}
         </h2>
-        <p style={{ padding: '0 24px 24px', whiteSpace: 'pre-wrap' }}>{children}</p>
+        {typeof children === 'string' ? (
+          <p
+            style={contentStyle}
+            dangerouslySetInnerHTML={{ __html: children }}
+          />
+        ) : (
+          <p style={contentStyle}>{children}</p>
+        )}
       </Modal>
     </>
   );

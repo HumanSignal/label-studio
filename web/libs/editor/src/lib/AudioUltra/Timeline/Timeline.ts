@@ -49,7 +49,7 @@ export class Timeline {
     this.waveform = waveform;
     this.visualizer = visualizer;
     this.placement = options?.placement || defaults.timelinePlacement;
-    this.padding = {  ...this.padding, ...options?.padding };
+    this.padding = { ...this.padding, ...options?.padding };
     this.fontSize = options?.fontSize ?? this.fontSize;
     this.fontFamily = options?.fontFamily ?? this.fontFamily;
     this.height = options?.height ?? defaults.timelinePlacement ? options?.height ?? defaults.timelineHeight : this.height;
@@ -118,7 +118,7 @@ export class Timeline {
 
         const playing = (start <= currentTime && end >= currentTime);
         const xStart = (start * zoomedWidth / duration) - scrollOffset;
-        const xEnd = (end - start)  * zoomedWidth / duration;
+        const xEnd = (end - start) * zoomedWidth / duration;
 
         const top = 0;
         const layer = this.layer;
@@ -143,10 +143,10 @@ export class Timeline {
       const { duration } = this.waveform;
       const { zoomedWidth } = this.visualizer;
       const scrollOffset = this.visualizer.getScrollLeftPx();
-      const start = selectedRegions.sort((a, b) => a.start - b.start )[0].start ;
-      const end = selectedRegions.sort((a, b) => b.end - a.end )[0].end;
+      const start = selectedRegions.sort((a, b) => a.start - b.start)[0].start ;
+      const end = selectedRegions.sort((a, b) => b.end - a.end)[0].end;
       const xStart = (start * zoomedWidth / duration) - scrollOffset;
-      const xEnd = (end - start)  * zoomedWidth / duration;
+      const xEnd = (end - start) * zoomedWidth / duration;
       const top = 0;
       const layer = this.layer;
 
@@ -164,7 +164,7 @@ export class Timeline {
     const layer = this.layer;
     const yOffset = placement === 'top' ? 0 : offset;
     const xOffset = placement === 'top' ? (this.padding?.left || 0) : 0;
-    const markYOffset = placement === 'top' ? (mark.type === 'label' ? height * 0.75 : height * 0.875 ) : yOffset;
+    const markYOffset = placement === 'top' ? (mark.type === 'label' ? height * 0.75 : height * 0.875) : yOffset;
     const markHeight = placement === 'top' ? 
       (mark.type === 'label'
         ? height * 0.25 : height * 0.125)
@@ -184,7 +184,7 @@ export class Timeline {
       layer.fillText(
         ts,
         markXOffset,
-        placement === 'top' ? yOffset + ((height * 0.75) / 2) + (fontSize / 2) - this.gridWidth: yOffset + height - 8,
+        placement === 'top' ? yOffset + ((height * 0.75) / 2) + (fontSize / 2) - this.gridWidth : yOffset + height - 8,
       );
     }
   }
@@ -200,7 +200,7 @@ export class Timeline {
     const scrollLeft = this.visualizer.getScrollLeftPx();
 
     const viewableDuration = this.mapToTime(width);
-    const [interval, labelInterval]  = this.getIntervals(viewableDuration);
+    const [interval, labelInterval] = this.getIntervals(viewableDuration);
 
     const exactStart = this.mapToTime(Math.abs(scrollLeft));
     const segmentStart = Math.floor(exactStart / interval) * interval;
@@ -215,7 +215,7 @@ export class Timeline {
 
       const isLabelInterval = Math.round(time * factor) % Math.round(labelInterval * factor);
 
-      const intervalType: TimelineMark['type'] = isLabelInterval === 0  ? 'label' : 'mark';
+      const intervalType: TimelineMark['type'] = isLabelInterval === 0 ? 'label' : 'mark';
 
       this.renderInterval({ x: this.mapToPx(i - exactStart), time, type: intervalType, includeMs });
     }
@@ -246,7 +246,7 @@ export class Timeline {
       return this._labeMaxWidth[key];
     }
 
-    const formatTemplate = `MM:MM:MM:MM${includeMs ? 'M' :''}`;
+    const formatTemplate = `MM:MM:MM:MM${includeMs ? 'M' : ''}`;
 
     const maxWidth = this.layer.measureText(formatTemplate).width;
 
@@ -263,7 +263,7 @@ export class Timeline {
 
     const exactInterval = toPrecision(lineSpace, Math.abs(significantDigits));
 
-    const significantDigitValue = Math.ceil(exactInterval/ Math.pow(10, significantDigits));
+    const significantDigitValue = Math.ceil(exactInterval / Math.pow(10, significantDigits));
 
     let interval = Math.pow(10, significantDigits);
 
@@ -286,7 +286,7 @@ export class Timeline {
 
     const significantLabelDigits = Math.floor(Math.log10(exactLabelInterval));
 
-    const significantLabelDigitValue = Math.ceil(exactLabelInterval/ Math.pow(10, significantLabelDigits));
+    const significantLabelDigitValue = Math.ceil(exactLabelInterval / Math.pow(10, significantLabelDigits));
 
     let labelInterval = toPrecision(10, significantLabelDigits);
 

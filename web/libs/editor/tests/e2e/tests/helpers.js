@@ -532,11 +532,11 @@ async function generateImageUrl({ width, height }) {
 }
 
 const getCanvasSize = () => {
-  const stage = window.Konva.stages[0];
+  const imageObject = window.Htx.annotationStore.selected.objects.find(o => o.type === 'image');
 
   return {
-    width: stage.width(),
-    height: stage.height(),
+    width: imageObject.canvasSize.width,
+    height: imageObject.canvasSize.height,
   };
 };
 const getImageSize = () => {

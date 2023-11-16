@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Select } from 'antd';
+import { Select } from 'antd';
 import { observer } from 'mobx-react';
 import { types } from 'mobx-state-tree';
 
@@ -19,7 +19,7 @@ import './Choices/Choises.styl';
 
 import './Choice';
 import DynamicChildrenMixin from '../../mixins/DynamicChildrenMixin';
-import { FF_DEV_2007, FF_DEV_2007_DEV_2008, FF_LSDV_4583, isFF } from '../../utils/feature-flags';
+import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
 import { ReadOnlyControlMixin } from '../../mixins/ReadOnlyMixin';
 import SelectedChoiceMixin from '../../mixins/SelectedChoiceMixin';
 import { HintTooltip } from '../../components/Taxonomy/Taxonomy';
@@ -37,8 +37,6 @@ const { Option } = Select;
  * The `Choices` tag can be used with any data types.
  *
  * [^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality.
- * [^FF_DEV_2007_DEV_2008]: `ff_dev_2007_dev_2008_dynamic_tag_children_250322_short` should be enabled to use dynamic options.
- * [^FF_DEV_2007]: `ff_dev_2007_rework_choices_280322_short` should be enabled to use `html` attribute
  *
  * @example
  * <!--Basic text classification labeling configuration-->
@@ -54,8 +52,8 @@ const { Option } = Select;
  *
  * @example <caption>This config with dynamic labels</caption>
  * <!--
- *   `Choice`s can be loaded dynamically from task data[^FF_DEV_2007_DEV_2008]. It should be an array of objects with attributes.
- *   `html` can be used to show enriched content[^FF_DEV_2007], it has higher priority than `value`, however `value` will be used in the exported result.
+ *   `Choice`s can be loaded dynamically from task data. It should be an array of objects with attributes.
+ *   `html` can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result.
  * -->
  * <View>
  *   <Audio name="audio" value="$audio" />
@@ -97,20 +95,15 @@ const { Option } = Select;
  * @param {string} [whenChoiceValue]   - Use with visibleWhen ("choice-selected" or "choice-unselected") and whenTagName, both are required. Narrow down visibility by choice value
  * @param {boolean} [perRegion]        - Use this tag to select a choice for a specific region instead of the entire task
  * @param {boolean} [perItem]          - Use this tag to select a choice for a specific item inside the object instead of the whole object[^FF_LSDV_4583]
- * @param {string} [value]             - Task data field containing a list of dynamically loaded choices (see example below)[^FF_DEV_2007_DEV_2008]
+ * @param {string} [value]             - Task data field containing a list of dynamically loaded choices (see example below)
  * @param {boolean} [allowNested]      - Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one.
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
-
   showinline: types.maybeNull(types.boolean),
-
   choice: types.optional(types.enumeration(['single', 'single-radio', 'multiple']), 'single'),
-
   layout: types.optional(types.enumeration(['select', 'inline', 'vertical']), 'vertical'),
-
-  ...(isFF(FF_DEV_2007_DEV_2008) ? { value: types.optional(types.string, '') } : {}),
-
+  value: types.optional(types.string, ''),
   allownested: types.optional(types.boolean, false),
 });
 
@@ -252,7 +245,7 @@ const ChoicesModel = types.compose(
   ReadOnlyControlMixin,
   SelectedChoiceMixin,
   VisibilityMixin,
-  ...(isFF(FF_DEV_2007_DEV_2008) ? [DynamicChildrenMixin] : []),
+  DynamicChildrenMixin,
   AnnotationMixin,
   TagAttrs,
   Model,
@@ -296,9 +289,7 @@ const HtxChoices = observer(({ item }) => {
       {item.layout === 'select' ? (
         <ChoicesSelectLayout item={item} />
       ) : (
-        !isFF(FF_DEV_2007)
-          ? <Form layout={item.layout}>{Tree.renderChildren(item, item.annotation)}</Form>
-          : Tree.renderChildren(item, item.annotation)
+        Tree.renderChildren(item, item.annotation)
       )}
     </Block>
   );

@@ -232,7 +232,7 @@ export const PanelBase: FC<PanelBaseProps> = ({
       const target = e.target as HTMLElement;
       const type = target.dataset.resize;
       const shift = (() => {
-        switch(type) {
+        switch (type) {
           case 'top-left':
             return 'top-left';
           case 'top':

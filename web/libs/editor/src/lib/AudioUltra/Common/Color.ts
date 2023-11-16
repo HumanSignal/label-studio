@@ -30,7 +30,7 @@ export const rgbaRegex = new RegExp(
 );
 export const namedColorRegex = /^[a-z]+$/i;
 
-export class RgbaColorArray  {
+export class RgbaColorArray {
   base: [number, number, number, number];
   rgba: [number, number, number, number];
 

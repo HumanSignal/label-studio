@@ -13,7 +13,7 @@ const SettingsRendererPure: FC<{store: any, settings: SettingsProperties}> = ({
     <Block name="settings">
       {Object.entries(settings).map(([key, value]) => {
         return (value.ff && !isFF(value.ff)) ? null : (
-          <SettingsField  key={key} name={key} store={store} value={value}/>
+          <SettingsField key={key} name={key} store={store} value={value}/>
         );
       })}
     </Block>

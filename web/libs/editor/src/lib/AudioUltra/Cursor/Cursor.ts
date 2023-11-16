@@ -62,7 +62,7 @@ export class Cursor extends Events<CursorEvents> {
   x: number;
   y: number;
   offsetX = 0;
-  offsetY= 0;
+  offsetY = 0;
   width = 2;
 
   constructor(
@@ -104,7 +104,7 @@ export class Cursor extends Events<CursorEvents> {
   }
 
   show() {
-    if (!this.shouldRender)  {
+    if (!this.shouldRender) {
       this.hide();
       return;
     }

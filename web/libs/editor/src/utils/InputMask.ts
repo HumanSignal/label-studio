@@ -230,7 +230,7 @@ export class MaskUtil {
       }
 
       /** While the input doesn't have a validator, splice character in */
-      while(mask && !mask.validator && key !== mask.char) {
+      while (mask && !mask.validator && key !== mask.char) {
         this.onChange(this.splice(event.target.value, index, mask.char));
         event.target.setSelectionRange(index + 1, index + 1);
         mask = this.mask[index + 1];
@@ -261,7 +261,7 @@ export class MaskUtil {
 
         for (let i = selectionStart; i < selectionEnd; i++) {
           if (partialValue[i] !== ':') {
-            partialValue = `${partialValue.substring(0, i)}${i === selectionStart ? newKey : this.proxyChar}${partialValue.substring(i+1, partialValue.length)}`;
+            partialValue = `${partialValue.substring(0, i)}${i === selectionStart ? newKey : this.proxyChar}${partialValue.substring(i + 1, partialValue.length)}`;
           }
         }
 

@@ -99,7 +99,7 @@ export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}
     ].map(prop => {
       try {
         return observe(region, prop, ({ newValue }) => {
-          switch(prop) {
+          switch (prop) {
             case 'highlighted': return setHighlighted(newValue);
             case 'fill': return setShouldFill(newValue);
           }

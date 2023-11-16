@@ -68,7 +68,7 @@ const _BaseNPointTool = types
     beforeCommitDrawing() {
       const s = self.getActiveShape;
 
-      return s.width > self.MIN_SIZE.X  && s.height * self.MIN_SIZE.Y;
+      return s.width > self.MIN_SIZE.X && s.height * self.MIN_SIZE.Y;
     },
   }));
 

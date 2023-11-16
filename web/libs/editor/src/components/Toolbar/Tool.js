@@ -70,8 +70,8 @@ export const Tool = ({
     currentShortcut = shortcut;
     if (shortcut && !hotkeys.hasKey(shortcut)) {
       hotkeys.addKey(shortcut, () => {
-        if(!tool?.disabled && !tool?.annotation?.isDrawing) {
-          if (tool?.unselectRegionOnToolChange){
+        if (!tool?.disabled && !tool?.annotation?.isDrawing) {
+          if (tool?.unselectRegionOnToolChange) {
             tool.annotation.unselectAreas();
           }
           onClick?.();
@@ -122,9 +122,9 @@ export const Tool = ({
       expanded: expanded && !dynamic,
       smart: dynamic || smart,
     }} onClick={(e) => {
-      if(!disabled && !isAnnotationDrawing) {
+      if (!disabled && !isAnnotationDrawing) {
         e.preventDefault();
-        if(tool?.unselectRegionOnToolChange) {
+        if (tool?.unselectRegionOnToolChange) {
           tool?.annotation?.unselectAreas?.();
         }
         onClick?.(e);
@@ -137,7 +137,7 @@ export const Tool = ({
       <Elem name="icon">
         {icon}
       </Elem>
-      {dynamic === false && controlsOnHover === false &&  (
+      {dynamic === false && controlsOnHover === false && (
         expanded ? (
           <>
             <Elem name="label">

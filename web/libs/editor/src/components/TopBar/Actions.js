@@ -20,7 +20,7 @@ export const Actions = ({ store }) => {
 
   return (
     <Elem name="section">
-      {store.hasInterface('annotations:view-all')  && (
+      {store.hasInterface('annotations:view-all') && (
         <Tooltip title="View all annotations">
           <Button
             icon={<IconViewAll />}

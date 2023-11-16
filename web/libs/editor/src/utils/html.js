@@ -93,7 +93,7 @@ function getNextNode(node) {
 }
 
 export function isValidTreeNode(node, commonAncestor) {
-  while(node) {
+  while (node) {
     if (commonAncestor && node === commonAncestor) return true;
     if (node.nodeType === Node.ELEMENT_NODE && node.dataset.skipNode === 'true') return false;
     node = node.parentNode;
@@ -245,7 +245,7 @@ function highlightRange(normedRange, cssClass, cssStyle) {
  * @param {Range} range
  */
 function splitBoundaries(range) {
-  let { startContainer, endContainer  } = range;
+  let { startContainer, endContainer } = range;
   const { startOffset, endOffset } = range;
 
   if (isTextNode(endContainer)) {
@@ -383,7 +383,7 @@ function moveStylesBetweenHeadTags(srcHead, destHead) {
   const rulesByStyleId = {};
   const fragment = document.createDocumentFragment();
 
-  for (let i = 0; i < srcHead.children.length; ) {
+  for (let i = 0; i < srcHead.children.length;) {
     const style = srcHead.children[i];
 
     if (style?.tagName !== 'STYLE') {
@@ -499,7 +499,7 @@ export const htmlEscape = string => {
 };
 
 function findNodeAt(context, at) {
-  for (let node = context.firstChild, l = 0; node; ) {
+  for (let node = context.firstChild, l = 0; node;) {
     if (node.textContent.length + l >= at)
       if (!node.firstChild) return [node, at - l];
       else node = node.firstChild;

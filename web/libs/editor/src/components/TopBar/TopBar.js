@@ -24,7 +24,7 @@ export const TopBar = observer(({ store }) => {
       {isFF(FF_DEV_3873) ? (
         <Elem name="group">
           <CurrentTask store={store}/>
-          {store.hasInterface('annotations:view-all')  && (
+          {store.hasInterface('annotations:view-all') && (
             <Tooltip title="View all annotations">
               <Button
                 className={'topbar__button'}

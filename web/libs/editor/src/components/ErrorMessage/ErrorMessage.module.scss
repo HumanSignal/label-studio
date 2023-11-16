@@ -6,6 +6,7 @@
   color: rgb(119, 27, 4);
   border: 1px solid rgb(230, 138, 110);
   background-color: rgb(255, 193, 174);
+  white-space: normal;
 
   & + & {
     margin: 0 0 16px; // in case we are in flex container, where margins don't collapse

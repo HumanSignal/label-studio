@@ -140,7 +140,7 @@ export class Geometry {
     };
   }
 
-  static modifyBBoxCoords(bbox, modifier = x=>x) {
+  static modifyBBoxCoords(bbox, modifier = x => x) {
     const p1 = modifier([bbox.x, bbox.y]);
     const p2 = modifier([bbox.width + bbox.x, bbox.height + bbox.y]);
 

@@ -42,7 +42,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({
 
       await commentStore.addComment(comment);
 
-    } catch(err) {
+    } catch (err) {
       actionRef.current.update?.(comment || '');
       console.error(err);
     }
@@ -54,7 +54,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({
 
 
   useEffect(() => {
-    if(!isFF(FF_DEV_3873)){
+    if (!isFF(FF_DEV_3873)) {
       commentStore.setAddedCommentThisSession(false);
       clearTooltipMessage();
     }
