@@ -37,6 +37,7 @@ class ChoicesHelper {
 
   hasCheckedChoice(text: string) {
     this.findCheckedChoice(text)
+      .scrollIntoView()
       .should('be.visible');
   }
 

@@ -11,6 +11,7 @@ docs/data/
 etc/
 /src/
 yarn-error.log
+/dist/
 
 # mobile/builds
 db/

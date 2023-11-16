@@ -15,7 +15,6 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@humansignal/frontend-test": ["libs/frontend-test/src/configure.js"],
       "@humansignal/frontend-test/*": ["libs/frontend-test/src/*"]
     }
   },

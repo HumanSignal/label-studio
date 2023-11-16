@@ -100,6 +100,8 @@ describe('Relations: Image Rectangle Regions', () => {
       task,
     });
 
+    ImageView.waitForImage();
+
     Relations.hasRelations(0);
 
     // Select the first region
@@ -144,6 +146,8 @@ describe('Relations: Image Rectangle Regions', () => {
       config,
       task,
     });
+
+    ImageView.waitForImage();
 
     Relations.hasRelations(0);
 

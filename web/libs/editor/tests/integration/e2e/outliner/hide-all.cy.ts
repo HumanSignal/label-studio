@@ -1,5 +1,5 @@
 import { LabelStudio, Sidebar, Tooltip } from '@humansignal/frontend-test/helpers/LSF/index';
-import { simpleRegionsConfig, simpleRegionsData, simpleRegionsResult } from 'data/outliner/hide-all';
+import { simpleRegionsConfig, simpleRegionsData, simpleRegionsResult } from '../../data/outliner/hide-all';
 
 describe('Outliner - Hide all regions', () => {
   it('should exist', () => {

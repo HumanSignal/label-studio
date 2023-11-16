@@ -1,9 +1,9 @@
-import { Choices, LabelStudio, Tooltip } from '@humansignal/frontend-test/helpers/LSF/index';
+import { Choices, LabelStudio, Tooltip } from "@humansignal/frontend-test/helpers/LSF";
 import {
   choicesConfig,
   choicesMultipleSelectionConfig, choicesSelectLayoutConfig,
   simpleData
-} from 'data/control_tags/choice';
+} from '../../data/control_tags/choice';
 import { FF_DEV_2007 } from '@humansignal/frontend-test/feature-flags';
 
 describe('Control Tags - Choice', () => {

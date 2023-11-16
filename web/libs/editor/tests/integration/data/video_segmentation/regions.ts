@@ -1,4 +1,4 @@
-export const simpleVideoData = { video: '/files/opossum_intro.webm' };
+export const simpleVideoData = { video: '/public/files/opossum_intro.webm' };
 
 export const simpleVideoConfig = `<View>
   <Video name="video" value="$video" />

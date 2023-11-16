@@ -1,5 +1,5 @@
-import { AudioView, LabelStudio, Sidebar } from '@humansignal/frontend-test/helpers/LSF/index';
-import * as audioFixtures from 'data/audio/audio_paragraphs';
+import { AudioView, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
+import * as audioFixtures from '../../data/audio/audio_paragraphs';
 import { FF_LSDV_E_278 } from '../../../../src/utils/feature-flags';
 
 describe('Audio: Paragraphs Sync', () => {

@@ -1,5 +1,5 @@
 import { Labels, LabelStudio, Sidebar, VideoView } from '@humansignal/frontend-test/helpers/LSF/index';
-import { simpleVideoConfig, simpleVideoData, simpleVideoResult } from 'data/video_segmentation/regions';
+import { simpleVideoConfig, simpleVideoData, simpleVideoResult } from '../../data/video_segmentation/regions';
 
 describe('Video segmentation', () => {
   it('Should be able to draw a simple rectangle', ()=>{

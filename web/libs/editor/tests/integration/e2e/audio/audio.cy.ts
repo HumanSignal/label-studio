@@ -1,4 +1,4 @@
-import { AudioView, LabelStudio } from '@humansignal/frontend-test/helpers/LSF/index';
+import { AudioView, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 
 describe('Audio', () => {
   it('Renders audio with merged channels by default', () => {

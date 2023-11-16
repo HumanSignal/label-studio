@@ -2,7 +2,7 @@ import { ImageView, LabelStudio, Sidebar } from '@humansignal/frontend-test/help
 import { fourRectanglesResult, simpleEllipseConfig, simpleEllipseResult,
   simpleImageData,
   simplePointConfig,
-  simplePointResult, simplePolygonConfig, simplePolygonResult, simpleRectangleConfig, simpleRectangleResult } from 'data/image_segmentation/tools/selection-tool';
+  simplePointResult, simplePolygonConfig, simplePolygonResult, simpleRectangleConfig, simpleRectangleResult } from '../../../data/image_segmentation/tools/selection-tool';
 import { FF_DEV_1442 } from '../../../../../src/utils/feature-flags';
 
 describe('Image segmentation - Tools - Selection tool', () => {
