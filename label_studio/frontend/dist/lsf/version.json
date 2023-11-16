@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-364: Fix crosshair functionality (#1616)",
-  "commit": "4891f397096fe3a8773ec98ba7e56d0289810b82",
+  "message": "chore: bump @babel/traverse from 7.18.2 to 7.23.2 in /e2e (#1593)",
+  "commit": "6b18f65c471dd52a4bc63b0b2c2aaf5680d704ab",
   "branch": "master",
-  "date": "2023-11-14T15:48:46Z"
+  "date": "2023-11-15T14:48:40Z"
 }

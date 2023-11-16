@@ -25,6 +25,7 @@ export const ProjectModelVersionSelector = ({
     e.preventDefault();
     e.stopPropagation();
 
+    setVersion(null);
     await updateProject({
       model_version: null,
     });

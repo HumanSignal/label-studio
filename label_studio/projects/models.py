@@ -889,6 +889,18 @@ class Project(ProjectMixin, models.Model):
         else:
             return list(output)
 
+    def get_selected_model_versions(self):
+        # selected model versions in ML backends
+        model_versions = list(
+            self.ml_backends.filter(project=self).values_list('model_version', flat=True)
+        )
+
+        # if no model versions in ml backends, use selected project.model_version
+        if not model_versions:
+            model_versions = [] if self.model_version is None else [self.model_version]
+
+        return model_versions
+
     def get_active_ml_backends(self):
         from ml.models import MLBackend, MLBackendState
 

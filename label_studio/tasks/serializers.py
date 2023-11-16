@@ -666,31 +666,26 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
             return self.context['request'].user
 
     def get_predictions(self, task):
+        # If you modify this function, make sure that
+        # annotate_predictions_score() was modified accordingly
+
+        # use all predictions by default
         predictions = task.predictions
-        project_model_version = task.project.model_version
         user = self._get_user()
 
         # new version of code with separate model version per ML backend
         if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', user=user or 'auto'):
-            active_ml_backends = task.project.get_active_ml_backends()
-
-            # use multiple model versions from all active ML backends
-            if active_ml_backends.exists():
-                model_versions = active_ml_backends.values_list('model_version', flat=True)
-                logger.debug(f'Selecting predictions from active ML backend model versions: {model_versions}')
+            model_versions = self.project(task).get_selected_model_versions()
+            logger.debug(f"Get predictions from ML backend or project model versions: {model_versions}")
+            if model_versions:
                 predictions = predictions.filter(model_version__in=model_versions)
 
-            # use model_version from project.model_version
-            elif project_model_version:
-                predictions = predictions.filter(model_version=project_model_version)
-
-            # use all predictions from the task
-            else:
-                predictions = predictions
-
         # old version of code
-        elif project_model_version:
-            predictions = predictions.filter(model_version=project_model_version)
+        else:
+            model_version = self.project(task).model_version
+            logger.debug(f"Get predictions from project model version only: {model_version}")
+            if model_version:
+                predictions = predictions.filter(model_version=model_version)
 
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 

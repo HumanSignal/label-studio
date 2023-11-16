@@ -17,6 +17,7 @@ from pydantic import BaseModel
 
 from label_studio.core.utils.common import load_func
 from label_studio.core.utils.params import cast_bool_from_str
+from label_studio.core.utils.db import fast_first
 
 logger = logging.getLogger(__name__)
 
@@ -534,24 +535,25 @@ def annotate_annotators(queryset):
 
 
 def annotate_predictions_score(queryset):
-    first_task = queryset.first()
-    if not first_task:
-        return queryset
+    # If you modify this function, make sure that
+    # TaskWithAnnotationsAndPredictionsAndDraftsSerializer.get_predictions()
+    # was modified accordingly
+
+    project = queryset.project
 
     # new approach with each ML backend contains it's version
-    if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', first_task.project.organization.created_by):
-        model_versions = list(
-            first_task.project.ml_backends.filter(project=first_task.project).values_list('model_version', flat=True)
-        )
-        if len(model_versions) == 0:
-            return queryset.annotate(predictions_score=Avg('predictions__score'))
+    if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', project.organization.created_by):
+        model_versions = project.get_selected_model_versions()
 
-        else:
-            return queryset.annotate(
-                predictions_score=Avg('predictions__score', filter=Q(predictions__model_version__in=model_versions))
-            )
+        q = Q()  # use all predictions by default
+        if model_versions:
+            # use predictions with selected model versions only
+            q = Q(predictions__model_version__in=model_versions)
+
+        return queryset.annotate(predictions_score=Avg('predictions__score', filter=q))
+
     else:
-        model_version = first_task.project.model_version
+        model_version = project.model_version
         if model_version is None:
             return queryset.annotate(predictions_score=Avg('predictions__score'))
         else:
@@ -624,7 +626,7 @@ class PreparedTaskManager(models.Manager):
         if fields_for_evaluation is None:
             fields_for_evaluation = []
 
-        first_task = queryset.first()
+        first_task = fast_first(queryset)
         project = None if first_task is None else first_task.project
 
         # db annotations applied only if we need them in ordering or filters
