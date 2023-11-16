@@ -90,7 +90,7 @@ jobs:
 
       - name: Collect static
         run: |
-          python label_studio/manage.py collectstatic
+          poetry run python label_studio/manage.py collectstatic
 
       - name: Download feature flags
         env:
