@@ -24,10 +24,10 @@
         Manage your experimental data here. Here you can add zip files with your IMU or camera data to the project.
         <li><a href="{% url 'sensormodel:deployment' main_project.project_id %}">Manage deployments</a></li>
         Manage your project deployments here. This gives an overview of the deployments of your sensors to your subjects.
-        <li><a href="{% url 'sensordata:offset' main_project.project_id %}">Synchronize sensors</a></li>
-        Here you can add the offset between the camera data and the IMU data.
         <li><a href="{% url 'subjectannotation:annotationtaskpage' main_project.project_id %}">Annotate subject presence</a></li>
         Here you can annotate the subject presence in your videos. The videos can be annotated with your subjects as labels.
+        <li><a href="{% url 'sensordata:offset' main_project.project_id %}">Synchronize sensors</a></li>
+        Here you can add the offset between the camera data and the IMU data.
         <li><a href="{% url 'taskgeneration:generate_form' main_project.project_id %}">Generate activity annnotation tasks</a></li>
         Annotate the data using the activity labels. It is only data with subjects present.
         <li><a href="{% url 'data_manager:project-data' main_project.project_id|add:2 %}">Annotate</a></li>

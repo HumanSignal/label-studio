@@ -124,7 +124,6 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
             imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
             # Get column names for showing in LS
             timestamp_column_name = imu_df.columns[timestamp_column]
-            print(imu_df.columns)
             value_column_name = imu_df.columns[int(value_column)]
             # Update labeling set up in activity annotion project
             # Create a XML markup for annotating

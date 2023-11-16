@@ -321,7 +321,7 @@ def generate_offset_anno_tasks(request, project_id):
             sync_sensordata = offsetannotationform.cleaned_data.get('sync_sensordata')
             try:
                 # Get ground truth sensor type from the subject annotation project
-                sensortype_A = SensorData.objects.filter(project__id=project.id+1).first().sensor.sensortype
+                sensortype_A = SensorData.objects.filter(project=project ,file_upload_project2__isnull=False).first().sensor.sensortype
             except: 
                 print('No sensortypes found in subject annotation project')
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
