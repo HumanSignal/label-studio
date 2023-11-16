@@ -16,8 +16,8 @@ from django.db.models.functions import Cast, Coalesce
 from pydantic import BaseModel
 
 from label_studio.core.utils.common import load_func
-from label_studio.core.utils.params import cast_bool_from_str
 from label_studio.core.utils.db import fast_first
+from label_studio.core.utils.params import cast_bool_from_str
 
 logger = logging.getLogger(__name__)
 

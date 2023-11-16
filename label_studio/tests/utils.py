@@ -17,11 +17,12 @@ from data_export.models import ConvertedFormat, Export
 from django.apps import apps
 from django.conf import settings
 from django.test import Client
-from ml.models import MLBackend
 from organizations.models import Organization
 from projects.models import Project
 from tasks.serializers import TaskWithAnnotationsSerializer
 from users.models import User
+
+from ml.models import MLBackend
 
 try:
     from businesses.models import BillingPlan, Business

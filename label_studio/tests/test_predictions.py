@@ -5,10 +5,11 @@ import json
 import pytest
 import requests_mock
 from core.redis import redis_healthcheck
-from ml.models import MLBackend
 from projects.models import Project
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from users.models import User
+
+from ml.models import MLBackend
 
 from .utils import make_project
 
