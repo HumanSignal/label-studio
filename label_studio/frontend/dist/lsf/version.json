@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-345: Fix taxonomy items collapsing when dropdown is closed",
-  "commit": "fcdc1df7b09877c684fb95c07625a0ad0bc1d58a",
+  "message": "fix: LEAP-364: Fix crosshair functionality (#1616)",
+  "commit": "4891f397096fe3a8773ec98ba7e56d0289810b82",
   "branch": "master",
-  "date": "2023/11/07 11:01:17"
+  "date": "2023-11-14T15:48:46Z"
 }

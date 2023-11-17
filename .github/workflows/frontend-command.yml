@@ -6,6 +6,7 @@ on:
 
 env:
   NODE: '18'
+  CACHE_NAME_PREFIX: v0
 
 jobs:
   build:
@@ -35,8 +36,6 @@ jobs:
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
           key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Get build
         id: get_build

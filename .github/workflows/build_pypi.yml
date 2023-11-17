@@ -66,32 +66,31 @@ jobs:
           PROVIDED_VERSION: ${{ inputs.version }}
         run: |
           set -x
+
+          wget https://github.com/gnprice/toml-cli/releases/download/v0.2.3/toml-0.2.3-x86_64-linux.tar.gz
+          tar -xzf toml-0.2.3-x86_64-linux.tar.gz
+          mv toml-0.2.3-x86_64-linux/toml toml
+          chmod +x toml
+
           version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
-          sed -i "s/^__version__[ ]*=.*/__version__ = '${version}'/g" label_studio/__init__.py
+          ./toml set pyproject.toml tool.poetry.version "$version" > pyproject.toml.new
+          mv -f pyproject.toml.new pyproject.toml
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Configure pip cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pypi-${{ hashFiles('deploy/requirements-mw.txt') }}-${{ hashFiles('deploy/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pypi-
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
-          pip install -r deploy/requirements.txt
-          pip install -e .
-          pip install twine
+          poetry install --with build
 
       - name: Collect static
         run: |
-          python label_studio/manage.py collectstatic
+          poetry run python label_studio/manage.py collectstatic
 
       - name: Download feature flags
         env:
@@ -105,7 +104,7 @@ jobs:
             --retry-delay 10 \
             -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
             "https://sdk.launchdarkly.com/sdk/latest-all" >"$LAUNCHDARKLY_DOWNLOAD_PATH"
-          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then 
+          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then
             echo "feature_flags.json is valid"
           else
             echo "feature_flags.json is invalid"
@@ -116,7 +115,7 @@ jobs:
       - name: Package
         env:
           VERSION_OVERRIDE: ${{ inputs.version }}
-        run: python setup.py sdist bdist_wheel
+        run: poetry build
 
       - name: Upload to PYPI
         if: inputs.upload_to_pypi
