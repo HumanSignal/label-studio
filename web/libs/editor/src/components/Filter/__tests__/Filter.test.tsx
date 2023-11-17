@@ -150,7 +150,7 @@ describe('Filter', () => {
 
     const dropdown = await filter.getByTestId('dropdown');
 
-    expect(dropdown.classList.contains('dm-visible')).toBe(true);
+    expect(dropdown.classList.contains('lsf-visible')).toBe(true);
 
     const AddButton = await filter.getByText('Add Filter');
 
@@ -160,9 +160,9 @@ describe('Filter', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    expect(dropdown.classList.contains('dm-before-appear')).toBe(false);
-    expect(dropdown.classList.contains('dm-visible')).toBe(false);
-    expect(dropdown.classList.contains('dm-before-disappear')).toBe(false);
+    expect(dropdown.classList.contains('lsf-before-appear')).toBe(false);
+    expect(dropdown.classList.contains('lsf-visible')).toBe(false);
+    expect(dropdown.classList.contains('lsf-before-disappear')).toBe(false);
   });
 
   test('Should show filter length badge', () => {
@@ -217,6 +217,6 @@ describe('Filter', () => {
 
     fireEvent.click(FilterButton);
 
-    expect(FilterButton.classList.contains('dm-filter-button_active')).toBe(true);
+    expect(FilterButton.classList.contains('lsf-filter-button_active')).toBe(true);
   });
 });

@@ -1,0 +1,59 @@
+var _rect, _path, _path2, _rect2, _rect3, _rect4, _rect5;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgAnnotation = function SvgAnnotation(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 20,
+    height: 20,
+    fill: "none",
+    ref: ref
+  }, props), _rect || (_rect = /*#__PURE__*/React.createElement("rect", {
+    width: 20,
+    height: 20,
+    fill: "currentColor",
+    fillOpacity: 0.2,
+    rx: 4
+  })), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    fillOpacity: 0.3,
+    d: "M5 5h10v10H5z"
+  })), _path2 || (_path2 = /*#__PURE__*/React.createElement("path", {
+    stroke: "currentColor",
+    strokeOpacity: 0.3,
+    strokeWidth: 2,
+    d: "M6 6h8v8H6z"
+  })), _rect2 || (_rect2 = /*#__PURE__*/React.createElement("rect", {
+    width: 4,
+    height: 4,
+    x: 12,
+    y: 12,
+    fill: "currentColor",
+    rx: 2
+  })), _rect3 || (_rect3 = /*#__PURE__*/React.createElement("rect", {
+    width: 4,
+    height: 4,
+    x: 4,
+    y: 12,
+    fill: "currentColor",
+    rx: 2
+  })), _rect4 || (_rect4 = /*#__PURE__*/React.createElement("rect", {
+    width: 4,
+    height: 4,
+    x: 12,
+    y: 4,
+    fill: "currentColor",
+    rx: 2
+  })), _rect5 || (_rect5 = /*#__PURE__*/React.createElement("rect", {
+    width: 4,
+    height: 4,
+    x: 4,
+    y: 4,
+    fill: "currentColor",
+    rx: 2
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgAnnotation);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiByeD0iNCIgZmlsbD0iY3VycmVudENvbG9yIiBmaWxsLW9wYWNpdHk9IjAuMiIvPgo8cmVjdCB4PSI1IiB5PSI1IiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1vcGFjaXR5PSIwLjMiLz4KPHJlY3QgeD0iNiIgeT0iNiIgd2lkdGg9IjgiIGhlaWdodD0iOCIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS1vcGFjaXR5PSIwLjMiIHN0cm9rZS13aWR0aD0iMiIvPgo8cmVjdCB4PSIxMiIgeT0iMTIiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4KPHJlY3QgeD0iNCIgeT0iMTIiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4KPHJlY3QgeD0iMTIiIHk9IjQiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4KPHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjQiIGhlaWdodD0iNCIgcng9IjIiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8L3N2Zz4K";

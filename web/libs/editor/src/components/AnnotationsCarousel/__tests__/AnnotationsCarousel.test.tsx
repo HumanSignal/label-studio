@@ -16,6 +16,6 @@ jest.mock('react', () => ({
 
 test('AnnotationsCarousel', async () => {
   const view = mount(<AnnotationsCarousel annotationStore={annotationStore} store={store} />);
-  
-  expect(view.find('.dm-annotations-carousel__carosel').children().length).toBe(9);
+
+  expect(view.find('.lsf-annotations-carousel__carosel').children().length).toBe(9);
 });

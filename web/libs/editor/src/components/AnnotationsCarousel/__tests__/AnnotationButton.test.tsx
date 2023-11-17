@@ -18,12 +18,12 @@ describe('AnnotationsButton', () => {
     const entity = annotationStore.annotations[0];
     const view = mount(<AnnotationButton entity={entity} capabilities={{}} annotationStore={annotationStore} />);
 
-    expect(view.find('.dm-annotation-button__entity-id').text()).toBe(`#${entity.pk}`);
+    expect(view.find('.lsf-annotation-button__entity-id').text()).toBe(`#${entity.pk}`);
   });
   test('Prediction', () => {
     const entity = annotationStore.predictions[0];
     const view = mount(<AnnotationButton entity={entity} capabilities={{}} annotationStore={annotationStore} />);
-    
-    expect(view.find('.dm-annotation-button__entity-id').text()).toBe(`#${entity.pk}`);
+
+    expect(view.find('.lsf-annotation-button__entity-id').text()).toBe(`#${entity.pk}`);
   });
 });
