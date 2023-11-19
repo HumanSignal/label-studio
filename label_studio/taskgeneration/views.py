@@ -31,69 +31,74 @@ def task_generation_page(request,project_id):
     taskform = TaskGenerationForm(column_names_choices=columns_names_choices, project=project)
     return render(request, 'taskgeneration.html', {'taskgenerationform':taskform, 'project':project})
 
-def create_task_pairs(request, project, subject, sensortype_B):
-    subj_anno_proj = Project.objects.get(id=project.id+1)
+def create_task_pairs(project, subject, sensortype_B):
     # Load data for given project and subject
     subject_presences = SubjectPresence.objects.filter(project=project, subject=subject)
     distinct_file_uploads = subject_presences.values('file_upload').distinct() # Get all unique files that contain subject
-    sensor_A_sensordata = SensorData.objects.filter(project=project,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
+    sensordata_A = SensorData.objects.filter(project=project,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
     # Load IMU deployments in the project that contain the subject
     sensor_B_deployments = Deployment.objects.filter(project=project,subject=subject,sensor__sensortype__sensortype=sensortype_B.sensortype)
-    sensor_B_sensordata = SensorData.objects.filter(sensor__in=sensor_B_deployments.values('sensor')) # find all sensordata (type B) that has a sensor in sensor_B_deployments
+    sensordata_B = SensorData.objects.filter(sensor__in=sensor_B_deployments.values('sensor')) # find all sensordata (type B) that has a sensor in sensor_B_deployments
     # Iterate over unique sendata_A sensordata objects, this reduces computations
-    for sendata_A in sensor_A_sensordata:
-        vid_beg_dt = sendata_A.begin_datetime #begin_datetime sendata_A
+    for sendata_A in sensordata_A:
+        sensor_A = sendata_A.sensor
+        A_beg_dt = sendata_A.begin_datetime #begin_datetime sendata_A
         # Iterate over all subject_presences for this sendata_A
         subject_presences_sendata_A = subject_presences.filter(file_upload=sendata_A.file_upload)
         for subj_pres in subject_presences_sendata_A:
-            b = vid_beg_dt + timedelta(seconds=subj_pres.start_time) #begin_datetime of subj. pres. annotation
-            e = vid_beg_dt + timedelta(seconds=subj_pres.end_time) #end_datetime of subj. pres. annotation
+            b_subj_pres = A_beg_dt + timedelta(seconds=subj_pres.start_time) #begin_datetime of subj. pres. annotation
+            e_subj_pres = A_beg_dt + timedelta(seconds=subj_pres.end_time) #end_datetime of subj. pres. annotation
             # Iterate over sensordata of type B that have been deployed with subject
-            for sendata_B in sensor_B_sensordata:
-                sensor_A = sendata_A.sensor
+            for sendata_B in sensordata_B:
                 sensor_B = sendata_B.sensor
-                # Check if there is an offset between sensor_A and sensor_B
-
-                if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B, offset_Date__lte=vid_beg_dt):
+                B_beg_dt = sendata_B.begin_datetime
+                B_end_dt = sendata_B.end_datetime
+                # Check if there is an offset between sensor_A and sensor_B, with begin_datetime before begin of sendata_A
+                if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,offset_Date__lte=A_beg_dt).exists():
                     # Take the latest instance of offset before the begin_datetime of the sendata_A 
                     offset = SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,
-                                                        offset_Date__lte=vid_beg_dt).order_by('-offset_Date').first().offset
+                                                        offset_Date__lte=A_beg_dt).order_by('-offset_Date').first().offset
+                # If there is no offset before begin sendata_A, but there is after the begin use that offset
+                elif SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B).exists:
+                    # Take the first instance of offset after the begin_datetime of the sendata_A 
+                    offset = SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,
+                                                        offset_Date__gte=A_beg_dt).order_by('-offset_Date').first().offset
                 else:
                     # If there is no SensorOffset defined set offset=0
                     offset = 0
                 offset_delta = timedelta(milliseconds=offset) # Difference in datetime because of sensor offset
                 # Check if either the begin or end of sendata_B are in the subj. pres. segment or the begin (of sendata_B) is before and the end (of sendata_B) is after the start of subj. pres.
-                begin_inside =  b <= sendata_B.begin_datetime-offset_delta <= e
-                end_inside =   b <= sendata_B.end_datetime-offset_delta <= e
-                begin_before_and_end_after_start =  (sendata_B.begin_datetime-offset_delta <= b) and (sendata_B.end_datetime-offset_delta >= b)
+                begin_inside =  b_subj_pres <= B_beg_dt-offset_delta <= e_subj_pres
+                end_inside =   b_subj_pres <= B_end_dt-offset_delta <= e_subj_pres
+                begin_before_and_end_after_start =  (B_beg_dt-offset_delta <= b_subj_pres) and (B_end_dt-offset_delta >= b_subj_pres)
                 if begin_inside or end_inside or begin_before_and_end_after_start:
                     # Find the start and end datetime of overlap
-                    if b >= sendata_B.begin_datetime-offset_delta:
-                        begin_overlap_dt = b
+                    if b_subj_pres >= B_beg_dt-offset_delta:
+                        begin_overlap_dt = b_subj_pres
                     else:
-                        begin_overlap_dt = sendata_B.begin_datetime-offset_delta
-                    if e <= sendata_B.end_datetime-offset_delta:
-                        end_overlap_dt = e
+                        begin_overlap_dt = B_beg_dt-offset_delta
+                    if e_subj_pres <= B_end_dt-offset_delta:
+                        end_overlap_dt = e_subj_pres
                     else:
-                        end_overlap_dt = sendata_B.end_datetime-offset_delta    
+                        end_overlap_dt = B_end_dt-offset_delta    
                     # Create overlap object, this is used to create tasks
                     if not SensorOverlap.objects.filter(sensordata_A=sendata_A,
                                                 sensordata_B=sendata_B,
                                                 project=project,
                                                 subject=subject,
-                                                start_A= (begin_overlap_dt-vid_beg_dt).total_seconds(),
-                                                end_A = (end_overlap_dt-vid_beg_dt).total_seconds(),
-                                                start_B = (begin_overlap_dt-sendata_B.begin_datetime+offset_delta).total_seconds(),
-                                                end_B = (end_overlap_dt-sendata_B.begin_datetime+offset_delta).total_seconds()
+                                                start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
+                                                end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
+                                                start_B = (begin_overlap_dt-B_beg_dt).total_seconds(),
+                                                end_B = (end_overlap_dt-B_beg_dt).total_seconds()
                                                 ).exists():
                         SensorOverlap.objects.create(sensordata_A=sendata_A,
                                                     sensordata_B=sendata_B,
                                                     project=project,
                                                     subject=subject,
-                                                    start_A= (begin_overlap_dt-vid_beg_dt).total_seconds(),
-                                                    end_A = (end_overlap_dt-vid_beg_dt).total_seconds(),
-                                                    start_B = (begin_overlap_dt-sendata_B.begin_datetime+offset_delta).total_seconds(),
-                                                    end_B = (end_overlap_dt-sendata_B.begin_datetime+offset_delta).total_seconds()
+                                                    start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
+                                                    end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
+                                                    start_B = (begin_overlap_dt-B_beg_dt).total_seconds(),
+                                                    end_B = (end_overlap_dt-B_beg_dt).total_seconds()
                                                     )
                     
         
@@ -207,26 +212,29 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
 
 def generate_taskgen_form(request, project_id):
     try:
+        # Get LS project
         project = Project.objects.get(id=project_id)
+        # Get a SubjectPresence to get the ground truth SensorType
         SubjectPresence.objects.filter(project=project).delete()
         parse_subject_presence_annotations(request=request, project=project)
-
         fileupload_instance = SubjectPresence.objects.filter(project=project).first()
-        
         if fileupload_instance is not None:
+            # Get sensortypes
             sensortype_A = SensorData.objects.filter(project=project,file_upload=fileupload_instance.file_upload).first().sensor.sensortype
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
-
             if sensortype_A is not None and sensortype_B is not None:
+                # Only IMU data is supported for now
                 if sensortype_B.sensortype == 'I':
+                    # Get a SensorData instance from the same type in order to read the column names
                     sensor_instance = Sensor.objects.filter(project=project, sensortype=sensortype_B).first()
                     imu_file_path = SensorData.objects.filter(sensor=sensor_instance).first().file_upload.file.path
-                    timestamp_column = sensortype_B.timestamp_column
                     imu_df = pd.read_csv(imu_file_path, engine='python')
                     column_names = imu_df.columns.to_list()
+                    # Put columns names as a form choices field
                     columns_names_choices = []
                     for i, column_name in enumerate(column_names):
                         columns_names_choices.append((i, column_name))
+                    # Pass the choices to the session, this way it can more easily be retrieved later in the flow.
                     request.session['choices'] = columns_names_choices
                     return redirect('taskgeneration:taskgeneration_form', project_id=project_id)
                 else:
