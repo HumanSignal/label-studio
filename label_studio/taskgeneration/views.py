@@ -57,12 +57,11 @@ def create_task_pairs(project, subject, sensortype_B):
                 if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,offset_Date__lte=A_beg_dt).exists():
                     # Take the latest instance of offset before the begin_datetime of the sendata_A 
                     offset = SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,
-                                                        offset_Date__lte=A_beg_dt).order_by('-offset_Date').first().offset
+                                                        offset_Date__lte=A_beg_dt, project=project).order_by('-offset_Date').first().offset
                 # If there is no offset before begin sendata_A, but there is after the begin use that offset
-                elif SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B).exists:
+                elif SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,project=project).exists():
                     # Take the first instance of offset after the begin_datetime of the sendata_A 
-                    offset = SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,
-                                                        offset_Date__gte=A_beg_dt).order_by('-offset_Date').first().offset
+                    offset = SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B, project=project).order_by('-offset_Date').first().offset
                 else:
                     # If there is no SensorOffset defined set offset=0
                     offset = 0
@@ -133,15 +132,14 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
             value_column_name = imu_df.columns[int(value_column)]
             # Update labeling set up in activity annotion project
             # Create a XML markup for annotating
-            template = create_activity_annotation_template(subject=subject,
-                                                           timestamp_column_name=timestamp_column_name,
+            template = create_activity_annotation_template(timestamp_column_name=timestamp_column_name,
                                                            value_column_name=value_column_name)
             # Get url for displaying project detail
             project_detail_url = request.build_absolute_uri(reverse('projects:api:project-detail', args=[project.id+2]))
+            print(f'project_detail_url:  {project_detail_url}')
             # Update labeling set up
             token = Token.objects.get(user=request.user)
             requests.patch(project_detail_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template})
-
             for i, segment in enumerate(range(amount_of_segments)):
                 # Determine start and end of segment in seconds for both sensors
                 if i == amount_of_segments-1: # Remaining segment
@@ -177,7 +175,7 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     ### Cut out csv file using pandas ### 
                     # Find the indeces of the timestamp instances closest to begin and end of segment
                     start_index = imu_df[imu_df.iloc[:, timestamp_column]>= begin_segment_B].index[0] # First timestamp after begin_segment
-                    end_index = imu_df[imu_df.iloc[:, timestamp_column] > end_segment_B].index[1] # First timestamp after end_segment
+                    end_index = imu_df[imu_df.iloc[:, timestamp_column] >= end_segment_B].index[0] # First timestamp after end_segment
                     # Only keep the rows in between the obtained indeces
                     segment_imu_df = imu_df.iloc[start_index:end_index]
                     # Add offset to every timestamp so that everthing shifts s.t. start time is 0
@@ -264,7 +262,7 @@ def generate_activity_tasks(request,project_id):
             sensortype_A = SensorData.objects.filter(file_upload=fileupload_instance).first().sensor.sensortype
             sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
             # Fill VideoImuOverlap objects
-            create_task_pairs(request= request,project=project, subject=subject, sensortype_B=sensortype_B)
+            create_task_pairs(project=project, subject=subject, sensortype_B=sensortype_B)
             # Create annotation data chunks (video and imu), this automatically creates tasks
             create_annotation_data_chunks(request=request, project=project, subject=subject, duration=duration,value_column=value_column)          
     return redirect('landingpage:landingpage', project_id=project_id)    

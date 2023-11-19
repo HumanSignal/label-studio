@@ -1,4 +1,4 @@
-def create_activity_annotation_template(subject,timestamp_column_name,value_column_name):
+def create_activity_annotation_template(timestamp_column_name,value_column_name):
     """
         Function that takes the names of the timestamp and value columns and creates an XML markup with it 
         for activity annotation
@@ -10,7 +10,7 @@ def create_activity_annotation_template(subject,timestamp_column_name,value_colu
     head = '<View><Header value="Activity annotation for $subject"/>'
     timeserieslabels = '<TimeSeriesLabels name="label" toName="ts"><Label value="Run"/><Label value="Walk"/></TimeSeriesLabels>'
     video = '<HyperText name="video" value="$video" inline="true"/>'
-    timeseries =   f'<TimeSeries name="ts" value="$csv" valueType="url" fixedScale="True" timeColumn="{timestamp_column_name}" fixedScale="true"><Channel column="{value_column_name}"/></TimeSeries>'
+    timeseries =   f'<TimeSeries name="ts" value="$csv" valueType="url" timeColumn="{timestamp_column_name}" fixedScale="true"><Channel column="{value_column_name}"/></TimeSeries>'
     tail = '</View>'
 
 
