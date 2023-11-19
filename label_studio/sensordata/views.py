@@ -327,7 +327,7 @@ def create_sync_task_pairs(project, sensordata_A, sensordata_B):
             # Add manual offset for sensor_B
             B_beg_dt = B_beg_dt + timedelta(milliseconds=sendata_B.sensor.manual_offset)
             B_end_dt = B_end_dt + timedelta(milliseconds=sendata_B.sensor.manual_offset)
-            # Check 
+            # Check if there is overlap
             begin_inside =  A_beg_dt <= B_beg_dt <= A_end_dt
             end_inside =   A_beg_dt <= B_end_dt <= B_end_dt
             begin_before_and_end_after_start =  (B_beg_dt <= A_beg_dt) and (B_end_dt >= A_beg_dt)
@@ -362,9 +362,11 @@ def create_sync_task_pairs(project, sensordata_A, sensordata_B):
 def create_sync_data_chunks(request, project,value_column_name):
     # Get all overlap for given subject and video
     sensor_overlap = SyncSensorOverlap.objects.filter(project=project)
+    # Iterate over all overlap
     for overlap in sensor_overlap:
         sensortype_A = overlap.sensordata_A.sensor.sensortype
         sensortype_B = overlap.sensordata_B.sensor.sensortype
+        # Check sensortype combination
         if sensortype_A.sensortype == 'C' and sensortype_B.sensortype == 'I':
             # Load data from SensorType and the csv file
             imu_file_path = overlap.sensordata_B.file_upload.file.path
@@ -381,7 +383,7 @@ def create_sync_data_chunks(request, project,value_column_name):
             # Update labeling set up
             token = Token.objects.get(user=request.user)
             requests.patch(project_detail_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template})
-    
+            # Create temporary files where the new chunks can be saved as
             with NamedTemporaryFile(prefix="SYNC_CHUNK", suffix=".mp4", delete=False, mode='w') as temp_video,\
                 NamedTemporaryFile(prefix="SYNC_CHUNK", suffix=".csv", delete=False, mode='w') as temp_imu:
                 video_file_path = overlap.sensordata_A.file_upload.file.path
@@ -406,14 +408,16 @@ def create_sync_data_chunks(request, project,value_column_name):
                 imu_df = imu_df.iloc[start_index:end_index]
                 # Add offset to every timestamp so that everthing shifts s.t. start time is 0
                 imu_df.iloc[:, timestamp_column] = imu_df.iloc[:, timestamp_column] - imu_df.iloc[0, timestamp_column]
-                # Create temporary file and save new csv to this file
+                # Save new csv to this file
                 imu_df.to_csv(temp_imu, index=False)
+                # Upload sync chunks to data_import project
                 upload_sensor_data(request=request, name=f'imu_sync', file_path=temp_imu.name ,project=project)
                 fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
                 imu_file_upload = fileupload_model.objects.latest('id')
                 upload_sensor_data(request=request, name=f'video_sync', file_path=temp_video.name ,project=project)               
                 fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
                 video_file_upload = fileupload_model.objects.latest('id')
+                # Create JSON that allows for synchronization between video and timeseries
                 refresh_every = 10
                 wait_before_sync = 3000
                 offset_annotation_project = Project.objects.get(id=project.id+3)
@@ -436,11 +440,13 @@ def create_sync_data_chunks(request, project,value_column_name):
 
 
 def generate_offset_anno_tasks(request, project_id):
+    # Get correct LS projects
     project = Project.objects.get(id=project_id)
     offset_annotation_project = Project.objects.get(id=project.id+3)
     if request.method == 'POST':
         offsetannotationform = OffsetAnnotationForm(request.POST)
         if offsetannotationform.is_valid():
+            # Get the SensorData chosen for synchronization
             sync_sensordata = offsetannotationform.cleaned_data.get('sync_sensordata')
             try:
                 # Get ground truth sensor type from the subject annotation project
@@ -459,34 +465,44 @@ def generate_offset_anno_tasks(request, project_id):
     
 
 def parse_offset_annotations(request,project_id):
+    # Get LS projects and tasks (Tasks hold annotations)
     project = Project.objects.get(id=project_id)
     offset_annotation_project = Project.objects.get(id=project.id+3)
     tasks = Task.objects.filter(project= offset_annotation_project)
     for i, task in enumerate(tasks):
+        # Get sensors, the sensor names are stored in the task data
         sensor_A = Sensor.objects.get(name = task.data['sensor_a'].replace('Sensor: ', ''))
         sensor_B = Sensor.objects.get(name = task.data['sensor_b'].replace('Sensor: ', ''))
         annotations = Annotation.objects.filter(task__in= tasks)
+        # Check if negative offset label. All offset labels for one task should have either negative or positive offset
         if annotations.first().result[0]['value']['timeserieslabels'][0] == 'Negative offset':
+            # Determine offset obtained by each offset annotation
             offsets = [annotation['value']['end']-annotation['value']['start']  for annotation in annotations[i].result]
             try:
+                # Determine average offset
                 avg_offset = statistics.mean(offsets) # avg offset as a float in seconds
             except statistics.StatisticsError as e:
                 print(f'{e}, There are no offset annotations for {sensor_A} and {sensor_B}')
                 avg_offset = 0
             offset_date = task.data['offset_date']
+            # Add negative offset
             if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset = -1*int(avg_offset*1000), offset_Date = offset_date):
                 SensorOffset.objects.create(sensor_A = sensor_A,
                                                sensor_B = sensor_B,
                                                offset = -1*int(avg_offset*1000), # convert to milliseconds integer
                                                offset_Date = offset_date)
+        # Check if positive offset label. All offset labels for one task should have either negative or positive offset
         elif annotations.first().result[0]['value']['timeserieslabels'][0] == 'Positive offset':
+            # Determine offset obtained by each offset annotation
             offsets = [annotation['value']['end']-annotation['value']['start']  for annotation in annotations[i].result]
             try:
+                # Determine average offset
                 avg_offset = statistics.mean(offsets) # avg offset as a float in seconds
             except statistics.StatisticsError as e:
                 print(f'{e}, There are no offset annotations for {sensor_A} and {sensor_B}')
                 avg_offset = 0
             offset_date = task.data['offset_date'] 
+            # Add positive offset
             if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date).exists():
                 SensorOffset.objects.create(sensor_A = sensor_A,
                                                sensor_B = sensor_B,
