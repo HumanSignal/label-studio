@@ -55,7 +55,15 @@
             <input type="submit" value="Go back to project page" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
-
+    <div class="forms">
+        <h2>Add deployment</h2>
+        <form action="{% url 'sensormodel:deployment' project.id %}" method="post">
+            <table>
+            {{ deploymentform.as_table }}
+            </table>
+            <input type="submit" value="Create deployment">
+        </form>
+    </div>
     <div class="deployments">
         <h2>Deployments</h2>
         <table class="tables">
@@ -75,20 +83,11 @@
                 <td>{{ deployment.begin_datetime }}</td>
                 <td>{{ deployment.end_datetime }}</td> 
                 <td>{{ deployment.location}} </td>
-                <td><a href="{% url 'sensormodel:adjust_deployment' project.id deployment.id %}">[Edit/Add subject]</a></td>
+                <td><a href="{% url 'sensormodel:adjust_deployment' project.id deployment.id %}">[Edit]</a></td>
                 <td><a href="{% url 'sensormodel:delete_deployment' project.id deployment.id %}">[Delete]</a></td>
             </tr> 
             {% endfor %} 
         </table>  
-    </div>
-    <div class="forms">
-        <h2>Add deployment</h2>
-        <form action="{% url 'sensormodel:deployment' project.id %}" method="post">
-            <table>
-            {{ deploymentform.as_table }}
-            </table>
-            <input type="submit" value="Create deployment">
-        </form>
     </div>
 </body>
 

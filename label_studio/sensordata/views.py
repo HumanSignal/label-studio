@@ -9,7 +9,6 @@ from .parsing.controllers.project_controller import ProjectController
 from pathlib import Path
 from .utils.annotation_template import create_offset_annotation_template
 from tasks.models import Task, Annotation
-from sensormodel.models import Deployment
 from django.http import HttpResponse
 
 import json
@@ -211,12 +210,7 @@ def parse_IMU(request, file_path, sensor, name, project):
                                            end_datetime=end_datetime, 
                                            project=project,
                                            file_upload=file_upload)
-    # Create Deployment. Later a subject, location and position can be added by the user
-    deployment = Deployment.objects.create(begin_datetime = sensordata.begin_datetime,
-                                           end_datetime = sensordata.end_datetime,
-                                           project = project,
-                                           sensor = sensordata.sensor
-    )
+
 
 def parse_camera(request, file_path, sensor, name, project):
     subjectannotation_project = Project.objects.get(id=(project.id+1))
@@ -250,12 +244,7 @@ def parse_camera(request, file_path, sensor, name, project):
                                            project=project, 
                                            file_upload=file_upload_dataimport, 
                                            file_upload_project2 = file_upload_subjectannotation)
-    # deployment = Deployment.objects.create(begin_datetime = sensordata.begin_datetime,
-    #                                        end_datetime = sensordata.end_datetime,
-    #                                        project = project,
-    #                                        sensor = sensordata.sensor
-    # )
-    
+
 def upload_sensor_data(request, name, file_path, project):
     user = request.user
     token = Token.objects.get(user=user)
