@@ -37,6 +37,7 @@ class Sensor(models.Model):
     sensor_hash = models.CharField(max_length=10,blank=True)
     sensortype = models.ForeignKey(SensorType,on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    manual_offset = models.IntegerField(default=0)
 
     def __str__(self):
         return 'Sensor: ' + str(self.name)
