@@ -23,6 +23,7 @@ import pandas as pd
 import zipfile
 import re
 import os
+import subprocess
 
 from projects.models import Project
 from tasks.models import Task
@@ -328,17 +329,43 @@ def generate_offset_anno_tasks(request, project_id):
             for sendata_A in sync_sensordata.filter(sensor__sensortype__sensortype=sensortype_A.sensortype):
                 for sendata_B in sync_sensordata.filter(sensor__sensortype__sensortype=sensortype_B.sensortype):
                     sendata_B_df = pd.read_csv(sendata_B.file_upload.file.path,skipfooter=1, engine='python')
-                    timestamp_column_name = sendata_B_df.columns[sensortype_B.timestamp_column]
-                    task_json_template = {
-                        "csv": f"{sendata_B.file_upload.file.url}?time={timestamp_column_name}&values={'a3d'}",
-                        "video": f"<video src='{sendata_A.file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),20); console.log('video is loaded, starting to sync with time series')}}, 3000); \" />",
-                        "sensor_a": f"{sendata_A.sensor}",
-                        "sensor_b": f"{sendata_B.sensor}",
-                        "offset_date": f"{min(sendata_A.begin_datetime,sendata_B.begin_datetime)}"
-                    }
-                    with NamedTemporaryFile(prefix=f'{sendata_A.sensor.id}_{sendata_B.sensor.id}', suffix='.json',mode='w',delete=False) as task_json_file:
-                        json.dump(task_json_template,task_json_file,indent=4)
-                    upload_sensor_data(request, name=f'{sendata_A.sensor}_{sendata_B.sensor}', file_path=task_json_file.name, project=offset_annotation_project)
+                    # Determine the difference of the datetimes of the begin of both sensor A and B
+                    difference_begin = (sendata_B.begin_datetime - sendata_A.begin_datetime).total_seconds()
+                    difference_end = (sendata_B.end_datetime - sendata_A.begin_datetime).total_seconds()
+                    # Create a new video that had been adjusted for the difference in the begin_datetimes
+                    with NamedTemporaryFile(prefix="vid_adjusted", suffix=".mp4", delete=False, mode='w') as temp_video:
+                        video_file_path = sendata_A.file_upload.file.path
+                        ### Cut out video using ffmpeg ###
+                        ffmpeg_command = [
+                        "ffmpeg",
+                        "-y",
+                        "-i", video_file_path,
+                        "-ss", str(difference_begin),
+                        "-to", str(difference_end),
+                        "-c:v", "copy",
+                        "-c:a", "copy",
+                        "-loglevel","quiet",
+                        temp_video.name,
+                        ]
+                        subprocess.run(ffmpeg_command, shell=True)
+                        upload_sensor_data(request=request, name='vid_adjusted', file_path=temp_video.name ,project=project)               
+                        fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
+                        video_file_upload = fileupload_model.objects.latest('id')
+                        refresh_every = 10
+                        wait_before_sync = 3000
+                        timestamp_column_name = sendata_B_df.columns[sensortype_B.timestamp_column]
+                        task_json_template = {
+                            "csv": f"{sendata_B.file_upload.file.url}?time={timestamp_column_name}&values={'a3d'}",
+                            "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
+                            "sensor_a": f"{sendata_A.sensor}",
+                            "sensor_b": f"{sendata_B.sensor}",
+                            "offset_date": f"{min(sendata_A.begin_datetime,sendata_B.begin_datetime)}"
+                        }
+                        with NamedTemporaryFile(prefix=f'{sendata_A.sensor.id}_{sendata_B.sensor.id}', suffix='.json',mode='w',delete=False) as task_json_file:
+                            json.dump(task_json_template,task_json_file,indent=4)
+                        upload_sensor_data(request, name=f'{sendata_A.sensor}_{sendata_B.sensor}', file_path=task_json_file.name, project=offset_annotation_project)
+                    os.remove(temp_video.name)                
+                    os.remove(task_json_file.name)
             # Update labeling setup to support offset annotation
             # Create a XML markup for annotating. Value column is always 'a3d'
             template = create_offset_annotation_template(timestamp_column_name=timestamp_column_name,value_column_name='a3d')
@@ -362,16 +389,17 @@ def parse_offset_annotations(request,project_id):
     project = Project.objects.get(id=project_id)
     offset_annotation_project = Project.objects.get(id=project.id+3)
     tasks = Task.objects.filter(project= offset_annotation_project)
-    for task in tasks:
-        sensor_A = Sensor.objects.get(sensor_id = task.data['sensor_a'].replace('Sensor: ', ''))
-        sensor_B = Sensor.objects.get(sensor_id = task.data['sensor_b'].replace('Sensor: ', ''))
+    for i, task in enumerate(tasks):
+        sensor_A = Sensor.objects.get(name = task.data['sensor_a'].replace('Sensor: ', ''))
+        sensor_B = Sensor.objects.get(name = task.data['sensor_b'].replace('Sensor: ', ''))
         annotations = Annotation.objects.filter(task__in= tasks)
         if annotations.first().result[0]['value']['timeserieslabels'][0] == 'Negative offset':
-            offsets = [annotation_result['value']['end']-annotation_result['value']['start']  for annotation_result in annotations.first().result]
+            offsets = [annotation['value']['end']-annotation['value']['start']  for annotation in annotations[i].result]
             try:
                 avg_offset = statistics.mean(offsets) # avg offset as a float in seconds
             except statistics.StatisticsError as e:
                 print(f'{e}, There are no offset annotations for {sensor_A} and {sensor_B}')
+                avg_offset = 0
             offset_date = task.data['offset_date']
             if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset = -1*int(avg_offset*1000), offset_Date = offset_date):
                 SensorOffset.objects.create(sensor_A = sensor_A,
@@ -379,18 +407,19 @@ def parse_offset_annotations(request,project_id):
                                                offset = -1*int(avg_offset*1000), # convert to milliseconds integer
                                                offset_Date = offset_date)
         elif annotations.first().result[0]['value']['timeserieslabels'][0] == 'Positive offset':
-            
-            offsets = [annotation_result['value']['end']-annotation_result['value']['start']  for annotation_result in annotations.first().result]
+            offsets = [annotation['value']['end']-annotation['value']['start']  for annotation in annotations[i].result]
             try:
                 avg_offset = statistics.mean(offsets) # avg offset as a float in seconds
             except statistics.StatisticsError as e:
                 print(f'{e}, There are no offset annotations for {sensor_A} and {sensor_B}')
+                avg_offset = 0
             offset_date = task.data['offset_date'] 
-            if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset = int(avg_offset*1000), offset_Date = offset_date).exists():
+            if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date).exists():
                 SensorOffset.objects.create(sensor_A = sensor_A,
                                                sensor_B = sensor_B,
                                                offset = int(avg_offset*1000), # convert to milliseconds integer
-                                               offset_Date = offset_date)
+                                               offset_Date = offset_date,
+                                               project=project)
         else:
             print('The labels in the offset labeling have been changed. This will cause malfunctioning')
     sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
