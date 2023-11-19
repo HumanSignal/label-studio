@@ -5,7 +5,10 @@ from .models import Deployment, Sensor, Subject
 class SensorForm(forms.ModelForm):
     class Meta:
         model = models.Sensor
-        fields = ['name','parsable_sensor_id','sensortype']
+        fields = ['name','parsable_sensor_id','sensortype','manual_offset']
+        widgets = {
+            'manual_offset': forms.TextInput(attrs={'placeholder': 'Optional. Give offset in milliseconds (integer)'}),
+        }
 
         def __init__(self, *args, **kwargs):
             project = kwargs.pop('project', None)
