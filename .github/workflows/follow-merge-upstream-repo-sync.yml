@@ -51,7 +51,7 @@ jobs:
           esac
 
       - name: Find or Create branch
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: get-branch
         env:
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
@@ -292,7 +292,7 @@ jobs:
 
       - name: Find or Create PR
         id: get-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           TITLE: "${{ github.event.client_payload.title }}"
           HTML_URL: "${{ github.event.client_payload.html_url }}"
@@ -364,7 +364,7 @@ jobs:
       - name: Check all submodules
         id: check-all-submodules
         if: github.event.client_payload.event_action == 'merged'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           result-encoding: string
@@ -427,7 +427,7 @@ jobs:
           github.event.client_payload.event_action == 'merged' &&
           steps.check-all-submodules.outputs.result != 'true'
         id: comment-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -492,7 +492,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Get PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: get-pr
         with:
           github-token: ${{ secrets.GIT_PAT }}
@@ -530,7 +530,7 @@ jobs:
       - name: Close PR
         if: github.event.client_payload.event_action == 'closed'
         id: close-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |

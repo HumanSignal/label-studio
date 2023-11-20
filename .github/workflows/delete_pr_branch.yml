@@ -13,7 +13,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Delete branch
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         if: startsWith(github.event.pull_request.head.ref, 'fb-')
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
