@@ -46,8 +46,8 @@ def create_task_pairs(project, subject, sensortype_B):
         # Iterate over all subject_presences for this sendata_A
         subject_presences_sendata_A = subject_presences.filter(file_upload=sendata_A.file_upload)
         for subj_pres in subject_presences_sendata_A:
-            b_subj_pres = A_beg_dt + timedelta(seconds=subj_pres.start_time) #begin_datetime of subj. pres. annotation
-            e_subj_pres = A_beg_dt + timedelta(seconds=subj_pres.end_time) #end_datetime of subj. pres. annotation
+            beg_subj_pres = A_beg_dt + timedelta(seconds=subj_pres.start_time) #begin_datetime of subj. pres. annotation
+            end_subj_pres = A_beg_dt + timedelta(seconds=subj_pres.end_time) #end_datetime of subj. pres. annotation
             # Iterate over sensordata of type B that have been deployed with subject
             for sendata_B in sensordata_B:
                 sensor_B = sendata_B.sensor
@@ -67,17 +67,17 @@ def create_task_pairs(project, subject, sensortype_B):
                     offset = 0
                 offset_delta = timedelta(milliseconds=offset) # Difference in datetime because of sensor offset
                 # Check if either the begin or end of sendata_B are in the subj. pres. segment or the begin (of sendata_B) is before and the end (of sendata_B) is after the start of subj. pres.
-                begin_inside =  b_subj_pres <= B_beg_dt+offset_delta <= e_subj_pres
-                end_inside =   b_subj_pres <= B_end_dt+offset_delta <= e_subj_pres
-                begin_before_and_end_after_start =  (B_beg_dt+offset_delta <= b_subj_pres) and (B_end_dt+offset_delta >= b_subj_pres)
+                begin_inside =  beg_subj_pres <= B_beg_dt+offset_delta <= end_subj_pres
+                end_inside =   beg_subj_pres <= B_end_dt+offset_delta <= end_subj_pres
+                begin_before_and_end_after_start =  (B_beg_dt+offset_delta <= beg_subj_pres) and (B_end_dt+offset_delta >= beg_subj_pres)
                 if begin_inside or end_inside or begin_before_and_end_after_start:
                     # Find the start and end datetime of overlap
-                    if b_subj_pres >= B_beg_dt+offset_delta:
-                        begin_overlap_dt = b_subj_pres
+                    if beg_subj_pres >= B_beg_dt+offset_delta:
+                        begin_overlap_dt = beg_subj_pres
                     else:
                         begin_overlap_dt = B_beg_dt+offset_delta
-                    if e_subj_pres <= B_end_dt+offset_delta:
-                        end_overlap_dt = e_subj_pres
+                    if end_subj_pres <= B_end_dt+offset_delta:
+                        end_overlap_dt = end_subj_pres
                     else:
                         end_overlap_dt = B_end_dt+offset_delta    
                     # Create overlap object, this is used to create tasks
