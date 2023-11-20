@@ -8,6 +8,7 @@ import time
 from typing import Union
 from urllib.parse import unquote, urlparse
 
+from csp.decorators import csp_update
 import drf_yasg.openapi as openapi
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
@@ -596,6 +597,7 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
 class UploadedFileResponse(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
+    @csp_update(SANDBOX=[])
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         request = self.request

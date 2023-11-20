@@ -228,6 +228,7 @@ MIDDLEWARE = [
     'core.middleware.ContextLogMiddleware',
     'core.middleware.DatabaseIsLockedRetryMiddleware',
     'core.current_request.ThreadLocalMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -674,3 +675,30 @@ PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
 DATA_MANAGER_FILTER_ALLOWLIST = list(
     set(get_env_list('DATA_MANAGER_FILTER_ALLOWLIST') + ['updated_by__active_organization'])
 )
+
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'",)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    'blob:',
+    'browser.sentry-cdn.com',
+    'https://*.googletagmanager.com',
+)
+CSP_IMG_SRC = (
+    "'self'",
+    'data:',
+    'https://*.google-analytics.com',
+    'https://*.googletagmanager.com',
+    'https://*.google.com',
+)
+CSP_CONNECT_SRC = (
+    "'self'",
+    'https://*.google-analytics.com',
+    'https://*.analytics.google.com',
+    'https://analytics.google.com',
+    'https://*.googletagmanager.com',
+    'https://*.g.doubleclick.net',
+    'https://*.ingest.sentry.io',
+)
+CSP_REPORT_ONLY = True
+CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src', 'style-src']
