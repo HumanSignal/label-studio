@@ -75,6 +75,7 @@ libs/editor/.env.production.local
 
 # Testing
 libs/editor/coverage/
+libs/editor/tests/e2e/output/
 
 # codecept screenshots
 libs/editor/e2e/output

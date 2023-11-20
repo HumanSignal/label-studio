@@ -89,10 +89,10 @@ describe('PanelBase', () => {
       </PanelBase>
     </div>);
 
-    expect(view.find('.dm-panel__title').text()).toBe(panelName);
-    expect(view.find('.dm-panel__body .dm-details').text()).toBe(sampleContent);
+    expect(view.find('.lsf-panel__title').text()).toBe(panelName);
+    expect(view.find('.lsf-panel__body .lsf-details').text()).toBe(sampleContent);
     expect(isCurrentlyExpanded).toBe(true);
-    view.find('.dm-panel__toggle').simulate('click');
+    view.find('.lsf-panel__toggle').simulate('click');
     expect(isCurrentlyExpanded).toBe(false);
   });
 });
