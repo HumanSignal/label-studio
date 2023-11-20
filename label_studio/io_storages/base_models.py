@@ -152,7 +152,7 @@ class StorageInfo(models.Model):
             self.job_health_check()
 
         # in progress last ping time, job is not needed here
-        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 2:
+        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 5:
             self.status = self.Status.FAILED
             self.traceback = (
                 'It appears the job was failed because the last ping time is too old, '
