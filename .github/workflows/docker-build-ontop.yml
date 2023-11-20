@@ -59,7 +59,7 @@ jobs:
 
       - name: Calculate Docker tags
         id: calculate-docker-tags
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           TAGS: ${{ inputs.tags }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}

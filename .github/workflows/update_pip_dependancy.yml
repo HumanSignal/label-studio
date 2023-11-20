@@ -51,7 +51,7 @@ jobs:
           git push origin HEAD:refs/heads/${branch}
 
       - name: Create PR to 'develop'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: create-pr
         with:
           github-token: ${{ secrets.GIT_PAT }}
