@@ -54,7 +54,7 @@ def create_task_pairs(project, subject, sensortype_B):
                 B_beg_dt = sendata_B.begin_datetime
                 B_end_dt = sendata_B.end_datetime
                 # Check if there is an offset between sensor_A and sensor_B, with begin_datetime before begin of sendata_A
-                if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,offset_Date__lte=A_beg_dt).exists():
+                if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,offset_Date__lte=A_beg_dt,project=project).exists():
                     # Take the latest instance of offset before the begin_datetime of the sendata_A 
                     offset = SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,
                                                         offset_Date__lte=A_beg_dt, project=project).order_by('-offset_Date').first().offset
