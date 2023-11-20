@@ -24,7 +24,7 @@
         "lintFilePatterns": ["libs/datamanager/**/*.{ts,tsx,js,jsx}"]
       }
     },
-    "test": {
+    "unit": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
