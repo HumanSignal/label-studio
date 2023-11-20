@@ -26,7 +26,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Validate
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const {repo, owner} = context.repo;

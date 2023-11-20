@@ -20,7 +20,7 @@ jobs:
 
       - name: 'Validate command'
         id: determine_command
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           COMMANDS_LIST: ${{ env.commands_list }}
         with:

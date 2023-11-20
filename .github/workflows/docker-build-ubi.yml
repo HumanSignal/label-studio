@@ -72,7 +72,7 @@ jobs:
           fi
 
       - name: Check is latest tag needs to be updated
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: generate-tags
         with:
           github-token: ${{ secrets.GIT_PAT }}
