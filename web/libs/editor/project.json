@@ -39,7 +39,7 @@
         "buildTarget": "editor:build",
         "hmr": true,
         "watch": true,
-        "liveReload": true,
+        "liveReload": true
       },
       "configurations": {
         "development": {
@@ -59,6 +59,14 @@
           "ci": true,
           "codeCoverage": true
         }
+      }
+    },
+    "integration": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "libs/editor/cypress.config.ts",
+        "testingType": "e2e",
+        "baseUrl": "http://localhost:3000"
       }
     }
   }

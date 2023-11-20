@@ -1,0 +1,8 @@
+{
+  "name": "frontend-test",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend-test/src",
+  "projectType": "library",
+  "targets": {},
+  "tags": []
+}

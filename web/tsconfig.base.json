@@ -14,7 +14,9 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@humansignal/frontend-test/*": ["libs/frontend-test/src/*"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

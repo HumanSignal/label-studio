@@ -1,3 +1,0 @@
-{
-  "reporterEnabled": "cypress-parallel/json-stream.reporter.js, spec"
-}
