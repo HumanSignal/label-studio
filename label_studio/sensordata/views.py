@@ -308,16 +308,18 @@ def create_sync_task_pairs(project, sensordata_A, sensordata_B):
         A_end_dt = sendata_A.end_datetime #end_datetime sendata_A
         # Add manual offset for either sensor_A (offset is in ms (int))
         if not sendata_A.sensor.manual_offset is None:
-            A_beg_dt = A_beg_dt + timedelta(milliseconds=sendata_A.sensor.manual_offset)
-            A_end_dt = A_end_dt + timedelta(milliseconds=sendata_A.sensor.manual_offset)
+            sensor_A_manual_offset = sendata_A.sensor.manual_offset
+            A_beg_dt = A_beg_dt + timedelta(milliseconds=sensor_A_manual_offset)
+            A_end_dt = A_end_dt + timedelta(milliseconds=sensor_A_manual_offset)
         # Iterate over sensordata of type B that have been deployed with subject
         for sendata_B in sensordata_B:
             B_beg_dt = sendata_B.begin_datetime #begin_datetime sendata_B
             B_end_dt = sendata_B.end_datetime #end_datetime sendata_B
             # Add manual offset for sensor_B
             if not sendata_B.sensor.manual_offset is None:
-                B_beg_dt = B_beg_dt + timedelta(milliseconds=sendata_B.sensor.manual_offset)
-                B_end_dt = B_end_dt + timedelta(milliseconds=sendata_B.sensor.manual_offset)
+                sensor_B_manual_offset = sendata_B.sensor.manual_offset
+                B_beg_dt = B_beg_dt + timedelta(milliseconds=sensor_B_manual_offset)
+                B_end_dt = B_end_dt + timedelta(milliseconds=sensor_B_manual_offset)
             # Check if there is overlap
             begin_inside =  A_beg_dt <= B_beg_dt <= A_end_dt
             end_inside =   A_beg_dt <= B_end_dt <= B_end_dt
