@@ -102,6 +102,11 @@ class ProjectSerializer(FlexFieldsModelSerializer):
                 initial_data['expert_instruction'], tags=SAFE_HTML_TAGS, attributes=SAFE_HTML_ATTRIBUTES
             )
 
+        # support reserved phrase for UI dropdown <All model versions>
+        if 'model_version' in initial_data:
+            if initial_data['model_version'] == '$all-model-versions$':
+                data['model_version'] = None
+
         return data
 
     class Meta:
