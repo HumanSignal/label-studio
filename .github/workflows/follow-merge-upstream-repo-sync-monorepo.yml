@@ -1,4 +1,4 @@
-name: 'Follow Merge: Upstream repo sync'
+name: 'Follow Merge: Upstream repo sync monorepo'
 
 on:
   repository_dispatch:
@@ -6,7 +6,7 @@ on:
       - upstream_repo_update
 
 concurrency:
-  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}
+  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}-monorepo
 
 env:
   NODE: 18
@@ -55,9 +55,9 @@ jobs:
         id: get-branch
         env:
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
-          BRANCH_NAME: "${{ github.event.client_payload.branch_name }}"
+          BRANCH_NAME: "${{ github.event.client_payload.branch_name }}-monorepo"
           BASE_BRANCH_NAME: "${{ github.event.client_payload.base_branch_name }}"
-          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+          DEFAULT_BRANCH: "fb-leap-e-1"
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -132,6 +132,30 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 1
           ref: ${{ github.event.client_payload.commit_sha }}
+
+      - name: Commit src
+        if: steps.details.outputs.frontend_module_dist
+        shell: bash
+        run: |
+          set -xeuo pipefail
+
+          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then
+            src_path="web/libs/datamanager/src"
+          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
+            src_path="web/libs/editor/src"
+          else
+            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
+            exit 1
+          fi
+
+          rm -rf "${src_path}"
+          mkdir -p "${src_path}"
+          cp -r tmp/src "${src_path}"
+
+          git add "web/libs"
+          git status -s
+          git commit --allow-empty -m '[submodules] Copy src ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
 
       - name: "Frontend: Setup nodejs"
         uses: actions/setup-node@v4
@@ -294,7 +318,7 @@ jobs:
         id: get-pr
         uses: actions/github-script@v7
         env:
-          TITLE: "${{ github.event.client_payload.title }}"
+          TITLE: "${{ github.event.client_payload.title }} monorepo"
           HTML_URL: "${{ github.event.client_payload.html_url }}"
           ACTOR: "${{ github.event.client_payload.actor }}"
           BRANCH_NAME: "${{ steps.get-branch.outputs.name }}"

@@ -152,7 +152,7 @@ class StorageInfo(models.Model):
             self.job_health_check()
 
         # in progress last ping time, job is not needed here
-        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 2:
+        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 5:
             self.status = self.Status.FAILED
             self.traceback = (
                 'It appears the job was failed because the last ping time is too old, '
@@ -445,6 +445,7 @@ class ImportStorage(Storage):
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,
                     on_failure=storage_background_failure,
+                    job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 )
                 self.info_set_job(sync_job.id)
                 logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
