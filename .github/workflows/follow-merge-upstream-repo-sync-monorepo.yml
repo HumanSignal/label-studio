@@ -140,9 +140,9 @@ jobs:
           set -xeuo pipefail
 
           if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then
-            src_path="web/libs/datamanager/src"
+            src_path="web/libs/datamanager"
           elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
-            src_path="web/libs/editor/src"
+            src_path="web/libs/editor"
           else
             echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
             exit 1
