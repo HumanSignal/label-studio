@@ -31,7 +31,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Check user's membership
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: check-membership
         with:
           github-token: ${{ secrets.GIT_PAT }}
@@ -48,7 +48,7 @@ jobs:
 
       - name: Notify user on failure
         if: steps.check-membership.outputs.result == 'false'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -65,7 +65,7 @@ jobs:
             });
 
       - name: Sync PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         if: steps.check-membership.outputs.result == 'true'
         id: sync-pr
         env:

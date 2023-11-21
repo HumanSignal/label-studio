@@ -760,6 +760,13 @@ def tick_clock(_, seconds: int = 1) -> None:
     freezer.start()
 
 
+def freeze_datetime(response, utc_time: str) -> None:
+    global freezer
+    freezer.stop()
+    freezer = freeze_time(utc_time)
+    freezer.start()
+
+
 def pytest_collection_modifyitems(config, items):
     # This function is called by pytest after the collection of tests has been completed to modify their order
     # it is being used as a workaround for the fact the kms and aes mocks resist teardown and cause other test failures

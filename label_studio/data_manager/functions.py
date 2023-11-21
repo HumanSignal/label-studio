@@ -2,6 +2,7 @@
 """
 import logging
 from collections import OrderedDict
+from typing import Tuple
 from urllib.parse import unquote
 
 import ujson as json
@@ -337,11 +338,37 @@ def preprocess_filter(_filter, *_):
     return _filter
 
 
-def preprocess_field_name(raw_field_name, only_undefined_field=False):
-    field_name = raw_field_name.replace('filter:', '')
-    field_name = field_name.replace('tasks:', '')
-    ascending = False if field_name[0] == '-' else True  # detect direction
-    field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+def preprocess_field_name(raw_field_name, only_undefined_field=False) -> Tuple[str, bool]:
+    """Transform a field name (as specified in the datamanager views endpoint) to
+    a django ORM field name. Also handle dotted accesses to task.data.
+
+    Edit with care; it's critical that this function not be changed in ways that
+    introduce vulnerabilities in the vein of the ORM Leak (see #5012). In particular
+    it is not advisable to use `replace` or other calls that replace all instances
+    of a string within this function.
+
+    Returns: Django ORM field name: str, Sort is ascending: bool
+    """
+
+    field_name = raw_field_name
+    ascending = True
+
+    # Descending marker `-` may come at the beginning of the string
+    if field_name.startswith('-'):
+        ascending = False
+        field_name = field_name[1:]
+
+    # For security reasons, these must only be removed when they fall at the beginning of the string (or after `-`).
+    optional_prefixes = ['filter:', 'tasks:']
+    for prefix in optional_prefixes:
+        if field_name.startswith(prefix):
+            field_name = field_name[len(prefix) :]
+
+    # Descending marker may also come after other prefixes. Double negative is not allowed.
+    if ascending and field_name.startswith('-'):
+        ascending = False
+        field_name = field_name[1:]
+
     if field_name.startswith('data.'):
         if only_undefined_field:
             field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
