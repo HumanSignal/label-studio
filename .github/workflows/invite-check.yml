@@ -15,9 +15,7 @@ jobs:
       - name: Check if the invite link is valid
         id: invite_link_is_active
         run: |
-          ! grep -Eo '(&quot;|")isSharedInviteError(&quot;|")\s*:\s*true' <(
-              curl --silent --location ${{ env.INVITE_LINK }} -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:96.0) Gecko/20100101 Firefox/96.0' -H "Accept: application/json"
-          )
+          ! grep --only-matching --extended-regexp '(&quot;|")isSharedInviteError(&quot;|")\s*:\s*true' <(curl --silent --location --user-agent Chrome/65536.0.0.0 ${{ env.INVITE_LINK }})
       - name: Notify to Slack
         if: always() && steps.invite_link_is_active.outcome == 'failure'
         uses: slackapi/slack-github-action@v1.24

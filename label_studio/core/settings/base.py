@@ -15,7 +15,7 @@ import os
 import re
 from datetime import timedelta
 
-from label_studio.core.utils.params import get_bool_env
+from label_studio.core.utils.params import get_bool_env, get_env_list
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -528,7 +528,8 @@ TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
-USER_PERM = 'core.api_permissions.HasOwnerPermission'
+ORGANIZATION_MEMBER_MIXIN = 'organizations.mixins.OrganizationMemberMixin'
+MEMBER_PERM = 'core.api_permissions.MemberHasOwnerPermission'
 RECALCULATE_ALL_STATS = None
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
@@ -666,3 +667,10 @@ if CSRF_TRUSTED_ORIGINS:
 
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
+PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
+
+# By default, we disallow filters with foreign keys in data manager for security reasons.
+# Add to this list (either here in code, or via the env) to allow specific filters that rely on foreign keys.
+DATA_MANAGER_FILTER_ALLOWLIST = list(
+    set(get_env_list('DATA_MANAGER_FILTER_ALLOWLIST') + ['updated_by__active_organization'])
+)

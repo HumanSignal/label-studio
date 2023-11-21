@@ -127,7 +127,7 @@ def _fill_annotations_project(project_id):
 def fill_annotations_project():
     logger.info('Start filling project field for Annotation model')
 
-    projects = Project.objects.all()
+    projects = Project.objects.all().only('id')
     for project in projects:
         start_job_async_or_sync(_fill_annotations_project, project.id)
 
@@ -135,7 +135,7 @@ def fill_annotations_project():
 
 
 def _fill_predictions_project(migration_name='0043_auto_20230825'):
-    projects = Project.objects.all()
+    projects = Project.objects.all().only('id')
     for project in projects:
         migration = AsyncMigrationStatus.objects.create(
             project=project,

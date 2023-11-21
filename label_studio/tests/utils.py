@@ -118,7 +118,9 @@ def gcs_client_mock():
             self.name = bucket_name
             self.is_json = is_json
 
-        def list_blobs(self, prefix):
+        def list_blobs(self, prefix, **kwargs):
+            if 'fake' in prefix:
+                return []
             return [File('abc'), File('def'), File('ghi')]
 
         def blob(self, key):

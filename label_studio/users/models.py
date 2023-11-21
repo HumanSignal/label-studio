@@ -199,17 +199,11 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         Token.objects.filter(user=self).delete()
         return Token.objects.create(user=self)
 
-    def soft_delete(self) -> None:
-        self.is_deleted = True
-        Token.objects.filter(user=self).delete()
-        self.save(update_fields=['is_deleted'])
-
-    def get_initials(self):
+    def get_initials(self, is_deleted=False):
         initials = '?'
 
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self):
-            if self.is_deleted:
-                return 'DU'
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self) and is_deleted:
+            return 'DU'
 
         if not self.first_name and not self.last_name:
             initials = self.email[0:2]
