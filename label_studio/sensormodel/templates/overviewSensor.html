@@ -71,6 +71,7 @@
                 <th>Sensor name</th>
                 <th>Parsable Sensor ID</th>
                 <th>Sensor type</th>
+                <th>Manual offset in ms</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -79,6 +80,7 @@
                 <td>{{ sensor.name }}</td>
                 <td>{{ sensor.parsable_sensor_id }}</td> 
                 <td>{{ sensor.sensortype }}</td>
+                <td>{{ sensor.manual_offset }}</td>
                 <td><a href="{% url 'sensormodel:adjust_sensor' project.id sensor.id %}"> [Edit] </a></td>
                 <td><a href="{% url 'sensormodel:delete_sensor' project.id sensor.id %}">[Delete]</a></td>
             </tr> 

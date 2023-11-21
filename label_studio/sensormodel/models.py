@@ -37,6 +37,7 @@ class Sensor(models.Model):
     sensor_hash = models.CharField(max_length=10,blank=True)
     sensortype = models.ForeignKey(SensorType,on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    manual_offset = models.IntegerField(default=0, blank=True, null=True)
 
     def __str__(self):
         return 'Sensor: ' + str(self.name)
@@ -44,8 +45,8 @@ class Sensor(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=50)
-    color = models.CharField(max_length=50)
-    size = models.CharField(max_length=50)
+    color = models.CharField(max_length=50, blank=True, null=True)
+    size = models.CharField(max_length=50, blank=True, null=True)
     extra_info = models.TextField(max_length=100, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     

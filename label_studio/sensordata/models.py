@@ -1,6 +1,6 @@
 from django.db import models
 from projects.models import Project
-from sensormodel.models import Sensor
+from sensormodel.models import Sensor, Subject
 from data_import.models import FileUpload
 
 class SensorData(models.Model):
@@ -22,3 +22,13 @@ class SensorOffset(models.Model):
     offset = models.IntegerField(blank=True, null=True)
     offset_Date = models.DateTimeField(blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+
+class SyncSensorOverlap(models.Model):
+    sensordata_A = models.ForeignKey(SensorData, on_delete=models.CASCADE, null=True,related_name='sync_sensor_A')
+    sensordata_B = models.ForeignKey(SensorData, on_delete=models.CASCADE, null=True,related_name='sync_sensor_B')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, related_name='sync_project')
+
+    start_A = models.FloatField(blank=True,null=True)
+    end_A = models.FloatField(blank=True,null=True)
+    start_B = models.FloatField(blank=True,null=True)
+    end_B = models.FloatField(blank=True,null=True)

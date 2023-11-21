@@ -2,14 +2,14 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.apps import apps
 from .forms import SensorDataForm, SensorOffsetForm, OffsetAnnotationForm
-from .models import SensorData, SensorOffset
+from .models import SensorData, SensorOffset, SyncSensorOverlap
 from .parsing.sensor_data import SensorDataParser
 from .parsing.video_metadata import VideoMetaData
 from .parsing.controllers.project_controller import ProjectController
 from pathlib import Path
 from .utils.annotation_template import create_offset_annotation_template
 from tasks.models import Task, Annotation
-from sensormodel.models import Subject
+from django.http import HttpResponse
 
 import json
 from datetime import timedelta
@@ -23,6 +23,7 @@ import pandas as pd
 import zipfile
 import re
 import os
+import subprocess
 
 from projects.models import Project
 from tasks.models import Task
@@ -203,8 +204,13 @@ def parse_IMU(request, file_path, sensor, name, project):
         # end_datetime = begin_datetime + end_time
 
     # Create SensorData object with parsed data
-    sensordata = SensorData.objects.create(name=name, sensor=sensor,\
-        begin_datetime=begin_datetime, end_datetime=end_datetime, project=project,file_upload=file_upload)
+    sensordata = SensorData.objects.create(name=name, 
+                                           sensor=sensor,
+                                           begin_datetime=begin_datetime,
+                                           end_datetime=end_datetime, 
+                                           project=project,
+                                           file_upload=file_upload)
+
 
 def parse_camera(request, file_path, sensor, name, project):
     subjectannotation_project = Project.objects.get(id=(project.id+1))
@@ -231,9 +237,14 @@ def parse_camera(request, file_path, sensor, name, project):
     end_datetime =  begin_datetime + delta
 
     # Create SensorData object with parsed data
-    sensordata = SensorData.objects.create(name=name, sensor=sensor,\
-        begin_datetime=begin_datetime, end_datetime=end_datetime, project=project, file_upload=file_upload_dataimport, file_upload_project2 = file_upload_subjectannotation)
-    
+    sensordata = SensorData.objects.create(name=name, 
+                                           sensor=sensor,
+                                           begin_datetime=begin_datetime, 
+                                           end_datetime=end_datetime, 
+                                           project=project, 
+                                           file_upload=file_upload_dataimport, 
+                                           file_upload_project2 = file_upload_subjectannotation)
+
 def upload_sensor_data(request, name, file_path, project):
     user = request.user
     token = Token.objects.get(user=user)
@@ -290,87 +301,203 @@ def deletesensordata(request, project_id, id):
     except (Project.DoesNotExist, SensorData.DoesNotExist):
         raise ValueError("Project or SensorData does not exist.")
 
-    
+def create_sync_task_pairs(project, sensordata_A, sensordata_B):
+    # Iterate over unique sendata_A sensordata objects, this reduces computations
+    for sendata_A in sensordata_A:
+        A_beg_dt = sendata_A.begin_datetime #begin_datetime sendata_A
+        A_end_dt = sendata_A.end_datetime #end_datetime sendata_A
+        # Add manual offset for either sensor_A (offset is in ms (int))
+        A_beg_dt = A_beg_dt + timedelta(milliseconds=sendata_A.sensor.manual_offset)
+        A_end_dt = A_end_dt + timedelta(milliseconds=sendata_A.sensor.manual_offset)
+        # Iterate over sensordata of type B that have been deployed with subject
+        for sendata_B in sensordata_B:
+            B_beg_dt = sendata_B.begin_datetime #begin_datetime sendata_B
+            B_end_dt = sendata_B.end_datetime #end_datetime sendata_B
+            # Add manual offset for sensor_B
+            B_beg_dt = B_beg_dt + timedelta(milliseconds=sendata_B.sensor.manual_offset)
+            B_end_dt = B_end_dt + timedelta(milliseconds=sendata_B.sensor.manual_offset)
+            # Check if there is overlap
+            begin_inside =  A_beg_dt <= B_beg_dt <= A_end_dt
+            end_inside =   A_beg_dt <= B_end_dt <= B_end_dt
+            begin_before_and_end_after_start =  (B_beg_dt <= A_beg_dt) and (B_end_dt >= A_beg_dt)
+            if begin_inside or end_inside or begin_before_and_end_after_start:
+                # Find the start and end datetime of overlap
+                if A_beg_dt >= B_beg_dt:
+                    begin_overlap_dt = A_beg_dt
+                else:
+                    begin_overlap_dt = B_beg_dt
+                if A_end_dt <= B_end_dt:
+                    end_overlap_dt = A_end_dt
+                else:
+                    end_overlap_dt = B_end_dt   
+                # Create overlap object, this is used to create tasks
+                if not SyncSensorOverlap.objects.filter(sensordata_A=sendata_A,
+                                            sensordata_B=sendata_B,
+                                            project=project,
+                                            start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
+                                            end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
+                                            start_B = (begin_overlap_dt-B_beg_dt).total_seconds(),
+                                            end_B = (end_overlap_dt-B_beg_dt).total_seconds()
+                                            ).exists():
+                    SyncSensorOverlap.objects.create(sensordata_A=sendata_A,
+                                                sensordata_B=sendata_B,
+                                                project=project,
+                                                start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
+                                                end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
+                                                start_B = (begin_overlap_dt-B_beg_dt).total_seconds(),
+                                                end_B = (end_overlap_dt-B_beg_dt).total_seconds()
+                                                )   
 
-def generate_offset_anno_tasks(request, project_id):
-    project = Project.objects.get(id=project_id)
-    offset_annotation_project = Project.objects.get(id=project.id+3)
-    if request.method == 'POST':
-        offsetannotationform = OffsetAnnotationForm(request.POST)
-        if offsetannotationform.is_valid():
-            sync_sensordata = offsetannotationform.cleaned_data.get('sync_sensordata')
-            try:
-                # Get ground truth sensor type from the subject annotation project
-                sensortype_A = SensorData.objects.filter(project__id=project.id+1).first().sensor.sensortype
-            except: 
-                print('No sensortypes found in subject annotation project')
-            sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
-            for sendata_A in sync_sensordata.filter(sensor__sensortype__sensortype=sensortype_A.sensortype):
-                for sendata_B in sync_sensordata.filter(sensor__sensortype__sensortype=sensortype_B.sensortype):
-                    sendata_B_df = pd.read_csv(sendata_B.file_upload.file.path,skipfooter=1, engine='python')
-                    timestamp_column_name = sendata_B_df.columns[sensortype_B.timestamp_column]
-                    task_json_template = {
-                        "csv": f"{sendata_B.file_upload.file.url}?time={timestamp_column_name}&values={'a3d'}",
-                        "video": f"<video src='{sendata_A.file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),20); console.log('video is loaded, starting to sync with time series')}}, 3000); \" />",
-                        "sensor_a": f"{sendata_A.sensor}",
-                        "sensor_b": f"{sendata_B.sensor}",
-                        "offset_date": f"{min(sendata_A.begin_datetime,sendata_B.begin_datetime)}"
-                    }
-                    with NamedTemporaryFile(prefix=f'{sendata_A.sensor.id}_{sendata_B.sensor.id}', suffix='.json',mode='w',delete=False) as task_json_file:
-                        json.dump(task_json_template,task_json_file,indent=4)
-                    upload_sensor_data(request, name=f'{sendata_A.sensor}_{sendata_B.sensor}', file_path=task_json_file.name, project=offset_annotation_project)
-            # Update labeling setup to support offset annotation
-            # Create a XML markup for annotating. Value column is always 'a3d'
-            template = create_offset_annotation_template(timestamp_column_name=timestamp_column_name,value_column_name='a3d')
+def create_sync_data_chunks(request, project,value_column_name):
+    # Get all overlap for given subject and video
+    sensor_overlap = SyncSensorOverlap.objects.filter(project=project)
+    # Iterate over all overlap
+    for overlap in sensor_overlap:
+        sensortype_A = overlap.sensordata_A.sensor.sensortype
+        sensortype_B = overlap.sensordata_B.sensor.sensortype
+        # Check sensortype combination
+        if sensortype_A.sensortype == 'C' and sensortype_B.sensortype == 'I':
+            # Load data from SensorType and the csv file
+            imu_file_path = overlap.sensordata_B.file_upload.file.path
+            timestamp_column = overlap.sensordata_B.sensor.sensortype.timestamp_column
+            imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
+            # Get column names for showing in LS
+            timestamp_column_name = imu_df.columns[timestamp_column]
+            # Update labeling set up in activity annotion project
+            # Create a XML markup for annotating
+            template = create_offset_annotation_template(timestamp_column_name=timestamp_column_name,
+                                                         value_column_name=value_column_name)
             # Get url for displaying project detail
             project_detail_url = request.build_absolute_uri(reverse('projects:api:project-detail', args=[project.id+3]))
             # Update labeling set up
             token = Token.objects.get(user=request.user)
             requests.patch(project_detail_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template})
-            return redirect(reverse('data_manager:project-data', kwargs={'pk':project.id+3}))
+            # Create temporary files where the new chunks can be saved as
+            with NamedTemporaryFile(prefix="SYNC_CHUNK", suffix=".mp4", delete=False, mode='w') as temp_video,\
+                NamedTemporaryFile(prefix="SYNC_CHUNK", suffix=".csv", delete=False, mode='w') as temp_imu:
+                video_file_path = overlap.sensordata_A.file_upload.file.path
+                ### Cut out video using ffmpeg ###
+                ffmpeg_command = [
+                "ffmpeg",
+                "-y",
+                "-i", video_file_path,
+                "-ss", str(overlap.start_A),
+                "-to", str(overlap.end_A),
+                "-c:v", "copy",
+                "-c:a", "copy",
+                "-loglevel","quiet",
+                temp_video.name,
+                ]
+                subprocess.run(ffmpeg_command, shell=True)
+                ### Cut out csv file using pandas ### 
+                # Find the indeces of the timestamp instances closest to begin and end of segment
+                start_index = imu_df[imu_df.iloc[:, timestamp_column]>= overlap.start_B].index[0] # First timestamp after begin_segment
+                end_index = imu_df[imu_df.iloc[:, timestamp_column] > overlap.end_B].index[1] # First timestamp after end_segment
+                # Only keep the rows in between the obtained indeces
+                imu_df = imu_df.iloc[start_index:end_index]
+                # Add offset to every timestamp so that everthing shifts s.t. start time is 0
+                imu_df.iloc[:, timestamp_column] = imu_df.iloc[:, timestamp_column] - imu_df.iloc[0, timestamp_column]
+                # Save new csv to this file
+                imu_df.to_csv(temp_imu, index=False)
+                # Upload sync chunks to data_import project
+                upload_sensor_data(request=request, name=f'imu_sync', file_path=temp_imu.name ,project=project)
+                fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
+                imu_file_upload = fileupload_model.objects.latest('id')
+                upload_sensor_data(request=request, name=f'video_sync', file_path=temp_video.name ,project=project)               
+                fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
+                video_file_upload = fileupload_model.objects.latest('id')
+                # Create JSON that allows for synchronization between video and timeseries
+                refresh_every = 10
+                wait_before_sync = 3000
+                offset_annotation_project = Project.objects.get(id=project.id+3)
+                task_json_template = {
+                    "csv": f"{overlap.sensordata_B.file_upload.file.url}?time={timestamp_column_name}&values={value_column_name.lower()}",
+                    "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
+                    "sensor_a": f"{overlap.sensordata_A.sensor}",
+                    "sensor_b": f"{overlap.sensordata_B.sensor}",
+                    "offset_date": f"{min(overlap.sensordata_A.begin_datetime,overlap.sensordata_A.begin_datetime)}"
+                }
+                with NamedTemporaryFile(prefix=f'{overlap.sensordata_A.sensor.id}_{overlap.sensordata_B.sensor.id}', suffix='.json',mode='w',delete=False) as task_json_file:
+                    json.dump(task_json_template,task_json_file,indent=4)
+
+                upload_sensor_data(request, name=f'sync', file_path=task_json_file.name, project=offset_annotation_project)
+            os.remove(temp_imu.name)
+            os.remove(temp_video.name)                
+            os.remove(task_json_file.name)
         else:
-            sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
-            offsetannotationform = OffsetAnnotationForm(project=project)
-            return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project, 'offset_project':offset_annotation_project}) 
-    else:
-        sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
-        offsetannotationform = OffsetAnnotationForm(project=project)
-        return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project, 'offset_project': offset_annotation_project}) 
+            return HttpResponse('Sensor combination not yet supported ', content_type='text/plain')
+
+
+def generate_offset_anno_tasks(request, project_id):
+    # Get correct LS projects
+    project = Project.objects.get(id=project_id)
+    offset_annotation_project = Project.objects.get(id=project.id+3)
+    if request.method == 'POST':
+        offsetannotationform = OffsetAnnotationForm(request.POST)
+        if offsetannotationform.is_valid():
+            # Get the SensorData chosen for synchronization
+            sync_sensordata = offsetannotationform.cleaned_data.get('sync_sensordata')
+            try:
+                # Get ground truth sensor type from the subject annotation project
+                sensortype_A = SensorData.objects.filter(project=project ,file_upload_project2__isnull=False).first().sensor.sensortype
+            except: 
+                print('No sensortypes found in subject annotation project')
+            sensortype_B = Sensor.objects.filter(project=project).exclude(sensortype=sensortype_A).first().sensortype
+            sensordata_A = sync_sensordata.filter(sensor__sensortype__sensortype=sensortype_A.sensortype)
+            sensordata_B = sync_sensordata.filter(sensor__sensortype__sensortype=sensortype_B.sensortype)
+            create_sync_task_pairs(project=project, sensordata_A=sensordata_A, sensordata_B=sensordata_B)
+            create_sync_data_chunks(request=request,project=project,value_column_name='A3D')
+            return redirect(reverse('data_manager:project-data', kwargs={'pk':project.id+3}))
+    sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
+    offsetannotationform = OffsetAnnotationForm(project=project)
+    return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project, 'offset_project': offset_annotation_project}) 
     
 
 def parse_offset_annotations(request,project_id):
+    # Get LS projects and tasks (Tasks hold annotations)
     project = Project.objects.get(id=project_id)
     offset_annotation_project = Project.objects.get(id=project.id+3)
     tasks = Task.objects.filter(project= offset_annotation_project)
-    for task in tasks:
-        sensor_A = Sensor.objects.get(sensor_id = task.data['sensor_a'].replace('Sensor: ', ''))
-        sensor_B = Sensor.objects.get(sensor_id = task.data['sensor_b'].replace('Sensor: ', ''))
+    for i, task in enumerate(tasks):
+        # Get sensors, the sensor names are stored in the task data
+        sensor_A = Sensor.objects.get(name = task.data['sensor_a'].replace('Sensor: ', ''))
+        sensor_B = Sensor.objects.get(name = task.data['sensor_b'].replace('Sensor: ', ''))
         annotations = Annotation.objects.filter(task__in= tasks)
+        # Check if negative offset label. All offset labels for one task should have either negative or positive offset
         if annotations.first().result[0]['value']['timeserieslabels'][0] == 'Negative offset':
-            offsets = [annotation_result['value']['end']-annotation_result['value']['start']  for annotation_result in annotations.first().result]
+            # Determine offset obtained by each offset annotation
+            offsets = [annotation['value']['end']-annotation['value']['start']  for annotation in annotations[i].result]
             try:
+                # Determine average offset
                 avg_offset = statistics.mean(offsets) # avg offset as a float in seconds
             except statistics.StatisticsError as e:
                 print(f'{e}, There are no offset annotations for {sensor_A} and {sensor_B}')
+                avg_offset = 0
             offset_date = task.data['offset_date']
+            # Add negative offset
             if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset = -1*int(avg_offset*1000), offset_Date = offset_date):
                 SensorOffset.objects.create(sensor_A = sensor_A,
                                                sensor_B = sensor_B,
                                                offset = -1*int(avg_offset*1000), # convert to milliseconds integer
                                                offset_Date = offset_date)
+        # Check if positive offset label. All offset labels for one task should have either negative or positive offset
         elif annotations.first().result[0]['value']['timeserieslabels'][0] == 'Positive offset':
-            
-            offsets = [annotation_result['value']['end']-annotation_result['value']['start']  for annotation_result in annotations.first().result]
+            # Determine offset obtained by each offset annotation
+            offsets = [annotation['value']['end']-annotation['value']['start']  for annotation in annotations[i].result]
             try:
+                # Determine average offset
                 avg_offset = statistics.mean(offsets) # avg offset as a float in seconds
             except statistics.StatisticsError as e:
                 print(f'{e}, There are no offset annotations for {sensor_A} and {sensor_B}')
+                avg_offset = 0
             offset_date = task.data['offset_date'] 
-            if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset = int(avg_offset*1000), offset_Date = offset_date).exists():
+            # Add positive offset
+            if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date).exists():
                 SensorOffset.objects.create(sensor_A = sensor_A,
                                                sensor_B = sensor_B,
                                                offset = int(avg_offset*1000), # convert to milliseconds integer
-                                               offset_Date = offset_date)
+                                               offset_Date = offset_date,
+                                               project=project)
         else:
             print('The labels in the offset labeling have been changed. This will cause malfunctioning')
     sensoroffset = SensorOffset.objects.all().order_by('offset_Date')

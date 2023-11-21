@@ -53,7 +53,8 @@ def create_task_pairs(request, project, subject, sensortype_B):
                 sensor_A = sendata_A.sensor
                 sensor_B = sendata_B.sensor
                 # Check if there is an offset between sensor_A and sensor_B
-                if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B):
+
+                if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B, offset_Date__lte=vid_beg_dt):
                     # Take the latest instance of offset before the begin_datetime of the sendata_A 
                     offset = SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,
                                                         offset_Date__lte=vid_beg_dt).order_by('-offset_Date').first().offset
@@ -124,7 +125,6 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
             imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
             # Get column names for showing in LS
             timestamp_column_name = imu_df.columns[timestamp_column]
-            print(imu_df.columns)
             value_column_name = imu_df.columns[int(value_column)]
             # Update labeling set up in activity annotion project
             # Create a XML markup for annotating
