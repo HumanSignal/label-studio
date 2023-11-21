@@ -5,16 +5,16 @@ import { default as Label } from '../Label/Label';
 import './Select.styl';
 
 const Select = ({
-  label = undefined,
-  className = undefined,
-  options = [],
-  validate = undefined,
-  required = undefined,
-  skip = undefined,
-  labelProps = undefined,
-  ghost = undefined,
+  label,
+  className,
+  options,
+  validate,
+  required,
+  skip,
+  labelProps,
+  ghost,
   size = 'medium',
-  defaultValue = undefined,
+  defaultValue,
   ...props
 }) => {
   const rootClass = cn('form-select');

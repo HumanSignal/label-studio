@@ -202,8 +202,6 @@ export class DataManager {
 
     this.type = config.type ?? "dm";
 
-    if(!config.root) return;
-
     this.initApp();
   }
 
