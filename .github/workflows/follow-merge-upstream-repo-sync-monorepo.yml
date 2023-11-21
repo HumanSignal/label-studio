@@ -148,7 +148,7 @@ jobs:
             exit 1
           fi
 
-          rm -rf "${src_path}"
+          rm -rf "${src_path}/src"
           mkdir -p "${src_path}"
           cp -r tmp/src "${src_path}"
 
