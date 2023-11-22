@@ -164,8 +164,9 @@ export const AppStore = types
       self.mode = mode;
     },
 
-    addActions(...actions) {
-      self.availableActions.push(...actions);
+    setActions(actions) {
+      if (!Array.isArray(actions)) throw new Error("Actions must be an array");
+      self.availableActions = actions;
     },
 
     removeAction(id) {
@@ -432,6 +433,7 @@ export const AppStore = types
                 "task_number",
                 "annotation_count",
                 "num_tasks_with_annotations",
+                "queue_total",
               ].join(","),
             }) : null),
           }
@@ -453,7 +455,7 @@ export const AppStore = types
         } else if (JSON.stringify(newProject ?? {}) !== JSON.stringify(self.project ?? {})) {
           self.project = newProject;
         }
-        if ( isFF(FF_LOPS_E_3) ) {
+        if (isFF(FF_LOPS_E_3)) {
           const itemType = self.SDK.type === 'DE' ? 'dataset' : 'project';
 
           self.SDK.invoke(`${itemType}Updated`, self.project);
@@ -469,7 +471,11 @@ export const AppStore = types
     fetchActions: flow(function* () {
       const serverActions = yield self.apiCall("actions");
 
-      self.addActions(...(serverActions ?? []));
+      const actions = (serverActions ?? []).map((action) => {
+        return [action, undefined];
+      });
+
+      self.SDK.updateActions(actions);
     }),
 
     fetchUsers: flow(function* () {
@@ -491,8 +497,8 @@ export const AppStore = types
       ];
 
       if (!isLabelStream || (self.project?.show_annotation_history && task)) {
-        if(self.SDK.type === 'dm') {
-          requests.push(self.fetchActions()); 
+        if (self.SDK.type === 'dm') {
+          requests.push(self.fetchActions());
         }
 
         if (self.SDK.settings?.onlyVirtualTabs && self.project?.show_annotation_history && !task) {
@@ -550,10 +556,14 @@ export const AppStore = types
         }
 
         if (result.response) {
-          self.serverError.set(methodName, {
-            error: "Something went wrong",
-            response: result.response,
-          });
+          try {
+            self.serverError.set(methodName, {
+              error: "Something went wrong",
+              response: result.response,
+            });
+          } catch {
+            // ignore
+          }
         }
 
         console.warn({
@@ -568,7 +578,11 @@ export const AppStore = types
         //   description: result?.response?.detail ?? result.error,
         // });
       } else {
-        self.serverError.delete(methodName);
+        try {
+          self.serverError.delete(methodName);
+        } catch {
+          // ignore
+        }
       }
 
       return result;

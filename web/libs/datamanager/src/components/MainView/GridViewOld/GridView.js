@@ -9,6 +9,8 @@ import { Space } from "../../Common/Space/Space";
 import { getProperty, prepareColumns } from "../../Common/Table/utils";
 import * as DataGroups from "../../DataGroups";
 import "./GridView.styl";
+import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
+import { SkeletonLoader } from "../../Common/SkeletonLoader";
 
 const GridHeader = observer(({ row, selected }) => {
   return (
@@ -43,10 +45,12 @@ const GridBody = observer(({ row, fields }) => {
 const GridDataGroup = observer(({ type, value, field, row }) => {
   const DataTypeComponent = DataGroups[type];
 
-  return DataTypeComponent ? (
-    <DataTypeComponent value={value} field={field} original={row} />
-  ) : (
-    <DataGroups.TextDataGroup value={value} field={field} original={row} />
+  return (isFF(FF_LOPS_E_3) && row.loading === field.alias) ? <SkeletonLoader /> : (
+    DataTypeComponent ? (
+      <DataTypeComponent value={value} field={field} original={row} />
+    ) : (
+      <DataGroups.TextDataGroup value={value} field={field} original={row} />
+    )
   );
 });
 
@@ -166,6 +170,8 @@ export const GridView = observer(
               itemCount={itemCount}
               isItemLoaded={isItemLoaded}
               loadMoreItems={loadMore}
+              threshold={Math.floor(view.dataStore.pageSize / 2)}
+              minimumBatchSize={view.dataStore.pageSize}
             >
               {({ onItemsRendered, ref }) => (
                 <Elem
@@ -175,7 +181,7 @@ export const GridView = observer(
                   height={height}
                   name="list"
                   rowHeight={rowHeight + 42}
-                  overscanRowCount={30}
+                  overscanRowCount={view.dataStore.pageSize}
                   columnCount={columnCount}
                   columnWidth={width / columnCount - 9.5}
                   rowCount={itemCount}

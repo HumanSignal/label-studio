@@ -82,7 +82,7 @@ const MixinBase = types
       if (withHightlight) self.highlighted = undefined;
     },
 
-    setList({ list, total, reload, associatedList = null }) {
+    setList({ list, total, reload, associatedList = [] }) {
       const newEntity = list.map((t) => ({
         ...t,
         source: JSON.stringify(t),
@@ -142,7 +142,7 @@ export const DataStore = (
       list: types.optional(types.array(listItemType), []),
       selectedId: types.optional(types.maybeNull(types.number), null),
       highlightedId: types.optional(types.maybeNull(types.number), null),
-      ...(associatedItemType ? { associatedList: types.optional(types.array(associatedItemType), []) } : {}),
+      ...(associatedItemType ? { associatedList: types.optional(types.maybeNull(types.array(associatedItemType)), []) } : {}),
     })
     .views((self) => ({
       get selected() {

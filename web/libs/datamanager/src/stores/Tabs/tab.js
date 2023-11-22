@@ -14,8 +14,10 @@ import { TabFilter } from "./tab_filter";
 import { TabHiddenColumns } from "./tab_hidden_columns";
 import { TabSelectedItems } from "./tab_selected_items";
 import { History } from '../../utils/history';
-import { FF_LOPS_12, isFF } from "../../utils/feature-flags";
-import { StringOrNumberID } from "../types";
+import { FF_DEV_1470, FF_LOPS_12, isFF } from "../../utils/feature-flags";
+import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
+
+const DEFAULT_THRESHOLD = { min: 0, max: 10 };
 
 export const Tab = types
   .model("View", {
@@ -50,7 +52,8 @@ export const Tab = types
     locked: false,
     editable: true,
     deletable: true,
-    search_text: types.optional(types.maybeNull(types.string), null),
+    semantic_search: types.optional(types.array(CustomJSON), []),
+    threshold: types.optional(ThresholdType, DEFAULT_THRESHOLD),
   })
   .volatile(() => {
     const defaultWidth = getComputedStyle(document.body).getPropertyValue("--menu-sidebar-width").replace("px", "").trim();
@@ -214,7 +217,8 @@ export const Tab = types
         columnsWidth: self.columnsWidth.toPOJO(),
         columnsDisplayType: self.columnsDisplayType.toPOJO(),
         gridWidth: self.gridWidth,
-        search_text: self.search_text,
+        semantic_search: self.semantic_search?.toJSON() ?? [],
+        threshold: self.threshold?.toJSON() ?? DEFAULT_THRESHOLD,
       };
 
       if (self.saved || apiVersion === 1) {
@@ -228,6 +232,7 @@ export const Tab = types
         Object.assign(tab, data);
       }
 
+      self.root.SDK.invoke("tabTypeChanged", { tab: tab.id, type: self.type });
       return tab;
     },
   }))
@@ -245,7 +250,8 @@ export const Tab = types
 
     setType(type) {
       self.type = type;
-      self.save();
+      self.root.SDK.invoke("tabTypeChanged", { tab: self.id, type });
+      self.save({ reload: isFF(FF_DEV_1470) });
     },
 
     setTarget(target) {
@@ -299,9 +305,14 @@ export const Tab = types
       self.selected = ids;
     },
 
-    setSearchText(searchText) {
-      self.search_text = searchText;
-      self.save();
+    setSemanticSearch(semanticSearchList) {
+      self.semantic_search = semanticSearchList ?? [];
+      return self.save();
+    },
+    
+    setSemanticSearchThreshold(min, max) {
+      self.threshold = { min, max };
+      return self.save();
     },
 
     selectAll() {
