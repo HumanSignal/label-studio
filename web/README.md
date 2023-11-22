@@ -17,7 +17,7 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 
 - Grid and list view to easily explore your datasets
 - Customizable data representation: select what data you want to see and how to show it
-- Easily slice your datasates with filters for more precise exploration
+- Easily slice your datasets with filters for more precise exploration
 - Deep integration with Label Studio Frontend
 
 ### Under the hood
@@ -36,7 +36,7 @@ Datamanager is an advanced tool specifically for data exploration within Label S
         - Configure `CSS_PREFIX` (e.g., `ls-`). Ensure uniqueness across apps and libraries.
         - Set `APP_FOLDER` to `apps/labelstudio/`.
     - `libs/editor/.env.example` -> `libs/editor/.env`
-        - Set CSS_PREFIX (e.g., `lsf-`).
+        - Set `CSS_PREFIX` (e.g., `lsf-`).
         - Set `APP_FOLDER` to `libs/editor/`.
     - `libs/datamanager/.env.example` -> `libs/datamanager/.env`
         - Set `NX_API_GATEWAY` to your API root (e.g., `https://localhost:8080/api/dm`).
