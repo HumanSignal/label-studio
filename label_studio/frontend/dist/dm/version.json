@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-303: Fix github vulnerabilities",
-  "commit": "633333e879752345dee4dfdadc3c696d02867525",
+  "message": "fix: DIA-609: Workspaces",
+  "commit": "6c6a25598519969799853c5ec6760bdf212e850b",
   "branch": "master",
-  "date": "2023/10/31 17:14:31"
+  "date": "2023-11-22T11:28:23Z"
 }
