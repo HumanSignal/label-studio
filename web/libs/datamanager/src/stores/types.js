@@ -56,3 +56,8 @@ export const HtmlOrReact = types.custom({
     return "is not a valid element";
   },
 });
+
+export const ThresholdType = types.model("ThresholdType", {
+  min: types.number,
+  max: types.number,
+});

@@ -4,7 +4,9 @@ import { toStudlyCaps } from 'strman';
 import { Block } from "../../../../utils/bem";
 import { TableContext, TableElem } from "../TableContext";
 import { getProperty, getStyle } from "../utils";
+import { SkeletonLoader } from "../../SkeletonLoader";
 import "./TableRow.styl";
+import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
 
 const CellRenderer = observer(
   ({ col: colInput, data, decoration, cellViews }) => {
@@ -29,6 +31,7 @@ const CellRenderer = observer(
     const renderProps = { column: col, original: data, value };
     const Decoration = decoration?.get?.(col);
     const style = getStyle(cellViews, col, Decoration);
+    const cellIsLoading = isFF(FF_LOPS_E_3) && data.loading === colInput.alias;
 
     return (
       <TableElem name="cell">
@@ -37,10 +40,10 @@ const CellRenderer = observer(
             ...(style ?? {}),
             display: "flex",
             height: "100%",
-            alignItems: "center",
+            alignItems: cellIsLoading ? "" : "center",
           }}
         >
-          {Renderer ? <Renderer {...renderProps} /> : value}
+          {cellIsLoading ? <SkeletonLoader /> : (Renderer ? <Renderer {...renderProps} /> : value)}
         </div>
       </TableElem>
     );
