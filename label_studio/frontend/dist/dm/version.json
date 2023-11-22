@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-303: Fix github vulnerabilities",
-  "commit": "633333e879752345dee4dfdadc3c696d02867525",
-  "branch": "master",
-  "date": "2023/10/31 17:14:31"
+  "message": "ci: CI TEST",
+  "commit": "5d5a9bd1212a7825fb406f43842f19961bb13cda",
+  "branch": "fb-ci-test-1",
+  "date": "2023-11-21T22:30:53Z"
 }
