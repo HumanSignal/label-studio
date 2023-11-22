@@ -1,28 +1,60 @@
 # Label Studio
 
-This folder holds all the pieces of the new frontend framework.
+Label Studio is a complex, NX-managed project divided into three main components:
 
-## Init and build
+## Main App (`apps/labelstudio`)
+This is the primary application that consolidates all frontend framework elements. It's the hub for integrating and managing the different libraries and functionalities of Label Studio.
 
-By default this section comes pre-built. Until you need to make any changes to the frontend part, you're good to go as is.
+## Library - Label Studio Frontend (`libs/editor`)
+Label Studio Frontend, developed with React and mobx-state-tree, is a robust frontend library tailored for data annotation. It's designed for seamless integration into your applications, providing a rich set of features for data handling and visualization. Customization and extensibility are core aspects, allowing for tailored annotation experiences.
 
-**To work with frontend you need NodeJS to be installed on your system.**
+## Library - Datamanager (`libs/datamanager`)
+Datamanager is an advanced tool specifically for data exploration within Label Studio. Key features include:
 
-To build and run the frontend, please follow these steps:
+<img align="right" height="180" src="https://github.com/heartexlabs/label-studio/blob/master/images/heartex_icon_opossum_green@2x.png?raw=true" />
 
-```bash
-# Install all the necessary modules
-yarn install --frozen-lockfile
+### Features
 
-# Run nx
-npm run dev
-```
+- Grid and list view to easily explore your datasets
+- Customizable data representation: select what data you want to see and how to show it
+- Easily slice your datasates with filters for more precise exploration
+- Deep integration with Label Studio Frontend
 
-It's also possible to compile frontend on the fly:
+### Under the hood
 
-```bash
-npm run dev:watch
-```
+- [Backend API][api_docs]
+- [Architecture][dm_architecture]
+
+## Installation Instructions
+
+1 - **Dependencies Installation:**
+- Execute `yarn install --frozen-lockfile` to install all necessary dependencies.
+
+2 - **Environment Configuration:**
+- Duplicate `.env.example` files in each directory to their `.env` counterparts and configure as follows:
+    - `apps/labelstudio/.env.example` -> `apps/labelstudio/.env`
+        - Configure `CSS_PREFIX` (e.g., `ls-`). Ensure uniqueness across apps and libraries.
+        - Set `APP_FOLDER` to `apps/labelstudio/`.
+    - `libs/editor/.env.example` -> `libs/editor/.env`
+        - Set CSS_PREFIX (e.g., `lsf-`).
+        - Set `APP_FOLDER` to `libs/editor/`.
+    - `libs/datamanager/.env.example` -> `libs/datamanager/.env`
+        - Set `NX_API_GATEWAY` to your API root (e.g., `https://localhost:8080/api/dm`).
+        - Configure `LS_ACCESS_TOKEN` (obtainable from Label Studio account page).
+        - Set `CSS_PREFIX` (e.g., `dm-`).
+        - Set `APP_FOLDER` to `libs/datamanager/`.
+
+## Usage Instructions
+### Development and Build Commands
+- **Label Studio App:**
+    - `yarn ls:watch`: Build the main Label Studio app continuously for development.
+- **Label Studio Frontend (Editor):**
+    - `yarn lsf:watch`: Continuously build the frontend editor.
+    - `yarn lsf:serve`: Run the frontend editor standalone.
+- **Datamanager**
+    - `yarn dm:watch`: Continuously build Datamanager.
+- **General Build**
+    - `yarn build`: Build all apps and libraries in the project.
 
 ## Creating pages
 
@@ -126,3 +158,28 @@ Now we're done. We can now open the page `/some_root/my_page_path` in the browse
 * `pages` – set of pages
 * `routes` – set of raw routes
 * `exact` – if true, lookup exact path rather than a subscring
+
+## Ecosystem
+
+| Project | Description |
+|-|-|
+| label-studio | Server part, distributed as a pip package |
+| label-studio-frontend | Frontend part, written in JavaScript and React, can be embedded into your application |
+| [label-studio-converter][lsc] | Encode labels into the format of your favorite machine learning library |
+| [label-studio-transformers][lst] | Transformers library connected and configured for use with label studio |
+| datamanager | Data exploration tool for Label Studio |
+
+## License
+
+This software is licensed under the [Apache 2.0 LICENSE](../LICENSE) © [HumanSignal](https://www.humansignal.com/). 2020
+
+<img src="https://github.com/heartexlabs/label-studio/blob/master/images/opossum_looking.png?raw=true" title="Hey everyone!" height="140" width="140" />
+
+[ls]: https://github.com/heartexlabs/label-studio
+[lsf]: https://github.com/heartexlabs/label-studio-frontend
+[lsc]: https://github.com/heartexlabs/label-studio-converter
+[lst]: https://github.com/heartexlabs/label-studio-transformers
+
+[api_docs]: https://github.com/heartexlabs/dm2/blob/master/docs/api_reference.md
+[lsf_dev]: https://github.com/heartexlabs/label-studio-frontend#development
+[dm_architecture]: https://github.com/heartexlabs/dm2/blob/master/docs/dm_architecture_diagram.pdf
