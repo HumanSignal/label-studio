@@ -86,12 +86,37 @@ const RegionsMixin = types
 
       const result = regions.filter(region => {
         if (excludeSelf && region === self) return false;
-        return region.dynamic && region.type === type && region.labelName === labelName;
+        const canBePartOfNotification = self.supportSuggestions ? self.dynamic : true;
+
+        return canBePartOfNotification
+          && region.type === type
+          && region.labelName === labelName
+          && region.results?.[0]?.to_name === self.results?.[0]?.to_name;
       });
 
       return result;
     },
 
+    // Indicates that it is not temporary region created just to display data like Textarea's one
+    // and is not a suggestion
+    get isRealRegion() {
+      return self.annotation?.areas?.has(self.id);
+    },
+
+    get shouldNotifyDrawingFinished() {
+      // extra calls on destroying will be skipped
+      // @see beforeDestroy action
+      if (!self.isRealRegion) return false;
+      if (self.annotation.isSuggestionsAccepting) return false;
+      // There are two modes:
+      // If object tag support suggestions - the region should be marked as a dynamic one to make notifications
+      // If object tag doesn't support suggestions - every region works as dynamic with auto suggestions
+      const canBeReasonOfNotification = self.supportSuggestions ? self.dynamic && !self.fromSuggestion : true;
+
+      const isSmartEnabled = self.results.some(r => r.from_name.smartEnabled);
+
+      return isSmartEnabled && canBeReasonOfNotification;
+    },
   }))
   .actions(self => {
     return {
@@ -114,6 +139,19 @@ const RegionsMixin = types
       },
 
       beforeDestroy() {
+        // beforeDestroy may be called by accident for Textarea and etc. as part of updateObjects action
+        // in that case the region already has no results
+
+        // The other bad behaviour is that beforeDestroy may be called on accepting suggestions 'cause they are deleting in that case
+
+        // So if you see this bad thing during debugging - now you know why
+        // and why we need this check
+        if (self.isRealRegion) {
+          return self.beforeDestroyArea();
+        }
+      },
+
+      beforeDestroyArea() {
         self.notifyDrawingFinished({ destroy: true });
       },
 
@@ -228,10 +266,6 @@ const RegionsMixin = types
         self.perRegionFocusRequest = null;
       },
 
-      revokeSuggestion() {
-        self.fromSuggestion = false;
-      }, 
-
       setHighlight(val) {
         self._highlighted = val;
       },
@@ -258,7 +292,7 @@ const RegionsMixin = types
         }
 
         // everything below is related to dynamic preannotations
-        if (!self.dynamic || self.fromSuggestion) return;
+        if (!self.shouldNotifyDrawingFinished) return;
 
         clearTimeout(self.drawingTimeout);
 

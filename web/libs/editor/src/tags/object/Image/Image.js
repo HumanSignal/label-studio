@@ -175,6 +175,7 @@ const Model = types.model({
   selectionArea: types.optional(ImageSelection, { start: null, end: null }),
 }).volatile(() => ({
   currentImage: undefined,
+  supportSuggestions: true,
 })).views(self => ({
   get store() {
     return getRoot(self);

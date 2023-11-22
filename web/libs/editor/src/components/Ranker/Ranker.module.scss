@@ -16,7 +16,7 @@
   border-radius: 2px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   overflow-y: scroll;
 
   [data-rbd-droppable-id] {
@@ -26,6 +26,32 @@
 
   & + & {
     margin-left: var(--ranker-gap);
+  }
+
+  .columnTitle {
+    display: flex;
+
+    button {
+      margin-left: auto;
+      background: none;
+      border: none;
+      font-size: 0.75em;
+      width: 2em;
+      cursor: pointer;
+    }
+
+    &.expanded button span::after {
+      content: '△';
+    }
+    &.expanded button:hover span::after {
+      content: '▲';
+    }
+    &.collapsed button span::after {
+      content: '▽';
+    }
+    &.collapsed button:hover span::after {
+      content: '▼';
+    }
   }
 }
 
@@ -38,11 +64,34 @@
   border-radius: 2px;
   background-color: #f5f5f5;
   color: black;
-  max-width: 400px;
 }
 
 .itemLine {
   margin: 0;
+}
+.itemTitle {
+  margin: 0;
+  display: flex;
+  cursor: pointer;
+}
+
+.item.collapsed > *:not(.itemTitle) {
+  display: none;
+}
+
+.item.expanded > .itemTitle::after {
+  content: '△';
+  margin-left: auto;
+}
+.item.expanded > .itemTitle:hover::after {
+  content: '▲';
+}
+.item.collapsed > .itemTitle::after {
+  content: '▽';
+  margin-left: auto;
+}
+.item.collapsed > .itemTitle:hover::after {
+  content: '▼';
 }
 
 .dropArea {

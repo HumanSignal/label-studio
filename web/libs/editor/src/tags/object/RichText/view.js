@@ -84,7 +84,6 @@ class RichTextPieceView extends Component {
       normedRange._range = range;
       normedRange.text = selectionText;
       normedRange.isText = item.type === 'text';
-      normedRange.dynamic = this.props.store.autoAnnotation;
       item.addRegion(normedRange, this.doubleClickSelection);
     }, {
       window: rootEl?.contentWindow ?? window,

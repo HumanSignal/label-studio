@@ -30,6 +30,29 @@ import styles from './Paragraphs.module.scss';
  *     <Label value="Random talk"></Label>
  *   </ParagraphLabels>
  * </View>
+ * @example
+ * <!-- Paragraphs with audio -->
+ * <View>
+ *   <Paragraphs audioUrl="$audio" value="$para" name="paragraphs"
+ *               layout="dialogue" textKey="text" nameKey="author"
+ *               showPlayer="true"
+ *               />
+ *   
+ *   <Choices name="choices" toName="paragraphs" choice="multiple">
+ *       <Choice value="Good quality"/>
+ *       <Choice value="Fast speech"/>
+ *   </Choices>    
+ * </View>
+ * 
+ * <!-- {"data": { 
+ *   "para": [
+ *     {"text": "test 1", "author": "A", "start": 0.0, "end": 1.0},
+ *     {"text": "test 2", "author": "B", "start": 1.0, "end": 2.0},
+ *     {"text": "test 3", "author": "A", "start": 2.0, "end": 3.0}
+ *   ], 
+ *   "audio": "/static/samples/game.wav"
+ * }}
+ * -->
  * @name Paragraphs
  * @regions ParagraphsRegion
  * @meta_title Paragraph Tags for Paragraphs
@@ -500,10 +523,6 @@ const ParagraphsLoadingModel = types.model()
       for (const range of ranges) {
         const area = self.annotation.createResult(range, labels, control, self);
 
-        if (getRoot(self).autoAnnotation) {
-          area.makeDynamic();
-        }
-
         area.setText(range.text);
 
         area.notifyDrawingFinished();
@@ -525,10 +544,6 @@ const ParagraphsLoadingModel = types.model()
         const control = states[0];
         const labels = { [control.valueType]: control.selectedValues() };
         const area = self.annotation.createResult(range, labels, control, self);
-
-        if (getRoot(self).autoAnnotation) {
-          area.makeDynamic();
-        }
 
         area.setText(range.text);
 
