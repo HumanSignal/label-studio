@@ -82,7 +82,7 @@ const GeneralSettings = observer(({ store }) => {
     <Block name="settings" mod={newUI}>
       {editorSettingsKeys.map((obj, index) => {
         return (
-          <Elem name="field" key={index}>
+          <Elem name="field" tag="label" key={index}>
             {isFF(FF_DEV_3873) ? (
               <>
                 <Block name="settings__label">

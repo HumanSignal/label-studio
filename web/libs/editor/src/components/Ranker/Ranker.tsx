@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 
 import Column from './Column';
@@ -10,11 +10,30 @@ interface BoardProps {
   inputData: NewBoardData;
   handleChange?: (ids: Record<string, string[]>) => void;
   readonly?: boolean;
+  collapsible?: boolean;
 }
+type CollapsedMap = Record<string, boolean>;
+type CollapsedContextType = [
+  boolean,
+  CollapsedMap,
+  (idOrIds: string | string[], value: boolean) => void
+];
+
+const CollapsedContext = createContext<CollapsedContextType>([true, {}, (_id, _value) => {}]);
 
 // Component for a drag and drop board with 1+ columns
-const Ranker = ({ inputData, handleChange, readonly }: BoardProps) => {
+const Ranker = ({ inputData, handleChange, readonly, collapsible = true }: BoardProps) => {
   const [data, setData] = useState(inputData);
+  // items in different columns are different components, so collapsed state should be stored
+  // separately; also it's better to not mutate items itself, so here is the map
+  const [collapsed, setCollapsed] = useState<CollapsedMap>({});
+  // array of ids is used by columns
+  const toggleCollapsed = useCallback((idOrIds: string | string[], value: boolean) => {
+    const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
+    const values = ids.reduce((acc, id) => ({ ...acc, [id]: value }), {});
+
+    setCollapsed(c => ({ ...c, ...values }));
+  }, []);
 
   // Update data when inputData changes
   useEffect(() => {
@@ -30,20 +49,20 @@ const Ranker = ({ inputData, handleChange, readonly }: BoardProps) => {
       return;
     }
 
-    //handle reorder when item was dragged to a new position
-    //determine which column item was moved from
+    // handle reorder when item was dragged to a new position
+    // determine which column item was moved from
     const startCol = data.columns.find(col => col.id === source.droppableId);
     const endCol = data.columns.find(col => col.id === destination.droppableId);
 
     if (startCol === endCol) {
-      //get original items list
+      // get original items list
       const newCol = [...data.itemIds[source.droppableId]];
 
-      //reorder items list
+      // reorder items list
       newCol.splice(source.index, 1);
       newCol.splice(destination.index, 0, draggableId);
 
-      //update state
+      // update state
       const newItemIds = {
         ...data.itemIds,
         [source.droppableId]: newCol,
@@ -55,12 +74,12 @@ const Ranker = ({ inputData, handleChange, readonly }: BoardProps) => {
       };
 
       setData(newData);
-      //update results
+      // update results
       handleChange ? handleChange(newItemIds) : null;
       return;
     }
 
-    //handle case when moving from one column to a different column
+    // handle case when moving from one column to a different column
     const startItemIds = [...data.itemIds[source.droppableId]];
 
     startItemIds.splice(source.index, 1);
@@ -86,7 +105,7 @@ const Ranker = ({ inputData, handleChange, readonly }: BoardProps) => {
   };
 
   return (
-    <>
+    <CollapsedContext.Provider value={[collapsible, collapsed, toggleCollapsed]}>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className={styles.board}>
           <>
@@ -98,8 +117,9 @@ const Ranker = ({ inputData, handleChange, readonly }: BoardProps) => {
           </>
         </div>
       </DragDropContext>
-    </>
+    </CollapsedContext.Provider>
   );
 };
 
+export { CollapsedContext };
 export default Ranker;

@@ -2,7 +2,7 @@ import { cloneElement, CSSProperties, forwardRef, MouseEvent, useCallback, useCo
 import { createPortal } from 'react-dom';
 import { useFullscreen } from '../../hooks/useFullscreen';
 import { Block, cn } from '../../utils/bem';
-import { alignElements } from '../../utils/dom';
+import { alignElements, ElementAlignment } from '../../utils/dom';
 import { aroundTransition } from '../../utils/transition';
 import './Dropdown.styl';
 import { DropdownContext } from './DropdownContext';
@@ -21,6 +21,7 @@ export interface DropdownRef {
 export interface DropdownProps {
   animated?: boolean;
   visible?: boolean;
+  alignment?: ElementAlignment;
   enabled?: boolean;
   inline?: boolean;
   className?: string;
@@ -51,7 +52,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(({
   const calculatePosition = useCallback(() => {
     const dropdownEl = dropdown.current!;
     const parent = (triggerRef?.current ?? dropdownEl.parentNode) as HTMLElement;
-    const { left, top } = alignElements(parent!, dropdownEl, 'bottom-left');
+    const { left, top } = alignElements(parent!, dropdownEl, props.alignment || 'bottom-left');
 
     setOffset({ left, top });
   }, [triggerRef, minIndex]);

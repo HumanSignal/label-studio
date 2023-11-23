@@ -76,6 +76,7 @@ const Model = types
   .model({
     type: 'ranker',
     toname: types.maybeNull(types.string),
+    collapsible: types.optional(types.boolean, true),
 
     // @todo allow Views inside: ['bucket', 'view']
     children: Types.unionArray(['bucket']),
@@ -200,7 +201,12 @@ const HtxRanker = inject('store')(
     if (!data) return null;
 
     return (
-      <Ranker inputData={data} handleChange={item.updateResult} readonly={item.isReadOnly()} />
+      <Ranker
+        inputData={data}
+        handleChange={item.updateResult}
+        readonly={item.isReadOnly()}
+        collapsible={item.collapsible}
+      />
     );
   }),
 );
