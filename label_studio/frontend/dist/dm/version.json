@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-124: Save and update have success/fail toast messages",
-  "commit": "c55f66fe64da5daf8dcd956f051ba95f1a079509",
-  "branch": "master",
-  "date": "2023/11/09 19:50:04"
+  "message": "fix: DIA-699: [FE] We are still using 'Items' instead of 'Records' on some places",
+  "commit": "91be607c8cfacb3de623dffd5de80a6724d69c87",
+  "branch": "fb-dia-699/items-to-records",
+  "date": "2023-11-23T06:58:25Z"
 }
