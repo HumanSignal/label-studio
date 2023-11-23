@@ -44,6 +44,7 @@ report.*.json
 .env*
 !.env.example
 !.env.build
+!.env.local
 !*.lock
 
 
@@ -68,7 +69,6 @@ libs/editor/backend/__pycache__
 libs/editor/.DS_Store
 
 # Env
-libs/editor/.env.local
 libs/editor/.env.development.local
 libs/editor/.env.test.local
 libs/editor/.env.production.local
@@ -99,7 +99,6 @@ libs/datamanager/.DS_Store
 
 # Env
 libs/datamanager/.env
-libs/datamanager/.env.local
 libs/datamanager/.env.development.local
 libs/datamanager/.env.test.local
 libs/datamanager/.env.production.local
