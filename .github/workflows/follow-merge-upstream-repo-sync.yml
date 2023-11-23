@@ -45,7 +45,7 @@ jobs:
               echo "poetry_group=test" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo ':error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
+              echo '::error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
               exit 1
               ;;
           esac
