@@ -151,7 +151,7 @@ jobs:
             cp -r "${COPY_SRC_PRESERVE_PATH}" "${preserve_dir}"
           fi 
 
-          rm "${COPY_SRC_PATH}"
+          rm -r "${COPY_SRC_PATH}"
           mkdir -p "${COPY_SRC_PATH}"
           cp -r tmp/src/* "${COPY_SRC_PATH}"
 
