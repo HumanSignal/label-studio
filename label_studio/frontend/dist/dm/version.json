@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-699: [FE] We are still using 'Items' instead of 'Records' on some places",
-  "commit": "91be607c8cfacb3de623dffd5de80a6724d69c87",
-  "branch": "fb-dia-699/items-to-records",
-  "date": "2023-11-23T06:58:25Z"
+  "commit": "b27d1eeb3386b2ee0e686b670687e307c52e9e75",
+  "branch": "master",
+  "date": "2023-11-23T11:07:18Z"
 }
