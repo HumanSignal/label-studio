@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-409: Update files to match with monorepo",
-  "commit": "d13d06ccbd934b640413b54c4b135e288376f3da",
-  "branch": "fb-leap-409",
-  "date": "2023-11-22T17:34:43Z"
+  "message": "fix: DIA-699: [FE] We are still using 'Items' instead of 'Records' on some places",
+  "commit": "91be607c8cfacb3de623dffd5de80a6724d69c87",
+  "branch": "fb-dia-699/items-to-records",
+  "date": "2023-11-23T06:58:25Z"
 }
