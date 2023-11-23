@@ -169,8 +169,8 @@ export const DataView = injector(
       } else if (store.SDK.type === 'DE' && (total === 0 || data.length === 0 || !hasData)) {
         return (
           <Block name="syncInProgress">
-            <Elem name='title' tag="h3">Hang tight! Items are syncing in the background</Elem>
-            <Elem name='text'>Press the button below to see any synced items</Elem>
+            <Elem name='title' tag="h3">Hang tight! Records are syncing in the background</Elem>
+            <Elem name='text'>Press the button below to see any synced records</Elem>
             <Button onClick={async () => {
               await store.fetchProject({ force: true, interaction: 'refresh' });
               await store.currentView?.reload();

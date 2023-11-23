@@ -332,8 +332,6 @@ export class LSFWrapper {
   }
 
   setLSFTask(task, annotationID, fromHistory) {
-    if (!this.lsf) return;
-
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
     this.setLoading(true, hasChangedTasks);
@@ -490,7 +488,7 @@ export class LSFWrapper {
     if (!body.length) return;
 
     await this.datamanager.apiCall("saveUserLabels", {}, { body });
-  };
+  }
 
   async loadUserLabels() {
     if (!this.lsf?.userLabels) return;
@@ -572,7 +570,7 @@ export class LSFWrapper {
 
       this.setAnnotation(annotationID);
     }
-  };
+  }
 
   /** @private */
   onSubmitAnnotation = async () => {
@@ -641,7 +639,7 @@ export class LSFWrapper {
 
     this.task.deleteDraft(id);
     return response;
-  };
+  }
 
   /**@private */
   onDeleteAnnotation = async (ls, annotation) => {
@@ -681,7 +679,7 @@ export class LSFWrapper {
     if (status === 200 || status === 201) this.datamanager.invoke("toast", { message: "Draft saved successfully", type: "info" });
     else if (status !== undefined) this.datamanager.invoke("toast", { message: "There was an error saving your draft", type: "error" });
 
-  };
+  }
 
   saveDraft = async (target = null) => {
     const selected = target || this.lsf?.annotationStore?.selected;
@@ -807,7 +805,7 @@ export class LSFWrapper {
     const urlParam = new URLSearchParams(location.search).get('interaction');
 
     return urlParam !== 'notifications';
-  };
+  }
 
   shouldExitStream = () => {
     const paramName = "exitStream";
@@ -820,7 +818,7 @@ export class LSFWrapper {
     if (searchParams.toString()) newRelativePathQuery += '?' + searchParams.toString();
     window.history.pushState(null, '', newRelativePathQuery);
     return !!urlParam;
-  };
+  }
 
 
   // Proxy events that are unused by DM integration
@@ -834,16 +832,16 @@ export class LSFWrapper {
     } else {
       this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
     }
-  };
+  }
 
   onNextTask = async (nextTaskId, nextAnnotationId) => {
     if (isFF(FF_OPTIC_2)) this.saveDraft();
     this.loadTask(nextTaskId, nextAnnotationId, true);
-  };
+  }
   onPrevTask = async (prevTaskId, prevAnnotationId) => {
     if (isFF(FF_OPTIC_2)) this.saveDraft();
     this.loadTask(prevTaskId, prevAnnotationId, true);
-  };
+  }
   async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true, exitStream) {
     const { taskID, currentAnnotation } = this;
     const unique_id = this.task.unique_lock_id;
