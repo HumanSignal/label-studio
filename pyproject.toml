@@ -120,6 +120,26 @@ homepage = "https://github.com/heartexlabs/label-studio"
 packages = [
     { include = "label_studio" },
 ]
+include = [
+    "deploy/requirements.txt",
+    "label_studio/frontend/dist/react-app/*",
+    "label_studio/frontend/dist/lsf/**/*",
+    "label_studio/frontend/dist/dm/**/*",
+    "label_studio/annotation_templates/**/*",
+    "label_studio/core/static/**/*",
+    "label_studio/core/static_build/**/*",
+    "label_studio/core/utils/schema/*.json",
+    "label_studio/core/templatetags/*.py",
+    "label_studio/core/version_.py",
+    "label_studio/core/all_urls.json",
+    "label_studio/io_storages/**/*.yml",
+]
+
+exclude = [
+    "label_studio/frontend/node_modules/**/*",
+    "label_studio/frontend/build-tmp/**/*"
+]
+
 
 [tool.poetry.scripts]
 label-studio = "label_studio.server:main"

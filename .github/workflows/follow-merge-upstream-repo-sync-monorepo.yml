@@ -45,7 +45,7 @@ jobs:
               echo "poetry_group=test" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo ':error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
+              echo '::error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
               exit 1
               ;;
           esac
@@ -139,16 +139,22 @@ jobs:
         run: |
           set -xeuo pipefail
 
-          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then
-            src_path="web/libs/datamanager"
-          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
-            src_path="web/libs/editor"
-          else
-            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
-            exit 1
-          fi
-
-          rm -rf "${src_path}/src"
+          case "${{ github.event.client_payload.repo_name }}" in
+            */dm2)
+              src_path="web/libs/datamanager"
+              find_rm_params=""
+              ;;
+            */label-studio-frontend)
+              src_path="web/libs/editor"
+              find_rm_params="! -path '${src_path}/src/examples/*'"
+              ;;
+            *)
+              echo '::notice::Repository ${{ github.event.client_payload.repo_name }} is not supported'
+              exit 0
+              ;;
+          esac
+                    
+          find "${src_path}/src" -type f ${find_rm_params} -exec rm {} +
           mkdir -p "${src_path}"
           cp -r tmp/src "${src_path}"
 
