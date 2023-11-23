@@ -236,10 +236,10 @@ export const Annotation = types
       return dataExists && pkExists;
     },
 
-    get onlyTextObjects() {
-      return self.objects.reduce((res, obj) => {
-        return res && ['text', 'hypertext', 'paragraphs'].includes(obj.type);
-      }, true);
+    get hasSuggestionsSupport() {
+      return self.objects.some((obj) => {
+        return obj.supportSuggestions;
+      });
     },
 
     isReadOnly() {
@@ -252,6 +252,8 @@ export const Annotation = types
     draftSelected: false,
     autosaveDelay: 5000,
     isDraftSaving: false,
+    // This flag indicates that we are accepting suggestions right now (an accepting is started and not finished yet)
+    isSuggestionsAccepting: false,
     submissionStarted: 0,
     versions: {},
     resultSnapshot: '',
@@ -1049,6 +1051,7 @@ export const Annotation = types
         suggestions: true,
       });
 
+      self.isSuggestionsAccepting = true;
       if (getRoot(self).autoAcceptSuggestions) {
         if (isFF(FF_DEV_1284)) {
           self.history.setReplaceNextUndoState(true);
@@ -1057,14 +1060,10 @@ export const Annotation = types
       } else {
         self.suggestions.forEach((suggestion) => {
           // regions that can't be accepted in usual way, should be auto-accepted;
-          // textarea will have simple classification area with no type, so check result.
-          // @todo per-regions is tough thing here as they can be in generated result,
-          // connected to manual region, will check it later
-          const results = suggestion.results ?? [];
-          const onlyAutoAccept = ['richtextregion', 'text', 'textrange'].includes(suggestion.type)
-            || results.findIndex(r => r.type === 'textarea') >= 0;
+          const supportSuggestions = suggestion.supportSuggestions;
 
-          if (onlyAutoAccept) {
+          // If we cannot display suggestions on object/control then just accept them
+          if (!supportSuggestions) {
             self.acceptSuggestion(suggestion.id);
             if (isFF(FF_DEV_1284)) {
               // This is necessary to prevent the occurrence of new steps in the history after updating objects at the end of current method
@@ -1073,6 +1072,7 @@ export const Annotation = types
           }
         });
       }
+      self.isSuggestionsAccepting = false;
 
       if (!isFF(FF_DEV_1284)) {
         history.freeze('richtext:suggestions');
@@ -1307,6 +1307,11 @@ export const Annotation = types
             }
           }
         } else {
+          // @todo: there is a strange behaviour that should be documented somewhere
+          // On serialization we use area id as result id to save it somewhere
+          // and on deserialization we use result id as area id
+          // but when we use suggestions we should keep in mind that we need to do it manually or use serialized data instead
+          // or we can get weird regions duplication in some cases
           const area = self.areas.get(item.cleanId);
 
           if (area) {
@@ -1328,14 +1333,6 @@ export const Annotation = types
       });
       self.suggestions.delete(id);
       
-      // hack to unlock sending textarea results
-      // to the ML backen every time
-      // it just sets `fromSuggestion` back to `false`
-      const isTextArea = area.results.findIndex(r => r.type === 'textarea') >= 0;
-
-      // This is temporary exception until we find the way to do it right
-      // and this was done to keep notifications on prompt editing or fixing answer from ML backend
-      if (isTextArea) area.revokeSuggestion();
     },
 
     rejectSuggestion(id) {

@@ -1,4 +1,4 @@
-import { getEnv, getRoot, getSnapshot, getType, types } from 'mobx-state-tree';
+import { getEnv, getSnapshot, getType, types } from 'mobx-state-tree';
 import { observer } from 'mobx-react';
 import React from 'react';
 import { Tool } from '../components/Toolbar/Tool';
@@ -63,13 +63,7 @@ const BaseTool = types
         return null;
       },
       get smartEnabled() {
-        const smart = self.control?.smart || false;
-        const autoAnnotation = self.control ? getRoot(self.control)?.autoAnnotation ?? false : false;
-
-        return (autoAnnotation && smart) || self.smartOnly;
-      },
-      get smartOnly() {
-        return self.control?.smartonly ?? false;
+        return self.control?.smartEnabled ?? false;
       },
     };
   })

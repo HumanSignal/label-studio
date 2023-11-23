@@ -11,7 +11,7 @@
         "compiler": "babel",
         "webpackConfig": "webpack.config.js",
         "tsConfig": "libs/datamanager/tsconfig.lib.json",
-        "main": "libs/datamanager/src/index.ts",
+        "main": "libs/datamanager/src/index.js",
         "outputPath": "dist/libs/datamanager",
         "isolatedConfig": true
 

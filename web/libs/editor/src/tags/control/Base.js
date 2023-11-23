@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { getRoot, types } from 'mobx-state-tree';
 import { FF_DEV_3391, FF_SNAP_TO_PIXEL, isFF } from '../../utils/feature-flags';
 import { BaseTag } from '../TagBase';
 import { SNAP_TO_PIXEL_MODE } from '../../components/ImageView/Image';
@@ -54,6 +54,13 @@ const ControlBase = types.model({
       return self.toNameTag.snapPointToPixel(point, self.snapMode);
     }
     return point;
+  },
+  get smartEnabled() {
+    const smart = self.smart ?? false;
+    const autoAnnotation = getRoot(self)?.autoAnnotation ?? false;
+
+    // @todo: Not sure why smartonly ignores autoAnnotation; It was like this from the beginning
+    return (autoAnnotation && smart) || self.smartonly || false;
   },
 }));
 

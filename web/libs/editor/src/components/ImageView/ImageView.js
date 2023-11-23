@@ -587,6 +587,11 @@ export default observer(
       if (p && p.className === 'Transformer') return;
 
       const handleMouseDown = () => {
+        if (e.evt.button === 1) {
+          // prevent middle click from scrolling page
+          e.evt.preventDefault();
+        }
+
         const isRightElementToCatchToolInteractions = el => {
           // It could be ruler ot segmentation
           if (el.nodeType === 'Group') {
@@ -1038,6 +1043,7 @@ export default observer(
             ) : (imageIsLoaded) ? (
               <EntireStage
                 item={item}
+                crosshairRef={this.crosshairRef}
                 onClick={this.handleOnClick}
                 imagePositionClassnames={imagePositionClassnames}
                 state={this.state}
@@ -1111,6 +1117,7 @@ const EntireStage = observer(({
   onMouseMove,
   onMouseUp,
   onWheel,
+  crosshairRef,
 }) => {
   const { store } = item;
   let size, position;
@@ -1162,6 +1169,7 @@ const EntireStage = observer(({
         item={item}
         store={store}
         state={state}
+        crosshairRef={crosshairRef}
       />
     </Stage>
   );
@@ -1171,6 +1179,7 @@ const StageContent = observer(({
   item,
   store,
   state,
+  crosshairRef,
 }) => {
   if (!isAlive(item)) return null;
   if (!store.task || !item.currentSrc) return null;
@@ -1239,9 +1248,9 @@ const StageContent = observer(({
 
       {item.crosshair && (
         <Crosshair
-          ref={this.crosshairRef}
-          width={isFF(FF_DEV_1285) ? item.stageWidth : item.stageComponentSize.width}
-          height={isFF(FF_DEV_1285) ? item.stageHeight : item.stageComponentSize.height}
+          ref={crosshairRef}
+          width={isFF(FF_ZOOM_OPTIM) ? item.containerWidth : (isFF(FF_DEV_1285) ? item.stageWidth : item.stageComponentSize.width)}
+          height={isFF(FF_ZOOM_OPTIM) ? item.containerHeight : (isFF(FF_DEV_1285) ? item.stageHeight : item.stageComponentSize.height)}
         />
       )}
     </>

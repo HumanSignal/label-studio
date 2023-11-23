@@ -1,4 +1,4 @@
-/** @global LSF */
+/** @global LSF * /
 
 /**
  * @typedef {{
@@ -191,14 +191,7 @@ export class DataManager {
 
     Object.assign(this.tabControls, config.tabControls ?? {});
 
-    if (config.actions) {
-      config.actions.forEach(([action, callback]) => {
-        if (!isDefined(action.id)) {
-          throw new Error("Every action must provide a unique ID");
-        }
-        this.actions.set(action.id, { action, callback });
-      });
-    }
+    this.updateActions(config.actions);
 
     this.type = config.type ?? "dm";
 
@@ -262,7 +255,10 @@ export class DataManager {
     if (!id) throw new Error("Action must provide a unique ID");
 
     this.actions.set(id, { action, callback });
-    this.store.addActions(action);
+
+    const actions = Array.from(this.actions.values()).map(({ action }) => action);
+
+    this.store?.setActions(actions);
   }
 
   removeAction(id) {
@@ -276,6 +272,17 @@ export class DataManager {
 
   installActions() {
     this.actions.forEach(({ action, callback }) => {
+      this.addAction(action, callback);
+    });
+  }
+
+  updateActions(actions) {
+    if (!Array.isArray(actions)) return;
+
+    actions.forEach(([action, callback]) => {
+      if (!isDefined(action.id)) {
+        throw new Error("Every action must provide a unique ID");
+      }
       this.addAction(action, callback);
     });
   }

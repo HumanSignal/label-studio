@@ -3,7 +3,7 @@ import Button from 'antd/lib/button/index';
 import Form from 'antd/lib/form/index';
 import Input from 'antd/lib/input/index';
 import { observer } from 'mobx-react';
-import { destroy, getRoot, isAlive, types } from 'mobx-state-tree';
+import { destroy, isAlive, types } from 'mobx-state-tree';
 
 import InfoModal from '../../../components/Infomodal/Infomodal';
 import Registry from '../../../core/Registry';
@@ -235,10 +235,6 @@ const Model = types.model({
     onChange(area) {
       self.updateResult();
       const currentArea = (area ?? self.result?.area);
-
-      if (getRoot(self).autoAnnotation) {
-        currentArea.makeDynamic();
-      }
       
       currentArea?.notifyDrawingFinished();
     },

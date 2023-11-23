@@ -51,7 +51,7 @@ class ToolsManager {
   }
 
   addTool(toolName, tool, removeDuplicatesNamed = null, prefix = guidGenerator()) {
-    if (tool.smart && tool.smartOnly) return;
+    if (tool.smart && tool.control?.smartonly) return;
     // todo: It seems that key is used only for storing,
     // but not for finding tools, so may be there might
     // be an array instead of an object

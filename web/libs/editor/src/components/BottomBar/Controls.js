@@ -153,11 +153,10 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
       const isDisabled = disabled || submitDisabled;
       const useExitOption = !isDisabled && isNotQuickView;
 
-
       const SubmitOption = ({ isUpdate, onClickMethod }) => {
         return (
           <Button
-            name="list-button"
+            name="submit-option"
             look="secondary"
             onClick={async (event) => {
               event.preventDefault();
@@ -208,6 +207,7 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
                 }}
                 icon={useExitOption && (
                   <Dropdown.Trigger
+                    alignment="top-right"
                     content={<SubmitOption onClickMethod={store.submitAnnotation} isUpdate={false} />}
                   >
                     <div>
@@ -243,6 +243,7 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
               }}
               icon={useExitOption && (
                 <Dropdown.Trigger
+                  alignment="top-right" 
                   content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
                 >
                   <div>
