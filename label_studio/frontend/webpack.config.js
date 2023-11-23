@@ -106,6 +106,7 @@ module.exports = {
           loader: '@svgr/webpack',
           options: {
             ref: true,
+            exportType: 'named',
             // svgo: false,
             svgoConfig: {
               plugins: [

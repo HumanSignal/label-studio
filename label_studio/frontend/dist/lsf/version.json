@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-345: Fix taxonomy items collapsing when dropdown is closed",
-  "commit": "fcdc1df7b09877c684fb95c07625a0ad0bc1d58a",
+  "message": "fix: LEAP-31: Fix functioning of auto annotations (#1605)",
+  "commit": "f209200de05aad01cba5dffc59883d0de4615458",
   "branch": "master",
-  "date": "2023/11/07 11:01:17"
+  "date": "2023-11-21T23:29:28Z"
 }

@@ -4,6 +4,7 @@ import os
 
 import ujson as json
 from data_manager.models import Filter, FilterGroup, View
+from django.conf import settings
 from django.db import transaction
 from projects.models import Project
 from rest_framework import serializers
@@ -17,6 +18,49 @@ class FilterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Filter
         fields = '__all__'
+
+    def validate_column(self, column: str) -> str:
+        """
+        Ensure that the passed filter expression starts with 'filter:tasks:' and contains
+        no foreign key traversals. This means either the filter expression contains no '__'
+        substrings, or that it's the task.data json field that's accessed.
+
+        Users depending on foreign key traversals in views can allowlist them via the
+        DATA_MANAGER_FILTER_ALLOWLIST setting in the env.
+
+        Edit with care. The validations below are critical for security.
+        """
+
+        column_copy = column
+
+        # We may support 'filter:annotations:' in the future, but we don't as of yet.
+        required_prefix = 'filter:tasks:'
+        optional_prefix = '-'
+
+        if not column_copy.startswith(required_prefix):
+            raise serializers.ValidationError(f'Filter "{column}" should start with "{required_prefix}"')
+
+        column_copy = column_copy[len(required_prefix) :]
+
+        if column_copy.startswith(optional_prefix):
+            column_copy = column_copy[len(optional_prefix) :]
+
+        if column_copy.startswith('data.'):
+            # Allow underscores if the filter is based on the `task.data` JSONField, because these don't leverage foreign keys.
+            return column
+
+        # Specific filters relying on foreign keys can be allowlisted
+        if column_copy in settings.DATA_MANAGER_FILTER_ALLOWLIST:
+            return column
+
+        # But in general, we don't allow foreign keys
+        if '__' in column_copy:
+            raise serializers.ValidationError(
+                f'"__" is not generally allowed in filters. Consider asking your administrator to add "{column_copy}" '
+                'to DATA_MANAGER_FILTER_ALLOWLIST, but note that some filter expressions may pose a security risk'
+            )
+
+        return column
 
 
 class FilterGroupSerializer(serializers.ModelSerializer):

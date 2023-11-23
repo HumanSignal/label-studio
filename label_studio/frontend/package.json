@@ -91,6 +91,7 @@
     "stylus": "^0.54.8",
     "stylus-loader": "^5.0.0",
     "terser-webpack-plugin": "^5.1.1",
+    "toml": "^3.0.0",
     "truncate-middle": "^1.0.6",
     "typescript": "^4.2.2",
     "webpack": "^5.80.0",
