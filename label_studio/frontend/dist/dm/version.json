@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-124: Save and update have success/fail toast messages",
-  "commit": "c55f66fe64da5daf8dcd956f051ba95f1a079509",
-  "branch": "master",
-  "date": "2023/11/09 19:50:04"
+  "message": "feat: DIA-601: [FE] User understands that similarity search sometimes automatically filters results",
+  "commit": "ea1e4b07444b80556a4f191aef8d2dbb0c8f1806",
+  "branch": "fb-dia-601/semantic-filter",
+  "date": "2023/11/13 09:20:04"
 }
