@@ -157,7 +157,7 @@ jobs:
 
           if [ -n ${COPY_SRC_PRESERVE_PATH} ]; then
             echo "Restoring preserved files"
-            cp -rf "${preserve_dir}/*" "${COPY_SRC_PATH}"
+            cp -rf ${preserve_dir}/* "${COPY_SRC_PATH}"
           fi 
 
           git add "${COPY_SRC_PATH}"
