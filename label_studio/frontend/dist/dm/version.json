@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-409: Update files to match with monorepo",
-  "commit": "f7e188d26d4119aecae3cbdef5b0802bc7e7e7ff",
-  "branch": "master",
-  "date": "2023-11-24T15:55:13Z"
+  "message": "fix: DIA-640: [FE] when creating a new dataset and navigating to it tasks request will fire multiple times",
+  "commit": "7d68fa6dd17aaf1273e438274057a70da079ce32",
+  "branch": "fb-dia-640/reduce-load",
+  "date": "2023-11-24T10:18:06Z"
 }
