@@ -253,17 +253,25 @@ def s3_export_bucket_kms(s3):
     yield s3
 
 
-def mock_put_aes(*args, **kwargs):
-    if 'ServerSideEncryption' not in kwargs or kwargs['ServerSideEncryption'] != 'AES256':
-        raise ClientError(
-            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
-        )
+def mock_put(*args, **kwargs):
+    client_error = ClientError(
+        error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
+    )
+    if kwargs['ServerSideEncryption'] == 'AES256':
+        if 'ServerSideEncryption' not in kwargs:
+            raise client_error
+    elif kwargs['ServerSideEncryption'] == 'aws:kms':
+        if 'ServerSideEncryption' not in kwargs or 'SSEKMSKeyId' not in kwargs:
+            raise client_error
+
+    else:
+        raise client_error
 
 
 @pytest.fixture()
 def mock_s3_resource_aes(mocker):
     mock_object = MagicMock()
-    mock_object.put = mock_put_aes
+    mock_object.put = mock_put
 
     mock_object_constructor = MagicMock()
     mock_object_constructor.return_value = mock_object
@@ -275,21 +283,10 @@ def mock_s3_resource_aes(mocker):
     mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
 
 
-def mock_put_kms(*args, **kwargs):
-    if (
-        'ServerSideEncryption' not in kwargs
-        or kwargs['ServerSideEncryption'] != 'aws:kms'
-        or 'SSEKMSKeyId' not in kwargs
-    ):
-        raise ClientError(
-            error_response={'Error': {'Code': 'AccessDenied', 'Message': 'Access Denied'}}, operation_name='PutObject'
-        )
-
-
 @pytest.fixture()
 def mock_s3_resource_kms(mocker):
     mock_object = MagicMock()
-    mock_object.put = mock_put_kms
+    mock_object.put = mock_put
 
     mock_object_constructor = MagicMock()
     mock_object_constructor.return_value = mock_object
@@ -491,6 +488,7 @@ def business_client(client):
     client.admin = user
     client.annotator = user
     client.user = user
+    client.api_key = user.reset_token().key
     client.organization = org
 
     if signin(client, email, password).status_code != 302:
@@ -760,3 +758,25 @@ def tick_clock(_, seconds: int = 1) -> None:
     now += timedelta(seconds=seconds)
     freezer = freeze_time(now)
     freezer.start()
+
+
+def freeze_datetime(response, utc_time: str) -> None:
+    global freezer
+    freezer.stop()
+    freezer = freeze_time(utc_time)
+    freezer.start()
+
+
+def pytest_collection_modifyitems(config, items):
+    # This function is called by pytest after the collection of tests has been completed to modify their order
+    # it is being used as a workaround for the fact the kms and aes mocks resist teardown and cause other test failures
+
+    mock_tests = []
+    other_tests = []
+    for item in items:
+        if 'mock_s3_resource_kms' in item.fixturenames or 'mock_s3_resource_aes' in item.fixturenames:
+            mock_tests.append(item)
+        else:
+            other_tests.append(item)
+
+    items[:] = other_tests + mock_tests

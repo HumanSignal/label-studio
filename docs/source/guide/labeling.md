@@ -2,8 +2,8 @@
 title: Label and annotate data
 tier: all 
 type: guide
-order: 208
-order_enterprise: 112
+order: 210
+order_enterprise: 110
 meta_title: Label and annotate data
 meta_description: Label and annotate data to create bounding boxes, label text spans, set up relations. Filter and sort project data for machine learning dataset creation.
 section: "Labeling"
@@ -368,7 +368,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 <div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 13: Comments box </i>
 
-!!! info 
+!!! note
     Use Outliner to work with larger annotation tasks (many bounding boxes in one image, larger videos, and so on).
 
 To add a region in the OCR transcription templates, draw a rectangle, and you can see a text box that appears in the **Outliner** panel to enter OCR text. The new functionality allows you to select a region and the **Details** panel changes. You can experience the following:

@@ -16,3 +16,5 @@
 !README.md
 !licenses/**
 !LICENSE
+!pyproject.toml
+!poetry.lock

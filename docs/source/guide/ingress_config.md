@@ -3,11 +3,13 @@ title: Set up an ingress controller for Label Studio Kubernetes deployments
 short: Set up an ingress controller
 type: guide
 tier: all
-order: 112
-order_enterprise: 137
+order: 65
+order_enterprise: 457
 meta_title: Set up an ingress controller for Label Studio Kubernetes Deployments
 meta_description: Set up an ingress controller to manage load balancing and access to Label Studio Kubernetes deployments for your data science and machine learning projects.
 section: "Install"
+parent: "install_k8s"
+parent_enterprise: "install_enterprise_k8s"
 ---
 
 Set up an ingress controller to manage Ingress, the Kubernetes resource that exposes HTTP and HTTPS routes from outside your Kubernetes cluster to the services within the cluster, such as Label Studio rqworkers and others.  
