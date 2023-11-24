@@ -452,7 +452,7 @@ def generate_offset_anno_tasks(request, project_id):
             create_sync_task_pairs(project=project, sensordata_A=sensordata_A, sensordata_B=sensordata_B)
             create_sync_data_chunks(request=request,project=project,value_column_name='A3D')
             return redirect(reverse('data_manager:project-data', kwargs={'pk':project.id+3}))
-    sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
+    sensoroffset = SensorOffset.objects.filter(project=project).order_by('offset_Date')
     offsetannotationform = OffsetAnnotationForm(project=project)
     return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project, 'offset_project': offset_annotation_project}) 
     
@@ -479,11 +479,19 @@ def parse_offset_annotations(request,project_id):
                 avg_offset = 0
             offset_date = task.data['offset_date']
             # Add negative offset
-            if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset = -1*int(avg_offset*1000), offset_Date = offset_date):
-                SensorOffset.objects.create(sensor_A = sensor_A,
-                                               sensor_B = sensor_B,
-                                               offset = -1*int(avg_offset*1000), # convert to milliseconds integer
-                                               offset_Date = offset_date)
+            if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset = -1*int(avg_offset*1000), offset_Date = offset_date, project=project).exists():
+                if SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date, project=project).exists():
+                    # If there already exists an offset on the offset_Date update the SensorOffset
+                    offset = SensorOffset.objects.get(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date)
+                    offset.offset = -1*int(avg_offset*1000)
+                    offset.save()
+                else:
+                    # If it does not yet exist, add
+                    SensorOffset.objects.create(sensor_A = sensor_A,
+                                                sensor_B = sensor_B,
+                                                offset = -1*int(avg_offset*1000), # convert to milliseconds integer
+                                                offset_Date = offset_date,
+                                                project=project)
         # Check if positive offset label. All offset labels for one task should have either negative or positive offset
         elif annotations.first().result[0]['value']['timeserieslabels'][0] == 'Positive offset':
             # Determine offset obtained by each offset annotation
@@ -496,15 +504,22 @@ def parse_offset_annotations(request,project_id):
                 avg_offset = 0
             offset_date = task.data['offset_date'] 
             # Add positive offset
-            if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date).exists():
-                SensorOffset.objects.create(sensor_A = sensor_A,
-                                               sensor_B = sensor_B,
-                                               offset = int(avg_offset*1000), # convert to milliseconds integer
-                                               offset_Date = offset_date,
-                                               project=project)
+            if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date, offset = int(avg_offset*1000), project=project).exists():
+                if SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date, project = project).exists():
+                    # If there already exists an offset on the offset_Date update the SensorOffset
+                    offset = SensorOffset.objects.get(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date)
+                    offset.offset = int(avg_offset*1000)
+                    offset.save()
+                else:
+                    # If there already exists an offset on the offset_Date update the SensorOffset
+                    SensorOffset.objects.create(sensor_A = sensor_A,
+                                                sensor_B = sensor_B,
+                                                offset = int(avg_offset*1000), # convert to milliseconds integer
+                                                offset_Date = offset_date,
+                                                project=project)
         else:
             print('The labels in the offset labeling have been changed. This will cause malfunctioning')
-    sensoroffset = SensorOffset.objects.all().order_by('offset_Date')
+    sensoroffset = SensorOffset.objects.filter(project=project).order_by('offset_Date')
     offsetannotationform = OffsetAnnotationForm(project=project)
     return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project , 'offset_project': offset_annotation_project}) 
 
