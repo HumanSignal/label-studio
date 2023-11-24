@@ -8,6 +8,7 @@ from django.apps import apps
 from django.http import HttpResponse
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
+from django.core.exceptions import ObjectDoesNotExist
 
 import subprocess
 import os
@@ -16,6 +17,7 @@ import numpy as np
 import json
 import requests
 
+from sensordata.models import SyncSensorOverlap
 from projects.models import Project
 from sensormodel.models import Deployment, Sensor
 from sensordata.models import SensorData, SensorOffset
@@ -33,12 +35,13 @@ def task_generation_page(request,project_id):
 
 def create_task_pairs(project, subject, sensortype_B):
     # Load data for given project and subject
+    SensorOverlap.objects.all().delete()
     subject_presences = SubjectPresence.objects.filter(project=project, subject=subject)
     distinct_file_uploads = subject_presences.values('file_upload').distinct() # Get all unique files that contain subject
     sensordata_A = SensorData.objects.filter(project=project,file_upload__in=distinct_file_uploads) # Get all SensorData related to these FileUploads
     # Load IMU deployments in the project that contain the subject
     sensor_B_deployments = Deployment.objects.filter(project=project,subject=subject,sensor__sensortype__sensortype=sensortype_B.sensortype)
-    sensordata_B = SensorData.objects.filter(sensor__in=sensor_B_deployments.values('sensor')) # find all sensordata (type B) that has a sensor in sensor_B_deployments
+    sensordata_B = SensorData.objects.filter(project= project, sensor__in=sensor_B_deployments.values('sensor')) # find all sensordata (type B) that has a sensor in sensor_B_deployments
     # Iterate over unique sendata_A sensordata objects, this reduces computations
     for sendata_A in sensordata_A:
         sensor_A = sendata_A.sensor
@@ -51,8 +54,6 @@ def create_task_pairs(project, subject, sensortype_B):
             # Iterate over sensordata of type B that have been deployed with subject
             for sendata_B in sensordata_B:
                 sensor_B = sendata_B.sensor
-                B_beg_dt = sendata_B.begin_datetime
-                B_end_dt = sendata_B.end_datetime
                 # Check if there is an offset between sensor_A and sensor_B, with begin_datetime before begin of sendata_A
                 if SensorOffset.objects.filter(sensor_A=sensor_A,sensor_B=sensor_B,offset_Date__lte=A_beg_dt,project=project).exists():
                     # Take the latest instance of offset before the begin_datetime of the sendata_A 
@@ -66,29 +67,33 @@ def create_task_pairs(project, subject, sensortype_B):
                     # If there is no SensorOffset defined set offset=0
                     offset = 0
                 offset_delta = timedelta(milliseconds=offset) # Difference in datetime because of sensor offset
+                B_beg_dt = sendata_B.begin_datetime-offset_delta
+                B_end_dt = sendata_B.end_datetime-offset_delta
                 # Check if either the begin or end of sendata_B are in the subj. pres. segment or the begin (of sendata_B) is before and the end (of sendata_B) is after the start of subj. pres.
-                begin_inside =  beg_subj_pres <= B_beg_dt+offset_delta <= end_subj_pres
-                end_inside =   beg_subj_pres <= B_end_dt+offset_delta <= end_subj_pres
-                begin_before_and_end_after_start =  (B_beg_dt+offset_delta <= beg_subj_pres) and (B_end_dt+offset_delta >= beg_subj_pres)
+                begin_inside =  beg_subj_pres <= B_beg_dt <= end_subj_pres
+                end_inside =   beg_subj_pres <= B_end_dt <= end_subj_pres
+                begin_before_and_end_after_start =  (B_beg_dt <= beg_subj_pres) and (B_end_dt >= beg_subj_pres)
                 if begin_inside or end_inside or begin_before_and_end_after_start:
                     # Find the start and end datetime of overlap
-                    if beg_subj_pres >= B_beg_dt+offset_delta:
-                        begin_overlap_dt = beg_subj_pres
-                    else:
-                        begin_overlap_dt = B_beg_dt+offset_delta
-                    if end_subj_pres <= B_end_dt+offset_delta:
-                        end_overlap_dt = end_subj_pres
-                    else:
-                        end_overlap_dt = B_end_dt+offset_delta    
+                    begin_overlap_dt = max(beg_subj_pres,B_beg_dt)
+                    end_overlap_dt = min(end_subj_pres,B_end_dt)   
                     # Create overlap object, this is used to create tasks
+                    try:
+                        sync_overlap = SyncSensorOverlap.objects.get(sensordata_A=sendata_A,sensordata_B=sendata_B)
+                        length_sync_overlap = sync_overlap.end_B-sync_overlap.start_B
+                        length_overlap = (end_overlap_dt-begin_overlap_dt).total_seconds()
+                        normalized_offset = (offset/length_sync_overlap)*length_overlap
+                    except ObjectDoesNotExist:
+                        normalized_offset = offset
+                    normalized_offset_delta = timedelta(milliseconds=normalized_offset)
                     if not SensorOverlap.objects.filter(sensordata_A=sendata_A,
                                                 sensordata_B=sendata_B,
                                                 project=project,
                                                 subject=subject,
                                                 start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
                                                 end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
-                                                start_B = (begin_overlap_dt-B_beg_dt+offset_delta).total_seconds(),
-                                                end_B = (end_overlap_dt-B_beg_dt+offset_delta).total_seconds()
+                                                start_B = (begin_overlap_dt-B_beg_dt+offset_delta-normalized_offset_delta).total_seconds(),
+                                                end_B = (end_overlap_dt-B_beg_dt+offset_delta-normalized_offset_delta).total_seconds()
                                                 ).exists():
                         SensorOverlap.objects.create(sensordata_A=sendata_A,
                                                     sensordata_B=sendata_B,
@@ -96,8 +101,8 @@ def create_task_pairs(project, subject, sensortype_B):
                                                     subject=subject,
                                                     start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
                                                     end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
-                                                    start_B = (begin_overlap_dt-B_beg_dt+offset_delta).total_seconds(),
-                                                    end_B = (end_overlap_dt-B_beg_dt+offset_delta).total_seconds()
+                                                    start_B = (begin_overlap_dt-B_beg_dt+offset_delta-normalized_offset_delta).total_seconds(),
+                                                    end_B = (end_overlap_dt-B_beg_dt+offset_delta-normalized_offset_delta).total_seconds()
                                                     )
                     
         

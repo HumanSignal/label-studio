@@ -395,6 +395,7 @@ def create_sync_data_chunks(request, project,value_column_name):
                 subprocess.run(ffmpeg_command, shell=True)
                 ### Cut out csv file using pandas ### 
                 # Find the indeces of the timestamp instances closest to begin and end of segment
+                
                 start_index = imu_df[imu_df.iloc[:, timestamp_column]>= overlap.start_B].index[0] # First timestamp after begin_segment
                 end_index = imu_df[imu_df.iloc[:, timestamp_column] > overlap.end_B].index[1] # First timestamp after end_segment
                 # Only keep the rows in between the obtained indeces
@@ -415,7 +416,7 @@ def create_sync_data_chunks(request, project,value_column_name):
                 wait_before_sync = 3000
                 offset_annotation_project = Project.objects.get(id=project.id+3)
                 task_json_template = {
-                    "csv": f"{overlap.sensordata_B.file_upload.file.url}?time={timestamp_column_name}&values={value_column_name.lower()}",
+                    "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name.lower()}",
                     "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
                     "sensor_a": f"{overlap.sensordata_A.sensor}",
                     "sensor_b": f"{overlap.sensordata_B.sensor}",

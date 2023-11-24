@@ -65,6 +65,7 @@ def createannotationtask(request, project_id):
 
 
 def parse_subject_presence_annotations(request, project):
+    SubjectPresence.objects.all().delete()
     subj_anno_proj = Project.objects.get(id=project.id+1)
     tasks = Task.objects.filter(project= subj_anno_proj)
     annotations = Annotation.objects.filter(task__in= tasks)
