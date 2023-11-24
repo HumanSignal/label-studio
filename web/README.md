@@ -19,11 +19,13 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 - Execute `yarn install --frozen-lockfile` to install all necessary dependencies.
 
 2 - **Environment Configuration:**
-- By default, the configuration is set in the .env.local files. These files contain the default settings used by the application.
-- For custom configuration, you can duplicate the `.env.example` files in each directory and rename them as `.env`. Then, make the necessary changes as per your requirements. The steps are as follows:
-    - `libs/datamanager/.env.example` -> `libs/datamanager/.env`
-        - Set `NX_API_GATEWAY` to your API root (e.g., `https://localhost:8080/api/dm`).
-        - Configure `LS_ACCESS_TOKEN` (obtainable from Label Studio account page).
+#### Custom Configuration for DataManager:
+- If you need to customize the configuration specifically for DataManager, follow these steps:
+  - Duplicate the `.env.example` file located in the DataManager directory and rename the copy to `.env`.
+  - Make your desired changes in this new `.env` file. The key configurations to consider are:
+      - `NX_API_GATEWAY`: Set this to your API root. For example, `https://localhost:8080/api/dm`.
+      - `LS_ACCESS_TOKEN`: This is the access token for Label Studio, which can be obtained from your Label Studio account page.
+- This process allows you to have a customized configuration for DataManager, separate from the default settings in the .env.local files.
 
 ## Usage Instructions
 ### Key Development and Build Commands

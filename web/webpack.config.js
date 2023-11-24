@@ -7,15 +7,28 @@ const { merge } = require('webpack-merge');
 require('dotenv').config();
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { EnvironmentPlugin } = require('webpack');
+const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const RELEASE = require('./release').getReleaseName();
 
+let css_prefix
+
+switch (process.env.LERNA_PACKAGE_NAME) {
+  case 'labelstudio':
+    css_prefix = 'ls-'
+    break;
+  case 'datamanager':
+    css_prefix = 'dm-'
+    break;
+  case 'editor':
+    css_prefix = 'lsf-'
+}
+
 const LOCAL_ENV = {
   NODE_ENV: 'development',
-  CSS_PREFIX: process.env.CSS_PREFIX,
+  CSS_PREFIX: css_prefix,
   RELEASE_NAME: RELEASE,
 };
 
@@ -34,7 +47,12 @@ const dirPrefix = {
 };
 
 
-const plugins = [new MiniCssExtractPlugin(), new EnvironmentPlugin(LOCAL_ENV)];
+const plugins = [
+  new MiniCssExtractPlugin(),
+  new DefinePlugin({
+    'process.env.CSS_PREFIX': JSON.stringify(css_prefix),
+  }),
+  new EnvironmentPlugin(LOCAL_ENV)];
 
 const optimizer = {};
 
@@ -110,7 +128,7 @@ module.exports = composePlugins(withNx({
 
         if (cssLoader && cssLoader.options) {
           cssLoader.options.modules = {
-            localIdentName: process.env.CSS_PREFIX + '[local]', // Customize this format
+            localIdentName: css_prefix + '[local]', // Customize this format
           };
         }
 

@@ -12,6 +12,16 @@ DataManager boasts several key features, enhancing data handling within Label St
 - Advanced Data Filtering: Slice datasets with filters for precise exploration.
 - Integration with Label Studio Frontend: Ensures cohesive functionality with the Label Studio Frontend.
 
+### Environment Configuration:
+#### Custom Configuration for DataManager:
+- If you need to customize the configuration specifically for DataManager, follow these steps:
+  - Duplicate the `.env.example` file located in the DataManager directory and rename the copy to `.env`.
+  - Make your desired changes in this new `.env` file. The key configurations to consider are:
+    - `NX_API_GATEWAY`: Set this to your API root. For example, `https://localhost:8080/api/dm`.
+    - `LS_ACCESS_TOKEN`: This is the access token for Label Studio, which can be obtained from your Label Studio account page.
+- This process allows you to have a customized configuration for DataManager, separate from the default settings in the .env.local files.
+
+
 ### Usage Instructions
 DataManager provides specific scripts for operation and testing:
 
