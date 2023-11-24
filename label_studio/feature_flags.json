@@ -3525,6 +3525,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_feat_optic_261_improved_organization_member_filter_count_short": {
+      "key": "fflag_feat_optic_261_improved_organization_member_filter_count_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "a81c546a7bd74411882fa5ac45fdf8fc",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_optic_2_ensure_draft_saved_short": {
       "key": "fflag_feat_optic_2_ensure_draft_saved_short",
       "on": true,
