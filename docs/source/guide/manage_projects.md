@@ -3,8 +3,8 @@ title: Manage projects in Label Studio Enterprise
 short: Project management
 tier: enterprise
 type: guide
-order: 115
-order_enterprise: 103
+order: 0
+order_enterprise: 60
 meta_title: Manage Role-Based Access Control in Label Studio
 meta_description: Manage access and set up permissions with user roles, organizations, and project workspaces for your projects in Label Studio Enterprise.
 section: "Project & Team Management"
@@ -121,7 +121,7 @@ As an **Organization Admin** and **Reviewer** in Label Studio UI, you can do the
 - View projects by workspace, including projects that you and other administrators have pinned.
 
 !!! note
-If there are no available pinned projects, all other projects will display.
+    If there are no available pinned projects, all other projects will display.
 
 As an **Annotator** in Label Studio UI, you can do the following:
 
@@ -142,7 +142,8 @@ To pin or unpin projects:
 
 3. Click **Pin project** to pin your projects.
 
-!!! note - When you pin a project, a message (for example, `New Project was pinned`) is displayed at the bottom of the page to confirm that your project is pinned. - Click **Undo** near the message to undo this action.
+!!! note
+    When you pin a project, a message (for example, `New Project was pinned`) is displayed at the bottom of the page to confirm that your project is pinned. - Click **Undo** near the message to undo this action.
 
 4. To filter and display only the pinned projects, click **Pinned projects** on the top-right side drop-down list.
 

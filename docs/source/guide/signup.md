@@ -2,8 +2,8 @@
 title: User management
 type: guide
 tier: opensource
-order: 114
-order_enterprise: 101
+order: 165
+order_enterprise: 0
 meta_title: User Management
 meta_description: Sign up for Label Studio and invite users to collaborate on your data labeling, machine learning, and data science projects.
 section: "Project & Team Management"
@@ -29,7 +29,7 @@ label-studio start --username <username> --password <password> [--user-token <to
 ```
 
 !!! note
-The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters.
+    The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters.
 
 ### Retrieve user info from the command line
 
@@ -87,8 +87,8 @@ Then, start Label Studio and log in with the username and password that you set 
 
 <img src="/images/invite-collaborators-ls-single-server.png" class="gif-border"/>
 
-!!! note
-To invite collaborators, you only need a single Label Studio instance, and all your team members should have access to it. If you want to build a simple solution that exposes Label Studio outside of your local network, you can [try ngrock](https://labelstud.io/guide/start.html#Expose-a-local-Label-Studio-instance-outside-using-ngrok).
+!!! info Tip
+    To invite collaborators, you only need a single Label Studio instance, and all your team members should have access to it. If you want to build a simple solution that exposes Label Studio outside of your local network, you can [try ngrock](https://labelstud.io/guide/start.html#Expose-a-local-Label-Studio-instance-outside-using-ngrok).
 
 After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. Inviting people to your Label Studio instance with a link does not restrict access to the signup page unless you also set an environment variable. See how to [Restrict signup for local deployments](#Restrict-signup-for-local-deployments) and [Restrict signup for cloud deployments](#Restrict-signup-for-cloud-deployments) on this page.
 

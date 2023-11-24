@@ -26,6 +26,8 @@ from io_storages.utils import get_uri_via_regex
 from rq.job import Job
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationSerializer, PredictionSerializer
+from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +152,7 @@ class StorageInfo(models.Model):
             self.job_health_check()
 
         # in progress last ping time, job is not needed here
-        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 2:
+        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 5:
             self.status = self.Status.FAILED
             self.traceback = (
                 'It appears the job was failed because the last ping time is too old, '
@@ -267,7 +269,7 @@ class ImportStorage(Storage):
                 if self.presign and task is not None:
                     proxy_url = urljoin(
                         settings.HOSTNAME,
-                        reverse('data_import:storage-data-presign', kwargs={'task_id': task.id})
+                        reverse('data_import:task-storage-data-presign', kwargs={'task_id': task.id})
                         + f'?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}',
                     )
                     return uri.replace(extracted_uri, proxy_url)
@@ -350,7 +352,8 @@ class ImportStorage(Storage):
             annotation_ser = AnnotationSerializer(data=annotations, many=True)
             if annotation_ser.is_valid(raise_exception=raise_exception):
                 annotation_ser.save()
-            # FIXME: add_annotation_history / post_process_annotations should be here
+        return task
+        # FIXME: add_annotation_history / post_process_annotations should be here
 
     def _scan_and_create_links(self, link_class):
         """
@@ -365,6 +368,7 @@ class ImportStorage(Storage):
         task = self.project.tasks.order_by('-inner_id').first()
         max_inner_id = (task.inner_id + 1) if task else 1
 
+        tasks_for_webhook = []
         for key in self.iterkeys():
             # w/o Dataflow
             # pubsub.push(topic, key)
@@ -389,11 +393,30 @@ class ImportStorage(Storage):
                     f'"Treat every bucket object as a source file"'
                 )
 
-            self.add_task(data, self.project, maximum_annotations, max_inner_id, self, key, link_class)
+            task = self.add_task(data, self.project, maximum_annotations, max_inner_id, self, key, link_class)
             max_inner_id += 1
 
             # update progress counters for storage info
             tasks_created += 1
+
+            # add task to webhook list
+            tasks_for_webhook.append(task)
+
+            # settings.WEBHOOK_BATCH_SIZE
+            # `WEBHOOK_BATCH_SIZE` sets the maximum number of tasks sent in a single webhook call, ensuring manageable payload sizes.
+            # When `tasks_for_webhook` accumulates tasks equal to/exceeding `WEBHOOK_BATCH_SIZE`, they're sent in a webhook via
+            # `emit_webhooks_for_instance`, and `tasks_for_webhook` is cleared for new tasks.
+            # If tasks remain in `tasks_for_webhook` at process end (less than `WEBHOOK_BATCH_SIZE`), they're sent in a final webhook
+            # call to ensure all tasks are processed and no task is left unreported in the webhook.
+            if len(tasks_for_webhook) >= settings.WEBHOOK_BATCH_SIZE:
+                emit_webhooks_for_instance(
+                    self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
+                )
+                tasks_for_webhook = []
+        if tasks_for_webhook:
+            emit_webhooks_for_instance(
+                self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
+            )
 
         self.project.update_tasks_states(
             maximum_annotations_changed=False, overlap_cohort_percentage_changed=False, tasks_number_changed=True
@@ -422,6 +445,7 @@ class ImportStorage(Storage):
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,
                     on_failure=storage_background_failure,
+                    job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 )
                 self.info_set_job(sync_job.id)
                 logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
