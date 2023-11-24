@@ -2,7 +2,7 @@
 """
 import json
 import logging
-from typing import Mapping, Optional
+from typing import Any, Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
 from core.bulk_update_utils import bulk_update
@@ -152,6 +152,7 @@ class Project(ProjectMixin, models.Model):
         default=None,
         help_text='Parsed label config in JSON format. See more about it in documentation',
     )
+    label_config_hash = models.BigIntegerField(null=True, default=None)
     expert_instruction = models.TextField(
         _('expert instruction'), blank=True, null=True, default='', help_text='Labeling instructions in HTML format'
     )
@@ -576,6 +577,15 @@ class Project(ProjectMixin, models.Model):
         # validate labels consistency
         labels_from_config, dynamic_label_from_config = get_all_labels(config_string)
         created_labels = merge_labels_counters(self.summary.created_labels, self.summary.created_labels_drafts)
+
+        def display_count(count: int, type: str) -> Optional[str]:
+            """Helper for displaying pluralized sources of validation errors,
+            eg "1 draft" or "3 annotations"
+            """
+            if not count:
+                return None
+            return f'{count} {type}{"s" if count > 1 else ""}'
+
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
             if (
@@ -606,9 +616,17 @@ class Project(ProjectMixin, models.Model):
             # check if labels from is subset if config labels
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
-                diff_str = '\n'.join(
-                    f'{l} ({labels_from_data[l]} annotations)' for l in different_labels  # noqa: E741
-                )
+                diff_str = ''
+                for label in different_labels:
+                    annotation_label_count = self.summary.created_labels.get(control_tag_from_data, {}).get(label, 0)
+                    draft_label_count = self.summary.created_labels_drafts.get(control_tag_from_data, {}).get(label, 0)
+                    annotation_display_count = display_count(annotation_label_count, 'annotation')
+                    draft_display_count = display_count(draft_label_count, 'draft')
+
+                    display = [disp for disp in [annotation_display_count, draft_display_count] if disp]
+                    if display:
+                        diff_str += f'{label} ({", ".join(display)})\n'
+
                 if (strict is True) and (
                     (control_tag_from_data not in dynamic_label_from_config)
                     and (
@@ -619,7 +637,7 @@ class Project(ProjectMixin, models.Model):
                 ):
                     # raise error if labels not dynamic and not in regex rules
                     raise LabelStudioValidationErrorSentryIgnored(
-                        f'These labels still exist in annotations or drafts:\n{diff_str}.'
+                        f'These labels still exist in annotations or drafts:\n{diff_str}'
                         f'Please add labels to tag with name="{str(control_tag_from_data)}".'
                     )
                 else:
@@ -676,6 +694,7 @@ class Project(ProjectMixin, models.Model):
         if self._label_config_has_changed() or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
             self.parsed_label_config = parse_config(self.label_config)
+            self.label_config_hash = hash(str(self.parsed_label_config))
 
         if self.label_config and (self._label_config_has_changed() or not exists or not self.control_weights):
             self.control_weights = self.get_updated_weights()
@@ -887,6 +906,18 @@ class Project(ProjectMixin, models.Model):
 
         self._storage_objects = storage_objects
         return storage_objects
+
+    def resolve_storage_uri(self, url: str) -> Optional[Mapping[str, Any]]:
+        from io_storages.functions import get_storage_by_url
+
+        storage_objects = self.get_all_storage_objects()
+        storage = get_storage_by_url(url, storage_objects)
+
+        if storage:
+            return {
+                'url': storage.generate_http_url(url),
+                'presign_ttl': storage.presign_ttl,
+            }
 
     def _update_tasks_counters(self, queryset, from_scratch=True):
         """
@@ -1269,7 +1300,7 @@ class ProjectSummary(models.Model):
                 for label in self._get_labels(result):
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
-        logger.debug(f'summary.created_labels = {labels}')
+        logger.debug(f'update summary.created_labels_drafts = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
 
@@ -1293,7 +1324,7 @@ class ProjectSummary(models.Model):
                             labels[from_name].pop(label)
                 if not labels[from_name]:
                     labels.pop(from_name)
-        logger.debug(f'summary.created_labels = {labels}')
+        logger.debug(f'summary.created_labels_drafts = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
 

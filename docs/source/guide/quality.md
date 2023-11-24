@@ -3,8 +3,8 @@ title: Review annotations in Label Studio
 short: Review annotations
 tier: enterprise
 type: guide
-order: 300
-order_enterprise: 113
+order: 0
+order_enterprise: 255
 meta_title: Review annotation quality in Label Studio
 meta_description: In data labeling projects, start evaluating annotator performance against ground truth annotations, predictions, and other annotator's annotations.
 section: "Quality control"
@@ -32,7 +32,7 @@ After you [assign reviewers to tasks](#Assign-reviewers-to-tasks), they can revi
 3. Continue reviewing annotated tasks until you've reviewed all annotated tasks. Click **Data Manager** to return to the list of tasks for the project.
 
 !!! note
-If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
+    If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
 
 ### Choose what to review
 
@@ -79,7 +79,7 @@ You can now navigate back through the review stream in the same path as moving f
 16. Navigate back through the Review Stream using the go back (`<`) button.
 
 !!! note
-Confirm that you are not taken through the same path that you have come through moving forward.
+    Confirm that you are not taken through the same path that you have come through moving forward.
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/go-back-reviewstream.png" style="opacity: 0.8"/></div>
@@ -153,7 +153,7 @@ Define ground truth annotations in a Label Studio project. Use ground truth anno
 Label Studio Enterprise compares annotations from annotators and model predictions against the ground truth annotations for a task to calculate an accuracy score between 0 and 1.
 
 !!! note
-Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](https://labelstud.io/guide/label_studio_compare.html) to learn more.
+    Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](https://labelstud.io/guide/label_studio_compare.html) to learn more.
 
 ## Define ground truth annotations for a project
 

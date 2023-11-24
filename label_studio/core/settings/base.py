@@ -15,7 +15,7 @@ import os
 import re
 from datetime import timedelta
 
-from label_studio.core.utils.params import get_bool_env
+from label_studio.core.utils.params import get_bool_env, get_env_list
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -107,6 +107,14 @@ INTERNAL_PORT = '8080'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
 DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
+
+# Whether to verify SSL certs when making external requests, eg in the uploader
+# ⚠️ Turning this off means assuming risk. ⚠️
+# Overridable at organization level via Organization#verify_ssl_certs
+VERIFY_SSL_CERTS = get_bool_env('VERIFY_SSL_CERTS', True)
+
+# 'sqlite-dll-<arch>-<version>.zip' should be hosted at this prefix
+WINDOWS_SQLITE_BINARY_HOST_PREFIX = get_env('WINDOWS_SQLITE_BINARY_HOST_PREFIX', 'https://www.sqlite.org/2023/')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -523,6 +531,8 @@ TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
+ORGANIZATION_MEMBER_MIXIN = 'organizations.mixins.OrganizationMemberMixin'
+MEMBER_PERM = 'core.api_permissions.MemberHasOwnerPermission'
 RECALCULATE_ALL_STATS = None
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
@@ -549,6 +559,7 @@ USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
 WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_BATCH_SIZE = int(get_env('WEBHOOK_BATCH_SIZE', 100))
 WEBHOOK_SERIALIZERS = {
     'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
     'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
@@ -632,6 +643,7 @@ if get_env('STORAGE_TYPE') == 's3':
     AWS_S3_VERIFY = get_env('STORAGE_AWS_S3_VERIFY', None)
     if AWS_S3_VERIFY == 'false' or AWS_S3_VERIFY == 'False' or AWS_S3_VERIFY == '0':
         AWS_S3_VERIFY = False
+    AWS_S3_SIGNATURE_VERSION = get_env('STORAGE_AWS_S3_SIGNATURE_VERSION', None)
 
 if get_env('STORAGE_TYPE') == 'azure':
     CLOUD_FILE_STORAGE_ENABLED = True
@@ -658,3 +670,10 @@ if CSRF_TRUSTED_ORIGINS:
 
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
+PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
+
+# By default, we disallow filters with foreign keys in data manager for security reasons.
+# Add to this list (either here in code, or via the env) to allow specific filters that rely on foreign keys.
+DATA_MANAGER_FILTER_ALLOWLIST = list(
+    set(get_env_list('DATA_MANAGER_FILTER_ALLOWLIST') + ['updated_by__active_organization'])
+)

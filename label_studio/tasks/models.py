@@ -6,7 +6,7 @@ import logging
 import numbers
 import os
 import uuid
-from typing import cast
+from typing import Any, Mapping, Optional, cast
 from urllib.parse import urljoin
 
 import ujson as json
@@ -318,12 +318,15 @@ class Task(TaskMixin, models.Model):
             return filename.replace(settings.MEDIA_URL, '')
         return filename
 
-    def resolve_storage_uri(self, url, project):
+    def resolve_storage_uri(self, url) -> Optional[Mapping[str, Any]]:
+        from io_storages.functions import get_storage_by_url
+
         storage = self.storage
+        project = self.project
 
         if not storage:
             storage_objects = project.get_all_storage_objects(type_='import')
-            storage = self._get_storage_by_url(url, storage_objects)
+            storage = get_storage_by_url(url, storage_objects)
 
         if storage:
             return {
@@ -332,6 +335,8 @@ class Task(TaskMixin, models.Model):
             }
 
     def resolve_uri(self, task_data, project):
+        from io_storages.functions import get_storage_by_url
+
         if project.task_data_login and project.task_data_password:
             protected_data = {}
             for key, value in task_data.items():
@@ -369,11 +374,11 @@ class Task(TaskMixin, models.Model):
                     continue
 
                 # project storage
-                # TODO: to resolve nested lists and dicts we should improve _get_storage_by_url(),
-                # TODO: problem with current approach: it can be used only the first storage that _get_storage_by_url
+                # TODO: to resolve nested lists and dicts we should improve get_storage_by_url(),
+                # TODO: problem with current approach: it can be used only the first storage that get_storage_by_url
                 # TODO: returns. However, maybe the second storage will resolve uris properly.
                 # TODO: resolve_uri() already supports them
-                storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
+                storage = self.storage or get_storage_by_url(task_data[field], storage_objects)
                 if storage:
                     try:
                         proxy_task = None
@@ -390,25 +395,6 @@ class Task(TaskMixin, models.Model):
                     if resolved_uri:
                         task_data[field] = resolved_uri
             return task_data
-
-    def _get_storage_by_url(self, url, storage_objects):
-        """Find the first compatible storage and returns pre-signed URL"""
-
-        for storage_object in storage_objects:
-            # check url is string because task can have int, float, dict, list
-            # and 'can_resolve_url' will fail
-            if isinstance(url, str) and storage_object.can_resolve_url(url):
-                return storage_object
-
-        # url is list or dict
-        if flag_set('fflag_feat_front_lsdv_4661_full_uri_resolve_15032023_short', user='auto'):
-            if isinstance(url, dict) or isinstance(url, list):
-                for storage_object in storage_objects:
-                    if storage_object.can_resolve_url(url):
-                        # note: only first found storage_object will be used for link resoling
-                        # probably we need to use more advanced can_resolve_url mechanics
-                        # that takes into account not only prefixes, but bucket path too
-                        return storage_object
 
     @property
     def storage(self):
@@ -1034,8 +1020,15 @@ def delete_draft(sender, instance, **kwargs):
     task = instance.task
     query_args = {'task': task, 'annotation': instance}
     drafts = AnnotationDraft.objects.filter(**query_args)
-    num_drafts = drafts.count()
-    drafts.delete()
+    num_drafts = 0
+    for draft in drafts:
+        # Delete each draft individually because deleting
+        # the whole queryset won't update `created_labels_drafts`
+        try:
+            draft.delete()
+            num_drafts += 1
+        except AnnotationDraft.DoesNotExist:
+            continue
     logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {instance}')
 
 

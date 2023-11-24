@@ -1,8 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import datetime
+from typing import Optional
 
+from core.feature_flags import flag_set
 from core.utils.common import load_func
+from core.utils.db import fast_first
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -23,8 +26,8 @@ for r in range(YEAR_START, (datetime.datetime.now().year + 1)):
 year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 
-class UserManager(BaseUserManager):
-    use_in_migrations = True
+class UserManagerWithDeleted(BaseUserManager):
+    use_in_migrations: bool = True
 
     def _create_user(self, email, password, **extra_fields):
         """
@@ -56,6 +59,15 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self._create_user(email, password, **extra_fields)
+
+
+class UserManager(UserManagerWithDeleted):
+    use_in_migrations: bool = False
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(is_deleted=False)
+        return qs
 
 
 class UserLastActivityMixin(models.Model):
@@ -95,7 +107,13 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     is_active = models.BooleanField(
         _('active'),
         default=True,
-        help_text=_('Designates whether to treat this user as active. ' 'Unselect this instead of deleting accounts.'),
+        help_text=_('Designates whether to treat this user as active. Unselect this instead of deleting accounts.'),
+    )
+    is_deleted = models.BooleanField(
+        _('deleted'),
+        default=False,
+        db_index=True,
+        help_text=_('Designates whether to treat this user as deleted. Select this instead of deleting accounts.'),
     )
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
@@ -111,6 +129,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     )
 
     objects = UserManager()
+    with_deleted = UserManagerWithDeleted()
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
@@ -147,8 +166,8 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         return annotations.values_list('project').distinct().count()
 
     @property
-    def own_organization(self):
-        return Organization.objects.get(created_by=self)
+    def own_organization(self) -> Optional[Organization]:
+        return fast_first(Organization.objects.filter(created_by=self))
 
     @property
     def has_organization(self):
@@ -176,14 +195,16 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         """Return the short name for the user."""
         return self.first_name
 
-    def reset_token(self):
-        token = Token.objects.filter(user=self)
-        if token.exists():
-            token.delete()
+    def reset_token(self) -> Token:
+        Token.objects.filter(user=self).delete()
         return Token.objects.create(user=self)
 
-    def get_initials(self):
+    def get_initials(self, is_deleted=False):
         initials = '?'
+
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self) and is_deleted:
+            return 'DU'
+
         if not self.first_name and not self.last_name:
             initials = self.email[0:2]
         elif self.first_name and not self.last_name:

@@ -19,17 +19,17 @@ logger = logging.getLogger(__name__)
 
 def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters'):
     logger = logging.getLogger(__name__)
-    # Don't load the contact_info field bc this function is called by migrations
-    # that run before the field was added
-    organizations = Organization.objects.defer('contact_info').order_by('-id')
+    # Don't load full Organization objects bc some columns (contact_info, verify_ssl_certs)
+    # aren't created until after a migration calls this code
+    organization_ids = Organization.objects.order_by('-id').values_list('id', flat=True)
 
-    for org in organizations:
-        logger.debug(f'Start recalculating stats for Organization {org.id}')
+    for org_id in organization_ids:
+        logger.debug(f'Start recalculating stats for Organization {org_id}')
 
         # start async calculation job on redis
         start_job_async_or_sync(
             redis_job_for_calculation,
-            org,
+            org_id,
             from_scratch,
             redis=redis,
             queue_name='critical',
@@ -37,15 +37,15 @@ def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_mi
             migration_name=migration_name,
         )
 
-        logger.debug(f'Organization {org.id} stats were recalculated')
+        logger.debug(f'Organization {org_id} stats were recalculated')
 
     logger.debug('All organizations were recalculated')
 
 
-def redis_job_for_calculation(org, from_scratch, migration_name='0018_manual_migrate_counters'):
+def redis_job_for_calculation(org_id, from_scratch, migration_name='0018_manual_migrate_counters'):
     """
     Recalculate counters for projects list
-    :param org: Organization to recalculate
+    :param org_id: ID of organization to recalculate
     :param from_scratch: Start calculation from scratch or skip calculated tasks
     """
     logger = logging.getLogger()
@@ -57,7 +57,7 @@ def redis_job_for_calculation(org, from_scratch, migration_name='0018_manual_mig
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-    projects = Project.objects.filter(organization=org).order_by('-updated_at')
+    projects = Project.objects.filter(organization_id=org_id).order_by('-updated_at')
     for project in projects:
         migration = AsyncMigrationStatus.objects.create(
             project=project,
@@ -127,7 +127,7 @@ def _fill_annotations_project(project_id):
 def fill_annotations_project():
     logger.info('Start filling project field for Annotation model')
 
-    projects = Project.objects.all()
+    projects = Project.objects.all().only('id')
     for project in projects:
         start_job_async_or_sync(_fill_annotations_project, project.id)
 
@@ -135,7 +135,7 @@ def fill_annotations_project():
 
 
 def _fill_predictions_project(migration_name='0043_auto_20230825'):
-    projects = Project.objects.all()
+    projects = Project.objects.all().only('id')
     for project in projects:
         migration = AsyncMigrationStatus.objects.create(
             project=project,

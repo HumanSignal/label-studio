@@ -57,7 +57,7 @@ def register_ml_backend_mock(
 
 @contextmanager
 def import_from_url_mock(**kwargs):
-    with mock.patch('data_import.uploader.validate_upload_url'):
+    with mock.patch('core.utils.io.validate_upload_url'):
         with requests_mock.Mocker(real_http=True) as m:
 
             with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
@@ -118,7 +118,9 @@ def gcs_client_mock():
             self.name = bucket_name
             self.is_json = is_json
 
-        def list_blobs(self, prefix):
+        def list_blobs(self, prefix, **kwargs):
+            if 'fake' in prefix:
+                return []
             return [File('abc'), File('def'), File('ghi')]
 
         def blob(self, key):

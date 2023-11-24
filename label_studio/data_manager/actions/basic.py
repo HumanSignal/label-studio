@@ -9,7 +9,7 @@ from core.utils.common import load_func
 from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
-from tasks.models import Annotation, Prediction, Task
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
 
@@ -66,7 +66,7 @@ def delete_tasks(project, queryset, **kwargs):
 
 
 def delete_tasks_annotations(project, queryset, **kwargs):
-    """Delete all annotations by tasks ids
+    """Delete all annotations and drafts by tasks ids
 
     :param project: project instance
     :param queryset: filtered tasks db queryset
@@ -80,7 +80,13 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations_ids = list(annotations.values('id'))
     # remove deleted annotations from project.summary
     project.summary.remove_created_annotations_and_labels(annotations)
+    # also remove drafts for the task. This includes task and annotation level
+    # drafts by design.
+    drafts = AnnotationDraft.objects.filter(task__id__in=task_ids)
+    project.summary.remove_created_drafts_and_labels(drafts)
+
     annotations.delete()
+    drafts.delete()  # since task-level annotation drafts will not have been deleted by CASCADE
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     request = kwargs['request']
 
