@@ -15,9 +15,9 @@ _Important Note: These scripts must be executed within the web folder or its sub
 - **`yarn lsf:e2e`: Execute end-to-end (e2e) tests on LSF**
   - To run comprehensive e2e tests, ensuring the frontend works as expected from start to finish. The Label Studio environment must be running, typically at `http://localhost:8080`.
 - **`yarn lsf:integration`: Run integration tests**
-  - To conduct integration tests using Cypress, verifying that different parts of LSF work together correctly.
+  - To conduct integration tests using Cypress, verifying that different parts of LSF work together correctly. The LSF in standalone mode (`yarn lsf:serve`) must be running.
 - **`yarn lsf:integration:ui`: Run integration tests in UI mode**
-  - Facilitates debugging during integration tests by running them in a UI mode, allowing you to visually track what is being tested.
+  - Facilitates debugging during integration tests by running them in a UI mode, allowing you to visually track what is being tested. The LSF in standalone mode (`yarn lsf:serve`) must be running.
 - **`yarn lsf:unit`: Run unit tests on LSF**
   - Essential for maintaining code quality and reliability, especially in collaborative development.
 
