@@ -15,6 +15,8 @@ DataManager boasts several key features, enhancing data handling within Label St
 ### Usage Instructions
 DataManager provides specific scripts for operation and testing:
 
+_Important Note: These scripts must be executed within the web folder or its subfolders. This is crucial for the scripts to function correctly, as they are designed to work within the context of the web directory's structure and dependencies._
+
 - **`yarn dm:watch`: Build DataManager continuously.**
     - This script is essential for development. It continuously builds DataManager, allowing developers to see their changes in real-time within the Label Studio environment.
 - **`yarn dm:unit`: Run unit tests on DataManager.**

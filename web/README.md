@@ -21,14 +21,9 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 2 - **Environment Configuration:**
 - By default, the configuration is set in the .env.local files. These files contain the default settings used by the application.
 - For custom configuration, you can duplicate the `.env.example` files in each directory and rename them as `.env`. Then, make the necessary changes as per your requirements. The steps are as follows:
-    - `apps/labelstudio/.env.example` -> `apps/labelstudio/.env`
-        - Configure `CSS_PREFIX` (e.g., `ls-`). Ensure uniqueness across apps and libraries.
-    - `libs/editor/.env.example` -> `libs/editor/.env`
-        - Set `CSS_PREFIX` (e.g., `lsf-`).
     - `libs/datamanager/.env.example` -> `libs/datamanager/.env`
         - Set `NX_API_GATEWAY` to your API root (e.g., `https://localhost:8080/api/dm`).
         - Configure `LS_ACCESS_TOKEN` (obtainable from Label Studio account page).
-        - Set `CSS_PREFIX` (e.g., `dm-`).
 
 ## Usage Instructions
 ### Key Development and Build Commands

@@ -3,6 +3,9 @@
 The Label Studio App is the cornerstone of the frontend aspect of Label Studio. This React-based application is where the magic of frontend development for Label Studio occurs. In this app, developers have the freedom and capability to create new pages and determine how libraries are utilized within the Label Studio environment. It's a purely frontend module, dedicated to crafting and refining the user interface and user experience aspects of Label Studio.
 
 ### Usage Instructions
+
+_Important Note: These scripts must be executed within the web folder or its subfolders. This is crucial for the scripts to function correctly, as they are designed to work within the context of the web directory's structure and dependencies._
+
 - **`yarn ls:watch`: Build LSF continuously**
     - Automatically builds the Label Studio on every change, providing a real-time development experience.
 - **`yarn ls:e2e`: Execute end-to-end (e2e) tests on LS**
