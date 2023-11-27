@@ -273,7 +273,12 @@ const Model = types
         ctx.save();
         if (isFF(FF_ZOOM_OPTIM)) {
           ctx.beginPath();
-          ctx.rect(self.parent.alignmentOffset.x, self.parent.alignmentOffset.y, self.parent.stageWidth, self.parent.stageHeight);
+          ctx.rect(
+            self.parent.alignmentOffset.x,
+            self.parent.alignmentOffset.y,
+            self.parent.stageWidth * self.parent.stageScale,
+            self.parent.stageHeight * self.parent.stageScale,
+          );
           ctx.clip();
         }
         ctx.beginPath();
