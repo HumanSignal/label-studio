@@ -1,6 +1,6 @@
 {
-  "message": "ci: TEST",
-  "commit": "0fc0c9966cbdf3fd9eebce9fda823c9708d200b2",
-  "branch": "fb-ci-test-1",
-  "date": "2023-11-22T16:58:04Z"
+  "message": "fix: LEAP-419: Fix brush issues appeared after fixing zoom performance",
+  "commit": "983a9a92f629362bb78122e3c859208f79f7d588",
+  "branch": "fb-leap-419/brush-fixes",
+  "date": "2023-11-27T15:35:01Z"
 }
