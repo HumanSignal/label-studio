@@ -18,7 +18,7 @@ import IsReadyMixin from '../mixins/IsReadyMixin';
 import { KonvaRegionMixin } from '../mixins/KonvaRegion';
 import { ImageModel } from '../tags/object/Image';
 import { colorToRGBAArray, rgbArrayToHex } from '../utils/colors';
-import { FF_DEV_3793, FF_DEV_4081, isFF } from '../utils/feature-flags';
+import { FF_DEV_3793, FF_DEV_4081, FF_ZOOM_OPTIM, isFF } from '../utils/feature-flags';
 import { AliveRegion } from './AliveRegion';
 import { RegionWrapper } from './RegionWrapper';
 
@@ -271,6 +271,11 @@ const Model = types
         const ctx = layer.canvas.context;
 
         ctx.save();
+        if (isFF(FF_ZOOM_OPTIM)) {
+          ctx.beginPath();
+          ctx.rect(self.parent.alignmentOffset.x, self.parent.alignmentOffset.y, self.parent.stageWidth, self.parent.stageHeight);
+          ctx.clip();
+        }
         ctx.beginPath();
         if (cachedPoints.length / 2 > 3) {
           ctx.moveTo(...self.prepareCoords([lastPointX, lastPointY]));
@@ -535,7 +540,11 @@ const HtxBrushView = ({ item, setShapeRef }) => {
       if (image) {
         if (!imageData) {
           context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
-          imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
+          if (isFF(FF_ZOOM_OPTIM)) {
+            imageData = context.getImageData(item.parent.alignmentOffset.x, item.parent.alignmentOffset.y, item.parent.stageWidth, item.parent.stageHeight);
+          } else {
+            imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
+          }
           const colorParts = colorToRGBAArray(shape.colorKey);
 
           for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
@@ -613,6 +622,27 @@ const HtxBrushView = ({ item, setShapeRef }) => {
   if (!item.parent) return null;
 
   const stage = item.parent?.stageRef;
+  const highlightProps = isFF(FF_ZOOM_OPTIM) ? {
+    scaleX: 1 / item.parent.zoomScale,
+    scaleY: 1 / item.parent.zoomScale,
+    x: -(item.parent.zoomingPositionX + item.parent.alignmentOffset.x) / item.parent.zoomScale,
+    y: -(item.parent.zoomingPositionY + item.parent.alignmentOffset.y) / item.parent.zoomScale,
+    width: item.containerWidth,
+    height: item.containerHeight,
+  } : {
+    scaleX: 1 / item.parent.stageScale,
+    scaleY: 1 / item.parent.stageScale,
+    x: -item.parent.zoomingPositionX / item.parent.stageScale,
+    y: -item.parent.zoomingPositionY / item.parent.stageScale,
+    width: item.parent.canvasSize.width,
+    height: item.parent.canvasSize.height,
+  };
+  const clip = isFF(FF_ZOOM_OPTIM) ? {
+    x: 0,
+    y: 0,
+    width: item.parent.stageWidth,
+    height: item.parent.stageHeight,
+  } : null;
 
   return (
     <RegionWrapper item={item}>
@@ -627,6 +657,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
         }}
         clearBeforeDraw={!item.isDrawing}
         visible={!item.hidden}
+        clip={clip}
       >
         <Group
           attrMy={item.needsUpdate}
@@ -664,6 +695,13 @@ const HtxBrushView = ({ item, setShapeRef }) => {
               return;
             }
 
+            if (!isFF(FF_ZOOM_OPTIM)) {
+              const tool = item.parent.getToolsManager().findSelectedTool();
+              const isMoveTool = tool && getType(tool).name === 'MoveTool';
+
+              if (tool && !isMoveTool) return;
+            }
+
             if (store.annotationStore.selected.relationMode) {
               stage.container().style.cursor = 'default';
             }
@@ -693,12 +731,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
             sceneFunc={highlightedRef.current.highlighted ? null : () => { }}
             hitFunc={() => { }}
             {...highlightedRef.current.highlight}
-            scaleX={1 / item.parent.stageScale}
-            scaleY={1 / item.parent.stageScale}
-            x={-item.parent.zoomingPositionX / item.parent.stageScale}
-            y={-item.parent.zoomingPositionY / item.parent.stageScale}
-            width={item.parent.stageWidth}
-            height={item.parent.stageHeight}
+            {...highlightProps}
             listening={false}
           />
         </Group>
