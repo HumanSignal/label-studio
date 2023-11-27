@@ -369,6 +369,26 @@ def add_data_field_form(user, project):
         }
     ]
 
+def batch_train(project, queryset, **kwargs):
+    request = kwargs['request']
+
+    """Call ML backend for prediction evaluation of the task queryset"""
+    tasks = queryset
+    if not tasks:
+        return
+    project = tasks[0].project
+
+    for ml_backend in project.ml_backends.all():
+
+        print("........we made it here")
+
+
+        ml_backend.train(tasks=tasks)
+        
+        # ml_backend.predict_tasks(tasks=tasks)
+
+    return {'processed_items': queryset.count(), 'detail': 'Retrieved ' + str(queryset.count()) + ' predictions'}
+
 
 actions = [
     {
@@ -413,6 +433,18 @@ actions = [
             'type': 'confirm',
         },
     },
+    {
+        'entry_point': batch_train,
+        'permission': all_permissions.projects_change, # check that this is enough for permisions
+        'title': 'Batch Train Model',
+        'order': 1,
+        'experimental': True,
+        'dialog': {
+            'text': 'Confirm that you want to train off of all annotated tasks.',
+            'type': 'confirm'
+        }
+    },
+
     {
         'entry_point': rename_labels,
         'permission': all_permissions.tasks_change,
