@@ -173,10 +173,9 @@ class MLApi(BaseHTTPAPI):
         time_id = int(project.created_at.timestamp())
         return f'{project.id}.{time_id}'
 
-    def train(self, project, use_ground_truth=False, tasks=None):
+    def train(self, project, use_ground_truth=False, batch_tasks=None):
         # TODO Replace AnonymousUser with real user from request
         user = AnonymousUser()
-        print(f".....we made it here 1.2")
         # Identify if feature flag is turned on
         if flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', user):
             request = {
@@ -184,28 +183,36 @@ class MLApi(BaseHTTPAPI):
                 'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data,
             }
             return self._request('webhook', request, verbose=False, timeout=TIMEOUT_PREDICT)
-        else:
-            print(f".....we made it here 1.5")
+        
+        elif batch_tasks is None:
             # get only tasks with annotations
-            if tasks is None:
-                tasks = project.tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
-            else:
-                tasks = tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
+            tasks = project.tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
             # create serialized tasks with annotations: {"data": {...}, "annotations": [{...}], "predictions": [{...}]}
-            # keeping this the same for if we send in tasks
+            tasks_ser = ExportDataSerializer(tasks, many=True).data
+            logger.debug(f'{len(tasks_ser)} tasks with annotations are sent to ML backend for training.')
+            request = {
+                'annotations': tasks_ser,
+                'project': self._create_project_uid(project),
+                'label_config': project.label_config,
+                'params': {'login': project.task_data_login, 'password': project.task_data_password},
+            }
+            return self._request('train', request, verbose=False, timeout=TIMEOUT_PREDICT)
+
+        else:
+            tasks = batch_tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
+            # create serialized tasks with annotations: {"data": {...}, "annotations": [{...}], "predictions": [{...}]}
             tasks_ser = ExportDataSerializer(tasks, many=True).data
             logger.debug(f'{len(tasks_ser)} tasks with annotations are sent to ML backend for training.')
             request = {
                 'annotations': tasks_ser,
                 'action': 'PROJECT_UPDATED',
-                # 'project': self._create_project_uid(project),
                 'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data,
                 'label_config': project.label_config,
                 'params': {'login': project.task_data_login, 'password': project.task_data_password},
             }
-            print(".....we made it here 2")
             return self._request('webhook', request, verbose=False, timeout=TIMEOUT_PREDICT)
 
+    
     def make_predictions(self, tasks, model_version, project, context=None):
         request = {
             'tasks': tasks,

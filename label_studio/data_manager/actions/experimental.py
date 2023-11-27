@@ -380,13 +380,8 @@ def batch_train(project, queryset, **kwargs):
 
     for ml_backend in project.ml_backends.all():
 
-        print("........we made it here")
-
-
         ml_backend.train(tasks=tasks)
         
-        # ml_backend.predict_tasks(tasks=tasks)
-
     return {'processed_items': queryset.count(), 'detail': 'Retrieved ' + str(queryset.count()) + ' predictions'}
 
 

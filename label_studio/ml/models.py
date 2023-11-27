@@ -149,7 +149,7 @@ class MLBackend(models.Model):
         self.update_state()
         # 
 
-        train_response = self.api.train(project=self.project, tasks=tasks)
+        train_response = self.api.train(project=self.project, batch_tasks=tasks)
         print(f"....the train_response is {train_response}")
         if train_response.is_error:
             self.state = MLBackendState.ERROR
