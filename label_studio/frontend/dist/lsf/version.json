@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-31: Fix functioning of auto annotations (#1605)",
-  "commit": "f209200de05aad01cba5dffc59883d0de4615458",
-  "branch": "master",
-  "date": "2023-11-21T23:29:28Z"
+  "message": "fix: LEAP-419: Fix brush issues appeared after fixing zoom performance",
+  "commit": "983a9a92f629362bb78122e3c859208f79f7d588",
+  "branch": "fb-leap-419/brush-fixes",
+  "date": "2023-11-27T15:35:01Z"
 }
