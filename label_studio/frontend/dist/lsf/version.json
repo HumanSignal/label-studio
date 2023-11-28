@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-364: Fix crosshair functionality (#1616)",
-  "commit": "4891f397096fe3a8773ec98ba7e56d0289810b82",
+  "message": "fix: LEAP-31: Fix functioning of auto annotations (#1605)",
+  "commit": "f209200de05aad01cba5dffc59883d0de4615458",
   "branch": "master",
-  "date": "2023-11-14T15:48:46Z"
+  "date": "2023-11-21T23:29:28Z"
 }

@@ -55,10 +55,11 @@ jobs:
             grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
           fi
           
-          echo "commit_msg_file=$(cat /tmp/info_commit_msg)" >> $GITHUB_OUTPUT
-          echo "COMMIT_MSG_FILE<<EOF" >> $GITHUB_ENV
-          echo "$(cat /tmp/info_commit_msg)" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            echo "COMMIT_MSG_FILE<<EOF"
+            cat /tmp/info_commit_msg
+            echo "EOF" 
+          } >> "${GITHUB_ENV}"
 
       - name: Commit and push
         id: commit_and_push
