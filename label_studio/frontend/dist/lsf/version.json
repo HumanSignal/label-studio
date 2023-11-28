@@ -1,6 +1,6 @@
 {
-  "message": "ci: TEST",
-  "commit": "0fc0c9966cbdf3fd9eebce9fda823c9708d200b2",
-  "branch": "fb-ci-test-1",
-  "date": "2023-11-22T16:58:04Z"
+  "message": "fix: LEAP-377: Polygon points can be moved correctly",
+  "commit": "a142a2654d1f1eb8cc1ad5e987e9c699be93af0e",
+  "branch": "fb-leap-377/polygon-points",
+  "date": "2023-11-28T02:13:07Z"
 }
