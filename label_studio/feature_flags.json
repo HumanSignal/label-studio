@@ -4362,6 +4362,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_back_optic_287_aggregate_query_for_groundtruth_per_user_short": {
+      "key": "fflag_fix_back_optic_287_aggregate_query_for_groundtruth_per_user_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "d30058aa1b7e4947994f0d726d9ae6ff",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short": {
       "key": "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short",
       "on": true,
