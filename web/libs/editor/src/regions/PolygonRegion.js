@@ -471,9 +471,7 @@ const Poly = memo(observer(({ item, colors, dragProps, draggable }) => {
  */
 function Edge({ name, item, idx, p1, p2, closed, regionStyles }) {
   const insertIdx = idx + 1; // idx1 + 1 or idx2
-  const flattenedPoints = useMemo(() => {
-    return getFlattenedPoints([p1, p2]);
-  }, [p1, p2]);
+  const flattenedPoints = [p1.canvasX, p1.canvasY, p2.canvasX, p2.canvasY];
 
   const lineProps = closed ? {
     stroke: 'transparent',
