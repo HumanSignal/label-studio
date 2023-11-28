@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-377: Polygon points can be moved correctly",
-  "commit": "a142a2654d1f1eb8cc1ad5e987e9c699be93af0e",
+  "commit": "a6802d2f4c8d6f652ba61b6a3a9cd5d47ff26ff3",
   "branch": "fb-leap-377/polygon-points",
-  "date": "2023-11-28T02:13:07Z"
+  "date": "2023-11-28T19:17:37Z"
 }
