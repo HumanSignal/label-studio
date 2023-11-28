@@ -1,6 +1,6 @@
 {
-  "message": "ci: TEST",
-  "commit": "0fc0c9966cbdf3fd9eebce9fda823c9708d200b2",
-  "branch": "fb-ci-test-1",
-  "date": "2023-11-22T16:58:04Z"
+  "message": "docs: DOC-161: Add beta tag for external taxonomy",
+  "commit": "6f7d7cad209caef4a4f3354e151db562c14019aa",
+  "branch": "fb-docs/beta-tag-taxonomy",
+  "date": "2023-11-28T15:32:36Z"
 }
