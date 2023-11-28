@@ -122,7 +122,8 @@ export const DataManagerPage = ({ ...props }) => {
     dataManager.on("navigate", (route) => {
       const target = route.replace(/^projects/, "");
 
-      history.push(buildLink(target, { id: params.id }));
+      if (target) history.push(buildLink(target, { id: params.id }));
+      else history.push("/projects/");
     });
 
     if (interactiveBacked) {
