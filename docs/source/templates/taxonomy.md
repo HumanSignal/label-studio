@@ -52,9 +52,17 @@ Use the [`Choice`](/tags/choice.html) tag to specify the taxonomy. Nest choices 
 ```
 
 
-## Taxonomies defined using a remote source
+## Taxonomies defined using a remote source - Beta 🧪
 
-You can modify the template to call an external taxonomy. To do this, remove the `Choice` tags and specify the `apiUrl` parameter:
+!!! note Beta feature
+    The feature to call external taxonomies through `apiUrl` is currently in its beta phase.  
+
+You can modify the template to call an external taxonomy. There are two types of external taxonomies:
+
+* [Taxonomies defined in JSON file](#Flat-file-format).
+* [Taxonomies defined in an API](#API-taxonomies).
+
+To call an external taxonomy, remove the `Choice` tags and specify the `apiUrl` parameter:
 
 ```xml
 <Taxonomy name="taxonomy" toName="text" apiUrl="<YOUR_TAXONOMY_URL>" />
@@ -90,7 +98,18 @@ The `apiUrl` must be accessible to Label Studio. You can accomplish this in seve
     While in this case the taxonomy itself is not publicly accessible, anyone with access to view the project's labeling configuration would be able to see the credentials. Annotators would also be able to view the credentials through the Network tab in their browser's developer tools.   
 * The URL points to your private cloud environment. This is the most secure option. 
 
-    [Follow these instructions to set up cloud storage for Label Studio](storage). You can then format your `apiUrl` using the appropriate URL format for your cloud service provider: `gs://`, `s3://`, `azure-blob://`.
+    [Follow these instructions to set up cloud storage for Label Studio](storage). You can then format your `apiUrl` using the appropriate URL format for your cloud service provider: `gs://`, `s3://`, `azure-blob://`. However, you should set up a storage connection for your taxonomy source that is separate from data you will be syncing. (See the note below.)
+
+!!! warning Note on setting up cloud storage
+    You can connect Label Studio to an external cloud environment where you store your taxonomy, and then call the taxonomy using the appropriate cloud-specific URL (`gs://`, `s3://`, `azure-blob://`). 
+    
+    However, if you perform a sync operation on the bucket, then the taxonomy is pulled into Label Studio as a task. The result is severely degraded Label Studio performance, depending on the size of your taxonomy. This can present a problem when you are using cloud storage synchronization to populate Label Studio tasks. 
+    
+    There are several workarounds for this issue:
+    - After syncing, simply delete the task. 
+    - Establish two source storage connections and two external cloud buckets. One bucket can contain the data you need to sync for labeling tasks, and the other bucket could contain your taxonomy (which would not be synced). 
+    - Establish two source storage connections and one external cloud bucket. Then use regex to to include/exclude the taxonomy when configuring the storage connection.
+
 
 
 ### Flat file format
