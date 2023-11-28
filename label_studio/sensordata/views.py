@@ -116,7 +116,7 @@ def process_sensor_file(request, file_path, sensor, name, project):
 def offset(request, project_id):
     project = Project.objects.get(id=project_id)
     offset_annotation_project = Project.objects.get(id=project.id+3)
-    sensoroffset = SensorOffset.objects.filter(project=project).order_by('offset_Date')
+    sensoroffset = SensorOffset.objects.filter(project=project).order_by('sensor_A')
     offsetannotationform = OffsetAnnotationForm(project=project)
     return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project, 'offset_project': offset_annotation_project})
 
@@ -158,7 +158,7 @@ def parse_IMU(request, file_path, sensor, name, project):
     try:
         imu_df['A3D'] = np.sqrt(imu_df['Ax']**2 + imu_df['Ay']**2 + imu_df['Az']**2)
     except KeyError as e:
-        print(print("No Ax, Ay or Az columns. ", e))
+        print("No Ax, Ay or Az columns. ", e)
         imu_df['A3D'] = imu_df['Ax']
     # Remove non-letters from column names
     imu_df.columns = [re.sub(r'[^a-zA-Z0-9]', '', col) for col in imu_df.columns]
@@ -453,7 +453,7 @@ def generate_offset_anno_tasks(request, project_id):
             create_sync_task_pairs(project=project, sensordata_A=sensordata_A, sensordata_B=sensordata_B)
             create_sync_data_chunks(request=request,project=project,value_column_name='A3D')
             return redirect(reverse('data_manager:project-data', kwargs={'pk':project.id+3}))
-    sensoroffset = SensorOffset.objects.filter(project=project).order_by('offset_Date')
+    sensoroffset = SensorOffset.objects.filter(project=project).order_by('sensor_A')
     offsetannotationform = OffsetAnnotationForm(project=project)
     return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project, 'offset_project': offset_annotation_project}) 
     
@@ -463,15 +463,16 @@ def parse_offset_annotations(request,project_id):
     project = Project.objects.get(id=project_id)
     offset_annotation_project = Project.objects.get(id=project.id+3)
     tasks = Task.objects.filter(project= offset_annotation_project)
+    
     for i, task in enumerate(tasks):
         # Get sensors, the sensor names are stored in the task data
         sensor_A = Sensor.objects.get(name = task.data['sensor_a'].replace('Sensor: ', ''))
         sensor_B = Sensor.objects.get(name = task.data['sensor_b'].replace('Sensor: ', ''))
-        annotations = Annotation.objects.filter(task__in= tasks)
+        annotation = Annotation.objects.filter(task=task)
         # Check if negative offset label. All offset labels for one task should have either negative or positive offset
-        if annotations.first().result[0]['value']['timeserieslabels'][0] == 'Negative offset':
+        if annotation[0].result[0]['value']['timeserieslabels'][0] == 'Negative offset':
             # Determine offset obtained by each offset annotation
-            offsets = [annotation['value']['end']-annotation['value']['start']  for annotation in annotations[i].result]
+            offsets = [anno['value']['end']-anno['value']['start']  for anno in annotation[0].result]
             try:
                 # Determine average offset
                 avg_offset = statistics.mean(offsets) # avg offset as a float in seconds
@@ -494,9 +495,9 @@ def parse_offset_annotations(request,project_id):
                                                 offset_Date = offset_date,
                                                 project=project)
         # Check if positive offset label. All offset labels for one task should have either negative or positive offset
-        elif annotations.first().result[0]['value']['timeserieslabels'][0] == 'Positive offset':
+        elif annotation[0].result[0]['value']['timeserieslabels'][0] == 'Positive offset':
             # Determine offset obtained by each offset annotation
-            offsets = [annotation['value']['end']-annotation['value']['start']  for annotation in annotations[i].result]
+            offsets = [anno['value']['end']-anno['value']['start']  for anno in annotation[0].result]
             try:
                 # Determine average offset
                 avg_offset = statistics.mean(offsets) # avg offset as a float in seconds
@@ -520,7 +521,7 @@ def parse_offset_annotations(request,project_id):
                                                 project=project)
         else:
             print('The labels in the offset labeling have been changed. This will cause malfunctioning')
-    sensoroffset = SensorOffset.objects.filter(project=project).order_by('offset_Date')
+    sensoroffset = SensorOffset.objects.filter(project=project).order_by('sensor_A')
     offsetannotationform = OffsetAnnotationForm(project=project)
     return render(request, 'offset.html', {'offsetannotationform':offsetannotationform, 'sensoroffset':sensoroffset, 'project':project , 'offset_project': offset_annotation_project}) 
 

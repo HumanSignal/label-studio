@@ -92,8 +92,8 @@ def create_task_pairs(project, subject, sensortype_B):
                                                 subject=subject,
                                                 start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
                                                 end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
-                                                start_B = (begin_overlap_dt-B_beg_dt+offset_delta-normalized_offset_delta).total_seconds(),
-                                                end_B = (end_overlap_dt-B_beg_dt+offset_delta-normalized_offset_delta).total_seconds()
+                                                start_B = (begin_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds(),
+                                                end_B = (end_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds()
                                                 ).exists():
                         SensorOverlap.objects.create(sensordata_A=sendata_A,
                                                     sensordata_B=sendata_B,
@@ -101,8 +101,8 @@ def create_task_pairs(project, subject, sensortype_B):
                                                     subject=subject,
                                                     start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
                                                     end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
-                                                    start_B = (begin_overlap_dt-B_beg_dt+offset_delta-normalized_offset_delta).total_seconds(),
-                                                    end_B = (end_overlap_dt-B_beg_dt+offset_delta-normalized_offset_delta).total_seconds()
+                                                    start_B = (begin_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds(),
+                                                    end_B = (end_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds()
                                                     )
                     
         
