@@ -54,9 +54,6 @@ Use the [`Choice`](/tags/choice.html) tag to specify the taxonomy. Nest choices 
 
 ## Taxonomies defined using a remote source - Beta 🧪
 
-!!! note Beta feature
-    The feature to call external taxonomies through `apiUrl` is currently in its beta phase.  
-
 You can modify the template to call an external taxonomy. There are two types of external taxonomies:
 
 * [Taxonomies defined in JSON file](#Flat-file-format).
@@ -67,6 +64,9 @@ To call an external taxonomy, remove the `Choice` tags and specify the `apiUrl` 
 ```xml
 <Taxonomy name="taxonomy" toName="text" apiUrl="<YOUR_TAXONOMY_URL>" />
 ```
+
+!!! note Beta feature
+    The feature to call external taxonomies through `apiUrl` is currently in its beta phase.  
 
 For example: 
 
