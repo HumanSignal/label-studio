@@ -14,11 +14,16 @@
     "lsf:unit": "nx run editor:unit",
     "dm:watch": "nx run datamanager:build:development --watch",
     "dm:unit": "nx run datamanager:unit",
-    "build": "nx run editor:build:production && nx run datamanager:build:production && nx run labelstudio:build:production",
+    "build": "NODE_ENV=production nx run editor:build:production && NODE_ENV=production nx run datamanager:build:production && NODE_ENV=production nx run labelstudio:build:production",
     "test:unit": "yarn lsf:unit && yarn ls:unit && yarn dm:unit",
     "test:e2e": "yarn ls:e2e && yarn lsf:e2e",
     "test:integration": "yarn lsf:integration",
     "postinstall": "cd libs/editor && bash scripts/postinstall.sh"
+  },
+  "husky": {
+    "hooks": {
+      "post-checkout": "cd libs/editor && bash scripts/postinstall.sh"
+    }
   },
   "private": true,
   "dependencies": {
@@ -33,6 +38,7 @@
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "antd": "^4.3.3",
     "babel-plugin-import": "^1.13.0",
+    "babel-plugin-remove-webpack": "^1.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
@@ -43,7 +49,7 @@
     "dotenv-defaults": "^2.0.2",
     "emoji-regex": "^7.0.3",
     "enzyme": "^3.11.0",
-    "husky": "^3.1.0",
+    "husky": "^8.0.3",
     "insert-after": "^0.1.4",
     "jest-fetch-mock": "^3.0.3",
     "keymaster": "^1.6.2",
