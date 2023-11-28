@@ -469,7 +469,7 @@ const Poly = memo(observer(({ item, colors, dragProps, draggable }) => {
 /**
  * Line between 2 points
  */
-function Edge({ name, item, idx, p1, p2, closed, regionStyles }) {
+const Edge = observer(({ name, item, idx, p1, p2, closed, regionStyles }) => {
   const insertIdx = idx + 1; // idx1 + 1 or idx2
   const flattenedPoints = [p1.canvasX, p1.canvasY, p2.canvasX, p2.canvasY];
 
@@ -507,7 +507,7 @@ function Edge({ name, item, idx, p1, p2, closed, regionStyles }) {
       />
     </Group>
   );
-}
+});
 
 const Edges = memo(observer(({ item, regionStyles }) => {
   const { points,closed } = item;
