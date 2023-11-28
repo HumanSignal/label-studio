@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-419: Fix brush issues appeared after fixing zoom performance",
-  "commit": "59b3aea1c9e0082771751e6b73b8f99f108b8063",
+  "commit": "e0dd6f1d905021b3e0c85020c0501f9d94741f24",
   "branch": "fb-leap-419/brush-fixes",
-  "date": "2023-11-28T14:42:28Z"
+  "date": "2023-11-28T15:46:23Z"
 }
