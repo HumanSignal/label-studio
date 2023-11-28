@@ -4,7 +4,7 @@ type: guide
 tier: opensource
 order: 78
 order_enterprise: 0
-meta_title: Start Commands for Label Studio
+meta_title: Start commands for Label Studio
 meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
 section: "Install"
 ---

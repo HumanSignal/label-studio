@@ -1,5 +1,5 @@
 ---
-title: Troubleshoot Labeling Issues
+title: Troubleshoot labeling issues
 short: Troubleshooting
 type: guide
 tier: all

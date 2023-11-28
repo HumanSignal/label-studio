@@ -1,18 +1,15 @@
 ---
-title: Quick Start
-short: Quick Start
+title: Quickstart
+short: Quickstart
 tier: opensource
 type: guide
 order: 7
 order_enterprise: 0
-meta_title: Quick Start
-meta_description: description
+meta_title: Quickstart guide for Label Studio
+meta_description: Quickstart guide for installing Label Studio and creating a new project. 
 section: "Get started"
 date: 2023-11-27 13:34:32
 ---
-
-
-
 
 1. Install Label Studio:
 
