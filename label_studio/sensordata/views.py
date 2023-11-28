@@ -158,7 +158,7 @@ def parse_IMU(request, file_path, sensor, name, project):
     try:
         imu_df['A3D'] = np.sqrt(imu_df['Ax']**2 + imu_df['Ay']**2 + imu_df['Az']**2)
     except KeyError as e:
-        print(print("No Ax, Ay or Az columns. ", e))
+        print("No Ax, Ay or Az columns. ", e)
         imu_df['A3D'] = imu_df['Ax']
     # Remove non-letters from column names
     imu_df.columns = [re.sub(r'[^a-zA-Z0-9]', '', col) for col in imu_df.columns]
@@ -482,7 +482,6 @@ def parse_offset_annotations(request,project_id):
             offset_date = task.data['offset_date']
             # Add negative offset
             if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset = -1*int(avg_offset*1000), offset_Date = offset_date, project=project).exists():
-                print(f'avg offset for sensor {sensor_A} and {sensor_B}: {-1*int(avg_offset*1000)}')
                 if SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date, project=project).exists():
                     # If there already exists an offset on the offset_Date update the SensorOffset
                     offset = SensorOffset.objects.get(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date)
@@ -508,7 +507,6 @@ def parse_offset_annotations(request,project_id):
             offset_date = task.data['offset_date'] 
             # Add positive offset
             if not SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date, offset = int(avg_offset*1000), project=project).exists():
-                print(f'avg offset for sensor {sensor_A} and {sensor_B}: {int(avg_offset*1000)}')
                 if SensorOffset.objects.filter(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date, project = project).exists():
                     # If there already exists an offset on the offset_Date update the SensorOffset
                     offset = SensorOffset.objects.get(sensor_A = sensor_A, sensor_B = sensor_B, offset_Date = offset_date)
