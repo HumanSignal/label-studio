@@ -6,7 +6,7 @@ tier: all
 order: 220
 order_enterprise: 120
 section: "Labeling"
-meta_title: Troubleshoot Label Studio
+meta_title: Troubleshoot labeling issues
 meta_description: Troubleshoot common issuesTroubleshoot machine learning with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
 ---
 
