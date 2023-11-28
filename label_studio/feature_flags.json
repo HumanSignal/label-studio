@@ -1272,7 +1272,7 @@
     },
     "ff_front_dev_1682_model_version_dropdown_070622_short": {
       "key": "ff_front_dev_1682_model_version_dropdown_070622_short",
-      "on": true,
+      "on": false,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -1294,7 +1294,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 8,
+      "version": 9,
       "deleted": false
     },
     "ff_front_dev_1731_ocr_editable_and_readonly_230222_short": {
