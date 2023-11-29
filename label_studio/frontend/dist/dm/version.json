@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-736: [FE] disable add to project actions when dataset sync is not complete",
-  "commit": "2c16b02b4bb7f228db9c9f53cc21ff95e1925157",
+  "commit": "34742575d6ef9f77a41204c64eb753148688d742",
   "branch": "fb-dia-736/export-sync",
-  "date": "2023-11-29T09:16:00Z"
+  "date": "2023-11-29T13:26:12Z"
 }
