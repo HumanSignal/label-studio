@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-31: Fix functioning of auto annotations (#1605)",
-  "commit": "f209200de05aad01cba5dffc59883d0de4615458",
+  "message": "fix: LEAP-377: Polygon points can be moved correctly",
+  "commit": "67c0b19f0ecee2b9b170bcf52f4d042294dc63c5",
   "branch": "master",
-  "date": "2023-11-21T23:29:28Z"
+  "date": "2023-11-29T13:19:11Z"
 }
