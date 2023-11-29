@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-364: Fix crosshair functionality (#1616)",
-  "commit": "4891f397096fe3a8773ec98ba7e56d0289810b82",
-  "branch": "master",
-  "date": "2023-11-14T15:48:46Z"
+  "message": "fix: LEAP-377: Polygon points can be moved correctly (#1626)",
+  "commit": "d498a66d8204c4728825c63c20c33d1f2951284f",
+  "branch": "fb-LEAP-377-cherry-pick",
+  "date": "2023-11-29T13:47:16Z"
 }
