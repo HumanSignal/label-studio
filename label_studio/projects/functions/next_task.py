@@ -169,8 +169,8 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
             not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
     if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
-        # show tasks with overlap > 1 first
-        if project.show_overlap_first:
+        # show tasks with overlap > 1 first (unless tasks are already prioritized on agreement)
+        if project.show_overlap_first and not prioritized_on_agreement:
             # don't output anything - just filter tasks with overlap
             logger.debug(f'User={user} tries overlap first from prepared tasks')
             _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
