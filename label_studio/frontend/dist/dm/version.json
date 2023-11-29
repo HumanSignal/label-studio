@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-666: [FE] Semantic search polish",
-  "commit": "290f2b2b9ac4b234739c6978682e19ce4ae03c43",
-  "branch": "fb-dia-666/semantic-search-polish",
-  "date": "2023-11-29T06:51:44Z"
+  "commit": "dc7e27b85798f2775d7761202fbcf5cb32f4dd3e",
+  "branch": "master",
+  "date": "2023-11-29T13:14:53Z"
 }
