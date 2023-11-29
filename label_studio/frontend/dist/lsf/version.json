@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-377: Polygon points can be moved correctly (#1626)",
-  "commit": "d498a66d8204c4728825c63c20c33d1f2951284f",
-  "branch": "fb-LEAP-377-cherry-pick",
-  "date": "2023-11-29T13:47:16Z"
+  "message": "fix: LEAP-419: Fix brush issues appeared after fixing zoom performance",
+  "commit": "99ef35d0b1ce3a087b3f0ad95897e7ac87680ef6",
+  "branch": "fb-leap-419-cherry-pick",
+  "date": "2023-11-27T15:35:01Z"
 }
