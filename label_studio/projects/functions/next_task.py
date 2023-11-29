@@ -143,6 +143,7 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
         user_postponed_tasks = postponed_drafts.distinct().values_list('task__pk', flat=True)
         not_solved_tasks = not_solved_tasks.exclude(pk__in=user_postponed_tasks)
 
+    prioritized_on_agreement = False
     # if annotator is assigned for tasks, he must solve it regardless of is_labeled=True
     if not assigned_flag:
         # include tasks that have been completed if their agreement is not at threshold if threshold setting is set
