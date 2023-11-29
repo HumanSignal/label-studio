@@ -111,9 +111,7 @@ The `apiUrl` must be accessible to Label Studio. You can accomplish this in seve
 
 
 !!! warning Note on setting up cloud storage
-    You can connect Label Studio to an external cloud environment where you store your taxonomy, and then call the taxonomy using the appropriate cloud-specific URL (`gs://`, `s3://`, `azure-blob://`). 
-    
-    However, if you perform a sync operation on the storage connection containing the taxonomy itself, then the entire taxonomy will be pulled into Label Studio as a task. The result may be severely degraded Label Studio performance, depending on the size of your taxonomy. This can present a problem when you are using cloud storage synchronization to populate Label Studio tasks. 
+    If you perform a sync operation on a storage connection that contains your taxonomy, then the entire taxonomy will be pulled into Label Studio as a task. The result may be severely degraded Label Studio performance, depending on the size of your taxonomy. This can present a problem when you are using cloud storage synchronization to populate Label Studio tasks. 
     
     There are several workarounds for this issue:
     - After syncing, simply delete the task. 
