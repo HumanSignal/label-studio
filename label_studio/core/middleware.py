@@ -6,6 +6,7 @@ from uuid import uuid4
 
 import ujson as json
 from core.utils.contextlog import ContextLog
+from csp.middleware import CSPMiddleware
 from django.conf import settings
 from django.contrib.auth import logout
 from django.core.exceptions import MiddlewareNotUsed
@@ -207,3 +208,14 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
         request.session.set_expiry(
             settings.MAX_TIME_BETWEEN_ACTIVITY if request.session.get('keep_me_logged_in', True) else 0
         )
+
+
+class HumanSignalCSPMiddleware(CSPMiddleware):
+    def process_response(self, request, response):
+        response = super().process_response(request, response)
+        if csp_policy := response.get('Content-Security-Policy-Report-Only'):
+            if response.get('override-report-only-csp'):
+                response['Content-Security-Policy'] = csp_policy
+                del response['Content-Security-Policy-Report-Only']
+                del response['override-report-only-csp']
+        return response

@@ -8,7 +8,6 @@ import time
 from typing import Union
 from urllib.parse import unquote, urlparse
 
-from csp.decorators import csp_update
 import drf_yasg.openapi as openapi
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
@@ -16,6 +15,7 @@ from core.redis import start_job_async_or_sync
 from core.utils.common import retry_database_locked, timeit
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.utils.params import bool_from_request, list_of_strings_from_request
+from csp.decorators import csp_update
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
@@ -614,9 +614,12 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         if file.storage.exists(file.name):
             content_type, encoding = mimetypes.guess_type(str(file.name))
             content_type = content_type or 'application/octet-stream'
-            return RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
+            resp = RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            resp = Response(status=status.HTTP_404_NOT_FOUND)
+
+        resp['override-report-only-csp'] = True
+        return resp
 
 
 class DownloadStorageData(APIView):

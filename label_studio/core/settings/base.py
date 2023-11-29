@@ -228,7 +228,7 @@ MIDDLEWARE = [
     'core.middleware.ContextLogMiddleware',
     'core.middleware.DatabaseIsLockedRetryMiddleware',
     'core.current_request.ThreadLocalMiddleware',
-    'csp.middleware.CSPMiddleware',
+    'core.middleware.HumanSignalCSPMiddleware',
 ]
 
 REST_FRAMEWORK = {
