@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-377: Polygon points can be moved correctly (#1626)",
-  "commit": "d498a66d8204c4728825c63c20c33d1f2951284f",
-  "branch": "fb-LEAP-377-cherry-pick",
-  "date": "2023-11-29T13:47:16Z"
+  "commit": "c3583cf9868fc6e82215839e7833b921434982c0",
+  "branch": "ls-release/1.10.0",
+  "date": "2023-11-29T14:56:59Z"
 }
