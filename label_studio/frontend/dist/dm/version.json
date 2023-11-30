@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-736: [FE] disable add to project actions when dataset sync is not complete",
-  "commit": "9dde27b34f64f3a99b6203713bdacbb0fcb39ceb",
+  "message": "fix: DIA-640: [FE] when creating a new dataset and navigating to it tasks request will fire multiple times",
+  "commit": "6f05afa8a71d28f2215546a710ceb561f713faa2",
   "branch": "master",
-  "date": "2023-11-30T09:39:12Z"
+  "date": "2023-11-30T10:34:35Z"
 }
