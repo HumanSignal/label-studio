@@ -206,6 +206,7 @@ class TaskListAPI(generics.ListCreateAPIView):
             'io_storages_localfilesimportstoragelink',
             'io_storages_redisimportstoragelink',
             'io_storages_s3importstoragelink',
+            'io_storages_aperturedbimportstoragelink',
             'file_upload',
         )
 

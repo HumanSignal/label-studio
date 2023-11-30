@@ -852,6 +852,66 @@
         "decorators": ""
     },
     {
+        "url": "/api/storages/aperturedb/",
+        "module": "io_storages.aperturedb.api.ApertureDBImportStorageListAPI",
+        "name": "storages:api:storage-aperturedb-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/aperturedb/<int:pk>",
+        "module": "io_storages.aperturedb.api.ApertureDBImportStorageDetailAPI",
+        "name": "storages:api:storage-aperturedb-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/aperturedb/<int:pk>/sync",
+        "module": "io_storages.aperturedb.api.ApertureDBImportStorageSyncAPI",
+        "name": "storages:api:storage-aperturedb-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/aperturedb/validate",
+        "module": "io_storages.aperturedb.api.ApertureDBImportStorageValidateAPI",
+        "name": "storages:api:storage-aperturedb-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/aperturedb/form",
+        "module": "io_storages.aperturedb.api.ApertureDBImportStorageFormLayoutAPI",
+        "name": "storages:api:storage-aperturedb-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/aperturedb",
+        "module": "io_storages.aperturedb.api.ApertureDBExportStorageListAPI",
+        "name": "storages:api:export-storage-aperturedb-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/aperturedb/<int:pk>",
+        "module": "io_storages.aperturedb.api.ApertureDBExportStorageDetailAPI",
+        "name": "storages:api:export-storage-aperturedb-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/aperturedb/<int:pk>/sync",
+        "module": "io_storages.aperturedb.api.ApertureDBExportStorageSyncAPI",
+        "name": "storages:api:export-storage-aperturedb-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/aperturedb/validate",
+        "module": "io_storages.aperturedb.api.ApertureDBExportStorageValidateAPI",
+        "name": "storages:api:export-storage-aperturedb-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/aperturedb/form",
+        "module": "io_storages.aperturedb.api.ApertureDBExportStorageFormLayoutAPI",
+        "name": "storages:api:export-storage-aperturedb-form",
+        "decorators": ""
+    },
+    {
         "url": "/api/storages/localfiles/",
         "module": "io_storages.localfiles.api.LocalFilesImportStorageListAPI",
         "name": "storages:api:storage-localfiles-list",
@@ -1029,6 +1089,12 @@
         "url": "/data/local-files/",
         "module": "core.views.localfiles_data",
         "name": "localfiles_data",
+        "decorators": ""
+    },
+    {
+        "url": "/data/aperturedb/",
+        "module": "core.views.aperturedb_data",
+        "name": "aperturedb_data",
         "decorators": ""
     },
     {

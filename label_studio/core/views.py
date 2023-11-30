@@ -31,8 +31,12 @@ from django.template import loader
 from django.utils._os import safe_join
 from drf_yasg.utils import swagger_auto_schema
 from io_storages.localfiles.models import LocalFilesImportStorage
+from io_storages.aperturedb.models import ApertureDBImportStorage
 from ranged_fileresponse import RangedFileResponse
 from rest_framework.views import APIView
+import urllib.request
+import aperturedb
+import magic
 
 logger = logging.getLogger(__name__)
 
@@ -199,6 +203,33 @@ def localfiles_data(request):
             return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
         else:
             return HttpResponseNotFound()
+
+    return HttpResponseForbidden()
+
+
+def aperturedb_data(request):
+    """Serving files for ApertureDBImportStorage"""
+    user = request.user
+    host = request.GET.get('host')
+    uid = request.GET.get('uniqueid')
+    if host and uid:
+        if not user.is_authenticated:
+            logger.warning("Not Authenticated")
+
+        for storage in ApertureDBImportStorage.objects:
+            if storage.hostname == host:
+                if storage.project.has_permission(user):
+                    db = storage.get_connection()
+                    blob = db.get_blob(uid)
+                    if blob is None:
+                        logger.warning(f"ApertureDB image not found, uid={uid}")
+                        return HttpResponseNotFound()
+                    content_type = magic.from_buffer(blob, mime=True)
+                    with io.BytesIO(blob) as payload:
+                        return RangedFileResponse(request, payload, content_type)
+
+        logger.warning(f"ApertureDB import storage '{host}' not found")
+        return HttpResponseNotFound()
 
     return HttpResponseForbidden()
 

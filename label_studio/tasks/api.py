@@ -164,6 +164,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             'io_storages_localfilesimportstoragelink',
             'io_storages_redisimportstoragelink',
             'io_storages_s3importstoragelink',
+            'io_storages_aperturedbimportstoragelink',
             'file_upload',
             'project__ml_backends',
         )

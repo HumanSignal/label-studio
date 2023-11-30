@@ -8,7 +8,7 @@ import { isDefined, objectClean } from '../../utils/helpers';
 import { Button } from '../Button/Button';
 import { Oneof } from '../Oneof/Oneof';
 import { Space } from '../Space/Space';
-import { Counter, Input, Select, Toggle } from './Elements';
+import { Counter, Input, Select, Toggle, TextArea } from './Elements';
 import './Form.styl';
 import { FormContext, FormResponseContext, FormStateContext, FormSubmissionContext, FormValidationContext } from './FormContext';
 import * as Validators from './Validation/Validators';
@@ -436,6 +436,7 @@ Form.Builder = React.forwardRef(({
           case "select": return Select;
           case "counter": return Counter;
           case "toggle": return Toggle;
+          case "textarea": return TextArea;
           default: return Input;
         }
       })();

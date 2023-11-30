@@ -68,6 +68,18 @@ from io_storages.s3.api import (
     S3ImportStorageSyncAPI,
     S3ImportStorageValidateAPI,
 )
+from io_storages.aperturedb.api import (
+    ApertureDBExportStorageDetailAPI,
+    ApertureDBExportStorageFormLayoutAPI,
+    ApertureDBExportStorageListAPI,
+    ApertureDBExportStorageSyncAPI,
+    ApertureDBExportStorageValidateAPI,
+    ApertureDBImportStorageDetailAPI,
+    ApertureDBImportStorageFormLayoutAPI,
+    ApertureDBImportStorageListAPI,
+    ApertureDBImportStorageSyncAPI,
+    ApertureDBImportStorageValidateAPI,
+)
 
 app_name = 'storages'
 
@@ -122,6 +134,17 @@ _api_urlpatterns = [
     path('export/redis/<int:pk>/sync', RedisExportStorageSyncAPI.as_view(), name='export-storage-redis-sync'),
     path('export/redis/validate', RedisExportStorageValidateAPI.as_view(), name='export-storage-redis-validate'),
     path('export/redis/form', RedisExportStorageFormLayoutAPI.as_view(), name='export-storage-redis-form'),
+    # ApertureDB
+    path('aperturedb/', ApertureDBImportStorageListAPI.as_view(), name='storage-aperturedb-list'),
+    path('aperturedb/<int:pk>', ApertureDBImportStorageDetailAPI.as_view(), name='storage-aperturedb-detail'),
+    path('aperturedb/<int:pk>/sync', ApertureDBImportStorageSyncAPI.as_view(), name='storage-aperturedb-sync'),
+    path('aperturedb/validate', ApertureDBImportStorageValidateAPI.as_view(), name='storage-aperturedb-validate'),
+    path('aperturedb/form', ApertureDBImportStorageFormLayoutAPI.as_view(), name='storage-aperturedb-form'),
+    path('export/aperturedb', ApertureDBExportStorageListAPI.as_view(), name='export-storage-aperturedb-list'),
+    path('export/aperturedb/<int:pk>', ApertureDBExportStorageDetailAPI.as_view(), name='export-storage-aperturedb-detail'),
+    path('export/aperturedb/<int:pk>/sync', ApertureDBExportStorageSyncAPI.as_view(), name='export-storage-aperturedb-sync'),
+    path('export/aperturedb/validate', ApertureDBExportStorageValidateAPI.as_view(), name='export-storage-aperturedb-validate'),
+    path('export/aperturedb/form', ApertureDBExportStorageFormLayoutAPI.as_view(), name='export-storage-aperturedb-form'),
 ]
 if settings.ENABLE_LOCAL_FILES_STORAGE:
     _api_urlpatterns += [

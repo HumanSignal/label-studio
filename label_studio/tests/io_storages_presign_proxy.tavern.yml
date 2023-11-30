@@ -510,6 +510,8 @@ stages:
         title: Microsoft Azure
       - name: redis
         title: Redis
+      - name: aperturedb
+        title: ApertureDB
       - name: localfiles
         title: Local files
 - name: stage
@@ -527,6 +529,8 @@ stages:
         title: Microsoft Azure
       - name: redis
         title: Redis
+      - name: aperturedb
+        title: ApertureDB
       - name: localfiles
         title: Local files
 

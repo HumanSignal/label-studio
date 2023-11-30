@@ -1,0 +1,45 @@
+# 2x3 grid
+adb_host_config: &adb_host_config
+  - type: text
+    name: hostname
+    label: Hostname
+    required: true
+  - type: number
+    name: port
+    label: Port
+    value: 55555
+  - type: toggle
+    name: use_ssl
+    label: Use SSL
+    value: true
+  - type: text
+    name: username
+    label: User Name
+    required: true
+  - type: password
+    name: password
+    label: Password
+    autoComplete: "off"
+    skipAutofill: true
+    allowEmpty: true
+    protectedValue: true
+  - type: password
+    name: token
+    label: Token
+    autoComplete: "off"
+    skipAutofill: true
+    allowEmpty: true
+    protectedValue: true
+
+ImportStorage:
+  - columnCount: 3
+    fields: *adb_host_config
+  - columnCount: 1
+    fields:
+      - type: textarea
+        name: constraints
+        label: FindImage Constraints (optional)
+
+ExportStorage:
+  - columnCount: 3
+    fields: *adb_host_config    

@@ -14,6 +14,7 @@ from io_storages.azure_blob.models import AzureBlobImportStorageLink
 from io_storages.gcs.models import GCSImportStorageLink
 from io_storages.localfiles.models import LocalFilesImportStorage
 from io_storages.s3.models import S3ImportStorageLink
+from io_storages.aperturedb.models import ApertureDBImportStorageLink
 from tasks.models import Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 
@@ -88,6 +89,7 @@ def remove_duplicates(project, queryset, **kwargs):
         'io_storages_gcsimportstoragelink': GCSImportStorageLink,
         'io_storages_azureblobimportstoragelink': AzureBlobImportStorageLink,
         'io_storages_localfilesimportstoragelink': LocalFilesImportStorage,
+        'io_storages_aperturedbimportstoragelink': ApertureDBImportStorageLink,
         # 'io_storages_redisimportstoragelink',
         # 'lse_io_storages_lses3importstoragelink'  # not supported yet
     }

@@ -179,6 +179,8 @@ launchdarkly-server-sdk = "7.5.0"
 python-json-logger = "2.0.4"
 label-studio-converter = "0.0.57"
 google-cloud-storage = "^2.13.0"
+aperturedb = ">=0.4.15"
+python-magic = ">=0.4.27"
 mysqlclient = {version = "*", optional = true}
 
 [tool.poetry.group.test.dependencies]
