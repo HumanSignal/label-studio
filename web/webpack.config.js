@@ -7,7 +7,7 @@ const { merge } = require('webpack-merge');
 require('dotenv').config();
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { EnvironmentPlugin, DefinePlugin } = require('webpack');
+const { EnvironmentPlugin, DefinePlugin, ProgressPlugin, optimize } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
@@ -41,31 +41,56 @@ const DEFAULT_NODE_ENV = process.env.BUILD_MODULE ? "production" : process.env.N
 const isDevelopment = DEFAULT_NODE_ENV !== "production";
 const customDistDir = !!process.env.WORK_DIR;
 
+const BUILD = {
+  NO_MINIMIZE: isDevelopment || !!process.env.BUILD_NO_MINIMIZATION,
+};
+
 const dirPrefix = {
   js: customDistDir ? "js/" : isDevelopment ? "" : "static/js/",
   css: customDistDir ? "css/" : isDevelopment ? "" : "static/css/",
 };
-
 
 const plugins = [
   new MiniCssExtractPlugin(),
   new DefinePlugin({
     'process.env.CSS_PREFIX': JSON.stringify(css_prefix),
   }),
-  new EnvironmentPlugin(LOCAL_ENV)];
+  new EnvironmentPlugin(LOCAL_ENV),
+];
 
-const optimizer = {};
+plugins.push(new optimize.LimitChunkCountPlugin({
+  maxChunks: 1,
+}));
 
-if (process.env.NODE_ENV === 'production') {
-  optimizer.minimize = true;
-  optimizer.minimizer = [new TerserPlugin(), new CssMinimizerPlugin()];
-  optimizer.runtimeChunk = false;
-  optimizer.splitChunks = {
-    cacheGroups: {
-      default: false,
-    },
+
+const optimizer = () => {
+  const result = {
+    minimize: true,
+    minimizer: [],
+    runtimeChunk: true,
   };
-}
+
+  if (DEFAULT_NODE_ENV === 'production') {
+    result.minimizer.push(
+      new TerserPlugin({
+        parallel: true,
+      }),
+      new CssMinimizerPlugin({
+        parallel: true,
+      }),
+    )
+  }
+
+  if (BUILD.NO_MINIMIZE) {
+    result.minimize = false;
+    result.minimizer = undefined;
+  }
+
+  result.runtimeChunk = false;
+  result.splitChunks = { cacheGroups: { default: false } }
+
+  return result;
+};
 
 // Nx plugins for webpack.
 module.exports = composePlugins(withNx({
@@ -179,6 +204,6 @@ module.exports = composePlugins(withNx({
     devtool,
     mode: process.env.NODE_ENV || 'development',
     plugins,
-    optimization: optimizer,
+    optimization: optimizer(),
   });
 });

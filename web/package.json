@@ -38,6 +38,7 @@
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "antd": "^4.3.3",
     "babel-plugin-import": "^1.13.0",
+    "babel-plugin-remove-webpack": "^1.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
