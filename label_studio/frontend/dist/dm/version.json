@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-409: Update files to match with monorepo",
-  "commit": "f7e188d26d4119aecae3cbdef5b0802bc7e7e7ff",
+  "message": "fix: DIA-736: [FE] disable add to project actions when dataset sync is not complete",
+  "commit": "9dde27b34f64f3a99b6203713bdacbb0fcb39ceb",
   "branch": "master",
-  "date": "2023-11-24T15:55:13Z"
+  "date": "2023-11-30T09:39:12Z"
 }
