@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-409: Update files to match with monorepo",
-  "commit": "f7e188d26d4119aecae3cbdef5b0802bc7e7e7ff",
+  "message": "fix: DIA-666: [FE] Semantic search polish",
+  "commit": "dc7e27b85798f2775d7761202fbcf5cb32f4dd3e",
   "branch": "master",
-  "date": "2023-11-24T15:55:13Z"
+  "date": "2023-11-29T13:14:53Z"
 }
