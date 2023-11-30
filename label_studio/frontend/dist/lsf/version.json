@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-419: Fix brush issues appeared after fixing zoom performance",
-  "commit": "bee26223c8f1171415f364abe68b5d77e03a9adb",
-  "branch": "master",
-  "date": "2023-11-30T06:59:04Z"
+  "message": "fix: LEAP-89: Fix rendering of relation arrow in gallery mode of image",
+  "commit": "b4ebb3d921641172fd20fa038d9147488d65c19f",
+  "branch": "fb-leap-89/relations",
+  "date": "2023-11-30T07:42:57Z"
 }
