@@ -1272,7 +1272,7 @@
     },
     "ff_front_dev_1682_model_version_dropdown_070622_short": {
       "key": "ff_front_dev_1682_model_version_dropdown_070622_short",
-      "on": true,
+      "on": false,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -1294,7 +1294,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 8,
+      "version": 9,
       "deleted": false
     },
     "ff_front_dev_1731_ocr_editable_and_readonly_230222_short": {
@@ -4362,6 +4362,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_back_optic_287_aggregate_query_for_groundtruth_per_user_short": {
+      "key": "fflag_fix_back_optic_287_aggregate_query_for_groundtruth_per_user_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "d30058aa1b7e4947994f0d726d9ae6ff",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short": {
       "key": "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short",
       "on": true,
@@ -5115,7 +5142,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 5,
       "deleted": false
     },
     "fflag_fix_front_lsdv_5436_dashboard_members_page_async_24072023_short": {
