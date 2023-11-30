@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-739: [FE] User is not able to update similarity range if filter is applied",
-  "commit": "f1eb0a10bdeb18aa633f38245c61e0bf5ab7423b",
+  "commit": "1689f15a0f4680bcd0d965fa3abd43663f52a087",
   "branch": "fb-dia-739/filter-overlap",
-  "date": "2023-11-30T12:52:19Z"
+  "date": "2023-11-30T12:52:28Z"
 }
