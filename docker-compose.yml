@@ -18,6 +18,7 @@ services:
     volumes:
       - ./mydata:/label-studio/data:rw
       - ./deploy/nginx/certs:/certs:ro
+      - ../label-studio:/label-studio
     #   Optional: Override nginx default conf
     #      - ./deploy/my.conf:/etc/nginx/nginx.conf
     command: nginx
@@ -42,8 +43,10 @@ services:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
       - JSON_LOG=1
     #      - LOG_LEVEL=DEBUG
+      - EXPERIMENTAL_FEATURES=True
     volumes:
       - ./mydata:/label-studio/data:rw
+      - ../label-studio:/label-studio
     command: label-studio-uwsgi
 
   db:

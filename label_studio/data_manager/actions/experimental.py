@@ -431,11 +431,11 @@ actions = [
     {
         'entry_point': batch_train,
         'permission': all_permissions.projects_change, # check that this is enough for permisions
-        'title': 'Batch Train Model',
+        'title': 'Batch Train',
         'order': 1,
         'experimental': True,
         'dialog': {
-            'text': 'Confirm that you want to train off of all annotated tasks.',
+            'text': 'Confirm that you want to train your model on all selected tasks.',
             'type': 'confirm'
         }
     },
