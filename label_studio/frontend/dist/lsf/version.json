@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-419: Fix brush issues appeared after fixing zoom performance",
-  "commit": "99ef35d0b1ce3a087b3f0ad95897e7ac87680ef6",
-  "branch": "fb-leap-419-cherry-pick",
-  "date": "2023-11-27T15:35:01Z"
+  "commit": "afb0887a8bc4e2a246dff13c01c6296e74ebf84a",
+  "branch": "ls-release/1.10.0",
+  "date": "2023-11-30T00:02:00Z"
 }
