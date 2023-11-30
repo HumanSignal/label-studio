@@ -1,6 +1,6 @@
 {
-  "message": "ci: TEST",
-  "commit": "0fc0c9966cbdf3fd9eebce9fda823c9708d200b2",
-  "branch": "fb-ci-test-1",
-  "date": "2023-11-22T16:58:04Z"
+  "message": "fix: LEAP-383: Fix bad html sanitizer",
+  "commit": "d14f4aec32885d0c29b34030554841851a70463b",
+  "branch": "fb-leap-383",
+  "date": "2023-11-30T18:38:46Z"
 }
