@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-640: [FE] when creating a new dataset and navigating to it tasks request will fire multiple times",
-  "commit": "a9bcdf37e9f4497af6ec47bcbffbcd917394ce33",
-  "branch": "fb-dia-640/reduce-load",
-  "date": "2023-11-30T10:31:07Z"
+  "commit": "6f05afa8a71d28f2215546a710ceb561f713faa2",
+  "branch": "master",
+  "date": "2023-11-30T10:34:35Z"
 }
