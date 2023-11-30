@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-419: Fix brush issues appeared after fixing zoom performance",
-  "commit": "bee26223c8f1171415f364abe68b5d77e03a9adb",
-  "branch": "master",
-  "date": "2023-11-30T06:59:04Z"
+  "message": "fix: LEAP-383: Fix bad html sanitizer",
+  "commit": "d14f4aec32885d0c29b34030554841851a70463b",
+  "branch": "fb-leap-383",
+  "date": "2023-11-30T18:38:46Z"
 }
