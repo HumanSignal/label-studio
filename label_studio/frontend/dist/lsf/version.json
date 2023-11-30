@@ -1,6 +1,6 @@
 {
-  "message": "ci: TEST",
-  "commit": "0fc0c9966cbdf3fd9eebce9fda823c9708d200b2",
-  "branch": "fb-ci-test-1",
-  "date": "2023-11-22T16:58:04Z"
+  "message": "fix: LEAP-89: Fix rendering of relation arrow in gallery mode of image",
+  "commit": "b4ebb3d921641172fd20fa038d9147488d65c19f",
+  "branch": "fb-leap-89/relations",
+  "date": "2023-11-30T07:42:57Z"
 }
