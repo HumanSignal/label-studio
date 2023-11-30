@@ -38,7 +38,7 @@ Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page
 <i>Check this video tutorial about SCIM and Okta setup.</i>
 
 !!! attention "important"
-    This video demonstrates the use of `userName` in the 'Unique Identifier Field for Users' field. It is essential to use an `email` as the unique identifier instead of 'userName'; otherwise, SCIM will not function correctly with users who were created prior to the SCIM integration.
+    This video demonstrates the use of `userName` in the 'Unique Identifier Field for Users' field. It is essential to use `email` as the unique identifier instead of `userName`; otherwise, SCIM will not function correctly with users who were created prior to the SCIM integration.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/MA3de3gu18A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
