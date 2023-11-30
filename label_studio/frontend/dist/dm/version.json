@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-409: Update files to match with monorepo",
-  "commit": "f7e188d26d4119aecae3cbdef5b0802bc7e7e7ff",
-  "branch": "master",
-  "date": "2023-11-24T15:55:13Z"
+  "message": "fix: DIA-739: [FE] User is not able to update similarity range if filter is applied",
+  "commit": "a6122d00ec4cd3c011fa1615b8a1afc1bece73cd",
+  "branch": "fb-dia-739/filter-overlap",
+  "date": "2023-11-30T09:24:32Z"
 }
