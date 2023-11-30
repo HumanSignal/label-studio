@@ -510,36 +510,6 @@ function findNodeAt(context, at) {
   }
 }
 
-/**
- * Sanitize html from scripts and iframes
- * @param {string} html
- * @param {object} [options]
- * @param {boolean} [options.useStub] use stub instead of removing to keep tags number and order for html tasks
- * @param {boolean} [options.useHeadStub] use different stub for scripts in head to not have excess tags there
- * @returns {string}
- */
-function sanitizeHtml(html, options = {}) {
-  if (!html) return '';
-
-  const reScripts = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi;
-  const stub = options.useStub ? '<ls-stub></ls-stub>' : '';
-  const headStub = '<ls-head-stub></ls-head-stub>';
-
-  if (options.useHeadStub) {
-    html = html.replace(/(<head.*?>)(.*?)(<\/head>)/, (_, opener, body, closer) => {
-      return [opener, body.replace(reScripts, headStub), closer].join('');
-    });
-  }
-
-  const sanitized = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi, stub)
-    .replace(/<iframe\b.*?(?:\/>|<\/iframe>)/g, stub)
-    // remove events
-    .replace(/\bon[a-z]+\s*=\s*(?:(['"])(?!\1).+?\1|(?:\S+?\(.*?\)(?=[\s>])))(.*?)/gi, '');
-
-  return sanitized;
-}
-
 export {
   toggleLabelsAndScores,
   labelWithCSS,
@@ -549,7 +519,6 @@ export {
   findIdxContainer,
   toGlobalOffset,
   highlightRange,
-  sanitizeHtml,
   splitBoundaries,
   normalizeBoundaries,
   createClass,

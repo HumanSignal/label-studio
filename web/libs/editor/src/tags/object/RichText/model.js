@@ -8,7 +8,7 @@ import ProcessAttrsMixin from '../../../mixins/ProcessAttrs';
 import RegionsMixin from '../../../mixins/Regions';
 import Utils from '../../../utils';
 import { parseValue } from '../../../utils/data';
-import { sanitizeHtml } from '../../../utils/html';
+import sanitizeHTML from 'sanitize-html';
 import messages from '../../../utils/messages';
 import { findRangeNative, rangeToGlobalOffset } from '../../../utils/selection-tools';
 import { escapeHtml, isValidObjectURL } from '../../../utils/utilities';
@@ -220,7 +220,7 @@ const Model = types
 
         // clean up the html — remove scripts and iframes
         // nodes count better be the same, so replace them with stubs
-        self._value = sanitizeHtml(String(val), { useStub: true, useHeadStub: true });
+        self._value = sanitizeHTML(String(val), { useStub: true, useHeadStub: true });
 
         self._regionsCache.forEach(({ region, annotation }) => {
           region.setText(self._value.substring(region.startOffset, region.endOffset));

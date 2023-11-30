@@ -92,6 +92,8 @@ const _Tool = types
     unselectRegionOnToolChange: false,
   })
   .volatile(() => ({
+    canInteractWithRegions: false,
+
     currentThreshold: null,
     mask: null,
 
