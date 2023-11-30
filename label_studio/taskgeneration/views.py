@@ -46,6 +46,10 @@ def create_task_pairs(project, subject, sensortype_B):
     for sendata_A in sensordata_A:
         sensor_A = sendata_A.sensor
         A_beg_dt = sendata_A.begin_datetime #begin_datetime sendata_A
+        # Add manual offset for either sensor_A (offset is in ms (int))
+        if not sendata_A.sensor.manual_offset is None:
+            sensor_A_manual_offset = sendata_A.sensor.manual_offset
+            A_beg_dt = A_beg_dt + timedelta(milliseconds=sensor_A_manual_offset)
         # Iterate over all subject_presences for this sendata_A
         subject_presences_sendata_A = subject_presences.filter(file_upload=sendata_A.file_upload)
         for subj_pres in subject_presences_sendata_A:
@@ -69,6 +73,11 @@ def create_task_pairs(project, subject, sensortype_B):
                 offset_delta = timedelta(milliseconds=offset) # Difference in datetime because of sensor offset
                 B_beg_dt = sendata_B.begin_datetime-offset_delta
                 B_end_dt = sendata_B.end_datetime-offset_delta
+                # Add manual offset for sensor_B
+                if not sendata_B.sensor.manual_offset is None:
+                    sensor_B_manual_offset = sendata_B.sensor.manual_offset
+                    B_beg_dt = B_beg_dt + timedelta(milliseconds=sensor_B_manual_offset)
+                    B_end_dt = B_end_dt + timedelta(milliseconds=sensor_B_manual_offset)
                 # Check if either the begin or end of sendata_B are in the subj. pres. segment or the begin (of sendata_B) is before and the end (of sendata_B) is after the start of subj. pres.
                 begin_inside =  beg_subj_pres <= B_beg_dt <= end_subj_pres
                 end_inside =   beg_subj_pres <= B_end_dt <= end_subj_pres
@@ -78,32 +87,15 @@ def create_task_pairs(project, subject, sensortype_B):
                     begin_overlap_dt = max(beg_subj_pres,B_beg_dt)
                     end_overlap_dt = min(end_subj_pres,B_end_dt)   
                     # Create overlap object, this is used to create tasks
-                    try:
-                        sync_overlap = SyncSensorOverlap.objects.get(sensordata_A=sendata_A,sensordata_B=sendata_B)
-                        length_sync_overlap = sync_overlap.end_B-sync_overlap.start_B
-                        length_overlap = (end_overlap_dt-begin_overlap_dt).total_seconds()
-                        normalized_offset = (offset/length_sync_overlap)*length_overlap
-                    except ObjectDoesNotExist:
-                        normalized_offset = offset
-                    normalized_offset_delta = timedelta(milliseconds=normalized_offset)
-                    if not SensorOverlap.objects.filter(sensordata_A=sendata_A,
-                                                sensordata_B=sendata_B,
-                                                project=project,
-                                                subject=subject,
-                                                start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
-                                                end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
-                                                start_B = (begin_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds(),
-                                                end_B = (end_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds()
-                                                ).exists():
-                        SensorOverlap.objects.create(sensordata_A=sendata_A,
-                                                    sensordata_B=sendata_B,
-                                                    project=project,
-                                                    subject=subject,
-                                                    start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
-                                                    end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
-                                                    start_B = (begin_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds(),
-                                                    end_B = (end_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds()
-                                                    )
+                    SensorOverlap.objects.create(sensordata_A=sendata_A,
+                                                 sensordata_B=sendata_B,
+                                                 project=project,
+                                                 subject=subject,
+                                                 start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
+                                                 end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
+                                                 start_B = (begin_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds(),
+                                                 end_B = (end_overlap_dt+offset_delta-sendata_B.begin_datetime).total_seconds()
+                                                 )
                     
         
 
@@ -114,6 +106,7 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
     distinct_sensor_data_A = sensor_overlap.values_list('sensordata_A').distinct()
     distinct_sensor_data_ids = [sendata_A[0] for sendata_A in distinct_sensor_data_A]
     # Iterate over distinct sensordata_A and find the sensordata_B with the longest overlap
+    # This way a sensordata_A file does not get annotated twice if there are several overlaps
     for sendata_A_id in distinct_sensor_data_ids: 
         all_overlap_for_sen_A  = sensor_overlap.filter(sensordata_A=sendata_A_id)
         longest_duration = 0
@@ -141,7 +134,6 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                                                            value_column_name=value_column_name)
             # Get url for displaying project detail
             project_detail_url = request.build_absolute_uri(reverse('projects:api:project-detail', args=[project.id+2]))
-            print(f'project_detail_url:  {project_detail_url}')
             # Update labeling set up
             token = Token.objects.get(user=request.user)
             requests.patch(project_detail_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template})
@@ -157,7 +149,6 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     end_segment_A = begin_segment_A +duration
                     begin_segment_B = longest_overlap.start_B+ duration*segment
                     end_segment_B = begin_segment_B +duration
-
     
                 with NamedTemporaryFile(prefix="CHUNK", suffix=".mp4", delete=False, mode='w') as temp_video,\
                     NamedTemporaryFile(prefix="CHUNK", suffix=".csv", delete=False, mode='w') as temp_imu:
@@ -184,28 +175,28 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     # Only keep the rows in between the obtained indeces
                     segment_imu_df = imu_df.iloc[start_index:end_index]
                     # Add offset to every timestamp so that everthing shifts s.t. start time is 0
-                    segment_imu_df.iloc[:, timestamp_column] = segment_imu_df.iloc[:, timestamp_column] - segment_imu_df.iloc[0, timestamp_column]
+                    segment_imu_df.iloc[:, timestamp_column].subtract(segment_imu_df.iloc[0, timestamp_column])
                     # Create temporary file and save new csv to this file
-                    segment_imu_df.to_csv(temp_imu, index=False)
-                    
+                    segment_imu_df.to_csv(temp_imu.name, index=False)
+                    # Upload the chunks to the project using the LS API and get the FileUpload object
                     upload_sensor_data(request=request, name=f'imu_segment_{i}', file_path=temp_imu.name ,project=project)
                     fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
                     imu_file_upload = fileupload_model.objects.latest('id')
                     upload_sensor_data(request=request, name=f'video_segment_{i}', file_path=temp_video.name ,project=project)               
                     fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
                     video_file_upload = fileupload_model.objects.latest('id')
-                    
-                    refresh_every = 10
-                    wait_before_sync = 3000
+                    # Parameters used in the synchronisation of timeseries and video
+                    refresh_every = 10 # Every 10 ms it syncs
+                    wait_before_sync = 3000 # In order to wait for the loading of the data, the syncing wait 3000 ms before starting
                     activity_annotation_project = Project.objects.get(id=project.id+2)
                     task_json_template = {
                         "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",
-                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
+                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=r()[0]),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
                         "subject": f"{subject}"
                     }
+                    # Upload the JSON to the correct LS project
                     with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
                         json.dump(task_json_template,task_json_file,indent=4)
-
                     upload_sensor_data(request, name=f'segment: {i}', file_path=task_json_file.name, project=activity_annotation_project)
                 os.remove(temp_imu.name)
                 os.remove(temp_video.name)                

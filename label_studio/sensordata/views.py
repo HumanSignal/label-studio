@@ -303,6 +303,7 @@ def deletesensordata(request, project_id, id):
 
 def create_sync_task_pairs(project, sensordata_A, sensordata_B):
     # Iterate over unique sendata_A sensordata objects, this reduces computations
+    SyncSensorOverlap.objects.all().delete()
     for sendata_A in sensordata_A:
         A_beg_dt = sendata_A.begin_datetime #begin_datetime sendata_A
         A_end_dt = sendata_A.end_datetime #end_datetime sendata_A
@@ -335,22 +336,14 @@ def create_sync_task_pairs(project, sensordata_A, sensordata_B):
                 else:
                     end_overlap_dt = B_end_dt   
                 # Create overlap object, this is used to create tasks
-                if not SyncSensorOverlap.objects.filter(sensordata_A=sendata_A,
-                                            sensordata_B=sendata_B,
-                                            project=project,
-                                            start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
-                                            end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
-                                            start_B = (begin_overlap_dt-B_beg_dt).total_seconds(),
-                                            end_B = (end_overlap_dt-B_beg_dt).total_seconds()
-                                            ).exists():
-                    SyncSensorOverlap.objects.create(sensordata_A=sendata_A,
-                                                sensordata_B=sendata_B,
-                                                project=project,
-                                                start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
-                                                end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
-                                                start_B = (begin_overlap_dt-B_beg_dt).total_seconds(),
-                                                end_B = (end_overlap_dt-B_beg_dt).total_seconds()
-                                                )   
+                SyncSensorOverlap.objects.create(sensordata_A=sendata_A,
+                                                 sensordata_B=sendata_B,
+                                                 project=project,
+                                                 start_A= (begin_overlap_dt-A_beg_dt).total_seconds(),
+                                                 end_A = (end_overlap_dt-A_beg_dt).total_seconds(),
+                                                 start_B = (begin_overlap_dt-B_beg_dt).total_seconds(),
+                                                 end_B = (end_overlap_dt-B_beg_dt).total_seconds()
+                                                 )   
 
 def create_sync_data_chunks(request, project,value_column_name):
     # Get all overlap for given subject and video
@@ -401,9 +394,9 @@ def create_sync_data_chunks(request, project,value_column_name):
                 # Only keep the rows in between the obtained indeces
                 imu_df = imu_df.iloc[start_index:end_index]
                 # Add offset to every timestamp so that everthing shifts s.t. start time is 0
-                imu_df.iloc[:, timestamp_column] = imu_df.iloc[:, timestamp_column] - imu_df.iloc[0, timestamp_column]
+                imu_df.iloc[:, timestamp_column].subtract(imu_df.iloc[0, timestamp_column])
                 # Save new csv to this file
-                imu_df.to_csv(temp_imu, index=False)
+                imu_df.to_csv(temp_imu.name, index=False)
                 # Upload sync chunks to data_import project
                 upload_sensor_data(request=request, name=f'imu_sync', file_path=temp_imu.name ,project=project)
                 fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
@@ -412,19 +405,20 @@ def create_sync_data_chunks(request, project,value_column_name):
                 fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
                 video_file_upload = fileupload_model.objects.latest('id')
                 # Create JSON that allows for synchronization between video and timeseries
-                refresh_every = 10
-                wait_before_sync = 3000
+                # Parameters used in the synchronisation of timeseries and video
+                refresh_every = 10 # Every 10 ms it syncs
+                wait_before_sync = 3000 # In order to wait for the loading of the data, the syncing wait 3000 ms before starting
                 offset_annotation_project = Project.objects.get(id=project.id+3)
                 task_json_template = {
                     "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name.lower()}",
-                    "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
+                    "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=r()[0]),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
                     "sensor_a": f"{overlap.sensordata_A.sensor}",
                     "sensor_b": f"{overlap.sensordata_B.sensor}",
                     "offset_date": f"{min(overlap.sensordata_A.begin_datetime,overlap.sensordata_A.begin_datetime)}"
                 }
+                # Upload the JSON to the correct LS project
                 with NamedTemporaryFile(prefix=f'{overlap.sensordata_A.sensor.id}_{overlap.sensordata_B.sensor.id}', suffix='.json',mode='w',delete=False) as task_json_file:
                     json.dump(task_json_template,task_json_file,indent=4)
-
                 upload_sensor_data(request, name=f'sync', file_path=task_json_file.name, project=offset_annotation_project)
             os.remove(temp_imu.name)
             os.remove(temp_video.name)                
@@ -466,8 +460,8 @@ def parse_offset_annotations(request,project_id):
     
     for i, task in enumerate(tasks):
         # Get sensors, the sensor names are stored in the task data
-        sensor_A = Sensor.objects.get(name = task.data['sensor_a'].replace('Sensor: ', ''))
-        sensor_B = Sensor.objects.get(name = task.data['sensor_b'].replace('Sensor: ', ''))
+        sensor_A = Sensor.objects.get(name = task.data['sensor_a'].replace('Sensor: ', ''),project=project)
+        sensor_B = Sensor.objects.get(name = task.data['sensor_b'].replace('Sensor: ', ''),project=project)
         annotation = Annotation.objects.filter(task=task)
         # Check if negative offset label. All offset labels for one task should have either negative or positive offset
         if annotation[0].result[0]['value']['timeserieslabels'][0] == 'Negative offset':
