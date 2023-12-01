@@ -16,7 +16,6 @@ class Migration(migrations.Migration):
             name='user',
             managers=[
                 ('objects', django.db.models.manager.Manager()),
-                # ('with_deleted', users.models.UserManagerWithDeleted()),
             ],
         ),
     ]
