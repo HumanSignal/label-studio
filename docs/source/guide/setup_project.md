@@ -24,7 +24,6 @@ After you [start Label Studio](start.html) and [create an account](signup.html),
 4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project).
 
 <div class="enterprise-only">
-
 5. (Optional) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
 6. [Publish your project](#Publish-project-to-annotators).
 
@@ -46,7 +45,9 @@ After you save a project, any other collaborator with access to the Label Studio
 
 <div class="opensource-only">
 
-## Set up instructions for data labelers
+## Set up annotation settings for your project
+
+### Set up instructions for data labelers
 
 In the project settings, you can add instructions and choose whether to show the instructions to annotators before they perform labeling.
 
@@ -57,7 +58,7 @@ In the project settings, you can add instructions and choose whether to show the
 
 Annotators can view instructions at any time  by clicking the information icon in the labeling interface.
 
-## Set up task sampling
+### Set up task sampling
 
 You can set up task sampling from the command line when you start Label Studio or from the Label Studio UI.
 
