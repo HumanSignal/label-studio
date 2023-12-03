@@ -430,7 +430,7 @@ actions = [
     },
     {
         'entry_point': batch_train,
-        'permission': all_permissions.projects_change, # check that this is enough for permisions
+        'permission': all_permissions.projects_change,
         'title': 'Batch Train',
         'order': 1,
         'experimental': True,
