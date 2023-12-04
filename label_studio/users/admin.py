@@ -13,23 +13,49 @@ from users.models import User
 
 class UserAdminShort(UserAdmin):
 
-    add_fieldsets = (
-        (None, {'fields': ('email', 'password1', 'password2')}),
-    )
+    add_fieldsets = ((None, {'fields': ('email', 'password1', 'password2')}),)
+
+    def get_queryset(self, request):
+        # Use the with_deleted method to include soft-deleted users in the queryset
+        return User.with_deleted.all()
 
     def __init__(self, *args, **kwargs):
         super(UserAdminShort, self).__init__(*args, **kwargs)
 
-        self.list_display = ('email', 'username', 'active_organization', 'organization', 'is_staff', 'is_superuser')
+        self.list_display = (
+            'email',
+            'username',
+            'active_organization',
+            'organization',
+            'is_staff',
+            'is_superuser',
+        )
         self.list_filter = ('is_staff', 'is_superuser', 'is_active')
-        self.search_fields = ('username', 'first_name', 'last_name', 'email',
-                              'organization__title', 'active_organization__title')
+        self.search_fields = (
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'organization__title',
+            'active_organization__title',
+        )
         self.ordering = ('email',)
 
-        self.fieldsets = ((None, {'fields': ('password', )}),
-                          ('Personal info', {'fields': ('email', 'username', 'first_name', 'last_name')}),
-                          ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',)}),
-                          ('Important dates', {'fields': ('last_login', 'date_joined')}))
+        self.fieldsets = (
+            (None, {'fields': ('password',)}),
+            ('Personal info', {'fields': ('email', 'username', 'first_name', 'last_name')}),
+            (
+                'Permissions',
+                {
+                    'fields': (
+                        'is_active',
+                        'is_staff',
+                        'is_superuser',
+                    )
+                },
+            ),
+            ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        )
 
 
 class AsyncMigrationStatusAdmin(admin.ModelAdmin):

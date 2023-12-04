@@ -35,11 +35,11 @@ jobs:
           git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "${{ env.NODE }}"
 
@@ -55,8 +55,6 @@ jobs:
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Print Yarn cache size
         run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}

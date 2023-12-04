@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5248: BBoxes optimizations",
-  "commit": "e888b2df9e16dbffb39f39529fa7de9dba0d92c7",
+  "message": "docs: DOC-161: Add beta tag for external taxonomy",
+  "commit": "2c59ae09175384e0b7c994575d708f2f2872cebd",
   "branch": "master",
-  "date": "2023/09/04 18:41:01"
+  "date": "2023-11-30T15:24:56Z"
 }

@@ -1,8 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import datetime
+from typing import Optional
 
+from core.feature_flags import flag_set
 from core.utils.common import load_func
+from core.utils.db import fast_first
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -17,14 +20,14 @@ from users.functions import hash_upload
 
 YEAR_START = 1980
 YEAR_CHOICES = []
-for r in range(YEAR_START, (datetime.datetime.now().year+1)):
+for r in range(YEAR_START, (datetime.datetime.now().year + 1)):
     YEAR_CHOICES.append((r, r))
 
 year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 
-class UserManager(BaseUserManager):
-    use_in_migrations = True
+class UserManagerWithDeleted(BaseUserManager):
+    use_in_migrations: bool = True
 
     def _create_user(self, email, password, **extra_fields):
         """
@@ -58,13 +61,21 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+class UserManager(UserManagerWithDeleted):
+    use_in_migrations: bool = False
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(is_deleted=False)
+        return qs
+
+
 class UserLastActivityMixin(models.Model):
-    last_activity = models.DateTimeField(
-        _('last activity'), default=timezone.now, editable=False)
+    last_activity = models.DateTimeField(_('last activity'), default=timezone.now, editable=False)
 
     def update_last_activity(self):
         self.last_activity = timezone.now()
-        self.save(update_fields=["last_activity"])
+        self.save(update_fields=['last_activity'])
 
     class Meta:
         abstract = True
@@ -80,6 +91,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     Username and password are required. Other fields are optional.
     """
+
     username = models.CharField(_('username'), max_length=256)
     email = models.EmailField(_('email address'), unique=True, blank=True)
 
@@ -88,32 +100,36 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     phone = models.CharField(_('phone'), max_length=256, blank=True)
     avatar = models.ImageField(upload_to=hash_upload, blank=True)
 
-    is_staff = models.BooleanField(_('staff status'), default=False,
-                                   help_text=_('Designates whether the user can log into this admin site.'))
+    is_staff = models.BooleanField(
+        _('staff status'), default=False, help_text=_('Designates whether the user can log into this admin site.')
+    )
 
-    is_active = models.BooleanField(_('active'), default=True,
-                                    help_text=_('Designates whether to treat this user as active. '
-                                                'Unselect this instead of deleting accounts.'))
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_('Designates whether to treat this user as active. Unselect this instead of deleting accounts.'),
+    )
+    is_deleted = models.BooleanField(
+        _('deleted'),
+        default=False,
+        db_index=True,
+        help_text=_('Designates whether to treat this user as deleted. Select this instead of deleting accounts.'),
+    )
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     activity_at = models.DateTimeField(_('last annotation activity'), auto_now=True)
 
     active_organization = models.ForeignKey(
-        'organizations.Organization',
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='active_users'
+        'organizations.Organization', null=True, on_delete=models.SET_NULL, related_name='active_users'
     )
 
     allow_newsletters = models.BooleanField(
-        _('allow newsletters'),
-        null=True,
-        default=None,
-        help_text=_('Allow sending newsletters to user')
+        _('allow newsletters'), null=True, default=None, help_text=_('Allow sending newsletters to user')
     )
 
     objects = UserManager()
+    with_deleted = UserManagerWithDeleted()
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
@@ -150,8 +166,8 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         return annotations.values_list('project').distinct().count()
 
     @property
-    def own_organization(self):
-        return Organization.objects.get(created_by=self)
+    def own_organization(self) -> Optional[Organization]:
+        return fast_first(Organization.objects.filter(created_by=self))
 
     @property
     def has_organization(self):
@@ -167,7 +183,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
             name = self.email
 
         return name
-        
+
     def get_full_name(self):
         """
         Return the first_name and the last_name for a given user with a space in between.
@@ -179,14 +195,16 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         """Return the short name for the user."""
         return self.first_name
 
-    def reset_token(self):
-        token = Token.objects.filter(user=self)
-        if token.exists():
-            token.delete()
+    def reset_token(self) -> Token:
+        Token.objects.filter(user=self).delete()
         return Token.objects.create(user=self)
-    
-    def get_initials(self):
+
+    def get_initials(self, is_deleted=False):
         initials = '?'
+
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self) and is_deleted:
+            return 'DU'
+
         if not self.first_name and not self.last_name:
             initials = self.email[0:2]
         elif self.first_name and not self.last_name:

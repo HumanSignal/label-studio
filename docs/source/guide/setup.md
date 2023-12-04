@@ -2,8 +2,8 @@
 title: Labeling configuration
 type: guide
 tier: all
-order: 119
-order_enterprise: 104
+order: 160
+order_enterprise: 57
 meta_title: Set up labeling configuration interface
 meta_description: Customize your data labeling and annotation interface with templates or custom tag combinations for your machine learning and data science projects.
 section: "Project & Team Management"
@@ -26,16 +26,29 @@ Configure the labels and task type for annotators using the templates included w
 
 You can make changes to the labeling interface and configuration in the project settings.
 
-!!! note
-You cannot remove labels or change the type of labeling being performed unless you delete existing annotations using those labels.
+!!! note 
+    If you are modifying a project that has in-progress work, note the following:
 
-1. In Label Studio UI, open the project you want to modify.
+    * You cannot remove labels or change the type of labeling being performed unless you delete any existing annotations that are using those labels.
+    * If you make changes to the labeling configuration, any tabs that you might have created in the Data Manager are removed.
+
+1. In Label Studio, open the project you want to modify.
 2. Click **Settings**.
 3. Click **Labeling Interface**.
 4. Browse templates, update the available labels, or use the `Code` option to further customize the interface using [tags](/tags).
 
-!!! note
-If you make changes to the labeling configuration, any tabs that you might have created in the data manager are removed.
+
+#### Code view autocomplete
+
+The code view has an autocomplete helper that appears as you type. 
+
+The autocomplete includes prompts for both tags and the parameters that are available for the selected tag:
+
+![Animated gif of code autocomplete in action](/images/label/autocomplete.gif)
+
+Tag suggestions appear after you type the opening angle bracket `<`. Parameter suggestions appear after adding a blank space within the tag. 
+
+To accept a suggestion, you can click to select it, or press the Tab key while the suggestion is highlighted.  
 
 ## Customize a template
 

@@ -2,10 +2,30 @@
 """
 from django.conf import settings  # noqa: I001
 
-from .azure_blob.models import AzureBlobImportStorage, AzureBlobImportStorageLink, AzureBlobExportStorage, AzureBlobExportStorageLink  # noqa: F401
-from .s3.models import S3ImportStorage, S3ImportStorageLink, S3ExportStorage, S3ExportStorageLink  # noqa: F401
-from .gcs.models import GCSImportStorage, GCSImportStorageLink, GCSExportStorage, GCSExportStorageLink  # noqa: F401
-from .redis.models import RedisImportStorage, RedisImportStorageLink, RedisExportStorage, RedisExportStorageLink  # noqa: F401
+from .azure_blob.models import (  # noqa: F401
+    AzureBlobImportStorage,
+    AzureBlobImportStorageLink,
+    AzureBlobExportStorage,
+    AzureBlobExportStorageLink,
+)
+from .s3.models import (  # noqa: F401
+    S3ImportStorage,
+    S3ImportStorageLink,
+    S3ExportStorage,
+    S3ExportStorageLink,
+)
+from .gcs.models import (  # noqa: F401
+    GCSImportStorage,
+    GCSImportStorageLink,
+    GCSExportStorage,
+    GCSExportStorageLink,
+)
+from .redis.models import (  # noqa: F401
+    RedisImportStorage,
+    RedisImportStorageLink,
+    RedisExportStorage,
+    RedisExportStorageLink,
+)
 
 from label_studio.core.utils.common import load_func
 

@@ -35,7 +35,14 @@ def ml_backend_mock(**kwargs):
         yield register_ml_backend_mock(m, **kwargs)
 
 
-def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, health_connect_timeout=False, train_job_id='123', setup_model_version='abc'):
+def register_ml_backend_mock(
+    m,
+    url='http://localhost:9090',
+    predictions=None,
+    health_connect_timeout=False,
+    train_job_id='123',
+    setup_model_version='abc',
+):
     m.post(f'{url}/setup', text=json.dumps({'status': 'ok', 'model_version': setup_model_version}))
     if health_connect_timeout:
         m.get(f'{url}/health', exc=requests.exceptions.ConnectTimeout)
@@ -44,13 +51,13 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
     m.post(f'{url}/train', text=json.dumps({'status': 'ok', 'job_id': train_job_id}))
     m.post(f'{url}/predict', text=json.dumps(predictions or {}))
     m.post(f'{url}/webhook', text=json.dumps({}))
-    m.get(f'{url}/versions', text=json.dumps({'versions': ["1", "2"]}))
+    m.get(f'{url}/versions', text=json.dumps({'versions': ['1', '2']}))
     return m
 
 
 @contextmanager
 def import_from_url_mock(**kwargs):
-    with mock.patch('data_import.uploader.validate_upload_url'):
+    with mock.patch('core.utils.io.validate_upload_url'):
         with requests_mock.Mocker(real_http=True) as m:
 
             with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
@@ -68,6 +75,7 @@ class _TestJob(object):
 @contextmanager
 def email_mock():
     from django.core.mail import EmailMultiAlternatives
+
     with mock.patch.object(EmailMultiAlternatives, 'send'):
         yield
 
@@ -84,17 +92,21 @@ def gcs_client_mock():
         def __init__(self, bucket_name, key, is_json):
             self.key = key
             self.bucket_name = bucket_name
-            self.name = f"{bucket_name}/{key}"
+            self.name = f'{bucket_name}/{key}'
             self.is_json = is_json
+
         def download_as_string(self):
             data = f'test_blob_{self.key}'
             if self.is_json:
                 return json.dumps({'str_field': data, 'int_field': 123, 'dict_field': {'one': 'wow', 'two': 456}})
             return data
+
         def upload_from_string(self, string):
             print(f'String {string} uploaded to bucket {self.bucket_name}')
+
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.bucket_name}/{self.key}'
+
         def download_as_bytes(self):
             data = f'test_blob_{self.key}'
             if self.is_json:
@@ -105,21 +117,27 @@ def gcs_client_mock():
         def __init__(self, bucket_name, is_json, **kwargs):
             self.name = bucket_name
             self.is_json = is_json
-        def list_blobs(self, prefix):
+
+        def list_blobs(self, prefix, **kwargs):
+            if 'fake' in prefix:
+                return []
             return [File('abc'), File('def'), File('ghi')]
+
         def blob(self, key):
             return DummyGCSBlob(self.name, key, self.is_json)
 
-    class DummyGCSClient():
+    class DummyGCSClient:
         def get_bucket(self, bucket_name):
             is_json = bucket_name.endswith('_JSON')
             return DummyGCSBucket(bucket_name, is_json)
 
         def list_blobs(self, bucket_name, prefix):
             is_json = bucket_name.endswith('_JSON')
-            return [DummyGCSBlob(bucket_name, 'abc', is_json),
-                    DummyGCSBlob(bucket_name, 'def', is_json),
-                    DummyGCSBlob(bucket_name, 'ghi', is_json)]
+            return [
+                DummyGCSBlob(bucket_name, 'abc', is_json),
+                DummyGCSBlob(bucket_name, 'def', is_json),
+                DummyGCSBlob(bucket_name, 'ghi', is_json),
+            ]
 
     with mock.patch.object(google_storage, 'Client', return_value=DummyGCSClient()):
         yield
@@ -137,22 +155,29 @@ def azure_client_mock():
         def __init__(self, container_name, key):
             self.key = key
             self.container_name = container_name
+
         def download_as_string(self):
             return f'test_blob_{self.key}'
+
         def upload_blob(self, string, overwrite):
             print(f'String {string} uploaded to bucket {self.container_name}')
+
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.container_name}/{self.key}'
+
         def content_as_text(self):
             return json.dumps({'str_field': str(self.key), 'int_field': 123, 'dict_field': {'one': 'wow', 'two': 456}})
 
     class DummyAzureContainer:
         def __init__(self, container_name, **kwargs):
             self.name = container_name
+
         def list_blobs(self, name_starts_with):
             return [File('abc'), File('def'), File('ghi')]
+
         def get_blob_client(self, key):
             return DummyAzureBlob(self.name, key)
+
         def get_container_properties(self, **kwargs):
             return SimpleNamespace(
                 name='test-container',
@@ -166,14 +191,13 @@ def azure_client_mock():
                 metadata={'key': 'value'},
                 encryption_scope='test-scope',
                 deleted=False,
-                version='1.0.0'
+                version='1.0.0',
             )
 
         def download_blob(self, key):
             return DummyAzureBlob(self.name, key)
 
-
-    class DummyAzureClient():
+    class DummyAzureClient:
         def get_container_client(self, container_name):
             return DummyAzureContainer(container_name)
 
@@ -216,13 +240,13 @@ def make_project(config, user, use_ml_backend=True, team_id=None, org=None):
 @pytest.fixture
 @pytest.mark.django_db
 def project_id(business_client):
-    payload = dict(title="test_project")
+    payload = dict(title='test_project')
     response = business_client.post(
-        "/api/projects/",
+        '/api/projects/',
         data=json.dumps(payload),
-        content_type="application/json",
+        content_type='application/json',
     )
-    return response.json()["id"]
+    return response.json()['id']
 
 
 def make_task(config, project):
@@ -237,6 +261,7 @@ def create_business(user):
 
 def make_annotation(config, task_id):
     from tasks.models import Annotation, Task
+
     task = Task.objects.get(pk=task_id)
 
     return Annotation.objects.create(project_id=task.project_id, task_id=task_id, **config)
@@ -244,6 +269,7 @@ def make_annotation(config, task_id):
 
 def make_prediction(config, task_id):
     from tasks.models import Prediction, Task
+
     task = Task.objects.get(pk=task_id)
     return Prediction.objects.create(task_id=task_id, project=task.project, **config)
 
@@ -290,6 +316,7 @@ def login(client, email, password):
 
 def signin(client, email, password):
     return client.post('/user/login/', data={'email': email, 'password': password})
+
 
 def signout(client):
     return client.get('/logout')
@@ -344,7 +371,6 @@ def save_export_file_path(response):
 def save_convert_file_path(response, export_id=None):
     export = response.json()[0]
     convert = export['converted_formats'][0]
-
 
     converted = ConvertedFormat.objects.get(id=convert['id'])
 

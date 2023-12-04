@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-380: [FE] 'Hang tight' message is missing when there is no tasks synced yet and sync is in progress",
-  "commit": "66797de8bcf7a7bc8ae401ab7975f589cd439ee7",
+  "message": "fix: DIA-739: [FE] User is not able to update similarity range if filter is applied",
+  "commit": "93aaec64a11d0a57a0b9baf3074f7d3dab386da0",
   "branch": "master",
-  "date": "2023/09/05 09:47:24"
+  "date": "2023-12-01T06:12:20Z"
 }

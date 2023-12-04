@@ -20,7 +20,7 @@ def get_next_task_logging_level(user):
 
 
 def _get_random_unlocked(task_query, user, upper_limit=None):
-    for task in task_query.order_by('?').only('id')[:settings.RANDOM_NEXT_TASK_SAMPLE_SIZE]:
+    for task in task_query.order_by('?').only('id')[: settings.RANDOM_NEXT_TASK_SAMPLE_SIZE]:
         try:
             task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
             if not task.has_lock(user):
@@ -63,8 +63,7 @@ def _try_tasks_with_overlap(tasks):
 
 
 def _try_breadth_first(tasks, user):
-    """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible
-    """
+    """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible"""
 
     tasks = tasks.annotate(annotations_count=Count('annotations', filter=~Q(annotations__completed_by=user)))
     max_annotations_count = tasks.aggregate(Max('annotations_count'))['annotations_count__max']
@@ -223,7 +222,9 @@ def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
     return next_task, queue_info
 
 
-def get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info):
+def get_task_from_qs_with_sampling(
+    not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info
+):
     if project.sampling == project.SEQUENCE:
         logger.debug(f'User={user} tries sequence sampling from prepared tasks')
         next_task = _get_first_unlocked(not_solved_tasks, user)
@@ -232,9 +233,7 @@ def get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, pr
 
     elif project.sampling == project.UNCERTAINTY:
         logger.debug(f'User={user} tries uncertainty sampling from prepared tasks')
-        next_task = _try_uncertainty_sampling(
-            not_solved_tasks, project, user_solved_tasks_array, user, prepared_tasks
-        )
+        next_task = _try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array, user, prepared_tasks)
         if next_task:
             queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
 
@@ -271,7 +270,9 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 logger.debug(f'User={user} tries overlap first from prepared tasks')
                 _, tasks_with_overlap = _try_tasks_with_overlap(not_solved_tasks)
                 queue_info += 'Show overlap first'
-                next_task, queue_info = get_task_from_qs_with_sampling(tasks_with_overlap, user_solved_tasks_array, prepared_tasks, user, project, queue_info)
+                next_task, queue_info = get_task_from_qs_with_sampling(
+                    tasks_with_overlap, user_solved_tasks_array, prepared_tasks, user, project, queue_info
+                )
 
         if not next_task:
             if dm_queue:
@@ -280,8 +281,9 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 next_task = not_solved_tasks.first()
 
             else:
-                next_task, queue_info = get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info)
-
+                next_task, queue_info = get_task_from_qs_with_sampling(
+                    not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info
+                )
 
         next_task, queue_info = postponed_queue(next_task, prepared_tasks, project, user, queue_info)
 
@@ -293,7 +295,7 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
 
         logger.log(
             get_next_task_logging_level(user),
-            f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}'
+            f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}',
         )
 
         # debug for critical overlap issue
@@ -327,16 +329,16 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                         'show_overlap_first': project.show_overlap_first,
                         'overlap_cohort_percentage': project.overlap_cohort_percentage,
                         'project_id': project.id,
-                        'title': project.title
+                        'title': project.title,
                     }
-                    logger.error(f'DEBUG INFO: get_next_task is_labeled/overlap: '
-                                 f'LOCALS ==> {local} :: PROJECT ==> {project_data} :: '
-                                 f'NEXT_TASK ==> {task}')
+                    logger.error(
+                        f'DEBUG INFO: get_next_task is_labeled/overlap: '
+                        f'LOCALS ==> {local} :: PROJECT ==> {project_data} :: '
+                        f'NEXT_TASK ==> {task}'
+                    )
             except Exception as e:
                 logger.error(f'get_next_task is_labeled/overlap try/except: {str(e)}')
                 pass
 
         add_stream_history(next_task, user, project)
         return next_task, queue_info
-
-

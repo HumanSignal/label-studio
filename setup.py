@@ -24,7 +24,7 @@ setuptools.setup(
     name=label_studio.package_name,
     version=label_studio.__version__,
     author='Heartex',
-    author_email="hello@heartex.ai",
+    author_email='hello@heartex.ai',
     description='Label Studio annotation tool',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -44,7 +44,5 @@ setuptools.setup(
             'label-studio=label_studio.server:main',
         ],
     },
-    extras_require={
-        'mysql': ['mysqlclient']
-    }
+    extras_require={'mysql': ['mysqlclient']},
 )

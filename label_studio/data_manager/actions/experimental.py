@@ -62,13 +62,10 @@ def propagate_annotations_form(user, project):
     field = {
         'type': 'number',
         'name': 'source_annotation_id',
-        'label': 'Enter source annotation ID' +
-                 (f' [first ID: {str(first_annotation.id)}]' if first_annotation else '')
+        'label': 'Enter source annotation ID'
+        + (f' [first ID: {str(first_annotation.id)}]' if first_annotation else ''),
     }
-    return [{
-        'columnCount': 1,
-        'fields': [field]
-    }]
+    return [{'columnCount': 1, 'fields': [field]}]
 
 
 def remove_duplicates(project, queryset, **kwargs):
@@ -78,9 +75,7 @@ def remove_duplicates(project, queryset, **kwargs):
         if field.startswith('io_storages_'):
             storages += [field]
 
-    tasks = list(queryset.values(
-        'data', 'id', 'total_annotations', *storages
-    ))
+    tasks = list(queryset.values('data', 'id', 'total_annotations', *storages))
     duplicates = defaultdict(list)
     for task in list(tasks):
         replace_task_data_undefined_with_config_field(task['data'], project)
@@ -117,9 +112,7 @@ def remove_duplicates(project, queryset, **kwargs):
                 if task['id'] != source[0]['id']:
                     link_instance = _class.objects.get(id=source[2])
                     _class.create(
-                        task=Task.objects.get(id=task['id']),
-                        key=link_instance.key,
-                        storage=link_instance.storage
+                        task=Task.objects.get(id=task['id']), key=link_instance.key, storage=link_instance.storage
                     )
 
     ### remove duplicates ###
@@ -150,9 +143,10 @@ def remove_duplicates(project, queryset, **kwargs):
 
     # remove tasks
     queryset = queryset.filter(id__in=removing, annotations__isnull=True)
-    assert queryset.count() == len(removing), \
-        f'Remove duplicates failed, operation is not finished: ' \
+    assert queryset.count() == len(removing), (
+        f'Remove duplicates failed, operation is not finished: '
         f'queryset count {queryset.count()} != removing {len(removing)}'
+    )
 
     delete_tasks(project, queryset)
     return {'response_code': 200, 'detail': f'Removed {len(removing)} tasks'}
@@ -172,21 +166,20 @@ def rename_labels(project, queryset, **kwargs):
 
     annotations = Annotation.objects.filter(project=project)
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        annotations = annotations \
-            .filter(result__icontains=control_tag) \
-            .filter(result__icontains=old_label_name)
+        annotations = annotations.filter(result__icontains=control_tag).filter(result__icontains=old_label_name)
     else:
-        annotations = annotations \
-            .filter(result__contains=[{'from_name': control_tag}]) \
-            .filter(result__contains=[{'value': {label_type: [old_label_name]}}])
+        annotations = annotations.filter(result__contains=[{'from_name': control_tag}]).filter(
+            result__contains=[{'value': {label_type: [old_label_name]}}]
+        )
 
     label_count = 0
     annotation_count = 0
     for annotation in annotations:
         changed = False
         for sub in annotation.result:
-            if sub.get('from_name', None) == control_tag \
-                    and old_label_name in sub.get('value', {}).get(label_type, []):
+            if sub.get('from_name', None) == control_tag and old_label_name in sub.get('value', {}).get(
+                label_type, []
+            ):
 
                 new_labels = []
                 for label in sub['value'][label_type]:
@@ -221,28 +214,26 @@ def rename_labels_form(user, project):
         old_names += label.get('labels', [])
         control_tags.append(key)
 
-    return [{
-        'columnCount': 1,
-        'fields': [
-            {
-                'type': 'select',
-                'name': 'control_tag',
-                'label': 'Choose a label control tag',
-                'options': control_tags,
-            },
-            {
-                'type': 'select',
-                'name': 'old_label_name',
-                'label': 'Old label name',
-                'options': list(set(old_names)),
-            },
-            {
-                'type': 'input',
-                'name': 'new_label_name',
-                'label': 'New label name'
-            },
-        ]
-    }]
+    return [
+        {
+            'columnCount': 1,
+            'fields': [
+                {
+                    'type': 'select',
+                    'name': 'control_tag',
+                    'label': 'Choose a label control tag',
+                    'options': control_tags,
+                },
+                {
+                    'type': 'select',
+                    'name': 'old_label_name',
+                    'label': 'Old label name',
+                    'options': list(set(old_names)),
+                },
+                {'type': 'input', 'name': 'new_label_name', 'label': 'New label name'},
+            ],
+        }
+    ]
 
 
 def add_data_field(project, queryset, **kwargs):
@@ -274,10 +265,10 @@ def add_data_field(project, queryset, **kwargs):
         else:
             queryset.update(
                 data=Func(
-                    F("data"),
+                    F('data'),
                     Value([value_name]),
                     Value(value, JSONField()),
-                    function="jsonb_set",
+                    function='jsonb_set',
                 )
             )
 
@@ -317,7 +308,7 @@ def add_expression(queryset, size, value, value_name):
 
     # range
     if command == 'range':
-        assert len(args) == 1, "range(start:int) should have start argument "
+        assert len(args) == 1, 'range(start:int) should have start argument '
         start = int(args[0])
         values = range(start, start + size)
         for i, v in enumerate(values):
@@ -339,14 +330,11 @@ def add_expression(queryset, size, value, value_name):
 
     # sampling with choices and weights
     elif command == 'choices':
-        assert 0 < len(args) < 3, 'choices(values:list, weights:list) ' \
-                                  'should have 1 or 2 args: values & weights (default=None)'
-        weights = json.loads(args[1]) if len(args) == 2 else None
-        values = random.choices(
-            population=json.loads(args[0]),
-            weights=weights,
-            k=size
+        assert 0 < len(args) < 3, (
+            'choices(values:list, weights:list) ' 'should have 1 or 2 args: values & weights (default=None)'
         )
+        weights = json.loads(args[1]) if len(args) == 2 else None
+        values = random.choices(population=json.loads(args[0]), weights=weights, k=size)
         for i, v in enumerate(values):
             tasks[i].data[value_name] = v
 
@@ -359,35 +347,27 @@ def add_expression(queryset, size, value, value_name):
                 task.data[value_name] = task.data[value_name].replace(old_value, new_value)
 
     else:
-        raise Exception(
-            'Undefined expression, you can use: ' + add_data_field_examples
-        )
+        raise Exception('Undefined expression, you can use: ' + add_data_field_examples)
 
     Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
 
 
 def add_data_field_form(user, project):
-    return [{
-        'columnCount': 1,
-        'fields': [
-            {
-                'type': 'input',
-                'name': 'value_name',
-                'label': 'Name'
-            },
-            {
-                'type': 'select',
-                'name': 'value_type',
-                'label': 'Type',
-                'options': ['String', 'Number', 'Expression'],
-            },
-            {
-                'type': 'input',
-                'name': 'value',
-                'label': 'Value'
-            }
-        ]
-    }]
+    return [
+        {
+            'columnCount': 1,
+            'fields': [
+                {'type': 'input', 'name': 'value_name', 'label': 'Name'},
+                {
+                    'type': 'select',
+                    'name': 'value_type',
+                    'label': 'Type',
+                    'options': ['String', 'Number', 'Expression'],
+                },
+                {'type': 'input', 'name': 'value', 'label': 'Value'},
+            ],
+        }
+    ]
 
 
 def dino_text_form(user, project):
@@ -434,13 +414,12 @@ actions = [
         'experimental': True,
         'dialog': {
             'text': 'Confirm that you want to add a new field in tasks. '
-                    'After this operation you must refresh the Data Manager page fully to see the new column! '
-                    'You can use the following expressions: ' + add_data_field_examples,
+            'After this operation you must refresh the Data Manager page fully to see the new column! '
+            'You can use the following expressions: ' + add_data_field_examples,
             'type': 'confirm',
             'form': add_data_field_form,
-        }
+        },
     },
-
     {
         'entry_point': dino_predictions,
         'permission': all_permissions.projects_change,
@@ -464,15 +443,14 @@ actions = [
         'experimental': True,
         'dialog': {
             'text': 'Confirm that you want to copy the source annotation to all selected tasks. '
-                    'Note: this action can be applied only for similar source objects: '
-                    'images with the same width and height, '
-                    'texts with the same length, '
-                    'audios with the same durations.',
+            'Note: this action can be applied only for similar source objects: '
+            'images with the same width and height, '
+            'texts with the same length, '
+            'audios with the same durations.',
             'type': 'confirm',
-            'form': propagate_annotations_form
-        }
+            'form': propagate_annotations_form,
+        },
     },
-
     {
         'entry_point': remove_duplicates,
         'permission': all_permissions.projects_change,
@@ -481,11 +459,10 @@ actions = [
         'experimental': True,
         'dialog': {
             'text': 'Confirm that you want to remove duplicated tasks with the same data fields.'
-                    'Only tasks without annotations will be deleted.',
-            'type': 'confirm'
-        }
+            'Only tasks without annotations will be deleted.',
+            'type': 'confirm',
+        },
     },
-
     {
         'entry_point': rename_labels,
         'permission': all_permissions.tasks_change,
@@ -494,10 +471,9 @@ actions = [
         'experimental': True,
         'dialog': {
             'text': 'Confirm that you want to rename a label in all annotations. '
-                    'Also you have to change label names in the labeling config manually.',
+            'Also you have to change label names in the labeling config manually.',
             'type': 'confirm',
             'form': rename_labels_form,
-        }
-    }
-
+        },
+    },
 ]
