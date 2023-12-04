@@ -228,7 +228,6 @@ MIDDLEWARE = [
     'core.middleware.ContextLogMiddleware',
     'core.middleware.DatabaseIsLockedRetryMiddleware',
     'core.current_request.ThreadLocalMiddleware',
-    'core.middleware.HumanSignalCSPMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -676,29 +675,42 @@ DATA_MANAGER_FILTER_ALLOWLIST = list(
     set(get_env_list('DATA_MANAGER_FILTER_ALLOWLIST') + ['updated_by__active_organization'])
 )
 
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_STYLE_SRC = ("'self'",)
-CSP_SCRIPT_SRC = (
-    "'self'",
-    'blob:',
-    'browser.sentry-cdn.com',
-    'https://*.googletagmanager.com',
-)
-CSP_IMG_SRC = (
-    "'self'",
-    'data:',
-    'https://*.google-analytics.com',
-    'https://*.googletagmanager.com',
-    'https://*.google.com',
-)
-CSP_CONNECT_SRC = (
-    "'self'",
-    'https://*.google-analytics.com',
-    'https://*.analytics.google.com',
-    'https://analytics.google.com',
-    'https://*.googletagmanager.com',
-    'https://*.g.doubleclick.net',
-    'https://*.ingest.sentry.io',
-)
-CSP_REPORT_ONLY = True
-CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src', 'style-src']
+if ENABLE_LS_CSP := get_bool_env('ENABLE_LS_CSP', True):
+    CSP_DEFAULT_SRC = (
+        "'self'",
+        "'report-sample'",
+    )
+    CSP_STYLE_SRC = ("'self'", "'report-sample'", "'unsafe-inline'")
+    CSP_SCRIPT_SRC = (
+        "'self'",
+        "'report-sample'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        'blob:',
+        'browser.sentry-cdn.com',
+        'https://*.googletagmanager.com',
+    )
+    CSP_IMG_SRC = (
+        "'self'",
+        "'report-sample'",
+        'data:',
+        'https://*.google-analytics.com',
+        'https://*.googletagmanager.com',
+        'https://*.google.com',
+    )
+    CSP_CONNECT_SRC = (
+        "'self'",
+        "'report-sample'",
+        'https://*.google-analytics.com',
+        'https://*.analytics.google.com',
+        'https://analytics.google.com',
+        'https://*.googletagmanager.com',
+        'https://*.g.doubleclick.net',
+        'https://*.ingest.sentry.io',
+    )
+    # Note that this will be overridden to true CSP for views that use the override_report_only_csp decorator
+    CSP_REPORT_ONLY = get_bool_env('LS_CSP_REPORT_ONLY', True)
+    CSP_REPORT_URI = get_env('LS_CSP_REPORT_URI', None)
+    CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src']
+
+    MIDDLEWARE.append('core.middleware.HumanSignalCspMiddleware')

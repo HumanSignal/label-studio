@@ -9,13 +9,14 @@ from typing import Union
 from urllib.parse import unquote, urlparse
 
 import drf_yasg.openapi as openapi
+from core.decorators import override_report_only_csp
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import retry_database_locked, timeit
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.utils.params import bool_from_request, list_of_strings_from_request
-from csp.decorators import csp_update
+from csp.decorators import csp
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
@@ -597,7 +598,8 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
 class UploadedFileResponse(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
-    @csp_update(SANDBOX=[])
+    @override_report_only_csp
+    @csp(SANDBOX=[])
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         request = self.request

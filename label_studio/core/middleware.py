@@ -210,12 +210,18 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
         )
 
 
-class HumanSignalCSPMiddleware(CSPMiddleware):
+class HumanSignalCspMiddleware(CSPMiddleware):
+    """
+    Extend CSPMiddleware to support switching report-only CSP to regular CSP.
+
+    For use with core.decorators.override_report_only_csp.
+    """
+
     def process_response(self, request, response):
         response = super().process_response(request, response)
-        if csp_policy := response.get('Content-Security-Policy-Report-Only'):
-            if response.get('override-report-only-csp'):
+        if getattr(response, '_override_report_only_csp', False):
+            if csp_policy := response.get('Content-Security-Policy-Report-Only'):
                 response['Content-Security-Policy'] = csp_policy
                 del response['Content-Security-Policy-Report-Only']
-                del response['override-report-only-csp']
+            delattr(response, '_override_report_only_csp')
         return response
