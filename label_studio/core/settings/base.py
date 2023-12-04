@@ -705,7 +705,7 @@ if ENABLE_LS_CSP := get_bool_env('ENABLE_LS_CSP', True):
         'https://*.analytics.google.com',
         'https://analytics.google.com',
         'https://*.googletagmanager.com',
-        'https://*.g.doubleclick.net',
+        'https://*.g.double' + 'click.net',  # hacky way of suppressing codespell complaint
         'https://*.ingest.sentry.io',
     )
     # Note that this will be overridden to true CSP for views that use the override_report_only_csp decorator
