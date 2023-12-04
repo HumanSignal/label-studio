@@ -616,12 +616,9 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         if file.storage.exists(file.name):
             content_type, encoding = mimetypes.guess_type(str(file.name))
             content_type = content_type or 'application/octet-stream'
-            resp = RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
-        else:
-            resp = Response(status=status.HTTP_404_NOT_FOUND)
+            return RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
 
-        resp['override-report-only-csp'] = True
-        return resp
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class DownloadStorageData(APIView):
