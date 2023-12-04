@@ -22,11 +22,11 @@ class Migration(migrations.Migration):
     operations = [
         AddIndex(
             model_name='annotation',
-            index=models.Index(fields=['project_id', 'completed_by_id'], name='task_compl_project_completed_by_idx'),
+            index=models.Index(fields=['project', 'completed_by_id'], name='task_comple_project_0bc0be_idx'),
         ),
         AddIndex(
             model_name='annotation',
-            index=models.Index(fields=['task_id', 'id'], name='task_compl_task_id_idx'),
+            index=models.Index(fields=['task', 'id'], name='task_comple_task_id_a6bdec_idx'),
         ),
     ]
 
