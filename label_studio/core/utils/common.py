@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import calendar
 import contextlib
 import copy
-import hashlib
 import logging
 import os
 import random
