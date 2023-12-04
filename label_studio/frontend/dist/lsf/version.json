@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-31: Fix functioning of auto annotations (#1605)",
-  "commit": "f209200de05aad01cba5dffc59883d0de4615458",
+  "message": "docs: DOC-161: Add beta tag for external taxonomy",
+  "commit": "2c59ae09175384e0b7c994575d708f2f2872cebd",
   "branch": "master",
-  "date": "2023-11-21T23:29:28Z"
+  "date": "2023-11-30T15:24:56Z"
 }
