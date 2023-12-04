@@ -26,7 +26,6 @@ from boxing import boxing
 from colorama import Fore
 from core.utils.params import get_env
 from django.conf import settings
-from django.utils.crypto import get_random_string
 from django.contrib.postgres.operations import BtreeGinExtension, TrigramExtension
 from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, Paginator
@@ -43,6 +42,7 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.utils import OperationalError
+from django.utils.crypto import get_random_string
 from django.utils.module_loading import import_string
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
