@@ -4,7 +4,7 @@ from collections import Counter
 from core.feature_flags import flag_set
 from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func
 from django.conf import settings
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, Value, When
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, F, Value, When
 from django.db.models.fields import DecimalField
 from projects.functions.stream_history import add_stream_history
 from tasks.models import Annotation, Task
@@ -160,8 +160,8 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
                 .filter(
                     Q(_agreement__lt=lse_project.agreement_threshold, is_labeled=True) | Q(is_labeled=False)
                 ).annotate(annotators=Count('annotations__completed_by', distinct=True))
-                # skip tasks that have been annotated by the maximum number of annotators
-                .filter(annotators__lt=lse_project.max_assignable_annotators)
+                # skip tasks that have been annotated by the maximum additional number of annotators
+                .filter(annotators__lt=F('overlap') + lse_project.max_additional_annotators_assignable)
             )
             prioritized_on_agreement, not_solved_tasks = _prioritize_low_agreement_tasks(not_solved_tasks, lse_project)
 
