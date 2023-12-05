@@ -1,20 +1,19 @@
 ---
-title: Create a dataset
-short: Create a dataset
-date: 2023-08-16 11:52:38
+title: Create a dataset for Data Discovery
+short: Create datasets
 tier: enterprise
+type: guide
 order: 0
 order_enterprise: 205
-meta_title: Create a Dataset to use with data discovery in Label Studio Enterprise
-meta_description: How to create a Dataset in Label Studio Enterprise using Google Cloud, Azure, or AWS.
-hide_sidebar: true
+meta_title: Create a Dataset to use with Data Discovery in Label Studio Enterprise
+meta_description: How to create a dataset in Label Studio Enterprise using Google Cloud, Azure, or AWS.
+section: "Data Discovery"
+date: 2023-08-16 11:52:38
 ---
 
 !!! note
-    At this time, we only support building datasets from a bucket of unstructured data, meaning that the data must be in individual files rather than a structured format such as CSV or JSON.
-
-!!! note
-    To create a new Dataset, your [user role](manage_users#Roles-in-Label-Studio-Enterprise) must have Owner or Administrator permissions. 
+    * At this time, we only support building datasets from a bucket of unstructured data, meaning that the data must be in individual files rather than a structured format such as CSV or JSON.
+    * To create a new dataset, your [user role](manage_users#Roles-in-Label-Studio-Enterprise) must have Owner or Administrator permissions. 
 
 ## Before you begin
 
