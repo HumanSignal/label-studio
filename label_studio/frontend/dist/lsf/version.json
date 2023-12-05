@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-89: Fix rendering of relation arrow in gallery mode of image",
-  "commit": "b4ebb3d921641172fd20fa038d9147488d65c19f",
-  "branch": "fb-leap-89/relations",
-  "date": "2023-11-30T07:42:57Z"
+  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
+  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
+  "branch": "master",
+  "date": "2023-12-05T16:41:20Z"
 }
