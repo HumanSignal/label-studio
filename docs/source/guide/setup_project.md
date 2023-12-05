@@ -143,6 +143,28 @@ If you want at least half of the tasks to be annotated by at least 3 people:
 
 If you're using manual distribution of tasks, annotators with tasks assigned to them label those tasks first, then Label Studio automatically distributes the remaining tasks to the project annotators so that the desired overlap and minimum number of annotations per task can be achieved.
 
+### Set low agreement threshold for auto-assignment
+
+To enhance task annotation quality in Label Studio, you can set additional constraints beyond the [task overlap](#Set-minimum-annotations-per-task). 
+
+To do this you can set a low agreement threshold, which ensures that a task isn't marked as complete until it meets both the required overlap and a minimum agreement level. If 
+set, both the overlap minimum number of annotations and a low agreement score at or above the low agreement threshold must be met before a task is considered complete.  
+
+To ensure tasks with chronically low agreement do not consume an excessive amount of annotator resources, you can also set a maximum number of additional annotators that can be assigned to address a low agreement score. 
+
+If this criteria is not met and auto distribution of tasks is enabled, the task will continue being assigned to available annotators until the low agreement threshold is met, or the configured maximum number of annotations limit is reached. 
+
+1. Within a project on the Label Studio UI, click **Settings**.
+2. Click **Quality**.
+3. Under **Annotation Agreement**, select **Assign additional annotator** under **Low agreement strategy**.
+4. Enter a chosen low agreement threshold as a percentage (1-100).
+5. (Optional) Enter a maximum number of annotations in the **Max assignable annotators** field.  Leave unset for no limit.
+
+For more information about auto distribution of tasks, see [Set up task distribution for labeling](#Set-up-task-distribution-for-labeling).
+
+For more information about annotator agreement, see [how annotator agreement is calculated](stats).
+
+
 ### Set annotating options
 
 If you want, you can allow empty annotations.

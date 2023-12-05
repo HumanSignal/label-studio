@@ -25,6 +25,8 @@ You can also see how the annotations from a specific annotator compare to the pr
 
 For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance).
 
+!!! info Tip
+    You can use the project settings to auto assign additional annotators to tasks that have a low agreement score. For more information, see [Set low agreement threshold for auto-assignment](setup_project#Set-low-agreement-threshold-for-auto-assignment). 
 
 ## Agreement method
 
