@@ -122,7 +122,7 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
-        run: twine upload dist/*
+        run: poetry run twine upload dist/*
 
       - name: Get PyPI package details
         id: pypi-package-details
