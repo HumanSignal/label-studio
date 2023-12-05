@@ -1,12 +1,12 @@
 ---
-title: Troubleshoot Label Studio
+title: Troubleshoot labeling issues
 short: Troubleshooting
 type: guide
 tier: all
-order: 15
-order_enterprise: 10
-section: "Get started"
-meta_title: Troubleshoot Label Studio
+order: 220
+order_enterprise: 120
+section: "Labeling"
+meta_title: Troubleshoot labeling issues
 meta_description: Troubleshoot common issuesTroubleshoot machine learning with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
 ---
 
@@ -134,58 +134,4 @@ See [Troubleshoot pre-annotations](predictions.html#Troubleshoot-pre-annotations
 
 Label Studio does not support labeling PDF files directly. However, you can convert files to HTML using your PDF viewer or another tool and label the PDF as part of the HTML. See an example labeling configuration in the [Label Studio playground](/playground/?config=%3CView%3E%3Cbr%3E%20%20%3CHyperText%20name%3D%22pdf%22%20value%3D%22%24pdf%22%2F%3E%3Cbr%3E%3Cbr%3E%20%20%3CHeader%20value%3D%22Rate%20this%20article%22%2F%3E%3Cbr%3E%20%20%3CRating%20name%3D%22rating%22%20toName%3D%22pdf%22%20maxRating%3D%2210%22%20icon%3D%22star%22%20size%3D%22medium%22%20%2F%3E%3Cbr%3E%3Cbr%3E%20%20%3CChoices%20name%3D%22choices%22%20choice%3D%22single-radio%22%20toName%3D%22pdf%22%20showInline%3D%22true%22%3E%3Cbr%3E%20%20%20%20%3CChoice%20value%3D%22Important%20article%22%2F%3E%3Cbr%3E%20%20%20%20%3CChoice%20value%3D%22Yellow%20press%22%2F%3E%3Cbr%3E%20%20%3C%2FChoices%3E%3Cbr%3E%3C%2FView%3E%3Cbr%3E).
 
-## Add self-signed certificate to trusted root store
 
-<div class="code-tabs">
-  <div data-name="Docker Compose">
-
-1. Mount your self-signed certificate as a volume into `app` container:
-
-```yaml
-volumes:
-  - ./my.cert:/tmp/my.cert:ro
-```
-2. Add environment variable with the name `CUSTOM_CA_CERTS` mentioning all certificates in comma-separated way that should be added into trust store:
-
-```yaml
-CUSTOM_CA_CERTS=/tmp/my.cert
-```
-  </div>
-
-  <div data-name="Kubernetes">
-
-1. Upload your self-signed certificate as a k8s secret.
-   Upload `my.cert` as a secrets with a name `test-my-root-cert`:
-```yaml
-kubectl create secret generic test-my-root-cert --from-file=file=my.cert
-```
-
-2. Add volumes into your values.yaml file and mention them in `.global.customCaCerts`:
-
-```yaml
-global:
-  customCaCerts:
-   - /opt/heartex/secrets/ca_certs/file/file
-
-app:
-  extraVolumes:
-    - name: foo
-      secret:
-        secretName: test-my-root-cert
-  extraVolumeMounts:
-    - name: foo
-      mountPath: "/opt/heartex/secrets/ca_certs/file"
-      readOnly: true
-
-rqworker:
-  extraVolumes:
-    - name: foo
-      secret:
-        secretName: test-my-root-cert
-  extraVolumeMounts:
-    - name: foo
-      mountPath: "/opt/heartex/secrets/ca_certs/file"
-      readOnly: true
-```
-  </div>
-</div>
