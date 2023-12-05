@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-754: [FE] Search option does not reflect actual queries state",
-  "commit": "a0ce76ccf06f0763adf34477d0b1b67e28537a33",
+  "commit": "92241fb9ff2648328a13759d0bf3aadac6a0bef5",
   "branch": "fb-dia-754/apicall-cancel",
-  "date": "2023-12-01T14:44:42Z"
+  "date": "2023-12-04T19:35:19Z"
 }
