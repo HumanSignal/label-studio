@@ -515,20 +515,24 @@ function findNodeAt(context, at) {
  * Sanitize html from scripts and iframes
  * @param {string} html
  * @param {array} [allowedTags]
+ * @param {object} [allowedAttributes]
  * @returns {string}
  */
-function sanitizeHtml(html, allowedTags = []) {
+function sanitizeHtml(html, allowedTags = [], allowedAttributes = {}) {
   if (!html) return '';
 
   console.log('heartex', html);
 
   const s = sanitizeHTML(html, {
-    allowedTags: sanitizeHTML.defaults.allowedTags.concat([...allowedTags, 'img', 'embed']),
+    allowedTags: sanitizeHTML.defaults.allowedTags.concat([...allowedTags, 'img', 'embed', 'video', 'audio', 'source']),
     allowedAttributes: {
       ...sanitizeHTML.defaults.allowedAttributes,
-      // You can also specify attributes that you want to allow for specific tags
+      ...allowedAttributes,
+      'embed': ['src', 'type', 'width', 'height', 'allowfullscreen', 'frameborder'],
+      'video': ['src', 'type', 'width', 'height', 'controls'],
+      'audio': ['src', 'controls'],
+      'source': ['src', 'type'],
       'img': ['src', 'alt'],
-      'embed': ['src', 'type', 'width', 'height'],
     },
   });
 
