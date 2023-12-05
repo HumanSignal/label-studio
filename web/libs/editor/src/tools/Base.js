@@ -30,6 +30,7 @@ const BaseTool = types
   .volatile(() => ({
     dynamic: false,
     index: 1,
+    canInteractWithRegions: true,
   }))
   .views(self => {
     return {

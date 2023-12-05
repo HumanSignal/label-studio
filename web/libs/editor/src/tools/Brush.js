@@ -55,6 +55,9 @@ const _Tool = types
     smart: true,
     unselectRegionOnToolChange: isFF(FF_DEV_4081) ? false : true,
   })
+  .volatile(() => ({
+    canInteractWithRegions: false,
+  }))
   .views(self => ({
     get viewClass() {
       return () => <ToolView item={self} />;

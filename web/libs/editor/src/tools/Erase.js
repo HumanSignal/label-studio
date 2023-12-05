@@ -55,6 +55,7 @@ const _Tool = types
   })
   .volatile(() => ({
     index: 9999,
+    canInteractWithRegions: false,
   }))
   .views(self => ({
     get viewClass() {

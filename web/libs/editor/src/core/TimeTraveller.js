@@ -9,7 +9,7 @@ const TimeTraveller = types
     undoIdx: 0,
     targetPath: '',
     skipNextUndoState: types.optional(types.boolean, false),
-
+    lastAdditionTime: types.optional(types.Date, () => new Date()),
     createdIdx: 0,
   })
   .volatile(() => ({
@@ -77,6 +77,7 @@ const TimeTraveller = types
       },
 
       onUpdate(handler) {
+        this.lastAdditionTime = new Date();
         updateHandlers.add(handler);
         return () => {
           updateHandlers.delete(handler);
