@@ -522,9 +522,19 @@ function sanitizeHtml(html, allowedTags = []) {
 
   console.log('heartex', html);
 
-  return sanitizeHTML(html, {
-    allowedTags: sanitizeHTML.defaults.allowedTags.concat([...allowedTags, 'img']),
+  const s = sanitizeHTML(html, {
+    allowedTags: sanitizeHTML.defaults.allowedTags.concat([...allowedTags, 'img', 'embed']),
+    allowedAttributes: {
+      ...sanitizeHTML.defaults.allowedAttributes,
+      // You can also specify attributes that you want to allow for specific tags
+      'img': ['src', 'alt'],
+      'embed': ['src', 'type', 'width', 'height'],
+    },
   });
+
+  console.log('heartex', s);
+
+  return s;
 }
 
 export {
