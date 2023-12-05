@@ -14,7 +14,7 @@ date: 2023-11-10 15:23:18
 > Streamline your data preparation process using Data Discovery in Label Studio. 
 
 !!! note Beta release
-    The Data Discovery feature set is currently in beta. If you would like to enable it for your organization, contact your account manager. 
+    This feature is currently in beta. To enable Data Discovery, contact your customer success manager or email [cs@humansignal.com](mailto:cs@humansignal.com). 
 
 In machine learning, the quality and relevance of the data used for training directly affects model performance. However, sifting through extensive unstructured datasets to find relevant items can be cumbersome and time-consuming. 
 
