@@ -1,5 +1,6 @@
 import insertAfter from 'insert-after';
 import * as Checkers from './utilities';
+import sanitizeHTML from 'sanitize-html';
 import Canvas from './canvas';
 
 // fast way to change labels visibility for all text regions
@@ -510,6 +511,20 @@ function findNodeAt(context, at) {
   }
 }
 
+/**
+ * Sanitize html from scripts and iframes
+ * @param {string} html
+ * @param {array} [allowedTags]
+ * @returns {string}
+ */
+function sanitizeHtml(html, allowedTags = []) {
+  if (!html) return '';
+
+  return sanitizeHTML(html, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([...allowedTags, 'img']),
+  });
+}
+
 export {
   toggleLabelsAndScores,
   labelWithCSS,
@@ -519,6 +534,7 @@ export {
   findIdxContainer,
   toGlobalOffset,
   highlightRange,
+  sanitizeHtml,
   splitBoundaries,
   normalizeBoundaries,
   createClass,

@@ -1,7 +1,7 @@
 import { useContext, useMemo } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
-import sanitizeHTML from 'sanitize-html';
+import { sanitizeHtml } from '../../utils/html';
 import { InputItem } from './createData';
 import { CollapsedContext } from './Ranker';
 
@@ -21,7 +21,7 @@ const Item = (props: ItemProps) => {
   const { item, index, readonly } = props;
 
   // @todo document html parameter later after proper tests
-  const html = useMemo(() => item.html ? sanitizeHTML(item.html) : '', [item.html]);
+  const html = useMemo(() => item.html ? sanitizeHtml(item.html) : '', [item.html]);
   const [collapsible, collapsedMap, toggleCollapsed] = useContext(CollapsedContext);
   const collapsed = collapsedMap[item.id] ?? false;
   const toggle = collapsible
