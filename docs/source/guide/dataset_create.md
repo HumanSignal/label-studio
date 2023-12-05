@@ -5,7 +5,7 @@ tier: enterprise
 type: guide
 order: 0
 order_enterprise: 205
-meta_title: Create a Dataset to use with Data Discovery in Label Studio Enterprise
+meta_title: Create a dataset to use with Data Discovery in Label Studio Enterprise
 meta_description: How to create a dataset in Label Studio Enterprise using Google Cloud, Azure, or AWS.
 section: "Data Discovery"
 date: 2023-08-16 11:52:38
