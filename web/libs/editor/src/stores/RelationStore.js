@@ -178,7 +178,7 @@ const RelationStore = types
       self._relations = [];
     },
 
-    serializeAnnotation() {
+    serialize() {
       return self.relations.map(r => {
         const s = {
           from_id: r.node1.cleanId,
