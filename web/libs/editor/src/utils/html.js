@@ -533,6 +533,7 @@ function sanitizeHtml(html, allowedTags = [], allowedAttributes = {}) {
       'audio': ['src', 'controls'],
       'source': ['src', 'type'],
       'img': ['src', 'alt'],
+      '*': ['data-*'],
     },
   });
 
