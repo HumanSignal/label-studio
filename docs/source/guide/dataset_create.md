@@ -1,5 +1,5 @@
 ---
-title: Create a dataset for Data Discovery
+title: Create a dataset for Data Discovery - Beta 🧪
 short: Create datasets
 tier: enterprise
 type: guide
