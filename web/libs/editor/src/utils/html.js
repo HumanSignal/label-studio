@@ -520,8 +520,10 @@ function findNodeAt(context, at) {
 function sanitizeHtml(html, allowedTags = []) {
   if (!html) return '';
 
+  console.log('heartex', html);
+
   return sanitizeHTML(html, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([...allowedTags, 'img']),
+    allowedTags: sanitizeHTML.defaults.allowedTags.concat([...allowedTags, 'img']),
   });
 }
 
