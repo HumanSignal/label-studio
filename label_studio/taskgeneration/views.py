@@ -175,7 +175,7 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     # Only keep the rows in between the obtained indeces
                     segment_imu_df = imu_df.iloc[start_index:end_index]
                     # Add offset to every timestamp so that everthing shifts s.t. start time is 0
-                    segment_imu_df.iloc[:, timestamp_column].subtract(segment_imu_df.iloc[0, timestamp_column])
+                    segment_imu_df.iloc[:, timestamp_column] = segment_imu_df.iloc[:, timestamp_column].subtract(segment_imu_df.iloc[0, timestamp_column])
                     # Create temporary file and save new csv to this file
                     segment_imu_df.to_csv(temp_imu.name, index=False)
                     # Upload the chunks to the project using the LS API and get the FileUpload object
@@ -187,7 +187,7 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
                     video_file_upload = fileupload_model.objects.latest('id')
                     # Parameters used in the synchronisation of timeseries and video
                     refresh_every = 10 # Every 10 ms it syncs
-                    wait_before_sync = 3000 # In order to wait for the loading of the data, the syncing wait 3000 ms before starting
+                    wait_before_sync = 1500 # In order to wait for the loading of the data, the syncing wait 3000 ms before starting
                     activity_annotation_project = Project.objects.get(id=project.id+2)
                     task_json_template = {
                         "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",

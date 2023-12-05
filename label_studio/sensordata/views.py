@@ -394,7 +394,7 @@ def create_sync_data_chunks(request, project,value_column_name):
                 # Only keep the rows in between the obtained indeces
                 imu_df = imu_df.iloc[start_index:end_index]
                 # Add offset to every timestamp so that everthing shifts s.t. start time is 0
-                imu_df.iloc[:, timestamp_column].subtract(imu_df.iloc[0, timestamp_column])
+                imu_df.iloc[:, timestamp_column] = imu_df.iloc[:, timestamp_column].subtract(imu_df.iloc[0, timestamp_column])
                 # Save new csv to this file
                 imu_df.to_csv(temp_imu.name, index=False)
                 # Upload sync chunks to data_import project
@@ -407,7 +407,7 @@ def create_sync_data_chunks(request, project,value_column_name):
                 # Create JSON that allows for synchronization between video and timeseries
                 # Parameters used in the synchronisation of timeseries and video
                 refresh_every = 10 # Every 10 ms it syncs
-                wait_before_sync = 3000 # In order to wait for the loading of the data, the syncing wait 3000 ms before starting
+                wait_before_sync = 1500 # In order to wait for the loading of the data, the syncing wait 3000 ms before starting
                 offset_annotation_project = Project.objects.get(id=project.id+3)
                 task_json_template = {
                     "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name.lower()}",
