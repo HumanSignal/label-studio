@@ -11,16 +11,16 @@ date: 2023-08-23 12:18:50
 section: "Data Discovery"
 ---
 
-Once your dataset is created, you will want to add items to projects as tasks. For some projects, this might be the complete dataset. But in most cases you will likely want to select a subset of data based on certain criteria. 
+Once your dataset is created, you will want to add records to projects as tasks. For some projects, this might be the complete dataset. But in most cases you will likely want to select a subset of data based on certain criteria. 
 
 If your dataset consists of several thousand unstructured items, then manually sorting, categorizing, and structuring that data can take a significant amount of time and effort. Instead, you can use Label Studio's AI-powered search capabilities to refine your datasets. 
 
 Label studio provides several search mechanisms:
 
 * **Natural language searching** - Also known as "semantic searching." Use keywords and phrases to explore your data. 
-* **Similarity searching** - Select one or more items and then sort the data based on semantic similarity to your selections. 
+* **Similarity searching** - Select one or more records and then sort the data based on semantic similarity to your selections. 
 * **Combined searches** - Combine similarity searching and natural language searching. 
-* **Filtering** - Reduce your dataset to only show items that have a certain threshold of similarity to your searches.
+* **Filtering** - Reduce your dataset to only show records that have a certain threshold of similarity to your searches.
 
 ## How searches work
 
