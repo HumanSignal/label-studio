@@ -4,7 +4,7 @@ from collections import Counter
 from core.feature_flags import flag_set
 from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func
 from django.conf import settings
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, F, Value, When
+from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, Value, When
 from django.db.models.fields import DecimalField
 from projects.functions.stream_history import add_stream_history
 from tasks.models import Annotation, Task
