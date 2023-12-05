@@ -1,6 +1,6 @@
 ---
 title: Create a dataset for Data Discovery - Beta 🧪
-short: Create datasets
+short: Import unstructured data
 tier: enterprise
 type: guide
 order: 0
