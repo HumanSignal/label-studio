@@ -600,13 +600,11 @@ class Annotation(AnnotationMixin, models.Model):
             models.Index(fields=['ground_truth']),
             models.Index(fields=['id', 'task']),
             models.Index(fields=['last_action']),
-            models.Index(fields=['project', 'completed_by_id']),
             models.Index(fields=['project', 'ground_truth']),
             models.Index(fields=['project', 'id']),
             models.Index(fields=['project', 'was_cancelled']),
             models.Index(fields=['task', 'completed_by']),
             models.Index(fields=['task', 'ground_truth']),
-            models.Index(fields=['task', 'id']),
             models.Index(fields=['task', 'was_cancelled']),
             models.Index(fields=['was_cancelled']),
         ]
