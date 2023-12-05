@@ -1,6 +1,6 @@
 {
-  "message": "docs: DOC-161: Add beta tag for external taxonomy",
-  "commit": "2c59ae09175384e0b7c994575d708f2f2872cebd",
-  "branch": "master",
-  "date": "2023-11-30T15:24:56Z"
+  "message": "feat: LEAP-355: Make relations work with TimeTraveler",
+  "commit": "e073329e957ffab28b2d8093d7561c336ada33f9",
+  "branch": "fb-leap-355/relations-improvements",
+  "date": "2023-12-05T03:55:18Z"
 }
