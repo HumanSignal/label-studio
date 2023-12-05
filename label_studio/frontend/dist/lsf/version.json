@@ -1,6 +1,6 @@
 {
-  "message": "ci: TEST",
-  "commit": "0fc0c9966cbdf3fd9eebce9fda823c9708d200b2",
-  "branch": "fb-ci-test-1",
-  "date": "2023-11-22T16:58:04Z"
+  "message": "feat: LEAP-355: Make relations work with TimeTraveler",
+  "commit": "e073329e957ffab28b2d8093d7561c336ada33f9",
+  "branch": "fb-leap-355/relations-improvements",
+  "date": "2023-12-05T03:55:18Z"
 }
