@@ -55,7 +55,6 @@ import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
  * Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
  *
  * [^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
- * [^FF_TAXONOMY_ASYNC]: `fflag_feat_front_lsdv_5451_async_taxonomy_110823_short` should be enabled to load items from `apiUrl` asynchronously
  *
  * @example
  * <!--Labeling configuration for providing a taxonomy of choices in response to a passage of text -->
@@ -78,7 +77,7 @@ import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
  * @meta_description Customize Label Studio with the Taxonomy tag and use hierarchical labels for machine learning and data science projects.
  * @param {string} name                   - Name of the element
  * @param {string} toName                 - Name of the element that you want to classify
- * @param {string} [apiUrl]               - Retrieve the taxonomy from a remote source. This can be a JSON-formatted file or a hierarchical data source read as an API.[^FF_TAXONOMY_ASYNC] For more information, see the [Taxonomy template page](/templates/taxonomy)
+ * @param {string} [apiUrl]               - **Beta** -- Retrieve the taxonomy from a remote source. This can be a JSON-formatted file or a hierarchical data source read as an API. For more information, see the [Taxonomy template page](/templates/taxonomy)
  * @param {boolean} [leafsOnly=false]     - Allow annotators to select only leaf nodes of taxonomy
  * @param {boolean} [showFullPath=false]  - Whether to show the full path of selected items
  * @param {string} [pathSeparator= / ]    - Separator to show in the full path (default is " / "). To avoid errors, ensure that your data does not include this separator
@@ -90,7 +89,7 @@ import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
  * @param {string} [placeholder=]         - What to display as prompt on the input
  * @param {boolean} [perRegion]           - Use this tag to classify specific regions instead of the whole object
  * @param {boolean} [perItem]             - Use this tag to classify specific items inside the object instead of the whole object[^FF_LSDV_4583]
- * @param {boolean} [legacy]              - Use this tag to enable the legacy version of the Taxonomy tag. When true, the `apiUrl` parameter is not usable[^FF_TAXONOMY_ASYNC]
+ * @param {boolean} [legacy]              - Use this tag to enable the legacy version of the Taxonomy tag. When true, the `apiUrl` parameter is not usable. 
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
