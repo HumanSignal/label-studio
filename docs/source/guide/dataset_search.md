@@ -1,6 +1,6 @@
 ---
 title: Use Data Discovery search to refine datasets for labeling - Beta 🧪
-short: Refine datasets
+short: Search and filter datasets
 tier: enterprise
 type: guide
 order: 0
