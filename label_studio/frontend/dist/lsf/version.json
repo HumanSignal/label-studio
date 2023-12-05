@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-383: Fix bad html sanitizer",
-  "commit": "8d2c9d54f4c3bccca8f1e82e9d8a5b52f6dc62f1",
+  "commit": "68b81c716a729ff88839d3a19f16d3895f9337b8",
   "branch": "fb-leap-383",
-  "date": "2023-12-05T16:05:36Z"
+  "date": "2023-12-05T17:22:51Z"
 }
