@@ -1,7 +1,8 @@
 import logging
-from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 
 import pytest
+
+from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 
 pytestmark = pytest.mark.django_db
 from label_studio_sdk import Client
