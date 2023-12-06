@@ -1,6 +1,6 @@
 {
-  "message": "eat: OPTIC-107: Draft saving on view all",
-  "commit": "88e2640e57609c609f6eaaacf9e86f7756fc9d80",
+  "message": "feat: OPTIC-107: Draft saving on view all",
+  "commit": "17391ba6c0300859a684b9af111ce76ce37a7775",
   "branch": "fb-optic-107/save-draft-view-all",
-  "date": "2023-12-05T00:26:24Z"
+  "date": "2023-12-06T09:19:22Z"
 }
