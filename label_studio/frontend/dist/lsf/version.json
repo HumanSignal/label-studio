@@ -1,6 +1,6 @@
 {
-  "message": "ci: TEST",
-  "commit": "0fc0c9966cbdf3fd9eebce9fda823c9708d200b2",
-  "branch": "fb-ci-test-1",
-  "date": "2023-11-22T16:58:04Z"
+  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
+  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
+  "branch": "master",
+  "date": "2023-12-05T16:41:20Z"
 }

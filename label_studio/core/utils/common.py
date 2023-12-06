@@ -27,6 +27,7 @@ from boxing import boxing
 from colorama import Fore
 from core.utils.params import get_env
 from django.conf import settings
+from django.utils.crypto import get_random_string
 from django.contrib.postgres.operations import BtreeGinExtension, TrigramExtension
 from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, Paginator
@@ -135,11 +136,9 @@ def custom_exception_handler(exc, context):
     return response
 
 
-def create_hash():
-    """This function generate 40 character long hash"""
-    h = hashlib.sha512()
-    h.update(str(time.time()).encode('utf-8'))
-    return h.hexdigest()[0:16]
+def create_hash() -> str:
+    """This function creates a secure token for the organization"""
+    return get_random_string(length=40)
 
 
 def paginator(objects, request, default_page=1, default_size=50):
