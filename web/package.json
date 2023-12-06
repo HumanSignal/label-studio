@@ -18,11 +18,11 @@
     "test:unit": "yarn lsf:unit && yarn ls:unit && yarn dm:unit",
     "test:e2e": "yarn ls:e2e && yarn lsf:e2e",
     "test:integration": "yarn lsf:integration",
-    "postinstall": "cd libs/editor && bash scripts/postinstall.sh"
+    "postinstall": "npx -y copy-files-from-to"
   },
   "husky": {
     "hooks": {
-      "post-checkout": "cd libs/editor && bash scripts/postinstall.sh"
+      "post-checkout": "npx -y copy-files-from-to"
     }
   },
   "private": true,
@@ -212,5 +212,11 @@
       "@babel/plugin-proposal-nullish-coalescing-operator"
     ]
   },
-  "packageManager": "yarn@3.6.0"
+  "packageManager": "yarn@3.6.0",
+  "copyFiles": [
+    {
+      "from": "./node_modules/@martel/audio-file-decoder/decode-audio.wasm",
+      "to": "./node_modules/@martel/audio-file-decoder/dist/decode-audio.wasm"
+    }
+  ]
 }
