@@ -58,7 +58,7 @@ const plugins = [
   new EnvironmentPlugin(LOCAL_ENV),
 ];
 
-if(process.env.NODE_ENV === 'production') {
+if(process.env.MODE !== 'standalone') {
   plugins.push(new optimize.LimitChunkCountPlugin({
     maxChunks: 1,
   }));
