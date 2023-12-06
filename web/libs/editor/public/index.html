@@ -23,12 +23,6 @@
       -->
     <link rel="stylesheet" href="./public/styles/main.css">
     <script>
-      window.addEventListener('error', function(e){
-        // prevent React's listener from firing
-        e.stopImmediatePropagation();
-        // prevent the browser's console error message
-        e.preventDefault();
-      });
       // window.APP_SETTINGS = {
       //   feature_flags: {},
       //   feature_flags_default_value: true,
@@ -79,6 +73,12 @@
 
       #label-studio {
         height: calc(100vh - 88px);
+      }
+
+      #webpack-dev-server-client-overlay {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
       }
     </style>
     <script>

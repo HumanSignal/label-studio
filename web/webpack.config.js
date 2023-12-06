@@ -58,10 +58,11 @@ const plugins = [
   new EnvironmentPlugin(LOCAL_ENV),
 ];
 
-plugins.push(new optimize.LimitChunkCountPlugin({
-  maxChunks: 1,
-}));
-
+if(process.env.NODE_ENV === 'production') {
+  plugins.push(new optimize.LimitChunkCountPlugin({
+    maxChunks: 1,
+  }));
+}
 
 const optimizer = () => {
   const result = {
