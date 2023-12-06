@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-31: Fix functioning of auto annotations (#1605)",
-  "commit": "f209200de05aad01cba5dffc59883d0de4615458",
+  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
+  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
   "branch": "master",
-  "date": "2023-11-21T23:29:28Z"
+  "date": "2023-12-05T16:41:20Z"
 }
