@@ -675,7 +675,7 @@ DATA_MANAGER_FILTER_ALLOWLIST = list(
     set(get_env_list('DATA_MANAGER_FILTER_ALLOWLIST') + ['updated_by__active_organization'])
 )
 
-if ENABLE_LS_CSP := get_bool_env('ENABLE_LS_CSP', True):
+if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
     CSP_DEFAULT_SRC = (
         "'self'",
         "'report-sample'",
@@ -708,7 +708,7 @@ if ENABLE_LS_CSP := get_bool_env('ENABLE_LS_CSP', True):
         'https://*.g.double' + 'click.net',  # hacky way of suppressing codespell complaint
         'https://*.ingest.sentry.io',
     )
-    # Note that this will be overridden to true CSP for views that use the override_report_only_csp decorator
+    # Note that this will be overridden to real CSP for views that use the override_report_only_csp decorator
     CSP_REPORT_ONLY = get_bool_env('LS_CSP_REPORT_ONLY', True)
     CSP_REPORT_URI = get_env('LS_CSP_REPORT_URI', None)
     CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src']
