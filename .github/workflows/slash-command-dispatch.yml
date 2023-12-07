@@ -33,7 +33,7 @@ jobs:
           script: |
             const body = context.payload.comment.body.toLowerCase().trim()
             const commands_list = process.env.COMMANDS_LIST.split("\n")
-            const issue_commands_list = process.env.JIRA_COMMANDS_LIST.split("\n")
+            const issue_commands_list = process.env.ISSUE_COMMANDS_LIST.split("\n")
             console.log("Detected PR comment: " + body)
             console.log("Commands list: " + commands_list)
             console.log("Issue commands list: " + issue_commands_list)
