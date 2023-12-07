@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-739: [FE] User is not able to update similarity range if filter is applied",
-  "commit": "93aaec64a11d0a57a0b9baf3074f7d3dab386da0",
+  "message": "fix: DIA-754: [FE] Search option does not reflect actual queries state",
+  "commit": "34d39c2d0070c4c33e5280feee1f4720db31bde5",
   "branch": "master",
-  "date": "2023-12-01T06:12:20Z"
+  "date": "2023-12-06T04:22:35Z"
 }
