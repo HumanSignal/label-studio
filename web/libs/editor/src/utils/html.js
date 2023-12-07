@@ -514,32 +514,53 @@ function findNodeAt(context, at) {
 /**
  * Sanitize html from scripts and iframes
  * @param {string} html
- * @param {array} [allowedTags]
- * @param {object} [allowedAttributes]
  * @returns {string}
  */
-function sanitizeHtml(html, allowedTags = [], allowedAttributes = {}) {
+function sanitizeHtml(html = []) {
   if (!html) return '';
 
-  console.log('heartex', html);
+  const disallowedAttributes = ['onauxclick', 'onafterprint', 'onbeforematch', 'onbeforeprint',
+    'onbeforeunload', 'onbeforetoggle', 'onblur', 'oncancel',
+    'oncanplay', 'oncanplaythrough', 'onchange', 'onclick', 'onclose',
+    'oncontextlost', 'oncontextmenu', 'oncontextrestored', 'oncopy',
+    'oncuechange', 'oncut', 'ondblclick', 'ondrag', 'ondragend',
+    'ondragenter', 'ondragleave', 'ondragover', 'ondragstart',
+    'ondrop', 'ondurationchange', 'onemptied', 'onended',
+    'onerror', 'onfocus', 'onformdata', 'onhashchange', 'oninput',
+    'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup',
+    'onlanguagechange', 'onload', 'onloadeddata', 'onloadedmetadata',
+    'onloadstart', 'onmessage', 'onmessageerror', 'onmousedown',
+    'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout',
+    'onmouseover', 'onmouseup', 'onoffline', 'ononline', 'onpagehide',
+    'onpageshow', 'onpaste', 'onpause', 'onplay', 'onplaying',
+    'onpopstate', 'onprogress', 'onratechange', 'onreset', 'onresize',
+    'onrejectionhandled', 'onscroll', 'onscrollend',
+    'onsecuritypolicyviolation', 'onseeked', 'onseeking', 'onselect',
+    'onslotchange', 'onstalled', 'onstorage', 'onsubmit', 'onsuspend',
+    'ontimeupdate', 'ontoggle', 'onunhandledrejection', 'onunload',
+    'onvolumechange', 'onwaiting', 'onwheel'];
 
-  const s = sanitizeHTML(html, {
-    allowedTags: sanitizeHTML.defaults.allowedTags.concat([...allowedTags, 'img', 'embed', 'video', 'audio', 'source']),
-    allowedAttributes: {
-      ...sanitizeHTML.defaults.allowedAttributes,
-      ...allowedAttributes,
-      'embed': ['src', 'type', 'width', 'height', 'allowfullscreen', 'frameborder'],
-      'video': ['src', 'type', 'width', 'height', 'controls'],
-      'audio': ['src', 'controls'],
-      'source': ['src', 'type'],
-      'img': ['src', 'alt'],
-      '*': ['data-*'],
+  return sanitizeHTML(html, {
+    allowedTags: false,
+    allowedAttributes: false,
+    disallowedTagsMode: 'discard',
+    disallowedTags: ['script', 'iframe'],
+    nonTextTags: ['script', 'textarea', 'option', 'noscript'],
+    transformTags: {
+      '*': (tagName, attribs) => {
+        Object.keys(attribs).forEach(attr => {
+          // If the attribute is in the disallowed list, remove it
+          if (disallowedAttributes.includes(attr)) {
+            delete attribs[attr];
+          }
+        });
+        return {
+          tagName,
+          attribs,
+        };
+      },
     },
   });
-
-  console.log('heartex', s);
-
-  return s;
 }
 
 export {
