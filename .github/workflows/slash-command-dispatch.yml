@@ -58,7 +58,7 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           issue-type: "issue"
           reactions: true
-          commands: ${{ env.jira_commands_list }}
+          commands: ${{ env.issue_commands_list }}
 
       - name: Slash Command Dispatch for PRs
         id: scd_prs
