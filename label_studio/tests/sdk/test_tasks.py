@@ -49,6 +49,28 @@ def test_delete_multi_tasks(django_live_url, business_client):
     assert remaining_tasks[0]['data']['my_text'] == 'Test task 5'
 
 
+def test_export_tasks(django_live_url, business_client):
+    ls = Client(url=django_live_url, api_key=business_client.api_key)
+    p = ls.start_project(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
+
+    task_data = [{'data': {'my_text': 'Test task ' + str(i)}} for i in range(10)]
+    p.import_tasks(task_data)
+
+    task_id = p.get_tasks()[0]['id']
+    annotation_data = {
+        'result': [{'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Positive']}}]
+    }
+    p.create_annotation(task_id, **annotation_data)
+
+    # by default, only tasks with annotations are exported
+    exported_tasks = p.export_tasks()
+    assert len(exported_tasks) == 1
+    assert exported_tasks[0]['data']['my_text'] == 'Test task 0'
+
+    exported_tasks = p.export_tasks(download_all_tasks=True)
+    assert len(exported_tasks) == 10
+
+
 def test_upload_and_list_tasks_does_not_log_to_stderr(django_live_url, business_client, caplog):
     caplog.set_level(logging.ERROR)
 
