@@ -1,6 +1,6 @@
 {
-  "message": "docs: DOC-161: Add beta tag for external taxonomy",
-  "commit": "2c59ae09175384e0b7c994575d708f2f2872cebd",
+  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
+  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
   "branch": "master",
-  "date": "2023-11-30T15:24:56Z"
+  "date": "2023-12-05T16:41:20Z"
 }
