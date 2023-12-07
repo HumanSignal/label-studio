@@ -127,28 +127,28 @@ def _fill_annotations_project(project_id):
 def fill_annotations_project():
     logger.info('Start filling project field for Annotation model')
 
-    projects = Project.objects.all().only('id')
-    for project in projects:
-        start_job_async_or_sync(_fill_annotations_project, project.id)
+    project_ids = Project.objects.all().values_list('id', flat=True)
+    for project_id in project_ids:
+        start_job_async_or_sync(_fill_annotations_project, project_id)
 
     logger.info('Finished filling project field for Annotation model')
 
 
 def _fill_predictions_project(migration_name='0043_auto_20230825'):
-    projects = Project.objects.all().only('id')
-    for project in projects:
+    project_ids = Project.objects.all().values_list('id', flat=True)
+    for project_id in project_ids:
         migration = AsyncMigrationStatus.objects.create(
-            project=project,
+            project_id=project_id,
             name=migration_name,
             status=AsyncMigrationStatus.STATUS_STARTED,
         )
 
-        updated_count = Prediction.objects.filter(task__project_id=project.id).update(project_id=project.id)
+        updated_count = Prediction.objects.filter(task__project_id=project_id).update(project_id=project_id)
 
         migration.status = AsyncMigrationStatus.STATUS_FINISHED
         migration.meta = {
             'predictions_processed': updated_count,
-            'total_project_predictions': project.predictions.count(),
+            'total_project_predictions': Prediction.objects.filter(project_id=project_id).count(),
         }
         migration.save()
 
