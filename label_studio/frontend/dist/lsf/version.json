@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-341: CSS inconsistencies which cause conflicts in MonoRepo builds",
-  "commit": "b4d9eef85ceca6bfc02327e2d3192b8229908fd4",
-  "branch": "master",
-  "date": "2023-12-08T11:54:24Z"
+  "message": "fix: OPTIC-341: Incorrect icon width causing layout issues with TabPanels in monorepo",
+  "commit": "73424e6c7759ee49a716eb552ce69567430dc969",
+  "branch": "fb-optic-341-move-icon",
+  "date": "2023-12-08T14:15:30Z"
 }
