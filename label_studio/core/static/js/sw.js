@@ -37,6 +37,133 @@ function startCleanupTimer() {
   }
 }
 
+async function getImage(event) {
+  if (!event.request.url.includes("isCacheable=true")) return true;
+  event.respondWith(
+    // Cache first approach, look for the cached response and check if it's still valid
+    caches
+      .match(event.request)
+      .then(async (cachedResponse) => {
+        if (cachedResponse) {
+          console.log("Found cached response:", cachedResponse);
+          // Check if the expiration timestamp has passed
+          const { expirationTimestamp } = parseCacheHeaders(cachedResponse);
+
+          const valid =
+            !expirationTimestamp || expirationTimestamp > Date.now();
+          const url = cachedResponse.headers.get("Location");
+
+          if (valid && url) {
+            // If the cached response is a redirect, fetch the redirect URL
+            return fetch(url);
+          }
+        }
+
+        // If there's no valid cached response, fetch redirect from the network and cache the response
+        // fetch the actual request to return to the user immediately
+        return fetch(event.request.url, {
+          headers: {
+            contentSecurityType: `default-src *;
+            img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *;
+            style-src  'self' 'unsafe-inline' *`
+            }
+          })
+          .then((response) => {
+            const reader = response.body.getReader();
+      
+            return new ReadableStream({
+              start(controller) {
+                return pump();
+                function pump() {
+                  return reader.read().then(({ done, value }) => {
+                    // When no more data needs to be consumed, close the stream
+                    if (done) {
+                      controller.close();
+                      return;
+                    }
+                    // Enqueue the next data chunk into our target stream
+                    controller.enqueue(value);
+                    return pump();
+                  });
+                }
+              },
+            });
+          })
+          // Create a new response out of the stream
+          .then((stream) => new Response(stream))
+          // Create an object URL for the response
+          .then(async (response) => {
+            const blob = await response.blob();
+
+            try {
+              return new Response(blob, { headers: response.headers });
+            } catch (err) {
+              console.error("Failed to create object URL:", err);
+            }
+            return response;
+          })
+          .then((response) => {
+            console.log("response", response);
+            // Get the Cache-Control header value if provided
+            const cacheControl = response.headers.get("Cache-Control");
+            // This will be the target URL if the response is a redirect
+            const url = response.url;
+
+            // Extract the max-age value from the Cache-Control header
+            // If there's no max-age, use the default value
+            const maxAgeMatch =
+              cacheControl && cacheControl.match(/max-age=(\d+)/);
+
+            let maxAge = CACHE_EXPIRATION_DEFAULT;
+
+            if (maxAgeMatch) {
+              const _age = parseInt(maxAgeMatch[1]);
+              if (!isNaN(_age)) {
+                maxAge = (_age - 10) * 1000; // Leave 10s of margin so there is no possible overlap
+              }
+            }
+
+            // Calculate the expiration timestamp based on the max-age value
+            const expirationTimestamp = Date.now() + maxAge;
+
+            const headers = new Headers(response.headers);
+            headers.append("Location", url);
+            headers.append(CACHE_EXPIRATION_HEADER, expirationTimestamp);
+
+            // Create a redirect response with the expiration timestamp header
+            const cachedResponse = new Response(null, {
+              status: 303,
+              statusText: "See Other",
+              headers: headers,
+            });
+
+            // Store the new Response object in the cache
+            caches.open(CACHE_NAME).then(async (cache) => {
+              try {
+                await cache.put(event.request, response);
+              } catch (error) {
+                if (error.name !== "QuotaExceededError") {
+                  // Ignore QuotaExceededError errors, they are expected
+                  console.error("Cache put failed:", error);
+                }
+              }
+            });
+
+            return response;
+          })
+          .catch((error) => {
+            console.error("Fetch failed:", error);
+            throw error;
+          });
+      })
+  );
+
+  // response was handled by the serviceworker.
+  // this is for later so we can create a middleware style pipeline to attempt to match and handle
+  // the request in order of priority
+  return true;
+}
+
 async function handlePresignedUrl(event) {
   // For now just catch presign requests and cache them
   // to void constantly requesting the same presign URL
@@ -159,7 +286,11 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", async (event) => {
-  await handlePresignedUrl(event);
+  await event.request.url.includes("isCacheable=true") ? (
+    getImage(event)
+  ) : (
+    handlePresignedUrl(event)
+  );
 });
 
 self.addEventListener("message", (event) => {
