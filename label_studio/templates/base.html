@@ -122,7 +122,9 @@
   }, {% block frontend_settings %}{}{% endblock %});
 </script>
 
+{% block app-js %}
 <script src="{{settings.HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
+{% endblock %}
 
 <div id="dynamic-content">
   <script>
