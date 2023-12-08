@@ -251,10 +251,13 @@ class Task(TaskMixin, models.Model):
 
     @property
     def overlap_with_agreement_threshold(self):
+        from stats.models import get_task_agreement
+
         if hasattr(self.project, 'lse_project') and self.project.lse_project.agreement_threshold is not None:
-            return self.project.lse_project.max_additional_annotators_assignable + self.overlap
-        else:
-            return self.overlap
+            agreement = get_task_agreement(self)
+            if agreement < self.project.lse_project.agreement_threshold:
+                return self.project.lse_project.max_additional_annotators_assignable + self.overlap
+        return self.overlap
 
     def num_locks_user(self, user):
         return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
