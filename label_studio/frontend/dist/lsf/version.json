@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
-  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
+  "message": "fix: OPTIC-341: CSS inconsistencies which cause conflicts in MonoRepo builds",
+  "commit": "b4d9eef85ceca6bfc02327e2d3192b8229908fd4",
   "branch": "master",
-  "date": "2023-12-05T16:41:20Z"
+  "date": "2023-12-08T11:54:24Z"
 }
