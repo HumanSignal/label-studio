@@ -77,7 +77,6 @@ const TimeTraveller = types
       },
 
       onUpdate(handler) {
-        this.lastAdditionTime = new Date();
         updateHandlers.add(handler);
         return () => {
           updateHandlers.delete(handler);
@@ -103,6 +102,7 @@ const TimeTraveller = types
         self.undoIdx = self.history.length - 1;
         replaceNextUndoState = false;
         changesDuringFreeze = false;
+        this.lastAdditionTime = new Date();
       },
 
       reinit(force = true) {
