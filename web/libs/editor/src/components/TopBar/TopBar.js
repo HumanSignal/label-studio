@@ -19,11 +19,10 @@ export const TopBar = observer(({ store }) => {
 
   const isViewAll = annotationStore?.viewingAll === true;
 
-  const toggleViewAll = async () => {
-    !isViewAll && await store.submitDraft(annotationStore.selected, { useToast: true });
+  const toggleViewAll = () => {
+    !isViewAll && entity.saveDraftImmediatelyWithResults({useToast: true});
     annotationStore.toggleViewingAllAnnotations();
   };
-
 
   return store ? (
     <Block name="topbar" mod={{ newLabelingUI: isFF(FF_DEV_3873) }}>
