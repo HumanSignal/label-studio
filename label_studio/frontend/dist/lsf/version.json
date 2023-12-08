@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-383: Fix bad html sanitizer",
-  "commit": "8600b05a959531ae57f46200b05776b7b7d3e71a",
+  "message": "fix: OPTIC-341: CSS inconsistencies which cause conflicts in MonoRepo builds",
+  "commit": "b4d9eef85ceca6bfc02327e2d3192b8229908fd4",
   "branch": "master",
-  "date": "2023-12-08T13:54:41Z"
+  "date": "2023-12-08T11:54:24Z"
 }
