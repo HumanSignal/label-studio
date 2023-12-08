@@ -375,7 +375,7 @@ class Project(ProjectMixin, models.Model):
 
     def reset_token(self):
         self.token = create_hash()
-        self.save()
+        self.save(update_fields=['token'])
 
     def add_collaborator(self, user):
         created = False
