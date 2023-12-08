@@ -1,6 +1,6 @@
 {
   "message": "fix: DIA-743: [FE] Blank space is displayed instead of the records on scroll up/down",
-  "commit": "a4ea50087139b8fb2445ebc46bd8c8f81b5fd670",
+  "commit": "d1ef444a1c4283859bc4006b8556e5689ef6c24f",
   "branch": "fb-dia-743/image-loading-sw",
-  "date": "2023-12-07T21:08:45Z"
+  "date": "2023-12-07T21:11:15Z"
 }
