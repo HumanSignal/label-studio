@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-754: [FE] Search option does not reflect actual queries state",
-  "commit": "34d39c2d0070c4c33e5280feee1f4720db31bde5",
-  "branch": "master",
-  "date": "2023-12-06T04:22:35Z"
+  "message": "fix: DIA-743: [FE] Blank space is displayed instead of the records on scroll up/down",
+  "commit": "a4ea50087139b8fb2445ebc46bd8c8f81b5fd670",
+  "branch": "fb-dia-743/image-loading-sw",
+  "date": "2023-12-07T21:08:45Z"
 }
