@@ -30,6 +30,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from tasks.functions import update_tasks_counters
 from tasks.models import Prediction, Task
 from users.models import User
 from webhooks.models import WebhookAction
@@ -360,7 +361,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                 )
             )
         predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
-        project.update_tasks_counters(Task.objects.filter(id__in=tasks_ids))
+        start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
         return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
 
 
