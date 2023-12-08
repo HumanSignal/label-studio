@@ -116,7 +116,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     real_task_ids = set(list(predictions.values_list('task__id', flat=True)))
     count = predictions.count()
     predictions.delete()
-    update_tasks_counters(Task.objects.filter(id__in=real_task_ids))
+    start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=real_task_ids))
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 

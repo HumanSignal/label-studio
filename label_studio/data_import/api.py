@@ -361,7 +361,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                 )
             )
         predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
-        update_tasks_counters(Task.objects.filter(id__in=tasks_ids))
+        start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
         return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
 
 
