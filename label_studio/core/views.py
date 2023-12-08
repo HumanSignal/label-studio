@@ -210,25 +210,24 @@ def localfiles_data(request):
 def aperturedb_data(request):
     """Serving files for ApertureDBImportStorage"""
     user = request.user
-    host = request.GET.get('host')
-    uid = request.GET.get('uniqueid')
-    if host and uid:
+    title = request.GET.get('title')
+    uid = request.GET.get('key')
+    if title and uid:
         if not user.is_authenticated:
             logger.warning("Not Authenticated")
 
-        for storage in ApertureDBImportStorage.objects:
-            if storage.hostname == host:
+        for storage in ApertureDBImportStorage.objects.all():
+            if storage.title == title:
                 if storage.project.has_permission(user):
-                    db = storage.get_connection()
-                    blob = db.get_blob(uid)
+                    blob = storage.get_blob(uid)
                     if blob is None:
                         logger.warning(f"ApertureDB image not found, uid={uid}")
                         return HttpResponseNotFound()
                     content_type = magic.from_buffer(blob, mime=True)
                     with io.BytesIO(blob) as payload:
-                        return RangedFileResponse(request, payload, content_type)
+                        return HttpResponse(payload, content_type=content_type)
 
-        logger.warning(f"ApertureDB import storage '{host}' not found")
+        logger.warning(f"ApertureDB import storage '{title}' not found")
         return HttpResponseNotFound()
 
     return HttpResponseForbidden()

@@ -17,17 +17,30 @@ class ApertureDBImportStorageSerializer(ImportStorageSerializer):
         fields = '__all__'
 
     def to_representation(self, instance):
-        raise NotImplementedError
+        result = super().to_representation(instance)
+        result.pop('password')
+        result.pop('token')
+        return result
 
     def validate(self, data):
-        raise NotImplementedError
+        # Validate local file path
+        data = super(ApertureDBImportStorageSerializer, self).validate(data)
+        storage = ApertureDBImportStorage(**data)
+        try:
+            storage.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+        return data
 
 
 class ApertureDBExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 
     def to_representation(self, instance):
-        raise NotImplementedError
+        result = super().to_representation(instance)
+        result.pop('password')
+        result.pop('token')
+        return result
     
     class Meta:
         model = ApertureDBExportStorage

@@ -45,7 +45,7 @@ class ApertureDBStorageMixin(models.Model):
         elif isinstance(response, dict):
             if "status" in response:
                 return response["status"]
-            for val in response.items():
+            for val in response.values():
                 return self._response_status(val)
 
     def get_connection(self):
@@ -61,7 +61,7 @@ class ApertureDBStorageMixin(models.Model):
 
     def validate_connection(self, client=None):
         db = self.get_connection()
-        res = db.query([{"GetStatus": {}}])
+        res, _ = db.query([{"GetStatus": {}}])
         if self._response_status(res) != 0:
             raise ValueError(f"Failed to connect to ApertureDB: {db.get_last_response_str()}")
 
@@ -70,6 +70,7 @@ class ApertureDBStorageMixin(models.Model):
 
 
 class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
+    url_scheme = "none"
 
     constraints = models.TextField(
         _('constraints'),
@@ -78,31 +79,33 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
 
     def iterkeys(self):
         db = self.get_connection()
-        limit = 100
+        batch = 100
         offset = 0
         find_images = {
             "uniqueids": True,
             "blobs": False,
-            "limit": limit
+            "limit": batch
         }
         if self.constraints:
             find_images["constrants"] = json.loads(str(self.constraints))
 
-        while (True):
+        limit = 1000
+
+        while (offset < limit):
             find_images["offset"] = offset
-            res, _, = db.query([{"FindImages": find_images}])
+            res, _, = db.query([{"FindImage": find_images}])
             if self._response_status(res) != 0:
                 raise ValueError(f"Failed to query images: {db.get_last_response_str()}")
-            fe_result = res[0]["FindImages"]
+            fe_result = res[0]["FindImage"]
             if fe_result["returned"] == 0:
                 return
             for ent in fe_result["entities"]:
                 yield ent["_uniqueid"]
-            offset += limit
+            offset += batch
 
     def get_data(self, key):
         return {
-            settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/aperturedb/?host={self.hostname}&key={key}'
+            settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/aperturedb/?title={self.title}&key={key}'
         }
 
     def get_blob(self, uniqueid):

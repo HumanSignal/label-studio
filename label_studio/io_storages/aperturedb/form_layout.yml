@@ -1,6 +1,9 @@
 # 2x3 grid
 adb_host_config: &adb_host_config
   - type: text
+    name: title
+    label: Storage Title
+  - type: text
     name: hostname
     label: Hostname
     required: true
@@ -8,10 +11,6 @@ adb_host_config: &adb_host_config
     name: port
     label: Port
     value: 55555
-  - type: toggle
-    name: use_ssl
-    label: Use SSL
-    value: true
   - type: text
     name: username
     label: User Name
