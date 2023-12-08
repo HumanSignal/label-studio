@@ -16,8 +16,7 @@ class Migration(migrations.Migration):
             name='user',
             managers=[
                 ('objects', django.db.models.manager.Manager()),
-                # Previously, this migration contained an addition of UserManagerWithDeleted, which has since been
-                # removed in order to avoid referencing a non-existent manager.
+                ('with_deleted', users.models.UserManagerWithDeleted()),
             ],
         ),
     ]
