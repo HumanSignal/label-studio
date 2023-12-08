@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
-  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
-  "branch": "master",
-  "date": "2023-12-05T16:41:20Z"
+  "message": "feat: OPTIC-107: Draft saving on view all",
+  "commit": "8955445652ab6f32fcae0f0c501e98dc18070067",
+  "branch": "fb-optic-107/save-draft-view-all",
+  "date": "2023-12-08T11:41:42Z"
 }
