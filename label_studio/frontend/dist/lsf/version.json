@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
-  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
+  "message": "fix: LEAP-383: Fix bad html sanitizer",
+  "commit": "8600b05a959531ae57f46200b05776b7b7d3e71a",
   "branch": "master",
-  "date": "2023-12-05T16:41:20Z"
+  "date": "2023-12-08T13:54:41Z"
 }
