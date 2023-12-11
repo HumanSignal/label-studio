@@ -1,6 +1,6 @@
-import { destroy, getParentOfType, getRoot, isAlive, isValidReference, types } from 'mobx-state-tree';
+import { destroy, getParent, getParentOfType, isAlive, types } from 'mobx-state-tree';
 
-import { cloneNode, guidGenerator } from '../core/Helpers';
+import { guidGenerator } from '../core/Helpers';
 import { RelationsModel } from '../tags/control/Relations';
 import { TRAVERSE_SKIP } from '../core/Tree';
 import Area from '../regions/Area';

@@ -37,7 +37,7 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     type: 'relation',
   })
-  .actions(self => ({
+  .actions(() => ({
   }));
 
 const RelationModel = types.compose('RelationModel', TagAttrs, Model);
