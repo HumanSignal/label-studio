@@ -3554,7 +3554,7 @@
     },
     "fflag_feat_optic_261_improved_organization_member_filter_count_short": {
       "key": "fflag_feat_optic_261_improved_organization_member_filter_count_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -3576,7 +3576,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_feat_optic_2_ensure_draft_saved_short": {
