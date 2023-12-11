@@ -46,8 +46,8 @@ jobs:
       checks: write
     uses: ./.github/workflows/docker-build.yml
     with:
-      sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-      branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      sha: ${{ github.event.client_payload.pull_request.head.sha || github.event.after }}
+      branch_name: ${{ github.event.client_payload.pull_request.head.ref || github.ref_name }}
     secrets: inherit
 
   notification:
@@ -85,7 +85,7 @@ jobs:
           reactions: "-1"
 
   help:
-    if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'help' || !contains(fromJson('["create"]'), github.event.client_payload.slash_command.args.unnamed.arg1)
+    if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'help'
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
