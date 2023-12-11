@@ -220,7 +220,7 @@ const Model = types
 
         // clean up the html — remove scripts and iframes
         // nodes count better be the same, so replace them with stubs
-        self._value = sanitizeHtml(String(val), { useStub: true, useHeadStub: true });
+        self._value = sanitizeHtml(String(val));
 
         self._regionsCache.forEach(({ region, annotation }) => {
           region.setText(self._value.substring(region.startOffset, region.endOffset));
