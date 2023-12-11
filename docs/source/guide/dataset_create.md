@@ -1,24 +1,29 @@
 ---
-title: Create a dataset
-short: Create a dataset
-date: 2023-08-16 11:52:38
+title: Create a dataset for Data Discovery - Beta 🧪
+short: Import unstructured data
 tier: enterprise
+type: guide
 order: 0
 order_enterprise: 205
-meta_title: Create a Dataset to use with data discovery in Label Studio Enterprise
-meta_description: How to create a Dataset in Label Studio Enterprise using Google Cloud, Azure, or AWS.
-hide_sidebar: true
+meta_title: Create a dataset to use with Data Discovery in Label Studio Enterprise
+meta_description: How to create a dataset in Label Studio Enterprise using Google Cloud, Azure, or AWS.
+section: "Data Discovery"
+date: 2023-08-16 11:52:38
 ---
 
 !!! note
-    At this time, we only support building datasets from a bucket of unstructured data, meaning that the data must be in individual files rather than a structured format such as CSV or JSON.
-
-!!! note
-    To create a new Dataset, your [user role](manage_users#Roles-in-Label-Studio-Enterprise) must have Owner or Administrator permissions. 
+    * At this time, we only support building datasets from a bucket of unstructured data, meaning that the data must be in individual files rather than a structured format such as CSV or JSON.
+    * To create a new dataset, your [user role](manage_users#Roles-in-Label-Studio-Enterprise) must have Owner or Administrator permissions. 
 
 ## Before you begin
 
 Datasets are retrieved from your cloud storage environment. As such, you will need to provide the appropriate access key to pull data from your cloud environment.
+
+If you are using a firewall, ensure you whitelist the following IP addresses (in addition to the [app.humansignal.com range](saas#IP-Range)):
+
+`34.85.250.235`  
+`35.245.250.139`  
+`35.188.239.181`
 
 ## Datasets using AWS
 
@@ -187,7 +192,7 @@ This user can be tied to a specific person or a group.
     | Bucket Name | Enter the name of the AWS S3 bucket. |
     | Bucket Prefix | Enter the folder name within the bucket that you would like to use.  For example, `data-set-1` or `data-set-1/subfolder-2`.  |
     | File Name Filter | Use glob format to filter which file types to sync. For example, to sync all JPG files, enter `*jpg`. To sync all JPG and PNG files, enter `**/**+(jpg\|png)`.<br><br>At this time, we support the following file types: .jpg, .jpeg, .png, .txt, .text |
-    | Region Name | By default, the region is `us-east-1`. If your bucket is located in a different region, overwrite the default and enter your region here. Otherwise, keep the default  |
+    | Region Name | By default, the region is `us-east-1`. If your bucket is located in a different region, overwrite the default and enter your region here. Otherwise, keep the default.  |
     | S3 Endpoint | Enter an S3 endpoint if you want to override the URL created by S3 to access your bucket. |
     | Access Key ID | Enter the ID for the access key you created in AWS. Ensure this access key has read permissions for the S3 bucket you are targeting (see [Create an AWS access key](#Create-a-policy-for-the-user) above). |
     | Secret Access Key | Enter the secret portion of the [access key](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) you created earlier. |
@@ -195,7 +200,7 @@ This user can be tied to a specific person or a group.
     | Treat every bucket object as a source file | **Enabled** - Each object in the bucket will be imported as a separate record in the dataset.<br>You should leave this option enabled if you are importing a bucket of unstructured data files such as JPG, PNG, or TXT. <br><br>**Disabled** - Disable this option if you are importing structured data, such as JSON or CSV files.<br><br>**NOTE:** At this time, we only support unstructured data. Structured data support is coming soon.  |
     | Recursive scan | Perform recursive scans over the bucket contents if you have nested folders in your S3 bucket. |
     | Use pre-signed URLs | If your tasks contain `s3://…` links, they must be pre-signed in order to be displayed in the browser. |
-    | Pre-signed URL counter | Adjust the counter for how many minutes the pre-signed URLs are valid. |
+    | Expiration minutes | Adjust the counter for how many minutes the pre-signed URLs are valid. |
 
     </div>
 
@@ -210,8 +215,6 @@ This user can be tied to a specific person or a group.
 6. Click **Create Dataset**. 
 
 Data sync initializes immediately after creating the dataset. Depending on how much data you have, syncing might take several minutes to complete.
-
-
 
 
 
@@ -356,3 +359,94 @@ Data sync initializes immediately after creating the dataset. Depending on how m
 
 
 
+## Datasets using Microsoft Azure 
+
+Requirements:
+
+- Your data is saved as blobs in an Azure storage account. We do not currently support Azure Data Lake.
+- You have access to retrieve the [storage account access key](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage). 
+- Your storage container has CORS configured properly. Configuring CORS allows you to view the data in Label Studio. When CORS is not configured, you are only able to view links to the data. 
+
+{% details <b>Configure CORS for the Azure storage account</b> %}
+
+
+Configure CORS at the storage account level. 
+
+1. In the Azure portal, navigate to the page for the storage account. 
+2. From the menu on the left, scroll down to **Settings > Resource sharing (CORS)**. 
+3. Under **Blob service** add the following rule:
+   
+   * **Allowed origins:** `*` 
+   * **Allowed methods:** `GET` 
+   * **Allowed headers:** `*` 
+   * **Exposed headers:** `Access-Control-Allow-Origin` 
+   * **Max age:** `3600` 
+
+4. Click **Save**. 
+
+![Screenshot of the Azure portal page for configuring CORS](/images/azure-storage-cors.png)
+
+
+{% enddetails %}
+
+{% details <b>Retrieve the Azure storage access key</b> %}
+
+###### Get the Azure storage account access key
+
+When you create a storage account, Azure automatically generates two keys that will provide access to objects within that storage account. For more information about keys, see [Azure documentation - Manage storage account access keys](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage). 
+
+1. Navigate to the storage account page in the portal. 
+2. From the menu on the left, scroll down to **Security + networking > Access keys**. 
+3. Copy the **key** value for either Key 1 or Key 2. 
+
+![Screenshot of the Azure portal access keys page](/images/azure-access-key.png)
+
+
+{% enddetails %}
+
+### Create a dataset from an Azure blob storage container
+
+1. From Label Studio, navigate to the Datasets page and click **Create Dataset**. 
+
+    ![Create a dataset action](/images/data_discovery/dataset_create.png)
+
+2. Complete the following fields and then click **Next**:
+
+    <div class="noheader rowheader">
+
+    | | |
+    | --- | --- |
+    | Name | Enter a name for the dataset. |
+    | Description | Enter a brief description for the dataset.  |
+    | Source | Select Microsoft Azure. |
+
+    </div>
+
+3. Complete the following fields: 
+
+    <div class="noheader rowheader">
+
+    | | |
+    | --- | --- |
+    | Container Name | Enter the name of a container within the Azure storage account. |
+    | Container Prefix | Enter the folder name within the container that you would like to use.  For example, `data-set-1` or `data-set-1/subfolder-2`.  |
+    | File Name Filter | Use glob format to filter which file types to sync. For example, to sync all JPG files, enter `*jpg`. To sync all JPG and PNG files, enter `**/**+(jpg\|png)`.<br><br>At this time, we support the following file types: .jpg, .jpeg, .png, .txt, .text |
+    | Account Name |  Enter the name of the Azure storage account. |
+    | Account key | Enter the access key for the Azure storage account (see [Retrieve the Azure storage access key](#Get-the-Azure-storage-account-access-key) above). |
+    | Treat every bucket object as a source file | **Enabled** - Each object in the bucket will be imported as a separate record in the dataset.<br>You should leave this option enabled if you are importing a bucket of unstructured data files such as JPG, PNG, or TXT. <br><br>**Disabled** - Disable this option if you are importing structured data, such as JSON or CSV files.<br><br>**NOTE:** At this time, we only support unstructured data. Structured data support is coming soon.  |
+    | Use pre-signed URLs | If your tasks contain `azure-blob://…` links, they must be pre-signed in order to be displayed in the browser. |
+    | Expiration minutes | Adjust the counter for how many minutes the pre-signed URLs are valid. |
+
+    </div>
+
+4. Click **Check Connection** to verify your credentials. If your connection is valid, click **Next**. 
+
+    ![Check Dataset connection](/images/data_discovery/dataset_check_connection_azure.png)
+
+5. Provide a name for your dataset column and select a data type. The data type that you select tells Label Studio how to store your data in a way that is [searchable](dataset_search).
+
+    ![Select dataset column](/images/data_discovery/dataset_column_azure.png)
+
+6. Click **Create Dataset**. 
+
+Data sync initializes immediately after creating the dataset. Depending on how much data you have, syncing might take several minutes to complete.

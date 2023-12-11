@@ -1,3 +1,6 @@
+from functools import wraps
+
+
 def permission_required(*permissions, fn=None):
     def decorator(view):
         def wrapped_view(self, request, *args, **kwargs):
@@ -19,3 +22,17 @@ def permission_required(*permissions, fn=None):
         return wrapped_view
 
     return decorator
+
+
+def override_report_only_csp(view_func):
+    """
+    Decorator to switch report-only CSP to regular CSP. For use with core.middleware.HumanSignalCspMiddleware.
+    """
+
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        response = view_func(*args, **kwargs)
+        setattr(response, '_override_report_only_csp', True)
+        return response
+
+    return wrapper
