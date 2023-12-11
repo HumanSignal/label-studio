@@ -10,6 +10,7 @@ env:
     ff
     git
     jira
+    docker
 
   issue_commands_list: |
     jira
