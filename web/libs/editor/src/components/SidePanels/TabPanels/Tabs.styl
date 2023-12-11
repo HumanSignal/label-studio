@@ -1,0 +1,149 @@
+.tabs
+    --tab-row-height 33px
+    --tab-height 32px
+    height inherit
+
+    &.ff_outliner_optim
+        height 100%
+    
+    &__tabs-row
+        display flex
+        background #f6f5f7
+        border-bottom: 1px solid rgba(137, 128, 152, 0.16);
+
+        .ff_outliner_optim &
+            height var(--tab-row-height)
+
+    &__tab-container
+        min-width 0 
+        flex-shrink 1
+
+        &_active
+            flex-shrink 0
+
+    &__contents
+        position relative
+        background #fff
+        height 100%
+        position relative
+        z-index 1
+        overflow-y auto
+        overflow-x hidden
+        styled-scrollbars()
+
+        .ff_outliner_optim &
+            height calc(100% - var(--tab-row-height))
+
+        & .main-content
+            overflow auto
+            padding-bottom calc(var(--bottombar-height) + 8px);
+
+        &_resizing
+            position relative
+            pointer-events none
+
+        &::before
+            top 0
+            left 0
+            content ""
+            width 100%
+            z-index 100
+            display block
+            position absolute
+
+        ~/_collapsed &
+            flex 1
+
+    &__drop-space-after
+        width 100%
+        flex-shrink 100
+        
+        &_hoveringRight
+            &:hover 
+                &::before
+                    content ''
+                    position absolute
+                    background #85cbfd
+                    width 4px
+                    height 100%
+
+.panel-tabs
+
+    &__draggable-tab
+        transform translateY(2px)
+
+    &__tab
+        overflow hidden
+        text-overflow ellipsis
+        white-space nowrap
+        padding 4px 24px 6px 24px
+        height var(--tab-height)
+        width 100%
+        font-weight 500
+        font-size 14px
+        line-height 24px
+        letter-spacing 0.15px
+        border-color rgba(65, 60, 74, 0.16)
+        margin: 0 2px
+        display block
+        cursor grab
+        user-select none
+
+        &_active
+            overflow visible
+            width fit-content
+            border-width 1px 1px 0px 1px
+            transform translate(-1px, -1px)
+            border-style solid;
+            background #fff
+
+        &:hover svg
+            display block
+
+    &__ghost-tab
+        opacity 0.8
+        position absolute
+        z-index 100
+        left 0
+        top 0
+        display none
+        
+    &__contents
+        background #fff
+
+    &__icon
+        position absolute
+        left 10px
+        top 9.5px
+        color var(--icon-color);
+        display none 
+        pointer-events none
+
+.drag_over_tab_left
+    &::before
+        content ''
+        position absolute
+        left 0
+        background #85cbfd
+        width 4px
+        height 30px
+        transform translateY(-4px)
+
+.drag_over_tab_right
+    &::after
+        content ''
+        position absolute
+        right 0
+        background #85cbfd
+        width 4px
+        height 30px
+        transform translateY(-4px)
+
+.drag_over_empty_tab_space
+    &::before
+        content ''
+        transform translate(-4px, 2px)
+        position absolute
+        background #85cbfd
+        width 4px
+        height 30px

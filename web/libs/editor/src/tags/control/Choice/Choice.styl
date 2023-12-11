@@ -1,0 +1,55 @@
+.choice_leaf.choice_layout
+.choice
+  line-height 40px
+
+  &_leaf&_layout
+    &_inline,
+    &_horizontal
+      display inline-block
+
+    &_vertical
+      display block
+      position relative
+
+  &_notLeaf
+    line-height 40px
+
+  &_leaf&_hidden,
+  &_notLeaf&_hidden
+    display none
+
+  &__item
+    display flex
+    flex-flow row nowrap
+    &_notLeaf
+      border-radius 4px
+      background rgba(0,0,0,0.06)
+      position relative
+
+  &__checkbox
+    padding-left 8px
+    flex 100 0 1%
+
+  &__toggle
+    color #0099FF
+    display flex
+    justify-content center
+    align-items center
+    flex-flow column
+    width 24px
+    margin 0 8px
+    flex-shrink 0
+    align-self center
+
+    &:hover
+      color #0099FF
+
+    &_collapsed
+      transform scaleY(-1)
+
+
+  &__children
+    padding-left 8px
+
+    &_collapsed
+      display none

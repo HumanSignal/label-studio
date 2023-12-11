@@ -1,0 +1,94 @@
+.range
+  --thickness 6px
+  display flex
+  align-items center
+
+  &_align
+    &_horizontal
+      min-width 120px
+      height 28px
+      padding 0 5px
+      flex-direction row
+
+    &_vertical
+      min-height 120px
+      width 28px
+      padding 5px 0
+      flex-direction column
+
+  &__body
+    position relative
+
+    ~/_align_horizontal &
+      height var(--thickness)
+      width 120px
+      margin 0 8px
+
+    ~/_align_vertical &
+      height 120px
+      width var(--thickness)
+      margin 8px 0
+
+  &__line
+    border-radius 8px
+    background rgba(#000, 0.08)
+
+    ~/_align_horizontal &
+      height var(--thickness)
+      width 100%
+
+    ~/_align_vertical &
+      width var(--thickness)
+      height 100%
+
+  &__indicator
+    border-radius 8px
+    position absolute
+    background-color rgba($accent_color, 0.5)
+
+    ~/_align_horizontal &
+      top: 0
+      height var(--thickness)
+
+    ~/_align_vertical &
+      left: 0
+      width var(--thickness)
+
+  &__range-handle
+    width 0
+    height 0
+    position absolute
+
+    &::before
+      content ''
+      width 16px
+      height 16px
+      position absolute
+      background #0099FF
+      border-radius 100%
+      box-shadow 0px 5px 10px rgba(0, 153, 255, 0.3), inset 0px -1px 0px rgba(0, 0, 0, 0.1)
+      transform translate3d(-50%, -50%, 0)
+
+    &::after
+      content ''
+      width 25px
+      height 25px
+      position absolute
+      transform translate3d(-50%, -50%, 0)
+
+    ~/_align_horizontal &
+      top 50%
+
+    ~/_align_vertical &
+      left 50%
+
+  &__icon
+    width 28px
+    height 28px
+    display flex
+    align-items center
+    justify-content center
+
+    svg
+      max-width 100%
+      max-height 100%

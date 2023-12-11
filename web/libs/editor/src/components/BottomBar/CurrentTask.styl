@@ -1,0 +1,71 @@
+.current-task
+  padding 0 8px 0 16px
+  display flex
+  align-content center
+  align-items center
+
+  &_with-history
+    height 100%
+    display grid
+    width 220px
+    grid-template-columns 1fr min-content
+    grid-template-areas 'id buttons' 'id buttons'
+    grid-template-rows 1fr 1fr
+
+  &__task-id
+    grid-area id
+    color black
+    font-size 14px
+    user-select text
+
+    &::before
+      content '#'
+
+  &__task-count
+    grid-area counter
+    color rgba(0, 0, 0, 0.4)
+    font-size 11px
+    user-select none
+
+  &__history-controls
+    display flex
+    grid-area buttons
+
+  &__prevnext
+    width 32px
+    height 32px
+    align-self center
+    justify-self center
+
+    &::before
+      top 50%
+      left 50%
+      content ''
+      width 10px
+      height 10px
+      display block
+      position absolute
+      border 2px solid #000
+      border-bottom none
+      border-right none
+      margin-top -3px
+      transform translate3d(-50%, -50%, 0) rotate(225deg)
+
+    &_next
+      grid-area n
+      transform rotate(-90deg)
+
+    &_next&_postpone::before
+      border-color #09f
+
+    &_prev
+      grid-area p
+      transform rotate(90deg)
+
+    &_hidden
+      display none
+
+    &_disabled::before
+      border 2px solid rgba(0, 0, 0, 0.3)
+      border-bottom none
+      border-right none

@@ -1,0 +1,25 @@
+waiting(c1 = #efefef, c2 = #fff)
+  $base_color = rgba(c2, 0.2)
+  $accent_color = c1
+
+  background-image repeating-linear-gradient(
+    -63.43deg,
+    $base_color 1px,
+    $accent_color 2px,
+    $accent_color 6px,
+    $base_color 7px,
+    $base_color 12px
+  )
+
+  background-color c2
+  background-size 37px 100%
+
+  &_animated
+    animation waiting 1s linear infinite
+
+@keyframes waiting
+  0%
+    background-position 0 0
+
+  100%
+    background-position 37px 0

@@ -1,0 +1,38 @@
+.sidebar-tabs
+  flex 1
+  position sticky
+  display flex
+  flex-direction column
+  max-height 100vh
+  top var(--sticky-items-offset)
+
+  &__toggle
+    width 100%
+    height 44px
+    display flex
+    background-color #f3f3f3
+
+  &__tab
+    flex 1
+    padding 12px 16px
+    font-weight 500
+    font-size 16px
+    line-height 19px
+    cursor pointer
+    box-sizing border-box
+    box-shadow 0 1px 0 rgba(#000, 0.1)
+
+    &:not(:last-child)
+      box-shadow -1px 0 0 rgba(#000, 0.1) inset, 0 1px 0 rgba(#000, 0.1)
+
+    &_active
+      background-color #fff
+      box-shadow none
+      cursor default
+
+      &:not(:last-child)
+        box-shadow -1px 0 0 rgba(#000, 0.1) inset
+
+  &__content
+    flex 1
+    overflow auto

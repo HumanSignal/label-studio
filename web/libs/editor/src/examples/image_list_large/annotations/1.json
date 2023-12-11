@@ -1,0 +1,3926 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "lead_time": 15.053,
+            "result": [
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 0,
+                    "value": {
+                        "x": 50.8,
+                        "y": 5.869797225186766,
+                        "width": 12.4,
+                        "height": 10.458911419423693,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Dx_aB91ISN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 11.36986301369863,
+                        "y": 34.390243902439025,
+                        "width": 22.73972602739726,
+                        "height": 22.195121951219512,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "WUoOctahqS",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 25.89041095890411,
+                        "y": 61.46341463414634,
+                        "width": 28.63013698630137,
+                        "height": 26.585365853658537,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "A2THHoTc0k",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 60.95890410958904,
+                        "y": 33.658536585365866,
+                        "width": 25.89041095890411,
+                        "height": 41.951219512195124,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ilctFWEUPf",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 39.86301369863013,
+                        "y": 15.853658536585366,
+                        "width": 28.63013698630137,
+                        "height": 18.29268292682927,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "E_QlqHMLpW",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 4.10958904109589,
+                        "y": 22.92682926829269,
+                        "width": 22.465753424657535,
+                        "height": 15.121951219512194,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "8ZJfHyvYWW",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 8.356164383561644,
+                        "y": 53.170731707317074,
+                        "width": 16.575342465753426,
+                        "height": 15.365853658536585,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "12-PTfpevE",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 63.6986301369863,
+                        "y": 79.26829268292683,
+                        "width": 23.97260273972602,
+                        "height": 12.195121951219512,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "_d5kpSQwad",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 63.56164383561645,
+                        "y": 29.268292682926823,
+                        "width": 29.726027397260275,
+                        "height": 18.048780487804873,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "fj_F87YdaY",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 37.67123287671233,
+                        "y": 38.53658536585367,
+                        "width": 16.71232876712329,
+                        "height": 15.365853658536585,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "E1qPRlF4JY",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 10.410958904109592,
+                        "y": 69.02439024390242,
+                        "width": 23.97260273972602,
+                        "height": 23.902439024390244,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "FKuzYMFIuA",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 46.57534246575342,
+                        "y": 70,
+                        "width": 22.465753424657535,
+                        "height": 24.634146341463413,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "DGMIrmmoHv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 64.10958904109589,
+                        "y": 49.75609756097561,
+                        "width": 30.958904109589042,
+                        "height": 40.48780487804878,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "HbQ9Oboj4p",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 30.684931506849313,
+                        "y": 22.195121951219512,
+                        "width": 15.068493150684931,
+                        "height": 40.48780487804878,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "dpw42ONxHS",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 2.8767123287671232,
+                        "y": 26.829268292682933,
+                        "width": 40,
+                        "height": 59.02439024390244,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "dN9imelcYb",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 46.84931506849315,
+                        "y": 4.390243902439023,
+                        "width": 36.71232876712329,
+                        "height": 40.97560975609756,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "64-43W3bH1",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 431,
+                    "image_rotation": 0,
+                    "item_index": 221,
+                    "value": {
+                        "x": 19.863013698630137,
+                        "y": 12.926829268292684,
+                        "width": 22.05479452054795,
+                        "height": 33.658536585365866,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "BkoqICc0KK",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 511,
+                    "image_rotation": 0,
+                    "item_index": 220,
+                    "value": {
+                        "x": 23.15068493150685,
+                        "y": 33.53909465020576,
+                        "width": 16.301369863013697,
+                        "height": 26.337448559670783,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Hbj1gAcOFy",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 511,
+                    "image_rotation": 0,
+                    "item_index": 220,
+                    "value": {
+                        "x": 23.835616438356166,
+                        "y": 76.13168724279835,
+                        "width": 24.10958904109589,
+                        "height": 11.522633744855968,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "04S-UdmiNb",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 511,
+                    "image_rotation": 0,
+                    "item_index": 220,
+                    "value": {
+                        "x": 68.08219178082192,
+                        "y": 36.62551440329218,
+                        "width": 22.191780821917813,
+                        "height": 24.074074074074073,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Hq9Glk1qe-",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 511,
+                    "image_rotation": 0,
+                    "item_index": 220,
+                    "value": {
+                        "x": 42.73972602739726,
+                        "y": 18.72427983539095,
+                        "width": 26.986301369863014,
+                        "height": 23.662551440329217,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "fGyS80Iw1m",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 511,
+                    "image_rotation": 0,
+                    "item_index": 220,
+                    "value": {
+                        "x": 37.26027397260274,
+                        "y": 65.84362139917695,
+                        "width": 25.616438356164384,
+                        "height": 6.378600823045268,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Z5bYmmGMKw",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 511,
+                    "image_rotation": 0,
+                    "item_index": 220,
+                    "value": {
+                        "x": 59.45205479452055,
+                        "y": 72.8395061728395,
+                        "width": 25.068493150684933,
+                        "height": 20.37037037037037,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "B0ZKMZv8Tx",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 15.205479452054798,
+                        "y": 20.84942084942085,
+                        "width": 29.589041095890412,
+                        "height": 29.536679536679543,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "qeGCVuRIw8",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 25.753424657534246,
+                        "y": 46.91119691119691,
+                        "width": 38.76712328767123,
+                        "height": 29.150579150579144,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "zS8AKj8YzL",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 47.12328767123287,
+                        "y": 34.36293436293436,
+                        "width": 34.24657534246575,
+                        "height": 21.428571428571427,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "wa_6WfLt2u",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 31.643835616438352,
+                        "y": 25.28957528957529,
+                        "width": 29.315068493150687,
+                        "height": 20.077220077220076,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "HdEWoAd-uk",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 6.575342465753424,
+                        "y": 78.95752895752895,
+                        "width": 10.821917808219178,
+                        "height": 9.073359073359073,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "UY90NnS_A2",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 30.684931506849313,
+                        "y": 74.13127413127413,
+                        "width": 21.91780821917808,
+                        "height": 13.320463320463324,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "M4F9eVPSex",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 73.28767123287673,
+                        "y": 52.12355212355211,
+                        "width": 12.73972602739726,
+                        "height": 34.36293436293436,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "EYahkXb4Dv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 55.89041095890411,
+                        "y": 11.196911196911197,
+                        "width": 28.767123287671232,
+                        "height": 22.393822393822393,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "E1s95QIQIL",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 11.643835616438356,
+                        "y": 14.864864864864865,
+                        "width": 27.671232876712327,
+                        "height": 9.652509652509652,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "xp2j_pU8Vk",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 8.63013698630137,
+                        "y": 6.370656370656371,
+                        "width": 12.054794520547945,
+                        "height": 19.69111969111969,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "z2JHD4s1hi",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 10.410958904109592,
+                        "y": 44.78764478764479,
+                        "width": 19.041095890410958,
+                        "height": 17.760617760617762,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "0hEFjlLbiq",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 24.931506849315067,
+                        "y": 69.88416988416989,
+                        "width": 12.602739726027398,
+                        "height": 16.409266409266408,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "wBmSZGUPmQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 545,
+                    "image_rotation": 0,
+                    "item_index": 219,
+                    "value": {
+                        "x": 55.47945205479452,
+                        "y": 70.65637065637065,
+                        "width": 18.356164383561644,
+                        "height": 25.28957528957529,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "7sR0QASnko",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 9.04109589041096,
+                        "y": 12.114989733059552,
+                        "width": 16.84931506849315,
+                        "height": 25.462012320328544,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "P9-qk4ExMb",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 29.589041095890412,
+                        "y": 36.55030800821355,
+                        "width": 28.08219178082192,
+                        "height": 22.587268993839835,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "CozCUaGrrN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 67.26027397260273,
+                        "y": 22.587268993839835,
+                        "width": 12.73972602739726,
+                        "height": 4.722792607802875,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "7NVqjIBogZ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 60,
+                        "y": 58.110882956878854,
+                        "width": 18.08219178082192,
+                        "height": 29.97946611909651,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "4akHvlK3yO",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 10.821917808219178,
+                        "y": 72.07392197125257,
+                        "width": 25.89041095890411,
+                        "height": 18.069815195071868,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "r3NheJaRKN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 10.821917808219178,
+                        "y": 44.969199178644764,
+                        "width": 17.671232876712324,
+                        "height": 14.373716632443529,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "H9z89P5sE-",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 43.15068493150686,
+                        "y": 8.829568788501026,
+                        "width": 14.931506849315069,
+                        "height": 9.856262833675565,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "7zThRhrtBr",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 49.45205479452055,
+                        "y": 52.15605749486652,
+                        "width": 36.43835616438356,
+                        "height": 22.587268993839835,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "9OruynoBou",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 41.23287671232877,
+                        "y": 72.27926078028747,
+                        "width": 23.15068493150685,
+                        "height": 23.20328542094456,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "qQ2lbz3aR6",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 70.54794520547945,
+                        "y": 69.19917864476386,
+                        "width": 17.123287671232877,
+                        "height": 26.488706365503074,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "25G53lGLt3",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 66.71232876712328,
+                        "y": 17.864476386036962,
+                        "width": 24.65753424657534,
+                        "height": 24.84599589322382,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Q0R6w1m_dj",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 54.93150684931507,
+                        "y": 3.901437371663245,
+                        "width": 33.56164383561644,
+                        "height": 18.480492813141684,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "eF0hgP2nPz",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 33.013698630136986,
+                        "y": 21.35523613963039,
+                        "width": 16.84931506849315,
+                        "height": 23.20328542094456,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "hx_UBbc06E",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 32.32876712328767,
+                        "y": 14.16837782340862,
+                        "width": 25.616438356164384,
+                        "height": 36.55030800821355,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Xq26DtM9SS",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 7.123287671232877,
+                        "y": 40.6570841889117,
+                        "width": 38.76712328767123,
+                        "height": 30.18480492813141,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "CRoZ2ijSHr",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 218,
+                    "value": {
+                        "x": 6.438356164383562,
+                        "y": 59.75359342915812,
+                        "width": 36.16438356164384,
+                        "height": 35.1129363449692,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "K1KHP1ySqC",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 9.315068493150685,
+                        "y": 7.083333333333333,
+                        "width": 23.28767123287671,
+                        "height": 23.958333333333336,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "6iq6H2hxmv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 18.356164383561644,
+                        "y": 37.291666666666664,
+                        "width": 30.82191780821918,
+                        "height": 13.333333333333334,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "1uq7vaaS_J",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 38.082191780821915,
+                        "y": 12.291666666666666,
+                        "width": 17.397260273972602,
+                        "height": 22.708333333333332,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "kLudp2dtFG",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 67.12328767123287,
+                        "y": 17.708333333333336,
+                        "width": 15.616438356164384,
+                        "height": 12.916666666666668,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "a5zKKTojV6",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 67.8082191780822,
+                        "y": 13.750000000000004,
+                        "width": 30.54794520547945,
+                        "height": 25,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "r-mYFq7uex",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 60.68493150684932,
+                        "y": 48.333333333333336,
+                        "width": 26.986301369863014,
+                        "height": 11.25,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "kT6G5ZrNBc",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 35.205479452054796,
+                        "y": 49.791666666666664,
+                        "width": 20.958904109589042,
+                        "height": 23.958333333333336,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "re3X2q5aY4",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 9.589041095890408,
+                        "y": 65.41666666666669,
+                        "width": 15.616438356164384,
+                        "height": 23.75,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "n6BrbKkI_M",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 38.356164383561634,
+                        "y": 66.45833333333331,
+                        "width": 18.63013698630137,
+                        "height": 14.166666666666666,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "6lRzxyxZiJ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 58.76712328767123,
+                        "y": 55.41666666666668,
+                        "width": 17.534246575342465,
+                        "height": 22.708333333333332,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "7dhmB5jnN6",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 505,
+                    "image_rotation": 0,
+                    "item_index": 217,
+                    "value": {
+                        "x": 64.93150684931507,
+                        "y": 82.5,
+                        "width": 26.301369863013697,
+                        "height": 15.625,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ZHH_0uPmCF",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 5.616438356164384,
+                        "y": 59.85401459854016,
+                        "width": 31.91780821917808,
+                        "height": 28.284671532846716,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "zdOUlOrJh7",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 51.36986301369863,
+                        "y": 46.715328467153284,
+                        "width": 26.438356164383563,
+                        "height": 32.846715328467155,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "DJMNzFCHwp",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 65.06849315068493,
+                        "y": 53.64963503649635,
+                        "width": 26.438356164383563,
+                        "height": 38.86861313868613,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "qIyzBuT_9X",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 48.35616438356164,
+                        "y": 30.83941605839416,
+                        "width": 28.08219178082192,
+                        "height": 15.328467153284672,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "6O5mLTnn1p",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 20.136986301369863,
+                        "y": 32.481751824817515,
+                        "width": 19.863013698630137,
+                        "height": 23.175182481751825,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "rS-gjJU4pv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 16.164383561643834,
+                        "y": 16.605839416058394,
+                        "width": 26.71232876712329,
+                        "height": 15.693430656934307,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "kttHC8Ulfx",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 56.57534246575342,
+                        "y": 9.854014598540147,
+                        "width": 30.684931506849313,
+                        "height": 13.686131386861314,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "QZBPTkYEOu",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 64.24657534246575,
+                        "y": 22.445255474452555,
+                        "width": 28.493150684931507,
+                        "height": 30.656934306569344,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "zfK_1Vp1Iq",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 6.575342465753424,
+                        "y": 23.175182481751825,
+                        "width": 26.301369863013697,
+                        "height": 34.85401459854015,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "tAqT3qfLZO",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 35.61643835616437,
+                        "y": 67.7007299270073,
+                        "width": 26.164383561643834,
+                        "height": 28.10218978102189,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Bww_BsEz3M",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 36.84931506849314,
+                        "y": 6.569343065693431,
+                        "width": 17.26027397260274,
+                        "height": 28.832116788321162,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "9r8c2BNtw-",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 42.054794520547944,
+                        "y": 39.78102189781022,
+                        "width": 20.547945205479447,
+                        "height": 22.08029197080292,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "sAPbk46O9K",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 4.2465753424657535,
+                        "y": 7.846715328467154,
+                        "width": 22.328767123287676,
+                        "height": 20.255474452554743,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "p--zB6Iuuo",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 74.24657534246573,
+                        "y": 4.744525547445255,
+                        "width": 20.136986301369863,
+                        "height": 23.722627737226276,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "q--y54vVRu",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 76.71232876712327,
+                        "y": 68.7956204379562,
+                        "width": 20,
+                        "height": 25.364963503649633,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "7cAlPyGuBr",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 576,
+                    "image_rotation": 0,
+                    "item_index": 216,
+                    "value": {
+                        "x": 2.191780821917808,
+                        "y": 81.02189781021897,
+                        "width": 11.917808219178083,
+                        "height": 16.05839416058394,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "aLuAB92tpN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 4.383561643835616,
+                        "y": 4.280821917808219,
+                        "width": 26.027397260273972,
+                        "height": 23.458904109589042,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "zni8vG1rWg",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 8.63013698630137,
+                        "y": 24.65753424657534,
+                        "width": 32.602739726027394,
+                        "height": 17.97945205479452,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "7JSMYvoZEZ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 12.602739726027398,
+                        "y": 34.417808219178085,
+                        "width": 38.904109589041106,
+                        "height": 29.623287671232884,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "bd0oKokRRc",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 5.890410958904109,
+                        "y": 52.91095890410958,
+                        "width": 23.698630136986303,
+                        "height": 25,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "OyJ7DY5sD9",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 5.890410958904109,
+                        "y": 73.45890410958904,
+                        "width": 27.397260273972602,
+                        "height": 20.54794520547945,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "8G1qdLLABN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 42.054794520547944,
+                        "y": 69.34931506849315,
+                        "width": 21.232876712328768,
+                        "height": 16.60958904109589,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "r9MnIPGR8W",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 40,
+                        "y": 48.45890410958904,
+                        "width": 32.87671232876712,
+                        "height": 17.123287671232877,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "MnAiGh6E2r",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 36.02739726027397,
+                        "y": 70.2054794520548,
+                        "width": 34.657534246575345,
+                        "height": 25.513698630136993,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "KLvUfKWdVV",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 44.794520547945204,
+                        "y": 22.26027397260274,
+                        "width": 28.493150684931507,
+                        "height": 25.171232876712335,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "-uFFI6oBTu",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 23.97260273972602,
+                        "y": 5.821917808219178,
+                        "width": 25.753424657534246,
+                        "height": 26.71232876712329,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "J6IN87nZFv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 39.86301369863013,
+                        "y": 8.39041095890411,
+                        "width": 21.506849315068493,
+                        "height": 16.43835616438356,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "nWj1qRcftM",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 53.97260273972603,
+                        "y": 10.102739726027398,
+                        "width": 17.123287671232877,
+                        "height": 13.86986301369863,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "502OiiZC8l",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 64.10958904109589,
+                        "y": 3.767123287671233,
+                        "width": 22.73972602739726,
+                        "height": 9.76027397260274,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "sXdb41gyBu",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 63.42465753424658,
+                        "y": 7.534246575342466,
+                        "width": 28.493150684931507,
+                        "height": 15.068493150684931,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "G5kf_j_5ar",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 73.28767123287673,
+                        "y": 9.246575342465754,
+                        "width": 18.493150684931507,
+                        "height": 19.006849315068493,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ocjuR2WiSb",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 69.86301369863014,
+                        "y": 16.095890410958905,
+                        "width": 17.123287671232877,
+                        "height": 13.527397260273975,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "efMZ8MIhZG",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 66.57534246575342,
+                        "y": 17.636986301369863,
+                        "width": 18.21917808219178,
+                        "height": 21.746575342465754,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "gg1s7Fdef7",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 86.30136986301372,
+                        "y": 15.41095890410959,
+                        "width": 2.73972602739726,
+                        "height": 18.664383561643834,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "XVvnF5tlHv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 74.79452054794523,
+                        "y": 30.30821917808219,
+                        "width": 13.972602739726028,
+                        "height": 17.123287671232877,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "2kVCzBifa_",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 77.67123287671232,
+                        "y": 32.36301369863014,
+                        "width": 16.71232876712329,
+                        "height": 23.28767123287671,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "FRutFmo9QK",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 69.04109589041096,
+                        "y": 48.97260273972603,
+                        "width": 17.671232876712324,
+                        "height": 12.157534246575345,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "2-wVeQ7guP",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 77.26027397260276,
+                        "y": 42.63698630136986,
+                        "width": 16.84931506849315,
+                        "height": 23.458904109589042,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "LPFmUdWeUD",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 64.7945205479452,
+                        "y": 51.88356164383563,
+                        "width": 23.013698630136986,
+                        "height": 16.267123287671232,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "uaxlbbR8Ls",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 71.64383561643835,
+                        "y": 58.21917808219178,
+                        "width": 23.15068493150685,
+                        "height": 21.746575342465754,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "9OfUxlGS8o",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 76.84931506849315,
+                        "y": 75.85616438356165,
+                        "width": 16.575342465753426,
+                        "height": 18.835616438356166,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "wDNGPdIxha",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 53.42465753424658,
+                        "y": 72.77397260273972,
+                        "width": 21.36986301369863,
+                        "height": 19.863013698630137,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "scwi0Vdjxg",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 614,
+                    "image_rotation": 0,
+                    "item_index": 215,
+                    "value": {
+                        "x": 32.602739726027394,
+                        "y": 64.55479452054794,
+                        "width": 18.08219178082192,
+                        "height": 13.356164383561644,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "n3ncVUzqYs",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 67.12328767123287,
+                        "y": 5.749486652977413,
+                        "width": 26.84931506849315,
+                        "height": 29.77412731006161,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "P-fGeTk7kN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 78.76712328767125,
+                        "y": 30.800821355236145,
+                        "width": 15.068493150684931,
+                        "height": 23.408624229979466,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "nDc9wNetDS",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 66.43835616438356,
+                        "y": 37.98767967145791,
+                        "width": 20.821917808219183,
+                        "height": 31.21149897330596,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "YtXPCeen_g",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 77.12328767123287,
+                        "y": 42.71047227926078,
+                        "width": 16.027397260273972,
+                        "height": 36.55030800821355,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "9oLb59pxF8",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 66.84931506849315,
+                        "y": 64.27104722792608,
+                        "width": 16.84931506849315,
+                        "height": 25.667351129363446,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Cy2pm24-Vx",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 68.08219178082192,
+                        "y": 56.2628336755647,
+                        "width": 25.616438356164384,
+                        "height": 39.83572895277207,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "e5tNyto7tR",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 52.19178082191781,
+                        "y": 70.63655030800821,
+                        "width": 24.383561643835616,
+                        "height": 27.310061601642705,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "DLGS1cwnLs",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 36.84931506849314,
+                        "y": 70.2258726899384,
+                        "width": 19.041095890410958,
+                        "height": 20.533880903490758,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "C4AJG-Qmq0",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 40.68493150684932,
+                        "y": 49.89733059548255,
+                        "width": 18.767123287671232,
+                        "height": 29.77412731006161,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ae2YLkP8-C",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 46.986301369863014,
+                        "y": 42.09445585215606,
+                        "width": 18.904109589041095,
+                        "height": 25.051334702258725,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "DjWoFkcxjA",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 49.31506849315068,
+                        "y": 26.694045174537994,
+                        "width": 19.863013698630137,
+                        "height": 29.568788501026695,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "SlL2m0BpcJ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 53.28767123287671,
+                        "y": 11.704312114989733,
+                        "width": 18.08219178082192,
+                        "height": 37.16632443531827,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "mpfbATKZcy",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 31.232876712328768,
+                        "y": 6.365503080082136,
+                        "width": 29.45205479452055,
+                        "height": 48.6652977412731,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "BlOUVFomWn",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 16.301369863013697,
+                        "y": 11.90965092402464,
+                        "width": 23.561643835616437,
+                        "height": 34.70225872689939,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "eR0ZAJd_Gl",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 6.575342465753424,
+                        "y": 7.597535934291583,
+                        "width": 22.876712328767123,
+                        "height": 18.68583162217659,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "bYjsoR_-iG",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 7.123287671232877,
+                        "y": 33.67556468172484,
+                        "width": 24.794520547945204,
+                        "height": 25.256673511293638,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ZUZxaL8ZoR",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 18.904109589041095,
+                        "y": 45.17453798767967,
+                        "width": 26.84931506849315,
+                        "height": 24.02464065708419,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "DPS_XmtmZ8",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 22.876712328767123,
+                        "y": 51.95071868583162,
+                        "width": 28.08219178082192,
+                        "height": 30.390143737166333,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "JWUO2k7SoN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 11.095890410958907,
+                        "y": 55.236139630390156,
+                        "width": 26.027397260273972,
+                        "height": 33.67556468172484,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "EYiBcEwtO0",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 5.342465753424658,
+                        "y": 73.1006160164271,
+                        "width": 26.84931506849315,
+                        "height": 25.87268993839836,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "byD7kggYcQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 214,
+                    "value": {
+                        "x": 35.06849315068493,
+                        "y": 75.15400410677618,
+                        "width": 23.97260273972602,
+                        "height": 18.8911704312115,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "zxkEVk0B72",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 71.76308539944904,
+                        "y": 1.0330578512396698,
+                        "width": 26.170798898071624,
+                        "height": 27.892561983471076,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Z6xhOhdmMM",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 72.58953168044077,
+                        "y": 9.917355371900827,
+                        "width": 21.349862258953163,
+                        "height": 25.6198347107438,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "uIzYigeA8l",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 50.68870523415978,
+                        "y": 15.702479338842975,
+                        "width": 19.008264462809922,
+                        "height": 34.917355371900825,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "AGjxeWGjpU",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 58.1267217630854,
+                        "y": 7.43801652892562,
+                        "width": 26.170798898071624,
+                        "height": 33.47107438016529,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "JoGaX0x_7D",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 37.1900826446281,
+                        "y": 1.6528925619834711,
+                        "width": 24.517906336088153,
+                        "height": 17.355371900826448,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "AA8CLCkp6w",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 3.994490358126722,
+                        "y": 2.8925619834710745,
+                        "width": 16.666666666666664,
+                        "height": 22.107438016528928,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "CrMaULKYEJ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 21.62534435261708,
+                        "y": 13.842975206611573,
+                        "width": 20.798898071625345,
+                        "height": 21.90082644628099,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "FOowXAp1z-",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 26.446280991735538,
+                        "y": 6.6115702479338845,
+                        "width": 18.870523415977956,
+                        "height": 25.826446280991732,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "rZtH2Sj5f4",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 9.917355371900829,
+                        "y": 28.512396694214875,
+                        "width": 26.446280991735538,
+                        "height": 33.67768595041321,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "-wQRysibYP",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 3.443526170798898,
+                        "y": 18.388429752066116,
+                        "width": 27.68595041322314,
+                        "height": 31.198347107438018,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "3j8dH5t7cQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 39.669421487603316,
+                        "y": 36.15702479338843,
+                        "width": 16.391184573002754,
+                        "height": 27.06611570247933,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "f7mW3B1UNk",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 59.36639118457299,
+                        "y": 33.264462809917354,
+                        "width": 26.446280991735538,
+                        "height": 22.520661157024794,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "TTx2V_ZuXC",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 79.06336088154268,
+                        "y": 27.685950413223146,
+                        "width": 16.115702479338843,
+                        "height": 17.56198347107438,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "apWmLATVEa",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 72.03856749311295,
+                        "y": 31.818181818181817,
+                        "width": 20.385674931129476,
+                        "height": 30.99173553719009,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "8AD6yqAcj_",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 62.396694214876035,
+                        "y": 52.27272727272727,
+                        "width": 24.517906336088153,
+                        "height": 18.181818181818183,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "9KhrE9hW4f",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 48.760330578512395,
+                        "y": 45.867768595041326,
+                        "width": 19.696969696969692,
+                        "height": 27.06611570247933,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "e_ztth-MCw",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 8.264462809917356,
+                        "y": 54.9586776859504,
+                        "width": 34.43526170798898,
+                        "height": 23.96694214876033,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "VnboLbgCjb",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 7.024793388429752,
+                        "y": 76.85950413223141,
+                        "width": 25.619834710743795,
+                        "height": 16.115702479338843,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Zb5QLu2QPS",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 38.429752066115704,
+                        "y": 60.95041322314051,
+                        "width": 17.90633608815427,
+                        "height": 25.6198347107438,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "iolD9EV7TY",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 60.88154269972452,
+                        "y": 67.14876033057851,
+                        "width": 23.553719008264462,
+                        "height": 19.214876033057852,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "UXq_WbxppW",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 75.20661157024796,
+                        "y": 56.19834710743802,
+                        "width": 20.661157024793393,
+                        "height": 26.033057851239672,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "BSoUGVVzBy",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 77.13498622589532,
+                        "y": 70.24793388429752,
+                        "width": 19.146005509641874,
+                        "height": 26.446280991735538,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "dbT_wJ3L4N",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 55.09641873278237,
+                        "y": 77.47933884297521,
+                        "width": 18.181818181818187,
+                        "height": 20.66115702479339,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "y48PLZ-n7f",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 30.71625344352617,
+                        "y": 77.68595041322314,
+                        "width": 18.457300275482094,
+                        "height": 17.148760330578515,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "_prZTw18Ng",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 512,
+                    "image_rotation": 0,
+                    "item_index": 213,
+                    "value": {
+                        "x": 2.8925619834710745,
+                        "y": 55.78512396694215,
+                        "width": 30.57851239669421,
+                        "height": 41.11570247933884,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "jq1FrxKRCU",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 2.8767123287671232,
+                        "y": 51.2396694214876,
+                        "width": 32.602739726027394,
+                        "height": 43.80165289256198,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "w0w2dndKFv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 59.45205479452055,
+                        "y": 30.578512396694215,
+                        "width": 23.97260273972602,
+                        "height": 29.75206611570248,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "feydEEMMdu",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 4.794520547945204,
+                        "y": 6.198347107438017,
+                        "width": 16.986301369863014,
+                        "height": 22.933884297520663,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "jhr-qPR_xi",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 14.246575342465754,
+                        "y": 17.97520661157025,
+                        "width": 19.452054794520553,
+                        "height": 9.297520661157025,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "tc4fho7TEi",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 18.08219178082192,
+                        "y": 11.15702479338843,
+                        "width": 23.97260273972602,
+                        "height": 5.578512396694215,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "mKS4huIH7J",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 28.767123287671232,
+                        "y": 4.958677685950414,
+                        "width": 23.15068493150685,
+                        "height": 9.297520661157025,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "3WPUP8QlvS",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 85.47945205479452,
+                        "y": 5.785123966942149,
+                        "width": 13.150684931506849,
+                        "height": 17.97520661157025,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "VZk15hPqbA",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 52.876712328767105,
+                        "y": 25.206611570247933,
+                        "width": 15.890410958904113,
+                        "height": 16.115702479338843,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "M2ETLWD6zl",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 51.23287671232877,
+                        "y": 8.057851239669422,
+                        "width": 16.301369863013697,
+                        "height": 20.041322314049587,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "WPaIsEnH2X",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 71.36986301369863,
+                        "y": 6.818181818181817,
+                        "width": 13.698630136986301,
+                        "height": 22.933884297520663,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "BbdN-8yqpQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 75.47945205479452,
+                        "y": 32.231404958677686,
+                        "width": 6.8493150684931505,
+                        "height": 10.12396694214876,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "svAfA2tEMf",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 82.46575342465754,
+                        "y": 35.9504132231405,
+                        "width": 9.589041095890408,
+                        "height": 14.049586776859504,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "8n6j079Hz6",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 88.9041095890411,
+                        "y": 30.371900826446275,
+                        "width": 4.52054794520548,
+                        "height": 11.983471074380166,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "sNqYXNnu7B",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 95.06849315068493,
+                        "y": 28.305785123966942,
+                        "width": 1.643835616438356,
+                        "height": 24.58677685950413,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "uVc1Bq_zcd",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 86.02739726027397,
+                        "y": 58.677685950413235,
+                        "width": 11.643835616438356,
+                        "height": 15.289256198347104,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "xzzfEwbAin",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 77.53424657534246,
+                        "y": 71.69421487603306,
+                        "width": 12.73972602739726,
+                        "height": 12.603305785123966,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "gVyFm0kzel",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 48.35616438356164,
+                        "y": 61.77685950413223,
+                        "width": 8.493150684931507,
+                        "height": 11.15702479338843,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "DUbuGoqxZZ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 56.57534246575342,
+                        "y": 69.42148760330579,
+                        "width": 7.397260273972603,
+                        "height": 17.355371900826448,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "-gZY-UiCeD",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 58.9041095890411,
+                        "y": 64.04958677685948,
+                        "width": 14.794520547945206,
+                        "height": 15.082644628099173,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ClzxY6jhwj",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 40.821917808219176,
+                        "y": 78.30578512396694,
+                        "width": 9.726027397260276,
+                        "height": 16.115702479338843,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Ou3LbfQND7",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 38.76712328767123,
+                        "y": 49.17355371900826,
+                        "width": 11.232876712328768,
+                        "height": 24.380165289256198,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "wYqmZazfyh",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 41.36986301369864,
+                        "y": 42.768595041322314,
+                        "width": 15.753424657534246,
+                        "height": 22.31404958677686,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "UEQU3bxN1F",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 41.78082191780822,
+                        "y": 30.578512396694208,
+                        "width": 9.315068493150685,
+                        "height": 18.388429752066116,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "GTQpD9cO6U",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 31.506849315068493,
+                        "y": 19.00826446280992,
+                        "width": 8.082191780821917,
+                        "height": 29.958677685950413,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "JPIwVSzw97",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 1.5068493150684932,
+                        "y": 35.33057851239669,
+                        "width": 23.561643835616437,
+                        "height": 20.041322314049587,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ivqttV8OXV",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 12.876712328767123,
+                        "y": 32.02479338842974,
+                        "width": 16.301369863013697,
+                        "height": 18.59504132231405,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "UD8UCQanQK",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 69.31506849315069,
+                        "y": 73.14049586776859,
+                        "width": 28.356164383561644,
+                        "height": 22.107438016528928,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "uB-P3okkZD",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 49.31506849315068,
+                        "y": 82.43801652892562,
+                        "width": 11.780821917808218,
+                        "height": 14.049586776859504,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "QJkfQ-8eXn",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 50.68493150684932,
+                        "y": 79.54545454545455,
+                        "width": 15.479452054794521,
+                        "height": 17.56198347107438,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "9xu3O0K-G2",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 34.38356164383561,
+                        "y": 79.54545454545455,
+                        "width": 10.410958904109592,
+                        "height": 19.62809917355372,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "kkIY4R39AV",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 38.082191780821915,
+                        "y": 74.17355371900827,
+                        "width": 13.424657534246576,
+                        "height": 5.1652892561983474,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "QmSyJCH7Ta",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 768,
+                    "original_height": 509,
+                    "image_rotation": 0,
+                    "item_index": 212,
+                    "value": {
+                        "x": 73.97260273972603,
+                        "y": 61.77685950413223,
+                        "width": 6.027397260273973,
+                        "height": 14.462809917355369,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "5UIR_2RTJa",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                }
+            ]
+        }
+    ],
+    "data": {
+        "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+    },
+    "id": 1,
+    "predictions": [
+        {
+            "created_ago": "3 hours",
+            "model_version": "model 1",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 11.612284069097889,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 34.702495201535505
+                    }
+                }
+            ]
+        },
+        {
+            "created_ago": "4 hours",
+            "model_version": "model 2",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 33.61228406909789,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 54.702495201535505
+                    }
+                }
+            ]
+        }
+    ]
+}

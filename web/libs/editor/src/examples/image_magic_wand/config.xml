@@ -1,0 +1,14 @@
+<View>
+  <Labels name="labels_1" toName="image_1">
+      <Label hotkey="1" value="Snow" background="#f61e33"/>
+      <Label hotkey="2" value="Cloud Shadow" background="#1eae3b"/>
+      <Label hotkey="3" value="Haze" background="#68eee5"/>
+      <Label hotkey="4" value="Cloud" background="#1b32de"/>
+      <Label hotkey="5" value="Exclude" background="#2C2C2B"/>
+  </Labels>
+  <Brush name="brush_1" toName="image_1" />
+  <MagicWand name="magicwand_1" toName="image_1" />
+  <View style="width: 100%; margin-bottom: 20%; margin-side: 10%;">
+    <Image name="image_1" value="$image" zoomControl="true" zoom="true" crossOrigin="anonymous" />
+  </View>
+</View>

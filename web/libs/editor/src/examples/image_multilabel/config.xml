@@ -1,0 +1,11 @@
+<View>
+  <Image name="img" value="$image"></Image>
+  <RectangleLabels name="tag" toName="img" canRotate="false">
+    <Label value="Planet"></Label>
+    <Label value="Moonwalker" background="blue"></Label>
+  </RectangleLabels>
+  <Choices name="choice" toName="img">
+    <Choice value="Space" />
+    <Choice value="Underground" />
+  </Choices>
+</View>

@@ -1,0 +1,31 @@
+[
+    {
+        "data": {
+            "url": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3"
+        },
+        "predictions": [
+            {
+                "model_version": "model 1",
+                "created_ago": "4 hours",
+                "result": [
+                    {
+                        "from_name": "choice",
+                        "id": "hIj6zg57SY",
+                        "to_name": "audio",
+                        "type": "choices",
+                        "value": {
+                            "choices": [
+                                "Lo-Fi"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "data": {
+            "url": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3"
+        }
+    }
+]

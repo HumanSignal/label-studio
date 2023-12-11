@@ -1,0 +1,16 @@
+<View>
+  <Header value="Time Series from CSV"
+          style="font-weight: normal"/>
+
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Run" background="#5b5"/>
+    <Label value="Walk" background="#55f"/>
+  </TimeSeriesLabels>
+
+  <TimeSeries name="ts" valueType="url"
+              timeColumn="time" value="$csv"
+              sep="," overviewChannels="velocity">
+    <Channel column="velocity" strokeColor="#1f77b4"/>
+    <Channel column="acceleration" strokeColor="#ff7f0e"/>
+  </TimeSeries>
+</View>

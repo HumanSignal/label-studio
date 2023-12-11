@@ -1,0 +1,51 @@
+.label
+  --color #ccc
+  --background #e8e8e8
+
+  display inline-flex
+  padding 2px 8px
+  margin 0
+  border-radius 3px
+  font-weight 400
+  font-size 14px
+  line-height 22px
+  background-color var(--background)
+  color #333
+  border-left-style solid
+  border-left-width 4px
+  border-left-color var(--color)
+  position relative
+  align-items center
+
+  &_margins
+    margin 0 8px 8px 0
+
+    &:last-child
+      margin 0 0 8px 0
+
+  &_empty
+    border-left-width 0
+
+  &_hidden
+    display none
+
+  &_clickable
+    cursor pointer
+
+  &_solid
+    background-color var(--color)
+
+  &_selected
+    background-color var(--color)
+    color white
+  &_selected &__hotkey
+    color white
+
+  &__text
+    position relative
+    white-space nowrap
+  &__hotkey
+    position relative
+    color rgba(0, 0, 0, 0.4)
+    font-size 13px
+    margin-left 12px

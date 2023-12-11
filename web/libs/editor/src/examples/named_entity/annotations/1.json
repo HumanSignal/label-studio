@@ -1,0 +1,29 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "result": [
+                {
+                    "from_name": "ner",
+                    "id": "beFiQTT1cU",
+                    "source": "$text",
+                    "to_name": "text",
+                    "type": "labels",
+                    "value": {
+                        "end": 354,
+                        "labels": [
+                            "Date"
+                        ],
+                        "start": 343,
+                        "text": "February 22"
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "text": "Showers continued throughout the week in the Bahia cocoa zone, alleviating the drought since early January and improving prospects for the coming temporao, although normal humidity levels have not been restored, Comissaria Smith said in its weekly review.\n\nThe dry period means the temporao will be late this year. Arrivals for the week ended February 22 were 155,221 bags of 60 kilos making a cumulative total for the season of 5.93 mln against 5.81 at the same stage last year. Again it seems that cocoa delivered earlier on consignment was included in the arrivals figures.\n\nComissaria Smith said there is still some doubt as to how much old crop cocoa is still available as harvesting has practically come to an end. With total Bahia crop estimates around 6.4 mln bags and sales standing at almost 6.2 mln there are a few hundred thousand bags still in the hands of farmers, middlemen, exporters and processors."
+    },
+    "id": 1,
+    "task_path": "../examples/named_entity/tasks.json"
+}

@@ -1,0 +1,10 @@
+<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g opacity="0.4">
+<rect width="28" height="28" rx="14" fill="white"/>
+<rect x="0.5" y="0.5" width="27" height="27" rx="13.5" stroke="currentColor" stroke-opacity="0.5" stroke-dasharray="2 2"/>
+</g>
+<g opacity="0.6">
+<path d="M13 6H15V22H13V6Z" fill="currentColor"/>
+<path d="M6 13H22V15H6V13Z" fill="currentColor"/>
+</g>
+</svg>

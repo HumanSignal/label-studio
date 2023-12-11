@@ -1,0 +1,110 @@
+@import "~antd/dist/antd.css";
+
+@import "./variables";
+@import "./mixins";
+@import "./functions";
+
+.ant-divider-horizontal.ant-divider-with-text-center::before,
+.ant-divider-horizontal.ant-divider-with-text-left::before,
+.ant-divider-horizontal.ant-divider-with-text-right::before,
+.ant-divider-horizontal.ant-divider-with-text-center::after,
+.ant-divider-horizontal.ant-divider-with-text-left::after,
+.ant-divider-horizontal.ant-divider-with-text-right::after {
+  border-top-color: #cecece !important;
+}
+
+.ls-renderall {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.ls-renderall > div {
+  width: 49%;
+  margin-right: 1%;
+}
+
+.ls-fade {
+  opacity: 1;
+  animation-name: fadeInOpacity;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in;
+  animation-duration: 1s;
+}
+
+.htx-highlight > .htx-highlight {
+  padding: 2px;
+}
+
+// .htx-no-highlight {
+//     display: none;
+// }
+
+.htx-no-label:after {
+  display: none;
+}
+
+.htx-highlight {
+  // border: 1px dashed #00aeff;
+}
+
+.htx-highlight-last {
+  // position: relative;
+}
+
+.htx-highlight-last:after {
+  margin-left: 2px;
+  // top: -0.3em;
+  // margin-right: 2px;
+  // position: relative;
+  // color: #1f104d;
+  // font-size: 75%;
+  // font-weight: bold;
+}
+
+.htx-highlight-vertical:after {
+}
+
+.htx-yoyo:after {
+  content: "Yoyo";
+}
+
+@keyframes fadeInOpacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.ant-list-item-action {
+  margin-left: 10px !important;
+}
+
+.ant-modal-confirm-error ul {
+  padding-left: 1.5em;
+}
+
+.react-dropdown-tree-select .node > .toggle {
+  font-family: monospace;
+  font-style: normal;
+  color: initial;
+  cursor: pointer;
+}
+// when node is disabled (when leafsOnly enabled) allow to collapse it by click anywhere
+// achieve this with enormously growing button to the right covering all the text
+.react-dropdown-tree-select .node.disabled > .toggle {
+  padding-right: 100%;
+  margin-right: -100%;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+}
+.react-dropdown-tree-select .node.disabled > label {
+  color: initial;
+  cursor: default;
+}
+.react-dropdown-tree-select .node.disabled > label > input {
+  opacity: 0;
+}

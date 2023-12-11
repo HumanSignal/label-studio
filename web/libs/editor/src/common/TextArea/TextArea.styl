@@ -1,0 +1,38 @@
+.textarea
+    --textarea-surface-color #FAFAFA
+    --textarea-border-size 1px
+    --textarea-border-color #DFDFDF
+    --textarea-border-radius 4px
+    --textarea-font-size 16px
+    --textarea-line-height 24px
+    --textarea-min-height 40px
+    --textarea-letter-spacing 0.5px
+    --textarea-padding 8px 16px
+
+    // @todo refactor the overall input styles to not have to use important to override
+    &_inline
+        --textarea-padding 8px var(--textarea-min-height) 8px 16px 
+
+        display flex
+        align-items center
+        min-height var(--textarea-min-height) !important
+        border var(--textarea-border-size) solid var(--textarea-border-color) !important
+        border-radius var(--textarea-border-radius) !important
+        background-color var(--textarea-surface-color) !important
+        padding var(--textarea-padding) !important
+        font-size var(--textarea-font-size) !important
+        line-height var(--textarea-line-height) !important
+        letter-spacing var(--textarea-letter-spacing) !important
+
+        grid-row 1 / 2
+        grid-column 1 / span 2
+        padding-right var(--textarea-min-height)
+        scrollbar-width none
+        -ms-overflow-style none
+
+        &::-webkit-scrollbar
+                width 0
+                height 0
+
+    &_autosize
+        resize none !important
