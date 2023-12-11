@@ -2,7 +2,7 @@ import { destroy, getParentOfType, getRoot, isAlive, types } from 'mobx-state-tr
 
 import { guidGenerator } from '../core/Helpers';
 import { RelationsModel } from '../tags/control/Relations';
-import { TRAVERSE_SKIP } from '../core/Tree';
+import Tree, { TRAVERSE_SKIP } from '../core/Tree';
 import Area from '../regions/Area';
 import { isDefined } from '../utils/utilities';
 
@@ -122,13 +122,12 @@ const RelationStore = types
   }))
   .actions(self => ({
     afterAttach() {
-      const root = getRoot(self);
-      const c = root.annotationStore.selected;
+      const appStore = getRoot(self);
 
       // find <Relations> tag in the tree
       let relationsTag = null;
 
-      c.traverseTree(function(node) {
+      Tree.traverseTree(appStore.annotationStore.root, function(node) {
         if (node.type === 'relations') {
           relationsTag = node;
           return TRAVERSE_SKIP;
