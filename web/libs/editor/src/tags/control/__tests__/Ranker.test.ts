@@ -7,6 +7,19 @@ import { ListModel } from '../../object/List';
 // @ts-ignore
 import { RankerModel } from '../Ranker';
 
+declare global {
+  interface Window { STORE_INIT_OK?: boolean }
+}
+
+// @todo we don't have a real init process here;
+// @todo so this is temporary fix to overpass the check in AnnotationMixin
+beforeEach(() => {
+  window.STORE_INIT_OK = true;
+});
+afterEach(() => {
+  window.STORE_INIT_OK = undefined;
+});
+
 const MockAnnotationStore = types.model('Annotation', {
   names: types.map(types.union(RankerModel, ListModel)),
 }).volatile(() => ({

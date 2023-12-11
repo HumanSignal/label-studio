@@ -1224,10 +1224,13 @@ export const Annotation = types
         // and object allows such merge — create new result with these labels
         if (!type.endsWith('labels') && value.labels && object.mergeLabelsAndResults) {
           const labels = value.labels;
-          const labelControl = object.states()?.find(control => control?.findLabel(labels[0]));
+          const controls = self.toNames.get(object.name).filter(s => s.type.endsWith('labels'));
+          const labelControl = controls.find(control => control?.findLabel(labels[0]));
 
-          area.setValue(labelControl);
-          area.results.find(r => r.type.endsWith('labels'))?.setValue(labels);
+          if (labelControl) {
+            area.setValue(labelControl);
+            area.results.find(r => r.type.endsWith('labels'))?.setValue(labels);
+          }
         }
       }
     },
