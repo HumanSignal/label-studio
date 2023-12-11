@@ -255,7 +255,7 @@ class Task(TaskMixin, models.Model):
 
         if hasattr(self.project, 'lse_project') and self.project.lse_project.agreement_threshold is not None:
             agreement = get_task_agreement(self)
-            if agreement < self.project.lse_project.agreement_threshold:
+            if agreement is not None and agreement < self.project.lse_project.agreement_threshold:
                 return self.project.lse_project.max_additional_annotators_assignable + self.overlap
         return self.overlap
 
