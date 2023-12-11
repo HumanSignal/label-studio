@@ -191,7 +191,6 @@ const NewTaxonomy = ({
       }}
       treeCheckStrictly
       showCheckedStrategy={TreeSelect.SHOW_ALL}
-      treeExpandAction="click"
       dropdownMatchSelectWidth={dropdownWidth}
       placeholder={options.placeholder || 'Click to add...'}
       style={style}

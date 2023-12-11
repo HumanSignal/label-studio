@@ -993,7 +993,8 @@ export const Annotation = types
                 if (tagNames.has(obj.to_name)) {
                   // Redirect references to existent tool
                   const targetObject = tagNames.get(obj.to_name);
-                  const states = targetObject.states();
+                  // @todo Video tag returns only `*labels` so maybe we have to add this check here
+                  const states = self.toNames.get(targetObject.name);
 
                   if (states?.length) {
                     const altToolsControllerType = obj.type.replace(/labels$/, '');

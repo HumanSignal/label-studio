@@ -1014,7 +1014,7 @@ export default observer(
                     item.setImageRef(ref);
                     this.imageRef.current = ref;
                   }}
-                  loading={(isFF(FF_DEV_3077) && !item.lazyoff) && 'lazy'}
+                  loading={(isFF(FF_DEV_3077) && !item.lazyoff) ? 'lazy' : 'false'}
                   style={item.imageTransform}
                   src={item.currentSrc}
                   onLoad={(e) => {

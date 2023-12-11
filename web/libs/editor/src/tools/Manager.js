@@ -119,9 +119,7 @@ class ToolsManager {
       unrelatedLabels.forEach(tag => tag.unselectAll());
     }
 
-    if (currentTool && currentTool.handleToolSwitch) {
-      currentTool.handleToolSwitch(tool);
-    }
+    currentTool?.handleToolSwitch?.(tool);
 
     if (selected) {
       this.unselectAll();
