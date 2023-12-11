@@ -128,9 +128,8 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
 });
 
 const RelationMeta: FC<any> = ({ relation }) => {
-  const { relations } = relation;
-  const { children, choice } = relations;
-  const selected = relations.getSelected().map((v: any) => v.value);
+  const { selectedValues, control } = relation;
+  const { children, choice } = control;
 
   const selectionMode = useMemo(() => {
     return choice === 'multiple' ? 'multiple' : undefined;
@@ -139,8 +138,7 @@ const RelationMeta: FC<any> = ({ relation }) => {
   const onChange = useCallback((val: any) => {
     const values: any[] = wrapArray(val);
 
-    relations.unselectAll();
-    values.forEach(v => relations.findRelation(v).setSelected(true));
+    relation.setRelations(values);
   }, []);
 
   return (
@@ -149,7 +147,7 @@ const RelationMeta: FC<any> = ({ relation }) => {
         mode={selectionMode}
         style={{ width: '100%' }}
         placeholder="Select labels"
-        defaultValue={selected}
+        defaultValue={selectedValues}
         onChange={onChange}
       >
         {children.map((c: any) => (

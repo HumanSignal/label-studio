@@ -171,6 +171,7 @@ const RelationItemObserver = observer(({ relation, startNode, endNode, visible, 
       endNode={endNode}
       direction={relation.direction}
       visible={visibility}
+      labels={relation.selectedValues}
       {...rest}
     />
   ) : null;
@@ -229,7 +230,6 @@ class RelationsOverlay extends PureComponent {
           rootRef={this.rootNode}
           startNode={relation.node1}
           endNode={relation.node2}
-          labels={relation.relations?.selectedValues()}
           dimm={hasHighlight && !highlighted}
           highlight={highlighted}
           visible={highlighted || visible}

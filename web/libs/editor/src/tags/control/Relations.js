@@ -3,6 +3,7 @@ import { types } from 'mobx-state-tree';
 import Registry from '../../core/Registry';
 import Types from '../../core/Types';
 import { guidGenerator } from '../../core/Helpers';
+import { AnnotationMixin } from '../../mixins/AnnotationMixin';
 
 /**
  * The `Relations` tag is used to create label relations between regions. Use to provide many values to apply to the relationship between two labeled regions.
@@ -38,27 +39,20 @@ const TagAttrs = types.model({
  */
 const ModelAttrs = types
   .model({
+    id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: 'relations',
-    children: Types.unionArray(['relations', 'relation']),
+    children: Types.unionArray(['relation']),
   })
   .views(self => ({
-    getSelected() {
-      return self.children.filter(c => c.selected === true);
+    get values() {
+      return self.children.map(c => c.value);
     },
-
-    selectedValues() {
-      return self.getSelected().map(c => c.value);
-    },
-
     findRelation(value) {
       return self.children.find(c => c.value === value);
     },
   }))
   .actions(self => ({
-    unselectAll() {
-      self.children.map(c => c.setSelected(false));
-    },
   }));
 
 const RelationsModel = types.compose('RelationsModel', ModelAttrs, TagAttrs);
