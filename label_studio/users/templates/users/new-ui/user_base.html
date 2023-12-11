@@ -7,8 +7,8 @@
 {% block head %}
 <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-129877673-1"></script>
-<script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-129877673-1" nonce="{{request.csp_nonce}}"></script>
+<script nonce="{{request.csp_nonce}}">
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
