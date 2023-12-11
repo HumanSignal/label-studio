@@ -1,0 +1,85 @@
+name: "/docker command"
+
+on:
+  repository_dispatch:
+    types: [ deploy-command ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.client_payload.github.payload.issue.number }}-${{ github.event.client_payload.slash_command.command }}-${{ github.event.client_payload.slash_command.args.unnamed.arg1 || github.event.client_payload.slash_command.args.all }}
+
+jobs:
+  create:
+    if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'build' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Check user's membership
+        uses: actions/github-script@v7
+        id: check-membership
+        env:
+          ACTOR: ${{ github.actor }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const actor = process.env.ACTOR;
+            const { data: membership } = await github.rest.orgs.getMembershipForUser({
+              org: owner,
+              username: actor,
+            });
+            if (membership.state != "active") {
+              const error = `Unfortunately you don't have membership in ${owner} organization`;
+              core.setOutput("error", error);
+              core.setFailed(error);
+            }
+
+      - name: "Build Docker Image"
+        id: docker-build
+        uses: ./.github/workflows/docker-build.yml
+        with:
+          sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+          branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Add reaction to command comment on success
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Docker image was pushed with the tag ${{ steps.docker-build.outputs.image_version }}
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "+1"
+
+      - name: Add reaction to command comment on failure
+        uses: peter-evans/create-or-update-comment@v3
+        if: failure()
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > **Error**: failed to execute "${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}" command
+            > ${{ steps.check-membership.outputs.error }}
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "-1"
+
+  help:
+    if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'help' || !contains(fromJson('["create"]'), github.event.client_payload.slash_command.args.unnamed.arg1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Command | Description
+            > --- | ---
+            > /docker build | Build and push custom docker image
+          reaction-type: hooray
