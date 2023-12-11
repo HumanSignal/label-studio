@@ -1,4 +1,6 @@
+import fnmatch
 import logging
+import re
 
 from azure.storage.blob import BlobServiceClient
 from core.utils.params import get_env
@@ -42,3 +44,25 @@ class AZURE(object):
         _, container = cls.get_client_and_container(container, account_name=account_name, account_key=account_key)
         blob = container.get_blob_client(url)
         return dict(blob.get_blob_properties())
+
+    @classmethod
+    def validate_pattern(cls, storage, pattern, glob_pattern=True):
+        logger.debug('Validating Azure Blob Storage connection')
+        client, container = storage.get_client_and_container()
+        if storage.prefix:
+            generator = container.list_blob_names(name_starts_with=storage.prefix, results_per_page=100, timeout=120)
+        else:
+            generator = container.list_blob_names(results_per_page=100, timeout=120)
+        # compile pattern to regex
+        if glob_pattern:
+            pattern = fnmatch.translate(pattern)
+        regex = re.compile(str(pattern))
+        # match pattern against all keys in the container
+        for key in generator:
+            if key.endswith('/'):
+                logger.debug(key + ' is skipped because it is a folder')
+                continue
+            if regex and regex.match(key):
+                logger.debug(key + ' is skipped by regex filter')
+                return True
+        return False

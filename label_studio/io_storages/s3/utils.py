@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import base64
+import fnmatch
 import logging
 from urllib.parse import urlparse
 
@@ -97,3 +98,12 @@ class AWS(object):
         metadata.pop('Body', None)
         metadata.pop('ResponseMetadata', None)
         return metadata
+
+    @classmethod
+    def validate_pattern(cls, storage, pattern, glob_pattern=True):
+        if not storage.regex_filter:
+            storage.regex_filter = fnmatch.translate(pattern) if glob_pattern else pattern
+        obj = next(storage.iterkeys())
+        if obj:
+            return True
+        return False
