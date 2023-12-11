@@ -2796,7 +2796,6 @@ const annotationStore = {
     'actionType': 'submitted',
   }],
   'viewingAllAnnotations': false,
-  'viewingAllPredictions': false,
   'validation': null,
   'sharedStores': {},
 };
@@ -5618,7 +5617,6 @@ const store = {
       'actionType': 'submitted',
     }],
     'viewingAllAnnotations': false,
-    'viewingAllPredictions': false,
     'validation': null,
     'sharedStores': {},
   },

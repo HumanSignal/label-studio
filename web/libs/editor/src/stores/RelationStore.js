@@ -1,4 +1,4 @@
-import { destroy, getParentOfType, getRoot, isAlive, isValidReference, types } from 'mobx-state-tree';
+import { destroy, getParent, getParentOfType, isAlive, isValidReference, types } from 'mobx-state-tree';
 
 import { cloneNode, guidGenerator } from '../core/Helpers';
 import { RelationsModel } from '../tags/control/Relations';
@@ -57,13 +57,14 @@ const Relation = types
   }))
   .actions(self => ({
     afterAttach() {
-      const root = getRoot(self);
-      const c = root.annotationStore.selected;
+      // @todo this should be rewritten to not have any connections to the tree
+      // @todo and to store labels only as strings
+      const annotation = getParent(self.parent);
 
       // find <Relations> tag in the tree
       let relations = null;
 
-      c.traverseTree(function(node) {
+      annotation.traverseTree(function(node) {
         if (node.type === 'relations') {
           relations = node;
           return TRAVERSE_SKIP;

@@ -30,7 +30,6 @@ const AnnotationStoreModel = types
     history: types.array(HistoryItem),
 
     viewingAllAnnotations: types.optional(types.boolean, false),
-    viewingAllPredictions: types.optional(types.boolean, false),
 
     validation: types.maybeNull(types.array(ValidationError)),
   })
@@ -43,12 +42,14 @@ const AnnotationStoreModel = types
     },
 
     get viewingAll() {
-      return self.viewingAllAnnotations || self.viewingAllPredictions;
+      return self.viewingAllAnnotations;
     },
   }))
   .actions(self => {
     function toggleViewingAll() {
-      if (self.viewingAllAnnotations || self.viewingAllPredictions) {
+      self.viewingAllAnnotations = !self.viewingAllAnnotations;
+
+      if (self.viewingAllAnnotations) {
         if (self.selected) {
           self.selected.unselectAll();
           self.selected.selected = false;
@@ -62,25 +63,13 @@ const AnnotationStoreModel = types
       }
     }
 
-    function toggleViewingAllPredictions() {
-      self.viewingAllPredictions = !self.viewingAllPredictions;
-
-      if (self.viewingAllPredictions) self.viewingAllAnnotations = false;
-
-      toggleViewingAll();
-    }
-
+    // @todo that's just an alias, rewrite it everywhere
     function toggleViewingAllAnnotations() {
-      self.viewingAllAnnotations = !self.viewingAllAnnotations;
-
-      if (self.viewingAllAnnotations) self.viewingAllPredictions = false;
-
       toggleViewingAll();
     }
 
     function unselectViewingAll() {
       self.viewingAllAnnotations = false;
-      self.viewingAllPredictions = false;
     }
 
     function _unselectAll() {
@@ -123,9 +112,9 @@ const AnnotationStoreModel = types
     }
 
     /**
-   * Select annotation
-   * @param {*} id
-   */
+     * Select annotation
+     * @param {*} id
+     */
     function selectAnnotation(id, options = {}) {
       if (!self.annotations.length) return null;
 
@@ -159,8 +148,8 @@ const AnnotationStoreModel = types
       getEnv(self).events.invoke('deleteAnnotation', self.store, annotation);
 
       /**
-     * MST destroy annotation
-     */
+       * MST destroy annotation
+       */
       destroy(annotation);
       
       /**
@@ -170,8 +159,8 @@ const AnnotationStoreModel = types
 
       self.selected = null;
       /**
-     * Select other annotation
-     */
+       * Select other annotation
+       */
       if (self.annotations.length > 0) {
         self.selectAnnotation(self.annotations[0].id);
       }
@@ -520,7 +509,6 @@ const AnnotationStoreModel = types
       beforeDestroy,
 
       toggleViewingAllAnnotations,
-      toggleViewingAllPredictions,
 
       initRoot,
       addToName,

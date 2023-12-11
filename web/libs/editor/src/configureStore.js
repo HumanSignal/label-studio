@@ -10,7 +10,7 @@ const getEnvironment = async () => {
   return (await import('./env/production')).default;
 };
 
-// Configure deafult store
+// Configure default store
 export const configureStore = async (params, events) => {
   if (params.options?.secureMode) window.LS_SECURE_MODE = true;
 

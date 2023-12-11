@@ -5,7 +5,7 @@ import { RelationShape } from './RelationShape';
 import { createPropertyWatcher, DOMWatcher } from './watchers';
 
 const parentImagePropsWatch = {
-  parent: ['zoomScale', 'zoomingPositionX', 'zoomingPositionY', 'rotation', 'currentImage'],
+  parent: ['zoomScale', 'zoomingPositionX', 'zoomingPositionY', 'rotation'],
 };
 
 const obtainWatcher = node => {

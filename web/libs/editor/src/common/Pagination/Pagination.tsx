@@ -48,7 +48,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
   pageSizeSelectable = true,
   hotkey,
   onChange,
-}) => {
+}, _ref) => {
   const [inputMode, setInputMode] = useState(false);
 
   const handleChangeSelect = (e:ChangeEvent<HTMLSelectElement>) => {

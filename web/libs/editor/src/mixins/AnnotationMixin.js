@@ -6,6 +6,12 @@ export const AnnotationMixin = types.model('AnnotationMixin', {
 
 }).views((self) => ({
   get annotation() {
+    if (!window.STORE_INIT_OK) {
+      console.log('WE HAVE A BREAKAGE DURING INIT!');
+      // @todo this error is to test it fully in tests, will be removed soon
+      throw new Error('Annotation store should not be accessed during annotation init!');
+    }
+
     if (!isAlive(self)) return null;
     if (isFF(FF_DEV_3391)) {
       const root = getRoot(self);

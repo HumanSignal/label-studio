@@ -890,9 +890,8 @@ export default observer(
 
     renderTools() {
       const { item, store } = this.props;
-      const cs = store.annotationStore;
 
-      if (cs.viewingAllAnnotations || cs.viewingAllPredictions) return null;
+      if (store.annotationStore.viewingAll) return null;
 
       const tools = item.getToolsManager().allTools();
 
