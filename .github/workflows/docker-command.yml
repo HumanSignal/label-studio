@@ -35,6 +35,11 @@ jobs:
               core.setFailed(error);
             }
 
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.after }}
+
       - name: "Build Docker Image"
         id: docker-build
         uses: ./.github/workflows/docker-build.yml
