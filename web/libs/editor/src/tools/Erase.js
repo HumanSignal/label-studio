@@ -27,8 +27,6 @@ const IconDot = ({ size }) => {
 };
 
 const ToolView = observer(({ item }) => {
-  console.log('item.iconClass', item.iconClass);
-
   return (
     <Tool
       label="Eraser"
