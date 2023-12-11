@@ -135,6 +135,7 @@ export const AppStore = types
   .volatile(() => ({
     needsDataFetch: false,
     projectFetch: false,
+    requestsInFlight: new Map(),
   }))
   .actions((self) => ({
     startPolling() {
@@ -541,16 +542,34 @@ export const AppStore = types
      * @param {string} methodName one of the methods in api-config
      * @param {object} params url vars and query string params
      * @param {object} body for POST/PATCH requests
-     * @param {{ errorHandler?: fn }} [options] additional options like errorHandler
+     * @param {{ errorHandler?: fn, headers?: object, allowToCancel?: boolean }} [options] additional options like errorHandler
      */
     apiCall: flow(function* (methodName, params, body, options) {
+      const isAllowCancel = options?.allowToCancel;
+      const controller = new AbortController();
+      const signal = controller.signal;
       const apiTransform = self.SDK.apiTransform?.[methodName];
       const requestParams = apiTransform?.params?.(params) ?? params ?? {};
-      const requestBody = apiTransform?.body?.(body) ?? body ?? undefined;
+      const requestBody = apiTransform?.body?.(body) ?? body ?? {};
+      const requestHeaders = apiTransform?.headers?.(options?.headers) ?? options?.headers ?? {};
+      const requestKey = `${methodName}_${JSON.stringify(params || {})}`;
+      
+      if (isAllowCancel) {
+        requestHeaders.signal = signal;
+        if (self.requestsInFlight.has(requestKey)) {
+          /* if already in flight cancel the first in favor of new one */
+          self.requestsInFlight.get(requestKey).abort();
+          console.log(`Request ${requestKey} canceled`);
+        }
+        self.requestsInFlight.set(requestKey, controller);
+      }
+      let result = yield self.API[methodName](requestParams, { headers: requestHeaders, body: requestBody.body ?? requestBody });
 
-      let result = yield self.API[methodName](requestParams, requestBody);
-
-      if (result.error && result.status !== 404) {
+      if (isAllowCancel) {
+        result.isCanceled = signal.aborted;
+        self.requestsInFlight.delete(requestKey);
+      }
+      if (result.error && result.status !== 404 && !signal.aborted) {
         if (options?.errorHandler?.(result)) {
           return result;
         }

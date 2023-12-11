@@ -181,12 +181,13 @@ export const DataStore = (
       fetch: flow(function* ({ id, query, pageNumber = null, reload = false, interaction, pageSize } = {}) {
         let currentViewId, currentViewQuery;
         const requestId = self.requestId = guidGenerator();
+        const root = getRoot(self);
 
         if (id) {
           currentViewId = id;
           currentViewQuery = query;
         } else {
-          const currentView = getRoot(self).viewsStore.selected;
+          const currentView = root.viewsStore.selected;
 
           currentViewId = currentView?.id;
           currentViewQuery = currentView?.virtual ? currentView?.query : null;
@@ -226,18 +227,18 @@ export const DataStore = (
 
         if (interaction) Object.assign(params, { interaction });
 
-        const data = yield getRoot(self).apiCall(apiMethod, params);
+        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === 'DE' });
 
         // We cancel current request processing if request id
-        // cnhaged during the request. It indicates that something
+        // changed during the request. It indicates that something
         // triggered another request while current one is not yet finished
-        if (requestId !== self.requestId) {
+        if (requestId !== self.requestId || data.isCanceled) {
           console.log(`Request ${requestId} was cancelled by another request`);
           return;
         }
 
         const highlightedID = self.highlighted;
-        const apiMethodSettings = getRoot(self).API.getSettingsByMethodName(apiMethod);
+        const apiMethodSettings = root.API.getSettingsByMethodName(apiMethod);
         const { total, [apiMethod]: list } = data;
         let associatedList = [];
 
@@ -260,7 +261,7 @@ export const DataStore = (
 
         self.loading = false;
 
-        getRoot(self).SDK.invoke('dataFetched', self);
+        root.SDK.invoke('dataFetched', self);
       }),
 
       reload: flow(function* ({ id, query, interaction } = {}) {

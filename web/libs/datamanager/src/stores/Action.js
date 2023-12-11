@@ -59,6 +59,8 @@ export const Action = types.model("Action", {
     isSeparator: types.optional(types.boolean, false),
     isTitle: types.optional(types.boolean, false),
     newStyle: types.optional(types.boolean, false),
+    disabled: types.optional(types.boolean, false),
+    disabledReason: types.optional(types.string, ""),
   } : {}),
 }).volatile(() => ({
   caller: null,

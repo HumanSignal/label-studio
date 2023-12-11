@@ -58,6 +58,6 @@ export const HtmlOrReact = types.custom({
 });
 
 export const ThresholdType = types.model("ThresholdType", {
-  min: types.number,
-  max: types.number,
+  min: types.maybeNull(types.number),
+  max: types.maybeNull(types.number),
 });

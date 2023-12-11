@@ -248,7 +248,7 @@ export class APIProxy {
           rawResponse = await fetch(apiCallURL, requestParams);
         }
 
-        if (raw) return rawResponse;
+        if (raw || rawResponse.isCanceled) return rawResponse;
 
         responseMeta = {
           headers: new Map(Array.from(rawResponse.headers)),

@@ -7,6 +7,7 @@ import { DynamicModel, registerModel } from "../DynamicModel";
 import { CustomJSON } from "../types";
 import { FF_DEV_2536, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 
+const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
 const fileAttributes = types.model({
   "certainty": types.optional(types.maybeNull(types.number), 0),
   "distance": types.optional(types.maybeNull(types.number), 0),
@@ -218,17 +219,19 @@ export const create = (columns) => {
       },
 
       postProcessData(data) {
-        const { total_annotations, total_predictions } = data;
+        const { total_annotations, total_predictions, similarity_score_upper_limit } = data;
 
         if (total_annotations !== null)
           self.totalAnnotations = total_annotations;
         if (total_predictions !== null)
           self.totalPredictions = total_predictions;
+        if (!isNaN(similarity_score_upper_limit))
+          self.similarityUpperLimit = (Math.ceil(similarity_score_upper_limit * SIMILARITY_UPPER_LIMIT_PRECISION) / SIMILARITY_UPPER_LIMIT_PRECISION);
       },
 
     }))
     .preProcessSnapshot((snapshot) => {
-      const { total_annotations, total_predictions, ...sn } = snapshot;
+      const { total_annotations, total_predictions, similarity_score_upper_limit, ...sn } = snapshot;
 
       return {
         ...sn,
@@ -239,6 +242,7 @@ export const create = (columns) => {
         })),
         totalAnnotations: total_annotations,
         totalPredictions: total_predictions,
+        similarityUpperLimit: similarity_score_upper_limit,
       };
     });
 };
