@@ -896,8 +896,6 @@ export default observer(
 
       const tools = item.getToolsManager().allTools();
 
-      console.log('tools', tools);
-
       return (
         <Toolbar tools={tools} />
       );
