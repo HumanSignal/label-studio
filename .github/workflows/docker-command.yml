@@ -2,7 +2,7 @@ name: "/docker command"
 
 on:
   repository_dispatch:
-    types: [ deploy-command ]
+    types: [ docker-command ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.client_payload.github.payload.issue.number }}-${{ github.event.client_payload.slash_command.command }}-${{ github.event.client_payload.slash_command.args.unnamed.arg1 || github.event.client_payload.slash_command.args.all }}
