@@ -1,0 +1,97 @@
+name: "/git command"
+
+on:
+  repository_dispatch:
+    types: [ jira-command ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.client_payload.github.payload.issue.number }}-${{ github.event.client_payload.slash_command.command }}-${{ github.event.client_payload.slash_command.args.unnamed.arg1 || github.event.client_payload.slash_command.args.all }}
+
+jobs:
+  create:
+    if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'create' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Check user's membership
+        uses: actions/github-script@v7
+        id: check-membership
+        env:
+          ACTOR: ${{ github.actor }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const actor = process.env.ACTOR;
+            const { data: membership } = await github.rest.orgs.getMembershipForUser({
+              org: owner,
+              username: actor,
+            });
+            if (membership.state != "active") {
+              const error = `Unfortunately you don't have membership in ${owner} organization, Jira Issue was not created`;
+              core.setOutput("error", error);
+              core.setFailed(error);
+            }
+
+      - name: Checkout Actions Hub
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: HumanSignal/actions-hub
+          path: ./.github/actions-hub
+
+      - name: Jira Create Issue
+        id: jira-create-issue
+        uses: ./.github/actions-hub/actions/jira-create-issue
+        with:
+          jira_server: ${{ vars.JIRA_SERVER }}
+          jira_username: ${{ secrets.JIRA_USERNAME }}
+          jira_token: ${{ secrets.JIRA_TOKEN }}
+          summary: ${{ github.event.client_payload.github.payload.issue.title }}
+          description: ${{ github.event.client_payload.github.payload.issue.body }}
+          project: ${{ github.event.client_payload.slash_command.args.unnamed.arg3 || 'TRIAG' }}
+          type: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 || 'task' }}
+
+      - name: Add reaction to command comment on success
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Jira issue [${{ steps.jira-create-issue.outputs.key }}](${{ steps.jira-create-issue.outputs.link }}) is created
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "+1"
+
+      - name: Add reaction to command comment on failure
+        uses: peter-evans/create-or-update-comment@v3
+        if: failure()
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > **Error**: failed to execute "${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}" command
+            > ${{ steps.check-membership.outputs.error }}
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "-1"
+
+  help:
+    if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'help' || !contains(fromJson('["create"]'), github.event.client_payload.slash_command.args.unnamed.arg1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Command | Description
+            > --- | ---
+            > /jira create [task|bug|story] `PROJECT` | Create a Jira issue in project `PROJECT`
+          reaction-type: hooray

@@ -2,18 +2,18 @@
 title: Start Label Studio
 type: guide
 tier: opensource
-order: 10
+order: 78
 order_enterprise: 0
-meta_title: Start Commands for Label Studio
+meta_title: Start commands for Label Studio
 meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
-section: "Get started"
+section: "Install"
 ---
 
 After you install Label Studio, start the server to start using it. 
 
 ```bash
 label-studio start
-```
+``` 
 
 By default, Label Studio starts with an SQLite database to store labeling tasks and annotations. You can specify different sources and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
 
@@ -69,7 +69,7 @@ export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
 
 !!! note
-    If you are using docker, you can write all your [environment variables into the `.env`](https://docs.docker.com/compose/env-file/) file.
+    If you are using Docker, you can write all your [environment variables into the `.env`](https://docs.docker.com/compose/env-file/) file.
     
     
     

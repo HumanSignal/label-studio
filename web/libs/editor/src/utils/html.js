@@ -1,5 +1,6 @@
 import insertAfter from 'insert-after';
 import * as Checkers from './utilities';
+import sanitizeHTML from 'sanitize-html';
 import Canvas from './canvas';
 
 // fast way to change labels visibility for all text regions
@@ -513,31 +514,53 @@ function findNodeAt(context, at) {
 /**
  * Sanitize html from scripts and iframes
  * @param {string} html
- * @param {object} [options]
- * @param {boolean} [options.useStub] use stub instead of removing to keep tags number and order for html tasks
- * @param {boolean} [options.useHeadStub] use different stub for scripts in head to not have excess tags there
  * @returns {string}
  */
-function sanitizeHtml(html, options = {}) {
+function sanitizeHtml(html = []) {
   if (!html) return '';
 
-  const reScripts = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi;
-  const stub = options.useStub ? '<ls-stub></ls-stub>' : '';
-  const headStub = '<ls-head-stub></ls-head-stub>';
+  const disallowedAttributes = ['onauxclick', 'onafterprint', 'onbeforematch', 'onbeforeprint',
+    'onbeforeunload', 'onbeforetoggle', 'onblur', 'oncancel',
+    'oncanplay', 'oncanplaythrough', 'onchange', 'onclick', 'onclose',
+    'oncontextlost', 'oncontextmenu', 'oncontextrestored', 'oncopy',
+    'oncuechange', 'oncut', 'ondblclick', 'ondrag', 'ondragend',
+    'ondragenter', 'ondragleave', 'ondragover', 'ondragstart',
+    'ondrop', 'ondurationchange', 'onemptied', 'onended',
+    'onerror', 'onfocus', 'onformdata', 'onhashchange', 'oninput',
+    'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup',
+    'onlanguagechange', 'onload', 'onloadeddata', 'onloadedmetadata',
+    'onloadstart', 'onmessage', 'onmessageerror', 'onmousedown',
+    'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout',
+    'onmouseover', 'onmouseup', 'onoffline', 'ononline', 'onpagehide',
+    'onpageshow', 'onpaste', 'onpause', 'onplay', 'onplaying',
+    'onpopstate', 'onprogress', 'onratechange', 'onreset', 'onresize',
+    'onrejectionhandled', 'onscroll', 'onscrollend',
+    'onsecuritypolicyviolation', 'onseeked', 'onseeking', 'onselect',
+    'onslotchange', 'onstalled', 'onstorage', 'onsubmit', 'onsuspend',
+    'ontimeupdate', 'ontoggle', 'onunhandledrejection', 'onunload',
+    'onvolumechange', 'onwaiting', 'onwheel'];
 
-  if (options.useHeadStub) {
-    html = html.replace(/(<head.*?>)(.*?)(<\/head>)/, (_, opener, body, closer) => {
-      return [opener, body.replace(reScripts, headStub), closer].join('');
-    });
-  }
-
-  const sanitized = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi, stub)
-    .replace(/<iframe\b.*?(?:\/>|<\/iframe>)/g, stub)
-    // remove events
-    .replace(/\bon[a-z]+\s*=\s*(?:(['"])(?!\1).+?\1|(?:\S+?\(.*?\)(?=[\s>])))(.*?)/gi, '');
-
-  return sanitized;
+  return sanitizeHTML(html, {
+    allowedTags: false,
+    allowedAttributes: false,
+    disallowedTagsMode: 'discard',
+    disallowedTags: ['script', 'iframe'],
+    nonTextTags: ['script', 'textarea', 'option', 'noscript'],
+    transformTags: {
+      '*': (tagName, attribs) => {
+        Object.keys(attribs).forEach(attr => {
+          // If the attribute is in the disallowed list, remove it
+          if (disallowedAttributes.includes(attr)) {
+            delete attribs[attr];
+          }
+        });
+        return {
+          tagName,
+          attribs,
+        };
+      },
+    },
+  });
 }
 
 export {

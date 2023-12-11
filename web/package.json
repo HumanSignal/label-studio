@@ -7,7 +7,7 @@
     "ls:unit": "nx run labelstudio:unit",
     "ls:e2e": "nx run labelstudio-e2e:e2e",
     "lsf:watch": "nx run editor:build:development --watch",
-    "lsf:serve": "nx run editor:serve:development",
+    "lsf:serve": "MODE=standalone nx run editor:serve:development",
     "lsf:e2e": "cd libs/editor/tests/e2e && yarn test",
     "lsf:integration": "nx run editor:integration",
     "lsf:integration:watch": "nx run editor:integration --watch",
@@ -18,11 +18,11 @@
     "test:unit": "yarn lsf:unit && yarn ls:unit && yarn dm:unit",
     "test:e2e": "yarn ls:e2e && yarn lsf:e2e",
     "test:integration": "yarn lsf:integration",
-    "postinstall": "cd libs/editor && bash scripts/postinstall.sh"
+    "postinstall": "npx -y copy-files-from-to"
   },
   "husky": {
     "hooks": {
-      "post-checkout": "cd libs/editor && bash scripts/postinstall.sh"
+      "post-checkout": "npx -y copy-files-from-to"
     }
   },
   "private": true,
@@ -120,7 +120,7 @@
     "@swc-node/register": "~1.6.7",
     "@swc/cli": "~0.1.62",
     "@swc/core": "1.3.96",
-    "@testing-library/react": "^14.1.2",
+    "@testing-library/react": "^12.1.2",
     "@types/chroma-js": "^2.1.3",
     "@types/jest": "^29.4.0",
     "@types/mini-css-extract-plugin": "^2.5.1",
@@ -212,5 +212,11 @@
       "@babel/plugin-proposal-nullish-coalescing-operator"
     ]
   },
-  "packageManager": "yarn@3.6.0"
+  "packageManager": "yarn@3.6.0",
+  "copyFiles": [
+    {
+      "from": "./node_modules/@martel/audio-file-decoder/decode-audio.wasm",
+      "to": "./node_modules/@martel/audio-file-decoder/dist/decode-audio.wasm"
+    }
+  ]
 }
