@@ -1,4 +1,4 @@
-name: "/git command"
+name: "/jira command"
 
 on:
   repository_dispatch:
