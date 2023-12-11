@@ -1,4 +1,4 @@
-import { destroy, getParent, getParentOfType, isAlive, types } from 'mobx-state-tree';
+import { destroy, getParentOfType, getRoot, isAlive, types } from 'mobx-state-tree';
 
 import { guidGenerator } from '../core/Helpers';
 import { RelationsModel } from '../tags/control/Relations';
@@ -122,7 +122,8 @@ const RelationStore = types
   }))
   .actions(self => ({
     afterAttach() {
-      const c = getParent(self);
+      const root = getRoot(self);
+      const c = root.annotationStore.selected;
 
       // find <Relations> tag in the tree
       let relationsTag = null;
