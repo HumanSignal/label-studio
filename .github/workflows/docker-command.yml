@@ -12,6 +12,8 @@ jobs:
     if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'build' }}
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    outputs:
+      error-msg: ${{ steps.check-membership.outputs.error }}
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
@@ -35,18 +37,27 @@ jobs:
               core.setFailed(error);
             }
 
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.event.after }}
+  build-docker:
+    name: "Build"
+    needs:
+      - create
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+      branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
+    secrets: inherit
 
-      - name: "Build Docker Image"
-        id: docker-build
-        uses: ./.github/workflows/docker-build.yml
-        with:
-          sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-          branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
-
+  notification:
+    if: always()
+    needs:
+      - build-docker
+      - create
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
       - name: Add reaction to command comment on success
         uses: peter-evans/create-or-update-comment@v3
         with:
@@ -54,7 +65,8 @@ jobs:
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
-            > Docker image was pushed with the tag ${{ steps.docker-build.outputs.image_version }}
+            > Docker image build status: ${{ needs.build-docker.result }}
+            > Docker image was pushed with the tag ${{ needs.build-docker.outputs.image_version }}
             >
             > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "+1"
@@ -68,7 +80,7 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             > **Error**: failed to execute "${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}" command
-            > ${{ steps.check-membership.outputs.error }}
+            > ${{ needs.check-membership.outputs.error-msg }}
             > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "-1"
 
