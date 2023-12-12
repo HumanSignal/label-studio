@@ -307,18 +307,20 @@ class GCS(object):
         return {key: value for key, value in blob._properties.items() if key in properties_name}
 
     @classmethod
-    def validate_pattern(cls, client: gcs.Client, storage, pattern, glob_pattern=True):
+    def validate_pattern(cls, storage, pattern, glob_pattern=True):
+        client = storage.get_client()
         blob_iter = client.list_blobs(storage.bucket, prefix=storage.prefix, page_size=100)
         prefix = str(storage.prefix) if storage.prefix else ''
         # compile pattern to regex
         if glob_pattern:
             pattern = fnmatch.translate(pattern)
+        regex = re.compile(str(pattern))
         for blob in blob_iter:
             # skip dir level
             if blob.name == (prefix.rstrip('/') + '/'):
                 continue
             # check regex pattern filter
-            if pattern and re.match(blob.name):
+            if pattern and regex.match(blob.name):
                 logger.debug(blob.name + ' is matched by regex filter')
                 return True
         return False
