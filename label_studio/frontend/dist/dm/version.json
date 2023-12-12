@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-739: [FE] User is not able to update similarity range if filter is applied",
-  "commit": "93aaec64a11d0a57a0b9baf3074f7d3dab386da0",
+  "message": "fix: DIA-706: [FE] Action menu remains open when user select 'Find similar option'",
+  "commit": "4b3dc54df052b7d2868791572668c70f944fa8fe",
   "branch": "master",
-  "date": "2023-12-01T06:12:20Z"
+  "date": "2023-12-12T04:51:04Z"
 }
