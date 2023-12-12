@@ -560,7 +560,7 @@ def configured_project(business_client, annotator_client):
     ]
 
     # get user to be owner
-    users = User.objects.filter(email='business@pytest.net')  # TODO: @nik: how to get proper email for business here?
+    users = User.objects.filter(email='business@pytest.net')  # TODO(nik): how to get proper email for business here?
     project = make_project(_project_for_text_choices_onto_A_B_classes, users[0])
 
     assert project.ml_backends.first().url == 'http://localhost:8999'
