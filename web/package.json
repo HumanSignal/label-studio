@@ -85,6 +85,7 @@
     "sass-loader": "^11.0.1",
     "strman": "^2.0.1",
     "style-loader": "^3.3.3",
+    "toml": "^3.0.0",
     "tslib": "^2.3.0",
     "wavesurfer.js": "^6.0.1",
     "webpack-merge": "^5.9.0"
