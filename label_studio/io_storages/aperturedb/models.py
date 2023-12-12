@@ -49,14 +49,15 @@ class ApertureDBStorageMixin(models.Model):
                 return self._response_status(val)
 
     def get_connection(self):
-        with self._db_lock:
-            if self._db is None:
-                self._db = Connector.Connector(
-                    str(self.hostname),
-                    self.port, user=str(self.username),
-                    password=str(self.password),
-                    token=str(self.token),
-                    use_ssl=self.use_ssl)
+        if self._db is None:
+            with self._db_lock:
+                if self._db is None:
+                    self._db = Connector.Connector(
+                        str(self.hostname),
+                        self.port, user=str(self.username),
+                        password=str(self.password),
+                        token=str(self.token),
+                        use_ssl=self.use_ssl)
         return self._db
 
     def validate_connection(self, client=None):
@@ -76,10 +77,21 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         _('constraints'),
         blank=True, null=True,
         help_text='ApertureDB FindImage constraints (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)')
+    
+    predictions = models.BooleanField(_('predictions'), default=False,
+                                  help_text='Load predictions from ApertureDB?')
+    
+    pred_conditions = models.TextField(
+        _('constraints'),
+        blank=True, null=True,
+        help_text='ApertureDB constraints on predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)')
 
     def iterkeys(self):
         db = self.get_connection()
-        batch = 100
+
+        limit = 60
+        batch = 60
+
         offset = 0
         find_images = {
             "uniqueids": True,
@@ -88,8 +100,6 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         }
         if self.constraints:
             find_images["constrants"] = json.loads(str(self.constraints))
-
-        limit = 1000
 
         while (offset < limit):
             find_images["offset"] = offset
@@ -103,17 +113,77 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
                 yield ent["_uniqueid"]
             offset += batch
 
+    @staticmethod
+    def _adb_to_rectanglelabels(img, bboxen):
+        width = img["width"]
+        height = img["height"]
+        return [{
+            "result": [{
+                "from_name": "label",
+                "to_name": "image",
+                "id": bbx["_uniqueid"],
+                "type": "rectanglelabels",
+                "original_width": width,
+                "original_height": height,
+                "image_rotation": 0,
+                "value": {
+                    "rotation": 0,
+                    "x": 100 * bbx["_coordinates"]["x"] / width,
+                    "y": 100 * bbx["_coordinates"]["y"] / height,
+                    "width": 100 * bbx["_coordinates"]["width"] / width,
+                    "height": 100 * bbx["_coordinates"]["height"] / height,
+                    "rectanglelabels": [bbx["_label"]]
+                }
+            } for bbx in bboxen]
+        }]
+        
+    def _get_bbox_labels(self, key):
+        db = self.get_connection()
+        query = [{
+            "FindImage": {
+                "blobs": False,
+                "_ref": 1,
+                "results": {
+                    "list": ["width", "height"]
+                },
+                "constraints": {
+                    "_uniqueid": ["==", key]
+                }
+            }
+        },{
+            "FindBoundingBox": {
+                "image_ref": 1,
+                "blobs": False,
+                "coordinates": True,
+                "labels": True,
+                "uniqueids": True
+            }
+        }]
+
+        res, _ = db.query(query)
+        status = self._response_status(res)
+        if status == 0:
+            return self._adb_to_rectanglelabels(res[0]["FindImage"]["entities"][0] or {}, res[1]["FindBoundingBox"]["entities"] if res[1]["FindBoundingBox"]["returned"] > 0 else [])
+        if status == 1:  # empty
+            return None
+        raise ValueError(f"Error retrieving ApertureDB image data : {db.get_last_response_str()}")
+
+
     def get_data(self, key):
-        return {
-            settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/aperturedb/?title={self.title}&key={key}'
-        }
+        uri = f'{settings.HOSTNAME}/data/aperturedb/?title={self.title}&key={key}'
+        data = {settings.DATA_UNDEFINED_NAME: uri}
+        if self.predictions:
+            return {
+                "predictions": self._get_bbox_labels(key),
+                "data": data
+            }
+        return data
 
     def get_blob(self, uniqueid):
         db = self.get_connection()
         res, blob = db.query([{
             "FindImage": {
                 "blobs": True,
-                "unique": True,
                 "constraints": {
                     "_uniqueid": ["==", uniqueid]
                 },

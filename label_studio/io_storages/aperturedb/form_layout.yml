@@ -10,7 +10,6 @@ adb_host_config: &adb_host_config
   - type: number
     name: port
     label: Port
-    value: 55555
   - type: text
     name: username
     label: User Name
@@ -37,7 +36,13 @@ ImportStorage:
     fields:
       - type: textarea
         name: constraints
-        label: FindImage Constraints (optional)
+        label: Image Constraints (optional)
+      - type: toggle
+        name: predictions
+        label: Include Predictions
+      - type: textarea
+        name: pred_constraints
+        label: Prediction Constraints (optional)
 
 ExportStorage:
   - columnCount: 3
