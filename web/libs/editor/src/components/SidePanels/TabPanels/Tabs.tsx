@@ -158,7 +158,7 @@ const Tab = ({
 
   const Label = () => (
     <Elem id={`${panelKey}_${tabIndex}_droppable`} name="tab" mod={{ active: locked ? tabIndex === breakPointActiveTab : active }}>
-      {!locked && <Elem name="icon" tag={IconOutlinerDrag} width={20} />}
+      {!locked && <Elem name="icon" tag={IconOutlinerDrag} width={8} />}
       {tabText}
     </Elem>
   );
