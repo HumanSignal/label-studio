@@ -27,9 +27,9 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
-      image_version: ${{ jobs.prepare_build.outputs.image_version }}
-      pretty_branch_name: ${{ jobs.prepare_build.outputs.pretty_branch_name }}
-      sha: ${{ jobs.prepare_build.outputs.sha }}
+      image_version: ${{ steps.version.outputs.image_version }}
+      pretty_branch_name: ${{ steps.version.outputs.pretty_branch_name }}
+      sha: ${{ steps.version.outputs.sha }}
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
@@ -49,10 +49,10 @@ jobs:
           sha="$(git rev-parse HEAD)"
           echo "sha=$sha" >> $GITHUB_OUTPUT
           regexp='^ls-release\/(.*)$'; 
-          if [[ '${{ inputs.branch_name }}' =~ $regexp ]]; then
+          if [[ '$BRANCH_NAME' =~ $regexp ]]; then
             image_version="${BASH_REMATCH[1]}rc${sha}"
           else
-            image_version='${{ inputs.branch_name }}'
+            image_version='$BRANCH_NAME'
           fi
           echo "image_version=${image_version}" >> $GITHUB_OUTPUT
           echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
