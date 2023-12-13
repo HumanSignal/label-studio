@@ -1,12 +1,13 @@
 ---
-title: RectangleLabels
+title: CubeLabels
 type: tags
-order: 424
-meta_title: Rectangle Label Tag to Label Rectangle Bounding Box in Images
-meta_description: Customize Label Studio with the RectangleLabels tag and add labeled rectangle bounding boxes in images for semantic segmentation and object detection machine learning and data science projects.
+order: 406
+is_new: t
+meta_title: Cube Label Tag to Label Cube Bounding Box in Images
+meta_description: Customize Label Studio with the CubeLabels tag and add labeled Cube bounding boxes in images for semantic segmentation and object detection machine learning and data science projects.
 ---
 
-The `RectangleLabels` tag creates labeled rectangles. Use to apply labels to bounding box semantic segmentation tasks.
+The `CubeLabels` tag creates labeled Cubes. Use to apply labels to bounding box semantic segmentation tasks.
 
 Use with the following data types: image.
 
@@ -19,8 +20,8 @@ Use with the following data types: image.
 | [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | Configure whether you can select one or multiple labels |
 | [maxUsages] | <code>number</code> |  | Maximum number of times a label can be used per task |
 | [showInline] | <code>boolean</code> | <code>true</code> | Show labels in the same visual line |
-| [opacity] | <code>float</code> | <code>0.6</code> | Opacity of rectangle |
-| [fillColor] | <code>string</code> |  | Rectangle fill color in hexadecimal |
+| [opacity] | <code>float</code> | <code>0.6</code> | Opacity of Cube |
+| [fillColor] | <code>string</code> |  | Cube fill color in hexadecimal |
 | [strokeColor] | <code>string</code> |  | Stroke color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | Show or hide rotation control |
@@ -61,10 +62,10 @@ Basic labeling configuration for applying labels to rectangular bounding boxes o
 
 ```html
 <View>
-  <RectangleLabels name="labels" toName="image">
+  <CubeLabels name="labels" toName="image">
     <Label value="Person" />
     <Label value="Animal" />
-  </RectangleLabels>
+  </CubeLabels>
   <Image name="image" value="$image" />
 </View>
 ```
