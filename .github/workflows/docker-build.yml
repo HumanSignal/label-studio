@@ -49,10 +49,10 @@ jobs:
           sha="$(git rev-parse HEAD)"
           echo "sha=$sha" >> $GITHUB_OUTPUT
           regexp='^ls-release\/(.*)$'; 
-          if [[ '$BRANCH_NAME' =~ $regexp ]]; then
+          if [[ "$BRANCH_NAME" =~ $regexp ]]; then
             image_version="${BASH_REMATCH[1]}rc${sha}"
           else
-            image_version='$BRANCH_NAME'
+            image_version=$BRANCH_NAME
           fi
           echo "image_version=${image_version}" >> $GITHUB_OUTPUT
           echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
@@ -133,6 +133,12 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: build-info
+
+      - name: Setup docker (missing on MacOS)
+        if: runner.os == 'macos'
+        run: |
+          brew install docker
+          colima start
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.0.0
