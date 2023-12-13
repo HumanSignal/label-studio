@@ -1,12 +1,13 @@
 ---
-title: Rectangle
+title: Cube
 type: tags
-order: 423
-meta_title: Rectangle Tag for Adding Rectangle Bounding Box to Images
-meta_description: Customize Label Studio with the Rectangle tag to add rectangle bounding boxes to images for machine learning and data science projects.
+order: 405
+is_new: t
+meta_title: Cube Tag for Adding Cube Bounding Box to Images
+meta_description: Customize Label Studio with the Cube tag to add Cube bounding boxes to images for machine learning and data science projects.
 ---
 
-The `Rectangle` tag is used to add a rectangle (Bounding Box) to an image without selecting a label. This can be useful when you have only one label to assign to a rectangle.
+The `Cube` tag is used to add a Cube (Bounding Box) to an image without selecting a label. This can be useful when you have only one label to assign to a Cube.
 
 Use with the following data types: image.
 
@@ -16,8 +17,8 @@ Use with the following data types: image.
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
 | toName | <code>string</code> |  | Name of the image to label |
-| [opacity] | <code>float</code> | <code>0.6</code> | Opacity of rectangle |
-| [fillColor] | <code>string</code> |  | Rectangle fill color in hexadecimal |
+| [opacity] | <code>float</code> | <code>0.6</code> | Opacity of Cube |
+| [fillColor] | <code>string</code> |  | Cube fill color in hexadecimal |
 | [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | Stroke color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | Whether to show or hide rotation control |
@@ -30,7 +31,7 @@ Basic labeling configuration for adding rectangular bounding box regions to an i
 
 ```html
 <View>
-  <Rectangle name="rect-1" toName="img-1" />
+  <Cube name="rect-1" toName="img-1" />
   <Image name="img-1" value="$img" />
 </View>
 ```
