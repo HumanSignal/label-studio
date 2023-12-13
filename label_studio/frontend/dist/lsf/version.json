@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-341: Incorrect icon width causing layout issues with TabPanels in monorepo",
-  "commit": "2f5b6e1f3aac6aacf23b66ac64f1d6a8f34d4036",
-  "branch": "master",
-  "date": "2023-12-08T16:36:04Z"
+  "message": "fix: LEAP-368: Don't add visibility to undo history",
+  "commit": "dfe1d775aec59c161147f09b823a9fe8b4ebf70e",
+  "branch": "fb-leap-368/undo-hidden",
+  "date": "2023-12-13T10:11:28Z"
 }
