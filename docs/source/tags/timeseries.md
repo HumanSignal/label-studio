@@ -1,7 +1,7 @@
 ---
 title: TimeSeries
 type: tags
-order: 309
+order: 310
 meta_title: Time Series Tags for Time Series Data
 meta_description: Customize Label Studio with the TimeSeries tag to annotate time series data for machine learning and data science projects.
 ---
