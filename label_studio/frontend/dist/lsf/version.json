@@ -1,6 +1,6 @@
 {
   "message": "LEAP-443: Improve LSF init",
-  "commit": "d4bb8700c375bb73db99e8b686ce8981637bcebf",
+  "commit": "547954a5fa3fa7be9c21b8947397584be3ba1f3c",
   "branch": "fb-leap-443/lsf-init",
-  "date": "2023-12-11T16:17:14Z"
+  "date": "2023-12-13T04:12:27Z"
 }
