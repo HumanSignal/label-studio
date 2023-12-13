@@ -73,6 +73,7 @@ const Model = types.model({
   _value: types.optional(types.string, ''),
   parentTypes: Types.tagsTypes([
     'Labels',
+    'CubeLabels',
     'EllipseLabels',
     'RectangleLabels',
     'PolygonLabels',

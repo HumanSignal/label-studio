@@ -1,0 +1,159 @@
+.block {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.28571429rem;
+  width: fit-content;
+  padding: 0.5em;
+}
+
+.block:empty {
+  display: none;
+}
+
+.divider {
+  margin: 12px 0;
+}
+
+.button {
+  margin: 0.3rem 0;
+}
+
+.wrapperComponent {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  align-self: stretch;
+}
+
+.wrapper {
+  max-width: 100%;
+  width: 100%;
+}
+
+.loading {
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  background: rgba(125,125,125,.15);
+  font-size: 24px;
+}
+
+.image-element {
+  position: absolute;
+}
+
+.image_position {
+  position: absolute;
+  &__top {
+    top: 0;
+  }
+  &__middle {
+    top: 50%;
+    transform: translateY(-50%);
+    &.image_position__center {
+      transform: translate(-50%, -50%);
+    }
+  }
+  &__bottom {
+    bottom: 0;
+  }
+  &__left {
+    left: 0;
+  }
+  &__center {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  &__right {
+    right: 0;
+  }
+}
+
+.container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  // padding hack to fill the empty space with given aspect ratio
+  // see Object3DView.render()
+  .frame {
+    position: absolute;
+    overflow: hidden;
+    height: 0;
+  }
+  .frame_height {
+    width: 100%;
+  }
+  .filler {
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .overlay {
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  img {
+    position: absolute;
+    top: 0;
+  }
+}
+
+.withGallery {
+  margin-bottom: 80px;
+}
+
+.withPagination {
+  padding-top: 30px; // pagination height 24px + 6px offset
+}
+
+.gallery {
+  position: absolute;
+  bottom: -80px;
+  display: flex;
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 8px; // for scroll
+
+  img {
+    cursor: pointer;
+    margin-right: 4px;
+    border: 4px solid transparent;
+    max-width: 120px;
+    height: 60px;
+    object-fit: cover;
+
+    &:hover {
+      border-color: #1890ff66;
+    }
+
+    &.active {
+      border-color: #1890ff;
+    }
+  }
+}
+
+.pagination {
+  position: absolute;
+  top: 0;
+  display: flex;
+  width: 100%;
+  padding-right: 40px; // for toolbar
+}

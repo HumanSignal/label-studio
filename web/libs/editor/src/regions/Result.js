@@ -57,6 +57,7 @@ const Result = types
       'pairwise',
       'videorectangle',
       'ranker',
+      'cubelabels',
     ]),
     // @todo much better to have just a value, not a hash with empty fields
     value: types.model({
@@ -75,6 +76,7 @@ const Result = types
       hypertextlabels: types.maybe(types.array(types.string)),
       paragraphlabels: types.maybe(types.array(types.string)),
       rectanglelabels: types.maybe(types.array(types.string)),
+      cubelabels: types.maybe(types.array(types.string)),
       keypointlabels: types.maybe(types.array(types.string)),
       polygonlabels: types.maybe(types.array(types.string)),
       ellipselabels: types.maybe(types.array(types.string)),

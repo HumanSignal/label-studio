@@ -1,81 +1,65 @@
 import { inject } from 'mobx-react';
 import { destroy, getRoot, getType, types } from 'mobx-state-tree';
 
-import ImageView from '../../../components/ImageView/ImageView';
+import Object3DView from '../../../components/Object3DView/Object3DView';
 import { customTypes } from '../../../core/CustomTypes';
 import Registry from '../../../core/Registry';
 import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
 import { IsReadyWithDepsMixin } from '../../../mixins/IsReadyMixin';
-import { BrushRegionModel } from '../../../regions/BrushRegion';
-import { EllipseRegionModel } from '../../../regions/EllipseRegion';
-import { KeyPointRegionModel } from '../../../regions/KeyPointRegion';
-import { PolygonRegionModel } from '../../../regions/PolygonRegion';
-import { RectRegionModel } from '../../../regions/RectRegion';
+import { CubeRegionModel } from '../../../regions/CubeRegion';
 import * as Tools from '../../../tools';
 import ToolsManager from '../../../tools/Manager';
 import { parseValue } from '../../../utils/data';
-import {
-  FF_DEV_3377,
-  FF_DEV_3666,
-  FF_DEV_3793,
-  FF_DEV_4081,
-  FF_LSDV_4583,
-  FF_LSDV_4583_6,
-  FF_LSDV_4711,
-  FF_ZOOM_OPTIM,
-  isFF
-} from '../../../utils/feature-flags';
 import { guidGenerator } from '../../../utils/unique';
 import { clamp, isDefined } from '../../../utils/utilities';
 import ObjectBase from '../Base';
 import { DrawingRegion } from './DrawingRegion';
-import { ImageEntityMixin } from './ImageEntityMixin';
-import { ImageSelection } from './ImageSelection';
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH, SNAP_TO_PIXEL_MODE } from '../../../components/ImageView/Image';
-import MultiItemObjectBase from '../MultiItemObjectBase';
+import { Object3DEntityMixin } from './Object3DEntityMixin';
+import { Object3DSelection } from './Object3DSelection';
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH, SNAP_TO_PIXEL_MODE } from '../../../components/Object3DView/Object3D';
 
 const IMAGE_PRELOAD_COUNT = 3;
 
 /**
- * The `Image` tag shows an image on the page. Use for all image annotation tasks to display an image on the labeling interface.
+ * The `Object3D` tag shows an object3d on the page. Use for all object3d annotation tasks to display an object3d on the labeling interface.
  *
- * Use with the following data types: images.
+ * Use with the following data types: object3ds.
  *
- * When you annotate image regions with this tag, the annotations are saved as percentages of the original size of the image, from 0-100.
+ * When you annotate object3d regions with this tag, the annotations are saved as percentages of the original size of the object3d, from 0-100.
  *
  * @example
- * <!--Labeling configuration to display an image on the labeling interface-->
+ * <!--Labeling configuration to display an object3d on the labeling interface-->
  * <View>
- *   <!-- Retrieve the image url from the url field in JSON or column in CSV -->
- *   <Image name="image" value="$url" rotateControl="true" zoomControl="true"></Image>
+ *   <!-- Retrieve the object3d url from the url field in JSON or column in CSV -->
+ *   <Object3D name="object3d" value="$url" rotateControl="true" zoomControl="true"></Object3D>
  * </View>
  *
  * @example
- * <!--Labeling configuration to perform multi-image segmentation-->
+ * <!--Labeling configuration to perform multi-object3d segmentation-->
  *
  * <View>
- *   <!-- Retrieve the image url from the url field in JSON or column in CSV -->
- *   <Image name="image" valueList="$images" rotateControl="true" zoomControl="true"></Image>
+ *   <!-- Retrieve the object3d url from the url field in JSON or column in CSV -->
+ *   <Object3D name="object3d" valueList="$object3ds" rotateControl="true" zoomControl="true"></Object3D>
  * </View>
  * <!-- {
  *   "data": {
- *     "images": [
- *       "https://images.unsplash.com/photo-1556740734-7f3a7d7f0f9c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80",
- *       "https://images.unsplash.com/photo-1556740734-7f3a7d7f0f9c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80",
+ *     "object3ds": [
+ *       "https://object3ds.unsplash.com/photo-1556740734-7f3a7d7f0f9c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80",
+ *       "https://object3ds.unsplash.com/photo-1556740734-7f3a7d7f0f9c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80",
  *     ]
  *   }
  * } -->
- * @name Image
- * @meta_title Image Tags for Images
- * @meta_description Customize Label Studio with the Image tag to annotate images for computer vision machine learning and data science projects.
+ * @name Object3D
+ * @meta_title Object3D Tags for Object3Ds
+ * @meta_description Customize Label Studio with the Object3D tag to annotate object3ds for computer vision machine learning and data science projects.
  * @param {string} name                       - Name of the element
- * @param {string} value                      - Data field containing a path or URL to the image
- * @param {string} [valueList]                - References a variable that holds a list of image URLs
+ * @param {string} value                      - Data field containing a path or URL to the object3d
+ * @param {string} [valueList]                - References a variable that holds a list of object3d URLs
  * @param {boolean} [smoothing]               - Enable smoothing, by default it uses user settings
- * @param {string=} [width=100%]              - Image width
- * @param {string=} [maxWidth=750px]          - Maximum image width
- * @param {boolean=} [zoom=false]             - Enable zooming an image with the mouse wheel
- * @param {boolean=} [negativeZoom=false]     - Enable zooming out an image
+ * @param {string=} [width=100%]              - Object3D width
+ * @param {string=} [maxWidth=750px]          - Maximum object3d width
+ * @param {boolean=} [zoom=false]             - Enable zooming an object3d with the mouse wheel
+ * @param {boolean=} [negativeZoom=false]     - Enable zooming out an object3d
  * @param {float=} [zoomBy=1.1]               - Scale factor
  * @param {boolean=} [grid=false]             - Whether to show a grid
  * @param {number=} [gridSize=30]             - Specify size of the grid
@@ -85,10 +69,10 @@ const IMAGE_PRELOAD_COUNT = 3;
  * @param {boolean} [contrastControl=false]   - Show contrast control in toolbar
  * @param {boolean} [rotateControl=false]     - Show rotate control in toolbar
  * @param {boolean} [crosshair=false]         - Show crosshair cursor
- * @param {left|center|right} [horizontalAlignment=left]      - Where to align image horizontally. Can be one of "left", "center", or "right"
- * @param {top|center|bottom} [verticalAlignment=top]         - Where to align image vertically. Can be one of "top", "center", or "bottom"
- * @param {auto|original|fit} [defaultZoom=fit]               - Specify the initial zoom of the image within the viewport while preserving its ratio. Can be one of "auto", "original", or "fit"
- * @param {none|anonymous|use-credentials} [crossOrigin=none] - Configures CORS cross domain behavior for this image, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).
+ * @param {left|center|right} [horizontalAlignment=left]      - Where to align object3d horizontally. Can be one of "left", "center", or "right"
+ * @param {top|center|bottom} [verticalAlignment=top]         - Where to align object3d vertically. Can be one of "top", "center", or "bottom"
+ * @param {auto|original|fit} [defaultZoom=fit]               - Specify the initial zoom of the object3d within the viewport while preserving its ratio. Can be one of "auto", "original", or "fit"
+ * @param {none|anonymous|use-credentials} [crossOrigin=none] - Configures CORS cross domain behavior for this object3d, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).
  */
 const TagAttrs = types.model({
   value: types.maybeNull(types.string),
@@ -129,24 +113,13 @@ const TagAttrs = types.model({
 });
 
 const IMAGE_CONSTANTS = {
-  rectangleModel: 'RectangleModel',
-  rectangleLabelsModel: 'RectangleLabelsModel',
-  ellipseModel: 'EllipseModel',
-  ellipseLabelsModel: 'EllipseLabelsModel',
-  brushLabelsModel: 'BrushLabelsModel',
-  rectanglelabels: 'rectanglelabels',
-  keypointlabels: 'keypointlabels',
-  polygonlabels: 'polygonlabels',
-  brushlabels: 'brushlabels',
-  brushModel: 'BrushModel',
-  ellipselabels: 'ellipselabels',
   cubeModel: 'CubeModel',
   cubeLabelsModel: 'CubeLabelsModel',
   cubelabels: 'cubelabels',
 };
 
 const Model = types.model({
-  type: 'image',
+  type: 'object3d',
 
   // tools: types.array(BaseTool),
 
@@ -164,33 +137,33 @@ const Model = types.model({
 
   /**
    * Mode
-   * brush for Image Segmentation
-   * eraser for Image Segmentation
+   * brush for Object3D Segmentation
+   * eraser for Object3D Segmentation
    */
-  mode: types.optional(types.enumeration(['drawing', 'viewing', 'brush', 'eraser']), 'viewing'),
+  mode: types.optional(types.enumeration(['drawing', 'viewing']), 'viewing'),
 
   regions: types.array(
-    types.union(BrushRegionModel, RectRegionModel, EllipseRegionModel, PolygonRegionModel, KeyPointRegionModel),
+    types.union(CubeRegionModel),
     [],
   ),
 
   drawingRegion: types.optional(DrawingRegion, null),
-  selectionArea: types.optional(ImageSelection, { start: null, end: null }),
+  selectionArea: types.optional(Object3DSelection, { start: null, end: null }),
 }).volatile(() => ({
-  currentImage: undefined,
+  currentObject3D: undefined,
   supportSuggestions: true,
 })).views(self => ({
   get store() {
     return getRoot(self);
   },
 
-  get multiImage() {
+  get multiObject3D() {
     return !!self.isMultiItem;
   },
 
-  // an alias of currentImage to make an interface reusable
+  // an alias of currentObject3D to make an interface reusable
   get currentItemIndex() {
-    return self.currentImage;
+    return self.currentObject3D;
   },
 
   get parsedValue() {
@@ -202,14 +175,14 @@ const Model = types.model({
   },
 
   get currentSrc() {
-    return self.currentImageEntity.src;
+    return self.currentObject3DEntity.src;
   },
 
   get usedValue() {
-    return self.multiImage ? self.valuelist : self.value;
+    return self.multiObject3D ? self.valuelist : self.value;
   },
 
-  get images() {
+  get object3ds() {
     const value = self.parsedValue;
 
     if (!value) return [];
@@ -290,14 +263,10 @@ const Model = types.model({
     return !!self.getToolsManager().allTools()?.length;
   },
 
-  get imageCrossOrigin() {
+  get object3dCrossOrigin() {
     const value = self.crossorigin.toLowerCase();
-
-    if (isFF(FF_LSDV_4711) && (!value || value === 'none')) return 'anonymous';
-
-    if (!isFF(FF_DEV_4081)) {
-      return null;
-    } else if (!value || value === 'none') {
+    
+    if (!value || value === 'none') {
       return null;
     } else {
       return value;
@@ -314,13 +283,6 @@ const Model = types.model({
 
   get zoomedPixelSize() {
     const { naturalWidth, naturalHeight } = self;
-
-    if (isFF(FF_DEV_3793)) {
-      return {
-        x: 100 / naturalWidth,
-        y: 100 / naturalHeight,
-      };
-    }
 
     return {
       x: self.stageWidth / naturalWidth,
@@ -358,27 +320,27 @@ const Model = types.model({
 
   createSerializedResult(region, value) {
     const index = region.item_index ?? 0;
-    const currentImageEntity = self.findImageEntity(index);
+    const currentObject3DEntity = self.findObject3DEntity(index);
 
-    const imageDimension = {
-      original_width: currentImageEntity.naturalWidth,
-      original_height: currentImageEntity.naturalHeight,
-      image_rotation: currentImageEntity.rotation,
+    const object3dDimension = {
+      original_width: currentObject3DEntity.naturalWidth,
+      original_height: currentObject3DEntity.naturalHeight,
+      object3d_rotation: currentObject3DEntity.rotation,
     };
 
-    if (self.multiImage && isDefined(index)) {
-      imageDimension.item_index = index;
+    if (self.multiObject3D && isDefined(index)) {
+      object3dDimension.item_index = index;
     }
 
     // We're using raw region result instead of calulated one when
-    // the image data is not available (image is not yet loaded)
+    // the object3d data is not available (object3d is not yet loaded)
     // As the serialization also happens during region creation,
     // we have to forsee this scenario and avoid using raw result
     // as it can only be present for already created (submitter) regions
-    const useRawResult = !currentImageEntity.imageLoaded && isDefined(region._rawResult);
+    const useRawResult = !currentObject3DEntity.object3dLoaded && isDefined(region._rawResult);
 
     return useRawResult ? structuredClone(region._rawResult) : {
-      ...imageDimension,
+      ...object3dDimension,
       value,
     };
   },
@@ -405,9 +367,6 @@ const Model = types.model({
 
     names.forEach(item => {
       if (
-        item.type === IMAGE_CONSTANTS.rectanglelabels ||
-        item.type === IMAGE_CONSTANTS.brushlabels ||
-        item.type === IMAGE_CONSTANTS.ellipselabels ||
         item.type === IMAGE_CONSTANTS.cubelabels
       ) {
         returnedControl = item;
@@ -443,50 +402,20 @@ const Model = types.model({
   get canvasSize() {
     if (self.isSideways) {
       return {
-        width: isFF(FF_DEV_3377)
-          ? self.naturalHeight * self.stageZoomX
-          : Math.round(self.naturalHeight * self.stageZoomX),
-        height: isFF(FF_DEV_3377)
-          ? self.naturalWidth * self.stageZoomY
-          : Math.round(self.naturalWidth * self.stageZoomY),
+        width: Math.round(self.naturalHeight * self.stageZoomX),
+        height: Math.round(self.naturalWidth * self.stageZoomY),
       };
     }
 
     return {
-      width: isFF(FF_DEV_3377)
-        ? self.naturalWidth * self.stageZoomX
-        : Math.round(self.naturalWidth * self.stageZoomX),
-      height: isFF(FF_DEV_3377)
-        ? self.naturalHeight * self.stageZoomY
-        : Math.round(self.naturalHeight * self.stageZoomY),
+      width: Math.round(self.naturalWidth * self.stageZoomX),
+      height: Math.round(self.naturalHeight * self.stageZoomY),
     };
   },
 
   get alignmentOffset() {
     const offset = { x: 0, y: 0 };
 
-    if (isFF(FF_ZOOM_OPTIM)) {
-      switch (self.horizontalalignment) {
-        case 'center': {
-          offset.x = (self.containerWidth - self.canvasSize.width) / 2;
-          break;
-        }
-        case 'right': {
-          offset.x = (self.containerWidth - self.canvasSize.width);
-          break;
-        }
-      }
-      switch (self.verticalalignment) {
-        case 'center': {
-          offset.y = (self.containerHeight - self.canvasSize.height) / 2;
-          break;
-        }
-        case 'bottom': {
-          offset.y = (self.containerHeight - self.canvasSize.height);
-          break;
-        }
-      }
-    }
     return offset;
   },
 
@@ -497,13 +426,13 @@ const Model = types.model({
     return !!self.drawingRegion;
   },
 
-  get imageTransform() {
+  get object3dTransform() {
     const imgStyle = {
-      // scale transform leaves gaps on image border, so much better to change image sizes
+      // scale transform leaves gaps on object3d border, so much better to change object3d sizes
       width: `${self.stageWidth * self.zoomScale}px`,
       height: `${self.stageHeight * self.zoomScale}px`,
       transformOrigin: 'left top',
-      // We should always set some transform to make the image rendering in the same way all the time
+      // We should always set some transform to make the object3d rendering in the same way all the time
       transform: 'translate3d(0,0,0)',
       filter: `brightness(${self.brightnessGrade}%) contrast(${self.contrastGrade}%)`,
     };
@@ -584,30 +513,30 @@ const Model = types.model({
     const manager = ToolsManager.getInstance({ name: self.name });
     const env = { manager, control: self, object: self };
 
-    function createImageEntities() {
+    function createObject3DEntities() {
       if (!self.store.task) return;
 
-      const parsedValue = self.multiImage
+      const parsedValue = self.multiObject3D
         ? self.parsedValueList
         : self.parsedValue;
 
       if (Array.isArray(parsedValue)) {
         parsedValue.forEach((src, index) => {
-          self.imageEntities.push({
+          self.object3dEntities.push({
             id: `${self.name}#${index}`,
             src,
             index,
           });
         });
       } else {
-        self.imageEntities.push({
+        self.object3dEntities.push({
           id: `${self.name}#0`,
           src: parsedValue,
           index: 0,
         });
       }
 
-      self.setCurrentImage(0);
+      self.setCurrentObject3D(0);
     }
 
     function afterAttach() {
@@ -626,15 +555,15 @@ const Model = types.model({
       if (self.rotatecontrol)
         manager.addTool('RotateTool', Tools.Rotate.create({}, env));
 
-      createImageEntities();
+      createObject3DEntities();
     }
 
     function afterResultCreated(region) {
       if (!region) return;
       if (region.classification) return;
-      if (!self.multiImage) return;
+      if (!self.multiObject3D) return;
 
-      region.setItemIndex?.(self.currentImage);
+      region.setItemIndex?.(self.currentObject3D);
     }
 
     function getToolsManager() {
@@ -652,25 +581,11 @@ const Model = types.model({
     return {
       views: {
         getSkipInteractions() {
-          if (isFF(FF_ZOOM_OPTIM)) {
-            if (skipInteractions) return true;
+          const manager = self.getToolsManager();
 
-            const relationMode = self.annotation.relationMode;
+          const isPanning = manager.findSelectedTool()?.toolName === 'ZoomPanTool';
 
-            if (relationMode) return false;
-
-            const manager = self.getToolsManager();
-            const tool = manager.findSelectedTool();
-            const canInteractWithRegions = tool?.canInteractWithRegions;
-
-            return !canInteractWithRegions;
-          } else {
-            const manager = self.getToolsManager();
-
-            const isPanning = manager.findSelectedTool()?.toolName === 'ZoomPanTool';
-
-            return skipInteractions || isPanning;
-          }
+          return skipInteractions || isPanning;
         },
       },
       actions: {
@@ -693,8 +608,8 @@ const Model = types.model({
     },
 
     afterRegionSelected(region) {
-      if (self.multiImage) {
-        self.setCurrentImage(region.item_index);
+      if (self.multiObject3D) {
+        self.setCurrentObject3D(region.item_index);
       }
     },
 
@@ -714,7 +629,7 @@ const Model = types.model({
         ...areaValue,
         results: [result],
         dynamic,
-        item_index: self.currentImage,
+        item_index: self.currentObject3D,
       };
 
       self.drawingRegion = areaRaw;
@@ -749,7 +664,7 @@ const Model = types.model({
     },
 
     /**
-     * Update brightnessGrade of Image
+     * Update brightnessGrade of Object3D
      * @param {number} value
      */
     setBrightnessGrade(value) {
@@ -764,36 +679,35 @@ const Model = types.model({
       self.gridsize = String(value);
     },
 
-    // an alias of setCurrentImage for making an interface reusable
+    // an alias of setCurrentObject3D for making an interface reusable
     setCurrentItem(index = 0) {
-      self.setCurrentImage(index);
+      self.setCurrentObject3D(index);
     },
 
-    setCurrentImage(index = 0) {
+    setCurrentObject3D(index = 0) {
       index = index ?? 0;
-      if (index === self.currentImage) return;
+      if (index === self.currentObject3D) return;
 
-      self.currentImage = index;
-      self.currentImageEntity = self.findImageEntity(index);
-      if (isFF(FF_LSDV_4583_6)) self.preloadImages();
+      self.currentObject3D = index;
+      self.currentObject3DEntity = self.findObject3DEntity(index);
     },
 
-    preloadImages() {
-      self.currentImageEntity.setImageLoaded(false);
-      self.currentImageEntity.preload();
+    preloadObject3Ds() {
+      self.currentObject3DEntity.setObject3DLoaded(false);
+      self.currentObject3DEntity.preload();
 
-      if (self.multiImage) {
-        const [currentIndex, length] = [self.currentImage, self.imageEntities.length];
+      if (self.multiObject3D) {
+        const [currentIndex, length] = [self.currentObject3D, self.object3dEntities.length];
         const prevSliceIndex = clamp(currentIndex - IMAGE_PRELOAD_COUNT, 0, currentIndex);
         const nextSliceIndex = clamp(currentIndex + 1 + IMAGE_PRELOAD_COUNT, currentIndex, length - 1);
 
-        const images = [
-          ...self.imageEntities.slice(prevSliceIndex, currentIndex),
-          ...self.imageEntities.slice(currentIndex + 1, nextSliceIndex),
+        const object3ds = [
+          ...self.object3dEntities.slice(prevSliceIndex, currentIndex),
+          ...self.object3dEntities.slice(currentIndex + 1, nextSliceIndex),
         ];
 
-        images.forEach((imageEntity) => {
-          imageEntity.preload();
+        object3ds.forEach((object3dEntity) => {
+          object3dEntity.preload();
         });
       }
     },
@@ -818,26 +732,26 @@ const Model = types.model({
       const maxScale = self.maxScale;
       const coverScale = self.coverScale;
 
-      if (maxScale > 1) { // image < container
+      if (maxScale > 1) { // object3d < container
         if (scale < maxScale) { // scale = 1 or before stage size is max
           self.stageZoom = scale; // scale stage
-          self.zoomScale = 1; // don't scale image
+          self.zoomScale = 1; // don't scale object3d
         } else {
           self.stageZoom = maxScale; // scale stage to max
-          self.zoomScale = scale / maxScale; // scale image for the rest scale
+          self.zoomScale = scale / maxScale; // scale object3d for the rest scale
         }
-      } else { // image > container
+      } else { // object3d > container
         if (scale > maxScale) { // scale = 1 or any other zoom bigger then viewport
           self.stageZoom = maxScale; // stage squizzed
-          self.zoomScale = scale; // scale image for the rest scale : scale image usually
-        } else { // negative zoom bigger than image negative scale
+          self.zoomScale = scale; // scale object3d for the rest scale : scale object3d usually
+        } else { // negative zoom bigger than object3d negative scale
           self.stageZoom = scale; // squize stage more
-          self.zoomScale = 1; // don't scale image
+          self.zoomScale = 1; // don't scale object3d
         }
       }
 
       if (self.zoomScale > 1) {
-        // zoomScale scales image above maxScale, so scale the rest of stage the same way
+        // zoomScale scales object3d above maxScale, so scale the rest of stage the same way
         const z = Math.min(maxScale * self.zoomScale, coverScale);
 
         if (self.containerWidth / self.naturalWidth > self.containerHeight / self.naturalHeight) {
@@ -853,10 +767,10 @@ const Model = types.model({
       }
     },
 
-    updateImageAfterZoom() {
+    updateObject3DAfterZoom() {
       const { stageWidth, stageHeight } = self;
 
-      self._recalculateImageParams();
+      self._recalculateObject3DParams();
 
       if (stageWidth !== self.stageWidth || stageHeight !== self.stageHeight) {
         self._updateRegionsSizes({
@@ -869,9 +783,7 @@ const Model = types.model({
     },
 
     setZoomPosition(x, y) {
-      const [width, height] = isFF(FF_DEV_3377)
-        ? [self.canvasSize.width, self.canvasSize.height]
-        : [self.containerWidth, self.containerHeight];
+      const [width, height] = [self.containerWidth, self.containerHeight];
 
       const [minX, minY] = [
         width - self.stageComponentSize.width * self.zoomScale,
@@ -886,9 +798,7 @@ const Model = types.model({
       const { stageComponentSize, zoomScale } = self;
       const { width, height } = stageComponentSize;
 
-      const [containerWidth, containerHeight] = isFF(FF_DEV_3377)
-        ? [self.canvasSize.width, self.canvasSize.height]
-        : [self.containerWidth, self.containerHeight];
+      const [containerWidth, containerHeight] = [self.containerWidth, self.containerHeight];
 
       self.setZoomPosition((containerWidth - width * zoomScale) / 2, (containerHeight - height * zoomScale) / 2);
     },
@@ -898,7 +808,7 @@ const Model = types.model({
 
       self.defaultzoom = 'fit';
       self.setZoom(maxScale);
-      self.updateImageAfterZoom();
+      self.updateObject3DAfterZoom();
       self.resetZoomPositionToCenter();
     },
 
@@ -907,14 +817,14 @@ const Model = types.model({
 
       self.defaultzoom = 'original';
       self.setZoom(maxScale > 1 ? 1 : 1 / maxScale);
-      self.updateImageAfterZoom();
+      self.updateObject3DAfterZoom();
       self.resetZoomPositionToCenter();
     },
 
     sizeToAuto() {
       self.defaultzoom = 'auto';
       self.setZoom(1);
-      self.updateImageAfterZoom();
+      self.updateObject3DAfterZoom();
       self.resetZoomPositionToCenter();
     },
 
@@ -926,13 +836,13 @@ const Model = types.model({
         if (self.negativezoom !== true && zoomScale <= 1) {
           self.setZoom(1);
           self.setZoomPosition(0, 0);
-          self.updateImageAfterZoom();
+          self.updateObject3DAfterZoom();
           return;
         }
         if (zoomScale <= 1) {
           self.setZoom(zoomScale);
           self.setZoomPosition(0, 0);
-          self.updateImageAfterZoom();
+          self.updateObject3DAfterZoom();
           return;
         }
 
@@ -954,20 +864,20 @@ const Model = types.model({
         };
 
         self.setZoomPosition(zoomingPosition.x, zoomingPosition.y);
-        self.updateImageAfterZoom();
+        self.updateObject3DAfterZoom();
       }
     },
 
     /**
-     * Set mode of Image (drawing and viewing)
+     * Set mode of Object3D (drawing and viewing)
      * @param {string} mode
      */
     setMode(mode) {
       self.mode = mode;
     },
 
-    setImageRef(ref) {
-      self.imageRef = ref;
+    setObject3DRef(ref) {
+      self.object3dRef = ref;
     },
 
     setContainerRef(ref) {
@@ -1022,15 +932,15 @@ const Model = types.model({
         );
       }
 
-      self.updateImageAfterZoom();
+      self.updateObject3DAfterZoom();
     },
 
-    _recalculateImageParams() {
-      self.stageWidth = isFF(FF_DEV_3377) ? self.naturalWidth * self.stageZoom : Math.round(self.naturalWidth * self.stageZoom);
-      self.stageHeight = isFF(FF_DEV_3377) ? self.naturalHeight * self.stageZoom : Math.round(self.naturalHeight * self.stageZoom);
+    _recalculateObject3DParams() {
+      self.stageWidth = Math.round(self.naturalWidth * self.stageZoom);
+      self.stageHeight = Math.round(self.naturalHeight * self.stageZoom);
     },
 
-    _updateImageSize({ width, height, userResize }) {
+    _updateObject3DSize({ width, height, userResize }) {
       if (self.naturalWidth === undefined) {
         return;
       }
@@ -1046,7 +956,7 @@ const Model = types.model({
         // reinit zoom to calc stageW/H
         self.setZoom(self.currentZoom);
 
-        self._recalculateImageParams();
+        self._recalculateObject3DParams();
 
         const zoomChangeRatio = self.stageZoom / prevStageZoom;
         const scaleChangeRatio = self.zoomScale / prevZoomScale;
@@ -1075,12 +985,12 @@ const Model = types.model({
       self.annotation.history.freeze();
 
       self.regions.forEach(shape => {
-        shape.updateImageSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
+        shape.updateObject3DSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
       });
       self.regs.forEach(shape => {
-        shape.updateImageSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
+        shape.updateObject3DSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
       });
-      self.drawingRegion?.updateImageSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
+      self.drawingRegion?.updateObject3DSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
 
       setTimeout(self.annotation.history.unfreeze, 0);
 
@@ -1091,14 +1001,14 @@ const Model = types.model({
       }
     },
 
-    updateImageSize(ev) {
-      const { naturalWidth, naturalHeight } = self.imageRef ?? ev.target;
+    updateObject3DSize(ev) {
+      const { naturalWidth, naturalHeight } = self.object3dRef ?? ev.target;
       const { offsetWidth, offsetHeight } = self.containerRef;
 
       self.naturalWidth = naturalWidth;
       self.naturalHeight = naturalHeight;
 
-      self._updateImageSize({ width: offsetWidth, height: offsetHeight });
+      self._updateObject3DSize({ width: offsetWidth, height: offsetHeight });
       // after regions' sizes adjustment we have to reset all saved history changes
       // mobx do some batch update here, so we have to reset it asynchronously
       // this happens only after initial load, so it's safe
@@ -1114,15 +1024,7 @@ const Model = types.model({
     },
 
     checkLabels() {
-      let labelStates;
-
-      if (isFF(FF_DEV_3666)) {
-        // there should be at least one available label or none of them should be selected
-        labelStates = self.activeStates() || [];
-      } else {
-        // there is should be at least one state selected for *labels object
-        labelStates = (self.states() || []).filter(s => s.type.includes('labels'));
-      }
+      const labelStates = (self.states() || []).filter(s => s.type.includes('labels'));
       const selectedStates = self.getAvailableStates();
 
       return selectedStates.length !== 0 || labelStates.length === 0;
@@ -1136,12 +1038,12 @@ const Model = types.model({
     },
 
     /**
-     * Resize of image canvas
+     * Resize of object3d canvas
      * @param {*} width
      * @param {*} height
      */
     onResize(width, height, userResize) {
-      self._updateImageSize({ width, height, userResize });
+      self._updateObject3DSize({ width, height, userResize });
     },
 
     event(name, ev, screenX, screenY) {
@@ -1156,7 +1058,7 @@ const Model = types.model({
 
 const CoordsCalculations = types.model()
   .actions(self => ({
-    // convert screen coords to image coords considering zoom
+    // convert screen coords to object3d coords considering zoom
     fixZoomedCoords([x, y]) {
       if (!self.stageRef) {
         return [x, y];
@@ -1168,7 +1070,7 @@ const CoordsCalculations = types.model()
       return [p.x, p.y];
     },
 
-    // convert image coords to screen coords considering zoom
+    // convert object3d coords to screen coords considering zoom
     zoomOriginalCoords([x, y]) {
       const p = self.stageRef.getAbsoluteTransform().point({ x, y });
 
@@ -1186,10 +1088,10 @@ const CoordsCalculations = types.model()
      */
 
     /**
-     * Wrap point operations to convert zoomed coords from screen to image and back
-     * Good for event handlers, receiving screen coords, but working with image coords
+     * Wrap point operations to convert zoomed coords from screen to object3d and back
+     * Good for event handlers, receiving screen coords, but working with object3d coords
      * Accepts both [x, y] and {x, y} points; preserves this format
-     * @param {PointFn} fn wrapped function do some math with image coords
+     * @param {PointFn} fn wrapped function do some math with object3d coords
      * @return {PointFn} outer function do some math with screen coords
      */
     fixForZoom(fn) {
@@ -1208,9 +1110,6 @@ const CoordsCalculations = types.model()
   .views(self => ({
     // helps to calculate rotation because internal coords are square and real one usually aren't
     get whRatio() {
-      // don't need this for absolute coords
-      if (!isFF(FF_DEV_3793)) return 1;
-
       return self.stageWidth / self.stageHeight;
     },
 
@@ -1249,21 +1148,20 @@ const AbsoluteCoordsCalculations = CoordsCalculations
     },
   }));
 
-const ImageModel = types.compose(
-  'ImageModel',
+const Object3DModel = types.compose(
+  'Object3DModel',
   TagAttrs,
   ObjectBase,
-  ...(isFF(FF_LSDV_4583) ? [MultiItemObjectBase] : []),
   AnnotationMixin,
   IsReadyWithDepsMixin,
-  ImageEntityMixin,
+  Object3DEntityMixin,
   Model,
-  isFF(FF_DEV_3793) ? CoordsCalculations : AbsoluteCoordsCalculations,
+  AbsoluteCoordsCalculations,
 );
 
-const HtxImage = inject('store')(ImageView);
+const HtxObject3D = inject('store')(Object3DView);
 
-Registry.addTag('image', ImageModel, HtxImage);
-Registry.addObjectType(ImageModel);
+Registry.addTag('object3d', Object3DModel, HtxObject3D);
+Registry.addObjectType(Object3DModel);
 
-export { ImageModel, HtxImage };
+export { Object3DModel, HtxObject3D };

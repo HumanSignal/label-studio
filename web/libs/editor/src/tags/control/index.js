@@ -1,4 +1,6 @@
 import { ChoicesModel } from './Choices';
+import { CubeModel } from './Cube';
+import { CubeLabelsModel } from './CubeLabels';
 import { DateTimeModel } from './DateTime';
 import { NumberModel } from './Number';
 import { PairwiseModel } from './Pairwise';
@@ -31,6 +33,8 @@ import { RelationModel } from './Relation';
 
 export {
   ChoicesModel,
+  CubeModel,
+  CubeLabelsModel,
   DateTimeModel,
   NumberModel,
   PairwiseModel,

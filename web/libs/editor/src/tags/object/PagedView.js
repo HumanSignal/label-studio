@@ -27,12 +27,14 @@ const Model = types.model({
     'number',
     'rating',
     'ranker',
+    'cube',
     'rectangle',
     'ellipse',
     'polygon',
     'keypoint',
     'brush',
     'magicwand',
+    'cubelabels',
     'rectanglelabels',
     'ellipselabels',
     'polygonlabels',
@@ -62,6 +64,7 @@ const Model = types.model({
     'paragraphlabels',
     'video',
     'videorectangle',
+    'object3d',
   ]),
 });
 

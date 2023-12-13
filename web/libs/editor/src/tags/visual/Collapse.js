@@ -40,11 +40,13 @@ const PanelModel = types.model({
     'choice',
     'rating',
     'ranker',
+    'cube',
     'rectangle',
     'ellipse',
     'polygon',
     'keypoint',
     'brush',
+    'cubelabels',
     'rectanglelabels',
     'ellipselabels',
     'polygonlabels',
@@ -68,6 +70,7 @@ const PanelModel = types.model({
     'timeserieslabels',
     'paragraphs',
     'paragraphlabels',
+    'object3d',
   ]),
 });
 

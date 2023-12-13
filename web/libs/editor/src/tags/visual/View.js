@@ -57,12 +57,14 @@ const Model = types
       'number',
       'rating',
       'ranker',
+      'cube',
       'rectangle',
       'ellipse',
       'polygon',
       'keypoint',
       'brush',
       'magicwand',
+      'cubelabels',
       'rectanglelabels',
       'ellipselabels',
       'polygonlabels',
@@ -93,6 +95,7 @@ const Model = types
       'video',
       'videorectangle',
       'ranker',
+      'object3d',
     ]),
   });
 
