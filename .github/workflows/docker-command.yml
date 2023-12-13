@@ -60,27 +60,26 @@ jobs:
     steps:
       - name: Add reaction to command comment on success
         uses: peter-evans/create-or-update-comment@v3
+        if: needs.build-docker.result != 'failure'
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
-            > Docker image build status: ${{ needs.build-docker.result }}
-            > Docker image was pushed with the tag ${{ needs.build-docker.outputs.image_version }}
+            > Docker image was pushed with the tag `${{ needs.build-docker.outputs.image_version }}`
             >
             > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "+1"
 
       - name: Add reaction to command comment on failure
         uses: peter-evans/create-or-update-comment@v3
-        if: failure()
+        if: needs.build-docker.result == 'failure'
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             > **Error**: failed to execute "${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}" command
-            > ${{ needs.check-membership.outputs.error-msg }}
             > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "-1"
 
