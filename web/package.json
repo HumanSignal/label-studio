@@ -78,7 +78,8 @@
     "sanitize-html": "^2.11.0",
     "strman": "^2.0.1",
     "wavesurfer.js": "^6.0.1",
-    "xpath-range": "^1.1.1"
+    "xpath-range": "^1.1.1",
+    "toml": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.13",
@@ -211,7 +212,6 @@
       "@babel/plugin-proposal-nullish-coalescing-operator"
     ]
   },
-  "packageManager": "yarn@3.6.0",
   "copyFiles": [
     {
       "from": "./node_modules/@martel/audio-file-decoder/decode-audio.wasm",

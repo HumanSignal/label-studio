@@ -1,7 +1,6 @@
 import { observer } from "mobx-react";
 import React from "react";
 import { FilterInput } from "../FilterInput";
-import { VariantSelect } from "./List";
 
 const BaseInput = observer(({ value, onChange, placeholder }) => {
   return (
@@ -45,11 +44,5 @@ export const StringFilter = [
     label: "not equal",
     valueType: "single",
     input: (props) => <BaseInput {...props} />,
-  },
-  {
-    key: "similar_to",
-    label: "similar to",
-    valueType: "list",
-    input: (props) => <VariantSelect {...props} />,
   },
 ];

@@ -73,6 +73,7 @@ export const ActionsButton = injector(observer(({ store, size, hasSelected, ...r
     const onClick = useCallback((e) => {
       e.preventDefault();
       e.stopPropagation();
+      if (action.disabled) return;
       action?.callback ? action?.callback(store.currentView?.selected?.snapshot, action) : invokeAction(action, isDeleteAction);
       parentRef?.current?.close?.();
     }, [store.currentView?.selected]);
@@ -88,12 +89,13 @@ export const ActionsButton = injector(observer(({ store, size, hasSelected, ...r
           isSeparator: action.isSeparator,
           isTitle: action.isTitle,
           danger: isDeleteAction,
+          disabled: action.disabled,
         }}
         name='actionButton'
       >
-        <Elem name='titleContainer'>
+        <Elem name='titleContainer' {...(action.disabled ? { title: action.disabledReason } : {})}>
           <Elem name='title'>{action.title}</Elem>
-          {hasChildren ? <Elem name='icon' tag={FaChevronRight} /> : null}
+          {(hasChildren) ? <Elem name='icon' tag={FaChevronRight} /> : null}
         </Elem>
       </Block>
     );
@@ -125,8 +127,9 @@ export const ActionsButton = injector(observer(({ store, size, hasSelected, ...r
           key={action.id}
           danger={isDeleteAction}
           onClick={onClick}
-          className={`actionButton${action.isSeparator ? "_isSeparator" : (action.isTitle ? "_isTitle" : "")}`}
+          className={`actionButton${action.isSeparator ? "_isSeparator" : (action.isTitle ? "_isTitle" : "")} ${(action.disabled) ? "actionButton_disabled" : ""}`}
           icon={isDeleteAction && <FaTrash />}
+          title={action.disabled ? action.disabledReason : null}
         >
           {action.title}
         </Menu.Item>
