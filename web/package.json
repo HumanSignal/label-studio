@@ -185,6 +185,7 @@
     "webpack-merge": "^5.9.0",
     "yargs": "^17.7.1"
   },
+  "packageManager": "yarn@4.0.2",
   "babel": {
     "presets": [
       [
