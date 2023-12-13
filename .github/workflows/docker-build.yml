@@ -136,9 +136,9 @@ jobs:
 
       - name: Setup docker (missing on MacOS)
         if: runner.os == 'macos'
-        run: |
-          brew install docker colima
-          colima start --cpu 4 --memory 12
+        uses: crazy-max/ghaction-setup-docker@v2
+        env:
+          COLIMA_START_ARGS: --cpu 4 --memory 8
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.0.0
