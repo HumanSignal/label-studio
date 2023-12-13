@@ -35,7 +35,7 @@ const Object3DView = () => {
 
   return (
     <div className="container">
-      <Canvas shadows frameloop="demand" eventSource={document.getElementById('root')} className="canvas">
+      <Canvas shadows frameloop="demand" className="canvas">
         <View index={1} track={view1}>
           <CameraSwitcher />
           <PivotControls scale={0.4} depthTest={false} matrix={matrix} />
@@ -140,7 +140,7 @@ function Scene({ background = 'white', children, ...props }) {
       <color attach="background" args={[background]} />
       <ambientLight />
       <directionalLight position={[10, 10, -15]} castShadow shadow-bias={-0.0001} shadow-mapSize={1024} />
-      <Environment preset="city" />
+      {/* <Environment preset="city" /> */}
       <group
         matrixAutoUpdate={false}
         onUpdate={(self) => (self.matrix = matrix)}
@@ -148,7 +148,7 @@ function Scene({ background = 'white', children, ...props }) {
         <Center>
           <Box/> 
 
-          <Gltf castShadow wireframereceiveShadow src="Perseverance-transformed.glb" />
+          {/* <Gltf castShadow wireframereceiveShadow src="/static/samples/Perseverance-transformed.glb" /> */}
         </Center>
         {children}
       </group>
