@@ -53,7 +53,7 @@
   {% get_current_language as LANGUAGE_CODE %}
   {% get_available_languages as LANGUAGES %}
 
-  {% if ff_zendesk_widget %}
+  {% if feature_flags|get_item:"fflag_feat_dia_787_zendesk_widget_integration" %}
   <!-- Start of labelstudio Zendesk Widget script -->
   <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=d6255b42-5b1e-49b2-9d83-ca5c4c49f144"> </script>
   <!-- End of labelstudio Zendesk Widget script -->
