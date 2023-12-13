@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-754: [FE] Search option does not reflect actual queries state",
-  "commit": "34d39c2d0070c4c33e5280feee1f4720db31bde5",
+  "message": "fix: DIA-706: [FE] Action menu remains open when user select 'Find similar option'",
+  "commit": "4b3dc54df052b7d2868791572668c70f944fa8fe",
   "branch": "master",
-  "date": "2023-12-06T04:22:35Z"
+  "date": "2023-12-12T04:51:04Z"
 }
