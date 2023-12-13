@@ -718,6 +718,9 @@ export default types
 
         if (current) {
           as.selectAnnotation(current.id);
+          // looks like we still need it anyway, but it's fast and harmless,
+          // and we only call it once on already visible annotation
+          current.reinitHistory();
         } else if (currentPrediction) {
           as.selectPrediction(currentPrediction.id);
         }
