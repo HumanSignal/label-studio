@@ -12,6 +12,8 @@ import { Relations as RelationsComponent } from './Relations';
 // eslint-disable-next-line
 // @ts-ignore
 import { DraftPanel } from '../../DraftPanel/DraftPanel';
+import { Assistant } from '../../Assistant/Assistant';
+
 interface DetailsPanelProps extends PanelProps {
   regions: any;
   selection: any;
@@ -67,6 +69,18 @@ const CommentsTab: FC<any> = inject('store')(observer(({ store }) => {
         </Block>
       )}
     </>
+  );
+}));
+
+const AssistTab: FC<any> = inject('store')(observer(({ store }) => {
+  return (
+    <Block name={'assistant-panel'}>
+      <Elem name="section-tab">
+        <Elem name="section-content">
+          <Assistant />
+        </Elem>
+      </Elem>
+    </Block>
   );
 }));
 
@@ -207,6 +221,7 @@ const SelectedRegion: FC<{region: any}> = observer(({
   );
 });
 
+export const Assist = observer(AssistTab);
 export const Comments = observer(CommentsTab);
 export const History = observer(HistoryTab);
 export const Relations = observer(RelationsTab);

@@ -1,20 +1,27 @@
 import { FC, MutableRefObject, ReactNode } from 'react';
 import { clamp } from '../../../utils/utilities';
-import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT, DEFAULT_PANEL_MAX_WIDTH, DEFAULT_PANEL_MIN_HEIGHT, DEFAULT_PANEL_WIDTH, PANEL_HEADER_HEIGHT } from '../constants';
-import { Comments, History, Info, Relations } from '../DetailsPanel/DetailsPanel';
+import {
+  DEFAULT_PANEL_HEIGHT,
+  DEFAULT_PANEL_MAX_HEIGHT,
+  DEFAULT_PANEL_MAX_WIDTH,
+  DEFAULT_PANEL_MIN_HEIGHT,
+  DEFAULT_PANEL_WIDTH,
+  PANEL_HEADER_HEIGHT
+} from '../constants';
+import { Assist, Comments, History, Info, Relations } from '../DetailsPanel/DetailsPanel';
 import { OutlinerComponent } from '../OutlinerPanel/OutlinerPanel';
 import { PanelProps } from '../PanelBase';
 import { emptyPanel, JoinOrder, PanelBBox, PanelView, Side, ViewportSize } from './types';
 
 export const determineLeftOrRight = (event: any, droppableElement?: ReactNode) => {
-  const element = droppableElement || event.target as HTMLElement;  
+  const element = droppableElement || event.target as HTMLElement;
   const dropWidth = (element as HTMLElement).clientWidth as number;
   const x = event.pageX as number - (element as HTMLElement).getBoundingClientRect().left;
   const half = dropWidth / 2;
-    
+
   return x > half ? Side.right : Side.left;
 };
-  
+
 export const determineDroppableArea = (droppingElement: HTMLElement) => droppingElement?.id?.includes('droppable');
 
 export const stateRemovedTab = (state: Record<string, PanelBBox>, movingPanel: string, movingTab: number) => {
@@ -49,7 +56,7 @@ export const setActiveDefaults = (state: Record<string, PanelBBox>) => {
 
   Object.keys(state).forEach((panelKey: string) => {
     const firstActiveTab = newState[panelKey].panelViews.findIndex((view) => view.active) ;
-    
+
     newState[panelKey].panelViews[firstActiveTab > 0 ? firstActiveTab : 0].active = true;
   });
 
@@ -80,15 +87,15 @@ export const stateAddedTab = (
 ) => {
   const newState = { ...state };
   const panel = newState[receivingPanel];
-  
+
   panel.panelViews = newState[receivingPanel].panelViews.map((view) => {
     view.active = false;
     return view;
   });
-  
+
   let index = receivingTab + (dropSide === Side.right ? 1 : 0);
 
-  if (movingPanel === receivingPanel && index > 0) index -= 1; 
+  if (movingPanel === receivingPanel && index > 0) index -= 1;
   panel.panelViews.splice(index, 0, movingTabData);
   return newState;
 };
@@ -107,6 +114,7 @@ export const panelComponents: {[key:string]: FC<PanelProps>} = {
   'history': History as FC<PanelProps>,
   'relations': Relations as FC<PanelProps>,
   'comments': Comments as FC<PanelProps>,
+  'assist': Assist as FC<PanelProps>,
   'info': Info as FC<PanelProps>,
 };
 
@@ -142,6 +150,12 @@ const panelViews = [
     component: panelComponents['comments'] as FC<PanelProps>,
     active: false,
   },
+  {
+    name: 'assist',
+    title: 'Assistant',
+    component: panelComponents['assist'] as FC<PanelProps>,
+    active: false,
+  },
 ];
 
 export const enterprisePanelDefault: Record<string, PanelBBox> = {
@@ -173,7 +187,7 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
     detached: false,
     alignment: Side.right,
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
-    panelViews: [panelViews[0], panelViews[2]],
+    panelViews: [panelViews[0], panelViews[2], panelViews[5]],
   },
 };
 
@@ -191,7 +205,7 @@ export const openSourcePanelDefault: Record<string, PanelBBox> = {
     detached: false,
     alignment: Side.right,
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
-    panelViews: [panelViews[3], panelViews[1]],
+    panelViews: [panelViews[3], panelViews[4], panelViews[1]],
   },
   'regions-relations': {
     order: 2,

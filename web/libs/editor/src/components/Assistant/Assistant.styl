@@ -1,0 +1,80 @@
+.assistant
+  display flex
+  flex-wrap wrap
+  padding 16px
+
+  &__history
+    display flex
+    flex-wrap wrap
+    width 100%
+    cursor pointer
+    margin-top 10px
+
+    &-item
+      width 100%
+      margin 2px 0
+      padding 1px 5px
+      display: flex;
+      justify-content: space-between;
+      align-items center
+
+      &-delete
+        width 8px
+        height 8px
+        display flex
+        opacity .5
+
+        &:hover
+          opacity 1
+
+      &:hover
+        background-color #F5F5F5
+
+
+  .assist-form
+    --primary-action-color #00A8FF
+    --primary-action-padding 4px
+    --primary-action-border-radius 4px
+    --primary-action-surface-color-hover rgba(9, 109, 217, 0.12)
+    --text-input-min-height 40px
+    --tooltip-text-color #F5222D
+
+    display grid
+    grid-template-columns: auto var(--text-input-min-height);
+    align-items center
+    gap 4px
+    width 100%
+
+    &__primary-action
+      height 100%
+      width 100%
+      display flex
+      justify-content center
+      align-items flex-start
+      flex-shrink 0
+      flex-grow 0
+      grid-row 1 / 2
+      grid-column 2 / -1
+
+      button
+        margin-top 4px
+        display flex
+        justify-content center
+        align-items center
+        flex-shrink 0
+        flex-grow 0
+        appearance none
+        border none
+        background-color transparent
+        color var(--primary-action-color)
+        border-radius var(--primary-action-border-radius)
+        padding 0
+        height calc(var(--text-input-min-height) - 8px);
+        width calc(var(--text-input-min-height) - 8px);
+
+        &:hover
+          background-color var(--primary-action-surface-color-hover)
+
+    &__tooltipMessage
+      color var(--tooltip-text-color)
+      font-size 0.9em
