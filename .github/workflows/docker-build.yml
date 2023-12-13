@@ -150,7 +150,7 @@ jobs:
           file: Dockerfile
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ jobs.prepare_build.outputs.image_version }}
+          tags: ${{ env.IMAGE_NAME }}:${{ needs.prepare_build.outputs.image_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -158,7 +158,9 @@ jobs:
     name: "Github check"
     timeout-minutes: 5
     runs-on: ubuntu-latest
-    needs: build_docker_images
+    needs:
+      - prepare_build
+      - build_docker_images
     steps:
       - name: Create Docker image tag Check
         uses: actions/github-script@v7
@@ -167,15 +169,15 @@ jobs:
             const { repo, owner } = context.repo;
             const details = {
               "branch": "${{ inputs.branch_name }}",
-              "pretty_branch_name": "${{ jobs.prepare_build.outputs.pretty_branch_name }}",
-              "image_version": "${{ jobs.prepare_build.outputs.image_version }}",
-              "sha": "${{ jobs.prepare_build.outputs.sha }}"
+              "pretty_branch_name": "${{ needs.prepare_build.outputs.pretty_branch_name }}",
+              "image_version": "${{ needs.prepare_build.outputs.image_version }}",
+              "sha": "${{ needs.prepare_build.outputs.sha }}"
             }
             const { data: check } = await github.rest.checks.create({
               owner,
               repo,
               name: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
-              head_sha: '${{ jobs.prepare_build.outputs.sha }}',
+              head_sha: '${{ needs.prepare_build.outputs.sha }}',
               status: 'in_progress',
               output: {
                 title: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
