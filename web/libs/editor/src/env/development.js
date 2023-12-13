@@ -153,6 +153,7 @@ function configureApplication(params) {
     onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
     onUnskipTask: params.onUnskipTask ? params.onUnskipTask : External.onUnskipTask,
     onPresignUrlForProject: params.onPresignUrlForProject,
+    onAssistantPrompt: params.onAssistantPrompt,
     onSubmitDraft: params.onSubmitDraft,
     onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
     onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,

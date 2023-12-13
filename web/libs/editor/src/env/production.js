@@ -66,6 +66,7 @@ function configureApplication(params) {
     onUnskipTask: params.onUnskipTask ? params.onUnskipTask : External.onUnskipTask,
     onSubmitDraft: params.onSubmitDraft,
     onPresignUrlForProject: params.onPresignUrlForProject,
+    onAssistantPrompt: params.onAssistantPrompt,
     onTaskLoad: params.onTaskLoad || External.onTaskLoad,
     onLabelStudioLoad: params.onLabelStudioLoad || External.onLabelStudioLoad,
     onEntityCreate: params.onEntityCreate || External.onEntityCreate,

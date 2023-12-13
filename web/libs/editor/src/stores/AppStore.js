@@ -636,6 +636,12 @@ export default types
       return presignUrl;
     }
 
+    async function onAssistantPrompt(prompt) {
+      const result = await self.events.invoke('assistantPrompt', self, prompt);
+
+      return result;
+    }
+
     /**
      * Reset annotation store
      */
@@ -848,6 +854,8 @@ export default types
       presignUrlForProject,
       setUsers,
       mergeUsers,
+
+      onAssistantPrompt,
 
       showModal,
       toggleComments,
