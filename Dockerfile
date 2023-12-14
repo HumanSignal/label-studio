@@ -116,6 +116,7 @@ RUN --mount=type=cache,target="/var/cache/apt",sharing=locked \
     usermod -a -G tty nobody; \
     usermod -a -G tty nginx
 
+# Install gosu
 RUN --mount=type=cache,target="/var/cache/apt",sharing=locked \
     --mount=type=cache,target="/var/lib/apt/lists",sharing=locked \
     set -eux; \
