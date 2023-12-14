@@ -11,8 +11,11 @@ on:
         type: string
     outputs:
       image_version:
-        description: "Docker tag"
+        description: "Docker branch tag"
         value: ${{ jobs.docker_build_and_push.outputs.image_version }}
+      build_version:
+        description: "Docker version tag"
+        value: ${{ jobs.docker_build_and_push.outputs.build_version }}
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
