@@ -169,15 +169,6 @@ jobs:
             exit 1
           fi
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        env:
-          LOG_LEVEL: debug
-          BINFMT_VERSION: qemu-v8.0.4-33
-        with:
-          platforms: arm64
-          image: tonistiigi/binfmt:${{ env.BINFMT_VERSION }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.0.0
 
