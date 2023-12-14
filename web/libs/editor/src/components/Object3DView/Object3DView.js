@@ -31,7 +31,7 @@ import { observer } from 'mobx-react';
 
 const Object3DView = () => {
   return ( 
-    <iframe src="http://localhost:3000/" height="300px" width="100%"></iframe>
+    <iframe src="http://localhost:3000/" height="700px" width="100%"></iframe>
   );
   //   // stored position of canvas before creating region
 
