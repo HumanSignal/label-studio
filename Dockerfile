@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.3
-FROM node:18 AS frontend-builder
+FROM --platform=${BUILDPLATFORM} node:18 AS frontend-builder
 
 ENV NPM_CACHE_LOCATION=$HOME/.cache/yarn/v6 \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \

@@ -207,9 +207,6 @@ jobs:
           COPY --chown=54546:0 ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} /label-studio/label_studio/feature_flags.json
           EOF
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Build and Push Release Ubuntu Docker image
         uses: docker/build-push-action@v5.1.0
         id: docker_build
