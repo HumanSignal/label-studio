@@ -16,7 +16,9 @@ from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+import json
+import random
+import string
 logger = logging.getLogger(__name__)
 
 
@@ -230,6 +232,32 @@ class MLBackendInteractiveAnnotating(APIView):
 
     permission_required = all_permissions.tasks_view
 
+    @staticmethod
+    def _find_occurrences(text, words, label):
+        occurrences = []
+        for word in words:
+            start = text.find(word)
+            while start != -1:
+                end = start + len(word)
+                characters = string.ascii_letters + string.digits  # Combining letters and digits
+                rand_id = ''.join(random.choice(characters) for _ in range(10))
+
+                occurrences.append({
+                    "value": {
+                        "start": start,
+                        "end": end,
+                        "text": text[start:end],
+                        "labels": [label]
+                    },
+                    "from_name": "label",
+                    "to_name": "text",
+                    "type": "labels",
+                    "id": rand_id,
+                    "origin": "manual"
+                })
+                start = text.find(word, end)
+        return occurrences
+
     def post(self, request, *args, **kwargs):
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
@@ -245,7 +273,17 @@ class MLBackendInteractiveAnnotating(APIView):
             context['project_credentials_password'] = task.project.task_data_password
 
         result = ml_backend.interactive_annotating(task, context, user=request.user)
+        llm_results = result['data']['result'][0]['value']['text'][0]
 
+        data = json.loads(llm_results)
+        extracted_lists = {key: value for key, value in data.items() if isinstance(value, list)}
+
+        data = task.data['0']
+        all_occurences = []
+        for tag, items in extracted_lists.items():
+            all_occurences += self._find_occurrences(data, items, tag)
+
+        result['data']['result'] = all_occurences
         return Response(
             result,
             status=status.HTTP_200_OK,
