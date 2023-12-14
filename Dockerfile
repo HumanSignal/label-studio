@@ -27,7 +27,7 @@ COPY pyproject.toml /label-studio
 
 # Setup Node and Yarn configurations and build frontend
 RUN --mount=type=cache,target="/root/.cache",sharing=locked \
-    set -eux; \
+    set -xeuo pipefail; \
     yarn config set registry https://registry.npmjs.org/; \
     yarn config set network-timeout 1200000; \
     yarn install --frozen-lockfile; \
@@ -56,7 +56,7 @@ WORKDIR /label-studio
 
 RUN --mount=type=cache,target="/var/cache/apt",sharing=locked \
     --mount=type=cache,target="/var/lib/apt/lists",sharing=locked \
-    set -eux; \
+    set -xeuo pipefail; \
     apt-get update; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y ca-certificates curl gnupg libxml2 gcc python3-dev; \
@@ -95,16 +95,16 @@ ENV DEBIAN_FRONTEND=noninteractive \
 WORKDIR $LS_DIR
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN set -eux; \
-	groupadd --gid 999 --system label-studio; \
-	useradd --uid 999 --system --gid label-studio --home-dir /label-studio label-studio; \
+RUN set -xeuo pipefail; \
+	groupadd --gid 1001 --system label-studio; \
+	useradd --uid 1001 --system --gid label-studio --home-dir /label-studio label-studio; \
 	mkdir -p $LABEL_STUDIO_BASE_DATA_DIR $OPT_DIR; \
 	chown -R label-studio:label-studio $LABEL_STUDIO_BASE_DATA_DIR $OPT_DIR
 
 # incapsulate nginx install & configure to a single layer
 RUN --mount=type=cache,target="/var/cache/apt",sharing=locked \
     --mount=type=cache,target="/var/lib/apt/lists",sharing=locked \
-    set -eux; \
+    set -xeuo pipefail; \
     apt-get update; \
     apt-get install -y --no-install-recommends ca-certificates gnupg wget; \
     wget -q https://nginx.org/keys/nginx_signing.key -O- | apt-key add -; \
@@ -119,7 +119,7 @@ RUN --mount=type=cache,target="/var/cache/apt",sharing=locked \
 # Install gosu
 RUN --mount=type=cache,target="/var/cache/apt",sharing=locked \
     --mount=type=cache,target="/var/lib/apt/lists",sharing=locked \
-    set -eux; \
+    set -xeuo pipefail; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends ca-certificates gnupg wget; \
@@ -147,7 +147,7 @@ COPY --from=wheel-builder /label-studio/dist/*.whl /label-studio/dist/
 
 # Install Label Studio wheel
 RUN --mount=type=cache,target="/root/.cache",sharing=locked \
-    set -eux; \
+    set -xeuo pipefail; \
     pip install /label-studio/dist/*.whl; \
     ln -s /usr/local/lib/python$(python3 --version | cut -d ' ' -f 2 | cut -d '.' -f 1,2)/site-packages/label_studio /label-studio; \
     rm -rf /label-studio/dist
