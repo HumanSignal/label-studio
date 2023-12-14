@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { Block, Elem } from '../../utils/bem';
 import { ReactComponent as IconSend } from '../../assets/icons/send.svg';
 import { IconCross } from '../../assets/icons';
+import { SpinnerCircle } from '../SpinnerCircle/SpinnerCircle';
 
 import './Assistant.styl';
 import { TextArea } from '../../common/TextArea/TextArea';
@@ -102,7 +103,7 @@ export const Assistant: FC<{ onPrompt: (prompt: string) => void, awaitingSuggest
           mod={{ loading: awaitingSuggestions }}
         >
           <button type="submit">
-            <IconSend />
+            <Elem name='icon' tag={awaitingSuggestions ? SpinnerCircle : IconSend} width={24} height={24}/>
           </button>
         </Elem>
       </Block>
