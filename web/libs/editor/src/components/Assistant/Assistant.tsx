@@ -7,8 +7,7 @@ import { IconCross } from '../../assets/icons';
 import './Assistant.styl';
 import { TextArea } from '../../common/TextArea/TextArea';
 
-
-export const Assistant: FC<{ }> = observer(() => {
+export const Assistant: FC<{ onPrompt: (prompt: string) => void }> = observer(({ onPrompt }) => {
   const [historyValue, setHistoryValue] = useState<string[]>([]);
   const [value, setValue] = useState('');
 
@@ -48,6 +47,8 @@ export const Assistant: FC<{ }> = observer(() => {
     e?.preventDefault?.();
 
     if (!value.trim()) return;
+
+    onPrompt(value);
 
     setHistory(value);
   }, [value]);

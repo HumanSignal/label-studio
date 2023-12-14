@@ -639,6 +639,8 @@ export default types
     async function onAssistantPrompt(prompt) {
       const result = await self.events.invoke('assistantPrompt', self, prompt);
 
+      self.annotationStore.selected.deserializeResults(result[0]);
+
       return result;
     }
 

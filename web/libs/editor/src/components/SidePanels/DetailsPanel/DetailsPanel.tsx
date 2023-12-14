@@ -77,7 +77,7 @@ const AssistTab: FC<any> = inject('store')(observer(({ store }) => {
     <Block name={'assistant-panel'}>
       <Elem name="section-tab">
         <Elem name="section-content">
-          <Assistant />
+          <Assistant onPrompt={store.onAssistantPrompt} />
         </Elem>
       </Elem>
     </Block>
