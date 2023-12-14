@@ -629,9 +629,12 @@ export default types
 
     async function onAssistantPrompt(prompt) {
       self.setFlags({ awaitingSuggestions: true });
+
       const result = await self.events.invoke('assistantPrompt', self, prompt);
 
       self.annotationStore.selected.deserializeResults(result[0]);
+      self.annotationStore.selected.updateObjects();
+
       self.setFlags({ awaitingSuggestions: false });
 
       return result;
