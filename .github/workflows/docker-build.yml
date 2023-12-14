@@ -12,24 +12,20 @@ on:
     outputs:
       image_version:
         description: "Docker tag"
-        value: ${{ jobs.prepare_build.outputs.image_version }}
+        value: ${{ jobs.docker_build_and_push.outputs.image_version }}
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
   IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
   DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"
-  LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
-  VERSION_FILE: "label_studio/core/version_.py"
 
 jobs:
-  prepare_build:
-    name: "Prepare for build"
-    timeout-minutes: 10
+  docker_build_and_push:
+    name: "Docker image"
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     outputs:
       image_version: ${{ steps.version.outputs.image_version }}
-      pretty_branch_name: ${{ steps.version.outputs.pretty_branch_name }}
-      sha: ${{ steps.version.outputs.sha }}
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
@@ -69,6 +65,15 @@ jobs:
           version="${current_time}$(echo $branch | cut -c1-$((50 - short_sha_length - current_time_length)))-${short_sha}"
           echo "build_version=$version" >> $GITHUB_OUTPUT
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.0.0
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3.0.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -80,11 +85,12 @@ jobs:
           VERSION_OVERRIDE: ${{ steps.version.outputs.build_version }}
         run: |
           python3 $(pwd)/label_studio/core/version.py
-          cat $(pwd)/${{ env.VERSION_FILE }}
+          cat $(pwd)/label_studio/core/version_.py
 
       - name: Download LaunchDarkly Community config
         env:
           LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
+          LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
         run: |
           set -xeuo pipefail
           curl \
@@ -101,77 +107,18 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: build-info
-          path: |
-            ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}
-            ${{ env.VERSION_FILE }}
-
-  build_docker_images:
-    name: "Build docker images"
-    timeout-minutes: 60
-    needs: prepare_build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux/amd64
-          - os: ubuntu-latest
-            platform: linux/arm64
-    steps:
-      - uses: hmarr/debug-action@v2.1.0
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-          ref: ${{ inputs.sha }}
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-info
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        if: matrix.platform == 'linux/arm64'
-        env:
-          LOG_LEVEL: debug
-          BINFMT_VERSION: qemu-v8.0.4-33
-        with:
-          platforms: arm64
-          image: tonistiigi/binfmt:${{ env.BINFMT_VERSION }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.0.0
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v3.0.0
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Push Docker image
         uses: docker/build-push-action@v5.1.0
+        id: docker_build_and_push
         with:
           context: .
           file: Dockerfile
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ needs.prepare_build.outputs.image_version }}
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.image_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  github_check:
-    name: "Github check"
-    timeout-minutes: 5
-    runs-on: ubuntu-latest
-    needs:
-      - prepare_build
-      - build_docker_images
-    steps:
       - name: Create Docker image tag Check
         uses: actions/github-script@v7
         with:
@@ -179,15 +126,15 @@ jobs:
             const { repo, owner } = context.repo;
             const details = {
               "branch": "${{ inputs.branch_name }}",
-              "pretty_branch_name": "${{ needs.prepare_build.outputs.pretty_branch_name }}",
-              "image_version": "${{ needs.prepare_build.outputs.image_version }}",
-              "sha": "${{ needs.prepare_build.outputs.sha }}"
+              "pretty_branch_name": "${{ steps.version.outputs.pretty_branch_name }}",
+              "image_version": "${{ steps.version.outputs.image_version }}",
+              "sha": "${{ steps.version.outputs.sha }}"
             }
             const { data: check } = await github.rest.checks.create({
               owner,
               repo,
               name: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
-              head_sha: '${{ needs.prepare_build.outputs.sha }}',
+              head_sha: '${{ steps.version.outputs.sha }}',
               status: 'in_progress',
               output: {
                 title: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
