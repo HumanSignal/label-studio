@@ -7,7 +7,7 @@ import { IconCross } from '../../assets/icons';
 import './Assistant.styl';
 import { TextArea } from '../../common/TextArea/TextArea';
 
-export const Assistant: FC<{ onPrompt: (prompt: string) => void }> = observer(({ onPrompt }) => {
+export const Assistant: FC<{ onPrompt: (prompt: string) => void, awaitingSuggestions: boolean }> = observer(({ onPrompt, awaitingSuggestions }) => {
   const [historyValue, setHistoryValue] = useState<string[]>([]);
   const [value, setValue] = useState('');
 
@@ -55,6 +55,7 @@ export const Assistant: FC<{ onPrompt: (prompt: string) => void }> = observer(({
 
   const setValueFromHistory = useCallback((item: string) => {
     setValue(item);
+    onPrompt(item);
     setHistory(item);
   }, [historyValue]);
 
@@ -96,7 +97,9 @@ export const Assistant: FC<{ onPrompt: (prompt: string) => void }> = observer(({
           onChange={setValue}
           onSubmit={onSubmit}
         />
-        <Elem tag="div" name="primary-action">
+        <Elem tag="div" name="primary-action"
+          mod={{ loading: awaitingSuggestions }}
+        >
           <button type="submit">
             <IconSend />
           </button>
