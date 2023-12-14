@@ -1,6 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import json
 import logging
+import random
+import string
 
 import drf_yasg.openapi as openapi
 from core.feature_flags import flag_set
@@ -16,9 +19,7 @@ from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import json
-import random
-import string
+
 logger = logging.getLogger(__name__)
 
 
@@ -242,19 +243,16 @@ class MLBackendInteractiveAnnotating(APIView):
                 characters = string.ascii_letters + string.digits  # Combining letters and digits
                 rand_id = ''.join(random.choice(characters) for _ in range(10))
 
-                occurrences.append({
-                    "value": {
-                        "start": start,
-                        "end": end,
-                        "text": text[start:end],
-                        "labels": [label]
-                    },
-                    "from_name": "label",
-                    "to_name": "text",
-                    "type": "labels",
-                    "id": rand_id,
-                    "origin": "manual"
-                })
+                occurrences.append(
+                    {
+                        'value': {'start': start, 'end': end, 'text': text[start:end], 'labels': [label]},
+                        'from_name': 'label',
+                        'to_name': 'text',
+                        'type': 'labels',
+                        'id': rand_id,
+                        'origin': 'manual',
+                    }
+                )
                 start = text.find(word, end)
         return occurrences
 
