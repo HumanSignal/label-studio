@@ -45,6 +45,30 @@
     gap 4px
     width 100%
 
+    &_disabled
+      opacity .5 !important
+      pointer-events none
+
+    &_loading
+      --borderWidth: 3px;
+      background: #FFF;
+      position: relative;
+      border-radius 4px
+      pointer-events: none;
+
+      &:after
+        content: '';
+        position: absolute;
+        top: calc(-1 * var(--borderWidth));
+        left: calc(-1 * var(--borderWidth));
+        height: calc(100% + var(--borderWidth) * 2);
+        width: calc(100% + var(--borderWidth) * 2);
+        background: linear-gradient(60deg, #9254DE, #9254DE, #13C2C2, #13C2C2);
+        border-radius: calc(2 * var(--borderWidth));
+        z-index: -1;
+        animation: animatedgradient 3s ease alternate infinite;
+        background-size: 300% 300%;
+
     &__primary-action
       height 100%
       width 100%
@@ -55,6 +79,10 @@
       flex-grow 0
       grid-row 1 / 2
       grid-column 2 / -1
+
+      &_loading
+        filter grayscale(1)
+        opacity .6
 
       button
         margin-top 4px
@@ -78,3 +106,18 @@
     &__tooltipMessage
       color var(--tooltip-text-color)
       font-size 0.9em
+
+
+@keyframes animatedgradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+

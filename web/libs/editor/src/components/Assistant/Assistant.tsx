@@ -89,8 +89,9 @@ export const Assistant: FC<{ onPrompt: (prompt: string) => void, awaitingSuggest
 
   return (
     <Block name="assistant">
-      <Block tag="form" name="assist-form" mod={{ inline: true }} onSubmit={onSubmit}>
+      <Block tag="form" name="assist-form" mod={{ inline: true, loading: awaitingSuggestions }} onSubmit={onSubmit}>
         <TextArea
+          className={awaitingSuggestions ? 'lsf-assist-form_disabled' : ''}
           name="assist-text"
           placeholder="Type your message here"
           value={value}
