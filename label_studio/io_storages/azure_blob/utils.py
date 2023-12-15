@@ -4,6 +4,7 @@ import re
 
 from azure.storage.blob import BlobServiceClient
 from core.utils.params import get_env
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -47,22 +48,34 @@ class AZURE(object):
 
     @classmethod
     def validate_pattern(cls, storage, pattern, glob_pattern=True):
-        logger.debug('Validating Azure Blob Storage connection')
+        """
+        Validate pattern against Azure Blob Storage
+        :param storage: AzureBlobStorage instance
+        :param pattern: Pattern to validate
+        :param glob_pattern: If True, pattern is a glob pattern, otherwise it is a regex pattern
+        :return: Message if pattern is not valid, empty string otherwise
+        """
+        logger.debug('Validating Azure Blob Storage pattern.')
         client, container = storage.get_client_and_container()
         if storage.prefix:
-            generator = container.list_blob_names(name_starts_with=storage.prefix, results_per_page=100, timeout=120)
+            generator = container.list_blob_names(name_starts_with=storage.prefix,
+                                                  results_per_page=settings.CLOUD_PAGE_CHECKED_OBJECTS,
+                                                  timeout=settings.CLOUD_TIMEOUT_CHECKED_OBJECTS)
         else:
-            generator = container.list_blob_names(results_per_page=100, timeout=120)
+            generator = container.list_blob_names(results_per_page=settings.CLOUD_PAGE_CHECKED_OBJECTS,
+                                                  timeout=settings.CLOUD_TIMEOUT_CHECKED_OBJECTS)
         # compile pattern to regex
         if glob_pattern:
             pattern = fnmatch.translate(pattern)
         regex = re.compile(str(pattern))
         # match pattern against all keys in the container
-        for key in generator:
+        for index, key in enumerate(generator):
+            if index > settings.CLOUD_MAX_CHECKED_OBJECTS:
+                return f"No match found in {settings.CLOUD_MAX_CHECKED_OBJECTS} records."
             if key.endswith('/'):
                 logger.debug(key + ' is skipped because it is a folder')
                 continue
             if regex and regex.match(key):
                 logger.debug(key + ' is skipped by regex filter')
-                return True
-        return False
+                return ""
+        return "Not found any objects matching the pattern."

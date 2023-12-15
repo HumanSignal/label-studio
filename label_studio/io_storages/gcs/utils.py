@@ -308,19 +308,30 @@ class GCS(object):
 
     @classmethod
     def validate_pattern(cls, storage, pattern, glob_pattern=True):
+        """
+        Validate pattern against Google Cloud Storage
+        :param storage: Google Cloud Storage instance
+        :param pattern: Pattern to validate
+        :param glob_pattern: If True, pattern is a glob pattern, otherwise it is a regex pattern
+        :return: Message if pattern is not valid, empty string otherwise
+        """
         client = storage.get_client()
-        blob_iter = client.list_blobs(storage.bucket, prefix=storage.prefix, page_size=100)
+        blob_iter = client.list_blobs(storage.bucket,
+                                      prefix=storage.prefix,
+                                      page_size=settings.CLOUD_PAGE_CHECKED_OBJECTS)
         prefix = str(storage.prefix) if storage.prefix else ''
         # compile pattern to regex
         if glob_pattern:
             pattern = fnmatch.translate(pattern)
         regex = re.compile(str(pattern))
-        for blob in blob_iter:
+        for index, blob in enumerate(blob_iter):
+            if index > settings.CLOUD_MAX_CHECKED_OBJECTS:
+                return f"No match found in {settings.CLOUD_MAX_CHECKED_OBJECTS} records."
             # skip dir level
             if blob.name == (prefix.rstrip('/') + '/'):
                 continue
             # check regex pattern filter
             if pattern and regex.match(blob.name):
                 logger.debug(blob.name + ' is matched by regex filter')
-                return True
-        return False
+                return ""
+        return "Not found any objects matching the pattern."

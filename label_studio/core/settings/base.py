@@ -714,3 +714,7 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
     CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src']
 
     MIDDLEWARE.append('core.middleware.HumanSignalCspMiddleware')
+
+CLOUD_MAX_CHECKED_OBJECTS = get_env('CLOUD_MAX_CHECKED_OBJECTS', 1000)
+CLOUD_PAGE_CHECKED_OBJECTS = get_env('CLOUD_PAGE_CHECKED_OBJECTS', 200)
+CLOUD_TIMEOUT_CHECKED_OBJECTS = get_env('CLOUD_PAGE_CHECKED_OBJECTS', 60)

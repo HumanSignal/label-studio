@@ -3,11 +3,13 @@
 import base64
 import fnmatch
 import logging
+import re
 from urllib.parse import urlparse
 
 import boto3
 from botocore.exceptions import ClientError
 from core.utils.params import get_env
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -101,9 +103,36 @@ class AWS(object):
 
     @classmethod
     def validate_pattern(cls, storage, pattern, glob_pattern=True):
-        if not storage.regex_filter:
-            storage.regex_filter = fnmatch.translate(pattern) if glob_pattern else pattern
-        obj = next(storage.iterkeys())
-        if obj:
-            return True
-        return False
+        """
+        Validate pattern against S3 Storage
+        :param storage: S3 Storage instance
+        :param pattern: Pattern to validate
+        :param glob_pattern: If True, pattern is a glob pattern, otherwise it is a regex pattern
+        :return: Message if pattern is not valid, empty string otherwise
+        """
+        client, bucket = storage.get_client_and_bucket()
+        if glob_pattern:
+            pattern = fnmatch.translate(pattern)
+        regex = re.compile(str(storage.regex_filter if storage.regex_filter else pattern))
+
+        if storage.prefix:
+            list_kwargs = {'Prefix': storage.prefix.rstrip('/') + '/'}
+            if not storage.recursive_scan:
+                list_kwargs['Delimiter'] = '/'
+            bucket_iter = bucket.objects.filter(**list_kwargs)
+        else:
+            bucket_iter = bucket.objects
+
+        bucket_iter = bucket_iter.page_size(settings.CLOUD_PAGE_CHECKED_OBJECTS).all()
+
+        for index, obj in enumerate(bucket_iter):
+            if index > settings.CLOUD_MAX_CHECKED_OBJECTS:
+                return f"No match found in {settings.CLOUD_MAX_CHECKED_OBJECTS} records."
+            key = obj.key
+            if key.endswith('/'):
+                logger.debug(key + ' is skipped because it is a folder')
+                continue
+            if regex and regex.match(key):
+                logger.debug(key + ' is skipped by regex filter')
+                return ""
+        return "Not found any objects matching the pattern."
