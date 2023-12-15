@@ -11,8 +11,11 @@ on:
         type: string
     outputs:
       image_version:
-        description: "Docker tag"
+        description: "Docker branch tag"
         value: ${{ jobs.docker_build_and_push.outputs.image_version }}
+      build_version:
+        description: "Docker version tag"
+        value: ${{ jobs.docker_build_and_push.outputs.build_version }}
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
@@ -26,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_version: ${{ steps.version.outputs.image_version }}
+      build_version: ${{ steps.version.outputs.build_version }}
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
@@ -45,10 +49,10 @@ jobs:
           sha="$(git rev-parse HEAD)"
           echo "sha=$sha" >> $GITHUB_OUTPUT
           regexp='^ls-release\/(.*)$'; 
-          if [[ '${{ inputs.branch_name }}' =~ $regexp ]]; then
+          if [[ "$BRANCH_NAME" =~ $regexp ]]; then
             image_version="${BASH_REMATCH[1]}rc${sha}"
           else
-            image_version='${{ inputs.branch_name }}'
+            image_version=$BRANCH_NAME
           fi
           echo "image_version=${image_version}" >> $GITHUB_OUTPUT
           echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
@@ -107,9 +111,6 @@ jobs:
             exit 1
           fi
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Push Docker image
         uses: docker/build-push-action@v5.1.0
         id: docker_build_and_push
@@ -118,7 +119,7 @@ jobs:
           file: Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.image_version }}
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.image_version }},${{ env.IMAGE_NAME }}:${{ steps.version.outputs.build_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
