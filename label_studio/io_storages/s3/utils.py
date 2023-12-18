@@ -113,7 +113,7 @@ class AWS(object):
         client, bucket = storage.get_client_and_bucket()
         if glob_pattern:
             pattern = fnmatch.translate(pattern)
-        regex = re.compile(str(storage.regex_filter if storage.regex_filter else pattern))
+        regex = re.compile(pattern)
 
         if storage.prefix:
             list_kwargs = {'Prefix': storage.prefix.rstrip('/') + '/'}
