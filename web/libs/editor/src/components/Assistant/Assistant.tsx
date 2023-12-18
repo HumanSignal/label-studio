@@ -8,6 +8,8 @@ import { SpinnerCircle } from '../SpinnerCircle/SpinnerCircle';
 import './Assistant.styl';
 import { TextArea } from '../../common/TextArea/TextArea';
 
+const MAX_NUMBER_OF_HISTORY_ITEMS = 10;
+
 export const Assistant: FC<{ onPrompt: (prompt: string) => void, awaitingSuggestions: boolean }> = observer(({ onPrompt, awaitingSuggestions }) => {
   const [historyValue, setHistoryValue] = useState<string[]>([]);
   const [value, setValue] = useState('');
@@ -36,7 +38,7 @@ export const Assistant: FC<{ onPrompt: (prompt: string) => void, awaitingSuggest
 
     _history.unshift(text);
 
-    if (_history.length > 5) {
+    if (_history.length > MAX_NUMBER_OF_HISTORY_ITEMS) {
       _history.pop();
     }
 

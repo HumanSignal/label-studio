@@ -630,7 +630,15 @@ export default types
     async function onAssistantPrompt(prompt) {
       self.setFlags({ awaitingSuggestions: true });
 
-      const result = await self.events.invoke('assistantPrompt', self, prompt);
+      const tags = [...self.annotationStore.selected.names.values()];
+      const labels = tags.find(t => t.type === 'labels').children.map(l => l._value);
+
+      const fullPrompt = `Provide json containing list for each of the following entities:
+      ${labels.join(', ')} mentioned in the text. No explanations and assumptions, please.
+      Provide empty lists in the json for the entities that are not required.
+      Respect this constraint and request: ${prompt}`;
+
+      const result = await self.events.invoke('assistantPrompt', self, fullPrompt);
 
       self.annotationStore.selected.deserializeResults(result[0]);
       self.annotationStore.selected.updateObjects();
