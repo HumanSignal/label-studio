@@ -1,4 +1,4 @@
-name: "/git command"
+name: "/jira command"
 
 on:
   repository_dispatch:
@@ -14,6 +14,15 @@ jobs:
     timeout-minutes: 3
     steps:
       - uses: hmarr/debug-action@v2.1.0
+
+      - name: Add Workflow link to command comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
       - name: Check user's membership
         uses: actions/github-script@v7
@@ -62,8 +71,6 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             > Jira issue [${{ steps.jira-create-issue.outputs.key }}](${{ steps.jira-create-issue.outputs.link }}) is created
-            >
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "+1"
 
       - name: Add reaction to command comment on failure
@@ -76,7 +83,6 @@ jobs:
           body: |
             > **Error**: failed to execute "${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}" command
             > ${{ steps.check-membership.outputs.error }}
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "-1"
 
   help:
