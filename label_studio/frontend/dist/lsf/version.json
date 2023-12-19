@@ -1,6 +1,6 @@
 {
   "message": "feat: LEAP-355: Make relations work with TimeTraveler",
-  "commit": "d15419b398969e7af6b21da86cb9d898768169fc",
+  "commit": "56d6375826d62df1b83009e6db210926f507318b",
   "branch": "fb-leap-355/relations-improvements",
-  "date": "2023-12-19T14:32:21Z"
+  "date": "2023-12-19T18:15:56Z"
 }
