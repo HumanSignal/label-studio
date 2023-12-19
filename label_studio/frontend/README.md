@@ -12,7 +12,7 @@ To build and run the frontend, please follow these steps:
 
 ```bash
 # Install all the necessary modules
-npm ci
+yarn install --frozen-lockfile
 
 # Run webpack
 npx webpack

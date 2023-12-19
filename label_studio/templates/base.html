@@ -25,7 +25,7 @@
   <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
   <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
 
-  <script>
+  <script nonce="{{request.csp_nonce}}">
     EDITOR_JS = "{{settings.HOSTNAME}}/label-studio-frontend/js/main.js?v={{ versions.lsf.commit }}";
     EDITOR_CSS = "{{settings.HOSTNAME}}/label-studio-frontend/css/main.css?v={{ versions.lsf.commit }}";
     DM_JS = "{{settings.HOSTNAME}}/dm/js/main.js?v={{ versions.dm2.commit }}";
@@ -37,7 +37,7 @@
    integrity="sha384-lowBFC6YTkvMIWPORr7+TERnCkZdo5ab00oH5NkFLeQUAmBTLGwJpFjF6djuxJ/5"
    crossorigin="anonymous"></script>
 
-  <script>
+  <script nonce="{{request.csp_nonce}}">
     window.exports = () => {};
   </script>
 
@@ -59,13 +59,7 @@
 <div class="app-wrapper"></div>
 
 <template id="main-content">
-  <main class="main" style="background: transparent">
-
-      <div class="ui floating dropdown theme basic" style="float: right;">
-        {% block top-buttons %}
-        {% endblock %}
-      </div>
-    </div>
+  <main class="main">
 
     <!-- Space & Divider -->
     {% block divider %}
@@ -87,7 +81,7 @@
   {% block context_menu_right %}{% endblock %}
 </template>
 
-<script id="app-settings">
+<script id="app-settings" nonce="{{request.csp_nonce}}">
   window.APP_SETTINGS = Object.assign({
     user: {
       id: {{ user.pk }},
@@ -110,6 +104,7 @@
     editor_keymap: JSON.parse({{ settings.EDITOR_KEYMAP|safe }}),
     feature_flags: {{ feature_flags|json_dumps_ensure_ascii|safe }},
     feature_flags_default_value: {{ settings.FEATURE_FLAGS_DEFAULT_VALUE|json_dumps_ensure_ascii|safe }},
+    server_id: {{ request.server_id|json_dumps_ensure_ascii|safe }},
 
     {% block app_more_settings %}
       flags: {
@@ -123,7 +118,7 @@
 <script src="{{settings.HOSTNAME}}/react-app/index.js?v={{ versions.backend.commit }}"></script>
 
 <div id="dynamic-content">
-  <script>
+  <script nonce="{{request.csp_nonce}}">
       applyCsrf();
 
       $('.message .close').on('click', function () {
@@ -135,7 +130,7 @@
   {% endblock %}
 
   {% block storage-persistence %}
-  <script>
+  <script nonce="{{request.csp_nonce}}">
     {# storage persistence #}
     {% if not settings.STORAGE_PERSISTENCE %}
     new Toast({

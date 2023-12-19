@@ -2,8 +2,8 @@
 title: Secure Label Studio
 type: guide
 tier: all
-order: 101
-order_enterprise: 128
+order: 105
+order_enterprise: 405
 meta_title: Secure Label Studio
 meta_description: About the security and hardening processes used by various Label Studio editions, and how you can configure a more secure data labeling project.
 section: "Security and Privacy"
@@ -61,6 +61,13 @@ If you're using Label Studio Enterprise, you can further secure user access in m
 
 Access to the REST API is restricted by user role and requires an access token that is specific to a user account. Access tokens can be reset at any time from the Label Studio UI or using the API.
 
+## Enable SSRF protection for production environments
+
+When deploying Label Studio into a production environment, set the `SSRF_PROTECTION_ENABLED` environment variable to `true`. 
+
+This variable is disabled by default to support users who are working with data in their local environments. However, it should be enabled in production usage. 
+
+
 ## Secure access to data in Label Studio
 
 Data in Label Studio is stored in one or two places, depending on your deployment configuration.
@@ -103,4 +110,64 @@ If you use Redis as an external storage database for data and annotations, the s
 
 Label Studio Enterprise automatically logs all user activities so that you can monitor the activities being performed in the application.
 
+</div>
+
+## Information collected by Label Studio
+
+Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the information we collect. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support.
+
+## Add self-signed certificate to trusted root store
+
+<div class="code-tabs">
+  <div data-name="Docker Compose">
+
+1. Mount your self-signed certificate as a volume into `app` container:
+
+```yaml
+volumes:
+  - ./my.cert:/tmp/my.cert:ro
+```
+2. Add environment variable with the name `CUSTOM_CA_CERTS` mentioning all certificates in comma-separated way that should be added into trust store:
+
+```yaml
+CUSTOM_CA_CERTS=/tmp/my.cert
+```
+  </div>
+
+  <div data-name="Kubernetes">
+
+1. Upload your self-signed certificate as a k8s secret.
+   Upload `my.cert` as a secrets with a name `test-my-root-cert`:
+```yaml
+kubectl create secret generic test-my-root-cert --from-file=file=my.cert
+```
+
+2. Add volumes into your values.yaml file and mention them in `.global.customCaCerts`:
+
+```yaml
+global:
+  customCaCerts:
+   - /opt/heartex/secrets/ca_certs/file/file
+
+app:
+  extraVolumes:
+    - name: foo
+      secret:
+        secretName: test-my-root-cert
+  extraVolumeMounts:
+    - name: foo
+      mountPath: "/opt/heartex/secrets/ca_certs/file"
+      readOnly: true
+
+rqworker:
+  extraVolumes:
+    - name: foo
+      secret:
+        secretName: test-my-root-cert
+  extraVolumeMounts:
+    - name: foo
+      mountPath: "/opt/heartex/secrets/ca_certs/file"
+      readOnly: true
+```
+  </div>
 </div>

@@ -1,7 +1,7 @@
 import sys
-import yaml
-
 from collections import OrderedDict
+
+import yaml
 
 
 def represent_ordereddict(dumper, data):
@@ -13,18 +13,22 @@ def represent_ordereddict(dumper, data):
 
         value.append((node_key, node_value))
 
-    return yaml.nodes.MappingNode(u'tag:yaml.org,2002:map', value)
+    return yaml.nodes.MappingNode('tag:yaml.org,2002:map', value)
 
 
 yaml.add_representer(OrderedDict, represent_ordereddict)
 
+
 class Regexp(yaml.YAMLObject):
-    yaml_tag = u'!re_match'
+    yaml_tag = '!re_match'
+
     def __init__(self, regexp):
         self.regexp = regexp
+
     # def __repr__(self):
     #     return "" % (
     #         self.__class__.__name__, self.name, self.hp, self.ac, self.attacks)
+
 
 old_test = sys.argv[1]
 
@@ -75,12 +79,12 @@ with open(old_test) as f:
                     if 'response' in stage_data and isinstance(stage_data['response'], dict):
                         for k, v in stage_data['response'].items():
                             if isinstance(v, str) and v.startswith('{'):
-                                if not 'save' in response_data:
+                                if 'save' not in response_data:
                                     response_data['save'] = {'json': {}}
                                 key = v.replace('{', '').replace('}', '')
                                 response_data['save']['json'][key] = k
                             else:
-                                if not 'json' in response_data:
+                                if 'json' not in response_data:
                                     response_data['json'] = {}
                                 response_data['json'][k] = v
 

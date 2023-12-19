@@ -192,6 +192,12 @@ def get_task(task_number: str, pr: int = None) -> AhaFeature or None:
     if task_number in TASK_CACHE.keys():
         return TASK_CACHE.get(task_number)
     try:
+        task = JiraIssue(task_number, pr)
+        TASK_CACHE[task_number] = task
+        return task
+    except Exception as e:
+        print(f'Could not find Issue   {task_number} in Jira: {e}')
+    try:
         task = AhaFeature(task_number, pr)
         TASK_CACHE[task_number] = task
         return task
@@ -203,12 +209,6 @@ def get_task(task_number: str, pr: int = None) -> AhaFeature or None:
         return task
     except Exception as e:
         print(f'Could not find Requirement {task_number} in Aha!: {e}')
-    try:
-        task = JiraIssue(task_number, pr)
-        TASK_CACHE[task_number] = task
-        return task
-    except Exception as e:
-        print(f'Could not find Issue   {task_number} in Jira: {e}')
     return None
 
 
@@ -228,7 +228,7 @@ def get_aha_release_features(release_num: str) -> list[AhaFeature]:
 
 
 def get_aha_release_features_by_tag(tag: str) -> list[AhaFeature]:
-    features = aha_client.paginate(f'api/v1/features', 'features', data={"tag": tag})
+    features = aha_client.paginate('api/v1/features', 'features', data={"tag": tag})
     tasks = set()
     for feature in features:
         if task := get_task(feature.get('reference_num')):
@@ -366,11 +366,11 @@ def render_output_md(
             f'[Jira Release {RELEASE_VERSION}]({JIRA_SERVER}/projects/{JIRA_PROJECT}/versions/'
             f'{jira_release.id}/tab/release-report-all-issues)')
     else:
-        comment.append(f'Jira Release not found')
+        comment.append('Jira Release not found')
     if aha_release:
         comment.append(f'[Aha! Release {RELEASE_VERSION}]({aha_release.get("url", "")})')
     else:
-        comment.append(f'Aha! Release not found')
+        comment.append('Aha! Release not found')
 
     if len(missing_in_tracker) == 0:
         comment.append('Release Notes are generated based on git log: No tasks found in Task Tracker.')
@@ -445,7 +445,7 @@ def main():
             aha_release_features = get_aha_release_features(aha_release.get("reference_num", None))
             print(f"Aha! Release {aha_release.get('url', '')}")
         else:
-            print(f"Aha! Release not found")
+            print("Aha! Release not found")
     else:
         if AHA_TAG:
             aha_release = {'url': f'{AHA_SERVER}/api/v1/features?tag={AHA_TAG.replace(" ", "%20")}'}
@@ -461,7 +461,7 @@ def main():
             f"Jira Release {JIRA_SERVER}/projects/{JIRA_PROJECT}/versions/"
             f"{jira_release.id}/tab/release-report-all-issues]")
     else:
-        print(f"Jira Release not found")
+        print("Jira Release not found")
 
     tracker_release_tasks = jira_release_issues + aha_release_features
 
@@ -473,7 +473,7 @@ def main():
         missing_in_tracker = missing_tasks(gh_release_tasks, tracker_release_tasks)
         missing_release_note_field = [x for x in tracker_release_tasks if not x.release_note]
     else:
-        print(f"No tasks found in Task Tracker")
+        print("No tasks found in Task Tracker")
         print("Using GitHub as a source")
         sorted_release_tasks = sort_task_by_label(gh_release_tasks)
         missing_in_gh = []
@@ -500,7 +500,7 @@ def main():
             print(f"Creating a markdown output file: '{OUTPUT_FILE_MD}'")
             f.write(output_md)
     else:
-        print(f"OUTPUT_FILE_MD is not specified")
+        print("OUTPUT_FILE_MD is not specified")
     print(output_md)
 
     output_json = render_output_json(sorted_release_tasks)
@@ -509,7 +509,7 @@ def main():
             print(f"Creating a json output file: '{OUTPUT_FILE_JSON}'")
             json.dump(output_json, f)
     else:
-        print(f"OUTPUT_FILE_JSON is not specified")
+        print("OUTPUT_FILE_JSON is not specified")
     print(output_json)
 
 

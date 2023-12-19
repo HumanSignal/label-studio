@@ -2,6 +2,8 @@ import logging
 from functools import wraps
 
 import requests
+from core.feature_flags import flag_set
+from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
 from django.conf import settings
 from django.db.models import Q
@@ -9,7 +11,33 @@ from django.db.models import Q
 from .models import Webhook, WebhookAction
 
 
-def run_webhook(webhook, action, payload=None):
+def get_active_webhooks(organization, project, action):
+    """Return all active webhooks for organization or project by action.
+
+    If project is None - function return only organization hooks
+    else project is not None - function return project and organization hooks
+    Organization hooks are global hooks.
+    """
+    action_meta = WebhookAction.ACTIONS[action]
+    if project and action_meta.get('organization-only'):
+        raise ValueError('There is no project webhooks for organization-only action')
+
+    return Webhook.objects.filter(
+        Q(organization=organization)
+        & (Q(project=project) | Q(project=None))
+        & Q(is_active=True)
+        & (
+            Q(send_for_all_actions=True)
+            | Q(
+                id__in=WebhookAction.objects.filter(webhook__organization=organization, action=action).values_list(
+                    'webhook_id', flat=True
+                )
+            )
+        )
+    ).distinct()
+
+
+def run_webhook_sync(webhook, action, payload=None):
     """Run one webhook for action.
 
     This function must not raise any exceptions.
@@ -32,42 +60,18 @@ def run_webhook(webhook, action, payload=None):
         return
 
 
-def get_active_webhooks(organization, project, action):
-    """Return all active webhooks for organization or project by action.
-
-    If project is None - function return only organization hooks
-    else project is not None - function return project and organization hooks
-    Organization hooks are global hooks.
+def emit_webhooks_sync(organization, project, action, payload):
     """
-    action_meta = WebhookAction.ACTIONS[action]
-    if project and action_meta.get('organization-only'):
-        raise ValueError("There is no project webhooks for organization-only action")
-
-    return Webhook.objects.filter(
-        Q(organization=organization)
-        & (Q(project=project) | Q(project=None))
-        & Q(is_active=True)
-        & (
-            Q(send_for_all_actions=True)
-            | Q(
-                id__in=WebhookAction.objects.filter(webhook__organization=organization, action=action).values_list(
-                    'webhook_id', flat=True
-                )
-            )
-        )
-    ).distinct()
-
-
-def emit_webhooks(organization, project, action, payload):
-    """Run all active webhooks for the action."""
+    Run all active webhooks for the action.
+    """
     webhooks = get_active_webhooks(organization, project, action)
     if project and payload and webhooks.filter(send_payload=True).exists():
         payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
     for wh in webhooks:
-        run_webhook(wh, action, payload)
+        run_webhook_sync(wh, action, payload)
 
 
-def emit_webhooks_for_instance(organization, project, action, instance=None):
+def emit_webhooks_for_instance_sync(organization, project, action, instance=None):
     """Run all active webhooks for the action using instances as payload.
 
     Be sure WebhookAction.ACTIONS contains all required fields.
@@ -91,7 +95,51 @@ def emit_webhooks_for_instance(organization, project, action, instance=None):
                     instance=get_nested_field(instance, value['field']), many=value['many']
                 ).data
     for wh in webhooks:
-        run_webhook(wh, action, payload)
+        run_webhook_sync(wh, action, payload)
+
+
+def run_webhook(webhook, action, payload=None):
+    """Run one webhook for action.
+
+    This function must not raise any exceptions.
+
+    Will run a webhook in an RQ worker.
+    """
+    if flag_set('fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short'):
+        start_job_async_or_sync(
+            run_webhook_sync,
+            webhook,
+            action,
+            payload,
+            queue_name='high',
+        )
+    else:
+        run_webhook_sync(webhook, action, payload)
+
+
+def emit_webhooks_for_instance(organization, project, action, instance=None):
+    """Run all active webhooks for the action using instances as payload.
+
+    Be sure WebhookAction.ACTIONS contains all required fields.
+
+    Will run all selected webhooks in an RQ worker.
+    """
+    if flag_set('fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short'):
+        start_job_async_or_sync(emit_webhooks_for_instance_sync, organization, project, action, instance)
+    else:
+        emit_webhooks_for_instance_sync(organization, project, action, instance)
+
+
+def emit_webhooks(organization, project, action, payload):
+    """
+    Run all active webhooks for the action.
+
+    Will run all selected webhooks in an RQ worker.
+    """
+    if flag_set('fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short'):
+        start_job_async_or_sync(emit_webhooks_sync, organization, project, action, payload)
+    else:
+        emit_webhooks_sync(organization, project, action, payload)
 
 
 def api_webhook(action):

@@ -90,6 +90,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/organizations/<int:pk>/memberships/<int:user_pk>/",
+        "module": "organizations.api.OrganizationMemberDetailAPI",
+        "name": "organizations:api:organization-membership-detail",
+        "decorators": ""
+    },
+    {
         "url": "/api/invite",
         "module": "organizations.api.OrganizationInviteAPI",
         "name": "organizations:organization-invite",
@@ -174,6 +180,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/reimports/<int:reimport_pk>/",
+        "module": "projects.api.ProjectReimportAPI",
+        "name": "projects:api:project-reimports",
+        "decorators": ""
+    },
+    {
         "url": "/api/projects/<int:pk>/tasks/",
         "module": "projects.api.ProjectTaskListAPI",
         "name": "projects:api:project-tasks-list",
@@ -247,8 +259,14 @@
     },
     {
         "url": "/tasks/<int:task_id>/presign/",
-        "module": "data_import.api.PresignStorageData",
-        "name": "data_import:storage-data-presign",
+        "module": "data_import.api.TaskPresignStorageData",
+        "name": "data_import:task-storage-data-presign",
+        "decorators": ""
+    },
+    {
+        "url": "/projects/<int:project_id>/presign/",
+        "module": "data_import.api.ProjectPresignStorageData",
+        "name": "data_import:project-storage-data-presign",
         "decorators": ""
     },
     {
@@ -462,12 +480,6 @@
         "decorators": ""
     },
     {
-        "url": "/data/avatars/<path>",
-        "module": "django.views.static.serve",
-        "name": "",
-        "decorators": ""
-    },
-    {
         "url": "/api/current-user/reset-token/",
         "module": "users.api.UserResetTokenAPI",
         "name": "current-user-reset-token",
@@ -483,6 +495,12 @@
         "url": "/api/current-user/whoami",
         "module": "users.api.UserWhoAmIAPI",
         "name": "current-user-whoami",
+        "decorators": ""
+    },
+    {
+        "url": "/data/avatars/<path>",
+        "module": "django.views.static.serve",
+        "name": "",
         "decorators": ""
     },
     {

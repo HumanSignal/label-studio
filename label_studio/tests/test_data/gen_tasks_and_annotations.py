@@ -9,14 +9,14 @@ with random label_choices
 to be bulk imported in project
 """
 
-import random as r
 import os
+import random as r
 
 from django.conf import settings
 
 task_template_start = """{"id": %s,"predictions":[],"annotations":["""
 
-label_choices = ["Neutral", "Positive", "Negative"]
+label_choices = ['Neutral', 'Positive', 'Negative']
 
 tc_template = """{"id": %s,"review_result":null,"ground_truth":false,"result":[{"id":"MGK92Ogo4t","type":"choices","value":{"choices":["%s"]},"to_name":"text","from_name":"sentiment"}],"created_at":"2020-07-06T07:55:08.250617Z","updated_at":"2020-07-06T07:55:08.250637Z","lead_time":79.583,"completed_by":%s}"""
 

@@ -1,20 +1,25 @@
-from django.db import models
+import logging
+from typing import Optional, TypeVar
 
-from django.db.models import (
-    Subquery
-)
+from django.db import models
+from django.db.models import Model, QuerySet, Subquery
+
+logger = logging.getLogger(__name__)
 
 
 class SQCount(Subquery):
-    template = "(SELECT count(*) FROM (%(subquery)s) _count)"
+    template = '(SELECT count(*) FROM (%(subquery)s) _count)'
     output_field = models.IntegerField()
 
 
-def fast_first(queryset):
+ModelType = TypeVar('ModelType', bound=Model)
+
+
+def fast_first(queryset: QuerySet[ModelType]) -> Optional[ModelType]:
     """Replacement for queryset.first() when you don't need ordering,
-       queryset.first() works slowly in some cases
+    queryset.first() works slowly in some cases
     """
-    try:
-        return queryset.all()[0]
-    except IndexError:
-        return None
+
+    if result := queryset[:1]:
+        return result[0]
+    return None

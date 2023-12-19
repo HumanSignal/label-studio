@@ -33,11 +33,11 @@ if (process.env.NODE_ENV === 'production') {
   optimizer.minimize = true;
   optimizer.minimizer = [new TerserPlugin(), new CssMinimizerPlugin()];
   optimizer.runtimeChunk = false,
-  optimizer.splitChunks = {
-    cacheGroups: {
-      default: false,
-    },
-  };
+    optimizer.splitChunks = {
+      cacheGroups: {
+        default: false,
+      },
+    };
 }
 
 module.exports = {
@@ -106,11 +106,20 @@ module.exports = {
           loader: '@svgr/webpack',
           options: {
             ref: true,
+            exportType: 'named',
+            // svgo: false,
             svgoConfig: {
-              plugins: [{
-                name: 'removeViewBox',
-                active: false
-              }]
+              plugins: [
+                {
+                  name: "preset-default",
+                  params: {
+                    overrides: {
+                      removeViewBox: false,
+                      removeUnknownsAndDefaults: false,
+                    }
+                  }
+                }
+              ],
             },
           },
         }],

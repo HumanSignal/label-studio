@@ -34,5 +34,14 @@
   form.project-name
     width: 500px
     margin: 32px auto
-  form.project-name > *:not(:first-child)
-    margin-top: 32px
+
+    & > *:not(:first-child)
+      margin-top: 32px
+
+    label
+      display inline-flex
+      align-items center
+
+  .project-name
+    .caption
+      margin-bottom 32px

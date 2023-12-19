@@ -51,7 +51,7 @@ export const useBreadcrumbControls = singletonHook(initialBreadcrumbs, () => {
   addAction = useCallback((key, onClick) => {
     const crumbs = localCrumbs.map(crumb => {
       if (crumb.key === key) {
-        return {...crumb, onClick: onClick};
+        return { ...crumb, onClick };
       }
       return crumb;
     });

@@ -1,8 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from rest_framework.exceptions import APIException, ValidationError
 from rest_framework import status
-from lxml.etree import XMLSyntaxError
+from rest_framework.exceptions import APIException, ValidationError
 
 
 class LabelStudioError(Exception):
@@ -44,11 +43,8 @@ class LabelStudioXMLSyntaxErrorSentryIgnored(Exception):
     pass
 
 
-class ImportFromLocalIPError(LabelStudioAPIException):
-    default_detail = 'Importing from local IP is not allowed'
-    status_code = status.HTTP_403_FORBIDDEN
-
-
-class MLModelLocalIPError(LabelStudioAPIException):
-    default_detail = 'Adding models with local IP is not allowed'
+class InvalidUploadUrlError(LabelStudioAPIException):
+    default_detail = (
+        'The provided URL was not valid. URLs must begin with http:// or https://, and cannot be local IPs.'
+    )
     status_code = status.HTTP_403_FORBIDDEN
