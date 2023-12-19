@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-466: Don't sanitize text tasks",
-  "commit": "5ad30aa578453c7b9c11865bdcd3471f0293bae0",
-  "branch": "fb-leap-466/dont-sanitize-text",
-  "date": "2023-12-19T16:38:50Z"
+  "commit": "3c7243d0d552ed989060bac9244d5742d397b5c4",
+  "branch": "master",
+  "date": "2023-12-19T19:26:05Z"
 }
