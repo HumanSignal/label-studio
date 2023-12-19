@@ -128,7 +128,7 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
   );
 });
 
-const RelationMeta: FC<any> = ({ relation }) => {
+const RelationMeta: FC<any> = observer(({ relation }) => {
   const { selectedValues, control } = relation;
   const { children, choice } = control;
 
@@ -140,7 +140,7 @@ const RelationMeta: FC<any> = ({ relation }) => {
     const values: any[] = wrapArray(val);
 
     relation.setRelations(values);
-  }, []);
+  }, [relation]);
 
   return (
     <Block name="relation-meta">
@@ -148,7 +148,7 @@ const RelationMeta: FC<any> = ({ relation }) => {
         mode={selectionMode}
         style={{ width: '100%' }}
         placeholder="Select labels"
-        defaultValue={selectedValues}
+        value={selectedValues}
         onChange={onChange}
       >
         {children.map((c: any) => (
@@ -159,6 +159,6 @@ const RelationMeta: FC<any> = ({ relation }) => {
       </Select>
     </Block>
   );
-};
+});
 
 export const Relations = observer(RealtionsComponent);
