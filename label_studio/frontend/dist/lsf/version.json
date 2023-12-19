@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-341: Incorrect icon width causing layout issues with TabPanels in monorepo",
-  "commit": "2f5b6e1f3aac6aacf23b66ac64f1d6a8f34d4036",
-  "branch": "master",
-  "date": "2023-12-08T16:36:04Z"
+  "message": "fix: LEAP-466: Don't sanitize text tasks",
+  "commit": "5ad30aa578453c7b9c11865bdcd3471f0293bae0",
+  "branch": "fb-leap-466/dont-sanitize-text",
+  "date": "2023-12-19T16:38:50Z"
 }
