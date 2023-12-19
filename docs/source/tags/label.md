@@ -1,7 +1,7 @@
 ---
 title: Label
 type: tags
-order: 411
+order: 413
 meta_title: Label Tag for Single Label Tags
 meta_description: Customize Label Studio with the Label tag to assign a single label to regions in a task for machine learning and data science projects.
 ---
