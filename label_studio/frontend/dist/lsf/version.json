@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-466: Don't sanitize text tasks (#1646)",
-  "commit": "2012e411da565f3b877eec4dd317e06242b63eeb",
-  "branch": "fb-leap-466/dont-sanitize-text-cherry-pick",
-  "date": "2023-12-19T19:26:05Z"
+  "commit": "369d5c03243330a80b87ca2b20bdc68f44f9afa3",
+  "branch": "ls-release/1.10.1",
+  "date": "2023-12-19T21:56:36Z"
 }
