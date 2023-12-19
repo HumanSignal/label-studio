@@ -984,16 +984,15 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
     """Update annotation counters in project summary"""
     instance.increase_project_summary_counters()
 
-    if created:
-        # If new annotation created, update task.is_labeled state
-        logger.debug(f'Update task stats for task={instance.task}')
-        if instance.was_cancelled:
-            instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count()
-        else:
-            instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
-        instance.task.update_is_labeled()
-        instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
-        logger.debug(f'Updated total_annotations and cancelled_annotations for {instance.task.id}.')
+    # If annotation is changed, update task.is_labeled state
+    logger.debug(f'Update task stats for task={instance.task}')
+    if instance.was_cancelled:
+        instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count()
+    else:
+        instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
+    instance.task.update_is_labeled()
+    instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
+    logger.debug(f'Updated total_annotations and cancelled_annotations for {instance.task.id}.')
 
 
 @receiver(pre_delete, sender=Prediction)
