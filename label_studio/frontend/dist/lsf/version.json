@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
-  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
+  "message": "fix: OPTIC-341: Incorrect icon width causing layout issues with TabPanels in monorepo",
+  "commit": "2f5b6e1f3aac6aacf23b66ac64f1d6a8f34d4036",
   "branch": "master",
-  "date": "2023-12-05T16:41:20Z"
+  "date": "2023-12-08T16:36:04Z"
 }

@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import calendar
 import contextlib
 import copy
-import hashlib
 import logging
 import os
 import random
@@ -44,6 +43,7 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.utils import OperationalError
+from django.utils.crypto import get_random_string
 from django.utils.module_loading import import_string
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
