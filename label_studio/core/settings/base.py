@@ -490,7 +490,8 @@ DM_ROOT = (
     os.path.join(BASE_DIR, '../../web/dist/libs/datamanager')
     if ENABLE_MONOREPO_ENV
     else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/dm')
-)# FRONTEND = GUI for django backend
+)
+# FRONTEND = GUI for django backend
 REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 
 # per project settings
