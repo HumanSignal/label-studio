@@ -56,9 +56,9 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
     const { direction } = relation;
 
     switch (direction) {
-      case 'left': return <IconRelationLeft/>;
-      case 'right': return <IconRelationRight/>;
-      case 'bi': return <IconRelationBi/>;
+      case 'left': return <IconRelationLeft data-direction={relation.direction}/>;
+      case 'right': return <IconRelationRight data-direction={relation.direction}/>;
+      case 'bi': return <IconRelationBi data-direction={relation.direction}/>;
       default: return null;
     }
   }, [relation.direction]);
@@ -92,6 +92,7 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
             {(hovered || relation.showMeta) && relation.hasRelations && (
               <Button
                 primary={relation.showMeta}
+                aria-label={`${relation.showMeta ? 'Hide' : 'Show'} Relation Labels`}
                 type={relation.showMeta ? undefined : 'text'}
                 onClick={relation.toggleMeta}
                 style={{ padding: 0 }}
@@ -102,14 +103,14 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
           </Elem>
           <Elem name="action">
             {(hovered || !relation.visible) && (
-              <Button type="text" onClick={relation.toggleVisibility}>
+              <Button type="text" onClick={relation.toggleVisibility} aria-label={`${relation.visible ? 'Hide' : 'Show'} Relation`}>
                 {relation.visible ? <IconEyeOpened/> : <IconEyeClosed />}
               </Button>
             )}
           </Elem>
           <Elem name="action">
             {hovered && (
-              <Button type="text" danger onClick={() => {
+              <Button type="text" danger aria-label="Delete Relation" onClick={() => {
                 relation.node1.setHighlight(false);
                 relation.node2.setHighlight(false);
                 relation.parent.deleteRelation(relation);
