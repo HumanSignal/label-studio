@@ -1,0 +1,39 @@
+var _g, _g2;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgPlusCircle = function SvgPlusCircle(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 28,
+    height: 28,
+    fill: "none",
+    ref: ref
+  }, props), _g || (_g = /*#__PURE__*/React.createElement("g", {
+    opacity: 0.4
+  }, /*#__PURE__*/React.createElement("rect", {
+    width: 28,
+    height: 28,
+    fill: "#fff",
+    rx: 14
+  }), /*#__PURE__*/React.createElement("rect", {
+    width: 27,
+    height: 27,
+    x: 0.5,
+    y: 0.5,
+    stroke: "currentColor",
+    strokeDasharray: "2 2",
+    strokeOpacity: 0.5,
+    rx: 13.5
+  }))), _g2 || (_g2 = /*#__PURE__*/React.createElement("g", {
+    fill: "currentColor",
+    opacity: 0.6
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M13 6h2v16h-2z"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M6 13h16v2H6z"
+  }))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgPlusCircle);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCAyOCAyOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgb3BhY2l0eT0iMC40Ij4KPHJlY3Qgd2lkdGg9IjI4IiBoZWlnaHQ9IjI4IiByeD0iMTQiIGZpbGw9IndoaXRlIi8+CjxyZWN0IHg9IjAuNSIgeT0iMC41IiB3aWR0aD0iMjciIGhlaWdodD0iMjciIHJ4PSIxMy41IiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiAyIi8+CjwvZz4KPGcgb3BhY2l0eT0iMC42Ij4KPHBhdGggZD0iTTEzIDZIMTVWMjJIMTNWNloiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8cGF0aCBkPSJNNiAxM0gyMlYxNUg2VjEzWiIgZmlsbD0iY3VycmVudENvbG9yIi8+CjwvZz4KPC9zdmc+Cg==";

@@ -1,0 +1,21 @@
+var _path;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgCommentCheck = function SvgCommentCheck(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 20,
+    height: 20,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "#5CDBD3",
+    fillRule: "evenodd",
+    d: "M5.2 4.5h9.6c.66 0 1.2.54 1.2 1.2v9.593a.5.5 0 0 1-.854.353l-1.253-1.253a1 1 0 0 0-.707-.293H5.2c-.66 0-1.2-.54-1.2-1.2V5.7c0-.66.54-1.2 1.2-1.2m7.938 3.638a.667.667 0 0 0-.943-.943L9.667 9.724 8.138 8.195a.667.667 0 1 0-.943.943l2 2c.26.26.683.26.943 0z",
+    clipRule: "evenodd"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgCommentCheck);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01LjIgNC41SDE0LjhDMTUuNDYgNC41IDE2IDUuMDQgMTYgNS43VjE1LjI5MjlDMTYgMTUuNzM4MyAxNS40NjE0IDE1Ljk2MTQgMTUuMTQ2NCAxNS42NDY0TDEzLjg5MjkgMTQuMzkyOUMxMy43MDU0IDE0LjIwNTQgMTMuNDUxIDE0LjEgMTMuMTg1OCAxNC4xSDUuMkM0LjU0IDE0LjEgNCAxMy41NiA0IDEyLjlWNS43QzQgNS4wNCA0LjU0IDQuNSA1LjIgNC41Wk0xMy4xMzgxIDguMTM4MDdDMTMuMzk4NCA3Ljg3NzcyIDEzLjM5ODQgNy40NTU2MSAxMy4xMzgxIDcuMTk1MjZDMTIuODc3NyA2LjkzNDkxIDEyLjQ1NTYgNi45MzQ5MSAxMi4xOTUzIDcuMTk1MjZMOS42NjY2NyA5LjcyMzg2TDguMTM4MDcgOC4xOTUyNkM3Ljg3NzcyIDcuOTM0OTEgNy40NTU2MSA3LjkzNDkxIDcuMTk1MjYgOC4xOTUyNkM2LjkzNDkxIDguNDU1NjEgNi45MzQ5MSA4Ljg3NzcyIDcuMTk1MjYgOS4xMzgwN0w5LjE5NTI2IDExLjEzODFDOS40NTU2MSAxMS4zOTg0IDkuODc3NzIgMTEuMzk4NCAxMC4xMzgxIDExLjEzODFMMTMuMTM4MSA4LjEzODA3WiIgZmlsbD0iIzVDREJEMyIvPgo8L3N2Zz4K";
