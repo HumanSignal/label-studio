@@ -1,0 +1,29 @@
+var _rect, _path, _path2;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgDraftCreated2 = function SvgDraftCreated2(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 20,
+    height: 20,
+    fill: "none",
+    ref: ref
+  }, props), _rect || (_rect = /*#__PURE__*/React.createElement("rect", {
+    width: 20,
+    height: 20,
+    fill: "currentColor",
+    fillOpacity: 0.2,
+    rx: 4
+  })), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    fillOpacity: 0.3,
+    d: "M5 5h10v2l-1 5-1-5H7v6l5 1-5 1H5z"
+  })), _path2 || (_path2 = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    d: "M4.5 14a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0M12.5 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0M4 6a2 2 0 1 1 4 0 2 2 0 0 1-4 0"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgDraftCreated2);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHJ4PSI0IiBmaWxsPSJjdXJyZW50Q29sb3IiIGZpbGwtb3BhY2l0eT0iMC4yIi8+CiAgPHBhdGggZD0iTTUgNUgxNVY3TDE0IDEyTDEzIDdIN1YxM0wxMiAxNEw3IDE1SDVWNVoiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1vcGFjaXR5PSIwLjMiLz4KICA8cGF0aCBkPSJNNC41IDE0QzQuNSAxMy4xNzE2IDUuMTcxNTcgMTIuNSA2IDEyLjVDNi44Mjg0MyAxMi41IDcuNSAxMy4xNzE2IDcuNSAxNEM3LjUgMTQuODI4NCA2LjgyODQzIDE1LjUgNiAxNS41QzUuMTcxNTcgMTUuNSA0LjUgMTQuODI4NCA0LjUgMTRaIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4KICA8cGF0aCBkPSJNMTIuNSA2QzEyLjUgNS4xNzE1NyAxMy4xNzE2IDQuNSAxNCA0LjVDMTQuODI4NCA0LjUgMTUuNSA1LjE3MTU3IDE1LjUgNkMxNS41IDYuODI4NDMgMTQuODI4NCA3LjUgMTQgNy41QzEzLjE3MTYgNy41IDEyLjUgNi44Mjg0MyAxMi41IDZaIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4KICA8cGF0aCBkPSJNNCA2QzQgNC44OTU0MyA0Ljg5NTQzIDQgNiA0QzcuMTA0NTcgNCA4IDQuODk1NDMgOCA2QzggNy4xMDQ1NyA3LjEwNDU3IDggNiA4QzQuODk1NDMgOCA0IDcuMTA0NTcgNCA2WiIgZmlsbD0iY3VycmVudENvbG9yIi8+Cjwvc3ZnPgo=";

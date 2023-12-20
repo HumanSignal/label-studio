@@ -1,0 +1,34 @@
+var _rect, _path, _path2;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgExpand = function SvgExpand(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _rect || (_rect = /*#__PURE__*/React.createElement("rect", {
+    width: 20,
+    height: 14,
+    x: 2,
+    y: 5,
+    fill: "#fff",
+    stroke: "#000",
+    strokeWidth: 2,
+    rx: 1.5
+  })), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "#000",
+    fillOpacity: 0.15,
+    d: "M1 11h22v7H1z"
+  })), _path2 || (_path2 = /*#__PURE__*/React.createElement("path", {
+    fill: "#000",
+    fillRule: "evenodd",
+    d: "M12 9a1 1 0 0 1 .707.293l3 3a1 1 0 0 1-1.414 1.414L12 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414l3-3A1 1 0 0 1 12 9",
+    clipRule: "evenodd"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgExpand);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMiIgeT0iNSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjE0IiByeD0iMS41IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0xIDExSDIzVjE4SDFWMTFaIiBmaWxsPSJibGFjayIgZmlsbC1vcGFjaXR5PSIwLjE1Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTIgOC45OTk4OEMxMi4yNjUyIDguOTk5ODggMTIuNTE5NiA5LjEwNTI1IDEyLjcwNzEgOS4yOTI4TDE1LjcwNyAxMi4yOTI5QzE2LjA5NzUgMTIuNjgzNSAxNi4wOTc1IDEzLjMxNjYgMTUuNzA3IDEzLjcwNzFDMTUuMzE2NCAxNC4wOTc2IDE0LjY4MzMgMTQuMDk3NiAxNC4yOTI3IDEzLjcwNzFMMTIgMTEuNDE0MUw5LjcwNzEyIDEzLjcwNzFDOS4zMTY2IDE0LjA5NzYgOC42ODM0MyAxNC4wOTc2IDguMjkyOSAxMy43MDcxQzcuOTAyMzcgMTMuMzE2NiA3LjkwMjM2IDEyLjY4MzQgOC4yOTI4OCAxMi4yOTI5TDExLjI5MjkgOS4yOTI3OEMxMS40ODA0IDkuMTA1MjQgMTEuNzM0OCA4Ljk5OTg3IDEyIDguOTk5ODhaIiBmaWxsPSJibGFjayIvPgo8L3N2Zz4K";
