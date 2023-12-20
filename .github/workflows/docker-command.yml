@@ -17,6 +17,15 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
+      - name: Add Workflow link to command comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
       - name: Check user's membership
         uses: actions/github-script@v7
         id: check-membership
@@ -58,30 +67,40 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - name: Add reaction to command comment on success
-        uses: peter-evans/create-or-update-comment@v3
-        if: needs.build-docker.result != 'failure'
-        with:
-          token: ${{ secrets.GIT_PAT }}
-          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
-          body: |
-            > Docker image was pushed with the tag `${{ needs.build-docker.outputs.image_version }}`
-            >
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          reactions: "+1"
+      - name: Details
+        id: details
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          case "${{ needs.build-docker.result }}" in
+            success)
+              echo "comment=Docker image was pushed with the tag `${{ needs.build-docker.outputs.build_version }}`" >> $GITHUB_OUTPUT
+              echo "reaction=+1" >> $GITHUB_OUTPUT
+              ;;
+            skipped)
+              echo "comment=Workflow has been skipped" >> $GITHUB_OUTPUT
+              echo "reaction=confused" >> $GITHUB_OUTPUT
+              ;;
+            cancelled)
+              echo "comment=Workflow has been canceled" >> $GITHUB_OUTPUT
+              echo "reaction=confused" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "comment=**Error**: failed to execute \"${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}\" command" >> $GITHUB_OUTPUT
+              echo "reaction=-1" >> $GITHUB_OUTPUT
+              ;;
+          esac
 
-      - name: Add reaction to command comment on failure
+      - name: Add reaction to command comment
         uses: peter-evans/create-or-update-comment@v3
-        if: needs.build-docker.result == 'failure'
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
-            > **Error**: failed to execute "${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}" command
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          reactions: "-1"
+            > ${{ steps.details.outputs.comment }}
+          reactions: ${{ steps.details.outputs.reaction }}
 
   help:
     if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'help'

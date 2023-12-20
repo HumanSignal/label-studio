@@ -179,7 +179,7 @@ jobs:
 
       - name: Upload to artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Dist
           path: dist/
