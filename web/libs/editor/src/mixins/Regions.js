@@ -21,8 +21,6 @@ const RegionsMixin = types
     // Dynamic preannotations enabled
     dynamic: false,
 
-    locked: false,
-
     origin: types.optional(types.enumeration([
       'prediction',
       'prediction-changed',
@@ -35,6 +33,7 @@ const RegionsMixin = types
     // selected: false,
     _highlighted: false,
     hidden: false,
+    locked: false,
     isDrawing: false,
     perRegionFocusRequest: null,
     shapeRef: null,
