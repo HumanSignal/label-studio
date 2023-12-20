@@ -1,0 +1,91 @@
+title: Object Detection on the COCO dataset
+type: community
+group: Computer Vision
+details: <h1>Draw a bounding box around an object, and optionally add descriptive text</h1>
+config: |
+  <View>
+    <Image name="image" value="$image" />
+    <RectangleLabels name="label" toName="image">
+      <Label value="bottle"/>
+      <Label value="dining table"/>
+      <Label value="person"/>
+      <Label value="knife"/>
+      <Label value="bowl"/>
+      <Label value="oven"/>
+      <Label value="cup"/>
+      <Label value="broccoli"/>
+      <Label value="spoon"/>
+      <Label value="carrot"/>
+      <Label value="sink"/>
+      <Label value="potted plant"/>
+      <Label value="chair"/>
+      <Label value="refrigerator"/>
+      <Label value="banana"/>
+      <Label value="orange"/>
+      <Label value="umbrella"/>
+      <Label value="handbag"/>
+      <Label value="traffic light"/>
+      <Label value="bicycle"/>
+      <Label value="skateboard"/>
+      <Label value="car"/>
+      <Label value="truck"/>
+      <Label value="toilet"/>
+      <Label value="motorcycle"/>
+      <Label value="bird"/>
+      <Label value="keyboard"/>
+      <Label value="book"/>
+      <Label value="tv"/>
+      <Label value="vase"/>
+      <Label value="couch"/>
+      <Label value="airplane"/>
+      <Label value="suitcase"/>
+      <Label value="giraffe"/>
+      <Label value="cow"/>
+      <Label value="boat"/>
+      <Label value="bench"/>
+      <Label value="sheep"/>
+      <Label value="bus"/>
+      <Label value="backpack"/>
+      <Label value="train"/>
+      <Label value="stop sign"/>
+      <Label value="dog"/>
+      <Label value="cat"/>
+      <Label value="laptop"/>
+      <Label value="tie"/>
+      <Label value="elephant"/>
+      <Label value="clock"/>
+      <Label value="frisbee"/>
+      <Label value="bear"/>
+      <Label value="zebra"/>
+      <Label value="horse"/>
+      <Label value="skis"/>
+      <Label value="sports ball"/>
+      <Label value="baseball glove"/>
+      <Label value="donut"/>
+      <Label value="sandwich"/>
+      <Label value="cake"/>
+      <Label value="surfboard"/>
+      <Label value="bed"/>
+      <Label value="pizza"/>
+      <Label value="tennis racket"/>
+      <Label value="toothbrush"/>
+      <Label value="remote"/>
+      <Label value="apple"/>
+      <Label value="snowboard"/>
+      <Label value="kite"/>
+      <Label value="baseball bat"/>
+      <Label value="fire hydrant"/>
+      <Label value="mouse"/>
+      <Label value="teddy bear"/>
+      <Label value="cell phone"/>
+      <Label value="scissors"/>
+      <Label value="wine glass"/>
+      <Label value="fork"/>
+      <Label value="microwave"/>
+      <Label value="hot dog"/>
+      <Label value="parking meter"/>
+      <Label value="toaster"/>
+      <Label value="hair drier"/>
+    </RectangleLabels>
+    <TextArea name="details" toName="image" editable="true" perRegion="true"/>
+  </View>
