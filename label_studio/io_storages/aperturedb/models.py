@@ -90,11 +90,13 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         _('constraints'),
         blank=True, null=True,
         help_text='ApertureDB constraints on bounding box predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)')
+    
+    limit = models.PositiveIntegerField(_('limit'), null=True, blank=True,
+                                       help_text='Maximum number of tasks')
 
     def iterkeys(self):
         db = self.get_connection()
 
-        limit = 10000
         batch = 100
 
         offset = 0
@@ -111,7 +113,7 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         if self.constraints:
             find_images["constraints"] = json.loads(str(self.constraints))
 
-        while (offset < limit):
+        while (not self.limit) or (offset < self.limit):
             find_images["offset"] = offset
             res, _, = db.query([{"FindImage": find_images}])
             if self._response_status(res) != 0:
