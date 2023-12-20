@@ -37,12 +37,14 @@ ImportStorage:
       - type: textarea
         name: constraints
         label: Image Constraints (optional)
+        description: ApertureDB FindImage constraints (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)
       - type: toggle
         name: predictions
-        label: Include Predictions
+        label: Include Bounding Box Predictions
       - type: textarea
         name: pred_constraints
         label: Prediction Constraints (optional)
+        description: ApertureDB constraints on bounding box predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)
 
 ExportStorage:
   - columnCount: 3

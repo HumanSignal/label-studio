@@ -3,12 +3,14 @@
 import json
 import logging
 import threading
+import re
 
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from core.redis import start_job_async_or_sync
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
@@ -19,8 +21,11 @@ from io_storages.base_models import (
 from tasks.models import Annotation
 
 from aperturedb import Connector
+import traceback
 
 logger = logging.getLogger(__name__)
+
+UID_REGEX = re.compile(r"^\d+\.\d+\.\d+$")
 
 
 class ApertureDBStorageMixin(models.Model):
@@ -79,12 +84,12 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         help_text='ApertureDB FindImage constraints (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)')
     
     predictions = models.BooleanField(_('predictions'), default=False,
-                                  help_text='Load predictions from ApertureDB?')
+                                  help_text='Load bounding box predictions from ApertureDB?')
     
-    pred_conditions = models.TextField(
+    pred_constraints = models.TextField(
         _('constraints'),
         blank=True, null=True,
-        help_text='ApertureDB constraints on predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)')
+        help_text='ApertureDB constraints on bounding box predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)')
 
     def iterkeys(self):
         db = self.get_connection()
@@ -93,13 +98,18 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         batch = 100
 
         offset = 0
+        constraints = json.loads(str(self.constraints)) if self.constraints else {}
         find_images = {
             "uniqueids": True,
             "blobs": False,
-            "limit": batch
+            "limit": batch,
+            "constraints": constraints | {
+                "width": [">", 0],
+                "height": [">", 0]
+            }
         }
         if self.constraints:
-            find_images["constrants"] = json.loads(str(self.constraints))
+            find_images["constraints"] = json.loads(str(self.constraints))
 
         while (offset < limit):
             find_images["offset"] = offset
@@ -121,7 +131,7 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
             "result": [{
                 "from_name": "label",
                 "to_name": "image",
-                "id": str(bbx["LS_id"]) if bbx["LS_id"] is not None else bbx["_uniqueid"],
+                "id": str(bbx["LS_id"] if bbx["LS_id"] is not None else bbx["_uniqueid"]),
                 "type": "rectanglelabels",
                 "original_width": width,
                 "original_height": height,
@@ -137,7 +147,7 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
             } for bbx in bboxen]
         }] if len(bboxen) > 0 else []
         
-    def _get_bbox_annotations(self, key):
+    def _get_bbox_annotations(self, key, project_id):
         db = self.get_connection()
         query = [{
             "FindImage": {
@@ -155,45 +165,52 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         },{
             "FindEntity": {
                 "with_class": "LS_annotation",
-                "is_connected_to": { 
+                "is_connected_to": {
                     "ref": 1 
+                },
+                "constraints": {
+                    "LS_project_id": ["==", project_id]
                 },
                 "results": {
                     "list": ["LS_data"]
                 }
             }
-        },{
-            "FindBoundingBox": {
-                "image_ref": 1,
-                "blobs": False,
-                "coordinates": True,
-                "labels": True,
-                "uniqueids": True,
-                "results": {
-                    "list": ["LS_id"]
-                },
-                "constraints": {
-                    "LS_id": ["==", None],
-                }
-            }
         }]
+
+        if self.predictions:
+            pred_constraints = json.loads(str(self.pred_constraints)) if self.pred_constraints else {}
+            query.append({
+                "FindBoundingBox": {
+                    "image_ref": 1,
+                    "blobs": False,
+                    "coordinates": True,
+                    "labels": True,
+                    "uniqueids": True,
+                    "results": {
+                        "list": ["LS_id"]
+                    },
+                    "constraints": pred_constraints | {
+                        "LS_id": ["==", None],
+                    }
+                }
+            })
 
         res, _ = db.query(query)
         status = self._response_status(res)
         anns = []
         preds = []
-        if status == 0:
+        if status != 0:
+            raise ValueError(f"Error retrieving ApertureDB image data : {db.get_last_response_str()}")
+        if "entities" in res[0]["FindImage"]:
             img = res[0]["FindImage"]["entities"][0] or {}
-            annotations = res[1]["FindEntity"]["entities"] if res[1]["FindEntity"]["returned"] > 0 else []
-            bboxen = res[2]["FindBoundingBox"]["entities"] if res[2]["FindBoundingBox"]["returned"] > 0 else []
-
-            anns = [json.loads(ann["LS_data"]) for ann in annotations]
+            anns = res[1]["FindEntity"]["entities"] if res[1]["FindEntity"]["returned"] > 0 else []
+            anns = [json.loads(ann["LS_data"]) for ann in anns]
             anns = [{"result": ann["result"]} for ann in anns]
-            preds = self._adb_to_rectanglelabels(img, bboxen)
-            return anns, preds
-        if status == 1:  # empty
-            return [], []
-        raise ValueError(f"Error retrieving ApertureDB image data : {db.get_last_response_str()}")
+
+            if self.predictions:
+                bboxen = res[2]["FindBoundingBox"]["entities"] if res[2]["FindBoundingBox"]["returned"] > 0 else []
+                preds = self._adb_to_rectanglelabels(img, bboxen)
+        return anns, preds
 
 
     def get_data(self, key):
@@ -203,7 +220,7 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
             }
         }
 
-        anns, preds = self._get_bbox_annotations(key)
+        anns, preds = self._get_bbox_annotations(key, self.project.id)
         if len(anns) > 0:
             data["annotations"] = anns
         if len(preds) > 0:
@@ -230,7 +247,11 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         raise ValueError(f"Error retrieving ApertureDB image data : {db.get_last_response_str()}")
 
     def scan_and_create_links(self):
-        return self._scan_and_create_links(ApertureDBImportStorageLink)
+        try:
+            return self._scan_and_create_links(ApertureDBImportStorageLink)
+        except Exception as e:
+            logger.warning(f"Unhandled exception during ApertureDBImportStorage sync:  {''.join(traceback.format_exception(e))}")
+            raise e
 
     class Meta:
         abstract = True
@@ -308,11 +329,17 @@ class ApertureDBExportStorage(ApertureDBStorageMixin, ExportStorage):
             elif ann["type"].startswith("rectangle"):
                 bbox_map[ann["id"]] = AnnotationBBox(ann)
 
+        img_id = annotation.task.storage_filename
+        if not img_id:
+            img_url = annotation.task.data["image"]
+            img_id = re.split("key=", img_url)[-1]
+
+        ann_id = str(annotation.id)
         query = [{
             "FindImage": {
                 "blobs": False,
                 "constraints": {
-                    "_uniqueid": ["==", annotation.task.storage_filename]
+                    "_uniqueid": ["==", img_id]
                 },
                 "results": {
                     "count": True
@@ -323,10 +350,10 @@ class ApertureDBExportStorage(ApertureDBStorageMixin, ExportStorage):
             "AddEntity": {
                 "class": "LS_annotation",
                 "if_not_found": {
-                    "LS_id": ["==", annotation.id]
+                    "LS_id": ["==", ann_id]
                 },
                 "properties": {
-                    "LS_id": annotation.id,
+                    "LS_id": ann_id,
                 },
                 "connect": {
                     "ref": 1,
@@ -338,11 +365,12 @@ class ApertureDBExportStorage(ApertureDBStorageMixin, ExportStorage):
             "UpdateEntity": {
                 "ref": 2,
                 "properties": {
-                    # "LS_created_at": _convert_datetime(annotation.created_at),
-                    "LS_project": annotation.project.title,
-                    "LS_completed_by": annotation.completed_by.email,
-                    # "LS_updated_at": _convert_datetime(annotation.updated_at),
-                    "LS_updated_by": annotation.updated_by.email,
+                    "LS_created_at": { "_date": annotation.created_at.isoformat() },
+                    "LS_project_title": annotation.project.title,
+                    "LS_project_id": annotation.project.id,
+                    "LS_completed_by": annotation.completed_by.email if annotation.completed_by else "",
+                    "LS_updated_at": { "_date": annotation.updated_at.isoformat() },
+                    "LS_updated_by": annotation.updated_by.email if annotation.updated_by else "",
                     "LS_data": json.dumps(ser_annotation)
                 }
             }
@@ -361,7 +389,7 @@ class ApertureDBExportStorage(ApertureDBStorageMixin, ExportStorage):
                     "if_not_found": {
                         "any": {
                             "LS_id": ["==", id],
-                            "_uniqueid": ["==", id]
+                            "_uniqueid": ["==", id if UID_REGEX.match(id) else "0.0.0"]
                         }
                     }
                 }
@@ -372,7 +400,7 @@ class ApertureDBExportStorage(ApertureDBStorageMixin, ExportStorage):
                     "label": bbox.labels[0] if len(bbox.labels) > 0 else "",
                     "properties": {
                         "LS_text": json.dumps(bbox.text),
-                        "LS_annotation": annotation.id,
+                        "LS_annotation": ann_id,
                         "LS_label": json.dumps(bbox.labels)
                     }
                 }
@@ -389,8 +417,66 @@ class ApertureDBExportStorage(ApertureDBStorageMixin, ExportStorage):
         res, _ = db.query(query)
         status = self._response_status(res)
         if (status not in (0,2)):
-            raise ValueError(f"Error retrieving ApertureDB image data : {db.get_last_response_str()}")
-        logger.debug(f'Saved annotation {annotation} to {self.__class__.__name__} Storage')
+            raise ValueError(f"Error saving annotation data to ApertureDB : {db.get_last_response_str()}")
+
+    def delete_annotation(self, annotation):
+        db = self.get_connection()
+        logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}...')
+
+        ann_id = str(annotation.id)
+        query = [{
+            "FindEntity": {
+                "with_class": "LS_annotation",
+                "constraints": {
+                    "LS_id": ["==", ann_id]
+                },
+                "_ref": 1
+            }
+        },{
+            "FindBoundingBox": {
+                "is_connected_to": {
+                    "ref": 1,
+                    "connection_class": "LS_annotation_region"
+                },
+                "_ref": 2
+            }
+        },{
+            "DeleteBoundingBox": {
+                "ref": 2
+            }
+        },{
+            "DeleteEntity": {
+                "ref": 1
+            }
+        }]
+        
+        res, _ = db.query(query)
+        status = self._response_status(res)
+        if (status not in (0,2)):
+            raise ValueError(f"Error deleting annotation data from ApertureDB : {db.get_last_response_str()}")
+
+
+def async_aperturedb_annotation_operation(annotation, operation):
+    project = annotation.project
+    if hasattr(project, 'io_storages_aperturedbexportstorages'):
+        for storage in project.io_storages_aperturedbexportstorages.all():
+            logger.debug(f'{operation} {annotation} in ApertureDB storage {storage}')
+            getattr(storage, operation)(annotation)
+
+def enqueue_aperturedb_annotation_operation(annotation, operation):
+    storages = getattr(annotation.project, 'io_storages_aperturedbexportstorages', None)
+    if storages and storages.exists():  # avoid excess jobs in rq
+        start_job_async_or_sync(async_aperturedb_annotation_operation, annotation, operation)
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_aperturedb_storages(sender, instance, **kwargs):
+    enqueue_aperturedb_annotation_operation(instance, "save_annotation")
+
+
+@receiver(pre_delete, sender=Annotation)
+def delete_annotation_from_aperturedb_storages(sender, instance, **kwargs):
+    enqueue_aperturedb_annotation_operation(instance, "delete_annotation")
         
 
 class ApertureDBImportStorageLink(ImportStorageLink):

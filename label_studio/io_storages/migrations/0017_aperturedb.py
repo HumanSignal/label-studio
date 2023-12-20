@@ -61,8 +61,8 @@ class Migration(migrations.Migration):
                 ('token', models.TextField(blank=True, help_text='ApertureDB user token', null=True, verbose_name='token')),
                 ('use_ssl', models.BooleanField(default=True, help_text='Use SSL when communicating with ApertureDB', verbose_name='use_ssl')),
                 ('constraints', models.TextField(blank=True, help_text='ApertureDB FindImage constraints (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)', null=True, verbose_name='constraints')),
-                ('predictions', models.BooleanField(default=False, help_text='Load predictions from ApertureDB?', verbose_name='predictions')),
-                ('pred_conditions', models.TextField(blank=True, help_text='ApertureDB constraints on predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)', null=True, verbose_name='constraints')),
+                ('predictions', models.BooleanField(default=False, help_text='Load bounding box predictions from ApertureDB?', verbose_name='predictions')),
+                ('pred_constraints', models.TextField(blank=True, help_text='ApertureDB constraints on bounding box predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)', null=True, verbose_name='constraints')),
                 ('project', models.ForeignKey(help_text='A unique integer value identifying this project.', on_delete=django.db.models.deletion.CASCADE, related_name='io_storages_aperturedbimportstorages', to='projects.project')),
             ],
             options={
