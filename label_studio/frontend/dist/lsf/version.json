@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-368: Don't add visibility to undo history",
-  "commit": "dfe1d775aec59c161147f09b823a9fe8b4ebf70e",
+  "commit": "6b538578932187330553625d4136227f1a9a69fd",
   "branch": "fb-leap-368/undo-hidden",
-  "date": "2023-12-13T10:11:28Z"
+  "date": "2023-12-20T16:00:00Z"
 }
