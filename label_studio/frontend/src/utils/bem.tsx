@@ -97,10 +97,8 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
     finalClass.push(...mixMap);
   }
 
-  const attachNamespace = (cls: string) => {
-    if (new RegExp(CSS_PREFIX).test(cls)) return cls;
-    else return `${CSS_PREFIX}${cls}`;
-  };
+  const attachNamespace = (cls: string) =>
+    cls.startsWith(CSS_PREFIX) ? cls : `${CSS_PREFIX}${cls}`;
 
   return finalClass.filter(cls => !isEmptyString(cls)).map(attachNamespace).join(" ");
 };
