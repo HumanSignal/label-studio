@@ -331,6 +331,8 @@ export const FF_LEAP_187 = 'fflag_feat_front_leap_187_video_seek_on_select_short
  */
 export const FF_ZOOM_OPTIM = 'fflag_fix_front_leap_32_zoom_perf_190923_short';
 
+export const FF_SAFE_TEXT = 'fflag_fix_leap_466_text_sanitization';
+
 
 Object.assign(window, {
   APP_SETTINGS: {

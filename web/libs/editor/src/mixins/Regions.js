@@ -12,8 +12,6 @@ const RegionsMixin = types
 
     score: types.maybeNull(types.number),
 
-    hidden: types.optional(types.boolean, false),
-
     filtered: types.optional(types.boolean, false),
 
     parentID: types.optional(types.string, ''),
@@ -22,8 +20,6 @@ const RegionsMixin = types
 
     // Dynamic preannotations enabled
     dynamic: false,
-
-    locked: false,
 
     origin: types.optional(types.enumeration([
       'prediction',
@@ -36,6 +32,8 @@ const RegionsMixin = types
   .volatile(() => ({
     // selected: false,
     _highlighted: false,
+    hidden: false,
+    locked: false,
     isDrawing: false,
     perRegionFocusRequest: null,
     shapeRef: null,
