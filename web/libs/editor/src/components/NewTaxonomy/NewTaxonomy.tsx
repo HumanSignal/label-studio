@@ -143,7 +143,6 @@ const NewTaxonomy = ({
     setFilteredTreeData(list);
     if (expandedKeys?.length) setExpandedKeys(expandedKeys);
     else setExpandedKeys(undefined);
-
   }, []);
 
   const renderDropdown = useCallback((origin: ReactNode) => {
@@ -191,7 +190,7 @@ const NewTaxonomy = ({
       }}
       treeCheckStrictly
       showCheckedStrategy={TreeSelect.SHOW_ALL}
-      treeExpandAction="click"
+      treeExpandAction={false}
       dropdownMatchSelectWidth={dropdownWidth}
       placeholder={options.placeholder || 'Click to add...'}
       style={style}
