@@ -55,6 +55,21 @@ const PerRegionMixin = types
     },
   }))
   .actions(self => ({
+    _validatePerRegion() {
+      const objectTag = self.toNameTag;
+
+      for (const reg of objectTag.allRegs) {
+        const value = reg.results.find(s => s.from_name === self)?.mainValue;
+        const isValid = self.validateValue(value);
+
+        if (!isValid) {
+          self.annotation.selectArea(reg);
+          return false;
+        }
+      }
+
+      return true;
+    },
     createPerRegionResult() {
       self.perRegionArea?.setValue(self);
     },

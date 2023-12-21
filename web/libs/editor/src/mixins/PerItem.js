@@ -1,4 +1,5 @@
 import { types } from 'mobx-state-tree';
+import { FF_LSDV_4583, isFF } from '../utils/feature-flags';
 
 /**
  * This mixing defines perItem control-tag's parameter and related basic functionality
@@ -22,6 +23,26 @@ const PerItemMixin = types
     },
   }))
   .actions(self => ({
+    _validatePerItem() {
+      const objectTag = self.toNameTag;
+
+      return self.annotation.regions
+        .every((reg) => {
+          const result = reg.results.find(s => s.from_name === self);
+
+          if (!result || !result.hasValue) {
+            return true;
+          }
+          const value = result.mainValue;
+          const isValid = self.validateValue(value);
+
+          if (!isValid) {
+            objectTag.setCurrentItem(reg.item_index);
+            return false;
+          }
+          return true;
+        });
+    },
     createPerItemResult() {
       self.createPerObjectResult({
         item_index: self.toNameTag.currentItemIndex,

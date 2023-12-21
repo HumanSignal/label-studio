@@ -14,7 +14,7 @@ import { findRangeNative, rangeToGlobalOffset } from '../../../utils/selection-t
 import { escapeHtml, isValidObjectURL } from '../../../utils/utilities';
 import ObjectBase from '../Base';
 import { cloneNode } from '../../../core/Helpers';
-import { FF_LSDV_4620_3, isFF } from '../../../utils/feature-flags';
+import { FF_LSDV_4620_3, FF_SAFE_TEXT, isFF } from '../../../utils/feature-flags';
 import DomManager from './domManager';
 import { STATE_CLASS_MODS } from '../../../mixins/HighlightMixin';
 import Constants from '../../../core/Constants';
@@ -220,7 +220,12 @@ const Model = types
 
         // clean up the html — remove scripts and iframes
         // nodes count better be the same, so replace them with stubs
-        self._value = sanitizeHtml(String(val));
+        // we should not sanitize text tasks because we already have htmlEscape in view.js
+        if (isFF(FF_SAFE_TEXT) && self.type === 'text') {
+          self._value = val;
+        } else {
+          self._value = sanitizeHtml(String(val));
+        }
 
         self._regionsCache.forEach(({ region, annotation }) => {
           region.setText(self._value.substring(region.startOffset, region.endOffset));

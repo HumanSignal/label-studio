@@ -1,4 +1,5 @@
 import { types } from 'mobx-state-tree';
+import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
 
 /**
  * This is a mixin for a control-tag that is a base of creating classification-like tags.
@@ -40,6 +41,23 @@ const ClassificationBase = types.model('ClassificationBase', {
     };
   }).actions(self => {
     return {
+      validate() {
+        if (self.perregion) {
+          return self._validatePerRegion();
+        }
+        else if (self.peritem && isFF(FF_LSDV_4583)) {
+          return self._validatePerItem();
+        }
+        else {
+          return self._validatePerObject();
+        }
+      },
+      validateValue(value) {
+        return true;
+      },
+      _validatePerObject() {
+        return self.validateValue(self.selectedValues());
+      },
       createPerObjectResult(areaValues = {}) {
         self.annotation.createResult(
           areaValues,
