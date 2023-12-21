@@ -11,9 +11,9 @@ section: "Import and Export"
 date: 2023-12-06 10:48:03
 ---
 
-## General importation guidelines
+## General guidelines for importing data
 
-* For larger projects, do not upload data through the Label Studio interface. This works fine for proof of concept projects, but is not recommended for larger projects. We recommend that you configure external storage instead. 
+* For larger projects, do not upload data through the Label Studio interface. This works fine for proof of concept projects, but it is not recommended for larger projects. We recommend that you configure external storage instead. 
 * It’s best to keep about 100k tasks / 100k annotations per project for optimal performance.
 * Avoid frequent imports because each new import requires lengthy background operations. One import per 30 seconds will work without overloads.
 * If your API requests exceed our limits per request, they will be truncated. T
