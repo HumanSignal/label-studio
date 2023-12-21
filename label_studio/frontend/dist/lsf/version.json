@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-466: Don't sanitize text tasks",
-  "commit": "3c7243d0d552ed989060bac9244d5742d397b5c4",
-  "branch": "master",
-  "date": "2023-12-19T19:26:05Z"
+  "message": "fix: LEAP-447: Fix Number tag validation ",
+  "commit": "880cc15cb580ce44ebeb3b1edc6f9d4195540eef",
+  "branch": "fb-leap-447/number-validation",
+  "date": "2023-12-21T23:19:14Z"
 }
