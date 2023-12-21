@@ -1,5 +1,4 @@
 import { types } from 'mobx-state-tree';
-import { FF_LSDV_4583, isFF } from '../utils/feature-flags';
 
 /**
  * This mixing defines perItem control-tag's parameter and related basic functionality

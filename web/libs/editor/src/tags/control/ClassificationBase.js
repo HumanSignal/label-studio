@@ -52,7 +52,7 @@ const ClassificationBase = types.model('ClassificationBase', {
           return self._validatePerObject();
         }
       },
-      validateValue(value) {
+      validateValue() {
         return true;
       },
       _validatePerObject() {
