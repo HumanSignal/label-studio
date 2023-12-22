@@ -74,6 +74,7 @@ const RequiredMixin = types
             return false;
           }
         }
+        return true;
       },
     }; });
 
