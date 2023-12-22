@@ -15,6 +15,22 @@ class TaskMixin:
         pass
 
     def after_delete_actions(self):
+        """
+        Actions to execute after task deletion
+        """
+        pass
+
+    def before_delete_actions(self):
+        """
+        Actions to execute before task deletion
+        """
+        pass
+
+    @staticmethod
+    def after_bulk_delete_actions(tasks_ids):
+        """
+        Actions to execute after bulk task deletion
+        """
         pass
 
 

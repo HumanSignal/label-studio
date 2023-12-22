@@ -463,6 +463,7 @@ class Task(TaskMixin, models.Model):
         Task.delete_tasks_without_signals(queryset)
 
     def delete(self, *args, **kwargs):
+        self.before_delete_actions()
         result = super().delete(*args, **kwargs)
         # set updated_at field of task to now()
         self.after_delete_actions()
