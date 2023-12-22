@@ -1,0 +1,64 @@
+var _rect, _rect2, _g;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgSkipped = function SvgSkipped(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _rect || (_rect = /*#__PURE__*/React.createElement("rect", {
+    width: 20,
+    height: 20,
+    x: 2,
+    y: 2,
+    fill: "currentColor",
+    fillOpacity: 0.2,
+    rx: 4
+  })), /*#__PURE__*/React.createElement("mask", {
+    id: "skipped_svg__a",
+    width: 14,
+    height: 14,
+    x: 5,
+    y: 5,
+    maskUnits: "userSpaceOnUse",
+    style: {
+      maskType: "alpha"
+    }
+  }, _rect2 || (_rect2 = /*#__PURE__*/React.createElement("rect", {
+    width: 14,
+    height: 14,
+    x: 5,
+    y: 5,
+    fill: "currentColor",
+    rx: 7
+  }))), _g || (_g = /*#__PURE__*/React.createElement("g", {
+    mask: "url(#skipped_svg__a)"
+  }, /*#__PURE__*/React.createElement("rect", {
+    width: 14,
+    height: 14,
+    x: 5,
+    y: 5,
+    fill: "currentColor",
+    fillOpacity: 0.3,
+    rx: 7
+  }), /*#__PURE__*/React.createElement("rect", {
+    width: 12,
+    height: 12,
+    x: 6,
+    y: 6,
+    stroke: "currentColor",
+    strokeOpacity: 0.3,
+    strokeWidth: 2,
+    rx: 6
+  }), /*#__PURE__*/React.createElement("path", {
+    stroke: "currentColor",
+    strokeWidth: 2,
+    d: "m7 7 10 10"
+  }))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgSkipped);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiByeD0iNCIgZmlsbD0iY3VycmVudENvbG9yIiBmaWxsLW9wYWNpdHk9IjAuMiIvPgo8bWFzayBpZD0ibWFzazBfMTk3Ml8xNjQ2NSIgc3R5bGU9Im1hc2stdHlwZTphbHBoYSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iNSIgeT0iNSIgd2lkdGg9IjE0IiBoZWlnaHQ9IjE0Ij4KPHJlY3QgeD0iNSIgeT0iNSIgd2lkdGg9IjE0IiBoZWlnaHQ9IjE0IiByeD0iNyIgZmlsbD0iY3VycmVudENvbG9yIi8+CjwvbWFzaz4KPGcgbWFzaz0idXJsKCNtYXNrMF8xOTcyXzE2NDY1KSI+CjxyZWN0IHg9IjUiIHk9IjUiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgcng9IjciIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1vcGFjaXR5PSIwLjMiLz4KPHJlY3QgeD0iNiIgeT0iNiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiByeD0iNiIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS1vcGFjaXR5PSIwLjMiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNNyA3TDE3IDE3IiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIi8+CjwvZz4KPC9zdmc+Cg==";

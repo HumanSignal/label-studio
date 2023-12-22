@@ -1,12 +1,13 @@
 # syntax=docker/dockerfile:1.3
-FROM node:18 AS frontend-builder
+FROM --platform=${BUILDPLATFORM} node:18 AS frontend-builder
 
 ENV NPM_CACHE_LOCATION=$HOME/.cache/yarn/v6 \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    NX_REJECT_UNKNOWN_LOCAL_CACHE=0
 
-WORKDIR /label-studio/label_studio/frontend
+WORKDIR /label-studio/web
 
-COPY --chown=1001:0 label_studio/frontend .
+COPY --chown=1001:0 web .
 COPY --chown=1001:0 pyproject.toml /label-studio
 
 # Fix Docker Arm64 Build
@@ -15,7 +16,7 @@ RUN yarn config set network-timeout 1200000 # HTTP timeout used when downloading
 
 RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
     yarn install --frozen-lockfile \
- && yarn run build:production
+    && yarn run build
 
 FROM ubuntu:22.04
 
@@ -71,8 +72,8 @@ RUN --mount=type=cache,target=$POETRY_CACHE_DIR \
 
 COPY --chown=1001:0 . .
 
-RUN rm -rf ./label_studio/frontend
-COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
+RUN rm -rf ./label_studio/web
+COPY --chown=1001:0 --from=frontend-builder /label-studio/web/dist ./label_studio/web/dist
 
 RUN python3 label_studio/manage.py collectstatic --no-input && \
     chown -R 1001:0 $LS_DIR && \

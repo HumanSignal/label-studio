@@ -1,0 +1,60 @@
+.annotations-carousel
+  --carousel-left 0px
+  position relative
+  height 100%
+  align-items center
+  min-width 0
+  flex 1
+  &__container
+    display flex
+    width 100%
+    justify-content space-between
+    overflow hidden
+    height 100%
+  &__carosel
+    flex 1
+    display flex
+    gap 2px
+    white-space nowrap
+    padding-right 70px
+    position relative
+    transform translateX(calc(-1 * var(--carousel-left)))
+    transition all 0.15s ease-in-out 0.0s
+  &__carousel-controls
+    position absolute
+    right 0
+    white-space nowrap
+    top 50%
+    transform translateY(-50%)
+    display flex
+    gap 4px
+    padding-right 4px
+  &__nav
+    padding 0
+    height 28px
+    width 28px
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2);
+
+    &:hover
+      background #EBF3FC
+      box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2);
+
+    &_disabled
+      background #F0EFF1
+
+      svg
+        opacity .4
+
+      &:hover
+        background #F0EFF1
+        filter none
+
+    .button
+      &:hover
+        filter none
+
+      &__arrow
+        &_left
+          transform rotate(-90deg)
+        &_right
+          transform rotate(90deg)

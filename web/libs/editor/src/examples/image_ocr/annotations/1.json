@@ -1,0 +1,79 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "lead_time": 15.053,
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "Dx_aB91ISN",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 10.458911419423693,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 12.4,
+                        "x": 50.8,
+                        "y": 5.869797225186766
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+    },
+    "id": 1,
+    "predictions": [
+        {
+            "created_ago": "3 hours",
+            "model_version": "model 1",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 11.612284069097889,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 34.702495201535505
+                    }
+                }
+            ]
+        },
+        {
+            "created_ago": "4 hours",
+            "model_version": "model 2",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 33.61228406909789,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 54.702495201535505
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,166 @@
+.annotation-button
+  display flex
+  padding 4px 8px
+  border-radius 4px 4px 0 0
+  border-width 1px 1px 0px 1px
+  border-style solid
+  background-color rgba(137, 128, 152, 0.08)
+  border-color transparent
+  margin-top 2px
+  align-items center
+  gap 8px
+  cursor pointer
+  height calc(100% - 3px)
+  min-width 186px
+
+  &__user
+    line-height: 16px;
+    height: 16px;
+
+  &__main
+    flex: 1 0 auto;
+  &__mainSection
+    display flex
+    align-items center
+    gap 8px
+    flex: 1 0 auto;
+    .annotation-button__userpic_prediction
+      background-color #EFDBFF
+      color #7735D6
+  &__name
+    font-size 12px
+    font-weight 400
+    line-height 16px
+    letter-spacing 0.4px
+    text-align left
+    color: #898098;
+  &__entity-id
+    font-size 10px
+    font-weight 400
+    line-height 16px
+    letter-spacing 0.4px
+    text-align left
+    color #898098
+    margin-left 8px
+  &__created
+    font-size 10px
+    font-weight 400
+    line-height 16px
+    letter-spacing 0.4px
+    text-align left
+    color #898098
+
+  &:hover
+    background-color rgba(9, 109, 217, 0.12)
+    border-color rgba(9, 109, 217, 0.16)
+    border-bottom-color transparent
+
+    .annotation-button__name
+      color #1F1F1F
+
+    .annotation-button__created
+      color #413C4A
+
+    .annotation-button__ellipsisIcon
+      visibility visible
+
+  &_selected
+    background-color #FFFFFF
+    border-color rgba(137, 128, 152, 0.16)
+
+    &:hover
+      background-color #FFFFFF
+      border-color rgba(137, 128, 152, 0.16)
+      border-bottom-color transparent
+
+    .annotation-button__ellipsisIcon
+      visibility visible
+    .annotation-button__created
+      color #413C4A
+    .annotation-button__name
+      color #413C4A
+
+  &__icons
+    display inline-flex
+    align-items center
+    gap 12px
+  &__icon
+    display flex
+    border-radius 4px
+    &_groundTruth
+      color #FFC53D
+  &__ellipsisIcon
+    transform rotate(90deg)
+    display flex
+    border-radius 4px
+    color #898098
+    visibility hidden
+    &:hover
+      color #096DD9
+      background rgba(9, 109, 217, 0.12)
+  &__picSection
+    position relative
+  &__status
+    position absolute
+    top: 15px;
+    left: calc(50% + 5px);
+    border-radius 4px
+    color #FAFAFA
+    border 2px solid #FAFAFA
+    display flex
+    width 10px
+    height 10px
+    box-sizing content-box
+    align-items center
+    justify-content center
+    &_approved
+      background-color #389E0D
+    &_skipped
+      background-color #CF1322
+    &_updated
+      background-color #1D39C4
+      svg
+        display block
+  &_contextMenuOpen
+    .annotation-button
+      &__ellipsisIcon
+        color #096DD9
+        background #096DD91F
+
+.AnnotationButtonContextMenu
+  border-radius 4px
+  box-shadow: 0px 1px 3px 1px #26262626, 0px 1px 2px 0px #2626264D;
+  &__seperator
+    height 1px
+    background-color rgba(137, 128, 152, 0.12)
+  &__option
+    display flex
+    margin 8px
+    align-items center
+    white-space nowrap
+    gap 2px
+    cursor pointer
+    font-size 16px
+    font-weight 400
+    line-height 24px
+    letter-spacing 0.5px
+    border-radius 4px
+    padding-right 32px
+    &:hover
+      background-color rgba(65, 60, 74, 0.08)
+    &_duplicate
+      padding-top 6px
+      padding-bottom 6px
+      .AnnotationButtonContextMenu__icon
+        display flex
+        padding 0 8px 0 9px
+        align-items center
+    &_delete
+      padding-top 6px
+      padding-bottom 6px
+      color #CF1322
+      .AnnotationButtonContextMenu__icon
+        display flex
+        padding 4px 11px 4px 12px
+        align-items center
+    

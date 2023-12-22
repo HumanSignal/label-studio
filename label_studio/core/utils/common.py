@@ -213,10 +213,9 @@ def find_editor_files():
     editor_dir = settings.EDITOR_ROOT
 
     # find editor files to include in html
-    editor_js_dir = os.path.join(editor_dir, 'js')
-    editor_js = [prefix + 'js/' + f for f in os.listdir(editor_js_dir) if f.endswith('.js')]
-    editor_css_dir = os.path.join(editor_dir, 'css')
-    editor_css = [prefix + 'css/' + f for f in os.listdir(editor_css_dir) if f.endswith('.css')]
+    editor_js = [prefix + f for f in os.listdir(editor_dir) if f.endswith('.js')]
+    editor_css = [prefix + f for f in os.listdir(editor_dir) if f.endswith('.css')]
+
     return {'editor_js': editor_js, 'editor_css': editor_css}
 
 

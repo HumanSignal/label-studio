@@ -1,0 +1,35 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "result": [
+                {
+                    "value": {
+                        "choices": [
+                            "New Intent"
+                        ]
+                    },
+                    "id": "tH8nXMb0T_",
+                    "from_name": "utterance_action_0",
+                    "to_name": "user_0",
+                    "type": "choices"
+                },
+                {
+                    "value": {
+                        "choices": [
+                            "Training"
+                        ]
+                    },
+                    "id": "Ebt-uQHhwa",
+                    "from_name": "utterance_action_1",
+                    "to_name": "user_1",
+                    "type": "choices"
+                }
+            ]
+        }
+    ],
+    "data": {
+    },
+    "id": 1,
+    "task_path": "../examples/repeater/tasks.json"
+}

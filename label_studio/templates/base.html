@@ -26,10 +26,11 @@
   <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
 
   <script nonce="{{request.csp_nonce}}">
-    EDITOR_JS = "{{settings.HOSTNAME}}/label-studio-frontend/js/main.js?v={{ versions.lsf.commit }}";
-    EDITOR_CSS = "{{settings.HOSTNAME}}/label-studio-frontend/css/main.css?v={{ versions.lsf.commit }}";
-    DM_JS = "{{settings.HOSTNAME}}/dm/js/main.js?v={{ versions.dm2.commit }}";
-    DM_CSS = "{{settings.HOSTNAME}}/dm/css/main.css?v={{ versions.dm2.commit }}";
+    ENABLE_MONOREPO_ENV = "{{settings.ENABLE_MONOREPO_ENV}}" === "True"
+    EDITOR_JS = `{{settings.HOSTNAME}}/label-studio-frontend/${ENABLE_MONOREPO_ENV ? '' : 'js/'}main.js?v={{ versions.lsf.commit }}`;
+    EDITOR_CSS = `{{settings.HOSTNAME}}/label-studio-frontend/${ENABLE_MONOREPO_ENV ? '' : 'css/'}main.css?v={{ versions.lsf.commit }}`;
+    DM_JS = `{{settings.HOSTNAME}}/dm/${ENABLE_MONOREPO_ENV ? '' : 'js/'}main.js?v={{ versions.dm2.commit }}`;
+    DM_CSS = `{{settings.HOSTNAME}}/dm/${ENABLE_MONOREPO_ENV ? '' : 'css/'}main.css?v={{ versions.dm2.commit }}`;
   </script>
 
   <script
@@ -115,7 +116,9 @@
   }, {% block frontend_settings %}{}{% endblock %});
 </script>
 
-<script src="{{settings.HOSTNAME}}/react-app/index.js?v={{ versions.backend.commit }}"></script>
+{% block app-js %}
+<script src="{{settings.HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
+{% endblock %}
 
 <div id="dynamic-content">
   <script nonce="{{request.csp_nonce}}">

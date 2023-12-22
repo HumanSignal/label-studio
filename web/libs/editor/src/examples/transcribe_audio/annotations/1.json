@@ -1,0 +1,23 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "result": [
+                {
+                    "from_name": "answer",
+                    "id": "oMvLrMj8WP",
+                    "to_name": "answer",
+                    "type": "textarea",
+                    "value": {
+                        "text": "Mario"
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "url": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3"
+    },
+    "id": 1,
+    "task_path": "../examples/transcribe_audio/tasks.json"
+}

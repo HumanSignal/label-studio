@@ -1,0 +1,11 @@
+<View>
+  <Text name="text" value="$text"></Text>
+  <Choices name="validation-label" required="true" toName="text">
+    <Choice value="Missing words" alias="missing-words"></Choice>
+    <Choice value="Valid" alias="valid"></Choice>
+  </Choices>
+  <Choices name="second" required="true" toName="text">
+    <Choice value="Don't select me" alias="dont"></Choice>
+    <Choice value="Me neither" alias="neither"></Choice>
+  </Choices>
+</View>

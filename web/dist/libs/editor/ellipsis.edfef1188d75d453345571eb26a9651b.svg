@@ -1,0 +1,18 @@
+var _path;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgEllipsis = function SvgEllipsis(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 16 16",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "currentcolor",
+    d: "M4 6.667c-.733 0-1.333.6-1.333 1.333S3.267 9.333 4 9.333 5.333 8.733 5.333 8c0-.734-.6-1.333-1.333-1.333m8 0c-.733 0-1.333.6-1.333 1.333s.6 1.333 1.333 1.333 1.333-.6 1.333-1.333c0-.734-.6-1.333-1.333-1.333m-4 0c-.733 0-1.333.6-1.333 1.333S7.267 9.333 8 9.333 9.333 8.733 9.333 8c0-.734-.6-1.333-1.333-1.333"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgEllipsis);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTMuOTk5OTYgNi42NjY1QzMuMjY2NjMgNi42NjY1IDIuNjY2NjMgNy4yNjY1IDIuNjY2NjMgNy45OTk4NEMyLjY2NjYzIDguNzMzMTcgMy4yNjY2MyA5LjMzMzE3IDMuOTk5OTYgOS4zMzMxN0M0LjczMzI5IDkuMzMzMTcgNS4zMzMyOSA4LjczMzE3IDUuMzMzMjkgNy45OTk4NEM1LjMzMzI5IDcuMjY2NSA0LjczMzI5IDYuNjY2NSAzLjk5OTk2IDYuNjY2NVpNMTIgNi42NjY1QzExLjI2NjYgNi42NjY1IDEwLjY2NjYgNy4yNjY1IDEwLjY2NjYgNy45OTk4NEMxMC42NjY2IDguNzMzMTcgMTEuMjY2NiA5LjMzMzE3IDEyIDkuMzMzMTdDMTIuNzMzMyA5LjMzMzE3IDEzLjMzMzMgOC43MzMxNyAxMy4zMzMzIDcuOTk5ODRDMTMuMzMzMyA3LjI2NjUgMTIuNzMzMyA2LjY2NjUgMTIgNi42NjY1Wk03Ljk5OTk2IDYuNjY2NUM3LjI2NjYzIDYuNjY2NSA2LjY2NjYzIDcuMjY2NSA2LjY2NjYzIDcuOTk5ODRDNi42NjY2MyA4LjczMzE3IDcuMjY2NjMgOS4zMzMxNyA3Ljk5OTk2IDkuMzMzMTdDOC43MzMyOSA5LjMzMzE3IDkuMzMzMjkgOC43MzMxNyA5LjMzMzI5IDcuOTk5ODRDOS4zMzMyOSA3LjI2NjUgOC43MzMyOSA2LjY2NjUgNy45OTk5NiA2LjY2NjVaIiBmaWxsPSJjdXJyZW50Y29sb3IiLz4KPC9zdmc+Cg==";

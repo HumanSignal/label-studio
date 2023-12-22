@@ -1,0 +1,52 @@
+.dropdown
+  --menu-animation-duration: 0.15s;
+  --menu-animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
+  --menu-animation-start: -10px;
+
+  top calc(100% + 1px)
+  z-index 500
+  display none
+  position absolute
+  box-sizing border-box
+  background-color #fff
+  box-shadow 0 5px 20px rgba(0,0,0,0.2)
+  will-change transform, opacity
+
+  &_align
+    &_left
+      left -20px
+
+    &_right
+      right -20px
+
+  &__trigger
+    position relative
+
+  &.before-appear,
+  &.before-disappear
+    transition-property opacity, transform
+    transition-duration var(--menu-animation-duration)
+    transition-iming-function var(--menu-animation-curve)
+
+  // Animation transition handling
+  &.before-appear
+    opacity 0
+    display flex
+    transform translate3d(0, var(--menu-animation-start), 0)
+
+  &.appear
+    opacity 1
+    transform translate3d(0, 0, 0)
+
+  &.visible
+    opacity 1
+    display flex
+
+  &.before-disappear
+    opacity 1
+    display flex
+    transform translate3d(0, 0, 0)
+
+  &.disappear
+    opacity 0
+    transform translate3d(0, var(--menu-animation-start), 0)

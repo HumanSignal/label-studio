@@ -1,0 +1,39 @@
+<View>
+  <Labels name="ner" toName="my_text" choice="multiple">
+    <Label value="Person" background="red"/>
+    <Label value="Organization" background="darkorange"/>
+    <Label value="Fact" background="orange"/>
+    <Label value="Money" background="green"/>
+    <Label value="Date" background="darkblue"/>
+    <Label value="Time" background="blue"/>
+    <Label value="Ordinal" background="purple"/>
+    <Label value="Percent" background="#842"/>
+    <Label value="Product" background="#428"/>
+    <Label value="Language" background="#482"/>
+    <Label value="Location" background="rgba(0,0,0,0.8)"/>
+  </Labels>
+  <Text name="my_text" value="$reviewText"/>
+  <Choices name="sentiment" toName="my_text" choice="single" showInLine="true">
+    <Choice value="Positive"/>
+    <Choice value="Negative"/>
+    <Choice value="Neutral"/>
+  </Choices>
+  <Textarea name="description" toName="my_text" perRegion="true"
+             choice="single" showInLine="true" whenLabelValue="Person">
+    </Textarea>
+  <Choices name="gender" toName="my_text" perRegion="true"
+             choice="single" showInLine="true" whenLabelValue="Person">
+      <Choice value="Female"/>
+      <Choice value="Male"/>
+    </Choices>
+  <Choices name="currency" toName="my_text" perRegion="true"
+             choice="single" showInLine="true" whenLabelValue="Money">
+      <Choice value="USD"/>
+      <Choice value="EUR"/>
+    </Choices>
+  <Choices name="sentiment2" toName="my_text"
+             choice="single" showInLine="true" perRegion="true">
+      <Choice value="Positive"/>
+      <Choice value="Negative"/>
+    </Choices>
+</View>

@@ -1,0 +1,7 @@
+<View>
+  <ParagraphLabels name="ner" toName="text">
+    <Label value="Important Stuff"></Label>
+    <Label value="Random talk"></Label>
+  </ParagraphLabels>
+  <Paragraphs audioUrl="$audio" name="text" value="$dialogue" layout="dialogue" savetextresult="yes" />
+</View>

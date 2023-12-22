@@ -1,0 +1,3862 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "lead_time": 15.053,
+            "result": [
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 25.733333333333334,
+                        "y": 24.759871931696907,
+                        "width": 12.4,
+                        "height": 10.458911419423693,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "Dx_aB91ISN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 45.733333333333334,
+                        "y": 22.30522945570971,
+                        "width": 12.666666666666666,
+                        "height": 8.858057630736393,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "YdtLI2svMR",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 49.333333333333336,
+                        "y": 33.29775880469584,
+                        "width": 14.933333333333334,
+                        "height": 13.980789754535753,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Tk0rXYOb2o",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 39.06666666666668,
+                        "y": 51.2273212379936,
+                        "width": 17.866666666666667,
+                        "height": 9.818569903948772,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "vummunptlZ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 26.4,
+                        "y": 39.91462113127001,
+                        "width": 9.6,
+                        "height": 25.6136606189968,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "CCMfwXx3uz",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 18.133333333333333,
+                        "y": 49.30629669156884,
+                        "width": 29.2,
+                        "height": 15.048025613660618,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "0ynPsXU7y7",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 28.133333333333333,
+                        "y": 45.250800426894344,
+                        "width": 24.533333333333335,
+                        "height": 12.486659551760939,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Xcio9ldztz",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 56.93333333333333,
+                        "y": 58.80469583778015,
+                        "width": 15.466666666666667,
+                        "height": 7.897545357524013,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "2Rc0HiAQKH",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 62.13333333333333,
+                        "y": 34.25827107790822,
+                        "width": 24.4,
+                        "height": 25.29348986125934,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "_Bxjtt_vsG",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 51.733333333333334,
+                        "y": 17.822838847385274,
+                        "width": 22.533333333333335,
+                        "height": 16.542155816435432,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "luo2-gKlLI",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 56.53333333333333,
+                        "y": 12.913553895410885,
+                        "width": 28.266666666666666,
+                        "height": 17.502668089647813,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "eG1GMofLIn",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 36.13333333333333,
+                        "y": 12.379935965848453,
+                        "width": 18.53333333333334,
+                        "height": 13.980789754535753,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Ce9pWOdE_r",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 18,
+                        "y": 27.2145144076841,
+                        "width": 30.266666666666666,
+                        "height": 11.526147278548558,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "wQyYykg6eo",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.666666666666668,
+                        "y": 21.237993596584847,
+                        "width": 14.533333333333333,
+                        "height": 13.660618996798293,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "LHSHcgifXr",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.066666666666666,
+                        "y": 3.52187833511206,
+                        "width": 13.733333333333333,
+                        "height": 15.048025613660618,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Egz63ZQ1Vv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 8,
+                        "y": 14.834578441835646,
+                        "width": 22.8,
+                        "height": 14.08751334044824,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "k7-y9kw3JC",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 10.800000000000002,
+                        "y": 52.294557097118464,
+                        "width": 16.4,
+                        "height": 21.985058697972253,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "TDBEkq8irK",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 38.93333333333332,
+                        "y": 65.95517609391678,
+                        "width": 19.2,
+                        "height": 18.036286019210245,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "iHZf9J6aZs",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.53333333333333,
+                        "y": 67.02241195304163,
+                        "width": 28.933333333333334,
+                        "height": 11.739594450373533,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "sALmFfiZyH",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 53.6,
+                        "y": 51.65421558164354,
+                        "width": 34.79999999999999,
+                        "height": 15.901814300960512,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "ETqAAHKCRQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 54.666666666666664,
+                        "y": 65.95517609391678,
+                        "width": 37.86666666666667,
+                        "height": 12.379935965848453,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "mxNxQf7BuW",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 53.46666666666667,
+                        "y": 73.42582710779082,
+                        "width": 27.2,
+                        "height": 16.221985058697967,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "i4d-P5U6zh",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 18.399999999999995,
+                        "y": 67.34258271077908,
+                        "width": 25.733333333333334,
+                        "height": 20.064034151547492,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "8S7PAXOCOv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 29.6,
+                        "y": 72.99893276414087,
+                        "width": 28.933333333333334,
+                        "height": 20.277481323372466,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "fzkPl3uFkO",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 46.266666666666666,
+                        "y": 78.4418356456777,
+                        "width": 28.4,
+                        "height": 15.688367129135539,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "zhYM9bxnr7",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 60,
+                        "y": 4.16221985058698,
+                        "width": 24,
+                        "height": 20.917822838847385,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "uz1Tnso1x_",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 10.800000000000002,
+                        "y": 39.27427961579509,
+                        "width": 41.333333333333336,
+                        "height": 11.419423692636073,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "9SS-O5ekYO",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 68.40000000000002,
+                        "y": 37.67342582710779,
+                        "width": 26.4,
+                        "height": 17.07577374599786,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "BY8AZ8V5it",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 70.13333333333335,
+                        "y": 27.107790821771612,
+                        "width": 28.933333333333334,
+                        "height": 8.751334044823906,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "m0gC5Z5IKE",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 66.4,
+                        "y": 10.779082177161152,
+                        "width": 22.933333333333334,
+                        "height": 19.316969050160086,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "0N9MFtx_ul",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 65.6,
+                        "y": 75.34685165421558,
+                        "width": 21.2,
+                        "height": 18.463180362860193,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "ohmFQpfYvB",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 51.733333333333334,
+                        "y": 12.913553895410885,
+                        "width": 42.93333333333332,
+                        "height": 21.66488794023479,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "HCe3MCuTwf",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 9.73333333333333,
+                        "y": 8.217716115261473,
+                        "width": 28.4,
+                        "height": 16.11526147278548,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "pzWTOWrSWW",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 6.133333333333334,
+                        "y": 30.73639274279616,
+                        "width": 32.266666666666666,
+                        "height": 17.929562433297757,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "lWQvDAUFDq",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 6.533333333333333,
+                        "y": 57.31056563500534,
+                        "width": 2.6666666666666665,
+                        "height": 35.965848452508006,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "wTJ6bRHuML",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.6,
+                        "y": 37.353255069370334,
+                        "width": 44.93333333333333,
+                        "height": 47.705442902881536,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Stga_dgqIG",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 62.8,
+                        "y": 66.27534685165423,
+                        "width": 28.533333333333335,
+                        "height": 28.495197438633937,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "DHLH2pMzOY",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.86666666666667,
+                        "y": 5.44290288153682,
+                        "width": 38.53333333333333,
+                        "height": 33.724653148345794,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "IMM9eCx3Mj",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 5.2,
+                        "y": 56.35005336179296,
+                        "width": 46.8,
+                        "height": 41.30202774813234,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "kGcU5UvF_W",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 5.733333333333333,
+                        "y": 5.016008537886873,
+                        "width": 30.8,
+                        "height": 25.18676627534685,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "UBZ-aOA-9p",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 38.4,
+                        "y": 15.261472785485592,
+                        "width": 43.333333333333336,
+                        "height": 32.123799359658484,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Z0_7obrAC_",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 54.266666666666666,
+                        "y": 60.19210245464247,
+                        "width": 32.53333333333333,
+                        "height": 31.803628601921023,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Pi4JNBEuE1",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 62.8,
+                        "y": 64.88794023479187,
+                        "width": 31.066666666666666,
+                        "height": 32.97758804695839,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "cmhMyGlmve",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 43.06666666666668,
+                        "y": 3.84204909284952,
+                        "width": 23.6,
+                        "height": 25.933831376734258,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Pq3_F6DHTY",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 2,
+                        "y": 5.44290288153682,
+                        "width": 35.20000000000001,
+                        "height": 27.641408751334044,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "56d5L6RDjB",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 2.8,
+                        "y": 38.95410885805763,
+                        "width": 34.79999999999999,
+                        "height": 21.451440768409817,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "nMyH3O2bOo",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.333333333333334,
+                        "y": 62.00640341515475,
+                        "width": 26,
+                        "height": 20.8110992529349,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "ZnSwQvk1GK",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 69.46666666666667,
+                        "y": 50.48025613660619,
+                        "width": 29.866666666666667,
+                        "height": 16.542155816435432,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Ngr0vv20oA",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 62.53333333333333,
+                        "y": 63.39381003201708,
+                        "width": 34,
+                        "height": 25.400213447171826,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "vr_hVl_Jk3",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 41.86666666666667,
+                        "y": 32.23052294557096,
+                        "width": 1.2,
+                        "height": 1.0672358591248663,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "xt8Jr4wIbk",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 55.46666666666667,
+                        "y": 38.63393810032017,
+                        "width": 30.8,
+                        "height": 16.755602988260407,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "k7Y0XzXDkd",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 25.733333333333334,
+                        "y": 20.277481323372466,
+                        "width": 32.266666666666666,
+                        "height": 26.25400213447172,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "fZXPyvri6c",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 65.33333333333333,
+                        "y": 3.0949839914621133,
+                        "width": 30.4,
+                        "height": 21.34471718249733,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "sAT0phlLEP",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 4.933333333333334,
+                        "y": 2.8815368196371396,
+                        "width": 28.933333333333334,
+                        "height": 26.040554962646745,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "WVd_WNjK6V",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 5.066666666666666,
+                        "y": 1.92102454642476,
+                        "width": 16,
+                        "height": 21.66488794023479,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "1526TfD-Ry",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 9.73333333333333,
+                        "y": 11.312700106723586,
+                        "width": 19.2,
+                        "height": 23.906083244397013,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "oJIzgY_YoQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 17.333333333333332,
+                        "y": 21.237993596584847,
+                        "width": 22.266666666666666,
+                        "height": 21.77161152614728,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Yum9qHmoP4",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 17.333333333333332,
+                        "y": 15.901814300960512,
+                        "width": 20.133333333333333,
+                        "height": 20.8110992529349,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "uUnFclWgbM",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 23.333333333333332,
+                        "y": 15.581643543223052,
+                        "width": 15.733333333333333,
+                        "height": 16.862326574172897,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "MIAbjI8zyM",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 37.6,
+                        "y": 7.897545357524013,
+                        "width": 16.8,
+                        "height": 16.755602988260407,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "SAQWFcQWJm",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 33.733333333333334,
+                        "y": 8.004268943436502,
+                        "width": 33.2,
+                        "height": 23.052294557097117,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "CmFOTHbpV0",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 56.4,
+                        "y": 7.363927427961579,
+                        "width": 22.4,
+                        "height": 28.601921024546424,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Z-Xmke6urR",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 61.6,
+                        "y": 5.763073639274279,
+                        "width": 31.866666666666667,
+                        "height": 31.376734258271078,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "5sjUBXVjaH",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 21.733333333333334,
+                        "y": 12.913553895410885,
+                        "width": 29.866666666666667,
+                        "height": 23.372465314834578,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "p1eOcslGmN",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.13333333333333,
+                        "y": 11.205976520811099,
+                        "width": 31.733333333333334,
+                        "height": 33.084311632870865,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "3pFxTFyLrE",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.066666666666666,
+                        "y": 21.985058697972253,
+                        "width": 26.933333333333334,
+                        "height": 34.3649946638207,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "JMxv0CPoYY",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 40.93333333333332,
+                        "y": 15.901814300960512,
+                        "width": 32.266666666666666,
+                        "height": 30.843116328708646,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "EQh7KKDRDJ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 38.13333333333333,
+                        "y": 28.17502668089648,
+                        "width": 44,
+                        "height": 33.724653148345794,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "9CLzcbJR37",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 30.133333333333333,
+                        "y": 34.25827107790822,
+                        "width": 31.2,
+                        "height": 32.23052294557096,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "js5YezNOm4",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.266666666666666,
+                        "y": 39.48772678762006,
+                        "width": 36,
+                        "height": 28.8153681963714,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "9aeO7loson",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 58.4,
+                        "y": 63.39381003201708,
+                        "width": 32.4,
+                        "height": 24.22625400213447,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "BLpmvqnsuz",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.866666666666667,
+                        "y": 59.12486659551761,
+                        "width": 41.06666666666668,
+                        "height": 29.455709711846318,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "RbcDkdmUhm",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 21.600000000000005,
+                        "y": 50.907150480256135,
+                        "width": 23.466666666666665,
+                        "height": 25.400213447171826,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "qDypA2bCcq",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 21.600000000000005,
+                        "y": 67.8762006403415,
+                        "width": 18.266666666666666,
+                        "height": 21.451440768409817,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "1nDjfAgsO_",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.533333333333335,
+                        "y": 62.32657417289221,
+                        "width": 30.266666666666666,
+                        "height": 28.495197438633937,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "EqXL9tBLK0",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 25.866666666666667,
+                        "y": 61.36606189967983,
+                        "width": 18.8,
+                        "height": 21.558164354322304,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "VfHsHNdppQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 34.93333333333332,
+                        "y": 56.45677694770544,
+                        "width": 25.066666666666666,
+                        "height": 34.79188900747065,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "l3k-Jzmqx_",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 32,
+                        "y": 66.16862326574173,
+                        "width": 35.06666666666668,
+                        "height": 24.439701173959445,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "xlTLkVHAjY",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.93333333333333,
+                        "y": 62.4332977588047,
+                        "width": 43.6,
+                        "height": 24.012806830309497,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "e8Udp4m-P1",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 31.466666666666665,
+                        "y": 27.534685165421557,
+                        "width": 25.466666666666665,
+                        "height": 44.71718249733191,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "SOqWqDqt0R",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.666666666666664,
+                        "y": 28.495197438633937,
+                        "width": 37.46666666666667,
+                        "height": 39.48772678762006,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "wxX74Dj6Rz",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 37.333333333333336,
+                        "y": 18.463180362860193,
+                        "width": 44.4,
+                        "height": 34.25827107790822,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "SLb_1IAXmv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 51.86666666666667,
+                        "y": 38.4204909284952,
+                        "width": 40.53333333333333,
+                        "height": 28.495197438633937,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "ue2EnmhObs",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 40.4,
+                        "y": 44.50373532550694,
+                        "width": 32.266666666666666,
+                        "height": 31.376734258271078,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "x7-MMqvj15",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 9.466666666666667,
+                        "y": 59.018143009605126,
+                        "width": 44.53333333333333,
+                        "height": 35.64567769477055,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "kVd5p6xJBC",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 17.46666666666666,
+                        "y": 62.96691568836713,
+                        "width": 28.266666666666666,
+                        "height": 26.147278548559232,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "CmRrNSDVC3",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 13.866666666666667,
+                        "y": 46.4247598719317,
+                        "width": 39.20000000000001,
+                        "height": 30.416221985058698,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "6XMxSQnc24",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 19.733333333333334,
+                        "y": 48.7726787620064,
+                        "width": 30.8,
+                        "height": 34.4717182497332,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "kTeBAwARXJ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.733333333333333,
+                        "y": 4.909284951974386,
+                        "width": 24.266666666666666,
+                        "height": 23.799359658484526,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "A5rzKIa0mu",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.733333333333333,
+                        "y": 5.656350053361793,
+                        "width": 35.06666666666668,
+                        "height": 23.479188900747065,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "e-Hpu7TSIn",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 52.666666666666664,
+                        "y": 2.2411953041622197,
+                        "width": 41.733333333333334,
+                        "height": 28.8153681963714,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "3OMy_1bXOg",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 5.733333333333333,
+                        "y": 47.38527214514408,
+                        "width": 38,
+                        "height": 15.581643543223052,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "hAbLB7Wrmi",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 3.2,
+                        "y": 35.53895410885806,
+                        "width": 31.466666666666665,
+                        "height": 18.78335112059765,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "G6p3Av3Ifw",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.6,
+                        "y": 40.23479188900747,
+                        "width": 27.066666666666666,
+                        "height": 17.716115261472787,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "_g0gTRUPwE",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 4.133333333333334,
+                        "y": 50.3735325506937,
+                        "width": 21.2,
+                        "height": 19.957310565635005,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "41VZoxzmI2",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 15.333333333333334,
+                        "y": 48.45250800426894,
+                        "width": 38.53333333333333,
+                        "height": 27.001067235859125,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "y-7bY12AWk",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 25.6,
+                        "y": 61.68623265741729,
+                        "width": 42.666666666666664,
+                        "height": 21.77161152614728,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ywbgGIZOve",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 30.4,
+                        "y": 54.96264674493063,
+                        "width": 52.93333333333333,
+                        "height": 1.2806830309498398,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "d3s5brqLHx",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 36.79999999999999,
+                        "y": 49.51974386339381,
+                        "width": 45.733333333333334,
+                        "height": 23.906083244397013,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "4ENvSDbHj5",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 57.333333333333336,
+                        "y": 22.518676627534685,
+                        "width": 23.466666666666665,
+                        "height": 22.198505869797224,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "rDJgp8Bwx4",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.733333333333334,
+                        "y": 5.763073639274279,
+                        "width": 28.133333333333333,
+                        "height": 25.18676627534685,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "EIror-7RzY",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 15.733333333333333,
+                        "y": 13.874066168623266,
+                        "width": 31.066666666666666,
+                        "height": 30.629669156883672,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "EeLzAO13AZ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 46.8,
+                        "y": 7.68409818569904,
+                        "width": 40.53333333333333,
+                        "height": 27.107790821771612,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "3qPIUBx_k7",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.13333333333333,
+                        "y": 15.048025613660618,
+                        "width": 34,
+                        "height": 31.91035218783351,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "HxCuw9JuLj",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 28.533333333333335,
+                        "y": 41.19530416221985,
+                        "width": 44.93333333333333,
+                        "height": 20.17075773745998,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "mVzjrPLwax",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.333333333333332,
+                        "y": 38.95410885805763,
+                        "width": 38.266666666666666,
+                        "height": 33.084311632870865,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "TRwjKtbkL2",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 35.733333333333334,
+                        "y": 26.467449306296693,
+                        "width": 35.46666666666667,
+                        "height": 31.163287086446104,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "BI3cXM8dKU",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 40.13333333333333,
+                        "y": 31.69690501600854,
+                        "width": 49.46666666666667,
+                        "height": 26.360725720384206,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "AbJ3m9QUy6",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 51.333333333333336,
+                        "y": 56.029882604055494,
+                        "width": 37.86666666666667,
+                        "height": 27.107790821771612,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "QHw4wjB6Qw",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.266666666666666,
+                        "y": 38.52721451440768,
+                        "width": 43.6,
+                        "height": 42.3692636072572,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "UApPrfNK5R",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.333333333333332,
+                        "y": 27.961579509071505,
+                        "width": 26,
+                        "height": 20.8110992529349,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "o_EtI0s2WV",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 8.533333333333333,
+                        "y": 19.103521878335112,
+                        "width": 27.466666666666665,
+                        "height": 19.957310565635005,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "lUscgu_jp0",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 9.73333333333333,
+                        "y": 39.91462113127001,
+                        "width": 29.066666666666666,
+                        "height": 28.281750266808963,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "8Ukno_kgp-",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 19.2,
+                        "y": 32.764140875133414,
+                        "width": 35.20000000000001,
+                        "height": 29.669156883671292,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "q2qEa1rvKK",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 35.06666666666668,
+                        "y": 58.3778014941302,
+                        "width": 54.666666666666664,
+                        "height": 31.91035218783351,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "KBCdC3qC2v",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 17.600000000000005,
+                        "y": 57.097118463180365,
+                        "width": 39.6,
+                        "height": 34.25827107790822,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "BbidrB5qyG",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 50.53333333333333,
+                        "y": 61.89967982924226,
+                        "width": 37.333333333333336,
+                        "height": 32.55069370330843,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "KA0dX-n2pu",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 52.53333333333333,
+                        "y": 22.73212379935966,
+                        "width": 41.733333333333334,
+                        "height": 28.068303094983992,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "zj9dtAbnkv",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 34.266666666666666,
+                        "y": 31.590181430096052,
+                        "width": 36.79999999999999,
+                        "height": 31.376734258271078,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "WSRJe8aqCb",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 37.6,
+                        "y": 33.51120597652081,
+                        "width": 31.733333333333334,
+                        "height": 32.01707577374601,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "tMbzqZ98-J",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 19.733333333333334,
+                        "y": 31.483457844183565,
+                        "width": 26.133333333333333,
+                        "height": 19.103521878335112,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "7XN2Gk1KpW",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 23.333333333333332,
+                        "y": 31.803628601921023,
+                        "width": 36.266666666666666,
+                        "height": 38.84738527214515,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "xdapQJD8cG",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 52.13333333333333,
+                        "y": 52.61472785485592,
+                        "width": 23.866666666666667,
+                        "height": 18.463180362860193,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "gG-nkSs9s8",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 43.733333333333334,
+                        "y": 30.522945570971185,
+                        "width": 33.733333333333334,
+                        "height": 26.360725720384206,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "LcOPhjbc9p",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 28.133333333333333,
+                        "y": 43.863393810032015,
+                        "width": 33.733333333333334,
+                        "height": 37.5667022411953,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "OfkHyhw1hq",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 54.666666666666664,
+                        "y": 63.92742796157951,
+                        "width": 21.733333333333334,
+                        "height": 23.052294557097117,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "oLpVpGcvIV",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.53333333333333,
+                        "y": 11.84631803628602,
+                        "width": 38.666666666666664,
+                        "height": 29.242262540021343,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "DeeUfkYDWV",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 10.800000000000002,
+                        "y": 12.059765208110992,
+                        "width": 32.4,
+                        "height": 24.973319103521877,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Kx-fOl84y_",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 12.533333333333333,
+                        "y": 23.479188900747065,
+                        "width": 42.53333333333333,
+                        "height": 38.95410885805763,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "FMWjTIdLja",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 38.13333333333333,
+                        "y": 14.194236926360725,
+                        "width": 33.2,
+                        "height": 32.443970117395935,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "picc9sykys",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 24.666666666666668,
+                        "y": 10.992529348986126,
+                        "width": 37.86666666666667,
+                        "height": 40.981856990394874,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "ENolYMEe3_",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 18.266666666666666,
+                        "y": 43.75667022411953,
+                        "width": 34.4,
+                        "height": 38.740661686232656,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "0UsXBDFuxD",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 23.2,
+                        "y": 51.65421558164354,
+                        "width": 25.2,
+                        "height": 31.803628601921023,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "cU9DbHpDq2",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 46.53333333333333,
+                        "y": 57.6307363927428,
+                        "width": 40.79999999999999,
+                        "height": 24.119530416221984,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "AUcyQyFGgH",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.13333333333333,
+                        "y": 31.483457844183565,
+                        "width": 42.93333333333332,
+                        "height": 28.922091782283886,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "9AvuJ6vibX",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 54.53333333333333,
+                        "y": 2.454642475987193,
+                        "width": 36.93333333333332,
+                        "height": 29.242262540021343,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "A0UfmVpe_2",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 26,
+                        "y": 8.64461045891142,
+                        "width": 33.86666666666667,
+                        "height": 31.056563500533617,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "-59auoX4AD",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 12.4,
+                        "y": 12.059765208110992,
+                        "width": 47.2,
+                        "height": 42.58271077908218,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "jFZFBQzxnb",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.4,
+                        "y": 17.822838847385274,
+                        "width": 40.666666666666664,
+                        "height": 24.759871931696907,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "40xdjZlnQw",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.266666666666666,
+                        "y": 23.479188900747065,
+                        "width": 26.4,
+                        "height": 32.55069370330843,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "JnimJLuZv1",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.4,
+                        "y": 62.96691568836713,
+                        "width": 38.79999999999999,
+                        "height": 26.894343649946638,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "JiEzAvO7Bg",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 20.666666666666668,
+                        "y": 46.10458911419423,
+                        "width": 31.733333333333334,
+                        "height": 39.06083244397012,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "4Kv8HQHksd",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 19.2,
+                        "y": 23.799359658484526,
+                        "width": 36,
+                        "height": 29.989327641408753,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "II3SNd3DSF",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.4,
+                        "y": 23.906083244397013,
+                        "width": 33.2,
+                        "height": 30.73639274279616,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "6HBaWAiVkb",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 40.666666666666664,
+                        "y": 43.009605122732125,
+                        "width": 34.13333333333333,
+                        "height": 25.82710779082177,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "zoWU-BG9B6",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 25.2,
+                        "y": 10.992529348986126,
+                        "width": 52.666666666666664,
+                        "height": 28.70864461045891,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "9A30BFyF4o",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 12.4,
+                        "y": 8.110992529348984,
+                        "width": 33.06666666666667,
+                        "height": 33.724653148345794,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "mK94GWAiJn",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 33.86666666666667,
+                        "y": 14.194236926360725,
+                        "width": 43.333333333333336,
+                        "height": 28.70864461045891,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "UcuZTY9EyB",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 46.666666666666664,
+                        "y": 37.5667022411953,
+                        "width": 31.733333333333334,
+                        "height": 38.740661686232656,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "ZQBXA2yrlT",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 23.6,
+                        "y": 42.47598719316969,
+                        "width": 35.06666666666668,
+                        "height": 37.03308431163287,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "aARc44z3Wx",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 19.866666666666667,
+                        "y": 17.502668089647813,
+                        "width": 32.666666666666664,
+                        "height": 31.376734258271078,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "KGxHWstaFC",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 37.20000000000001,
+                        "y": 17.716115261472787,
+                        "width": 37.06666666666668,
+                        "height": 32.01707577374601,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "7gQDSKaCgt",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 20.933333333333334,
+                        "y": 35.859124866595515,
+                        "width": 32.666666666666664,
+                        "height": 39.167556029882604,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "dIpEzci-TX",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 40.266666666666666,
+                        "y": 43.009605122732125,
+                        "width": 33.46666666666667,
+                        "height": 33.83137673425827,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "fpHjqiRNqU",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 54.93333333333333,
+                        "y": 8.53788687299893,
+                        "width": 34.79999999999999,
+                        "height": 27.641408751334044,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "_-suFRAQXV",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 61.06666666666667,
+                        "y": 43.2230522945571,
+                        "width": 27.866666666666667,
+                        "height": 33.724653148345794,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "99bGzHDDlZ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.666666666666668,
+                        "y": 54.64247598719317,
+                        "width": 30.4,
+                        "height": 30.096051227321237,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "AG7jknHrGl",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.466666666666667,
+                        "y": 12.913553895410885,
+                        "width": 29.733333333333334,
+                        "height": 36.07257203842049,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "6plbOt0qwA",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 38,
+                        "y": 9.818569903948772,
+                        "width": 34.266666666666666,
+                        "height": 29.135538954108856,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "K9s9YWimpw",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 48.53333333333333,
+                        "y": 26.040554962646745,
+                        "width": 31.2,
+                        "height": 35.75240128068303,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "GhrRWBFeCR",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 28.133333333333333,
+                        "y": 15.048025613660618,
+                        "width": 29.733333333333334,
+                        "height": 37.13980789754536,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "X4gVkVNo-9",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 22.666666666666668,
+                        "y": 36.392742796157954,
+                        "width": 27.2,
+                        "height": 31.483457844183565,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "QxcEmHiSYU",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 54.93333333333333,
+                        "y": 7.257203842049093,
+                        "width": 31.6,
+                        "height": 25.82710779082177,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "YZd-iskT3o",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 14.666666666666666,
+                        "y": 10.138740661686233,
+                        "width": 25.466666666666665,
+                        "height": 31.163287086446104,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "RpUuG96AO5",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 18.933333333333334,
+                        "y": 41.942369263607254,
+                        "width": 26.533333333333335,
+                        "height": 24.546424759871933,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "cQuxQCLEve",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 52.4,
+                        "y": 14.727854855923159,
+                        "width": 27.066666666666666,
+                        "height": 24.65314834578442,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "OghsyxKnYi",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 36.266666666666666,
+                        "y": 12.8068303094984,
+                        "width": 30.266666666666666,
+                        "height": 29.028815368196373,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "8J9HtvHssg",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 44.666666666666664,
+                        "y": 46.85165421558165,
+                        "width": 38,
+                        "height": 33.29775880469584,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "eFcMn_lTsW",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 22.666666666666668,
+                        "y": 38.4204909284952,
+                        "width": 23.866666666666667,
+                        "height": 25.29348986125934,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "pjdIw4oU2S",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 22.933333333333334,
+                        "y": 16.862326574172897,
+                        "width": 18.266666666666666,
+                        "height": 15.901814300960512,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "KOhddDbdpr",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 52.13333333333333,
+                        "y": 16.755602988260407,
+                        "width": 25.733333333333334,
+                        "height": 26.680896478121664,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "SUAUMN-dHD",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 40.666666666666664,
+                        "y": 11.526147278548558,
+                        "width": 42.53333333333333,
+                        "height": 27.001067235859125,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "j_ZucMlu9j",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.2,
+                        "y": 51.44076840981857,
+                        "width": 34.53333333333333,
+                        "height": 33.19103521878335,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "8WhDMC9-hz",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 53.86666666666667,
+                        "y": 59.978655282817506,
+                        "width": 30.133333333333333,
+                        "height": 27.42796157950907,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "-aQd7Pt0BU",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 41.86666666666667,
+                        "y": 43.970117395944506,
+                        "width": 38.53333333333333,
+                        "height": 23.799359658484526,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "JAM-oiP1Ft",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16,
+                        "y": 37.246531483457844,
+                        "width": 35.86666666666667,
+                        "height": 26.680896478121664,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "vZ713OzPzM",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 24.266666666666666,
+                        "y": 48.66595517609392,
+                        "width": 35.333333333333336,
+                        "height": 34.47171824973319,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "FracPfapou",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 54.266666666666666,
+                        "y": 57.097118463180365,
+                        "width": 25.333333333333332,
+                        "height": 23.479188900747065,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "_tTQgLN1IQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 42.53333333333333,
+                        "y": 31.27001067235859,
+                        "width": 36.13333333333333,
+                        "height": 29.455709711846318,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "PedlEI7FUL",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 17.866666666666667,
+                        "y": 27.107790821771612,
+                        "width": 32.666666666666664,
+                        "height": 33.40448239060832,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "_i4NwweVho",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 18,
+                        "y": 55.38954108858058,
+                        "width": 32.4,
+                        "height": 30.629669156883672,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "UVDbNMx05i",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 45.06666666666667,
+                        "y": 8.858057630736393,
+                        "width": 36,
+                        "height": 22.198505869797224,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "075mXgpeqE",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 20,
+                        "y": 14.300960512273212,
+                        "width": 32.53333333333333,
+                        "height": 20.70437566702241,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "nHrw41Fx6M",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 41.06666666666667,
+                        "y": 31.803628601921023,
+                        "width": 40.8,
+                        "height": 24.119530416221984,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Y5TrutIkba",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 46,
+                        "y": 53.5752401280683,
+                        "width": 28.133333333333333,
+                        "height": 28.495197438633937,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "d1tPCGfWoP",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 52.8,
+                        "y": 5.549626467449306,
+                        "width": 34.4,
+                        "height": 21.451440768409817,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "Benk3jUj5G",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 11.733333333333333,
+                        "y": 9.28495197438634,
+                        "width": 35.6,
+                        "height": 25.400213447171826,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "eBYEIJSwoQ",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 12.4,
+                        "y": 46.744930629669156,
+                        "width": 27.2,
+                        "height": 26.894343649946638,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Planet"
+                        ]
+                    },
+                    "id": "PVVSaA5iU8",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.866666666666667,
+                        "y": 14.621131270010672,
+                        "width": 30.4,
+                        "height": 28.922091782283886,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "PbDoCblGmg",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 50,
+                        "y": 16.435432230522945,
+                        "width": 31.466666666666665,
+                        "height": 28.495197438633937,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "iXFQeM4HVC",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 29.333333333333332,
+                        "y": 43.970117395944506,
+                        "width": 32,
+                        "height": 31.27001067235859,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "qwt2EqGXxd",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 45.2,
+                        "y": 46.85165421558165,
+                        "width": 33.733333333333334,
+                        "height": 29.028815368196373,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "W9aDyKVcy-",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 38.8,
+                        "y": 24.973319103521877,
+                        "width": 32.8,
+                        "height": 29.028815368196373,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "wsS4HlHJaq",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 33.86666666666667,
+                        "y": 32.44397011739594,
+                        "width": 27.466666666666665,
+                        "height": 32.33724653148346,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "vDff2blXa8",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 38.13333333333333,
+                        "y": 50.58697972251868,
+                        "width": 32.53333333333333,
+                        "height": 21.985058697972253,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "gJz2VHKzul",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 24.8,
+                        "y": 40.34151547491996,
+                        "width": 26.933333333333334,
+                        "height": 35.75240128068303,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "AiFGy2oeZO",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.8,
+                        "y": 16.862326574172894,
+                        "width": 26.8,
+                        "height": 25.506937033084313,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "c-F30Mz0Y8",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.8,
+                        "y": 51.54749199573106,
+                        "width": 22.133333333333333,
+                        "height": 25.6136606189968,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "rGUYGuUb63",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 52.13333333333333,
+                        "y": 8.964781216648879,
+                        "width": 36.4,
+                        "height": 28.38847385272145,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "vGpO0Tipbh",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                },
+                {
+                    "original_width": 2242,
+                    "original_height": 2802,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 60.8,
+                        "y": 58.27107790821771,
+                        "width": 30,
+                        "height": 24.759871931696907,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ]
+                    },
+                    "id": "544BszfECL",
+                    "from_name": "tag",
+                    "to_name": "img",
+                    "type": "rectanglelabels"
+                }
+            ]
+        }
+    ],
+    "data": {
+        "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+    },
+    "id": 1,
+    "predictions": [
+        {
+            "created_ago": "3 hours",
+            "model_version": "model 1",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 11.612284069097889,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 34.702495201535505
+                    }
+                }
+            ]
+        },
+        {
+            "created_ago": "4 hours",
+            "model_version": "model 2",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 33.61228406909789,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 54.702495201535505
+                    }
+                }
+            ]
+        }
+    ]
+}

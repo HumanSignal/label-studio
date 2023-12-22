@@ -1,0 +1,100 @@
+var _path, _g, _g2, _path2, _defs;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgPolygonTool = function SvgPolygonTool(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 32 32",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    fillRule: "evenodd",
+    d: "M7 8a1 1 0 0 1 1-1h16a1 1 0 0 1 .22 1.976.997.997 0 0 1-.118.767l-4.15 6.742a6 6 0 1 1-1.703-1.05l3.961-6.435H8a1 1 0 0 1-1-1",
+    clipRule: "evenodd",
+    opacity: 0.4
+  })), _g || (_g = /*#__PURE__*/React.createElement("g", {
+    filter: "url(#polygon-tool_svg__a)"
+  }, /*#__PURE__*/React.createElement("rect", {
+    width: 5,
+    height: 5,
+    x: 21.5,
+    y: 5.5,
+    fill: "currentColor",
+    rx: 2.5
+  }))), _g2 || (_g2 = /*#__PURE__*/React.createElement("g", {
+    filter: "url(#polygon-tool_svg__b)"
+  }, /*#__PURE__*/React.createElement("rect", {
+    width: 5,
+    height: 5,
+    x: 5.5,
+    y: 5.5,
+    fill: "currentColor",
+    rx: 2.5
+  }))), _path2 || (_path2 = /*#__PURE__*/React.createElement("path", {
+    fill: "#fff",
+    fillRule: "evenodd",
+    d: "M15.146 17.646C15 17.793 15 18.03 15 18.5V20h-1.5c-.471 0-.707 0-.854.146-.146.147-.146.383-.146.854s0 .707.146.854c.147.146.383.146.854.146H15v1.5c0 .471 0 .707.146.854.147.146.383.146.854.146s.707 0 .854-.146C17 24.207 17 23.97 17 23.5V22h1.5c.471 0 .707 0 .854-.146.146-.147.146-.383.146-.854s0-.707-.146-.854C19.207 20 18.97 20 18.5 20H17v-1.5c0-.471 0-.707-.146-.854-.147-.146-.383-.146-.854-.146s-.707 0-.854.146",
+    clipRule: "evenodd"
+  })), _defs || (_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
+    id: "polygon-tool_svg__a",
+    width: 11,
+    height: 11,
+    x: 18.5,
+    y: 3.5,
+    colorInterpolationFilters: "sRGB",
+    filterUnits: "userSpaceOnUse"
+  }, /*#__PURE__*/React.createElement("feFlood", {
+    floodOpacity: 0,
+    result: "BackgroundImageFix"
+  }), /*#__PURE__*/React.createElement("feColorMatrix", {
+    "in": "SourceAlpha",
+    result: "hardAlpha",
+    values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+  }), /*#__PURE__*/React.createElement("feOffset", {
+    dy: 1
+  }), /*#__PURE__*/React.createElement("feGaussianBlur", {
+    stdDeviation: 1.5
+  }), /*#__PURE__*/React.createElement("feColorMatrix", {
+    values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0"
+  }), /*#__PURE__*/React.createElement("feBlend", {
+    in2: "BackgroundImageFix",
+    result: "effect1_dropShadow"
+  }), /*#__PURE__*/React.createElement("feBlend", {
+    "in": "SourceGraphic",
+    in2: "effect1_dropShadow",
+    result: "shape"
+  })), /*#__PURE__*/React.createElement("filter", {
+    id: "polygon-tool_svg__b",
+    width: 11,
+    height: 11,
+    x: 2.5,
+    y: 3.5,
+    colorInterpolationFilters: "sRGB",
+    filterUnits: "userSpaceOnUse"
+  }, /*#__PURE__*/React.createElement("feFlood", {
+    floodOpacity: 0,
+    result: "BackgroundImageFix"
+  }), /*#__PURE__*/React.createElement("feColorMatrix", {
+    "in": "SourceAlpha",
+    result: "hardAlpha",
+    values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+  }), /*#__PURE__*/React.createElement("feOffset", {
+    dy: 1
+  }), /*#__PURE__*/React.createElement("feGaussianBlur", {
+    stdDeviation: 1.5
+  }), /*#__PURE__*/React.createElement("feColorMatrix", {
+    values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0"
+  }), /*#__PURE__*/React.createElement("feBlend", {
+    in2: "BackgroundImageFix",
+    result: "effect1_dropShadow"
+  }), /*#__PURE__*/React.createElement("feBlend", {
+    "in": "SourceGraphic",
+    in2: "effect1_dropShadow",
+    result: "shape"
+  })))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgPolygonTool);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIG9wYWNpdHk9IjAuNCIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik03IDhDNyA3LjQ0NzcyIDcuNDQ3NzIgNyA4IDdIMjRDMjQuNTUyMyA3IDI1IDcuNDQ3NzIgMjUgOEMyNSA4LjQ3NjY5IDI0LjY2NjUgOC44NzU0OCAyNC4yMiA4Ljk3NTcyQzI0LjI4MzEgOS4yMjc3NyAyNC4yNDg2IDkuNTA0MDcgMjQuMTAxNyA5Ljc0Mjg1TDE5Ljk1MjMgMTYuNDg1NUMyMS4yMDc1IDE3LjU4NTMgMjIgMTkuMjAwMSAyMiAyMUMyMiAyNC4zMTM3IDE5LjMxMzcgMjcgMTYgMjdDMTIuNjg2MyAyNyAxMCAyNC4zMTM3IDEwIDIxQzEwIDE3LjY4NjMgMTIuNjg2MyAxNSAxNiAxNUMxNi43OTU2IDE1IDE3LjU1NSAxNS4xNTQ4IDE4LjI0OTggMTUuNDM2MUwyMi4yMTA0IDlIOEM3LjQ0NzcyIDkgNyA4LjU1MjI4IDcgOFoiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8ZyBmaWx0ZXI9InVybCgjZmlsdGVyMF9kKSI+CjxyZWN0IHg9IjIxLjUiIHk9IjUuNSIgd2lkdGg9IjUiIGhlaWdodD0iNSIgcng9IjIuNSIgZmlsbD0iY3VycmVudENvbG9yIi8+CjwvZz4KPGcgZmlsdGVyPSJ1cmwoI2ZpbHRlcjFfZCkiPgo8cmVjdCB4PSI1LjUiIHk9IjUuNSIgd2lkdGg9IjUiIGhlaWdodD0iNSIgcng9IjIuNSIgZmlsbD0iY3VycmVudENvbG9yIi8+CjwvZz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNS4xNDY0IDE3LjY0NjRDMTUgMTcuNzkyOSAxNSAxOC4wMjg2IDE1IDE4LjVWMjBIMTMuNUMxMy4wMjg2IDIwIDEyLjc5MjkgMjAgMTIuNjQ2NCAyMC4xNDY0QzEyLjUgMjAuMjkyOSAxMi41IDIwLjUyODYgMTIuNSAyMUMxMi41IDIxLjQ3MTQgMTIuNSAyMS43MDcxIDEyLjY0NjQgMjEuODUzNkMxMi43OTI5IDIyIDEzLjAyODYgMjIgMTMuNSAyMkgxNVYyMy41QzE1IDIzLjk3MTQgMTUgMjQuMjA3MSAxNS4xNDY0IDI0LjM1MzZDMTUuMjkyOSAyNC41IDE1LjUyODYgMjQuNSAxNiAyNC41QzE2LjQ3MTQgMjQuNSAxNi43MDcxIDI0LjUgMTYuODUzNiAyNC4zNTM2QzE3IDI0LjIwNzEgMTcgMjMuOTcxNCAxNyAyMy41VjIySDE4LjVDMTguOTcxNCAyMiAxOS4yMDcxIDIyIDE5LjM1MzYgMjEuODUzNkMxOS41IDIxLjcwNzEgMTkuNSAyMS40NzE0IDE5LjUgMjFDMTkuNSAyMC41Mjg2IDE5LjUgMjAuMjkyOSAxOS4zNTM2IDIwLjE0NjRDMTkuMjA3MSAyMCAxOC45NzE0IDIwIDE4LjUgMjBIMTdWMTguNUMxNyAxOC4wMjg2IDE3IDE3Ljc5MjkgMTYuODUzNiAxNy42NDY0QzE2LjcwNzEgMTcuNSAxNi40NzE0IDE3LjUgMTYgMTcuNUMxNS41Mjg2IDE3LjUgMTUuMjkyOSAxNy41IDE1LjE0NjQgMTcuNjQ2NFoiIGZpbGw9IndoaXRlIi8+CjxkZWZzPgo8ZmlsdGVyIGlkPSJmaWx0ZXIwX2QiIHg9IjE4LjUiIHk9IjMuNSIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiBmaWx0ZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIGNvbG9yLWludGVycG9sYXRpb24tZmlsdGVycz0ic1JHQiI+CjxmZUZsb29kIGZsb29kLW9wYWNpdHk9IjAiIHJlc3VsdD0iQmFja2dyb3VuZEltYWdlRml4Ii8+CjxmZUNvbG9yTWF0cml4IGluPSJTb3VyY2VBbHBoYSIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDEyNyAwIiByZXN1bHQ9ImhhcmRBbHBoYSIvPgo8ZmVPZmZzZXQgZHk9IjEiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMS41Ii8+CjxmZUNvbG9yTWF0cml4IHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwLjQgMCIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluMj0iQmFja2dyb3VuZEltYWdlRml4IiByZXN1bHQ9ImVmZmVjdDFfZHJvcFNoYWRvdyIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImVmZmVjdDFfZHJvcFNoYWRvdyIgcmVzdWx0PSJzaGFwZSIvPgo8L2ZpbHRlcj4KPGZpbHRlciBpZD0iZmlsdGVyMV9kIiB4PSIyLjUiIHk9IjMuNSIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiBmaWx0ZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIGNvbG9yLWludGVycG9sYXRpb24tZmlsdGVycz0ic1JHQiI+CjxmZUZsb29kIGZsb29kLW9wYWNpdHk9IjAiIHJlc3VsdD0iQmFja2dyb3VuZEltYWdlRml4Ii8+CjxmZUNvbG9yTWF0cml4IGluPSJTb3VyY2VBbHBoYSIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDEyNyAwIiByZXN1bHQ9ImhhcmRBbHBoYSIvPgo8ZmVPZmZzZXQgZHk9IjEiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMS41Ii8+CjxmZUNvbG9yTWF0cml4IHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwLjQgMCIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluMj0iQmFja2dyb3VuZEltYWdlRml4IiByZXN1bHQ9ImVmZmVjdDFfZHJvcFNoYWRvdyIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImVmZmVjdDFfZHJvcFNoYWRvdyIgcmVzdWx0PSJzaGFwZSIvPgo8L2ZpbHRlcj4KPC9kZWZzPgo8L3N2Zz4K";

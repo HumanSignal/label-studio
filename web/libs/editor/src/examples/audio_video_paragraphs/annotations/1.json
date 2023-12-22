@@ -1,0 +1,37 @@
+{
+    "annotations": [
+        {
+            "result": [
+                {"id":"ryzr4QdL93","from_name":"label","to_name":"text","source":"$dialogue","type":"paragraphlabels","value":{"start":"2","end":"4","startOffset":0,"endOffset":134,"paragraphlabels":["Important Stuff"]}},
+                {"id":"ryzr4QdL94","from_name":"audio_label","to_name":"audio","source":"$video","type":"labels","value": {"start": 2,"end": 4,"labels":["Neutral"]}}
+            ]
+        }
+    ],
+    "data": {
+        "dialogue":[
+            {
+               "author":"Mia Wallace",
+               "text":"Dont you hate that?"
+            },
+            {
+               "author":"Vincent Vega:",
+               "text":"Hate what?"
+            },
+            {
+               "author":"Mia Wallace:",
+               "text":"Uncomfortable silences. Why do we feel its necessary to yak about nonsense in order to be comfortable?"
+            },
+            {
+               "author":"Vincent Vega:",
+               "text":"I dont know. Thats a good question."
+            },
+            {
+               "author":"Mia Wallace:",
+               "text":"Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence."
+            }
+         ]
+    },
+    "id": 0,
+    "task_path": "../examples/audio_video_paragraphs/tasks.json"
+}
+

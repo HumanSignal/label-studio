@@ -1,0 +1,50 @@
+.mark {
+  cursor: pointer;
+
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+
+  border-radius: 5px;
+  margin: 0;
+  padding: 0.4em 1em;
+
+  white-space: pre-line;
+
+  &.selected {
+    border: 1px solid red;
+  }
+
+  &.highlighted {
+    border: 1px dashed #00aeff;
+  }
+
+  &.relation {
+    cursor: crosshair;
+  }
+}
+
+.delete {
+  color: #1890ff;
+  padding-top: 0.5em;
+  padding-left: 1em;
+  line-height: 1.8em;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 0.5em;
+
+  // fix antd styles to resize textarea container and fix paddings
+  div[class~="ant-typography-edit-content"] {
+    flex-grow: 1;
+    left: -1px;
+    padding: 0;
+    margin-top: -1px;
+    margin-bottom: calc(1.6em - 9px);
+
+    textarea {
+      // the same as in .mark, its padding set to 0
+      padding: 0.4em 1em;
+    }
+  }
+}

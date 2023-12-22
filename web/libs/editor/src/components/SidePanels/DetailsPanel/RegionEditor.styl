@@ -1,0 +1,75 @@
+.region-editor
+  --col-count 3
+  --col-width calc((100% - 16px) / var(--col-count))
+
+  width 100%
+  padding 0 8px
+  grid-auto-flow row
+  box-sizing border-box
+
+  &_disabled
+    pointer-events none
+    opacity 0.4
+
+  &__wrapper
+    display grid
+    width 100%
+    grid-gap 4px
+    grid-template-columns repeat(var(--col-count), minmax(0, 1fr))
+
+  &__time-control
+    display flex
+    justify-content space-around
+    width 100%
+
+  &__property
+    height 32px
+    display flex
+    position relative
+    align-items center
+    justify-self: stretch;
+
+  &__text
+    top 0
+    left 0
+    height 100%
+    display flex
+    width 16px
+    margin-left 8px
+    align-items center
+    position absolute
+    text-align center
+    opacity 0.3
+    font-size 12px
+    pointer-events none
+
+  &__input
+    margin 0
+    flex 1
+    font-size 12px
+
+    &:not([type=checkbox]):not([type=radio])
+      flex 1
+      outline none
+      width 100%
+      border 1px solid transparent
+      height 32px
+      border-radius 4px
+      box-sizing border-box
+      padding 4px 4px 4px 24px
+      transition-property background-color, border-color
+      transition-duration 80ms
+      transition-timing-function ease
+
+      &:hover
+        border-color #E5E5E5
+
+      &:focus
+        border-color $accent_color
+        box-shadow 0 0 0 1px $accent_color
+
+  &__input[type=checkbox] + &__text,
+  &__input[type=radio] + &__text
+    margin-left 0
+    margin-right 4px
+    position static

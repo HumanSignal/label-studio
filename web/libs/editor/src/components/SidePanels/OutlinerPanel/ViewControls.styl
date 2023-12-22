@@ -1,0 +1,79 @@
+.view-controls
+  top 0
+  z-index 2
+  height var(--view-controls-height)
+  display grid
+  position sticky
+  padding 0 4px
+  align-items center
+  grid-auto-flow column
+  grid-auto-columns min-content
+  grid-column-gap 8px
+  background-color #fff
+  box-shadow 0 1px 0 rgba(#000, 0.1)
+
+  &__sort
+    display flex
+    align-items center
+
+  &__label
+    width 100%
+    display flex
+    align-items center
+    justify-content space-between
+
+    span
+      display flex
+      align-items center
+      color $accent_color
+
+  &_collapsed
+    top 0
+    position static
+
+  .button
+    height 40px
+    font-size 14px
+    font-weight 400
+    padding 0
+    justify-content flex-start
+
+    &_newUI
+      font-size 12px
+      font-weight 500
+      line-height 24px
+      height 24px
+      box-shadow initial
+
+    &__icon
+      width 24px
+      height 24px
+      flex none
+      margin 0
+
+    &:focus
+      box-shadow none
+
+  &_FF_LSDV_4992
+    grid-column-gap 4px
+
+    .button
+      height 24px
+      font-size 11px
+      white-space nowrap
+      box-shadow none
+
+      &:hover
+        background rgba(65, 60, 74, 0.08)
+        border-radius 4px
+
+      &[disabled]
+        background-color #fff
+        color rgba(#000, 0.3)
+
+      &_type_text
+        padding 0px 2px !important
+
+      &.dropdown__trigger
+        padding 0px 6px 0px 2px
+
