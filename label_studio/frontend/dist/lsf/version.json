@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-466: Don't sanitize text tasks",
-  "commit": "3c7243d0d552ed989060bac9244d5742d397b5c4",
+  "message": "fix: LEAP-368: Don't add `hidden` and `locked` to undo history",
+  "commit": "88ba15c536dfe39c4e211239fbce98300ab41807",
   "branch": "master",
-  "date": "2023-12-19T19:26:05Z"
+  "date": "2023-12-21T16:27:45Z"
 }
