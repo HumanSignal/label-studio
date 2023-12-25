@@ -14,12 +14,6 @@ class TaskMixin:
     def post_process_bulk_update_stats(cls, tasks) -> None:
         pass
 
-    def after_delete_actions(self):
-        """
-        Actions to execute after task deletion
-        """
-        pass
-
     def before_delete_actions(self):
         """
         Actions to execute before task deletion
