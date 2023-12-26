@@ -25,7 +25,7 @@ frontend-setup:
 
 # Build frontend continuously on files changes
 frontend-watch:
-	cd web && yarn run ls:watch
+	cd web && yarn run watch
 
 # Build production-ready optimized bundle
 frontend-build: frontend-setup
