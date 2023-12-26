@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-89: Fix rendering of relation arrow in MIG case",
-  "commit": "bb1c54895433bd58affd79d0fbaf32b3c865f2b2",
+  "message": "fix: LEAP-466: Don't sanitize text tasks",
+  "commit": "3c7243d0d552ed989060bac9244d5742d397b5c4",
   "branch": "master",
-  "date": "2023-12-05T16:41:20Z"
+  "date": "2023-12-19T19:26:05Z"
 }
