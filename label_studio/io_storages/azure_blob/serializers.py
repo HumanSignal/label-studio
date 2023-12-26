@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError
 class AzureBlobImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure')
     presign = serializers.BooleanField(required=False, default=True)
+    secure_fields = ['account_name', 'account_key']
 
     class Meta:
         model = AzureBlobImportStorage
@@ -17,12 +18,16 @@ class AzureBlobImportStorageSerializer(ImportStorageSerializer):
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
-        result.pop('account_name')
-        result.pop('account_key')
+        for attr in AzureBlobImportStorageSerializer.secure_fields:
+            result.pop(attr)
         return result
 
     def validate(self, data):
         data = super(AzureBlobImportStorageSerializer, self).validate(data)
+        if 'id' in self.initial_data:
+            storage_object = self.Meta.model.objects.get(id=self.initial_data['id'])
+            for attr in AzureBlobImportStorageSerializer.secure_fields:
+                data[attr] = data.get(attr) or getattr(storage_object, attr)
         storage = self.Meta.model(**data)
         try:
             storage.validate_connection()
