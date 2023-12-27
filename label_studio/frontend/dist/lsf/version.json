@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-381: Remove excess regexp from BEM module",
-  "commit": "e9010cfb40f4df376de258c4bf87da9abe884596",
-  "branch": "fb-leap-381/css-prefix",
-  "date": "2023-12-27T14:58:43Z"
+  "commit": "84069d9a309ca80a8275aa18be70d3883d9d3dbf",
+  "branch": "master",
+  "date": "2023-12-27T22:15:19Z"
 }
