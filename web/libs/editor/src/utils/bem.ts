@@ -111,8 +111,10 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
     finalClass.push(...Array.from(new Set(mixMap)));
   }
 
-  const attachNamespace = (cls: string) =>
-    cls.startsWith(CSS_PREFIX) ? cls : `${CSS_PREFIX}${cls}`;
+  const attachNamespace = (cls: string) => {
+    if (typeof cls !== 'string') console.error('Non-string classname: ', cls);
+    return String(cls).startsWith(CSS_PREFIX) ? cls : `${CSS_PREFIX}${cls}`;
+  };
 
   return finalClass.map(attachNamespace).join(' ');
 };
