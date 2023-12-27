@@ -29,7 +29,7 @@ const PerItemMixin = types
         .every((reg) => {
           const result = reg.results.find(s => s.from_name === self);
 
-          if (!result || !result.hasValue) {
+          if (!result?.hasValue) {
             return true;
           }
           const value = result.mainValue;
