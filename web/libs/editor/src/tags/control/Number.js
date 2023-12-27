@@ -83,10 +83,10 @@ const Model = types
         const errors = [];
 
         if (isDefined(self.min) && value < self.min) {
-          errors.push(`Value must be greater that or equal to ${self.min}`);
+          errors.push(`Value must be greater than or equal to ${self.min}`);
         }
         if (isDefined(self.max) && value > self.max) {
-          errors.push(`Value must be less that or equal to ${self.max}`);
+          errors.push(`Value must be less than or equal to ${self.max}`);
         }
         if (isDefined(self.step)) {
           const step = parseFloat(self.step);
@@ -178,7 +178,8 @@ const Model = types
       onHotKey() {
         return self.increaseValue();
       },
-    }; });
+    };
+  });
 
 const NumberModel = types.compose('NumberModel',
   ControlBase,
