@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-447: Fix Number tag validation ",
-  "commit": "0c489c8143fb472a23fadf6a76552e10b07332e9",
+  "commit": "0824f4f38b6a6290f60f5ddfd8c80a1af0b52665",
   "branch": "fb-leap-447/number-validation",
-  "date": "2023-12-22T00:51:46Z"
+  "date": "2023-12-27T06:23:59Z"
 }
