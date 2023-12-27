@@ -1,7 +1,6 @@
 import { destroy, getParentOfType, getRoot, isAlive, types } from 'mobx-state-tree';
 
 import { guidGenerator } from '../core/Helpers';
-import { RelationsModel } from '../tags/control/Relations';
 import Tree, { TRAVERSE_SKIP } from '../core/Tree';
 import Area from '../regions/Area';
 import { isDefined } from '../utils/utilities';
@@ -20,11 +19,11 @@ const Relation = types
 
     // labels
     labels: types.maybeNull(types.array(types.string)),
-
-    showMeta: types.optional(types.boolean, false),
-
-    visible: true,
   })
+  .volatile(() => ({
+    showMeta: false,
+    visible: true,
+  }))
   .views(self => ({
     get parent() {
       return getParentOfType(self, RelationStore);
@@ -108,11 +107,16 @@ const Relation = types
 const RelationStore = types
   .model('RelationStore', {
     relations: types.array(Relation),
-    showConnections: types.optional(types.boolean, true),
-    highlighted: types.maybeNull(types.safeReference(Relation)),
-    control: types.maybeNull(types.safeReference(RelationsModel)),
   })
+  .volatile(() => ({
+    showConnections: true,
+    _highlighted: null,
+    control: null,
+  }))
   .views(self => ({
+    get highlighted() {
+      return self.relations.find(r => r.id === self._highlighted);
+    },
     get size() {
       return self.relations.length;
     },
@@ -214,11 +218,11 @@ const RelationStore = types
     },
 
     setHighlight(relation) {
-      self.highlighted = relation;
+      self._highlighted = relation.id;
     },
 
     removeHighlight() {
-      self.highlighted = null;
+      self._highlighted = null;
     },
   }));
 
