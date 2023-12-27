@@ -274,7 +274,7 @@ export const restorePanel = (showComments: boolean) => {
       .map(([_, panel]: any) => panel.panelViews)
       .flat(1);
 
-  if (!allTabs || allTabs.length !== (panelViews.length - (showComments ? 1 : 0))) {
+  if (!allTabs || allTabs.length !== (panelViews.length - (showComments ? 0 : 1))) {
     const defaultPanel = showComments ? enterprisePanelDefault : openSourcePanelDefault;
 
     return { panelData: defaultPanel, collapsedSide: defaultCollapsedSide };
