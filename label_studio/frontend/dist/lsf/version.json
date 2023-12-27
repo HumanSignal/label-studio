@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-341: Incorrect icon width causing layout issues with TabPanels in monorepo",
-  "commit": "2f5b6e1f3aac6aacf23b66ac64f1d6a8f34d4036",
-  "branch": "master",
-  "date": "2023-12-08T16:36:04Z"
+  "message": "fix: LEAP-461: Fix displaying conditions for comments tab",
+  "commit": "1a19c3ec424a5c65cf30634326d527ce99f10e83",
+  "branch": "fb-leap-461/comments",
+  "date": "2023-12-27T16:13:04Z"
 }
