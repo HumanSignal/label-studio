@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-466: Don't sanitize text tasks",
-  "commit": "3c7243d0d552ed989060bac9244d5742d397b5c4",
+  "message": "fix: LEAP-381: Remove excess regexp from BEM module",
+  "commit": "84069d9a309ca80a8275aa18be70d3883d9d3dbf",
   "branch": "master",
-  "date": "2023-12-19T19:26:05Z"
+  "date": "2023-12-27T22:15:19Z"
 }
