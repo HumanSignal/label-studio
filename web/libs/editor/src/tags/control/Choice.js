@@ -17,6 +17,7 @@ import { Block, Elem } from '../../utils/bem';
 import './Choice/Choice.styl';
 import { LsChevron } from '../../assets/icons';
 import { HintTooltip } from '../../components/Taxonomy/Taxonomy';
+import { sanitizeHtml } from '../../utils/html';
 
 /**
  * The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
@@ -207,7 +208,7 @@ const HtxNewChoiceView = ({ item, store }) => {
           onChange={changeHandler}
         >
           <HintTooltip title={item.hint} wrapper="span">
-            {item.html ? <span dangerouslySetInnerHTML={{ __html: item.html }}/> : item._value }
+            {item.html ? <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.html) }}/> : item._value }
             {showHotkey && (<Hint>[{item.hotkey}]</Hint>)}
           </HintTooltip>
         </Elem>

@@ -331,6 +331,10 @@ export const FF_LEAP_187 = 'fflag_feat_front_leap_187_video_seek_on_select_short
  */
 export const FF_ZOOM_OPTIM = 'fflag_fix_front_leap_32_zoom_perf_190923_short';
 
+export const FF_SAFE_TEXT = 'fflag_fix_leap_466_text_sanitization';
+
+export const FF_SANITIZATION = 'fflag_fix_front_leap_444_html_sanitization_lsf_components ';
+
 
 Object.assign(window, {
   APP_SETTINGS: {
@@ -345,6 +349,7 @@ Object.assign(window, {
 function getFeatureFlags() {
   return {
     ...(window.APP_SETTINGS?.feature_flags ?? {}),
+    [FF_SANITIZATION]: true,
     // could be used to explicitly set flags for testing, i.e. [FF_DEV_3793]: true
   };
 }

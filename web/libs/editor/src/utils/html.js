@@ -2,6 +2,7 @@ import insertAfter from 'insert-after';
 import * as Checkers from './utilities';
 import sanitizeHTML from 'sanitize-html';
 import Canvas from './canvas';
+import { FF_SANITIZATION, isFF } from './feature-flags';
 
 // fast way to change labels visibility for all text regions
 function toggleLabelsAndScores(show) {
@@ -519,6 +520,8 @@ function findNodeAt(context, at) {
 function sanitizeHtml(html = []) {
   if (!html) return '';
 
+  if (!isFF(FF_SANITIZATION)) return html;
+
   const disallowedAttributes = ['onauxclick', 'onafterprint', 'onbeforematch', 'onbeforeprint',
     'onbeforeunload', 'onbeforetoggle', 'onblur', 'oncancel',
     'oncanplay', 'oncanplaythrough', 'onchange', 'onclick', 'onclose',
@@ -540,11 +543,19 @@ function sanitizeHtml(html = []) {
     'ontimeupdate', 'ontoggle', 'onunhandledrejection', 'onunload',
     'onvolumechange', 'onwaiting', 'onwheel'];
 
+  const disallowedTags = {
+    'script': true,
+    'iframe': true,
+  };
+
   return sanitizeHTML(html, {
     allowedTags: false,
     allowedAttributes: false,
     disallowedTagsMode: 'discard',
-    disallowedTags: ['script', 'iframe'],
+    exclusiveFilter(frame) {
+      //...except those in the blacklist
+      return disallowedTags[frame.tag];
+    },
     nonTextTags: ['script', 'textarea', 'option', 'noscript'],
     transformTags: {
       '*': (tagName, attribs) => {
