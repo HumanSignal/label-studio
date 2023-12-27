@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-341: Incorrect icon width causing layout issues with TabPanels in monorepo",
-  "commit": "2f5b6e1f3aac6aacf23b66ac64f1d6a8f34d4036",
-  "branch": "master",
-  "date": "2023-12-08T16:36:04Z"
+  "message": "fix: LEAP-444: Implement HTML sanitization in LSF",
+  "commit": "7e4c20a92f95bec05529d355cb2110aec7850b58",
+  "branch": "fb-leap-444",
+  "date": "2023-12-27T16:44:27Z"
 }
