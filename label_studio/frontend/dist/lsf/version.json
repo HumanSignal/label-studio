@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-466: Don't sanitize text tasks",
-  "commit": "3c7243d0d552ed989060bac9244d5742d397b5c4",
-  "branch": "master",
-  "date": "2023-12-19T19:26:05Z"
+  "message": "fix: LEAP-444: Implement HTML sanitization in LSF",
+  "commit": "7e4c20a92f95bec05529d355cb2110aec7850b58",
+  "branch": "fb-leap-444",
+  "date": "2023-12-27T16:44:27Z"
 }
