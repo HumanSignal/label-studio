@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-466: Don't sanitize text tasks",
-  "commit": "3c7243d0d552ed989060bac9244d5742d397b5c4",
-  "branch": "master",
-  "date": "2023-12-19T19:26:05Z"
+  "message": "fix: LEAP-461: Fix displaying conditions for comments tab",
+  "commit": "1a19c3ec424a5c65cf30634326d527ce99f10e83",
+  "branch": "fb-leap-461/comments",
+  "date": "2023-12-27T16:13:04Z"
 }
