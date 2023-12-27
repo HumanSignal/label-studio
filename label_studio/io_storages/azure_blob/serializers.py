@@ -24,11 +24,16 @@ class AzureBlobImportStorageSerializer(ImportStorageSerializer):
 
     def validate(self, data):
         data = super(AzureBlobImportStorageSerializer, self).validate(data)
-        if 'id' in self.initial_data:
-            storage_object = self.Meta.model.objects.get(id=self.initial_data['id'])
-            for attr in AzureBlobImportStorageSerializer.secure_fields:
-                data[attr] = data.get(attr) or getattr(storage_object, attr)
-        storage = self.Meta.model(**data)
+        storage = self.instance
+        if storage:
+            for key, value in data.items():
+                setattr(storage, key, value)
+        else:
+            if 'id' in self.initial_data:
+                storage_object = self.Meta.model.objects.get(id=self.initial_data['id'])
+                for attr in AzureBlobImportStorageSerializer.secure_fields:
+                    data[attr] = data.get(attr) or getattr(storage_object, attr)
+            storage = self.Meta.model(**data)
         try:
             storage.validate_connection()
         except Exception as exc:
