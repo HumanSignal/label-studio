@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-444: Implement HTML sanitization in LSF",
-  "commit": "1ef9e1fab784aeb02dd4f00e52a7ed066bae5abe",
+  "commit": "1841a960993aab8e9c3424a8ea8f80bb31105124",
   "branch": "fb-leap-444",
-  "date": "2023-12-27T17:02:33Z"
+  "date": "2023-12-28T10:20:43Z"
 }
