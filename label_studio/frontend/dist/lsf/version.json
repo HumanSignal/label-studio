@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-381: Remove excess regexp from BEM module",
-  "commit": "84069d9a309ca80a8275aa18be70d3883d9d3dbf",
-  "branch": "master",
-  "date": "2023-12-27T22:15:19Z"
+  "message": "fix: OPTIC-354: Comment draft preserved between annotations",
+  "commit": "1300f73542baa16d05e12fa10482a25d217e1adc",
+  "branch": "fb-optic-354/comment-draft-preserved-between-annotations",
+  "date": "2023-12-27T18:11:31Z"
 }
