@@ -462,6 +462,12 @@ class Task(TaskMixin, models.Model):
         queryset = Task.objects.filter(id__in=task_ids)
         Task.delete_tasks_without_signals(queryset)
 
+    def delete(self, *args, **kwargs):
+        self.before_delete_actions()
+        result = super().delete(*args, **kwargs)
+        # set updated_at field of task to now()
+        return result
+
 
 pre_bulk_create = Signal(providing_args=['objs', 'batch_size'])
 post_bulk_create = Signal(providing_args=['objs', 'batch_size'])

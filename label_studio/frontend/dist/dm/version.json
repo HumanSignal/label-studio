@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-706: [FE] Action menu remains open when user select 'Find similar option'",
-  "commit": "4b3dc54df052b7d2868791572668c70f944fa8fe",
+  "message": "fix: LEAP-381: Remove excess regexp from BEM module",
+  "commit": "98b229d353071f1d5480298e43a5277018dd93b0",
   "branch": "master",
-  "date": "2023-12-12T04:51:04Z"
+  "date": "2023-12-27T22:25:05Z"
 }
