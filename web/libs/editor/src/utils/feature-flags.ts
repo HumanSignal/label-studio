@@ -333,9 +333,6 @@ export const FF_ZOOM_OPTIM = 'fflag_fix_front_leap_32_zoom_perf_190923_short';
 
 export const FF_SAFE_TEXT = 'fflag_fix_leap_466_text_sanitization';
 
-export const FF_SANITIZATION = 'fflag_fix_front_leap_444_html_sanitization_lsf_components ';
-
-
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),

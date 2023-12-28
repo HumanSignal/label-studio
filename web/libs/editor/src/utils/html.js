@@ -2,7 +2,6 @@ import insertAfter from 'insert-after';
 import * as Checkers from './utilities';
 import sanitizeHTML from 'sanitize-html';
 import Canvas from './canvas';
-import { FF_SANITIZATION, isFF } from './feature-flags';
 
 // fast way to change labels visibility for all text regions
 function toggleLabelsAndScores(show) {
@@ -519,8 +518,6 @@ function findNodeAt(context, at) {
  */
 function sanitizeHtml(html = []) {
   if (!html) return '';
-
-  if (!isFF(FF_SANITIZATION)) return html;
 
   const disallowedAttributes = ['onauxclick', 'onafterprint', 'onbeforematch', 'onbeforeprint',
     'onbeforeunload', 'onbeforetoggle', 'onblur', 'oncancel',

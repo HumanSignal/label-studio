@@ -27,8 +27,8 @@ const htmlSanitizeList = [
 ];
 
 
-describe('Helper function hexToRGBA', () => {
-  test('3 dig', () => {
+describe('Helper function html sanitize', () => {
+  test('sanitize html list', () => {
     htmlSanitizeList.forEach((item) => {
       expect(sanitizeHtml(item.input)).toBe(item.expected);
     });
