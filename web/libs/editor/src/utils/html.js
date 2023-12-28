@@ -549,6 +549,7 @@ function sanitizeHtml(html = []) {
     allowedTags: false,
     allowedAttributes: false,
     disallowedTagsMode: 'discard',
+    allowVulnerableTags: true,
     exclusiveFilter(frame) {
       //...except those in the blacklist
       return disallowedTags[frame.tag];
