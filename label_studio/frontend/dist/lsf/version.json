@@ -1,6 +1,6 @@
 {
   "message": "fix: OPTIC-354: Comment draft preserved between annotations",
-  "commit": "1300f73542baa16d05e12fa10482a25d217e1adc",
+  "commit": "1e63e53b6ad1f357e0fec212cd1e404c21cbaa0c",
   "branch": "fb-optic-354/comment-draft-preserved-between-annotations",
   "date": "2023-12-27T18:11:31Z"
 }
