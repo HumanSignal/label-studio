@@ -257,7 +257,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
             {isChildOfGroup && visible && <Elem name="grouped-top" ref={resizeGroup} mod={{ drag: 'grouped-top' === resizing }} data-resize={'grouped-top'} />}
             <Elem ref={headerRef} onClick={() => { if (collapsed) handleGroupPanelToggle(); }} id={key} mod={{ collapsed }} name="header">
               <Elem name="header-left">
-                {!collapsed && <Elem name="icon" style={{ pointerEvents: 'none' }} tag={IconOutlinerDrag} width={20} />}
+                {!collapsed && <Elem name="icon" style={{ pointerEvents: 'none' }} tag={IconOutlinerDrag} width={8} />}
                 {!visible && !collapsed && <Elem name="title">{panelViews.map(view => view.title).join(' ')}</Elem>}
               </Elem>
               <Elem name="header-right" >
