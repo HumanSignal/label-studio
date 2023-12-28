@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-341: Incorrect icon width causing layout issues with TabPanels in monorepo",
-  "commit": "2f5b6e1f3aac6aacf23b66ac64f1d6a8f34d4036",
-  "branch": "master",
-  "date": "2023-12-08T16:36:04Z"
+  "message": "fix: OPTIC-354: Comment draft preserved between annotations",
+  "commit": "1300f73542baa16d05e12fa10482a25d217e1adc",
+  "branch": "fb-optic-354/comment-draft-preserved-between-annotations",
+  "date": "2023-12-27T18:11:31Z"
 }
