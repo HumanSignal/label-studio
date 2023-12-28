@@ -132,7 +132,7 @@ const GeneralPanel: FC<any> = inject('store')(observer(({ store, currentEntity }
   const { relationStore } = currentEntity;
   const showAnnotationHistory = store.hasInterface('annotations:history');
   const showDraftInHistory = isFF(FF_DEV_2290);
-  console.log(store)
+
   return (
     <>
       {!showDraftInHistory ? (
@@ -169,7 +169,7 @@ const GeneralPanel: FC<any> = inject('store')(observer(({ store, currentEntity }
           </Elem>
           <Elem name="section-content">
             <CommentsComponent
-              annotationStore={store.annotation}
+              annotationStore={store.annotationStore} 
               commentStore={store.commentStore}
               cacheKey={`task.${store.task.id}`}
             />
