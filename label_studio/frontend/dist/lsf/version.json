@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-381: Remove excess regexp from BEM module",
-  "commit": "84069d9a309ca80a8275aa18be70d3883d9d3dbf",
-  "branch": "master",
-  "date": "2023-12-27T22:15:19Z"
+  "message": "Fb leap 248/multiple hotkeys",
+  "commit": "dae93ec30620022a822e2ebcf7a13d71b170c24e",
+  "branch": "fb-leap-248/multiple-hotkeys",
+  "date": "2023-12-29T03:59:44Z"
 }
