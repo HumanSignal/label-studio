@@ -82,6 +82,7 @@ keymaster.filter = function(event) {
 const ALIASES = {
   'plus': '=', // "ctrl plus" is actually a "ctrl =" because shift is not used
   'minus': '-',
+  ',': '¼', // This should be a comma but it's not working with keymaster
 };
 
 export const Hotkey = (
@@ -144,17 +145,27 @@ export const Hotkey = (
     });
   };
 
+  const getKeys = (key: string) => {
+    const tokenRegex = /((?:\w+\+)*(?:[^,]+|,)),?/g;
+
+    return [...key.replace(/\s/,'').matchAll(tokenRegex)].map(match => match[1]);
+  };
+
   const unbind = () => {
     for (const scope of [DEFAULT_SCOPE, INPUT_SCOPE]) {
       for (const key of Object.keys(_hotkeys_map)) {
-        if (isFF(FF_LSDV_1148)) {
-          removeKeyHandlerRef(scope, key);
-          keymaster.unbind(key, scope);
-          rebindKeyHandlers(scope, key);
-        } else {
-          keymaster.unbind(key, scope);
+        const keys = getKeys(key);
+
+        for (const key of keys) {
+          if (isFF(FF_LSDV_1148)) {
+            removeKeyHandlerRef(scope, key);
+            keymaster.unbind(key, scope);
+            rebindKeyHandlers(scope, key);
+          } else {
+            keymaster.unbind(key, scope);
+          }
+          delete _hotkeys_desc[key];
         }
-        delete _hotkeys_desc[key];
       }
     }
 
@@ -165,8 +176,9 @@ export const Hotkey = (
 
   return {
     applyAliases(key: string) {
-      return key
-        .split(',')
+      const keys = getKeys(key);
+
+      return keys
         .map(k => k.split('+').map(k => ALIASES[k.trim()] ?? k).join('+'))
         .join(',');
     },
