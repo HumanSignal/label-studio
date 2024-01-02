@@ -126,13 +126,12 @@ class AWS(object):
         bucket_iter = bucket_iter.page_size(settings.CLOUD_PAGE_CHECKED_OBJECTS).all()
 
         for index, obj in enumerate(bucket_iter):
-            if index > settings.CLOUD_MAX_CHECKED_OBJECTS:
-                return f"No match found in {settings.CLOUD_MAX_CHECKED_OBJECTS} records."
             key = obj.key
+            # skip directories
             if key.endswith('/'):
                 logger.debug(key + ' is skipped because it is a folder')
                 continue
             if regex and regex.match(key):
-                logger.debug(key + ' is skipped by regex filter')
+                logger.debug(key + ' matches file pattern')
                 return ""
-        return "Not found any objects matching the pattern."
+        return "No objects found matching the provided file pattern"

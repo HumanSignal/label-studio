@@ -325,13 +325,11 @@ class GCS(object):
             pattern = fnmatch.translate(pattern)
         regex = re.compile(str(pattern))
         for index, blob in enumerate(blob_iter):
-            if index > settings.CLOUD_MAX_CHECKED_OBJECTS:
-                return f"No match found in {settings.CLOUD_MAX_CHECKED_OBJECTS} records."
-            # skip dir level
+            # skip directories
             if blob.name == (prefix.rstrip('/') + '/'):
                 continue
             # check regex pattern filter
             if pattern and regex.match(blob.name):
-                logger.debug(blob.name + ' is matched by regex filter')
+                logger.debug(blob.name + ' matches file pattern')
                 return ""
-        return "Not found any objects matching the pattern."
+        return "No objects found matching the provided file pattern"

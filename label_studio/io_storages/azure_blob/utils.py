@@ -70,12 +70,11 @@ class AZURE(object):
         regex = re.compile(str(pattern))
         # match pattern against all keys in the container
         for index, key in enumerate(generator):
-            if index > settings.CLOUD_MAX_CHECKED_OBJECTS:
-                return f"No match found in {settings.CLOUD_MAX_CHECKED_OBJECTS} records."
+            # skip directories
             if key.endswith('/'):
                 logger.debug(key + ' is skipped because it is a folder')
                 continue
             if regex and regex.match(key):
-                logger.debug(key + ' is skipped by regex filter')
+                logger.debug(key + ' matches file pattern')
                 return ""
-        return "Not found any objects matching the pattern."
+        return "No objects found matching the provided file pattern"
