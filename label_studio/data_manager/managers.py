@@ -11,7 +11,20 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db import models
-from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, Value, When
+from django.db.models import (
+    Aggregate,
+    Avg,
+    Case,
+    DateTimeField,
+    Exists,
+    F,
+    FloatField,
+    OuterRef,
+    Q,
+    Subquery,
+    Value,
+    When,
+)
 from django.db.models.functions import Cast, Coalesce
 from pydantic import BaseModel
 
@@ -498,8 +511,36 @@ class GroupConcat(Aggregate):
 def annotate_completed_at(queryset):
     from tasks.models import Annotation
 
-    newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
-    return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
+    LseProject = load_func(settings.LSE_PROJECT)
+
+    get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
+
+    queryset = get_tasks_agreement_queryset(queryset)
+
+    # Subquery to get the agreement_threshold for each project
+    agreement_threshold_subquery = Subquery(
+        LseProject.objects.filter(project_id=OuterRef('project_id')).values('agreement_threshold')[:1],
+        output_field=FloatField(),
+    )
+
+    # Subquery to get the latest Annotation for each task
+    newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id').values('created_at')[:1]
+    agreement_threshold_exists_subquery = Exists(
+        LseProject.objects.filter(project_id=OuterRef('project_id'), agreement_threshold__isnull=False)
+    )
+
+    completed_at_case = Case(
+        When(
+            Q(is_labeled=True)
+            & (Q(_agreement__gte=agreement_threshold_subquery) | ~agreement_threshold_exists_subquery),
+            then=Subquery(newest),
+        ),
+        default=Value(None),
+        output_field=DateTimeField(),
+    )
+
+    # Updated queryset annotation
+    return queryset.annotate(completed_at=completed_at_case)
 
 
 def annotate_annotations_results(queryset):
