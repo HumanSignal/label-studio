@@ -218,7 +218,7 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
     def get_data(self, key):
         data = {
             "data": {
-                settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/aperturedb/?title={self.title}&key={key}'
+                settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/aperturedb/?title={self.title or "none"}&key={key}'
             }
         }
 

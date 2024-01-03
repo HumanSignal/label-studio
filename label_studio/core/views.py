@@ -217,7 +217,7 @@ def aperturedb_data(request):
             logger.warning("Not Authenticated")
 
         for storage in ApertureDBImportStorage.objects.all():
-            if storage.title == title:
+            if (storage.title == title) or (title == "none" and not storage.title):
                 if storage.project.has_permission(user):
                     blob = storage.get_blob(uid)
                     if blob is None:
