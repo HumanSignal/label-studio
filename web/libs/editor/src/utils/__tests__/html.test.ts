@@ -1,4 +1,3 @@
-/* global describe, test, expect, it */
 import { sanitizeHtml } from '../html';
 
 const htmlSanitizeList = [
