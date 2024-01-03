@@ -5291,7 +5291,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 5,
       "deleted": false
     },
     "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation": {
