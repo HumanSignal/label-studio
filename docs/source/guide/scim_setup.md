@@ -77,7 +77,6 @@ Fill in the fields:
    - Create Users
    - Update User Attributes
    - Deactivate Users
-   - Sync Password
 
 ## Assign the application to a single user
 
