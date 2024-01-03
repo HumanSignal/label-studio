@@ -75,7 +75,7 @@ export const CommentStore = types
     }
 
     function setCurrentComment(comment) {
-      self.currentComment = { ...self.currentComment, [self.annotation.id]: comment }
+      self.currentComment = { ...self.currentComment, [self.annotation.id]: comment };
     }
 
     function setCommentFormSubmit(submitCallback) {
