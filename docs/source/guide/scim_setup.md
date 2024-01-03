@@ -36,6 +36,10 @@ Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page
 ## Set up SCIM integration
 
 <i>Check this video tutorial about SCIM and Okta setup.</i>
+
+!!! attention "important"
+    This video demonstrates the use of `userName` in the 'Unique Identifier Field for Users' field. It is essential to use `email` as the unique identifier instead of `userName`; otherwise, SCIM will not function correctly with users who were created prior to the SCIM integration.
+
 <iframe width="560" height="315" src="https://www.youtube.com/embed/MA3de3gu18A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 To manage access to Label Studio Enterprise, add the application to your SCIM provider (Okta). Okta uses Bearer (request header should be `Authorization: Bearer <token>`) token to interact with REST API endpoints of the application to provision and deprovision access.
@@ -58,7 +62,7 @@ To manage access to Label Studio Enterprise, add the application to your SCIM pr
 
 Fill in the fields:
  - **SCIM connector base URL**: `https://<LABEL_STUDIO_BASE_URL>/scim/v2/` where `<LABEL_STUDIO_BASE_URL>` is the base URL of your Label Studio Enterprise instance.
- - **Unique identifier field for users**: Leave `userName`. Label Studio Enterprise uses email as user identifier in this field.
+ - **Unique identifier field for users**: Use `email`. Label Studio Enterprise uses email as user identifier in this field.
  - **Supported provisioning actions**: Select the following items:
    - Import New Users and Profile Updates
    - Push New Users
@@ -73,7 +77,6 @@ Fill in the fields:
    - Create Users
    - Update User Attributes
    - Deactivate Users
-   - Sync Password
 
 ## Assign the application to a single user
 

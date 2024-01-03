@@ -111,6 +111,7 @@ def run_webhook(webhook, action, payload=None):
             webhook,
             action,
             payload,
+            queue_name='high',
         )
     else:
         run_webhook_sync(webhook, action, payload)

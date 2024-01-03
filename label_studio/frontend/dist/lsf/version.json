@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-364: Fix crosshair functionality (#1616)",
-  "commit": "4891f397096fe3a8773ec98ba7e56d0289810b82",
+  "message": "fix: LEAP-444: Implement HTML sanitization in LSF",
+  "commit": "e24a3068a4e47c8a0ef7bcfbb585ef2490728bee",
   "branch": "master",
-  "date": "2023-11-14T15:48:46Z"
+  "date": "2024-01-03T09:21:14Z"
 }
