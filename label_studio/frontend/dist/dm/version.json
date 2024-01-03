@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-381: Remove excess regexp from BEM module",
-  "commit": "98b229d353071f1d5480298e43a5277018dd93b0",
+  "message": "feat: DIA-474: [FE] add new column for DE",
+  "commit": "a8e6e5e6cd6601d765a7f0abd4efa87cec1a3fe5",
   "branch": "master",
-  "date": "2023-12-27T22:25:05Z"
+  "date": "2024-01-03T07:13:20Z"
 }
