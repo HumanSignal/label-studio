@@ -2,12 +2,10 @@
 """
 import os
 
-from botocore.exceptions import ClientError, ParamValidationError
-from io_storages.aperturedb.models import ApertureDBExportStorage, ApertureDBImportStorage
+from io_storages.aperturedb.models import ApertureDBExportStorage, ApertureDBImportStorage, ApertureDBStorageMixin
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-
 
 class ApertureDBImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
@@ -18,14 +16,22 @@ class ApertureDBImportStorageSerializer(ImportStorageSerializer):
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
-        result.pop('password')
-        result.pop('token')
+        for attr in ApertureDBStorageMixin.secure_fields:
+            result.pop(attr)
         return result
 
     def validate(self, data):
-        # Validate local file path
         data = super(ApertureDBImportStorageSerializer, self).validate(data)
-        storage = ApertureDBImportStorage(**data)
+        storage = self.instance
+        if storage:
+            for key, value in data.items():
+                setattr(storage, key, value)
+        else:
+            if 'id' in self.initial_data:
+                storage_object = self.Meta.model.objects.get(id=self.initial_data['id'])
+                for attr in ApertureDBStorageMixin.secure_fields:
+                    data[attr] = data.get(attr) or getattr(storage_object, attr)
+            storage = self.Meta.model(**data)
         try:
             storage.validate_connection()
         except Exception as exc:
@@ -35,13 +41,31 @@ class ApertureDBImportStorageSerializer(ImportStorageSerializer):
 
 class ApertureDBExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
-
-    def to_representation(self, instance):
-        result = super().to_representation(instance)
-        result.pop('password')
-        result.pop('token')
-        return result
     
     class Meta:
         model = ApertureDBExportStorage
         fields = '__all__'
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        for attr in ApertureDBStorageMixin.secure_fields:
+            result.pop(attr)
+        return result
+
+    def validate(self, data):
+        data = super(ApertureDBExportStorageSerializer, self).validate(data)
+        storage = self.instance
+        if storage:
+            for key, value in data.items():
+                setattr(storage, key, value)
+        else:
+            if 'id' in self.initial_data:
+                storage_object = self.Meta.model.objects.get(id=self.initial_data['id'])
+                for attr in ApertureDBStorageMixin.secure_fields:
+                    data[attr] = data.get(attr) or getattr(storage_object, attr)
+            storage = self.Meta.model(**data)
+        try:
+            storage.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+        return data

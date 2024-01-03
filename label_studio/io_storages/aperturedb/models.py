@@ -44,6 +44,8 @@ class ApertureDBStorageMixin(models.Model):
     _db_lock = threading.Lock()
     _db = None
 
+    secure_fields = ['password', 'token']
+
     def _response_status(self, response):
         if isinstance(response, list):
             return max([self._response_status(val) for val in response])
