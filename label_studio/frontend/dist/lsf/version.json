@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-444: Implement HTML sanitization in LSF",
-  "commit": "e24a3068a4e47c8a0ef7bcfbb585ef2490728bee",
-  "branch": "master",
-  "date": "2024-01-03T09:21:14Z"
+  "message": "fix: LEAP-344: View all annotation tab is not loading",
+  "commit": "a8b6d8768e6380f2dbc70c87b09145d9f9432b2a",
+  "branch": "fb-leap-344",
+  "date": "2024-01-03T17:44:20Z"
 }
