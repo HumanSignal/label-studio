@@ -11,7 +11,6 @@ section: "Quality control"
 
 ---
 
-
 Write a custom agreement metric to assess the quality of the predictions and annotations in your Label Studio Enterprise project. Label Studio Enterprise contains a variety of [agreement metrics for your project](stats.html) but if you want to evaluate annotations using a custom metric or a standard metric not available in Label Studio, you can write your own. 
 
 This functionality is only available for Label Studio Enterprise Cloud customers, or for [customers running Label Studio Enterprise in a private cloud](#Set-up-permissions-for-a-private-cloud-custom-agreement-metric) with Amazon Web Services Elastic Compute Cluster [(AWS EC2)](https://aws.amazon.com/ec2/) or Amazon Elastic Kubernetes Service [(EKS)](https://aws.amazon.com/eks/).
@@ -115,14 +114,7 @@ Set up a custom agreement metric for a specific project in Label Studio Enterpri
 4. Write or paste code defining a custom agreement metric in the text box. 
 5. Click **Save & Deploy**.
 
-## Troubleshoot your custom agreement metric
-
-After adding your code to Label Studio Enterprise, the following could happen:
-
-- Your code might fail to deploy if there are errors. If you don't see errors in the Label Studio UI, check your web browser console after you attempt to save the code.
-- Your code might fail to run properly based on the format of your JSON annotations. Export an example annotation from your project in Label Studio JSON format and make sure your function handles the annotation as expected outside of Label Studio. 
-
-If you change the labeling configuration for your project, you might need to update the custom agreement metric code to handle the new format of annotations produced.
+For information on troubleshooting custom metrics, see [Troubleshoot agreements](quality_troubleshoot). 
 
 ## Set up permissions for a private cloud custom agreement metric
 
