@@ -62,8 +62,8 @@ class ApertureDBStorageMixin(models.Model):
                     self._db = Connector.Connector(
                         str(self.hostname),
                         self.port, user=str(self.username),
-                        password=str(self.password),
-                        token=str(self.token),
+                        password=str(self.password) if self.password else "",
+                        token=str(self.token) if self.token else "",
                         use_ssl=self.use_ssl)
         return self._db
 
