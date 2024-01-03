@@ -9,7 +9,7 @@ import { FF_DEV_3034, isFF } from '../../utils/feature-flags';
 import './Comments.styl';
 
 
-export const Comments: FC<{ annotationStore: any; commentStore: any, cacheKey?: string }> = observer(({ annotationStore, commentStore, cacheKey }) => {
+export const Comments: FC<{ annotationStore: any, commentStore: any, cacheKey?: string }> = observer(({ annotationStore, commentStore, cacheKey }) => {
   const mounted = useMounted();
 
   const loadComments = async () => {
