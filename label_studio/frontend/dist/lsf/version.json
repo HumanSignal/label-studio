@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-381: Remove excess regexp from BEM module",
-  "commit": "84069d9a309ca80a8275aa18be70d3883d9d3dbf",
+  "message": "fix: LEAP-444: Implement HTML sanitization in LSF",
+  "commit": "e24a3068a4e47c8a0ef7bcfbb585ef2490728bee",
   "branch": "master",
-  "date": "2023-12-27T22:15:19Z"
+  "date": "2024-01-03T09:21:14Z"
 }
