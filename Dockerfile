@@ -85,4 +85,4 @@ EXPOSE 8080
 USER 1001
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
-CMD ["label-studio"]
+CMD ["label-studio-uwsgi"]
