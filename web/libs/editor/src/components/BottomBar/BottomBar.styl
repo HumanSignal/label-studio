@@ -1,0 +1,32 @@
+.bottombar
+  height var(--bottombar-height)
+  width 100%
+  z-index 101
+  flex none
+  display flex
+  align-items stretch
+  justify-content space-between
+  background-color #fff
+  border-bottom 1px solid rgba(#000, 0.1)
+  user-select none
+  position absolute
+  bottom 0
+
+  &__group
+    display flex
+    align-items stretch
+
+  &__section
+    display flex
+    padding 0 8px
+    align-items center
+    box-sizing border-box
+
+    &_flat
+      padding 0
+
+    & .button
+      &_withIcon
+        &:not([disabled]):hover
+            background-color rgba(65, 60, 74, 0.08) !important
+            border-radius 4px

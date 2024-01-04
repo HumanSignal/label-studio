@@ -1,0 +1,25 @@
+.control-info
+  position relative
+  margin-left 7px
+  height 14px
+  width 14px
+
+  &__tooltip
+    transition opacity .2s ease-out
+    background #262626
+    padding 4px 16px
+    width 220px
+    height auto
+    border-radius 4px
+    color #FAFAFA
+    font-size 16px
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    visibility hidden
+    opacity 0
+    z-index 2
+
+  &:hover &__tooltip
+    visibility visible
+    opacity 1

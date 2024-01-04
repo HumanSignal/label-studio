@@ -1,0 +1,31 @@
+[
+    {
+        "data": {
+            "text": "To have faith is to trust yourself to the water"
+        },
+        "predictions": [
+            {
+                "model_version": "model 1",
+                "created_ago": "3 hours",
+                "result": [
+                    {
+                        "from_name": "validation-label",
+                        "id": "NT0HCnJjv5",
+                        "to_name": "text",
+                        "type": "choices",
+                        "value": {
+                            "choices": [
+                                "valid"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "data": {
+            "text": "When you swim you don't grab hold of the water, because if you do you will sink and drown. Instead you relax, and float."
+        }
+    }
+]
