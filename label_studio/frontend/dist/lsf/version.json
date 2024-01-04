@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-354: Comment draft preserved between annotations",
-  "commit": "d1e4416d0e52fc03e7b9e7490bc143ebe13a7dc0",
-  "branch": "master",
-  "date": "2024-01-03T15:18:43Z"
+  "message": "fix: LEAP-439: Add maskData exporting into new MIG serialization approach",
+  "commit": "2c71ea1d28c5b9d13b95a60884023825dae75dbb",
+  "branch": "fb-leap-439/new-mask-export",
+  "date": "2024-01-04T18:54:23Z"
 }
