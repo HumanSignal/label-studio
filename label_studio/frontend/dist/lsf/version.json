@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-248: Fix app crashing by hotkeys ",
-  "commit": "dd17af3af76d18eb3ba49241939dfbfc432576cc",
+  "commit": "415e87d6c7f598c168797c5ac07b63a3180b107d",
   "branch": "fb-leap-248/multiple-hotkeys",
-  "date": "2023-12-29T04:39:19Z"
+  "date": "2024-01-04T13:34:17Z"
 }
