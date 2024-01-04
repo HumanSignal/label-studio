@@ -1,0 +1,21 @@
+{
+    "annotations": [
+        {
+            "result": [
+                {
+                    "value": {
+                        "choices": [
+                            "Tuna"
+                        ]
+                    },
+                    "id": "55NfiU7T4t",
+                    "from_name": "sub",
+                    "to_name": "menu",
+                    "type": "choices",
+                    "origin": "manual"
+                }
+            ]
+        }
+    ],
+    "id": 1
+}

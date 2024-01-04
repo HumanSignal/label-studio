@@ -1,0 +1,76 @@
+.relations
+  &__item
+    cursor default
+    user-select none
+    padding 0 8px
+
+    &_hidden
+      opacity 0.4
+
+    &:hover
+      background-color rgba(#000, 0.02)
+
+  &__content
+    display flex
+    align-items center
+    padding 5px 0
+
+  &__direction
+    height 100%
+    width 100%
+    z-index 1
+    cursor pointer
+    position absolute
+    display flex
+    align-items center
+    justify-content flex-end
+    color rgba(#000, 0.4)
+
+    &:hover
+      color rgba(#000, 0.8)
+
+  &__icon
+    width 24px
+    display flex
+    flex none
+    position relative
+    align-items center
+    justify-content center
+
+  &__actions
+    flex 1
+    display grid
+    justify-content flex-end
+    grid-auto-flow column
+    grid-auto-columns minmax(32px, min-content)
+
+  &__action
+    display flex
+    height 32px
+    width 32px
+    align-items center
+    justify-content center
+
+    svg
+      width 18px
+      height 18px
+
+    .button
+      width 100%
+      height 100%
+
+.region-meta
+  margin 8px 0
+
+.relation-meta
+  display flex
+  padding-left 64px
+  padding-bottom 5px
+  align-items center
+
+  &__title
+    flex none
+    padding-right 8px
+
+  &__select
+    flex 1

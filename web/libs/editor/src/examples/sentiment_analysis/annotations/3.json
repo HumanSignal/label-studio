@@ -1,0 +1,36 @@
+{
+    "annotations": [
+        {
+            "id": 3001,
+            "result": [
+                {
+                    "from_name": "sentiment",
+                    "id": "fC8tY67j8Z",
+                    "to_name": "my_text",
+                    "type": "choices",
+                    "value": {
+                        "choices": [
+                            "Neutral"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "asin": "1384719342",
+        "helpful": [
+            1,
+            1
+        ],
+        "overall": 5,
+        "reviewText": "The primary job of this device is to block the breath that would otherwise produce a popping sound, while allowing your voice to pass through with no noticeable reduction of volume or high frequencies. The double cloth filter blocks the pops and lets the voice through with no coloration. The metal clamp mount attaches to the mike stand secure enough to keep it attached. The goose neck needs a little coaxing to stay where you put it.",
+        "reviewTime": "08 28, 2013",
+        "reviewerID": "A195EZSQDW3E21",
+        "reviewerName": "Rick Bennette \"Rick Bennette\"",
+        "summary": "It Does The Job Well",
+        "unixReviewTime": 1377648000
+    },
+    "id": 3,
+    "task_path": "../examples/sentiment_analysis/tasks.json"
+}

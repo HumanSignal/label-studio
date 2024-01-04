@@ -1,0 +1,190 @@
+.tool
+  width 32px
+  height 32px
+  margin 4px
+  display flex
+  cursor pointer
+  position relative
+  align-items center
+  justify-content center
+  user-select none
+  z-index 1
+  background none
+  border none
+  padding 0
+
+  --text-color rgba(#000, 0.4)
+  --text-color-hover #000
+
+  &:hover
+    z-index 100
+
+  &__icon
+    width 32px
+    height 32px
+    opacity 0.5
+    color var(--text-color-hover)
+
+    svg
+      width 100%
+      height 100%
+
+    ~/_active &,
+    ~/:hover &
+      opacity 1
+
+  &_active > &__icon
+    background rgba(#000, 0.1)
+    box-shadow inset 0px 1px 0px rgba(#000, 0.05), inset 0px 0px 0px 1px rgba(#000, 0.05)
+    border-radius 5px
+
+    ~/_smart&
+      background rgba(#7F64FF, 0.2)
+      box-shadow inset 0px 1px 0px rgba(#7F64FF, 0.1), inset 0px 0px 0px 1px rgba(#7F64FF, 0.1)
+
+  &__tooltip
+    top 50%
+    display none
+    right 100%
+    font-size 14px
+    font-size 14px
+    font-weight 500
+    user-select none
+    position absolute
+    box-sizing border-box
+    padding-right 10px
+    transform translate3d(0, -50%, 0)
+    pointer-events none
+
+    &-body
+      display flex
+      height 40px
+      align-items center
+      border-radius 5px
+      white-space nowrap
+      padding 0 14px
+      color var(--text-color)
+      background-color #fff
+      box-shadow 0px 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 5px 10px rgba(0, 0, 0, 0.1)
+
+    ~/:hover &
+      display block
+
+    ~/_active &
+      display none
+
+    ~/:hover &-body,
+    ~/_active &-body
+      color var(--text-color-hover)
+
+    ~/_alignment_right &-body
+      flex-direction row-reverse
+
+    ~/_alignment_left &-body
+      flex-direction row
+
+    &_controlled
+      pointer-events all
+
+  &__controls
+    top 50%
+    right 100%
+    position absolute
+    transform translate3d(0, -50%, 0)
+
+    &-body
+      display flex
+      border-radius 5px
+      background-color #fff
+      box-shadow 0px 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 5px 10px rgba(0, 0, 0, 0.1)
+
+    ~/_alignment_right &
+      padding-right 10px
+
+    ~/_alignment_left &-body
+      padding-left 10px
+
+
+
+  &__shortcut
+    opacity 0.6
+    display flex
+    font-size 12px
+    font-weight bold
+    color rgba(0, 0, 0, 0.6)
+
+    ~/_active &,
+    ~/:hover &
+      opacity 1
+
+    ~/_alignment_right &
+      margin 0 20px 0 0
+
+    ~/_alignment_left &
+      margin 0 0 0 20px
+
+    ^[0]_expanded^[0]_alignment_right &
+      margin 0 20px 0 0
+
+    ^[0]_expanded^[0]_alignment_left &
+      margin 0 0 0 20px
+
+  &__key
+    padding 0 4px
+    height 16px
+    display flex
+    align-items center
+    background #FFFFFF
+    border-radius 2px
+    font-family Roboto
+    text-transform uppercase
+    box-shadow 0px 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 0px rgba(0, 0, 0, 0.08)
+
+  &__key + &__key
+    margin-left 4px
+
+  &__label
+    flex 1
+    display flex
+    align-items center
+    font-weight 500
+    justify-content space-between
+    color var(--text-color)
+
+    ~/_alignment_right &
+      padding-left 8px
+      padding-right 12px
+      flex-direction row-reverse
+
+    ~/_alignment_left &
+      padding-left 12px
+      padding-right 8px
+      flex-direction row
+
+    ~/:hover &,
+    ~/_active &
+      color var(--text-color-hover)
+
+  &__smart
+    display flex
+
+  &_expanded
+    width calc(100% - 8px)
+
+    ~/_active&
+      border-radius 5px
+      background-color rgba(#000, 0.06)
+
+  &_alignment_left
+    flex-direction row
+
+  &_alignment_right
+    flex-direction row-reverse
+
+  &_smart
+    --text-color rgba(#7F64FF, 0.6)
+    --text-color-hover #7F64FF
+
+    ~/_active&
+      border-radius 5px
+      background-color rgba(#000, 0.06)

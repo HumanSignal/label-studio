@@ -1,0 +1,31 @@
+.block {
+  position: relative;
+  border: 1px solid #f2f3f4;
+  background-color: #f8f9f9;
+  border-radius: 5px;
+  padding: 7px 20px;
+  margin: 10px 0;
+  display: flex;
+  flex-flow: column;
+
+  &:last-of-type {
+    margin-bottom: 20px;
+  }
+
+  &_selected {
+    border: 2px solid #ff4d4f;
+  }
+}
+
+.name {
+  font-weight: bold;
+}
+
+.tag {
+  margin-top: 10px;
+}
+
+.date {
+  font-style: italic;
+  font-size: 0.8rem;
+}

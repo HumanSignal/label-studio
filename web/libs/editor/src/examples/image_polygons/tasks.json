@@ -1,0 +1,45 @@
+[
+    {
+        "data": {
+            "image": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg"
+        },
+        "predictions": [
+            {
+                "model_version": "model 1",
+                "created_ago": "3 hours",
+                "result": [
+                    {
+                        "id": "XSMXwwsaTn",
+                        "from_name": "tag",
+                        "to_name": "img",
+                        "source": "$image",
+                        "type": "polygonlabels",
+                        "value": {
+                            "points": [
+                                [
+                                    27.2,
+                                    41.24629080118694
+                                ],
+                                [
+                                    25.73333333333333,
+                                    70.62314540059347
+                                ],
+                                [
+                                    48.13333333333333,
+                                    62.61127596439169
+                                ],
+                                [
+                                    48.13333333333333,
+                                    32.93768545994065
+                                ]
+                            ],
+                            "polygonlabels": [
+                                "Hello"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

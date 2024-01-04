@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "test": "cypress run --quiet --browser chrome",
+    "test:with-coverage": "COLLECT_COVERAGE=true test:parallel",
+    "test:ui": "cypress open",
+    "test:parallel": "cypress-parallel -r spec -b -m -s test -t ${CPU_NUMBER:=2} -d ./specs/",
+    "test:reset": "rm -rf output && yarn run coverage:reset",
+    "coverage:reset": "rm -rf coverage .nyc_output",
+    "coverage:report": "nyc report --temp-dir=.nyc_output --report-dir=report --reporter=html --reporter=text --cwd=. --exclude-after-remap false",
+    "coverage:summary": "nyc report --temp-dir=.nyc_output --reporter=text-summary --cwd=. --exclude-after-remap false"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.2"
+  }
+}

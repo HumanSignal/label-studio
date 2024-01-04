@@ -1,0 +1,23 @@
+<View>
+  <Header value="Select regions:"></Header>
+  <Labels name="label" toName="audio" choice="multiple">
+    <Label value="Beat" background="#98C84E"></Label>
+    <Label value="Voice" background="red"></Label>
+    <Label value="Guitar" background="blue"></Label>
+    <Label value="Other"></Label>
+  </Labels>
+  <Header value="Select genre:"></Header>
+  <Choices name="choice" toName="audio" choice="multiple">
+    <Choice value="Lo-Fi" />
+    <Choice value="Rock" />
+    <Choice value="Pop" />
+  </Choices>
+  <Header value="Listen the audio:"></Header>
+  <Audio name="audio" value="$url" cursorcolor="#FF0000" cursorwidth="4"/>
+  <Header>How many instruments in this audio?</Header>
+  <Number name="overall" toName="audio" defaultValue="2" />
+  <View visibleWhen="region-selected">
+    <Header>And in this fragment?</Header>
+    <Number name="fragment" toName="audio" perRegion="true" />
+  </View>
+</View>

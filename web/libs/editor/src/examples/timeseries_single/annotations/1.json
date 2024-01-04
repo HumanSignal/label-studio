@@ -1,0 +1,34 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "readonly": true,
+            "result": [
+                {
+                  "value": {
+                    "start": 4,
+                    "end": 23,
+                    "instant": false,
+                    "timeserieslabels": ["Run"]
+                  },
+                  "id": "Oek-tTCZ6_",
+                  "from_name": "label",
+                  "to_name": "ts",
+                  "type": "timeserieslabels"
+                },
+                {
+                  "value": {
+                    "start": 52,
+                    "end": 69,
+                    "instant": false,
+                    "timeserieslabels": ["Walk"]
+                  },
+                  "id": "U0S2_cORxv",
+                  "from_name": "label",
+                  "to_name": "ts",
+                  "type": "timeserieslabels"
+                }
+              ]
+        }
+    ]
+}

@@ -1,0 +1,97 @@
+.select
+  height 40px
+  background #FAFAFA
+  font-size 16px
+  line-height 22px
+  border 1px solid $black_15
+  box-sizing border-box
+  border-radius 5px
+  cursor pointer
+
+  &_size
+    &_compact
+      height 32px
+
+    &_small
+      height 24px
+      font-size 12px
+
+  &__list
+    width max-content
+
+  &__selected
+    width 100%
+    padding 0 7px
+    min-width 60px
+    display flex
+    font-weight 500
+    align-items center
+
+  &__value
+    width max-content
+    min-width 30px
+    flex 1
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+
+  &__option
+    cursor pointer
+    padding 4px 16px
+
+    &:hover,
+    &_focused
+      background-color #f7f7f7
+
+    &_selected
+      color white
+      background-color $accent_color
+
+    &_selected:hover,
+    &_selected&_focused
+      background-color lighten($accent_color, 10)
+
+  &__icon
+    width 16px
+    height 16px
+    margin-left 5px
+    position relative
+
+    &::before,
+    &::after
+      width 6px
+      height 6px
+      display block
+      position absolute
+      content: ""
+      border 1px solid $accent_color
+      border-right none
+      border-bottom none
+
+    &::before
+      top 0
+      left 50%
+      transform translate(-50%, 50%) rotate(45deg)
+
+    &::after
+      bottom 0
+      left 50%
+      transform translate(-50%, -50%) rotate(-135deg)
+
+  &__optgroup
+    &-list
+      width max-content
+    &-label
+      padding 4px 16px
+      color rgba(#000, 0.6)
+
+  &__optgroup-list &__option
+    padding-left 24px
+
+  &_disabled
+    pointer-events none
+
+  &:focus
+    outline none
+    box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
+    border-color rgba($accent_color, 0.2)
