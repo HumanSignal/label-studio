@@ -316,9 +316,9 @@ class GCS(object):
         :return: Message if pattern is not valid, empty string otherwise
         """
         client = storage.get_client()
-        blob_iter = client.list_blobs(storage.bucket,
-                                      prefix=storage.prefix,
-                                      page_size=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE)
+        blob_iter = client.list_blobs(
+            storage.bucket, prefix=storage.prefix, page_size=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE
+        )
         prefix = str(storage.prefix) if storage.prefix else ''
         # compile pattern to regex
         if glob_pattern:
@@ -331,5 +331,5 @@ class GCS(object):
             # check regex pattern filter
             if pattern and regex.match(blob.name):
                 logger.debug(blob.name + ' matches file pattern')
-                return ""
-        return "No objects found matching the provided glob pattern"
+                return ''
+        return 'No objects found matching the provided glob pattern'

@@ -58,12 +58,16 @@ class AZURE(object):
         logger.debug('Validating Azure Blob Storage pattern.')
         client, container = storage.get_client_and_container()
         if storage.prefix:
-            generator = container.list_blob_names(name_starts_with=storage.prefix,
-                                                  results_per_page=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE,
-                                                  timeout=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT)
+            generator = container.list_blob_names(
+                name_starts_with=storage.prefix,
+                results_per_page=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE,
+                timeout=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT,
+            )
         else:
-            generator = container.list_blob_names(results_per_page=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE,
-                                                  timeout=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT)
+            generator = container.list_blob_names(
+                results_per_page=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE,
+                timeout=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT,
+            )
         # compile pattern to regex
         if glob_pattern:
             pattern = fnmatch.translate(pattern)
@@ -76,5 +80,5 @@ class AZURE(object):
                 continue
             if regex and regex.match(key):
                 logger.debug(key + ' matches file pattern')
-                return ""
-        return "No objects found matching the provided glob pattern"
+                return ''
+        return 'No objects found matching the provided glob pattern'
