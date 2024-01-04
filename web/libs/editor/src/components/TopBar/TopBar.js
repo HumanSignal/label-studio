@@ -20,7 +20,7 @@ export const TopBar = observer(({ store }) => {
   const isViewAll = annotationStore?.viewingAll === true;
 
   const toggleViewAll = () => {
-    !isViewAll && entity.saveDraftImmediatelyWithResults({useToast: true});
+    !isViewAll && entity.saveDraftImmediatelyWithResults({ useToast: true});
     annotationStore.toggleViewingAllAnnotations();
   };
 
