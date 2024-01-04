@@ -515,7 +515,12 @@ def annotate_completed_at(queryset):
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-    if get_tasks_agreement_queryset:
+    newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
+    if (
+        get_tasks_agreement_queryset
+        and LseProject
+        and LseProject.objects.filter(project_id=queryset[0].project_id).exists()
+    ):
         queryset = get_tasks_agreement_queryset(queryset)
 
         # Subquery to get the agreement_threshold for each project
@@ -533,27 +538,28 @@ def annotate_completed_at(queryset):
         )
 
         # Subquery to get the latest Annotation for each task
-        newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id').values('created_at')[:1]
         agreement_threshold_exists_subquery = Exists(
             LseProject.objects.filter(project_id=OuterRef('project_id'), agreement_threshold__isnull=False)
         )
 
         completed_at_case = Case(
             When(
-                Q(is_labeled=True)
-                & (
-                    Q(_agreement__gte=agreement_threshold_subquery)
-                    | ~agreement_threshold_exists_subquery
-                    | Q(annotation_count__gte=max_annotators_subquery)
-                ),
-                then=Subquery(newest),
+                # Check if agreement_threshold is not set
+                ~agreement_threshold_exists_subquery & Q(is_labeled=True),
+                then=Subquery(newest.values('created_at')),
+            ),
+            When(
+                # If agreement_threshold is set, evaluate all conditions
+                agreement_threshold_exists_subquery
+                & Q(is_labeled=True)
+                & (Q(_agreement__gte=agreement_threshold_subquery) | Q(annotation_count__gte=max_annotators_subquery)),
+                then=Subquery(newest.values('created_at')),
             ),
             default=Value(None),
             output_field=DateTimeField(),
         )
         return queryset.annotate(completed_at=completed_at_case)
     else:
-        newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
         return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
 
 
