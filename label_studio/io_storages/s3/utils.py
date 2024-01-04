@@ -134,4 +134,4 @@ class AWS(object):
             if regex and regex.match(key):
                 logger.debug(key + ' matches file pattern')
                 return ""
-        return "No objects found matching the provided file pattern"
+        return "No objects found matching the provided glob pattern"

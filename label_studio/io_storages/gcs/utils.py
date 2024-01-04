@@ -332,4 +332,4 @@ class GCS(object):
             if pattern and regex.match(blob.name):
                 logger.debug(blob.name + ' matches file pattern')
                 return ""
-        return "No objects found matching the provided file pattern"
+        return "No objects found matching the provided glob pattern"
