@@ -265,7 +265,7 @@ jobs:
         run: |
           set -xeuo pipefail
 
-          poetry add "git+https://github.com/${{ github.event.client_payload.repo_name }}.git#${{ github.event.client_payload.commit_sha }}" --lock --group "${{ steps.details.outputs.poetry_group }}"
+          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock --group "${{ steps.details.outputs.poetry_group }}"
 
           git add pyproject.toml poetry.lock
           git status -s

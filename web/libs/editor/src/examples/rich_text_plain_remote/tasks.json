@@ -1,0 +1,14 @@
+[
+    {
+        "data": {
+            "url": "https://htx-pub.s3.amazonaws.com/example.txt"
+        },
+        "predictions": [
+            {
+                "model_version": "model 1",
+                "created_ago": "2 weeks, 6 days",
+                "result": []
+            }
+        ]
+    }
+]

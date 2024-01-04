@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-754: [FE] Search option does not reflect actual queries state",
-  "commit": "34d39c2d0070c4c33e5280feee1f4720db31bde5",
+  "message": "feat: DIA-474: [FE] add new column for DE",
+  "commit": "a8e6e5e6cd6601d765a7f0abd4efa87cec1a3fe5",
   "branch": "master",
-  "date": "2023-12-06T04:22:35Z"
+  "date": "2024-01-03T07:13:20Z"
 }

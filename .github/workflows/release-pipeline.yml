@@ -23,13 +23,13 @@ jobs:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
-  build_ubi_docker_image:
-    name: "Build UBI docker image"
-    uses: ./.github/workflows/docker-build-ubi.yml
-    with:
-      sha: ${{ github.ref_name }}
-      version: ${{ github.ref_name }}
-    secrets: inherit
+#  build_ubi_docker_image:
+#    name: "Build UBI docker image"
+#    uses: ./.github/workflows/docker-build-ubi.yml
+#    with:
+#      sha: ${{ github.ref_name }}
+#      version: ${{ github.ref_name }}
+#    secrets: inherit
 
   build_hugging_face_docker_image:
     name: "Build Hugging Face docker image"
@@ -125,3 +125,27 @@ jobs:
     with:
       docker_image_version: ${{ github.ref_name }}
     secrets: inherit
+
+  notify_slack_on_failure:
+    name: "Notify Slack on Failure"
+    needs:
+      - promote_docker_image
+      - build_hugging_face_docker_image
+      - build-pypi
+      - delete-rc-assets
+      - update-homebrew-tap
+      - update-helm-chart
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    steps:
+      - name: Send Notification to Slack
+        id: slack_notify_ops_release
+        uses: slackapi/slack-github-action@v1.24
+        with:
+          channel-id: '${{ vars.SLACK_CH_RELEASE_TRAIN }}'
+          slack-message: |
+            On or more steps of Label Studio OpenSource release pipeline got failed! <!subteam^${{ vars.SLACK_GR_DEVOPS }}>
+
+            ><https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|[Workflow run]>
+        env:
+          SLACK_LSE_BOT_TOKEN: ${{ secrets.SLACK_LSE_BOT_TOKEN }}

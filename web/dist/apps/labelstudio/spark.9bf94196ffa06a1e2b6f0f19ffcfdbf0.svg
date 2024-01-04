@@ -1,0 +1,37 @@
+var _path, _defs;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgSpark = function SvgSpark(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 14,
+    height: 14,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "url(#spark_svg__a)",
+    d: "m11.083.583-.735 1.605-1.598.729 1.598.735.735 1.598.73-1.598 1.604-.735-1.604-.73m-6.563.146L3.792 5.542.583 7l3.209 1.458 1.458 3.209 1.458-3.209L9.917 7 6.708 5.542m4.375 3.208-.735 1.598-1.598.735 1.598.73.735 1.604.73-1.604 1.604-.73-1.604-.735"
+  })), _defs || (_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: "spark_svg__a",
+    x1: 0.583,
+    x2: 16.024,
+    y1: 0.583,
+    y2: 6.041,
+    gradientUnits: "userSpaceOnUse"
+  }, /*#__PURE__*/React.createElement("stop", {
+    className: "spark_svg__stop1",
+    stopColor: "#FFA663"
+  }), /*#__PURE__*/React.createElement("stop", {
+    className: "spark_svg__stop2",
+    offset: 0.516,
+    stopColor: "#FF7557"
+  }), /*#__PURE__*/React.createElement("stop", {
+    className: "spark_svg__stop3",
+    offset: 1,
+    stopColor: "#E37BD3"
+  })))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgSpark);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDE0IDE0IiBmaWxsPSJub25lIj4KICA8Zz4KICAgIDxwYXRoIGQ9Ik0xMS4wODMzIDAuNTgzMzMyTDEwLjM0ODMgMi4xODc1TDguNzUwMDEgMi45MTY2N0wxMC4zNDgzIDMuNjUxNjdMMTEuMDgzMyA1LjI1TDExLjgxMjUgMy42NTE2N0wxMy40MTY3IDIuOTE2NjdMMTEuODEyNSAyLjE4NzVNNS4yNTAwMSAyLjMzMzMzTDMuNzkxNjggNS41NDE2N0wwLjU4MzM0NCA3TDMuNzkxNjggOC40NTgzM0w1LjI1MDAxIDExLjY2NjdMNi43MDgzNCA4LjQ1ODMzTDkuOTE2NjggN0w2LjcwODM0IDUuNTQxNjdNMTEuMDgzMyA4Ljc1TDEwLjM0ODMgMTAuMzQ4M0w4Ljc1MDAxIDExLjA4MzNMMTAuMzQ4MyAxMS44MTI1TDExLjA4MzMgMTMuNDE2N0wxMS44MTI1IDExLjgxMjVMMTMuNDE2NyAxMS4wODMzTDExLjgxMjUgMTAuMzQ4MyIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzNfMjU5OCkiLz4KICA8L2c+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfM18yNTk4IiB4MT0iMC41ODMzNDQiIHkxPSIwLjU4MzMzMiIgeDI9IjE2LjAyMzciIHkyPSI2LjA0MDgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHN0b3AgY2xhc3M9InN0b3AxIiBzdG9wLWNvbG9yPSIjRkZBNjYzIi8+CiAgICAgIDxzdG9wIGNsYXNzPSJzdG9wMiIgb2Zmc2V0PSIwLjUxNTYyNSIgc3RvcC1jb2xvcj0iI0ZGNzU1NyIvPgogICAgICA8c3RvcCBjbGFzcz0ic3RvcDMiIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0UzN0JEMyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+Cjwvc3ZnPgo=";

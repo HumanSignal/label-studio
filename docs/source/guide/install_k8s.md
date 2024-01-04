@@ -32,8 +32,7 @@ If you want to install Label Studio on Kubernetes and you have unrestricted acce
 5. (Optional) Configure [ingress](ingress_config.html).
 6. (Optional) Configure [values.yaml](helm_values.html).
 7. (Optional) [Set up TLS for PostgreSQL](#Optional-set-up-TLS-for-PostgreSQL)
-8. (Optional) [Set up TLS for Redis](#Optional-set-up-TLS-for-Redis)
-9. [Use Helm to install Label Studio on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-on-your-Kubernetes-cluster).
+8. [Use Helm to install Label Studio on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-on-your-Kubernetes-cluster).
 
 If you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet, see how to [Install Label Studio without public internet access](/guide/install_airgapped.html).
 
@@ -117,35 +116,6 @@ global:
       pgSslRootCertSecretKey: "ca.crt"
       pgSslCertSecretKey: "client.crt"
       pgSslKeySecretKey: "client.key"
-```
-
-4. Install or upgrade Label Studio using Helm.
-
-## Optional: set up TLS for Redis
-
-To configure Label Studio to use TLS for end-client connections with Redis, do the following:
-
-1. Enable TLS for your Redis instance and save Root TLS certificate, client certificate and its key for the next steps.
-2. Create a Kubernetes secret with your certificates, replacing `<PATH_TO_CA>`, `<PATH_TO_CLIENT_CRT>` and `<PATH_TO_CLIENT_KEY>` with paths to your certificates:
-
-```shell
-kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA> --from-file=client.crt=<PATH_TO_CLIENT_CRT> --from-file=client.key=<PATH_TO_CLIENT_KEY>
-```
-
-3. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
-
-!!! note
-    In the case if you are using self-signed certificates that host cannot verify you have to set `redisSslCertReqs` to `None`
-
-```yaml
-global:
-  redisConfig:
-    ssl:
-      redisSslCertReqs: "required"
-      redisSslSecretName: "<YOUR_SECRET_NAME>"
-      redisSslCaCertsSecretKey: "ca.crt"
-      redisSslCertFileSecretKey: "client.crt"
-      redisSslKeyFileSecretKey: "client.key"
 ```
 
 4. Install or upgrade Label Studio using Helm.

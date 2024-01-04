@@ -81,7 +81,7 @@ jobs:
           mv -f pyproject.toml.new pyproject.toml
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -179,7 +179,7 @@ jobs:
 
       - name: Upload to artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Dist
           path: dist/
