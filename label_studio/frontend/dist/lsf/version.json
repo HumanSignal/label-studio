@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-341: Incorrect icon width causing layout issues with TabPanels in monorepo",
-  "commit": "2f5b6e1f3aac6aacf23b66ac64f1d6a8f34d4036",
-  "branch": "master",
-  "date": "2023-12-08T16:36:04Z"
+  "message": "fix: LEAP-439: Add maskData exporting into new MIG serialization approach",
+  "commit": "2c71ea1d28c5b9d13b95a60884023825dae75dbb",
+  "branch": "fb-leap-439/new-mask-export",
+  "date": "2024-01-04T18:54:23Z"
 }
