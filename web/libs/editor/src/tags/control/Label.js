@@ -18,6 +18,7 @@ import ToolsManager from '../../tools/Manager';
 import Utils from '../../utils';
 import { parseValue } from '../../utils/data';
 import { FF_DEV_2128, isFF } from '../../utils/feature-flags';
+import { sanitizeHtml } from '../../utils/html';
 
 /**
  * The `Label` tag represents a single label. Use with the `Labels` tag, including `BrushLabels`, `EllipseLabels`, `HyperTextLabels`, `KeyPointLabels`, and other `Labels` tags to specify the value of a specific label.
@@ -304,7 +305,7 @@ const HtxLabelView = inject('store')(
         selected={item.selected}
         onClick={item.onClick}
       >
-        {item.html ? <div title={item._value} dangerouslySetInnerHTML={{ __html: item.html }}/> : item._value }
+        {item.html ? <div title={item._value} dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.html) }}/> : item._value }
         {item.showalias === true && item.alias && (
           <span style={Utils.styleToProp(item.aliasstyle)}>&nbsp;{item.alias}</span>
         )}
