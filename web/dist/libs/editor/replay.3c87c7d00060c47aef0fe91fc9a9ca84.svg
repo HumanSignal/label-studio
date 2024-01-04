@@ -1,0 +1,24 @@
+var _path, _path2;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgReplay = function SvgReplay(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "#000",
+    fillRule: "evenodd",
+    d: "M11 6a1 1 0 0 1 1-1 8 8 0 1 1-8 8 1 1 0 1 1 2 0 6 6 0 1 0 6-6 1 1 0 0 1-1-1",
+    clipRule: "evenodd"
+  })), _path2 || (_path2 = /*#__PURE__*/React.createElement("path", {
+    fill: "#000",
+    d: "M12 5.737c0-1.645 0-2.468-.528-2.75-.528-.283-1.213.173-2.581 1.086l-.395.263C7.367 5.089 6.803 5.465 6.803 6c0 .535.564.911 1.693 1.664l.395.263c1.368.913 2.053 1.369 2.58 1.086C12 8.73 12 7.908 12 6.263z"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgReplay);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMSA2QzExIDUuNDQ3NzIgMTEuNDQ3NyA1IDEyIDVDMTYuNDE4MyA1IDIwIDguNTgxNzIgMjAgMTNDMjAgMTcuNDE4MyAxNi40MTgzIDIxIDEyIDIxQzcuNTgxNzIgMjEgNCAxNy40MTgzIDQgMTNDNCAxMi40NDc3IDQuNDQ3NzIgMTIgNSAxMkM1LjU1MjI4IDEyIDYgMTIuNDQ3NyA2IDEzQzYgMTYuMzEzNyA4LjY4NjI5IDE5IDEyIDE5QzE1LjMxMzcgMTkgMTggMTYuMzEzNyAxOCAxM0MxOCA5LjY4NjI5IDE1LjMxMzcgNyAxMiA3QzExLjQ0NzcgNyAxMSA2LjU1MjI4IDExIDZaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBkPSJNMTIgNS43MzcwM0MxMiA0LjA5MjAxIDEyIDMuMjY5NSAxMS40NzE5IDIuOTg2ODRDMTAuOTQzNyAyLjcwNDE5IDEwLjI1OTMgMy4xNjA0NCA4Ljg5MDYgNC4wNzI5M0w4LjQ5NjE1IDQuMzM1OUM3LjM2NzIzIDUuMDg4NTEgNi44MDI3OCA1LjQ2NDgyIDYuODAyNzggNkM2LjgwMjc4IDYuNTM1MTggNy4zNjcyMyA2LjkxMTQ5IDguNDk2MTUgNy42NjQxTDguODkwNiA3LjkyNzA3QzEwLjI1OTMgOC44Mzk1NiAxMC45NDM3IDkuMjk1ODEgMTEuNDcxOSA5LjAxMzE2QzEyIDguNzMwNSAxMiA3LjkwNzk5IDEyIDYuMjYyOTdWNS43MzcwM1oiIGZpbGw9ImJsYWNrIi8+Cjwvc3ZnPgo=";

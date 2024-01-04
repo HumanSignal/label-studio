@@ -1,0 +1,13 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "result": []
+        }
+    ],
+    "data": {
+        "url": "https://htx-pub.s3.amazonaws.com/example.txt"
+    },
+    "id": 1,
+    "task_path": "../examples/named_entity/tasks.json"
+}

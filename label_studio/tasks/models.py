@@ -462,6 +462,12 @@ class Task(TaskMixin, models.Model):
         queryset = Task.objects.filter(id__in=task_ids)
         Task.delete_tasks_without_signals(queryset)
 
+    def delete(self, *args, **kwargs):
+        self.before_delete_actions()
+        result = super().delete(*args, **kwargs)
+        # set updated_at field of task to now()
+        return result
+
 
 pre_bulk_create = Signal(providing_args=['objs', 'batch_size'])
 post_bulk_create = Signal(providing_args=['objs', 'batch_size'])
@@ -596,17 +602,17 @@ class Annotation(AnnotationMixin, models.Model):
     class Meta:
         db_table = 'task_completion'
         indexes = [
-            models.Index(fields=['task', 'ground_truth']),
-            models.Index(fields=['task', 'completed_by']),
-            models.Index(fields=['id', 'task']),
-            models.Index(fields=['task', 'was_cancelled']),
-            models.Index(fields=['was_cancelled']),
-            models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['ground_truth']),
+            models.Index(fields=['id', 'task']),
             models.Index(fields=['last_action']),
             models.Index(fields=['project', 'ground_truth']),
-            models.Index(fields=['project', 'was_cancelled']),
             models.Index(fields=['project', 'id']),
+            models.Index(fields=['project', 'was_cancelled']),
+            models.Index(fields=['task', 'completed_by']),
+            models.Index(fields=['task', 'ground_truth']),
+            models.Index(fields=['task', 'was_cancelled']),
+            models.Index(fields=['was_cancelled']),
         ]
 
     def created_ago(self):
@@ -984,16 +990,15 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
     """Update annotation counters in project summary"""
     instance.increase_project_summary_counters()
 
-    if created:
-        # If new annotation created, update task.is_labeled state
-        logger.debug(f'Update task stats for task={instance.task}')
-        if instance.was_cancelled:
-            instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count()
-        else:
-            instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
-        instance.task.update_is_labeled()
-        instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
-        logger.debug(f'Updated total_annotations and cancelled_annotations for {instance.task.id}.')
+    # If annotation is changed, update task.is_labeled state
+    logger.debug(f'Update task stats for task={instance.task}')
+    if instance.was_cancelled:
+        instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count()
+    else:
+        instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
+    instance.task.update_is_labeled()
+    instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
+    logger.debug(f'Updated total_annotations and cancelled_annotations for {instance.task.id}.')
 
 
 @receiver(pre_delete, sender=Prediction)

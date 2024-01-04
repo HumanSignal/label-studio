@@ -46,6 +46,9 @@ on:
         type: string
         required: false
 
+env:
+  PYTHON_VERSION_FILE: "pyproject.toml"
+
 jobs:
   pypi:
     name: "PyPI"
@@ -61,23 +64,24 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
+      - name: Install toml
+        run: |
+          set -euo pipefail
+          wget -q -O- "https://github.com/gnprice/toml-cli/releases/download/v0.2.3/toml-0.2.3-x86_64-linux.tar.gz" | tar -xz -C .
+          mv toml-0.2.3-x86_64-linux/toml toml
+          chmod +x toml
+
       - name: Manage version
         env:
           PROVIDED_VERSION: ${{ inputs.version }}
         run: |
-          set -x
-
-          wget https://github.com/gnprice/toml-cli/releases/download/v0.2.3/toml-0.2.3-x86_64-linux.tar.gz
-          tar -xzf toml-0.2.3-x86_64-linux.tar.gz
-          mv toml-0.2.3-x86_64-linux/toml toml
-          chmod +x toml
-
+          set -euo pipefail
           version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
-          ./toml set pyproject.toml tool.poetry.version "$version" > pyproject.toml.new
+          ./toml set '${{ env.PYTHON_VERSION_FILE }}' tool.poetry.version "$version" > pyproject.toml.new
           mv -f pyproject.toml.new pyproject.toml
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -122,7 +126,7 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
-        run: twine upload dist/*
+        run: poetry run twine upload dist/*
 
       - name: Get PyPI package details
         id: pypi-package-details
@@ -175,7 +179,7 @@ jobs:
 
       - name: Upload to artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Dist
           path: dist/

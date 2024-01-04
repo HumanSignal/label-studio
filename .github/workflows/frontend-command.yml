@@ -14,6 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Add Workflow link to command comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
       - name: Checkout on chat command
         uses: actions/checkout@v4
         with:
@@ -55,10 +66,11 @@ jobs:
             grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
           fi
           
-          echo "commit_msg_file=$(cat /tmp/info_commit_msg)" >> $GITHUB_OUTPUT
-          echo "COMMIT_MSG_FILE<<EOF" >> $GITHUB_ENV
-          echo "$(cat /tmp/info_commit_msg)" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            echo "COMMIT_MSG_FILE<<EOF"
+            cat /tmp/info_commit_msg
+            echo "EOF" 
+          } >> "${GITHUB_ENV}"
 
       - name: Commit and push
         id: commit_and_push
@@ -90,8 +102,6 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             > Already up-to-date. Nothing to commit.
-            >
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "confused"
 
       - name: Add reaction to command comment on success
@@ -104,8 +114,6 @@ jobs:
           body: |
             > Successfully pushed new changes
             > ${{ env.COMMIT_MSG_FILE }}
-            >
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "+1"
 
       - name: Add reaction to command comment on failure
@@ -117,8 +125,6 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             > **Error**: failed to get build
-            >
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "-1"
 
   help:

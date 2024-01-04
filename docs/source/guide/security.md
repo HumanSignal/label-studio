@@ -111,3 +111,63 @@ If you use Redis as an external storage database for data and annotations, the s
 Label Studio Enterprise automatically logs all user activities so that you can monitor the activities being performed in the application.
 
 </div>
+
+## Information collected by Label Studio
+
+Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the information we collect. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support.
+
+## Add self-signed certificate to trusted root store
+
+<div class="code-tabs">
+  <div data-name="Docker Compose">
+
+1. Mount your self-signed certificate as a volume into `app` container:
+
+```yaml
+volumes:
+  - ./my.cert:/tmp/my.cert:ro
+```
+2. Add environment variable with the name `CUSTOM_CA_CERTS` mentioning all certificates in comma-separated way that should be added into trust store:
+
+```yaml
+CUSTOM_CA_CERTS=/tmp/my.cert
+```
+  </div>
+
+  <div data-name="Kubernetes">
+
+1. Upload your self-signed certificate as a k8s secret.
+   Upload `my.cert` as a secrets with a name `test-my-root-cert`:
+```yaml
+kubectl create secret generic test-my-root-cert --from-file=file=my.cert
+```
+
+2. Add volumes into your values.yaml file and mention them in `.global.customCaCerts`:
+
+```yaml
+global:
+  customCaCerts:
+   - /opt/heartex/secrets/ca_certs/file/file
+
+app:
+  extraVolumes:
+    - name: foo
+      secret:
+        secretName: test-my-root-cert
+  extraVolumeMounts:
+    - name: foo
+      mountPath: "/opt/heartex/secrets/ca_certs/file"
+      readOnly: true
+
+rqworker:
+  extraVolumes:
+    - name: foo
+      secret:
+        secretName: test-my-root-cert
+  extraVolumeMounts:
+    - name: foo
+      mountPath: "/opt/heartex/secrets/ca_certs/file"
+      readOnly: true
+```
+  </div>
+</div>

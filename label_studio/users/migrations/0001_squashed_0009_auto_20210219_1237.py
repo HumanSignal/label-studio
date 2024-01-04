@@ -12,7 +12,7 @@ from rest_framework.authtoken.models import Token
 
 def add_tokens(apps, schema_editor):
     User = apps.get_model('users', 'User')
-    all_users = User.with_deleted.all()
+    all_users = User.objects.all()
 
     for user_one in all_users:
         if not hasattr(user_one, 'auth_token'):
@@ -67,9 +67,6 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'users',
                 'db_table': 'htx_user',
             },
-            managers=[
-                ('with_deleted', users.models.UserManagerWithDeleted()),
-            ],
         ),
         migrations.RunPython(add_tokens),
         # migrations.RunPython(add_users),  # TODO: flag:ent

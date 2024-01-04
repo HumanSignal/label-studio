@@ -1,0 +1,28 @@
+<View>
+  <Header>Document ID: $document_id</Header>
+  <Repeater indexFlag="{{idx}}" on="$images" mode="pagination">
+    <View style="display: flex; margin-bottom: 10px;">
+      <View style="margin-right: 10px; width: 20em">
+        <Header value="Labels">Header</Header>
+        <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">
+          <Label alias="title" value="Title"/>
+          <Label alias="reference" value="Document reference"/>
+        </RectangleLabels>
+        <RectangleLabels name="taxonomy_{{idx}}" toName="page_{{idx}}">
+          <Label alias="taxonomy" background="#B2CDFE" selectedColor="#74A7FE" value="Primary taxonomy">
+          </Label>
+          <Label alias="taxonomy_other" background="#F9AEC8" selectedColor="#FF7FAC" value="Other taxonomies">
+          </Label>
+        </RectangleLabels>
+        <View>
+          <Taxonomy name="categories_{{idx}}" perRegion="true" toName="page_{{idx}}" visibleWhen="region-selected" whenLabelValue="taxonomy" value="$categories" sharedStore="categories"/>
+          <Taxonomy name="taxonomy_other_{{idx}}" perRegion="true" toName="page_{{idx}}" visibleWhen="region-selected" whenLabelValue="taxonomy_other" value="$other" sharedStore="taxonomies"/>
+        </View>
+      </View>
+      <View style="width: 2048px">
+        <Image maxHeight="auto" name="page_{{idx}}" value="$images[{{idx}}].url">
+        </Image>
+      </View>
+    </View>
+  </Repeater>
+</View>

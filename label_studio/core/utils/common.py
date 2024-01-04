@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import calendar
 import contextlib
 import copy
-import hashlib
 import logging
 import os
 import random
@@ -43,6 +42,7 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.utils import OperationalError
+from django.utils.crypto import get_random_string
 from django.utils.module_loading import import_string
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
@@ -135,11 +135,9 @@ def custom_exception_handler(exc, context):
     return response
 
 
-def create_hash():
-    """This function generate 40 character long hash"""
-    h = hashlib.sha512()
-    h.update(str(time.time()).encode('utf-8'))
-    return h.hexdigest()[0:16]
+def create_hash() -> str:
+    """This function creates a secure token for the organization"""
+    return get_random_string(length=40)
 
 
 def paginator(objects, request, default_page=1, default_size=50):
@@ -215,10 +213,9 @@ def find_editor_files():
     editor_dir = settings.EDITOR_ROOT
 
     # find editor files to include in html
-    editor_js_dir = os.path.join(editor_dir, 'js')
-    editor_js = [prefix + 'js/' + f for f in os.listdir(editor_js_dir) if f.endswith('.js')]
-    editor_css_dir = os.path.join(editor_dir, 'css')
-    editor_css = [prefix + 'css/' + f for f in os.listdir(editor_css_dir) if f.endswith('.css')]
+    editor_js = [prefix + f for f in os.listdir(editor_dir) if f.endswith('.js')]
+    editor_css = [prefix + f for f in os.listdir(editor_dir) if f.endswith('.css')]
+
     return {'editor_js': editor_js, 'editor_css': editor_css}
 
 

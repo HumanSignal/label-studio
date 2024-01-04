@@ -90,9 +90,6 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Push Docker image
         uses: docker/build-push-action@v5.1.0
         id: docker_build_and_push

@@ -539,7 +539,9 @@ class ExportStorage(Storage, ProjectStorageMixin):
         total_annotations = Annotation.objects.filter(project=self.project).count()
         self.info_set_in_progress()
 
-        for annotation in Annotation.objects.filter(project=self.project):
+        for annotation in Annotation.objects.filter(project=self.project).iterator(
+            chunk_size=settings.STORAGE_EXPORT_CHUNK_SIZE
+        ):
             self.save_annotation(annotation)
 
             # update progress counters

@@ -104,7 +104,7 @@ target-version = ['py38']
 [tool.poetry]
 
 name = "label-studio"
-version = "1.9.3dev"
+version = "1.10.2dev"
 description = "Label Studio annotation tool"
 authors = [
     "Heartex <hello@heartex.ai>",
@@ -120,6 +120,26 @@ homepage = "https://github.com/heartexlabs/label-studio"
 packages = [
     { include = "label_studio" },
 ]
+include = [
+    "deploy/requirements.txt",
+    "label_studio/frontend/dist/react-app/*",
+    "label_studio/frontend/dist/lsf/**/*",
+    "label_studio/frontend/dist/dm/**/*",
+    "label_studio/annotation_templates/**/*",
+    "label_studio/core/static/**/*",
+    "label_studio/core/static_build/**/*",
+    "label_studio/core/utils/schema/*.json",
+    "label_studio/core/templatetags/*.py",
+    "label_studio/core/version_.py",
+    "label_studio/core/all_urls.json",
+    "label_studio/io_storages/**/*.yml",
+]
+
+exclude = [
+    "label_studio/frontend/node_modules/**/*",
+    "label_studio/frontend/build-tmp/**/*"
+]
+
 
 [tool.poetry.scripts]
 label-studio = "label_studio.server:main"
@@ -180,6 +200,7 @@ python-json-logger = "2.0.4"
 label-studio-converter = "0.0.57"
 google-cloud-storage = "^2.13.0"
 mysqlclient = {version = "*", optional = true}
+django-csp = "3.7"
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
@@ -198,7 +219,7 @@ pre-commit = "3.3.3"
 s3transfer = "0.7.0"
 mock = ">=5.1.0"
 moto = ">=4.2.6"
-label-studio-sdk = { url = "https://github.com/HumanSignal/label-studio-sdk/archive/3c1e0513cba426ab8ada2259ca4e368dd1086baf.zip" }
+label-studio-sdk = { url = "https://github.com/HumanSignal/label-studio-sdk/archive/b74e2d693f203bfb16c8919fd9670ec8e2c5f8ea.zip" }
 [tool.poetry.group.build.dependencies]
 twine = ">=4.0.2"
 

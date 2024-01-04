@@ -1,0 +1,10 @@
+<View>
+  <Table name="csv-table" value="$text" valuetype="csv|url|separator=," />
+  <Header>Choose ingredients</Header>
+  <Choices name="sub" toName="csv-table">
+    <Choice value="Tuna" />
+    <Choice value="Vegetables" />
+    <Choice value="Chicken" />
+    <Choice value="Spicy" />
+  </Choices>
+</View>

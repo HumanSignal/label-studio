@@ -141,7 +141,7 @@ jobs:
             core.setOutput("ubi-tags", ubiTags.join(','));
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -206,9 +206,6 @@ jobs:
           COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
           COPY --chown=54546:0 ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} /label-studio/label_studio/feature_flags.json
           EOF
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Build and Push Release Ubuntu Docker image
         uses: docker/build-push-action@v5.1.0

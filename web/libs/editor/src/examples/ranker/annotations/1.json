@@ -1,0 +1,19 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "result": [
+                {
+                    "from_name": "rank",
+                    "id": "beFiQTT1cU",
+                    "source": "$items",
+                    "to_name": "search",
+                    "type": "ranker",
+                    "value": {
+                        "ranker": ["1234", "123", "12345", "123456", "1234567"]
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -5,7 +5,6 @@ import logging
 from typing import Any, Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
-from core.bulk_update_utils import bulk_update
 from core.feature_flags import flag_set
 from core.label_config import (
     check_control_in_config_by_regex,
@@ -28,7 +27,6 @@ from core.utils.common import (
     merge_labels_counters,
 )
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
-from data_manager.managers import TaskQuerySet
 from django.conf import settings
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.db import models, transaction
@@ -375,7 +373,7 @@ class Project(ProjectMixin, models.Model):
 
     def reset_token(self):
         self.token = create_hash()
-        self.save()
+        self.save(update_fields=['token'])
 
     def add_collaborator(self, user):
         created = False
@@ -929,56 +927,6 @@ class Project(ProjectMixin, models.Model):
                 'presign_ttl': storage.presign_ttl,
             }
 
-    def _update_tasks_counters(self, queryset, from_scratch=True):
-        """
-        Update tasks counters
-        :param queryset: Tasks to update queryset
-        :param from_scratch: Skip calculated tasks
-        :return: Count of updated tasks
-        """
-        objs = []
-
-        total_annotations = Count('annotations', distinct=True, filter=Q(annotations__was_cancelled=False))
-        cancelled_annotations = Count('annotations', distinct=True, filter=Q(annotations__was_cancelled=True))
-        total_predictions = Count('predictions', distinct=True)
-        # construct QuerySet in case of list of Tasks
-        if isinstance(queryset, list) and len(queryset) > 0 and isinstance(queryset[0], Task):
-            queryset = Task.objects.filter(id__in=[task.id for task in queryset])
-        # construct QuerySet in case annotated queryset
-        if isinstance(queryset, TaskQuerySet) and queryset.exists() and isinstance(queryset[0], int):
-            queryset = Task.objects.filter(id__in=queryset)
-
-        if not from_scratch:
-            queryset = queryset.exclude(
-                Q(total_annotations__gt=0) | Q(cancelled_annotations__gt=0) | Q(total_predictions__gt=0)
-            )
-
-        # filter our tasks with 0 annotations and 0 predictions and update them with 0
-        queryset.filter(annotations__isnull=True, predictions__isnull=True).update(
-            total_annotations=0, cancelled_annotations=0, total_predictions=0
-        )
-
-        # filter our tasks with 0 annotations and 0 predictions
-        queryset = queryset.filter(Q(annotations__isnull=False) | Q(predictions__isnull=False))
-        queryset = queryset.annotate(
-            new_total_annotations=total_annotations,
-            new_cancelled_annotations=cancelled_annotations,
-            new_total_predictions=total_predictions,
-        )
-
-        for task in queryset.only('id', 'total_annotations', 'cancelled_annotations', 'total_predictions'):
-            task.total_annotations = task.new_total_annotations
-            task.cancelled_annotations = task.new_cancelled_annotations
-            task.total_predictions = task.new_total_predictions
-            objs.append(task)
-        with transaction.atomic():
-            bulk_update(
-                objs,
-                update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'],
-                batch_size=settings.BATCH_SIZE,
-            )
-        return len(objs)
-
     def _update_tasks_counters_and_is_labeled(self, task_ids, from_scratch=True):
         """
         Update tasks counters and is_labeled in batches of size settings.BATCH_SIZE.
@@ -986,6 +934,8 @@ class Project(ProjectMixin, models.Model):
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
+        from tasks.functions import update_tasks_counters
+
         num_tasks_updated = 0
         page_idx = 0
 
@@ -994,7 +944,7 @@ class Project(ProjectMixin, models.Model):
                 # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
                 # will roll back.
                 queryset = make_queryset_from_iterable(task_ids_slice)
-                num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
+                num_tasks_updated += update_tasks_counters(queryset, from_scratch)
                 bulk_update_stats_project_tasks(queryset, self)
             page_idx += 1
         return num_tasks_updated
@@ -1014,8 +964,10 @@ class Project(ProjectMixin, models.Model):
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
+        from tasks.functions import update_tasks_counters
+
         queryset = make_queryset_from_iterable(queryset)
-        objs = self._update_tasks_counters(queryset, from_scratch)
+        objs = update_tasks_counters(queryset, from_scratch)
         self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
 
         if recalculate_all_stats and recalculate_stats_counts:

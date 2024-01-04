@@ -476,12 +476,23 @@ SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION'
 ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS = get_bool_env('ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS', default=False)
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
+
+ENABLE_MONOREPO_ENV = get_bool_env('ENABLE_MONOREPO_ENV', default=False)
+
 # EDITOR = label-studio-frontend repository
-EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
+EDITOR_ROOT = (
+    os.path.join(BASE_DIR, '../../web/dist/libs/editor')
+    if ENABLE_MONOREPO_ENV
+    else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/lsf')
+)
 # DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = os.path.join(BASE_DIR, '../frontend/dist/dm')
+DM_ROOT = (
+    os.path.join(BASE_DIR, '../../web/dist/libs/datamanager')
+    if ENABLE_MONOREPO_ENV
+    else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/dm')
+)
 # FRONTEND = GUI for django backend
-REACT_APP_ROOT = os.path.join(BASE_DIR, '../frontend/dist/react-app')
+REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 
 # per project settings
 BATCH_SIZE = 1000
@@ -606,6 +617,7 @@ BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
 FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
 FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
 STORAGE_IN_PROGRESS_TIMER = float(get_env('STORAGE_IN_PROGRESS_TIMER', 5.0))
+STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
 
 USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)
 
@@ -674,3 +686,43 @@ PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
 DATA_MANAGER_FILTER_ALLOWLIST = list(
     set(get_env_list('DATA_MANAGER_FILTER_ALLOWLIST') + ['updated_by__active_organization'])
 )
+
+if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
+    CSP_DEFAULT_SRC = (
+        "'self'",
+        "'report-sample'",
+    )
+    CSP_STYLE_SRC = ("'self'", "'report-sample'", "'unsafe-inline'")
+    CSP_SCRIPT_SRC = (
+        "'self'",
+        "'report-sample'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        'blob:',
+        'browser.sentry-cdn.com',
+        'https://*.googletagmanager.com',
+    )
+    CSP_IMG_SRC = (
+        "'self'",
+        "'report-sample'",
+        'data:',
+        'https://*.google-analytics.com',
+        'https://*.googletagmanager.com',
+        'https://*.google.com',
+    )
+    CSP_CONNECT_SRC = (
+        "'self'",
+        "'report-sample'",
+        'https://*.google-analytics.com',
+        'https://*.analytics.google.com',
+        'https://analytics.google.com',
+        'https://*.googletagmanager.com',
+        'https://*.g.double' + 'click.net',  # hacky way of suppressing codespell complaint
+        'https://*.ingest.sentry.io',
+    )
+    # Note that this will be overridden to real CSP for views that use the override_report_only_csp decorator
+    CSP_REPORT_ONLY = get_bool_env('LS_CSP_REPORT_ONLY', True)
+    CSP_REPORT_URI = get_env('LS_CSP_REPORT_URI', None)
+    CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src']
+
+    MIDDLEWARE.append('core.middleware.HumanSignalCspMiddleware')

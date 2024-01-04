@@ -9,12 +9,14 @@ from typing import Union
 from urllib.parse import unquote, urlparse
 
 import drf_yasg.openapi as openapi
+from core.decorators import override_report_only_csp
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import retry_database_locked, timeit
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.utils.params import bool_from_request, list_of_strings_from_request
+from csp.decorators import csp
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
@@ -28,6 +30,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from tasks.functions import update_tasks_counters
 from tasks.models import Prediction, Task
 from users.models import User
 from webhooks.models import WebhookAction
@@ -358,7 +361,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                 )
             )
         predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
-        project.update_tasks_counters(Task.objects.filter(id__in=tasks_ids))
+        start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
         return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
 
 
@@ -596,6 +599,8 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
 class UploadedFileResponse(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
+    @override_report_only_csp
+    @csp(SANDBOX=[])
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         request = self.request
@@ -613,8 +618,8 @@ class UploadedFileResponse(generics.RetrieveAPIView):
             content_type, encoding = mimetypes.guess_type(str(file.name))
             content_type = content_type or 'application/octet-stream'
             return RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class DownloadStorageData(APIView):

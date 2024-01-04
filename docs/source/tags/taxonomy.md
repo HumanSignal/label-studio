@@ -14,15 +14,13 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 
 [^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
 
-[^2]: `fflag_feat_front_lsdv_5451_async_taxonomy_110823_short` should be enabled to load items from `apiUrl` asynchronously
-
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
 | toName | <code>string</code> |  | Name of the element that you want to classify |
-| [apiUrl] | <code>string</code> |  | Retrieve the taxonomy from a remote source. This can be a JSON-formatted file or a hierarchical data source read as an API.[^2] For more information, see the [Taxonomy template page](/templates/taxonomy) |
+| [apiUrl] | <code>string</code> |  | **Beta** -- Retrieve the taxonomy from a remote source. This can be a JSON-formatted file or a hierarchical data source read as an API. For more information, see the [Taxonomy template page](/templates/taxonomy) |
 | [leafsOnly] | <code>boolean</code> | <code>false</code> | Allow annotators to select only leaf nodes of taxonomy |
 | [showFullPath] | <code>boolean</code> | <code>false</code> | Whether to show the full path of selected items |
 | [pathSeparator] | <code>string</code> | <code>&quot;/&quot;</code> | Separator to show in the full path (default is " / "). To avoid errors, ensure that your data does not include this separator |
@@ -34,7 +32,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [placeholder=] | <code>string</code> |  | What to display as prompt on the input |
 | [perRegion] | <code>boolean</code> |  | Use this tag to classify specific regions instead of the whole object |
 | [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object[^1] |
-| [legacy] | <code>boolean</code> |  | Use this tag to enable the legacy version of the Taxonomy tag. When true, the `apiUrl` parameter is not usable[^2] |
+| [legacy] | <code>boolean</code> |  | Use this tag to enable the legacy version of the Taxonomy tag. When true, the `apiUrl` parameter is not usable. |
 
 ### Example
 

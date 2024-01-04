@@ -9,6 +9,7 @@ from core.utils.common import load_func
 from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
+from tasks.functions import update_tasks_counters
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -61,6 +62,9 @@ def delete_tasks(project, queryset, **kwargs):
     if not project.tasks.exists():
         project.views.all().delete()
         reload = True
+
+    # Execute actions after delete tasks
+    Task.after_bulk_delete_actions(tasks_ids_list)
 
     return {'processed_items': count, 'reload': reload, 'detail': 'Deleted ' + str(count) + ' tasks'}
 
@@ -115,7 +119,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     real_task_ids = set(list(predictions.values_list('task__id', flat=True)))
     count = predictions.count()
     predictions.delete()
-    project.update_tasks_counters(Task.objects.filter(id__in=real_task_ids))
+    start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=real_task_ids))
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 

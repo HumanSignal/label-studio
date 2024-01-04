@@ -11,14 +11,6 @@ class ProjectMixin:
         """
         start_job_async_or_sync(self._rearrange_overlap_cohort)
 
-    def update_tasks_counters(self, tasks_queryset, from_scratch=True):
-        """
-        Async start updating tasks counters
-        :param tasks_queryset: Tasks to update queryset
-        :param from_scratch: Skip calculated tasks
-        """
-        start_job_async_or_sync(self._update_tasks_counters, tasks_queryset, from_scratch=from_scratch)
-
     def update_tasks_counters_and_is_labeled(self, tasks_queryset, from_scratch=True):
         """
         Async start updating tasks counters and than is_labeled

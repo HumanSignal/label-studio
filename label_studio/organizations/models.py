@@ -152,7 +152,7 @@ class Organization(OrganizationMixin, models.Model):
 
     def reset_token(self):
         self.token = create_hash()
-        self.save()
+        self.save(update_fields=['token'])
 
     def check_max_projects(self):
         """This check raise an exception if the projects limit is hit"""
