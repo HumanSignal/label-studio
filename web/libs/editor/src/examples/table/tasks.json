@@ -1,0 +1,15 @@
+[
+    {
+        "data": {
+            "menu": {
+                "Tuna": "12,35",
+                "Vegetarian": "8,53",
+                "Chicken": "10,66",
+                "Spicy": "11,99",
+                "Cheese": "3,99",
+                "Extra sauce": "2,50"
+            }
+        },
+        "predictions": []
+    }
+]

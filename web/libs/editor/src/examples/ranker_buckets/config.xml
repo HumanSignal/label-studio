@@ -1,0 +1,11 @@
+<View>
+  <Style>
+    .htx-ranker-column { background: cornflowerblue; }
+    .htx-ranker-item { background: lightgoldenrodyellow; }
+  </Style>
+  <List name="results" value="$items" title="Search Results" />
+  <Ranker name="rank" toName="results">
+    <Bucket name="best" title="Best results" />
+    <Bucket name="ads" title="Paid results" />
+  </Ranker>
+</View>

@@ -1,0 +1,31 @@
+var _g;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgKeypointDisabled = function SvgKeypointDisabled(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 36,
+    height: 36,
+    fill: "none",
+    ref: ref
+  }, props), _g || (_g = /*#__PURE__*/React.createElement("g", {
+    opacity: 0.2
+  }, /*#__PURE__*/React.createElement("rect", {
+    width: 14,
+    height: 14,
+    x: 8.1,
+    y: 18,
+    fill: "#000",
+    rx: 2,
+    transform: "rotate(-45 8.1 18)"
+  }), /*#__PURE__*/React.createElement("path", {
+    fill: "#fff",
+    fillRule: "evenodd",
+    d: "M17 14h2v3h3v2h-3v3h-2v-3h-3v-2h3z",
+    clipRule: "evenodd"
+  }))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgKeypointDisabled);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAzNiAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgb3BhY2l0eT0iMC4yIj4KPHJlY3QgeD0iOC4xMDA0OSIgeT0iMTgiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgcng9IjIiIHRyYW5zZm9ybT0icm90YXRlKC00NSA4LjEwMDQ5IDE4KSIgZmlsbD0iYmxhY2siLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNyAxNEgxOVYxN0gyMlYxOUgxOVYyMkgxN1YxOUgxNFYxN0gxN1YxNFoiIGZpbGw9IndoaXRlIi8+CjwvZz4KPC9zdmc+Cg==";
