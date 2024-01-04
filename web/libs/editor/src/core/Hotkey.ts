@@ -82,7 +82,9 @@ keymaster.filter = function(event) {
 const ALIASES = {
   'plus': '=', // "ctrl plus" is actually a "ctrl =" because shift is not used
   'minus': '-',
-  ',': '¼', // This should be a comma but it's not working with keymaster
+  // Here is a magic trick. Keymaster doesn't work with comma correctly (it breaks down everything upon unbinding), but the key code for comma it expects is 188
+  // And the magic is that '¼' has the same keycode. So we are going to trick keymaster to handle this in the right way.
+  ',': '¼',
 };
 
 export const Hotkey = (
