@@ -318,7 +318,7 @@ class GCS(object):
         client = storage.get_client()
         blob_iter = client.list_blobs(storage.bucket,
                                       prefix=storage.prefix,
-                                      page_size=settings.CLOUD_PAGE_CHECKED_OBJECTS)
+                                      page_size=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE)
         prefix = str(storage.prefix) if storage.prefix else ''
         # compile pattern to regex
         if glob_pattern:

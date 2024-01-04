@@ -123,7 +123,7 @@ class AWS(object):
         else:
             bucket_iter = bucket.objects
 
-        bucket_iter = bucket_iter.page_size(settings.CLOUD_PAGE_CHECKED_OBJECTS).all()
+        bucket_iter = bucket_iter.page_size(settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE).all()
 
         for index, obj in enumerate(bucket_iter):
             key = obj.key
