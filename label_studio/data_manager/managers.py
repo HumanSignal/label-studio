@@ -514,7 +514,6 @@ def annotate_completed_at(queryset):
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-
     if get_tasks_agreement_queryset:
         queryset = get_tasks_agreement_queryset(queryset)
 
@@ -543,7 +542,6 @@ def annotate_completed_at(queryset):
     else:
         newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
         return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
-
 
 
 def annotate_annotations_results(queryset):

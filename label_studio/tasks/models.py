@@ -251,7 +251,10 @@ class Task(TaskMixin, models.Model):
 
     @property
     def overlap_with_agreement_threshold(self):
-        from stats.models import get_task_agreement
+        try:
+            from stats.models import get_task_agreement
+        except (ModuleNotFoundError, ImportError):
+            pass
 
         if hasattr(self.project, 'lse_project') and self.project.lse_project.agreement_threshold is not None:
             agreement = get_task_agreement(self)
