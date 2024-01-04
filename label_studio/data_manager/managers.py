@@ -19,6 +19,7 @@ from django.db.models import (
     Exists,
     F,
     FloatField,
+    IntegerField,
     OuterRef,
     Q,
     Subquery,
@@ -523,6 +524,14 @@ def annotate_completed_at(queryset):
             output_field=FloatField(),
         )
 
+        # Subquery for max_additional_annotators_assignable + overlap
+        max_annotators_subquery = Subquery(
+            LseProject.objects.filter(project_id=OuterRef('project_id'))
+            .annotate(total_max_annotators=F('max_additional_annotators_assignable') + OuterRef('overlap'))
+            .values('total_max_annotators')[:1],
+            output_field=IntegerField(),
+        )
+
         # Subquery to get the latest Annotation for each task
         newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id').values('created_at')[:1]
         agreement_threshold_exists_subquery = Exists(
@@ -532,7 +541,11 @@ def annotate_completed_at(queryset):
         completed_at_case = Case(
             When(
                 Q(is_labeled=True)
-                & (Q(_agreement__gte=agreement_threshold_subquery) | ~agreement_threshold_exists_subquery),
+                & (
+                    Q(_agreement__gte=agreement_threshold_subquery)
+                    | ~agreement_threshold_exists_subquery
+                    | Q(annotation_count__gte=max_annotators_subquery)
+                ),
                 then=Subquery(newest),
             ),
             default=Value(None),
