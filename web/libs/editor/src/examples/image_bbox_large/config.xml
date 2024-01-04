@@ -1,0 +1,11 @@
+<View>
+  <Image name="img" value="$image"></Image>
+  <RectangleLabels name="tag" toName="img" fillOpacity="0.5" strokeWidth="5">
+    <Label value="Planet"></Label>
+    <Label value="Moonwalker" background="blue"></Label>
+  </RectangleLabels>
+  <KeyPointLabels name="kp" toName="img" strokeWidth="1">
+    <Label value="Point1"/>
+    <Label value="Point2"/>
+  </KeyPointLabels>
+</View>

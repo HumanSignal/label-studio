@@ -1,0 +1,8 @@
+<View>
+  <Image name="img" valueList="$images"></Image>
+
+  <RectangleLabels name="tag" toName="img" fillOpacity="0.5" strokeWidth="5">
+    <Label value="Planet"></Label>
+    <Label value="Moonwalker" background="blue"></Label>
+  </RectangleLabels>
+</View>

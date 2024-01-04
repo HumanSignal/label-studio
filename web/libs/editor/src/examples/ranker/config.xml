@@ -1,0 +1,8 @@
+<View>
+  <Style>
+    .htx-ranker-column { background: cornflowerblue; }
+    .htx-ranker-item { background: lightgoldenrodyellow; }
+  </Style>
+  <List name="search" value="$items" title="Search Results" />
+  <Ranker name="rank" toName="search" />
+</View>

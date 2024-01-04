@@ -1,0 +1,16 @@
+.progress {
+  color: #ff5630;
+}
+
+.wave {
+  position: relative;
+
+  canvas {
+    // prevent reset.css from breaking waveforms
+    max-width: unset;
+  }
+}
+
+.menu {
+  margin: 2em 0;
+}
