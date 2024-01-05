@@ -120,7 +120,9 @@ WINDOWS_SQLITE_BINARY_HOST_PREFIX = get_env('WINDOWS_SQLITE_BINARY_HOST_PREFIX',
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Base path for media root and other uploaded files
-BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
+BASE_DATA_DIR = get_env('BASE_DATA_DIR')
+if BASE_DATA_DIR is None:
+    BASE_DATA_DIR = get_data_dir()
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
