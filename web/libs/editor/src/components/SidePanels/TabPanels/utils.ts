@@ -273,7 +273,6 @@ export const restorePanel = (showComments: boolean): StoredPanelState => {
 
   // stored state can have less tabs than available, for example if it was stored on old version
   // or if comments were enabled; then return default state
-  // @todo if comments were disabled they might still be displayed causing unexpected behavior
   if (!allTabs || allTabs.length !== countOfAllAvailableTabs) {
     const defaultPanel = showComments ? enterprisePanelDefault : openSourcePanelDefault;
 
