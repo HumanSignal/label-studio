@@ -2445,33 +2445,6 @@
       "version": 4,
       "deleted": false
     },
-    "fflag_feat_dia_471_add_new_column_projects_short": {
-      "key": "fflag_feat_dia_471_add_new_column_projects_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "f72902443e194e42848fe67c07793cfd",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "fflag_feat_dia_787_zendesk_widget_integration": {
       "key": "fflag_feat_dia_787_zendesk_widget_integration",
       "on": false,
@@ -3063,7 +3036,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_feat_front_lsdv_4620_outliner_optimization_310723_short": {
@@ -5291,7 +5264,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 5,
       "deleted": false
     },
     "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation": {

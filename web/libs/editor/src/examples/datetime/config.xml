@@ -1,0 +1,17 @@
+<View>
+  <Header>Global date+time, required, stored as dd.mm.yyyy HH:MM</Header>
+  <DateTime name="full" toName="text" required="true" min="2021-11-10" format="%d.%m.%Y %H:%M"/>
+  <Header>Select text to see related smaller DateTime controls for every region</Header>
+  <Labels name="label" toName="text">
+    <Label value="birth" background="green"/>
+    <Label value="death" background="red"/>
+    <Label value="event" background="orange"/>
+  </Labels>
+  <Text name="text" value="$text"/>
+  <View visibleWhen="region-selected">
+    <Header>Date in this fragment, required, stored as ISO date</Header>
+    <DateTime name="date" toName="text" perRegion="true" only="date" required="true" format="%Y-%m-%d"/>
+    <Header>Year this happened, but stored also as ISO date</Header>
+    <DateTime name="year" toName="text" perRegion="true" only="year" format="%Y-%m-%d"/>
+  </View>
+</View>

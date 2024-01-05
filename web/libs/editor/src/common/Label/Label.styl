@@ -1,0 +1,65 @@
+.field-label
+  margin-bottom 0
+
+  &__text
+    padding 0 16px
+    height 22px
+    display flex
+    margin-bottom 4px
+    font-size 14px
+    line-height 22px
+    justify-content space-between
+
+  &__description
+    margin-top 5px
+    font-size 14px
+    line-height 22px
+    color $black_40
+
+  &__field
+    line-height 0
+
+  &_size_large &__text
+    font-weight 500
+    font-size 16px
+    line-height 22px
+    margin-bottom 16px
+
+  &_flat &__text
+    padding 0
+
+  .input, .select, .textarea
+    width 100%
+
+  &[data-required] &__text::after
+    content "Required"
+    color $black_20
+
+  &_large &__text
+    font-size 16px
+    font-weight 500
+    margin-bottom 16px
+
+  &_placement_right
+    display inline-flex
+    flex-direction row-reverse
+  &_placement_left
+    display inline-flex
+
+  &_empty &__text,
+  &_placement_right &__text
+  &_placement_left &__text
+    margin-bottom 0
+    font-size 16px
+    line-height 22px
+    height auto
+    align-items center
+
+  &_placement_right:not(&_withDescription) &__field
+  &_placement_left:not(&_withDescription) &__field
+    display flex
+    align-items center
+
+  &_placement_right&_withDescription &__field
+  &_placement_left&_withDescription &__field
+    margin-top 5px
