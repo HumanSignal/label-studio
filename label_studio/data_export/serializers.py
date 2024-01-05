@@ -6,13 +6,14 @@ from data_export.models import DataExport
 from django.conf import settings
 from label_studio_tools.core.label_config import is_video_object_tracking
 from label_studio_tools.postprocessing.video import extract_key_frames
-from ml.mixins import InteractiveMixin
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
 from users.serializers import UserSimpleSerializer
+
+from ml.mixins import InteractiveMixin
 
 from .models import ConvertedFormat, Export
 
