@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-354: Comment draft preserved between annotations",
-  "commit": "d1e4416d0e52fc03e7b9e7490bc143ebe13a7dc0",
+  "message": "fix: LEAP-248: Fix app crashing by hotkeys ",
+  "commit": "28c0e12c566794df3d749799276d2a0c60f28e2b",
   "branch": "master",
-  "date": "2024-01-03T15:18:43Z"
+  "date": "2024-01-05T15:30:28Z"
 }
