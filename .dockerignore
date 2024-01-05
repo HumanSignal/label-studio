@@ -11,6 +11,7 @@
 !deploy/uwsgi.ini
 !deploy/default.conf
 !label_studio/**
+label_studio/frontend
 !web/**
 !setup.py
 !README.md
