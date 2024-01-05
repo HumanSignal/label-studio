@@ -2,7 +2,7 @@
 
 DataManager uses LabelStudio API to operate.
 
-Request parameters shoud be JSON.
+Request parameters should be JSON.
 
 Responses are in JSON as well.
 
@@ -199,8 +199,8 @@ Override selected items list.
 
 ###### Request parameters
 
-| Property | Type                                         | Desctiption             |
-| -------- | -------------------------------------------- | ----------------------- |
+| Property | Type                                         | Description             |
+|----------|----------------------------------------------|-------------------------|
 | body     | JSON encoded [SelectedItems](#SelectedItems) | Selected items to write |
 
 ##### **PATCH**
@@ -209,8 +209,8 @@ Add items to the list. This method does not override SelectedItems, instead it m
 
 ###### Request parameters
 
-| Property | Type                                         | Desctiption             |
-| -------- | -------------------------------------------- | ----------------------- |
+| Property | Type                                         | Description             |
+|----------|----------------------------------------------|-------------------------|
 | body     | JSON encoded [SelectedItems](#SelectedItems) | Selected items to write |
 
 ##### **DELETE**
@@ -219,8 +219,8 @@ Remove items from the list.
 
 ###### Request parameters
 
-| Property | Type                                         | Desctiption             |
-| -------- | -------------------------------------------- | ----------------------- |
+| Property | Type                                         | Description             |
+|----------|----------------------------------------------|-------------------------|
 | body     | JSON encoded [SelectedItems](#SelectedItems) | Selected items to write |
 ---
 
