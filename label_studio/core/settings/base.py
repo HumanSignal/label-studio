@@ -15,6 +15,8 @@ import os
 import re
 from datetime import timedelta
 
+from django.core.exceptions import ImproperlyConfigured
+
 from label_studio.core.utils.params import get_bool_env, get_env_list
 
 formatter = 'standard'
@@ -101,6 +103,13 @@ if HOSTNAME:
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
                 logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
+
+DOMAIN_FROM_REQUEST = get_bool_env('DOMAIN_FROM_REQUEST', False)
+
+if DOMAIN_FROM_REQUEST:
+    # in this mode HOSTNAME can be only subpath
+    if HOSTNAME and not HOSTNAME.startswith('/'):
+        raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
 
 INTERNAL_PORT = '8080'
 
