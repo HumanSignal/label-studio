@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-354: Comment draft preserved between annotations",
-  "commit": "d1e4416d0e52fc03e7b9e7490bc143ebe13a7dc0",
+  "message": "fix: LEAP-344: View all annotation tab is not loading",
+  "commit": "eb1194c1e8ad5f9c0e725b2955dbc202f169649b",
   "branch": "master",
-  "date": "2024-01-03T15:18:43Z"
+  "date": "2024-01-08T09:48:32Z"
 }

@@ -46,7 +46,7 @@ To have access to the backend DataManager uses endpoints. Every endpoint is conv
 
 Every endpoint could be either a string or an object.
 
-API endpoint paths also support `:[parameter-name]` notation, e.g. `/tabs/:tabID/tasks`. These parameteres are required if specified. This means DM will throw an exception if the parameter is not present in the API call.
+API endpoint paths also support `:[parameter-name]` notation, e.g. `/tabs/:tabID/tasks`. These parameters are required if specified. This means DM will throw an exception if the parameter is not present in the API call.
 
 ```js
 // In this case DM will assume that api.columns() is a get request
@@ -60,7 +60,7 @@ apiEndpoints: {
 For requests other than **GET** use object notation:
 
 ```javascript
-// If you want to specify a method, use oject instead
+// If you want to specify a method, use object instead
 apiEndpoints: {
   updateTab: {
     path: "/api/tabs/:id",

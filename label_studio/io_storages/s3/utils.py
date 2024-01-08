@@ -1,12 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import base64
+import fnmatch
 import logging
+import re
 from urllib.parse import urlparse
 
 import boto3
 from botocore.exceptions import ClientError
 from core.utils.params import get_env
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -97,3 +100,38 @@ class AWS(object):
         metadata.pop('Body', None)
         metadata.pop('ResponseMetadata', None)
         return metadata
+
+    @classmethod
+    def validate_pattern(cls, storage, pattern, glob_pattern=True):
+        """
+        Validate pattern against S3 Storage
+        :param storage: S3 Storage instance
+        :param pattern: Pattern to validate
+        :param glob_pattern: If True, pattern is a glob pattern, otherwise it is a regex pattern
+        :return: Message if pattern is not valid, empty string otherwise
+        """
+        client, bucket = storage.get_client_and_bucket()
+        if glob_pattern:
+            pattern = fnmatch.translate(pattern)
+        regex = re.compile(pattern)
+
+        if storage.prefix:
+            list_kwargs = {'Prefix': storage.prefix.rstrip('/') + '/'}
+            if not storage.recursive_scan:
+                list_kwargs['Delimiter'] = '/'
+            bucket_iter = bucket.objects.filter(**list_kwargs)
+        else:
+            bucket_iter = bucket.objects
+
+        bucket_iter = bucket_iter.page_size(settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE).all()
+
+        for index, obj in enumerate(bucket_iter):
+            key = obj.key
+            # skip directories
+            if key.endswith('/'):
+                logger.debug(key + ' is skipped because it is a folder')
+                continue
+            if regex and regex.match(key):
+                logger.debug(key + ' matches file pattern')
+                return ''
+        return 'No objects found matching the provided glob pattern'
