@@ -1,4 +1,5 @@
 import base64
+import fnmatch
 import json
 import logging
 import re
@@ -304,3 +305,31 @@ class GCS(object):
         if not properties_name:
             return blob._properties
         return {key: value for key, value in blob._properties.items() if key in properties_name}
+
+    @classmethod
+    def validate_pattern(cls, storage, pattern, glob_pattern=True):
+        """
+        Validate pattern against Google Cloud Storage
+        :param storage: Google Cloud Storage instance
+        :param pattern: Pattern to validate
+        :param glob_pattern: If True, pattern is a glob pattern, otherwise it is a regex pattern
+        :return: Message if pattern is not valid, empty string otherwise
+        """
+        client = storage.get_client()
+        blob_iter = client.list_blobs(
+            storage.bucket, prefix=storage.prefix, page_size=settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE
+        )
+        prefix = str(storage.prefix) if storage.prefix else ''
+        # compile pattern to regex
+        if glob_pattern:
+            pattern = fnmatch.translate(pattern)
+        regex = re.compile(str(pattern))
+        for index, blob in enumerate(blob_iter):
+            # skip directories
+            if blob.name == (prefix.rstrip('/') + '/'):
+                continue
+            # check regex pattern filter
+            if pattern and regex.match(blob.name):
+                logger.debug(blob.name + ' matches file pattern')
+                return ''
+        return 'No objects found matching the provided glob pattern'
