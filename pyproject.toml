@@ -122,6 +122,9 @@ packages = [
 ]
 include = [
     "deploy/requirements.txt",
+    "web/dist/libs/datamanager/**/*",
+    "web/dist/libs/editor/**/*",
+    "web/dist/apps/labelstudio/**/*",
     "label_studio/frontend/dist/react-app/*",
     "label_studio/frontend/dist/lsf/**/*",
     "label_studio/frontend/dist/dm/**/*",

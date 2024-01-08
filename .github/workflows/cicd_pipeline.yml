@@ -49,6 +49,8 @@ jobs:
               - 'label_studio/!(frontend)/**'
               - 'deploy/requirements**'
               - 'setup.py'
+              - 'poetry.lock'
+              - 'pyproject.toml'
               - '.github/workflows/bandit.yml'
               - '.github/workflows/tests.yml'
               - '.github/workflows/test_conda.yml'
@@ -61,6 +63,8 @@ jobs:
               - 'deploy/**'
               - 'Dockerfile**'
               - 'setup.py'
+              - 'poetry.lock'
+              - 'pyproject.toml'
               - '.github/workflows/cicd_pipeline.yml'
               - '.github/workflows/docker-build.yml'
 
