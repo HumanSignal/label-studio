@@ -14,7 +14,7 @@ def settings(request):
     """Make available django settings on each template page"""
     versions = collect_versions()
 
-    os_release = versions.get('release')
+    os_release = versions.get('label-studio-os-backend', {}).get('commit', 'none')[0:6]
     # django templates can't access names with hyphens
     versions['lsf'] = versions.get('label-studio-frontend', {})
     versions['lsf']['commit'] = versions['lsf'].get('commit', os_release)[0:6]
