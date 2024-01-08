@@ -21,6 +21,11 @@ This triggers next rerender with next annotation until all the annotations are r
 class Item extends Component {
   componentDidMount() {
     Promise.all(this.props.annotation.objects.map(o => {
+      // as the image has lazy load, and the image is not being added to the viewport
+      // until it's loaded we need to skip the validation assuming that it's always ready,
+      // otherwise we'll get a blank canvas
+      if (o.type === 'image') return Promise.resolve();
+      
       return o.isReady
         ? Promise.resolve(o.isReady)
         : new Promise(resolve => {
