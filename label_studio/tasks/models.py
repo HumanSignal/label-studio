@@ -221,7 +221,7 @@ class Task(TaskMixin, models.Model):
         num_annotations = self.annotations.exclude(q | Q(ground_truth=True)).count()
         num = num_locks + num_annotations
 
-        if num > self.overlap_with_agreement_threshold:
+        if num > self.overlap_with_agreement_threshold(num, num_locks):
             logger.error(
                 f'Num takes={num} > overlap={self.overlap} for task={self.id}, '
                 f"skipped mode {self.project.skip_queue} - it's a bug",
@@ -237,7 +237,7 @@ class Task(TaskMixin, models.Model):
                 if self.is_labeled is True:
                     self.save(update_fields=['is_labeled'])
 
-        result = bool(num >= self.overlap_with_agreement_threshold)
+        result = bool(num >= self.overlap_with_agreement_threshold(num, num_locks))
         logger.log(
             get_next_task_logging_level(user),
             f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations} '
@@ -249,17 +249,23 @@ class Task(TaskMixin, models.Model):
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
 
-    @property
-    def overlap_with_agreement_threshold(self):
+    def overlap_with_agreement_threshold(self, num, num_locks):
         try:
             from stats.models import get_task_agreement
         except (ModuleNotFoundError, ImportError):
             pass
 
+        # Limit to one extra annotator at a time when the task is under the threshold and meets the overlap criteria,
+        # regardless of the max_additional_annotators_assignable setting. This ensures recalculating agreement after
+        # each annotation and prevents concurrent annotations from dropping the agreement below the threshold.
         if hasattr(self.project, 'lse_project') and self.project.lse_project.agreement_threshold is not None:
             agreement = get_task_agreement(self)
             if agreement is not None and agreement < self.project.lse_project.agreement_threshold:
-                return self.project.lse_project.max_additional_annotators_assignable + self.overlap
+                return (
+                    min(self.overlap + self.project.lse_project.max_additional_annotators_assignable, num + 1)
+                    if num_locks == 0
+                    else num
+                )
         return self.overlap
 
     def num_locks_user(self, user):
