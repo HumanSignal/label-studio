@@ -61,7 +61,7 @@ const CommentsTab: FC<any> = inject('store')(observer(({ store }) => {
         <Block name="comments-panel">
           <Elem name="section-tab">
             <Elem name="section-content">
-              <CommentsComponent commentStore={store.commentStore} cacheKey={`task.${store.task.id}`} />
+              <CommentsComponent annotationStore={store.annotationStore} commentStore={store.commentStore} cacheKey={`task.${store.task.id}`} />
             </Elem>
           </Elem>
         </Block>
@@ -169,6 +169,7 @@ const GeneralPanel: FC<any> = inject('store')(observer(({ store, currentEntity }
           </Elem>
           <Elem name="section-content">
             <CommentsComponent
+              annotationStore={store.annotationStore} 
               commentStore={store.commentStore}
               cacheKey={`task.${store.task.id}`}
             />
