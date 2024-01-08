@@ -1,4 +1,4 @@
-name: 'Follow Merge: Upstream repo sync'
+name: 'Follow Merge: Upstream repo sync monorepo'
 
 on:
   repository_dispatch:
@@ -6,7 +6,7 @@ on:
       - upstream_repo_update
 
 concurrency:
-  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}
+  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}-monorepo
 
 env:
   NODE: 18
@@ -35,9 +35,12 @@ jobs:
           case "${{ github.event.client_payload.repo_name }}" in
             */dm2)
               echo "frontend_module_dist=${{ env.STATIC_DIST }}/dm" >> $GITHUB_OUTPUT
+              echo "copy_src_path=web/libs/datamanager/src" >> $GITHUB_OUTPUT
               ;;
             */label-studio-frontend)
               echo "frontend_module_dist=${{ env.STATIC_DIST }}/lsf" >> $GITHUB_OUTPUT
+              echo "copy_src_path=web/libs/editor/src" >> $GITHUB_OUTPUT
+              echo "copy_src_preserve_path=web/libs/editor/src/examples" >> $GITHUB_OUTPUT
               echo "build_lsf_docs=true" >> $GITHUB_OUTPUT
               ;;
             */label-studio-sdk)
@@ -55,9 +58,9 @@ jobs:
         id: get-branch
         env:
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
-          BRANCH_NAME: "${{ github.event.client_payload.branch_name }}"
+          BRANCH_NAME: "${{ github.event.client_payload.branch_name }}-monorepo"
           BASE_BRANCH_NAME: "${{ github.event.client_payload.base_branch_name }}"
-          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+          DEFAULT_BRANCH: "fb-leap-e-1"
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -132,6 +135,35 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 1
           ref: ${{ github.event.client_payload.commit_sha }}
+
+      - name: Commit src
+        if: steps.details.outputs.copy_src_path
+        shell: bash
+        env:
+          COPY_SRC_PATH: ${{ steps.details.outputs.copy_src_path }}
+          COPY_SRC_PRESERVE_PATH: ${{ steps.details.outputs.copy_src_preserve_path }}
+        run: |
+          set -xeuo pipefail
+          
+          preserve_dir=$(mktemp -d)
+          if [ -n ${COPY_SRC_PRESERVE_PATH} ]; then
+            echo "Preserving ${COPY_SRC_PRESERVE_PATH}"
+            cp -r "${COPY_SRC_PRESERVE_PATH}" "${preserve_dir}"
+          fi 
+
+          rm -r "${COPY_SRC_PATH}"
+          mkdir -p "${COPY_SRC_PATH}"
+          cp -r tmp/src/* "${COPY_SRC_PATH}"
+
+          if [ -n ${COPY_SRC_PRESERVE_PATH} ]; then
+            echo "Restoring preserved files"
+            cp -rf ${preserve_dir}/* "${COPY_SRC_PATH}"
+          fi 
+
+          git add "${COPY_SRC_PATH}"
+          git status -s
+          git commit --allow-empty -m '[submodules] Copy src ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
 
       - name: "Frontend: Setup nodejs"
         uses: actions/setup-node@v4
@@ -294,7 +326,7 @@ jobs:
         id: get-pr
         uses: actions/github-script@v7
         env:
-          TITLE: "${{ github.event.client_payload.title }}"
+          TITLE: "${{ github.event.client_payload.title }} monorepo"
           HTML_URL: "${{ github.event.client_payload.html_url }}"
           ACTOR: "${{ github.event.client_payload.actor }}"
           BRANCH_NAME: "${{ steps.get-branch.outputs.name }}"
