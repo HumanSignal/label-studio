@@ -10,7 +10,7 @@ import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
 
 export type CommentFormProps = {
   commentStore: any,
-  value?: string,
+  annotationStore: any,
   onChange?: (value: string) => void,
   inline?: boolean,
   rows?: number,
@@ -19,7 +19,7 @@ export type CommentFormProps = {
 
 export const CommentForm: FC<CommentFormProps> = observer(({
   commentStore,
-  value = '',
+  annotationStore,
   inline = true,
   onChange,
   rows = 1,
@@ -52,7 +52,6 @@ export const CommentForm: FC<CommentFormProps> = observer(({
     commentStore.setCurrentComment(comment || '');
   }, [commentStore]);
 
-
   useEffect(() => {
     if (!isFF(FF_DEV_3873)) {
       commentStore.setAddedCommentThisSession(false);
@@ -72,6 +71,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({
     commentStore.setCommentFormSubmit(() => onSubmit());
   }, [actionRef, commentStore]);
 
+  const value = commentStore.currentComment[annotationStore.selected.id] || '';
 
   return (
     <Block ref={formRef} tag="form" name="comment-form" mod={{ inline }} onSubmit={onSubmit}>

@@ -13,7 +13,7 @@ export const CommentStore = types
   .volatile(() => ({
     addedCommentThisSession: false,
     commentFormSubmit: () => {},
-    currentComment: '',
+    currentComment: {},
     inputRef: {},
     tooltipMessage: '',
   }))
@@ -75,7 +75,7 @@ export const CommentStore = types
     }
 
     function setCurrentComment(comment) {
-      self.currentComment = comment;
+      self.currentComment = { ...self.currentComment, [self.annotation.id]: comment };
     }
 
     function setCommentFormSubmit(submitCallback) {
