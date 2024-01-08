@@ -54,7 +54,8 @@ class AzureBlobStorageMixin(models.Model):
         if not account_name or not account_key:
             raise ValueError(
                 'Azure account name and key must be set using '
-                'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY'
+                'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY '
+                'or account_name and account_key fields.'
             )
         connection_string = (
             'DefaultEndpointsProtocol=https;AccountName='

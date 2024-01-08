@@ -120,7 +120,9 @@ WINDOWS_SQLITE_BINARY_HOST_PREFIX = get_env('WINDOWS_SQLITE_BINARY_HOST_PREFIX',
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Base path for media root and other uploaded files
-BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
+BASE_DATA_DIR = get_env('BASE_DATA_DIR')
+if BASE_DATA_DIR is None:
+    BASE_DATA_DIR = get_data_dir()
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
@@ -476,12 +478,23 @@ SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION'
 ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS = get_bool_env('ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS', default=False)
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
+
+ENABLE_MONOREPO_ENV = get_bool_env('ENABLE_MONOREPO_ENV', default=False)
+
 # EDITOR = label-studio-frontend repository
-EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
+EDITOR_ROOT = (
+    os.path.join(BASE_DIR, '../../web/dist/libs/editor')
+    if ENABLE_MONOREPO_ENV
+    else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/lsf')
+)
 # DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = os.path.join(BASE_DIR, '../frontend/dist/dm')
+DM_ROOT = (
+    os.path.join(BASE_DIR, '../../web/dist/libs/datamanager')
+    if ENABLE_MONOREPO_ENV
+    else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/dm')
+)
 # FRONTEND = GUI for django backend
-REACT_APP_ROOT = os.path.join(BASE_DIR, '../frontend/dist/react-app')
+REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 
 # per project settings
 BATCH_SIZE = 1000
@@ -715,3 +728,6 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
     CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src']
 
     MIDDLEWARE.append('core.middleware.HumanSignalCspMiddleware')
+
+CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE', 10000)
+CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT', 60)
