@@ -519,6 +519,7 @@ def annotate_completed_at(queryset):
     if (
         get_tasks_agreement_queryset
         and LseProject
+        and queryset
         and LseProject.objects.filter(project_id=queryset[0].project_id).exists()
     ):
         queryset = get_tasks_agreement_queryset(queryset)
