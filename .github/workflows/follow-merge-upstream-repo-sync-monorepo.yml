@@ -1,0 +1,616 @@
+name: 'Follow Merge: Upstream repo sync monorepo'
+
+on:
+  repository_dispatch:
+    types:
+      - upstream_repo_update
+
+concurrency:
+  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}-monorepo
+
+env:
+  NODE: 18
+  CACHE_NAME_PREFIX: v1
+  STATIC_DIST: 'label_studio/frontend/dist'
+  RELEASE_BRANCH_PREFIX: "ls-release/"
+  DOCS_TARGET_DIR: "docs/source/tags/"
+
+jobs:
+  open:
+    name: Sync PR
+    if: |
+      github.event.client_payload.event_action == 'opened' ||
+      github.event.client_payload.event_action == 'synchronize' ||
+      github.event.client_payload.event_action == 'merged'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Details
+        id: details
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          case "${{ github.event.client_payload.repo_name }}" in
+            */dm2)
+              echo "frontend_module_dist=${{ env.STATIC_DIST }}/dm" >> $GITHUB_OUTPUT
+              echo "copy_src_path=web/libs/datamanager/src" >> $GITHUB_OUTPUT
+              ;;
+            */label-studio-frontend)
+              echo "frontend_module_dist=${{ env.STATIC_DIST }}/lsf" >> $GITHUB_OUTPUT
+              echo "copy_src_path=web/libs/editor/src" >> $GITHUB_OUTPUT
+              echo "copy_src_preserve_path=web/libs/editor/src/examples" >> $GITHUB_OUTPUT
+              echo "build_lsf_docs=true" >> $GITHUB_OUTPUT
+              ;;
+            */label-studio-sdk)
+              echo "poetry=true" >> $GITHUB_OUTPUT
+              echo "poetry_group=test" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo '::error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
+              exit 1
+              ;;
+          esac
+
+      - name: Find or Create branch
+        uses: actions/github-script@v7
+        id: get-branch
+        env:
+          RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
+          BRANCH_NAME: "${{ github.event.client_payload.branch_name }}-monorepo"
+          BASE_BRANCH_NAME: "${{ github.event.client_payload.base_branch_name }}"
+          DEFAULT_BRANCH: "fb-leap-e-1"
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const {repo, owner} = context.repo;
+
+            const branch_name = process.env.BRANCH_NAME;
+            const default_branch = process.env.DEFAULT_BRANCH;
+            const base_branch_name = process.env.BASE_BRANCH_NAME;
+            const release_branch_prefix = process.env.RELEASE_BRANCH_PREFIX;
+            
+            let base_name = default_branch;
+            if (base_branch_name.startsWith(release_branch_prefix)) {
+              base_name = base_branch_name;
+            }
+            core.setOutput('base_name', base_name);
+            
+            const branches = await github.paginate(
+              github.rest.repos.listBranches,
+              {
+                owner,
+                repo,
+                per_page: 100
+              },
+              (response) => response.data
+            );
+            const {data: default_commit} = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: base_name
+            });
+            
+            let branch = branches.find(e => e.name === branch_name || e.name === branch_name.toLowerCase())
+            
+            if (branch === undefined) {
+              console.log('Branch not found. Creating a new one.');
+              const ref_branch_prefix = 'refs/heads/';
+              branch = (await github.rest.git.createRef({
+                owner,
+                repo,
+                ref: `${ref_branch_prefix}${branch_name}`,
+                sha: default_commit.sha,
+              })).data;
+              core.setOutput('name', branch.ref.replace(ref_branch_prefix, ''));
+            } else {
+              console.log('Branch found.');
+              core.setOutput('name', branch.name);
+            }
+
+      - name: Configure git
+        shell: bash
+        env:
+          AUTHOR_USERNAME: ${{ github.event.client_payload.author_username }}
+          AUTHOR_EMAIL: ${{ github.event.client_payload.author_email }}
+        run: |
+          set -xeuo pipefail
+          git config --global user.name "${AUTHOR_USERNAME}"
+          git config --global user.email "${AUTHOR_EMAIL}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          fetch-depth: 0
+          ref: ${{ steps.get-branch.outputs.name }}
+
+      - name: "Frontend: Checkout module"
+        if: steps.details.outputs.frontend_module_dist
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.client_payload.repo_name }}
+          path: tmp
+          token: ${{ secrets.GIT_PAT }}
+          fetch-depth: 1
+          ref: ${{ github.event.client_payload.commit_sha }}
+
+      - name: Commit src
+        if: steps.details.outputs.copy_src_path
+        shell: bash
+        env:
+          COPY_SRC_PATH: ${{ steps.details.outputs.copy_src_path }}
+          COPY_SRC_PRESERVE_PATH: ${{ steps.details.outputs.copy_src_preserve_path }}
+        run: |
+          set -xeuo pipefail
+          
+          preserve_dir=$(mktemp -d)
+          if [ -n ${COPY_SRC_PRESERVE_PATH} ]; then
+            echo "Preserving ${COPY_SRC_PRESERVE_PATH}"
+            cp -r "${COPY_SRC_PRESERVE_PATH}" "${preserve_dir}"
+          fi 
+
+          rm -r "${COPY_SRC_PATH}"
+          mkdir -p "${COPY_SRC_PATH}"
+          cp -r tmp/src/* "${COPY_SRC_PATH}"
+
+          if [ -n ${COPY_SRC_PRESERVE_PATH} ]; then
+            echo "Restoring preserved files"
+            cp -rf ${preserve_dir}/* "${COPY_SRC_PATH}"
+          fi 
+
+          git add "${COPY_SRC_PATH}"
+          git status -s
+          git commit --allow-empty -m '[submodules] Copy src ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
+
+      - name: "Frontend: Setup nodejs"
+        uses: actions/setup-node@v4
+        if: steps.details.outputs.frontend_module_dist
+        with:
+          node-version: "${{ env.NODE }}"
+
+      - name: "Frontend: Upgrade Yarn"
+        if: steps.details.outputs.frontend_module_dist
+        run: npm install -g yarn@1.22
+
+      - name: Get yarn cache directory path
+        if: steps.details.outputs.frontend_module_dist
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - name: "Frontend: Configure yarn cache"
+        if: steps.details.outputs.frontend_module_dist
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: "Frontend: Print Yarn cache size"
+        if: steps.details.outputs.frontend_module_dist
+        run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
+
+      - name: "Frontend: Install Yarn dependencies"
+        if: steps.details.outputs.frontend_module_dist
+        run: |
+          rm package-lock.json || true
+          yarn install
+        working-directory: tmp
+
+      - name: "Frontend: Build module"
+        if: steps.details.outputs.frontend_module_dist
+        working-directory: tmp
+        env:
+          CI: false # on true webpack breaks on warnings, and we have them a lot
+          NODE_ENV: 'production'
+          TITLE: ${{ github.event.client_payload.title }}
+        run: |
+          yarn run build:module
+          if [[ "${{ github.event.client_payload.event_action }}" == 'merged' ]]; then 
+            branch="${{ github.event.client_payload.base_branch_name }}"
+          else
+            branch="${{ github.event.client_payload.branch_name }}"
+          fi
+          cat << EOF > "build/static/version.json"
+          {
+            "message": "${TITLE}",
+            "commit": "${{ github.event.client_payload.commit_sha }}",
+            "branch": "${branch}",
+            "date": "$(git log -1 --date=format:"%Y-%m-%dT%TZ" --format="%ad" | cat)"
+          }
+          EOF
+
+      - name: "Frontend: LSF Docs: Cache node modules"
+        if: steps.details.outputs.build_lsf_docs
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
+
+      - name: "Frontend: LSF Docs: Install NPM deps"
+        if: steps.details.outputs.build_lsf_docs
+        continue-on-error: true
+        run: npm install -g jsdoc-to-markdown node-fetch
+
+      - name: "Frontend: LSF Docs: Build"
+        id: lsf-docs-build
+        if: steps.details.outputs.build_lsf_docs
+        continue-on-error: true
+        working-directory: tmp/scripts
+        run: node create-docs.js
+
+      - name: "Frontend: Commit"
+        if: steps.details.outputs.frontend_module_dist
+        shell: bash
+        run: |
+          set -xeuo pipefail
+
+          rm -rf "${{ steps.details.outputs.frontend_module_dist }}"
+          mkdir -p "${{ steps.details.outputs.frontend_module_dist }}"
+          cp -r tmp/build/static/* "${{ steps.details.outputs.frontend_module_dist }}"
+
+          git add "${{ steps.details.outputs.frontend_module_dist }}"
+          git status -s
+          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
+
+      - name: Set up Poetry
+        if: steps.details.outputs.poetry
+        uses: snok/install-poetry@v1
+
+      - name: "Requirements: Commit"
+        if: steps.details.outputs.poetry
+        shell: bash
+        run: |
+          set -xeuo pipefail
+
+          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock --group "${{ steps.details.outputs.poetry_group }}"
+
+          git add pyproject.toml poetry.lock
+          git status -s
+          git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
+
+      - name: "Frontend: LSF Docs: Commit"
+        if: steps.details.outputs.build_lsf_docs && steps.lsf-docs-build.conclusion == 'success'
+        continue-on-error: true
+        run: |
+          set -xeuo pipefail
+          docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
+          find "${docs_target_dir}" ! -name 'index.md' -type f -exec rm -rf {} +
+          mkdir -p "${docs_target_dir}"
+          cp -Rf tmp/docs/* "${docs_target_dir}"
+          git status
+          git add "${docs_target_dir}"
+          git commit -m 'docs: LSF Update' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
+
+      - name: Merge base branch
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -xeuo pipefail
+          
+          branch='${{ steps.get-branch.outputs.name }}'
+          base_branch='origin/${{ steps.get-branch.outputs.base_name }}'
+          
+          lsf_path='label_studio/frontend/dist/lsf/'
+          dm_path='label_studio/frontend/dist/dm/'
+          
+          git merge "${base_branch}" --message "Merge branch '${base_branch}' into '${branch}'" || true
+
+          git diff --name-only --diff-filter=U --relative
+          
+          git checkout --ours "${lsf_path}"
+          git add "${lsf_path}" || ture
+          
+          git checkout --ours "${dm_path}"
+          git add "${dm_path}" || ture
+          
+          unmerged_files=$(git diff --name-only --diff-filter=U --relative)
+          
+          if [ -z "${unmerged_files}" ]; then
+            echo "No unmerged files found"
+            echo "Pushing merge commit"
+            git commit -m "Merge branch '${base_branch}' into '${branch}'" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
+            git push origin HEAD
+          else
+            echo "Unmerged files found:"
+            echo "${unmerged_files}"  
+            echo "Skipping push"
+            exit 0
+          fi
+
+      - name: Find or Create PR
+        id: get-pr
+        uses: actions/github-script@v7
+        env:
+          TITLE: "${{ github.event.client_payload.title }} monorepo"
+          HTML_URL: "${{ github.event.client_payload.html_url }}"
+          ACTOR: "${{ github.event.client_payload.actor }}"
+          BRANCH_NAME: "${{ steps.get-branch.outputs.name }}"
+          BASE_BRANCH_NAME: "${{ steps.get-branch.outputs.base_name }}"
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            
+            const title = process.env.TITLE;
+            const html_url = process.env.HTML_URL;
+            const actor = process.env.ACTOR;
+            const branch_name = process.env.BRANCH_NAME;
+            const base_branch_name = process.env.BASE_BRANCH_NAME;
+            
+            const pr_header = [
+              `Hi @${actor}!`,
+              '',
+              'This PR was [created](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) in a response to PRs in upstream repos:',
+            ].join('\n')
+            
+            const {data: listPulls} = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${branch_name}`,
+              base: base_branch_name,
+              per_page: 1
+            });
+            
+            let pull;
+            
+            if (listPulls.length !== 0) {
+              console.log(`Found PR for branch '${branch_name}'`)
+              pull = listPulls[0];
+            } else {
+              console.log(`PR for branch '${branch_name}' is not created yet`)
+              pull = (await github.rest.pulls.create({
+                owner,
+                repo,
+                title: title,
+                head: branch_name,
+                base: base_branch_name,
+                draft: true,
+                body: pr_header + `\n- ${html_url}`
+              })).data;
+            }
+            
+            if (pull.body && pull.body.includes(html_url)) {
+              console.log(`${html_url} already referenced in PR description`)
+            } else {
+              console.log(`Adding a new reference to ${html_url} to PR`)
+              const body = pull.body || pr_header
+              const new_body = body + `\n- ${html_url}`
+              pull = (await github.rest.pulls.update({
+                title: process.env.TITLE,
+                owner,
+                repo,
+                pull_number: pull.number,
+                body: new_body
+              })).data;
+            }
+            
+            core.setOutput('pull', pull);
+            core.setOutput('number', pull.number);
+            core.setOutput('node_id', pull.node_id);
+
+      - name: Check all submodules
+        id: check-all-submodules
+        if: github.event.client_payload.event_action == 'merged'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          result-encoding: string
+          script: |
+            const { repo, owner } = context.repo;
+            const branchName = '${{ steps.get-branch.outputs.name }}';
+            const branchNameLowerCase = branchName.toLowerCase();
+
+            const submodules = [
+              { owner: owner, repo: 'label-studio-frontend' },
+              { owner: owner, repo: 'dm2' }
+            ]
+            let openPRs = []  
+            for (let submodule of submodules) {
+              core.info(`Checking ${ submodule.owner }/${ submodule.repo }`)
+              const listAllOpenPulls = await github.paginate(
+                github.rest.pulls.list,
+                {
+                  owner: submodule.owner,
+                  repo: submodule.repo,
+                  status: 'open',
+                  per_page: 100
+                },
+                (response) => response.data
+              );
+            
+              const listOpenPulls = listAllOpenPulls.filter(e => e.head.ref.toLowerCase() === branchNameLowerCase)
+
+              for (let pr of listOpenPulls) {
+                if ( submodule.hasOwnProperty('paths-ignore') ) {
+                  core.info(`Checking ${ submodule.owner }/${ submodule.repo } for ignore files`)
+                  const getCommitResponse = await github.rest.repos.getCommit({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                    ref: pr.merge_commit_sha
+                  });
+                  if ( getCommitResponse.data.files.every(e => e.filename.startsWith(submodule['paths-ignore'])) ) {
+                    core.info(`Skiping ${ pr.html_url } since it only change ${ submodule['paths-ignore'] } files`)
+                    continue
+                  }
+                }
+                openPRs.push(pr)
+              }
+            }
+            
+            if ( openPRs.length === 0 ) {
+              return true
+            } else {
+              let comment_lines = ['To enable Auto Merge for this PR also merge those PRs:']
+              core.info(`Found ${ openPRs.length } open PRs`)
+              for (let pr of openPRs) {
+                core.info(`${ pr.html_url } is not merged yet`)
+                comment_lines.push(`- ${ pr.html_url }`)
+              } 
+              return comment_lines.join('\n')
+            }
+
+      - name: Comment PR
+        if: |
+          github.event.client_payload.event_action == 'merged' &&
+          steps.check-all-submodules.outputs.result != 'true'
+        id: comment-pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const pr_number = ${{ steps.get-pr.outputs.number }}
+            github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr_number,
+              body: `${{ steps.check-all-submodules.outputs.result }}`,
+            });
+
+      - name: Convert to ready for review
+        if: |
+          github.event.client_payload.event_action == 'merged' &&
+          steps.check-all-submodules.outputs.result == 'true'
+        id: ready-for-review-pr
+        shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
+        run: |
+          echo "$GIT_PAT" | gh auth login --with-token
+          gh api graphql -F id='${{ steps.get-pr.outputs.node_id }}' -f query='
+            mutation($id: ID!) {
+              markPullRequestReadyForReview(input: { pullRequestId: $id }) {
+                pullRequest {
+                  id
+                }
+              }
+            }
+          '
+
+      - name: Enable AutoMerge
+        id: enable-pr-automerge
+        if: |
+          github.event.client_payload.event_action == 'merged' &&
+          steps.check-all-submodules.outputs.result == 'true'
+        shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
+        run: |
+          echo "$GIT_PAT" | gh auth login --with-token
+          gh api graphql -f pull='${{ steps.get-pr.outputs.node_id }}' -f query='
+            mutation($pull: ID!) {
+              enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: SQUASH}) {
+                pullRequest {
+                  id
+                  number
+                }
+              }
+            }'
+
+
+  others:
+    name: Other actions with PR
+    if: |
+      github.event.client_payload.event_action == 'converted_to_draft' ||
+      github.event.client_payload.event_action == 'ready_for_review' ||
+      github.event.client_payload.event_action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Get PR
+        uses: actions/github-script@v7
+        id: get-pr
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const {repo, owner} = context.repo;
+            const branchName = '${{ github.event.client_payload.branch_name }}';
+            const branchNameLowerCase = branchName.toLowerCase();
+            const {data: listPullsResponse} = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${branchName}`,
+              per_page: 1
+            });
+            const {data: listPullsResponseLowerCase} = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${branchNameLowerCase}`,
+              per_page: 1
+            });
+            
+            if (listPullsResponse.length !== 0) {
+              console.log(`Found PR for branch '${branchName}'`)
+              core.setOutput("branch-name", branchName);
+              return listPullsResponse
+            } else if (listPullsResponseLowerCase.length !== 0) {
+              console.log(`Found PR for branch '${branchNameLowerCase}'`)
+              core.setOutput("branch-name", branchNameLowerCase);
+              return listPullsResponseLowerCase
+            } else {
+              console.log(`PR for branch '${branchNameLowerCase}' is not created yet`)
+              core.setOutput("branch-name", branchNameLowerCase);
+              return listPullsResponseLowerCase
+            }
+
+      - name: Close PR
+        if: github.event.client_payload.event_action == 'closed'
+        id: close-pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const listPullsResponse = ${{ steps.get-pr.outputs.result }}
+            for (let pr of listPullsResponse ) {
+              core.info(`Closing ${ pr.html_url }`)
+              github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: pr.number,
+                state: 'close'
+              });
+            }
+
+      - name: Convert to draft
+        if: github.event.client_payload.event_action == 'converted_to_draft'
+        id: convert-pr-to-draft
+        shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
+        run: |
+          echo "$GIT_PAT" | gh auth login --with-token
+          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
+            mutation($id: ID!) {
+              convertPullRequestToDraft(input: { pullRequestId: $id }) {
+                pullRequest {
+                  id
+                  isDraft
+                }
+              }
+            }
+          '
+
+      - name: Convert to ready for review
+        if: github.event.client_payload.event_action == 'ready_for_review'
+        id: ready-for-review-pr
+        shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
+        run: |
+          echo "$GIT_PAT" | gh auth login --with-token
+          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
+            mutation($id: ID!) {
+              markPullRequestReadyForReview(input: { pullRequestId: $id }) {
+                pullRequest {
+                  id
+                }
+              }
+            }
+          '

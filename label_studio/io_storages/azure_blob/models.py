@@ -54,7 +54,8 @@ class AzureBlobStorageMixin(models.Model):
         if not account_name or not account_key:
             raise ValueError(
                 'Azure account name and key must be set using '
-                'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY'
+                'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY '
+                'or account_name and account_key fields.'
             )
         connection_string = (
             'DefaultEndpointsProtocol=https;AccountName='
@@ -85,9 +86,12 @@ class AzureBlobStorageMixin(models.Model):
         if self.prefix and 'Export' not in self.__class__.__name__:
             logger.debug(f'Test connection to container {self.container} with prefix {self.prefix}')
             prefix = str(self.prefix)
-            blobs = list(container.list_blobs(name_starts_with=prefix, results_per_page=1))
+            try:
+                blob = next(container.list_blob_names(name_starts_with=prefix))
+            except StopIteration:
+                blob = None
 
-            if not blobs:
+            if not blob:
                 raise KeyError(f'{self.url_scheme}://{self.container}/{self.prefix} not found.')
 
 

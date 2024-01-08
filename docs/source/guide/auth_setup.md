@@ -3,8 +3,8 @@ title: Set up authentication for Label Studio
 short: Set up authentication
 tier: enterprise
 type: guide
-order: 113
-order_enterprise: 139
+order: 0
+order_enterprise: 485
 meta_title: Authentication for Label Studio Enterprise
 meta_description: Label Studio Enterprise documentation for setting up SSO and LDAP authentication for your data labeling, machine learning, and data science projects.
 section: "Install"
@@ -188,3 +188,13 @@ MANUAL_ROLE_MANAGEMENT=0
 ```
 
 Setting these options disables the Label Studio API and UI options to assign roles and workspaces for specific users within Label Studio and relies entirely on the settings in the environment variable file.
+
+### Enabling TLS on LDAP/Active Directory
+
+To enable a secure Transport Layer Security (TLS) connection on LDAP/Active Directory, add the following env variables:
+
+```bash
+AUTH_LDAP_CONNECTION_OPTIONS="OPT_X_TLS_CACERTFILE=/path/to/cert.crt;OPT_X_TLS_NEWCTX=0"
+```
+
+Where `OPT_X_TLS_CACERTFILE` points to a file with certificates. If you’re using self-signed certificates, you’ll need to add `OPT_X_TLS_NEWCTX=0` as the last entry of the `AUTH_LDAP_CONNECTION_OPTIONS` env variable.

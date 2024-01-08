@@ -121,6 +121,11 @@ class UserAPI(viewsets.ModelViewSet):
             return UserSerializerUpdate
         return super().get_serializer_class()
 
+    def get_serializer_context(self):
+        context = super(UserAPI, self).get_serializer_context()
+        context['user'] = self.request.user
+        return context
+
     def update(self, request, *args, **kwargs):
         return super(UserAPI, self).update(request, *args, **kwargs)
 

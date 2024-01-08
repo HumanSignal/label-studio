@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-255: Parse username and password from basic auth URL and use for API calls",
-  "commit": "e8fcdb746aac38218edf1e8dd5033141516c5075",
+  "message": "fix: LEAP-248: Fix app crashing by hotkeys ",
+  "commit": "28c0e12c566794df3d749799276d2a0c60f28e2b",
   "branch": "master",
-  "date": "2023/10/16 13:05:26"
+  "date": "2024-01-05T15:30:28Z"
 }

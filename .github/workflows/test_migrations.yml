@@ -38,7 +38,8 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        id: setup_python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -47,33 +48,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}/bin/*
-            ${{ env.pythonLocation }}/include
-            ${{ env.pythonLocation }}/lib/python*/site-packages/*
-            !${{ env.pythonLocation }}/bin/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
-          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
-          pip install -r deploy/requirements.txt
-          pip install -e .
+          poetry install
 
       - name: Test migrations
         run: |
-          output=$(python label_studio/manage.py makemigrations)
+          output=$(poetry run python label_studio/manage.py makemigrations)
           if ! grep 'No changes detected' <<< "${output}"; then
             error="${output}"
             error="${error//'%'/'%25'}"

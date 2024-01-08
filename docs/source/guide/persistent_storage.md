@@ -2,8 +2,8 @@
 title: Set up persistent storage
 type: guide
 tier: all
-order: 112
-order_enterprise: 138
+order: 85
+order_enterprise: 475
 meta_title: Set up persistent storage with Label Studio
 meta_description: Configure persistent storage with Label Studio hosted in the cloud to store uploaded data such as task data, user images, and more.
 section: "Install"

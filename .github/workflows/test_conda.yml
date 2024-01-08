@@ -9,7 +9,6 @@ on:
 
 env:
   CACHE_NAME_PREFIX: v1
-  PIP_VERSION: "20.2"
 
 jobs:
   conda:
@@ -25,6 +24,11 @@ jobs:
             pip-cache-path: "~/.cache/pip"
           - os: "windows-latest"
             pip-cache-path: "~\\AppData\\Local\\pip\\Cache"
+    # required for poetry action
+    # see https://github.com/marketplace/actions/install-poetry-action#running-on-windows
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - uses: hmarr/debug-action@v2.1.0
@@ -36,26 +40,18 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: Setup Conda
-        uses: conda-incubator/setup-miniconda@v2.2.0
+        uses: conda-incubator/setup-miniconda@v3.0.1
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           activate-environment: test-environment
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          path: ${{ matrix.pip-cache-path }}
-          key: Conda-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            Conda-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-${{ matrix.python-version }}-
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          pip install -r deploy/requirements-mw.txt
-          pip install -r deploy/requirements.txt
-          pip install -e .
+          poetry install --with test
 
       - name: Conda info
         shell: bash -el {0}

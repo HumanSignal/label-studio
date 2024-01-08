@@ -1061,6 +1061,7 @@ main {
   font-size: 0.9em;
   color: var(--color-gray-900);
   padding: 0.6em;
+  text-align: left;
 }
 
 .content-markdown table tbody tr:nth-child(even) {
@@ -1091,7 +1092,7 @@ main {
   margin: 1em 0;
 }
 
-.content-markdown img.gif-border {
+.content-markdown img {
   border: 1px var(--color-gray-100) solid;
 }
 

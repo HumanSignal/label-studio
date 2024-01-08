@@ -1,0 +1,9 @@
+<View>
+  <Image name="img" value="$image"></Image>
+  <Brush name="b" toName="img"/>
+
+  <Labels name="tag" toName="img">
+    <Label value="Planet"></Label>
+    <Label value="Moonwalker" background="blue"></Label>
+  </Labels>
+</View>

@@ -26,7 +26,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Validate
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const {repo, owner} = context.repo;
@@ -35,24 +35,24 @@ jobs:
             const targetBranch = '${{ github.event.pull_request.base.ref || github.event.ref }}'.replace('refs/heads/', '')
             const strictCheckBranchPrefixes = ['ls-release/'];
             const submodules = [
-                {
-                    owner: owner,
-                    repo: 'label-studio-frontend',
-                    file_path: 'label_studio/frontend/dist/lsf/version.json',
-                    regexp: '"commit": "(.*)",',
-                },
-                {
-                    owner: owner,
-                    repo: 'dm2',
-                    file_path: 'label_studio/frontend/dist/dm/version.json',
-                    regexp: '"commit": "(.*)",',
-                },
-                {
-                    owner: owner,
-                    repo: 'label-studio-sdk',
-                    file_path: 'deploy/requirements-test.txt',
-                    regexp: 'https://github.com/HumanSignal/label-studio-sdk/archive/(.*).zip',
-                },
+              {
+                owner: owner,
+                repo: 'label-studio-frontend',
+                file_path: 'label_studio/frontend/dist/lsf/version.json',
+                regexp: /"commit": "(?<sha>[a-f0-9]{40})",/,
+              },
+              {
+                owner: owner,
+                repo: 'dm2',
+                file_path: 'label_studio/frontend/dist/dm/version.json',
+                regexp: /"commit": "(?<sha>[a-f0-9]{40})",/,
+              },
+              {
+                owner: owner,
+                repo: 'label-studio-sdk',
+                file_path: 'pyproject.toml',
+                regexp: /label-studio-sdk(\/archive|.git).*(?<sha>[a-f0-9]{40})/,
+              },
             ];
             
             async function getSubmoduleVersion(submodule, sha) {
@@ -62,9 +62,9 @@ jobs:
                     ref: sha,
                     path: submodule.file_path,
                 });
-                const content = Buffer.from(response.data.content, 'base64').toString('utf-8');
+                const content = Buffer.from(response.data.content, response.data.encoding).toString('utf-8');
                 const match = content.match(submodule.regexp);
-                return match[1];
+                return match.groups.sha;
             }
             
             async function validateSubmodule(submodule, base_sha, head_sha) {

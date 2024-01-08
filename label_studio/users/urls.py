@@ -8,7 +8,6 @@ from django.urls import path, re_path
 from django.views.static import serve
 from rest_framework import routers
 from users import api, views
-from users.views import UserSoftDeleteView
 
 router = routers.DefaultRouter()
 router.register(r'users', api.UserAPI, basename='user')
@@ -24,8 +23,6 @@ urlpatterns = [
     path('api/current-user/reset-token/', api.UserResetTokenAPI.as_view(), name='current-user-reset-token'),
     path('api/current-user/token', api.UserGetTokenAPI.as_view(), name='current-user-token'),
     path('api/current-user/whoami', api.UserWhoAmIAPI.as_view(), name='current-user-whoami'),
-    # additional user actions
-    path('api/users/<int:pk>/soft-delete/', UserSoftDeleteView.as_view(), name='user-soft-delete'),
 ]
 
 # When CLOUD_FILE_STORAGE_ENABLED is set, avatars are uploaded to cloud storage with a different URL pattern.

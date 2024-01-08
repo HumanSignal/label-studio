@@ -5,18 +5,21 @@ import json
 import logging
 import mimetypes
 import time
+from typing import Union
 from urllib.parse import unquote, urlparse
 
 import drf_yasg.openapi as openapi
+from core.decorators import override_report_only_csp
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import retry_database_locked, timeit
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.utils.params import bool_from_request, list_of_strings_from_request
+from csp.decorators import csp
 from django.conf import settings
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from projects.models import Project, ProjectImport, ProjectReimport
@@ -27,6 +30,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from tasks.functions import update_tasks_counters
 from tasks.models import Prediction, Task
 from users.models import User
 from webhooks.models import WebhookAction
@@ -357,7 +361,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                 )
             )
         predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
-        project.update_tasks_counters(Task.objects.filter(id__in=tasks_ids))
+        start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
         return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
 
 
@@ -595,6 +599,8 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
 class UploadedFileResponse(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
+    @override_report_only_csp
+    @csp(SANDBOX=[])
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         request = self.request
@@ -612,8 +618,8 @@ class UploadedFileResponse(generics.RetrieveAPIView):
             content_type, encoding = mimetypes.guess_type(str(file.name))
             content_type = content_type or 'application/octet-stream'
             return RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class DownloadStorageData(APIView):
@@ -659,30 +665,11 @@ class DownloadStorageData(APIView):
         return response
 
 
-class PresignStorageData(APIView):
-    """A file proxy to presign storage urls."""
+class PresignAPIMixin:
+    def handle_presign(self, request: HttpRequest, fileuri: str, instance: Union[Task, Project]) -> Response:
+        model_name = type(instance).__name__
 
-    swagger_schema = None
-    http_method_names = ['get']
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, *args, **kwargs):
-        """Get the presigned url for a given fileuri"""
-        request = self.request
-        task_id = kwargs.get('task_id')
-        fileuri = request.GET.get('fileuri')
-
-        if fileuri is None or task_id is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            task = Task.objects.get(pk=task_id)
-        except Task.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        project = task.project
-
-        if not project.has_permission(request.user):
+        if not instance.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         # Attempt to base64 decode the fileuri
@@ -690,13 +677,15 @@ class PresignStorageData(APIView):
             fileuri = base64.urlsafe_b64decode(fileuri.encode()).decode()
         # For backwards compatibility, try unquote if this fails
         except Exception as exc:
-            logger.debug(f'Failed to decode base64 {fileuri} for task {task_id}: {exc} falling back to unquote')
+            logger.debug(
+                f'Failed to decode base64 {fileuri} for {model_name} {instance.id}: {exc} falling back to unquote'
+            )
             fileuri = unquote(fileuri)
 
         try:
-            resolved = task.resolve_storage_uri(fileuri, project)
+            resolved = instance.resolve_storage_uri(fileuri)
         except Exception as exc:
-            logger.error(f'Failed to resolve storage uri {fileuri} for task {task_id}: {exc}')
+            logger.error(f'Failed to resolve storage uri {fileuri} for {model_name} {instance.id}: {exc}')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if resolved is None or resolved.get('url') is None:
@@ -712,3 +701,51 @@ class PresignStorageData(APIView):
         response.headers['Cache-Control'] = f'no-store, max-age={max_age}'
 
         return response
+
+
+class TaskPresignStorageData(PresignAPIMixin, APIView):
+    """A file proxy to presign storage urls at the task level."""
+
+    swagger_schema = None
+    http_method_names = ['get']
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        """Get the presigned url for a given fileuri"""
+        request = self.request
+        task_id = kwargs.get('task_id')
+        fileuri = request.GET.get('fileuri')
+
+        if fileuri is None or task_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return self.handle_presign(request, fileuri, task)
+
+
+class ProjectPresignStorageData(PresignAPIMixin, APIView):
+    """A file proxy to presign storage urls at the project level."""
+
+    swagger_schema = None
+    http_method_names = ['get']
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        """Get the presigned url for a given fileuri"""
+        request = self.request
+        project_id = kwargs.get('project_id')
+        fileuri = request.GET.get('fileuri')
+
+        if fileuri is None or project_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            project = Project.objects.get(pk=project_id)
+        except Project.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return self.handle_presign(request, fileuri, project)

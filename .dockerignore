@@ -11,7 +11,10 @@
 !deploy/uwsgi.ini
 !deploy/default.conf
 !label_studio/**
+!web/**
 !setup.py
 !README.md
 !licenses/**
 !LICENSE
+!pyproject.toml
+!poetry.lock

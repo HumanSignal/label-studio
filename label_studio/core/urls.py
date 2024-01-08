@@ -30,15 +30,23 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 handler500 = 'core.views.custom_500'
 
 versions = collect_versions()
-schema_view = get_schema_view(
-    openapi.Info(
-        title='Label Studio API',
-        default_version='v' + versions['release'],
-        contact=openapi.Contact(url='https://labelstud.io'),
-        x_logo={'url': '../../static/icons/logo-black.svg'},
-    ),
+open_api_info = openapi.Info(
+    title='Label Studio API',
+    default_version='v' + versions['release'],
+    contact=openapi.Contact(url='https://labelstud.io'),
+    x_logo={'url': '../../static/icons/logo-black.svg'},
+)
+
+private_schema_view = get_schema_view(
+    open_api_info,
     public=True,
-    permission_classes=[AllowAny if settings.PUBLIC_API_DOCS else IsAuthenticated],
+    permission_classes=[IsAuthenticated],
+)
+
+public_schema_view = get_schema_view(
+    open_api_info,
+    public=True,
+    permission_classes=[AllowAny],
 )
 
 urlpatterns = [
@@ -82,9 +90,11 @@ urlpatterns = [
     re_path(r'trigger500/', views.TriggerAPIError.as_view(), name='metrics'),
     re_path(r'samples/time-series.csv', views.samples_time_series, name='static_time_series'),
     re_path(r'samples/paragraphs.json', views.samples_paragraphs, name='samples_paragraphs'),
-    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('docs/api/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    re_path(
+        r'^swagger(?P<format>\.json|\.yaml)$', private_schema_view.without_ui(cache_timeout=0), name='schema-json'
+    ),
+    re_path(r'^swagger/$', private_schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('docs/api/', public_schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path(
         'docs/',
         RedirectView.as_view(url='/static/docs/public/guide/introduction.html', permanent=False),

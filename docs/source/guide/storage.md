@@ -3,8 +3,8 @@ title: Sync data from external storage
 short: Cloud storage setup 
 type: guide
 tier: all
-order: 125
-order_enterprise: 108
+order: 265
+order_enterprise: 165
 meta_title: Cloud and External Storage Integration
 meta_description: "Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, Redis, and local file directories with Label Studio."
 section: "Import and Export"
@@ -623,51 +623,7 @@ You can also create a storage connection using the Label Studio API.
 ### Set up local storage with Docker
 If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
 
-## Troubleshoot CORS and access problems
 
-Troubleshoot some common problems when using cloud or external storage with Label Studio. 
+### Troubleshooting cloud storage
 
-### I can't see the data in my tasks
-
-Check your web browser console for errors.
-
-- If you see CORS problems, make sure you have CORS set up properly. 
-     <img src='/images/cors-error-2.png' style="opacity: 0.9; max-width: 500px">
-  
-    - For Amazon S3, see [Configuring and using cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html) in the Amazon S3 User Guide.
-    - For GCS, see [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors) in the Google Cloud Storage documentation.
-    - For Microsoft Azure, see [Cross-Origin Resource Sharing (CORS) support for Azure Storage](https://docs.microsoft.com/en-us/rest/api/storageservices/cross-origin-resource-sharing--cors--support-for-the-azure-storage-services) in the Microsoft Azure documentation. 
-
-!!! note
-    1. Make sure to apply the correct role and permissions for your Service Account. For example, Service Account Role "roles/iam.serviceAccountTokenCreator" to the Service Account.
-    
-    2. If the name of the Service Account `labelstudio` is using the error displayed in the DEBUG logs, then you can enable them using the `--log-level DEBUG` flag in the `label-studio start` command.
-
-- If you see 403 errors, make sure you configured the correct credentials. 
-    - For Amazon S3, see [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) in the Amazon AWS Command Line Interface User Guide.
-    - For GCS, see [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) in the Google Cloud Storage documentation. Your account must have the `Service Account Token Creator` role. 
-    
-- For Amazon S3, make sure you specified the correct region when creating a bucket. If needed, change the region in your source or target storage settings or the `.aws/config` file, otherwise you might have problems accessing your bucket objects.
-    For example, update the following: `~/.aws/config`
-    
-    ```
-    [default]
-    region=us-east-2  # change to the region of your bucket
-    ```
-- For Amazon S3, make sure that the credentials that you used to set up the source or target storage connection are still valid. If you see 403 errors in the browser console, and you set up the correct permissions for the bucket, you might need to update the Access Key ID, Secret Access Key, and Session ID. See the AWS Identity and Access Management documentation on [Requesting temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html). 
-
-### Tasks or annotations do not sync
-
-If you're pressing the **Sync** button but tasks do not sync, or you can't see the new tasks in the Data Manager, check the following:
-
-- Make sure you specified the correct credentials.
-    - For Amazon S3, see [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) in the Amazon AWS Command Line Interface User Guide. Also be sure to check that they work from the [aws client](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
-    - For GCS, see [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) in the Google Cloud Storage documentation. Your account must have the **Service Account Token Creator** and **Storage Object Viewer** roles and **storage.buckets.get** access permission. See [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) and [IAM permissions for Cloud Storage](https://cloud.google.com/storage/docs/access-control/iam-permissions) in the Google Cloud Storage documentation. Also, if you're using a service account to authorize access to the Google Cloud Platform, make sure to activate it. See [gcloud auth activate-service-account](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) in the Google Cloud SDK: Command Line Interface documentation.
-    
-- Make sure that files exist under the specified bucket or container prefix, and that your file filter regex matches the files. When you set the prefix, subfolders are not recursively scanned.
-
-### Tasks don't load the way I expect
-
-If the tasks sync to Label Studio but don't appear the way that you expect, maybe with URLs instead of images or with one task where you expect to see many, check the following:
-- If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from local storage into Label Studio, you can place multiple tasks in one JSON file. 
-- If you're syncing image or audio files, make sure **Treat every bucket object as a source file** is enabled. 
+See [Troubleshoot import and export issues](import_troubleshoot#Troubleshoot-cloud-storage).

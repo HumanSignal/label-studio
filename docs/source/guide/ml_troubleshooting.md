@@ -3,8 +3,8 @@ title: Troubleshoot machine learning
 short: Troubleshooting
 type: guide
 tier: all
-order: 213
-order_enterprise: 119
+order: 370
+order_enterprise: 325
 meta_title: Troubleshoot Machine Learning
 meta_description: Troubleshoot Label Studio connections with machine learning frameworks using the Label Studio ML backend SDK.
 section: "Machine learning"

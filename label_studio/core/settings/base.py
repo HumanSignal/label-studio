@@ -15,7 +15,7 @@ import os
 import re
 from datetime import timedelta
 
-from label_studio.core.utils.params import get_bool_env
+from label_studio.core.utils.params import get_bool_env, get_env_list
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -120,7 +120,9 @@ WINDOWS_SQLITE_BINARY_HOST_PREFIX = get_env('WINDOWS_SQLITE_BINARY_HOST_PREFIX',
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Base path for media root and other uploaded files
-BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
+BASE_DATA_DIR = get_env('BASE_DATA_DIR')
+if BASE_DATA_DIR is None:
+    BASE_DATA_DIR = get_data_dir()
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
@@ -476,12 +478,23 @@ SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION'
 ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS = get_bool_env('ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS', default=False)
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
+
+ENABLE_MONOREPO_ENV = get_bool_env('ENABLE_MONOREPO_ENV', default=False)
+
 # EDITOR = label-studio-frontend repository
-EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
+EDITOR_ROOT = (
+    os.path.join(BASE_DIR, '../../web/dist/libs/editor')
+    if ENABLE_MONOREPO_ENV
+    else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/lsf')
+)
 # DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = os.path.join(BASE_DIR, '../frontend/dist/dm')
+DM_ROOT = (
+    os.path.join(BASE_DIR, '../../web/dist/libs/datamanager')
+    if ENABLE_MONOREPO_ENV
+    else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/dm')
+)
 # FRONTEND = GUI for django backend
-REACT_APP_ROOT = os.path.join(BASE_DIR, '../frontend/dist/react-app')
+REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 
 # per project settings
 BATCH_SIZE = 1000
@@ -528,7 +541,8 @@ TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
-USER_PERM = 'core.api_permissions.HasOwnerPermission'
+ORGANIZATION_MEMBER_MIXIN = 'organizations.mixins.OrganizationMemberMixin'
+MEMBER_PERM = 'core.api_permissions.MemberHasOwnerPermission'
 RECALCULATE_ALL_STATS = None
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
@@ -605,6 +619,7 @@ BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
 FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
 FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
 STORAGE_IN_PROGRESS_TIMER = float(get_env('STORAGE_IN_PROGRESS_TIMER', 5.0))
+STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
 
 USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)
 
@@ -639,6 +654,7 @@ if get_env('STORAGE_TYPE') == 's3':
     AWS_S3_VERIFY = get_env('STORAGE_AWS_S3_VERIFY', None)
     if AWS_S3_VERIFY == 'false' or AWS_S3_VERIFY == 'False' or AWS_S3_VERIFY == '0':
         AWS_S3_VERIFY = False
+    AWS_S3_SIGNATURE_VERSION = get_env('STORAGE_AWS_S3_SIGNATURE_VERSION', None)
 
 if get_env('STORAGE_TYPE') == 'azure':
     CLOUD_FILE_STORAGE_ENABLED = True
@@ -666,3 +682,49 @@ if CSRF_TRUSTED_ORIGINS:
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
 PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
+
+# By default, we disallow filters with foreign keys in data manager for security reasons.
+# Add to this list (either here in code, or via the env) to allow specific filters that rely on foreign keys.
+DATA_MANAGER_FILTER_ALLOWLIST = list(
+    set(get_env_list('DATA_MANAGER_FILTER_ALLOWLIST') + ['updated_by__active_organization'])
+)
+
+if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
+    CSP_DEFAULT_SRC = (
+        "'self'",
+        "'report-sample'",
+    )
+    CSP_STYLE_SRC = ("'self'", "'report-sample'", "'unsafe-inline'")
+    CSP_SCRIPT_SRC = (
+        "'self'",
+        "'report-sample'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        'blob:',
+        'browser.sentry-cdn.com',
+        'https://*.googletagmanager.com',
+    )
+    CSP_IMG_SRC = (
+        "'self'",
+        "'report-sample'",
+        'data:',
+        'https://*.google-analytics.com',
+        'https://*.googletagmanager.com',
+        'https://*.google.com',
+    )
+    CSP_CONNECT_SRC = (
+        "'self'",
+        "'report-sample'",
+        'https://*.google-analytics.com',
+        'https://*.analytics.google.com',
+        'https://analytics.google.com',
+        'https://*.googletagmanager.com',
+        'https://*.g.double' + 'click.net',  # hacky way of suppressing codespell complaint
+        'https://*.ingest.sentry.io',
+    )
+    # Note that this will be overridden to real CSP for views that use the override_report_only_csp decorator
+    CSP_REPORT_ONLY = get_bool_env('LS_CSP_REPORT_ONLY', True)
+    CSP_REPORT_URI = get_env('LS_CSP_REPORT_URI', None)
+    CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src']
+
+    MIDDLEWARE.append('core.middleware.HumanSignalCspMiddleware')

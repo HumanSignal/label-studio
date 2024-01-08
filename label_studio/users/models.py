@@ -26,8 +26,8 @@ for r in range(YEAR_START, (datetime.datetime.now().year + 1)):
 year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 
-class UserManagerWithDeleted(BaseUserManager):
-    use_in_migrations: bool = True
+class UserManager(BaseUserManager):
+    use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
         """
@@ -59,15 +59,6 @@ class UserManagerWithDeleted(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self._create_user(email, password, **extra_fields)
-
-
-class UserManager(UserManagerWithDeleted):
-    use_in_migrations: bool = False
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        qs = qs.filter(is_deleted=False)
-        return qs
 
 
 class UserLastActivityMixin(models.Model):
@@ -109,12 +100,6 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         default=True,
         help_text=_('Designates whether to treat this user as active. Unselect this instead of deleting accounts.'),
     )
-    is_deleted = models.BooleanField(
-        _('deleted'),
-        default=False,
-        db_index=True,
-        help_text=_('Designates whether to treat this user as deleted. Select this instead of deleting accounts.'),
-    )
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
@@ -129,7 +114,6 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     )
 
     objects = UserManager()
-    with_deleted = UserManagerWithDeleted()
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
@@ -199,17 +183,11 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         Token.objects.filter(user=self).delete()
         return Token.objects.create(user=self)
 
-    def soft_delete(self) -> None:
-        self.is_deleted = True
-        Token.objects.filter(user=self).delete()
-        self.save(update_fields=['is_deleted'])
-
-    def get_initials(self):
+    def get_initials(self, is_deleted=False):
         initials = '?'
 
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self):
-            if self.is_deleted:
-                return 'DU'
+        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self) and is_deleted:
+            return 'DU'
 
         if not self.first_name and not self.last_name:
             initials = self.email[0:2]

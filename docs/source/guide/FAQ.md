@@ -1,38 +1,22 @@
 ---
-title: Troubleshoot Label Studio
+title: Troubleshoot labeling issues
 short: Troubleshooting
 type: guide
 tier: all
-order: 100
-order_enterprise: 100
-section: "Get started"
-meta_title: Troubleshoot Label Studio
+order: 220
+order_enterprise: 120
+section: "Labeling"
+meta_title: Troubleshoot labeling issues
 meta_description: Troubleshoot common issuesTroubleshoot machine learning with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
 ---
 
-If you encounter an issue using Label Studio, use this page to troubleshoot it. 
-- If you need to troubleshoot a machine learning backend, see [Troubleshoot machine learning](ml_troubleshooting.html). 
-- If you need to troubleshoot a cloud or external storage connection, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems). 
+If you encounter an issue while labeling, see if your issue is listed below. If you can't find your issue here, check our other troubleshooting pages:
 
-## Blank page when loading a project
+- [Troubleshoot machine learning](ml_troubleshooting) if you're using an ML backend. 
+- [Troubleshoot import and export issues](import_troubleshoot) for issues related to loading or syncing data from cloud storage (including CORS issues) and pre-annotations. 
+- [Troubleshoot project issue](project_troubleshoot) for general project issues. 
 
-After starting Label Studio and opening a project, you see a blank page. Several possible issues could be the cause.
 
-### Cause: Host not recognized
-
-If you specify a host without a protocol such as `http://` or `https://` when starting Label Studio, Label Studio can fail to locate the correct files to load the project page.
-
-<div class="opensource-only">
-
-To resolve this issue, update the host specified as an environment variable or when starting Label Studio. See [Start Label Studio](start.html)
-
-</div>
-
-<div class="enterprise-only">
-
-To resolve this issue, update the host specified as an environment variable or when starting Label Studio. Check LABEL_STUDIO_HOST environment variable.
-
-</div>
 
 ## Slowness while labeling
 
@@ -105,87 +89,14 @@ If you find that after annotating audio data, the visible audio wave doesn't mat
 
 ```bash
 ffmpeg -y -i audio.mp3 -ar 8k -ac 1 audio.wav
-```
-
-## HTML label offsets are in the wrong places
-
-If the offsets for exported HTML labels don't match your expected output, such as with HTML named entity recognition (NER) tasks, the most common reason why is due to HTML minification. When you upload HTML files to Label Studio for labeling, the HTML is minified to remove whitespace. When you annotate those tasks, the offsets for the labels apply to the minified version of the HTML, rather than the original unmodified HTML files. 
-
-To prevent the HTML files from being minified, you can use a different import method. See [Import HTML data](tasks.html#Import-HTML-data) for more.
-
-If you want to correct existing annotations, you can minify your source HTML files in the same way that Label Studio does. The minification is performed with the following script:
-
-```python
-import htmlmin
-
-with open("sample.html", "r") as f:
-html_doc = f.read()
-
-minified_html_doc = htmlmin.minify(html_doc, remove_all_empty_space=True)
-```
-
-If minification does not seem to be affecting the offset placements, complex CSS or other reasons could be the cause. 
+``` 
 
 ## Predictions aren't visible to annotators  
 
-See [Troubleshoot pre-annotations](predictions.html#Troubleshoot-pre-annotations) to investigate possible reasons why predictions don't show up.
+See [Troubleshoot pre-annotations](import_troubleshoot#Troubleshoot-pre-annotations) to investigate possible reasons why predictions don't show up.
 
 ## Can't label PDF data
 
 Label Studio does not support labeling PDF files directly. However, you can convert files to HTML using your PDF viewer or another tool and label the PDF as part of the HTML. See an example labeling configuration in the [Label Studio playground](/playground/?config=%3CView%3E%3Cbr%3E%20%20%3CHyperText%20name%3D%22pdf%22%20value%3D%22%24pdf%22%2F%3E%3Cbr%3E%3Cbr%3E%20%20%3CHeader%20value%3D%22Rate%20this%20article%22%2F%3E%3Cbr%3E%20%20%3CRating%20name%3D%22rating%22%20toName%3D%22pdf%22%20maxRating%3D%2210%22%20icon%3D%22star%22%20size%3D%22medium%22%20%2F%3E%3Cbr%3E%3Cbr%3E%20%20%3CChoices%20name%3D%22choices%22%20choice%3D%22single-radio%22%20toName%3D%22pdf%22%20showInline%3D%22true%22%3E%3Cbr%3E%20%20%20%20%3CChoice%20value%3D%22Important%20article%22%2F%3E%3Cbr%3E%20%20%20%20%3CChoice%20value%3D%22Yellow%20press%22%2F%3E%3Cbr%3E%20%20%3C%2FChoices%3E%3Cbr%3E%3C%2FView%3E%3Cbr%3E).
 
-## Add self-signed certificate to trusted root store
 
-<div class="code-tabs">
-  <div data-name="Docker Compose">
-
-1. Mount your self-signed certificate as a volume into `app` container:
-
-```yaml
-volumes:
-  - ./my.cert:/tmp/my.cert:ro
-```
-2. Add environment variable with the name `CUSTOM_CA_CERTS` mentioning all certificates in comma-separated way that should be added into trust store:
-
-```yaml
-CUSTOM_CA_CERTS=/tmp/my.cert
-```
-  </div>
-
-  <div data-name="Kubernetes">
-
-1. Upload your self-signed certificate as a k8s secret.
-   Upload `my.cert` as a secrets with a name `test-my-root-cert`:
-```yaml
-kubectl create secret generic test-my-root-cert --from-file=file=my.cert
-```
-
-2. Add volumes into your values.yaml file and mention them in `.global.customCaCerts`:
-
-```yaml
-global:
-  customCaCerts:
-   - /opt/heartex/secrets/ca_certs/file/file
-
-app:
-  extraVolumes:
-    - name: foo
-      secret:
-        secretName: test-my-root-cert
-  extraVolumeMounts:
-    - name: foo
-      mountPath: "/opt/heartex/secrets/ca_certs/file"
-      readOnly: true
-
-rqworker:
-  extraVolumes:
-    - name: foo
-      secret:
-        secretName: test-my-root-cert
-  extraVolumeMounts:
-    - name: foo
-      mountPath: "/opt/heartex/secrets/ca_certs/file"
-      readOnly: true
-```
-  </div>
-</div>

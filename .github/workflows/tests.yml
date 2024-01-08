@@ -46,7 +46,8 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        id: setup_python
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -55,34 +56,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}/bin/*
-            ${{ env.pythonLocation }}/include
-            ${{ env.pythonLocation }}/lib/python*/site-packages/*
-            !${{ env.pythonLocation }}/bin/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
-          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip setuptools
-          pip install --upgrade cython
-          pip install -U pip==20.2
-          pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
-          pip install -e .
+          poetry install --with test
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        id: setup_node
+        uses: actions/setup-node@v4
         with:
           node-version: "${{ env.NODE }}"
 
@@ -95,22 +78,20 @@ jobs:
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json') }}-${{ hashFiles('label_studio/frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE }}-
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-npm-ls-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json', 'label_studio/frontend/package-lock.json') }}
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild_wo_frontend.sh
+        run: poetry run ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
-        run: python label_studio/manage.py migrate
+        run: poetry run python label_studio/manage.py migrate
 
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --cov=. --cov-report=xml -vv -n auto
+          poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.4
@@ -187,7 +168,8 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        id: setup_python
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -196,34 +178,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install libffi7 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}/bin/*
-            ${{ env.pythonLocation }}/include
-            ${{ env.pythonLocation }}/lib/python*/site-packages/*
-            !${{ env.pythonLocation }}/bin/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
-          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Install pip dependencies
+      - name: Install Python dependencies
         run: |
-          pip install -U pip==20.2
-          pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
-          pip install -e .
+          poetry install --with test
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        id: setup_node
+        uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: "${{ env.NODE }}"
 
       - name: Get npm cache directory
         id: npm-cache-dir
@@ -234,22 +200,20 @@ jobs:
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json') }}-${{ hashFiles('label_studio/frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE }}-
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-npm-ls-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json', 'label_studio/frontend/package-lock.json') }}
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild_wo_frontend.sh
+        run: poetry run ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
-        run: python label_studio/manage.py migrate
+        run: poetry run python label_studio/manage.py migrate
 
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --cov=. --cov-report=xml -vv -n auto
+          poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.4
@@ -269,6 +233,12 @@ jobs:
         python-version:
           - '3.8'
           - '3.9'
+
+    # required for poetry action
+    # see https://github.com/marketplace/actions/install-poetry-action#running-on-windows
+    defaults:
+      run:
+        shell: bash
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -292,34 +262,24 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        id: setup_python
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        with:
-          path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip setuptools
-          pip install --upgrade cython
-          if (Test-Path -Path '.\deploy\requirements.txt' -PathType Leaf)
-          {pip install -r deploy\requirements.txt}
-          if (Test-Path -Path '.\deploy\requirements-test.txt' -PathType Leaf)
-          {pip install -r deploy/requirements-test.txt}
-          pip install -e .
+          poetry install --with test
 
       - name: Fix sqlite.dll for python < 3.9
         if: ${{ contains(matrix.python-version, '3.8') }}
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
+          bash -c "poetry run label-studio init my_project --agree-fix-sqlite --force-fix-sqlite"
           cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
         shell: cmd
 
@@ -327,7 +287,7 @@ jobs:
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          label-studio init my_project --username test@test.com --password testpwd
+          bash -c "poetry run label-studio init my_project --username test@test.com --password testpwd"
         shell: cmd
 
       - name: Test with pytest
@@ -335,4 +295,4 @@ jobs:
           collect_analytics: 0
         run: |
           cd label_studio/
-          python -m pytest -vv -n auto
+          poetry run python -m pytest -vv -n auto

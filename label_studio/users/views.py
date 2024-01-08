@@ -2,30 +2,20 @@
 """
 import logging
 
-import drf_yasg.openapi as openapi
 from core.feature_flags import flag_set
 from core.middleware import enforce_csrf_checks
-from core.permissions import all_permissions
 from core.utils.common import load_func
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
 from django.shortcuts import redirect, render, reverse
 from django.utils.http import is_safe_url
-from drf_yasg.utils import swagger_auto_schema
 from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
-from rest_framework import status, views
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from users import forms
 from users.functions import login, proceed_registration
-from users.models import User
-
-HasObjectPermission = load_func(settings.USER_PERM)
 
 logger = logging.getLogger()
 
@@ -159,33 +149,3 @@ def user_account(request):
         'users/user_account.html',
         {'settings': settings, 'user': user, 'user_profile_form': form, 'token': token},
     )
-
-
-class UserSoftDeleteView(views.APIView):
-    permission_classes = (IsAuthenticated, HasObjectPermission)
-    permission_required = all_permissions.organizations_change
-
-    @swagger_auto_schema(
-        tags=['Users'],
-        operation_summary='Soft delete user',
-        operation_description="""
-            Soft delete a specific user in the system by marking them as deleted, 
-            without actually removing the user data from the database.
-        """,
-        manual_parameters=[
-            openapi.Parameter(name='pk', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='User ID'),
-        ],
-    )
-    def delete(self, request, pk, *args, **kwargs):
-        try:
-            # only fetch & delete user if they are in the same organization as the calling user
-            user = User.objects.filter(active_organization=request.user.active_organization).get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404('User could not be found in organization')
-
-        self.check_object_permissions(request, user)
-        if pk == request.user.pk:
-            return Response({'detail': 'User cannot delete self'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-        user.soft_delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)

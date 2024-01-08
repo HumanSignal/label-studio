@@ -560,7 +560,7 @@ def configured_project(business_client, annotator_client):
     ]
 
     # get user to be owner
-    users = User.objects.filter(email='business@pytest.net')  # TODO: @nik: how to get proper email for business here?
+    users = User.objects.filter(email='business@pytest.net')  # TODO(nik): how to get proper email for business here?
     project = make_project(_project_for_text_choices_onto_A_B_classes, users[0])
 
     assert project.ml_backends.first().url == 'http://localhost:8999'
@@ -757,6 +757,13 @@ def tick_clock(_, seconds: int = 1) -> None:
     freezer.stop()
     now += timedelta(seconds=seconds)
     freezer = freeze_time(now)
+    freezer.start()
+
+
+def freeze_datetime(response, utc_time: str) -> None:
+    global freezer
+    freezer.stop()
+    freezer = freeze_time(utc_time)
     freezer.start()
 
 

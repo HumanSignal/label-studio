@@ -3,7 +3,8 @@ title: Project Performance Dashboards
 short: Performance Dashboards
 tier: enterprise
 type: guide
-order_enterprise: 103
+order: 0
+order_enterprise: 65
 meta_title: Manage Role-Based Access Control in Label Studio
 meta_description: Manage access and set up permissions with user roles, organizations, and project workspaces for your projects in Label Studio Enterprise.
 section: "Project & Team Management"
@@ -16,6 +17,9 @@ Manage project timelines, improve [resource allocation](/guide/setup_project.htm
 Navigate to your project’s Dashboard tab to discover the project’s progress at a holistic level and use the date time selector to discover trends for key performance indicators such as lead time or submitted annotations and to discover insights through time series charts for tasks, annotations, reviews, and label distributions.
 
 <img src="/images/FullDashboardPage.png" alt="" class="gif-border" />
+
+!!! info Tip
+    You can reorder charts using drag and drop. 
 
 ## Review dataset progress
 
@@ -82,3 +86,8 @@ For example, if you notice a high discrepancy between tasks that have been revie
 View up to 30 labels that were used during annotation for the time period selected in a stacked bar chart to identify the distribution of labels at various levels of granularity over time. Use this chart to identify possible problems with your dataset distribution, such as an unbalanced dataset where some labels are overrepresented in an annotated dataset compared with others.
 
 For example, if you’re developing a dataset of OCR images, and 90% of your tasks have Text labels and 10% have Handwriting labels, you might want to increase the number of images of handwriting in your dataset, to improve the eventual accuracy of a machine learning model trained on this dataset.
+
+If you have a labeling configuration that contains multiple label groups, you will see a separate chart for each group showing the label counts within that group.
+
+!!! info Tip
+    From the menu in the upper right of each chart, select **Summary** to view a donut chart showing label distribution. 

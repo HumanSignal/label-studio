@@ -3,8 +3,8 @@ title: Review annotations in Label Studio
 short: Review annotations
 tier: enterprise
 type: guide
-order: 300
-order_enterprise: 113
+order: 0
+order_enterprise: 255
 meta_title: Review annotation quality in Label Studio
 meta_description: In data labeling projects, start evaluating annotator performance against ground truth annotations, predictions, and other annotator's annotations.
 section: "Quality control"

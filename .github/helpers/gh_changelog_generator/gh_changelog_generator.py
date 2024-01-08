@@ -192,6 +192,12 @@ def get_task(task_number: str, pr: int = None) -> AhaFeature or None:
     if task_number in TASK_CACHE.keys():
         return TASK_CACHE.get(task_number)
     try:
+        task = JiraIssue(task_number, pr)
+        TASK_CACHE[task_number] = task
+        return task
+    except Exception as e:
+        print(f'Could not find Issue   {task_number} in Jira: {e}')
+    try:
         task = AhaFeature(task_number, pr)
         TASK_CACHE[task_number] = task
         return task
@@ -203,12 +209,6 @@ def get_task(task_number: str, pr: int = None) -> AhaFeature or None:
         return task
     except Exception as e:
         print(f'Could not find Requirement {task_number} in Aha!: {e}')
-    try:
-        task = JiraIssue(task_number, pr)
-        TASK_CACHE[task_number] = task
-        return task
-    except Exception as e:
-        print(f'Could not find Issue   {task_number} in Jira: {e}')
     return None
 
 

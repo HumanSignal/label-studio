@@ -6,12 +6,15 @@ from core.utils.common import create_hash, load_func
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Count, Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
 
+OrganizationMemberMixin = load_func(settings.ORGANIZATION_MEMBER_MIXIN)
 
-class OrganizationMember(models.Model):
+
+class OrganizationMember(OrganizationMemberMixin, models.Model):
     """ """
 
     user = models.ForeignKey(
@@ -24,6 +27,18 @@ class OrganizationMember(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
+    deleted_at = models.DateTimeField(
+        _('deleted at'),
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text='Timestamp indicating when the organization member was marked as deleted.  '
+        'If NULL, the member is not considered deleted.',
+    )
+
+    # objects = OrganizationMemberQuerySet.as_manager()
+
     @classmethod
     def find_by_user(cls, user_or_user_pk, organization_pk):
         from users.models import User
@@ -32,11 +47,26 @@ class OrganizationMember(models.Model):
         return OrganizationMember.objects.get(user=user_pk, organization=organization_pk)
 
     @property
+    def is_deleted(self):
+        return bool(self.deleted_at)
+
+    @property
     def is_owner(self):
         return self.user.id == self.organization.created_by.id
 
     class Meta:
         ordering = ['pk']
+
+    def soft_delete(self):
+        with transaction.atomic():
+            self.deleted_at = timezone.now()
+            self.save(update_fields=['deleted_at'])
+            self.user.active_organization = self.user.organizations.filter(
+                organizationmember__deleted_at__isnull=True
+            ).first()
+            self.user.save(update_fields=['active_organization'])
+
+        self.user.task_locks.all().delete()
 
 
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)
@@ -73,11 +103,15 @@ class Organization(OrganizationMixin, models.Model):
         return _create_organization(title=title, created_by=created_by)
 
     @classmethod
-    def find_by_user(cls, user):
+    def find_by_user(cls, user, check_deleted=False):
         memberships = OrganizationMember.objects.filter(user=user).prefetch_related('organization')
         if not memberships.exists():
             raise ValueError(f'No memberships found for user {user}')
-        return memberships.first().organization
+        membership = memberships.first()
+        if check_deleted:
+            return (membership.organization, True) if membership.deleted_at else (membership.organization, False)
+
+        return membership.organization
 
     @classmethod
     def find_by_invite_url(cls, url):
@@ -90,13 +124,14 @@ class Organization(OrganizationMixin, models.Model):
     def has_user(self, user):
         return self.users.filter(pk=user.pk).exists()
 
+    def has_deleted(self, user):
+        return OrganizationMember.objects.filter(user=user, organization=self, deleted_at__isnull=False).exists()
+
     def has_project_member(self, user):
         return self.projects.filter(members__user=user).exists()
 
     def has_permission(self, user):
-        if self in user.organizations.all():
-            return True
-        return False
+        return OrganizationMember.objects.filter(user=user, organization=self, deleted_at__isnull=True).exists()
 
     def add_user(self, user):
         if self.users.filter(pk=user.pk).exists():
@@ -112,12 +147,12 @@ class Organization(OrganizationMixin, models.Model):
     def remove_user(self, user):
         OrganizationMember.objects.filter(user=user, organization=self).delete()
         if user.active_organization_id == self.id:
-            user.active_organization = user.organizations.first()
+            user.active_organization = user.organizations.filter(organizationmember__deleted_at__isnull=True).first()
             user.save(update_fields=['active_organization'])
 
     def reset_token(self):
         self.token = create_hash()
-        self.save()
+        self.save(update_fields=['token'])
 
     def check_max_projects(self):
         """This check raise an exception if the projects limit is hit"""

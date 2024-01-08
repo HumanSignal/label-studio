@@ -152,7 +152,7 @@ class StorageInfo(models.Model):
             self.job_health_check()
 
         # in progress last ping time, job is not needed here
-        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 2:
+        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 5:
             self.status = self.Status.FAILED
             self.traceback = (
                 'It appears the job was failed because the last ping time is too old, '
@@ -269,7 +269,7 @@ class ImportStorage(Storage):
                 if self.presign and task is not None:
                     proxy_url = urljoin(
                         settings.HOSTNAME,
-                        reverse('data_import:storage-data-presign', kwargs={'task_id': task.id})
+                        reverse('data_import:task-storage-data-presign', kwargs={'task_id': task.id})
                         + f'?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}',
                     )
                     return uri.replace(extracted_uri, proxy_url)
@@ -445,6 +445,7 @@ class ImportStorage(Storage):
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,
                     on_failure=storage_background_failure,
+                    job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 )
                 self.info_set_job(sync_job.id)
                 logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
@@ -538,7 +539,9 @@ class ExportStorage(Storage, ProjectStorageMixin):
         total_annotations = Annotation.objects.filter(project=self.project).count()
         self.info_set_in_progress()
 
-        for annotation in Annotation.objects.filter(project=self.project):
+        for annotation in Annotation.objects.filter(project=self.project).iterator(
+            chunk_size=settings.STORAGE_EXPORT_CHUNK_SIZE
+        ):
             self.save_annotation(annotation)
 
             # update progress counters

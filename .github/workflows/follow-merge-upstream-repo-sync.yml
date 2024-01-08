@@ -41,16 +41,17 @@ jobs:
               echo "build_lsf_docs=true" >> $GITHUB_OUTPUT
               ;;
             */label-studio-sdk)
-              echo "requirements_dist=deploy/requirements-test.txt" >> $GITHUB_OUTPUT
+              echo "poetry=true" >> $GITHUB_OUTPUT
+              echo "poetry_group=test" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo ':error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
+              echo '::error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
               exit 1
               ;;
           esac
 
       - name: Find or Create branch
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: get-branch
         env:
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
@@ -107,10 +108,13 @@ jobs:
 
       - name: Configure git
         shell: bash
+        env:
+          AUTHOR_USERNAME: ${{ github.event.client_payload.author_username }}
+          AUTHOR_EMAIL: ${{ github.event.client_payload.author_email }}
         run: |
           set -xeuo pipefail
-          git config --global user.name '${{ github.event.client_payload.author_username }}'
-          git config --global user.email '${{ github.event.client_payload.author_email }}'
+          git config --global user.name "${AUTHOR_USERNAME}"
+          git config --global user.email "${AUTHOR_EMAIL}"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -130,7 +134,7 @@ jobs:
           ref: ${{ github.event.client_payload.commit_sha }}
 
       - name: "Frontend: Setup nodejs"
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: steps.details.outputs.frontend_module_dist
         with:
           node-version: "${{ env.NODE }}"
@@ -168,6 +172,7 @@ jobs:
         env:
           CI: false # on true webpack breaks on warnings, and we have them a lot
           NODE_ENV: 'production'
+          TITLE: ${{ github.event.client_payload.title }}
         run: |
           yarn run build:module
           if [[ "${{ github.event.client_payload.event_action }}" == 'merged' ]]; then 
@@ -177,10 +182,10 @@ jobs:
           fi
           cat << EOF > "build/static/version.json"
           {
-            "message": "${{ github.event.client_payload.title }}",
+            "message": "${TITLE}",
             "commit": "${{ github.event.client_payload.commit_sha }}",
             "branch": "${branch}",
-            "date": "$(git log -1 --date=format:"%Y/%m/%d %T" --format="%ad" | cat)"
+            "date": "$(git log -1 --date=format:"%Y-%m-%dT%TZ" --format="%ad" | cat)"
           }
           EOF
 
@@ -218,15 +223,19 @@ jobs:
           git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
+      - name: Set up Poetry
+        if: steps.details.outputs.poetry
+        uses: snok/install-poetry@v1
+
       - name: "Requirements: Commit"
-        if: steps.details.outputs.requirements_dist
+        if: steps.details.outputs.poetry
         shell: bash
         run: |
           set -xeuo pipefail
 
-          sed -i "s#https://github.com/${{ github.event.client_payload.repo_name }}/archive/.*#https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip#g" "${{ steps.details.outputs.requirements_dist }}"
+          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock --group "${{ steps.details.outputs.poetry_group }}"
 
-          git add "${{ steps.details.outputs.requirements_dist }}"
+          git add pyproject.toml poetry.lock
           git status -s
           git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
@@ -283,7 +292,7 @@ jobs:
 
       - name: Find or Create PR
         id: get-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           TITLE: "${{ github.event.client_payload.title }}"
           HTML_URL: "${{ github.event.client_payload.html_url }}"
@@ -355,7 +364,7 @@ jobs:
       - name: Check all submodules
         id: check-all-submodules
         if: github.event.client_payload.event_action == 'merged'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           result-encoding: string
@@ -418,7 +427,7 @@ jobs:
           github.event.client_payload.event_action == 'merged' &&
           steps.check-all-submodules.outputs.result != 'true'
         id: comment-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -483,7 +492,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Get PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: get-pr
         with:
           github-token: ${{ secrets.GIT_PAT }}
@@ -521,7 +530,7 @@ jobs:
       - name: Close PR
         if: github.event.client_payload.event_action == 'closed'
         id: close-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |

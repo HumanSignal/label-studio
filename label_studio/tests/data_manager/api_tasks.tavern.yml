@@ -1124,7 +1124,7 @@ marks:
   - usefixtures:
       - django_live_url
 stages:
-  
+
   - id: signup
     type: ref
 
@@ -1479,3 +1479,255 @@ stages:
         "total_predictions": 0,
         "total": 1,
       }
+
+---
+
+# See FilterSerializer; test logic preventing exploit that traverses the ORM
+# to leak sensitive data character-by-character
+test_name: tasks_api_filter_security_restrictions
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+
+- id: signup
+  type: ref
+
+- id: create_project
+  name: create_project
+  request:
+    data:
+      title: Test Draft 1
+      show_collab_predictions: true
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+        created_by: created_by.id
+    status_code: 201
+
+- name: create view with exploit filter should fail
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/views'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:updated_by__sensitive_field"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        filter_group:
+          filters:
+            - column:
+              - '"__" is not generally allowed in filters. Consider asking your administrator to add "updated_by__sensitive_field" to DATA_MANAGER_FILTER_ALLOWLIST, but note that some filter expressions may pose a security risk'
+
+- name: create view with allowlisted filter should succeed
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/views'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:updated_by__active_organization"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 201
+    save:
+      json:
+        view_pk: id
+
+- name: change filter to typical column succeeds
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:updated_by"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 200
+
+- name: change filter to unexpected prefix fails
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "tasks:filter:annotations_results"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        filter_group:
+          filters:
+            - column:
+              - 'Filter "tasks:filter:annotations_results" should start with "filter:tasks:"'
+
+- name: change filter to include direction marker succeeds
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:-annotations_results"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 200
+
+- name: invalid filter with direction marker fails, but suggests correct allowlist
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:-updated_by__sensitive_field"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        filter_group:
+          filters:
+            - column:
+              - '"__" is not generally allowed in filters. Consider asking your administrator to add "updated_by__sensitive_field" to DATA_MANAGER_FILTER_ALLOWLIST, but note that some filter expressions may pose a security risk'
+
+- name: change filter to dotted data field with underscores succeeds
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:data.images__0"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 200
+
+- name: change filter to valid column without prefix fails
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "annotations_results"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        filter_group:
+          filters:
+            - column:
+              - 'Filter "annotations_results" should start with "filter:tasks:"'
+
+---
+
+# Regression test preventing replace-all of prefixes from being used to construct exploit filters
+test_name: tasks_api_prevent_prefix_regression
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+
+- id: signup
+  type: ref
+
+- id: create_project
+  name: create_project
+  request:
+    data:
+      title: Test Draft 1
+      show_collab_predictions: true
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+        created_by: created_by.id
+    status_code: 201
+
+# Perhaps our validation should be further improved, but for now, it's
+# garbage in, garbage out.
+- name: create view with prefix in middle of filter should succeed
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/views'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            # in an earlier version, preprocess_field_name would have
+            # transformed this to updated_by__sensitive_field
+            - filter: "filter:tasks:updated_by_tasks:_sensitive_field"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 201
+    save:
+      json:
+        view_pk: id
+
+- name: get_tasks fails because "updated_by_tasks:_sensitive_field" doesn't resolve to a field
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?view={view_pk}'
+  response:
+    # 500 actually expected here
+    status_code: 500

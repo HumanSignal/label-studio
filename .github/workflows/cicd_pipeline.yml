@@ -49,6 +49,8 @@ jobs:
               - 'label_studio/!(frontend)/**'
               - 'deploy/requirements**'
               - 'setup.py'
+              - 'poetry.lock'
+              - 'pyproject.toml'
               - '.github/workflows/bandit.yml'
               - '.github/workflows/tests.yml'
               - '.github/workflows/test_conda.yml'
@@ -61,10 +63,12 @@ jobs:
               - 'deploy/**'
               - 'Dockerfile**'
               - 'setup.py'
+              - 'poetry.lock'
+              - 'pyproject.toml'
               - '.github/workflows/cicd_pipeline.yml'
               - '.github/workflows/docker-build.yml'
 
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         id: commit-details
         with:
           script: |
@@ -195,7 +199,7 @@ jobs:
           fetch-depth: 0
 
       - name: Create release draft
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: create-draft-release
         env:
           TARGET_COMMITISH: "${{ github.ref_name }}"
@@ -315,8 +319,6 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-gh-actions-
 
       - name: Install tools and dependencies
         run: |
@@ -367,7 +369,7 @@ jobs:
           echo "CHANGELOG_JSON_EOF" >> $GITHUB_ENV
 
       - name: Update Draft Release
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: update-draft-release
         with:
           github-token: ${{ secrets.GIT_PAT }}

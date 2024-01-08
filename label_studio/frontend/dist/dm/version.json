@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-206: Ensure users can navigate freely and drafts are saved when leaving the labelling screen",
-  "commit": "32a18f43f46d65f61db5841ac58258f36f194bdc",
+  "message": "feat: DIA-474: [FE] add new column for DE",
+  "commit": "a8e6e5e6cd6601d765a7f0abd4efa87cec1a3fe5",
   "branch": "master",
-  "date": "2023/09/26 10:39:21"
+  "date": "2024-01-03T07:13:20Z"
 }

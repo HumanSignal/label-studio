@@ -2,8 +2,8 @@
 title: Configuration details of SaaS
 type: guide
 tier: enterprise
-order: 102
-order_enterprise: 128
+order: 0
+order_enterprise: 410
 meta_title: app.humansignal.com Settings
 meta_description: This page contains information about the settings that are used on app.humansignal.com, available to HumanSignal SaaS customers.
 section: "Security and Privacy"
