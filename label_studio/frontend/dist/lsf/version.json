@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-344: View all annotation tab is not loading",
-  "commit": "ddb613a1a98e5a78a939601907a06bf9e9882367",
-  "branch": "fb-leap-344",
-  "date": "2024-01-08T11:24:45Z"
+  "commit": "eb1194c1e8ad5f9c0e725b2955dbc202f169649b",
+  "branch": "master",
+  "date": "2024-01-08T09:48:32Z"
 }
