@@ -28,7 +28,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
     OPT_DIR=/opt/heartex/instance-data/etc \
     SETUPTOOLS_USE_DISTUTILS=stdlib \
-    ENABLE_MONOREPO_ENV=true
 
 WORKDIR $LS_DIR
 
