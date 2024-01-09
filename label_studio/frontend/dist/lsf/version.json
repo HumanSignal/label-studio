@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-461: Fix displaying conditions for comments tab",
-  "commit": "7dc18d9828b18c33eafa8bfa1cb88b49657b9631",
+  "commit": "26ee53a0e546d5aa5ef7a1a7c1dd94453cc564ab",
   "branch": "fb-leap-461/comments",
-  "date": "2024-01-05T17:18:18Z"
+  "date": "2024-01-09T15:26:53Z"
 }
