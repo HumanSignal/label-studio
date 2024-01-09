@@ -1,0 +1,14 @@
+# The image built from this Dockerfile will include the test dependencies,
+# and can be used for running the project's unit tests from within a container.
+# Use via the `make build-testing-image` and `make docker-testing-shell` Makefile targets.
+
+FROM heartexlabs/label-studio:latest
+
+USER 0
+
+# Copy and install test dependencies
+COPY --chown=1001:0 deploy/requirements-test.txt .
+RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+    pip3 install -r requirements-test.txt
+
+USER 1001

@@ -7,8 +7,8 @@ body {
     overflow-x: unset !important;
 }
 
-body, a, li, p, h1, h2, h3, h4, h5, h6, input, button, textarea, select {
-    font-family: 'Roboto', sans-serif;
+body, a, li, p, h1, h2, h3, h4, h5, h6, input, button, textarea, select, .label, .value {
+    font-family: "Roboto", Arial, sans-serif !important;
 }
 h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
@@ -36,13 +36,6 @@ table tr:nth-child(2n).positive {
 table th {
     font-weight: normal;
     font-size: 1em;
-}
-table td {
-
-}
-
-.label, .value {
-    font-family: 'Roboto', sans-serif !important;
 }
 
 .team-header {
@@ -511,7 +504,6 @@ hotkey i {
     font-weight: normal !important;
 }
 .ui .statistic .value {
-    font-family: Roboto, sans-serif !important;
     font-weight: lighter !important;
     color: #444 !important;
 }

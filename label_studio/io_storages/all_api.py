@@ -2,20 +2,19 @@
 """
 import logging
 
-from django.conf import settings
-from rest_framework import generics
-from rest_framework.views import APIView
 from core.permissions import all_permissions
+from django.conf import settings
+from django.utils.decorators import method_decorator
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from rest_framework.views import APIView
 
 from label_studio.core.utils.common import load_func
-from .azure_blob.serializers import AzureBlobImportStorageSerializer
-from .gcs.serializers import GCSImportStorageSerializer
-from .localfiles.api import LocalFilesImportStorageListAPI, LocalFilesExportStorageListAPI
+
+from .localfiles.api import LocalFilesExportStorageListAPI, LocalFilesImportStorageListAPI
 
 logger = logging.getLogger(__name__)
 # TODO: replace hardcoded apps lists with search over included storage apps
@@ -27,12 +26,14 @@ get_storage_list = load_func(settings.GET_STORAGE_LIST)
 def _get_common_storage_list():
     storage_list = get_storage_list()
     if settings.ENABLE_LOCAL_FILES_STORAGE:
-        storage_list += [{
-            'name': 'localfiles',
-            'title': 'Local files',
-            'import_list_api': LocalFilesImportStorageListAPI,
-            'export_list_api': LocalFilesExportStorageListAPI
-        }]
+        storage_list += [
+            {
+                'name': 'localfiles',
+                'title': 'Local files',
+                'import_list_api': LocalFilesImportStorageListAPI,
+                'export_list_api': LocalFilesExportStorageListAPI,
+            }
+        ]
 
     return storage_list
 
@@ -40,12 +41,15 @@ def _get_common_storage_list():
 _common_storage_list = _get_common_storage_list()
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Storage'],
         operation_summary='List all import storages types',
         operation_description='Retrieve a list of the import storages types.',
-        responses={"200": "A list of import storages types {'name': name, 'title': title}."}
-    ))
+        responses={'200': "A list of import storages types {'name': name, 'title': title}."},
+    ),
+)
 class AllImportStorageTypesAPI(APIView):
     permission_required = all_permissions.projects_change
 
@@ -53,12 +57,15 @@ class AllImportStorageTypesAPI(APIView):
         return Response([{'name': s['name'], 'title': s['title']} for s in _common_storage_list])
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Storage'],
         operation_summary='List all export storages types',
         operation_description='Retrieve a list of the export storages types.',
-        responses={"200": "A list of export storages types {'name': name, 'title': title}."}
-    ))
+        responses={'200': "A list of export storages types {'name': name, 'title': title}."},
+    ),
+)
 class AllExportStorageTypesAPI(APIView):
     permission_required = all_permissions.projects_change
 
@@ -66,7 +73,9 @@ class AllExportStorageTypesAPI(APIView):
         return Response([{'name': s['name'], 'title': s['title']} for s in _common_storage_list])
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Storage'],
         operation_summary='List all import storages from the project',
         operation_description='Retrieve a list of the import storages of all types with their IDs.',
@@ -75,10 +84,12 @@ class AllExportStorageTypesAPI(APIView):
                 name='project',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying your project.'),
+                description='A unique integer value identifying your project.',
+            ),
         ],
-        responses={200: "List of ImportStorageSerializer"}
-    ))
+        responses={200: 'List of ImportStorageSerializer'},
+    ),
+)
 class AllImportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -90,19 +101,22 @@ class AllImportStorageListAPI(generics.ListAPIView):
             response = view(request._request, *args, **kwargs)
             payload = response.data
             if not isinstance(payload, list):
-                raise ValueError(f'Response is not list')
+                raise ValueError('Response is not list')
             return response.data
-        except Exception as exc:
+        except Exception:
             logger.error(f"Can't process {api.__class__.__name__}", exc_info=True)
             return []
 
     def list(self, request, *args, **kwargs):
-        list_responses = sum([
-            self._get_response(s['import_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])
+        list_responses = sum(
+            [self._get_response(s['import_list_api'], request, *args, **kwargs) for s in _common_storage_list], []
+        )
         return Response(list_responses)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
         tags=['Storage'],
         operation_summary='List all export storages from the project',
         operation_description='Retrieve a list of the export storages of all types with their IDs.',
@@ -111,10 +125,12 @@ class AllImportStorageListAPI(generics.ListAPIView):
                 name='project',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying your project.'),
+                description='A unique integer value identifying your project.',
+            ),
         ],
-        responses={200: "List of ExportStorageSerializer"}
-    ))
+        responses={200: 'List of ExportStorageSerializer'},
+    ),
+)
 class AllExportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -126,6 +142,7 @@ class AllExportStorageListAPI(generics.ListAPIView):
         return response.data
 
     def list(self, request, *args, **kwargs):
-        list_responses = sum([
-            self._get_response(s['export_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])
+        list_responses = sum(
+            [self._get_response(s['export_list_api'], request, *args, **kwargs) for s in _common_storage_list], []
+        )
         return Response(list_responses)

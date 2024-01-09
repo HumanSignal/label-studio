@@ -1,16 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
 
+import pytest
 from django.db import transaction
-
-from ..utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
+
+from ..utils import make_annotation, make_prediction, make_task, project_id  # noqa
 
 
 @pytest.mark.parametrize(
-    "tasks_count, annotations_count, predictions_count",
+    'tasks_count, annotations_count, predictions_count',
     [
         [10, 2, 2],
     ],
@@ -18,34 +18,36 @@ from projects.models import Project
 @pytest.mark.django_db
 def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_count, business_client, project_id):
     # create
-    payload = dict(project=project_id, data={"test": 1})
+    payload = dict(project=project_id, data={'test': 1})
     response = business_client.post(
-        "/api/dm/views/",
+        '/api/dm/views/',
         data=json.dumps(payload),
-        content_type="application/json",
+        content_type='application/json',
     )
 
     assert response.status_code == 201, response.content
-    view_id = response.json()["id"]
+    response.json()['id']
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
-        task_id = make_task({"data": {}}, project).id
+        task_id = make_task({'data': {}}, project).id
         print('TASK_ID: %s' % task_id)
         for _ in range(0, annotations_count):
             print('COMPLETION')
-            make_annotation({"result": []}, task_id)
+            make_annotation({'result': []}, task_id)
 
         for _ in range(0, predictions_count):
-            make_prediction({"result": []}, task_id)
+            make_prediction({'result': []}, task_id)
     with transaction.atomic():
-        business_client.post(f"/api/dm/actions?project={project_id}&id=delete_tasks",
-                             json={'selectedItems': {"all": True, "excluded": []}})
+        business_client.post(
+            f'/api/dm/actions?project={project_id}&id=delete_tasks',
+            json={'selectedItems': {'all': True, 'excluded': []}},
+        )
     assert project.tasks.count() == 0
 
 
 @pytest.mark.parametrize(
-    "tasks_count, annotations_count, predictions_count",
+    'tasks_count, annotations_count, predictions_count',
     [
         [10, 2, 2],
     ],
@@ -53,33 +55,37 @@ def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_cou
 @pytest.mark.django_db
 def test_action_delete_all_annotations(tasks_count, annotations_count, predictions_count, business_client, project_id):
     # create
-    payload = dict(project=project_id, data={"test": 1})
+    payload = dict(project=project_id, data={'test': 1})
     response = business_client.post(
-        "/api/dm/views/",
+        '/api/dm/views/',
         data=json.dumps(payload),
-        content_type="application/json",
+        content_type='application/json',
     )
 
     assert response.status_code == 201, response.content
-    view_id = response.json()["id"]
+    response.json()['id']
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
-        task_id = make_task({"data": {}}, project).id
+        task_id = make_task({'data': {}}, project).id
         print('TASK_ID: %s' % task_id)
         for _ in range(0, annotations_count):
             print('COMPLETION')
-            make_annotation({"result": []}, task_id)
+            make_annotation({'result': []}, task_id)
 
         for _ in range(0, predictions_count):
-            make_prediction({"result": []}, task_id)
+            make_prediction({'result': []}, task_id)
     # get next task - should be 0
-    status = business_client.post(f"/api/dm/actions?project={project_id}&id=next_task",
-                         json={'selectedItems': {"all": True, "excluded": []}})
+    status = business_client.post(
+        f'/api/dm/actions?project={project_id}&id=next_task', json={'selectedItems': {'all': True, 'excluded': []}}
+    )
     assert status.status_code == 404
-    business_client.post(f"/api/dm/actions?project={project_id}&id=delete_tasks_annotations",
-                         json={'selectedItems': {"all": True, "excluded": []}})
+    business_client.post(
+        f'/api/dm/actions?project={project_id}&id=delete_tasks_annotations',
+        json={'selectedItems': {'all': True, 'excluded': []}},
+    )
     # get next task - should be 1
-    status = business_client.post(f"/api/dm/actions?project={project_id}&id=next_task",
-                                  json={'selectedItems': {"all": True, "excluded": []}})
+    status = business_client.post(
+        f'/api/dm/actions?project={project_id}&id=next_task', json={'selectedItems': {'all': True, 'excluded': []}}
+    )
     assert status.status_code == 200

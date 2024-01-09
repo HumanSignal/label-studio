@@ -12,6 +12,8 @@ Choices can have dynamic value to load labels from task. This task data should c
 
 The `Choices` tag can be used with any data types.
 
+[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality.
+
 ### Parameters
 
 | Param | Type | Default | Description |
@@ -22,11 +24,12 @@ The `Choices` tag can be used with any data types.
 | [showInline] | <code>boolean</code> | <code>false</code> | Show choices in the same visual line |
 | [required] | <code>boolean</code> | <code>false</code> | Validate whether a choice has been selected |
 | [requiredMessage] | <code>string</code> |  | Show a message if validation fails |
-| [visibleWhen] | <code>region-selected</code> \| <code>choice-selected</code> \| <code>no-region-selected</code> |  | Control visibility of the choices. |
+| [visibleWhen] | <code>region-selected</code> \| <code>no-region-selected</code> \| <code>choice-selected</code> \| <code>choice-unselected</code> |  | Control visibility of the choices. Can also be used with `when*` attributes below to narrow down visibility |
 | [whenTagName] | <code>string</code> |  | Use with visibleWhen. Narrow down visibility by name of the tag. For regions, use the name of the object tag, for choices, use the name of the choices tag |
-| [whenLabelValue] | <code>string</code> |  | Narrow down visibility by label value |
-| [whenChoiceValue] | <code>string</code> |  | Narrow down visibility by choice value |
+| [whenLabelValue] | <code>string</code> |  | Use with visibleWhen="region-selected". Narrow down visibility by label value |
+| [whenChoiceValue] | <code>string</code> |  | Use with visibleWhen ("choice-selected" or "choice-unselected") and whenTagName, both are required. Narrow down visibility by choice value |
 | [perRegion] | <code>boolean</code> |  | Use this tag to select a choice for a specific region instead of the entire task |
+| [perItem] | <code>boolean</code> |  | Use this tag to select a choice for a specific item inside the object instead of the whole object[^1] |
 | [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded choices (see example below) |
 | [allowNested] | <code>boolean</code> |  | Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one. |
 
@@ -49,8 +52,6 @@ Basic text classification labeling configuration
 
 `Choice`s can be loaded dynamically from task data. It should be an array of objects with attributes.
   `html` can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result.
-  *ff_dev_2007_dev_2008_dynamic_tag_children_250322_short* should be enabled to use dynamic options.
-  *ff_dev_2007_rework_choices_280322_short* should be enabled to use `html` attribute.
 
 ```html
 <View>

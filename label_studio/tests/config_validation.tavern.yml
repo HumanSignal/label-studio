@@ -63,6 +63,241 @@ stages:
     status_code: 200
 
 ---
+test_name: try_removing_created_labels_drafts
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+
+stages:
+- # Signup to the system
+  id: signup
+  type: ref
+
+- # Create a project with a specific labeling configuration
+  name: create project
+  request:
+    data:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="1"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- # Import a task to the project
+  name: import task
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example task sentence
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- # Get the next task
+  name: get next task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+
+- # Submit the draft for the task
+  name: submit draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - 1
+          id: HyhYO_s9cc
+          from_name: sentiment
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+
+- # Try to remove an existing in draft label from the config
+  name: remove existing label
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="2"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+
+- # Delete all tasks of the project
+  name: delete tasks
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/projects/{pk}/tasks'
+  response:
+    status_code: 204
+
+- # Try to remove an existing label from the config successfully
+  name: remove existing label successfully
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="2"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+---
+test_name: try_create_annotation_from_draft
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  
+stages:
+- # Signup to the system
+  id: signup
+  type: ref
+
+- # Create a project with a specific labeling configuration
+  name: create project
+  request:
+    data:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="1"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- # Import a task to the project
+  name: import task
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example task sentence
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- # Get the next task
+  name: get next task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+
+- # Submit the draft for the task
+  name: submit draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - 1
+          id: HyhYO_s9cc
+          from_name: sentiment
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+    save:
+      json:
+        draft_pk: id
+
+
+- # Try to remove an existing in draft label from the config
+  name: remove existing label
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="2"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+
+- id: create_annotation
+  name: Create annotation
+  request:
+    url: "{django_live_url}/api/tasks/{task_id}/annotations"
+    method: POST
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - 1
+          id: HyhYO_s9cc
+          from_name: sentiment
+          to_name: text
+          type: choices
+          origin: manual
+      draft_id: !int "{draft_pk}"
+      lead_time: 34.56
+  response:
+    status_code: 201
+    save:
+      json:
+        annotation_pk: id
+
+- # Delete annotation
+  name: delete annotation
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/annotations/{annotation_pk}'
+  response:
+    status_code: 204
+
+- # Try to remove an existing label from the config successfully
+  name: remove existing label successfully
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="2"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+---
 test_name: try_removing_created_labels
 strict: false
 marks:
@@ -504,6 +739,508 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/validate'
   response:
     status_code: 200
+
+
+---
+test_name: delete_annotations_from_data_manager_deletes_task_drafts_and_correctly_updates_project_summary
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+
+- id: signup
+  type: ref
+
+- name: stage
+  request:
+    data:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View> '
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example 1
+    - text: Example 2
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+
+- name: Submit a draft for the task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - 1
+          from_name: label
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+    save:
+      json:
+        draft_pk: id
+
+- name: Validate config that removes 1 should fail
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "These labels still exist in annotations or drafts:\n1 (1 draft)\nPlease add labels to tag with name=\"label\"."
+
+- name: Delete all annotations and drafts
+  request:
+    headers:
+      content-type: application/json
+    json:
+      filters:
+        conjunction: and
+        items: []
+      ordering: []
+      project: '{pk}'
+      selectedItems:
+        all: true
+        excluded: []
+    method: POST
+    url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={pk}'
+  response:
+    status_code: 200
+
+# Submit another draft for the task, with a different choice. This is required because
+# if the project had no drafts or annotations in it, and we tried to validate, the
+# summary would be reset and we'd get a pass regardless of what we tried to remove
+# from the config.
+- name: Submit a second task draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - 2
+          from_name: label
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+
+# It should now be possible to delete choice value 1, which was
+# the choice from the first task draft created (and deleted).
+- name: Validate config that removes 1 should succeed
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+# ...but it should not be possible to delete choice 2.
+- name: Validate config that removes 2 should fail
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "These labels still exist in annotations or drafts:\n2 (1 draft)\nPlease add labels to tag with name=\"label\"."
+
+
+---
+test_name: delete_annotations_from_data_manager_deletes_annotation_drafts_and_correctly_updates_project_summary
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+
+- id: signup
+  type: ref
+
+- name: stage
+  request:
+    data:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View> '
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example 1
+    - text: Example 2
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+
+- name: Submit annotation for the task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '1'
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/annotations'
+  response:
+    save:
+      json:
+        annotation_id: id
+    status_code: 201
+
+- name: Create draft over previously created annotation
+  request:
+    url: "{django_live_url}/api/tasks/{task_id}/annotations/{annotation_id}/drafts"
+    method: POST
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '2'
+  response:
+    status_code: 201
+
+- name: Validate config that removes 1 should fail
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "These labels still exist in annotations or drafts:\n1 (1 annotation)\nPlease add labels to tag with name=\"label\"."
+
+- name: Validate config that removes 2 should fail
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "These labels still exist in annotations or drafts:\n2 (1 draft)\nPlease add labels to tag with name=\"label\"."
+
+- name: Delete all annotations and drafts
+  request:
+    headers:
+      content-type: application/json
+    json:
+      filters:
+        conjunction: and
+        items: []
+      ordering: []
+      project: '{pk}'
+      selectedItems:
+        all: true
+        excluded: []
+    method: POST
+    url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={pk}'
+  response:
+    status_code: 200
+
+# Submit a draft for the task (not annotation). This is required because if the project had
+# no drafts or annotations in it, and we tried to validate, the summary would be reset
+# and we'd get a pass regardless of what we tried to remove from the config.
+- name: submit task draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - '1'
+          from_name: label
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+
+# It should now be possible to delete choice value 2, which was
+# the choice from the previously created annotation draft.
+- name: Validate config that removes 2 should succeed
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+# ...but it should not be possible to delete choice 1.
+- name: Validate config that removes 1 should fail
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "These labels still exist in annotations or drafts:\n1 (1 draft)\nPlease add labels to tag with name=\"label\"."
+
+
+---
+test_name: update_annotation_with_associated_draft_correctly_updates_project_summary
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+
+- id: signup
+  type: ref
+
+- name: stage
+  request:
+    data:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View> '
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example 1
+    - text: Example 2
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+
+- name: Submit an annotation for the task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '1'
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/annotations'
+  response:
+    save:
+      json:
+        annotation_id: id
+    status_code: 201
+
+- name: Create draft over previously created annotation
+  request:
+    url: "{django_live_url}/api/tasks/{task_id}/annotations/{annotation_id}/drafts"
+    method: POST
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '2'
+  response:
+    status_code: 201
+
+- name: Validate config that removes 1 should fail
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "These labels still exist in annotations or drafts:\n1 (1 annotation)\nPlease add labels to tag with name=\"label\"."
+
+- name: Validate config that removes 2 should fail
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "These labels still exist in annotations or drafts:\n2 (1 draft)\nPlease add labels to tag with name=\"label\"."
+
+- name: Update previously created annotation
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '3'
+    method: PATCH
+    url: '{django_live_url}/api/annotations/{annotation_id}'
+  response:
+    status_code: 200
+
+- name: Validate config that removes 1 and 2 should succeed
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+- name: Validate config that removes 3 should fail
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "These labels still exist in annotations or drafts:\n3 (1 annotation)\nPlease add labels to tag with name=\"label\"."
 
 
 ---

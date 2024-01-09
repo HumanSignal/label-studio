@@ -4,7 +4,7 @@ order: 201
 meta_title: Data Labeling & Annotation Tool Interactive Demo
 meta_description: Label Studio interactive demo and playground for data labeling and annotation for machine learning and data science projects.
 ---
-<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <style>
   .page-type-playground .content-grid {
     display: block;
@@ -16,6 +16,13 @@ meta_description: Label Studio interactive demo and playground for data labeling
   .page-type-playground .content-footer {
     max-width: 1030px;
     margin: 4em auto;
+  }
+
+  @media (max-width: 1100px) {
+    .page-type-playground .content-footer {
+      padding-left: 1em;
+      padding-right: 1em;
+    }
   }
   .content {
      max-width: none !important;
@@ -284,6 +291,48 @@ meta_description: Label Studio interactive demo and playground for data labeling
     }
 
 }
+
+.playground-cta {
+  background-color: var(--color-gray-10);
+  border: 1px var(--color-gray-900) solid;
+  padding: 2em;
+  max-width: 1030px;
+  margin: 3em auto -1em auto;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  text-align: center;
+}
+
+.playground-cta > svg {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.playground-cta .Heading {
+  margin: 0;
+}
+
+.playground-cta-button-group {
+  margin-top: 0.9em;
+  display: flex;
+  gap: 1em;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 2;
+}
+
+.page-tier-enterprise .playground-cta {
+  background-color: var(--color-yellow-5);
+  border: 1px var(--color-yellow-100) solid;
+}
+
+.page-tier-enterprise .Secondary:not(:hover) {
+  background-color: #fff;
+}
+
 </style>
 
 <!-- html -->
@@ -348,6 +397,28 @@ meta_description: Label Studio interactive demo and playground for data labeling
 </div>
 
 
+<div class="playground-cta">
+  <h2 class="Heading Large">Want to put these templates into practice?</h2>
+  <div class="playground-cta-button-group">
+    <a href="https://labelstud.io/guide/install.html" class="Button Secondary">Install Open Source</a>
+    <a href="https://humansignal.com/free-trial" class="Button">Try Enterprise Cloud</a>
+  </div>
+  <svg width="67" height="68" viewBox="0 0 67 68" fill="none" xmlns="http://www.w3.org/2000/svg" class="opensource-only">
+    <rect x="22.4653" y="45.0219" width="22.2281" height="22.2281" fill="#FF8267"/>
+    <rect x="22.4653" y="22.7938" width="22.2281" height="22.2281" fill="#FFC27B"/>
+    <rect x="44.6936" y="0.565613" width="22.2281" height="22.2281" fill="#DD7DFF"/>
+    <rect x="44.6936" y="22.7938" width="22.2281" height="22.2281" fill="#FF8267"/>
+    <rect x="0.237305" y="22.7938" width="22.2281" height="22.2281" fill="#DD7DFF"/>
+  </svg>
+  <svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg" class="enterprise-only">
+    <rect x="22.5437" y="45.0219" width="22.2281" height="22.2281" fill="#FFF9F2"/>
+    <rect x="22.5437" y="22.7938" width="22.2281" height="22.2281" fill="#FFB156"/>
+    <rect x="45.5437" y="44.7938" width="22.2281" height="22.2281" fill="#FFB156"/>
+    <rect x="44.7719" y="0.565643" width="22.2281" height="22.2281" fill="#FFCF96"/>
+    <rect x="44.7719" y="22.7938" width="22.2281" height="22.2281" fill="#FFF9F2"/>
+    <rect x="0.315643" y="22.7938" width="22.2281" height="22.2281" fill="#FFCF96"/>
+  </svg>
+</div>
 
 
 <!-- Hidden template codes -->

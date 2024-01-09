@@ -29,14 +29,14 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: "Validate PR's title"
-        uses: thehanimo/pr-title-checker@v1.3.7
+        uses: thehanimo/pr-title-checker@v1.4.1
         with:
           GITHUB_TOKEN: ${{ github.token }}
           pass_on_octokit_error: false
           configuration_path: ".github/pr-title-checker-config.json"
 
       - name: "Set PR's label based on title"
-        uses: release-drafter/release-drafter@v5.23.0
+        uses: release-drafter/release-drafter@v5.25.0
         with:
           disable-releaser: true
           config-name: autolabeler.yml

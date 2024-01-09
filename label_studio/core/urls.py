@@ -1,6 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-"""bn URL Configuration
+
+URL Configurations
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.0/topics/http/urls/
@@ -15,44 +15,62 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.apps import apps
+from core import views
+from core.utils.common import collect_versions
+from core.utils.static_serve import serve
 from django.conf import settings
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
 from django.views.generic.base import RedirectView
-
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
-from rest_framework.permissions import AllowAny
-
-from core import views
-from core.utils.static_serve import serve
-from core.utils.common import collect_versions
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 handler500 = 'core.views.custom_500'
 
 versions = collect_versions()
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Label Studio API",
-        default_version='v' + versions['release'],
-        contact=openapi.Contact(url="https://labelstud.io"),
-        x_logo={"url": "../../static/icons/logo-black.svg"}
-    ),
+open_api_info = openapi.Info(
+    title='Label Studio API',
+    default_version='v' + versions['release'],
+    contact=openapi.Contact(url='https://labelstud.io'),
+    x_logo={'url': '../../static/icons/logo-black.svg'},
+)
+
+private_schema_view = get_schema_view(
+    open_api_info,
     public=True,
-    permission_classes=(AllowAny,),
+    permission_classes=[IsAuthenticated],
+)
+
+public_schema_view = get_schema_view(
+    open_api_info,
+    public=True,
+    permission_classes=[AllowAny],
 )
 
 urlpatterns = [
     re_path(r'^$', views.main, name='main'),
+    re_path(r'^sw\.js$', views.static_file_with_host_resolver('static/js/sw.js', content_type='text/javascript')),
+    re_path(
+        r'^sw-fallback\.js$',
+        views.static_file_with_host_resolver('static/js/sw-fallback.js', content_type='text/javascript'),
+    ),
     re_path(r'^favicon\.ico$', RedirectView.as_view(url='/static/images/favicon.ico', permanent=True)),
-    re_path(r'^label-studio-frontend/(?P<path>.*)$', serve, kwargs={'document_root': settings.EDITOR_ROOT, 'show_indexes': True}),
+    re_path(
+        r'^label-studio-frontend/(?P<path>.*)$',
+        serve,
+        kwargs={'document_root': settings.EDITOR_ROOT, 'show_indexes': True},
+    ),
     re_path(r'^dm/(?P<path>.*)$', serve, kwargs={'document_root': settings.DM_ROOT, 'show_indexes': True}),
-    re_path(r'^react-app/(?P<path>.*)$', serve, kwargs={'document_root': settings.REACT_APP_ROOT, 'show_indexes': True}),
-    re_path(r'^static/fonts/roboto/roboto.css$', views.static_file_with_host_resolver('static/fonts/roboto/roboto.css', content_type='text/css')),
+    re_path(
+        r'^react-app/(?P<path>.*)$', serve, kwargs={'document_root': settings.REACT_APP_ROOT, 'show_indexes': True}
+    ),
+    re_path(
+        r'^static/fonts/roboto/roboto.css$',
+        views.static_file_with_host_resolver('static/fonts/roboto/roboto.css', content_type='text/css'),
+    ),
     re_path(r'^static/(?P<path>.*)$', serve, kwargs={'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
-
     re_path(r'^', include('organizations.urls')),
     re_path(r'^', include('projects.urls')),
     re_path(r'^', include('data_import.urls')),
@@ -64,34 +82,34 @@ urlpatterns = [
     re_path(r'^', include('ml.urls')),
     re_path(r'^', include('webhooks.urls')),
     re_path(r'^', include('labels_manager.urls')),
-
-    re_path(r'data/local-files/', views.localfiles_data, name="localfiles_data"),
-
-    re_path(r'version/', views.version_page, name="version"),  # html page
-    re_path(r'api/version/', views.version_page, name="api-version"),  # json response
-
-    re_path(r'health/', views.health, name="health"),
-    re_path(r'metrics/', views.metrics, name="metrics"),
-    re_path(r'trigger500/', views.TriggerAPIError.as_view(), name="metrics"),
-
-    re_path(r'samples/time-series.csv', views.samples_time_series, name="static_time_series"),
-    re_path(r'samples/paragraphs.json', views.samples_paragraphs, name="samples_paragraphs"),
-
-    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-
-    path('docs/api/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('docs/', RedirectView.as_view(url='/static/docs/public/guide/introduction.html', permanent=False), name='docs-redirect'),
-
+    re_path(r'data/local-files/', views.localfiles_data, name='localfiles_data'),
+    re_path(r'version/', views.version_page, name='version'),  # html page
+    re_path(r'api/version/', views.version_page, name='api-version'),  # json response
+    re_path(r'health/', views.health, name='health'),
+    re_path(r'metrics/', views.metrics, name='metrics'),
+    re_path(r'trigger500/', views.TriggerAPIError.as_view(), name='metrics'),
+    re_path(r'samples/time-series.csv', views.samples_time_series, name='static_time_series'),
+    re_path(r'samples/paragraphs.json', views.samples_paragraphs, name='samples_paragraphs'),
+    re_path(
+        r'^swagger(?P<format>\.json|\.yaml)$', private_schema_view.without_ui(cache_timeout=0), name='schema-json'
+    ),
+    re_path(r'^swagger/$', private_schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('docs/api/', public_schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path(
+        'docs/',
+        RedirectView.as_view(url='/static/docs/public/guide/introduction.html', permanent=False),
+        name='docs-redirect',
+    ),
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
     path('feature-flags/', views.feature_flags, name='feature_flags'),
-    re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 if settings.DEBUG:
     try:
         import debug_toolbar
+
         urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns
     except ImportError:
         pass

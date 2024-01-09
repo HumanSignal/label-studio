@@ -16,9 +16,9 @@ jobs:
       INDEX_NAME: "ghaction"
       CONFIG: >
         {"index_name": "ghaction",
-        "stop_urls": ["https://docs.heartex.com/guide/index.html", "https://docs.heartex.com/guide/notion-faq.html", "https://labelstud.io/sdk/index.html"], 
+        "stop_urls": ["https://docs.humansignal.com/guide/index.html", "https://docs.humansignal.com/guide/notion-faq.html", "https://labelstud.io/sdk/index.html"], 
         "selectors_exclude": [".home-page-index"], 
-        "start_urls": ["https://docs.heartex.com/guide", "https://docs.heartex.com/templates", "https://docs.heartex.com/tags", "https://labelstud.io/sdk/"],
+        "start_urls": ["https://docs.humansignal.com/guide", "https://docs.humansignal.com/templates", "https://docs.humansignal.com/tags", "https://labelstud.io/sdk/"],
         "selectors": {
         "lvl0": ".content h1, .ResourcesBannerHeading",
         "lvl1": ".content h2, .ResourcesContent h2",

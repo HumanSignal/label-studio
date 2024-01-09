@@ -79,7 +79,7 @@
   text-transform: uppercase;
 }
 .login_page form button {
-text-transform: uppercase;
+  text-transform: uppercase;
 }
 .login_page .field_errors {
   position: absolute;
@@ -99,6 +99,210 @@ text-transform: uppercase;
 .login_page .field_errors li {
   margin-top: 12px;
 }
+
+/* Login page new UI */
+
+html, body {
+  height: 100%;
+}
+
+.login_page_new_ui {
+  display: flex;
+  font-weight: 400;
+  height: 100%;
+}
+
+.login_page_new_ui .left {
+  flex: 1;
+  background: linear-gradient(109.47deg, rgba(255, 166, 99, 0.15) 0%, rgba(255, 117, 87, 0.15) 51.56%, rgba(227, 123, 211, 0.15) 100%);
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login_page_new_ui .left:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 179px;
+  height: 239px;
+  background: url('../images/login-bg.svg') no-repeat center center;
+  background-size: contain;
+}
+
+.login_page_new_ui .left h2 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: 0em;
+  text-align: center;
+  margin: 0;
+}
+
+.login_page_new_ui .left h3 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin: 8px 0 0 0;
+}
+
+.login_page_new_ui .left .logo_humansignal{
+  position: absolute;
+  bottom: 60px;
+  left: 60px;
+  display: flex;
+  flex-direction: column;
+  color: #000;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+}
+
+.login_page_new_ui .tips {
+  max-width:520px;
+  border-radius: 8px;
+  border: 1px solid #BFBFBF;
+  background: #FFF;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.10);
+  padding: 16px;
+  margin:18vh 60px 0 60px;
+  position: relative;
+  z-index:3;
+}
+
+.login_page_new_ui .tips:after {
+  content: '';
+  width: 115px;
+  height: 83px;
+  position: absolute;
+  bottom: -72px;
+  left: 16px;
+  background: url('../images/heidi-tip.svg') no-repeat center center;
+}
+
+.login_page_new_ui .tips .title {
+  color: #12110D;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: bold;
+  line-height: 24px; /* 150% */
+  letter-spacing: 0.15px;
+  margin-bottom: 8px;
+}
+
+.login_page_new_ui .tips .description {
+  color: #12110D;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 142.857% */
+  letter-spacing: 0.25px;
+}
+
+.login_page_new_ui .tips .description a {
+  color: #09F;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
+
+.login_page_new_ui .tips .description a:hover {
+  text-decoration: underline;
+}
+
+.login_page_new_ui .right {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.login_page_new_ui .toggle, .login_page_new_ui form {
+  width: 272px;
+  margin: 24px auto;
+}
+.login_page_new_ui .toggle {
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: stretch;
+}
+
+.login_page_new_ui .toggle > * {
+  flex-grow: 1;
+  text-align: center;
+  padding: 10px 0;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #8C8C8C;
+  border-top: 2px solid transparent;
+}
+.login_page_new_ui .toggle > *.active {
+  border-color: #1890FF;
+  color: #1890FF;
+}
+.login_page_new_ui .toggle > *:hover {
+  color: #69C0FF;
+  border-color: #69C0FF;
+}
+.login_page_new_ui form {
+  display: grid;
+  flex-direction: column;
+  grid-auto-flow: rows;
+  grid-gap: 24px;
+}
+.login_page_new_ui form > * {
+  position: relative;
+}
+.login_page_new_ui form p {
+  margin: 0;
+}
+.login_page_new_ui form .error {
+  color: #F5222D;
+}
+.login_page_new_ui form input,
+.login_page_new_ui form button {
+  width: 100%;
+}
+.login_page_new_ui form input::placeholder {
+  text-transform: uppercase;
+}
+.login_page_new_ui form button {
+  text-transform: uppercase;
+}
+.login_page_new_ui .field_errors {
+  position: absolute;
+  left: 272px;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  padding-left: 16px;
+  list-style: none;
+  text-align: left;
+  font-size: 14px;
+  line-height: 16px;
+  color: #F5222D;
+  width: 300px;
+  max-width: calc(50vw - 152px); /* 272/2 + 16 right margin */
+}
+.login_page_new_ui .field_errors li {
+  margin-top: 12px;
+}
+
+
 
 .auto-generated form {
   width: 100%;

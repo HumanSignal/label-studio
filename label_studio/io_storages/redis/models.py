@@ -1,46 +1,36 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
-import redis
 import json
+import logging
 
+import redis
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.dispatch import receiver
 from django.db.models.signals import post_save
-
-from tasks.models import Annotation
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
     ImportStorage,
     ImportStorageLink,
-    ProjectStorageMixin
+    ProjectStorageMixin,
 )
-
+from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
 
 class RedisStorageMixin(models.Model):
-    path = models.TextField(
-        _('path'), null=True, blank=True,
-        help_text='Storage prefix (optional)')
-    host = models.TextField(
-        _('host'), null=True, blank=True,
-        help_text='Server Host IP (optional)')
-    port = models.TextField(
-        _('port'), null=True, blank=True,
-        help_text='Server Port (optional)')
-    password = models.TextField(
-        _('password'), null=True, blank=True,
-        help_text='Server Password (optional)')
+    path = models.TextField(_('path'), null=True, blank=True, help_text='Storage prefix (optional)')
+    host = models.TextField(_('host'), null=True, blank=True, help_text='Server Host IP (optional)')
+    port = models.TextField(_('port'), null=True, blank=True, help_text='Server Port (optional)')
+    password = models.TextField(_('password'), null=True, blank=True, help_text='Server Password (optional)')
     regex_filter = models.TextField(
-        _('port'), null=True, blank=True,
-        help_text='Cloud storage regex for filtering objects')
+        _('port'), null=True, blank=True, help_text='Cloud storage regex for filtering objects'
+    )
     use_blob_urls = models.BooleanField(
-        _('use_blob_urls'), default=False,
-        help_text='Interpret objects as BLOBs and generate URLs')
+        _('use_blob_urls'), default=False, help_text='Interpret objects as BLOBs and generate URLs'
+    )
 
     def get_redis_connection(self, db=None, redis_config={}):
         """Get a redis connection from the provided arguments.
@@ -59,10 +49,11 @@ class RedisStorageMixin(models.Model):
             # This should never happen, but better to check than to accidentally
             # overwrite an existing database by choosing a wrong default:
             raise ValueError(
-                "Please explicitly pass a redis db id to prevent accidentally overwriting existing database!")
+                'Please explicitly pass a redis db id to prevent accidentally overwriting existing database!'
+            )
 
         # Since tasks are always text, we use StrictRedis with utf-8 decoding.
-        r = redis.StrictRedis(db=db, charset="utf-8", decode_responses=True, **redis_config)
+        r = redis.StrictRedis(db=db, charset='utf-8', decode_responses=True, **redis_config)
         # Test connection
         # (this will raise redis.exceptions.ConnectionError if it cannot connect)
         r.ping()
@@ -70,17 +61,18 @@ class RedisStorageMixin(models.Model):
 
     def get_client(self):
         redis_config = {}
-        if self.host: redis_config["host"] = self.host
-        if self.port: redis_config["port"] = self.port
-        if self.password: redis_config["password"] = self.password
+        if self.host:
+            redis_config['host'] = self.host
+        if self.port:
+            redis_config['port'] = self.port
+        if self.password:
+            redis_config['password'] = self.password
 
         return self.get_redis_connection(db=self.db, redis_config=redis_config)
 
 
 class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
-    db = models.PositiveSmallIntegerField(
-        _('db'), default=1,
-        help_text='Server Database')
+    db = models.PositiveSmallIntegerField(_('db'), default=1, help_text='Server Database')
 
     def can_resolve_url(self, url):
         return False
@@ -115,10 +107,8 @@ class RedisImportStorage(ProjectStorageMixin, RedisImportStorageBase):
         abstract = False
 
 
-class RedisExportStorage(ExportStorage, RedisStorageMixin):
-    db = models.PositiveSmallIntegerField(
-        _('db'), default=2,
-        help_text='Server Database')
+class RedisExportStorage(RedisStorageMixin, ExportStorage):
+    db = models.PositiveSmallIntegerField(_('db'), default=2, help_text='Server Database')
 
     def save_annotation(self, annotation):
         client = self.get_client()

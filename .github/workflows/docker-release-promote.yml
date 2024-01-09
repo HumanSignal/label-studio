@@ -15,7 +15,7 @@ on:
 
 env:
   DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"
-  IMAGE_NAME: "heartexlabs/label-studio"
+  IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
   RELEASE_DOCKERFILE: "Dockerfile.release"
   PREFLIGHT_REPO: "quay.io/opdev/preflight:stable"
   DOCKER_CONFIG_PATH: "/home/runner/.docker/config.json"
@@ -24,7 +24,7 @@ env:
 jobs:
   docker_release_retag:
     name: "Docker image"
-    timeout-minutes: 45
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     outputs:
       image_version: ${{ steps.get_info.outputs.image_version }}
@@ -32,7 +32,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Get an artifact from check suite
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: get_info
         with:
           github-token: ${{ secrets.GIT_PAT }}
@@ -58,12 +58,12 @@ jobs:
             core.setOutput("sha", details.sha);
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.release_tag }}
 
       - name: Check is latest tag needs to be updated
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: generate-tags
         with:
           github-token: ${{ secrets.GIT_PAT }}
@@ -141,7 +141,7 @@ jobs:
             core.setOutput("ubi-tags", ubiTags.join(','));
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -170,16 +170,16 @@ jobs:
           fi
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.5.0
+        uses: docker/setup-buildx-action@v3.0.0
 
       - name: Login to DockerHub
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v3.0.0
         with:
-          username: heartexlabs
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to RedHat Registry
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v3.0.0
         with:
           registry: quay.io
           username: ${{ secrets.REDHAT_REGISTRY_LOGIN }}
@@ -207,11 +207,8 @@ jobs:
           COPY --chown=54546:0 ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} /label-studio/label_studio/feature_flags.json
           EOF
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
       - name: Build and Push Release Ubuntu Docker image
-        uses: docker/build-push-action@v4.0.0
+        uses: docker/build-push-action@v5.1.0
         id: docker_build
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}

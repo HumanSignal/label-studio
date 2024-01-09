@@ -7,7 +7,13 @@ env:
   commands_list: |
     help
     frontend
+    ff
     git
+    jira
+    docker
+
+  issue_commands_list: |
+    jira
 
 jobs:
   slashCommandDispatch:
@@ -19,31 +25,50 @@ jobs:
 
       - name: 'Validate command'
         id: determine_command
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           COMMANDS_LIST: ${{ env.commands_list }}
+          ISSUE_COMMANDS_LIST: ${{ env.issue_commands_list }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const body = context.payload.comment.body.toLowerCase().trim()
             const commands_list = process.env.COMMANDS_LIST.split("\n")
+            const issue_commands_list = process.env.ISSUE_COMMANDS_LIST.split("\n")
             console.log("Detected PR comment: " + body)
             console.log("Commands list: " + commands_list)
+            console.log("Issue commands list: " + issue_commands_list)
             commandArray = body.split(/\s+/)
             const contextCommand = commandArray[0].split('/')[1].trim();
             console.log("contextCommand: " + contextCommand)
             core.setOutput('command_state', 'known')
+            core.setOutput('is_issue_command', 'false')
             if (! commands_list.includes(contextCommand)) {
               core.setOutput('command_state', 'unknown')
               core.setOutput('command', contextCommand)
             }
+            if (issue_commands_list.includes(contextCommand)) {
+              core.setOutput('is_issue_command', 'true')
+            }
 
-      - name: Slash Command Dispatch
-        id: scd
-        if: ${{ steps.determine_command.outputs.command_state != 'unknown' }}
+      - name: Slash Command Dispatch for Issues
+        id: scd_issues
+        if: ${{ steps.determine_command.outputs.command_state != 'unknown' && steps.determine_command.outputs.is_issue_command == 'true' }}
         uses: peter-evans/slash-command-dispatch@v3
         with:
           token: ${{ secrets.GIT_PAT }}
+          reaction-token: ${{ secrets.GIT_PAT }}
+          issue-type: "issue"
+          reactions: true
+          commands: ${{ env.issue_commands_list }}
+
+      - name: Slash Command Dispatch for PRs
+        id: scd_prs
+        if: ${{ steps.determine_command.outputs.command_state != 'unknown' && steps.determine_command.outputs.is_issue_command != 'true' }}
+        uses: peter-evans/slash-command-dispatch@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          reaction-token: ${{ secrets.GIT_PAT }}
           issue-type: "pull-request"
           reactions: true
           commands: ${{ env.commands_list }}
@@ -54,6 +79,6 @@ jobs:
         with:
           comment-id: ${{ github.event.comment.id }}
           body: |
-            > '/${{ steps.determine_command.outputs.command }}' is unknown command.
+            > '/${{ steps.determine_command.outputs.command }}' is an unknown command.
             > See '/help'
           reactions: eyes, confused

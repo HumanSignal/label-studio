@@ -2,8 +2,8 @@
 title: Set up persistent storage
 type: guide
 tier: all
-order: 112
-order_enterprise: 138
+order: 85
+order_enterprise: 475
 meta_title: Set up persistent storage with Label Studio
 meta_description: Configure persistent storage with Label Studio hosted in the cloud to store uploaded data such as task data, user images, and more.
 section: "Install"
@@ -27,7 +27,7 @@ Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/use
 !!! note 
     If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide.
 
-### Optional: Configure CORS for the S3 bucket
+### Configure CORS for the S3 bucket
 
 !!! note 
     In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
@@ -338,7 +338,7 @@ Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio hos
       - Value: `projects/_/buckets/heartex-example-bucket-123456`
     - Or, **use a Common Expression Language** (CEL) to specify an IAM condition. For example, set the following: `resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')`. See [CEL for Conditions in Overview of IAM Conditions](https://cloud.google.com/iam/docs/conditions-overview#cel) in the Google Cloud Storage guide.
 
-### Optional: Configure CORS for the GCS bucket
+### Configure CORS for the GCS bucket
 
 !!! note 
     In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
@@ -349,7 +349,7 @@ echo '[
    {
       "origin": ["*"],
       "method": ["GET","PUT","POST","DELETE","HEAD"],
-      "responseHeader": ["Content-Type"],
+      "responseHeader": ["Content-Type","Access-Control-Allow-Origin"],
       "maxAgeSeconds": 3600
    }
 ]' > cors-config.json
@@ -514,7 +514,7 @@ az storage container create --name <YOUR_CONTAINER_NAME> \
           --account-key "<YOUR_STORAGE_KEY>"
 ```
 
-### Optional: Configure CORS for the Azure bucket
+### Configure CORS for the Azure bucket
 
 !!! note 
     In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.

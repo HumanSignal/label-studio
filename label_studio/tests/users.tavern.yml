@@ -7,14 +7,17 @@ marks:
 stages:
 - id: signup
   type: ref
+
 - id: get_my_user
   type: ref
+
 - name: stage
   request:
     method: GET
     url: '{django_live_url}/api/users'
   response:
     status_code: 200
+
 - name: stage
   request:
     method: GET
@@ -24,6 +27,7 @@ stages:
     save:
       json:
         org_pk: active_organization
+
 - name: stage
   request:
     json:
@@ -37,9 +41,52 @@ stages:
       json:
         new_user_pk: id
     status_code: 201
+
 - name: stage
   request:
     method: GET
     url: '{django_live_url}/api/users/{new_user_pk}'
   response:
     status_code: 200
+
+- name: attempt_update_email_raises_405
+  request:
+    url: "{django_live_url}/api/users/{new_user_pk}"
+    json:
+      email: test_user_new_email_change@heartextest.com
+    method: PATCH
+    headers:
+      content-type: application/json
+  response:
+    status_code: 405
+
+---
+test_name: test_users_malicious_redirect
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+  - name: malicious_signup
+    request:
+      url: "{django_live_url}/user/signup?next=http://malicious.com"
+      data:
+        email: test_second_org@heartex.com
+        password: 12345678
+      method: POST
+    response:
+      status_code: 302
+      headers:
+        location: "/projects/" # redirect to projects page rather than malicious.com
+
+  - name: malicious_login
+    request:
+      url: "{django_live_url}/user/login?next=http://malicious.com"
+      data:
+        email: test_second_org@heartex.com
+        password: 12345678
+      method: POST
+    response:
+      status_code: 302
+      headers:
+        location: "/projects/" # redirect to projects page rather than malicious.com

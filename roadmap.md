@@ -3,7 +3,7 @@
 We love open source and are inspired by community-driven development. 
 That's why we made our Label Studio roadmap publicly available. Here is a link:
 
-[Label Studio Roadmap](https://github.com/orgs/heartexlabs/projects/1)
+[Label Studio Roadmap](https://github.com/orgs/humansignal/projects/1)
 
 If you want to contribute or make a feature request for the next release, please read this guide first.
 
@@ -23,12 +23,12 @@ Though the roadmap reflects most of the current data annotation community needs,
 
 #### Contribution
 
-The easiest way to contribute to Label Studio is by creating a [feature request](https://github.com/heartexlabs/label-studio/issues/new?assignees=makseq&labels=&template=feature_request.md&title=), or review the [existing ones](https://github.com/heartexlabs/label-studio/issues) 
+The easiest way to contribute to Label Studio is by creating a [feature request](https://github.com/humansignal/label-studio/issues/new?assignees=makseq&labels=&template=feature_request.md&title=), or review the [existing ones](https://github.com/humansignal/label-studio/issues) 
 and leave your comment or vote. 
 
 GitHub issues are processed in the following steps:
 
-1. Issue is assigned to the [Label Studio Roadmap](https://github.com/orgs/heartexlabs/projects/1) project. This means we're on it and things are going to happen.
+1. Issue is assigned to the [Label Studio Roadmap](https://github.com/orgs/humansignal/projects/1) project. This means we're on it and things are going to happen.
 2. Issue is assigned to a milestone referring to a specific Label Studio version. This means you can get your feature in a public release by a specific date (the end of the assigned milestone), or even early in a bleeding-edge version (master branch).
 
-We prioritize all created requests according to the current roadmap. If your feature request or submitted issue is left without any tag or assignment, no worries. Give it some time — we'll include it later, or you can [ping us on Slack](https://slack.labelstudio.heartex.com/?source=github-roadmap) if you think it's very urgent.
+We prioritize all created requests according to the current roadmap. If your feature request or submitted issue is left without any tag or assignment, no worries. Give it some time — we'll include it later, or you can [ping us on Slack](https://slack.labelstud.io/?source=github-roadmap) if you think it's very urgent.

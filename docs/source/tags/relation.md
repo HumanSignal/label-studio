@@ -1,7 +1,7 @@
 ---
 title: Relation
 type: tags
-order: 424
+order: 423
 meta_title: Relation Tag for a Single Relation
 meta_description: Customize Label Studio by using the Relation tag to add a single consistent label to relations between regions in machine learning and data science projects.
 ---

@@ -1,0 +1,84 @@
+{% load filters %}
+
+<script nonce="{{request.csp_nonce}}">
+  const dataTips = [
+    {
+      title: 'Did you know?',
+      description: 'You can sync data from all popular cloud storage providers to collect new items for labeling as they are uploaded, and return the annotation results to train and continuously improve models.',
+      cta: {
+        text: 'Learn more',
+        url: `https://labelstud.io/guide/storage`,
+        params: {
+          experiment: 'login_revamp',
+          treatment: 'sync_cloud_data',
+        }
+      },
+
+    }, {
+      title: 'Did you know?',
+      description: 'You can enable webhooks to trigger machine learning model training or perform active learning after a certain number of tasks have been annotated.',
+      cta: {
+        text: 'See use cases',
+        url: 'https://labelstud.io/guide/webhooks#What-to-use-Label-Studio-webhooks-for',
+        params: {
+          experiment: 'login_revamp',
+          treatment: 'enable_webhooks',
+        }
+      },
+
+    }, {
+      title: 'Did you know?',
+      description: 'You can use keyboard shortcuts, or hotkeys, to speed up labeling. Click Settings while annotating to enable predefined hotkeys or see how you can customize your own.',
+      cta: {
+        text: 'Learn more',
+        url: 'https://labelstud.io/guide/labeling.html#Use-keyboard-shortcuts',
+        params: {
+          experiment: 'login_revamp',
+          treatment: 'hotkeys',
+        }
+      },
+
+    }, {
+      title: 'Did you know?',
+      description: 'Label Studio has dozens of pre-built templates for all data types you can use to configure your labeling UI, from image classification to sentiment analysis to supervised LLM fine-tuning. ',
+      cta: {
+        text: 'See all templates',
+        url: 'https://labelstud.io/templates',
+        params: {
+          experiment: 'login_revamp',
+          treatment: 'templates',
+        }
+      },
+    }
+  ];
+
+  const SERVER_ID = {{ request.server_id|json_dumps_ensure_ascii|safe }};
+
+  function createURL(url, params) {
+    const base = new URL(url);
+
+    Object.entries(params ?? {}).forEach(([key, value]) => {
+      base.searchParams.set(key, value);
+    });
+
+    if (SERVER_ID) base.searchParams.set("server_id", SERVER_ID);
+
+    return base.toString()
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const _title = document.querySelector('.tips .title');
+    const _description = document.querySelector('.tips .description');
+
+    const selectedTip = dataTips[Math.floor(Math.random() * dataTips.length)];
+    const ctaUrl = createURL(selectedTip.cta.url, selectedTip.cta.params)
+
+    _title.innerHTML = selectedTip.title;
+    _description.innerHTML = `${selectedTip.description} <a href="${ctaUrl}" target="_blank">${selectedTip.cta.text}</a>`;
+  });
+</script>
+
+<div class="tips">
+  <div class="title"></div>
+  <div class="description"></div>
+</div>

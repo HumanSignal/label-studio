@@ -1,0 +1,94 @@
+.menu
+  flex 1
+  margin 0
+  padding 8px
+  display flex
+  flex-direction column
+  list-style-type none
+
+  ul, li
+    display block
+    list-style-type none
+
+  &__item
+    height 48px
+    width 100%
+    display flex
+    cursor pointer
+    padding 0 13px
+    border-radius 3px
+    align-items center
+    box-sizing border-box
+    color rgba(0,0,0,0.6)
+    font-size 16px
+    font-family Roboto
+    white-space nowrap
+    user-select none
+
+    &-icon
+      display block
+      margin-right 10px
+      object-fit contain
+      opacity 0.5
+      display flex
+      align-items center
+      justify-content center
+
+    &_look
+      &_danger
+        color #DD0000
+
+    &:not(&_look_danger):hover
+      color #000
+
+    &:not(&_active):hover
+      background-color rgba(0, 0, 0, 0.04)
+
+    &_active
+      color #000
+      background-color rgba(0, 0, 0, 0.08)
+
+    &_active:not(.sidebar__pin):not(&_clickable)
+      pointer-events none
+
+    &:hover &-icon, &_active &-icon
+      opacity 1
+
+  &__spacer
+    flex 1
+
+  &__divider
+    height 1px
+    margin 8px 0
+    background-color rgba(0, 0, 0, 0.1)
+
+  &_size_compact &__item
+    height 32px
+    font-size 16px
+
+  &_size_auto &__item
+    padding 0 16px
+
+  &_size_auto
+    width auto !important
+    min-width initial !important
+
+
+  &_size_small &__item
+    height 24px
+    font-size 14px
+    padding 0 10px
+
+  &_collapsed
+    padding 0
+
+.menu-group
+  &__title
+    padding 4px 10px
+    font-size 14px
+    color rgba(#000, 0.6)
+
+  &__list
+    padding 0
+    margin-left 10px
+    list-style-type none

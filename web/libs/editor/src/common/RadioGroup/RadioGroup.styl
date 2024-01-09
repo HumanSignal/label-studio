@@ -1,0 +1,64 @@
+.radio-group
+  --radius 8px
+  --height 40px
+  --padding 4px
+  --font-size 16px
+  --button-padding 0 10px
+  --button-checked-shadow 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.02), 0px 5px 10px rgba(0, 0, 0, 0.15)
+
+  height var(--height)
+  border-radius var(--radius)
+  padding var(--padding)
+  background linear-gradient(0deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), #FFFFFF
+  box-shadow inset 0px 1px 0px rgba(0, 0, 0, 0.05), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.05)
+
+  &__buttons
+    height calc(var(--height) - calc(var(--padding) * 2))
+    display grid
+    grid-auto-columns 1fr
+    grid-auto-flow column
+
+  &__button
+    display flex
+    opacity 0.6
+    padding var(--button-padding)
+    font-weight 500
+    position relative
+    text-align center
+    align-items center
+    justify-content center
+    font-size var(--font-size)
+    border-radius calc(var(--radius) - var(--padding))
+    height calc(var(--height) - calc(var(--padding) * 2))
+    cursor pointer
+
+    &_checked
+      opacity 1
+      background-color #fff
+      box-shadow: var(--button-checked-shadow)
+
+    &_disabled
+      opacity 0.3
+      cursor not-allowed
+
+  &__input
+    top 0
+    left 0
+    opacity 0
+    width 100%
+    height 100%
+    position absolute
+
+  &_size
+    &_medium
+      --height 32px
+      --radius 8px
+      --font-size 14px
+
+    &_small
+      --height 24px
+      --radius 4px
+      --padding 2px
+      --font-size 12px
+      --button-padding 0 5px
+      --button-checked-shadow 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.02), 0px 2px 4px rgba(0, 0, 0, 0.15)

@@ -1,15 +1,19 @@
 name: "Update Feature Flags"
 
 on:
+  schedule:
+    - cron: '0 6 * * 1-5'
   workflow_call:
     inputs:
       ref:
+        default: develop
         required: true
         type: string
   workflow_dispatch:
     inputs:
       ref:
         description: "Ref"
+        default: develop
         required: true
         type: string
 
@@ -33,8 +37,9 @@ jobs:
           git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GIT_PAT }}
           fetch-depth: 1
           ref: ${{ inputs.ref }}
 
@@ -61,5 +66,5 @@ jobs:
         run: |
           git add "${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
           git status -s
-          git commit -m '${{ env.FEATURE_FLAGS_COMMIT_MESSAGE }}' || true
+          git commit -m '${{ env.FEATURE_FLAGS_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
           git push origin HEAD

@@ -1,17 +1,21 @@
-var HTMLParser = require('node-html-parser');
+var HTMLParser = require("node-html-parser");
 
-hexo.extend.filter.register('after_render:html', function(data) {
+module.exports = function (ctx) {
+  return function includeTag(content) {
+    const { config } = ctx;
 
-  const { config } = this;
+    /* If you’re on the OSS site, remove every `.enterprise-only` element. Opposite for the ENT site */
+    const classToRemove =
+      config.theme_config.tier === "opensource"
+        ? ".enterprise-only"
+        : ".opensource-only";
 
-  /* If you’re on the OSS site, remove every `.enterprise-only` element. Opposite for the ENT site */
-  const classToRemove = config.theme_config.tier === "opensource" ? ".enterprise-only" : ".opensource-only";
+    const template = HTMLParser.parse(content);
 
-  const template = HTMLParser.parse(data);
+    template.querySelectorAll(classToRemove).forEach((x) => x.remove());
 
-  template.querySelectorAll(classToRemove).forEach(x=> x.remove()); 
+    content = template.toString();
 
-  data = template.toString();
-
-  return data;
-})
+    return content;
+  };
+};

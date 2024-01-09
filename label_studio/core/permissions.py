@@ -1,11 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
-import rules
-
-from pydantic import BaseModel
+import logging   # noqa: I001
 from typing import Optional
 
+from pydantic import BaseModel
+
+import rules
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,6 @@ class AllPermissions(BaseModel):
     labels_view = 'labels.view'
     labels_change = 'labels.change'
     labels_delete = 'labels.delete'
-
 
 
 all_permissions = AllPermissions()

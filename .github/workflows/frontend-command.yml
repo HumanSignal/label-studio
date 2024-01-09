@@ -6,6 +6,7 @@ on:
 
 env:
   NODE: '18'
+  CACHE_NAME_PREFIX: v0
 
 jobs:
   build:
@@ -13,15 +14,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Add Workflow link to command comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
       - name: Checkout on chat command
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "${{ env.NODE }}"
 
@@ -35,13 +47,6 @@ jobs:
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
           key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE }}-
-
-      - name: Install node-fetch
-        run: |
-          npm install -g node-fetch@^2.6.1
-          npm link node-fetch
 
       - name: Get build
         id: get_build
@@ -61,10 +66,11 @@ jobs:
             grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
           fi
           
-          echo "commit_msg_file=$(cat /tmp/info_commit_msg)" >> $GITHUB_OUTPUT
-          echo "COMMIT_MSG_FILE<<EOF" >> $GITHUB_ENV
-          echo "$(cat /tmp/info_commit_msg)" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            echo "COMMIT_MSG_FILE<<EOF"
+            cat /tmp/info_commit_msg
+            echo "EOF" 
+          } >> "${GITHUB_ENV}"
 
       - name: Commit and push
         id: commit_and_push
@@ -83,7 +89,7 @@ jobs:
             echo "changes=no" >> $GITHUB_OUTPUT
             exit 0
           else 
-            git commit -m "[frontend] Get build ${REPO}"
+            git commit -m "[frontend] Get build ${REPO}" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           fi
           git push origin HEAD
 
@@ -96,8 +102,6 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             > Already up-to-date. Nothing to commit.
-            >
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "confused"
 
       - name: Add reaction to command comment on success
@@ -110,8 +114,6 @@ jobs:
           body: |
             > Successfully pushed new changes
             > ${{ env.COMMIT_MSG_FILE }}
-            >
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "+1"
 
       - name: Add reaction to command comment on failure
@@ -123,8 +125,6 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             > **Error**: failed to get build
-            >
-            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "-1"
 
   help:
@@ -142,6 +142,6 @@ jobs:
             > Command | Description
             > --- | ---
             > /frontend build           | Get build frontend static for all repos
-            > /frontend build lsf [sha] | Get build frontend static for heartexlabs/label-studio-frontend only
-            > /frontend build dm [sha]  | Get build frontend static for heartexlabs/dm2 only
+            > /frontend build lsf [sha] | Get build frontend static for ${{ github.repository_owner }}/label-studio-frontend only
+            > /frontend build dm [sha]  | Get build frontend static for ${{ github.repository_owner }}/dm2 only
           reaction-type: hooray

@@ -5,6 +5,7 @@ marks:
 - usefixtures:
   - django_live_url
   - testing_session_timeouts
+  - freeze_clock
 stages:
 - id: signup
   name: Sign up
@@ -38,7 +39,11 @@ stages:
       json:
         pk: id
     status_code: 201
-  delay_after: 2
+    # hack to let us call a function after each stage
+    verify_response_with:
+      - function: label_studio.tests.conftest:tick_clock
+        extra_kwargs:
+          seconds: 2
 
 # After MAX_TIME_BETWEEN_ACTIVITY has passed, the session will be over and requests will be denied
 - name: get_projects
@@ -62,7 +67,8 @@ stages:
     method: POST
   response:
     status_code: 302
-  delay_after: 1
+    verify_response_with:
+      function: label_studio.tests.conftest:tick_clock
 
 # make another request within MAX_TIME_BETWEEN_ACTIVITY
 - name: get_projects_1
@@ -74,9 +80,10 @@ stages:
       json:
         pk: id
     status_code: 201
-  delay_after: 1
+    verify_response_with:
+      function: label_studio.tests.conftest:tick_clock
 
-# and five more 
+# and five more
 - name: get_projects_2
   request:
     method: POST
@@ -86,7 +93,8 @@ stages:
       json:
         pk: id
     status_code: 201
-  delay_after: 1
+    verify_response_with:
+      function: label_studio.tests.conftest:tick_clock
 
 - name: get_projects_3
   request:
@@ -97,7 +105,8 @@ stages:
       json:
         pk: id
     status_code: 201
-  delay_after: 1
+    verify_response_with:
+      function: label_studio.tests.conftest:tick_clock
 
 - name: get_projects_4
   request:
@@ -108,7 +117,10 @@ stages:
       json:
         pk: id
     status_code: 201
-  delay_after: 1
+    verify_response_with:
+      - function: label_studio.tests.conftest:tick_clock
+        extra_kwargs:
+          seconds: 3
 
 # and by now we reach MAX_SESSION_AGE and hte session end even if we were active
 - name: get_projects_5
@@ -120,4 +132,3 @@ stages:
       json:
         pk: id
     status_code: 401
-

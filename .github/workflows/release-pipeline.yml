@@ -10,7 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  HOMEBREW_TAP_REPO_OWNER: "heartexlabs"
   HOMEBREW_TAP_REPO: "homebrew-tap"
 
 jobs:
@@ -19,24 +18,24 @@ jobs:
     permissions:
       contents: read
       checks: read
-    uses: heartexlabs/label-studio/.github/workflows/docker-release-promote.yml@develop
+    uses: ./.github/workflows/docker-release-promote.yml
     with:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
-  build_ubi_docker_image:
-    name: "Build UBI docker image"
-    uses: heartexlabs/label-studio/.github/workflows/docker-build-ubi.yml@develop
-    with:
-      sha: ${{ github.ref_name }}
-      version: ${{ github.ref_name }}
-    secrets: inherit
+#  build_ubi_docker_image:
+#    name: "Build UBI docker image"
+#    uses: ./.github/workflows/docker-build-ubi.yml
+#    with:
+#      sha: ${{ github.ref_name }}
+#      version: ${{ github.ref_name }}
+#    secrets: inherit
 
   build_hugging_face_docker_image:
     name: "Build Hugging Face docker image"
     needs:
       - promote_docker_image
-    uses: heartexlabs/label-studio/.github/workflows/docker-build-ontop.yml@develop
+    uses: ./.github/workflows/docker-build-ontop.yml
     with:
       base_docker_image_version: ${{ github.ref_name }}
       tags: "hf-latest,hf-${{ github.ref_name }}"
@@ -48,7 +47,7 @@ jobs:
     name: "Build"
     permissions:
       contents: write
-    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    uses: ./.github/workflows/build_pypi.yml
     with:
       version: ${{ github.ref_name }}
       ref: ${{ github.ref_name }}
@@ -65,7 +64,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Delete Release Candidate Assets
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           RELEASE_ID: "${{ github.event.release.id }}"
         with:
@@ -100,17 +99,53 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: DispatchEvent
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
+            const {repo, owner} = context.repo;
             await github.rest.repos.createDispatchEvent({
-              owner: '${{ env.HOMEBREW_TAP_REPO_OWNER }}',
+              owner: owner,
               repo: '${{ env.HOMEBREW_TAP_REPO }}',
               event_type: 'upstream_formula_update',
               client_payload: {
                 formula: 'label-studio',
+                version: '${{ github.ref_name }}',
+                actor: '${{ github.actor }}',
                 url: '${{ needs.build-pypi.outputs.pipy-artifact-url }}',
                 sha256: '${{ needs.build-pypi.outputs.pipy-artifact-digests-sha256 }}',
               }
             });
+
+  update-helm-chart:
+    name: "Update Helm Chart"
+    needs:
+      - promote_docker_image
+    uses: ./.github/workflows/bump-helm-chart.yml
+    with:
+      docker_image_version: ${{ github.ref_name }}
+    secrets: inherit
+
+  notify_slack_on_failure:
+    name: "Notify Slack on Failure"
+    needs:
+      - promote_docker_image
+      - build_hugging_face_docker_image
+      - build-pypi
+      - delete-rc-assets
+      - update-homebrew-tap
+      - update-helm-chart
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    steps:
+      - name: Send Notification to Slack
+        id: slack_notify_ops_release
+        uses: slackapi/slack-github-action@v1.24
+        with:
+          channel-id: '${{ vars.SLACK_CH_RELEASE_TRAIN }}'
+          slack-message: |
+            On or more steps of Label Studio OpenSource release pipeline got failed! <!subteam^${{ vars.SLACK_GR_DEVOPS }}>
+
+            ><https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|[Workflow run]>
+        env:
+          SLACK_LSE_BOT_TOKEN: ${{ secrets.SLACK_LSE_BOT_TOKEN }}

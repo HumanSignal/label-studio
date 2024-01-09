@@ -2,7 +2,7 @@
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)
 
-[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide/) • [Twitter](https://twitter.com/labelstudiohq) • [Join Slack Community <img src="https://app.heartex.ai/docs/images/slack-mini.png" width="18px"/>](https://slack.labelstudio.heartex.com/?source=github-1)
+[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide/) • [Twitter](https://twitter.com/labelstudiohq) • [Join Slack Community <img src="https://app.heartex.ai/docs/images/slack-mini.png" width="18px"/>](https://slack.labelstud.io/?source=github-1)
 
 
 ## What is Label Studio?
@@ -81,7 +81,7 @@ browser can access the MinIO server. For more detailed instructions, please refe
 ### Install locally with pip
 
 ```bash
-# Requires Python >=3.7 <=3.9
+# Requires Python >=3.8
 pip install label-studio
 
 # Start the server at http://localhost:8080
@@ -126,7 +126,7 @@ The frontend part of Label Studio app lies in the `frontend/` folder and written
 
 ```
 cd label_studio/frontend/
-npm ci
+yarn install --frozen-lockfile
 npx webpack
 cd ../..
 python label_studio/manage.py collectstatic --no-input
@@ -154,16 +154,32 @@ pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 pip install label-studio
 ```
 
-#### Run test suite
+### Run test suite
+To add the tests' dependencies to your local install:
+
 ```bash
 pip install -r deploy/requirements-test.txt
+```
+
+Alternatively, it is possible to run the unit tests from a Docker container in which the test dependencies are installed:
+
+
+```bash
+make build-testing-image
+make docker-testing-shell
+```
+
+In either case, to run the unit tests:
+
+```bash
 cd label_studio
 
-# postgres (assumes default postgres user,db,pass)
-DJANGO_DB=default DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
-
 # sqlite3
-DJANGO_DB=sqlite DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+DJANGO_DB=sqlite DJANGO_SETTINGS_MODULE=core.settings.label_studio pytest -vv
+
+# postgres (assumes default postgres user,db,pass. Will not work in Docker
+# testing container without additional configuration)
+DJANGO_DB=default DJANGO_SETTINGS_MODULE=core.settings.label_studio pytest -vv
 ```
 
 

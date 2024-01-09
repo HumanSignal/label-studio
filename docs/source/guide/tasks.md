@@ -3,8 +3,8 @@ title: Get data into Label Studio
 short: Import data
 type: guide
 tier: all
-order: 120
-order_enterprise: 105
+order: 255
+order_enterprise: 155
 meta_title: Import Data into Label Studio
 meta_description: Label and annotate data for your machine learning and data science projects using common file formats or the Label Studio JSON format.
 section: "Import and Export"
@@ -24,7 +24,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 
 | Data type | Supported file types |
 | --- | --- |
-| Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
+| Audio | .flac, .m4a, .mp3, .ogg, .wav |
 | [HyperText (HTML)](#Import-HTML-data) | .html, .htm, .xml |
 | Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | Paragraphs (Dialogue) | .json |
@@ -34,7 +34,8 @@ You can import many types of data, including text, timeseries, audio, and image 
 | [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
 | Video | .mp4, .webm, .avi |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
+If you don't see a supported data or file type that you want to import, please let us know by submitting an issue to the <a className="no-go" href="https://github.com/humansignal/label-studio/issues">Label Studio Repository</a>.
+
 
 ### How to import your data
 

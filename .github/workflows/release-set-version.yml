@@ -22,7 +22,7 @@ on:
         type: string
 
 env:
-  PYTHON_VERSION_FILE: "label_studio/__init__.py"
+  PYTHON_VERSION_FILE: "pyproject.toml"
 
 jobs:
   commit-version:
@@ -33,7 +33,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.branch }}
@@ -41,7 +41,7 @@ jobs:
 
       - name: Get GitHub user details
         id: get-github-user
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           ACTOR_USERNAME: ${{ github.event.sender.login }}
         with:
@@ -87,15 +87,27 @@ jobs:
               exit 1
           fi
 
+      - name: Install toml
+        run: |
+          set -euo pipefail
+          wget -q -O- "https://github.com/gnprice/toml-cli/releases/download/v0.2.3/toml-0.2.3-x86_64-linux.tar.gz" | tar -xz -C .
+          mv toml-0.2.3-x86_64-linux/toml toml
+          chmod +x toml
+
+      - name: Manage version
+        env:
+          PROVIDED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
+          ./toml set '${{ env.PYTHON_VERSION_FILE }}' tool.poetry.version "$version" > pyproject.toml.new
+          mv -f pyproject.toml.new pyproject.toml
+
       - name: Commit version file
         id: make-commit
         run: |
           set -euo pipefail
-          
-          sed -i "s/^__version__[ ]*=.*/__version__ = '${{ inputs.version }}'/g" ${{ env.PYTHON_VERSION_FILE }}
-          
           git add ${{ env.PYTHON_VERSION_FILE }}
-          git commit --message "chore: Bump version to ${{ inputs.version }}"
-
+          git commit -m "chore: Bump version to ${{ inputs.version }}" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
           git push origin HEAD:refs/heads/${{ inputs.branch }}

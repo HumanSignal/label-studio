@@ -2,8 +2,8 @@
 title: Label and annotate data
 tier: all 
 type: guide
-order: 208
-order_enterprise: 112
+order: 210
+order_enterprise: 110
 meta_title: Label and annotate data
 meta_description: Label and annotate data to create bounding boxes, label text spans, set up relations. Filter and sort project data for machine learning dataset creation.
 section: "Labeling"
@@ -45,10 +45,11 @@ When you label with bounding boxes and other image segmentation tasks, or when y
 1. Select the label that you want to apply to the region.
 2. Draw the bounding box or highlight the text that you want to label. 
 3. In the **Regions** or **Labels** sidebar, locate and select the region that you labeled and click the eye icon to hide the region.
-4. Select the next label that you want to apply to the overlapping region.
-5. Draw the bounding box or highlight the text that you want to label.
-6. Continue hiding and labeling regions until you've completed annotating the task. If you want, select the eye icon next to **Regions** to hide and then show all regions labeled on the task to confirm the end result.
-7. Click **Submit** to submit the completed annotation and move on to the next task.
+4. Or press cmd or ctrl to draw over the existing **Regions** or **Labels** (NOTE: This do not work for Keypoints)
+5. Select the next label that you want to apply to the overlapping region.
+6. Draw the bounding box or highlight the text that you want to label.
+7. Continue hiding and labeling regions until you've completed annotating the task. If you want, select the eye icon next to **Regions** to hide and then show all regions labeled on the task to confirm the end result.
+8. Click **Submit** to submit the completed annotation and move on to the next task.
 
 ### Select multiple regions
 You can select multiple regions while labeling to make changes to them together. 
@@ -99,6 +100,13 @@ After you relate two annotation regions, you can modify the relation in the **Re
 
 ### Skipping a task
 When annotators skip a task, the task no longer appears in the labeling queue for that annotator. Other annotators still see the task in their labeling queue. 
+
+### Exiting a labeling flow 
+When annotators are not finished with their annotation work but would like to exit their labeling flow to, for example, pause the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation on their annotations, they can click the drop-down menu next to **Submit** and then select **Submit and Exit** (or **Update and Exit**). This will submit the current annotation and redirect them to the Projects page. 
+
+If they are not done with their annotation, then they can simply check to make sure their draft was saved in the history panel and then navigate to the Projects page to stop the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation from running. 
+
+<img src="../images/submit-and-exit.png" class="gif-border">
 
 
 ## Label with collaborators
@@ -170,13 +178,6 @@ When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `
 | `b` | If performing brush mask labeling, select the brush option in the toolbar. 
 | `[` | When the brush or eraser option is selected, decrease the size of the brush or eraser. |
 | `]` | When the brush or eraser option is selected, increase the size of the brush or eraser. |
-
-### Audio-specific hotkeys
-When labeling audio data types with the `Audio` tag, you can use specific hotkeys to take audio-specific actions.
-
-| Key | Description |
-| --- | --- | 
-| `ctrl` + `b` OR `cmd` + `b` | Rewind audio 1 second. |
 
 ### Time series-specific hotkeys
 When labeling timeseries data with the `TimeSeries` tag, you can use specific hotkeys to take actions on a selected region on the time series data.
@@ -294,7 +295,7 @@ The **Outliner** is a replacement for the existing interface with a multiple-pan
 
 ### Feature capabilities
 
-Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the left of the image and **Details** panel on the right of the image. 
+Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the right of the image and **Details** panel on the left of the image. 
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/outliner-details-panels-view.png" style="opacity: 0.8" class="gif-border"/></div>
@@ -367,7 +368,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 <div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 13: Comments box </i>
 
-!!! info 
+!!! note
     Use Outliner to work with larger annotation tasks (many bounding boxes in one image, larger videos, and so on).
 
 To add a region in the OCR transcription templates, draw a rectangle, and you can see a text box that appears in the **Outliner** panel to enter OCR text. The new functionality allows you to select a region and the **Details** panel changes. You can experience the following:

@@ -11,6 +11,7 @@ services:
       - app
     environment:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
+    # - ENABLE_MONOREPO_ENV=1
     #   Optional: Specify SSL termination certificate & key
     #   Just drop your cert.pem and cert.key into folder 'deploy/nginx/certs'
     #      - NGINX_SSL_CERT=/certs/cert.pem
@@ -19,7 +20,7 @@ services:
       - ./mydata:/label-studio/data:rw
       - ./deploy/nginx/certs:/certs:ro
     #   Optional: Override nginx default conf
-    #      - ./deploy/nginx/default.conf:/label-studio/deploy/nginx/default.conf
+    #      - ./deploy/my.conf:/etc/nginx/nginx.conf
     command: nginx
 
   app:

@@ -6,7 +6,7 @@ on:
       - upstream_repo_update
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
+  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}
 
 env:
   NODE: 18
@@ -26,8 +26,35 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
+      - name: Details
+        id: details
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          case "${{ github.event.client_payload.repo_name }}" in
+            */dm2)
+              echo "frontend_module_dist=${{ env.STATIC_DIST }}/dm" >> $GITHUB_OUTPUT
+              echo "copy_src_path=web/libs/datamanager/src" >> $GITHUB_OUTPUT
+              ;;
+            */label-studio-frontend)
+              echo "frontend_module_dist=${{ env.STATIC_DIST }}/lsf" >> $GITHUB_OUTPUT
+              echo "copy_src_path=web/libs/editor/src" >> $GITHUB_OUTPUT
+              echo "copy_src_preserve_path=web/libs/editor/src/examples" >> $GITHUB_OUTPUT
+              echo "build_lsf_docs=true" >> $GITHUB_OUTPUT
+              ;;
+            */label-studio-sdk)
+              echo "poetry=true" >> $GITHUB_OUTPUT
+              echo "poetry_group=test" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo '::error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
+              exit 1
+              ;;
+          esac
+
       - name: Find or Create branch
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: get-branch
         env:
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
@@ -84,20 +111,24 @@ jobs:
 
       - name: Configure git
         shell: bash
+        env:
+          AUTHOR_USERNAME: ${{ github.event.client_payload.author_username }}
+          AUTHOR_EMAIL: ${{ github.event.client_payload.author_email }}
         run: |
           set -xeuo pipefail
-          git config --global user.name '${{ github.event.client_payload.author_username }}'
-          git config --global user.email '${{ github.event.client_payload.author_email }}'
+          git config --global user.name "${AUTHOR_USERNAME}"
+          git config --global user.email "${AUTHOR_EMAIL}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 0
           ref: ${{ steps.get-branch.outputs.name }}
 
-      - name: Checkout module
-        uses: actions/checkout@v3
+      - name: "Frontend: Checkout module"
+        if: steps.details.outputs.frontend_module_dist
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.event.client_payload.repo_name }}
           path: tmp
@@ -105,37 +136,75 @@ jobs:
           fetch-depth: 1
           ref: ${{ github.event.client_payload.commit_sha }}
 
-      - uses: actions/setup-node@v3
+      - name: Commit src
+        if: steps.details.outputs.copy_src_path
+        shell: bash
+        env:
+          COPY_SRC_PATH: ${{ steps.details.outputs.copy_src_path }}
+          COPY_SRC_PRESERVE_PATH: ${{ steps.details.outputs.copy_src_preserve_path }}
+        run: |
+          set -xeuo pipefail
+          
+          preserve_dir=$(mktemp -d)
+          if [ -n ${COPY_SRC_PRESERVE_PATH} ] && [ -d ${COPY_SRC_PRESERVE_PATH} ]; then
+            echo "Preserving ${COPY_SRC_PRESERVE_PATH}"
+            cp -r "${COPY_SRC_PRESERVE_PATH}" "${preserve_dir}"
+          fi 
+
+          rm -r "${COPY_SRC_PATH}"
+          mkdir -p "${COPY_SRC_PATH}"
+          cp -r tmp/src/* "${COPY_SRC_PATH}"
+
+          if [ -n ${COPY_SRC_PRESERVE_PATH} ]; then
+            echo "Restoring preserved files"
+            cp -rf ${preserve_dir}/* "${COPY_SRC_PATH}"
+          fi 
+
+          git add "${COPY_SRC_PATH}"
+          git status -s
+          git commit --allow-empty -m '[submodules] Copy src ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
+
+      - name: "Frontend: Setup nodejs"
+        uses: actions/setup-node@v4
+        if: steps.details.outputs.frontend_module_dist
         with:
           node-version: "${{ env.NODE }}"
 
-      - name: Upgrade Yarn
+      - name: "Frontend: Upgrade Yarn"
+        if: steps.details.outputs.frontend_module_dist
         run: npm install -g yarn@1.22
 
       - name: Get yarn cache directory path
+        if: steps.details.outputs.frontend_module_dist
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Configure yarn cache
+      - name: "Frontend: Configure yarn cache"
+        if: steps.details.outputs.frontend_module_dist
         uses: actions/cache@v3
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Print Yarn cache size
+      - name: "Frontend: Print Yarn cache size"
+        if: steps.details.outputs.frontend_module_dist
         run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
 
-      - name: Install dependencies
+      - name: "Frontend: Install Yarn dependencies"
+        if: steps.details.outputs.frontend_module_dist
         run: |
           rm package-lock.json || true
           yarn install
         working-directory: tmp
 
-      - name: Build module
+      - name: "Frontend: Build module"
+        if: steps.details.outputs.frontend_module_dist
         working-directory: tmp
         env:
           CI: false # on true webpack breaks on warnings, and we have them a lot
           NODE_ENV: 'production'
+          TITLE: ${{ github.event.client_payload.title }}
         run: |
           yarn run build:module
           if [[ "${{ github.event.client_payload.event_action }}" == 'merged' ]]; then 
@@ -145,64 +214,76 @@ jobs:
           fi
           cat << EOF > "build/static/version.json"
           {
-            "message": "${{ github.event.client_payload.title }}",
+            "message": "${TITLE}",
             "commit": "${{ github.event.client_payload.commit_sha }}",
             "branch": "${branch}",
-            "date": "$(git log -1 --date=format:"%Y/%m/%d %T" --format="%ad" | cat)"
+            "date": "$(git log -1 --date=format:"%Y-%m-%dT%TZ" --format="%ad" | cat)"
           }
           EOF
 
-      - name: "LSF Docs: Cache node modules"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+      - name: "Frontend: LSF Docs: Cache node modules"
+        if: steps.details.outputs.build_lsf_docs
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
 
-      - name: "LSF Docs: Install NPM deps"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
-        working-directory: tmp/scripts
-        run: npm install jsdoc-to-markdown node-fetch
+      - name: "Frontend: LSF Docs: Install NPM deps"
+        if: steps.details.outputs.build_lsf_docs
+        continue-on-error: true
+        run: npm install -g jsdoc-to-markdown node-fetch
 
-      - name: "LSF Docs: Build"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+      - name: "Frontend: LSF Docs: Build"
+        id: lsf-docs-build
+        if: steps.details.outputs.build_lsf_docs
+        continue-on-error: true
         working-directory: tmp/scripts
         run: node create-docs.js
 
-      - name: Commit static
+      - name: "Frontend: Commit"
+        if: steps.details.outputs.frontend_module_dist
         shell: bash
         run: |
           set -xeuo pipefail
 
-          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
-            module_dist="${{ env.STATIC_DIST }}/dm"
-          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
-            module_dist="${{ env.STATIC_DIST }}/lsf"
-          else
-            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
-            exit 1
-          fi
-          
-          rm -rf "${module_dist}"
-          mkdir -p "${module_dist}"
-          cp -r tmp/build/static/* "${module_dist}"
+          rm -rf "${{ steps.details.outputs.frontend_module_dist }}"
+          mkdir -p "${{ steps.details.outputs.frontend_module_dist }}"
+          cp -r tmp/build/static/* "${{ steps.details.outputs.frontend_module_dist }}"
 
-          git add "${{ env.STATIC_DIST }}"
+          git add "${{ steps.details.outputs.frontend_module_dist }}"
           git status -s
-          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
+          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
-      - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+      - name: Set up Poetry
+        if: steps.details.outputs.poetry
+        uses: snok/install-poetry@v1
+
+      - name: "Requirements: Commit"
+        if: steps.details.outputs.poetry
+        shell: bash
+        run: |
+          set -xeuo pipefail
+
+          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock --group "${{ steps.details.outputs.poetry_group }}"
+
+          git add pyproject.toml poetry.lock
+          git status -s
+          git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin HEAD
+
+      - name: "Frontend: LSF Docs: Commit"
+        if: steps.details.outputs.build_lsf_docs && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
           set -xeuo pipefail
           docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
+          find "${docs_target_dir}" ! -name 'index.md' -type f -exec rm -rf {} +
           mkdir -p "${docs_target_dir}"
           cp -Rf tmp/docs/* "${docs_target_dir}"
           git status
           git add "${docs_target_dir}"
-          git commit -m 'docs: LSF Update'
+          git commit -m 'docs: LSF Update' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
       - name: Merge base branch
@@ -232,7 +313,7 @@ jobs:
           if [ -z "${unmerged_files}" ]; then
             echo "No unmerged files found"
             echo "Pushing merge commit"
-            git commit --message "Merge branch '${base_branch}' into '${branch}'" || true
+            git commit -m "Merge branch '${base_branch}' into '${branch}'" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
             git push origin HEAD
           else
             echo "Unmerged files found:"
@@ -243,7 +324,7 @@ jobs:
 
       - name: Find or Create PR
         id: get-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           TITLE: "${{ github.event.client_payload.title }}"
           HTML_URL: "${{ github.event.client_payload.html_url }}"
@@ -264,7 +345,7 @@ jobs:
             const pr_header = [
               `Hi @${actor}!`,
               '',
-              'This PR was created in response to a PRs in upstream repo:',
+              'This PR was [created](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) in a response to PRs in upstream repos:',
             ].join('\n')
             
             const {data: listPulls} = await github.rest.pulls.list({
@@ -315,17 +396,18 @@ jobs:
       - name: Check all submodules
         id: check-all-submodules
         if: github.event.client_payload.event_action == 'merged'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           result-encoding: string
           script: |
+            const { repo, owner } = context.repo;
             const branchName = '${{ steps.get-branch.outputs.name }}';
             const branchNameLowerCase = branchName.toLowerCase();
 
             const submodules = [
-              { owner: 'heartexlabs', repo: 'label-studio-frontend' },
-              { owner: 'heartexlabs', repo: 'dm2' }
+              { owner: owner, repo: 'label-studio-frontend' },
+              { owner: owner, repo: 'dm2' }
             ]
             let openPRs = []  
             for (let submodule of submodules) {
@@ -377,7 +459,7 @@ jobs:
           github.event.client_payload.event_action == 'merged' &&
           steps.check-all-submodules.outputs.result != 'true'
         id: comment-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -442,7 +524,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Get PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: get-pr
         with:
           github-token: ${{ secrets.GIT_PAT }}
@@ -480,7 +562,7 @@ jobs:
       - name: Close PR
         if: github.event.client_payload.event_action == 'closed'
         id: close-pr
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |

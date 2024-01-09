@@ -3,14 +3,16 @@ title: Compare Community and Enterprise Features
 short: Enterprise vs Community
 type: guide
 tier: all
-order: 100
+order: 20
+order_enterprise: 15
 section: "Get started"
 meta_title: Label Studio Community and Enterprise Features
-meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects. 
+meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects.
 ---
 
-Label Studio is available as a Community edition open source data labeling tool. Label Studio Enterprise includes extended functionality and support for teams focused on scalability, quality control and security of their dataset building processes. 
+Label Studio is available as open source software as well as an [Enterprise cloud service](https://humansignal.com/). The Enterprise version offers enhanced security (SSO, RBAC, SOC2), team management, analytics and reporting, and uptime and support SLAs. A [free trial is available](https://humansignal.com/free-trial) to get started quickly and explore the enterprise cloud product.
 
+<a class="Button" href="https://humansignal.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
 
 <table>
   <tr>
@@ -18,7 +20,6 @@ Label Studio is available as a Community edition open source data labeling tool.
     <th>Community</th>
     <th>Enterprise</th>
   </tr>
-  
 
 <tr>
     <td colspan="3"><b>Data Management</b></td>
@@ -76,7 +77,7 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td colspan="3"><b>Data Labeling Workflows</b></td>
   </tr>
    <tr>
-    <td><a href=”https://labelstud.io/playground/”> Label any data type from text, images, audio, time series data to multimodality.</a></td>
+    <td><a href="https://labelstud.io/playground/"> Label any data type from text, images, audio, time series data to multimodality.</a></td>
     <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -97,6 +98,45 @@ Label Studio is available as a Community edition open source data labeling tool.
   </tr>
 
   <tr>
+    <td colspan="3"><b>Data Discovery (Beta)</b></td>
+  </tr>
+   <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_create">Connect, manage, and index datasets from GCP, AWS, and Azure.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search">Visualize and explore all your unstructured image or text data in a visual grid or list view.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search#Embeddings">Automatically generate embeddings and reference embeddings to uncover similarities between data points and measure confidence levels.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search#Natural-language-searching">Find relevant data using natural language, such as one or more phrases or keywords.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search#Similarity-searches">Uncover similar data points by selecting one or more records (data points) as reference.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search#Search-results-and-refining-by-similarity">Sort your dataset based on similarity to your selections.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_manage#Create-project-tasks-from-a-dataset">Send data subsets as tasks to new or existing Label Studio Enterprise projects for human or AI processing (annotation or review).</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+
+  <tr>
     <td colspan="4"><b>User Management</b></td>
   </tr>
   
@@ -111,7 +151,6 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
   </tr>
 
-  
   <tr>
     <td colspan="3"><b>Machine Learning</b></td>
   </tr>
@@ -180,7 +219,25 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td>Dedicated enterprise support team with service level agreements (SLAs). </a></td>
+    <td>Dedicated enterprise support team with service level agreements (SLAs).</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td colspan="3"><b>Managed Cloud Service</b></td>
+  </tr>
+  <tr>
+    <td>SOC2-certified cloud platform</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+   </tr>
+  <tr>
+    <td>99.9% uptime SLA</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td>Customer success & technical support SLA</td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>

@@ -61,7 +61,7 @@ stages:
     response:
       json:
         data:
-          image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=s3.*//pytest-s3-images.+"
+          image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=czM6Ly9weXRlc3QtczMtaW1hZ2VzL2ltYWdlMS5qcGc="
       status_code: 200
   - name: stage
     request:
@@ -82,7 +82,7 @@ stages:
       json:
         tasks:
           - data:
-              image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=s3.*//pytest-s3-images.+"
+              image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=czM6Ly9weXRlc3QtczMtaW1hZ2VzL2ltYWdlMS5qcGc="
       status_code: 200
   - name: stage
     request:
@@ -303,7 +303,7 @@ stages:
     response:
       json:
         data:
-          image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//test-gs-bucket.+"
+          image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldC90ZXN0LWdzLWJ1Y2tldC9hYmM="
       status_code: 200
 ---
 test_name: test_invalidate_gcs_storage
@@ -473,16 +473,16 @@ stages:
     response:
       json:
         data:
-          image: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
+          image: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
           dict:
-            key1: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
+            key1: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
             array:
-              - !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
-              - !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
+              - !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+              - !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
           array:
-            - item1: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
+            - item1: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
               some: "some text"
-            - item2: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
+            - item2: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
               some: "some text"
       status_code: 200
 ---
@@ -842,7 +842,7 @@ stages:
   response:
     json:
       data:
-        image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=azure-blob.*//pytest-azure-images.+"
+        image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=YXp1cmUtYmxvYjovL3B5dGVzdC1henVyZS1pbWFnZXMvYWJj"
     status_code: 200
 - name: stage
   request:
@@ -1087,9 +1087,8 @@ stages:
   response:
     json:
       data:
-        pdf: !re_match "<embed src='/tasks/\\d+/presign/\\?fileuri=gs.*//heartex-test/file.pdf?.*"
+        pdf: !re_match "<embed src='/tasks/\\d+/presign/\\?fileuri=Z3M6Ly9oZWFydGV4LXRlc3QvZmlsZS5wZGY="
     status_code: 200
-
 ---
 # we check here 2 things:
 # - that json blobs are successfully synced from bucket,
@@ -1153,9 +1152,72 @@ stages:
   response:
     json:
       data:
-        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=s3.*//hypertext-bucket/file%20with%20/spaces%20and%27%20/%20%27%20/%20quotes.jpg"
+        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9oeXBlcnRleHQtYnVja2V0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gcXVvdGVzLmpwZw=="
+    status_code: 200
+---
+# - Check that json blobs containing partially encoded contents resolve correctly from the bucket,
+# - s3:// links inside hypertext (like <a href="s3://path/to/%2Bbucket%3D.jpg"/> have been resolved)
+test_name: test_import_jsons_from_s3_and_resolve_partially_encoded
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><HyperText name="text" value="$text"/><Choices name="label"
+        toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_s3_storage_with_json_and_hypertext
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    data:
+      bucket: pytest-s3-json-partially-encoded
+      project: '{project_pk}'
+      title: Testing S3 storage 3 (bucket from conftest.py)
+      use_blob_urls: false
+    method: POST
+    url: '{django_live_url}/api/storages/s3'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 1
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
     status_code: 200
 
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9oeXBlcnRleHQtYnVja2V0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gJTJCcXVvdGVzJTNELmpwZw=="
+    status_code: 200
 ---
 # we don't fail when unexisted s3:// links occur in the list
 test_name: test_import_json_with_unexisted_s3_links

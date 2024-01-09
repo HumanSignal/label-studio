@@ -1,22 +1,25 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
-import socket
-import ipaddress
-import pkg_resources
-import shutil
 import glob
 import io
-import ujson as json
+import ipaddress
 import itertools
-import yaml
-
-from urllib.parse import urlparse
+import os
+import shutil
+import socket
 from contextlib import contextmanager
-from tempfile import mkstemp, mkdtemp
+from tempfile import mkdtemp, mkstemp
 
-from appdirs import user_config_dir, user_data_dir, user_cache_dir
+import pkg_resources
+import requests
+import ujson as json
+import yaml
+from appdirs import user_cache_dir, user_config_dir, user_data_dir
+from django.conf import settings
+from urllib3.util import parse_url
 
+# full path import results in unit test failures
+from .exceptions import InvalidUploadUrlError
 
 _DIR_APP_NAME = 'label-studio'
 
@@ -46,9 +49,7 @@ def find_node(package_name, node_path, node_type):
         elif node_path in nodes:
             return os.path.join(path, node_path)
     else:
-        raise IOError(
-            'Could not find "%s" at package "%s"' % (node_path, basedir)
-        )
+        raise IOError('Could not find "%s" at package "%s"' % (node_path, basedir))
 
 
 def find_file(file):
@@ -168,25 +169,62 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def url_is_local(url):
-    domain = urlparse(url).hostname
+def validate_upload_url(url, block_local_urls=True):
+    """Utility function for defending against SSRF attacks. Raises
+        - InvalidUploadUrlError if the url is not HTTP[S], or if block_local_urls is enabled
+          and the URL resolves to a local address.
+        - LabelStudioApiException if the hostname cannot be resolved
+
+    :param url: Url to be checked for validity/safety,
+    :param block_local_urls: Whether urls that resolve to local/private networks should be allowed.
+    """
+
+    parsed_url = parse_url(url)
+
+    if parsed_url.scheme not in ('http', 'https'):
+        raise InvalidUploadUrlError
+
+    domain = parsed_url.host
     try:
         ip = socket.gethostbyname(domain)
     except socket.error:
         from core.utils.exceptions import LabelStudioAPIException
+
         raise LabelStudioAPIException(f"Can't resolve hostname {domain}")
-    else:
-        if ip in (
-            '0.0.0.0', # nosec
-        ):
-            return True
-        local_subnets = [
-            '127.0.0.0/8',
-            '10.0.0.0/8',
-            '172.16.0.0/12',
-            '192.168.0.0/16',
-        ]
-        for subnet in local_subnets:
-            if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
-                return True
-        return False
+
+    if block_local_urls:
+        validate_ip(ip)
+
+
+def validate_ip(ip: str) -> None:
+    """Checks if an IP is local/private.
+
+    :param ip: IP address to be checked.
+    """
+
+    if ip == '0.0.0.0':  # nosec
+        raise InvalidUploadUrlError
+
+    local_subnets = [
+        '127.0.0.0/8',
+        '10.0.0.0/8',
+        '172.16.0.0/12',
+        '192.168.0.0/16',
+    ]
+
+    for subnet in local_subnets:
+        if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
+            raise InvalidUploadUrlError
+
+
+def ssrf_safe_get(url, *args, **kwargs):
+    validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)
+    # Reason for #nosec: url has been validated as SSRF safe by the
+    # validation check above.
+    response = requests.get(url, *args, **kwargs)   # nosec
+
+    # second check for SSRF for prevent redirect and dns rebinding attacks
+    if settings.SSRF_PROTECTION_ENABLED:
+        response_ip = response.raw._connection.sock.getpeername()[0]
+        validate_ip(response_ip)
+    return response

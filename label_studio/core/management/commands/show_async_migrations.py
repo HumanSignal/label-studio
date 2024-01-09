@@ -1,8 +1,7 @@
 import logging
 
-from django.core.management.base import BaseCommand
-
 from core.models import AsyncMigrationStatus
+from django.core.management.base import BaseCommand
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +21,6 @@ class Command(BaseCommand):
             migrations = AsyncMigrationStatus.objects.filter(project__organization_id=org)
 
         for m in migrations:
-            logger.debug(f"{m.name} \t {m.created_at} \t Project <{m.project}> \t {m.status} \t {m.meta}")
+            logger.debug(f'{m.name} \t {m.created_at} \t Project <{m.project}> \t {m.status} \t {m.meta}')
 
         logger.debug(f"===> AsyncMigrationStatus for Organization {org if org > -1 else 'ALL'} printed")

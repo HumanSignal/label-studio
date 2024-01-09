@@ -1,22 +1,21 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import drf_yasg.openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
-from django.utils.decorators import method_decorator
-from django.conf import settings
 
+import drf_yasg.openapi as openapi
+from core.feature_flags import flag_set
+from core.permissions import ViewClassPermission, all_permissions
+from django.conf import settings
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
+from ml.models import MLBackend
+from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
+from projects.models import Project, Task
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.views import APIView
 from rest_framework.response import Response
-
-from core.feature_flags import flag_set
-from core.permissions import all_permissions, ViewClassPermission
-from projects.models import Project, Task
-from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
-from ml.models import MLBackend
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
@@ -38,14 +37,8 @@ logger = logging.getLogger(__name__)
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'project': openapi.Schema(
-                    type=openapi.TYPE_INTEGER,
-                    description='Project ID'
-                ),
-                'url': openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description='ML backend URL'
-                ),
+                'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
+                'url': openapi.Schema(type=openapi.TYPE_STRING, description='ML backend URL'),
             },
         ),
     ),
@@ -65,12 +58,11 @@ logger = logging.getLogger(__name__)
         ),
         manual_parameters=[
             openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_QUERY,
-                description='Project ID'),
+                name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
+            ),
         ],
-    ))
+    ),
+)
 class MLBackendListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
@@ -79,7 +71,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     )
     serializer_class = MLBackendSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["is_interactive"]
+    filterset_fields = ['is_interactive']
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
@@ -173,7 +165,8 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this ML backend.'),
+                description='A unique integer value identifying this ML backend.',
+            ),
         ],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -224,7 +217,8 @@ class MLBackendTrainAPI(APIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this ML backend.'),
+                description='A unique integer value identifying this ML backend.',
+            ),
         ],
         request_body=MLInteractiveAnnotatingRequest,
         responses={
@@ -264,7 +258,7 @@ class MLBackendInteractiveAnnotating(APIView):
         tags=['Machine Learning'],
         operation_summary='Get model versions',
         operation_description='Get available versions of the model.',
-        responses={"200": "List of available versions."},
+        responses={'200': 'List of available versions.'},
     ),
 )
 class MLBackendVersionsAPI(generics.RetrieveAPIView):
@@ -276,7 +270,7 @@ class MLBackendVersionsAPI(generics.RetrieveAPIView):
         self.check_object_permissions(self.request, ml_backend)
         versions_response = ml_backend.get_versions()
         if versions_response.status_code == 200:
-            result = {'versions': versions_response.response.get("versions", [])}
+            result = {'versions': versions_response.response.get('versions', [])}
             return Response(data=result, status=200)
         elif versions_response.status_code == 404:
             result = {'versions': [ml_backend.model_version], 'message': 'Upgrade your ML backend version to latest.'}

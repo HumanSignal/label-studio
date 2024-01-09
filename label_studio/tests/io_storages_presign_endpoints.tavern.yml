@@ -1,0 +1,146 @@
+---
+test_name: test_project_presign_endpoint_s3
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - name: stage
+    request:
+      data:
+        bucket: pytest-s3-images
+        project: "{project_pk}"
+        title: Testing S3 storage (bucket from conftest.py)
+        use_blob_urls: true
+        presign_ttl: 3600
+      method: POST
+      url: "{django_live_url}/api/storages/s3"
+    response:
+      status_code: 201
+
+  - name: get_presigned_url
+    request:
+      url: "{django_live_url}/projects/{project_pk}/presign?fileuri=czM6Ly9weXRlc3QtczMtaW1hZ2VzL2ltYWdlMS5qcGc="
+    response:
+      status_code: 303
+      headers:
+        location: !re_match "https://pytest-s3-images.s3.amazonaws.com.+X-Amz-Security-Token=testing"
+
+
+---
+test_name: test_task_presign_endpoint_s3
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - id: create_task
+    type: ref
+
+  - name: stage
+    request:
+      data:
+        bucket: pytest-s3-images
+        project: "{project_pk}"
+        title: Testing S3 storage (bucket from conftest.py)
+        use_blob_urls: true
+        presign_ttl: 3600
+      method: POST
+      url: "{django_live_url}/api/storages/s3"
+    response:
+      status_code: 201
+
+  - name: get_presigned_url
+    request:
+      url: "{django_live_url}/tasks/{task_pk}/presign?fileuri=czM6Ly9weXRlc3QtczMtaW1hZ2VzL2ltYWdlMS5qcGc="
+    response:
+      status_code: 303
+      headers:
+        location: !re_match "https://pytest-s3-images.s3.amazonaws.com.+X-Amz-Security-Token=testing"
+
+
+---
+test_name: test_project_presign_endpoint_gcp
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - name: stage
+    request:
+      data:
+        bucket: test-gs-bucket
+        project: "{project_pk}"
+        title: Test GCS storage import (mocked GCS client from conftest.py)
+        use_blob_urls: true
+      method: POST
+      url: "{django_live_url}/api/storages/gcs"
+    response:
+      status_code: 201
+
+  - name: get_presigned_url
+    request:
+      url: "{django_live_url}/projects/{project_pk}/presign?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+    response:
+      status_code: 303
+      headers:
+        location: "https://storage.googleapis.com/whatever-bucket-with/manual.link.jpg"
+
+
+---
+test_name: test_task_presign_endpoint_gcp
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - id: create_task
+    type: ref
+
+  - name: stage
+    request:
+      data:
+        bucket: test-gs-bucket
+        project: "{project_pk}"
+        title: Test GCS storage import (mocked GCS client from conftest.py)
+        use_blob_urls: true
+      method: POST
+      url: "{django_live_url}/api/storages/gcs"
+    response:
+      status_code: 201
+
+  - name: get_presigned_url
+    request:
+      url: "{django_live_url}/tasks/{task_pk}/presign?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+    response:
+      status_code: 303
+      headers:
+        location: "https://storage.googleapis.com/whatever-bucket-with/manual.link.jpg"

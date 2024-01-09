@@ -1,14 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import ujson as json
-
 from functools import reduce
 from operator import getitem
 from urllib.parse import urlparse
-from django.conf import settings
-from rest_framework.exceptions import ValidationError
+
+import ujson as json
 from core.label_config import replace_task_data_undefined_with_config_field
+from rest_framework.exceptions import ValidationError
 
 
 class SkipField(Exception):
@@ -16,7 +15,7 @@ class SkipField(Exception):
 
 
 _DATA_TYPES = {
-    'Text': [str, int, float],
+    'Text': [str, int, float, list],
     'Header': [str, int, float],
     'HyperText': [str],
     'Image': [str, list],
@@ -24,7 +23,7 @@ _DATA_TYPES = {
     'Table': [dict, str],
     'TimeSeries': [dict, list, str],
     'TimeSeriesChannel': [dict, list, str],
-    'List': [list],
+    'List': [list, str],
     'Choices': [str, list],
     'PolygonLabels': [str, list],
     'Labels': [str, list],
@@ -36,13 +35,14 @@ _DATA_TYPES = {
     'RectangleLabels': [str, list],
     'TimeSeriesLabels': [str, list],
     'Taxonomy': [str, list, type(None)],
+    'Ranker': [list, str],
 }
 logger = logging.getLogger(__name__)
 
 
 class TaskValidator:
-    """ Task Validator with project scheme configs validation. It is equal to TaskSerializer from django backend.
-    """
+    """Task Validator with project scheme configs validation. It is equal to TaskSerializer from django backend."""
+
     def __init__(self, project, instance=None):
         self.project = project
         self.instance = instance
@@ -51,8 +51,7 @@ class TaskValidator:
 
     @staticmethod
     def check_data(project, data):
-        """ Validate data from task['data']
-        """
+        """Validate data from task['data']"""
         if data is None:
             raise ValidationError('Task is empty (None)')
 
@@ -65,8 +64,8 @@ class TaskValidator:
             is_array = '[' in data_key
             data_key = data_key.split('[')[0]
 
-            if "." in data_key:
-                keys = data_key.split(".")
+            if '.' in data_key:
+                keys = data_key.split('.')
                 try:
                     data_item = reduce(getitem, keys, data)
                 except KeyError:
@@ -77,28 +76,27 @@ class TaskValidator:
                 data_item = data[data_key]
 
             if is_array:
-                expected_types = (list, )
+                expected_types = (list,)
             else:
                 expected_types = _DATA_TYPES.get(data_type, (str,))
 
             if not isinstance(data_item, tuple(expected_types)):
-                raise ValidationError('data[\'{data_key}\']={data_value} is of type \'{type}\', '
-                                      "but the object tag {data_type} expects the following types: {expected_types}"
-                                      .format(data_key=data_key, data_value=data_item,
-                                              type=type(data_item).__name__, data_type=data_type,
-                                              expected_types=[e.__name__ for e in expected_types]))
-
-            if data_type == 'List':
-                for item in data_item:
-                    key = 'text'  # FIXME: read key from config (elementValue from List)
-                    if key not in item:
-                        raise ValidationError('Each item from List must have key "' + key + '"')
+                raise ValidationError(
+                    "data['{data_key}']={data_value} is of type '{type}', "
+                    'but the object tag {data_type} expects the following types: {expected_types}'.format(
+                        data_key=data_key,
+                        data_value=data_item,
+                        type=type(data_item).__name__,
+                        data_type=data_type,
+                        expected_types=[e.__name__ for e in expected_types],
+                    )
+                )
 
         return data
 
     @staticmethod
     def check_data_and_root(project, data, dict_is_root=False):
-        """ Check data consistent and data is dict with task or dict['task'] is task
+        """Check data consistent and data is dict with task or dict['task'] is task
 
         :param project:
         :param data:
@@ -125,11 +123,14 @@ class TaskValidator:
     @staticmethod
     def raise_if_wrong_class(task, key, class_def):
         if key in task and not isinstance(task[key], class_def):
+            if isinstance(class_def, tuple):
+                class_def = ' or '.join([c.__name__ for c in class_def])
+            else:
+                class_def = class_def.__name__
             raise ValidationError('Task[{key}] must be {class_def}'.format(key=key, class_def=class_def))
 
     def validate(self, task):
-        """ Validate whole task with task['data'] and task['annotations']. task['predictions']
-        """
+        """Validate whole task with task['data'] and task['annotations']. task['predictions']"""
         # task is class
         if hasattr(task, 'data'):
             self.check_data_and_root(self.project, task.data)
@@ -145,7 +146,9 @@ class TaskValidator:
                 except ValueError as e:
                     raise ValidationError("Can't parse task data: " + str(e))
             else:
-                raise ValidationError('Field "data" must be string or dict, but not "' + type(self.instance.data) + '"')
+                raise ValidationError(
+                    'Field "data" must be string or dict, but not "' + type(self.instance.data) + '"'
+                )
             self.check_data_and_root(self.instance.project, data)
             return task
 
@@ -199,18 +202,15 @@ class TaskValidator:
     @staticmethod
     def format_error(i, detail, item):
         if len(detail) == 1:
-            code = (str(detail[0].code + ' ')) if detail[0].code != "invalid" else ''
-            return 'Error {code} at item {i}: {detail} :: {item}'\
-                .format(code=code, i=i, detail=detail[0], item=item)
+            code = (str(detail[0].code + ' ')) if detail[0].code != 'invalid' else ''
+            return 'Error {code} at item {i}: {detail} :: {item}'.format(code=code, i=i, detail=detail[0], item=item)
         else:
             errors = ', '.join(detail)
             codes = str([d.code for d in detail])
-            return 'Errors {codes} at item {i}: {errors} :: {item}'\
-                .format(codes=codes, i=i, errors=errors, item=item)
+            return 'Errors {codes} at item {i}: {errors} :: {item}'.format(codes=codes, i=i, errors=errors, item=item)
 
     def to_internal_value(self, data):
-        """ Body of run_validation for all data items
-        """
+        """Body of run_validation for all data items"""
         if data is None:
             raise ValidationError('All tasks are empty (None)')
 
@@ -242,7 +242,7 @@ class TaskValidator:
                     self.prediction_count += len(item['predictions'])
 
         if any(errors):
-            logger.warning('Can\'t deserialize tasks due to ' + str(errors))
+            logger.warning("Can't deserialize tasks due to " + str(errors))
             raise ValidationError(errors)
 
         return ret

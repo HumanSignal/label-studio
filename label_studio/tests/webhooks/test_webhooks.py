@@ -1,15 +1,11 @@
+import json
 from unittest import TestCase
 
 import pytest
-import json
-import requests_mock
 import requests
+import requests_mock
 from django.urls import reverse
-from organizations.models import Organization
 from projects.models import Project
-from io import BytesIO
-from django.core.files.uploadedfile import SimpleUploadedFile
-
 from webhooks.models import Webhook, WebhookAction
 from webhooks.utils import emit_webhooks, emit_webhooks_for_instance, run_webhook
 
@@ -67,7 +63,7 @@ def test_emit_webhooks(setup_project_dialog, organization_webhook):
 @pytest.mark.django_db
 def test_emit_webhooks_for_instance(setup_project_dialog, organization_webhook):
     webhook = organization_webhook
-    project_title = f'Projects 1'
+    project_title = 'Projects 1'
     project = Project.objects.create(title=project_title)
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
@@ -115,7 +111,7 @@ def test_webhooks_for_projects(configured_project, business_client, organization
         response = business_client.patch(
             reverse('projects:api:project-detail', kwargs={'pk': project_id}),
             data=json.dumps({'title': 'Test title'}),
-            content_type="application/json",
+            content_type='application/json',
         )
 
     assert response.status_code == 200
@@ -155,7 +151,7 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
                     'data': {'meta_info': 'meta info A', 'text': 'text A'},
                 }
             ),
-            content_type="application/json",
+            content_type='application/json',
         )
     assert response.status_code == 201
     assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
@@ -188,7 +184,7 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
 
     webhook = organization_webhook
 
-    IMPORT_CSV = "tests/test_suites/samples/test_5.csv"
+    IMPORT_CSV = 'tests/test_suites/samples/test_5.csv'
 
     with open(IMPORT_CSV, 'rb') as file_:
         data = SimpleUploadedFile('test_5.csv', file_.read(), content_type='multipart/form-data')
@@ -197,7 +193,7 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
         response = business_client.post(
             f'/api/projects/{configured_project.id}/import',
             data={'csv_1': data},
-            format="multipart",
+            format='multipart',
         )
     assert response.status_code == 201
     assert response.json()['task_count'] == 3
@@ -224,23 +220,23 @@ def test_webhooks_for_annotation(configured_project, business_client, organizati
             f'/api/tasks/{task.id}/annotations?project={configured_project.id}',
             data=json.dumps(
                 {
-                    "result": [
+                    'result': [
                         {
-                            "value": {"choices": ["class_A"]},
-                            "id": "nJS76J03pi",
-                            "from_name": "text_class",
-                            "to_name": "text",
-                            "type": "choices",
-                            "origin": "manual",
+                            'value': {'choices': ['class_A']},
+                            'id': 'nJS76J03pi',
+                            'from_name': 'text_class',
+                            'to_name': 'text',
+                            'type': 'choices',
+                            'origin': 'manual',
                         }
                     ],
-                    "draft_id": 0,
-                    "parent_prediction": None,
-                    "parent_annotation": None,
-                    "project": configured_project.id,
+                    'draft_id': 0,
+                    'parent_prediction': None,
+                    'parent_annotation': None,
+                    'project': configured_project.id,
                 }
             ),
-            content_type="application/json",
+            content_type='application/json',
         )
 
     assert response.status_code == 201
@@ -257,10 +253,10 @@ def test_webhooks_for_annotation(configured_project, business_client, organizati
             f'/api/annotations/{annotation_id}?project={configured_project.id}&taskId={task.id}',
             data=json.dumps(
                 {
-                    "result": [],
+                    'result': [],
                 }
             ),
-            content_type="application/json",
+            content_type='application/json',
         )
         assert response.status_code == 200
 
@@ -268,19 +264,19 @@ def test_webhooks_for_annotation(configured_project, business_client, organizati
             f'/api/annotations/{annotation_id}?project={configured_project.id}&taskId={task.id}',
             data=json.dumps(
                 {
-                    "result": [
+                    'result': [
                         {
-                            "value": {"choices": ["class_B"]},
-                            "id": "nJS76J03pi",
-                            "from_name": "text_class",
-                            "to_name": "text",
-                            "type": "choices",
-                            "origin": "manual",
+                            'value': {'choices': ['class_B']},
+                            'id': 'nJS76J03pi',
+                            'from_name': 'text_class',
+                            'to_name': 'text',
+                            'type': 'choices',
+                            'origin': 'manual',
                         }
                     ],
                 }
             ),
-            content_type="application/json",
+            content_type='application/json',
         )
         assert response.status_code == 200
 
@@ -298,7 +294,7 @@ def test_webhooks_for_annotation(configured_project, business_client, organizati
         m.register_uri('POST', webhook.url)
         response = business_client.delete(
             f'/api/annotations/{annotation_id}',
-            content_type="application/json",
+            content_type='application/json',
         )
     assert response.status_code == 204
     assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
@@ -318,8 +314,8 @@ def test_webhooks_for_action_delete_tasks_annotations(configured_project, busine
     for task in configured_project.tasks.all():
         response = business_client.post(
             f'/api/tasks/{task.id}/annotations?project={configured_project.id}',
-            data=json.dumps({"result": [{"value": {"choices": ["class_B"]}}]}),
-            content_type="application/json",
+            data=json.dumps({'result': [{'value': {'choices': ['class_B']}}]}),
+            content_type='application/json',
         )
         assert response.status_code == 201
 
@@ -329,11 +325,11 @@ def test_webhooks_for_action_delete_tasks_annotations(configured_project, busine
             f'/api/dm/actions?id=delete_tasks_annotations&project={configured_project.id}',
             data=json.dumps(
                 {
-                    "project": str(configured_project.id),
-                    "selectedItems": {"all": True},
+                    'project': str(configured_project.id),
+                    'selectedItems': {'all': True},
                 }
             ),
-            content_type="application/json",
+            content_type='application/json',
         )
 
     assert response.status_code == 200
@@ -353,14 +349,44 @@ def test_webhooks_for_action_delete_tasks_annotations(configured_project, busine
             f'/api/dm/actions?id=delete_tasks&project={configured_project.id}',
             data=json.dumps(
                 {
-                    "project": str(configured_project.id),
-                    "selectedItems": {"all": True},
+                    'project': str(configured_project.id),
+                    'selectedItems': {'all': True},
                 }
             ),
-            content_type="application/json",
+            content_type='application/json',
         )
     assert response.status_code == 200
     assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
     r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
     assert r.json()['action'] == WebhookAction.TASKS_DELETED
+
+
+# CREATE TASKS FROM STORAGES
+@pytest.mark.django_db
+def test_webhooks_for_tasks_from_storages(configured_project, business_client, organization_webhook):
+    webhook = organization_webhook
+    # CREATE
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        add_url = '/api/storages/s3'
+        payload = {
+            'bucket': 'pytest-s3-images',
+            'project': configured_project.id,
+            'title': 'Testing S3 storage (bucket from conftest.py)',
+            'use_blob_urls': True,
+            'presign_ttl': 3600,
+        }
+        add_response = business_client.post(add_url, data=json.dumps(payload), content_type='application/json')
+        storage_pk = add_response.json()['id']
+
+        # Sync S3 Storage
+        sync_url = f'/api/storages/s3/{storage_pk}/sync'
+        business_client.post(sync_url)
+    # assert response.status_code == 201
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.TASKS_CREATED
+    assert 'tasks' in r.json()
+    assert 'project' in r.json()

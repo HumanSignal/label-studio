@@ -21,6 +21,7 @@ Use with the following data types: image.
 | [showInline] | <code>boolean</code> | <code>true</code> | Show labels in the same visual line |
 | [opacity] | <code>float</code> | <code>0.9</code> | Opacity of the keypoint |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
+| [snap] | <code>pixel</code> \| <code>none</code> | <code>none</code> | Snap keypoint to image pixels |
 
 ### Sample Results JSON
 

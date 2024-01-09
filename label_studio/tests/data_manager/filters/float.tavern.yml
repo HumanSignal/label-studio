@@ -1,0 +1,285 @@
+---
+test_name: signed-float-ordering
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project_empty_config
+    type: ref
+
+  - &create_tasks
+    name: create_tasks
+    request:
+      files:
+        json_file: tests/data_manager/filters/float_tasks.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 0
+        prediction_count: 0
+        task_count: 3
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.a": "Number",
+            "tasks:data.b": "Number",
+            "tasks:data.c": "Number",
+            "tasks:data.d": "String"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": []
+          },
+          "ordering": [
+            "tasks:data.a"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 3,
+        "tasks": [
+        {
+          "data": {
+            "a": "123"
+          }
+        },
+        {
+          "data": {
+            "a": "456"
+          }
+        },
+        {
+          "data": {
+            "a": "789"
+          }
+        }
+        ]
+      }
+      status_code: 200
+  - name: change_ordering
+    request:
+      method: PATCH
+      url: '{django_live_url}/api/dm/views/{view.id}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.a": "Number",
+            "tasks:data.b": "Number",
+            "tasks:data.c": "Number",
+            "tasks:data.d": "String"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": []
+          },
+          "ordering": [
+            "tasks:data.b"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      status_code: 200
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 3,
+        "tasks": [
+        {
+          "data": {
+            "b": 123
+          }
+        },
+        {
+          "data": {
+            "b": 456
+          }
+        },
+        {
+          "data": {
+            "b": 789
+          }
+        }
+        ]
+      }
+      status_code: 200
+  - name: change_ordering_to_c
+    request:
+      method: PATCH
+      url: '{django_live_url}/api/dm/views/{view.id}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.a": "Number",
+            "tasks:data.b": "Number",
+            "tasks:data.c": "Number",
+            "tasks:data.d": "String"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": []
+          },
+          "ordering": [
+            "tasks:data.c"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      status_code: 200
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 3,
+        "tasks": [
+        {
+          "data": {
+            "c": -7.89
+          }
+        },
+        {
+          "data": {
+            "c": 4.56
+          }
+        },
+        {
+          "data": {
+            "c": 12.3
+          }
+        }
+        ]
+      }
+      status_code: 200
+  - name: change_ordering_to_d
+    request:
+      method: PATCH
+      url: '{django_live_url}/api/dm/views/{view.id}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.a": "Number",
+            "tasks:data.b": "Number",
+            "tasks:data.c": "Number",
+            "tasks:data.d": "String"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": []
+          },
+          "ordering": [
+            "tasks:data.d"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      status_code: 200
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 3,
+        "tasks": [
+        {
+          "data": { }
+        },
+        {
+          "data": { }
+        },
+        {
+          "data": { }
+        }
+        ]
+      }
+      status_code: 200
+---
+test_name: ordering-unsupported-values
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project_empty_config
+    type: ref
+
+  - *create_tasks
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.a": "Number",
+            "tasks:data.b": "Number",
+            "tasks:data.c": "Number",
+            "tasks:data.d": "String",
+            "tasks:data.e": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": []
+          },
+          "ordering": [
+            "tasks:data.e"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      status_code: 200

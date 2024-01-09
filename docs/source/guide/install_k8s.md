@@ -3,8 +3,8 @@ title: Deploy Label Studio on Kubernetes
 short: Kubernetes
 tier: opensource
 type: guide
-order: 106
-order_enterprise: 132
+order: 60
+order_enterprise: 0
 meta_title: Deploy Label Studio on Kubernetes
 meta_description: Deploy Label Studio on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment.
 section: "Install"
@@ -17,7 +17,7 @@ Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon
 <div class="opensource-only">
 
 !!! warning
-To install Label Studio Enterprise Edition, see <a href="install_enterprise_k8s.html">Deploy Label Studio Enterprise on Kubernetes</a>. This page is specific to the version of Label Studio.
+    To install Label Studio Enterprise Edition, see <a href="install_enterprise_k8s.html">Deploy Label Studio Enterprise on Kubernetes</a>. This page is specific to the community version of Label Studio.
 
 </div>
 
@@ -30,10 +30,9 @@ If you want to install Label Studio on Kubernetes and you have unrestricted acce
 3. [Add the Helm chart repository](#Add-the-Helm-chart-repository).
 4. (Optional) Set up [persistent storage](persistent_storage.html).
 5. (Optional) Configure [ingress](ingress_config.html).
-6. [Configure a values.yaml file](#Configure-values-yaml).
+6. (Optional) Configure [values.yaml](helm_values.html).
 7. (Optional) [Set up TLS for PostgreSQL](#Optional-set-up-TLS-for-PostgreSQL)
-8. (Optional) [Set up TLS for Redis](#Optional-set-up-TLS-for-Redis)
-9. [Use Helm to install Label Studio on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-on-your-Kubernetes-cluster).
+8. [Use Helm to install Label Studio on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-on-your-Kubernetes-cluster).
 
 If you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet, see how to [Install Label Studio without public internet access](/guide/install_airgapped.html).
 
@@ -106,7 +105,7 @@ kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA>
 3. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
 
 !!! note
-If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
+    If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
 
 ```yaml
 global:
@@ -121,38 +120,12 @@ global:
 
 4. Install or upgrade Label Studio using Helm.
 
-## Optional: set up TLS for Redis
-
-To configure Label Studio to use TLS for end-client connections with Redis, do the following:
-
-1. Enable TLS for your Redis instance and save Root TLS certificate, client certificate and its key for the next steps.
-2. Create a Kubernetes secret with your certificates, replacing `<PATH_TO_CA>`, `<PATH_TO_CLIENT_CRT>` and `<PATH_TO_CLIENT_KEY>` with paths to your certificates:
-
-```shell
-kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA> --from-file=client.crt=<PATH_TO_CLIENT_CRT> --from-file=client.key=<PATH_TO_CLIENT_KEY>
-```
-
-3. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
-
-!!! note
-In the case if you are using self-signed certificates that host cannot verify you have to set `redisSslCertReqs` to `None`
-
-```yaml
-global:
-  redisConfig:
-    ssl:
-      redisSslCertReqs: "required"
-      redisSslSecretName: "<YOUR_SECRET_NAME>"
-      redisSslCaCertsSecretKey: "ca.crt"
-      redisSslCertFileSecretKey: "client.crt"
-      redisSslKeyFileSecretKey: "client.key"
-```
-
-4. Install or upgrade Label Studio using Helm.
-
-### Use Helm to install Label Studio on your Kubernetes cluster
+## Use Helm to install Label Studio on your Kubernetes cluster
 
 Use Helm to install Label Studio on your Kubernetes cluster. Provide your custom resource definitions YAML file. Specify any environment variables that you need to set for your Label Studio installation using the `--set` argument with the `helm install` command.
+
+!!! note
+    If you are deploying to a production environment, you should set the `SSRF_PROTECTION_ENABLED: true` environment variable. See [Secure Label Studio](security#Enable-SSRF-protection-for-production-environments).
 
 From the command line, run the following:
 

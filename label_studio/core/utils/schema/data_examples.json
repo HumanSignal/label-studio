@@ -39,6 +39,23 @@
         ]
       }
     ],
+    "List": [
+      {
+        "id": 1,
+        "title": "The Amazing World of Opossums",
+        "body": "Opossums are fascinating marsupials native to North America. They have prehensile tails, which help them to climb trees and navigate their surroundings with ease. Additionally, they are known for their unique defense mechanism, called 'playing possum,' where they mimic the appearance and smell of a dead animal to deter predators."
+      },
+      {
+        "id": 2,
+        "title": "Opossums: Nature's Pest Control",
+        "body": "Opossums play a crucial role in controlling insect and rodent populations, as they consume a variety of pests like cockroaches, beetles, and mice. This makes them valuable allies for gardeners and homeowners, as they help to maintain a balanced ecosystem and reduce the need for chemical pest control methods."
+      },
+      {
+        "id": 3,
+        "title": "Fun Fact: Opossums Are Immune to Snake Venom",
+        "body": "One surprising characteristic of opossums is their natural immunity to snake venom. They have a unique protein in their blood called 'Lethal Toxin-Neutralizing Factor' (LTNF), which neutralizes venom from a variety of snake species, including rattlesnakes and cottonmouths. This allows opossums to prey on snakes without fear of harm, further highlighting their important role in the ecosystem."
+      }
+    ],
     "$longText": "Opossums are frequently considered to be living fossils, and as a result are often used to approximate the ancestral therian condition in comparative studies. However, this is inaccurate, the oldest opossum fossils are early Miocene in age (roughly 20 million years old) and the last common ancestor of all living opossums approximately dates to the Oligocene-Miocene boundary (roughly 23 million years ago) and is at most no older than Oligocene in age. Many extinct metatherians once considered early opossums, such as Alphadon, Peradectes, Herpetotherium, and Pucadelphys, have since been recognized to have been previously grouped with opossums on the basis of plesiomorphies and are now considered to represent older branches of Metatheria only distantly related to modern opossums.",
     "$corefText": "I voted for Obama because he was most aligned with my values, she said.",
     "$pdf": "<embed src='<HOSTNAME>/static/samples/sample.pdf' width='100%' height='600px'/>",

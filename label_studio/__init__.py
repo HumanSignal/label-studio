@@ -1,10 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import importlib.metadata
+
 # Package name
 package_name = 'label-studio'
 
 # Package version
-__version__ = '1.7.5dev'
+__version__ = '1.10.1dev'
+
 
 # pypi info
 __latest_version__ = None

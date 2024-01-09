@@ -20,7 +20,6 @@ from django.utils.translation import gettext_lazy as _
 from label_studio_converter import Converter
 from tasks.models import Annotation
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -102,7 +101,7 @@ class DataExport(object):
         annotation_number = Annotation.objects.filter(project=project).count()
         try:
             platform_version = version.get_git_version()
-        except:
+        except:  # noqa: E722
             platform_version = 'none'
             logger.error('Version is not detected in save_export_files()')
         info = {
@@ -201,7 +200,7 @@ class ConvertedFormat(models.Model):
         Export,
         related_name='converted_formats',
         on_delete=models.CASCADE,
-        help_text='Export snapshot for this converted file'
+        help_text='Export snapshot for this converted file',
     )
     file = models.FileField(
         upload_to=settings.DELAYED_EXPORT_DIR,
@@ -212,16 +211,8 @@ class ConvertedFormat(models.Model):
         choices=Status.choices,
         default=Status.CREATED,
     )
-    traceback = models.TextField(
-        null=True,
-        blank=True,
-        help_text='Traceback report in case of errors'
-    )
-    export_type = models.CharField(
-        max_length=64,
-        choices=Status.choices,
-        default=Status.CREATED,
-    )
+    traceback = models.TextField(null=True, blank=True, help_text='Traceback report in case of errors')
+    export_type = models.CharField(max_length=64)
     created_at = models.DateTimeField(
         _('created at'),
         null=True,

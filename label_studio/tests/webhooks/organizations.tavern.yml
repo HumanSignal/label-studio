@@ -1,0 +1,111 @@
+---
+test_name: test_members_soft_delete
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+
+- id: get_my_user
+  type: ref
+
+- name: get_active_organization
+  request:
+    method: GET
+    url: '{django_live_url}/api/users/{user_pk}'
+  response:
+    status_code: 200
+    save:
+      json:
+        org_pk: active_organization
+
+- type: ref
+  id: get_invite_url
+
+- type: ref
+  id: logout
+
+# signup 2 new users
+- name: signup_new_user_under_active_organization
+  request:
+    url: "{django_live_url}{invite_url}"
+    data:
+      email: test_user@heartextest.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+
+- type: ref
+  id: logout
+
+- name: signup_second_new_user_under_active_organization
+  request:
+    url: "{django_live_url}{invite_url}"
+    data:
+      email: test_second_user@heartextest.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+
+- id: get_my_user # get user_pk to use in soft-delete
+  type: ref
+
+- id: get_user_token
+  type: ref
+
+- id: logout
+  type: ref
+
+- id: get_my_user_with_token
+  name: Get my user with token
+  request:
+    headers:
+      authorization: "Token {user_token}"
+    url: "{django_live_url}/api/current-user/whoami"
+    method: GET
+  response:
+    status_code: 200
+
+- name: login_as_first_new_user
+  request:
+    url: "{django_live_url}/user/login"
+    data:
+      email: test_user@heartextest.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+
+- name: soft_delete_user_fails_without_owner_logged_in
+  request:
+    url: "{django_live_url}/api/organizations/{org_pk}/memberships/{user_pk}"
+    method: DELETE
+  response:
+    status_code: 403
+
+- id: logout
+  type: ref
+
+- id: login # as owner
+  type: ref
+
+- name: soft_delete_user_succeeds_as_owner
+  request:
+    url: "{django_live_url}/api/organizations/{org_pk}/memberships/{user_pk}"
+    method: DELETE
+  response:
+    status_code: 204
+
+- name: soft_delete_user_fails_second_deletion_attempt
+  request:
+    url: "{django_live_url}/api/users/{user_pk}/soft-delete"
+    method: DELETE
+  response:
+    status_code: 404
+
+- id: logout
+  type: ref

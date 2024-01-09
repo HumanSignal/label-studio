@@ -18,14 +18,14 @@ Install Label Studio in a clean Python environment. Heartex highly recommends us
 
 ## Install with pip
 
-To install Label Studio with pip and a virtual environment, you need Python version 3.7 or later. Run the following:
+To install Label Studio with pip and a virtual environment, you need Python version 3.8 or later. Run the following:
 ```bash
 python3 -m venv env
 source env/bin/activate
 python -m pip install label-studio
 ```
 
-To install Label Studio with pip, you need Python version 3.7 or later. Run the following:
+To install Label Studio with pip, you need Python version 3.8 or later. Run the following:
 ```bash
 pip install label-studio
 ```

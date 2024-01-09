@@ -22,6 +22,7 @@ Use with the following data types: image.
 | [strokeColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | Keypoint stroke color in hexadecimal |
 | [smart] | <code>boolean</code> |  | Show smart tool for interactive pre-annotations |
 | [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
+| [snap] | <code>pixel</code> \| <code>none</code> | <code>none</code> | Snap keypoint to image pixels |
 
 ### Example
 

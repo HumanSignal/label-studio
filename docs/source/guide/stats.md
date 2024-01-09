@@ -3,8 +3,8 @@ title: Annotation agreement and how it is calculated
 short: Annotation agreement
 tier: enterprise
 type: guide
-order: 300
-order_enterprise: 114
+order: 0
+order_enterprise: 260
 meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
 section: "Quality control"
@@ -24,7 +24,6 @@ Task agreement shows the consensus between multiple annotators when labeling the
 You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.
 
 For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance).
-
 
 ## Agreement method
 

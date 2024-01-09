@@ -1,34 +1,39 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
 import logging
+import os
 import traceback as tb
-
-from django.conf import settings
 from datetime import datetime
-from django.db import transaction
-from django.http import HttpResponse
-from django.core.files import File
-from django.core.files.storage import FileSystemStorage
-from drf_yasg import openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
-from django.utils.decorators import method_decorator
-from rest_framework import status, generics
-from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, ValidationError
-from rest_framework.views import APIView
 from urllib.parse import urlparse
 
+from core.feature_flags import flag_set
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
-from core.feature_flags import flag_set
 from core.utils.common import batch
+from django.conf import settings
+from django.core.files import File
+from django.core.files.storage import FileSystemStorage
+from django.db import transaction
+from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from drf_yasg import openapi as openapi
+from drf_yasg.utils import swagger_auto_schema
 from projects.models import Project
-from tasks.models import Task
-from .models import DataExport, Export, ConvertedFormat
-
-from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer, ExportParamSerializer, ExportConvertSerializer
 from ranged_fileresponse import RangedFileResponse
+from rest_framework import generics, status
+from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from tasks.models import Task
+
+from .models import ConvertedFormat, DataExport, Export
+from .serializers import (
+    ExportConvertSerializer,
+    ExportCreateSerializer,
+    ExportDataSerializer,
+    ExportParamSerializer,
+    ExportSerializer,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +49,8 @@ logger = logging.getLogger(__name__)
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.'),
+                description='A unique integer value identifying this project.',
+            ),
         ],
         responses={
             200: openapi.Response(
@@ -53,7 +59,7 @@ logger = logging.getLogger(__name__)
                     title='Format list',
                     description='List of available formats',
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(title="Export format", type=openapi.TYPE_STRING),
+                    items=openapi.Schema(title='Export format', type=openapi.TYPE_STRING),
                 ),
             )
         },
@@ -110,7 +116,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.'
+                description='A unique integer value identifying this project.',
             ),
         ],
         tags=['Export'],
@@ -161,7 +167,9 @@ class ExportAPI(generics.RetrieveAPIView):
         query_serializer = ExportParamSerializer(data=request.GET)
         query_serializer.is_valid(raise_exception=True)
 
-        export_type = query_serializer.validated_data.get('exportType') or query_serializer.validated_data['export_type']
+        export_type = (
+            query_serializer.validated_data.get('exportType') or query_serializer.validated_data['export_type']
+        )
         only_finished = not query_serializer.validated_data['download_all_tasks']
         download_resources = query_serializer.validated_data['download_resources']
         interpolate_key_frames = query_serializer.validated_data['interpolate_key_frames']
@@ -182,8 +190,10 @@ class ExportAPI(generics.RetrieveAPIView):
         tasks = []
         for _task_ids in batch(task_ids, 1000):
             tasks += ExportDataSerializer(
-                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts'],
-                context={'interpolate_key_frames': interpolate_key_frames}
+                self.get_task_queryset(query.filter(id__in=_task_ids)),
+                many=True,
+                expand=['drafts'],
+                context={'interpolate_key_frames': interpolate_key_frames},
             ).data
         logger.debug('Prepare export files')
 
@@ -264,8 +274,9 @@ class ProjectExportFilesAuthCheck(APIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.')
-        ]
+                description='A unique integer value identifying this project.',
+            )
+        ],
     ),
 )
 @method_decorator(
@@ -281,8 +292,9 @@ class ProjectExportFilesAuthCheck(APIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.')
-        ]
+                description='A unique integer value identifying this project.',
+            )
+        ],
     ),
 )
 class ExportListAPI(generics.ListCreateAPIView):
@@ -297,6 +309,11 @@ class ExportListAPI(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return ExportCreateSerializer
         return super().get_serializer_class()
+
+    def get_serializer_context(self):
+        context = super(ExportListAPI, self).get_serializer_context()
+        context['user'] = self.request.user
+        return context
 
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
@@ -333,6 +350,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         else:
             return queryset
 
+
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
@@ -346,13 +364,15 @@ class ExportListAPI(generics.ListCreateAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.'),
+                description='A unique integer value identifying this project.',
+            ),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                description='Primary key identifying the export file.'),
-        ]
+                description='Primary key identifying the export file.',
+            ),
+        ],
     ),
 )
 @method_decorator(
@@ -368,13 +388,15 @@ class ExportListAPI(generics.ListCreateAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.'),
+                description='A unique integer value identifying this project.',
+            ),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                description='Primary key identifying the export file.'),
-        ]
+                description='Primary key identifying the export file.',
+            ),
+        ],
     ),
 )
 class ExportDetailAPI(generics.RetrieveDestroyAPIView):
@@ -397,9 +419,9 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                 return Response(
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     data={
-                        'detail':
-                            'Could not delete file from storage. Check that your user has permissions to delete files: %s' % str(e)
-                    }
+                        'detail': 'Could not delete file from storage. Check that your user has permissions to delete files: %s'
+                        % str(e)
+                    },
                 )
 
         return super().delete(*args, **kwargs)
@@ -441,12 +463,14 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.'),
+                description='A unique integer value identifying this project.',
+            ),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                description='Primary key identifying the export file.'),
+                description='Primary key identifying the export file.',
+            ),
         ],
     ),
 )
@@ -487,17 +511,27 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             if isinstance(file.storage, FileSystemStorage):
                 url = file.storage.url(file.name)
             else:
-                url = file.storage.url(file.name, storage_url=True, http_method=request.method)
+                url = file.storage.url(file.name, storage_url=True)
             protocol = urlparse(url).scheme
 
-            # Let NGINX handle it
-            response = HttpResponse()
-            # The below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
-            redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
+            # NGINX downloads are a solid way to make uwsgi workers free
+            if settings.USE_NGINX_FOR_EXPORT_DOWNLOADS:
+                # let NGINX handle it
+                response = HttpResponse()
+                # below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
+                redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
+                response['X-Accel-Redirect'] = redirect
+                response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
+                response['filename'] = os.path.basename(file.name)
+                return response
 
-            response['X-Accel-Redirect'] = redirect
-            response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
-            return response
+            # No NGINX: standard way for export downloads in the community edition
+            else:
+                ext = file.name.split('.')[-1]
+                response = RangedFileResponse(request, file, content_type=f'application/{ext}')
+                response['Content-Disposition'] = f'attachment; filename="{file.name}"'
+                response['filename'] = os.path.basename(file.name)
+                return response
         else:
             if export_type is None:
                 file_ = snapshot.file
@@ -537,9 +571,7 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
 
     now = datetime.now()
     file_name = f'project-{project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.{ext}'
-    file_path = (
-        f'{project.id}/{file_name}'
-    )  # finally file will be in settings.DELAYED_EXPORT_DIR/project.id/file_name
+    file_path = f'{project.id}/{file_name}'  # finally file will be in settings.DELAYED_EXPORT_DIR/project.id/file_name
     file_ = File(converted_file, name=file_path)
     converted_format.file.save(file_path, file_)
     converted_format.status = ConvertedFormat.Status.COMPLETED
@@ -569,13 +601,15 @@ def set_convert_background_failure(job, connection, type, value, traceback_obj):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.'),
+                description='A unique integer value identifying this project.',
+            ),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                description='Primary key identifying the export file.'),
-        ]
+                description='Primary key identifying the export file.',
+            ),
+        ],
     ),
 )
 class ExportConvertAPI(generics.RetrieveAPIView):
@@ -590,10 +624,8 @@ class ExportConvertAPI(generics.RetrieveAPIView):
         export_type = serializer.validated_data['export_type']
 
         with transaction.atomic():
-            converted_format, created = ConvertedFormat.objects.get_or_create(
-                export=snapshot, export_type=export_type
-            )
-            
+            converted_format, created = ConvertedFormat.objects.get_or_create(export=snapshot, export_type=export_type)
+
             if not created:
                 raise ValidationError(f'Conversion to {export_type} already started')
 
@@ -602,6 +634,6 @@ class ExportConvertAPI(generics.RetrieveAPIView):
             converted_format.id,
             export_type,
             snapshot.project,
-            on_failure=set_convert_background_failure
+            on_failure=set_convert_background_failure,
         )
         return Response({'export_type': export_type, 'converted_format': converted_format.id})

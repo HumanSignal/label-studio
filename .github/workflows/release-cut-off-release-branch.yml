@@ -28,7 +28,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
@@ -68,7 +68,7 @@ jobs:
           echo "next_develop_version=${next_develop_version}" >> $GITHUB_OUTPUT
 
       - name: Cut dependencies release branches
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -77,8 +77,8 @@ jobs:
             const release = '${{ steps.calculate_branch_name_and_version.outputs.release_branch }}'
 
             let submodules = [
-                {owner: 'heartexlabs', repo: 'label-studio-frontend'},
-                {owner: 'heartexlabs', repo: 'dm2'}
+                {owner: owner, repo: 'label-studio-frontend'},
+                {owner: owner, repo: 'dm2'}
             ]
 
             async function getLSSubmoduleVersions(sha) {
@@ -156,7 +156,7 @@ jobs:
 
   set-version-default-branch:
     name: 'Set version in default branch'
-    uses: heartexlabs/label-studio/.github/workflows/release-set-version.yml@develop
+    uses: ./.github/workflows/release-set-version.yml
     needs:
       - draft-new-release
     with:
@@ -166,10 +166,22 @@ jobs:
       contents: write
     secrets: inherit
 
+  update-feature-flags:
+    name: "Update feature flags in release branch"
+    needs:
+      - draft-new-release
+    permissions:
+      contents: write
+    uses: ./.github/workflows/feature-flags-update.yml
+    with:
+      ref: ${{ needs.draft-new-release.outputs.release_branch }}
+    secrets: inherit
+
   set-version-release-branch:
     name: 'Set version in release branch'
-    uses: heartexlabs/label-studio/.github/workflows/release-set-version.yml@develop
+    uses: ./.github/workflows/release-set-version.yml
     needs:
+      - update-feature-flags
       - draft-new-release
     with:
       version: ${{ needs.draft-new-release.outputs.release_version }}
