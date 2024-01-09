@@ -27,7 +27,7 @@ export default observer(({ store }) => {
   const classname = [
     styles.block,
     styles.block__controls,
-    store.annotationStore.viewingAllAnnotations ? styles.hidden : '',
+    store.annotationStore.viewingAll ? styles.hidden : '',
   ].join(' ');
 
   return (

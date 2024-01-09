@@ -35,7 +35,7 @@ import '../../tags/visual';
 import { TreeValidation } from '../TreeValidation/TreeValidation';
 import { guidGenerator } from '../../utils/unique';
 import Grid from './Grid';
-import { SidebarPage, SidebarTabs } from '../SidebarTabs/SidebarTabs';
+import { SidebarTabs } from '../SidebarTabs/SidebarTabs';
 import { AnnotationTab } from '../AnnotationTab/AnnotationTab';
 import { SidePanels } from '../SidePanels/SidePanels';
 import { SideTabsPanels } from '../SidePanels/TabPanels/SideTabsPanels';
@@ -131,27 +131,23 @@ class App extends Component {
   }
 
   _renderUI(root, as) {
+    if (as.viewingAll) return this.renderAllAnnotations();
+
     return (
-      <>
-        {!as.viewingAllAnnotations && !as.viewingAllPredictions && (
-          <Block
-            key={(as.selectedHistory ?? as.selected)?.id}
-            name="main-view"
-            onScrollCapture={this._notifyScroll}
-          >
-            <Elem name="annotation">
-              {<Annotation root={root} annotation={as.selected} />}
-              {this.renderRelations(as.selected)}
-            </Elem>
-            {(!isFF(FF_DEV_3873)) && getRoot(as).hasInterface('infobar') && this._renderInfobar(as)}
-            {as.selected.hasSuggestionsSupport && (
-              <DynamicPreannotationsControl />
-            )}
-          </Block>
+      <Block
+        key={(as.selectedHistory ?? as.selected)?.id}
+        name="main-view"
+        onScrollCapture={this._notifyScroll}
+      >
+        <Elem name="annotation">
+          {<Annotation root={root} annotation={as.selected} />}
+          {this.renderRelations(as.selected)}
+        </Elem>
+        {(!isFF(FF_DEV_3873)) && getRoot(as).hasInterface('infobar') && this._renderInfobar(as)}
+        {as.selected.hasSuggestionsSupport && (
+          <DynamicPreannotationsControl />
         )}
-        {as.viewingAllAnnotations && this.renderAllAnnotations()}
-        {as.viewingAllPredictions && this.renderAllPredictions()}
-      </>
+      </Block>
     );
   }
 
@@ -168,13 +164,9 @@ class App extends Component {
   }
 
   renderAllAnnotations() {
-    const cs = this.props.store.annotationStore;
+    const as = this.props.store.annotationStore;
 
-    return <Grid store={cs} annotations={[...cs.annotations, ...cs.predictions]} root={cs.root} />;
-  }
-
-  renderAllPredictions() {
-    return this._renderAll(this.props.store.annotationStore.predictions);
+    return <Grid store={as} annotations={[...as.annotations, ...as.predictions]} root={as.root} />;
   }
 
   renderRelations(selectedStore) {
@@ -208,7 +200,7 @@ class App extends Component {
 
     if (!root) return this.renderNoAnnotation();
 
-    const viewingAll = as.viewingAllAnnotations || as.viewingAllPredictions;
+    const viewingAll = as.viewingAll;
 
     // tags can be styled in config when user is awaiting for suggestions from ML backend
     const mainContent = (
@@ -259,7 +251,7 @@ class App extends Component {
             }}
           >
             {outlinerEnabled ? (
-              isFF(FF_DEV_3873) ? (
+              newUIEnabled ? (
                 <SideTabsPanels
                   panelsHidden={viewingAll}
                   currentEntity={as.selectedHistory ?? as.selected}
@@ -268,7 +260,7 @@ class App extends Component {
                   focusTab={store.commentStore.tooltipMessage ? 'comments' : null}
                 >
                   {mainContent}
-                  {isDefined(store) && store.hasInterface('topbar') && <BottomBar store={store} />}
+                  {store.hasInterface('topbar') && <BottomBar store={store} />}
                 </SideTabsPanels>
               ) : (
                 <SidePanels
@@ -277,8 +269,6 @@ class App extends Component {
                   regions={as.selected.regionStore}
                 >
                   {mainContent}
-
-                  {isFF(FF_DEV_3873) && isDefined(store) && store.hasInterface('topbar') && <BottomBar store={store} />}
                 </SidePanels>
               )
             ) : (
@@ -288,22 +278,14 @@ class App extends Component {
                 {viewingAll === false && (
                   <Block name="menu" mod={{ bsp: settings.bottomSidePanel }}>
                     {store.hasInterface('side-column') && (
-                      <SidebarTabs active="annotation">
-                        <SidebarPage name="annotation" title="Annotation">
-                          <AnnotationTab store={store} />
-                        </SidebarPage>
-
-                        {this.props.panels.map(({ name, title, Component }) => (
-                          <SidebarPage key={name} name={name} title={title}>
-                            <Component />
-                          </SidebarPage>
-                        ))}
+                      <SidebarTabs>
+                        <AnnotationTab store={store} />
                       </SidebarTabs>
                     )}
                   </Block>
                 )}
 
-                {newUIEnabled && isDefined(store) && store.hasInterface('topbar') && <BottomBar store={store} />}
+                {newUIEnabled && store.hasInterface('topbar') && <BottomBar store={store} />}
               </>
             )}
           </Block>
