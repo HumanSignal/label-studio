@@ -710,11 +710,11 @@ export const Annotation = types
       if (self.autosave) self.autosave.flush();
     },
 
-    async saveDraftImmediatelyWithResults() {
+    async saveDraftImmediatelyWithResults(params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted || self.isDraftSaving) return {};
       self.setDraftSaving(true);
-      const res = await self.saveDraft(null);
+      const res = await self.saveDraft(params);
 
       return res;
     },
