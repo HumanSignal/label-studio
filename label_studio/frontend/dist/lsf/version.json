@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-107: Draft saving on view all",
-  "commit": "08aa5b599a64e4b90956b861739df273946ee738",
+  "message": "feat: LEAP-355: Make relations work with TimeTraveler",
+  "commit": "2a748d6548ee8f67e274f4b4efcba646a25937e0",
   "branch": "master",
-  "date": "2024-01-08T13:19:30Z"
+  "date": "2024-01-08T18:27:27Z"
 }
