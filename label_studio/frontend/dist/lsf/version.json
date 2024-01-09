@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-344: View all annotation tab is not loading",
-  "commit": "eb1194c1e8ad5f9c0e725b2955dbc202f169649b",
-  "branch": "master",
-  "date": "2024-01-08T09:48:32Z"
+  "message": "fix: LSDV-4864: Magic Wand doesn't work with MIG ",
+  "commit": "283e0a76e530d90ffff614739fc0869e632b755f",
+  "branch": "fb-lsdv-4864/magic-wand-mig",
+  "date": "2024-01-09T11:48:07Z"
 }

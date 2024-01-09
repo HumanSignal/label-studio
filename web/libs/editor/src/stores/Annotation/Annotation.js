@@ -31,6 +31,12 @@ import { UserExtended } from '../UserStore';
 
 const hotkeys = Hotkey('Annotations', 'Annotations');
 
+const TrackedState = types
+  .model('TrackedState', {
+    areas: types.map(Area),
+    relationStore: types.optional(RelationStore, {}),
+  });
+
 export const Annotation = types
   .model('Annotation', {
     id: types.identifier,
@@ -70,7 +76,12 @@ export const Annotation = types
     ground_truth: types.optional(types.boolean, false),
     skipped: false,
 
-    history: types.optional(TimeTraveller, { targetPath: '../areas' }),
+    // This field stores all data that affects undo/redo history
+    // It should contain real objects to be able to work with them through snapshots
+    // Annotation will use getters to get them at the top level
+    // This data is never redefined directly, it's empty at the start
+    trackedState: types.optional(TrackedState, {}),
+    history: types.optional(TimeTraveller, { targetPath: '../trackedState' }),
 
     dragMode: types.optional(types.boolean, false),
 
@@ -78,11 +89,6 @@ export const Annotation = types
     readonly: types.optional(types.boolean, false),
 
     relationMode: types.optional(types.boolean, false),
-    relationStore: types.optional(RelationStore, {
-      relations: [],
-    }),
-
-    areas: types.map(Area),
 
     suggestions: types.map(Area),
 
@@ -98,6 +104,14 @@ export const Annotation = types
 
     ...(isFF(FF_DEV_3391) ? { root: Types.allModelsTypes() } : {}),
   })
+  .views(self => ({
+    get areas() {
+      return self.trackedState.areas;
+    },
+    get relationStore() {
+      return self.trackedState.relationStore;
+    },
+  }))
   .preProcessSnapshot(sn => {
     // sn.draft = Boolean(sn.draft);
     let user = sn.user ?? sn.completed_by ?? undefined;
@@ -637,7 +651,7 @@ export const Annotation = types
       self.startAutosave();
     },
 
-    startAutosave: flow(function *() {
+    startAutosave: flow(function* () {
       if (!getEnv(self).events.hasEvent('submitDraft')) return;
       // view all must never trigger autosave
       if (self.isReadOnly()) return;
@@ -667,13 +681,13 @@ export const Annotation = types
       onSnapshot(self.areas, self.autosave);
     }),
 
-    async saveDraft(params) {
+    saveDraft: flow(function* (params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted) return;
       // if this is now a history item or prediction don't save it
       if (!self.editable) return;
 
-      const result = self.serializeAnnotation({ fast: true });
+      const result = yield self.serializeAnnotation({ fast: true });
       // if this is new annotation and no regions added yet
 
       if (!isFF(FF_LSDV_3009) && !self.pk && !result.length) return;
@@ -686,7 +700,7 @@ export const Annotation = types
 
         return res;
       });
-    },
+    }),
 
     submissionInProgress() {
       self.submissionStarted = Date.now();
@@ -696,11 +710,11 @@ export const Annotation = types
       if (self.autosave) self.autosave.flush();
     },
 
-    async saveDraftImmediatelyWithResults() {
+    async saveDraftImmediatelyWithResults(params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted || self.isDraftSaving) return {};
       self.setDraftSaving(true);
-      const res = await self.saveDraft(null);
+      const res = await self.saveDraft(params);
 
       return res;
     },
@@ -920,15 +934,14 @@ export const Annotation = types
       return self.regionStore.regions.slice(prevSize);
     },
 
-    serializeAnnotation(options) {
-      // return self.serialized;
-
+    async serializeAnnotation(options) {
       document.body.style.cursor = 'wait';
 
-      const result = self.results
-        .map(r => r.serialize(options))
+      const result = (await Promise.all(
+        self.results.map(r => r.serialize(options)))
+      )
         .filter(Boolean)
-        .concat(self.relationStore.serializeAnnotation(options));
+        .concat(self.relationStore.serialize(options));
 
       document.body.style.cursor = 'default';
 
@@ -1019,7 +1032,7 @@ export const Annotation = types
         if (tagNames.has(obj.from_name) && tagNames.has(obj.to_name)) {
           res.push(obj);
         }
-        
+
         // Insert image dimensions from result 
         (() => {
           if (!isDefined(obj.original_width)) return;
@@ -1029,7 +1042,7 @@ export const Annotation = types
 
           if (tag.type !== 'image') return;
 
-          const imageEntity = tag.findImageEntity(obj.item_index ?? 0); 
+          const imageEntity = tag.findImageEntity(obj.item_index ?? 0);
 
           if (!imageEntity) return;
 
@@ -1332,7 +1345,7 @@ export const Annotation = types
         area.setValue(state);
       });
       self.suggestions.delete(id);
-      
+
     },
 
     rejectSuggestion(id) {

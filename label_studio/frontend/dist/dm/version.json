@@ -1,6 +1,6 @@
 {
-  "message": "feat: DIA-474: [FE] add new column for DE",
-  "commit": "a8e6e5e6cd6601d765a7f0abd4efa87cec1a3fe5",
-  "branch": "master",
-  "date": "2024-01-03T07:13:20Z"
+  "message": "fix: LSDV-4864: Magic Wand doesn't work with MIG ",
+  "commit": "4126a8a0172aa63fde1c862de07bc1ee5d6d95c6",
+  "branch": "fb-lsdv-4864/magic-wand-mig",
+  "date": "2023/05/04 15:53:02"
 }
