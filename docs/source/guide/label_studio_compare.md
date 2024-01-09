@@ -10,7 +10,7 @@ meta_title: Label Studio Community and Enterprise Features
 meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects.
 ---
 
-Label Studio is available as open source software, as well as an [Enterprise cloud service](https://heartex.com/) with enhanced security (SSO, RBAC, SOC2), team management, analytics & reporting, and uptime & support SLAs. A [free trial is available](https://humansignal.com/free-trial) to get started quickly and explore the enterprise cloud product.
+Label Studio is available as open source software as well as an [Enterprise cloud service](https://humansignal.com/). The Enterprise version offers enhanced security (SSO, RBAC, SOC2), team management, analytics and reporting, and uptime and support SLAs. A [free trial is available](https://humansignal.com/free-trial) to get started quickly and explore the enterprise cloud product.
 
 <a class="Button" href="https://humansignal.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
 
@@ -93,6 +93,45 @@ Label Studio is available as open source software, as well as an [Enterprise cl
   </tr>
   <tr>
     <td>Annotator-specific labeling view that only shows assigned tasks.</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+
+  <tr>
+    <td colspan="3"><b>Data Discovery (Beta)</b></td>
+  </tr>
+   <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_create">Connect, manage, and index datasets from GCP, AWS, and Azure.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search">Visualize and explore all your unstructured image or text data in a visual grid or list view.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search#Embeddings">Automatically generate embeddings and reference embeddings to uncover similarities between data points and measure confidence levels.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search#Natural-language-searching">Find relevant data using natural language, such as one or more phrases or keywords.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search#Similarity-searches">Uncover similar data points by selecting one or more records (data points) as reference.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_search#Search-results-and-refining-by-similarity">Sort your dataset based on similarity to your selections.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/dataset_manage#Create-project-tasks-from-a-dataset">Send data subsets as tasks to new or existing Label Studio Enterprise projects for human or AI processing (annotation or review).</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
