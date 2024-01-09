@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-355: Make relations work with TimeTraveler",
-  "commit": "2a748d6548ee8f67e274f4b4efcba646a25937e0",
-  "branch": "master",
-  "date": "2024-01-08T18:27:27Z"
+  "message": "fix: LEAP-515: Fix CommentForm for old UI",
+  "commit": "5cb5557d63239fef12e1d8290a21ff3dadecb766",
+  "branch": "fb-leap-515/comments-old-ui",
+  "date": "2024-01-09T16:52:51Z"
 }
