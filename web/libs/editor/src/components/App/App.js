@@ -48,6 +48,7 @@ import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, isFF } from '../../utils/f
 import { Annotation } from './Annotation';
 import { Button } from '../../common/Button/Button';
 import { reactCleaner } from '../../utils/reactCleaner';
+import { sanitizeHtml } from '../../utils/html';
 
 /**
  * App
@@ -241,7 +242,7 @@ class App extends Component {
             <>
               {store.showingDescription && (
                 <Segment>
-                  <div dangerouslySetInnerHTML={{ __html: store.description }} />
+                  <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(store.description) }} />
                 </Segment>
               )}
             </>
@@ -263,7 +264,7 @@ class App extends Component {
                   panelsHidden={viewingAll}
                   currentEntity={as.selectedHistory ?? as.selected}
                   regions={as.selected.regionStore}
-                  showComments={!store.hasInterface('annotations:comments')}
+                  showComments={store.hasInterface('annotations:comments')}
                   focusTab={store.commentStore.tooltipMessage ? 'comments' : null}
                 >
                   {mainContent}
