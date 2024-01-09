@@ -35,13 +35,9 @@ const TagAttrs = types.model({
 const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
-    selected: types.optional(types.boolean, false),
     type: 'relation',
   })
-  .actions(self => ({
-    setSelected(value) {
-      self.selected = value;
-    },
+  .actions(() => ({
   }));
 
 const RelationModel = types.compose('RelationModel', TagAttrs, Model);
