@@ -9,7 +9,7 @@ const TimeTraveller = types
     undoIdx: 0,
     targetPath: '',
     skipNextUndoState: types.optional(types.boolean, false),
-
+    lastAdditionTime: types.optional(types.Date, new Date()),
     createdIdx: 0,
   })
   .volatile(() => ({
@@ -102,6 +102,7 @@ const TimeTraveller = types
         self.undoIdx = self.history.length - 1;
         replaceNextUndoState = false;
         changesDuringFreeze = false;
+        self.lastAdditionTime = new Date();
       },
 
       reinit(force = true) {

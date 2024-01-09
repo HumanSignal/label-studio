@@ -72,6 +72,7 @@ export const ActionsButton = injector(observer(({ store, size, hasSelected, ...r
     const submenuRef = useRef();
     const onClick = useCallback((e) => {
       e.preventDefault();
+      e.stopPropagation();
       if (action.disabled) return;
       action?.callback ? action?.callback(store.currentView?.selected?.snapshot, action) : invokeAction(action, isDeleteAction);
       parentRef?.current?.close?.();

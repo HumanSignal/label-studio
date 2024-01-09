@@ -50,11 +50,6 @@ report.*.json
 
 # editor ignored files
 
-# temporary files copied from the root
-libs/editor/package.json
-libs/editor/package-lock.json
-libs/editor/yarn.lock
-
 libs/editor/__pycache__/
 
 # Logs
@@ -87,11 +82,6 @@ libs/editor/e2e/output
 
 
 # datamanager ignored files
-
-# temporary files copied from the root
-libs/datamanager/package.json
-libs/datamanager/package-lock.json
-libs/datamanager/yarn.lock
 
 # Logs
 libs/datamanager/logs

@@ -45,7 +45,7 @@ jobs:
         if: always()
         run: cat ${{ env.REPORT_PATH }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Security check results
