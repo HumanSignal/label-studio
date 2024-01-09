@@ -143,6 +143,31 @@ If you want at least half of the tasks to be annotated by at least 3 people:
 
 If you're using manual distribution of tasks, annotators with tasks assigned to them label those tasks first, then Label Studio automatically distributes the remaining tasks to the project annotators so that the desired overlap and minimum number of annotations per task can be achieved.
 
+
+### Set low agreement threshold for auto-assignment
+
+To enhance task annotation quality in Label Studio, you can set additional constraints beyond the [task overlap](#Set-minimum-annotations-per-task). 
+
+You can optionally set a low agreement threshold to ensure that a task is not marked complete until it meets both the required overlap and a minimum agreement level. If set, both the overlap minimum number of annotations and a low agreement score at or above the low agreement threshold must be met before a task is considered complete.  
+
+To ensure tasks with chronically low agreement do not consume an excessive amount of annotator resources, you can also set a maximum number of additional annotators that can be assigned to address a low agreement score. 
+
+If this criteria is not met and auto distribution of tasks is enabled, the task will continue being assigned to available annotators until the low agreement threshold is met, or the configured maximum number of annotations limit is reached. 
+
+
+From Label Studio, go to the **Settings** page for your project and select **Quality**. The following settings are located under **Task agreement**. 
+
+| Field | Description |
+| --- | --- |
+| **Agreement metric** | Select the metric that should determine task agreement. For more information about the options available, see [Annotation agreement and how it is calculated](stats). |
+| **Low agreement strategy** | <ul><li> **Do nothing** - Tasks with a low agreement can be marked complete; no additional actions are taken.</li> <li> **Assign additional annotator** - Automatically assign an additional annotator (if available) to tasks with low agreement.</li></ul> |
+| **Desired agreement threshold** | Enter the agreement threshold as a percentage (1-100) that a task must have before it can be considered complete. |
+| **Maximum additional annotators** | Optionally, enter a maximum number of annotators that can be automatically assigned to the task. Annotators will be assigned one at a time until the agreement threshold is achieved. <br /><br />If this field is blank, there will be no limit to additional annotators. |
+
+
+For more information about auto distribution of tasks, see [Set up task distribution for labeling](#Set-up-task-distribution-for-labeling).
+
+
 ### Set annotating options
 
 If you want, you can allow empty annotations.
