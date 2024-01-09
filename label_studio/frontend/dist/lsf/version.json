@@ -1,6 +1,6 @@
 {
-  "message": "Fix image loading",
-  "commit": "e87b4de3a1988b5d9550d91011cea05ec2338991",
+  "message": "fix: LSDV-4864: Magic Wand doesn't work with MIG ",
+  "commit": "efb73119480f80fa1b19f96333571dfc5b90dad7",
   "branch": "fb-lsdv-4864/magic-wand-mig",
-  "date": "2023-05-04T15:11:10Z"
+  "date": "2024-01-08T17:03:37Z"
 }
