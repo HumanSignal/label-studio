@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-461: Fix displaying conditions for comments tab",
-  "commit": "083812f3291b4b85845841e4ca58126e6d12e50e",
+  "message": "fix: LEAP-439: Add maskData exporting into new MIG serialization approach",
+  "commit": "a3e4f43f823890cbc40f712634defbff003124dd",
   "branch": "master",
-  "date": "2024-01-09T18:54:17Z"
+  "date": "2024-01-09T21:10:34Z"
 }
