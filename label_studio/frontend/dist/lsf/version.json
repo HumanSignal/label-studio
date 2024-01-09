@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-344: View all annotation tab is not loading",
-  "commit": "eb1194c1e8ad5f9c0e725b2955dbc202f169649b",
+  "message": "feat: OPTIC-107: Draft saving on view all",
+  "commit": "08aa5b599a64e4b90956b861739df273946ee738",
   "branch": "master",
-  "date": "2024-01-08T09:48:32Z"
+  "date": "2024-01-08T13:19:30Z"
 }
