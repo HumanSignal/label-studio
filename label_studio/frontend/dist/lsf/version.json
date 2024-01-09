@@ -1,6 +1,6 @@
 {
   "message": "fix: LEAP-439: Add maskData exporting into new MIG serialization approach",
-  "commit": "e0abaa5a3d40b242dff96b7dfbda034c4cd1f4d2",
+  "commit": "63a5bbd55ade151aa81af4bf24e9de434bbb3672",
   "branch": "fb-leap-439/new-mask-export",
-  "date": "2024-01-09T20:09:04Z"
+  "date": "2024-01-09T20:11:13Z"
 }
