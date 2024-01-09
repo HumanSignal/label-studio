@@ -1,0 +1,38 @@
+var _defs, _path;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgMagicWandTool = function SvgMagicWandTool(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 32,
+    height: 32,
+    fill: "none",
+    style: {
+      padding: 6
+    },
+    viewBox: "0 0 489.059 489.059",
+    ref: ref
+  }, props), _defs || (_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: "magic-wand-tool_svg__a",
+    x1: 10.5,
+    x2: 29,
+    y1: 10,
+    y2: 27,
+    gradientUnits: "userSpaceOnUse"
+  }, /*#__PURE__*/React.createElement("stop", {
+    stopColor: "var(--text-color-hover)",
+    stopOpacity: 0.8
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: 1,
+    stopColor: "var(--text-color-hover)",
+    stopOpacity: 0.4
+  })))), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "url(#magic-wand-tool_svg__a)",
+    d: "M481.211 443.368 224.809 186.946l55.817-17.364c3.88-1.196 6.736-4.509 7.38-8.528a10.636 10.636 0 0 0-4.383-10.385l-56.798-40.165a36.358 36.358 0 0 1-15.417-30.172l.916-69.519c.051-4.06-2.23-7.796-5.837-9.647a10.637 10.637 0 0 0-11.225.962l-55.73 41.584a36.383 36.383 0 0 1-33.439 5.294L40.246 26.678a10.712 10.712 0 0 0-11.007 2.55c-2.868 2.872-3.847 7.138-2.563 10.987l22.376 65.862c3.8 11.343 1.828 23.837-5.325 33.438l-41.596 55.73c-2.418 3.272-2.819 7.628-.977 11.236a10.72 10.72 0 0 0 9.688 5.84l69.502-.898a36.39 36.39 0 0 1 30.174 15.366l40.149 56.807c2.373 3.32 6.401 5.021 10.412 4.387a10.645 10.645 0 0 0 8.518-7.378l17.375-55.805 256.389 256.422a26.749 26.749 0 0 0 18.908 7.836c6.885 0 13.73-2.615 18.943-7.836 10.459-10.45 10.459-27.396-.001-37.854",
+    opacity: 0.5
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgMagicWandTool);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDg5LjA1OSA0ODkuMDU5IiBmaWxsPSJub25lIiB3aWR0aD0iMzJweCIgaGVpZ2h0PSIzMnB4IiBzdHlsZT0icGFkZGluZzogNnB4OyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCiAgPGRlZnM+DQogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyIiB4MT0iMTAuNDk5OSIgeTE9IjEwIiB4Mj0iMjguOTk5OSIgeTI9IjI3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+DQogICAgICA8c3RvcCBzdG9wLW9wYWNpdHk9IjAuOCIgc3RvcC1jb2xvcj0idmFyKC0tdGV4dC1jb2xvci1ob3ZlcikiIC8+DQogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3Atb3BhY2l0eT0iMC40IiBzdG9wLWNvbG9yPSJ2YXIoLS10ZXh0LWNvbG9yLWhvdmVyKSIgLz4NCiAgICA8L2xpbmVhckdyYWRpZW50Pg0KICA8L2RlZnM+DQogIDxnIG9wYWNpdHk9IjAuNSI+DQogICAgPHBhdGggZD0iTTQ4MS4yMTEsNDQzLjM2OEwyMjQuODA5LDE4Ni45NDZsNTUuODE3LTE3LjM2NGMzLjg4LTEuMTk2LDYuNzM2LTQuNTA5LDcuMzgtOC41MjhjMC42NDItNC4wMTgtMS4wNTgtOC4wNTEtNC4zODMtMTAuMzg1DQogICAgCWwtNTYuNzk4LTQwLjE2NWMtOS44MTQtNi45MTMtMTUuNTYtMTguMi0xNS40MTctMzAuMTcybDAuOTE2LTY5LjUxOWMwLjA1MS00LjA2LTIuMjMtNy43OTYtNS44MzctOS42NDcNCiAgICAJYy0zLjYwOC0xLjg0NC03Ljk3Ni0xLjQ4My0xMS4yMjUsMC45NjJsLTU1LjczLDQxLjU4NGMtOS41ODgsNy4xNjMtMjIuMTE3LDkuMTM2LTMzLjQzOSw1LjI5NEw0MC4yNDYsMjYuNjc4DQogICAgCWMtMy44NDgtMS4zMTUtOC4xMTgtMC4zMjItMTEuMDA3LDIuNTVjLTIuODY4LDIuODcyLTMuODQ3LDcuMTM4LTIuNTYzLDEwLjk4N2wyMi4zNzYsNjUuODYyYzMuOCwxMS4zNDMsMS44MjgsMjMuODM3LTUuMzI1LDMzLjQzOA0KICAgIAlMMi4xMzEsMTk1LjI0NWMtMi40MTgsMy4yNzItMi44MTksNy42MjgtMC45NzcsMTEuMjM2YzEuODU5LDMuNjMzLDUuNTk5LDUuODg3LDkuNjg4LDUuODRsNjkuNTAyLTAuODk4DQogICAgCWMxMS45NzEtMC4xNTMsMjMuMjQ0LDUuNTgyLDMwLjE3NCwxNS4zNjZsNDAuMTQ5LDU2LjgwN2MyLjM3MywzLjMyLDYuNDAxLDUuMDIxLDEwLjQxMiw0LjM4N2M0LjAyNS0wLjYzMiw3LjMxNC0zLjQ5Nyw4LjUxOC03LjM3OA0KICAgIAlsMTcuMzc1LTU1LjgwNWwyNTYuMzg5LDI1Ni40MjJjNS4yNDMsNS4yMjEsMTIuMDk0LDcuODM2LDE4LjkwOCw3LjgzNmM2Ljg4NSwwLDEzLjczLTIuNjE1LDE4Ljk0My03LjgzNg0KICAgIAlDNDkxLjY3MSw0NzAuNzcyLDQ5MS42NzEsNDUzLjgyNiw0ODEuMjExLDQ0My4zNjh6IiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXIpIiAvPg0KICA8L2c+DQo8L3N2Zz4NCg==";

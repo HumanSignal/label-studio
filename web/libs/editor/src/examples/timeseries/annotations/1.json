@@ -1,0 +1,38 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "result": [
+                {
+                    "value": {
+                        "start": 1602708145233,
+                        "end": 1602708375312,
+                        "instant": false,
+                        "timeserieslabels": [
+                            "Voice"
+                        ]
+                    },
+                    "id": "9TxbkzPXdp",
+                    "from_name": "label",
+                    "to_name": "ts",
+                    "type": "timeserieslabels",
+                    "origin": "prediction"
+                },
+                {
+                    "value": {
+                        "start": 1602708695229,
+                        "end": 1602708975281,
+                        "instant": false,
+                        "timeserieslabels": [
+                            "Other"
+                        ]
+                    },
+                    "id": "5CqP2WqMRz",
+                    "from_name": "label",
+                    "to_name": "ts",
+                    "type": "timeserieslabels"
+                }
+            ]
+        }
+    ]
+}
