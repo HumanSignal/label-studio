@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-355: Make relations work with TimeTraveler",
-  "commit": "2a748d6548ee8f67e274f4b4efcba646a25937e0",
+  "message": "fix: LEAP-461: Fix displaying conditions for comments tab",
+  "commit": "083812f3291b4b85845841e4ca58126e6d12e50e",
   "branch": "master",
-  "date": "2024-01-08T18:27:27Z"
+  "date": "2024-01-09T18:54:17Z"
 }
