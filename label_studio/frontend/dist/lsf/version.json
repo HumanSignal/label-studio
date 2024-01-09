@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-344: View all annotation tab is not loading",
-  "commit": "eb1194c1e8ad5f9c0e725b2955dbc202f169649b",
+  "message": "feat: LEAP-355: Make relations work with TimeTraveler",
+  "commit": "2a748d6548ee8f67e274f4b4efcba646a25937e0",
   "branch": "master",
-  "date": "2024-01-08T09:48:32Z"
+  "date": "2024-01-08T18:27:27Z"
 }
