@@ -403,7 +403,7 @@ const Selection = observer(({ item, ...triggeredOnResize }) => {
 
   return (
     <>
-      { isFF(FF_DBLCLICK_DELAY)
+      {isFF(FF_DBLCLICK_DELAY)
         ? <Layer name="selection-regions-layer" />
         : <SelectedRegions item={item} selectedRegions={item.selectedRegions} {...triggeredOnResize} />
       }
@@ -489,6 +489,22 @@ const Crosshair = memo(forwardRef(({ width, height }, ref) => {
     </Layer>
   );
 }));
+
+/**
+ * Component that creates an overlay on top
+ * of the image to support Magic Wand tool
+ */
+const CanvasOverlay = observer(({ item }) => {
+  return isFF(FF_DEV_4081) ? (
+    <canvas
+      className={styles.overlay}
+      ref={ref => {
+        item.setOverlayRef(ref);
+      }}
+      style={item.imageTransform}
+    />
+  ) : null;
+});
 
 export default observer(
   class ImageView extends Component {
@@ -1001,6 +1017,7 @@ export default observer(
                 imageTransform={item.imageTransform}
                 updateImageSize={item.updateImageSize}
                 size={item.canvasSize}
+                overlay={<CanvasOverlay item={item} />}
               />
             ) : (
               <div
@@ -1026,15 +1043,7 @@ export default observer(
                   crossOrigin={item.imageCrossOrigin}
                   alt="LS"
                 />
-                {isFF(FF_DEV_4081) ? (
-                  <canvas
-                    className={styles.overlay}
-                    ref={ref => {
-                      item.setOverlayRef(ref);
-                    }}
-                    style={item.imageTransform}
-                  />
-                ) : null}
+                <CanvasOverlay item={item} />
               </div>
             )}
             {/* @todo this is dirty hack; rewrite to proper async waiting for data to load */}
@@ -1141,12 +1150,8 @@ const EntireStage = observer(({
 
   return (
     <Stage
-      ref={ref => {
-        item.setStageRef(ref);
-      }}
-      className={[styles['image-element'],
-        ...imagePositionClassnames,
-      ].join(' ')}
+      ref={ref => { item.setStageRef(ref); }}
+      className={[styles['image-element'], ...imagePositionClassnames].join(' ')}
       width={size.width}
       height={size.height}
       scaleX={item.zoomScale}

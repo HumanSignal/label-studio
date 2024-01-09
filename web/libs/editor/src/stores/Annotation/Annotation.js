@@ -181,16 +181,6 @@ export const Annotation = types
       return results;
     },
 
-    get serialized() {
-      // Dirty hack to force MST track changes
-      self.areas.toJSON();
-
-      return self.results
-        .map(r => r.serialize())
-        .filter(Boolean)
-        .concat(self.relationStore.serializeAnnotation());
-    },
-
     get serializedSelection() {
       // Dirty hack to force MST track changes
       self.areas.toJSON();
@@ -467,7 +457,7 @@ export const Annotation = types
     validate() {
       let ok = true;
 
-      self.traverseTree(function(node) {
+      self.traverseTree(function (node) {
         ok = node.validate?.();
         if (ok === false) {
           return TRAVERSE_STOP;
@@ -637,7 +627,7 @@ export const Annotation = types
       self.startAutosave();
     },
 
-    startAutosave: flow(function *() {
+    startAutosave: flow(function* () {
       if (!getEnv(self).events.hasEvent('submitDraft')) return;
       // view all must never trigger autosave
       if (self.isReadOnly()) return;
@@ -667,13 +657,13 @@ export const Annotation = types
       onSnapshot(self.areas, self.autosave);
     }),
 
-    async saveDraft(params) {
+    saveDraft: flow(function* (params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted) return;
       // if this is now a history item or prediction don't save it
       if (!self.editable) return;
 
-      const result = self.serializeAnnotation({ fast: true });
+      const result = yield self.serializeAnnotation({ fast: true });
       // if this is new annotation and no regions added yet
 
       if (!isFF(FF_LSDV_3009) && !self.pk && !result.length) return;
@@ -686,7 +676,7 @@ export const Annotation = types
 
         return res;
       });
-    },
+    }),
 
     submissionInProgress() {
       self.submissionStarted = Date.now();
@@ -920,15 +910,17 @@ export const Annotation = types
       return self.regionStore.regions.slice(prevSize);
     },
 
-    serializeAnnotation(options) {
-      // return self.serialized;
-
+    async serializeAnnotation(options) {
       document.body.style.cursor = 'wait';
+      let result = [];
 
-      const result = self.results
-        .map(r => r.serialize(options))
-        .filter(Boolean)
-        .concat(self.relationStore.serializeAnnotation(options));
+      for (const singleResult of self.results) {
+        const serialized = await singleResult.serialize();
+
+        if (serialized) result.push(serialized);
+      }
+
+      result = result.concat(self.relationStore.serializeAnnotation(options));
 
       document.body.style.cursor = 'default';
 
@@ -1019,7 +1011,7 @@ export const Annotation = types
         if (tagNames.has(obj.from_name) && tagNames.has(obj.to_name)) {
           res.push(obj);
         }
-        
+
         // Insert image dimensions from result 
         (() => {
           if (!isDefined(obj.original_width)) return;
@@ -1029,7 +1021,7 @@ export const Annotation = types
 
           if (tag.type !== 'image') return;
 
-          const imageEntity = tag.findImageEntity(obj.item_index ?? 0); 
+          const imageEntity = tag.findImageEntity(obj.item_index ?? 0);
 
           if (!imageEntity) return;
 
@@ -1332,7 +1324,7 @@ export const Annotation = types
         area.setValue(state);
       });
       self.suggestions.delete(id);
-      
+
     },
 
     rejectSuggestion(id) {

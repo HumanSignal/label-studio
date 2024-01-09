@@ -571,7 +571,6 @@ export default types
         self.incrementQueuePosition();
       });
       entity.dropDraft();
-      !entity.sentUserGenerate && entity.sendUserGenerate();
     }
 
     function skipTask(extraData) {
@@ -727,15 +726,20 @@ export default types
     }
 
     function setHistory(history = []) {
+      console.log('Setting annotation history');
       const as = self.annotationStore;
+
+      const selected = as.selected?.toJSON();
+
+      console.log({ pk: selected?.pk, id: selected?.id });
 
       as.clearHistory();
 
       // always check that history is for correct and submitted annotation
-      if (!history.length || !as.selected?.pk) return;
-      if (Number(as.selected.pk) !== Number(history[0].annotation_id)) return;
+      if (Array.isArray(history) && !history.length || !as.selected?.pk) return console.warn('Invalid history record', history);
+      if (Number(as.selected.pk) !== Number(history[0].annotation_id)) return console.log('Mismatched annotation history id', history);
 
-      (history ?? []).forEach(item => {
+      history.forEach(item => {
         const obj = as.addHistory(item);
 
         obj.deserializeResults(item.result ?? [], { hidden: true });

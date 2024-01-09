@@ -3,9 +3,9 @@ import { Button, Form } from 'antd';
 
 import { observer } from 'mobx-react';
 
-const toJSON = (annotation) => {
+const toJSON = async (annotation) => {
   const id = annotation.pk || annotation.id;
-  const result = annotation.serializeAnnotation();
+  const result = await annotation.serializeAnnotation();
   const draft = annotation.versions.draft;
   const json = { id, result };
 
@@ -32,22 +32,22 @@ const DebugComponent = ({ store }) => {
     if (cs.annotations.length) cs.selectAnnotation(cs.annotations[0].id);
   }, []);
 
-  const serializeCurrent = useCallback(() => {
+  const serializeCurrent = useCallback(async () => {
     const input = refAnnotations.current;
 
     if (!input) return;
     const annotation = store.annotationStore.selected;
-    const json = [toJSON(annotation)];
+    const json = await toJSON(annotation);
 
     input.value = JSON.stringify(json, null, 2);
   }, []);
 
-  const serializeAll = useCallback(() => {
+  const serializeAll = useCallback(async () => {
     const input = refAnnotations.current;
 
     if (!input) return;
     const { annotations, predictions } = store.annotationStore;
-    const json = [...annotations, ...predictions].map(toJSON);
+    const json = await Promise.all([...annotations, ...predictions].map(toJSON));
 
     input.value = JSON.stringify(json, null, 2);
   }, []);

@@ -173,8 +173,9 @@ function RLE2Region(item, { color = Constants.FILL_COLOR } = {}) {
 /**
 * Exports region using canvas. Doesn't require Konva#Stage access
 * @param {Region} region Brush region
+* @return {Promise<Uint8Array>} RLE encoded data
 */
-function exportRLE(region) {
+async function exportRLE(region) {
   const {
     naturalWidth,
     naturalHeight,
@@ -197,6 +198,19 @@ function exportRLE(region) {
   const ctx = canvas.getContext('2d');
 
   document.body.appendChild(canvas);
+
+  if (region.maskDataURL) {
+    await new Promise((resolve) => {
+      const image = new Image();
+
+      image.onload = () => {
+        ctx.drawImage(image, 0, 0);
+        resolve();
+      };
+
+      image.src = region.maskDataURL;
+    });
+  }
 
   // Restore original RLE if available
   if (region.rle && region.rle.length > 0) {
@@ -263,9 +277,9 @@ function exportRLE(region) {
  * Given a brush region return the RLE encoded array.
  * @param {BrushRegion} region BrushRegtion to turn into RLE array.
  * @param {tags.object.Image} image Image the region will be interacting with.
- * @returns {string} RLE encoded contents.
+ * @returns {Promise<Uint8Array>} RLE encoded contents.
  */
-function Region2RLE(region) {
+async function Region2RLE(region) {
   // New way of exporting brush regions
   if (isFF(FF_LSDV_4583)) return exportRLE(region);
 

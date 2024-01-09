@@ -413,7 +413,7 @@ const Model = types
        * @param {boolean} [options.fast] Saving only touches, without RLE
        * @return {BrushRegionResult}
        */
-      serialize(options) {
+      async serialize(options) {
         const object = self.object;
         const value = { format: 'rle' };
 
@@ -423,7 +423,7 @@ const Model = types
           if (self.touches.length) value.touches = self.touches;
           if (self.maskDataURL) value.maskDataURL = self.maskDataURL;
         } else {
-          const rle = Canvas.Region2RLE(self, object);
+          const rle = await Canvas.Region2RLE(self, object);
 
           if (!rle || !rle.length) return null;
 
