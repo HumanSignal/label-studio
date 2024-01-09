@@ -19,6 +19,11 @@ export const TopBar = observer(({ store }) => {
 
   const isViewAll = annotationStore?.viewingAll === true;
 
+  const toggleViewAll = () => {
+    !isViewAll && entity.saveDraftImmediatelyWithResults({ useToast: true });
+    annotationStore.toggleViewingAllAnnotations();
+  };
+
   return store ? (
     <Block name="topbar" mod={{ newLabelingUI: isFF(FF_DEV_3873) }}>
       {isFF(FF_DEV_3873) ? (
@@ -31,7 +36,7 @@ export const TopBar = observer(({ store }) => {
                 icon={<IconViewAll />}
                 type="text"
                 aria-label="View All"
-                onClick={() => annotationStore.toggleViewingAllAnnotations()}
+                onClick={toggleViewAll}
                 primary={ isViewAll }
                 style={{
                   height: 36,
