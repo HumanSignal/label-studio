@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-439: Add maskData exporting into new MIG serialization approach",
-  "commit": "a3e4f43f823890cbc40f712634defbff003124dd",
-  "branch": "master",
-  "date": "2024-01-09T21:10:34Z"
+  "message": "fix: LEAP-521: Update LSF and DM files on monorepo",
+  "commit": "f3a5e6259a315c89797bde160a3074af60b1e5ab",
+  "branch": "fb-leap-521",
+  "date": "2024-01-10T08:16:03Z"
 }
