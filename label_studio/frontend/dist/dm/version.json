@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-706: [FE] Action menu remains open when user select 'Find similar option'",
-  "commit": "4b3dc54df052b7d2868791572668c70f944fa8fe",
+  "message": "feat: OPTIC-107: Draft saving on view all",
+  "commit": "b2006083fb40a3d5a1ee7979ff24497864dfcdac",
   "branch": "master",
-  "date": "2023-12-12T04:51:04Z"
+  "date": "2024-01-04T09:37:55Z"
 }

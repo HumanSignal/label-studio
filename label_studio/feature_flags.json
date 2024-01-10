@@ -2445,33 +2445,6 @@
       "version": 4,
       "deleted": false
     },
-    "fflag_feat_dia_471_add_new_column_projects_short": {
-      "key": "fflag_feat_dia_471_add_new_column_projects_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "f72902443e194e42848fe67c07793cfd",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "fflag_feat_dia_787_zendesk_widget_integration": {
       "key": "fflag_feat_dia_787_zendesk_widget_integration",
       "on": false,
@@ -3063,7 +3036,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_feat_front_lsdv_4620_outliner_optimization_310723_short": {
@@ -4443,33 +4416,6 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_fix_back_optic_216_change_per_user_agreement_query_to_hit_more_indexes": {
-      "key": "fflag_fix_back_optic_216_change_per_user_agreement_query_to_hit_more_indexes",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 1
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "7cc7a432897c4e0382d39150bca8812a",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_fix_back_optic_287_aggregate_query_for_groundtruth_per_user_short": {
       "key": "fflag_fix_back_optic_287_aggregate_query_for_groundtruth_per_user_short",
       "on": false,
@@ -5292,6 +5238,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
+      "deleted": false
+    },
+    "fflag_fix_leap_466_text_sanitization": {
+      "key": "fflag_fix_leap_466_text_sanitization",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "224d52df373e4061b517235600063392",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 5,
       "deleted": false
     },
     "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation": {
