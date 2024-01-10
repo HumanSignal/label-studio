@@ -710,14 +710,14 @@ export const Annotation = types
       if (self.autosave) self.autosave.flush();
     },
 
-    async saveDraftImmediatelyWithResults(params) {
+    saveDraftImmediatelyWithResults: flow(function *(params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted || self.isDraftSaving) return {};
       self.setDraftSaving(true);
-      const res = await self.saveDraft(params);
+      const res = yield self.saveDraft(params);
 
       return res;
-    },
+    }),
 
     pauseAutosave() {
       if (!self.autosave) return;
@@ -934,10 +934,10 @@ export const Annotation = types
       return self.regionStore.regions.slice(prevSize);
     },
 
-    async serializeAnnotation(options) {
+    serializeAnnotation: flow(function *(options) {
       document.body.style.cursor = 'wait';
 
-      const result = (await Promise.all(
+      const result = (yield Promise.all(
         self.results.map(r => r.serialize(options)))
       )
         .filter(Boolean)
@@ -946,7 +946,7 @@ export const Annotation = types
       document.body.style.cursor = 'default';
 
       return result;
-    },
+    }),
 
     // Some annotations may be created with wrong assumptions
     // And this problems are fixable, so better to fix them on start
