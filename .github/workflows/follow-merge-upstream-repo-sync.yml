@@ -146,7 +146,7 @@ jobs:
           set -xeuo pipefail
           
           preserve_dir=$(mktemp -d)
-          if [ -n ${COPY_SRC_PRESERVE_PATH} ]; then
+          if [ -n ${COPY_SRC_PRESERVE_PATH} ] && [ -d ${COPY_SRC_PRESERVE_PATH} ]; then
             echo "Preserving ${COPY_SRC_PRESERVE_PATH}"
             cp -r "${COPY_SRC_PRESERVE_PATH}" "${preserve_dir}"
           fi 
