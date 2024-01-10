@@ -73,7 +73,7 @@ jobs:
             const dockerHubImageName = '${{ env.IMAGE_NAME }}';
             const redHatImageName = 'quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }}';
             const regexp = '^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.post([0-9]+))?$';
-            
+
             function compareVersions(a, b) {
               if (a[1] === b[1])
                 if (a[2] === b[2])
@@ -86,7 +86,7 @@ jobs:
               else
                 return +a[1] - b[1]
             }
-            
+
             const tags = await github.paginate(
               github.rest.repos.listTags,
               {
@@ -104,15 +104,15 @@ jobs:
               .reverse()
             console.log('Sorted tags:')
             console.log(sortedTags.map(e => e[0]))
-            
+
             const newestVersion = sortedTags[0];
             console.log(`Newest tag: ${newestVersion[0]}`)
-            
+
             let dockerHubUbuntuRawTags = [newTag];
             let dockerHubUbiRawTags = [`ubi_${newTag}`];
             let redHatUbiRawTags = [newTag];
-            
-            
+
+
             if (compareVersions(newTag.match(regexp), newestVersion) >= 0) {
               console.log(`new tag ${newTag} is higher that all existing tags`)
               console.log(dockerHubUbuntuRawTags)
@@ -124,18 +124,18 @@ jobs:
               console.log('not latest')
               core.setOutput("latest", false);
             }
-            
+
             const ubuntuTags = dockerHubUbuntuRawTags.map(e => `${dockerHubImageName}:${e}`)
             const redHatTags = redHatUbiRawTags.map(e => `${redHatImageName}:${e}`)
             const ubiTags = redHatTags.concat(
               dockerHubUbiRawTags.map(e => `${dockerHubImageName}:${e}`)
             )
-            
+
             console.log('Ubuntu tags:')
             console.log(ubuntuTags)
             console.log('Ubi tags:')
             console.log(ubiTags)
-            
+
             core.setOutput("ubuntu-tags", ubuntuTags.join(','));
             core.setOutput("redhat-tags", redHatTags.join(','));
             core.setOutput("ubi-tags", ubiTags.join(','));
@@ -161,7 +161,7 @@ jobs:
             --retry-delay 10 \
             -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
             "https://sdk.launchdarkly.com/sdk/latest-all" >"${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
-          if [ "$(jq 'has("flags")' <<< cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }})" = "true" ]; then 
+          if [ "$(jq 'has("flags")' <<< cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }})" = "true" ]; then
             echo "feature_flags.json is valid"
           else
             echo "feature_flags.json is invalid"
@@ -245,4 +245,4 @@ jobs:
         with:
           version: label-studio@${{ inputs.release_tag }}
           projects: opensource-v1-frontend
-          sourcemaps: label_studio/frontend/dist
+          sourcemaps: web/dist
