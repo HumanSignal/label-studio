@@ -136,8 +136,7 @@ include = [
 ]
 
 exclude = [
-    "label_studio/frontend/node_modules/**/*",
-    "label_studio/frontend/build-tmp/**/*"
+    "label_studio/frontend",
 ]
 
 
