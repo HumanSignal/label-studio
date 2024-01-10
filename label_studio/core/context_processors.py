@@ -14,18 +14,19 @@ def settings(request):
     """Make available django settings on each template page"""
     versions = collect_versions()
 
+    os_release = versions.get('label-studio-os-backend', {}).get('commit', 'none')[0:6]
     # django templates can't access names with hyphens
     versions['lsf'] = versions.get('label-studio-frontend', {})
-    versions['lsf']['commit'] = versions['lsf'].get('commit', 'none')[0:6]
+    versions['lsf']['commit'] = versions['lsf'].get('commit', os_release)[0:6]
+
+    versions['dm2'] = versions.get('dm2', {})
+    versions['dm2']['commit'] = versions['dm2'].get('commit', os_release)[0:6]
 
     versions['backend'] = {}
     if 'label-studio-os-backend' in versions:
         versions['backend']['commit'] = versions['label-studio-os-backend'].get('commit', 'none')[0:6]
     if 'label-studio-enterprise-backend' in versions:
         versions['backend']['commit'] = versions['label-studio-enterprise-backend'].get('commit', 'none')[0:6]
-
-    if 'dm2' in versions:
-        versions['dm2']['commit'] = versions['dm2'].get('commit', 'none')[0:6]
 
     feature_flags = {}
     if hasattr(request, 'user'):
