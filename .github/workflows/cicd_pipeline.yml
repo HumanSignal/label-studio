@@ -79,6 +79,7 @@ jobs:
                 repo,
                 ref: '${{ github.event.pull_request.head.sha || github.event.after }}'
             });
+            console.log(`Last commit message is "${commit.commit.message}"`)
             core.setOutput("commit-message", commit.commit.message);
 
   gitleaks:
@@ -124,7 +125,7 @@ jobs:
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.fork == false &&
       needs.changed_files.outputs.frontend == 'true' &&
-      needs.changed_files.outputs.commit-message != 'ci: Build frontend'
+      !startsWith(needs.changed_files.outputs.commit-message, 'ci: Build frontend')
     permissions:
       contents: write
     uses: ./.github/workflows/frontend-build.yml
