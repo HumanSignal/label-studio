@@ -226,6 +226,7 @@ def generate_taskgen_form(request, project_id):
                     columns_names_choices = []
                     for i, column_name in enumerate(column_names):
                         columns_names_choices.append((i, column_name))
+                    columns_names_choices.reverse()
                     # Pass the choices to the session, this way it can more easily be retrieved later in the flow.
                     request.session['choices'] = columns_names_choices
                     return redirect('taskgeneration:taskgeneration_form', project_id=project_id)
