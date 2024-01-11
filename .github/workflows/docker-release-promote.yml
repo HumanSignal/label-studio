@@ -224,7 +224,7 @@ jobs:
           # Usually it takes 10-20 sec so the image becomes available
           sleep 10s
           docker pull ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }}
-          docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
+          docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/web/dist/ /workspace/web/
 
       - name: Create Sentry release @ backend
         uses: getsentry/action-release@v1
