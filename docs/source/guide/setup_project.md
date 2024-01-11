@@ -154,6 +154,9 @@ To ensure tasks with chronically low agreement do not consume an excessive amoun
 
 If this criteria is not met and auto distribution of tasks is enabled, the task will continue being assigned to available annotators until the low agreement threshold is met, or the configured maximum number of annotations limit is reached. 
 
+!!! note
+    When configuring the minimum annotations per task and maximum additional annotators, be mindful of the number of annotators available in your project. If you have fewer annotators available than the sum of minimum annotations per task + maximum additional annotators, you might encounter a scenario in which a task with a low agreement score cannot be marked complete.
+
 
 From Label Studio, go to the **Settings** page for your project and select **Quality**. The following settings are located under **Task agreement**. 
 
