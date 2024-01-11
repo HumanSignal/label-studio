@@ -57,6 +57,7 @@ jobs:
               - '.github/workflows/test_migrations.yml'
             frontend:
               - 'label_studio/frontend/**'
+              - 'web/**'
               - '.github/workflows/frontend-build.yml'
             docker:
               - 'label_studio/**'
