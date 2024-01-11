@@ -880,7 +880,7 @@ export default types
 
         let node;
 
-        while ((node = children.shift())) {
+        while ((node = children.shift() && children)) {
           try {
             destroy(node);
           } catch (e) {
