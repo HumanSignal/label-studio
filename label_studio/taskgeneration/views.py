@@ -109,100 +109,98 @@ def create_annotation_data_chunks(request, project, subject, duration,value_colu
     # This way a sensordata_A file does not get annotated twice if there are several overlaps
     for sendata_A_id in distinct_sensor_data_ids: 
         all_overlap_for_sen_A  = sensor_overlap.filter(sensordata_A=sendata_A_id)
-        longest_duration = 0
-        for overlap_A in all_overlap_for_sen_A:
-            if overlap_A.end_A - overlap_A.start_A > longest_duration:
-                longest_duration = overlap_A.end_A - overlap_A.start_A
-                longest_overlap = overlap_A
+        for overlap in all_overlap_for_sen_A:
+            # Determine duration/length of overlap, this will be used to determine the amount of segments
+            overlap_duration = overlap.end_A - overlap.start_A
+            # Extract sensor types
+            sensortype_A = overlap.sensordata_A.sensor.sensortype.sensortype
+            sensortype_B = overlap.sensordata_B.sensor.sensortype.sensortype
+            # For now only Camera and IMU is supported
+            if sensortype_A == 'C' and sensortype_B == 'I':
+                # Determine amount of segments that fit inside overlap
+                amount_of_segments = int(overlap_duration // duration) + (overlap_duration % duration > 0)
+                # Load data from SensorType and the csv file
+                imu_file_path = overlap.sensordata_B.file_upload.file.path
+                timestamp_column = overlap.sensordata_B.sensor.sensortype.timestamp_column
+                imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
+                # Get column names for showing in LS
+                timestamp_column_name = imu_df.columns[timestamp_column]
+                value_column_name = imu_df.columns[int(value_column)]
+                # Update labeling set up in activity annotion project
+                # Create a XML markup for annotating
+                template = create_activity_annotation_template(timestamp_column_name=timestamp_column_name,
+                                                                value_column_name=value_column_name)
+                # Get url for displaying project detail
+                project_detail_url = request.build_absolute_uri(reverse('projects:api:project-detail', args=[project.id+2]))
+                # Update labeling set up
+                token = Token.objects.get(user=request.user)
+                requests.patch(project_detail_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template})
+                for i, segment in enumerate(range(amount_of_segments)):
+                    # Determine start and end of segment in seconds for both sensors
+                    if i == amount_of_segments-1: # Remaining segment
+                        begin_segment_A = overlap.start_A+ duration*segment
+                        end_segment_A = overlap.end_A
+                        begin_segment_B = overlap.start_B+ duration*segment
+                        end_segment_B = overlap.end_B
+                    else:
+                        begin_segment_A = overlap.start_A+ duration*segment
+                        end_segment_A = begin_segment_A +duration
+                        begin_segment_B = overlap.start_B+ duration*segment
+                        end_segment_B = begin_segment_B +duration
 
-
-        sensortype_A = longest_overlap.sensordata_A.sensor.sensortype.sensortype
-        sensortype_B = longest_overlap.sensordata_B.sensor.sensortype.sensortype
-        if sensortype_A == 'C' and sensortype_B == 'I':
-            # Determine amount of segments that fit inside overlap
-            amount_of_segments = int(longest_duration // duration) + (longest_duration % duration > 0)
-            # Load data from SensorType and the csv file
-            imu_file_path = longest_overlap.sensordata_B.file_upload.file.path
-            timestamp_column = longest_overlap.sensordata_B.sensor.sensortype.timestamp_column
-            imu_df = pd.read_csv(imu_file_path,skipfooter=1, engine='python')
-            # Get column names for showing in LS
-            timestamp_column_name = imu_df.columns[timestamp_column]
-            value_column_name = imu_df.columns[int(value_column)]
-            # Update labeling set up in activity annotion project
-            # Create a XML markup for annotating
-            template = create_activity_annotation_template(timestamp_column_name=timestamp_column_name,
-                                                           value_column_name=value_column_name)
-            # Get url for displaying project detail
-            project_detail_url = request.build_absolute_uri(reverse('projects:api:project-detail', args=[project.id+2]))
-            # Update labeling set up
-            token = Token.objects.get(user=request.user)
-            requests.patch(project_detail_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template})
-            for i, segment in enumerate(range(amount_of_segments)):
-                # Determine start and end of segment in seconds for both sensors
-                if i == amount_of_segments-1: # Remaining segment
-                    begin_segment_A = longest_overlap.start_A+ duration*segment
-                    end_segment_A = longest_overlap.end_A
-                    begin_segment_B = longest_overlap.start_B+ duration*segment
-                    end_segment_B = longest_overlap.end_B
-                else:
-                    begin_segment_A = longest_overlap.start_A+ duration*segment
-                    end_segment_A = begin_segment_A +duration
-                    begin_segment_B = longest_overlap.start_B+ duration*segment
-                    end_segment_B = begin_segment_B +duration
-    
-                with NamedTemporaryFile(prefix="CHUNK", suffix=".mp4", delete=False, mode='w') as temp_video,\
-                    NamedTemporaryFile(prefix="CHUNK", suffix=".csv", delete=False, mode='w') as temp_imu:
-                    video_file_path = longest_overlap.sensordata_A.file_upload.file.path
-                    ### Cut out video using ffmpeg ###
-                    ffmpeg_command = [
-                    "ffmpeg",
-                    "-y",
-                    "-i", video_file_path,
-                    "-ss", str(begin_segment_A),
-                    "-to", str(end_segment_A),
-                    "-c:v", "copy",
-                    "-c:a", "copy",
-                    "-loglevel","quiet",
-                    temp_video.name,
-                    ]
-                    subprocess.run(ffmpeg_command, shell=True)
-                    
-                    
-                    ### Cut out csv file using pandas ### 
-                    # Find the indeces of the timestamp instances closest to begin and end of segment
-                    start_index = imu_df[imu_df.iloc[:, timestamp_column]>= begin_segment_B].index[0] # First timestamp after begin_segment
-                    end_index = imu_df[imu_df.iloc[:, timestamp_column] >= end_segment_B].index[0] # First timestamp after end_segment
-                    # Only keep the rows in between the obtained indeces
-                    segment_imu_df = imu_df.iloc[start_index:end_index]
-                    # Add offset to every timestamp so that everthing shifts s.t. start time is 0
-                    segment_imu_df.iloc[:, timestamp_column] = segment_imu_df.iloc[:, timestamp_column].subtract(segment_imu_df.iloc[0, timestamp_column])
-                    # Create temporary file and save new csv to this file
-                    segment_imu_df.to_csv(temp_imu.name, index=False)
-                    # Upload the chunks to the project using the LS API and get the FileUpload object
-                    upload_sensor_data(request=request, name=f'imu_segment_{i}', file_path=temp_imu.name ,project=project)
-                    fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
-                    imu_file_upload = fileupload_model.objects.latest('id')
-                    upload_sensor_data(request=request, name=f'video_segment_{i}', file_path=temp_video.name ,project=project)               
-                    fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
-                    video_file_upload = fileupload_model.objects.latest('id')
-                    # Parameters used in the synchronisation of timeseries and video
-                    refresh_every = 10 # Every 10 ms it syncs
-                    wait_before_sync = 1500 # In order to wait for the loading of the data, the syncing wait 3000 ms before starting
-                    activity_annotation_project = Project.objects.get(id=project.id+2)
-                    task_json_template = {
-                        "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",
-                        "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=r()[0]),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
-                        "subject": f"{subject}"
-                    }
-                    # Upload the JSON to the correct LS project
-                    with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
-                        json.dump(task_json_template,task_json_file,indent=4)
-                    upload_sensor_data(request, name=f'segment: {i}', file_path=task_json_file.name, project=activity_annotation_project)
-                os.remove(temp_imu.name)
-                os.remove(temp_video.name)                
-                os.remove(task_json_file.name)
-        else:
-            return HttpResponse('Sensor combination not yet supported ', content_type='text/plain')
+                    with NamedTemporaryFile(prefix="CHUNK", suffix=".mp4", delete=False, mode='w') as temp_video,\
+                        NamedTemporaryFile(prefix="CHUNK", suffix=".csv", delete=False, mode='w') as temp_imu:
+                        video_file_path = overlap.sensordata_A.file_upload.file.path
+                        ### Cut out video using ffmpeg ###
+                        ffmpeg_command = [
+                        "ffmpeg",
+                        "-y",
+                        "-i", video_file_path,
+                        "-ss", str(begin_segment_A),
+                        "-to", str(end_segment_A),
+                        "-c:v", "copy",
+                        "-c:a", "copy",
+                        "-loglevel","quiet",
+                        temp_video.name,
+                        ]
+                        subprocess.run(ffmpeg_command, shell=True)
+                        
+                        
+                        ### Cut out csv file using pandas ### 
+                        # Find the indeces of the timestamp instances closest to begin and end of segment
+                        start_index = imu_df[imu_df.iloc[:, timestamp_column]>= begin_segment_B].index[0] # First timestamp after begin_segment
+                        end_index = imu_df[imu_df.iloc[:, timestamp_column] >= end_segment_B].index[0] # First timestamp after end_segment
+                        # Only keep the rows in between the obtained indeces
+                        segment_imu_df = imu_df.iloc[start_index:end_index]
+                        # Add offset to every timestamp so that everthing shifts s.t. start time is 0
+                        segment_imu_df.iloc[:, timestamp_column] = segment_imu_df.iloc[:, timestamp_column].subtract(segment_imu_df.iloc[0, timestamp_column])
+                        # Create temporary file and save new csv to this file
+                        segment_imu_df.to_csv(temp_imu.name, index=False)
+                        # Upload the chunks to the project using the LS API and get the FileUpload object
+                        upload_sensor_data(request=request, name=f'imu_segment_{i}', file_path=temp_imu.name ,project=project)
+                        fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
+                        imu_file_upload = fileupload_model.objects.latest('id')
+                        upload_sensor_data(request=request, name=f'video_segment_{i}', file_path=temp_video.name ,project=project)               
+                        fileupload_model = apps.get_model(app_label='data_import', model_name='FileUpload')
+                        video_file_upload = fileupload_model.objects.latest('id')
+                        # Parameters used in the synchronisation of timeseries and video
+                        refresh_every = 10 # Every 10 ms it syncs
+                        wait_before_sync = 1500 # In order to wait for the loading of the data, the syncing wait 3000 ms before starting
+                        activity_annotation_project = Project.objects.get(id=project.id+2)
+                        task_json_template = {
+                            "csv": f"{imu_file_upload.file.url}?time={timestamp_column_name}&values={value_column_name}",
+                            "video": f"<video src='{video_file_upload.file.url}' width='100%' controls onloadeddata=\"setTimeout(function(){{ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.{timestamp_column_name.lower()};v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=r()[0]),{refresh_every}); console.log('video is loaded, starting to sync with time series')}}, {wait_before_sync}); \" />",
+                            "subject": f"{subject}"
+                        }
+                        # Upload the JSON to the correct LS project
+                        with NamedTemporaryFile(prefix=f'segment_{i}_', suffix='.json',mode='w',delete=False) as task_json_file:
+                            json.dump(task_json_template,task_json_file,indent=4)
+                        upload_sensor_data(request, name=f'segment: {i}', file_path=task_json_file.name, project=activity_annotation_project)
+                    os.remove(temp_imu.name)
+                    os.remove(temp_video.name)                
+                    os.remove(task_json_file.name)
+            else:
+                return HttpResponse('Sensor combination not yet supported ', content_type='text/plain')
 
 def generate_taskgen_form(request, project_id):
     try:
