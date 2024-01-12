@@ -61,7 +61,7 @@ jobs:
           
           release_version="${first}.${second}.${third}"
           release_branch="${{ env.RELEASE_BRANCH_PREFIX }}/${first}.${second}.${third}"
-          next_develop_version="${first}.${second}.$(($third + 1))dev"
+          next_develop_version="${first}.${second}.$(($third + 1)).dev0"
           
           echo "release_branch=${release_branch}" >> $GITHUB_OUTPUT
           echo "release_version=${release_version}" >> $GITHUB_OUTPUT
