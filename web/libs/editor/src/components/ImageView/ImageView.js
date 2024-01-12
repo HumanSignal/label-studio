@@ -1150,7 +1150,7 @@ const EntireStage = observer(({
 
   return (
     <Stage
-      ref={ref => { item.setStageRef(ref); }}
+      ref={ref => item.setStageRef(ref)}
       className={[styles['image-element'], ...imagePositionClassnames].join(' ')}
       width={size.width}
       height={size.height}
