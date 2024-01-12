@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4864: LEAP-148: Magic Wand doesn't work with MIG ",
-  "commit": "ecc46ed9f348064b6e8cae6b2be664c5692fb32f",
+  "commit": "b88252d86d1f2d0e6b820359d438b5085eb3c46c",
   "branch": "fb-lsdv-4864/magic-wand-mig",
-  "date": "2024-01-12T15:02:27Z"
+  "date": "2024-01-12T15:04:27Z"
 }
