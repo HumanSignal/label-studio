@@ -727,7 +727,6 @@ export default types
 
     function setHistory(history = []) {
       const as = self.annotationStore;
-      const selected = as.selected?.toJSON();
 
       as.clearHistory();
 
