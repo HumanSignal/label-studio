@@ -33,8 +33,8 @@ Use with the following data types: image.
 | original_height | <code>number</code> | height of the original image (px) |
 | image_rotation | <code>number</code> | rotation degree of the image (deg) |
 | value | <code>Object</code> |  |
-| value.x | <code>number</code> | x coordinate of the top left corner before rotation (0-100) |
-| value.y | <code>number</code> | y coordinate of the top left corner before rotation (0-100) |
+| value.x | <code>number</code> | x coordinate of the top left corner after rotation (0-100) |
+| value.y | <code>number</code> | y coordinate of the top left corner after rotation (0-100) |
 | value.width | <code>number</code> | width of the bounding box (0-100) |
 | value.height | <code>number</code> | height of the bounding box (0-100) |
 | value.rotation | <code>number</code> | rotation degree of the bounding box (deg) |
