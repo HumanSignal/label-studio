@@ -101,7 +101,7 @@ jobs:
           set -euo pipefail
           version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
           ./toml set '${{ env.PYTHON_VERSION_FILE }}' tool.poetry.version "$version" > pyproject.toml.new
-          mv -f pyproject.toml.new pyproject.toml
+          mv -f pyproject.toml.new '${{ env.PYTHON_VERSION_FILE }}'
 
       - name: Commit version file
         id: make-commit
