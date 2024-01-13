@@ -875,13 +875,15 @@ export default types
         const children = [];
 
         walk(self, (node) => {
-          if (!isRoot(node) && getParent(node) === self) children.push(node);
+          if (!isRoot(node) && getParent(node) === self) {
+            if (node.annotations) children.unshift(...node.annotations);
+            else children.push(node);
+          }
         });
 
         let node;
 
         while ((node = children?.shift())) {
-          console.log(node.annotations?.[0].trackedState.areas);
           try {
             destroy(node);
           } catch (e) {
