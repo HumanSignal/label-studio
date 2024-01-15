@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-107: Draft saving on view all",
-  "commit": "b2006083fb40a3d5a1ee7979ff24497864dfcdac",
-  "branch": "master",
-  "date": "2024-01-04T09:37:55Z"
+  "message": "feat: DIA-820: [FE] Make List type columns display as intended type with out the ability for users to change type for Data Discovery",
+  "commit": "8aef2507ad8920a7c8347da0468620a695530408",
+  "branch": "fb-dia-820/type-selection",
+  "date": "2024-01-15T06:29:46Z"
 }
