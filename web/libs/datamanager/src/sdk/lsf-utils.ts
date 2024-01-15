@@ -76,10 +76,10 @@ export const annotationToServer = (
   };
 };
 
-export const getAnnotationSnapshot = (c: LSFAnnotation) => ({
+export const getAnnotationSnapshot = async (c: LSFAnnotation) => ({
   id: c.id,
   pk: c.pk,
-  result: c.serializeAnnotation(),
+  result: await c.serializeAnnotation(),
   leadTime: c.leadTime,
   userGenerate: !!c.userGenerate,
   sentUserGenerate: !!c.sentUserGenerate,

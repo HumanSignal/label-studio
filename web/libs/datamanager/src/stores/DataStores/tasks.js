@@ -48,9 +48,8 @@ export const create = (columns) => {
       },
     }))
     .actions((self) => ({
-      mergeAnnotations(annotations) {
-        // skip drafts, they'll be added later
-        self.annotations = annotations.filter(a => a.pk).map((c) => {
+      mergeAnnotations: flow(function *(annotations) {
+        const merged = annotations.filter(a => a.pk).map(async (c) => {
           const existingAnnotation = self.annotations.find(
             (ec) => ec.id === Number(c.pk),
           );
@@ -62,26 +61,31 @@ export const create = (columns) => {
               id: c.id,
               pk: c.pk,
               draftId: c.draftId,
-              result: c.serializeAnnotation(),
+              result: await c.serializeAnnotation(),
               leadTime: c.leadTime,
               userGenerate: !!c.userGenerate,
               sentUserGenerate: !!c.sentUserGenerate,
             };
           }
         });
-      },
 
-      updateAnnotation(annotation) {
+        // skip drafts, they'll be added later
+        self.annotations = yield Promise.all(merged);
+      }),
+
+      updateAnnotation: flow(function *(annotation) {
         const existingAnnotation = self.annotations.find((c) => {
           return c.id === Number(annotation.pk) || c.pk === annotation.pk;
         });
 
+        const snapshot = yield getAnnotationSnapshot(annotation);
+
         if (existingAnnotation) {
-          Object.assign(existingAnnotation, getAnnotationSnapshot(annotation));
+          Object.assign(existingAnnotation, snapshot);
         } else {
-          self.annotations.push(getAnnotationSnapshot(annotation));
+          self.annotations.push(snapshot);
         }
-      },
+      }),
 
       deleteAnnotation(annotation) {
         const index = self.annotations.findIndex((c) => {
