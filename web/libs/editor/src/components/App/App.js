@@ -264,7 +264,7 @@ class App extends Component {
                   panelsHidden={viewingAll}
                   currentEntity={as.selectedHistory ?? as.selected}
                   regions={as.selected.regionStore}
-                  showComments={!store.hasInterface('annotations:comments')}
+                  showComments={store.hasInterface('annotations:comments')}
                   focusTab={store.commentStore.tooltipMessage ? 'comments' : null}
                 >
                   {mainContent}

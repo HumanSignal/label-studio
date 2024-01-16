@@ -103,8 +103,13 @@ export type CommonProps = EventHandlers & {
   currentEntity: any,
 }
 
-interface PanelsCollapsed { [Side.left]: boolean, [Side.right]: boolean }
-    
+export interface PanelsCollapsed { [Side.left]: boolean, [Side.right]: boolean }
+
+export type StoredPanelState = {
+  panelData: Record<string, PanelBBox>,
+  collapsedSide: PanelsCollapsed,
+}
+
 export type BaseProps = PanelBBox & CommonProps & {
   name: string,
   top: number,
@@ -125,13 +130,13 @@ export type BaseProps = PanelBBox & CommonProps & {
   dragBottom: boolean,
   lockPanelContents: boolean,
 }
-    
+
 export type Result = {
   detached: BaseProps[],
   left:BaseProps[],
   right:BaseProps[],
 }
-    
+
 export const emptyPanel: PanelBBox = {
   order: 0,
   top: 0,

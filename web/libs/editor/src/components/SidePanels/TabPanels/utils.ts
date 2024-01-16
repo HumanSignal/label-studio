@@ -4,7 +4,7 @@ import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT, DEFAULT_PANEL_MAX_WIDTH
 import { Comments, History, Info, Relations } from '../DetailsPanel/DetailsPanel';
 import { OutlinerComponent } from '../OutlinerPanel/OutlinerPanel';
 import { PanelProps } from '../PanelBase';
-import { emptyPanel, JoinOrder, PanelBBox, PanelView, Side, ViewportSize } from './types';
+import { emptyPanel, JoinOrder, PanelBBox, PanelsCollapsed, PanelView, Side, StoredPanelState, ViewportSize } from './types';
 
 export const determineLeftOrRight = (event: any, droppableElement?: ReactNode) => {
   const element = droppableElement || event.target as HTMLElement;  
@@ -45,12 +45,12 @@ export const setActive = (state: Record<string, PanelBBox>, key: string, tabInde
 };
 
 export const setActiveDefaults = (state: Record<string, PanelBBox>) => {
-  const newState = { ...state };
+  const newState: Record<string, PanelBBox> = { ...state };
 
-  Object.keys(state).forEach((panelKey: string) => {
-    const firstActiveTab = newState[panelKey].panelViews.findIndex((view) => view.active) ;
-    
-    newState[panelKey].panelViews[firstActiveTab > 0 ? firstActiveTab : 0].active = true;
+  Object.values(newState).forEach(panel => {
+    const noActiveTabs = !panel.panelViews.find(view => view.active);
+
+    if (noActiveTabs) panel.panelViews[0].active = true;
   });
 
   return newState;
@@ -93,8 +93,8 @@ export const stateAddedTab = (
   return newState;
 };
 
-export const stateRemovePanelEmptyViews = (state: Record<string, PanelBBox>) => {
-  const newState = { ...state };
+export const stateRemovePanelEmptyViews = (state: Record<string, PanelBBox> | null) => {
+  const newState: Record<string, PanelBBox> = { ...state };
 
   Object.keys(newState).forEach((panel) => {
     if (newState[panel].panelViews.length === 0) delete newState[panel];
@@ -244,11 +244,11 @@ export const resizers = [
 
 
 export const checkCollapsedPanelsHaveData = (
-  collapsedSide: { [key: string]: boolean },
+  collapsedSide: PanelsCollapsed,
   panelData: Record<string, PanelBBox>,
 ) => {
   const collapsedCopy = { ...collapsedSide };
-  const collapsedPanels = Object.keys(collapsedCopy).filter((side) => collapsedCopy[side]);
+  const collapsedPanels = (Object.keys(collapsedCopy) as Side[]).filter(side => collapsedCopy[side]);
 
   collapsedPanels.forEach((side) => {
     const hasData = Object.keys(panelData).some((panel) => {
@@ -261,35 +261,34 @@ export const checkCollapsedPanelsHaveData = (
   return collapsedCopy;
 };
 
-export const restorePanel = (showComments: boolean) => {
-  const perviousState = window.localStorage.getItem('panelState');
-  const parsed = perviousState && JSON.parse(perviousState);
+export const restorePanel = (showComments: boolean): StoredPanelState => {
+  const previousState = window.localStorage.getItem('panelState');
+  const parsed: StoredPanelState | null = previousState && JSON.parse(previousState);
   const panelData = parsed && parsed.panelData;
   const defaultCollapsedSide = { [Side.left]: false, [Side.right]: false };
-  const collapsedSide = parsed?.collapsedSide ? parsed.collapsedSide : defaultCollapsedSide;
+  const collapsedSide = parsed?.collapsedSide ?? defaultCollapsedSide;
+  const allTabs = panelData && Object.values(panelData).map(panel => panel.panelViews).flat(1);
+  // don't use comments tab anywhere if it's disabled
+  const countOfAllAvailableTabs = panelViews.length - (showComments ? 0 : 1);
 
-  const allTabs =
-    panelData &&
-    Object.entries(panelData)
-      .map(([_, panel]: any) => panel.panelViews)
-      .flat(1);
-
-  if (!allTabs || allTabs.length !== (panelViews.length - (showComments ? 1 : 0))) {
-    const defaultPanel = showComments ? openSourcePanelDefault : enterprisePanelDefault;
+  // stored state can have less tabs than available, for example if it was stored on old version
+  // or if comments were enabled; then return default state
+  if (!allTabs || allTabs.length !== countOfAllAvailableTabs) {
+    const defaultPanel = showComments ? enterprisePanelDefault : openSourcePanelDefault;
 
     return { panelData: defaultPanel, collapsedSide: defaultCollapsedSide };
   }
 
   const noEmptyPanels = stateRemovePanelEmptyViews(panelData);
   const withActiveDefaults = setActiveDefaults(noEmptyPanels);
-  const safeCollapsedSide = checkCollapsedPanelsHaveData(collapsedSide, withActiveDefaults) as { [Side.left]: boolean, [Side.right]: boolean };
+  const safeCollapsedSide = checkCollapsedPanelsHaveData(collapsedSide, withActiveDefaults);
 
   return { panelData: restoreComponentsToState(withActiveDefaults), collapsedSide: safeCollapsedSide };
 };
 
 export const restoreComponentsToState = (panelData: Record<string, PanelBBox>) => {
-  const updatedPanels: any = { ...panelData };
-  
+  const updatedPanels: Record<string, PanelBBox> = { ...panelData };
+
   Object.keys(updatedPanels).forEach(panelName => {
     const panel = updatedPanels[panelName];
 
