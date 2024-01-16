@@ -17,6 +17,8 @@ from requests.adapters import HTTPAdapter
 
 from label_studio.core.utils.params import get_env
 
+from django.db.models import Count, Q
+
 version = get_git_version()
 logger = logging.getLogger(__name__)
 
@@ -171,7 +173,7 @@ class MLApi(BaseHTTPAPI):
         time_id = int(project.created_at.timestamp())
         return f'{project.id}.{time_id}'
 
-    def train(self, project, use_ground_truth=False):
+    def train(self, project, use_ground_truth=False, batch_tasks=None):
         # TODO Replace AnonymousUser with real user from request
         user = AnonymousUser()
         # Identify if feature flag is turned on
@@ -181,7 +183,8 @@ class MLApi(BaseHTTPAPI):
                 'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data,
             }
             return self._request('webhook', request, verbose=False, timeout=TIMEOUT_PREDICT)
-        else:
+        
+        elif batch_tasks is None:
             # get only tasks with annotations
             tasks = project.tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
             # create serialized tasks with annotations: {"data": {...}, "annotations": [{...}], "predictions": [{...}]}
@@ -195,6 +198,21 @@ class MLApi(BaseHTTPAPI):
             }
             return self._request('train', request, verbose=False, timeout=TIMEOUT_PREDICT)
 
+        else:
+            tasks = batch_tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
+            # create serialized tasks with annotations: {"data": {...}, "annotations": [{...}], "predictions": [{...}]}
+            tasks_ser = ExportDataSerializer(tasks, many=True).data
+            logger.debug(f'{len(tasks_ser)} tasks with annotations are sent to ML backend for training.')
+            request = {
+                'annotations': tasks_ser,
+                'action': 'PROJECT_UPDATED',
+                'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data,
+                'label_config': project.label_config,
+                'params': {'login': project.task_data_login, 'password': project.task_data_password},
+            }
+            return self._request('webhook', request, verbose=False, timeout=TIMEOUT_PREDICT)
+
+    
     def make_predictions(self, tasks, model_version, project, context=None):
         request = {
             'tasks': tasks,

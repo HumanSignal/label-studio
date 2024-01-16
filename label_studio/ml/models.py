@@ -144,8 +144,9 @@ class MLBackend(models.Model):
                 self.error_message = None
         self.save()
 
-    def train(self):
-        train_response = self.api.train(self.project)
+    def train(self, tasks=None):
+        train_response = self.api.train(project=self.project, batch_tasks=tasks)
+
         if train_response.is_error:
             self.state = MLBackendState.ERROR
             self.error_message = train_response.error_message
