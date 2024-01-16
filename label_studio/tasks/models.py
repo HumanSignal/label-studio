@@ -250,8 +250,7 @@ class Task(TaskMixin, models.Model):
     def num_locks_user(self, user):
         return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
 
-    @property
-    def storage_filename(self):
+    def get_storage_filename(self):
         for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
