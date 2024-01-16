@@ -875,13 +875,12 @@ export default types
         const children = [];
 
         walk(self, (node) => {
-          if (!isRoot(node) && getParent(node) === self) {
-            children.push(node);
-          }
+          if (!isRoot(node) && getParent(node) === self) children.push(node);
         });
 
         let node;
 
+        // eslint-disable-next-line no-cond-assign
         while (node = children.shift()) {
           try {
             destroy(node);
