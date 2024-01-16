@@ -34,7 +34,7 @@ const Model = types
     },
 
     get annotation() {
-      return getRoot(self).annotationStore.selected;
+      return getRoot(self)?.annotationStore?.selected;
     },
 
     getShape() {
