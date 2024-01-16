@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-439: Add maskData exporting into new MIG serialization approach",
-  "commit": "a3e4f43f823890cbc40f712634defbff003124dd",
-  "branch": "master",
-  "date": "2024-01-09T21:10:34Z"
+  "message": "fix: LEAP-246: Replace overlaping MIG hotkeys",
+  "commit": "892731b0a2e3b1db5a02795662f203a480f10ab2",
+  "branch": "fb-leap-246/duplicate-hotkeys",
+  "date": "2024-01-16T15:49:09Z"
 }
