@@ -876,8 +876,7 @@ export default types
 
         walk(self, (node) => {
           if (!isRoot(node) && getParent(node) === self) {
-            if (node.annotations) children.unshift(...node.annotations);
-            else children.push(node);
+            children.push(node);
           }
         });
 
