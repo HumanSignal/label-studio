@@ -182,7 +182,7 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
 
 def _prioritize_low_agreement_tasks(tasks, lse_project):
     low_agreement_tasks = tasks.filter(_agreement__lt=lse_project.agreement_threshold, is_labeled=True)
-    return (True, low_agreement_tasks) if low_agreement_tasks.exists() else (False, tasks)
+    return (True, low_agreement_tasks) if low_agreement_tasks else (False, tasks)
 
 
 def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_flag):
