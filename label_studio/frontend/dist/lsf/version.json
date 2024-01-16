@@ -1,6 +1,6 @@
 {
   "message": "fix: OPTIC-353: Fix null errors when switching from task detail to settings",
-  "commit": "a1fdd180d1ed31fdc65829bebb2a84b6bb6172b6",
+  "commit": "32a5a44c3f58bcdd3b84f9db0c96da430dcce0b8",
   "branch": "fb-optic-353/task-detail-to-settings-null-error",
-  "date": "2024-01-15T18:10:01Z"
+  "date": "2024-01-16T09:34:44Z"
 }
