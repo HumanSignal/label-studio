@@ -11,7 +11,22 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db import models
-from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, TextField, Value, When, DateTimeField, IntegerField
+from django.db.models import (
+    Aggregate,
+    Avg,
+    Case,
+    DateTimeField,
+    Exists,
+    F,
+    FloatField,
+    IntegerField,
+    OuterRef,
+    Q,
+    Subquery,
+    TextField,
+    Value,
+    When,
+)
 from django.db.models.functions import Cast, Coalesce, Concat
 from pydantic import BaseModel
 
