@@ -5,9 +5,21 @@ import { createElement, Fragment } from 'react';
 import { Tooltip } from '../common/Tooltip/Tooltip';
 import Hint from '../components/Hint/Hint';
 import { Block, Elem } from '../utils/bem';
-import { FF_LSDV_1148, isFF } from '../utils/feature-flags';
+import { FF_LSDV_1148, FF_MULTI_OBJECT_HOTKEYS, isFF } from '../utils/feature-flags';
 import { isDefined, isMacOS } from '../utils/utilities';
 import defaultKeymap from './settings/keymap.json';
+
+if (!isFF(FF_MULTI_OBJECT_HOTKEYS)) {
+  const prev = (defaultKeymap as Keymap)['image:prev'];
+  const next = (defaultKeymap as Keymap)['image:next'];
+
+  if (prev) {
+    prev.key = prev.mac = 'ctrl+a';
+  }
+  if (next) {
+    next.key = next.mac = 'ctrl+d';
+  }
+}
 
 // Validate keymap integrity
 const allowedKeympaKeys = ['key', 'mac', 'description', 'modifier', 'modifierDescription'];
