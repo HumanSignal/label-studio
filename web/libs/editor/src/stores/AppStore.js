@@ -880,8 +880,7 @@ export default types
 
         let node;
 
-        // eslint-disable-next-line no-cond-assign
-        while (node = children.shift()) {
+        while ((node = children.shift())) {
           try {
             destroy(node);
           } catch (e) {
