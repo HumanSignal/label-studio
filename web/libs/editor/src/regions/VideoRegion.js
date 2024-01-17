@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { getRoot, types } from 'mobx-state-tree';
 
 import { guidGenerator } from '../core/Helpers';
 import { AreaMixin } from '../mixins/AreaMixin';
@@ -34,7 +34,7 @@ const Model = types
     },
 
     get annotation() {
-      return self.object.annotation;
+      return getRoot(self)?.annotationStore?.selected;
     },
 
     getShape() {

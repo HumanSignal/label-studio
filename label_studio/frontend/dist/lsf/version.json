@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-439: Add maskData exporting into new MIG serialization approach",
-  "commit": "a3e4f43f823890cbc40f712634defbff003124dd",
+  "message": "fix: OPTIC-353: Fix null errors when switching from task detail to settings",
+  "commit": "8eaa8c7203b3d5e7aeacdd45c43426a0e0bc31aa",
   "branch": "master",
-  "date": "2024-01-09T21:10:34Z"
+  "date": "2024-01-17T09:34:13Z"
 }
