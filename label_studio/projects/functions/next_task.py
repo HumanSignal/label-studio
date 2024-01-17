@@ -2,14 +2,16 @@ import logging
 from collections import Counter
 
 from core.feature_flags import flag_set
-from core.utils.common import conditional_atomic, db_is_not_sqlite
+from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func
 from django.conf import settings
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, Value, When
+from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, Value, When
 from django.db.models.fields import DecimalField
 from projects.functions.stream_history import add_stream_history
 from tasks.models import Annotation, Task
 
 logger = logging.getLogger(__name__)
+
+get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
 
 def get_next_task_logging_level(user):
@@ -141,19 +143,46 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
         user_postponed_tasks = postponed_drafts.distinct().values_list('task__pk', flat=True)
         not_solved_tasks = not_solved_tasks.exclude(pk__in=user_postponed_tasks)
 
-    # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
+    prioritized_on_agreement = False
+    # if annotator is assigned for tasks, he must solve it regardless of is_labeled=True
     if not assigned_flag:
-        not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
+        # include tasks that have been completed if their agreement is not at threshold if threshold setting is set
+        lse_project = getattr(project, 'lse_project', None)
+        if (
+            lse_project
+            and lse_project.agreement_threshold is not None
+            and get_tasks_agreement_queryset
+            and user.is_annotator
+        ):
+            not_solved_tasks = (
+                get_tasks_agreement_queryset(not_solved_tasks)
+                # include tasks that are not labeled or are labeled but fall below the agreement threshold
+                .filter(
+                    Q(_agreement__lt=lse_project.agreement_threshold, is_labeled=True) | Q(is_labeled=False)
+                ).annotate(annotators=Count('annotations__completed_by', distinct=True))
+                # skip tasks that have been annotated by the maximum additional number of annotators
+                .filter(annotators__lt=F('overlap') + lse_project.max_additional_annotators_assignable)
+            )
+            prioritized_on_agreement, not_solved_tasks = _prioritize_low_agreement_tasks(not_solved_tasks, lse_project)
+
+        # otherwise, filtering out completed tasks is sufficient
+        else:
+            not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
     if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
-        # show tasks with overlap > 1 first
-        if project.show_overlap_first:
+        # show tasks with overlap > 1 first (unless tasks are already prioritized on agreement)
+        if project.show_overlap_first and not prioritized_on_agreement:
             # don't output anything - just filter tasks with overlap
             logger.debug(f'User={user} tries overlap first from prepared tasks')
             _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
             queue_info += 'Show overlap first'
 
     return not_solved_tasks, user_solved_tasks_array, queue_info
+
+
+def _prioritize_low_agreement_tasks(tasks, lse_project):
+    low_agreement_tasks = tasks.filter(_agreement__lt=lse_project.agreement_threshold, is_labeled=True)
+    return (True, low_agreement_tasks) if low_agreement_tasks else (False, tasks)
 
 
 def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_flag):
@@ -182,7 +211,7 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
         queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
 
     if not next_task and project.maximum_annotations > 1:
-        # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
+        # if there are any tasks in progress (with maximum number of annotations), randomly sampling from them
         logger.debug(f'User={user} tries depth first from prepared tasks')
         next_task = _try_breadth_first(not_solved_tasks, user)
         if next_task:
