@@ -1,11 +1,16 @@
+import React from "react";
+import { useConfig } from '../../../providers/ConfigProvider';
 import { format } from "date-fns";
+import { modal } from '../../../components/Modal/Modal';
+import { useModalControls } from "../../../components/Modal/ModalPopup";
+import { useAPI } from "../../../providers/ApiProvider";
 import { NavLink } from "react-router-dom";
 import { LsCross } from "../../../assets/icons";
 import { Button, Userpic } from "../../../components";
 import { Block, Elem } from "../../../utils/bem";
 import "./SelectedUser.styl";
 
-const UserProjectsLinks = ({projects}) => {
+const UserProjectsLinks = ({ projects }) => {
   return (
     <Elem name="links-list">
       {projects.map((project) => (
@@ -17,8 +22,44 @@ const UserProjectsLinks = ({projects}) => {
   );
 };
 
-export const SelectedUser = ({ user, onClose }) => {
+export const SelectedUser = ({ user, onClose, setUsersList }) => {
   const fullName = [user.first_name, user.last_name].filter(n => !!n).join(" ").trim();
+  const config = useConfig();
+  const canDelete = user.id !== config.user.id;
+  const handleButtonClick = () => {
+
+    modal({
+      title: "Delete Member",
+      body: () => {
+        const ctrl = useModalControls();
+        const api = useAPI();
+        
+        return (
+          <Block name="delete-modal-contents">
+            <Elem name="description">This will permanently remove this member from the organization. All their contributions will remain unaffected.</Elem>
+            <Elem name="footer">
+              <Elem tag={Button} name="cancel" onClick={() => { ctrl.hide(); }}>
+                Cancel
+              </Elem>
+              <Elem tag={Button} name="delete" onClick={async () => {
+                await api.callApi("deleteUser", {
+                  params: { user_pk: user.id },
+                });
+                setUsersList(usersList => usersList.filter(u => u.user.id !== user.id));
+                onClose();
+                ctrl.hide();
+              }}>
+                Delete Member
+              </Elem>
+            </Elem>
+          </Block >
+        );
+      },
+      style: { width: '556px' },
+      optimize: false,
+      allowClose: true,
+    });
+  };
 
   return (
     <Block name="user-info">
@@ -27,7 +68,7 @@ export const SelectedUser = ({ user, onClose }) => {
       <Elem name="header">
         <Userpic
           user={user}
-          style={{width: 64, height: 64, fontSize: 28}}
+          style={{ width: 64, height: 64, fontSize: 28 }}
         />
 
         {fullName && (
@@ -40,6 +81,14 @@ export const SelectedUser = ({ user, onClose }) => {
       {user.phone && (
         <Elem name="section">
           <a href={`tel:${user.phone}`}>{user.phone}</a>
+        </Elem>
+      )}
+
+      {canDelete && (
+        <Elem name="delete">
+          <Elem tag={Button} name="delete-button" onClick={() => handleButtonClick()}>
+                Delete
+          </Elem>
         </Elem>
       )}
 

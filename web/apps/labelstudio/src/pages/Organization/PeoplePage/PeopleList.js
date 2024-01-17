@@ -2,37 +2,14 @@ import { formatDistance } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 import { Pagination, Spinner, Userpic } from "../../../components";
 import { usePage, usePageSize } from "../../../components/Pagination/Pagination";
-import { useAPI } from "../../../providers/ApiProvider";
 import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/helpers";
-import { useUpdateEffect } from "../../../utils/hooks";
 import './PeopleList.styl';
 import { CopyableTooltip } from '../../../components/CopyableTooltip/CopyableTooltip';
 
-export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
-  const api = useAPI();
-  const [usersList, setUsersList] = useState();
+export const PeopleList = ({ usersList, onSelect, selectedUser, totalItems, fetchUsers, defaultSelected }) => {
   const [currentPage] = usePage('page', 1);
   const [currentPageSize] = usePageSize('page_size', 30);
-  const [totalItems, setTotalItems] = useState(0);
-
-  console.log({ currentPage, currentPageSize });
-
-  const fetchUsers = useCallback(async (page, pageSize) => {
-    const response = await api.callApi('memberships', {
-      params: {
-        pk: 1,
-        contributed_to_projects: 1,
-        page,
-        page_size: pageSize,
-      },
-    });
-
-    if (response.results) {
-      setUsersList(response.results);
-      setTotalItems(response.count);
-    }
-  }, []);
 
   const selectUser = useCallback((user) => {
     if (selectedUser?.id === user.id) {
