@@ -22,13 +22,19 @@ def annotate_finished_task_number(queryset):
 
 def annotate_total_predictions_number(queryset):
     if flag_set(
-        'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+        'fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations',
         user='auto',
     ):
-        predictions = Prediction.objects.filter(project=OuterRef('id')).values('id')
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            predictions = Prediction.objects.filter(project=OuterRef('id')).values('id')
+        else:
+            predictions = Prediction.objects.filter(task__project=OuterRef('id')).values('id')
+        return queryset.annotate(total_predictions_number=SQCount(predictions))
     else:
-        predictions = Prediction.objects.filter(task__project=OuterRef('id')).values('id')
-    return queryset.annotate(total_predictions_number=SQCount(predictions))
+        return queryset.annotate(total_predictions_number=Count('tasks__predictions', distinct=True))
 
 
 def annotate_total_annotations_number(queryset):
