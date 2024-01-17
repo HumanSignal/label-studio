@@ -11,8 +11,23 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db import models
-from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, Value, When
-from django.db.models.functions import Cast, Coalesce
+from django.db.models import (
+    Aggregate,
+    Avg,
+    Case,
+    DateTimeField,
+    Exists,
+    F,
+    FloatField,
+    IntegerField,
+    OuterRef,
+    Q,
+    Subquery,
+    TextField,
+    Value,
+    When,
+)
+from django.db.models.functions import Cast, Coalesce, Concat
 from pydantic import BaseModel
 
 from label_studio.core.utils.common import load_func
@@ -498,8 +513,65 @@ class GroupConcat(Aggregate):
 def annotate_completed_at(queryset):
     from tasks.models import Annotation
 
+    LseProject = load_func(settings.LSE_PROJECT)
+    get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
+
     newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
-    return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
+    if (
+        get_tasks_agreement_queryset
+        and LseProject
+        and queryset
+        and LseProject.objects.filter(project_id=queryset[0].project_id).exists()
+    ):
+        queryset = get_tasks_agreement_queryset(queryset)
+
+        # Subquery to get the agreement_threshold for each project
+        agreement_threshold_subquery = Subquery(
+            LseProject.objects.filter(project_id=OuterRef('project_id')).values('agreement_threshold')[:1],
+            output_field=FloatField(),
+        )
+
+        # Subquery for max_additional_annotators_assignable + overlap
+        max_annotators_subquery = Subquery(
+            LseProject.objects.filter(project_id=OuterRef('project_id'))
+            .annotate(total_max_annotators=F('max_additional_annotators_assignable') + OuterRef('overlap'))
+            .values('total_max_annotators')[:1],
+            output_field=IntegerField(),
+        )
+
+        # Subquery to get the latest Annotation for each task
+        agreement_threshold_exists_subquery = Exists(
+            LseProject.objects.filter(project_id=OuterRef('project_id'), agreement_threshold__isnull=False)
+        )
+
+        completed_at_case = Case(
+            When(
+                # Check if agreement_threshold is not set
+                ~agreement_threshold_exists_subquery & Q(is_labeled=True),
+                then=Subquery(newest.values('created_at')),
+            ),
+            When(
+                # If agreement_threshold is set, evaluate all conditions
+                agreement_threshold_exists_subquery
+                & Q(is_labeled=True)
+                & (Q(_agreement__gte=agreement_threshold_subquery) | Q(annotation_count__gte=max_annotators_subquery)),
+                then=Subquery(newest.values('created_at')),
+            ),
+            default=Value(None),
+            output_field=DateTimeField(),
+        )
+        return queryset.annotate(completed_at=completed_at_case)
+    else:
+        return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
+
+
+def annotate_storage_filename(queryset: TaskQuerySet) -> TaskQuerySet:
+    from label_studio.data_manager.functions import intersperse
+
+    storage_key_names = [F(s + '__key') for s in settings.IO_STORAGES_IMPORT_LINK_NAMES]
+    return queryset.annotate(
+        storage_filename=Concat(*intersperse(storage_key_names, Value(';')), output_field=TextField())
+    )
 
 
 def annotate_annotations_results(queryset):
@@ -605,6 +677,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     'annotations_ids': annotate_annotations_ids,
     'file_upload': file_upload,
     'draft_exists': annotate_draft_exists,
+    'storage_filename': annotate_storage_filename,
 }
 
 
