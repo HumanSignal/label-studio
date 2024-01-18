@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-246: Replace overlaping MIG hotkeys",
-  "commit": "309d0f9451619e3c714044ddc1ff99d91613fb6f",
-  "branch": "master",
-  "date": "2024-01-17T16:09:13Z"
+  "message": "fix: LEAP-240: Prevent creating region on clicking outside selected one",
+  "commit": "4faed9ac55d7386cbd9af8a1ade66d064a13d16e",
+  "branch": "fb-leap-240/fix-click-outside",
+  "date": "2024-01-18T04:45:00Z"
 }
