@@ -6,7 +6,7 @@ on:
       - upstream_repo_update
 
 concurrency:
-  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}
+  group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
 
 env:
   NODE: 18
