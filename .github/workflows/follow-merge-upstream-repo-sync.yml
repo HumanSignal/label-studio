@@ -276,26 +276,6 @@ jobs:
         with:
           node-version: "${{ env.NODE }}"
 
-      - name: "LSF Docs: Upgrade Yarn"
-        if: steps.details.outputs.build_lsf_docs
-        run: npm install -g yarn@1.22
-
-      - name: Get yarn cache directory path
-        if: steps.details.outputs.build_lsf_docs
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: "LSF Docs: Print Yarn cache size"
-        if: steps.details.outputs.build_lsf_docs
-        run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
-
-      - name: "LSF Docs: Install Yarn dependencies"
-        if: steps.details.outputs.build_lsf_docs
-        run: |
-          rm package-lock.json || true
-          yarn install
-        working-directory: tmp
-
       - name: "LSF Docs: Cache node modules"
         if: steps.details.outputs.build_lsf_docs
         uses: actions/cache@v3
