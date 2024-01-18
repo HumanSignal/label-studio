@@ -32,6 +32,9 @@ You can also label a specific task in the **Quick View** or **Preview** by click
 
 You can also select the checkboxes next to specific tasks and then click **Label $n Tasks** to label the selected number of tasks. For example, select the checkboxes for 5 different tasks, then click **Label 5 Tasks** to label only those 5 tasks. 
 
+!!! note
+    When labeling tasks, you should not open the label stream (click **Label All Tasks**) simultaneously in two tabs. This could result in you receiving the same task twice. 
+
 ### Label a region in the data
 Annotate a section of the data by adding a region. 
 
