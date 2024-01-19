@@ -212,10 +212,7 @@ def aperturedb_data(request):
     user = request.user
     title = request.GET.get('title')
     uid = request.GET.get('key')
-    if title and uid:
-        if not user.is_authenticated:
-            logger.warning("Not Authenticated")
-
+    if title and uid and user.is_authenticated:
         for storage in ApertureDBImportStorage.objects.all():
             if (storage.title == title) or (title == "none" and not storage.title):
                 if storage.project.has_permission(user):
