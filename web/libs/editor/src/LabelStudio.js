@@ -79,6 +79,8 @@ export class LabelStudio {
     };
 
     const clearRenderedApp = () => {
+      if (!rootElement.childNodes?.length) return;
+
       const childNodes = [...rootElement.childNodes];
       // cleanDomAfterReact needs this key to be sure that cleaning affects only current react subtree
       const reactKey = findReactKey(childNodes[0]);

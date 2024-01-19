@@ -281,7 +281,7 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_storage_filename(task):
-        return task.storage_filename
+        return task.get_storage_filename()
 
     @staticmethod
     def get_updated_by(obj):

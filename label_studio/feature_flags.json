@@ -28,6 +28,33 @@
       "version": 4,
       "deleted": false
     },
+    "feat_dia_620_move_to_aws_secret_manager_short": {
+      "key": "feat_dia_620_move_to_aws_secret_manager_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "36361511e1544aa9bfe7126182d4f409",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "feat_front_dev_1752_notification_links_in_label_and_review_streams": {
       "key": "feat_front_dev_1752_notification_links_in_label_and_review_streams",
       "on": false,
@@ -997,7 +1024,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 6,
+      "version": 7,
       "deleted": false
     },
     "ff_front_dev_1470_dm_pagination_010422_short": {
@@ -5234,6 +5261,33 @@
       },
       "clientSide": false,
       "salt": "6e13d0416e9840f6af5e005142db542e",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
+    "fflag_fix_leap_246_multi_object_hotkeys_160124_short": {
+      "key": "fflag_fix_leap_246_multi_object_hotkeys_160124_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "800fcd0d7d4541349fef5f59174d58b5",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
