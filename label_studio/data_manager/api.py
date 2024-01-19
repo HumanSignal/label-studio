@@ -137,6 +137,7 @@ class TaskPagination(PageNumberPagination):
     total_predictions = 0
     max_page_size = settings.TASK_API_PAGE_SIZE_MAX
 
+
     @async_to_sync
     async def async_paginate_queryset(self, queryset, request, view=None):
         predictions_count_qs = Prediction.objects.filter(task_id__in=queryset)
@@ -177,6 +178,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         PUT=all_permissions.tasks_change,
         DELETE=all_permissions.tasks_delete,
     )
+    pagination_class = TaskPagination
 
     @staticmethod
     def get_task_serializer_context(request, project):
@@ -228,7 +230,6 @@ class TaskListAPI(generics.ListCreateAPIView):
         context = self.get_task_serializer_context(self.request, project)
 
         # paginated tasks
-        self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
 
         # get request params
