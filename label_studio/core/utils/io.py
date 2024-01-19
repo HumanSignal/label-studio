@@ -245,8 +245,8 @@ def validate_ip(ip: str) -> None:
     ]
 
     banned_subnets = [
-        *(default_banned_subnets if settings.USE_DEFAULT_BANNED_SUBNETS else [])
-        * (settings.USER_ADDITIONAL_BANNED_SUBNETS or []),
+        *(default_banned_subnets if settings.USE_DEFAULT_BANNED_SUBNETS else []),
+        *(settings.USER_ADDITIONAL_BANNED_SUBNETS or []),
     ]
 
     for subnet in banned_subnets:
