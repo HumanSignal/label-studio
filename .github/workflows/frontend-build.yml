@@ -16,7 +16,6 @@ on:
 env:
   NODE: 18
   CACHE_NAME_PREFIX: v1
-  FRONTEND_OLD_DIR: label_studio/frontend
   FRONTEND_MONOREPO_DIR: web
   FRONTEND_BUILD_COMMIT_MESSAGE: "ci: Build frontend"
 
@@ -61,25 +60,7 @@ jobs:
       - name: Print Yarn cache size
         run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
 
-      - name: "Monorepo: Check"
-        id: monorepo-check
-        run: |
-          if [ -e '${{ env.FRONTEND_MONOREPO_DIR }}/package.json' ]; then
-            echo "monorepo_path=${{ env.FRONTEND_MONOREPO_DIR }}" >> $GITHUB_OUTPUT
-          else
-            echo "old_path=${{ env.FRONTEND_OLD_DIR }}" >> $GITHUB_OUTPUT
-            echo "::warning::Frontend Monorepo not found"
-          fi
-
-      - name: Build
-        if: steps.monorepo-check.outputs.old_path
-        run: |
-          yarn install --frozen-lockfile
-          yarn run build:production
-        working-directory: ${{ env.FRONTEND_OLD_DIR }}
-
       - name: "Monorepo: Build"
-        if: steps.monorepo-check.outputs.monorepo_path
         run: |
           yarn install --frozen-lockfile
           yarn build
@@ -88,7 +69,6 @@ jobs:
       - name: Commit and Push
         run: |
           git add "${{ env.FRONTEND_MONOREPO_DIR }}" || true
-          git add "${{ env.FRONTEND_OLD_DIR }}" || true
           git status -s
           git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
           git push origin HEAD
