@@ -72,6 +72,53 @@ class TestUploader:
                 load_tasks(request, project)
             assert 'URL resolves to a reserved network address (block: 127.0.0.0/8)' in str(e.value)
 
+        def test_user_specified_block(self, project, settings):
+            settings.SSRF_PROTECTION_ENABLED = True
+            settings.USER_ADDITIONAL_BANNED_SUBNETS = ['1.2.3.4']
+            request = MockedRequest(url='http://validurl.com')
+
+            # Mock the necessary parts of the response object
+            mock_response = Mock()
+            mock_response.raw._connection.sock.getpeername.return_value = ('1.2.3.4', 8080)
+
+            # Patch the requests.get call in the data_import.uploader module
+            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
+                ValidationError
+            ) as e:
+                load_tasks(request, project)
+            assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in str(e.value)
+
+            mock_response.raw._connection.sock.getpeername.return_value = ('0.0.0.0', 8080)
+            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
+                ValidationError
+            ) as e:
+                load_tasks(request, project)
+            assert 'URL resolves to a reserved network address (block: 0.0.0.0/8)' in str(e.value)
+
+        def test_user_specified_block_without_default(self, project, settings):
+            settings.SSRF_PROTECTION_ENABLED = True
+            settings.USER_ADDITIONAL_BANNED_SUBNETS = ['1.2.3.4']
+            settings.USE_DEFAULT_BANNED_SUBNETS = False
+            request = MockedRequest(url='http://validurl.com')
+
+            # Mock the necessary parts of the response object
+            mock_response = Mock()
+            mock_response.raw._connection.sock.getpeername.return_value = ('1.2.3.4', 8080)
+
+            # Patch the requests.get call in the data_import.uploader module
+            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
+                ValidationError
+            ) as e:
+                load_tasks(request, project)
+            assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in str(e.value)
+
+            mock_response.raw._connection.sock.getpeername.return_value = ('0.0.0.0', 8080)
+            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
+                ValidationError
+            ) as e:
+                load_tasks(request, project)
+            assert "'Mock' object is not subscriptable" in str(e.value)  # validate ip did not raise exception
+
 
 class TestTasksFileChecks:
     @pytest.mark.parametrize('value', (0, settings.TASKS_MAX_FILE_SIZE - 1))
