@@ -72,7 +72,7 @@ export const parseCSV = (text, separator = 'auto') => {
 
   const re = new RegExp(
     [
-      '"(?:[^""]|"""?)*"', // quoted text with possible quoted quotes inside it ("not a ""value""")
+      '"(?:""|[^"])*"', // quoted text with possible quoted quotes inside it ("not a ""value""")
       `[^"${separator}]+`, // usual value, no quotes, between separators
       `(?=${separator}(${separator}|$))`, // empty value in the middle or at the end of string
       `^(?=${separator})`, // empty value at the start of the string
