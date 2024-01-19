@@ -70,7 +70,7 @@ class TestUploader:
                 ValidationError
             ) as e:
                 load_tasks(request, project)
-            assert 'The provided URL was not valid.' in str(e.value)
+            assert 'URL resolves to a reserved network address (block: 127.0.0.0/8)' in str(e.value)
 
 
 class TestTasksFileChecks:
