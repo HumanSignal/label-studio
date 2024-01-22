@@ -10,13 +10,30 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@humansignal/frontend-test/*": ["libs/frontend-test/src/*"]
-    }
+      "@humansignal/frontend-test/*": [
+        "libs/frontend-test/src/*"
+      ],
+      "@humansignal/storybook": [
+        "libs/storybook/src/index.ts"
+      ],
+      "@humansignal/storybook-host": [
+        "libs/storybook/src/index.ts"
+      ]
+    },
+    "types": [
+      "vite-plugin-svgr/client"
+    ]
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }
