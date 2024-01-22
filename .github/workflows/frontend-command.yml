@@ -41,7 +41,7 @@ jobs:
         id: npm-cache-dir
         run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Configure npm cache
         id: npm-cache
         with:
