@@ -38,6 +38,11 @@ style.textContent = `
 .toc button:hover {
   color: var(--color-yellow-120);
 }
+.onprem-highlight {
+  display: block!important;
+  font-weight: bold;
+  margin: 1em 0 0 0;
+}
 `;
 
 document.head.appendChild(style);
