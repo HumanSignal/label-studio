@@ -46,7 +46,9 @@ report.*.json
 !.env.local
 !*.lock
 
-
+libs/**/package.json
+libs/**/package-lock.json
+libs/**/yarn.lock
 
 # editor ignored files
 
