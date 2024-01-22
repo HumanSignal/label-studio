@@ -15,6 +15,14 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ github.event.inputs.ref }}
+          submodules: 'recursive'
+          fetch-depth: 0
+
       - name: Calculate version
         id: calculate_version
         shell: bash
