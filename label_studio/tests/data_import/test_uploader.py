@@ -88,12 +88,12 @@ class TestUploader:
                 load_tasks(request, project)
             assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in str(e.value)
 
-            mock_response.raw._connection.sock.getpeername.return_value = ('0.0.0.0', 8080)
+            mock_response.raw._connection.sock.getpeername.return_value = ('198.51.100.0', 8080)
             with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
                 ValidationError
             ) as e:
                 load_tasks(request, project)
-            assert 'URL resolves to a reserved network address (block: 0.0.0.0/8)' in str(e.value)
+            assert 'URL resolves to a reserved network address (block: 198.51.100.0/24)' in str(e.value)
 
         def test_user_specified_block_without_default(self, project, settings):
             settings.SSRF_PROTECTION_ENABLED = True
@@ -112,7 +112,7 @@ class TestUploader:
                 load_tasks(request, project)
             assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in str(e.value)
 
-            mock_response.raw._connection.sock.getpeername.return_value = ('0.0.0.0', 8080)
+            mock_response.raw._connection.sock.getpeername.return_value = ('198.51.100.0', 8080)
             with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
                 ValidationError
             ) as e:
