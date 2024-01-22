@@ -3,35 +3,23 @@ const concatMd = require("concat-md");
 
 hexo.extend.filter.register("after_init", async function () {
     const compareVersions = (a, b) => {
-        const [aMain, aSub] = a.split('-').map((part) => part.split('.').map(Number));
-        const [bMain, bSub] = b.split('-').map((part) => part.split('.').map(Number));
-
-        // Compare main version
-        for (let i = 0; i < Math.max(aMain.length, bMain.length); i++) {
-            const aVal = aMain[i] || 0;
-            const bVal = bMain[i] || 0;
-
-            if (aVal > bVal) return -1;
-            if (aVal < bVal) return 1;
+        const versionRegExp = /(?<x>\d+)\.(?<y>\d+)\.(?<z>\d+)(\.dev|dev-|-)?(?<n>\d+)?/;
+        const aMatch = a.match(versionRegExp);
+        const bMatch = b.match(versionRegExp);
+        for (let d of ['x', 'y', 'z', 'n']) {
+            const aMatchInt = aMatch.groups[d]? aMatch.groups[d] * 1 : -1;
+            const bMatchInt = bMatch.groups[d]? bMatch.groups[d] * 1 : -1;
+            if (aMatchInt === bMatchInt)
+                continue;
+            if (aMatchInt < 0)
+                return 1;
+            if (bMatchInt < 0)
+                return -1;
+            return aMatchInt - bMatchInt;
         }
-
-        // If main versions are equal, compare sub-versions
-        if (aSub && bSub) {
-            for (let i = 0; i < Math.max(aSub.length, bSub.length); i++) {
-                const aVal = aSub[i] || 0;
-                const bVal = bSub[i] || 0;
-
-                if (aVal > bVal) return -1;
-                if (aVal < bVal) return 1;
-            }
-        } else if (aSub) {
-            return -1;
-        } else if (bSub) {
-            return 1;
-        }
-
-        return 0;
+        return 0
     };
+
     const markdownFiles = await concatMd.default(
         "source/guide/release_notes/onprem", {sorter: compareVersions}
     );

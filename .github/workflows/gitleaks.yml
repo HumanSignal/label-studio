@@ -23,7 +23,7 @@ jobs:
 
       - name: Configure gitleaks binary cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /usr/local/bin/gitleaks
           key: gitleaks-${{ env.GIT_GITLEAKS_VERSION }}
