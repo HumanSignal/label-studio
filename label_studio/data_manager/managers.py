@@ -11,8 +11,8 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db import models
-from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, Value, When
-from django.db.models.functions import Cast, Coalesce
+from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, TextField, Value, When
+from django.db.models.functions import Cast, Coalesce, Concat
 from pydantic import BaseModel
 
 from label_studio.core.utils.common import load_func
@@ -502,6 +502,15 @@ def annotate_completed_at(queryset):
     return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
 
 
+def annotate_storage_filename(queryset: TaskQuerySet) -> TaskQuerySet:
+    from label_studio.data_manager.functions import intersperse
+
+    storage_key_names = [F(s + '__key') for s in settings.IO_STORAGES_IMPORT_LINK_NAMES]
+    return queryset.annotate(
+        storage_filename=Concat(*intersperse(storage_key_names, Value(';')), output_field=TextField())
+    )
+
+
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(
@@ -605,6 +614,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     'annotations_ids': annotate_annotations_ids,
     'file_upload': file_upload,
     'draft_exists': annotate_draft_exists,
+    'storage_filename': annotate_storage_filename,
 }
 
 

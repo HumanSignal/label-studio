@@ -316,7 +316,7 @@ jobs:
             core.setOutput("id", release.id);
             core.setOutput("tag_name", release.tag_name);
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Configure pip cache
         id: pip-cache
         with:

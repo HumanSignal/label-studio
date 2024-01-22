@@ -2,7 +2,7 @@
 """
 import logging
 from collections import OrderedDict
-from typing import Tuple
+from typing import Any, Iterable, Tuple
 from urllib.parse import unquote
 
 import ujson as json
@@ -375,3 +375,20 @@ def preprocess_field_name(raw_field_name, only_undefined_field=False) -> Tuple[s
         else:
             field_name = field_name.replace('data.', 'data__')
     return field_name, ascending
+
+
+def intersperse(items: Iterable, separator: Any) -> list:
+    """
+    Create a list with a separator between each item in the passed iterable `items`
+
+    for example, intersperse(['one', 'two', 'three'], 0) == ['one', 0, 'two', 0, 'three']
+    """
+
+    output = []
+    for item in items:
+        output.append(item)
+        output.append(separator)
+    # if there are no items, there will be no last separator to remove
+    if output:
+        output.pop()
+    return output
