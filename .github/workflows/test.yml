@@ -18,7 +18,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GIT_PAT }}
           ref: ${{ github.event.inputs.ref }}
           submodules: 'recursive'
           fetch-depth: 0
