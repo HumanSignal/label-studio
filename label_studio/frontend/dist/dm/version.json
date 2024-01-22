@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-107: Draft saving on view all",
-  "commit": "b2006083fb40a3d5a1ee7979ff24497864dfcdac",
-  "branch": "master",
+  "message": "chore: Cherry picked DIA-820 into release 1.11.0",
+  "commit": "02f190d464e3236c17217e3089ee1892aa5919d9",
+  "branch": "ls-release/1.11.0 ",
   "date": "2024-01-04T09:37:55Z"
 }
