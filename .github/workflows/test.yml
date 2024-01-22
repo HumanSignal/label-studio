@@ -1,0 +1,46 @@
+name: "TEST"
+
+on:
+  push:
+    branches:
+      - develop
+
+env:
+  RELEASE_BRANCH_PREFIX: "ls-release/"
+  PYTHON_VERSION_FILE: "pyproject.toml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Calculate version
+        id: calculate_version
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          main_release_version=$(sed -n 's#^version[ ]\+=[ ]\+"\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\).*#\1.\2.\3#p' '${{ env.PYTHON_VERSION_FILE }}')
+          
+          if latest_dev_tag=$(git tag -l | grep "${main_release_version}" | grep "dev" | sort -V | tail -n1); then
+            latest_dev_number=$(echo "${latest_dev_tag}" | cut -d '-' -f2 | cut -d 'v' -f2)
+            release_version="${main_release_version}.dev$((${latest_dev_number} + 1))"
+            next_dev_tag="${main_release_version}.dev$((${latest_dev_number} + 2))"
+          else
+            release_version="${main_release_version}.dev0"
+            next_dev_tag="${main_release_version}.dev1"
+            latest_dev_tag=$(git tag -l | grep "dev" | sort -V | tail -n1)
+          fi
+          
+          echo "release_version=${release_version}" >> $GITHUB_OUTPUT
+          echo "next_dev_tag=${next_dev_tag}" >> $GITHUB_OUTPUT
+          echo "latest_dev_tag=tags/${latest_dev_tag}" >> $GITHUB_OUTPUT
+
+      - name: Calculate version
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          echo '${{ steps.calculate_version.outputs.release_version }}'
+          echo '${{ steps.calculate_version.outputs.next_dev_tag }}'
+          echo '${{ steps.calculate_version.outputs.latest_dev_tag }}'
