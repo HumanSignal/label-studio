@@ -172,8 +172,7 @@
         "RectangleLabels": {"$ref": "#/definitions/MaybeMultipleLabels"},
         "Relations": {"$ref": "#/definitions/MaybeMultipleRelations"},
         "TimeSeriesLabels": {"$ref": "#/definitions/MaybeMultipleLabels"},
-        "VideoRectangle": {"$ref": "#/definitions/tags_with_name_and_toname"},
-        "Header": {"$ref": "#/definitions/tags_with_value"}
+        "VideoRectangle": {"$ref": "#/definitions/tags_with_name_and_toname"}
       }
     },
     "MaybeMultipleView": {
