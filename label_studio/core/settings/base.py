@@ -273,7 +273,7 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = get_env_list('ALLOWED_HOSTS', default=['*'])
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
