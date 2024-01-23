@@ -89,7 +89,8 @@ We may also add references to JIRA tickets created on our side for the purpose o
 
 The primary repository for Label Studio, and contains the majority of the logic for how labels are managed. Three areas where you may want to contribute include:
 
-* `label_studio`--This is the main app, containing most of the backend code. It also acts as the central integration point for all frontend elements. 
+* `label_studio`--This is the main app, containing most of the backend code. 
+* `web/apps/labelstudio` -- This acts as the central integration point for all frontend elements. 
 * `web/libs/editor`--This is the frontend library. It uses React to build the UI and mobx-state-tree for state management. 
 * `web/libs/datamanager`--This is the frontend interface for the Label Studio Data Manager, our data exploration tool. 
 
