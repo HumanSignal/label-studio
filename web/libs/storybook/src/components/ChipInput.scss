@@ -21,7 +21,7 @@ $danger_color: #ff0000;
     border-color: var(--blue-10);
   }
 
-  &__emailInput {
+  &__input {
     display: inline-block;
     min-width: 200px;
     max-width: 100%;
@@ -38,7 +38,7 @@ $danger_color: #ff0000;
     }
   }
 
-  &__emailTag {
+  &__chip {
     border: 1px solid rgba(137, 128, 152, 0.16);
     border-radius: 2px;
     background-color: #D6E4FF;

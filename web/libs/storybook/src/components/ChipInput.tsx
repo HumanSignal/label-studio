@@ -13,6 +13,7 @@ import * as z from 'zod';
 import './ChipInput.scss';
 
 const InputFormats = {
+  plain: z.string(),
   email: z.string().email(),
 };
 
@@ -37,14 +38,14 @@ export type ChipProps = {
 
 const separatorRegexp = /[ ,;]+/;
 
-const validateEmail = (schema: z.ZodString, value: string) => {
+const validate = (schema: z.ZodString, value: string) => {
   const result = schema.safeParse(value);
   return result.success;
 };
 
 const Chip = ({ value, onClose }: ChipProps) => {
   return (
-    <Elem tag="span" name="emailTag">
+    <Elem tag="span" name="chip">
       {value}
       <Elem tag="span" name="closeButton" onClick={onClose}>
         <Elem tag="span" name="close">
@@ -77,13 +78,14 @@ export const ChipInput = ({
     return InputFormats.email;
   }, [restProps]);
 
-  // update emails list on upper component on email added or removed
+  // update values list on upper component on
+  // value added or removed
   useEffect(() => {
     onChange?.(selectedValues);
   }, [onChange, selectedValues, selectedValues.length]);
 
   // resize input to fit text in it up to 100% (in styles)
-  // resets after every email added or if field is cleared
+  // resets after every value added or if field is cleared
   useLayoutEffect(() => {
     if (!inputRef.current || !wrapperRef.current) return;
 
@@ -92,16 +94,16 @@ export const ChipInput = ({
     wrapperRef.current.style.width = currentValue ? width + 'px' : '';
   }, [currentValue]);
 
-  // emails should be already valid
-  const addValues = (emails: string[]) => {
-    // only unique emails
-    setSelectedValues((currentEmails) => [
-      ...new Set([...currentEmails, ...emails]),
+  // values should be already valid
+  const addValues = (values: string[]) => {
+    // only unique values
+    setSelectedValues((currentValues) => [
+      ...new Set([...currentValues, ...values]),
     ]);
   };
 
   const addValue = (value: string) => {
-    const isValid = validateEmail(inputSchema, value);
+    const isValid = validate(inputSchema, value);
 
     setCurrentValue(isValid ? '' : value);
     if (isValid) addValues([value]);
@@ -122,18 +124,18 @@ export const ChipInput = ({
 
     // handle paste values
     if (separatorRegexp.test(value)) {
-      const emails = value.split(separatorRegexp);
+      const values = value.split(separatorRegexp);
 
-      // last (or only) email in list is left in input to edit
+      // last (or only) value in list is left in input to edit
       // will be added to list on blur on submit anyway
-      current = emails.pop();
+      current = values.pop();
 
-      for (const email of emails) {
-        if (validateEmail(inputSchema, email)) {
-          valid.push(email);
+      for (const value of values) {
+        if (validate(inputSchema, value)) {
+          valid.push(value);
         } else {
-          // invalid emails are left in input, so they can be fixed
-          current = [email, current].join(',');
+          // invalid values are left in input, so they can be fixed
+          current = [value, current].join(',');
         }
       }
       addValues(valid);
@@ -146,13 +148,15 @@ export const ChipInput = ({
   };
 
   const deleteItem = (value: string) =>
-    setSelectedValues(selectedValues.filter((curEmail) => curEmail !== value));
+    setSelectedValues(
+      selectedValues.filter((currentValue) => currentValue !== value)
+    );
 
   return (
     <Block name="chip-input" className={className} onClick={onComponentFocus}>
       <Elem name="content" onClick={onComponentFocus}>
-        {selectedValues.filter(Boolean).map((email, index) => (
-          <Chip key={index} value={email} onClose={() => deleteItem(email)} />
+        {selectedValues.filter(Boolean).map((value, index) => (
+          <Chip key={index} value={value} onClose={() => deleteItem(value)} />
         ))}
 
         {/* will be hidden on focus */}
@@ -161,13 +165,13 @@ export const ChipInput = ({
             {placeholder}
           </Elem>
         )}
-        <Elem tag="span" name="emailInput" ref={wrapperRef}>
+        <Elem tag="span" name="input" ref={wrapperRef}>
           <input
             ref={inputRef}
             value={currentValue}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                // we are about to submit form, so add email
+                // we are about to submit form, so add value
                 addValue(e.currentTarget.value);
               }
               if (separatorRegexp.test(e.key)) {

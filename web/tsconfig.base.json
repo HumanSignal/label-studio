@@ -24,8 +24,14 @@
       "@humansignal/storybook": [
         "libs/storybook/src/index.ts"
       ],
-      "@humansignal/storybook-host": [
-        "libs/storybook/src/index.ts"
+      "@humansignal/ui": [
+        "libs/storybook/components.ts"
+      ],
+      "@humansignal/utils": [
+        "libs/storybook/utils.ts"
+      ],
+      "@humansignal/icons": [
+        "libs/storybook/icons.ts"
       ]
     },
     "types": [
