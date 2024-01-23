@@ -12,10 +12,10 @@ hexo.extend.filter.register("after_init", async function () {
             if (aMatchInt === bMatchInt)
                 continue;
             if (aMatchInt < 0)
-                return 1;
-            if (bMatchInt < 0)
                 return -1;
-            return aMatchInt - bMatchInt;
+            if (bMatchInt < 0)
+                return 1;
+            return bMatchInt - aMatchInt;
         }
         return 0
     };
