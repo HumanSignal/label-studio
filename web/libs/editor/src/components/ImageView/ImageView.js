@@ -522,7 +522,7 @@ export default observer(
       const { item } = this.props;
 
       if (isFF(FF_DEV_1442)) {
-        this.handleDeferredMouseDown?.();
+        this.handleDeferredMouseDown?.(true);
       }
       if (this.skipNextClick) {
         this.skipNextClick = false;
@@ -558,8 +558,8 @@ export default observer(
     };
 
     handleDeferredClick = (handleDeferredMouseDownCallback, handleDeselection, eligibleToDeselect = false) => {
-      this.handleDeferredMouseDown = () => {
-        if (eligibleToDeselect) {
+      this.handleDeferredMouseDown = (wasClicked) => {
+        if (wasClicked && eligibleToDeselect) {
           handleDeselection();
         }
         handleDeferredMouseDownCallback();
@@ -568,7 +568,7 @@ export default observer(
       };
       this.resetDeferredClickTimeout();
       this.deferredClickTimeout.push(setTimeout(() => {
-        this.handleDeferredMouseDown?.();
+        this.handleDeferredMouseDown?.(false);
       }, this.props.item.annotation.isDrawing ? 0 : 100));
     };
 
@@ -740,7 +740,7 @@ export default observer(
 
       if (isFF(FF_DEV_1442) && isDragging) {
         this.resetDeferredClickTimeout();
-        this.handleDeferredMouseDown?.();
+        this.handleDeferredMouseDown?.(false);
       }
 
       if ((isMouseWheelClick || isShiftDrag) && item.zoomScale > 1) {
