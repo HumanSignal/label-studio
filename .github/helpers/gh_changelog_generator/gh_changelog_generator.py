@@ -32,6 +32,9 @@ GH_TOKEN = os.getenv("GH_TOKEN").strip('\"')  # https://github.com/settings/toke
 LAUNCHDARKLY_SDK_KEY = os.getenv("LAUNCHDARKLY_SDK_KEY", '').strip('\"')
 LAUNCHDARKLY_ENVIRONMENT = os.getenv("LAUNCHDARKLY_ENVIRONMENT", '').strip('\"')
 
+HELM_CHART_REPO = os.getenv("HELM_CHART_REPO", None)
+HELM_CHART_PATH = os.getenv("HELM_CHART_PATH", None)
+
 OUTPUT_FILE_MD = os.getenv("OUTPUT_FILE_MD", 'output.md')
 OUTPUT_FILE_JSON = os.getenv("OUTPUT_FILE_JSON", 'output.json')
 
@@ -343,8 +346,12 @@ def render_output_md(
         missing_in_tracker: list[AhaFeature],
         missing_release_note_field: list[AhaFeature],
         turned_off_feature_flags: list[str],
+        helm_chart_version: str = None,
 ) -> str:
     release_notes_lines = []
+
+    if helm_chart_version:
+        release_notes_lines.append(f'Helm Chart version: {helm_chart_version}')
 
     for label, tasks in sorted(sorted_release_tasks.items(),
                                key=lambda x: LABEL_SORT.index(x[0]) if x[0] in LABEL_SORT else 100):
@@ -428,6 +435,14 @@ def render_output_json(
     return result
 
 
+def get_helm_chart_version(repo: str, path: str) -> str or None:
+    chart_repo = github_client.get_repo(repo)
+    content = chart_repo.get_contents(path)
+    version_regexp = re.compile(r'version:\s*(.*)')
+    match = re.search(version_regexp, content.decoded_content.decode('utf-8'))
+    return match.group(1)
+
+
 def main():
     gh_release = get_github_release(PREVIOUS_REF, CURRENT_REF)
     print(f"{gh_release.html_url}")
@@ -485,6 +500,13 @@ def main():
     except Exception as e:
         print(f'Failed to fetch Feature Flags: {e}')
 
+    helm_chart_version = None
+    if HELM_CHART_REPO and HELM_CHART_PATH:
+        try:
+            helm_chart_version = get_helm_chart_version(HELM_CHART_REPO, HELM_CHART_PATH)
+        except Exception as e:
+            print(f'Failed to fetch Helm Chart Version: {e}')
+
     output_md = render_output_md(
         gh_release,
         jira_release,
@@ -494,6 +516,7 @@ def main():
         missing_in_tracker,
         missing_release_note_field,
         turned_off_feature_flags,
+        helm_chart_version=helm_chart_version,
     )
     if OUTPUT_FILE_MD:
         with open(OUTPUT_FILE_MD, 'w') as f:

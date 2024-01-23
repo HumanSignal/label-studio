@@ -346,6 +346,8 @@ jobs:
           JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
           JIRA_PROJECT: "DEV"
           JIRA_RN_FIELD: "customfield_10064"
+          HELM_CHART_REPO: "HumanSignal/charts"
+          HELM_CHART_PATH: "heartex/label-studio/Chart.yaml"
           LAUNCHDARKLY_SDK_KEY: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
           LAUNCHDARKLY_ENVIRONMENT: "community"
           OUTPUT_FILE_MD: "${{ github.workspace }}/output.md"
