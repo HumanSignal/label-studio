@@ -56,9 +56,9 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
     const { direction } = relation;
 
     switch (direction) {
-      case 'left': return <IconRelationLeft data-direction={relation.direction}/>;
-      case 'right': return <IconRelationRight data-direction={relation.direction}/>;
-      case 'bi': return <IconRelationBi data-direction={relation.direction}/>;
+      case 'left': return <IconRelationLeft/>;
+      case 'right': return <IconRelationRight/>;
+      case 'bi': return <IconRelationBi/>;
       default: return null;
     }
   }, [relation.direction]);
@@ -92,7 +92,6 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
             {(hovered || relation.showMeta) && relation.hasRelations && (
               <Button
                 primary={relation.showMeta}
-                aria-label={`${relation.showMeta ? 'Hide' : 'Show'} Relation Labels`}
                 type={relation.showMeta ? undefined : 'text'}
                 onClick={relation.toggleMeta}
                 style={{ padding: 0 }}
@@ -103,14 +102,14 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
           </Elem>
           <Elem name="action">
             {(hovered || !relation.visible) && (
-              <Button type="text" onClick={relation.toggleVisibility} aria-label={`${relation.visible ? 'Hide' : 'Show'} Relation`}>
+              <Button type="text" onClick={relation.toggleVisibility}>
                 {relation.visible ? <IconEyeOpened/> : <IconEyeClosed />}
               </Button>
             )}
           </Elem>
           <Elem name="action">
             {hovered && (
-              <Button type="text" danger aria-label="Delete Relation" onClick={() => {
+              <Button type="text" danger onClick={() => {
                 relation.node1.setHighlight(false);
                 relation.node2.setHighlight(false);
                 relation.parent.deleteRelation(relation);
@@ -128,9 +127,10 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
   );
 });
 
-const RelationMeta: FC<any> = observer(({ relation }) => {
-  const { selectedValues, control } = relation;
-  const { children, choice } = control;
+const RelationMeta: FC<any> = ({ relation }) => {
+  const { relations } = relation;
+  const { children, choice } = relations;
+  const selected = relations.getSelected().map((v: any) => v.value);
 
   const selectionMode = useMemo(() => {
     return choice === 'multiple' ? 'multiple' : undefined;
@@ -139,8 +139,9 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
   const onChange = useCallback((val: any) => {
     const values: any[] = wrapArray(val);
 
-    relation.setRelations(values);
-  }, [relation]);
+    relations.unselectAll();
+    values.forEach(v => relations.findRelation(v).setSelected(true));
+  }, []);
 
   return (
     <Block name="relation-meta">
@@ -148,7 +149,7 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
         mode={selectionMode}
         style={{ width: '100%' }}
         placeholder="Select labels"
-        value={selectedValues}
+        defaultValue={selected}
         onChange={onChange}
       >
         {children.map((c: any) => (
@@ -159,6 +160,6 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
       </Select>
     </Block>
   );
-});
+};
 
 export const Relations = observer(RealtionsComponent);

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal } from 'antd';
-import { sanitizeHtml } from '../../utils/html';
 
 export const InstructionsModal = ({
   title,
@@ -51,7 +50,7 @@ export const InstructionsModal = ({
         {typeof children === 'string' ? (
           <p
             style={contentStyle}
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(children) }}
+            dangerouslySetInnerHTML={{ __html: children }}
           />
         ) : (
           <p style={contentStyle}>{children}</p>

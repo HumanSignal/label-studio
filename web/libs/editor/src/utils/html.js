@@ -540,20 +540,11 @@ function sanitizeHtml(html = []) {
     'ontimeupdate', 'ontoggle', 'onunhandledrejection', 'onunload',
     'onvolumechange', 'onwaiting', 'onwheel'];
 
-  const disallowedTags = {
-    'script': true,
-    'iframe': true,
-  };
-
   return sanitizeHTML(html, {
     allowedTags: false,
     allowedAttributes: false,
     disallowedTagsMode: 'discard',
-    allowVulnerableTags: true,
-    exclusiveFilter(frame) {
-      //...except those in the blacklist
-      return disallowedTags[frame.tag];
-    },
+    disallowedTags: ['script', 'iframe'],
     nonTextTags: ['script', 'textarea', 'option', 'noscript'],
     transformTags: {
       '*': (tagName, attribs) => {

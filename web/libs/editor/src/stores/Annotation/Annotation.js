@@ -31,12 +31,6 @@ import { UserExtended } from '../UserStore';
 
 const hotkeys = Hotkey('Annotations', 'Annotations');
 
-const TrackedState = types
-  .model('TrackedState', {
-    areas: types.map(Area),
-    relationStore: types.optional(RelationStore, {}),
-  });
-
 export const Annotation = types
   .model('Annotation', {
     id: types.identifier,
@@ -76,12 +70,7 @@ export const Annotation = types
     ground_truth: types.optional(types.boolean, false),
     skipped: false,
 
-    // This field stores all data that affects undo/redo history
-    // It should contain real objects to be able to work with them through snapshots
-    // Annotation will use getters to get them at the top level
-    // This data is never redefined directly, it's empty at the start
-    trackedState: types.optional(TrackedState, {}),
-    history: types.optional(TimeTraveller, { targetPath: '../trackedState' }),
+    history: types.optional(TimeTraveller, { targetPath: '../areas' }),
 
     dragMode: types.optional(types.boolean, false),
 
@@ -89,6 +78,11 @@ export const Annotation = types
     readonly: types.optional(types.boolean, false),
 
     relationMode: types.optional(types.boolean, false),
+    relationStore: types.optional(RelationStore, {
+      relations: [],
+    }),
+
+    areas: types.map(Area),
 
     suggestions: types.map(Area),
 
@@ -104,14 +98,6 @@ export const Annotation = types
 
     ...(isFF(FF_DEV_3391) ? { root: Types.allModelsTypes() } : {}),
   })
-  .views(self => ({
-    get areas() {
-      return self.trackedState.areas;
-    },
-    get relationStore() {
-      return self.trackedState.relationStore;
-    },
-  }))
   .preProcessSnapshot(sn => {
     // sn.draft = Boolean(sn.draft);
     let user = sn.user ?? sn.completed_by ?? undefined;
@@ -202,7 +188,7 @@ export const Annotation = types
       return self.results
         .map(r => r.serialize())
         .filter(Boolean)
-        .concat(self.relationStore.serialize());
+        .concat(self.relationStore.serializeAnnotation());
     },
 
     get serializedSelection() {
@@ -710,11 +696,11 @@ export const Annotation = types
       if (self.autosave) self.autosave.flush();
     },
 
-    async saveDraftImmediatelyWithResults(params) {
+    async saveDraftImmediatelyWithResults() {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted || self.isDraftSaving) return {};
       self.setDraftSaving(true);
-      const res = await self.saveDraft(params);
+      const res = await self.saveDraft(null);
 
       return res;
     },
@@ -942,7 +928,7 @@ export const Annotation = types
       const result = self.results
         .map(r => r.serialize(options))
         .filter(Boolean)
-        .concat(self.relationStore.serialize(options));
+        .concat(self.relationStore.serializeAnnotation(options));
 
       document.body.style.cursor = 'default';
 

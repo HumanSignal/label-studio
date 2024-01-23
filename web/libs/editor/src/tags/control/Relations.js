@@ -38,20 +38,27 @@ const TagAttrs = types.model({
  */
 const ModelAttrs = types
   .model({
-    id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: 'relations',
-    children: Types.unionArray(['relation']),
+    children: Types.unionArray(['relations', 'relation']),
   })
   .views(self => ({
-    get values() {
-      return self.children.map(c => c.value);
+    getSelected() {
+      return self.children.filter(c => c.selected === true);
     },
+
+    selectedValues() {
+      return self.getSelected().map(c => c.value);
+    },
+
     findRelation(value) {
       return self.children.find(c => c.value === value);
     },
   }))
-  .actions(() => ({
+  .actions(self => ({
+    unselectAll() {
+      self.children.map(c => c.setSelected(false));
+    },
   }));
 
 const RelationsModel = types.compose('RelationsModel', ModelAttrs, TagAttrs);

@@ -54,7 +54,6 @@ export const AnnotationTab = observer(({ store }) => {
 
           <Elem name="content">
             <Comments
-              annotationStore={as}
               commentStore={store.commentStore}
               cacheKey={`task.${store.task.id}`}
             />

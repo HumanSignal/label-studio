@@ -5,21 +5,9 @@ import { createElement, Fragment } from 'react';
 import { Tooltip } from '../common/Tooltip/Tooltip';
 import Hint from '../components/Hint/Hint';
 import { Block, Elem } from '../utils/bem';
-import { FF_LSDV_1148, FF_MULTI_OBJECT_HOTKEYS, isFF } from '../utils/feature-flags';
+import { FF_LSDV_1148, isFF } from '../utils/feature-flags';
 import { isDefined, isMacOS } from '../utils/utilities';
 import defaultKeymap from './settings/keymap.json';
-
-if (!isFF(FF_MULTI_OBJECT_HOTKEYS)) {
-  const prev = (defaultKeymap as Keymap)['image:prev'];
-  const next = (defaultKeymap as Keymap)['image:next'];
-
-  if (prev) {
-    prev.key = prev.mac = 'ctrl+a';
-  }
-  if (next) {
-    next.key = next.mac = 'ctrl+d';
-  }
-}
 
 // Validate keymap integrity
 const allowedKeympaKeys = ['key', 'mac', 'description', 'modifier', 'modifierDescription'];
@@ -94,9 +82,6 @@ keymaster.filter = function(event) {
 const ALIASES = {
   'plus': '=', // "ctrl plus" is actually a "ctrl =" because shift is not used
   'minus': '-',
-  // Here is a magic trick. Keymaster doesn't work with comma correctly (it breaks down everything upon unbinding), but the key code for comma it expects is 188
-  // And the magic is that '¼' has the same keycode. So we are going to trick keymaster to handle this in the right way.
-  ',': '¼',
 };
 
 export const Hotkey = (
@@ -159,27 +144,17 @@ export const Hotkey = (
     });
   };
 
-  const getKeys = (key: string) => {
-    const tokenRegex = /((?:\w+\+)*(?:[^,]+|,)),?/g;
-
-    return [...key.replace(/\s/,'').matchAll(tokenRegex)].map(match => match[1]);
-  };
-
   const unbind = () => {
     for (const scope of [DEFAULT_SCOPE, INPUT_SCOPE]) {
       for (const key of Object.keys(_hotkeys_map)) {
-        const keys = getKeys(key);
-
-        for (const key of keys) {
-          if (isFF(FF_LSDV_1148)) {
-            removeKeyHandlerRef(scope, key);
-            keymaster.unbind(key, scope);
-            rebindKeyHandlers(scope, key);
-          } else {
-            keymaster.unbind(key, scope);
-          }
-          delete _hotkeys_desc[key];
+        if (isFF(FF_LSDV_1148)) {
+          removeKeyHandlerRef(scope, key);
+          keymaster.unbind(key, scope);
+          rebindKeyHandlers(scope, key);
+        } else {
+          keymaster.unbind(key, scope);
         }
+        delete _hotkeys_desc[key];
       }
     }
 
@@ -190,9 +165,8 @@ export const Hotkey = (
 
   return {
     applyAliases(key: string) {
-      const keys = getKeys(key);
-
-      return keys
+      return key
+        .split(',')
         .map(k => k.split('+').map(k => ALIASES[k.trim()] ?? k).join('+'))
         .join(',');
     },
