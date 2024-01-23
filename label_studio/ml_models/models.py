@@ -8,26 +8,12 @@ from django.utils.translation import gettext_lazy as _
 
 class ModelInterface(models.Model):
 
-    title = models.CharField(
-        _('title'),
-        max_length=500,
-        null=False,
-        blank=False,
-        help_text='Model name'
-    )
+    title = models.CharField(_('title'), max_length=500, null=False, blank=False, help_text='Model name')
 
-    description = models.TextField(
-        _('description'),
-        null=True,
-        blank=True,
-        help_text='Model description'
-    )
+    description = models.TextField(_('description'), null=True, blank=True, help_text='Model description')
 
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        related_name='created_models',
-        on_delete=models.SET_NULL,
-        null=True
+        settings.AUTH_USER_MODEL, related_name='created_models', on_delete=models.SET_NULL, null=True
     )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -42,4 +28,4 @@ class ModelInterface(models.Model):
     )
 
     def has_permission(self, user):
-        return True # TODO - which roles have access by default?
+        return True   # TODO - which roles have access by default?

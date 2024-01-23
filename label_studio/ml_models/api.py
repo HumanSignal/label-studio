@@ -12,7 +12,7 @@ from rest_framework import viewsets
         tags=['Models'],
         operation_summary='List models',
         operation_description='List all models.',
-    ),   
+    ),
 )
 @method_decorator(
     name='create',
@@ -20,7 +20,7 @@ from rest_framework import viewsets
         tags=['Models'],
         operation_summary='Create model',
         operation_description='Create a new model.',
-    ),   
+    ),
 )
 @method_decorator(
     name='retrieve',
@@ -28,7 +28,7 @@ from rest_framework import viewsets
         tags=['Models'],
         operation_summary='Get model',
         operation_description='Retrieve a specific model.',
-    ),   
+    ),
 )
 @method_decorator(
     name='update',
@@ -36,7 +36,7 @@ from rest_framework import viewsets
         tags=['Models'],
         operation_summary='Put model',
         operation_description='Overwrite a specific model by ID.',
-    ),   
+    ),
 )
 @method_decorator(
     name='partial_update',
@@ -44,7 +44,7 @@ from rest_framework import viewsets
         tags=['Models'],
         operation_summary='Update model',
         operation_description='Update a specific model by ID.',
-    ),   
+    ),
 )
 @method_decorator(
     name='destroy',
@@ -74,4 +74,3 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         serializer.validated_data['organization'] = self.request.user.active_organization
         serializer.validated_data['created_by'] = self.request.user
         serializer.save()
-
