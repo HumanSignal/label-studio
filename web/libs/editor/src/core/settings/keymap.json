@@ -168,11 +168,13 @@
     "description": "Previous Page"
   },
   "image:prev": {
-    "key": "ctrl+a",
+    "key": "ctrl+left",
+    "mac": "command+left",
     "description": "Previous Image"
   },
   "image:next": {
-    "key": "ctrl+d",
+    "key": "ctrl+right",
+    "mac": "command+right",
     "description": "Next Image"
   }
 }
