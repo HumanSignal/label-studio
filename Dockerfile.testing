@@ -1,6 +1,10 @@
 # The image built from this Dockerfile will include the test dependencies,
 # and can be used for running the project's unit tests from within a container.
 # Use via the `make build-testing-image` and `make docker-testing-shell` Makefile targets.
+#
+# Try, for example, running `make docker-testing-shell` and then
+# `cd label_studio && DJANGO_DB=sqlite pytest .` from within the container.
+
 
 FROM heartexlabs/label-studio:latest
 
