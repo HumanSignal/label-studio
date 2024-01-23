@@ -169,6 +169,7 @@ export const ChipInput = ({
           <input
             ref={inputRef}
             value={currentValue}
+            data-testid="chip-input-field"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 // we are about to submit form, so add value

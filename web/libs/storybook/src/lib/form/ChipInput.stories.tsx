@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import { ChipInput } from '../../components/ChipInput';
+import { within, userEvent } from '@storybook/testing-library';
 
 const meta: Meta<typeof ChipInput> = {
   component: ChipInput,
@@ -36,6 +37,17 @@ export const WithPlaceholder: Story = {
   argTypes: meta.argTypes,
   args: {
     placeholder: 'This is an arbitrary placeholder',
+  },
+  async play({ canvasElement }) {
+    const canvas = within(canvasElement);
+
+    await userEvent.type(
+      canvas.getByTestId('chip-input-field'),
+      'hello@world.com another@email.com ',
+      {
+        delay: 200,
+      }
+    );
   },
 };
 

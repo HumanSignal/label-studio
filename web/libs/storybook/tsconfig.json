@@ -1,16 +1,28 @@
 {
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "allowJs": false,
-    "esModuleInterop": false,
+    "checkJs": false,
+    "jsx": "preserve",
+    "rootDirs": [
+      "./src"
+    ],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "types": [
-      "vite-plugin-svgr/client"
-    ]
+    "typeRoots": [
+      "src/types",
+      "../../node_modules/@types"
+    ],
+    "types": []
   },
   "files": [],
-  "include": [],
+  "include": [
+    "./src/**/*.ts",
+    "./tests/**/*.ts",
+    "cypress.config.ts"
+  ],
   "references": [
     {
       "path": "./tsconfig.lib.json"
