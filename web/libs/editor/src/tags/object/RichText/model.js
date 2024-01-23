@@ -222,7 +222,7 @@ const Model = types
         // nodes count better be the same, so replace them with stubs
         // we should not sanitize text tasks because we already have htmlEscape in view.js
         if (isFF(FF_SAFE_TEXT) && self.type === 'text') {
-          self._value = val;
+          self._value = String(val);
         } else {
           self._value = sanitizeHtml(String(val));
         }
