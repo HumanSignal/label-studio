@@ -23,6 +23,9 @@ With the Label Studio Python SDK, you can perform the following tasks in a Pytho
 
 See the [full SDK reference documentation for all available modules](https://labelstud.io/sdk/), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
 
+!!! info Tip
+    For additional guidance on using our SDK, see [5 Tips and Tricks for Label Studio’s API and SDK](https://labelstud.io/blog/5-tips-and-tricks-for-label-studio-s-api-and-sdk/).
+
 ## Start using the Label Studio Python SDK
 
 1. Install the SDK:
