@@ -87,19 +87,17 @@ We may also add references to JIRA tickets created on our side for the purpose o
 
 ### [Label Studio](https://github.com/humansignal/label-studio)
 
-The primary repository for the Label Studio Backend contains the majority of the logic for how labels are managed.
+The primary repository for Label Studio, and contains the majority of the logic for how labels are managed. Three areas where you may want to contribute include:
 
-### [Label Studio Frontend](https://github.com/HumanSignal/label-studio-frontend)
+* `label_studio`--This is the main app, containing most of the backend code. 
+* `web/apps/labelstudio` -- This acts as the central integration point for all frontend elements. 
+* `web/libs/editor`--This is the frontend library. It uses React to build the UI and mobx-state-tree for state management. 
+* `web/libs/datamanager`--This is the frontend interface for the Label Studio Data Manager, our data exploration tool. 
 
-The repository for the Label Studio user interface, developed using React and mobx-state-tree. The Label Studio Frontend is scheduled to be merged into the primary Label Studio repository.
 
 ### [Label Studio SDK](https://github.com/HumanSignal/label-studio-sdk)
 
 Python SDK to build advanced automation and integrations against the Label Studio API.
-
-### [Data Manager](https://github.com/HumanSignal/dm2)
-
-Data manager frontend interface to Label Studio. This repository is scheduled to be merged into the primary Label Studio repository.
 
 ### [Label Studio Converter](https://github.com/HumanSignal/label-studio-converter)
 
