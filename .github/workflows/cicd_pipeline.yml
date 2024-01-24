@@ -47,8 +47,6 @@ jobs:
           filters: |
             src:
               - 'label_studio/!(frontend)/**'
-              - 'deploy/requirements**'
-              - 'setup.py'
               - 'poetry.lock'
               - 'pyproject.toml'
               - '.github/workflows/bandit.yml'
@@ -63,7 +61,6 @@ jobs:
               - 'label_studio/**'
               - 'deploy/**'
               - 'Dockerfile**'
-              - 'setup.py'
               - 'poetry.lock'
               - 'pyproject.toml'
               - '.github/workflows/cicd_pipeline.yml'
