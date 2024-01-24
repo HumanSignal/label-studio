@@ -98,7 +98,7 @@ def validate_label_config(config_string):
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
         error_message = 'Validation failed on {}: {}'.format(
-            '/'.join(map(str, exc.path)), error_message.replace('@', '')
+            '/'.join(map(str, exc.absolute_path)), error_message.replace('@', '')
         )
         raise LabelStudioValidationErrorSentryIgnored(error_message)
 

@@ -103,36 +103,41 @@
       }
     },
     "tags_with_value": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/tag_with_value"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/tag_with_value"}
-      }, {"$ref": "#/definitions/tag_with_value"}]
+      }]
     },
     "tags_with_value_or_object": {
       "anyOf": [{
+        "type": "object"
+      }, {"$ref": "#/definitions/tag_with_value"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/tag_with_value"}
-      }, {
-        "type": "object"
-      }, {"$ref": "#/definitions/tag_with_value"}]
+      }]
     },
     "tags_with_value_required_name": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/tag_with_value_required_name"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/tag_with_value_required_name"}
-      }, {"$ref": "#/definitions/tag_with_value_required_name"}]
+      }]
     },
     "tags_with_column": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/tag_with_column"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/tag_with_column"}
-      }, {"$ref": "#/definitions/tag_with_column"}]
+      }]
     },
     "tags_with_name_and_toname": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/tag_with_name_and_toname"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/tag_with_name_and_toname"}
-      }, {"$ref": "#/definitions/tag_with_name_and_toname"}]
+      }]
     },
     "View": {
       "type": "object",
@@ -179,28 +184,31 @@
       }
     },
     "MaybeMultipleView": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/View"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/View"}
-      }, {"$ref": "#/definitions/View"}]
+      }]
     },
     "Choice": {
       "$ref": "#/definitions/tag_with_value"
     },
     "MaybeMultipleChoice": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/Choice"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/Choice"}
-      }, {"$ref": "#/definitions/Choice"}]
+      }]
     },
     "Label": {
       "$ref": "#/definitions/tag_with_value"
     },
     "MaybeMultipleLabel": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/Label"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/Label"}
-      }, {"$ref": "#/definitions/Label"}]
+      }]
     },
     "Choices": {
       "type": "object",
@@ -230,10 +238,11 @@
       }
     },
     "MaybeMultipleChoices": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/Choices"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/Choices"}
-      }, {"$ref": "#/definitions/Choices"}]
+      }]
     },
     "Labels": {
       "type": "object",
@@ -260,10 +269,11 @@
       }
     },
     "MaybeMultipleLabels": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/Labels"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/Labels"}
-      }, {"$ref": "#/definitions/Labels"}]
+      }]
     },
     "Relations": {
       "type": "object",
@@ -275,10 +285,11 @@
       }
     },
     "MaybeMultipleRelations": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/Relations"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/Relations"}
-      }, {"$ref": "#/definitions/Relations"}]
+      }]
     },
     "TextArea": {
       "type": "object",
@@ -299,10 +310,11 @@
       }
     },
     "MaybeMultipleTextAreas": {
-      "anyOf": [{
+      "anyOf": [ {"$ref": "#/definitions/TextArea"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/TextArea"}
-      }, {"$ref": "#/definitions/TextArea"}]
+      }]
     },
     "TimeSeries": {
       "type": "object",
@@ -335,10 +347,11 @@
       }
     },
     "MaybeMultipleTimeSeries": {
-      "anyOf": [{
+      "anyOf": [{"$ref": "#/definitions/TimeSeries"},
+        {
         "type": "array",
         "items": {"$ref": "#/definitions/TimeSeries"}
-      }, {"$ref": "#/definitions/TimeSeries"}]
+      }]
     }
   },
   "type": "object",
