@@ -154,7 +154,7 @@
         "Paragraphs": {"$ref": "#/definitions/tags_with_value_required_name"},
         "Table": {"$ref": "#/definitions/tags_with_value"},
         "Text": {"$ref": "#/definitions/tags_with_value_required_name"},
-        "TimeSeries": {"$ref": "#/definitions/tags_with_value_required_name"},
+        "TimeSeries": {"$ref": "#/definitions/MaybeMultipleTimeSeries"},
         "HyperText": {"$ref": "#/definitions/tags_with_value_required_name"},
         "View": {"$ref": "#/definitions/MaybeMultipleView"},
         "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"},
