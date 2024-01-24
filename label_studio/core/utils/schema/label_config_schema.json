@@ -300,6 +300,39 @@
         "type": "array",
         "items": {"$ref": "#/definitions/TextArea"}
       }, {"$ref": "#/definitions/TextArea"}]
+    },
+    "TimeSeries": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "@name",
+            "@value"
+          ]
+        },
+        {
+          "required": [
+            "@name",
+            "@valueList"
+          ]
+        }
+      ],
+      "properties": {
+        "@value": {
+          "$ref": "#/definitions/@value"
+        },
+        "$": {
+          "$ref": "#/definitions/$"
+        },
+        "View": {"$ref": "#/definitions/MaybeMultipleView"},
+        "Channel": {"$ref": "#/definitions/tags_with_column"}
+      }
+    },
+    "MaybeMultipleTimeSeries": {
+      "anyOf": [{
+        "type": "array",
+        "items": {"$ref": "#/definitions/TimeSeries"}
+      }, {"$ref": "#/definitions/TimeSeries"}]
     }
   },
   "type": "object",
