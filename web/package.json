@@ -217,5 +217,8 @@
       "from": "./node_modules/@martel/audio-file-decoder/decode-audio.wasm",
       "to": "./node_modules/@martel/audio-file-decoder/dist/decode-audio.wasm"
     }
-  ]
+  ],
+  "resolutions": {
+    "follow-redirects": "^1.15.5"
+  }
 }
