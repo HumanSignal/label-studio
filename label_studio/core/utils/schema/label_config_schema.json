@@ -191,7 +191,14 @@
       }]
     },
     "Choice": {
-      "$ref": "#/definitions/tag_with_value"
+      "allOf": [
+        {"$ref": "#/definitions/tag_with_value"},
+        {
+          "properties": {
+            "Choice": {"$ref": "#/definitions/MaybeMultipleChoice"}
+          }
+        }
+      ]
     },
     "MaybeMultipleChoice": {
       "anyOf": [{"$ref": "#/definitions/Choice"},
@@ -230,10 +237,7 @@
         "$": {
           "$ref": "#/definitions/$"
         },
-        "Choice": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/Choice"}
-        },
+        "Choice": {"$ref": "#/definitions/MaybeMultipleChoice"},
         "View": {"$ref": "#/definitions/MaybeMultipleView"}
       }
     },

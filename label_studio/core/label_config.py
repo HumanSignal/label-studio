@@ -84,7 +84,7 @@ def parse_config_to_json(config_string):
     if xml is None:
         raise etree.ParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
-    config = _fix_choices(config)
+    #  config = _fix_choices(config)
     return config
 
 
