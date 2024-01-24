@@ -314,7 +314,8 @@ export const DataView = injector(
 
       const task = dataStore.focusPrev();
 
-      if (isFF(FF_DEV_4008)) getRoot(view).startLabeling(task);
+      // additional way to accomplish the same goal
+      getRoot(view).startLabeling(task);
     });
 
     useShortcut("dm.focus-next", () => {
@@ -322,7 +323,8 @@ export const DataView = injector(
 
       const task = dataStore.focusNext();
 
-      if (isFF(FF_DEV_4008)) getRoot(view).startLabeling(task);
+      // additional way to accomplish the same goal
+      getRoot(view).startLabeling(task);
     });
 
     useShortcut("dm.close-labeling", () => {
