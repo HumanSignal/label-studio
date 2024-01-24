@@ -372,14 +372,9 @@ export default types
 
           if (annotationStore.viewingAll) return;
 
-          const entity = annotationStore.selected;
-
-          entity?.submissionInProgress();
-
           self.nextTask()
         });
       }
-
       /**
        * Hotkey for previous annotation
        */
@@ -389,14 +384,9 @@ export default types
 
           if (annotationStore.viewingAll) return;
 
-          const entity = annotationStore.selected;
-
-          entity?.submissionInProgress();
-
           self.prevTask()
         });
       }
-
       /**
        * Hotkey for delete
        */
