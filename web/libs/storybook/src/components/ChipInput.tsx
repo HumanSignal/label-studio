@@ -45,12 +45,10 @@ const validate = (schema: z.ZodString, value: string) => {
 
 const Chip = ({ value, onClose }: ChipProps) => {
   return (
-    <Elem tag="span" name="chip">
+    <Elem tag="span" name="chip" data-testid="chip">
       {value}
-      <Elem tag="span" name="closeButton" onClick={onClose}>
-        <Elem tag="span" name="close">
-          <IconCross />
-        </Elem>
+      <Elem tag="button" name="remove" onClick={onClose}>
+        <IconCross />
       </Elem>
     </Elem>
   );
@@ -155,13 +153,15 @@ export const ChipInput = ({
   return (
     <Block name="chip-input" className={className} onClick={onComponentFocus}>
       <Elem name="content" onClick={onComponentFocus}>
-        {selectedValues.filter(Boolean).map((value, index) => (
-          <Chip key={index} value={value} onClose={() => deleteItem(value)} />
-        ))}
+        <span>
+          {selectedValues.filter(Boolean).map((value, index) => (
+            <Chip key={index} value={value} onClose={() => deleteItem(value)} />
+          ))}
+        </span>
 
         {/* will be hidden on focus */}
         {selectedValues.length === 0 && !currentValue && placeholder && (
-          <Elem tag="span" name="placeholder">
+          <Elem tag="span" name="placeholder" data-testid="placeholder">
             {placeholder}
           </Elem>
         )}

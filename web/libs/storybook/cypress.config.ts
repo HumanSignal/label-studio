@@ -1,9 +1,7 @@
 import configure from '@humansignal/frontend-test/configure';
-import { nxComponentTestingPreset } from '@nx/react/plugins/component-testing';
 import path from 'node:path';
 
-const localPath = (p) => path.resolve(process.cwd(), p);
-const nxConfig = nxComponentTestingPreset(__filename).devServer;
+const localPath = (p: string) => path.resolve(process.cwd(), p);
 
 const config = configure((cfg) => {
   cfg.e2e = Object.assign(cfg.e2e ?? {}, {
@@ -26,7 +24,5 @@ const config = configure((cfg) => {
 
   return cfg;
 });
-
-console.log(config);
 
 export default config;

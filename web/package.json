@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "ui:watch": "nx storybook storybook",
-    "ui:test": "nx test-storybook storybook",
+    "ui:test:e2e": "nx run storybook:test-e2e",
+    "ui:test:component": "nx run storybook:test-component",
     "ls:watch": "nx run labelstudio:build:development --watch",
     "ls:unit": "nx run labelstudio:unit",
     "ls:e2e": "nx run labelstudio-e2e:e2e",
