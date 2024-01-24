@@ -91,7 +91,7 @@
         "@column"
       ],
       "properties": {
-        "@value": {
+        "@column": {
           "$ref": "#/definitions/@column"
         },
         "$": {
