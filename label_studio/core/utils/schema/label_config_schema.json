@@ -58,6 +58,9 @@
         "@value": {
           "$ref": "#/definitions/@value"
         },
+        "@valueList": {
+          "$ref": "#/definitions/@valueList"
+        },
         "$": {
           "$ref": "#/definitions/$"
         }
@@ -320,6 +323,9 @@
       "properties": {
         "@value": {
           "$ref": "#/definitions/@value"
+        },
+        "@valueList": {
+          "$ref": "#/definitions/@valueList"
         },
         "$": {
           "$ref": "#/definitions/$"
