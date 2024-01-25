@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react';
-import { ChipInput } from '../../components/ChipInput';
+import { ChipInput } from '../../components/form/ChipInput';
 import { within, userEvent } from '@storybook/testing-library';
 import z from 'zod';
 

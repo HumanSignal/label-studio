@@ -31,6 +31,9 @@ frontend-watch:
 frontend-build: frontend-setup
 	cd web && yarn run build
 
+frontend-storybook-serve: frontend-setup
+	cd web && yarn run ui:serve
+
 # Run tests
 test:
 	cd label_studio && DJANGO_DB=sqlite pytest -v -m "not integration_tests"

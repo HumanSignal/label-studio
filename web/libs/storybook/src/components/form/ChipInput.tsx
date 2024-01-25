@@ -7,8 +7,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { IconCross } from '../assets/icons';
-import { Block, Elem } from '../utils/bem';
+import { IconCross } from '../../assets/icons';
+import { Block, Elem } from '../../utils/bem';
 import * as z from 'zod';
 import './ChipInput.scss';
 

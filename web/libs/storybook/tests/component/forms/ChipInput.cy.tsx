@@ -1,4 +1,4 @@
-import { ChipInput } from '../../../src/components/ChipInput';
+import { ChipInput } from '../../../src/components/form/ChipInput';
 import z from 'zod';
 
 describe('Basic rendering', () => {

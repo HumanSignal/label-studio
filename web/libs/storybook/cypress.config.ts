@@ -4,11 +4,6 @@ import path from 'node:path';
 const localPath = (p: string) => path.resolve(process.cwd(), p);
 
 const config = configure((cfg) => {
-  cfg.e2e = Object.assign(cfg.e2e ?? {}, {
-    supportFolder: localPath('./tests/support/'),
-    downloadsFolder: localPath('./tests/downloads'),
-    fixturesFolder: localPath('./tests/fixtures'),
-  });
   cfg.component = Object.assign(cfg.component ?? {}, {
     devServer: {
       bundler: 'vite',
@@ -20,7 +15,7 @@ const config = configure((cfg) => {
     supportFolder: localPath('./tests/support/'),
     downloadsFolder: localPath('./tests/downloads'),
     fixturesFolder: localPath('./tests/fixtures'),
-    setupNodeEvents: cfg.e2e.setupNodeEvents,
+    setupNodeEvents: cfg.e2e?.setupNodeEvents,
   } as Cypress.Config['component']);
 
   return cfg;

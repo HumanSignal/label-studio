@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "ui:watch": "nx storybook storybook",
+    "ui:serve": "nx storybook storybook",
     "ui:test:component": "nx run storybook:test-component",
     "ls:watch": "nx run labelstudio:build:development --watch",
     "ls:unit": "nx run labelstudio:unit",
