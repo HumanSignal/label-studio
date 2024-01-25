@@ -586,11 +586,14 @@ export class LSFWrapper {
         // don't react on duplicated annotations error
         { errorHandler: result => result.status === 409 },
       );
-    }, false, loadNext, exitStream);
+    }, false, loadNext);
     const status = result?.$meta?.status;
 
     if (status === 200 || status === 201) this.datamanager.invoke("toast", { message: "Annotation saved successfully", type: "info" });
     else if (status !== undefined) this.datamanager.invoke("toast", { message: "There was an error saving your Annotation", type: "error" });
+
+    if (exitStream) return  this.exitStream();
+
   };
 
   /** @private */
