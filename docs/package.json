@@ -42,6 +42,7 @@
     "save": "^2.4.0"
   },
   "resolutions": {
+    "follow-redirects": "^1.15.5",
     "hexo-footnote/hexo-util": "3.0.1",
     "markdown-it": "13.0.1"
   },
