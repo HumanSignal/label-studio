@@ -291,7 +291,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
             for ts_child in p:
                 if ts_child.tag != 'Channel':
                     continue
-                value_columns.append(ts_child.get('column') or "default")
+                value_columns.append(ts_child.get('column') or '_default_')
             sep = p.get('sep')
             time_format = p.get('timeFormat')
 
