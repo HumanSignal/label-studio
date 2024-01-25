@@ -440,7 +440,7 @@ const RootTitle: FC<any> = observer(({
           {item?.text && <Elem name="text">{item.text.replace(/\\n/g, '\n')}</Elem>}
           {item?.isDrawing && (
             <Elem tag="span" name="incomplete">
-              <Tooltip title={`Incomplete ${item.type?.replace('region', '') ?? 'region'}$`}>
+              <Tooltip title={`Incomplete ${item.type?.replace('region', '') ?? 'region'}`}>
                 <IconWarning />
               </Tooltip>
             </Elem>
