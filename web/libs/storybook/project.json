@@ -37,20 +37,6 @@
         }
       }
     },
-    "test-storybook": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "test-storybook -c libs/storybook/.storybook --url=http://localhost:4400"
-      }
-    },
-    "test-e2e": {
-      "executor": "@nx/cypress:cypress",
-      "options": {
-        "cypressConfig": "libs/storybook/cypress.config.ts",
-        "testingType": "e2e",
-        "baseUrl": "http://localhost:4400"
-      }
-    },
     "test-component": {
       "executor": "@nx/cypress:cypress",
       "options": {

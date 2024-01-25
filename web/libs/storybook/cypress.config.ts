@@ -20,6 +20,7 @@ const config = configure((cfg) => {
     supportFolder: localPath('./tests/support/'),
     downloadsFolder: localPath('./tests/downloads'),
     fixturesFolder: localPath('./tests/fixtures'),
+    setupNodeEvents: cfg.e2e.setupNodeEvents,
   } as Cypress.Config['component']);
 
   return cfg;

@@ -18,15 +18,34 @@ const InputFormats = {
 };
 
 export type ChipInputProps = {
+  /**
+   * Array of items to display in the field
+   */
   value?: string[];
+  /**
+   * Custom class
+   */
   className?: string;
+  /**
+   * Placeholder text
+   */
   placeholder?: string;
+  /**
+   * Callback triggerred whenever the list of current values change
+   */
   onChange?: (newValue: string[]) => void;
 } & (
   | {
+      /**
+       * Predefined formats to validate chips against.
+       * @default {"email"}
+       */
       format?: keyof typeof InputFormats;
     }
   | {
+      /**
+       * Custom validation schema. Uses zod to validate
+       */
       validate?: z.ZodString;
     }
 );
@@ -47,7 +66,12 @@ const Chip = ({ value, onClose }: ChipProps) => {
   return (
     <Elem tag="span" name="chip" data-testid="chip">
       {value}
-      <Elem tag="button" name="remove" onClick={onClose}>
+      <Elem
+        tag="button"
+        name="remove"
+        data-testid="chip-remove"
+        onClick={onClose}
+      >
         <IconCross />
       </Elem>
     </Elem>
@@ -56,9 +80,9 @@ const Chip = ({ value, onClose }: ChipProps) => {
 
 export const ChipInput = ({
   onChange,
-  className,
-  value,
-  placeholder,
+  className = '',
+  value = [],
+  placeholder = 'Enter emails separated by spaces or commas',
   ...restProps
 }: ChipInputProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -113,31 +137,41 @@ export const ChipInput = ({
     inputRef.current?.focus();
   };
 
-  const onInputChange: FormEventHandler<HTMLInputElement> = (e) => {
-    const value = e.currentTarget.value;
+  const onPaste = (e: ClipboardEvent) => {
+    if (e.type !== 'paste') return;
+    if (e.clipboardData === null) return;
+
+    const value = e.clipboardData.getData('text/plain') ?? '';
     const valid = [];
     let current: string | undefined = value;
 
+    const values = value.split(separatorRegexp);
+
+    // last (or only) value in list is left in input to edit
+    // will be added to list on blur on submit anyway
+    current = values.pop();
+
+    for (const value of values) {
+      console.log(value);
+
+      if (validate(inputSchema, value)) {
+        valid.push(value);
+      } else {
+        // invalid values are left in input, so they can be fixed
+        current = [value, current].join(',');
+      }
+    }
+    addValues(valid);
+    if (current) setCurrentValue(current);
+  };
+
+  const onInputChange: FormEventHandler<HTMLInputElement> = (e) => {
+    separatorRegexp.lastIndex = 0;
+    const value = e.currentTarget.value;
+    const current: string | undefined = value;
+
     if (value.length === 0) return setCurrentValue('');
 
-    // handle paste values
-    if (separatorRegexp.test(value)) {
-      const values = value.split(separatorRegexp);
-
-      // last (or only) value in list is left in input to edit
-      // will be added to list on blur on submit anyway
-      current = values.pop();
-
-      for (const value of values) {
-        if (validate(inputSchema, value)) {
-          valid.push(value);
-        } else {
-          // invalid values are left in input, so they can be fixed
-          current = [value, current].join(',');
-        }
-      }
-      addValues(valid);
-    }
     if (current) setCurrentValue(current);
   };
 
@@ -149,6 +183,15 @@ export const ChipInput = ({
     setSelectedValues(
       selectedValues.filter((currentValue) => currentValue !== value)
     );
+
+  // in order to properly simulate paste event we need to subscribe to
+  // native one instead of synthetic event from React
+  useEffect(() => {
+    const el = inputRef?.current;
+    el?.addEventListener('paste', onPaste);
+
+    return () => el?.removeEventListener('paste', onPaste);
+  });
 
   return (
     <Block name="chip-input" className={className} onClick={onComponentFocus}>

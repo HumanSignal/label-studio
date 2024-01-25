@@ -5,9 +5,11 @@ $danger_color: #ff0000;
 .chip-input {
   position: relative;
   overflow: auto;
+  min-height: 38px;
   border: 1px solid var(--surface-outline-outline-dark, #8C8C8C);
   background-color: var(--gray-2);
   border-radius: 4px;
+  box-sizing: border-box;
   padding: 4px 12px;
   font-family: Roboto;
 
@@ -26,7 +28,7 @@ $danger_color: #ff0000;
   &__input {
     display: inline-block;
     width: 20px;
-    height: 26px;
+    height: 28px;
 
     input {
       border: 0 none;
@@ -51,7 +53,7 @@ $danger_color: #ff0000;
     padding: 4px 8px;
     margin: 2px 4px; // margin-right: 4px;
     color: var(--pirmary-on-containte);
-    // margin-bottom: 4px;
+    cursor: default;
   }
 
   &__remove {
@@ -64,7 +66,7 @@ $danger_color: #ff0000;
     justify-content: center;
     align-items: center;
     padding: 3px;
-
+    cursor: pointer;
 
     svg {
       width: 100%;
@@ -85,6 +87,7 @@ $danger_color: #ff0000;
     line-height: 24px;
     color: #898098;
     pointer-events: none;
+    vertical-align: middle;
   }
 
   &:focus-within &__placeholder {
