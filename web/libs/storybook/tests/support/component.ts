@@ -1,5 +1,17 @@
 import { mount } from 'cypress/react';
 
+Cypress.on('uncaught:exception', (err) => {
+  const ignoredErrors = [
+    'ResizeObserver loop completed with undelivered notifications.',
+  ];
+
+  const ignored = ignoredErrors.some((errMessage) => {
+    return err.message.includes(errMessage);
+  });
+
+  return !ignored;
+});
+
 Cypress.Commands.add('mount', mount);
 
 Cypress.Commands.add(
