@@ -10,7 +10,7 @@ const config = configure((cfg) => {
       framework: 'react',
     },
     indexHtmlFile: localPath('./tests/support/component-index.html'),
-    specPattern: localPath('./tests/component/**/*.cy.{ts,tsx}'),
+    specPattern: localPath('./tests/specs/**/*.cy.{ts,tsx}'),
     supportFile: localPath('./tests/support/component.ts'),
     supportFolder: localPath('./tests/support/'),
     downloadsFolder: localPath('./tests/downloads'),

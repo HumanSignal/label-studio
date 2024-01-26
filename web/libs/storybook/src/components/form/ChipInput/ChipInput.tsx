@@ -7,8 +7,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { IconCross } from '../../assets/icons';
-import { Block, Elem } from '../../utils/bem';
+import { IconCross } from '../../../assets/icons';
+import { Block, Elem } from '../../../utils/bem';
 import * as z from 'zod';
 import './ChipInput.scss';
 
@@ -30,6 +30,10 @@ export type ChipInputProps = {
    * Placeholder text
    */
   placeholder?: string;
+  /**
+   * Allow only unique values
+   */
+  unique?: boolean;
   /**
    * Callback triggerred whenever the list of current values change
    */
@@ -78,16 +82,20 @@ const Chip = ({ value, onClose }: ChipProps) => {
   );
 };
 
+/**
+ * General purpose Chip input component
+ */
 export const ChipInput = ({
   onChange,
   className = '',
   value = [],
   placeholder = 'Enter emails separated by spaces or commas',
+  unique = true,
   ...restProps
 }: ChipInputProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wrapperRef = useRef<HTMLSpanElement | null>(null);
-  const [selectedValues, setSelectedValues] = useState<string[]>(value ?? []);
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [currentValue, setCurrentValue] = useState('');
 
   const inputSchema = useMemo(() => {
@@ -99,6 +107,17 @@ export const ChipInput = ({
     }
     return InputFormats.email;
   }, [restProps]);
+
+  const validateValues = (values: string[]) => {
+    return values.filter((val) => validate(inputSchema, val));
+  };
+
+  useEffect(() => {
+    const list = validateValues(value);
+    addValues(list);
+    // We don't need to track `addValues` here
+    // eslint-disable-next-line
+  }, [value]);
 
   // update values list on upper component on
   // value added or removed
@@ -118,10 +137,12 @@ export const ChipInput = ({
 
   // values should be already valid
   const addValues = (values: string[]) => {
-    // only unique values
-    setSelectedValues((currentValues) => [
-      ...new Set([...currentValues, ...values]),
-    ]);
+    setSelectedValues((currentValues) => {
+      const updatedValues = unique
+        ? [...new Set([...currentValues, ...values])] // only unique values allowed
+        : [...currentValues, ...values];
+      return updatedValues;
+    });
   };
 
   const addValue = (value: string) => {
