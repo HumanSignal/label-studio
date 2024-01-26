@@ -50,10 +50,10 @@ export const RegionItem: FC<RegionItemProps> = observer(({
         {withIds && <span>{region.cleanId}</span>}
       </Elem>
       {MainDetails && <Elem name="content"><MainDetails region={region}/></Elem>}
-      {region?.isDrawing && (
+      {region.isDrawing && (
         <Elem name="warning">
           <IconWarning />
-          <Elem name="warning-text">Incomplete {region.type.replace('region', '')}</Elem>
+          <Elem name="warning-text">Incomplete {region.type?.replace('region', '') ?? 'region'}</Elem>
         </Elem>
       )}
       {withActions && (

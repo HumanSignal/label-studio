@@ -203,6 +203,13 @@
     "webpack-merge": "^5.9.0",
     "yargs": "^17.7.1"
   },
+  "resolutions": {
+    "jpeg-js": "0.4.4",
+    "d3-color": "3.1.0",
+    "merge": "2.1.1",
+    "diff": "3.5.0",
+    "follow-redirects": "^1.15.5"
+  },
   "babel": {
     "presets": [
       [

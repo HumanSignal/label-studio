@@ -47,8 +47,6 @@ jobs:
           filters: |
             src:
               - 'label_studio/!(frontend)/**'
-              - 'deploy/requirements**'
-              - 'setup.py'
               - 'poetry.lock'
               - 'pyproject.toml'
               - '.github/workflows/bandit.yml'
@@ -63,7 +61,6 @@ jobs:
               - 'label_studio/**'
               - 'deploy/**'
               - 'Dockerfile**'
-              - 'setup.py'
               - 'poetry.lock'
               - 'pyproject.toml'
               - '.github/workflows/cicd_pipeline.yml'
@@ -316,7 +313,7 @@ jobs:
             core.setOutput("id", release.id);
             core.setOutput("tag_name", release.tag_name);
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Configure pip cache
         id: pip-cache
         with:

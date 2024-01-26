@@ -121,7 +121,6 @@ packages = [
     { include = "label_studio" },
 ]
 include = [
-    "deploy/requirements.txt",
     "web/dist/libs/datamanager/**/*",
     "web/dist/libs/editor/**/*",
     "web/dist/apps/labelstudio/**/*",

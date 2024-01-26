@@ -311,7 +311,10 @@ def sort_task_by_label(tasks: list[AhaFeature]) -> dict[str, list[AhaFeature]]:
 def render_tasks_md(tasks: list[AhaFeature]) -> list[str]:
     result = []
     for task in tasks:
-        result.append(f'- {task.desc} [{task.key}]({task.link})')
+        line = f'- {task.desc} [{task.key}]({task.link})'
+        if task.pr:
+            line += f' (#{task.pr})'
+        result.append(line)
     return result
 
 
