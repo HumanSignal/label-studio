@@ -71,6 +71,8 @@ COPY --chown=1001:0 label_studio/__init__.py ./label_studio/__init__.py
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR \
     poetry check --lock && poetry install
 
+COPY --chown=1001:0 LICENSE LICENSE
+COPY --chown=1001:0 licenses licenses
 COPY --chown=1001:0 label_studio label_studio
 COPY --chown=1001:0 deploy deploy
 
