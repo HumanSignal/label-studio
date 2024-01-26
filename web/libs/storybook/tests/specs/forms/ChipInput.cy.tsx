@@ -1,4 +1,5 @@
 import { ChipInput } from '../../../src/components/form/ChipInput/ChipInput';
+import sinon from 'sinon';
 import z from 'zod';
 
 describe('Basic rendering', () => {
@@ -115,5 +116,19 @@ describe('Basic rendering', () => {
     input().type('three@example.com{enter}');
 
     chip().should('have.length', 3);
+  });
+
+  it('should properly emit `onChange` event', () => {
+    const handler = cy.stub().as('handler');
+    cy.mount(<ChipInput onChange={handler} />);
+
+    const input = () => cy.get('[data-testid=chip-input-field]');
+
+    input().type('one@example.com{enter}');
+
+    cy.get('@handler').should(
+      'have.been.calledWithMatch',
+      sinon.match(['one@example.com'])
+    );
   });
 });

@@ -95,8 +95,18 @@ export const ChipInput = ({
 }: ChipInputProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wrapperRef = useRef<HTMLSpanElement | null>(null);
-  const [selectedValues, setSelectedValues] = useState<string[]>([]);
+  const [selectedValues, _setSelectedValues] = useState<string[]>([]);
   const [currentValue, setCurrentValue] = useState('');
+
+  const setSelectedValues = (
+    input: string[] | ((current: string[]) => string[])
+  ) => {
+    _setSelectedValues((current) => {
+      const updated = input instanceof Function ? input(current) : input;
+      onChange?.(updated);
+      return updated;
+    });
+  };
 
   const inputSchema = useMemo(() => {
     if ('format' in restProps && restProps.format !== undefined) {
@@ -114,16 +124,10 @@ export const ChipInput = ({
 
   useEffect(() => {
     const list = validateValues(value);
-    addValues(list);
+    if (list.length > 0) addValues(list);
     // We don't need to track `addValues` here
     // eslint-disable-next-line
-  }, [value]);
-
-  // update values list on upper component on
-  // value added or removed
-  useEffect(() => {
-    onChange?.(selectedValues);
-  }, [onChange, selectedValues, selectedValues.length]);
+  }, []);
 
   // resize input to fit text in it up to 100% (in styles)
   // resets after every value added or if field is cleared
