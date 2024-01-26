@@ -4,7 +4,8 @@ const valueToString = (value) => {
   try {
     return JSON.stringify(value);
   } catch {
-    return value.toString();
+    /* if undefined or null we'll treat it as empty string, otherwise toString(), this will allow 0 and false to render properly */
+    return (value ?? "").toString();
   }
 };
 
@@ -18,7 +19,7 @@ export const StringCell = ({ value }) => {
         lineHeight: "16px",
       }}
     >
-      {value ? valueToString(value) : ""}
+      {valueToString(value)}
     </div>
   );
 };
