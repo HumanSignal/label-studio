@@ -1,7 +1,5 @@
 @import "../../../assets/styles/base.scss";
 
-$danger_color: #ff0000;
-
 .chip-input {
   position: relative;
   overflow: auto;
@@ -18,7 +16,7 @@ $danger_color: #ff0000;
   }
 
   &.isError &__placeholder {
-    color: $danger_color;
+    color: var(--red-6);
   }
 
   &:focus-within {
