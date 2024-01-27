@@ -13,6 +13,10 @@ parent_enterprise: "scim_setup"
 date: 2024-01-25 10:07:22
 ---
 
+System for Cross-domain Identity Management (SCIM) is an open standard for automating the exchange of user identity information between identity domains or IT systems. SCIM is designed to make user management in cloud-based applications and services easier and more efficient, reducing the time and resources required for user administration.
+
+For organizations using Label Studio Enterprise, SCIM provides a streamlined approach to managing user identities and access permissions. By integrating SCIM, administrators can automate the provisioning and deprovisioning of users, synchronize user data across systems, and ensure that the right individuals have access to the necessary resources within Label Studio Enterprise.
+
 ## SCIM workflow
 
 You can use SCIM to do the following:
