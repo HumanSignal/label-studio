@@ -41,12 +41,6 @@ You can use SCIM with Label Studio to control and interact with two entities: Us
 
     This will also require a payload that includes user information such as email and password. 
 
-**SCIM user parameters:**
-
-* `first_name`
-* `last_name`
-* `email`
-
 #### Groups
 
 * Modify group members: `PUT /scim/v2/Groups/<group-name>`
