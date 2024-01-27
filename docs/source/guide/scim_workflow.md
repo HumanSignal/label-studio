@@ -13,7 +13,6 @@ parent_enterprise: "scim_setup"
 date: 2024-01-25 10:07:22
 ---
 
-
 ## SCIM workflow
 
 You can use SCIM to do the following:
@@ -78,9 +77,6 @@ These settings can also be configured in the Label Studio app from the **Organiz
 
 * [Retrieve SCIM settings](https://app.heartex.com/docs/api/#tag/SSO/operation/api_scim_settings_list): `GET /api/scim/settings`
 * [Update SCIM settings](https://app.heartex.com/docs/api/#tag/SSO/operation/api_scim_settings_list): `POST /api/scim/settings`
-
-
-
 
 
 ## SCIM settings
