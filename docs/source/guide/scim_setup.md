@@ -33,6 +33,8 @@ SCIM interacts with your SSO integration.
 
 Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page uses integration with [Okta](https://www.okta.com/integrate/). However, Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that support the standard.
 
+For more information on how SCIM workflows, see [How SCIM works with Label Studio Enterprise](scim_workflow). 
+
 ## Set up SCIM integration
 
 <i>Check this video tutorial about SCIM and Okta setup.</i>
