@@ -1,11 +1,13 @@
 const valueToString = (value) => {
   if (typeof value === "string") return value;
+  /* if undefined or null we'll treat it as empty string */
+  if (value === undefined || value === null) return "";
 
   try {
+    /* JSON.stringify will handle JSON and non-strings, non-null, non-undefined */
     return JSON.stringify(value);
   } catch {
-    /* if undefined or null we'll treat it as empty string, otherwise toString(), this will allow 0 and false to render properly */
-    return (value ?? "").toString();
+    return 'Error: Invalid JSON';
   }
 };
 
