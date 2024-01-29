@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-240: Prevent creating region on clicking outside selected one",
-  "commit": "4faed9ac55d7386cbd9af8a1ade66d064a13d16e",
-  "branch": "fb-leap-240/fix-click-outside",
-  "date": "2024-01-18T04:45:00Z"
+  "message": "fix: LEAP-240: Prevent creating region on clicking outside selected one (#1667)",
+  "commit": "923c09cbbd8c03468e0c45445086f0e817d99f0c",
+  "branch": "master",
+  "date": "2024-01-29T16:56:03Z"
 }
