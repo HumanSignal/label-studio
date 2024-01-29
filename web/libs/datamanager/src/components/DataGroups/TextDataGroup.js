@@ -12,12 +12,17 @@ const valueToString = (value) => {
 
 export const TextDataGroup = ({ value }) => {
   const output = valueToString(value);
+  const style = { 
+    padding: 5, 
+    height: TextDataGroup.height, 
+    overflow: "hidden", 
+    whiteSpace: "nowrap", 
+    textOverflow: "ellipsis",
+  };
 
   return (
     <Tooltip title={output}>
-      <div
-        style={{ padding: 5, height: TextDataGroup.height, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
-      >
+      <div style={style}>
         {output}
       </div>
     </Tooltip>
