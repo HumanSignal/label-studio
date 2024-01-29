@@ -7,10 +7,6 @@ on:
         required: true
         type: string
 
-env:
-  NODE: '18'
-  CACHE_NAME_PREFIX: v1
-
 jobs:
   migrations:
     name: "migrations"
