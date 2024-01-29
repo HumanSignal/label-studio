@@ -1,5 +1,3 @@
-import { Tooltip } from "../Common/Tooltip/Tooltip";
-
 const valueToString = (value) => {
   if (typeof value === "string") return value;
 
@@ -21,11 +19,9 @@ export const TextDataGroup = ({ value }) => {
   };
 
   return (
-    <Tooltip title={output}>
-      <div style={style}>
-        {output}
-      </div>
-    </Tooltip>
+    <div style={style} title={output}>
+      {output}
+    </div>
   );
 };
 
