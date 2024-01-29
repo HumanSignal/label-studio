@@ -68,8 +68,7 @@ COPY label_studio/__init__.py ./label_studio/__init__.py
 
 # Install dependencies
 RUN --mount=type=cache,target="/root/.cache",sharing=locked \
-    poetry install --no-ansi && \
-    rm -rf /tmp/tmp*
+    poetry install --with docker --no-ansi
 
 # Copy the source code
 COPY . .

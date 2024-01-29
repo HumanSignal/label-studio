@@ -199,7 +199,6 @@ label-studio-converter = "0.0.57"
 google-cloud-storage = "^2.13.0"
 mysqlclient = {version = "*", optional = true}
 django-csp = "3.7"
-pyuwsgi = "~2.0.23"
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
@@ -224,6 +223,9 @@ twine = ">=4.0.2"
 
 [tool.poetry.extras]
 mysql = ["mysqlclient"]
+
+[tool.poetry.group.docker.dependencies]
+pyuwsgi = "^2.0.23"
 
 [build-system]
 requires = ["poetry-core"]
