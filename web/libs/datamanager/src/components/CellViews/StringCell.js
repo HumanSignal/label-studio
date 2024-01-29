@@ -12,15 +12,15 @@ const valueToString = (value) => {
 };
 
 export const StringCell = ({ value }) => {
+  const style = {
+    maxHeight: "100%",
+    overflow: "hidden",
+    fontSize: 12,
+    lineHeight: "16px",
+  };
+
   return (
-    <div
-      style={{
-        maxHeight: "100%",
-        overflow: "hidden",
-        fontSize: 12,
-        lineHeight: "16px",
-      }}
-    >
+    <div style={style}>
       {valueToString(value)}
     </div>
   );
