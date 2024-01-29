@@ -127,6 +127,7 @@ jobs:
 
       - name: Merge
         id: merge
+        continue-on-error: true
         env:
           BASE_BRANCH: ${{ steps.get-branch.outputs.base_name }}
           HEAD_BRANCH: ${{ steps.get-branch.outputs.name }}
@@ -198,7 +199,8 @@ jobs:
             echo "message=Successfully merged: ${output_last_line}" >> $GITHUB_OUTPUT
             exit 0
           fi
-
+          
+          git merge --abort || true
           echo "result=false" >> $GITHUB_OUTPUT
           echo "reaction=-1" >> $GITHUB_OUTPUT
           {
@@ -286,6 +288,7 @@ jobs:
       - name: "LSF Docs: Install NPM deps"
         if: steps.details.outputs.build_lsf_docs
         continue-on-error: true
+        working-directory: tmp/scripts
         run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"

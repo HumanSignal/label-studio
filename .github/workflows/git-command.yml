@@ -16,7 +16,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: Add Workflow link to command comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -130,7 +130,7 @@ jobs:
           git push origin HEAD
 
       - name: Add reaction to command comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         if: always()
         with:
           token: ${{ secrets.GIT_PAT }}
@@ -146,7 +146,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
