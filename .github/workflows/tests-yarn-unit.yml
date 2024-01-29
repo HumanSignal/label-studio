@@ -1,28 +1,21 @@
-name: "Frontend build"
+name: "yarn unit"
 
 on:
   workflow_call:
     inputs:
-      ref:
-        required: true
-        type: string
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: "Ref"
+      head_sha:
         required: true
         type: string
 
 env:
   NODE: "18"
   FRONTEND_MONOREPO_DIR: "web"
-  FRONTEND_BUILD_COMMIT_MESSAGE: "ci: Build frontend"
 
 jobs:
-  build:
-    name: "Frontend"
-    timeout-minutes: 15
+  main:
+    name: "yarn unit"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
@@ -36,7 +29,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
 
       - name: Setup frontend environment
@@ -45,13 +37,7 @@ jobs:
           node-version: "${{ env.NODE }}"
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
-      - name: "Monorepo: Build"
-        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
-        run: yarn build
-
-      - name: Commit and Push
+      - name: Run tests
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
         run: |
-          git add "${{ env.FRONTEND_MONOREPO_DIR }}" || true
-          git status -s
-          git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
-          git push origin HEAD
+          yarn test:unit

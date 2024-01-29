@@ -127,7 +127,7 @@ const NodeDebug: FC<any> = observer(({ className, node }) => {
 const Node: FC<any> = observer(({ className, node }) => {
   const name = useNodeName(node);
 
-  if (!(name in NodeViews)) {
+  if (!name || !(name in NodeViews)) {
     console.error(`No ${name} in NodeView`);
     return null;
   }
@@ -138,9 +138,9 @@ const Node: FC<any> = observer(({ className, node }) => {
   return (
     <Block name="node" tag="span" className={className}>
       {labelName}
-      {node?.isDrawing && (
+      {node.isDrawing && (
         <Elem tag="span" name="incomplete">
-          <Tooltip title="Incomplete polygon">
+          <Tooltip title={`Incomplete ${node.type?.replace('region', '') ?? 'region'}`}>
             <IconWarning />
           </Tooltip>
         </Elem>
