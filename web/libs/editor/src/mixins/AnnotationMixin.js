@@ -1,15 +1,14 @@
 import { getRoot, isAlive, types } from 'mobx-state-tree';
 import Types from '../core/Types';
-import { FF_DEV_3391, isFF } from '../utils/feature-flags';
+import { FF_DEV_3391, FF_SIMPLE_INIT, isFF } from '../utils/feature-flags';
 
 export const AnnotationMixin = types.model('AnnotationMixin', {
 
 }).views((self) => ({
   get annotation() {
-    if (!window.STORE_INIT_OK) {
-      console.log('WE HAVE A BREAKAGE DURING INIT!');
-      // @todo this error is to test it fully in tests, will be removed soon
-      throw new Error('Annotation store should not be accessed during annotation init!');
+    // annotation should not be accessed before store is initialized
+    if (isFF(FF_SIMPLE_INIT) && !window.STORE_INIT_OK) {
+      console.error('LSF: annotation accessed before store is initialized', self);
     }
 
     if (!isAlive(self)) return null;

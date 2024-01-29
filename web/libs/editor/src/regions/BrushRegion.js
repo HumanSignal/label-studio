@@ -228,19 +228,24 @@ const Model = types
     let pathPoints,
       cachedPoints,
       lastPointX = -1,
-      lastPointY = -1;
+      lastPointY = -1,
+      maskImage;
 
     return {
       afterCreate() {
-        // if ()
-        // const newdata = ctx.createImageData(750, 937);
-        // newdata.data.set(decode(item._rle));
-        // const dec = decode(self._rle);
-        // self._rle_image =
-        // item._cached_mask = decode(item._rle);
-        // const newdata = ctx.createImageData(750, 937);
-        //     newdata.data.set(item._cached_mask);
-        //     var img = imagedata_to_image(newdata);
+        self.updateMaskImage();
+      },
+
+      updateMaskImage() {
+        if (self.maskDataURL) {
+          if (!maskImage) maskImage = new window.Image();
+
+          maskImage.src = self.maskDataURL;
+        }
+      },
+
+      getMaskImage() {
+        return maskImage;
       },
 
       setLayerRef(ref) {
@@ -349,6 +354,7 @@ const Model = types
         annotation.startAutosave();
 
         self.maskDataURL = maskDataURL;
+        self.updateMaskImage();
 
         self.notifyDrawingFinished();
 

@@ -208,6 +208,13 @@ function exportRLE(region) {
     ctx.putImageData(imageData, 0, 0);
   }
 
+  const maskImage = region.getMaskImage?.();
+
+  if (maskImage) {
+    // Apply maskDataURL to existing image data
+    ctx.drawImage(maskImage, 0, 0);
+  }
+
   // If the region was changed manually, we'll have access to user tuoches
   // Render those on the canvas after RLE
   if (region.touches.length > 0) {

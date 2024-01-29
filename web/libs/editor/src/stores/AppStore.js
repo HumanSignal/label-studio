@@ -24,7 +24,7 @@ import Settings from './SettingsStore';
 import Task from './TaskStore';
 import { UserExtended } from './UserStore';
 import { UserLabels } from './UserLabels';
-import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, isFF } from '../utils/feature-flags';
+import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from '../utils/feature-flags';
 import { CommentStore } from './Comment/CommentStore';
 import { destroy as destroySharedStore } from '../mixins/SharedChoiceStore/mixin';
 
@@ -676,10 +676,7 @@ export default types
      */
     function initializeStore({ annotations = [], completions = [], predictions = [], annotationHistory }) {
       const as = self.annotationStore;
-      // @todo will become a feature flag
-      const simpleInit = window.SIMPLE_INIT ?? true;
-
-      console.log('SIMPLE INIT', simpleInit);
+      const simpleInit = isFF(FF_SIMPLE_INIT);
 
       // some hacks to properly clear react and mobx structures
       as.afterReset?.();
@@ -691,6 +688,8 @@ export default types
         }
       }
 
+      // goal here is to deserialize everything fast and select only first annotation
+      // no extra processes during eserialization and further processes triggered during select
       if (simpleInit) {
         window.STORE_INIT_OK = false;
 
@@ -710,8 +709,9 @@ export default types
           obj.deserializeResults(c.draft || c.result, { hidden: true });
         });
 
-        console.log('WE DID THE INIT!');
         window.STORE_INIT_OK = true;
+        // simple logging to detect if simple init is used on users' machines
+        console.log('LSF: deserialization is finished');
 
         // previously items were selected one by one and the last one left selected,
         // but because they were added to the beginning of the array, the last one was first.

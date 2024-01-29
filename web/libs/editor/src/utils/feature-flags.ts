@@ -325,6 +325,9 @@ export const FF_TAXONOMY_SELECTED = 'fflag_fix_front_leap_149_taxonomy_selected_
 /** Skip video to region start when it's selected in the outliner */
 export const FF_LEAP_187 = 'fflag_feat_front_leap_187_video_seek_on_select_short';
 
+/** Select annotation only once during store init and trigger the rest from this select */
+export const FF_SIMPLE_INIT = 'fflag_fix_front_leap_443_select_annotation_once';
+
 /**
  * Optimize stage rendering for large number of regions and zoom interactions
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_leap_32_zoom_perf_190923_short/targeting
