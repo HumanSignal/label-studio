@@ -1,6 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StaticContent } from '../../app/StaticContent/StaticContent';
-import { IconBook, IconFolder, IconPersonInCircle, IconPin, IconTerminal, LsDoor, LsGitHub, LsSettings, LsSlack } from '../../assets/icons';
+import { IconBook, IconFolder, IconModel, IconPersonInCircle, IconPin, IconTerminal, LsDoor, LsGitHub, LsSettings, LsSlack } from '../../assets/icons';
 import { useConfig } from '../../providers/ConfigProvider';
 import { useContextComponent, useFixedLocation } from '../../providers/RoutesProvider';
 import { cn } from '../../utils/bem';
@@ -205,8 +205,9 @@ export const Menubar = ({
                 />
                 {isFF(FF_DIA_835) && (
                   <Menu.Item
-                    label="Prompter"
+                    label="Models"
                     to={PrompterPage.path}
+                    icon={<IconModel/>}
                     exact
                   />
                 )}
