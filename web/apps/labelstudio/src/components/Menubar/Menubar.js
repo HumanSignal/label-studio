@@ -15,6 +15,7 @@ import './Menubar.styl';
 import './MenuContent.styl';
 import './MenuSidebar.styl';
 import { PrompterPage } from '../../pages/Organization/Prompter/PrompterPage';
+import { FF_DIA_835, isFF } from '../../utils/feature-flags';
 
 export const MenubarContext = createContext();
 
@@ -202,11 +203,13 @@ export const Menubar = ({
                   data-external
                   exact
                 />
-                <Menu.Item
-                  label="Prompter"
-                  to={PrompterPage.path}
-                  exact
-                />
+                {isFF(FF_DIA_835) && (
+                  <Menu.Item
+                    label="Prompter"
+                    to={PrompterPage.path}
+                    exact
+                  />
+                )}
 
                 <Menu.Spacer/>
 
