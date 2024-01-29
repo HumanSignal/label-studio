@@ -127,6 +127,7 @@ jobs:
 
       - name: Merge
         id: merge
+        continue-on-error: true
         env:
           BASE_BRANCH: ${{ steps.get-branch.outputs.base_name }}
           HEAD_BRANCH: ${{ steps.get-branch.outputs.name }}
@@ -198,7 +199,8 @@ jobs:
             echo "message=Successfully merged: ${output_last_line}" >> $GITHUB_OUTPUT
             exit 0
           fi
-
+          
+          git merge --abort || true
           echo "result=false" >> $GITHUB_OUTPUT
           echo "reaction=-1" >> $GITHUB_OUTPUT
           {
