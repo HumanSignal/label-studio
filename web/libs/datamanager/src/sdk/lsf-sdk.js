@@ -592,7 +592,7 @@ export class LSFWrapper {
     if (status === 200 || status === 201) this.datamanager.invoke("toast", { message: "Annotation saved successfully", type: "info" });
     else if (status !== undefined) this.datamanager.invoke("toast", { message: "There was an error saving your Annotation", type: "error" });
 
-    if (exitStream) return  this.exitStream();
+    if (exitStream) return this.exitStream();
 
   };
 
