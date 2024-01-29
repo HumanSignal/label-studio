@@ -86,6 +86,7 @@ RUN --mount=type=cache,target="/root/.cache",sharing=locked \
 
 FROM python:${PYTHON_VERSION}-slim
 ARG GOSU_VERSION
+ARG PYTHON_VERSION
 ENV DEBIAN_FRONTEND=noninteractive \
     LS_DIR=/label-studio \
     DJANGO_SETTINGS_MODULE=core.settings.label_studio \
@@ -132,7 +133,7 @@ RUN --mount=type=cache,target="/var/cache/apt",sharing=locked \
 	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
 	apt-mark auto '.*' > /dev/null; \
-	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
+	[[ -z "$savedAptMark" ]] || apt-mark manual $savedAptMark > /dev/null; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	chmod +x /usr/local/bin/gosu; \
 	gosu --version; \
@@ -143,14 +144,14 @@ COPY deploy/ ./deploy/
 COPY deploy/default.conf /etc/nginx/nginx.conf
 
 # Copy final wheel package and frontend assets from the wheel-builder stage
-COPY --from=wheel-builder /label-studio/dist/*.whl /label-studio/dist/
+COPY --from=wheel-builder /label-studio/dist/*.whl /tmp/dist/
 
 # Install Label Studio wheel
 RUN --mount=type=cache,target="/root/.cache",sharing=locked \
     set -eux; \
-    pip install /label-studio/dist/*.whl; \
-    ln -s /usr/local/lib/python$(python3 --version | cut -d ' ' -f 2 | cut -d '.' -f 1,2)/site-packages/label_studio /label-studio; \
-    rm -rf /label-studio/dist
+    pip install /tmp/dist/*.whl; \
+    ln -s /usr/local/lib/python${PYTHON_VERSION}/site-packages/label_studio /label-studio/label_studio; \
+    rm -rf /tmp/dist
 
 VOLUME $LABEL_STUDIO_BASE_DATA_DIR
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
