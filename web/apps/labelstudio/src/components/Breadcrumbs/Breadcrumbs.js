@@ -8,7 +8,7 @@ import { Dropdown } from '../Dropdown/Dropdown';
 import { Menu } from '../Menu/Menu';
 import './Breadcrumbs.styl';
 
-const {Block, Elem} = BemWithSpecifiContext();
+const { Block, Elem } = BemWithSpecifiContext();
 
 export const Breadcrumbs = () => {
   const config = useConfig();
@@ -24,6 +24,8 @@ export const Breadcrumbs = () => {
     }
   }, [reactBreadcrumbs, config]);
 
+  console.log(breadcrumbs);
+
   return (
     <Block name="breadcrumbs">
       <Elem tag="ul" name="list">
@@ -37,7 +39,7 @@ export const Breadcrumbs = () => {
           const isInternal = findComponent(href) !== null;
 
           const title = (
-            <Elem tag="span" name="label" mod={{faded: index === item.length - 1}}>
+            <Elem tag="span" name="label" mod={{ faded: index === item.length - 1 }}>
               {item.title}
             </Elem>
           );
@@ -46,28 +48,30 @@ export const Breadcrumbs = () => {
             <Dropdown>
               <Menu>
                 {item.submenu.map((sub, index) => {
-                  return <Menu.Item
-                    key={`${index}-${item.title}`}
-                    label={sub.title}
-                    icon={sub.icon}
-                    href={sub.href ?? sub.path}
-                    active={sub.active}
-                  />;
+                  return (
+                    <Menu.Item
+                      key={`${index}-${item.title}`}
+                      label={sub.title}
+                      icon={sub.icon}
+                      href={sub.href ?? sub.path}
+                      active={sub.active}
+                    />
+                  );
                 })}
               </Menu>
             </Dropdown>
           ) : null;
 
           return item.onClick ? (
-            <Elem key={key} tag="li" name="item" mod={{last: isLastItem}}>
+            <Elem key={key} tag="li" name="item" mod={{ last: isLastItem }}>
               <span onClick={item.onClick}>{title}</span>
             </Elem>
           ) : dropdownSubmenu ? (
-            <Elem key={key} tag="li" component={Dropdown.Trigger} name="item" mod={{last: isLastItem}} content={dropdownSubmenu}>
+            <Elem key={key} tag="li" component={Dropdown.Trigger} name="item" mod={{ last: isLastItem }} content={dropdownSubmenu}>
               <span>{title}</span>
             </Elem>
           ) : (href && !isLastItem) ? (
-            <Elem key={key} tag="li" name="item" mod={{last: isLastItem}}>
+            <Elem key={key} tag="li" name="item" mod={{ last: isLastItem }}>
               {isInternal ? (
                 <NavLink to={href} data-external={true}>{title}</NavLink>
               ) : (
@@ -75,7 +79,7 @@ export const Breadcrumbs = () => {
               )}
             </Elem>
           ) : (
-            <Elem key={key} tag="li" name="item" mod={{last: isLastItem}}>
+            <Elem key={key} tag="li" name="item" mod={{ last: isLastItem }}>
               {title}
             </Elem>
           );

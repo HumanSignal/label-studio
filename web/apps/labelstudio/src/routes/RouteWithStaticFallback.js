@@ -16,7 +16,7 @@ const extractModalRoutes = (children) => {
     });
   } catch (err) {
     console.log(err);
-    console.log({children});
+    console.log({ children });
   }
 
   return [modalRoutes, regularRoutes];
@@ -25,7 +25,7 @@ const extractModalRoutes = (children) => {
 /**
  * Router wrapper that handles 404 pages
  */
-export const RouteWithStaticFallback = ({children, render, route, component, staticComponent, ...props}) => {
+export const RouteWithStaticFallback = ({ children, render, route, component, staticComponent, ...props }) => {
   const menubar = React.useContext(MenubarContext);
 
   const notFoundRenderer = (children) => {

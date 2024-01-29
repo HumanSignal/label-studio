@@ -14,18 +14,19 @@ import { VersionNotifier, VersionProvider } from '../VersionNotifier/VersionNoti
 import './Menubar.styl';
 import './MenuContent.styl';
 import './MenuSidebar.styl';
+import { PrompterPage } from '../../pages/Organization/Prompter/PrompterPage';
 
 export const MenubarContext = createContext();
 
-const LeftContextMenu = ({className}) => (
+const LeftContextMenu = ({ className }) => (
   <StaticContent
     id="context-menu-left"
     className={className}
   >{(template) => <Breadcrumbs fromTemplate={template} />}</StaticContent>
 );
 
-const RightContextMenu = ({className, ...props}) => {
-  const {ContextComponent, contextProps} = useContextComponent();
+const RightContextMenu = ({ className, ...props }) => {
+  const { ContextComponent, contextProps } = useContextComponent();
 
   return ContextComponent ? (
     <div className={className}>
@@ -70,12 +71,14 @@ export const Menubar = ({
     e.preventDefault();
 
     const newState = !sidebarPinned;
+
     setSidebarPinned(newState);
     onSidebarPin?.(newState);
   }, [sidebarPinned]);
 
   const sidebarToggle = useCallback((visible) => {
     const newState = visible;
+
     setSidebarOpened(newState);
     onSidebarToggle?.(newState);
   }, [sidebarOpened]);
@@ -128,9 +131,9 @@ export const Menubar = ({
           </Dropdown.Trigger>
 
           <div className={menubarContext}>
-            <LeftContextMenu className={contextItem.mod({left: true})}/>
+            <LeftContextMenu className={contextItem.mod({ left: true })}/>
 
-            <RightContextMenu className={contextItem.mod({right: true})}/>
+            <RightContextMenu className={contextItem.mod({ right: true })}/>
           </div>
 
           <Dropdown.Trigger ref={useMenuRef} align="right" content={(
@@ -181,8 +184,8 @@ export const Menubar = ({
               onToggle={sidebarToggle}
               onVisibilityChanged={() => window.dispatchEvent(new Event('resize'))}
               visible={sidebarOpened}
-              className={[sidebarClass, sidebarClass.mod({floating: !sidebarPinned})].join(" ")}
-              style={{width: 240}}
+              className={[sidebarClass, sidebarClass.mod({ floating: !sidebarPinned })].join(" ")}
+              style={{ width: 240 }}
             >
               <Menu>
                 <Menu.Item
@@ -197,6 +200,11 @@ export const Menubar = ({
                   to="/organization"
                   icon={<IconPersonInCircle/>}
                   data-external
+                  exact
+                />
+                <Menu.Item
+                  label="Prompter"
+                  to={PrompterPage.path}
                   exact
                 />
 
@@ -247,7 +255,7 @@ export const Menubar = ({
           )}
 
           <MenubarContext.Provider value={providerValue}>
-            <div className={contentClass.elem('content').mod({withSidebar: sidebarPinned && sidebarOpened})}>
+            <div className={contentClass.elem('content').mod({ withSidebar: sidebarPinned && sidebarOpened })}>
               {children}
             </div>
           </MenubarContext.Provider>
