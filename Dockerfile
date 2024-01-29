@@ -75,7 +75,6 @@ RUN --mount=type=cache,target="/root/.cache",sharing=locked \
 COPY . .
 
 # Copy compiled frontend assets from the frontend-builder stage
-RUN rm -rf ./label_studio/web
 COPY --from=frontend-builder /label-studio/web/dist ./label_studio/web/dist
 ## Collect static files
 RUN --mount=type=cache,target="/root/.cache",sharing=locked \
@@ -139,6 +138,8 @@ RUN --mount=type=cache,target="/var/cache/apt",sharing=locked \
 	gosu --version; \
 	gosu nobody true
 
+COPY LICENSE LICENSE
+COPY licenses licenses
 # Copy docker-entrypoint scripts
 COPY deploy/ ./deploy/
 COPY deploy/default.conf /etc/nginx/nginx.conf
@@ -154,5 +155,6 @@ RUN --mount=type=cache,target="/root/.cache",sharing=locked \
     rm -rf /tmp/dist
 
 VOLUME $LABEL_STUDIO_BASE_DATA_DIR
+ENV HOME=$LS_DIR
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
 CMD ["label-studio"]
