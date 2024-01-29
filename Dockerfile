@@ -68,7 +68,7 @@ COPY label_studio/__init__.py ./label_studio/__init__.py
 
 # Install dependencies
 RUN --mount=type=cache,target="/root/.cache",sharing=locked \
-    poetry install --with docker --no-ansi
+    poetry install --no-ansi
 
 # Copy the source code
 COPY . .
@@ -149,7 +149,8 @@ COPY --from=wheel-builder /label-studio/dist/*.whl /tmp/dist/
 # Install Label Studio wheel
 RUN --mount=type=cache,target="/root/.cache",sharing=locked \
     set -eux; \
-    pip install /tmp/dist/*.whl; \
+    WHEEL="$(find /tmp/dist -name '*.whl')"; \
+    pip install "$WHEEL"'[uwsgi]'; \
     ln -s /usr/local/lib/python${PYTHON_VERSION}/site-packages/label_studio /label-studio/label_studio; \
     rm -rf /tmp/dist
 
