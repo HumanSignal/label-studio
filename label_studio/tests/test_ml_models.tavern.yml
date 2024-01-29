@@ -11,7 +11,7 @@ stages:
   - type: ref 
     id: get_user_token
 
-  - name: Get user and actiive organization
+  - name: Get user and active organization
     request:
       url: "{django_live_url}/api/current-user/whoami"
       method: GET

@@ -24,7 +24,6 @@ class ModelInterface(models.Model):
         'organizations.Organization',
         on_delete=models.CASCADE,
         related_name='model_interfaces',
-        null=True,
     )
 
     def has_permission(self, user):
