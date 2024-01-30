@@ -41,14 +41,12 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
             src:
               - 'label_studio/!(frontend)/**'
-              - 'deploy/requirements**'
-              - 'setup.py'
               - 'poetry.lock'
               - 'pyproject.toml'
               - '.github/workflows/bandit.yml'
@@ -59,11 +57,13 @@ jobs:
               - 'label_studio/frontend/**'
               - 'web/**'
               - '.github/workflows/frontend-build.yml'
+              - '.github/workflows/tests-yarn-unit.yml'
+              - '.github/workflows/tests-yarn-integration.yml'
+              - '.github/workflows/tests-yarn-e2e.yml'
             docker:
               - 'label_studio/**'
               - 'deploy/**'
               - 'Dockerfile**'
-              - 'setup.py'
               - 'poetry.lock'
               - 'pyproject.toml'
               - '.github/workflows/cicd_pipeline.yml'
@@ -316,7 +316,7 @@ jobs:
             core.setOutput("id", release.id);
             core.setOutput("tag_name", release.tag_name);
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Configure pip cache
         id: pip-cache
         with:
@@ -411,6 +411,36 @@ jobs:
       release-id: ${{ needs.draft-release.outputs.id }}
     secrets: inherit
 
+  tests-yarn-unit:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true'
+    uses: ./.github/workflows/tests-yarn-unit.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  tests-yarn-integration:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true' && github.ref_name == 'develop'
+    uses: ./.github/workflows/tests-yarn-integration.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  tests-yarn-e2e:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true' && github.ref_name == 'develop'
+    uses: ./.github/workflows/tests-yarn-e2e.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
   check_gate:
     name: "Ready to merge"
     if: always()
@@ -422,11 +452,14 @@ jobs:
       - pytest
       - migrations
       - build-docker
+      - tests-yarn-unit
+      - tests-yarn-integration
+      - tests-yarn-e2e
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-failures:
+          allowed-failures: tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
           allowed-skips: gitleaks, bandit, ruff, blue, pytest, migrations, conda-test, build-docker
           jobs: ${{ toJSON(needs) }}

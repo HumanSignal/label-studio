@@ -106,16 +106,6 @@ jobs:
               core.setOutput('name', branch.name);
             }
 
-      - name: Configure git
-        shell: bash
-        env:
-          AUTHOR_USERNAME: ${{ github.event.client_payload.author_username }}
-          AUTHOR_EMAIL: ${{ github.event.client_payload.author_email }}
-        run: |
-          set -xeuo pipefail
-          git config --global user.name "${AUTHOR_USERNAME}"
-          git config --global user.email "${AUTHOR_EMAIL}"
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -123,90 +113,29 @@ jobs:
           fetch-depth: 0
           ref: ${{ steps.get-branch.outputs.name }}
 
+      - name: Checkout Actions Hub
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: HumanSignal/actions-hub
+          path: ./.github/actions-hub
+
+      - name: Git Configure
+        uses: ./.github/actions-hub/actions/git-configure
+        with:
+          username: ${{ github.event.client_payload.author_username }}
+          email: ${{ github.event.client_payload.author_email }}
+
 # Merge
 
-      - name: Merge
+      - name: Git Merge
         id: merge
-        env:
-          BASE_BRANCH: ${{ steps.get-branch.outputs.base_name }}
-          HEAD_BRANCH: ${{ steps.get-branch.outputs.name }}
-          OUR_FILES: "pyproject.toml poetry.lock web"
-        shell: bash
-        run: |
-          set -xeuo pipefail
-          
-          commit_message="Merge branch '${BASE_BRANCH}' into '${HEAD_BRANCH}'"
-          commit_message_workflow_link='Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-          
-          is-ours() {
-            local my_variable="$1"
-            for e in ${OUR_FILES}; do
-              if [[ "${my_variable}" =~ ^"${e}" ]]; then
-                  return 0
-              fi
-            done
-            return 1
-          }
-          
-          git-resolve-conflict() {
-            STRATEGY="$1"
-            FILE_PATH="$2"
-            tmp_1=$(mktemp)
-            tmp_2=$(mktemp)
-            tmp_3=$(mktemp)
-            git show :1:"${FILE_PATH}" > "${tmp_1}"
-            git show :2:"${FILE_PATH}" > "${tmp_2}"
-            git show :3:"${FILE_PATH}" > "${tmp_3}"
-            git merge-file "${STRATEGY}" -p "${tmp_2}" "${tmp_1}" "${tmp_3}" > "${FILE_PATH}"
-            rm "${tmp_1}" || true
-            rm "${tmp_2}" || true
-            rm "${tmp_3}" || true
-            return 0
-          }
-          
-          if output=$(git merge "origin/${BASE_BRANCH}" -m "${commit_message}" -m "${commit_message_workflow_link}"); then
-            echo "result=true" >> $GITHUB_OUTPUT
-            echo "reaction=+1" >> $GITHUB_OUTPUT
-            output_last_line=$(tail -n1 <<< "${output}")
-            echo "message=Successfully merged: ${output_last_line}" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          conflict_files=$(git diff --name-only --diff-filter=U)
-          result='true'
-          while read -r conflict_file; do
-            if is-ours "${conflict_file}"; then
-              if git-resolve-conflict --ours "${conflict_file}"; then
-                echo "::notice file=${conflict_file}::Merge Conflict automatically resolved ${conflict_file}"
-                git add "${conflict_file}"
-              else
-                result='false'
-                echo "::error file=${conflict_file}::Failed to automatically resolve ${conflict_file}"        
-              fi
-            else
-              result='false'
-              echo "::error file=${conflict_file}::Could not resolve ${conflict_file}"
-            fi
-          done <<< ${conflict_files}
-          
-          conflict_files=$(git diff --name-only --diff-filter=U)
-          if [ -z "${conflict_files}" ]; then
-            git commit -m "${commit_message}" -m "${commit_message_workflow_link}"
-            echo "result=true" >> $GITHUB_OUTPUT
-            echo "reaction=+1" >> $GITHUB_OUTPUT
-            output_last_line=$(git show --shortstat HEAD | tail -n1)
-            echo "message=Successfully merged: ${output_last_line}" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          echo "result=false" >> $GITHUB_OUTPUT
-          echo "reaction=-1" >> $GITHUB_OUTPUT
-          {
-              echo "message<<EOF"
-              echo "Unresolvable merge conflict detected, please resolve it using the git command line: ${conflict_files}"
-              echo "EOF" 
-            } >> $GITHUB_OUTPUT
-          exit 1
+        continue-on-error: true
+        uses: ./.github/actions-hub/actions/git-merge
+        with:
+          base_branch: ${{ steps.get-branch.outputs.base_name }}
+          head_branch: ${{ steps.get-branch.outputs.name }}
+          our_files: "pyproject.toml poetry.lock web"
 
 # Frontend
 
@@ -278,7 +207,7 @@ jobs:
 
       - name: "LSF Docs: Cache node modules"
         if: steps.details.outputs.build_lsf_docs
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
@@ -286,6 +215,7 @@ jobs:
       - name: "LSF Docs: Install NPM deps"
         if: steps.details.outputs.build_lsf_docs
         continue-on-error: true
+        working-directory: tmp/scripts
         run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
