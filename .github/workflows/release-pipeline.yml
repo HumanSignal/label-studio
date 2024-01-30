@@ -148,4 +148,4 @@ jobs:
 
             ><https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|[Workflow run]>
         env:
-          SLACK_LSE_BOT_TOKEN: ${{ secrets.SLACK_LSE_BOT_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_LSE_BOT_TOKEN }}
