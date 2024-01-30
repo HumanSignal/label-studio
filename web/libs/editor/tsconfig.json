@@ -14,9 +14,6 @@
   },
   "files": [],
   "include": ["src/types", "node_modules/@types"],
-  "exclude": [
-    "public",
-  ],
   "references": [
     {
       "path": "./tsconfig.lib.json"
