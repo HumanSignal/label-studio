@@ -15,6 +15,9 @@ You can use the Label Studio API to import data for labeling, export annotations
 
 See the [API reference documentation](/api) for further guidance and interactive examples. If you want to write Python scripts using the API, use the [Label Studio Python SDK](sdk.html). 
 
+!!! info Tip
+    For additional guidance on using our API, see [5 Tips and Tricks for Label Studio’s API and SDK](https://labelstud.io/blog/5-tips-and-tricks-for-label-studio-s-api-and-sdk/).
+
 <div class="enterprise-only">
 
 <p>

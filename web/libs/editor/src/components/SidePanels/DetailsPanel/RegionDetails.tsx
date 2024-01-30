@@ -91,13 +91,9 @@ export const RegionDetailsMain: FC<{region: any}> = observer(({
         {region?.text ? (
           <Block name="region-meta">
             <Elem name="item">
-              <Elem
-                name="content"
-                mod={{ type: 'text' }}
-                dangerouslySetInnerHTML={{
-                  __html: region.text.replace(/\\n/g, '\n'),
-                }}
-              />
+              <Elem name="content" mod={{ type: 'text' }}>
+                {region.text.replace(/\\n/g, '\n')}
+              </Elem>
             </Elem>
           </Block>
         ) : null}
