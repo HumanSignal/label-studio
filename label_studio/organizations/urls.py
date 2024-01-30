@@ -30,6 +30,7 @@ _api_urlpattens = [
 urlpatterns = [
     path('organization/', views.simple_view, name='organization-simple'),
     path('organization/webhooks', views.simple_view, name='organization-simple-webhooks'),
+    path('organization/plans', views.simple_view, name='organization-simple-plans'),
     path('people/', include(_urlpatterns)),
     path('api/organizations/', include((_api_urlpattens, app_name), namespace='api')),
     # invite
