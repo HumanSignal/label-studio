@@ -137,7 +137,6 @@ class TaskPagination(PageNumberPagination):
     total_predictions = 0
     max_page_size = settings.TASK_API_PAGE_SIZE_MAX
 
-
     @async_to_sync
     async def async_paginate_queryset(self, queryset, request, view=None):
         predictions_count_qs = Prediction.objects.filter(task_id__in=queryset)
