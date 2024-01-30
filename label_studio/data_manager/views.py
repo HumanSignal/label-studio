@@ -5,6 +5,8 @@ from core.version import get_short_version
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
+### todo(jo): delete this comment, just triggering follow merge
+
 
 @login_required
 def task_page(request, pk):
