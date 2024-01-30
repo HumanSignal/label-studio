@@ -24,8 +24,6 @@ export const Breadcrumbs = () => {
     }
   }, [reactBreadcrumbs, config]);
 
-  console.log(breadcrumbs);
-
   return (
     <Block name="breadcrumbs">
       <Elem tag="ul" name="list">

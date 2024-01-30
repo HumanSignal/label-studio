@@ -10,7 +10,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvironmentPlugin, DefinePlugin, ProgressPlugin, optimize } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const { log } = require("console");
 
 const RELEASE = require('./release').getReleaseName();
 
@@ -157,7 +156,6 @@ module.exports = composePlugins(withNx({
             localIdentName: css_prefix + '[local]', // Customize this format
           };
         }
-        console.log(_r, cssLoader)
       })
     }
 
