@@ -156,7 +156,7 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-    def predict_tasks(self, tasks):
+    def predict_tasks(self, tasks, context=None, user=None):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
@@ -166,7 +166,7 @@ class MLBackend(models.Model):
             from tasks.models import Task
 
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
-
+        
         # Filter tasks that already contain the current model version in predictions
         tasks = tasks.annotate(predictions_count=Count('predictions')).exclude(
             Q(predictions_count__gt=0) & Q(predictions__model_version=self.model_version)
@@ -175,7 +175,10 @@ class MLBackend(models.Model):
             logger.debug(f'All tasks already have prediction from model version={self.model_version}')
             return
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+
+        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project, context=context)
+
+        # end of changes
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -189,16 +192,18 @@ class MLBackend(models.Model):
         if len(responses) == 0:
             logger.warning(f'ML backend returned empty prediction for project {self}')
             return
-
+        
+        if context is None:
         # ML Backend doesn't support batch of tasks, do it one by one
-        elif len(responses) == 1 and len(tasks) != 1:
-            logger.warning(
-                f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                f'switched to one-by-one task retrieval'
-            )
-            for task in tasks:
-                self.predict_one_task(task)
-            return
+
+            if len(responses) == 1 and len(tasks) != 1:
+                logger.warning(
+                    f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
+                    f"switched to one-by-one task retrieval"
+                )
+                for task in tasks:
+                    self.predict_one_task(task=task, context=context)
+                return
 
         # wrong result number
         elif len(responses) != len(tasks_ser):
@@ -225,7 +230,7 @@ class MLBackend(models.Model):
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
 
-    def predict_one_task(self, task, check_state=True):
+    def predict_one_task(self, task, check_state=True, context=None):
         if check_state:
             self.update_state()
             if self.not_ready:
@@ -242,7 +247,7 @@ class MLBackend(models.Model):
         ml_api = self.api
 
         task_ser = TaskSimpleSerializer(task).data
-        ml_api_result = ml_api.make_predictions([task_ser], self.model_version, self.project)
+        ml_api_result = ml_api.make_predictions([task_ser], self.model_version, self.project, context=context)
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
