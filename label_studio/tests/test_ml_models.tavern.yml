@@ -1,0 +1,109 @@
+---
+test_name: Create Model
+strict: false
+marks:
+  - usefixtures:
+    - django_live_url
+
+stages:
+  - type: ref 
+    id: signup
+  - type: ref 
+    id: get_user_token
+
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+
+  - name: Get initial empty list of models
+    request:
+      url: "{django_live_url}/api/models"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        !anylist
+
+  - name: Create a model
+    request:
+      url: "{django_live_url}/api/models"
+      method: POST
+      json:
+        title: "My model 1"
+        description: "My first model"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_id: id
+          model_created_at: created_at
+          model_updated_at: updated_at
+
+  - name: Get specific model
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        id: !int "{model_id}"
+        title: "My model 1"
+        description: "My first model"
+        created_at: "{model_created_at}"
+        updated_at: "{model_updated_at}"
+        created_by:
+          id: !int "{user_id}"
+          email: "{user_email}"
+
+  - name: Patch specific model
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        description: "My updated description"
+    response:
+      status_code: 200
+      json:
+        description: "My updated description"
+
+  - name: Get list of models with one model
+    request:
+      url: "{django_live_url}/api/models"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        - id: !int "{model_id}"
+
+  - name: Delete specific model
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: DELETE
+      json:
+        id: !int "{model_id}"
+    response:
+      status_code: 204
+
+  - name: Get non-existent model
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: GET
+    response:
+      status_code: 404
+
+  - name: Get empty list of models after delete
+    request:
+      url: "{django_live_url}/api/models"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        !anylist

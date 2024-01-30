@@ -942,6 +942,48 @@
         "decorators": ""
     },
     {
+        "url": "/api/models/",
+        "module": "ml_models.api.ModelInterfaceAPI",
+        "name": "ml_models:api:models-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/models\\.<format>/",
+        "module": "ml_models.api.ModelInterfaceAPI",
+        "name": "ml_models:api:models-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/models/<pk>/",
+        "module": "ml_models.api.ModelInterfaceAPI",
+        "name": "ml_models:api:models-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/models/<pk>\\.<format>/",
+        "module": "ml_models.api.ModelInterfaceAPI",
+        "name": "ml_models:api:models-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "ml_models:api:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/\\.<format>/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "ml_models:api:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/models/",
+        "module": "ml_models.views.model_interfaces_view",
+        "name": "ml_models:models-list",
+        "decorators": ""
+    },
+    {
         "url": "/api/webhooks/",
         "module": "webhooks.api.WebhookListAPI",
         "name": "webhooks:api:webhook-list",

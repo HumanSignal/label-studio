@@ -35,6 +35,10 @@ class AllPermissions(BaseModel):
     labels_view = 'labels.view'
     labels_change = 'labels.change'
     labels_delete = 'labels.delete'
+    model_interface_create = 'model_interface.create'
+    model_interface_view = 'model_interface.view'
+    model_interface_change = 'model_interface.change'
+    model_interface_delete = 'model_interface.delete'
 
 
 all_permissions = AllPermissions()
