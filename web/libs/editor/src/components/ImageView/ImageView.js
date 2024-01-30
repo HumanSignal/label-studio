@@ -506,7 +506,9 @@ export default observer(
     crosshairRef = createRef();
     handleDeferredMouseDown = null;
     deferredClickTimeout = [];
-    skipMouseUp = false;
+    skipNextMouseDown = false;
+    skipNextClick = false;
+    skipNextMouseUp = false;
     mouseDownPoint = null;
 
     constructor(props) {
@@ -520,10 +522,10 @@ export default observer(
       const { item } = this.props;
 
       if (isFF(FF_DEV_1442)) {
-        this.handleDeferredMouseDown?.();
+        this.handleDeferredMouseDown?.(true);
       }
-      if (this.skipMouseUp) {
-        this.skipMouseUp = false;
+      if (this.skipNextClick) {
+        this.skipNextClick = false;
         return;
       }
 
@@ -556,8 +558,8 @@ export default observer(
     };
 
     handleDeferredClick = (handleDeferredMouseDownCallback, handleDeselection, eligibleToDeselect = false) => {
-      this.handleDeferredMouseDown = () => {
-        if (eligibleToDeselect) {
+      this.handleDeferredMouseDown = (wasClicked) => {
+        if (wasClicked && eligibleToDeselect) {
           handleDeselection();
         }
         handleDeferredMouseDownCallback();
@@ -566,7 +568,7 @@ export default observer(
       };
       this.resetDeferredClickTimeout();
       this.deferredClickTimeout.push(setTimeout(() => {
-        this.handleDeferredMouseDown?.();
+        this.handleDeferredMouseDown?.(false);
       }, this.props.item.annotation.isDrawing ? 0 : 100));
     };
 
@@ -575,6 +577,7 @@ export default observer(
       const isPanTool = item.getToolsManager().findSelectedTool()?.fullName === 'ZoomPanTool';
       const isMoveTool = item.getToolsManager().findSelectedTool()?.fullName === 'MoveTool';
 
+      this.skipNextMouseDown = this.skipNextMouseUp = this.skipNextClick = false;
       if (isFF(FF_LSDV_4930)) {
         this.mouseDownPoint = { x: e.evt.offsetX, y: e.evt.offsetY };
       }
@@ -626,6 +629,10 @@ export default observer(
 
           this.canvasX = left;
           this.canvasY = top;
+          if (this.skipNextMouseDown) {
+            this.skipNextMouseDown = false;
+            return true;
+          }
           item.event('mousedown', e, x, y);
 
           return true;
@@ -652,7 +659,9 @@ export default observer(
 
         const handleDeselection = () => {
           item.annotation.unselectAll();
-          this.skipMouseUp = true;
+          this.skipNextMouseDown = true;
+          this.skipNextMouseUp = true;
+          this.skipNextClick = true;
         };
 
         this.handleDeferredClick(handleMouseDown, handleDeselection, eligibleToDeselect);
@@ -680,7 +689,7 @@ export default observer(
 
       item.freezeHistory();
 
-      return item.event('mouseup', e, x - this.canvasX, y - this.canvasY);
+      return this.triggerMouseUp(e, x - this.canvasX, y - this.canvasY);
     };
 
     handleGlobalMouseMove = e => {
@@ -705,7 +714,17 @@ export default observer(
       item.freezeHistory();
       item.setSkipInteractions(false);
 
-      return item.event('mouseup', e, e.evt.offsetX, e.evt.offsetY);
+      return this.triggerMouseUp(e, e.evt.offsetX, e.evt.offsetY);
+    };
+
+    triggerMouseUp = (e, x, y) => {
+      if (this.skipNextMouseUp) {
+        this.skipNextMouseUp = false;
+        return;
+      }
+      const { item } = this.props;
+
+      return item.event('mouseup', e, x, y);
     };
 
     handleMouseMove = e => {
@@ -721,7 +740,7 @@ export default observer(
 
       if (isFF(FF_DEV_1442) && isDragging) {
         this.resetDeferredClickTimeout();
-        this.handleDeferredMouseDown?.();
+        this.handleDeferredMouseDown?.(false);
       }
 
       if ((isMouseWheelClick || isShiftDrag) && item.zoomScale > 1) {
