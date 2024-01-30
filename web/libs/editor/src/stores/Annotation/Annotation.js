@@ -681,13 +681,13 @@ export const Annotation = types
       onSnapshot(self.areas, self.autosave);
     }),
 
-    saveDraft: flow(function* (params) {
+    async saveDraft(params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted) return;
       // if this is now a history item or prediction don't save it
       if (!self.editable) return;
 
-      const result = yield self.serializeAnnotation({ fast: true });
+      const result = self.serializeAnnotation({ fast: true });
       // if this is new annotation and no regions added yet
 
       if (!isFF(FF_LSDV_3009) && !self.pk && !result.length) return;
@@ -700,7 +700,7 @@ export const Annotation = types
 
         return res;
       });
-    }),
+    },
 
     submissionInProgress() {
       self.submissionStarted = Date.now();
@@ -710,14 +710,14 @@ export const Annotation = types
       if (self.autosave) self.autosave.flush();
     },
 
-    saveDraftImmediatelyWithResults: flow(function *(params) {
+    async saveDraftImmediatelyWithResults(params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted || self.isDraftSaving) return {};
       self.setDraftSaving(true);
-      const res = yield self.saveDraft(params);
+      const res = await self.saveDraft(params);
 
       return res;
-    }),
+    },
 
     pauseAutosave() {
       if (!self.autosave) return;
@@ -935,6 +935,8 @@ export const Annotation = types
     },
 
     serializeAnnotation(options) {
+      // return self.serialized;
+
       document.body.style.cursor = 'wait';
 
       const result = self.results
@@ -1031,7 +1033,7 @@ export const Annotation = types
         if (tagNames.has(obj.from_name) && tagNames.has(obj.to_name)) {
           res.push(obj);
         }
-
+        
         // Insert image dimensions from result 
         (() => {
           if (!isDefined(obj.original_width)) return;
@@ -1041,7 +1043,7 @@ export const Annotation = types
 
           if (tag.type !== 'image') return;
 
-          const imageEntity = tag.findImageEntity(obj.item_index ?? 0);
+          const imageEntity = tag.findImageEntity(obj.item_index ?? 0); 
 
           if (!imageEntity) return;
 
@@ -1344,7 +1346,7 @@ export const Annotation = types
         area.setValue(state);
       });
       self.suggestions.delete(id);
-
+      
     },
 
     rejectSuggestion(id) {
