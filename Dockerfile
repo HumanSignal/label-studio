@@ -78,7 +78,7 @@ COPY --from=frontend-builder /label-studio/web/dist ./label_studio/web/dist
 ## Collect static files
 RUN --mount=type=cache,target="/root/.cache",sharing=locked \
     poetry run python label_studio/manage.py collectstatic --no-input \
-    && poetry build -f wheel
+    && poetry build -f wheel --no-ansi
 
 ################################ Stage: final (production-ready image)
 
