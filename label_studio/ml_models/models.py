@@ -21,10 +21,7 @@ class ModelInterface(models.Model):
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
     organization = models.ForeignKey(
-        'organizations.Organization',
-        on_delete=models.CASCADE,
-        related_name='model_interfaces',
-        null=True
+        'organizations.Organization', on_delete=models.CASCADE, related_name='model_interfaces', null=True
     )
 
     def has_permission(self, user):
