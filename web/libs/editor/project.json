@@ -15,21 +15,21 @@
         "tsConfig": "libs/editor/tsconfig.lib.json",
         "main": "libs/editor/src/index.js",
         "outputPath": "dist/libs/editor",
-        "isolatedConfig": true,
-        "assets": [
-          {
-            "glob": "public",
-            "input": "libs/editor",
-            "output": "public/"
-          }
-        ]
+        "isolatedConfig": true
       },
       "configurations": {
         "development": {
           "extractLicenses": false,
           "optimization": false,
           "sourceMap": true,
-          "vendorChunk": true
+          "vendorChunk": true,
+          "assets": [
+            {
+              "glob": "public",
+              "input": "libs/editor",
+              "output": "public/"
+            }
+          ]
         },
         "production": {
           "optimization": true,
@@ -59,7 +59,7 @@
       },
       "configurations": {
         "development": {
-          "buildTarget": "editor:build"
+          "buildTarget": "editor:build:development"
         }
       }
     },
