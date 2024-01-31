@@ -1,0 +1,119 @@
+---
+test_name: Model Provider Connection CRUD
+strict: false
+marks:
+  - usefixtures:
+    - django_live_url
+
+stages:
+  - type: ref 
+    id: signup
+  - type: ref 
+    id: get_user_token
+
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+
+  - name: Get initial empty list of model provider connections
+    request:
+      url: "{django_live_url}/api/model-provider-connections"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        []
+
+  - name: Get list of provider choices
+    request:
+      url: "{django_live_url}/api/model-provider-connections/provider-choices"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          provider_choices: provider_choices
+
+  - name: Create a model provider connection
+    request:
+      url: "{django_live_url}/api/model-provider-connections"
+      method: POST
+      json:
+        provider: "{provider_choices[0]}"
+        api_key: "my-secret-api-key"
+    response:
+        status_code: 201
+        save:
+          json:
+            mpc_id: id
+            mpc_provider: provider
+            mpc_scope: scope
+            mpc_created_at: created_at
+            mpc_updated_at: updated_at
+
+  - name: Get specific model provider connection
+    request:
+      url: "{django_live_url}/api/model-provider-connections/{mpc_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        id: !int "{mpc_id}"
+        provider: "{mpc_provider}"
+        scope: "{mpc_scope}"
+        created_at: "{mpc_created_at}"
+        updated_at: "{mpc_updated_at}"
+        created_by:
+          id: !int "{user_id}"
+          email: "{user_email}"
+        organization: !int "{organization_id}"
+
+  # Update API key, but is not present in response by design
+  - name: Patch specific model provider connection
+    request:
+      url: "{django_live_url}/api/model-provider-connections/{mpc_id}"
+      method: PATCH
+      json:
+        api_key: "my updated api key"
+    response:
+      status_code: 200
+
+  - name: Get list with one model provider connection
+    request:
+      url: "{django_live_url}/api/model-provider-connections"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        id: !int "{mpc_id}"
+
+  - name: Delete specific model provider connection
+    request:
+      url: "{django_live_url}/api/model-provider-connections/{mpc_id}"
+      method: DELETE
+    response:
+      status_code: 204
+
+  - name: Get empty list of model provider connections after delete
+    request:
+      url: "{django_live_url}/api/model-provider-connections"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        []
+
+  - name: Get non-existent model provider connection
+    request:
+      url: "{django_live_url}/api/model-provider-connections/{mpc_id}"
+      method: GET
+    response:
+      status_code: 404
