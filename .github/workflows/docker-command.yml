@@ -75,7 +75,7 @@ jobs:
           
           case "${{ needs.build-docker.result }}" in
             success)
-              echo "comment=Docker image was pushed with the tag `${{ needs.build-docker.outputs.build_version }}`" >> $GITHUB_OUTPUT
+              echo "comment=Docker image was pushed with the tag \`${{ needs.build-docker.outputs.build_version }}\`" >> $GITHUB_OUTPUT
               echo "reaction=+1" >> $GITHUB_OUTPUT
               ;;
             skipped)

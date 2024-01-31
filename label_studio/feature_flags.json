@@ -4997,6 +4997,33 @@
       "version": 7,
       "deleted": false
     },
+    "fflag_fix_front_leap_443_select_annotation_once": {
+      "key": "fflag_fix_front_leap_443_select_annotation_once",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "7fa01b9222564e5b9e3c415d48effd01",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_front_lsdv_4600_lead_time_27072023_short": {
       "key": "fflag_fix_front_lsdv_4600_lead_time_27072023_short",
       "on": true,
