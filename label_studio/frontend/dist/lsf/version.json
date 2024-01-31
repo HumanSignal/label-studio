@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-240: Prevent creating region on clicking outside selected one (#1667)",
-  "commit": "923c09cbbd8c03468e0c45445086f0e817d99f0c",
+  "message": "fix: LEAP-447: Fix Number tag validation  (#1649)",
+  "commit": "524aa7db9517fb509cad0fa1146235577033b201",
   "branch": "master",
-  "date": "2024-01-29T16:56:03Z"
+  "date": "2024-01-30T23:47:06Z"
 }
