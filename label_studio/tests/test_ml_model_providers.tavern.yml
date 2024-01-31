@@ -93,7 +93,7 @@ stages:
     response:
       status_code: 200
       json:
-        id: !int "{mpc_id}"
+        - id: !int "{mpc_id}"
 
   - name: Delete specific model provider connection
     request:
