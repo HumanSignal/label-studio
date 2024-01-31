@@ -25,4 +25,7 @@ class ModelInterface(models.Model):
     )
 
     def has_permission(self, user):
-        return True   # TODO - which roles have access by default?
+        if user.active_organization == self.organization:
+            return True
+        else:
+            return False
