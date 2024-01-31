@@ -161,6 +161,28 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
 
 
 @pytest.mark.django_db
+def test_config_validation_for_missing_to_name_in_number_tag_fails(business_client, project_id):
+    """
+    Validate Choices tag for 1 choice with workaround
+    Example bug DEV-3635
+    """
+    payload = {
+        'label_config': (
+            '<View>'
+            '<Text name="question" value="$question" granularity="word"/>'
+            '<Number name="number" to="question" required="true" />'
+            '</View>'
+        )
+    }
+    response = business_client.patch(
+        f'/api/projects/{project_id}',
+        data=json.dumps(payload),
+        content_type='application/json',
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
 def test_parse_wrong_xml(business_client, project_id):
     # Change label config to Repeater
     payload = {
