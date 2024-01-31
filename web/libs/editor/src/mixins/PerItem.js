@@ -22,6 +22,35 @@ const PerItemMixin = types
     },
   }))
   .actions(self => ({
+    /**
+     * Validates all values related to the current classification per item (Multi Items Segmentation).
+     *
+     * - This method should not be overridden.
+     * - It is used only in validate method of the ClassificationBase mixin.
+     *
+     * @returns {boolean}
+     * @private
+     */
+    _validatePerItem() {
+      const objectTag = self.toNameTag;
+
+      return self.annotation.regions
+        .every((reg) => {
+          const result = reg.results.find(s => s.from_name === self);
+
+          if (!result?.hasValue) {
+            return true;
+          }
+          const value = result.mainValue;
+          const isValid = self.validateValue(value);
+
+          if (!isValid) {
+            objectTag.setCurrentItem(reg.item_index);
+            return false;
+          }
+          return true;
+        });
+    },
     createPerItemResult() {
       self.createPerObjectResult({
         item_index: self.toNameTag.currentItemIndex,
