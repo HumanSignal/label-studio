@@ -55,8 +55,12 @@ def parse_config(config_string):
 
 def _fix_choices(config):
     """
-    workaround for single choice
+    [ex] workaround for single choice
     https://github.com/heartexlabs/label-studio/issues/1259
+
+    if you see the similar problem try to use another order of rules in the related part of the config inside `anyOf`
+    we do show only the first error so it might be meaningful
+    rules like `MaybeMultiple*` in that case work better when the option with single element comes before an array of elements
     """
     if 'Choices' in config:
         # for single Choices tag in View
@@ -84,7 +88,7 @@ def parse_config_to_json(config_string):
     if xml is None:
         raise etree.ParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
-    #  config = _fix_choices(config)
+    # previously we called `_fix_choices` here, but no longer need to because changing schema helps with that
     return config
 
 
