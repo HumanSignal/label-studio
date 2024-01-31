@@ -170,7 +170,7 @@ def test_config_validation_for_missing_to_name_in_number_tag_fails(business_clie
             '<View>'
             '<Text name="question" value="$question" granularity="word"/>'
             '<Number name="number" to="question" required="true" />'
-            '</Vii>'
+            '</View>'
         )
     }
     response = business_client.patch(
