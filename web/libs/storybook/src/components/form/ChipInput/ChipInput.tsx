@@ -42,7 +42,7 @@ export type ChipInputProps = {
   | {
       /**
        * Predefined formats to validate chips against.
-       * @default {"email"}
+       * @default email
        */
       format?: keyof typeof InputFormats;
     }

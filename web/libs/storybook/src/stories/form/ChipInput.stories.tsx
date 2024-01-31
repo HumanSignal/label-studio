@@ -29,9 +29,6 @@ type Story = StoryObj<typeof ChipInput>;
 
 export const Default: Story = {
   argTypes: meta.argTypes,
-  render() {
-    return <ChipInput />;
-  },
 };
 
 export const CustomPlaceholder: Story = {
