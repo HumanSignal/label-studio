@@ -26,7 +26,6 @@ After you [start Label Studio](start.html) and [create an account](signup.html),
 <div class="enterprise-only">
 5. (Optional) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
 6. [Publish your project](#Publish-project-to-annotators).
-
 </div>
 
 ## Create a project

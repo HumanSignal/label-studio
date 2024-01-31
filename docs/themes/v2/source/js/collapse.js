@@ -40,7 +40,7 @@ style.textContent = `
 }
 .onprem-highlight {
   display: block!important;
-  font-weight: bold;
+  font-weight: 600;
   margin: 1em 0 0 0;
 }
 `;
