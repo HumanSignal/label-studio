@@ -13,13 +13,13 @@ class ModelProviderConnection(models.Model):
 
 
     class ModelProviderConnectionScopes(models.TextChoices):
-        ORG = 'Org', _('Organization')
+        ORG = 'Organization', _('Organization')
         USER = 'User', _('User')
         MODEL = 'Model', _('Model')
 
 
     provider = models.CharField(
-        max_length=10,
+        max_length=255,
         choices=ModelProviders.choices,
         default=ModelProviders.OPENAI
     )
@@ -32,7 +32,7 @@ class ModelProviderConnection(models.Model):
     )
 
     scope = models.CharField(
-        max_length=10,
+        max_length=255,
         choices=ModelProviderConnectionScopes.choices,
         default=ModelProviderConnectionScopes.ORG
     )
@@ -52,7 +52,4 @@ class ModelProviderConnection(models.Model):
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
     def has_permission(self, user):
-        if user.active_organization == self.organization:
-            return True
-        else:
-            return False
+        return user.active_organization == self.organization

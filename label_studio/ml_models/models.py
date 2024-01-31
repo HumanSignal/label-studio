@@ -25,7 +25,4 @@ class ModelInterface(models.Model):
     )
 
     def has_permission(self, user):
-        if user.active_organization == self.organization:
-            return True
-        else:
-            return False
+        return user.active_organization == self.organization
