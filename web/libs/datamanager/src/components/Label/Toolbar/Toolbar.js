@@ -27,10 +27,7 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
 
   const task = view.dataStore.selected;
 
-  const { viewingAllAnnotations, viewingAllPredictions } =
-    lsf?.annotationStore ?? {};
-
-  const viewAll = viewingAllAnnotations || viewingAllPredictions;
+  const { viewingAll: viewAll } = lsf?.annotationStore ?? {};
 
   return lsf?.noTask === false && task ? (
     <Block name="label-toolbar" mod={{ labelStream: isLabelStream }}>

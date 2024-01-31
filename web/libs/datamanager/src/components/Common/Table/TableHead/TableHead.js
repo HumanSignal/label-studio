@@ -18,6 +18,7 @@ import { TableContext, TableElem } from "../TableContext";
 import { getStyle } from "../utils";
 import "./TableHead.styl";
 import { FF_DEV_2984, FF_DEV_3873, FF_LOPS_E_10, isFF } from "../../../../utils/feature-flags";
+import { getRoot } from "mobx-state-tree";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -120,9 +121,11 @@ const ColumnRenderer = observer(
       );
     }
 
+    const root = getRoot(column.original);
+    const isDE = root.SDK.type === "DE";
     const canOrder = sortingEnabled && column.original?.canOrder;
     const Decoration = decoration?.get?.(column);
-    const extra = columnHeaderExtra
+    const extra = !isDE && columnHeaderExtra
       ? columnHeaderExtra(column, Decoration)
       : null;
     const content = Decoration?.content
@@ -158,7 +161,7 @@ const ColumnRenderer = observer(
           onResizeFinished={(width) => onResize?.(column, width)}
           onReset={() => onReset?.(column)}
         >
-          {column.parent ? (
+          {!isDE && column.parent ? (
             <DropdownWrapper
               column={column}
               cellViews={cellViews}

@@ -15,7 +15,6 @@
 import {
   FF_DEV_1752,
   FF_DEV_2186,
-  FF_DEV_2715,
   FF_DEV_2887,
   FF_DEV_3034,
   FF_DEV_3734,
@@ -163,8 +162,6 @@ export class LSFWrapper {
     const queuePosition = queueDone ? queueDone + 1 : queueLeft ? queueTotal - queueLeft + 1 : 1;
 
     const lsfProperties = {
-      // ensure that we are able to distinguish at component level if the app has fully hydrated.
-      hydrated: false,
       user: options.user,
       config: this.lsfConfig,
       task: taskToLSFormat(this.task),
@@ -195,7 +192,6 @@ export class LSFWrapper {
       onSelectAnnotation: this.onSelectAnnotation,
       onNextTask: this.onNextTask,
       onPrevTask: this.onPrevTask,
-      panels: this.datamanager.panels,
     };
 
     this.initLabelStudio(lsfProperties);
@@ -378,13 +374,6 @@ export class LSFWrapper {
     this.lsf.initializeStore(lsfTask);
     this.setAnnotation(annotationID, fromHistory || isRejectedQueue);
     this.setLoading(false);
-    if (isFF(FF_DEV_2715)) {
-      this.setHydrated(true);
-    }
-  }
-
-  setHydrated(value) {
-    this.lsf.setHydrated?.(value);
   }
 
   /** @private */
@@ -677,34 +666,41 @@ export class LSFWrapper {
   };
 
   draftToast = (status) => {
-
     if (status === 200 || status === 201) this.datamanager.invoke("toast", { message: "Draft saved successfully", type: "info" });
     else if (status !== undefined) this.datamanager.invoke("toast", { message: "There was an error saving your draft", type: "error" });
+  }
 
+  needsDraftSave = (annotation) => {
+    if (annotation.history?.hasChanges && !annotation.draftSaved) return true;
+    if (annotation.history?.hasChanges && new Date(annotation.history.lastAdditionTime) > new Date(annotation.draftSaved)) return true;
+    return false;
   }
 
   saveDraft = async (target = null) => {
     const selected = target || this.lsf?.annotationStore?.selected;
-    const hasChanges = selected.history.hasChanges;
-    const submissionInProgress  = selected?.submissionStarted;
-    const draftIsFresh = new Date(selected.draftSaved) > new Date() - selected.autosaveDelay;
+    const hasChanges = this.needsDraftSave(selected);
 
-    if (selected?.isDraftSaving || draftIsFresh) {
+    if (selected?.isDraftSaving) {
       await when(() => !selected.isDraftSaving);
       this.draftToast(200);
     }
-    else if (hasChanges && selected && !submissionInProgress) {
+    else if (hasChanges && selected) {
       const res = await selected?.saveDraftImmediatelyWithResults();
       const status = res?.$meta?.status;
 
       this.draftToast(status);
     }
-  };
+  };  
 
   onSubmitDraft = async (studio, annotation, params = {}) => {
     const annotationDoesntExist = !annotation.pk;
     const data = { body: this.prepareData(annotation, { draft: true }) }; // serializedAnnotation
+    const hasChanges = this.needsDraftSave(annotation);
+    const showToast = params?.useToast && hasChanges;
+    // console.log('onSubmitDraft', params?.useToast, hasChanges);
 
+    if (params?.useToast) delete params.useToast;
+    
     Object.assign(data.body, params);
 
     await this.saveUserLabels();
@@ -712,7 +708,8 @@ export class LSFWrapper {
     if (annotation.draftId > 0) {
       // draft has been already created
       const res = await this.datamanager.apiCall("updateDraft", { draftID: annotation.draftId }, data);
-
+      
+      showToast && this.draftToast(res?.$meta?.status);
       return res;
 
     } else {
@@ -728,6 +725,8 @@ export class LSFWrapper {
         );
       }
       response?.id && annotation.setDraftId(response?.id);
+      showToast && this.draftToast(response?.$meta?.status);
+
       return response;
     }
   };

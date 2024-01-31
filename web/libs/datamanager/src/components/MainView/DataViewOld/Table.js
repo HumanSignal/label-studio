@@ -125,7 +125,7 @@ export const DataView = injector(
         } else if (e.metaKey || e.ctrlKey) {
           window.open(`./?task=${itemID}`, "_blank");
         } else {
-          if (isFF(FF_OPTIC_2)) await store._sdk.lsf?.saveDraft();
+          if (isFF(FF_OPTIC_2)) store._sdk.lsf?.saveDraft();
           getRoot(view).startLabeling(item);
         }
       },
@@ -247,8 +247,12 @@ export const DataView = injector(
           },
         },
         {
-          resolver: (col) => col.type === "Image",
+          resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type !== 'DE',
           style: { width: 150, justifyContent: "center" },
+        },
+        {
+          resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type === 'DE',
+          style: { width: 150 },
         },
         {
           resolver: (col) => ["Date", "Datetime"].includes(col.type),
