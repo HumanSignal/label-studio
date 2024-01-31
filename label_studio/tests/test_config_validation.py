@@ -180,7 +180,7 @@ def test_config_validation_for_missing_to_name_in_number_tag_fails(business_clie
     )
     assert response.status_code == 400
     response_data = response.json()
-    assert '!!! TODO: put correct error message for missing to_name here !!!' in response_data['detail']
+    assert "'toName' is a required property" in response_data['validation_errors']['label_config'][0]
 
 
 @pytest.mark.django_db
