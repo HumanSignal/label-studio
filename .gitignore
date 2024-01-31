@@ -74,3 +74,6 @@ docker-compose.override.yml
 .bash_history
 
 .pdm-python
+
+# actions-hub
+.github/actions-hub
