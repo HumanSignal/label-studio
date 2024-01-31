@@ -78,12 +78,12 @@ jobs:
         run: |
           set -xeuo pipefail
           
-          regexp='^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)[a-zA-Z0-9-]*$'
+          regexp='^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.[a-zA-Z]+([0-9]+))?$'
           
           if [[ "${{ inputs.version }}" =~ $regexp ]]; then
               echo "${{ inputs.version }} does match the regexp ${regexp}"
           else
-              echo "${{ inputs.version }} does not match the regexp ${regexp}"
+              echo "::error::${{ inputs.version }} does not match the regexp ${regexp}"
               exit 1
           fi
 
@@ -101,7 +101,7 @@ jobs:
           set -euo pipefail
           version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
           ./toml set '${{ env.PYTHON_VERSION_FILE }}' tool.poetry.version "$version" > pyproject.toml.new
-          mv -f pyproject.toml.new pyproject.toml
+          mv -f pyproject.toml.new '${{ env.PYTHON_VERSION_FILE }}'
 
       - name: Commit version file
         id: make-commit

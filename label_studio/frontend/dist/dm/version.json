@@ -1,6 +1,6 @@
 {
-  "message": "fix: DIA-706: [FE] Action menu remains open when user select 'Find similar option'",
-  "commit": "4b3dc54df052b7d2868791572668c70f944fa8fe",
+  "message": "feat: DIA-820: [FE] Make List type columns display as intended type with out the ability for users to change type for Data Discovery",
+  "commit": "18fac7b33e411aede836b930791018f7f659acf7",
   "branch": "master",
-  "date": "2023-12-12T04:51:04Z"
+  "date": "2024-01-17T08:26:43Z"
 }

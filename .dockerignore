@@ -4,14 +4,12 @@
 # Except:
 !deploy/docker-entrypoint.d/**
 !deploy/docker-entrypoint.sh
-!deploy/requirements-mw.txt
-!deploy/requirements-test.txt
-!deploy/requirements.txt
 !deploy/heroku_run.sh
 !deploy/uwsgi.ini
 !deploy/default.conf
 !label_studio/**
-!setup.py
+label_studio/frontend
+!web/**
 !README.md
 !licenses/**
 !LICENSE

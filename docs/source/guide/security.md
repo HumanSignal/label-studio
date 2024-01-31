@@ -2,7 +2,7 @@
 title: Secure Label Studio
 type: guide
 tier: all
-order: 105
+order: 143
 order_enterprise: 405
 meta_title: Secure Label Studio
 meta_description: About the security and hardening processes used by various Label Studio editions, and how you can configure a more secure data labeling project.
@@ -99,6 +99,10 @@ Use workspaces, projects, and roles to further secure access to cloud storage an
 In Label Studio Enterprise, if you're using Amazon S3, Label Studio can use an IAM role configured with an external ID to access S3 bucket contents securely. See [Set up an S3 connection with IAM role access](/guide/storage.html#Set-up-an-S3-connection-with-IAM-role-access)
 
 </div>
+
+
+!!! attention Note on securing cloud data
+    If you need to secure your data in a way to ensure that it is not touched by Label Studio, see [Source storage Sync and URI resolving](storage#Source-storage-Sync-and-URI-resolving). 
 
 ### Secure access to Redis storage
 

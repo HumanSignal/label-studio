@@ -25,12 +25,15 @@
   <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
   <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
 
-  <script nonce="{{request.csp_nonce}}">
-    EDITOR_JS = "{{settings.HOSTNAME}}/label-studio-frontend/js/main.js?v={{ versions.lsf.commit }}";
-    EDITOR_CSS = "{{settings.HOSTNAME}}/label-studio-frontend/css/main.css?v={{ versions.lsf.commit }}";
-    DM_JS = "{{settings.HOSTNAME}}/dm/js/main.js?v={{ versions.dm2.commit }}";
-    DM_CSS = "{{settings.HOSTNAME}}/dm/css/main.css?v={{ versions.dm2.commit }}";
-  </script>
+  {% block app-scripts %}
+    <script nonce="{{request.csp_nonce}}">
+      EDITOR_JS = `{{settings.HOSTNAME}}/label-studio-frontend/main.js?v={{ versions.lsf.commit }}`;
+      EDITOR_CSS = `{{settings.HOSTNAME}}/label-studio-frontend/main.css?v={{ versions.lsf.commit }}`;
+      DM_JS = `{{settings.HOSTNAME}}/dm/main.js?v={{ versions.dm2.commit }}`;
+      DM_CSS = `{{settings.HOSTNAME}}/dm/main.css?v={{ versions.dm2.commit }}`;
+    </script>
+  {% endblock %}
+
 
   <script
    src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
@@ -115,7 +118,9 @@
   }, {% block frontend_settings %}{}{% endblock %});
 </script>
 
-<script src="{{settings.HOSTNAME}}/react-app/index.js?v={{ versions.backend.commit }}"></script>
+{% block app-js %}
+<script src="{{settings.HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
+{% endblock %}
 
 <div id="dynamic-content">
   <script nonce="{{request.csp_nonce}}">

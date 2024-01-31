@@ -104,7 +104,7 @@ target-version = ['py38']
 [tool.poetry]
 
 name = "label-studio"
-version = "1.10.2dev"
+version = "1.11.1.dev0"
 description = "Label Studio annotation tool"
 authors = [
     "Heartex <hello@heartex.ai>",
@@ -121,10 +121,9 @@ packages = [
     { include = "label_studio" },
 ]
 include = [
-    "deploy/requirements.txt",
-    "label_studio/frontend/dist/react-app/*",
-    "label_studio/frontend/dist/lsf/**/*",
-    "label_studio/frontend/dist/dm/**/*",
+    "web/dist/libs/datamanager/**/*",
+    "web/dist/libs/editor/**/*",
+    "web/dist/apps/labelstudio/**/*",
     "label_studio/annotation_templates/**/*",
     "label_studio/core/static/**/*",
     "label_studio/core/static_build/**/*",
@@ -136,8 +135,7 @@ include = [
 ]
 
 exclude = [
-    "label_studio/frontend/node_modules/**/*",
-    "label_studio/frontend/build-tmp/**/*"
+    "label_studio/frontend",
 ]
 
 

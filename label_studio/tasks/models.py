@@ -250,8 +250,7 @@ class Task(TaskMixin, models.Model):
     def num_locks_user(self, user):
         return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
 
-    @property
-    def storage_filename(self):
+    def get_storage_filename(self):
         for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
@@ -461,6 +460,12 @@ class Task(TaskMixin, models.Model):
     def delete_tasks_without_signals_from_task_ids(task_ids):
         queryset = Task.objects.filter(id__in=task_ids)
         Task.delete_tasks_without_signals(queryset)
+
+    def delete(self, *args, **kwargs):
+        self.before_delete_actions()
+        result = super().delete(*args, **kwargs)
+        # set updated_at field of task to now()
+        return result
 
 
 pre_bulk_create = Signal(providing_args=['objs', 'batch_size'])

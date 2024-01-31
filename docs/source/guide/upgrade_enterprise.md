@@ -17,7 +17,7 @@ If you are using the on-premises version of Label Studio, you will need to take 
 
 ## Upgrade process overview
 
-1. Back up your databases (development and production). 
+1. [Back up](backup_enterprise) your databases (development and production). 
 2. Perform the upgrade on your development server first. 
 3. Run health checks and tests. ([See below.](#Checks-after-upgrading))
 4. Perform the upgrade on your production server. 

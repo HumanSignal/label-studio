@@ -15,6 +15,8 @@ import os
 import re
 from datetime import timedelta
 
+from django.core.exceptions import ImproperlyConfigured
+
 from label_studio.core.utils.params import get_bool_env, get_env_list
 
 formatter = 'standard'
@@ -102,6 +104,13 @@ if HOSTNAME:
             if FORCE_SCRIPT_NAME:
                 logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
 
+DOMAIN_FROM_REQUEST = get_bool_env('DOMAIN_FROM_REQUEST', False)
+
+if DOMAIN_FROM_REQUEST:
+    # in this mode HOSTNAME can be only subpath
+    if HOSTNAME and not HOSTNAME.startswith('/'):
+        raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
+
 INTERNAL_PORT = '8080'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -120,7 +129,9 @@ WINDOWS_SQLITE_BINARY_HOST_PREFIX = get_env('WINDOWS_SQLITE_BINARY_HOST_PREFIX',
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Base path for media root and other uploaded files
-BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
+BASE_DATA_DIR = get_env('BASE_DATA_DIR')
+if BASE_DATA_DIR is None:
+    BASE_DATA_DIR = get_data_dir()
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
@@ -262,7 +273,7 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = get_env_list('ALLOWED_HOSTS', default=['*'])
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
@@ -401,6 +412,8 @@ MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_second
 MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))
 
 SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
+USE_DEFAULT_BANNED_SUBNETS = get_bool_env('USE_DEFAULT_BANNED_SUBNETS', True)
+USER_ADDITIONAL_BANNED_SUBNETS = get_env_list('USER_ADDITIONAL_BANNED_SUBNETS', default=[])
 
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
@@ -476,12 +489,13 @@ SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION'
 ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS = get_bool_env('ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS', default=False)
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
+
 # EDITOR = label-studio-frontend repository
-EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
+EDITOR_ROOT = os.path.join(BASE_DIR, '../../web/dist/libs/editor')
 # DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = os.path.join(BASE_DIR, '../frontend/dist/dm')
+DM_ROOT = os.path.join(BASE_DIR, '../../web/dist/libs/datamanager')
 # FRONTEND = GUI for django backend
-REACT_APP_ROOT = os.path.join(BASE_DIR, '../frontend/dist/react-app')
+REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 
 # per project settings
 BATCH_SIZE = 1000
@@ -715,3 +729,6 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
     CSP_INCLUDE_NONCE_IN = ['script-src', 'default-src']
 
     MIDDLEWARE.append('core.middleware.HumanSignalCspMiddleware')
+
+CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE', 10000)
+CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT', 60)

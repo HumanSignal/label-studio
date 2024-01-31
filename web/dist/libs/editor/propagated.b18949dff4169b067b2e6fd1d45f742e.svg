@@ -1,0 +1,47 @@
+var _rect, _rect2, _rect3, _rect4;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgPropagated = function SvgPropagated(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _rect || (_rect = /*#__PURE__*/React.createElement("rect", {
+    width: 20,
+    height: 20,
+    x: 2,
+    y: 2,
+    fill: "currentColor",
+    fillOpacity: 0.18,
+    rx: 4
+  })), _rect2 || (_rect2 = /*#__PURE__*/React.createElement("rect", {
+    width: 12.336,
+    height: 3.525,
+    x: 5,
+    y: 10.244,
+    fill: "currentColor",
+    rx: 1.762
+  })), _rect3 || (_rect3 = /*#__PURE__*/React.createElement("rect", {
+    width: 8.353,
+    height: 3.957,
+    x: 19.825,
+    y: 11.899,
+    fill: "currentColor",
+    rx: 1.979,
+    transform: "rotate(135 19.825 11.9)"
+  })), _rect4 || (_rect4 = /*#__PURE__*/React.createElement("rect", {
+    width: 4.177,
+    height: 7.915,
+    x: 19.825,
+    y: 11.899,
+    fill: "currentColor",
+    rx: 2,
+    transform: "rotate(135 19.825 11.9)"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgPropagated);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiByeD0iNCIgZmlsbD0iY3VycmVudENvbG9yIiBmaWxsLW9wYWNpdHk9IjAuMTgiLz4KPHJlY3QgeD0iNSIgeT0iMTAuMjQ0MSIgd2lkdGg9IjEyLjMzNTgiIGhlaWdodD0iMy41MjQ1MSIgcng9IjEuNzYyMjYiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8cmVjdCB4PSIxOS44MjQ4IiB5PSIxMS44OTkyIiB3aWR0aD0iOC4zNTMxOSIgaGVpZ2h0PSIzLjk1NzM1IiByeD0iMS45Nzg2OCIgdHJhbnNmb3JtPSJyb3RhdGUoMTM1IDE5LjgyNDggMTEuODk5MikiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8cmVjdCB4PSIxOS44MjQ4IiB5PSIxMS44OTkyIiB3aWR0aD0iNC4xNzY2IiBoZWlnaHQ9IjcuOTE0NyIgcng9IjIiIHRyYW5zZm9ybT0icm90YXRlKDEzNSAxOS44MjQ4IDExLjg5OTIpIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4KPC9zdmc+Cg==";
