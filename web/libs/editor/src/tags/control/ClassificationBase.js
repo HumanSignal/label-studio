@@ -1,4 +1,5 @@
 import { types } from 'mobx-state-tree';
+import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
 
 /**
  * This is a mixin for a control-tag that is a base of creating classification-like tags.
@@ -40,6 +41,65 @@ const ClassificationBase = types.model('ClassificationBase', {
     };
   }).actions(self => {
     return {
+      /**
+       * Validates the input based on certain conditions.
+       *
+       * Generally, this method does not need to be overridden. And you need to override the validateValue method instead.
+       * However, there are exceptions. For example, RequiredMixin, Choices, and
+       * Taxonomy have their own additional logic, for which a broader context is needed.
+       * In this case, the parent method call is added at the beginning or end
+       * of the method to maintain all functionality in a predictable manner.
+       *
+       * @returns {boolean}
+       */
+      validate() {
+        if (self.perregion) {
+          return self._validatePerRegion();
+        } else if (self.peritem && isFF(FF_LSDV_4583)) {
+          return self._validatePerItem();
+        } else {
+          return self._validatePerObject();
+        }
+      },
+      /**
+       * Validates the value.
+       *
+       * Override to add your custom validation logic specific for the tag.
+       * Per-item, per-region and per-object validation will be applied automatically.
+       *
+       * @example
+       * SomeModel.actions(self => {
+       *     const Super = { validateValue: self.validateValue };
+       *
+       *     return {
+       *       validateValue(value) {
+       *         if (!Super.validateValue(value)) return false;
+       *         // your validation logic
+       *       }
+       *       // other actions
+       *     }
+       * });
+       *
+       * @param {*} value - The value to be validated.
+       * @returns {boolean}
+       *
+       */
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      validateValue(value) {
+        return true;
+      },
+      /**
+       * Validates all values related to the current classification per object.
+       *
+       * - This method should not be overridden.
+       * - It is used only in validate method of the ClassificationBase mixin.
+       *
+       * @returns {boolean}
+       * @private
+       */
+      _validatePerObject() {
+        return self.validateValue(self.selectedValues());
+      },
       createPerObjectResult(areaValues = {}) {
         self.annotation.createResult(
           areaValues,
