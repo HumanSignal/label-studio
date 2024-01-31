@@ -1,5 +1,3 @@
-include deploy/requirements.txt
-
 # react LSF / react-app with dm
 recursive-include web/dist/libs/editor *
 include web/dist/apps/labelstudio/*
