@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -55,7 +55,7 @@ jobs:
           echo "reaction=${reaction}" >> $GITHUB_OUTPUT
 
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -68,7 +68,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
