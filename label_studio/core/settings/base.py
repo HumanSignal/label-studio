@@ -15,6 +15,8 @@ import os
 import re
 from datetime import timedelta
 
+from django.core.exceptions import ImproperlyConfigured
+
 from label_studio.core.utils.params import get_bool_env, get_env_list
 
 formatter = 'standard'
@@ -101,6 +103,13 @@ if HOSTNAME:
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
                 logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
+
+DOMAIN_FROM_REQUEST = get_bool_env('DOMAIN_FROM_REQUEST', False)
+
+if DOMAIN_FROM_REQUEST:
+    # in this mode HOSTNAME can be only subpath
+    if HOSTNAME and not HOSTNAME.startswith('/'):
+        raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
 
 INTERNAL_PORT = '8080'
 
@@ -264,7 +273,7 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = get_env_list('ALLOWED_HOSTS', default=['*'])
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
@@ -403,6 +412,8 @@ MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_second
 MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))
 
 SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
+USE_DEFAULT_BANNED_SUBNETS = get_bool_env('USE_DEFAULT_BANNED_SUBNETS', True)
+USER_ADDITIONAL_BANNED_SUBNETS = get_env_list('USER_ADDITIONAL_BANNED_SUBNETS', default=[])
 
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
@@ -479,20 +490,10 @@ ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS = get_bool_env('ALLOW_IMPORT_TASKS_WITH_U
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 
-ENABLE_MONOREPO_ENV = get_bool_env('ENABLE_MONOREPO_ENV', default=False)
-
 # EDITOR = label-studio-frontend repository
-EDITOR_ROOT = (
-    os.path.join(BASE_DIR, '../../web/dist/libs/editor')
-    if ENABLE_MONOREPO_ENV
-    else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/lsf')
-)
+EDITOR_ROOT = os.path.join(BASE_DIR, '../../web/dist/libs/editor')
 # DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = (
-    os.path.join(BASE_DIR, '../../web/dist/libs/datamanager')
-    if ENABLE_MONOREPO_ENV
-    else os.path.join(BASE_DIR, '../../label_studio/frontend/dist/dm')
-)
+DM_ROOT = os.path.join(BASE_DIR, '../../web/dist/libs/datamanager')
 # FRONTEND = GUI for django backend
 REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 

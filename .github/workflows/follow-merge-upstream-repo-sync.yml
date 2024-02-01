@@ -6,12 +6,11 @@ on:
       - upstream_repo_update
 
 concurrency:
-  group: ${{ github.event.client_payload.repo_name }}-${{ github.event.client_payload.branch_name }}
+  group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
 
 env:
   NODE: 18
   CACHE_NAME_PREFIX: v1
-  STATIC_DIST: 'label_studio/frontend/dist'
   RELEASE_BRANCH_PREFIX: "ls-release/"
   DOCS_TARGET_DIR: "docs/source/tags/"
 
@@ -34,11 +33,9 @@ jobs:
           
           case "${{ github.event.client_payload.repo_name }}" in
             */dm2)
-              echo "frontend_module_dist=${{ env.STATIC_DIST }}/dm" >> $GITHUB_OUTPUT
               echo "copy_src_path=web/libs/datamanager/src" >> $GITHUB_OUTPUT
               ;;
             */label-studio-frontend)
-              echo "frontend_module_dist=${{ env.STATIC_DIST }}/lsf" >> $GITHUB_OUTPUT
               echo "copy_src_path=web/libs/editor/src" >> $GITHUB_OUTPUT
               echo "copy_src_preserve_path=web/libs/editor/src/examples" >> $GITHUB_OUTPUT
               echo "build_lsf_docs=true" >> $GITHUB_OUTPUT
@@ -109,16 +106,6 @@ jobs:
               core.setOutput('name', branch.name);
             }
 
-      - name: Configure git
-        shell: bash
-        env:
-          AUTHOR_USERNAME: ${{ github.event.client_payload.author_username }}
-          AUTHOR_EMAIL: ${{ github.event.client_payload.author_email }}
-        run: |
-          set -xeuo pipefail
-          git config --global user.name "${AUTHOR_USERNAME}"
-          git config --global user.email "${AUTHOR_EMAIL}"
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -126,8 +113,34 @@ jobs:
           fetch-depth: 0
           ref: ${{ steps.get-branch.outputs.name }}
 
+      - name: Checkout Actions Hub
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: HumanSignal/actions-hub
+          path: ./.github/actions-hub
+
+      - name: Git Configure
+        uses: ./.github/actions-hub/actions/git-configure
+        with:
+          username: ${{ github.event.client_payload.author_username }}
+          email: ${{ github.event.client_payload.author_email }}
+
+# Merge
+
+      - name: Git Merge
+        id: merge
+        continue-on-error: true
+        uses: ./.github/actions-hub/actions/git-merge
+        with:
+          base_branch: ${{ steps.get-branch.outputs.base_name }}
+          head_branch: ${{ steps.get-branch.outputs.name }}
+          our_files: "pyproject.toml poetry.lock web"
+
+# Frontend
+
       - name: "Frontend: Checkout module"
-        if: steps.details.outputs.frontend_module_dist
+        if: steps.details.outputs.copy_src_path
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.client_payload.repo_name }}
@@ -136,7 +149,7 @@ jobs:
           fetch-depth: 1
           ref: ${{ github.event.client_payload.commit_sha }}
 
-      - name: Commit src
+      - name: "Frontend: Commit and Push"
         if: steps.details.outputs.copy_src_path
         shell: bash
         env:
@@ -146,16 +159,16 @@ jobs:
           set -xeuo pipefail
           
           preserve_dir=$(mktemp -d)
-          if [ -n ${COPY_SRC_PRESERVE_PATH} ] && [ -d ${COPY_SRC_PRESERVE_PATH} ]; then
+          if [ -n "${COPY_SRC_PRESERVE_PATH}" ] && [ -d "${COPY_SRC_PRESERVE_PATH}" ]; then
             echo "Preserving ${COPY_SRC_PRESERVE_PATH}"
             cp -r "${COPY_SRC_PRESERVE_PATH}" "${preserve_dir}"
           fi 
 
-          rm -r "${COPY_SRC_PATH}"
+          rm -r "${COPY_SRC_PATH}" || true
           mkdir -p "${COPY_SRC_PATH}"
           cp -r tmp/src/* "${COPY_SRC_PATH}"
 
-          if [ -n ${COPY_SRC_PRESERVE_PATH} ]; then
+          if [ -n "${COPY_SRC_PRESERVE_PATH}" ]; then
             echo "Restoring preserved files"
             cp -rf ${preserve_dir}/* "${COPY_SRC_PATH}"
           fi 
@@ -165,101 +178,13 @@ jobs:
           git commit --allow-empty -m '[submodules] Copy src ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
-      - name: "Frontend: Setup nodejs"
-        uses: actions/setup-node@v4
-        if: steps.details.outputs.frontend_module_dist
-        with:
-          node-version: "${{ env.NODE }}"
+# POETRY
 
-      - name: "Frontend: Upgrade Yarn"
-        if: steps.details.outputs.frontend_module_dist
-        run: npm install -g yarn@1.22
-
-      - name: Get yarn cache directory path
-        if: steps.details.outputs.frontend_module_dist
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: "Frontend: Configure yarn cache"
-        if: steps.details.outputs.frontend_module_dist
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: "Frontend: Print Yarn cache size"
-        if: steps.details.outputs.frontend_module_dist
-        run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
-
-      - name: "Frontend: Install Yarn dependencies"
-        if: steps.details.outputs.frontend_module_dist
-        run: |
-          rm package-lock.json || true
-          yarn install
-        working-directory: tmp
-
-      - name: "Frontend: Build module"
-        if: steps.details.outputs.frontend_module_dist
-        working-directory: tmp
-        env:
-          CI: false # on true webpack breaks on warnings, and we have them a lot
-          NODE_ENV: 'production'
-          TITLE: ${{ github.event.client_payload.title }}
-        run: |
-          yarn run build:module
-          if [[ "${{ github.event.client_payload.event_action }}" == 'merged' ]]; then 
-            branch="${{ github.event.client_payload.base_branch_name }}"
-          else
-            branch="${{ github.event.client_payload.branch_name }}"
-          fi
-          cat << EOF > "build/static/version.json"
-          {
-            "message": "${TITLE}",
-            "commit": "${{ github.event.client_payload.commit_sha }}",
-            "branch": "${branch}",
-            "date": "$(git log -1 --date=format:"%Y-%m-%dT%TZ" --format="%ad" | cat)"
-          }
-          EOF
-
-      - name: "Frontend: LSF Docs: Cache node modules"
-        if: steps.details.outputs.build_lsf_docs
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
-
-      - name: "Frontend: LSF Docs: Install NPM deps"
-        if: steps.details.outputs.build_lsf_docs
-        continue-on-error: true
-        run: npm install -g jsdoc-to-markdown node-fetch
-
-      - name: "Frontend: LSF Docs: Build"
-        id: lsf-docs-build
-        if: steps.details.outputs.build_lsf_docs
-        continue-on-error: true
-        working-directory: tmp/scripts
-        run: node create-docs.js
-
-      - name: "Frontend: Commit"
-        if: steps.details.outputs.frontend_module_dist
-        shell: bash
-        run: |
-          set -xeuo pipefail
-
-          rm -rf "${{ steps.details.outputs.frontend_module_dist }}"
-          mkdir -p "${{ steps.details.outputs.frontend_module_dist }}"
-          cp -r tmp/build/static/* "${{ steps.details.outputs.frontend_module_dist }}"
-
-          git add "${{ steps.details.outputs.frontend_module_dist }}"
-          git status -s
-          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-          git push origin HEAD
-
-      - name: Set up Poetry
+      - name: "Poetry: Set up"
         if: steps.details.outputs.poetry
         uses: snok/install-poetry@v1
 
-      - name: "Requirements: Commit"
+      - name: "Poetry: Commit and Push"
         if: steps.details.outputs.poetry
         shell: bash
         run: |
@@ -272,7 +197,35 @@ jobs:
           git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
-      - name: "Frontend: LSF Docs: Commit"
+# LSF Docs
+
+      - name: "LSF Docs: Setup nodejs"
+        uses: actions/setup-node@v4
+        if: steps.details.outputs.build_lsf_docs
+        with:
+          node-version: "${{ env.NODE }}"
+
+      - name: "LSF Docs: Cache node modules"
+        if: steps.details.outputs.build_lsf_docs
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
+
+      - name: "LSF Docs: Install NPM deps"
+        if: steps.details.outputs.build_lsf_docs
+        continue-on-error: true
+        working-directory: tmp/scripts
+        run: npm install -g jsdoc-to-markdown node-fetch
+
+      - name: "LSF Docs: Build"
+        id: lsf-docs-build
+        if: steps.details.outputs.build_lsf_docs
+        continue-on-error: true
+        working-directory: tmp/scripts
+        run: node create-docs.js
+
+      - name: "LSF Docs: Commit and Push"
         if: steps.details.outputs.build_lsf_docs && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
@@ -286,41 +239,6 @@ jobs:
           git commit -m 'docs: LSF Update' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
-      - name: Merge base branch
-        shell: bash
-        continue-on-error: true
-        run: |
-          set -xeuo pipefail
-          
-          branch='${{ steps.get-branch.outputs.name }}'
-          base_branch='origin/${{ steps.get-branch.outputs.base_name }}'
-          
-          lsf_path='label_studio/frontend/dist/lsf/'
-          dm_path='label_studio/frontend/dist/dm/'
-          
-          git merge "${base_branch}" --message "Merge branch '${base_branch}' into '${branch}'" || true
-
-          git diff --name-only --diff-filter=U --relative
-          
-          git checkout --ours "${lsf_path}"
-          git add "${lsf_path}" || ture
-          
-          git checkout --ours "${dm_path}"
-          git add "${dm_path}" || ture
-          
-          unmerged_files=$(git diff --name-only --diff-filter=U --relative)
-          
-          if [ -z "${unmerged_files}" ]; then
-            echo "No unmerged files found"
-            echo "Pushing merge commit"
-            git commit -m "Merge branch '${base_branch}' into '${branch}'" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
-            git push origin HEAD
-          else
-            echo "Unmerged files found:"
-            echo "${unmerged_files}"  
-            echo "Skipping push"
-            exit 0
-          fi
 
       - name: Find or Create PR
         id: get-pr

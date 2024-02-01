@@ -14,10 +14,8 @@ on:
         type: string
 
 env:
-  NODE: 18
-  CACHE_NAME_PREFIX: v1
-  FRONTEND_OLD_DIR: label_studio/frontend
-  FRONTEND_MONOREPO_DIR: web
+  NODE: "18"
+  FRONTEND_MONOREPO_DIR: "web"
   FRONTEND_BUILD_COMMIT_MESSAGE: "ci: Build frontend"
 
 jobs:
@@ -38,56 +36,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
 
-      - uses: actions/setup-node@v4
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
         with:
           node-version: "${{ env.NODE }}"
-
-      - name: Upgrade Yarn
-        run: npm install -g yarn@1.22
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Configure yarn cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Print Yarn cache size
-        run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
-
-      - name: "Monorepo: Check"
-        id: monorepo-check
-        run: |
-          if [ -e '${{ env.FRONTEND_MONOREPO_DIR }}/package.json' ]; then
-            echo "monorepo_path=${{ env.FRONTEND_MONOREPO_DIR }}" >> $GITHUB_OUTPUT
-          else
-            echo "old_path=${{ env.FRONTEND_OLD_DIR }}" >> $GITHUB_OUTPUT
-            echo "::warning::Frontend Monorepo not found"
-          fi
-
-      - name: Build
-        if: steps.monorepo-check.outputs.old_path
-        run: |
-          yarn install --frozen-lockfile
-          yarn run build:production
-        working-directory: ${{ env.FRONTEND_OLD_DIR }}
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
       - name: "Monorepo: Build"
-        if: steps.monorepo-check.outputs.monorepo_path
-        run: |
-          yarn install --frozen-lockfile
-          yarn build
-        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn build
 
       - name: Commit and Push
         run: |
           git add "${{ env.FRONTEND_MONOREPO_DIR }}" || true
-          git add "${{ env.FRONTEND_OLD_DIR }}" || true
           git status -s
           git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
           git push origin HEAD

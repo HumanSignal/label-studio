@@ -73,7 +73,7 @@ jobs:
         id: npm-cache-dir
         run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Configure npm cache
         id: npm-cache
         with:
@@ -94,7 +94,7 @@ jobs:
           poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v3.1.5
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -195,7 +195,7 @@ jobs:
         id: npm-cache-dir
         run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Configure npm cache
         id: npm-cache
         with:
@@ -216,7 +216,7 @@ jobs:
           poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v3.1.5
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml

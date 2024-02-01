@@ -1,6 +1,6 @@
 {
-  "message": "LEAP-443: Improve LSF init",
-  "commit": "0505e273c2e6244e804587252b6d31c41cfcf1b6",
-  "branch": "fb-leap-443/lsf-init",
-  "date": "2024-01-08T15:14:10Z"
+  "message": "fix: LEAP-447: Fix Number tag validation  (#1649)",
+  "commit": "524aa7db9517fb509cad0fa1146235577033b201",
+  "branch": "master",
+  "date": "2024-01-30T23:47:06Z"
 }
