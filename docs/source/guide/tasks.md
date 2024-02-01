@@ -191,7 +191,7 @@ Use this parameter to retrieve data from multi-column csv on [S3 or other cloud 
 
 If you import a file with a list of tasks, and every task in this list is a link to another file in the storage. In this case, you can use the `resolver` parameter to retrieve the content of these files from a storage. 
 
-**Use case**
+#### Use Case
 
 There is a list of tasks, where the "remote" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
 
@@ -209,7 +209,7 @@ id;text
 12;The most flexible data annotation tool. Quickly installable. Build custom UIs or use pre-built labeling templates.
 ```
 
-**Solution**
+#### Solution
 
 To retrieve the file, use the following parameters:
 
@@ -219,7 +219,7 @@ To retrieve the file, use the following parameters:
 
 3. Display the result.
 
-**Syntax**
+#### Syntax
 
 The syntax for the `resolver` parameter consists of a list of options separated by a `|` symbol.
 

@@ -15,11 +15,13 @@ Label Studio is available as open source software as well as an [Enterprise clo
 <a class="Button" href="https://humansignal.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
 
 <table>
+<thead>
   <tr>
     <th>Functionality</th>
     <th>Community</th>
     <th>Enterprise</th>
   </tr>
+  </thead>
 
 <tr>
     <td colspan="3"><b>Data Management</b></td>

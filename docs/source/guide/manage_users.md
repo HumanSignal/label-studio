@@ -56,6 +56,7 @@ A Label Studio administrator sees all projects and workspaces that exist in the 
 <i>Table 3: Permissions in Label Studio Enterprise </i>
 
 <table>
+<thead>
   <tr>
     <th>Action</th>
     <th>Annotator</th>
@@ -64,6 +65,7 @@ A Label Studio administrator sees all projects and workspaces that exist in the 
     <th>Administrator</th>
     <th>Owner</th>
   </tr>
+  </thead>
   <tr>
     <td colspan="6"><b>User Management</b></td>
   </tr>

@@ -40,11 +40,13 @@ Limit the number of requests to your server by subscribing only to the events re
 Label Studio makes two main types of events available to integrate with webhooks: project-level task events and organization events.
 
 <table>
+<thead>
   <tr>
     <th>Event Action</th>
     <th>Details</th>
     <th>Use Case</th>
   </tr>
+  </thead>
   <tr>
     <td><a href="webhook_reference.html#Task-Created">Task Created</a></td>
     <td>For a specific project, triggers when new tasks are created. One event per import action. Bulk task creation is sent as one event.</td>

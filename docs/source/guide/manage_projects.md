@@ -21,7 +21,7 @@ You can manage data and projects in the Label Studio UI using the following:
   - [More menu to Pin/Unpin and Duplicate projects](#More-menu-to-pin-or-unpin-and-duplicate-projects).
   - [Delete a workspace](#Delete-a-workspace).
 
-### Use the organization page
+## Use the organization page
 
 To manage organization membership, use the **Organization** page in the Label Studio UI. When you sign up for Label Studio Enterprise for the first time, an organization associated with your account is automatically created. You become the owner of that organization. People who join Label Studio Enterprise from an invitation link or with an LDAP or SSO role join an existing organization.
 
@@ -45,7 +45,7 @@ Managers within an organization can see all workspaces in that organization, eve
 
 If you have access to multiple organizations, use the **Organizations** page to switch between the organizations that you are a member of.
 
-### Workspaces
+## Workspaces
 
 Workspaces are a key differentiating factor between open-source and enterprise versions, providing powerful capabilities to organize, categorize and manage projects at different stages of their lifecycle or use case.
 
@@ -89,11 +89,11 @@ You can also remove yourself or other members from a workspace by following the 
 
 Each user has a personal Sandbox workspace that they can use to experiment with project settings and get familiar with Label Studio. After you set up a project and want others to collaborate on it with you, you can update the project workspace in the **Project Settings**. You cannot add members to your Sandbox workspace.
 
-### More menu to Pin or Unpin and Duplicate projects
+## More menu to Pin or Unpin and Duplicate projects
 
 Use the more menu (three dots (**...**) located in the bottom-right of each project card) to explore the following features:
 
-#### Pin or Unpin projects
+### Pin or Unpin projects
 
 You can pin a project to the top of the page and unpin a project too. The **Pin project** and **Unpin project** feature allows you to filter and find projects of interest.
 
@@ -157,7 +157,7 @@ Now, you can see all the pinned projects only.
 
 6. To view all the projects (both the **Pinned** and **Unpinned** projects), click **All projects** on the top-right side drop-down list.
 
-### Search projects
+## Search projects
 
 Use the search box to search for projects by name. This allows partial and case-insensitive matches. The search is performed as you type, and the results are displayed in the project list. For example, if you type `new` in the search box, you will see projects with names such as `New Project`, `New Project 2`, and `New Project 3`.
 
@@ -196,7 +196,7 @@ Use the search box to search for projects by name. This allows partial and case-
   <i>Figure 17: No matching results for search criteria.</i>
     
 
-#### Duplicate a project
+## Duplicate a project
 
 The **Duplicate project** feature allows you to duplicate projects to a target workspace optionally importing the settings, tasks, and annotations. Duplicate a project by using the Project’s settings or Project card’s more menu (three dots **...**).
 
@@ -226,11 +226,11 @@ To duplicate a project:
     <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/created-a-duplicated-project.png" style="opacity: 0.8"/></div>
     <i>Figure 21: Create a duplicate project.</i>
 
-### Working with Archived Workspaces
+## Working with Archived Workspaces
 
 To reduce clutter in the workspace sidebar you can archive one or more workspaces from view, allowing you to easily locate high-priority labeling initiatives. You’ll still have complete access to workspaces that have been archived and you can unarchive them at any time.
 
-#### Archiving a workspace
+### Archiving a workspace
 
 Archived workspaces and the projects they contain can be referenced or worked on as normal, even when hidden from the main view. Simply click the menu next to a workspace name and click “Archive” to hide it from view.
 
@@ -240,19 +240,19 @@ You can also archive a workspace from the gear icon next to the current workspac
 
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-edit-modal.png" style="opacity: 0.8"/></div>
 
-#### View archived workspace
+### View archived workspace
 
 To view archived workspaces, expand the archived workspaces toggle at the bottom of the project page sidebar.
 
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-archive-expand.png" style="opacity: 0.8"/></div>
 
-#### Unarchiving a workspace
+### Unarchiving a workspace
 
 To unarchive a workspace, use the same menu where you initially archived it and click “Unarchive” which will bring the workspace into the normal workspace view.
 
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-unarchive-menu.png" style="opacity: 0.8"/></div>
 
-### Delete a workspace
+## Delete a workspace
 
 You can only delete a workspace if it has no projects. If you want to delete a workspace, first delete the projects or move them to another workspace.
 

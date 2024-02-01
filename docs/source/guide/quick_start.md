@@ -12,13 +12,11 @@ date: 2023-11-27 13:34:32
 ---
 
 1. Install Label Studio:
-
 ```bash
 pip install label-studio
 ```
 
 2. Start Label Studio
-
 ```bash
 label-studio start
 ```

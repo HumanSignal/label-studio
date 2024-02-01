@@ -17,9 +17,12 @@ html {
   --color-yellow-90: #FFB882;
   --color-yellow-30: #FFE4D0;
   --color-yellow-5: #FFF6EF;
+  --color-yellow-300: #FFB882;
 
   --color-blue-90: #617ADA;
   --color-blue-100: #4C5FA9;
+  --color-blue-80: #99ABF5;
+  --color-blue-30: #D4DBFB;
 
   --color-green-400: #57B7AB;
   --color-green-100: #D4F1EB;
@@ -142,6 +145,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.25em;
+  color: var(--color-gray-900);
 }
 
 .page-header nav a:not(.Button):hover,
@@ -426,7 +430,7 @@ main {
   border-right: 1px var(--color-gray-300) solid;
   background: var(--color-gray-100);
   box-shadow: 0 0 12px rgba(23,20,13,.16);
-  padding: .5em 1.5em 7em 1.5em;
+  padding: 1.5em 1.5em 7em 1.5em;
   flex-shrink: 0;
 }
 
@@ -748,6 +752,10 @@ main {
   position: relative;
 }
 
+strong, b{
+  font-weight: 600;
+}
+
 .Heading a {
   text-decoration: none;
   color: currentColor;
@@ -866,7 +874,8 @@ h1, h2, h3, h4, h5, h6{
 .Text,
 .content-markdown p,
 .content-markdown ul,
-.content-markdown ol {
+.content-markdown ol,
+.content-markdown i {
   --min-size: 1rem;
   /* 16px */
   --max-size: 1rem;
@@ -875,12 +884,12 @@ h1, h2, h3, h4, h5, h6{
 
   font-family: var(--font-family-secondary);
   font-size: clamp(var(--min-size), 7vw, var(--max-size));
-  color: var(--color-gray-900);
+  color: var(--color-gray-700);
   line-height: var(--line-height);
   font-weight: normal;
 }
 
-.content-markdown ol {
+.content-markdown ol,ul {
   padding-left: 1.5rem;
 }
 
@@ -1177,7 +1186,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .content-markdown li::marker {
-  color: var(--color-purple-90);
+  color: var(--color-gray-900);
   font-family: var(--font-family-primary);
   font-weight: 600;
 }
@@ -1197,18 +1206,18 @@ h1, h2, h3, h4, h5, h6{
   font-size: 0.85em;
   font-weight: 600;
   color: var(--color-gray-900);
-  background-color: var(--color-gray-50);
+  background-color: var(--color-gray-200);
   padding: 0.25em;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .content-markdown table {
   border: 1px var(--color-gray-300) solid;
   border-collapse: collapse;
-  margin: 2em 0;
+  margin: 1em 0;
   overflow: auto;
-  display: block;
-  width: 100%;
+  display: inline-block;
+  max-width: 100%;
   border-radius: .5rem;
 }
 
@@ -1220,6 +1229,11 @@ h1, h2, h3, h4, h5, h6{
   padding: 0.6em;
   text-align: left;
   font-weight: 600;
+}
+
+.content-markdown table thead tr th {
+  background-color: var(--color-gray-900);
+  color: var(--color-white);
 }
 
 .content-markdown table tbody tr td b {
@@ -1234,6 +1248,17 @@ h1, h2, h3, h4, h5, h6{
   border-right: 1px var(--color-gray-300) solid;
   border-top: 1px var(--color-gray-300) solid;
   padding: 0.6em;
+  line-height: 1.4;
+}
+
+/* @media (min-width: 60rem) {
+  .content-markdown table tbody tr td:first-child {
+    white-space: nowrap;
+  }
+} */
+
+.content-markdown table tbody tr td:last-child {
+  border-right: none;
 }
 
 .content-markdown .noheader table thead {
@@ -1248,10 +1273,15 @@ h1, h2, h3, h4, h5, h6{
   border-top: 1px var(--color-gray-300) solid;
 }
 
+/* table td:first-child {
+  width: 100%;
+} */
+
 .content-markdown img {
   max-width: 100%;
   height: auto;
   margin: 1em 0;
+  display: block;
 }
 
 .content-markdown img {
@@ -1275,6 +1305,10 @@ h1, h2, h3, h4, h5, h6{
   border-radius: .25rem;
   box-shadow: 0 0 10px rgba(23,20,13,.16);
   padding-bottom: .5rem;
+}
+
+h1 + .admonition{
+  margin-top: 2rem !important;
 }
 
 .content-markdown .admonition+.admonition {
@@ -1362,8 +1396,9 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .code-tabs>div:not(.buttons) {
-  border: 1px solid var(--color-gray-100);
-  border-radius: 2px;
+  border: 1px solid var(--color-gray-300);
+  background: var(--color-gray-100);
+  border-radius: .5rem;
   z-index: 100;
   padding: 1em;
 }
@@ -1371,20 +1406,23 @@ h1, h2, h3, h4, h5, h6{
 .code-tabs>.buttons {
   display: flex;
   gap: 1.5em;
+  margin-left: 1rem;
 }
 
 .code-tabs>.buttons a {
   text-decoration: none;
   padding: 0.5em 0;
   color: var(--color-gray-500);
+  transition: all 200ms;
 }
 
 .code-tabs>.buttons a:hover {
-  color: var(--color-main-accent);
+  color: var(--color-blue-90);
+  text-decoration: none;
 }
 
 .code-tabs>.buttons a.active {
-  color: var(--color-main-accent);
+  color: var(--color-blue-90);
   border-bottom: 3px currentColor solid;
 }
 
@@ -1461,7 +1499,8 @@ details {
   padding: 10px 15px;
   border-radius: 8px;
   display: block;
-  background: var(--color-gray-50);
+  background: var(--color-gray-100);
+  border: 1px solid var(--color-gray-300);
 }
 
 details summary {
@@ -1892,7 +1931,7 @@ pre code.hljs {
   font-size: 0.9rem;
   line-height: 1.25;
   border-radius: 8px;
-  background: #131522;
+  background: var(--color-gray-900);
   position: relative;
   white-space: pre;
 }
@@ -1900,11 +1939,11 @@ pre code.hljs {
 pre code.hljs {
   display: block;
   overflow-x: auto;
-  padding: 2em 1em
+  padding: 2.5em 1.5em 1.5em;
 }
 
 code.hljs {
-  padding: 3px 5px
+  padding: 3px 5px;
 }
 
 /*!
@@ -1930,7 +1969,7 @@ code.hljs {
 .hljs-tag,
 .hljs-template-tag,
 .hljs-variable.language_ {
-  color: #f7768e
+  color: var(--color-yellow-300);
 }
 
 .hljs-link,
@@ -1940,12 +1979,12 @@ code.hljs {
 .hljs-template-variable,
 .hljs-type,
 .hljs-variable {
-  color: #ff9e64
+  color: var(--color-yellow-90);
 }
 
 .hljs-attribute,
 .hljs-built_in {
-  color: #e0af68
+  color: var(--color-yellow-90);
 }
 
 .hljs-keyword,
@@ -1955,11 +1994,11 @@ code.hljs {
 .hljs-title.class_,
 .hljs-title.class_.inherited__,
 .hljs-title.function_ {
-  color: #7dcfff
+  color: var(--color-blue-80);
 }
 
 .hljs-selector-tag {
-  color: #73daca
+  color: #a0d964;
 }
 
 .hljs-addition,
@@ -1967,13 +2006,13 @@ code.hljs {
 .hljs-quote,
 .hljs-string,
 .hljs-symbol {
-  color: #9ece6a
+  color: var(--color-green-400);
 }
 
 .hljs-code,
 .hljs-formula,
 .hljs-section {
-  color: #7aa2f7
+  color: var(--color-blue-90);
 }
 
 .hljs-attr,
@@ -1981,16 +2020,16 @@ code.hljs {
 .hljs-keyword,
 .hljs-name,
 .hljs-operator {
-  color: #bb9af7
+  color: var(--color-purple-90);
 }
 
 .hljs-punctuation {
-  color: #c0caf5
+  color:var(--color-white);
 }
 
 .hljs {
-  background: #1a1b26;
-  color: #fff
+  background: var(--color-gray-900);
+  color: var(--color-white);
 }
 
 .hljs-emphasis {
@@ -2114,18 +2153,20 @@ code.hljs {
   text-decoration: none;
   font-weight: 600;
   cursor: pointer;
+  color: var(--color-blue-90);
+  transition: all 200ms;
 }
 
 .playground-buttons a:hover,
 .playground-buttons button:hover {
-  color: var(--color-gray-900);
+  color: var(--color-blue-100);
+  text-decoration: none !important;
 }
 
 .playground-buttons button {
   appearance: none;
   border: 0;
   background-color: transparent;
-  color: var(--color-main-accent);
 }
 
 /****************************
@@ -2188,12 +2229,13 @@ code.hljs {
 
 .ds-dropdown-menu {
   background-color: white;
-  border: 1px var(--color-gray-600) solid;
+  border: 1px var(--color-gray-300) solid;
   border-radius: .75rem;
   /* top: calc(100% + 4px)!important; Needed to overwrite Algolia’s default style */
   top: calc(100% + 7.5px) !important;
   padding: 1em;
   width: 160%;
+  box-shadow: 0 0 12px rgba(23,20,13,.16);
 }
 
 .algolia-docsearch-footer {
@@ -2293,7 +2335,7 @@ code.hljs {
 }
 
 .page-tier-enterprise .page-header-main-nav > li > a:not(.Button) {
-  background-color: var(--color-white);
+  color: var(--color-white);
 }
 
 .page-header nav>ul>li>ul a {
@@ -2310,8 +2352,8 @@ code.hljs {
   color: var(--color-gray-900);
 }
 
-.page-tier-enterprise .content-markdown li::marker {
-  color: var(--color-gray-900);
+.page-tier-enterprise .page-header .Button:hover {
+  background-color: var(--color-orange-90);
 }
 
 .heidi{

@@ -15,17 +15,23 @@ All labeling activities in Label Studio occur in the context of a project.
 <div class="opensource-only">
 
 After you [start Label Studio](start.html) and [create an account](signup.html), create a project to start labeling your data.
-   
-</div>
 
 1. [Create a project](#Create-a-project)
 2. [Import data](tasks.html).
 3. Select a template to configure the labeling interface for your dataset. [Set up the labeling interface for your project](setup.html).
 4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project).
 
+</div>
+
 <div class="enterprise-only">
+
+1. [Create a project](#Create-a-project)
+2. [Import data](tasks.html).
+3. Select a template to configure the labeling interface for your dataset. [Set up the labeling interface for your project](setup.html).
+4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project).
 5. (Optional) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
 6. [Publish your project](#Publish-project-to-annotators).
+
 </div>
 
 ## Create a project
