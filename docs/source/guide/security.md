@@ -142,6 +142,7 @@ CUSTOM_CA_CERTS=/tmp/my.cert
 
 1. Upload your self-signed certificate as a k8s secret.
    Upload `my.cert` as a secrets with a name `test-my-root-cert`:
+   
 ```yaml
 kubectl create secret generic test-my-root-cert --from-file=file=my.cert
 ```

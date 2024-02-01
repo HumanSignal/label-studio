@@ -704,7 +704,6 @@ main {
 
 .page-type-templates .container {
   margin: 0 auto;
-  max-width: 1030px;
 }
 
 .home-page-title {
@@ -1333,6 +1332,7 @@ h1 + .admonition{
   font-weight: 400;
   width: 100%;
   position: relative;
+  text-transform: capitalize;
 }
 
 .admonition-title:before{
@@ -1367,6 +1367,13 @@ h1 + .admonition{
   --color-background: var(--color-white);
 }
 
+.content-markdown .admonition.beta {
+  --color-border: var(--color-purple-90);
+  --color-title: var(--color-gray-900);
+  --color-title-background: var(--color-purple-0);
+  --color-background: var(--color-white);
+}
+
 .content-markdown .admonition.enterprise {
   --color-border: var(--color-gray-900);
   --color-title: var(--color-white);
@@ -1382,13 +1389,14 @@ h1 + .admonition{
 }
 
 .content-markdown blockquote {
-  border-left: 2px var(--color-main-accent) solid;
+  border-left: 3px var(--color-orange-90) solid;
   margin-left: 0;
   padding-left: 1em;
 }
 
 .content-markdown blockquote p {
   color: var(--color-gray-900);
+  line-height: 1.3;
 }
 
 .content-markdown blockquote p+p {
@@ -1507,6 +1515,10 @@ details summary {
   cursor: pointer;
 }
 
+details + details{
+  margin-top: 1rem;
+}
+
 
 /****************************
   Templates
@@ -1521,26 +1533,22 @@ details summary {
 
 .templates-card {
   --padding: 0.75em;
-
   background-color: var(--color-gray-10);
-  border: 1px solid var(--color-gray-200);
+  border: 1px solid var(--color-gray-300);
   padding: var(--padding);
-  transition: border-radius 200ms;
+  transition: all 200ms;
   position: relative;
+  border-radius: .5rem;
+  box-shadow: 0 0 12px rgba(23,20,13,.16);
+  overflow: hidden;
 }
 
 .templates-card:hover {
-  border-color: var(--color-main-accent);
-  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(23,20,13,.16);
 }
 
 .templates-card:hover a {
-  color: var(--color-main-accent);
-}
-
-.templates-card:hover img {
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
+  color: var(--color-blue-90);
 }
 
 .templates-card img {
