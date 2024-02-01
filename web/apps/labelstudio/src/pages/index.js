@@ -1,5 +1,5 @@
 import { ProjectsPage } from './Projects/Projects';
 import { OrganizationPage } from './Organization';
-import { PrompterPage } from './Organization/Prompter/PrompterPage';
+import { ModelsPage } from './Organization/Models/ModelsPage';
 
-export const Pages = [ProjectsPage, OrganizationPage, PrompterPage];
+export const Pages = [ProjectsPage, OrganizationPage, ModelsPage];

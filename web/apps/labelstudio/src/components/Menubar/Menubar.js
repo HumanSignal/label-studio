@@ -14,7 +14,7 @@ import { VersionNotifier, VersionProvider } from '../VersionNotifier/VersionNoti
 import './Menubar.styl';
 import './MenuContent.styl';
 import './MenuSidebar.styl';
-import { PrompterPage } from '../../pages/Organization/Prompter/PrompterPage';
+import { ModelsPage } from '../../pages/Organization/Models/ModelsPage';
 import { FF_DIA_835, isFF } from '../../utils/feature-flags';
 
 export const MenubarContext = createContext();
@@ -206,7 +206,7 @@ export const Menubar = ({
                 {isFF(FF_DIA_835) && (
                   <Menu.Item
                     label="Models"
-                    to={PrompterPage.path}
+                    to={ModelsPage.path}
                     icon={<IconModel/>}
                     exact
                   />

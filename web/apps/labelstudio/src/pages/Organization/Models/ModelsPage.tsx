@@ -4,7 +4,7 @@ import { Space } from 'apps/labelstudio/src/components/Space/Space';
 import { Block } from 'apps/labelstudio/src/utils/bem';
 import { EmptyList } from './@components/EmptyList';
 
-export const PrompterPage: Page = () => {
+export const ModelsPage: Page = () => {
   return (
     <Block name="prompter">
       <EmptyList/>
@@ -12,11 +12,11 @@ export const PrompterPage: Page = () => {
   );
 };
 
-PrompterPage.title = () => "Models";
-PrompterPage.titleRaw = "Models";
-PrompterPage.path = "/prompt";
+ModelsPage.title = () => "Models";
+ModelsPage.titleRaw = "Models";
+ModelsPage.path = "/models";
 
-PrompterPage.context = () => {
+ModelsPage.context = () => {
   return (
     <Space size="small">
       <Button
