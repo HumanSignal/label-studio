@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
 import { PeoplePage } from './PeoplePage/PeoplePage';
@@ -9,6 +8,7 @@ const ALLOW_ORGANIZATION_WEBHOOKS = window.APP_SETTINGS.flags?.allow_organizatio
 
 const MenuLayout = ({ children, ...routeProps }) => {
   let menuItems = [PeoplePage];
+
   if (ALLOW_ORGANIZATION_WEBHOOKS){
     menuItems.push(
       WebhookPage,
@@ -24,6 +24,7 @@ const MenuLayout = ({ children, ...routeProps }) => {
 };
 
 const organizationPages = {};
+
 if (ALLOW_ORGANIZATION_WEBHOOKS){
   organizationPages[WebhookPage] = WebhookPage;
 }
