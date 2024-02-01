@@ -55,8 +55,12 @@ def parse_config(config_string):
 
 def _fix_choices(config):
     """
-    workaround for single choice
+    [ex] workaround for single choice
     https://github.com/heartexlabs/label-studio/issues/1259
+
+    if you see the similar problem try to use another order of rules in the related part of the config inside `anyOf`
+    we do show only the first error so it might be meaningful
+    rules like `MaybeMultiple*` in that case work better when the option with single element comes before an array of elements
     """
     if 'Choices' in config:
         # for single Choices tag in View
@@ -84,7 +88,7 @@ def parse_config_to_json(config_string):
     if xml is None:
         raise etree.ParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
-    config = _fix_choices(config)
+    # previously we called `_fix_choices` here, but no longer need to because changing schema helps with that
     return config
 
 
@@ -98,7 +102,7 @@ def validate_label_config(config_string):
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
         error_message = 'Validation failed on {}: {}'.format(
-            '/'.join(map(str, exc.path)), error_message.replace('@', '')
+            '/'.join(map(str, exc.absolute_path)), error_message.replace('@', '')
         )
         raise LabelStudioValidationErrorSentryIgnored(error_message)
 
@@ -291,7 +295,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
             for ts_child in p:
                 if ts_child.tag != 'Channel':
                     continue
-                value_columns.append(ts_child.get('column'))
+                value_columns.append(ts_child.get('column') or '_default_')
             sep = p.get('sep')
             time_format = p.get('timeFormat')
 

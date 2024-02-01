@@ -60,7 +60,7 @@ def any_api_client(request, client_and_token, business_client):
                 'title': '111',
                 'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class"><Choice value="pos"/><Choice value="neg"/></Choices></View>',
             },
-            {'label_config': ["Validation failed on : 'toName' is a required property"]},
+            {'label_config': ["Validation failed on View/Choices: 'toName' is a required property"]},
             400,
         ),
         # empty label config
@@ -119,7 +119,7 @@ def test_create_project(client_and_token, payload, response, status_code):
             {
                 'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class"><Choice value="pos"/><Choice value="neg"/></Choices></View>'
             },
-            {'label_config': ["Validation failed on : 'toName' is a required property"]},
+            {'label_config': ["Validation failed on View/Choices: 'toName' is a required property"]},
             400,
         ),
     ],
