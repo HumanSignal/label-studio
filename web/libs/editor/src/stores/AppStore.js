@@ -185,6 +185,8 @@ export default types
     initialized: false,
     hydrated: false,
     suggestionsRequest: null,
+    // @todo should be removed along with the FF; it's used to detect FF in other parts
+    simpleInit: isFF(FF_SIMPLE_INIT),
   }))
   .views(self => ({
     get events() {
@@ -676,7 +678,6 @@ export default types
      */
     function initializeStore({ annotations = [], completions = [], predictions = [], annotationHistory }) {
       const as = self.annotationStore;
-      const simpleInit = isFF(FF_SIMPLE_INIT);
 
       // some hacks to properly clear react and mobx structures
       as.afterReset?.();
@@ -690,7 +691,7 @@ export default types
 
       // goal here is to deserialize everything fast and select only first annotation
       // no extra processes during eserialization and further processes triggered during select
-      if (simpleInit) {
+      if (self.simpleInit) {
         window.STORE_INIT_OK = false;
 
         // add predictions and annotations to the store;
