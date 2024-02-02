@@ -204,6 +204,48 @@
         "decorators": ""
     },
     {
+        "url": "/api/model-provider-connections/",
+        "module": "ml_model_providers.api.ModelProviderConnectionAPI",
+        "name": "model-provider-connections:api:model_provider_connections-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/model-provider-connections\\.<format>/",
+        "module": "ml_model_providers.api.ModelProviderConnectionAPI",
+        "name": "model-provider-connections:api:model_provider_connections-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/model-provider-connections/<pk>/",
+        "module": "ml_model_providers.api.ModelProviderConnectionAPI",
+        "name": "model-provider-connections:api:model_provider_connections-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/model-provider-connections/<pk>\\.<format>/",
+        "module": "ml_model_providers.api.ModelProviderConnectionAPI",
+        "name": "model-provider-connections:api:model_provider_connections-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "model-provider-connections:api:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/\\.<format>/",
+        "module": "rest_framework.routers.APIRootView",
+        "name": "model-provider-connections:api:api-root",
+        "decorators": ""
+    },
+    {
+        "url": "/api/model-provider-connections/provider-choices",
+        "module": "ml_model_providers.api.ModelProviderChoicesAPI",
+        "name": "model-provider-connections:model-provider-choices",
+        "decorators": ""
+    },
+    {
         "url": "/api/templates/",
         "module": "projects.api.TemplateListAPI",
         "name": "projects:api-templates:template-list",
