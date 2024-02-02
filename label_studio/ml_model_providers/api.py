@@ -90,5 +90,5 @@ class ModelProviderChoicesAPI(generics.RetrieveAPIView):
 
     def get(self, request):
         choices = [choice[0] for choice in ModelProviderConnection.ModelProviders.choices]
-        
-        return Response({"provider_choices": choices})
+
+        return Response({'provider_choices': choices})

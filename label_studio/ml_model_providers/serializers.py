@@ -14,7 +14,9 @@ class CreatedByFromContext:
 
 
 class ModelProviderConnectionSerializer(serializers.ModelSerializer):
-    created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='User who created model provider connection')
+    created_by = UserSimpleSerializer(
+        default=CreatedByFromContext(), help_text='User who created model provider connection'
+    )
     secure_fields = ['api_key']
 
     class Meta:
@@ -27,4 +29,3 @@ class ModelProviderConnectionSerializer(serializers.ModelSerializer):
         for attr in self.secure_fields:
             result.pop(attr)
         return result
-
