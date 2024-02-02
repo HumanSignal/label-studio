@@ -489,6 +489,11 @@ main {
   transform: rotate(180deg);
 }
 
+.icon-external-link {
+  vertical-align: middle;
+  margin-left: 0.25em;
+}
+
 @media (max-width: 800px) {
   .page-sidebar {
     display: none;
