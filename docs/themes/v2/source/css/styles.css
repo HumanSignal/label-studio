@@ -3,29 +3,22 @@
 }
 
 html {
-  --color-purple-100: #E37BD3;
-  --color-purple-90: #E995DC;
-  --color-purple-30: #F7D6F2;
-  --color-purple-0: #FBF2FC;
+  --color-orange-400: #FF7557;
+  --color-orange-100: #FFD6CD;
 
-  --color-orange-90: #FF7557;
-  --color-orange-30: #FFD6CD;
-  --color-orange-10: #FFF1EE;
-
-  --color-yellow-120: #E69559;
-  --color-yellow-100: #FFA663;
-  --color-yellow-90: #FFB882;
-  --color-yellow-30: #FFE4D0;
-  --color-yellow-5: #FFF6EF;
-  --color-yellow-300: #FFB882;
-
-  --color-blue-90: #617ADA;
-  --color-blue-100: #4C5FA9;
-  --color-blue-80: #99ABF5;
-  --color-blue-30: #D4DBFB;
+  --color-yellow-400: #FFA663;
+  --color-yellow-100: #FFE4D0;
 
   --color-green-400: #57B7AB;
   --color-green-100: #D4F1EB;
+
+  --color-blue-600: #576CC1;
+  --color-blue-400: #6D87F1;
+  --color-blue-300: #99ABF5;
+  --color-blue-100: #D4DBFB;
+
+  --color-purple-400: #E37BD3;
+  --color-purple-100: #F7D6F2;
 
   --color-gray-900: #12110D;
   --color-gray-800: #262522;
@@ -36,8 +29,6 @@ html {
   --color-gray-300: #E1DED5;
   --color-gray-200: #F0EFEB;
   --color-gray-100: #F9F8F6;
-  --color-gray-50: #F9F8F6;
-  --color-gray-10: #F9F8F6;
   --color-white: #FDFDFC;
 
   --font-family-primary: "Hellix-Regular", sans-serif;
@@ -58,7 +49,7 @@ body {
 }
 
 .page-tier-opensource {
-  --color-main-accent: var(--color-orange-90);
+  --color-main-accent: var(--color-orange-400);
 }
 
 .HeaderSquares{
@@ -98,7 +89,7 @@ body {
 .page-header nav button+ul {
   display: none;
   padding: 1em 1em 1em 1em;
-  background-color: var(--color-gray-50);
+  background-color: var(--color-gray-100);
   margin-left: -1em;
   margin-right: -1em;
   margin-top: 0.5em;
@@ -211,7 +202,7 @@ body {
 }
 
 .page-header-content-switcher>div>a {
-  color: var(--color-orange-90);
+  color: var(--color-orange-400);
   text-decoration: none;
   height: 100%;
   display: flex;
@@ -244,7 +235,7 @@ body {
 }
 
 .page-header-content-switcher ul a:hover {
-  color: var(--color-orange-90);
+  color: var(--color-orange-400);
 }
 
 .HeaderLogo {
@@ -420,7 +411,7 @@ main {
 }
 
 .page-sidebar {
-  --color-accent: var(--color-blue-90);
+  --color-accent: var(--color-blue-400);
 
   position: sticky;
   width: var(--sidebar-size);
@@ -511,12 +502,12 @@ main {
 }
 
 .page-sidebar .page-sidebar-children-list [aria-current="page"] {
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
   font-weight: 400;
   border: none;
   border-radius: 0;
   background: none;
-  border-left: 3px solid var(--color-blue-90);
+  border-left: 3px solid var(--color-blue-400);
 }
 
 .page-sidebar-toggle-children-list {
@@ -645,7 +636,7 @@ main {
 }
 
 .changelog-item{
-  border-left: 1px solid var(--color-gray-300);
+  border-left: 1px solid var(--color-orange-400);
   margin-left: 0;
   position: relative;
   padding-left: 1.5rem;
@@ -660,14 +651,14 @@ main {
 .changelog-item:before{
   padding-left: 0;
   content: "";
-  width: 1rem;
-  height: 1rem;
+  width: .75rem;
+  height: .75rem;
   border-radius: 1rem;
   background: var(--color-gray-200);
-  border: 1px solid var(--color-gray-300);
+  background: linear-gradient(109.47deg, #FFA663 0%, #FF7557 51.56%, #E37BD3 100%), var(--color-white);
   position: absolute;
   top: 0;
-  left: -.5rem;
+  left: -.375rem;
 }
 
 .changelog-item:last-child{
@@ -850,7 +841,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .content-markdown a:not(.Button) {
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
   text-decoration: none;
 }
 
@@ -969,7 +960,7 @@ h1, h2, h3, h4, h5, h6{
 
 .Link {
   font-size: 1em;
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -982,7 +973,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .Link:hover {
-  color: var(--color-blue-100);
+  color: var(--color-blue-600);
 }
 
 .Link.Full {
@@ -999,7 +990,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .block-link:hover{
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
 }
 
 /****************************
@@ -1081,7 +1072,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .toc {
-  background-color: var(--color-gray-10);
+  background-color: var(--color-gray-100);
   padding: 1.5em;
   width: var(--toc-size);
   flex-shrink: 0;
@@ -1095,7 +1086,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .notion-toc {
-  background-color: var(--color-gray-10);
+  background-color: var(--color-gray-100);
   padding: 2em;
   margin-top: 2em;
   font-size: 1.25em;
@@ -1123,7 +1114,7 @@ h1, h2, h3, h4, h5, h6{
 
 .toc-list a:hover,
 .toc-ent-trial a:hover {
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
 }
 
 .toc-list>li+li {
@@ -1221,7 +1212,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .content-markdown table tr th {
-  background-color: var(--color-gray-50);
+  background-color: var(--color-gray-100);
   font-family: var(--font-family-primary);
   font-size: 0.9em;
   color: var(--color-gray-900);
@@ -1240,7 +1231,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .content-markdown table tbody tr:nth-child(even) {
-  background-color: var(--color-gray-10);
+  background-color: var(--color-gray-100);
 }
 
 .content-markdown table tbody tr td {
@@ -1296,7 +1287,7 @@ h1, h2, h3, h4, h5, h6{
 .content-markdown .admonition {
   --color-border: var(--color-gray-900);
   --color-title: var(--color-gray-900);
-  --color-background: var(--color-gray-10);
+  --color-background: var(--color-gray-100);
   --color-title-background: var(--color-white);
   border-left: 3px var(--color-border) solid;
   background-color: var(--color-background);
@@ -1327,7 +1318,7 @@ h1 + .admonition{
   color: var(--color-title);
   margin: 0;
   background: var(--color-title-background);
-  padding: .25rem .75rem .25rem 1.75rem;
+  padding: .25rem .75rem .25rem 1.7rem;
   border-radius: 0 .25rem 0 0;
   font-weight: 400;
   width: 100%;
@@ -1336,49 +1327,84 @@ h1 + .admonition{
 }
 
 .admonition-title:before{
-  content: url(../images/design/infoicon.svg);
+  content: url(../images/design/info-icon.svg);
   position: absolute;
   left: .5rem;
-  top: .25rem;
+  top: .35rem;
 }
 
 .admonition p{
   padding: 0 .75rem .5rem .75rem;
 }
 
+/* alert */
 .content-markdown .admonition.attention {
-  --color-border: var(--color-orange-90);
+  --color-border: var(--color-orange-400);
   --color-title: var(--color-gray-900);
-  --color-title-background: var(--color-orange-30);
+  --color-title-background: var(--color-orange-100);
   --color-background: var(--color-white);
 }
 
+.admonition.attention .admonition-title:before{
+  content: url(../images/design/alert-icon.svg);
+}
+
+/* warning */
 .content-markdown .admonition.warning {
-  --color-border: var(--color-yellow-100);
+  --color-border: var(--color-yellow-400);
   --color-title: var(--color-gray-900);
-  --color-title-background: var(--color-yellow-30);
+  --color-title-background: var(--color-yellow-100);
   --color-background: var(--color-white);
 }
 
-.content-markdown .admonition.info, .content-markdown .admonition.note {
+.admonition.warning .admonition-title:before{
+  content: url(../images/design/warning-icon.svg);
+}
+
+/* note */
+.content-markdown .admonition.note {
+  --color-border: var(--color-blue-400);
+  --color-title: var(--color-gray-900);
+  --color-title-background: var(--color-blue-100);
+  --color-background: var(--color-white);
+}
+
+/* tips */
+.content-markdown .admonition.info {
   --color-border: var(--color-green-400);
   --color-title: var(--color-gray-900);
   --color-title-background: var(--color-green-100);
   --color-background: var(--color-white);
 }
 
-.content-markdown .admonition.beta {
-  --color-border: var(--color-purple-90);
+.admonition.info .admonition-title:before{
+  content: url(../images/design/tip-icon.svg);
+}
+
+/* beta */
+.content-markdown .admonition.todo {
+  --color-border: var(--color-purple-400);
   --color-title: var(--color-gray-900);
-  --color-title-background: var(--color-purple-0);
+  --color-title-background: var(--color-purple-100);
   --color-background: var(--color-white);
 }
 
-.content-markdown .admonition.enterprise {
+.admonition.todo .admonition-title:before{
+  content: url(../images/design/beta-icon.svg);
+  top: .325rem;
+  left: .625rem;
+}
+
+/* enterprise */
+.content-markdown .admonition.error {
   --color-border: var(--color-gray-900);
-  --color-title: var(--color-white);
-  --color-title-background: var(--color-gray-900);
+  --color-title: var(--color-gray-900);
+  --color-title-background: var(--color-gray-100);
   --color-background: var(--color-white);
+}
+
+.admonition.error .admonition-title:before{
+  content: url(../images/design/enterprise-icon.svg);
 }
 
 .content-markdown iframe {
@@ -1389,7 +1415,7 @@ h1 + .admonition{
 }
 
 .content-markdown blockquote {
-  border-left: 3px var(--color-orange-90) solid;
+  border-left: 3px var(--color-orange-400) solid;
   margin-left: 0;
   padding-left: 1em;
 }
@@ -1425,12 +1451,12 @@ h1 + .admonition{
 }
 
 .code-tabs>.buttons a:hover {
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
   text-decoration: none;
 }
 
 .code-tabs>.buttons a.active {
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
   border-bottom: 3px currentColor solid;
 }
 
@@ -1533,7 +1559,7 @@ details + details{
 
 .templates-card {
   --padding: 0.75em;
-  background-color: var(--color-gray-10);
+  background-color: var(--color-gray-100);
   border: 1px solid var(--color-gray-300);
   padding: var(--padding);
   transition: all 200ms;
@@ -1548,7 +1574,7 @@ details + details{
 }
 
 .templates-card:hover a {
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
 }
 
 .templates-card img {
@@ -1910,11 +1936,11 @@ Footer
 .helpful-button {
   --color: var(--color-main-accent);
   --color-hover: var(--color-white);
-  --background-hover: var(--color-orange-90);
-  --background: var(--color-orange-10);
+  --background-hover: var(--color-orange-400);
+  --background: var(--color-orange-100);
 
   appearance: none;
-  background-color: var(--background);
+  background-color: var(--color-orange-100);
   border: 1px var(--color) solid;
   color: var(--color);
   font-size: 0.875rem;
@@ -1977,7 +2003,7 @@ code.hljs {
 .hljs-tag,
 .hljs-template-tag,
 .hljs-variable.language_ {
-  color: var(--color-yellow-300);
+  color: var(--color-yellow-400);
 }
 
 .hljs-link,
@@ -1987,12 +2013,12 @@ code.hljs {
 .hljs-template-variable,
 .hljs-type,
 .hljs-variable {
-  color: var(--color-yellow-90);
+  color: var(--color-yellow-400);
 }
 
 .hljs-attribute,
 .hljs-built_in {
-  color: var(--color-yellow-90);
+  color: var(--color-yellow-400);
 }
 
 .hljs-keyword,
@@ -2002,7 +2028,7 @@ code.hljs {
 .hljs-title.class_,
 .hljs-title.class_.inherited__,
 .hljs-title.function_ {
-  color: var(--color-blue-80);
+  color: var(--color-blue-300);
 }
 
 .hljs-selector-tag {
@@ -2020,7 +2046,7 @@ code.hljs {
 .hljs-code,
 .hljs-formula,
 .hljs-section {
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
 }
 
 .hljs-attr,
@@ -2028,7 +2054,7 @@ code.hljs {
 .hljs-keyword,
 .hljs-name,
 .hljs-operator {
-  color: var(--color-purple-90);
+  color: var(--color-purple-400);
 }
 
 .hljs-punctuation {
@@ -2161,13 +2187,13 @@ code.hljs {
   text-decoration: none;
   font-weight: 600;
   cursor: pointer;
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
   transition: all 200ms;
 }
 
 .playground-buttons a:hover,
 .playground-buttons button:hover {
-  color: var(--color-blue-100);
+  color: var(--color-blue-600);
   text-decoration: none !important;
 }
 
@@ -2218,7 +2244,7 @@ code.hljs {
 #docsearch-input {
   align-self: center;
   border-radius: 2em;
-  background-color: var(--color-gray-50);
+  background-color: var(--color-gray-100);
   border: 0;
   padding: 0.5em 1em 0.5em 2.5em;
   font-size: 1rem;
@@ -2232,7 +2258,7 @@ code.hljs {
 }
 
 #docsearch-input:focus {
-  outline-color: var(--color-blue-90);
+  outline-color: var(--color-blue-400);
 }
 
 .ds-dropdown-menu {
@@ -2256,7 +2282,7 @@ code.hljs {
 }
 
 .algolia-docsearch-suggestion:hover .algolia-docsearch-suggestion--wrapper {
-  border-color: var(--color-blue-90);
+  border-color: var(--color-blue-400);
 }
 
 .algolia-docsearch-suggestion--category-header {
@@ -2275,8 +2301,8 @@ code.hljs {
 }
 
 .algolia-docsearch-suggestion--wrapper {
-  background-color: var(--color-gray-10);
-  border: 1px var(--color-gray-10) solid;
+  background-color: var(--color-gray-100);
+  border: 1px var(--color-gray-100) solid;
   border-radius: .25rem;
   margin-top: .25rem;
 }
@@ -2291,7 +2317,7 @@ code.hljs {
 }
 
 .algolia-docsearch-suggestion--highlight {
-  color: var(--color-blue-90);
+  color: var(--color-blue-400);
   font-weight: 600;
 }
 
@@ -2330,7 +2356,7 @@ code.hljs {
 ****************************/
 
 .page-tier-enterprise {
-  --color-main-accent: var(--color-orange-90);
+  --color-main-accent: var(--color-orange-400);
 }
 
 .page-tier-enterprise .page-header {
@@ -2352,7 +2378,7 @@ code.hljs {
 }
 
 .page-tier-enterprise .page-header nav a:not(.Button):hover {
-  color: var(--color-orange-90);
+  color: var(--color-orange-400);
 }
 
 .page-tier-enterprise .page-header .Button {
@@ -2361,7 +2387,7 @@ code.hljs {
 }
 
 .page-tier-enterprise .page-header .Button:hover {
-  background-color: var(--color-orange-90);
+  background-color: var(--color-orange-400);
 }
 
 .heidi{
@@ -2375,8 +2401,8 @@ code.hljs {
 
 .page-tier-enterprise .helpful-button {
   --color-hover: var(--color-white);
-  --background: var(--color-yellow-5);
-  --background-hover: var(--color-orange-90);
+  --background: var(--color-yellow-400);
+  --background-hover: var(--color-orange-400);
 }
 
 .page-tier-enterprise .hamburger-button span {
@@ -2460,7 +2486,7 @@ code.hljs {
 }
 
 .page-tier-enterprise .page-header-content-switcher ul a:hover {
-  color: var(--color-orange-90);
+  color: var(--color-orange-400);
 }
 
 @media (max-width: 1150px) {
