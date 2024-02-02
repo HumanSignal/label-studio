@@ -53,6 +53,12 @@
         "name": "",
         "decorators": ""
     },
+  {
+        "url": "/models/",
+        "module": "organizations.views.simple_view",
+        "name": "organizations:models",
+        "decorators": ""
+    },
     {
         "url": "/organization/",
         "module": "organizations.views.simple_view",
