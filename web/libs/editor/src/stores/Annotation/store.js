@@ -50,6 +50,16 @@ const AnnotationStoreModel = types
     function toggleViewingAll() {
       if (self.viewingAllAnnotations || self.viewingAllPredictions) {
         if (self.selected) {
+          const comments = self.store.commentStore;
+
+          if (comments.currentComment) {
+            // comment will save draft automatically
+            comments.commentFormSubmit();
+          } else if (self.selected.type === 'annotation') {
+            // save draft if there are changes waiting to be saved
+            self.selected.saveDraftImmediately();
+          }
+
           self.selected.unselectAll();
           self.selected.selected = false;
         }
