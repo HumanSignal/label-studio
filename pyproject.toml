@@ -199,6 +199,7 @@ label-studio-converter = "0.0.58"
 google-cloud-storage = "^2.13.0"
 mysqlclient = {version = "*", optional = true}
 django-csp = "3.7"
+openai = ">=1.10.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
