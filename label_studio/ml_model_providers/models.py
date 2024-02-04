@@ -4,6 +4,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from openai import AuthenticationError, OpenAI
 
 
 class ModelProviderConnection(models.Model):
@@ -42,3 +43,20 @@ class ModelProviderConnection(models.Model):
 
     def has_permission(self, user):
         return user.active_organization == self.organization
+
+    def validate_api_key(self):
+        """
+        Checks if API key provided is valid
+
+        Return: boolean if API key is valid or not
+        """
+        if self.provider == self.ModelProviders.OPENAI:
+            try:
+                print("creating open ai client")
+                client = OpenAI(api_key=self.api_key)
+                print("successfully created open ai client")
+                client.models.list()
+            except AuthenticationError as e:
+                return False
+            else:
+                return True
