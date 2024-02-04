@@ -223,7 +223,7 @@ jobs:
         if: steps.details.outputs.build_lsf_docs
         continue-on-error: true
         working-directory: tmp/scripts
-        run: node create-docs.js
+        run: NODE_PATH=$(npm root -g) node create-docs.js
 
       - name: "LSF Docs: Commit and Push"
         if: steps.details.outputs.build_lsf_docs && steps.lsf-docs-build.conclusion == 'success'
