@@ -375,7 +375,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
     def add_predictions(self, task_predictions):
         """Save predictions to DB and set the latest model version in the project"""
         db_predictions = []
-
+        
         # add predictions
         last_model_version = None
         for i, predictions in enumerate(task_predictions):
@@ -576,57 +576,57 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
         exclude = ()
 
 
-class TaskIDWithAnnotationsSerializer(TaskSerializer):
-    """ """
+# class TaskIDWithAnnotationsSerializer(TaskSerializer):
+#     """ """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # TODO: this called twice due to base class initializer
-        self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context)
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         # TODO: this called twice due to base class initializer
+#         self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context)
 
-    class Meta:
-        model = Task
-        fields = ['id', 'annotations']
-
-
-class TaskWithPredictionsSerializer(TaskSerializer):
-    """ """
-
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
-
-    class Meta:
-        model = Task
-        fields = '__all__'
+#     class Meta:
+#         model = Task
+#         fields = ['id', 'annotations']
 
 
-class TaskWithAnnotationsAndPredictionsSerializer(TaskSerializer):
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
-    annotations = serializers.SerializerMethodField(default=[], read_only=True)
+# class TaskWithPredictionsSerializer(TaskSerializer):
+#     """ """
 
-    def get_annotations(self, task):
-        annotations = task.annotations
+#     predictions = PredictionSerializer(many=True, default=[], read_only=True)
 
-        if 'request' in self.context:
-            user = self.context['request'].user
-            if user.is_annotator:
-                annotations = annotations.filter(completed_by=user)
+#     class Meta:
+#         model = Task
+#         fields = '__all__'
 
-        return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
 
-    @staticmethod
-    def generate_prediction(task):
-        """Generate prediction for task and store it to Prediction model"""
-        prediction = task.predictions.filter(model_version=task.project.model_version)
-        if not prediction.exists():
-            task.project.create_prediction(task)
+# class TaskWithAnnotationsAndPredictionsSerializer(TaskSerializer):
+#     predictions = PredictionSerializer(many=True, default=[], read_only=True)
+#     annotations = serializers.SerializerMethodField(default=[], read_only=True)
 
-    def to_representation(self, instance):
-        self.generate_prediction(instance)
-        return super().to_representation(instance)
+#     def get_annotations(self, task):
+#         annotations = task.annotations
 
-    class Meta:
-        model = Task
-        exclude = ()
+#         if 'request' in self.context:
+#             user = self.context['request'].user
+#             if user.is_annotator:
+#                 annotations = annotations.filter(completed_by=user)
+
+#         return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
+
+#     @staticmethod
+#     def generate_prediction(task):
+#         """Generate prediction for task and store it to Prediction model"""
+#         prediction = task.predictions.filter(model_version=task.project.model_version)
+#         if not prediction.exists():
+#             task.project.create_prediction(task)
+
+#     def to_representation(self, instance):
+#         self.generate_prediction(instance)
+#         return super().to_representation(instance)
+
+#     class Meta:
+#         model = Task
+#         exclude = ()
 
 
 class AnnotationDraftSerializer(ModelSerializer):
@@ -711,13 +711,19 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
             return lock.unique_id
 
     def get_predictions(self, task):
-        project = task.project
-        if not project.show_collab_predictions:
-            return []
-        else:
-            for ml_backend in project.ml_backends.all():
-                ml_backend.predict_tasks([task])
-            return super().get_predictions(task)
+        """ """
+        predictions = task.get_predictions_for_prelabeling()        
+        return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
+        
+    # def get_predictions(self, task):
+    #     project = task.project
+
+    #     if not project.show_collab_predictions:
+    #         return []
+        # else:
+        #     # for ml_backend in project.ml_backends.all():
+        #     #     ml_backend.predict_tasks([task])
+        #     return super().get_predictions(task)
 
     def get_annotations(self, task):
         result = []

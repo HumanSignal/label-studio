@@ -1,4 +1,4 @@
-import { format, isValid } from 'date-fns';
+import { format, isValid, formatDistanceToNow, parseISO } from 'date-fns';
 import { useCallback, useContext } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 import truncate from 'truncate-middle';
@@ -62,18 +62,21 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
         <BackendState backend={backend}/>
 
         <Dropdown.Trigger align="right" content={(
-          <Menu size="small">
+          <Menu size="medium">
             <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
             <Menu.Item onClick={() => confirmDelete(backend)}>Delete</Menu.Item>
           </Menu>
         )}>
-          <Button type="link" icon={<FaEllipsisV/>}/>
+        <Button type="link" icon={<FaEllipsisV/>} style={{ padding: "15px" }} />
         </Dropdown.Trigger>
       </div>
     )}>
       <DescriptionList className={cn('ml').elem('summary')}>
         <DescriptionList.Item term="URL" termStyle={{ whiteSpace: 'nowrap' }}>
           {truncate(backend.url, 20, 10, '...')}
+        </DescriptionList.Item>
+        <DescriptionList.Item term="Created" termStyle={{ whiteSpace: 'nowrap' }}>
+          {formatDistanceToNow(parseISO(backend.created_at), { addSuffix: true })}
         </DescriptionList.Item>
         {backend.description && (
           <DescriptionList.Item

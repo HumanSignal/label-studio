@@ -6,6 +6,7 @@ import { GeneralSettings } from './GeneralSettings';
 import { InstructionsSettings } from './InstructionsSettings';
 import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
+import { PredictionsSettings } from './PredictionsSettings/PredictionsSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
 
 
@@ -17,6 +18,7 @@ export const MenuLayout = ({children, ...routeProps}) => {
         LabelingSettings,
         InstructionsSettings,
         MachineLearningSettings,
+	PredictionsSettings,
         StorageSettings,
         WebhookPage,
         DangerZone,
@@ -37,6 +39,7 @@ export const SettingsPage = {
     InstructionsSettings,
     LabelingSettings,
     MachineLearningSettings,
+    PredictionsSettings,
     StorageSettings,
     WebhookPage,
     DangerZone,

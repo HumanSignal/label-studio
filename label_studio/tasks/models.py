@@ -4,6 +4,7 @@ import base64
 import datetime
 import logging
 import numbers
+import random
 import os
 import uuid
 from typing import Any, Mapping, Optional, cast
@@ -179,6 +180,21 @@ class Task(TaskMixin, models.Model):
         return os.path.basename(self.file_upload.file.name)
 
     @classmethod
+    def get_random(cls, project):
+        """ Get random task from a project, this should not be used lightly as its expensive method to run"""
+        if project is None:
+            raise Exception('Project id is required')
+        
+        ids = cls.objects.filter(project=project).values_list('id', flat=True)
+        if len(ids) == 0:
+            return None
+            
+        random_id = random.choice(ids)
+        
+        return cls.objects.get(id=random_id)
+
+    
+    @classmethod
     def get_locked_by(cls, user, project=None, tasks=None):
         """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
         lock = None
@@ -194,6 +210,73 @@ class Task(TaskMixin, models.Model):
         if lock:
             return lock.task
 
+    def refresh_predictions(self):
+        """This is called to get new predictions from the model if its connected
+        """
+        from data_manager.functions import retrieve_predictions
+        
+        project = self.project
+        
+        if project.retrieve_predictions_automatically:
+            # TODO where is the check for duplicate lives?
+            return retrieve_predictions([self])
+        
+    def get_predictions_for_prelabeling(self):
+        """This is called to return either new predictions from the
+        model or grab static predictions if they were set, depending
+        on the projects configuration.
+
+        """        
+        from data_manager.functions import retrieve_predictions
+        
+        project = self.project
+        predictions = self.predictions
+
+        if project.retrieve_predictions_automatically:            
+            new_predictions = retrieve_predictions([self])
+            
+            # TODO this is not as clean as I'd want it to
+            # be. Effectively retrieve_predictions will work only for
+            # tasks where there is no predictions matching current
+            # model version. In case it will return a model_version
+            # and we can grab predictions explicitly
+            if isinstance(new_predictions, str):
+                model_version = new_predictions
+                return predictions.filter(model_version=model_version)
+            else:
+                return new_predictions
+            
+        elif project.show_collab_predictions and project.model_version is not None:
+            return predictions.filter(model_version=project.model_version)
+        else:
+            return []
+        
+        ### code from tasks/serliazers.py 668
+        # if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', user=user or 'auto'):
+        #     active_ml_backends = task.project.get_active_ml_backends()
+        #     model_versions = active_ml_backends.values_list('model_version', flat=True)
+        #     logger.debug(f'Selecting predictions from active ML backend model versions: {model_versions}')
+        #     predictions = predictions.filter(model_version__in=model_versions)
+        # elif task.project.model_version:
+        #     predictions = predictions.filter(model_version=task.project.model_version)
+        
+        ### code from tasks/serliazers.py 719
+        # if not project.show_collab_predictions:
+        #     return []
+        # else:
+        #     retrieve_predictions([task])
+                
+        #     return super().get_predictions(task)
+                
+        ### code from tasks/api.py 187
+        # if project.retrieve_predictions_automatically or project.show_collab_predictions) \
+        #    and not self.task.predictions.exists():
+
+        #     print("we are here, yes")
+            
+        #     retrieve_predictions([self.task])
+        #     self.task.refresh_from_db()
+        
     def has_lock(self, user=None):
         """
         Check whether current task has been locked by some user
@@ -783,7 +866,13 @@ class Prediction(models.Model):
 
     result = JSONField('result', null=True, default=dict, help_text='Prediction result')
     score = models.FloatField(_('score'), default=None, help_text='Prediction score', null=True)
-    model_version = models.TextField(_('model version'), default='', blank=True, null=True)
+    
+    model_version = models.TextField(_('model version'), default='', blank=True, null=True,
+                                     help_text='A string value that for model version that produced the prediction. Used in both live models and when uploading offline predictions.')
+
+    model = models.ForeignKey('ml.MLBackend', on_delete=models.CASCADE, related_name='predictions', null=True,
+                              help_text='An ML Backend instance that created the prediction.')
+    
     cluster = models.IntegerField(
         _('cluster'),
         default=None,
@@ -1043,6 +1132,8 @@ def update_ml_backend(sender, instance, **kwargs):
 
     project = instance.project
 
+    print("@receiver(post_save, sender=Annotation)")
+    
     if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
         annotation_count = Annotation.objects.filter(project=project).count()
 

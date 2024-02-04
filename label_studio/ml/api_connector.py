@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Count
 from requests.adapters import HTTPAdapter
+from requests.auth import HTTPBasicAuth
 
 from label_studio.core.utils.params import get_env
 
@@ -31,6 +32,17 @@ TIMEOUT_DUPLICATE_MODEL = float(get_env('ML_TIMEOUT_DUPLICATE_MODEL', 1))
 TIMEOUT_DELETE = float(get_env('ML_TIMEOUT_DELETE', 1))
 TIMEOUT_TRAIN_JOB_STATUS = float(get_env('ML_TIMEOUT_TRAIN_JOB_STATUS', 1))
 
+# TODO 
+# we would need to make it configurable on the ML backend side too
+PREDICT_URL = "predict"
+HEALTH_URL = "health"
+VALIDATE_URL = "validate"
+SETUP_URL = "setup"
+DUPLICATE_URL = "duplicate_model"
+DELETE_URL = "delete"
+JOB_STATUS_URL = "job_status"
+VERSIONS_URL = "versions"
+
 
 class BaseHTTPAPI(object):
     MAX_RETRIES = 2
@@ -38,11 +50,18 @@ class BaseHTTPAPI(object):
         'User-Agent': 'heartex/' + (version or ''),
     }
 
-    def __init__(self, url, timeout=None, connection_timeout=None, max_retries=None, headers=None, **kwargs):
+    def __init__(self, url, timeout=None, connection_timeout=None, max_retries=None, headers=None,
+                 auth_method=None, **kwargs):
         self._url = url
         self._timeout = timeout or TIMEOUT_DEFAULT
         self._connection_timeout = connection_timeout or CONNECTION_TIMEOUT
         self._headers = headers or {}
+        self._auth_method = auth_method
+        
+        if auth_method == "BA":
+            # TODO add kwarg check in here
+            self._basic_auth = (kwargs.get("basic_auth_user"), kwargs.get("basic_auth_pass"))
+        
         self._max_retries = max_retries or self.MAX_RETRIES
         self._sessions = {self._session_key(): self.create_session()}
 
@@ -72,6 +91,9 @@ class BaseHTTPAPI(object):
         if 'timeout' not in kwargs:
             kwargs['timeout'] = self._connection_timeout, self._timeout
 
+        if self._auth_method == "BA":
+            kwargs['auth'] = HTTPBasicAuth(*self._basic_auth)
+            
         # add connection timeout if it's not presented
         elif isinstance(kwargs['timeout'], float) or isinstance(kwargs['timeout'], int):
             kwargs['timeout'] = (self._connection_timeout, kwargs['timeout'])
@@ -195,10 +217,9 @@ class MLApi(BaseHTTPAPI):
             }
             return self._request('train', request, verbose=False, timeout=TIMEOUT_PREDICT)
 
-    def make_predictions(self, tasks, model_version, project, context=None):
+    def _prep_prediction_req(self, tasks, project, context=None):
         request = {
-            'tasks': tasks,
-            'model_version': model_version,
+            'tasks': tasks,            
             'project': self._create_project_uid(project),
             'label_config': project.label_config,
             'params': {
@@ -207,30 +228,35 @@ class MLApi(BaseHTTPAPI):
                 'context': context,
             },
         }
-        return self._request('predict', request, verbose=False, timeout=TIMEOUT_PREDICT)
+        
+        return request
+        
+    def make_predictions(self, tasks, project, context=None):
+        request = self._prep_prediction_req(tasks, project, context=context)
+        return self._request(PREDICT_URL, request, verbose=False, timeout=TIMEOUT_PREDICT)
 
     def health(self):
-        return self._request('health', method='GET', timeout=TIMEOUT_HEALTH)
+        return self._request(HEALTH_URL, method='GET', timeout=TIMEOUT_HEALTH)
 
     def validate(self, config):
-        return self._request('validate', request={'config': config}, timeout=self._validate_request_timeout)
+        return self._request(VALIDATE_URL, request={'config': config}, timeout=self._validate_request_timeout)
 
-    def setup(self, project, model_version=None):
+    def setup(self, project, extra_params=None, **kwargs):
         return self._request(
-            'setup',
+            SETUP_URL,
             request={
                 'project': self._create_project_uid(project),
                 'schema': project.label_config,
                 'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
-                'access_token': project.created_by.auth_token.key,
-                'model_version': model_version,
+                'access_token': project.created_by.auth_token.key,                
+                'extra_params': extra_params
             },
             timeout=TIMEOUT_SETUP,
         )
 
     def duplicate_model(self, project_src, project_dst):
         return self._request(
-            'duplicate_model',
+            DUPLICATE_URL,
             request={
                 'project_src': self._create_project_uid(project_src),
                 'project_dst': self._create_project_uid(project_dst),
@@ -239,14 +265,14 @@ class MLApi(BaseHTTPAPI):
         )
 
     def delete(self, project):
-        return self._request('delete', request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_DELETE)
+        return self._request(DELETE_URL, request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_DELETE)
 
     def get_train_job_status(self, train_job):
-        return self._request('job_status', request={'job': train_job.job_id}, timeout=TIMEOUT_TRAIN_JOB_STATUS)
+        return self._request(JOB_STATUS_URL, request={'job': train_job.job_id}, timeout=TIMEOUT_TRAIN_JOB_STATUS)
 
     def get_versions(self, project):
         return self._request(
-            'versions', request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_SETUP, method='GET'
+            VERSIONS_URL, request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_SETUP, method='GET'
         )
 
 

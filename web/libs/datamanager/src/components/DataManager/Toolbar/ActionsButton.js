@@ -45,14 +45,14 @@ export const ActionsButton = injector(observer(({ store, size, hasSelected, ...r
   const actions = store.availableActions
     .filter((a) => !a.hidden)
     .sort((a, b) => a.order - b.order);
-
+  
   const invokeAction = (action, destructive) => {
     if (action.dialog) {
-      const { type: dialogType, text, form } = action.dialog;
+      const { type: dialogType, text, form, title, modal_title } = action.dialog;
       const dialog = Modal[dialogType] ?? Modal.confirm;
-
+      
       dialog({
-        title: destructive ? "Destructive action." : "Confirm action.",
+        title: modal_title ? modal_title : destructive ? "Destructive action" : "Confirm action",
         body: buildDialogContent(text, form, formRef),
         buttonLook: destructive ? "destructive" : "primary",
         onOk() {

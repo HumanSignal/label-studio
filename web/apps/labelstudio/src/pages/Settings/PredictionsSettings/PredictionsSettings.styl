@@ -1,36 +1,28 @@
-.test-request
-  h4
-    margin-bottom 2px
-    font-weight bold
 
-  &__blocks
-    display flex
-    justify-content: space-between
- 
-  &__left
-    flex 1
-
-  &__right
-    margin-left 20px
-    flex 1
-
-  &__code
-    max-height 400px
-    overflow-y scroll
-    padding 10px
-    border-radius 4px
-    background #FAFAFA
-    border 1px solid rgba(137, 128, 152, 0.16)
-    
-    pre
-      whiteSpace: pre-wrap
-      wordWrap: break-word
-
-.ml-settings
-  display flex
+.pred-settings
 
   &__wrapper
     width 680px    
+
+  &__model-exists-info
+    align-items center
+    margin-bottom 20px
+    background #FAFAFA
+    padding 10px 20px
+    border 1px solid rgba(137, 128, 152, 0.16)
+    font: 16px Roboto;
+    border-radius 8px
+    display: flex
+    justify-content: center
+    align-items: center
+    gap 10px
+
+  &__title-block
+    margin 20px 0px
+    margin-top 40px
+
+  &__title
+    font-weight: bold
 
 .ml
   display grid
@@ -51,10 +43,6 @@
     display flex
     align-items center
     margin-right 10px
-    font-size 12px
-    border 1px solid #cecece
-    padding 3px 6px
-    border-radius 10px; 
 
   &__summary
     margin-bottom 16px

@@ -44,6 +44,7 @@ const ActionDialog = types.model("ActionDialog", {
   text: types.string,
   type: types.enumeration(["confirm", "prompt"]),
   form: types.maybeNull(types.array(ActionFormRow)),
+  modal_title: types.maybeNull(types.string),
 });
 
 const isFFLOPSE3 = isFF(FF_LOPS_E_3);

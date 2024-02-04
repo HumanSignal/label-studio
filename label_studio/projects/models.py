@@ -30,7 +30,7 @@ from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from django.conf import settings
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.db import models, transaction
-from django.db.models import Avg, BooleanField, Case, Count, JSONField, Q, Sum, Value, When
+from django.db.models import Avg, BooleanField, Case, Count, JSONField, Q, Sum, Value, When, Max
 from django.utils.translation import gettext_lazy as _
 from label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
@@ -176,6 +176,8 @@ class Project(ProjectMixin, models.Model):
     show_collab_predictions = models.BooleanField(
         _('show predictions to annotator'), default=True, help_text='If set, the annotator can view model predictions'
     )
+
+    # evaluate is the wrong word here. correct should be retrieve_predictions_automatically
     evaluate_predictions_automatically = models.BooleanField(
         _('evaluate predictions automatically'),
         default=False,
@@ -259,12 +261,17 @@ class Project(ProjectMixin, models.Model):
     pinned_at = models.DateTimeField(_('pinned at'), null=True, default=None, help_text='Pinned date and time')
 
     def __init__(self, *args, **kwargs):
+        rpa = kwargs.pop('retrieve_predictions_automatically', None)
+        
         super(Project, self).__init__(*args, **kwargs)
         self.__original_label_config = self.label_config
         self.__maximum_annotations = self.maximum_annotations
         self.__overlap_cohort_percentage = self.overlap_cohort_percentage
         self.__skip_queue = self.skip_queue
 
+        if rpa is not None:
+            self.evaluate_predictions_automatically = rpa
+        
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
         if self.label_config is not None:
@@ -276,19 +283,15 @@ class Project(ProjectMixin, models.Model):
     def num_tasks(self):
         return self.tasks.count()
 
-    def get_current_predictions(self):
-        if flag_set(
-            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
-            user='auto',
-        ):
-            return Prediction.objects.filter(Q(project=self.id) & Q(model_version=self.model_version))
-        else:
-            return Prediction.objects.filter(Q(task__project=self.id) & Q(model_version=self.model_version))
-
+    # creating an alias for wrongly named  
     @property
-    def num_predictions(self):
-        return self.get_current_predictions().count()
+    def retrieve_predictions_automatically(self):
+        return self.evaluate_predictions_automatically
 
+    @retrieve_predictions_automatically.setter
+    def retrieve_predictions_automatically(self, value):
+        self.evaluate_predictions_automatically = value
+        
     @property
     def num_annotations(self):
         return Annotation.objects.filter(project=self).count()
@@ -296,10 +299,6 @@ class Project(ProjectMixin, models.Model):
     @property
     def num_drafts(self):
         return AnnotationDraft.objects.filter(task__project=self).count()
-
-    @property
-    def has_predictions(self):
-        return self.get_current_predictions().exists()
 
     @property
     def has_any_predictions(self):
@@ -862,7 +861,7 @@ class Project(ProjectMixin, models.Model):
                 result[field] = value
         return result
 
-    def get_model_versions(self, with_counters=False):
+    def get_model_versions(self, with_counters=False, extended=False):
         """
         Get model_versions from project predictions
         :param with_counters: With count of predictions for each version
@@ -878,15 +877,32 @@ class Project(ProjectMixin, models.Model):
         else:
             predictions = Prediction.objects.filter(task__project=self)
         # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
-        model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
-        output = {r['model_version']: r['count'] for r in model_versions}
-        if self.model_version is not None and self.model_version not in output:
-            output[self.model_version] = 0
-        if with_counters:
-            return output
-        else:
-            return list(output)
 
+        if extended:
+            model_versions = predictions.values('model_version').annotate(count=Count('model_version'), latest=Max('created_at'))
+            return model_versions
+        else:
+            # TODO this needs to be removed at some point
+            model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
+            output = {r['model_version']: r['count'] for r in model_versions}
+            if self.model_version is not None and self.model_version not in output:
+                output[self.model_version] = 0
+            if with_counters:
+                return output
+            else:
+                return list(output)
+
+    def update_ml_backends_state(self):
+        """
+        """
+        from ml.models import MLBackend, MLBackendState
+        
+        ml_backends = MLBackend.objects.filter(project_id=self.id)
+        for mlb in ml_backends:
+            mlb.update_state()
+            
+        return ml_backends
+            
     def get_active_ml_backends(self):
         from ml.models import MLBackend, MLBackendState
 
@@ -907,7 +923,7 @@ class Project(ProjectMixin, models.Model):
 
     def resolve_storage_uri(self, url: str) -> Optional[Mapping[str, Any]]:
         from io_storages.functions import get_storage_by_url
-
+        
         storage_objects = self.get_all_storage_objects()
         storage = get_storage_by_url(url, storage_objects)
 

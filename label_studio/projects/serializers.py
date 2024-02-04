@@ -94,8 +94,9 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         # FIXME: remake this logic with start_training_on_annotation_update
         initial_data = data
         data = super().to_internal_value(data)
+        
         if 'start_training_on_annotation_update' in initial_data:
-            data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])
+            data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])            
 
         if 'expert_instruction' in initial_data:
             data['expert_instruction'] = bleach.clean(
@@ -220,6 +221,12 @@ class ProjectReimportSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ProjectModelVersionExtendedSerializer(serializers.Serializer):
+    model_version = serializers.CharField()
+    count = serializers.IntegerField()
+    latest = serializers.DateTimeField()
+
+    
 class GetFieldsSerializer(serializers.Serializer):
     include = serializers.CharField(required=False)
     filter = serializers.CharField(required=False, default='all')

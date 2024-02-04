@@ -31,6 +31,7 @@ from projects.serializers import (
     ProjectReimportSerializer,
     ProjectSerializer,
     ProjectSummarySerializer,
+    ProjectModelVersionExtendedSerializer
 )
 from rest_framework import filters, generics, status
 from rest_framework.exceptions import NotFound
@@ -45,7 +46,7 @@ from tasks.serializers import (
     NextTaskSerializer,
     TaskSerializer,
     TaskSimpleSerializer,
-    TaskWithAnnotationsAndPredictionsAndDraftsSerializer,
+    TaskWithAnnotationsAndPredictionsAndDraftsSerializer
 )
 from webhooks.models import WebhookAction
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
@@ -591,5 +592,14 @@ class ProjectModelVersions(generics.RetrieveAPIView):
     queryset = Project.objects.all()
 
     def get(self, request, *args, **kwargs):
+        # TODO make sure "extended" is the right word and follows everything else
+        extended = self.request.query_params.get('extended', False)
         project = self.get_object()
-        return Response(data=project.get_model_versions(with_counters=True))
+        data = project.get_model_versions(with_counters=True, extended=extended)
+        
+        if extended:
+            serializer = ProjectModelVersionExtendedSerializer(data, many=True)
+            # serializer.is_valid(raise_exception=True)
+            return Response(serializer.data)
+        else:
+            return Response(data=data)

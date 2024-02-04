@@ -2,7 +2,7 @@
 """
 from core.utils.io import validate_upload_url
 from django.conf import settings
-from ml.models import MLBackend
+from ml.models import MLBackend, MLBackendAuth
 from rest_framework import serializers
 
 
@@ -15,7 +15,22 @@ class MLBackendSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         attrs = super(MLBackendSerializer, self).validate(attrs)
         url = attrs['url']
-        healthcheck_response = MLBackend.healthcheck_(url)
+        auth_method = attrs['auth_method']
+                        
+        if auth_method == MLBackendAuth.BASIC_AUTH:
+            if "basic_auth_user" not in attrs or \
+               "basic_auth_pass" not in attrs:
+                raise serializers.ValidationError(f"When you select Basic Auth you need to provide"
+                                                  f"Username and Password parameters")
+        
+        healthcheck_response = MLBackend.healthcheck_(**attrs)
+        
+        if healthcheck_response.is_error and healthcheck_response.status_code == 401:
+            raise serializers.ValidationError(
+                f"Able to connect to ML Server, but "
+                f"authentication parameters were either not provided or are incorrect."
+            )
+        
         if healthcheck_response.is_error:
             raise serializers.ValidationError(
                 f"Can't connect to ML backend {url}, health check failed. "
@@ -23,8 +38,8 @@ class MLBackendSerializer(serializers.ModelSerializer):
                 f'<a href="https://labelstud.io/guide/ml.html>Learn more</a>'
                 f' about how to set up an ML backend. Additional info:' + healthcheck_response.error_message
             )
-        project = attrs['project']
-        setup_response = MLBackend.setup_(url, project)
+        
+        setup_response = MLBackend.setup_(**attrs)
         if setup_response.is_error:
             raise serializers.ValidationError(
                 f"Successfully connected to {url} but it doesn't look like a valid ML backend. "

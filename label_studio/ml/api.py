@@ -76,10 +76,11 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
+        
         self.check_object_permissions(self.request, project)
-        ml_backends = MLBackend.objects.filter(project_id=project.id)
-        for mlb in ml_backends:
-            mlb.update_state()
+        
+        ml_backends = project.update_ml_backends_state()
+            
         return ml_backends
 
     def perform_create(self, serializer):
@@ -202,6 +203,54 @@ class MLBackendTrainAPI(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Machine Learning'],
+        operation_summary='Predict',
+        operation_description="""
+        After you add an ML backend, call this API with the ML backend ID to run a prediction on specific task data               
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this ML backend.',
+            ),
+        ],        
+        responses={
+            200: openapi.Response(title='Predicting OK', description='Predicting has successfully started.'),
+            500: openapi.Response(
+                description='Predicting error',
+                schema=openapi.Schema(
+                    title='Error message',
+                    description='Error message',
+                    type=openapi.TYPE_STRING,
+                    example='Server responded with an error.',
+                ),
+            ),
+        },
+    ),
+)
+
+class MLBackendPredictAPI(APIView):
+    serializer_class = MLBackendSerializer
+    permission_required = all_permissions.projects_change
+    
+    def post(self, request, *args, **kwargs):
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, ml_backend)
+
+        random = request.query_params.get("random", False)
+        if random:
+            kwargs = ml_backend.predict_random()
+            return Response(**kwargs)
+            
+        ml_backend.predict()
+        return Response(status=status.HTTP_200_OK)
+
+    
 @method_decorator(
     name='post',
     decorator=swagger_auto_schema(
