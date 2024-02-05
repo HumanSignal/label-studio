@@ -64,16 +64,23 @@ body {
 
 .page-header {
   border-bottom: 1px solid var(--color-gray-300);
-  height: 76px;
   top: 0;
   background-color: var(--color-white);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 1em;
+  flex-direction: column;
+  padding: 0 1.5em;
   column-gap: 1em;
   z-index: 4;
   position: relative;
+}
+
+.page-header-top-level{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  column-gap: 1em;
+  padding: .625rem 0;
 }
 
 .page-header nav>ul {
@@ -84,6 +91,7 @@ body {
   margin: 0;
   padding: 0;
   white-space: nowrap;
+
 }
 
 .page-header nav button+ul {
@@ -173,6 +181,12 @@ body {
   display: flex;
 }
 
+.page-header-logo a{
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
 @media (max-width: 550px) {
   .page-header-logo {
     flex-basis: 14em;
@@ -181,69 +195,43 @@ body {
 }
 
 .page-header-content-switcher {
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
-}
-
-@media (hover: hover) {
-  .page-header-content-switcher:hover ul {
-    display: flex;
-  }
-}
-
-.page-header-content-switcher>div {
-  display: flex;
-  align-items: center;
-}
-
-.page-header-content-switcher>div svg {
-  margin: 0.5rem;
-}
-
-.page-header-content-switcher>div>a {
-  color: var(--color-orange-400);
-  text-decoration: none;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.25em;
-  transition: all 200ms;
-}
-
-.page-header-content-switcher ul {
-  position: absolute;
-  top: 100%;
-  left: -1rem;
-  padding: 1em;
-  border-radius: .5rem;
-  border: 1px var(--color-gray-300) solid;
-  background-color: var(--color-white);
-  z-index: 22;
   list-style: none;
-  margin: 0;
-  display: none;
-  flex-direction: column;
-  gap: 0.75em;
-  box-shadow: 0 0 12px rgba(23,20,13,.16);
+  margin: .5rem 0 0 0;
+  display: flex;
+  align-items: center;
+  padding-left: 0;
 }
 
-.page-header-content-switcher ul a {
+.page-header-content-switcher li+li {
+  margin-left: 1.5rem;
+}
+
+.page-header-content-switcher a {
   text-decoration: none;
   color: var(--color-gray-900);
   transition: all 200ms;
+  padding: 0 0 .75rem;
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-.page-header-content-switcher ul a:hover {
+.page-header-content-switcher .active {
+  color: var(--color-orange-400);
+  border-bottom: 3px solid var(--color-orange-400);
+}
+
+.page-header-content-switcher a:hover {
   color: var(--color-orange-400);
 }
 
-.HeaderLogo {
-  --border-color: var(--color-gray-300);
+.page-header-content-switcher a svg * {
+  transition: all 200ms;
+  fill: var(--color-gray-900);
+}
 
-  border-right: 1px var(--border-color) solid;
-  padding-right: 1rem;
-  margin-right: 1rem;
+.page-header-content-switcher a:hover svg * {
+  fill: var(--color-orange-400);
 }
 
 @media (max-width: 400px) {
@@ -267,9 +255,9 @@ body {
     display: none;
   }
 
-  .page-header nav>ul>li {
+  /* .page-header nav>ul>li {
     padding: 0.7em 0;
-  }
+  } */
 
   .page-header nav>ul>li>ul {
     position: absolute;
@@ -2246,11 +2234,12 @@ code.hljs {
   border-radius: 2em;
   background-color: var(--color-gray-100);
   border: 0;
-  padding: 0.5em 1em 0.5em 2.5em;
+  padding: 0.75em 1em 0.75em 2.5em;
   font-size: 1rem;
   width: 100%;
   border: 1px solid var(--color-gray-300);
   font-family: var(--font-family-primary);
+  font-size: .875rem;
 }
 
 #docsearch-input::placeholder {
@@ -2366,6 +2355,7 @@ code.hljs {
 .page-header-main-nav > li > a:not(.Button) {
   color: var(--color-gray-900);
   transition: all 200ms;
+  font-size: .875rem;
 }
 
 .page-tier-enterprise .page-header-main-nav > li > a:not(.Button) {
@@ -2375,6 +2365,7 @@ code.hljs {
 .page-header nav>ul>li>ul a {
   color: black;
   transition: all 200ms;
+  font-size: .875rem;
 }
 
 .page-tier-enterprise .page-header nav a:not(.Button):hover {
@@ -2384,6 +2375,7 @@ code.hljs {
 .page-tier-enterprise .page-header .Button {
   background-color: var(--color-white);
   color: var(--color-gray-900);
+  font-size: .875rem;
 }
 
 .page-tier-enterprise .page-header .Button:hover {
@@ -2456,8 +2448,25 @@ code.hljs {
   stroke: var(--color-white);
 }
 
-.page-tier-enterprise .HeaderLogo {
-  --border-color: var(--color-gray-700);
+.page-tier-enterprise .page-header-content-switcher a {
+  color: var(--color-white);
+}
+
+.page-tier-enterprise .page-header-content-switcher a:hover {
+  color: var(--color-orange-400);
+}
+
+.page-tier-enterprise .page-header-content-switcher a svg * {
+  fill: var(--color-white);
+}
+
+.page-tier-enterprise .page-header-content-switcher a:hover svg * {
+  fill: var(--color-orange-400);
+}
+
+.page-tier-enterprise .page-header-content-switcher .active {
+  color: var(--color-orange-400);
+  border-bottom: 3px solid var(--color-orange-400);
 }
 
 @media (max-width: 500px) {
@@ -2465,28 +2474,6 @@ code.hljs {
     flex-basis: 12em;
     flex-grow: 1;
   }
-}
-
-.page-tier-enterprise .HeaderLogo svg {
-  max-width: 100%;
-}
-
-.page-tier-enterprise .page-header-content-switcher>div>a {
-  color: var(--color-main-accent);
-}
-
-
-.page-tier-enterprise .page-header-content-switcher ul {
-  background-color: var(--color-white);
-}
-
-.page-tier-enterprise .page-header-content-switcher ul a {
-  text-decoration: none;
-  color: var(--color-gray-900);
-}
-
-.page-tier-enterprise .page-header-content-switcher ul a:hover {
-  color: var(--color-orange-400);
 }
 
 @media (max-width: 1150px) {
