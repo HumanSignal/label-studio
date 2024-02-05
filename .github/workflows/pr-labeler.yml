@@ -26,7 +26,7 @@ jobs:
       pull-requests: write
     steps:
 
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: "Validate PR's title"
         uses: thehanimo/pr-title-checker@v1.4.1
@@ -47,7 +47,7 @@ jobs:
     name: "Set Aha! Releases field"
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Set field
         shell: bash
