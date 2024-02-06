@@ -69,7 +69,7 @@ export const DangerZone = () => {
     type: 'label_cache',
     help:
       'If you are unable to modify the labeling configuration due to validation errors ' +
-      'concerning existing labels, but you are confident that the labels don't exist. You can ' +
+      'concerning existing labels, but you are confident that the labels don\'t exist. You can ' +
       'use this action to reset the cache and try again.',
     label: `Reset Label Cache`,
   }, {
