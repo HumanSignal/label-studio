@@ -17,6 +17,7 @@ export const API_CONFIG = {
     updateProject: "PATCH:/projects/:pk",
     createProject: "POST:/projects",
     deleteProject: "DELETE:/projects/:pk",
+    resetLabelCache: "POST:/projects/:pk/summary/reset-created-labels",
 
     // Presigning
     presignUrlForTask: "/../tasks/:taskID/presign",

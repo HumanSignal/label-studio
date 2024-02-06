@@ -28,6 +28,12 @@ export const DangerZone = () => {
           // console.log('delete tasks');
         } else if(type === 'predictions') {
           // console.log('delete predictions');
+        } else if(type === 'label_cache') {
+          await api.callApi('resetLabelCache', {
+            params: {
+              pk: project.id,
+            },
+          });
         } else if(type === 'tabs') {
           await api.callApi('deleteTabs', {
             body: {
@@ -60,10 +66,19 @@ export const DangerZone = () => {
     disabled: true, //&& !project.total_predictions_number,
     label: `Delete ${project.total_predictions_number} Predictions`,
   }, {
+    type: 'label_cache',
+    help:
+      `If you are unable to modify the labeling configuration due to validation errors ` +
+      `concerning existing labels, but you are confident that the labels don't exist. You can ` +
+      `use this action to reset the cache and try again.`,
+    label: `Reset Label Cache`,
+  }, {
     type: 'tabs',
+    help: 'If the Data Manager is not loading, dropping all Data Manager tabs can help.',
     label: `Drop All Tabs`,
   }, {
     type: 'project',
+    help: 'Deleting a project removes all tasks, annotations, and project data from the database.',
     label: 'Delete Project',
   }], [project]);
 
@@ -82,9 +97,19 @@ export const DangerZone = () => {
             const disabled = btn.disabled || (processing && !waiting);
 
             return (btn.disabled !== true) && (
-              <Button key={btn.type} look="danger" disabled={disabled} waiting={waiting} onClick={handleOnClick(btn.type)}>
-                {btn.label}
-              </Button>
+              <div>
+                {btn.help && <Label description={btn.help} style={{ width: 600, display: 'block' }} />}
+                <Button
+                  key={btn.type}
+                  look="danger"
+                  disabled={disabled}
+                  waiting={waiting}
+                  onClick={handleOnClick(btn.type)}
+                  style={{ marginLeft: 16, marginTop: 10 }}
+                >
+                  {btn.label}
+                </Button>
+              </div>
             );
           })}
         </Space>
