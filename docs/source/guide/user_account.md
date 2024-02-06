@@ -3,7 +3,7 @@ title: Manage your user account settings
 short: Account and settings
 tier: all
 type: guide
-order: 0
+order: 110
 order_enterprise: 372
 meta_title: User Account and Settings
 meta_description: Update your user account and settings in Label Studio

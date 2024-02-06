@@ -31,9 +31,11 @@ For SaaS deployments, use [`app.heartex.com/user/trial`](https://app.heartex.com
     `curl -X PATCH -H "Content-Type: application/json" -H "Authorization: Token your_api_token" -d '{"title": "new title"}' <https://your-api-url.com/api/organization/>`
 
 
-#### Restrict signup through /user/signup
+#### Require invites for new users
 
-For on-prem deployments, you can restrict the option to create accounts through the `/user/signup` page by setting the following environment variable:
+While you can invite users to join your organization with the invite link, this does not prevent users from registering new account through the signup page (for on-prem deployments).
+
+You can remove the option to create accounts through the `/user/signup` page by setting the following environment variable:
 
 ```bash
 LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
