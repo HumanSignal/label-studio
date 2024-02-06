@@ -1,4 +1,4 @@
-from tasks.models import Task
+from tasks.models import Task, AnnotationDraft
 
 
 def make_queryset_from_iterable(tasks_list):
@@ -26,3 +26,17 @@ def make_queryset_from_iterable(tasks_list):
                 raise ValueError(f'Unknown object type: {str(task)}')
         queryset = Task.objects.filter(id__in=ids)
     return queryset
+
+
+def recalculate_created_labels_from_scratch(project, summary):
+    summary.created_labels = {}
+    if project.annotations.exists():
+        summary.update_created_annotations_and_labels(project.annotations.all())
+    else:
+        summary.save(update_fields=['created_labels'])
+    summary.created_labels_drafts = {}
+    drafts = AnnotationDraft.objects.filter(task__project=project)
+    if drafts.exists():
+        summary.update_created_labels_drafts(drafts)
+    else:
+        summary.save(update_fields=['created_labels_drafts'])

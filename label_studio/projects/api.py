@@ -9,6 +9,7 @@ from core.filters import ListFilter
 from core.label_config import config_essential_data_has_changed
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
+from core.redis import start_job_async_or_sync
 from core.utils.common import paginator, paginator_help, temporary_disconnect_all_signals
 from core.utils.exceptions import LabelStudioDatabaseException, ProjectExistException
 from core.utils.io import find_dir, find_file, read_yaml
@@ -23,6 +24,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from projects.functions.next_task import get_next_task
 from projects.functions.stream_history import get_label_stream_history
+from projects.functions.utils import recalculate_created_labels_from_scratch
 from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
 from projects.serializers import (
     GetFieldsSerializer,
@@ -395,6 +397,31 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
+
+
+class ProjectSummaryResetCreatedLabelsAPI(GetParentObjectMixin, generics.CreateAPIView):
+    """ This API is useful when we need to reset project.summary.created_labels and created_labels_drafts
+    and recalculate them from scratch. It's hard to correctly follow all changes in annotation region
+    labels and these fields aren't calculated properly after some time. Label config changes are not allowed
+    when these changes touch any labels from these created_labels* dictionaries.
+    """
+    parser_classes = (JSONParser,)
+    parent_queryset = Project.objects.all()
+    permission_required = ViewClassPermission(
+        POST=all_permissions.projects_change,
+    )
+
+    @swagger_auto_schema(auto_schema=None)
+    def post(self, *args, **kwargs):
+        project = self.get_parent_object()
+        summary = project.summary
+        start_job_async_or_sync(
+            recalculate_created_labels_from_scratch,
+            project,
+            summary,
+            organization_id=self.request.user.active_organization.id,
+        )
+        return Response(200)
 
 
 @method_decorator(
