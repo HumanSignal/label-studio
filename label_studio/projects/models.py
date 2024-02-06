@@ -1200,6 +1200,15 @@ class ProjectSummary(models.Model):
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def remove_created_annotations_and_labels(self, annotations):
+        # we are going to remove all drafts, make full refresh
+        if self.project.annotations.count() == annotations.count():
+            # it's hard to calculate created_labels_drafts properly, so it's better to reset it completely
+            # if no more drafts are in the project
+            self.created_labels = {}
+            self.created_annotations = {}
+            self.save(update_fields=['created_labels', 'created_annotations'])
+            return
+
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
