@@ -22,25 +22,25 @@ export const DangerZone = () => {
       buttonLook: "destructive",
       onOk: async () => {
         setProcessing(type);
-        if(type === 'annotations') {
+        if (type === 'annotations') {
           // console.log('delete annotations');
-        } else if(type === 'tasks') {
+        } else if (type === 'tasks') {
           // console.log('delete tasks');
-        } else if(type === 'predictions') {
+        } else if (type === 'predictions') {
           // console.log('delete predictions');
-        } else if(type === 'label_cache') {
+        } else if (type === 'label_cache') {
           await api.callApi('resetLabelCache', {
             params: {
               pk: project.id,
             },
           });
-        } else if(type === 'tabs') {
+        } else if (type === 'tabs') {
           await api.callApi('deleteTabs', {
             body: {
               project: project.id,
             },
           });
-        } else if(type === 'project') {
+        } else if (type === 'project') {
           await api.callApi('deleteProject', {
             params: {
               pk: project.id,
@@ -68,9 +68,9 @@ export const DangerZone = () => {
   }, {
     type: 'label_cache',
     help:
-      `If you are unable to modify the labeling configuration due to validation errors ` +
-      `concerning existing labels, but you are confident that the labels don't exist. You can ` +
-      `use this action to reset the cache and try again.`,
+      'If you are unable to modify the labeling configuration due to validation errors ' +
+      'concerning existing labels, but you are confident that the labels don't exist. You can ' +
+      'use this action to reset the cache and try again.',
     label: `Reset Label Cache`,
   }, {
     type: 'tabs',
