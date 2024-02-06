@@ -421,7 +421,7 @@ class ProjectSummaryResetCreatedLabelsAPI(GetParentObjectMixin, generics.CreateA
             summary,
             organization_id=self.request.user.active_organization.id,
         )
-        return Response(200)
+        return Response(status=status.HTTP_200_OK)
 
 
 @method_decorator(
