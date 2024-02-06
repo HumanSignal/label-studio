@@ -18,7 +18,7 @@ Furthermore, user management streamlines the workflow and enhances the efficienc
 
 Label Studio Enterprise user management options include:
 
-* **Role-Based Access Control (RBAC)**: Roles dictate the level of access that a users has and what actions they are able to complete. For more information about these roles, see [Roles and Permissions](admin_roles). For information about assigning roles, see [Manage user accounts](admin_user_manage).
+* **Role-Based Access Control (RBAC)**: Roles dictate the level of access that a users has and what actions they are able to complete. For more information about these roles, see [Roles and Permissions](admin_roles). For information about assigning roles, see [Manage user accounts](admin_manage_lse).
 
 * **User workflows through roles**: You can also use roles to design annotation workflows for your users. For example, you can use the project settings to configure separate instructions to display to reviewers and annotators. For more information, see [Project setup](setup_project).
 

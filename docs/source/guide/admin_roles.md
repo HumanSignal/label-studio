@@ -19,7 +19,7 @@ Access can be further refined through workspace and project membership. For more
 
 ## Roles in Label Studio Enterprise
 
-For information on how to assign users to roles, see [Manage user accounts](admin_user_manage).
+For information on how to assign users to roles, see [Manage user accounts](admin_manage_lse).
 
 | Role          | Description                                                                                                                                                                                  |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
