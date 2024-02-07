@@ -110,15 +110,13 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
  
     def _is_input_text_type(self, project):
-        print("parsing project config")
         parsed_configs = project.get_parsed_config()
-        import json
-        print(json.dumps(parsed_configs,indent=2))
         if parsed_configs:
             for config in parsed_configs:
-                for input in parsed_configs[config].get('inputs',[]):
-                    if input.get('type', '') == 'Text' and input.get('value','') == 'text':
-                        return True
+                if parsed_configs[config].get('type',None) == "Choices":
+                    for input in parsed_configs[config].get('inputs',[]):
+                        if input.get('type', '') == 'Text' and input.get('value','') == 'text':
+                            return True
         return False
     
     def get_queryset(self):
