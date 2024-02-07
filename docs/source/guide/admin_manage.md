@@ -30,7 +30,7 @@ You can see user info, including their API token, as the last line of the respon
 
 ```
 => User info:
-{'id': 1, 'first_name': 'User', 'last_name': 'Somebody', 'username': 'label-studio', 'email': 'example@labelstud.io', 'last_activity': '2021-06-15T19:37:29.594618Z', 'avatar': '/data/avatars/071280b8-48ACD59200000578-5322459-image-m-23_1517162202847.jpg', 'initials': 'el', 'phone': '', 'active_organization': 1, 'token': '1bc2c33cb44e56cb9f1e191238ffb78564675faa', 'status': 'ok'}
+{'id': 1, 'first_name': 'User', 'last_name': 'Somebody', 'username': 'label-studio', 'email': 'example@labelstud.io', 'last_activity': '2021-06-15T19:37:29.594618Z', 'avatar': '/data/avatars/img.jpg', 'initials': 'el', 'phone': '', 'active_organization': 1, 'token': '<api_token>', 'status': 'ok'}
 ```
 
 Users can also retrieve their own tokens from the Label Studio app. For more information, see [Manage your user account settings](user_account). 
