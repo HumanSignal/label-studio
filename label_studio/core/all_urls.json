@@ -178,7 +178,7 @@
         "module": "projects.api.ProjectSummaryAPI",
         "name": "projects:api:project-summary",
         "decorators": ""
-    },s
+    },
     {
         "url": "/api/projects/<int:pk>/summary/reset/",
         "module": "projects.api.ProjectSummaryResetAPI",
