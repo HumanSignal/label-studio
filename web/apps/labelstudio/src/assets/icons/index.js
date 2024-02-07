@@ -28,3 +28,4 @@ export { ReactComponent as LsPencil } from './pencil.svg';
 export { ReactComponent as IconInfoOutline } from './info-outline.svg';
 export { ReactComponent as IconSpark } from './spark.svg';
 export { ReactComponent as IconModel } from './model.svg';
+export { ReactComponent as IconMoreVertical } from "./more-vertical.svg";

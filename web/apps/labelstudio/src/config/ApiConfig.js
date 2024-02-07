@@ -1,3 +1,4 @@
+import { ModelsApiConfig } from "./ModelsApiConfig";
 
 export const API_CONFIG = {
   gateway: `${window.APP_SETTINGS.hostname}/api`,
@@ -72,6 +73,7 @@ export const API_CONFIG = {
     createWebhook: "POST:/webhooks",
     deleteWebhook: "DELETE:/webhooks/:pk",
     webhooksInfo: "/webhooks/info",
+    ...ModelsApiConfig,
   },
   alwaysExpectJSON: false,
 };

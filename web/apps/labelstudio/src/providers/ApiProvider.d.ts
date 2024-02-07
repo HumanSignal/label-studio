@@ -4,7 +4,7 @@ export interface Meta {
   url: string,
 }
 
-export interface WrappedResponse<T> extends T {
+export type WrappedResponse<T> = T & {
   $meta: Meta,
 }
 

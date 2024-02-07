@@ -86,6 +86,7 @@ export class APIProxy {
       return new URL(url).toString();
     } catch (e) {
       const gateway = new URL(window.location.href);
+
       gateway.search = "";
       gateway.hash = "";
 
@@ -374,6 +375,7 @@ export class APIProxy {
     */
   resolveEndpoint(endpoint, data) {
     let finalEndpoint;
+
     if (endpoint instanceof Function) {
       finalEndpoint = endpoint(data);
     } else {
@@ -410,6 +412,7 @@ export class APIProxy {
     */
   bodyToJSON(body) {
     const object = formDataToJPO(body);
+
     return JSON.stringify(object);
   }
 
@@ -421,6 +424,7 @@ export class APIProxy {
   async generateError(fetchResponse, exception) {
     const result = (async () => {
       const text = await fetchResponse.text();
+
       try {
         return JSON.parse(text);
       } catch (e) {
@@ -449,6 +453,7 @@ export class APIProxy {
         return details;
       }
     };
+
     return {
       error: exception.message,
       details: parsedDetails(),
@@ -479,13 +484,16 @@ export class APIProxy {
         ok = false;
       }
 
+      const r = new Response(JSON.stringify(response), {
+        status: ok ? 200 : 500,
+        headers: {
+          "content-type": "application/json;charset=UTF-8",
+        },
+        url,
+      });
+
       setTimeout(() => {
-        resolve({
-          ok,
-          json() {
-            return Promise.resolve(response);
-          },
-        });
+        resolve(r);
       }, this.mockDelay);
     });
   }
