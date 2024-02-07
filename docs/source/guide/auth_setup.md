@@ -1,13 +1,13 @@
 ---
-title: Set up authentication for Label Studio
-short: Set up authentication
+title: Set up SSO authentication for Label Studio
+short: SSO and SAML
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 485
+order_enterprise: 375
 meta_title: Authentication for Label Studio Enterprise
 meta_description: Label Studio Enterprise documentation for setting up SSO and LDAP authentication for your data labeling, machine learning, and data science projects.
-section: "Install"
+section: "Administration"
 
 ---
 
