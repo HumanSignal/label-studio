@@ -33,7 +33,7 @@ _api_urlpatterns = [
     path(
         '<int:pk>/summary/reset-created-labels/',
         api.ProjectSummaryResetCreatedLabelsAPI.as_view(),
-        name='project-summary-created-labels'
+        name='project-summary-created-labels',
     ),
     # Project import
     path('<int:pk>/imports/<int:import_pk>/', api.ProjectImportAPI.as_view(), name='project-imports'),

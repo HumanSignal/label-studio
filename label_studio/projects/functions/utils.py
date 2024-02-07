@@ -1,4 +1,4 @@
-from tasks.models import Task, AnnotationDraft
+from tasks.models import AnnotationDraft, Task
 
 
 def make_queryset_from_iterable(tasks_list):

@@ -405,6 +405,7 @@ class ProjectSummaryResetCreatedLabelsAPI(GetParentObjectMixin, generics.CreateA
     labels and these fields aren't calculated properly after some time. Label config changes are not allowed
     when these changes touch any labels from these created_labels* dictionaries.
     """
+
     parser_classes = (JSONParser,)
     parent_queryset = Project.objects.all()
     permission_required = ViewClassPermission(
