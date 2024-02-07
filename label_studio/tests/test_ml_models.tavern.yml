@@ -107,3 +107,409 @@ stages:
       status_code: 200
       json:
         !anylist
+
+---
+test_name: test_models_with_compatible_project
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="Humor"/><Choice value="Not Humor"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+
+  - name: Import tasks
+    request:
+      files:
+        csv: tests/test_suites/samples/humor_dataset_2_annotations.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task: "task_ids[0]"
+          second_task: "task_ids[1]"
+          
+  - name: Create a model
+    request:
+      url: "{django_live_url}/api/models"
+      method: POST
+      json:
+        title: "My model 1"
+        description: "My first model"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_id: id
+          model_created_at: created_at
+          model_updated_at: updated_at
+
+  - name: Get projects compatible with the model
+    request:
+      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        projects: [
+          {
+            "id": !int "{project_pk}",
+            "title": "compatible_project"
+          }
+        ]
+      headers:
+        content-type: application/json
+
+---
+test_name: test_models_with_incompatible_project_zero_annotations
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="Humor"/><Choice value="Not Humor"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+
+  - name: Import tasks
+    request:
+      files:
+        csv: tests/test_suites/samples/humor_dataset_0_annotations.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task: "task_ids[0]"
+          second_task: "task_ids[1]"
+          
+  - name: Create a model
+    request:
+      url: "{django_live_url}/api/models"
+      method: POST
+      json:
+        title: "My model 1"
+        description: "My first model"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_id: id
+          model_created_at: created_at
+          model_updated_at: updated_at
+
+  - name: Get projects compatible with the model
+    request:
+      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        projects: []
+      headers:
+        content-type: application/json
+
+---
+test_name: test_models_with_incompatible_project_no_dataset
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="Humor"/><Choice value="Not Humor"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+          
+  - name: Create a model
+    request:
+      url: "{django_live_url}/api/models"
+      method: POST
+      json:
+        title: "My model 1"
+        description: "My first model"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_id: id
+          model_created_at: created_at
+          model_updated_at: updated_at
+
+  - name: Get projects compatible with the model
+    request:
+      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        projects: []
+      headers:
+        content-type: application/json
+
+---
+test_name: test_models_with_incompatible_project_zero_annotations
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="Humor"/><Choice value="Not Humor"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+
+  - name: Import tasks
+    request:
+      files:
+        csv: tests/test_suites/samples/humor_dataset_0_annotations.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task: "task_ids[0]"
+          second_task: "task_ids[1]"
+          
+  - name: Create a model
+    request:
+      url: "{django_live_url}/api/models"
+      method: POST
+      json:
+        title: "My model 1"
+        description: "My first model"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_id: id
+          model_created_at: created_at
+          model_updated_at: updated_at
+
+  - name: Get projects compatible with the model
+    request:
+      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        projects: []
+      headers:
+        content-type: application/json
+
+---
+test_name: test_models_with_incompatible_project_non_text_label_config
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Image name="image" value="$image"/><RectangleLabels name="objects" toName="image" choices="multiple"><Label
+          value="Cat"/><Label value="Dog"/></RectangleLabels></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  
+  - name: Import tasks
+    request:
+      files:
+        csv: tests/test_suites/samples/image_urls_with_bboxes.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import?return_task_ids=true&preannotated_from_fields=bbox'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task: "task_ids[0]"
+          second_task: "task_ids[1]"
+          
+  - name: Create a model
+    request:
+      url: "{django_live_url}/api/models"
+      method: POST
+      json:
+        title: "My model 1"
+        description: "My first model"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_id: id
+          model_created_at: created_at
+          model_updated_at: updated_at
+
+  - name: Get projects compatible with the model
+    request:
+      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        projects: []
+      headers:
+        content-type: application/json

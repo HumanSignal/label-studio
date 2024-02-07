@@ -1014,6 +1014,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/models/<int:pk>/compatible-projects",
+        "module": "ml_models.api.ModelsCompatibleProjectsAPI",
+        "name": "ml_models:api:nodels-compatible-projects",
+        "decorators": ""
+    },
+    {
         "url": "/api/",
         "module": "rest_framework.routers.APIRootView",
         "name": "ml_models:api:api-root",

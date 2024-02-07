@@ -1,9 +1,16 @@
+import drf_yasg.openapi as openapi
 from core.permissions import ViewClassPermission, all_permissions
+from django.conf import settings
 from django.utils.decorators import method_decorator
+from django.db.models import Count, OuterRef, Q
 from drf_yasg.utils import swagger_auto_schema
 from ml_models.models import ModelInterface
+from projects.models import Project
 from ml_models.serializers import ModelInterfaceSerializer
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
+from rest_framework.response import Response
+
+
 
 
 @method_decorator(
@@ -74,3 +81,61 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         serializer.validated_data['organization'] = self.request.user.active_organization
         serializer.validated_data['created_by'] = self.request.user
         serializer.save()
+
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Models'],
+        operation_summary='List projects compatible with model',
+        operation_description="""
+            Retrieve a list of compatible project for a specific model. For example, use the following cURL command:
+            ```bash
+            curl -X GET {}/api/models/{{id}}/compatible-projects -H 'Authorization: Token abc123'
+            ```
+        """.format(
+            settings.HOSTNAME or 'https://localhost:8080'
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying model.',
+            ),
+        ]
+    ),
+)
+class ModelCompatibleProjects(generics.RetrieveAPIView):
+
+    permission_required = all_permissions.projects_view
+ 
+    def _is_input_text_type(self, project):
+        print("parsing project config")
+        parsed_configs = project.get_parsed_config()
+        import json
+        print(json.dumps(parsed_configs,indent=2))
+        if parsed_configs:
+            for config in parsed_configs:
+                for input in parsed_configs[config].get('inputs',[]):
+                    if input.get('type', '') == 'Text' and input.get('value','') == 'text':
+                        return True
+        return False
+    
+    def get_queryset(self):
+        return Project.objects.with_counts(fields = ['total_annotations_number']).filter(organization=self.request.user.active_organization, total_annotations_number__gt=1)
+    
+    def get(self, *args, **kwargs):
+        user_projects = self.get_queryset()
+        compatible_project_list = []
+        for project in user_projects:
+            if self._is_input_text_type(project=project):
+                compatible_project_list.append(
+                    {
+                        'title': project.title,
+                        'id': project.id,
+                    }
+                )
+        result = {
+            "projects" : compatible_project_list
+        }
+        return Response(result, status=200)
