@@ -28,12 +28,19 @@ def make_queryset_from_iterable(tasks_list):
     return queryset
 
 
-def recalculate_created_labels_from_scratch(project, summary):
-    summary.created_labels = {}
+def recalculate_created_annotations_and_labels_from_scratch(project, summary, organization_id):
+    """ Recalculate created_labels, created_annotations and created_labels_drafts from scratch
+
+    :param project: Project
+    :param summary: ProjectSummary
+    :param organization_id: Organization.id, it is required for django-rq displaying on admin page
+    """
+    summary.created_labels, summary.created_annotations = {}, {}
     if project.annotations.exists():
         summary.update_created_annotations_and_labels(project.annotations.all())
     else:
-        summary.save(update_fields=['created_labels'])
+        summary.save(update_fields=['created_labels', 'created_annotations'])
+
     summary.created_labels_drafts = {}
     drafts = AnnotationDraft.objects.filter(task__project=project)
     if drafts.exists():

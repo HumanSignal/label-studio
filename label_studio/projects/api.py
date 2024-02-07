@@ -24,7 +24,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from projects.functions.next_task import get_next_task
 from projects.functions.stream_history import get_label_stream_history
-from projects.functions.utils import recalculate_created_labels_from_scratch
+from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
 from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
 from projects.serializers import (
     GetFieldsSerializer,
@@ -416,7 +416,7 @@ class ProjectSummaryResetCreatedLabelsAPI(GetParentObjectMixin, generics.CreateA
         project = self.get_parent_object()
         summary = project.summary
         start_job_async_or_sync(
-            recalculate_created_labels_from_scratch,
+            recalculate_created_annotations_and_labels_from_scratch,
             project,
             summary,
             organization_id=self.request.user.active_organization.id,

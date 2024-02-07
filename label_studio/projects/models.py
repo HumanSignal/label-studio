@@ -1201,7 +1201,7 @@ class ProjectSummary(models.Model):
 
     def remove_created_annotations_and_labels(self, annotations):
         # we are going to remove all drafts, make full refresh
-        if self.project.annotations.count() == annotations.count():
+        if self.project.annotations.count() == len(annotations):
             # it's hard to calculate created_labels_drafts properly, so it's better to reset it completely
             # if no more drafts are in the project
             self.created_labels = {}
@@ -1267,7 +1267,7 @@ class ProjectSummary(models.Model):
 
     def remove_created_drafts_and_labels(self, drafts):
         # we are going to remove all drafts, make full refresh
-        if AnnotationDraft.objects.filter(task__project=self.project).count() == drafts.count():
+        if AnnotationDraft.objects.filter(task__project=self.project).count() == len(drafts):
             # it's hard to calculate created_labels_drafts properly, so it's better to reset it completely
             # if no more drafts are in the project
             self.created_labels_drafts = {}
