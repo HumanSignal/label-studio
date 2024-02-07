@@ -513,3 +513,86 @@ stages:
         projects: []
       headers:
         content-type: application/json
+
+---
+test_name: test_models_with_incompatible_project_Taxonomy_type_label_config
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Taxonomy name="taxonomy" toName="text"><Choice value="Archaea" /><Choice value="Bacteria" /><Choice value="Eukarya"><Choice value="Human" /><Choice value="Oppossum" /><Choice value="Extraterrestial" /></Choice></Taxonomy></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  
+  - name: Import tasks
+    request:
+      files:
+        csv: tests/test_suites/samples/humor_dataset_0_annotations.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task: "task_ids[0]"
+          second_task: "task_ids[1]"
+          
+  - name: Create a model
+    request:
+      url: "{django_live_url}/api/models"
+      method: POST
+      json:
+        title: "My model 1"
+        description: "My first model"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_id: id
+          model_created_at: created_at
+          model_updated_at: updated_at
+
+  - name: Get projects compatible with the model
+    request:
+      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        projects: []
+      headers:
+        content-type: application/json
