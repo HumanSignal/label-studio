@@ -55,8 +55,8 @@ You can share this link with users, who can then complete the registration proce
 
 Click **Reset Link** to reset the link. When reset, anyone who have the old link will be unable to register a new user account. 
 
-!!! note
-    Inviting people to your Label Studio instance with a link does not restrict access to the signup page. For that, you will need to set an environment variable. See [Require invites for new users](#Require-invites-for-new-users) below. 
+!!! warning Security Note
+    Resetting the invitation link is a security measure that should be part of a broader strategy of controlling access, which includes disabling the signup page. See [Require invites for new users](#Require-invites-for-new-users) below. 
 
 ## Require invites for new users
 
