@@ -2,15 +2,12 @@ import drf_yasg.openapi as openapi
 from core.permissions import ViewClassPermission, all_permissions
 from django.conf import settings
 from django.utils.decorators import method_decorator
-from django.db.models import Count, OuterRef, Q
 from drf_yasg.utils import swagger_auto_schema
 from ml_models.models import ModelInterface
-from projects.models import Project
 from ml_models.serializers import ModelInterfaceSerializer
-from rest_framework import viewsets, generics
+from projects.models import Project
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
-
-
 
 
 @method_decorator(
