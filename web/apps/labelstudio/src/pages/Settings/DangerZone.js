@@ -28,8 +28,8 @@ export const DangerZone = () => {
           // console.log('delete tasks');
         } else if (type === 'predictions') {
           // console.log('delete predictions');
-        } else if (type === 'label_cache') {
-          await api.callApi('resetLabelCache', {
+        } else if (type === 'reset_cache') {
+          await api.callApi('projectResetCache', {
             params: {
               pk: project.id,
             },
@@ -66,12 +66,12 @@ export const DangerZone = () => {
     disabled: true, //&& !project.total_predictions_number,
     label: `Delete ${project.total_predictions_number} Predictions`,
   }, {
-    type: 'label_cache',
+    type: 'reset_cache',
     help:
-      'If you are unable to modify the labeling configuration due to validation errors ' +
-      'concerning existing labels, but you are confident that the labels don\'t exist. You can ' +
+      'Reset Cache may help in cases like if you are unable to modify the labeling configuration due ' +
+      'to validation errors concerning existing labels, but you are confident that the labels don\'t exist. You can ' +
       'use this action to reset the cache and try again.',
-    label: `Reset Label Cache`,
+    label: `Reset Cache`,
   }, {
     type: 'tabs',
     help: 'If the Data Manager is not loading, dropping all Data Manager tabs can help.',

@@ -178,11 +178,11 @@
         "module": "projects.api.ProjectSummaryAPI",
         "name": "projects:api:project-summary",
         "decorators": ""
-    },
+    },s
     {
-        "url": "/api/projects/<int:pk>/summary/reset-created-labels/",
-        "module": "projects.api.ProjectSummaryResetCreatedLabelsAPI",
-        "name": "projects:api:project-summary-created-labels",
+        "url": "/api/projects/<int:pk>/summary/reset/",
+        "module": "projects.api.ProjectSummaryResetAPI",
+        "name": "projects:api:project-summary-reset",
         "decorators": ""
     },
     {

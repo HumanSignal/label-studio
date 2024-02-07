@@ -1,4 +1,7 @@
 from tasks.models import AnnotationDraft, Task
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 
 def make_queryset_from_iterable(tasks_list):
@@ -35,6 +38,8 @@ def recalculate_created_annotations_and_labels_from_scratch(project, summary, or
     :param summary: ProjectSummary
     :param organization_id: Organization.id, it is required for django-rq displaying on admin page
     """
+    logger.info(f'Reset cache started for project {project.id} and organization {organization_id}')
+
     summary.created_labels, summary.created_annotations = {}, {}
     if project.annotations.exists():
         summary.update_created_annotations_and_labels(project.annotations.all())
@@ -47,3 +52,10 @@ def recalculate_created_annotations_and_labels_from_scratch(project, summary, or
         summary.update_created_labels_drafts(drafts)
     else:
         summary.save(update_fields=['created_labels_drafts'])
+
+    logger.info(
+        f'Reset cache finished for project {project.id} and organization {organization_id}:\n'
+        f'created_annotations = {summary.created_annotations}\n'
+        f'created_labels = {summary.created_labels}\n'
+        f'created_labels_drafts = {summary.created_labels_drafts}'
+    )
