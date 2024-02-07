@@ -23,7 +23,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [step] | <code>number</code> | <code>1</code> | Step for value increment/decrement |
 | [defaultValue] | <code>number</code> |  | Default number value; will be added automatically to result for required fields |
 | [hotkey] | <code>string</code> |  | Hotkey for increasing number value |
-| [required] | <code>boolean</code> | <code>false</code> | Whether to require number validation |
+| [required] | <code>boolean</code> | <code>false</code> | Whether number is required or not |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 | [perRegion] | <code>boolean</code> |  | Use this tag to classify specific regions instead of the whole object |
 | [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object[^1] |
