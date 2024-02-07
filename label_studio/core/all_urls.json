@@ -180,6 +180,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/summary/reset-created-labels/",
+        "module": "projects.api.ProjectSummaryResetCreatedLabelsAPI",
+        "name": "projects:api:project-summary-created-labels",
+        "decorators": ""
+    },
+    {
         "url": "/api/projects/<int:pk>/imports/<int:import_pk>/",
         "module": "projects.api.ProjectImportAPI",
         "name": "projects:api:project-imports",

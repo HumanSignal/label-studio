@@ -29,7 +29,7 @@ def make_queryset_from_iterable(tasks_list):
 
 
 def recalculate_created_annotations_and_labels_from_scratch(project, summary, organization_id):
-    """ Recalculate created_labels, created_annotations and created_labels_drafts from scratch
+    """Recalculate created_labels, created_annotations and created_labels_drafts from scratch
 
     :param project: Project
     :param summary: ProjectSummary

@@ -400,7 +400,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
 
 
 class ProjectSummaryResetCreatedLabelsAPI(GetParentObjectMixin, generics.CreateAPIView):
-    """ This API is useful when we need to reset project.summary.created_labels and created_labels_drafts
+    """This API is useful when we need to reset project.summary.created_labels and created_labels_drafts
     and recalculate them from scratch. It's hard to correctly follow all changes in annotation region
     labels and these fields aren't calculated properly after some time. Label config changes are not allowed
     when these changes touch any labels from these created_labels* dictionaries.

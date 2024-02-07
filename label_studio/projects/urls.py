@@ -30,7 +30,11 @@ _api_urlpatterns = [
     # Project summary
     path('<int:pk>/summary/', api.ProjectSummaryAPI.as_view(), name='project-summary'),
     # Project summary
-    path('<int:pk>/summary/reset-created-labels/', api.ProjectSummaryResetCreatedLabelsAPI.as_view(), name='project-summary'),
+    path(
+        '<int:pk>/summary/reset-created-labels/',
+        api.ProjectSummaryResetCreatedLabelsAPI.as_view(),
+        name='project-summary-created-labels'
+    ),
     # Project import
     path('<int:pk>/imports/<int:import_pk>/', api.ProjectImportAPI.as_view(), name='project-imports'),
     # Project reimport
