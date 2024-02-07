@@ -15,6 +15,8 @@ import {
 import Utils from '../../utils';
 import styles from './Annotations.module.scss';
 
+/** @deprecated this file is not used; DraftPanel is moved to separate component */
+
 export const DraftPanel = observer(({ item }) => {
   if (!item.draftSaved && !item.versions.draft) return null;
   const saved = item.draft && item.draftSaved ? ` saved ${Utils.UDate.prettyDate(item.draftSaved)}` : '';
