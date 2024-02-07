@@ -52,8 +52,8 @@ const AnnotationStoreModel = types
         if (self.selected) {
           // const comments = self.store.commentStore;
 
-          // @todo current comment is an object and that was not a part of original fix
-          // @todo so leave it for later
+          // @todo `currentComment` is an object and saving them was not a part of original fix
+          // @todo so I leave it for next fix coming soon
           // if (comments.currentComment) {
           //   // comment will save draft automatically
           //   comments.commentFormSubmit();
