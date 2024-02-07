@@ -76,8 +76,9 @@ For information on how to assign users to roles, see [Manage user accounts](admi
     <td style="text-align:center">✅</td>
     <td style="text-align:center">✅</td>
   </tr>
-<td colspan="6" style="text-align:center"><b>Project Management</b></td>
-</tr>
+  <tr>
+    <td colspan="6" style="text-align:center"><b>Project Management</b></td>
+  </tr>
   <tr>
     <td>Workspace access</td>
     <td style="text-align:center">R</td>
@@ -86,7 +87,6 @@ For information on how to assign users to roles, see [Manage user accounts](admi
     <td style="text-align:center">CRUD</td>
     <td style="text-align:center">CRUD</td>
   </tr>
- <tr>
   <tr>
     <td>Project access</td>
     <td style="text-align:center">R</td>
