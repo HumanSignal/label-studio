@@ -575,11 +575,14 @@ export class LSFWrapper {
         // don't react on duplicated annotations error
         { errorHandler: result => result.status === 409 },
       );
-    }, false, loadNext, exitStream);
+    }, false, loadNext);
     const status = result?.$meta?.status;
 
     if (status === 200 || status === 201) this.datamanager.invoke("toast", { message: "Annotation saved successfully", type: "info" });
     else if (status !== undefined) this.datamanager.invoke("toast", { message: "There was an error saving your Annotation", type: "error" });
+
+    if (exitStream) return this.exitStream();
+
   };
 
   /** @private */
@@ -843,7 +846,7 @@ export class LSFWrapper {
     if (isFF(FF_OPTIC_2)) this.saveDraft();
     this.loadTask(prevTaskId, prevAnnotationId, true);
   }
-  async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true, exitStream) {
+  async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
     const { taskID, currentAnnotation } = this;
     const unique_id = this.task.unique_lock_id;
     const serializedAnnotation = this.prepareData(currentAnnotation, { includeId });
@@ -878,7 +881,6 @@ export class LSFWrapper {
     }
 
     this.setLoading(false);
-    if (exitStream) return this.exitStream();
 
     if (!loadNext || this.datamanager.isExplorer) {
       await this.loadTask(taskID, currentAnnotation.pk, true);
