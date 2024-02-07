@@ -9,12 +9,11 @@ from django.db.models import Count, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from ml.api_connector import MLApi
 from projects.models import Project
 from tasks.models import Prediction
 from tasks.serializers import PredictionSerializer, TaskSimpleSerializer
 from webhooks.serializers import Webhook, WebhookSerializer
-
-from ml.api_connector import MLApi
 
 logger = logging.getLogger(__name__)
 

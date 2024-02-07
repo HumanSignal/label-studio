@@ -2,9 +2,8 @@
 """
 from core.utils.io import validate_upload_url
 from django.conf import settings
-from rest_framework import serializers
-
 from ml.models import MLBackend
+from rest_framework import serializers
 
 
 class MLBackendSerializer(serializers.ModelSerializer):

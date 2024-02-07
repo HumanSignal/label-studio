@@ -9,14 +9,13 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
+from ml.models import MLBackend
+from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 from projects.models import Project, Task
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from ml.models import MLBackend
-from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 
 logger = logging.getLogger(__name__)
 
