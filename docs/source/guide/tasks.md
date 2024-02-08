@@ -18,6 +18,12 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 - If your data is stored locally, [import it into Label Studio](#Import-data-from-a-local-directory).
 - If your data contains predictions or pre-annotations, see [Import pre-annotated data into Label Studio](predictions.html).
 
+## General guidelines for importing data
+
+* For larger projects, do not upload data through the Label Studio interface. This works fine for proof of concept projects, but it is not recommended for larger projects. We recommend that you configure external storage instead. 
+* It’s best to keep about 100k tasks / 100k annotations per project for optimal performance.
+* Avoid frequent imports because each new import requires lengthy background operations. One import per 30 seconds will work without overloads.
+
 ## Types of data you can import into Label Studio
 
 You can import many types of data, including text, timeseries, audio, and image data. The file types supported depend on the type of data. 
