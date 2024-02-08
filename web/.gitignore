@@ -12,6 +12,7 @@ node_modules
 .project
 .classpath
 .c9/
+.DS_Store
 *.launch
 .settings/
 *.sublime-workspace
