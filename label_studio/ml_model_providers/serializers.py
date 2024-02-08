@@ -38,7 +38,12 @@ class ModelProviderConnectionSerializer(serializers.ModelSerializer):
                 setattr(model_provider_connection, key, value)
         else:
             model_provider_connection = self.Meta.model(**data)
-        if not model_provider_connection.validate_api_key():
+
+        try:
+            model_provider_connection.validate_api_key()
+        except AuthenticationError:
             raise ValidationError("API key provided is not valid")
+        except NotImplementedError as e:
+            raise ValidationError(e)
 
         return data

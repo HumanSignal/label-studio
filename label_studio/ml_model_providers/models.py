@@ -51,12 +51,7 @@ class ModelProviderConnection(models.Model):
         Return: boolean if API key is valid or not
         """
         if self.provider == self.ModelProviders.OPENAI:
-            try:
-                print("creating open ai client")
-                client = OpenAI(api_key=self.api_key)
-                print("successfully created open ai client")
-                client.models.list()
-            except AuthenticationError as e:
-                return False
-            else:
-                return True
+            client = OpenAI(api_key=self.api_key)
+            client.models.list()
+        else:
+            raise NotImplementedError(f"Verification of API key for provider {self.provider} is not implemented")
