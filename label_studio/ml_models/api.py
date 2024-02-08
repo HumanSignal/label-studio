@@ -107,11 +107,11 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
  
     def _is_project_compatible(self, project):
-        parsed_configs = project.get_parsed_config()
-        if parsed_configs:
-            for config in parsed_configs:
-                if parsed_configs[config].get('type',None) == "Choices":
-                    for input in parsed_configs[config].get('inputs',[]):
+        parced_config = project.get_parsed_config()
+        if parced_config:
+            for tag in parced_config:
+                if parced_config[tag].get('type',None) == "Choices":
+                    for input in parced_config[tag].get('inputs',[]):
                         if input.get('type', '') == 'Text' and input.get('value','') == 'text':
                             return True
         return False
