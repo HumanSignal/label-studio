@@ -106,7 +106,7 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
 
     permission_required = all_permissions.projects_view
  
-    def _is_input_text_type(self, project):
+    def _is_project_compatible(self, project):
         parsed_configs = project.get_parsed_config()
         if parsed_configs:
             for config in parsed_configs:
@@ -123,7 +123,7 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
         user_projects = self.get_queryset()
         compatible_project_list = []
         for project in user_projects:
-            if self._is_input_text_type(project=project):
+            if self._is_project_compatible(project=project):
                 compatible_project_list.append(
                     {
                         'title': project.title,
