@@ -107,8 +107,8 @@ The component parts of Label Studio are available as modular extensible packages
 | Module   | Technology      | Description      |
 | --------------- | ----------------------------- | ------------------------------------------------------------- |
 | [Label Studio main app](https://github.com/HumanSignal/label-studio/)     | Python and [Django](https://www.djangoproject.com/)    | The main app with most of the backend code for Label Studio; used to perform data labeling.    |
-| Label Studio frontend       | JavaScript web app using [React](https://reactjs.org/) and [MST](https://github.com/mobxjs/mobx-state-tree) | This acts as the central integration point for all frontend elements. Located under `web/apps/labelstudio`  and `web/libs/editor` in the main app repo.              |
-| Data Manager      | JavaScript web app using [React](https://reactjs.org/)     | Manage data and tasks for labeling.  Located under `web/libs/datamanager` in the main app repo.                         |
+| [Label Studio frontend](frontend_reference)       | JavaScript web app using [React](https://reactjs.org/) and [MST](https://github.com/mobxjs/mobx-state-tree) | Located within the main app repo. `web/apps/labelstudio` acts as the central integration point for all frontend elements. `web/libs/editor` is the frontend library.              |
+| Data Manager      | JavaScript web app using [React](https://reactjs.org/)     | Manage data and tasks for labeling. Located under `web/libs/datamanager` in the main app repo.                         |
 | [Machine Learning Backends](https://github.com/HumanSignal/label-studio-ml-backend) | Python   | Predict data labels at various parts of the labeling process. |
 
 <br>
