@@ -119,7 +119,7 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
     def get_queryset(self):
         return Project.objects.with_counts(fields = ['total_annotations_number']).filter(organization=self.request.user.active_organization, total_annotations_number__gt=1)
     
-    def get(self, *args, **kwargs):
+    def get(self, *args):
         user_projects = self.get_queryset()
         compatible_project_list = []
         for project in user_projects:
