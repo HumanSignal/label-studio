@@ -214,7 +214,7 @@ EDITOR_KEYMAP='{"annotation:submit":{"key": "shift+s","description": "My Custom 
 ```
 This overwrites the existing hotkey mapping with your custom mapping. See [more about how to set environment variables](start.html#Set-environment-variables). 
 
-Refer to the full list of customizable hotkeys in the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) repository to update a different hotkey combination. 
+Refer to the full list of customizable hotkeys in the [`keymap.json` file](https://github.com/HumanSignal/label-studio/blob/develop/web/libs/editor/src/core/settings/keymap.json) repository to update a different hotkey combination. 
 
 You cannot use this environment variable to remove an existing or add a new keyboard shortcut. 
 
