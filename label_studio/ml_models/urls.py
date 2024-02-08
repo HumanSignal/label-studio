@@ -9,7 +9,7 @@ router = DefaultRouter()
 router.register(r'models', api.ModelInterfaceAPI, basename='models')
 _api_model_urlpatterns = [
     path('', views.model_interfaces_view, name='models-list'),
-    path('<int:pk>/compatible-projects', api.ModelCompatibleProjects.as_view(), name='model-compatible-projects-list'),
+    path('compatible-projects', api.ModelCompatibleProjects.as_view(), name='model-compatible-projects-list'),
 ]
 
 urlpatterns = [

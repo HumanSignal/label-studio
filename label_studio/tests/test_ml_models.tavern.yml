@@ -182,7 +182,7 @@ stages:
 
   - name: Get projects compatible with the model
     request:
-      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      url: "{django_live_url}/api/models/compatible-projects"
       method: GET
     response:
       status_code: 200
@@ -270,7 +270,7 @@ stages:
 
   - name: Get projects compatible with the model
     request:
-      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      url: "{django_live_url}/api/models/compatible-projects"
       method: GET
     response:
       status_code: 200
@@ -338,7 +338,7 @@ stages:
 
   - name: Get projects compatible with the model
     request:
-      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      url: "{django_live_url}/api/models/compatible-projects"
       method: GET
     response:
       status_code: 200
@@ -421,7 +421,7 @@ stages:
 
   - name: Get projects compatible with the model
     request:
-      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      url: "{django_live_url}/api/models/compatible-projects"
       method: GET
     response:
       status_code: 200
@@ -505,7 +505,7 @@ stages:
 
   - name: Get projects compatible with the model
     request:
-      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      url: "{django_live_url}/api/models/compatible-projects"
       method: GET
     response:
       status_code: 200
@@ -588,7 +588,7 @@ stages:
 
   - name: Get projects compatible with the model
     request:
-      url: "{django_live_url}/api/models/{model_id}/compatible-projects"
+      url: "{django_live_url}/api/models/compatible-projects"
       method: GET
     response:
       status_code: 200

@@ -1014,7 +1014,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/models/<int:pk>/compatible-projects",
+        "url": "/api/models/compatible-projects",
         "module": "ml_models.api.ModelsCompatibleProjectsAPI",
         "name": "ml_models:api:nodels-compatible-projects",
         "decorators": ""
