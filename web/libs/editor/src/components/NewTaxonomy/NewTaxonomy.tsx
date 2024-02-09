@@ -172,7 +172,7 @@ const NewTaxonomy = ({
       refInput.current?.resetValue();
     }
   }, [refInput]);
-
+  
   return (
     <TreeSelect
       treeData={defaultSearch ? treeData : filteredTreeData}
