@@ -185,13 +185,13 @@ const NewTaxonomy = ({
       showArrow={!defaultSearch}
       dropdownRender={renderDropdown}
       onDropdownVisibleChange={handleDropdownChange}
+      treeExpandAction={false}
       treeExpandedKeys={!defaultSearch ? expandedKeys : undefined}
       onTreeExpand={(expandedKeys: React.Key[]) => {
         setExpandedKeys(expandedKeys);
       }}
       treeCheckStrictly
       showCheckedStrategy={TreeSelect.SHOW_ALL}
-      treeExpandAction={false}
       dropdownMatchSelectWidth={dropdownWidth}
       placeholder={options.placeholder || 'Click to add...'}
       style={style}
