@@ -1,11 +1,13 @@
 ---
 title: Automatic Speech Recognition with NVIDIA NeMo
-type: blog
+type: guide
 tier: all
 order: 60
 meta_title: Automatic Speech Recognition with NVIDIA NeMo
 meta_description: Label Studio tutorial for Automatic Speech Recognition with NVIDIA NeMo
-
+section: "Machine learning"
+parent: "ml_tutorials"
+parentPageExtension: "html"
 ---
 
 
@@ -69,4 +71,3 @@ label-studio start my_project --init
 11. Click **Add Model** and add the ML backend using this URL: `http://localhost:9090`.
 
 12. Import audio data and start reviewing pre-annotations.
-
