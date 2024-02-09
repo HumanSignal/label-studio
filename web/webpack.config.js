@@ -145,13 +145,17 @@ module.exports = composePlugins(withNx({
       });
     }
 
-    if (rule.test.toString().match(/css|scss|sass|styl/)) {
-      const r = rule.oneOf.filter((r) => r.use && r.use.find((u) => u.loader && u.loader.includes('css-loader')));
+    if (rule.test.toString().match(/scss|sass|styl/)) {
+      const r = rule.oneOf.filter((r) => r.use && r.test.toString().match(/scss|sass|styl/) && r.use.find((u) => u.loader && u.loader.includes('css-loader')));
 
       r.forEach((_r) => {
         const cssLoader = _r.use.find(use => use.loader && use.loader.includes('css-loader'));
 
-        if (cssLoader && cssLoader.options) {
+        const isSASS = _r.use.some(use => use.loader && use.loader.match(/sass|scss/));
+
+        if (isSASS) _r.exclude = /node_modules/
+
+        if (cssLoader.options) {
           cssLoader.options.modules = {
             localIdentName: css_prefix + '[local]', // Customize this format
           };
