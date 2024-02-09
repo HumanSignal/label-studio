@@ -20,6 +20,8 @@ After you [start Label Studio](start.html) and [create an account](signup.html),
 2. [Import data](tasks.html).
 3. Select a template to configure the labeling interface for your dataset. [Set up the labeling interface for your project](setup.html).
 4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project).
+   
+</div>
 
 </div>
 

@@ -7,7 +7,8 @@ meta_title: Text Classification with Scikit-Learn Tutorial
 meta_description: Label Studio tutorial for text classification using Scikit-Learn and Label Studio.
 section: "Machine learning"
 parent: "ml_tutorials"
-parentPageExtension: "html"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
 

@@ -7,7 +7,8 @@ meta_title: Chatbot response generation with HuggingFace's GPT2 model
 meta_description: Label Studio tutorial for Chatbot response generation with HuggingFace's GPT2 model
 section: "Machine learning"
 parent: "ml_tutorials"
-parentPageExtension: "html"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
 

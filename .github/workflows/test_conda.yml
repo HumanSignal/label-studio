@@ -31,7 +31,7 @@ jobs:
         shell: bash
 
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4

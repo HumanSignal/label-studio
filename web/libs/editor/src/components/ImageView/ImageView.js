@@ -490,6 +490,22 @@ const Crosshair = memo(forwardRef(({ width, height }, ref) => {
   );
 }));
 
+/**
+ * Component that creates an overlay on top
+ * of the image to support Magic Wand tool
+ */
+const CanvasOverlay = observer(({ item }) => {
+  return isFF(FF_DEV_4081) ? (
+    <canvas
+      className={styles.overlay}
+      ref={ref => {
+        item.setOverlayRef(ref);
+      }}
+      style={item.imageTransform}
+    />
+  ) : null;
+});
+
 export default observer(
   class ImageView extends Component {
     // stored position of canvas before creating region
@@ -1020,6 +1036,7 @@ export default observer(
                 imageTransform={item.imageTransform}
                 updateImageSize={item.updateImageSize}
                 size={item.canvasSize}
+                overlay={<CanvasOverlay item={item} />}
               />
             ) : (
               <div
@@ -1045,15 +1062,7 @@ export default observer(
                   crossOrigin={item.imageCrossOrigin}
                   alt="LS"
                 />
-                {isFF(FF_DEV_4081) ? (
-                  <canvas
-                    className={styles.overlay}
-                    ref={ref => {
-                      item.setOverlayRef(ref);
-                    }}
-                    style={item.imageTransform}
-                  />
-                ) : null}
+                <CanvasOverlay item={item} />
               </div>
             )}
             {/* @todo this is dirty hack; rewrite to proper async waiting for data to load */}

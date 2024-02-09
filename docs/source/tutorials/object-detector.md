@@ -7,7 +7,8 @@ meta_title: OpenMMLab Image object detector or MMDetection
 meta_description: Label Studio tutorial for OpenMMLab Image object detector or MMDetection
 section: "Machine learning"
 parent: "ml_tutorials"
-parentPageExtension: "html"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
 

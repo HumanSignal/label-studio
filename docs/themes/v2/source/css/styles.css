@@ -305,7 +305,7 @@ body {
     width: 100%;
   }
 
-  .page-header nav a svg:not(.github-icon) {
+  .page-header nav a svg:not(.github-icon, .icon-external-link) {
     display: none;
   }
 
@@ -513,6 +513,11 @@ main {
 
 .page-sidebar-toggle-children-list.active svg {
   transform: rotate(180deg);
+}
+
+.icon-external-link {
+  vertical-align: middle;
+  margin-left: 0.25em;
 }
 
 @media (max-width: 800px) {
@@ -1289,8 +1294,14 @@ h1 + .admonition{
   margin-top: 2rem !important;
 }
 
-.content-markdown .admonition+.admonition {
+.content-markdown .admonition+.admonition, .content-markdown h2+.admonition, .content-markdown h3+.admonition, .content-markdown h4+.admonition, 
+.content-markdown h5+.admonition, .content-markdown h6+.admonition {
   margin-top: 2em;
+}
+
+.content-markdown h2+.admonition, .content-markdown h3+.admonition, .content-markdown h4+.admonition, 
+.content-markdown h5+.admonition, .content-markdown h6+.admonition {
+  margin-top: 1em;
 }
 
 .content-markdown .admonition *:last-child {

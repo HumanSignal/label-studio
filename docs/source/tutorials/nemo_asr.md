@@ -7,7 +7,8 @@ meta_title: Automatic Speech Recognition with NVIDIA NeMo
 meta_description: Label Studio tutorial for Automatic Speech Recognition with NVIDIA NeMo
 section: "Machine learning"
 parent: "ml_tutorials"
-parentPageExtension: "html"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
 
