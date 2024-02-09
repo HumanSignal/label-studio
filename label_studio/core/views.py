@@ -225,6 +225,8 @@ def static_file_with_host_resolver(path_on_disk, content_type):
 
 
 def feature_flags(request):
+    # junk change to trigger follow merge
+
     user = request.user
     if not user.is_authenticated:
         return HttpResponseForbidden()
