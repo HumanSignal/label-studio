@@ -151,6 +151,8 @@ module.exports = composePlugins(withNx({
       r.forEach((_r) => {
         const cssLoader = _r.use.find(use => use.loader && use.loader.includes('css-loader'));
 
+        if (!cssLoader) return;
+
         const isSASS = _r.use.some(use => use.loader && use.loader.match(/sass|scss/));
 
         if (isSASS) _r.exclude = /node_modules/
