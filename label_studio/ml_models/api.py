@@ -84,22 +84,7 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
     decorator=swagger_auto_schema(
         tags=['Models'],
         operation_summary='List projects compatible with model',
-        operation_description="""
-            Retrieve a list of compatible project for a specific model. For example, use the following cURL command:
-            ```bash
-            curl -X GET {}/api/models/{{id}}/compatible-projects -H 'Authorization: Token abc123'
-            ```
-        """.format(
-            settings.HOSTNAME or 'https://localhost:8080'
-        ),
-        manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='A unique integer value identifying model.',
-            ),
-        ]
+        operation_description="""Retrieve a list of compatible project for model."""
     ),
 )
 class ModelCompatibleProjects(generics.RetrieveAPIView):
@@ -107,12 +92,12 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
  
     def _is_project_compatible(self, project):
-        parced_config = project.get_parsed_config()
-        if parced_config:
-            for tag in parced_config:
-                if parced_config[tag].get('type',None) == "Choices":
-                    for input in parced_config[tag].get('inputs',[]):
-                        if input.get('type', '') == 'Text' and input.get('value','') == 'text':
+        parsed_config = project.get_parsed_config()
+        if parsed_config:
+            for tag in parsed_config:
+                if parsed_config[tag].get('type',None) == "Choices":
+                    for input in parsed_config[tag].get('inputs',[]):
+                        if input.get('type', '') == 'Text':
                             return True
         return False
     
