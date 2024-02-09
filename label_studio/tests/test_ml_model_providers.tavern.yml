@@ -48,7 +48,7 @@ stages:
       method: POST
       json:
         provider: "{provider_choices[0]}"
-        api_key: "my-secret-api-key"
+        api_key: "valid-openai-api-key-1" # This is one of the 2 "valid" keys in openai client mock
     response:
         status_code: 201
         save:
@@ -82,9 +82,18 @@ stages:
       url: "{django_live_url}/api/model-provider-connections/{mpc_id}"
       method: PATCH
       json:
-        api_key: "my updated api key"
+        api_key: "valid-openai-api-key-2" # This is one of the 2 "valid" keys in openai client mock
     response:
       status_code: 200
+
+  - name: Patch specific model provider connection invalid API key
+    request:
+      url: "{django_live_url}/api/model-provider-connections/{mpc_id}"
+      method: PATCH
+      json:
+        api_key: "invalid-openai-api-key"
+    response:
+      status_code: 400
 
   - name: Get list with one model provider connection
     request:

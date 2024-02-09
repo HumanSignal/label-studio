@@ -2,6 +2,7 @@
 """
 
 from ml_model_providers.models import ModelProviderConnection
+from openai import AuthenticationError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from users.serializers import UserSimpleSerializer
