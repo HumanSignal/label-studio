@@ -984,6 +984,12 @@
         "decorators": ""
     },
     {
+        "url": "/models/",
+        "module": "ml_models.views.model_interfaces_view",
+        "name": "ml_models:models-list",
+        "decorators": ""
+    },
+    {
         "url": "/api/models/compatible-projects",
         "module": "ml_models.api.ModelCompatibleProjects",
         "name": "ml_models:model-compatible-projects-list",
