@@ -54,6 +54,10 @@
         if (document.activeElement.localName === 'body' && e.code !== "Space" && e.code !== "MetaLeft" && !e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
           searchInput.focus();
         }
+
+        if(document.activeElement.localName === 'body' && e.code === "KeyK" && (e.metaKey || e.ctrlKey)) {
+          searchInput.focus();
+        }
       }
     
       window.addEventListener("keydown", handleFocusSearch);
@@ -75,4 +79,3 @@
     toggleQuicNavButton.addEventListener("click", toggleQuickNav)
  }
 })();
-
