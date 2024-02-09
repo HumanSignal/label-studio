@@ -13,5 +13,6 @@ _api_model_urlpatterns = [
 
 urlpatterns = [
     path('api/', include((router.urls, app_name), namespace='api')),
+    path('models/', views.model_interfaces_view, name='models-list'),
     path('api/models/', include(_api_model_urlpatterns)),
 ]
