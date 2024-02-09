@@ -64,11 +64,12 @@
       <% }
       tocHeader = p.page.section;
       %>
-      <li>
+      <% if(p.page.short || p.page.title) { %>
+        <li>
         <a href="<%- url_for(p.page.path) %>" class="<%- p.page.is_new ? ' new' : '' %>" <%- page.title === p.page.title ? 'aria-current="page"' : '' %>>
-        <%- p.page.short ? p.page.short: p.page.title %></a>
+        <%- p.page.short ? p.page.short : p.page.title %></a>
         <% if(p.childPages.length > 0) {%>
-          <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
+          <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
           <button class="page-sidebar-toggle-children-list<%- activeChildPage.length > 0 ? ' active' : ''%>">
             <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
@@ -84,5 +85,6 @@
           </ul>
         <% } %>
       </li>
+      <% } %>
     <% }) %>
 </ul>
