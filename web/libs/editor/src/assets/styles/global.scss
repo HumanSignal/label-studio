@@ -17,7 +17,7 @@
   width: 100%;
 }
 
-.ls-renderall>div {
+.ls-renderall > div {
   width: 49%;
   margin-right: 1%;
 }
@@ -30,7 +30,7 @@
   animation-duration: 1s;
 }
 
-.htx-highlight>.htx-highlight {
+.htx-highlight > .htx-highlight {
   padding: 2px;
 }
 
@@ -60,7 +60,8 @@
   // font-weight: bold;
 }
 
-.htx-highlight-vertical:after {}
+.htx-highlight-vertical:after {
+}
 
 .htx-yoyo:after {
   content: "Yoyo";
@@ -70,7 +71,6 @@
   0% {
     opacity: 0;
   }
-
   100% {
     opacity: 1;
   }
@@ -84,28 +84,25 @@
   padding-left: 1.5em;
 }
 
-.react-dropdown-tree-select .node>.toggle {
+.react-dropdown-tree-select .node > .toggle {
   font-family: monospace;
   font-style: normal;
   color: initial;
   cursor: pointer;
 }
-
 // when node is disabled (when leafsOnly enabled) allow to collapse it by click anywhere
 // achieve this with enormously growing button to the right covering all the text
-.react-dropdown-tree-select .node.disabled>.toggle {
+.react-dropdown-tree-select .node.disabled > .toggle {
   padding-right: 100%;
   margin-right: -100%;
   position: relative;
   z-index: 1;
   user-select: none;
 }
-
-.react-dropdown-tree-select .node.disabled>label {
+.react-dropdown-tree-select .node.disabled > label {
   color: initial;
   cursor: default;
 }
-
-.react-dropdown-tree-select .node.disabled>label>input {
+.react-dropdown-tree-select .node.disabled > label > input {
   opacity: 0;
 }
