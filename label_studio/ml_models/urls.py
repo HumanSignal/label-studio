@@ -7,8 +7,12 @@ from rest_framework.routers import DefaultRouter
 app_name = 'ml_models'
 router = DefaultRouter()
 router.register(r'models', api.ModelInterfaceAPI, basename='models')
+_api_model_urlpatterns = [
+    path('compatible-projects', api.ModelCompatibleProjects.as_view(), name='model-compatible-projects-list'),
+]
 
 urlpatterns = [
     path('api/', include((router.urls, app_name), namespace='api')),
     path('models/', views.model_interfaces_view, name='models-list'),
+    path('api/models/', include(_api_model_urlpatterns)),
 ]
