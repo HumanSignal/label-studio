@@ -3,7 +3,7 @@
     <% const pages = site.pages.filter(page => !page.hide_menu && page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
     <% if(isEnterpriseTheme) pages.forEach(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
     <% const orderedPages = pages.sort('order') %>
-    <% const parentPages = orderedPages.filter(page => page.parent === undefined) %>
+    <% const parentPages = orderedPages.filter(page => isEnterpriseTheme ? page.parent_enterprise === undefined : page.parent === undefined) %>
     <% const childrenPages = orderedPages.filter(page => page.parent_enterprise !== undefined || page.parent !== undefined ) %>
 
     <% const pagesArray = parentPages.map(page => {
