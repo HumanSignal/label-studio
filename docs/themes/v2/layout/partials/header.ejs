@@ -175,15 +175,9 @@
       const currentQuickLink = quickLinks.find(link => link.href.includes(page.type));
     %>
     <ul class="page-header-content-switcher">
-      <li>
-        <a class="active" href="<%- currentQuickLink ? currentQuickLink.href : quickLinks[0].href %>">
-          <%- currentQuickLink ? currentQuickLink.label : quickLinks[0].label %>
-        </a>
-      </li>
       <% quickLinks.forEach(function(link) { %>
-        <% if(!link.href.includes(page.type)) { %>
-        <li><a href="<%- link.href %>"><%- link.label %></a></li>
-      <% }}); %>
+        <li><a href="<%- link.href %>" class="<%- link.href === (currentQuickLink.href || quickLinks[0].href) ? 'active' : '' %>"><%- link.label %></a></li>
+      <% }); %>
       <li>
         <a href="https://app.heartex.com/docs/api" target="_blank">
           API
