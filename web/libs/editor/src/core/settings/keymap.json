@@ -7,19 +7,19 @@
   "audio:playpause": {
 
   },
-  "ts:grow-left":{
+  "ts:grow-left": {
     "key": "left",
     "description": "Increase region to the left"
   },
-  "ts:grow-right":{
+  "ts:grow-right": {
     "key": "right",
     "description": "Increase region to the right"
   },
-  "ts:shrink-left":{
+  "ts:shrink-left": {
     "key": "alt+left",
     "description": "Decrease region on the left"
   },
-  "ts:shrink-right":{
+  "ts:shrink-right": {
     "key": "alt+right",
     "description": "Decrease region on the right"
   },
@@ -44,6 +44,16 @@
     "key": "ctrl+space",
     "mac": "alt+enter",
     "description": "Skip task"
+  },
+  "annotation:next": {
+    "key": "ctrl+right",
+    "mac": "command+right",
+    "description": "Next annotation"
+  },
+  "annotation:previous": {
+    "key": "ctrl+left",
+    "mac": "command+left",
+    "description": "Previous annotation"
   },
   "annotation:undo": {
     "key": "ctrl+z",

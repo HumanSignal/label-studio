@@ -364,6 +364,30 @@ export default types
       }
 
       /**
+       * Hotkey for next annotation
+       */
+      if (self.hasInterface('submit', 'update', 'review')) {
+        hotkeys.addNamed('annotation:next', () => {
+          const annotationStore = self.annotationStore;
+
+          if (annotationStore.viewingAll) return;
+
+          self.nextTask()
+        });
+      }
+      /**
+       * Hotkey for previous annotation
+       */
+      if (self.hasInterface('submit', 'update', 'review')) {
+        hotkeys.addNamed('annotation:previous', () => {
+          const annotationStore = self.annotationStore;
+
+          if (annotationStore.viewingAll) return;
+
+          self.prevTask()
+        });
+      }
+      /**
        * Hotkey for delete
        */
       hotkeys.addNamed('region:delete-all', () => {
