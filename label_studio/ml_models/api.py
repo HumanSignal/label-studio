@@ -99,7 +99,7 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
                         if input.get('type', '') == 'Text':
                             return True
         return False
-    def build_inputs_payload(self, project):
+    def _build_inputs_payload(self, project):
         parsed_config = project.get_parsed_config()
         # using this to remove duplicate inputs 
         input_map = {}
@@ -114,7 +114,7 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
                     }
         return list(input_map.values())
 
-    def build_classes_payload(self, project):
+    def _build_classes_payload(self, project):
         labels, _ = get_all_labels(project.label_config)
         return sorted(list(set([
                     label
@@ -130,8 +130,8 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
         compatible_project_list = []
         for project in user_projects:
             if self._is_project_compatible(project=project):
-                inputs = self.build_inputs_payload(project=project)
-                classes = self.build_classes_payload(project=project)
+                inputs = self._build_inputs_payload(project=project)
+                classes = self._build_classes_payload(project=project)
                 compatible_project_list.append(
                     {
                         'title': project.title,
