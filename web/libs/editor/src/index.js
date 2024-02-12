@@ -1,3 +1,4 @@
+import 'antd/dist/antd.css';
 import './core/feature-flags';
 import './assets/styles/global.scss';
 import { LabelStudio } from './LabelStudio';
