@@ -47,8 +47,6 @@ class ModelProviderConnection(models.Model):
     def validate_api_key(self):
         """
         Checks if API key provided is valid
-
-        Return: boolean if API key is valid or not
         """
         if self.provider == self.ModelProviders.OPENAI:
             client = openai.OpenAI(api_key=self.api_key)
