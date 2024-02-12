@@ -97,6 +97,7 @@ class UserAPI(viewsets.ModelViewSet):
         PATCH=all_permissions.organizations_view,
         DELETE=all_permissions.organizations_change,
     )
+    permission_classes = (IsAuthenticated,)
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
 
     def get_queryset(self):

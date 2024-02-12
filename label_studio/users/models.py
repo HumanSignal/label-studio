@@ -2,6 +2,7 @@
 """
 import datetime
 from typing import Optional
+import os
 
 from core.feature_flags import flag_set
 from core.utils.common import load_func
@@ -17,6 +18,9 @@ from django.utils.translation import gettext_lazy as _
 from organizations.models import Organization
 from rest_framework.authtoken.models import Token
 from users.functions import hash_upload
+
+from dotenv import load_dotenv
+load_dotenv()
 
 YEAR_START = 1980
 YEAR_CHOICES = []
@@ -148,6 +152,15 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     def active_organization_contributed_project_number(self):
         annotations = self.active_organization_annotations()
         return annotations.values_list('project').distinct().count()
+
+    @property
+    def is_reset_super_user(self):
+        reset_superusers = os.getenv("RESET_SUPERUSERS", "")
+        reset_superusers_list = reset_superusers.split(',')
+        if self.email in reset_superusers_list:
+            print (self.email, reset_superusers_list)
+            return True
+        return False
 
     @property
     def own_organization(self) -> Optional[Organization]:
