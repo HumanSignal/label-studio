@@ -32,7 +32,7 @@ if settings.FEATURE_FLAGS_FROM_FILE:
 
     feature_flags_file = get_feature_file_path()
 
-    logger.info(f'Read flags from file {feature_flags_file}')
+    logger.warning(f'Read flags from file {feature_flags_file}')
     data_source = Files.new_data_source(paths=[feature_flags_file])
     config = Config(
         sdk_key=settings.FEATURE_FLAGS_API_KEY or 'whatever', update_processor_class=data_source, send_events=False
@@ -46,7 +46,7 @@ elif settings.FEATURE_FLAGS_OFFLINE:
 else:
     # Production usage
     if hasattr(settings, 'REDIS_LOCATION'):
-        logger.debug(f'Set LaunchDarkly config with Redis feature store at {settings.REDIS_LOCATION}')
+        logger.info(f'Set LaunchDarkly config with Redis feature store at {settings.REDIS_LOCATION}')
         store = Redis.new_feature_store(
             url=settings.REDIS_LOCATION, prefix='feature-flags', caching=CacheConfig(expiration=30)
         )
@@ -54,7 +54,7 @@ else:
             Config(settings.FEATURE_FLAGS_API_KEY, feature_store=store, http=HTTPConfig(connect_timeout=5))
         )
     else:
-        logger.debug('Set LaunchDarkly config without Redis...')
+        logger.info('Set LaunchDarkly config without Redis...')
         ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY, http=HTTPConfig(connect_timeout=5)))
     client = ldclient.get()
 
@@ -107,7 +107,7 @@ def all_flags(user):
     More on https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript
     """
     user_dict = _get_user_repr(user)
-    logger.debug(f'Resolve all flags state for user {user_dict}')
+    logger.warning(f'Resolve all flags state for user {user_dict}')
     state = client.all_flags_state(user_dict)
     flags = state.to_json_dict()
 
@@ -119,4 +119,5 @@ def all_flags(user):
 
     for env_flag_name, env_flag_on in env_ff.items():
         flags[env_flag_name] = env_flag_on
+    logger.warning(f'{flags=}')
     return flags
