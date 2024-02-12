@@ -22,6 +22,6 @@ jobs:
         with:
           python-version: '3.10'
 
-      - uses: pre-commit/action@v3.0.0
+      - uses: pre-commit/action@v3.0.1
         with:
           extra_args: ruff --all-files --hook-stage pre-push
