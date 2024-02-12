@@ -145,7 +145,7 @@ module.exports = composePlugins(withNx({
       });
     }
 
-    if (rule.test.toString().match(/css|scss|sass|styl/)) {
+    if (rule.test.toString().match(/scss|sass|styl/)) {
       const r = rule.oneOf.filter((r) => r.use && r.use.find((u) => u.loader && u.loader.includes('css-loader')));
 
       r.forEach((_r) => {
