@@ -1,10 +1,11 @@
 import drf_yasg.openapi as openapi
+
 from core.permissions import ViewClassPermission, all_permissions
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from ml_models.models import ModelInterface
-from ml_models.serializers import ModelInterfaceSerializer
+from ml_models.models import ModelInterface, ThirdPartyModelVersion
+from ml_models.serializers import ModelInterfaceSerializer, ThirdPartyModelVersionSerializer
 from projects.models import Project
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
@@ -79,6 +80,95 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         serializer.validated_data['created_by'] = self.request.user
         serializer.save()
 
+
+@method_decorator(
+    name='list',
+    decorator=swagger_auto_schema(
+        tags=['Models: Model Versions'],
+        operation_summary='List third-party model versions',
+        operation_description='List all third-party versions of a model.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='model_id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                required=True,
+                description='A unique integer value identifying the model ID to list versions for.',
+            ),
+        ],
+
+    ),
+)
+@method_decorator(
+    name='create',
+    decorator=swagger_auto_schema(
+        tags=['Models: Model Versions'],
+        operation_summary='Create third-party model version',
+        operation_description='Create a new third-party version of a model.',
+    ),
+)
+@method_decorator(
+    name='retrieve',
+    decorator=swagger_auto_schema(
+        tags=['Models: Model Versions'],
+        operation_summary='Get third-party model version',
+        operation_description='Retrieve a specific third-party version of a model.',
+    ),
+)
+@method_decorator(
+    name='update',
+    decorator=swagger_auto_schema(
+        tags=['Models: Model Versions'],
+        operation_summary='Put third-party model version',
+        operation_description='Overwrite a specific third-party model version by ID.',
+    ),
+)
+@method_decorator(
+    name='partial_update',
+    decorator=swagger_auto_schema(
+        tags=['Models: Model Versions'],
+        operation_summary='Update third-party model version',
+        operation_description='Update a specific third-party model version by ID.',
+    ),
+)
+@method_decorator(
+    name='destroy',
+    decorator=swagger_auto_schema(
+        tags=['Models: Model Versions'],
+        operation_summary='Delete third-party model version',
+        operation_description='Delete a third-party model version by ID',
+    ),
+)
+
+class ThirdPartyModelVersionAPI(viewsets.ModelViewSet):
+    serializer_class = ThirdPartyModelVersionSerializer
+    permission_required = ViewClassPermission( # TODO use same permissions or different? 
+        GET=all_permissions.model_interface_view,
+        DELETE=all_permissions.model_interface_delete,
+        PATCH=all_permissions.model_interface_change,
+        PUT=all_permissions.model_interface_change,
+        POST=all_permissions.model_interface_create,
+    )   
+
+    def get_queryset(self):
+        model_interface_pk = self.request.query_params.get('model_id')
+        if model_interface_pk is not None:
+            model_interface = generics.get_object_or_404(ModelInterface, pk=model_interface_pk)
+            model_versions = ThirdPartyModelVersion.objects.filter(parent_model=model_interface.id)
+        else:
+            model_versions = ThirdPartyModelVersion.objects.filter(organization=self.request.user.active_organization)
+
+        return model_versions
+
+    def perform_create(self, serializer):
+        serializer.is_valid(raise_exception=True)
+
+        # we need to save these fields for faster access and filters without excess joins
+        serializer.validated_data['organization'] = self.request.user.active_organization
+        serializer.validated_data['created_by'] = self.request.user
+        serializer.save()
+
+
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
@@ -119,3 +209,5 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
             "projects" : compatible_project_list
         }
         return Response(result, status=200)
+
+
