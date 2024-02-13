@@ -9,7 +9,7 @@ app_name = 'ml_models'
 
 router = DefaultRouter()
 router.register(r'models', ModelInterfaceAPI, basename='models')
-router.register(r'model-verions/third-party', ThirdPartyModelVersionAPI, basename='third-party-model-versions')
+router.register(r'model-versions/third-party', ThirdPartyModelVersionAPI, basename='third-party-model-versions')
 
 _urlpatterns = [
     path('', model_interfaces_view, name='models-list'),

@@ -978,25 +978,25 @@
         "decorators": ""
     },
     {
-        "url": "/api/model-verions/third-party/",
+        "url": "/api/model-versions/third-party/",
         "module": "ml_models.api.ThirdPartyModelVersionAPI",
         "name": "ml_models:api:third-party-model-versions-list",
         "decorators": ""
     },
     {
-        "url": "/api/model-verions/third-party\\.<format>/",
+        "url": "/api/model-versions/third-party\\.<format>/",
         "module": "ml_models.api.ThirdPartyModelVersionAPI",
         "name": "ml_models:api:third-party-model-versions-list",
         "decorators": ""
     },
     {
-        "url": "/api/model-verions/third-party/<pk>/",
+        "url": "/api/model-versions/third-party/<pk>/",
         "module": "ml_models.api.ThirdPartyModelVersionAPI",
         "name": "ml_models:api:third-party-model-versions-detail",
         "decorators": ""
     },
     {
-        "url": "/api/model-verions/third-party/<pk>\\.<format>/",
+        "url": "/api/model-versions/third-party/<pk>\\.<format>/",
         "module": "ml_models.api.ThirdPartyModelVersionAPI",
         "name": "ml_models:api:third-party-model-versions-detail",
         "decorators": ""
