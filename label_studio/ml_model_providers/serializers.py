@@ -43,10 +43,10 @@ class ModelProviderConnectionSerializer(serializers.ModelSerializer):
         try:
             model_provider_connection.validate_api_key()
         except AuthenticationError:
-            raise ValidationError("API key provided is not valid")
+            raise ValidationError('API key provided is not valid')
         except NotImplementedError as e:
             raise ValidationError(e)
         except Exception:
-            raise ValidationError("An error occured while validating API key")
+            raise ValidationError('An error occured while validating API key')
 
         return data

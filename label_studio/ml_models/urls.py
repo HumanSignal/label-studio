@@ -5,7 +5,6 @@ from ml_models.api import ModelCompatibleProjects, ModelInterfaceAPI, ThirdParty
 from ml_models.views import model_interfaces_view
 from rest_framework.routers import DefaultRouter
 
-
 app_name = 'ml_models'
 
 router = DefaultRouter()

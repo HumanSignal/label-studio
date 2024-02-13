@@ -75,4 +75,3 @@ class ThirdPartyModelVersion(ModelVersion):
 
     def has_permission(self, user):
         return user.active_organization == self.organization
-

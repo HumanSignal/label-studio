@@ -1,5 +1,4 @@
 import drf_yasg.openapi as openapi
-
 from core.label_config import get_all_labels
 from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
@@ -96,7 +95,6 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
                 description='A unique integer value identifying the model ID to list versions for.',
             ),
         ],
-
     ),
 )
 @method_decorator(
@@ -139,16 +137,15 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         operation_description='Delete a third-party model version by ID',
     ),
 )
-
 class ThirdPartyModelVersionAPI(viewsets.ModelViewSet):
     serializer_class = ThirdPartyModelVersionSerializer
-    permission_required = ViewClassPermission( # TODO use same permissions or different? 
+    permission_required = ViewClassPermission(  # TODO use same permissions or different?
         GET=all_permissions.model_interface_view,
         DELETE=all_permissions.model_interface_delete,
         PATCH=all_permissions.model_interface_change,
         PUT=all_permissions.model_interface_change,
         POST=all_permissions.model_interface_create,
-    )   
+    )
 
     def get_queryset(self):
         model_interface_pk = self.request.query_params.get('model_id')
@@ -174,48 +171,44 @@ class ThirdPartyModelVersionAPI(viewsets.ModelViewSet):
     decorator=swagger_auto_schema(
         tags=['Models'],
         operation_summary='List projects compatible with model',
-        operation_description="""Retrieve a list of compatible project for model."""
+        operation_description="""Retrieve a list of compatible project for model.""",
     ),
 )
 class ModelCompatibleProjects(generics.RetrieveAPIView):
 
     permission_required = all_permissions.projects_view
- 
+
     def _is_project_compatible(self, project):
         parsed_config = project.get_parsed_config()
         if parsed_config:
             for tag in parsed_config:
-                if parsed_config[tag].get('type',None) == "Choices":
-                    for input in parsed_config[tag].get('inputs',[]):
+                if parsed_config[tag].get('type', None) == 'Choices':
+                    for input in parsed_config[tag].get('inputs', []):
                         if input.get('type', '') == 'Text':
                             return True
         return False
+
     def _build_inputs_payload(self, project):
         parsed_config = project.get_parsed_config()
-        # using this to remove duplicate inputs 
+        # using this to remove duplicate inputs
         input_map = {}
         for tag in parsed_config:
             for input in parsed_config[tag]['inputs']:
-                input_type = input.get('type',None)
+                input_type = input.get('type', None)
                 input_name = input.get('value', None)
                 if input_type and input_name and f'{input_type}_{input_name}' not in input_map:
-                    input_map[f'{input_type}_{input_name}'] = {
-                        'type': input_type,
-                        'name': input_name
-                    }
+                    input_map[f'{input_type}_{input_name}'] = {'type': input_type, 'name': input_name}
         return list(input_map.values())
 
     def _build_classes_payload(self, project):
         labels, _ = get_all_labels(project.label_config)
-        return sorted(list(set([
-                    label
-                    for label_list in labels.values()
-                    for label in label_list
-                ])))
-    
+        return sorted(list(set([label for label_list in labels.values() for label in label_list])))
+
     def get_queryset(self):
-        return Project.objects.with_counts(fields = ['total_annotations_number']).filter(organization=self.request.user.active_organization, total_annotations_number__gt=1)
-    
+        return Project.objects.with_counts(fields=['total_annotations_number']).filter(
+            organization=self.request.user.active_organization, total_annotations_number__gt=1
+        )
+
     def get(self, *args):
         user_projects = self.get_queryset()
         compatible_project_list = []
@@ -224,16 +217,7 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
                 inputs = self._build_inputs_payload(project=project)
                 classes = self._build_classes_payload(project=project)
                 compatible_project_list.append(
-                    {
-                        'title': project.title,
-                        'id': project.id,
-                        'inputs': inputs,
-                        'classes' : classes
-                    }
+                    {'title': project.title, 'id': project.id, 'inputs': inputs, 'classes': classes}
                 )
-        result = {
-            "projects" : compatible_project_list
-        }
+        result = {'projects': compatible_project_list}
         return Response(result, status=200)
-
-

@@ -1,8 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 
-from ml_models.models import ModelInterface, ThirdPartyModelVersion
 from ml_model_providers.models import ModelProviderConnection
+from ml_models.models import ModelInterface, ThirdPartyModelVersion
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from users.serializers import UserSimpleSerializer
@@ -34,9 +34,11 @@ class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # Check if a version of this model exists with same name already
-        existing_versions_with_title = self.Meta.model.objects.filter(title=data['title'], parent_model=data['parent_model'])
+        existing_versions_with_title = self.Meta.model.objects.filter(
+            title=data['title'], parent_model=data['parent_model']
+        )
         if len(existing_versions_with_title) > 0:
-            raise ValidationError("A version with this name already exists.")
+            raise ValidationError('A version with this name already exists.')
 
         # Check if we have a valid API key / connection for this provider
         model_provider_connections = ModelProviderConnection.objects.filter(provider=data['provider'])
