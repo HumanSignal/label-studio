@@ -94,20 +94,26 @@ Start and finish a labeling project with Label Studio by following these steps:
 
 ## Architecture
 
-You can use any of the Label Studio components in your own tools, or customize them to suit your needs. Before customizing Label Studio extensively, you might want to review Label Studio Enterprise Edition to see if it already contains the relevant functionality you want to build. See [Label Studio Features](https://labelstud.io/guide/label_studio_compare.html) for more.
+<div class="opensource-only">
+
+!!! error Enterprise
+    You can use any of the Label Studio components in your own tools, or customize them to suit your needs. Before customizing Label Studio extensively, you might want to review Label Studio Enterprise Edition to see if it already contains the relevant functionality you want to build. See [Label Studio Features](https://labelstud.io/guide/label_studio_compare.html) for more.
+
+</div>
 
 The component parts of Label Studio are available as modular extensible packages that you can integrate into your existing machine learning processes and tools.
 
-| Module                                                                              | Technology                                                                                                  | Description                                                   |
-| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| [Label Studio Backend](https://github.com/heartexlabs/label-studio/)                | Python and [Django](https://www.djangoproject.com/)                                                         | Use to perform data labeling.                                 |
-| [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend)       | JavaScript web app using [React](https://reactjs.org/) and [MST](https://github.com/mobxjs/mobx-state-tree) | Perform data labeling in a user interface.                    |
-| [Data Manager](https://github.com/heartexlabs/dm2)                                  | JavaScript web app using [React](https://reactjs.org/)                                                      | Manage data and tasks for labeling.                           |
-| [Machine Learning Backends](https://github.com/heartexlabs/label-studio-ml-backend) | Python                                                                                                      | Predict data labels at various parts of the labeling process. |
+
+| Module   | Technology      | Description      |
+| --------------- | ----------------------------- | ------------------------------------------------------------- |
+| [Label Studio main app](https://github.com/HumanSignal/label-studio/)     | Python and [Django](https://www.djangoproject.com/)    | The main app with most of the backend code for Label Studio; used to perform data labeling.    |
+| [Label Studio frontend](frontend_reference)       | JavaScript web app using [React](https://reactjs.org/) and [MST](https://github.com/mobxjs/mobx-state-tree) | Located within the main app repo. `web/apps/labelstudio` acts as the central integration point for all frontend elements. `web/libs/editor` is the frontend library.              |
+| Data Manager      | JavaScript web app using [React](https://reactjs.org/)     | Manage data and tasks for labeling. Located under `web/libs/datamanager` in the main app repo.                         |
+| [Machine Learning Backends](https://github.com/HumanSignal/label-studio-ml-backend) | Python   | Predict data labels at various parts of the labeling process. |
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
-<!--update to include data manager-->
+
 
 
 
