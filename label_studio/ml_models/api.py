@@ -104,7 +104,7 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
         # using this to remove duplicate inputs 
         input_map = {}
         for tag in parsed_config:
-            for input in parsed_config[tag].get('inputs',[]):
+            for input in parsed_config[tag]['inputs']:
                 input_type = input.get('type',None)
                 input_name = input.get('value', None)
                 if input_type and input_name and f'{input_type}_{input_name}' not in input_map:
