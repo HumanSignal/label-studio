@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import openai
 
 from django.conf import settings
 from django.db import models
@@ -42,3 +43,13 @@ class ModelProviderConnection(models.Model):
 
     def has_permission(self, user):
         return user.active_organization == self.organization
+
+    def validate_api_key(self):
+        """
+        Checks if API key provided is valid
+        """
+        if self.provider == self.ModelProviders.OPENAI:
+            client = openai.OpenAI(api_key=self.api_key)
+            client.models.list()
+        else:
+            raise NotImplementedError(f"Verification of API key for provider {self.provider} is not implemented")
