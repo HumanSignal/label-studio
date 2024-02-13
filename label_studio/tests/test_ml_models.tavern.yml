@@ -187,12 +187,15 @@ stages:
     response:
       status_code: 200
       json:
-        projects: [
-          {
-            "id": !int "{project_pk}",
-            "title": "compatible_project"
-          }
-        ]
+        projects: 
+          - id : !int "{project_pk}"
+            title: "compatible_project"
+            classes:
+            - "Humor"
+            - "Not Humor"
+            inputs:
+            - type: "Text"
+              name: "text"
       headers:
         content-type: application/json
 

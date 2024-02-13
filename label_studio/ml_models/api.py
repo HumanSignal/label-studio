@@ -1,6 +1,5 @@
-import drf_yasg.openapi as openapi
+from core.label_config import get_all_labels
 from core.permissions import ViewClassPermission, all_permissions
-from django.conf import settings
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from ml_models.models import ModelInterface
@@ -100,6 +99,28 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
                         if input.get('type', '') == 'Text':
                             return True
         return False
+    def _build_inputs_payload(self, project):
+        parsed_config = project.get_parsed_config()
+        # using this to remove duplicate inputs 
+        input_map = {}
+        for tag in parsed_config:
+            for input in parsed_config[tag]['inputs']:
+                input_type = input.get('type',None)
+                input_name = input.get('value', None)
+                if input_type and input_name and f'{input_type}_{input_name}' not in input_map:
+                    input_map[f'{input_type}_{input_name}'] = {
+                        'type': input_type,
+                        'name': input_name
+                    }
+        return list(input_map.values())
+
+    def _build_classes_payload(self, project):
+        labels, _ = get_all_labels(project.label_config)
+        return sorted(list(set([
+                    label
+                    for label_list in labels.values()
+                    for label in label_list
+                ])))
     
     def get_queryset(self):
         return Project.objects.with_counts(fields = ['total_annotations_number']).filter(organization=self.request.user.active_organization, total_annotations_number__gt=1)
@@ -109,10 +130,14 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
         compatible_project_list = []
         for project in user_projects:
             if self._is_project_compatible(project=project):
+                inputs = self._build_inputs_payload(project=project)
+                classes = self._build_classes_payload(project=project)
                 compatible_project_list.append(
                     {
                         'title': project.title,
                         'id': project.id,
+                        'inputs': inputs,
+                        'classes' : classes
                     }
                 )
         result = {
