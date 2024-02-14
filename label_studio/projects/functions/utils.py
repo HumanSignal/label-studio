@@ -1,7 +1,13 @@
-from tasks.models import AnnotationDraft, Task
 from logging import getLogger
+from typing import TYPE_CHECKING
+
+from tasks.models import AnnotationDraft, Task
 
 logger = getLogger(__name__)
+
+
+if TYPE_CHECKING:
+    from projects.models import Project, ProjectSummary
 
 
 def make_queryset_from_iterable(tasks_list):
@@ -31,7 +37,9 @@ def make_queryset_from_iterable(tasks_list):
     return queryset
 
 
-def recalculate_created_annotations_and_labels_from_scratch(project, summary, organization_id):
+def recalculate_created_annotations_and_labels_from_scratch(
+    project: 'Project', summary: 'ProjectSummary', organization_id: int
+) -> None:
     """Recalculate created_labels, created_annotations and created_labels_drafts from scratch
 
     :param project: Project
@@ -41,17 +49,11 @@ def recalculate_created_annotations_and_labels_from_scratch(project, summary, or
     logger.info(f'Reset cache started for project {project.id} and organization {organization_id}')
 
     summary.created_labels, summary.created_annotations = {}, {}
-    if project.annotations.exists():
-        summary.update_created_annotations_and_labels(project.annotations.all())
-    else:
-        summary.save(update_fields=['created_labels', 'created_annotations'])
+    summary.update_created_annotations_and_labels(project.annotations.all())
 
     summary.created_labels_drafts = {}
     drafts = AnnotationDraft.objects.filter(task__project=project)
-    if drafts.exists():
-        summary.update_created_labels_drafts(drafts)
-    else:
-        summary.save(update_fields=['created_labels_drafts'])
+    summary.update_created_labels_drafts(drafts)
 
     logger.info(
         f'Reset cache finished for project {project.id} and organization {organization_id}:\n'
