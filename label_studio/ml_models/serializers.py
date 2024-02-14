@@ -33,8 +33,7 @@ class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_by', 'created_at', 'updated_at']
 
     def validate(self, data):
-        third_party_model_version = self.instance
-        if third_party_model_version:
+        if third_party_model_version := self.instance:
             for key, value in data.items():
                 setattr(third_party_model_version, key, value)
 
