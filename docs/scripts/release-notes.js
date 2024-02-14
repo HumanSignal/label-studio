@@ -3,7 +3,7 @@ const concatMd = require("concat-md");
 
 hexo.extend.filter.register("after_init", async function () {
     const compareVersions = (a, b) => {
-        const versionRegExp = /(?<x>\d+)?\.(?<y>\d+)?\.(?<z>\d+)?(\.dev|dev-|-)?(?<n>\d+)?/;
+        const versionRegExp = /(?<x>\d+)?\.(?<y>\d+)?\.(?<z>\d+)?(?<t>\.dev|dev-|-|\.post)?(?<n>\d+)?/;
         const aMatch = a.match(versionRegExp);
         const bMatch = b.match(versionRegExp);
         const toInt = (a, d) => a.groups[d]? a.groups[d] * 1 : 0;
