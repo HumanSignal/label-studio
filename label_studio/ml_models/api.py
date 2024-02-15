@@ -151,7 +151,9 @@ class ThirdPartyModelVersionAPI(viewsets.ModelViewSet):
         model_interface_pk = self.request.query_params.get('model_id')
         if model_interface_pk is not None:
             model_interface = generics.get_object_or_404(ModelInterface, pk=model_interface_pk)
-            model_versions = ThirdPartyModelVersion.objects.filter(parent_model=model_interface.id)
+            model_versions = ThirdPartyModelVersion.objects.filter(
+                parent_model=model_interface.id, organization=self.request.user.active_organization
+            )
         else:
             model_versions = ThirdPartyModelVersion.objects.filter(organization=self.request.user.active_organization)
 

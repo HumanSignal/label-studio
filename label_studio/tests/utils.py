@@ -225,7 +225,6 @@ def redis_client_mock():
 def openai_client_mock():
     import openai
     import requests
-
     from openai import AuthenticationError
 
     class DummyOpenAIModels:
@@ -238,8 +237,8 @@ def openai_client_mock():
                 return ['mocked-openai-model-1', 'mocked-openai-model-2']
             else:
                 # Dummy request to properly init an AuthenticationError
-                r = requests.get("http://www.google.com")
-                raise AuthenticationError("OpenAI error", response=r, body=None)
+                r = requests.get('http://www.google.com')
+                raise AuthenticationError('OpenAI error', response=r, body=None)
 
     class DummyOpenAIClient:
         def __init__(self, api_key, **kwargs):

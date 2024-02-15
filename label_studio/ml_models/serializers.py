@@ -49,8 +49,12 @@ class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
             raise ValidationError('A version with this name already exists.')
 
         # Check if we have a valid API key / connection for this provider
-        model_provider_connections = ModelProviderConnection.objects.filter(provider=third_party_model_version.provider)
+        model_provider_connections = ModelProviderConnection.objects.filter(
+            provider=third_party_model_version.provider
+        )
         if not model_provider_connections:
-            raise ValidationError(f"A valid API key for provider {third_party_model_version.provider} has not been setup yet.")
+            raise ValidationError(
+                f'A valid API key for provider {third_party_model_version.provider} has not been setup yet.'
+            )
 
         return data
