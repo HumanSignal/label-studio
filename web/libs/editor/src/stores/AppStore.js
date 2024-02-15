@@ -714,11 +714,12 @@ export default types
         // simple logging to detect if simple init is used on users' machines
         console.log('LSF: deserialization is finished');
 
-        // previously items were selected one by one and the last one left selected,
-        // but because they were added to the beginning of the array, the last one was first.
-        // keeping this logic here
-        const current = as.annotations[0];
-        const currentPrediction = !current && as.predictions[0];
+        // next line might be unclear after removing FF_SIMPLE_INIT
+        // reversing the list caused problems before when task is reloaded and list is reversed again.
+        // AnnotationsCarousel has its own ordering anyway, so we just keep technical order
+        // as simple as possible.
+        const current = as.annotations.at(-1);
+        const currentPrediction = !current && as.predictions.at(-1);
 
         if (current) {
           as.selectAnnotation(current.id);

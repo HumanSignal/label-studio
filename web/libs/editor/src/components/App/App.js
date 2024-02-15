@@ -44,7 +44,7 @@ import './App.styl';
 import { Space } from '../../common/Space/Space';
 import { DynamicPreannotationsControl } from '../AnnotationTab/DynamicPreannotationsControl';
 import { isDefined } from '../../utils/utilities';
-import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, isFF } from '../../utils/feature-flags';
+import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from '../../utils/feature-flags';
 import { Annotation } from './Annotation';
 import { Button } from '../../common/Button/Button';
 import { reactCleaner } from '../../utils/reactCleaner';
@@ -165,8 +165,14 @@ class App extends Component {
 
   renderAllAnnotations() {
     const as = this.props.store.annotationStore;
+    const entities = [...as.annotations, ...as.predictions];
 
-    return <Grid store={as} annotations={[...as.annotations, ...as.predictions]} root={as.root} />;
+    if (isFF(FF_SIMPLE_INIT)) {
+      // the same sorting we have in AnnotationsCarousel, so we'll see the same order in both places
+      entities.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+    }
+
+    return <Grid store={as} annotations={entities} root={as.root} />;
   }
 
   renderRelations(selectedStore) {

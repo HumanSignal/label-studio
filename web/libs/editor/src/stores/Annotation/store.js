@@ -9,7 +9,7 @@ import Types from '../../core/Types';
 import { StoreExtender } from '../../mixins/SharedChoiceStore/extender';
 import { ViewModel } from '../../tags/visual';
 import Utils from '../../utils';
-import { FF_DEV_1621, FF_DEV_3034, FF_DEV_3391, FF_DEV_3617, isFF } from '../../utils/feature-flags';
+import { FF_DEV_1621, FF_DEV_3034, FF_DEV_3391, FF_DEV_3617, FF_SIMPLE_INIT, isFF } from '../../utils/feature-flags';
 import { emailFromCreatedBy } from '../../utils/utilities';
 import { Annotation } from './Annotation';
 import { HistoryItem } from './HistoryItem';
@@ -324,6 +324,12 @@ const AnnotationStoreModel = types
 
       const item = createItem(options);
 
+      if (isFF(FF_SIMPLE_INIT)) {
+        self.predictions.push(item);
+
+        return self.predictions.at(-1);
+      }
+
       self.predictions.unshift(item);
 
       const record = self.predictions[0];
@@ -350,9 +356,13 @@ const AnnotationStoreModel = types
         item.completed_by = actual_user ?? getRoot(self).user?.id ?? undefined;
       }
 
-      self.annotations.unshift(item);
+      if (isFF(FF_SIMPLE_INIT)) {
+        self.annotations.push(item);
+      } else {
+        self.annotations.unshift(item);
+      }
 
-      const record = self.annotations[0];
+      const record = self.annotations.at(isFF(FF_SIMPLE_INIT) ? -1 : 0);
 
       record.addVersions({
         result: options.result,
