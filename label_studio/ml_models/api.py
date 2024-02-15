@@ -61,11 +61,11 @@ from rest_framework.response import Response
 class ModelInterfaceAPI(viewsets.ModelViewSet):
     serializer_class = ModelInterfaceSerializer
     permission_required = ViewClassPermission(
-        GET=all_permissions.model_interface_view,
-        DELETE=all_permissions.model_interface_delete,
-        PATCH=all_permissions.model_interface_change,
-        PUT=all_permissions.model_interface_change,
-        POST=all_permissions.model_interface_create,
+        GET=all_permissions.models_view,
+        DELETE=all_permissions.models_delete,
+        PATCH=all_permissions.models_change,
+        PUT=all_permissions.models_change,
+        POST=all_permissions.models_create,
     )
 
     def get_queryset(self):
@@ -140,11 +140,11 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
 class ThirdPartyModelVersionAPI(viewsets.ModelViewSet):
     serializer_class = ThirdPartyModelVersionSerializer
     permission_required = ViewClassPermission(  # TODO use same permissions or different?
-        GET=all_permissions.model_interface_view,
-        DELETE=all_permissions.model_interface_delete,
-        PATCH=all_permissions.model_interface_change,
-        PUT=all_permissions.model_interface_change,
-        POST=all_permissions.model_interface_create,
+        GET=all_permissions.models_view,
+        DELETE=all_permissions.models_delete,
+        PATCH=all_permissions.models_change,
+        PUT=all_permissions.models_change,
+        POST=all_permissions.models_create,
     )
 
     def get_queryset(self):
