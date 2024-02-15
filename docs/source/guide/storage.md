@@ -18,9 +18,17 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Google Cloud Storage](#Google-Cloud-Storage)
 - [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
 - [Redis database](#Redis-database)
-- [Local storage](#Local-storage) <div class="enterprise-only">(for On-premise only)</div>
+- [Local storage](#Local-storage) <div class="enterprise-only">(for On-prem only)</div>
 
-If something goes wrong, check the [troubleshooting section](#Troubleshoot-CORS-and-access-problems). 
+## Troubleshooting
+
+When working with an external cloud storage connection, keep the following in mind:
+
+* Label Studio doesn’t import the data stored in the bucket, but instead creates *references* to the objects. Therefore, you must have full access control on the data to be synced and shown on the labeling screen.
+* Sync operations with external buckets only goes one way. It either creates tasks from objects on the bucket (Source storage) or pushes annotations to the output bucket (Target storage). Changing something on the bucket side doesn’t guarantee consistency in results.
+* We recommend using a separate bucket folder for each Label Studio project.
+
+For more troubleshooting information, see [Troubleshooting Import, Export, & Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center. 
 
 ## How external storage connections and sync work
 
@@ -626,4 +634,4 @@ If you're using Label Studio in Docker, you need to mount the local directory th
 
 ### Troubleshooting cloud storage
 
-See [Troubleshoot import and export issues](import_troubleshoot#Troubleshoot-cloud-storage).
+See [Troubleshooting Import, Export, and Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center. 

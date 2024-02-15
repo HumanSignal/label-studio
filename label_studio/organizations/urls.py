@@ -31,6 +31,8 @@ urlpatterns = [
     path('organization/', views.simple_view, name='organization-simple'),
     path('organization/webhooks', views.simple_view, name='organization-simple-webhooks'),
     path('people/', include(_urlpatterns)),
+    # TODO: temporary route, remove as needed
+    path('models/', views.simple_view, name='models'),
     path('api/organizations/', include((_api_urlpattens, app_name), namespace='api')),
     # invite
     path('api/invite', api.OrganizationInviteAPI.as_view(), name='organization-invite'),

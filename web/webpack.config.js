@@ -128,7 +128,11 @@ module.exports = composePlugins(withNx({
   }
 
   config.module.rules.forEach((rule) => {
-    if (rule.test.toString().includes('scss')) {
+    const testString = rule.test.toString()
+    const isScss = testString.includes('scss')
+    const isCssModule = testString.includes('.module')
+
+    if (isScss) {
       rule.oneOf.forEach(loader => {
         if (loader.use) {
           const cssLoader = loader.use.find(use => use.loader && use.loader.includes('css-loader'));
@@ -145,19 +149,46 @@ module.exports = composePlugins(withNx({
       });
     }
 
+    if (rule.test.toString().match(/scss|sass|styl/) && !isCssModule) {
+      const r = rule.oneOf.filter((r) => {
+        // we don't need rules that don't have loaders
+        if (!r.use) return false;
+
+        const testString = r.test.toString();
+
+        // we also don't need css modules as these are used directly
+        // in the code and don't need prefixing
+        if (testString.match(/module/)) return false;
+
+        // we only target pre-processors that has 'css-loader included'
+        return testString.match(/scss|sass|styl/) && r.use.some(u => u.loader && u.loader.includes('css-loader'));
+      });
+
+      r.forEach((_r) => {
+        const cssLoader = _r.use.find(use => use.loader && use.loader.includes('css-loader'));
+
+        if (!cssLoader) return;
+
+        const isSASS = _r.use.some(use => use.loader && use.loader.match(/sass|scss/));
+
+        if (isSASS) _r.exclude = /node_modules/
+
+        if (cssLoader.options) {
+          cssLoader.options.modules = {
+            localIdentName: css_prefix + '[local]', // Customize this format
+              getLocalIdent(_ctx, _ident, className) {
+                if (className.includes('ant')) return className;
+              }
+          };
+        }
+      })
+    }
+
     if (rule.test.toString().includes('styl')) {
       const r = rule.oneOf.filter((r) => r.use && r.use.find((u) => u.loader && u.loader.includes('stylus-loader')));
 
       r.forEach(_r => {
         const l = _r.use.filter((u) => u.loader && u.loader.includes('stylus-loader'));
-        const cssLoader = _r.use.find(use => use.loader && use.loader.includes('css-loader'));
-
-        if (cssLoader && cssLoader.options) {
-          cssLoader.options.modules = {
-            localIdentName: css_prefix + '[local]', // Customize this format
-          };
-        }
-
 
         l.forEach(_l => {
           _l.options = {
