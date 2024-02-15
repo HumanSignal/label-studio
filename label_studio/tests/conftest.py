@@ -41,10 +41,10 @@ from .utils import (
     import_from_url_mock,
     make_project,
     ml_backend_mock,
+    openai_client_mock,
     redis_client_mock,
     register_ml_backend_mock,
     signin,
-    openai_client_mock,
 )
 
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)

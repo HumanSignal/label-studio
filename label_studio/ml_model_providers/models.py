@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import openai
-
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -52,4 +51,4 @@ class ModelProviderConnection(models.Model):
             client = openai.OpenAI(api_key=self.api_key)
             client.models.list()
         else:
-            raise NotImplementedError(f"Verification of API key for provider {self.provider} is not implemented")
+            raise NotImplementedError(f'Verification of API key for provider {self.provider} is not implemented')

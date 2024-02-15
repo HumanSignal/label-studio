@@ -948,6 +948,12 @@
         "decorators": ""
     },
     {
+        "url": "/models/",
+        "module": "ml_models.views.model_interfaces_view",
+        "name": "ml_models:models-list",
+        "decorators": ""
+    },
+    {
         "url": "/api/models/",
         "module": "ml_models.api.ModelInterfaceAPI",
         "name": "ml_models:api:models-list",
@@ -972,6 +978,30 @@
         "decorators": ""
     },
     {
+        "url": "/api/model-versions/third-party/",
+        "module": "ml_models.api.ThirdPartyModelVersionAPI",
+        "name": "ml_models:api:third-party-model-versions-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/model-versions/third-party\\.<format>/",
+        "module": "ml_models.api.ThirdPartyModelVersionAPI",
+        "name": "ml_models:api:third-party-model-versions-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/model-versions/third-party/<pk>/",
+        "module": "ml_models.api.ThirdPartyModelVersionAPI",
+        "name": "ml_models:api:third-party-model-versions-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/model-versions/third-party/<pk>\\.<format>/",
+        "module": "ml_models.api.ThirdPartyModelVersionAPI",
+        "name": "ml_models:api:third-party-model-versions-detail",
+        "decorators": ""
+    },
+    {
         "url": "/api/",
         "module": "rest_framework.routers.APIRootView",
         "name": "ml_models:api:api-root",
@@ -981,12 +1011,6 @@
         "url": "/api/\\.<format>/",
         "module": "rest_framework.routers.APIRootView",
         "name": "ml_models:api:api-root",
-        "decorators": ""
-    },
-    {
-        "url": "/models/",
-        "module": "ml_models.views.model_interfaces_view",
-        "name": "ml_models:models-list",
         "decorators": ""
     },
     {
