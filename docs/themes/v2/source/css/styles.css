@@ -1118,8 +1118,14 @@ main {
   background-color: var(--color-background);
 }
 
-.content-markdown .admonition+.admonition {
+.content-markdown .admonition+.admonition, .content-markdown h2+.admonition, .content-markdown h3+.admonition, .content-markdown h4+.admonition, 
+.content-markdown h5+.admonition, .content-markdown h6+.admonition {
   margin-top: 2em;
+}
+
+.content-markdown h2+.admonition, .content-markdown h3+.admonition, .content-markdown h4+.admonition, 
+.content-markdown h5+.admonition, .content-markdown h6+.admonition {
+  margin-top: 1em;
 }
 
 .content-markdown .admonition *:last-child {
