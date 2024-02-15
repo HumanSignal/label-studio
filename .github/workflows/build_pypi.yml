@@ -177,6 +177,23 @@ jobs:
                });
             }
 
+      - name: Check file size
+        env:
+          DIST_DIR: "./dist"
+          THRESHOLD: "100"
+        run: |
+          result=true
+          for file in $(find "${DIST_DIR}" -maxdepth 1 -type f); do
+            size=$(du -m "$file" | cut -f1)
+            if [ $size -ge $THRESHOLD ]; then
+              echo "::error::${file}(${size}Mb) exceeds size threshold(${THRESHOLD}Mb)"
+              result=false
+            fi
+          done
+          if [ "${result}" != "true" ]; then
+            exit 1
+          fi
+
       - name: Upload to artifact
         if: always()
         uses: actions/upload-artifact@v4
