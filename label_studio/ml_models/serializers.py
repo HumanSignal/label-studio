@@ -85,7 +85,7 @@ class ModelRunSerializer(serializers.ModelSerializer):
 
         if not ThirdPartyModelVersion.objects.filter(
             pk=model_run.model_version.pk, organization=model_run.organization
-        ):
+        ).exists():
             ValidationError(f'User does not have access to ModelVersion = {data["model_version"]}')
 
         # todo: we may need to update this check to specifically check for project subset conditions
