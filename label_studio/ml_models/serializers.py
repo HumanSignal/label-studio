@@ -2,11 +2,11 @@
 """
 
 from ml_model_providers.models import ModelProviderConnection
-from ml_models.models import ModelInterface, ThirdPartyModelVersion, ModelRun
-from tasks.models import Task
+from ml_models.models import ModelInterface, ModelRun, ThirdPartyModelVersion
 from projects.models import Project
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from tasks.models import Task
 from users.serializers import UserSimpleSerializer
 
 
@@ -61,6 +61,7 @@ class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
 
         return data
 
+
 # from rest_framework import serializers
 
 # class MySerializer(serializers.Serializer):
@@ -79,11 +80,12 @@ class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
 #             pass
 #         return data
 
-class ModelRunSerializer(serializers.ModelSerializer):
 
+class ModelRunSerializer(serializers.ModelSerializer):
     @property
     def org(self):
         return self.context.get('org')
+
     class Meta:
         model = ModelRun
         fields = '__all__'
@@ -91,20 +93,22 @@ class ModelRunSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if model_run := self.instance:
-            print("ln95")
+            print('ln95')
             for key, value in data.items():
                 setattr(model_run, key, value)
 
         else:
-            print("ln98")
+            print('ln98')
             model_run = self.Meta.model(**data)
         print(data)
-        print("ln103")
-        if not Project.objects.filter(id = model_run.project.pk, organization=model_run.organization).exists():
+        print('ln103')
+        if not Project.objects.filter(id=model_run.project.pk, organization=model_run.organization).exists():
             ValidationError(f'User does not have access to Project = {data["project"]}')
-        if not ThirdPartyModelVersion.objects.filter(pk=model_run.model_version.pk, organization=model_run.organization):
+        if not ThirdPartyModelVersion.objects.filter(
+            pk=model_run.model_version.pk, organization=model_run.organization
+        ):
             ValidationError(f'User does not have access to ModelVersion = {data["model_version"]}')
-        #todo: we may need to update this check to specifically check for project subset conditions
-        if len(Task.objects.filter(project = data['project'])) == 0:
-            ValidationError(f'Project does not have any tasks')
+        # todo: we may need to update this check to specifically check for project subset conditions
+        if len(Task.objects.filter(project=data['project'])) == 0:
+            ValidationError('Project does not have any tasks')
         return data

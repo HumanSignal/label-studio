@@ -1,15 +1,15 @@
+from datetime import datetime
+
 import drf_yasg.openapi as openapi
 from core.label_config import get_all_labels
 from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from ml_models.models import ModelInterface, ThirdPartyModelVersion, ModelRun
-from ml_models.serializers import ModelInterfaceSerializer, ThirdPartyModelVersionSerializer, ModelRunSerializer
+from ml_models.models import ModelInterface, ModelRun, ThirdPartyModelVersion
+from ml_models.serializers import ModelInterfaceSerializer, ModelRunSerializer, ThirdPartyModelVersionSerializer
 from projects.models import Project
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
-from rest_framework.exceptions import MethodNotAllowed
-from datetime import datetime
 
 
 @method_decorator(
@@ -226,6 +226,7 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
         result = {'projects': compatible_project_list}
         return Response(result, status=200)
 
+
 @method_decorator(
     name='post',
     decorator=swagger_auto_schema(
@@ -248,26 +249,18 @@ class ModelRunAPI(generics.ListCreateAPIView):
         GET=all_permissions.model_run_view,
         POST=all_permissions.model_run_create,
     )
-    
+
     def get_queryset(self):
         return ModelRun.objects.filter(organization=self.request.user.active_organization)
-
-    def update(self, request, *args, **kwargs):
-        raise MethodNotAllowed('PUT')
-
-    def partial_update(self, request, *args, **kwargs):
-        raise MethodNotAllowed('PATCH')
-
-    def destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed('DELETE')
-    
-    def retrieve(self, request, *args, **kwargs):
-        raise MethodNotAllowed('GET')
 
     def perform_create(self, serializer):
         self.request.data['organization'] = self.request.user.active_organization
         serializer.is_valid(raise_exception=True)
-        existing_model_run = ModelRun.objects.filter(project=serializer.validated_data['project'], model_version=serializer.validated_data['model_version'], project_subset=serializer.validated_data['project_subset'])
+        existing_model_run = ModelRun.objects.filter(
+            project=serializer.validated_data['project'],
+            model_version=serializer.validated_data['model_version'],
+            project_subset=serializer.validated_data['project_subset'],
+        )
         if existing_model_run.exists():
             existing_model_run.delete()
 
@@ -276,8 +269,7 @@ class ModelRunAPI(generics.ListCreateAPIView):
         serializer.validated_data['triggered_at'] = datetime.utcnow()
         serializer.validated_data['organization'] = self.request.user.active_organization
         print(serializer.validated_data)
-        
+
         serializer.save()
 
-        #todo : addtional support needed to generate csv to upload to s3, trigger adala  
-        
+        # todo : addtional support needed to generate csv to upload to s3, trigger adala

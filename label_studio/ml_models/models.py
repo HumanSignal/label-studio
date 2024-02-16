@@ -76,13 +76,13 @@ class ThirdPartyModelVersion(ModelVersion):
 
     def has_permission(self, user):
         return user.active_organization == self.organization
-    
+
 
 class ModelRun(models.Model):
     class ProjectSubset(models.TextChoices):
         ALL = 'All', _('All')
         HASGT = 'HasGT', _('HasGT')
-    
+
     class FileType(models.TextChoices):
         INPUT = 'Input', _('Input')
         OUTPUT = 'Output', _('Output')
@@ -96,7 +96,7 @@ class ModelRun(models.Model):
     organization = models.ForeignKey(
         'organizations.Organization', on_delete=models.CASCADE, related_name='model_runs', null=True
     )
-        
+
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='model_runs')
 
     model_version = models.ForeignKey(ThirdPartyModelVersion, on_delete=models.CASCADE, related_name='model_runs')
@@ -111,19 +111,17 @@ class ModelRun(models.Model):
     project_subset = models.CharField(max_length=255, choices=ProjectSubset.choices, default=ProjectSubset.HASGT)
     status = models.CharField(max_length=255, choices=ProjectStatus.choices, default=ProjectStatus.PENDING)
 
-
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
     triggered_at = models.DateTimeField(_('triggered at'))
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
 
-    
-    #todo may need to clean up in future
+    # todo may need to clean up in future
     @property
     def get_input_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input_tasks.csv'
-    
+
     @property
     def get_output_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/.csv'
