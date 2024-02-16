@@ -1020,6 +1020,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/model-run",
+        "module": "ml_models.api.ModelRunAPI",
+        "name": "ml_models:model-run",
+        "decorators": ""
+    },
+    {
         "url": "/api/model-provider-connections/",
         "module": "ml_model_providers.api.ModelProviderConnectionAPI",
         "name": "model-provider-connections:api:model_provider_connections-list",
