@@ -780,4 +780,3 @@ def pytest_collection_modifyitems(config, items):
             other_tests.append(item)
 
     items[:] = other_tests + mock_tests
-
