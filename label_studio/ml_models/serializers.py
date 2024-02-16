@@ -80,7 +80,6 @@ class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
 #         return data
 
 class ModelRunSerializer(serializers.ModelSerializer):
-    created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='User who created Dataset')
 
     @property
     def org(self):
@@ -88,20 +87,22 @@ class ModelRunSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelRun
         fields = '__all__'
-        read_only_fields = ['created_by', 'created_at', 'triggered_at', 'completed_at']
+        read_only_fields = ['created_by', 'created_at', 'triggered_at', 'completed_at', 'status']
 
     def validate(self, data):
-
-        if third_party_model_version := self.instance:
+        if model_run := self.instance:
+            print("ln95")
             for key, value in data.items():
-                setattr(third_party_model_version, key, value)
+                setattr(model_run, key, value)
 
         else:
-            third_party_model_version = self.Meta.model(**data)
-
-        if not Project.objects.filter(id = data['project'], organization=self.org).exists():
+            print("ln98")
+            model_run = self.Meta.model(**data)
+        print(data)
+        print("ln103")
+        if not Project.objects.filter(id = model_run.project.pk, organization=model_run.organization).exists():
             ValidationError(f'User does not have access to Project = {data["project"]}')
-        if not ThirdPartyModelVersion.objects.filter(pk=data['model_version'], organization=self.org):
+        if not ThirdPartyModelVersion.objects.filter(pk=model_run.model_version.pk, organization=model_run.organization):
             ValidationError(f'User does not have access to ModelVersion = {data["model_version"]}')
         #todo: we may need to update this check to specifically check for project subset conditions
         if len(Task.objects.filter(project = data['project'])) == 0:

@@ -43,6 +43,8 @@ class AllPermissions(BaseModel):
     model_provider_connection_view = 'model_provider_connection.view'
     model_provider_connection_change = 'model_provider_connection.change'
     model_provider_connection_delete = 'model_provider_connection.delete'
+    model_run_create = 'model_run.create'
+    model_run_view = 'model_run.view' 
 
 
 all_permissions = AllPermissions()

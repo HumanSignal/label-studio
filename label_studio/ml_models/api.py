@@ -9,6 +9,7 @@ from projects.models import Project
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import MethodNotAllowed
+from datetime import datetime
 
 
 @method_decorator(
@@ -226,20 +227,30 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
         return Response(result, status=200)
 
 @method_decorator(
-    name='create',
+    name='post',
     decorator=swagger_auto_schema(
         tags=['Models: Model Runs'],
         operation_summary='Create Model Run object',
         operation_description='Create a new Model Run for given project_id, model_version_id and project_subset if it does not exist, if it exists delete the record and create new',
     ),
 )
-class ModelRunAPI(viewsets.ModelViewSet):
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Models: Model Runs'],
+        operation_summary='get list of model runs',
+        operation_description='get list of model runs for the organization',
+    ),
+)
+class ModelRunAPI(generics.ListCreateAPIView):
     serializer_class = ModelRunSerializer
-    def list(self, request, *args, **kwargs):
-        raise MethodNotAllowed('GET')
-
-    def retrieve(self, request, *args, **kwargs):
-        raise MethodNotAllowed('GET')
+    permission_required = ViewClassPermission(  # TODO use same permissions or different?
+        GET=all_permissions.model_run_view,
+        POST=all_permissions.model_run_create,
+    )
+    
+    def get_queryset(self):
+        return ModelRun.objects.filter(organization=self.request.user.active_organization)
 
     def update(self, request, *args, **kwargs):
         raise MethodNotAllowed('PUT')
@@ -249,17 +260,24 @@ class ModelRunAPI(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed('DELETE')
+    
+    def retrieve(self, request, *args, **kwargs):
+        raise MethodNotAllowed('GET')
 
     def perform_create(self, serializer):
-        serializer = ModelRunSerializer(data=self.request.data, context = {'org': self.request.user.active_organization})
-        
+        self.request.data['organization'] = self.request.user.active_organization
+        serializer.is_valid(raise_exception=True)
         existing_model_run = ModelRun.objects.filter(project=serializer.validated_data['project'], model_version=serializer.validated_data['model_version'], project_subset=serializer.validated_data['project_subset'])
         if existing_model_run.exists():
             existing_model_run.delete()
 
         # we need to save these fields for faster access and filters without excess joins
         serializer.validated_data['created_by'] = self.request.user
+        serializer.validated_data['triggered_at'] = datetime.utcnow()
+        serializer.validated_data['organization'] = self.request.user.active_organization
+        print(serializer.validated_data)
+        
         serializer.save()
 
-        #todo : addtional support needed to generate csv to upload to s3 
+        #todo : addtional support needed to generate csv to upload to s3, trigger adala  
         

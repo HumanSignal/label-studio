@@ -16,15 +16,13 @@ _urlpatterns = [
 ]
 
 _api_model_urlpatterns = [
-    path('compatible-projects', ModelCompatibleProjects.as_view(), name='model-compatible-projects-list'),
+    path('models/compatible-projects', ModelCompatibleProjects.as_view(), name='model-compatible-projects-list'),
+    path('model-run',ModelRunAPI.as_view(), name='model-run')
 ]
-_api_model_run_urlpattern = [
-    path('', ModelRunAPI, name='model-run')
-]
+
 
 urlpatterns = [
     path('models/', include(_urlpatterns)),
     path('api/', include((router.urls, app_name), namespace='api')),
-    path('api/models/', include(_api_model_urlpatterns)),
-    path('api/model-run', include(_api_model_run_urlpattern))
+    path('api/', include(_api_model_urlpatterns)),
 ]

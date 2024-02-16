@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection
+from projects.models import Project
 
 
 class ModelInterface(models.Model):
@@ -91,8 +92,12 @@ class ModelRun(models.Model):
         COMPLETED = 'Completed', ('Completed')
         FAILED = 'Failed', ('Failed')
         CANCELED = 'CANCELED', ('CANCELED')
+
+    organization = models.ForeignKey(
+        'organizations.Organization', on_delete=models.CASCADE, related_name='model_runs', null=True
+    )
         
-    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='model_runs')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='model_runs')
 
     model_version = models.ForeignKey(ThirdPartyModelVersion, on_delete=models.CASCADE, related_name='model_runs')
 
