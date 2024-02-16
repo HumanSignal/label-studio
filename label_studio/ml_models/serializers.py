@@ -62,25 +62,6 @@ class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
         return data
 
 
-# from rest_framework import serializers
-
-# class MySerializer(serializers.Serializer):
-#     # Define your serializer fields here
-
-#     def __init__(self, *args, **kwargs):
-#         # Accept additional parameters in the serializer
-#         additional_param = kwargs.pop('additional_param', None)
-#         super(MySerializer, self).__init__(*args, **kwargs)
-#         self.additional_param = additional_param
-
-#     def validate(self, data):
-#         # Use self.additional_param in your validation logic
-#         if self.additional_param is not None:
-#             # Perform validation using additional_param
-#             pass
-#         return data
-
-
 class ModelRunSerializer(serializers.ModelSerializer):
     @property
     def org(self):
@@ -92,7 +73,7 @@ class ModelRunSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_by', 'created_at', 'triggered_at', 'completed_at', 'status']
 
     def validate(self, data):
-        
+
         if model_run := self.instance:
             for key, value in data.items():
                 setattr(model_run, key, value)
@@ -110,5 +91,5 @@ class ModelRunSerializer(serializers.ModelSerializer):
         # todo: we may need to update this check to specifically check for project subset conditions
         if len(Task.objects.filter(project=data['project'])) == 0:
             ValidationError('Project does not have any tasks')
-            
+
         return data
