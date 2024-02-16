@@ -221,34 +221,6 @@ def redis_client_mock():
         yield
 
 
-@contextmanager
-def openai_client_mock():
-    import openai
-    import requests
-    from openai import AuthenticationError
-
-    class DummyOpenAIModels:
-        def __init__(self, api_key, **kwargs):
-            self.api_key = api_key
-            self.valid_api_keys = ['valid-openai-api-key-1', 'valid-openai-api-key-2']
-
-        def list(self):
-            if self.api_key in self.valid_api_keys:
-                return ['mocked-openai-model-1', 'mocked-openai-model-2']
-            else:
-                # Dummy request to properly init an AuthenticationError
-                r = requests.get('http://www.google.com')
-                raise AuthenticationError('OpenAI error', response=r, body=None)
-
-    class DummyOpenAIClient:
-        def __init__(self, api_key, **kwargs):
-            self.api_key = api_key
-            self.models = DummyOpenAIModels(api_key)
-
-    with mock.patch.object(openai, 'OpenAI', new=DummyOpenAIClient):
-        yield
-
-
 def upload_data(client, project, tasks):
     tasks = TaskWithAnnotationsSerializer(tasks, many=True).data
     data = [{'data': task['data'], 'annotations': task['annotations']} for task in tasks]

@@ -41,7 +41,6 @@ from .utils import (
     import_from_url_mock,
     make_project,
     ml_backend_mock,
-    openai_client_mock,
     redis_client_mock,
     register_ml_backend_mock,
     signin,
@@ -321,12 +320,6 @@ def redis_client():
 def ml_backend():
     with ml_backend_mock() as m:
         yield m
-
-
-@pytest.fixture(autouse=True)
-def openai_client():
-    with openai_client_mock():
-        yield
 
 
 @pytest.fixture(name='import_from_url')
@@ -787,3 +780,4 @@ def pytest_collection_modifyitems(config, items):
             other_tests.append(item)
 
     items[:] = other_tests + mock_tests
+
