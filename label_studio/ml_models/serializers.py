@@ -92,23 +92,23 @@ class ModelRunSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_by', 'created_at', 'triggered_at', 'completed_at', 'status']
 
     def validate(self, data):
+        
         if model_run := self.instance:
-            print('ln95')
             for key, value in data.items():
                 setattr(model_run, key, value)
-
         else:
-            print('ln98')
             model_run = self.Meta.model(**data)
-        print(data)
-        print('ln103')
+
         if not Project.objects.filter(id=model_run.project.pk, organization=model_run.organization).exists():
             ValidationError(f'User does not have access to Project = {data["project"]}')
+
         if not ThirdPartyModelVersion.objects.filter(
             pk=model_run.model_version.pk, organization=model_run.organization
         ):
             ValidationError(f'User does not have access to ModelVersion = {data["model_version"]}')
+
         # todo: we may need to update this check to specifically check for project subset conditions
         if len(Task.objects.filter(project=data['project'])) == 0:
             ValidationError('Project does not have any tasks')
+            
         return data
