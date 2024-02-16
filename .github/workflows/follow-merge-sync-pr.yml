@@ -13,8 +13,8 @@ on:
       - 'lse-release/**'
     paths-ignore:
       - 'label_studio/frontend/**'
-      - 'web/**'
       - 'docs/**'
+#      - 'web/dist/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}

@@ -15,7 +15,6 @@ export const Actions = ({ store }) => {
   const isViewAll = annotationStore.viewingAll;
 
   const onToggleVisibility = useCallback(() => {
-    !isViewAll && entity.saveDraftImmediatelyWithResults({ useToast: true });
     annotationStore.toggleViewingAllAnnotations();
   }, [annotationStore]);
 

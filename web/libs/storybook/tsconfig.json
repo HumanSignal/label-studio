@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "checkJs": false,
+    "jsx": "preserve",
+    "rootDirs": [
+      "./src"
+    ],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "typeRoots": [
+      "src/types",
+      "../../node_modules/@types"
+    ],
+    "types": []
+  },
+  "files": [],
+  "include": [
+    "./src/**/*.ts",
+    "./tests/**/*.ts",
+    "cypress.config.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.storybook.json"
+    }
+  ],
+  "extends": "../../tsconfig.base.json"
+}
