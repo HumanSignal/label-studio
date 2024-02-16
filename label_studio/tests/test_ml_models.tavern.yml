@@ -767,3 +767,175 @@ stages:
         id: !int "{model_version_id}"
         title: "{model_version_title}"
         prompt: "My modified prompt with a {{variable}} or maybe a $variable"
+
+---
+test_name: test_model_run_create_and_list
+strict: false
+marks:
+  - usefixtures:
+    - django_live_url
+
+stages:
+  - type: ref 
+    id: signup
+  - type: ref 
+    id: get_user_token
+
+  - name: Get user and active organization
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          organization_id: active_organization
+          user_email: email
+          user_id: id
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="Humor"/><Choice value="Not Humor"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+
+  - name: Import tasks
+    request:
+      files:
+        csv: tests/test_suites/samples/humor_dataset_2_annotations.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task: "task_ids[0]"
+          second_task: "task_ids[1]"
+          
+  - name: Create a model
+    request:
+      url: "{django_live_url}/api/models"
+      method: POST
+      json:
+        title: "My model 1"
+        description: "My first model"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_id: id
+          model_created_at: created_at
+          model_updated_at: updated_at
+
+  - name: Get list of provider choices
+    request:
+      url: "{django_live_url}/api/model-provider-connections/provider-choices"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          provider_choices: provider_choices
+
+  - name: Create a model provider connection
+    request:
+      url: "{django_live_url}/api/model-provider-connections"
+      method: POST
+      json:
+        provider: "{provider_choices[0]}"
+        api_key: "valid-openai-api-key-1" # This is one of the 2 "valid" keys in openai client mock
+    response:
+        status_code: 201
+        save:
+          json:
+            mpc_id: id
+
+  - name: Create a third party model version
+    request:
+      url: "{django_live_url}/api/model-versions/third-party"
+      method: POST
+      json:
+        title: "My first model version"
+        prompt: "My model versions prompt"
+        provider: "{provider_choices[0]}"
+        provider_model_id: "gpt-3.5" # Not checked for validity anywhere at the moment
+        parent_model: !int "{model_id}"
+    response:
+      status_code: 201
+      json:
+        created_by:
+          id: !int "{user_id}"
+          email: "{user_email}"
+      save:
+        json:
+          model_version_id: id
+          model_version_title: title
+          model_version_prompt: prompt
+          model_version_provider_model_id: provider_model_id
+          model_version_parent_model: parent_model
+
+  - name: Get specific model version
+    request:
+      url: "{django_live_url}/api/model-versions/third-party/{model_version_id}"
+      method: GET
+    response:
+      json:
+        id: !int "{model_version_id}"
+        title: "{model_version_title}"
+        prompt: "{model_version_prompt}"
+        provider_model_id: "{model_version_provider_model_id}"
+        parent_model: !int "{model_version_parent_model}"
+  
+  - name: Create a model run
+    request:
+      url: "{django_live_url}/api/model-run"
+      method: POST
+      json:
+        project_subset: "All"
+        project: !int "{project_pk}"
+        model_version: !int "{model_version_id}"
+    response:
+      status_code: 201
+      save:
+        json:
+          model_run_id: id
+          model_run_created_at: created_at
+          model_run_triggered_at: triggered_at
+          model_run_status: status
+          model_run_project_subset: project_subset
+          model_run_completed_at: completed_at
+          model_run_organization: organization
+          model_run_project: project
+          model_run_model_version: model_version
+          model_run_created_by: created_by
+  
+
+  - name: get a model run list 
+    request:
+      url: "{django_live_url}/api/model-run"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        - id: !int "{model_run_id}"
+          created_at: "{model_run_created_at}"
+          triggered_at: "{model_run_triggered_at}"
+          status: "{model_run_status}"
+          project_subset: "{model_run_project_subset}"
+          completed_at: null
+          organization: !int "{model_run_organization}"
+          project: !int "{model_run_project}"
+          model_version: !int "{model_run_model_version}"
+          created_by: !int "{model_run_created_by}"
