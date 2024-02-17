@@ -56,11 +56,12 @@ Here, select your workspace, enter a project name, and (optionally) a project de
 Once complete, you can click **Save** to create the project, or you can complete the other tabs. 
 
 Data Import
-: From here, you can upload files into Label Studio. <br/>
-However, for larger projects, we recommend setting up cloud storage or using a different import method. For more information, see [Get data into Label Studio](tasks) and [Sync data from external storage](storage).
+: From here, you can upload files into Label Studio. You can do this now or after the project has been created.<br/>
+However, for larger projects, we recommend setting up cloud storage or using a different import method. For more information, see [Get data into Label Studio](tasks) and [Sync data from external storage](storage).<br />
 
 Labeling Setup
-: You can select a template to begin your labeling configuration. For easier setup, select a [template](/templates). You can later customize template to meet your needs. See [Configure labeling](setup). 
+: You can select a template to begin your labeling configuration. For easier setup, select a [template](/templates). You can later customize template to meet your needs. See [Configure labeling](setup). <br/>
+You can do this now or after the project has been created.
 
 When you're done, click **Save**. 
 
@@ -117,9 +118,9 @@ In versions of Label Studio earlier than 1.0.0, when you start Label Studio for 
 
 ## Configure high-impact settings
 
-By design, Label Studio is highly customizable and there are numerous configuration options for a project. 
+By design, Label Studio is highly customizable and there are numerous configuration options for a project. To configure project settings, open a project and click **Settings** in the upper right. 
 
-To avoid getting overwhelmed, focus on the following settings. They have the most impact on your labeling experience:
+To avoid getting overwhelmed, focus on the following settings. They have the most impact on your labeling experience.
 
 #### Annotation settings
 
