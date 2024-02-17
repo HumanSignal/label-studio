@@ -64,7 +64,7 @@ User roles are set at the organization level. For more information, see [User ro
 
     Once added, managers can see all projects within a workspace, including unpublished projects. 
 * **Annotators**--Can see cards for all projects, but cannot enter the label stream until the project is published and they have tasks to complete. 
-* **Reviewers**--Can see cards for all projects, but cannot enter access the project until it is published and they have reviews to annotate. 
+* **Reviewers**--Can see cards for all projects, but cannot access the project until it is published and they have reviews to annotate. 
 
 ## Edit workspaces
 
@@ -76,7 +76,7 @@ To access these actions, your user role must be Owner, Administrator, or Manager
 
 ## Archive workspaces
 
-To reduce clutter in the workspace sidebar you can archive one or more workspaces from view, allowing you to easily locate high-priority labeling initiatives. You’ll still have complete access to workspaces that have been archived and you can unarchive them at any time.
+To reduce clutter in the workspace sidebar you can archive workspaces from view, allowing you to easily locate high-priority labeling initiatives. You’ll still have complete access to workspaces that have been archived and you can unarchive them at any time.
 
 Click the gear icon next to the workspace name, or click the overflow menu next to the workspace and select **Archive**:
 
@@ -88,14 +88,14 @@ To view archived workspaces, expand the archived workspaces menu at the bottom o
 
 ![Screenshot of archived workspace options](/images/project/workspace-archive-expand.png)
 
-From here, you can use click the gear icon next to the workspace name, or click the overflow menu next to the workspace and select **Unarchive**:
+From here, you can click the gear icon next to the workspace name, or click the overflow menu next to the workspace and select **Unarchive**:
 
 ![Screenshot of archived workspace options](/images/project/workspace-unarchive-menu.png)
 
 
 ## Delete a workspace
 
-You can only delete a workspace if it has no projects. If you want to delete a workspace, first delete the projects or [move them](manage_projects#Move-projects-between-workspaces) to another workspace.
+You can only delete a workspace if it has no projects. If you want to delete a workspace, first [delete the projects](manage_projects#Delete-projects) or [move them](manage_projects#Move-projects-between-workspaces) to another workspace.
 
 Once all projects are deleted, click the gear icon next to the workspace name and click **Delete**. 
 
