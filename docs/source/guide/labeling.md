@@ -248,49 +248,48 @@ You can add multiple types of regions to image annotations. You can add any of t
 To add different types of regions to your image annotations, follow this example.
 
 Create a custom template for your labeling interface using the following example:
+
 ```xml
 <View>
-  <Image name="image" value="$image" />
-  <Rectangle name="rect" toName="image" />
-  <Ellipse name="ellipse" toName="image" />
-  <KeyPoint name="kp" toName="image" />
-  <Polygon name="polygon" toName="image" />
-  <Brush name="brush" toName="image" />
-  <Choices name="choices" toName="image">
-    <Choice value="yes"></Choice>
-    <Choice value="no"></Choice>
-  </Choices>
-<Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
-  <Label value="building" background="green"></Label>
-  <Label value="vehicle" background="blue"></Label>
-  </Labels>
+    <Image name="image" value="$image" />
+    <Rectangle name="rect" toName="image" />
+    <Ellipse name="ellipse" toName="image" />
+    <KeyPoint name="kp" toName="image" />
+    <Polygon name="polygon" toName="image" />
+    <Brush name="brush" toName="image" />
+    <Choices name="choices" toName="image">
+        <Choice value="yes"></Choice>
+        <Choice value="no"></Choice>
+    </Choices>
+    <Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
+        <Label value="building" background="green"></Label>
+        <Label value="vehicle" background="blue"></Label>
+    </Labels>
 </View>
 ```
 
 This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator, along with image classification choices of yes and no, and region labels of building and vehicle.
 
-### Faster image labeling
-You can add a rectangle or an ellipse to your image with just two clicks, or double click to create a polygon, rectangle, or ellipse. 
-
-If you accidentally select a point on an image while creating a polygon, just double click to remove the erroneous point and continue creating the region. There must be at least three points on the polygon to be able to remove a point.
-
 ### Create regions without labels
 When you're annotating images, you can create regions without applying labels. 
 
-1. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
-2. Select the created region in the sidebar or on the image.
-3. Select the label that you want to apply to the region.
-4. Repeat these steps for any regions that you want to create.
+1. Create a custom template using the example provided above under [Add multiple types of regions to image annotations](#Add-multiple-types-of-regions-to-image-annotations). 
+2. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
+3. Select the created region in the sidebar or on the image.
+4. Select the label that you want to apply to the region.
+5. Repeat these steps for any regions that you want to create.
 
 This can be helpful for two-step labeling, where you want one annotator to create regions and another annotator to label the regions. 
-
-By default, regions without labels appear gray.
 
 ### Erase brush mask labels
 If you make a mistake when labeling with the brush mask, you can erase it. You must select a brush region in the sidebar before you can erase any part of it. 
 
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
 
+### Faster image labeling
+You can add a rectangle or an ellipse to your image with just two clicks, or double click to create a polygon, rectangle, or ellipse. 
+
+If you accidentally select a point on an image while creating a polygon, just double click to remove the erroneous point and continue creating the region. There must be at least three points on the polygon to be able to remove a point.
 
 ## Outliner 
 
