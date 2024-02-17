@@ -57,7 +57,7 @@ When you duplicate a project, you can copy the following:
 * Most project settings
 * Project tasks or uploaded data (optionally)
 
-It does not include:
+Duplication does not include:
 
 * Project membership settings 
 * Task assignments
