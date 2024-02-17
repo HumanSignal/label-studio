@@ -1,0 +1,401 @@
+---
+title: Project settings
+short: Project settings
+tier: enterprise
+type: guide
+order: 0
+order_enterprise: 62
+meta_title: Project settings
+meta_description: Brief descriptions of all the options available when configuring the project settings
+section: "Project Management"
+date: 2024-02-06 22:28:14
+---
+
+!!! error Enterprise
+    Many settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_comparison) to learn more.
+
+## General
+
+Use these settings to specify some basic information about the project. 
+
+| Field          | Description    |
+| ------------- | ------------ |
+| **Workspace**         | Select a [workspace](workspaces) for the project. |
+| **Project Name** | Enter a name for the project. |
+| **Description**       | Enter a description for the project. |
+| **Color**      | You can select a color for the project. The project is highlighted with this color when viewing the Projects page. |
+| **Proxy Credentials**     | Enter proxy credentials. These might be necessary if your task data is protected with basic HTTP access authentication.<br><br> For example, if your Label Studio instance needs to access the internet through a corporate proxy server. |
+
+## Labeling interface
+
+The labeling interface is the central configuration point for projects. This determines how tasks are presented to annotators. 
+
+For information on setting up the labeling interface, see [Labeling configuration](setup). 
+
+## Annotation
+
+Use these settings to configure what options annotators will see and how their labeling tasks are assigned. 
+
+<dl>
+
+<dt>Instructions</dt>
+
+<dd>
+Specify instructions to show the annotators. This field accepts HTML formatting. 
+
+Enable **Show before labeling** to display a pop-up message to annotators when they enter the label stream. If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface. 
+
+<dd>
+
+<dt id="distribute-tasks">Distribute Labeling Tasks</dt>
+
+<dd>
+
+Select how you want to distribute tasks to annotators for labeling. 
+
+| Field          | Description    |
+| ------------- | ------------ |
+| **Auto**         | Annotators are automatically assigned to tasks, and the option to manually assign annotators is disabled. Automatic assignments are distributed to all users with the Annotator role who are project [members](#Members) <br /><br />You can further define the automatic assignment workflow in the [**Quality** settings](#Quality).  |
+| **Manual** | You must [manually assign](manage_data#Assign-annotators-to-tasks) annotators to tasks. Annotators are not be able to view any labeling tasks until they have those tasks manually assigned to them. |
+
+<dd>
+
+<dt>Skip Queue</dt>
+
+<dd>
+
+Select how you want to handle skipped tasks. To disallow skipped tasks, you can hide the **Skip** action under the **Annotating Options** section (see below).
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+**Requeue skipped tasks back to the annotator**
+</td>
+<td>
+
+If an annotator skips a task, the task is moved to the bottom of their queue. They see the task again as they reach the end of their queue. 
+
+If the annotator exits the label stream without labeling the skipped task, and then later re-enter the label stream, whether they see the task again depends on how task distribution is set up. In auto distribution mode, whether they see the task again depends on whether other annotators have since completed the task. In manual distribution mode, they will continue to see the skipped task until it is completed.  
+
+Skipped tasks are not marked as completed, and affect the Overall Project Progress calculation visible from the project Dashboard. (Meaning that the progress for a project with skipped tasks will be less than 100%.)  
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Requeue skipped tasks to others**
+</td>
+<td>
+
+If an annotator skips a task, the task is removed from their queue and assigned to a different annotator.
+
+After skipping the task and completing their labeling queue, the annotator cannot return to the skipped task. If you are using auto distribution, another annotator can label the task. If you are using manual distribution, the the skipped task must be manually assigned to another annotator to be completed. 
+
+If there are no other annotators assigned to the task, or if all annotators skip the task, then the task remains unfinished. Skipped tasks are not marked as completed, and affect the Overall Project Progress calculation visible from the project Dashboard. (Meaning that the progress for a project with skipped tasks will be less than 100%.) 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Ignore skipped**
+</td>
+<td>
+
+How this setting works depends on your labeling distribution method. 
+
+* Auto distribution: If an annotator skips a task, the task is marked as completed and removed from the annotator's queue. 
+
+    If task overlap (as defined in [**Annotations per task minimum**](#overlap)) is set to 1, then the skipped task is not seen again by an annotator. However, if the overlap is greater than 1, then the task is still shown to other annotators until the minimum annotations are reached. 
+
+* Manual distribution: If the annotator skips a task, it is removed from their queue. But other annotators assigned to the task will still see it in their queue.  
+
+For both distribution methods, **Ignore skipped** treats skipped tasks differently when it comes to calculating progress. Unlike the other skip queue options, in this case skipped tasks are marked as Completed and do not adversely affect the Overall Project Progress calculation visible from the project Dashboard. (Meaning that the progress for a project with skipped tasks can still be 100%, assuming all tasks are otherwise completed.)
+
+</td>
+</tr>
+</table>
+
+<dd>
+
+<dt id="annotating-options">Annotating Options</dt>
+
+<dd>
+
+Configure additional settings for annotators. 
+
+| Field          | Description    |
+| ------------- | ------------ |
+| **Show Skip button**         | Use this to show or hide the **Skip** action for annotators. |
+| **Allow empty annotations** | This determines whether annotators can submit a task without making any annotations on it. If enabled, annotators can submit a task even if they haven't added any labels or regions, resulting in an empty annotation. |
+| **Show the Data Manager to annotators** | When disabled, annotators can only enter the label stream. When enabled, annotators can access the Data Manager, where they can select which tasks to complete from the Data Manager list. <br /><br />However, some information is still hidden from annotators and they can only view a subset of the Data Manager columns. For example, they cannot see columns such as Annotators, Agreement, Reviewers, and more. |
+| **Reveal pre-annotations interactively** | When enabled, pre-annotations are not automatically displayed to an annotator. Instead, annotators can choose when to reveal these pre-annotations as they work on the task, providing them with the opportunity to first assess the image or text without the influence of the model's predictions. |
+| **Annotators must leave a comment on skip** | When enabled, annotators are required to leave a comment when skipping a task. |
+
+<dd>
+
+<dt id="task-sampling">Task Sampling</dt>
+
+<dd>
+
+Configure the order in which tasks are presented to annotators.  
+
+| Field          | Description    |
+| ------------- | ------------ |
+| **Uncertainty Sampling**         | This option is for when you are using a machine learning backend and want to employ [active learning](active_learning). Active learning mode continuously trains and reviews predictions from a connected machine learning model, allowing the model to improve iteratively as new annotations are created.<br /><br />When Uncertainty Sampling is enabled, Label Studio strategically selects tasks with the least confident, or most uncertain, prediction scores from your model. The goal is to minimize the amount of data that needs to be labeled while maximizing the performance of the model. |
+| **Sequential Sampling** | Tasks are shown to annotators in the same order that they appear on the Data Manager. |
+| **Uniform Sampling** | Tasks are shown in random order.  |
+
+<dd>
+
+</dl>
+
+
+## Review
+
+Use these settings to configure what options reviewers will see. 
+
+<dl>
+
+<dt>Instructions</dt>
+
+<dd>
+Specify instructions to show the reviewers. This field accepts HTML formatting. 
+
+Enable **Show before reviewing** to display a pop-up message to reviewers when they enter the label stream. If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface.  
+
+<dd>
+
+<dt id="reviewing-options">Reviewing Options</dt>
+
+<dd>
+
+Configure additional settings for reviewers.
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+Review completion
+</td>
+<td>
+
+Select how many annotations need to be processed by a reviewer:
+
+* **Mark task as reviewed after it has at least 1 accepted annotation**--In a task where multiple annotators submitted labels, the reviewer only needs to accept one to consider the task reviewed. 
+
+* **Mark task as reviewed after all annotations are processed**--In a task where multiple annotators submitted labels, the reviewer needs to accept or reject annotations submitted by all annotators. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Review only manually assigned tasks**
+</td>
+<td>
+
+If enabled, a reviewer can only see tasks to which they've been assigned. Otherwise, they can view all tasks that are ready for review.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Show only finished tasks in the review stream**
+</td>
+<td>
+
+If enabled, a reviewer only sees tasks that have met the **Annotations per task minimum** threshold. 
+
+Note that in most cases, skipped tasks do not contribute towards meeting the minimum. See the **Skip Queue** settings above. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Show the Data Manager to reviewers**
+</td>
+<td>
+
+When disabled, reviewers can only enter the review stream. When enabled, reviewers can access the Data Manager, where they can select which tasks to review. 
+
+However, some information is still hidden from reviewers and they can only view a subset of the Data Manager columns. For example, they cannot see columns such as who the other Reviewers are. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Requeue rejected tasks back to annotators**
+</td>
+<td>
+
+Rejected tasks are reassigned back to the annotator. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Reviewers must leave a comment on reject**
+</td>
+<td>
+
+When rejecting a task, the reviewer must leave a comment.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Show agreement to reviewers in the Data Manager**
+</td>
+<td>
+
+If reviewers can view the Data Manager, this setting controls whether they can access the Agreement column. 
+
+</td>
+</tr>
+</table>
+
+<dd>
+
+</dl>
+
+
+## Quality
+
+<dl>
+
+<dt id="overlap">Overlap of Annotations</dt>
+
+<dd>
+
+!!! note
+    Overlap settings only apply when the project is using Auto distribution mode. If you are using Manual distribution mode, all tasks must be manually assigned - meaning that you are also manually determining overlap.  
+
+By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, increase the **Annotations per task minimum**.
+
+Us the slider below this field to indicate how the overlap should be enforced. For example, if you want all tasks to be annotated by at least 2 annotators:
+
+- Set the minimum number of annotations to **2**
+- Enforce the overlap for 100% of tasks.
+
+If you want at least half of the tasks to be annotated by at least 3 people:
+
+- Set the minimum number of annotations to **3**
+- Enforce the overlap for 50% of tasks.
+
+The following options supersede what you specified under [**Annotations > Task Sampling**](#task-sampling). 
+
+| Field          | Description    |
+| ------------- | ------------ |
+| **Show tasks with overlap first**         | If your overlap enforcement is less than 100% (meaning that only some tasks require multiple annotators), then the tasks that *do* require multiple annotations are shown first. <br /><br />If your overlap is 100%, then this setting has no effect.   |
+| **Show tasks with ground truth labels first** | Prioritize tasks that already have a ground truth label. |
+
+</dd>
+
+<dt>Annotation Agreement</dt>
+
+<dd>
+
+Annotation statistics such as annotator consensus are calculated using an agreement metric. If you want the agreement metric to calculate annotation or prediction agreement by requiring exact matching choices, choose that option in the annotation settings. 
+
+For more information, see [Annotation agreement and how it is calculated](stats). 
+
+</dd>
+
+<dt>Custom weights</dt>
+
+<dd>
+
+Set custom weights for tags and labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
+
+Weights set to zero are ignored from calculation.
+
+</dd>
+</dl>
+
+## Members
+
+Use this page to control which users are project members. 
+
+Project members have access to published projects, depending on the permissions associated with their role. For more information, see [User roles and permissions](admin_roles). 
+
+Some users cannot be added or removed from the Members page at the project level. These users include administrators, who already have access to every project (outside of the Sandbox). This also includes users who have been added as members to the Workspace. Workspace membership is inherited by the projects within the workspace.   
+
+If you have [Auto distribution](#distribute-tasks) enabled, users with the Annotator role are automatically assigned tasks when they are added as members. Similarly, by default, project members with the Reviewer role are able to begin reviewing annotations once the tasks are labeled. 
+
+If you have [Manual distribution](#distribute-tasks) enabled, you need to add users with the Annotator role as project members before you can assign them to tasks. And if you have [**Review only manually assigned tasks**](#reviewing-options) enabled, the users with the Reviewer role must also be project members before they can be assigned to tasks. 
+
+## Machine learning
+
+Click **Add Model** to connect an machine learning (ML) backend to your project. For more information about using ML backends, see [Machine learning integration](ml).
+
+<dl>
+
+<dt>ML-Assisted Labeling</dt>
+
+<dd>
+
+| Field          | Description    |
+| ------------- | ------------ |
+| **Start model training after any annotations are submitted or updated**         | Triggers the connected ML backend to start the training process each time an annotation is created or updated. <br /><br />This is part of an [active learning loop](active_learning) where the model can be continuously improved as new annotations are added to the dataset. When this setting is enabled, the ML backend's `fit()` method is called, allowing the model to learn from the most recent annotations and potentially improve its predictions for subsequent tasks.   |
+| **Retrieve predictions when loading a task automatically** | When enabled, Label Studio automatically fetches predictions from the connected ML backend for each task as it is loaded by an annotator. This means that when an annotator navigates to a new task, Label Studio sends a request to the ML backend to retrieve any available predictions for that task, which are then displayed to the annotator. <br /><br />When disabled, someone must manually retrieve predictions. This can be done in using the **Actions** menu in the Data Manager.  |
+| **Show predictions to annotators in the Label Stream and Quick View** | When enabled, predictions are shown to annotators during the labeling process. This is enabled by default.<br /><br />Disable this option to hide predictions from annotators. For example, you might want to hide predictions to prevent bias. |
+
+</dd>
+
+<dt>Model Version</dt>
+
+<dd>
+
+If you have multiple versions, you can select which version is used to generate predictions. 
+
+</dd>
+
+</dl>
+
+## Cloud storage
+
+This is where you connect Label Studio to a cloud storage provider:
+
+* **Source Cloud Storage**--This is where the source data for your project is saved. When you sync your source storage, Label Studio retrieves data to be annotated. 
+* **Target Cloud Storage**--This is where your annotations are saved. When you sync your target storage, annotations are sent from Label Studio to the target storage location. 
+
+For more information, see [Sync data from external storage](storage). 
+
+
+## Webhooks
+
+You can use webhooks to integration third-party applications. For more information, see [Set up webhooks in Label Studio](webhooks) and our [integrations directory](https://labelstud.io/integrations/).
+
+## Danger Zone
+
+From here, you can access actions that result in data loss, and should be used with caution. 
+
+* **Reset Cache** 
+
+    Reset the labeling cache. This can help in situations where you are seeing validation errors concerning certain labels -- but you know that those labels do not exist. 
+* **Drop All Tabs**
+
+    If the Data Manager is not loading, dropping all Data Manager tabs can help.
+* **Delete Project**
+
+    Deleting a project permanently removes all tasks, annotations, and project data from Label Studio.

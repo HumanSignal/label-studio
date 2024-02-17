@@ -494,6 +494,23 @@ main {
   margin-left: 0.25em;
 }
 
+dt {
+    font-weight: bold;
+}
+
+dd .admonition:first-child {
+    margin-top: 1em;
+}
+
+dd .admonition:last-child {
+    margin-bottom: 1em;
+}
+
+dl {
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
 @media (max-width: 800px) {
   .page-sidebar {
     display: none;
