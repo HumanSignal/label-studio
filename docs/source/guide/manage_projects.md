@@ -23,7 +23,7 @@ For more project actions, see:
 Use the search box in the upper right. You can search by project name. 
 
 * To search within a workspace, use the search field on the workspace page. 
-* To search across all projects, including those within archived workspaces, go to **All projects** to perform your search. 
+* To search across all projects, including those within archived workspaces, go to **All Projects** to perform your search. 
 
 The project search allows partial and case-insensitive matches.  
 
