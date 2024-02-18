@@ -180,6 +180,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/summary/reset/",
+        "module": "projects.api.ProjectSummaryResetAPI",
+        "name": "projects:api:project-summary-reset",
+        "decorators": ""
+    },
+    {
         "url": "/api/projects/<int:pk>/imports/<int:import_pk>/",
         "module": "projects.api.ProjectImportAPI",
         "name": "projects:api:project-imports",

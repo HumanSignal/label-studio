@@ -61,7 +61,7 @@ jobs:
     needs:
       - build-pypi
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Delete Release Candidate Assets
         uses: actions/github-script@v7
@@ -96,7 +96,7 @@ jobs:
     needs:
       - build-pypi
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: DispatchEvent
         uses: actions/github-script@v7
@@ -136,7 +136,7 @@ jobs:
       - update-homebrew-tap
       - update-helm-chart
     runs-on: ubuntu-latest
-    if: ${{ failure() }}
+    if: failure()
     steps:
       - name: Send Notification to Slack
         id: slack_notify_ops_release

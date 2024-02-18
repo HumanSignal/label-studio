@@ -50,6 +50,19 @@ const AnnotationStoreModel = types
     function toggleViewingAll() {
       if (self.viewingAllAnnotations || self.viewingAllPredictions) {
         if (self.selected) {
+          // const comments = self.store.commentStore;
+
+          // @todo `currentComment` is an object and saving them was not a part of original fix
+          // @todo so I leave it for next fix coming soon
+          // if (comments.currentComment) {
+          //   // comment will save draft automatically
+          //   comments.commentFormSubmit();
+          // } else
+          if (self.selected.type === 'annotation') {
+            // save draft if there are changes waiting to be saved — it's handled inside
+            self.selected.saveDraftImmediately();
+          }
+
           self.selected.unselectAll();
           self.selected.selected = false;
         }

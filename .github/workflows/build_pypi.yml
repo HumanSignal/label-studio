@@ -57,7 +57,7 @@ jobs:
       pipy-artifact-url: ${{ steps.pypi-package-details.outputs.pipy-artifact-url }}
       pipy-artifact-digests-sha256: ${{ steps.pypi-package-details.outputs.pipy-artifact-digests-sha256 }}
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -176,6 +176,23 @@ jobs:
                   data: await fs.readFileSync(`./dist/${file}`)
                });
             }
+
+      - name: Check file size
+        env:
+          DIST_DIR: "./dist"
+          THRESHOLD: "100"
+        run: |
+          result=true
+          for file in $(find "${DIST_DIR}" -maxdepth 1 -type f); do
+            size=$(du -m "$file" | cut -f1)
+            if [ $size -ge $THRESHOLD ]; then
+              echo "::error::${file}(${size}Mb) exceeds size threshold(${THRESHOLD}Mb)"
+              result=false
+            fi
+          done
+          if [ "${result}" != "true" ]; then
+            exit 1
+          fi
 
       - name: Upload to artifact
         if: always()
