@@ -62,7 +62,7 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
         <BackendState backend={backend}/>
 
         <Dropdown.Trigger align="right" content={(
-          <Menu size="medium">
+          <Menu size="small" contextual>
             <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
             <Menu.Item onClick={() => confirmDelete(backend)}>Delete</Menu.Item>
           </Menu>

@@ -215,9 +215,7 @@ class Task(TaskMixin, models.Model):
         """
         from data_manager.functions import retrieve_predictions
         
-        project = self.project
-        
-        if project.retrieve_predictions_automatically:
+        if self.project.should_retrieve_predictions:
             # TODO where is the check for duplicate lives?
             return retrieve_predictions([self])
         
@@ -231,51 +229,28 @@ class Task(TaskMixin, models.Model):
         
         project = self.project
         predictions = self.predictions
-
-        if project.retrieve_predictions_automatically:            
-            new_predictions = retrieve_predictions([self])
-            
-            # TODO this is not as clean as I'd want it to
-            # be. Effectively retrieve_predictions will work only for
-            # tasks where there is no predictions matching current
-            # model version. In case it will return a model_version
-            # and we can grab predictions explicitly
-            if isinstance(new_predictions, str):
-                model_version = new_predictions
-                return predictions.filter(model_version=model_version)
+        
+        # if we even
+        # TODO if we use live_model on project then we will need to check for it here
+        if project.show_collab_predictions and \
+           project.model_version is not None:
+            if project.ml_backend_in_model_version:
+                new_predictions = retrieve_predictions([self])
+                # TODO this is not as clean as I'd want it to
+                # be. Effectively retrieve_predictions will work only for
+                # tasks where there is no predictions matching current
+                # model version. In case it will return a model_version
+                # and we can grab predictions explicitly
+                if isinstance(new_predictions, str):
+                    model_version = new_predictions
+                    return predictions.filter(model_version=model_version)
+                else:
+                    return new_predictions            
             else:
-                return new_predictions
-            
-        elif project.show_collab_predictions and project.model_version is not None:
-            return predictions.filter(model_version=project.model_version)
+                return predictions.filter(model_version=project.model_version)
         else:
-            return []
-        
-        ### code from tasks/serliazers.py 668
-        # if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', user=user or 'auto'):
-        #     active_ml_backends = task.project.get_active_ml_backends()
-        #     model_versions = active_ml_backends.values_list('model_version', flat=True)
-        #     logger.debug(f'Selecting predictions from active ML backend model versions: {model_versions}')
-        #     predictions = predictions.filter(model_version__in=model_versions)
-        # elif task.project.model_version:
-        #     predictions = predictions.filter(model_version=task.project.model_version)
-        
-        ### code from tasks/serliazers.py 719
-        # if not project.show_collab_predictions:
-        #     return []
-        # else:
-        #     retrieve_predictions([task])
-                
-        #     return super().get_predictions(task)
-                
-        ### code from tasks/api.py 187
-        # if project.retrieve_predictions_automatically or project.show_collab_predictions) \
-        #    and not self.task.predictions.exists():
+            return []            
 
-        #     print("we are here, yes")
-            
-        #     retrieve_predictions([self.task])
-        #     self.task.refresh_from_db()
         
     def has_lock(self, user=None):
         """

@@ -4,11 +4,30 @@ import { FormField } from '../../FormField';
 import { default as Label } from '../Label/Label';
 import './Select.styl';
 
-const Select = ({ label, className, options, validate, required, skip, labelProps, ghost, ...props }) => {
+const Select = ({ label, className, options, validate, required, skip, labelProps, groupProps, ghost, ...props }) => {
   const rootClass = cn('select');
   const initialValue = useMemo(() => props.value ?? "", [props.value]);
   const [value, setValue] = useState(initialValue);
 
+  let grouped = options.reduce((groupedOptions, option) => {
+    const key = option.group || 'NoGroup'; // fallback group for items without a group property
+    (groupedOptions[key] = groupedOptions[key] || []).push(option);
+    return groupedOptions;
+  }, {});
+
+  const renderOption = (option) => {
+    const value = option.value ?? option;
+    const label = option.label ?? value;
+    const disabled = option.disabled ?? false;
+    const hidden = option.hidden ?? false;
+
+    return (
+      <option key={value} value={value} disabled={disabled} hidden={hidden}>
+        {label}
+      </option>
+    );
+  };
+  
   const classList = rootClass.mod({ ghost }).mix(className);
 
   useEffect(() => {
@@ -41,19 +60,14 @@ const Select = ({ label, className, options, validate, required, skip, labelProp
               {props.placeholder && (!props.defaulValue || !props.value) && (
                 <option value="" disabled hidden>{props.placeholder}</option>
               )}
-
-              {(options ?? []).map(option => {
-                const value = option.value ?? option;
-                const label = option.label ?? value;
-                const disabled = option.disabled ?? false;
-                const hidden = option.hidden ?? false;
-
-                return (
-                  <option key={value} value={value} disabled={disabled} hidden={hidden}>
-                    {label}
-                  </option>
-                );
-              })}
+	      
+	      {
+		Object.keys(grouped).map((group) => {		
+		  return (group === 'NoGroup') ?
+		    grouped[group].map(renderOption) :
+		    <optgroup label={group}> {grouped[group].map(renderOption)} </optgroup>
+		})
+	      }
             </select>
           </div>
         );

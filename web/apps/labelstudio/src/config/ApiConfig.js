@@ -54,7 +54,7 @@ export const API_CONFIG = {
     trainMLBackend: "POST:/ml/:pk/train",
     predictWithML: "POST:/ml/:pk/predict",    
     projectModelVersions: "/projects/:pk/model-versions",
-    projectModelVersionsExtended: "/projects/:pk/model-versions",
+    deletePredictions: "DELETE:/projects/:pk/model-versions",
     modelVersions: "/ml/:pk/versions",
     mlInteractive: "POST:/ml/:pk/interactive-annotating",
 

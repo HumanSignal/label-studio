@@ -16,6 +16,7 @@ import { PredictionsList } from './PredictionsList';
 import { Block, Elem } from '../../../utils/bem';
 import './PredictionsSettings.styl';
 
+
 export const PredictionsSettings = () => {
   const api = useAPI();
   const { project, fetchProject } = useContext(ProjectContext);
@@ -35,7 +36,7 @@ export const PredictionsSettings = () => {
         }
     });
       
-    if (versions) setVersions(versions);
+    if (versions) setVersions(versions.static);
   }, [project, setVersions]);
         
   useEffect(() => {
@@ -48,9 +49,6 @@ export const PredictionsSettings = () => {
     return (
       <Block name="pred-settings">
         <Elem name={'wrapper'}>                
-          { ! edittable && <Elem name={'model-exists-info'}>
-                              <div><IconInfo width="20" height="20" /></div>
-                              <div>You have enabled live model predictions on the Model page. Toggle that option off to select predictions manually.</div></Elem> }
           
           { versions.length > 0 &&
             <Description style={{ marginTop: 0, maxWidth: 680 }}>
@@ -63,51 +61,22 @@ export const PredictionsSettings = () => {
             </Description>
           }
 
-          <Form action="updateProject"
-                formData={{ ...project }}
-                params={{ pk: project.id }}
-                onSubmit={() => fetchProject()}>
-            <Form.Row columnCount={1}>          
-              <div style={{ paddingLeft: 16 }}>        
-                { versions.length > 0 && <Toggle label="Use predictions to pre-label data"
-                                     description="Enable and select which set of predictions to use for prelabeling."
-                                     name="show_collab_predictions"
-                                     onChange={(e) => {
-                                       setCollab(e.target.checked)
-                                     }}
-                                     disabled={! edittable}
-                /> }       
-              </div>
-            </Form.Row>
-            
-            { versions.length > 0 &&
+          { versions.length > 0 &&
               <Elem name={"title-block"}>
                 <Elem name={"title"}>Predictions List</Elem>
                 <Caption>Each card is associated with separate model version.</Caption>
               </Elem>
             }
-            
-            { versions.length == 0 && <EmptyState  icon={<IconEmptyPredictions />}
+          
+          { versions.length == 0 && <EmptyState  icon={<IconEmptyPredictions />}
                  title="No predictions yet uploaded"
                  description="Predictions could be used to prelabel the data, or validate the model. You can upload and select predictions from multiple model versions. You can also connect live models in the Model tab."
     
                  footer={ <div>Need help?<br/><a href="https://labelstud.io/guide/predictions" target="_blank">Learn more on how to upload predictions in our docs</a></div>} /> 
             }
-            
-            <PredictionsList versions={versions}
-                             onSelect={setActiveVersion}
-                             selectedVersion={project.model_version}
-                             edittable={edittable && ((collab !== null) ? collab : project.show_collab_predictions)} />
-
-            <Input type="hidden" name="model_version" value={activeVersion} />
-            
-            <Form.Actions>
-              <Form.Indicator>
-                <span case="success">Saved!</span>
-              </Form.Indicator>          
-              { versions.length > 0 && <Button type="submit" look="primary" disabled={! edittable} style={{ width: 120 }}>Save</Button> }
-            </Form.Actions>                           
-          </Form>                  
+          
+          <PredictionsList project={project} versions={versions} fetchVersions={fetchVersions} />
+          
           <Divider height={32}/>
         </Elem>
       </Block>

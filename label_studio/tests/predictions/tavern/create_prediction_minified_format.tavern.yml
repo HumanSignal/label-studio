@@ -1,0 +1,46 @@
+---
+test_name: create_prediction_minified_format
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: create_task
+  type: ref
+- id: create_prediction
+  name: create_prediction
+  request:
+    json:
+      result: Negative
+      score: 0.987
+      model_version: test_model
+      task: '{task_pk}'
+    method: POST
+    url: '{django_live_url}/api/predictions'
+  response:
+    save:
+      json:
+        prediction_pk: id
+    status_code: 201
+- id: get_prediction_by_id
+  name: get_prediction_by_id
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    json:
+      id: !int '{prediction_pk}'
+      result:
+        - value:
+            choices:
+              - Negative
+          from_name: label
+          to_name: text
+          type: choices
+      score: 0.987
+      model_version: test_model
+    status_code: 200

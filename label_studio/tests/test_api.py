@@ -169,6 +169,7 @@ def test_creating_activating_new_ml_backend(
         my_url = current_active_ml_backend_url
         m.post(f'{my_url}/setup', text=json.dumps({'model_version': 'Version from My Super AI'}))
         m.get(f'{my_url}/health', text=json.dumps({'status': 'UP'}))
+        
         r = business_client.post(
             '/api/ml',
             data=json.dumps({'project': configured_project.id, 'title': 'My Super AI', 'url': my_url}),

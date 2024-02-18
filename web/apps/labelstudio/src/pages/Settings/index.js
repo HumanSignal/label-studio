@@ -3,7 +3,7 @@ import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
 import { WebhookPage } from '../WebhookPage/WebhookPage';
 import { DangerZone } from './DangerZone';
 import { GeneralSettings } from './GeneralSettings';
-import { InstructionsSettings } from './InstructionsSettings';
+import { AnnotationSettings } from './AnnotationSettings';
 import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
 import { PredictionsSettings } from './PredictionsSettings/PredictionsSettings';
@@ -16,7 +16,7 @@ export const MenuLayout = ({children, ...routeProps}) => {
       menuItems={[
         GeneralSettings,
         LabelingSettings,
-        InstructionsSettings,
+	AnnotationSettings,
         MachineLearningSettings,
 	PredictionsSettings,
         StorageSettings,
@@ -36,7 +36,7 @@ export const SettingsPage = {
   layout: MenuLayout,
   component: GeneralSettings,
   pages: {
-    InstructionsSettings,
+    AnnotationSettings,
     LabelingSettings,
     MachineLearningSettings,
     PredictionsSettings,

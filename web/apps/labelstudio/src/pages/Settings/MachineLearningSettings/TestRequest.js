@@ -24,7 +24,9 @@ export const TestRequest = ({ backend }) => {
   return (
     <Block name="test-request">
       <Button onClick={() => { sendTestRequest(backend) }}>Send Request</Button>
-      <Caption>This would send a test request to predict endpoint of the ML Backend using a random task.</Caption>
+      <Caption>
+        This sends a test request to the prediction endpoint of the ML Backend using a random task.
+      </Caption>
       <Elem name={'blocks'}>
         <Elem name={'left'}>
           {/* <h4>Task</h4> */}

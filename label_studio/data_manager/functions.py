@@ -314,13 +314,14 @@ def get_prepared_queryset(request, project):
     return queryset
 
 
-def retrieve_predictions(tasks):
+def retrieve_predictions(tasks, backend=None):
     """Call ML backend to retrieve predictions with the task queryset as an input"""
     if not tasks:
         return
 
-    project = tasks[0].project
-    backend = project.ml_backends.first()
+    if not backend:
+        project = tasks[0].project
+        backend = project.ml_backends.first()
 
     # IMPORTANT change here, ml_backends.all => ml_backends.first
     # we are using only one ML backend, not multiple    

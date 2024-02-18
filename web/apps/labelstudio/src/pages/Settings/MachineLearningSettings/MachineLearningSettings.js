@@ -13,11 +13,9 @@ import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
 import { MachineLearningListNew } from './MachineLearningListNew';
-import { ProjectModelVersionSelector } from './ProjectModelVersionSelector';
 import { CustomBackendForm } from './Forms';
 import { TestRequest } from './TestRequest';
 import { StartModelTraining } from './StartModelTraining';
-import { ModelVersionSelector } from './ModelVersionSelector';
 import { Block, cn, Elem } from '../../../utils/bem';
 import { FF_DEV_1682, isFF } from '../../../utils/feature-flags';
 import './MachineLearningSettings.styl';
@@ -121,19 +119,10 @@ export const MachineLearningSettings = () => {
                     <div style={{ paddingLeft: 16 }}>
                       <Toggle
                         label="Start model training on annotation submission"
-                        description="This option will send a request to /train with information about annotations. You can Use this to enable an Active Learning loop. You can also manually start training through model menu in its card."
+                        description="This option will send a request to /train with information about annotations. You can use this to enable an Active Learning loop. You can also manually start training through model menu in its card."
                         name="start_training_on_annotation_update"
                       />
-                    </div>
-                    
-                    <div style={{ paddingLeft: 16 }}>
-                      <ToggleRight
-                        label="Get predictions on task load"
-                        description="Predictions are retrieved each time the task is loaded in Label Stream or Quick View, and used to pre-label data. You can also configure which set of predictions could be used in Predictions tab."
-                        name="evaluate_predictions_automatically"
-                      />
-                      <br/><br/>
-                    </div>
+                    </div>                                       
                   </Form.Row>
               ) }
 

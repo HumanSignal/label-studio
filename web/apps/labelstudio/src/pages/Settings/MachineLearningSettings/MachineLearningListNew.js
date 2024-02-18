@@ -1,6 +1,7 @@
 import { format, isValid, formatDistanceToNow, parseISO } from 'date-fns';
 import { useCallback, useContext } from 'react';
-import { FaEllipsisV } from 'react-icons/fa';
+import { LsBulb, LsCheck, LsEllipsis, LsMinus } from '../../../assets/icons';
+
 import truncate from 'truncate-middle';
 import { Button, Card, Dropdown, Menu } from '../../../components';
 import { DescriptionList } from '../../../components/DescriptionList/DescriptionList';
@@ -65,15 +66,15 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
             </div>
             <div className={rootClass.elem("menu")}>
               <Dropdown.Trigger align="right" content={(
-                <Menu size="medium">
+                <Menu size="medium" contextual>
                     <Menu.Item onClick={() => onTestRequest(backend)}>Send Test Request</Menu.Item>
                     <Menu.Item onClick={() => onStartTrain(backend)}>Start Training</Menu.Item>
                     
                     <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
-                    <Menu.Item onClick={() => confirmDelete(backend)}>Delete</Menu.Item>
+                  <Menu.Item onClick={() => confirmDelete(backend)} isDangerous>Delete</Menu.Item>
                   </Menu>
               )}>
-                <Button type="link" icon={<FaEllipsisV/>} style={{ padding: "15px" }} />
+                <Button type="link" icon={<LsEllipsis/>} style={{ padding: "15px" }} />
               </Dropdown.Trigger>
               
             </div>

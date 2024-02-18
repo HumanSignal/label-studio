@@ -48,6 +48,7 @@ from tasks.serializers import (
     TaskSimpleSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer
 )
+from ml.serializers import MLBackendSerializer
 from webhooks.models import WebhookAction
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 
@@ -592,14 +593,38 @@ class ProjectModelVersions(generics.RetrieveAPIView):
     queryset = Project.objects.all()
 
     def get(self, request, *args, **kwargs):
-        # TODO make sure "extended" is the right word and follows everything else
+        # TODO make sure "extended" is the right word and is
+        # consistent with other APIs we've got
         extended = self.request.query_params.get('extended', False)
+        include_live_models = self.request.query_params.get('include_live_models', False)
         project = self.get_object()
         data = project.get_model_versions(with_counters=True, extended=extended)
         
         if extended:
+            serializer_models = None
             serializer = ProjectModelVersionExtendedSerializer(data, many=True)
+            
+            if include_live_models:
+                ml_models = project.get_ml_backends()
+                serializer_models = MLBackendSerializer(ml_models, many=True)
+            
             # serializer.is_valid(raise_exception=True)
-            return Response(serializer.data)
+            return Response({
+                "static": serializer.data,
+                "live": serializer_models and serializer_models.data
+            })
         else:
             return Response(data=data)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        """
+        project = self.get_object()
+        model_version = request.data.get("model_version", None)
+        
+        if not model_version:
+            raise RestValidationError("model_version param is required")
+        
+        count = project.delete_predictions(model_version=model_version)
+        
+        return Response(data=count)
