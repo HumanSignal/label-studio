@@ -1,19 +1,24 @@
 {
   "compilerOptions": {
-    "checkJs": false,
-    "jsx": "preserve",
-    "rootDirs": ["./src"],
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
     "strict": true,
-    "typeRoots": ["src/types", "../../node_modules/@types"],
-    "types": []
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["vite/client"],
+    "noEmit": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "esModuleInterop": false,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx"
   },
   "files": [],
-  "include": ["src/types", "node_modules/@types"],
+  "include": ["src/types", "node_modules/@types", "src"],
   "references": [
     {
       "path": "./tsconfig.lib.json"
