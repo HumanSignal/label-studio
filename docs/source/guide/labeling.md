@@ -267,8 +267,12 @@ Create a custom template for your labeling interface using the following example
     </Labels>
 </View>
 ```
-
 This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator, along with image classification choices of yes and no, and region labels of building and vehicle.
+
+### Faster image labeling
+You can add a rectangle or an ellipse to your image with just two clicks, or double click to create a polygon, rectangle, or ellipse. 
+
+If you accidentally select a point on an image while creating a polygon, just double click to remove the erroneous point and continue creating the region. There must be at least three points on the polygon to be able to remove a point.
 
 ### Create regions without labels
 When you're annotating images, you can create regions without applying labels. 
@@ -285,11 +289,6 @@ This can be helpful for two-step labeling, where you want one annotator to creat
 If you make a mistake when labeling with the brush mask, you can erase it. You must select a brush region in the sidebar before you can erase any part of it. 
 
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
-
-### Faster image labeling
-You can add a rectangle or an ellipse to your image with just two clicks, or double click to create a polygon, rectangle, or ellipse. 
-
-If you accidentally select a point on an image while creating a polygon, just double click to remove the erroneous point and continue creating the region. There must be at least three points on the polygon to be able to remove a point.
 
 ## Outliner 
 
