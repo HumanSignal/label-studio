@@ -12,7 +12,7 @@ date: 2024-02-06 22:28:14
 ---
 
 !!! error Enterprise
-    Many settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_comparison) to learn more.
+    Many settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare) to learn more.
 
 ## General
 
