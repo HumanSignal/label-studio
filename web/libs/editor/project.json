@@ -47,19 +47,22 @@
       }
     },
     "serve": {
-      "executor": "@nx/webpack:dev-server",
+      "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "port": 3000,
         "buildTarget": "editor:build",
-        "hmr": true,
-        "watch": true,
-        "liveReload": true
+        "buildLibsFromSource": true
       },
       "configurations": {
         "development": {
           "buildTarget": "editor:build"
         }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "options": {
+        "buildTarget": "editor:build"
       }
     },
     "unit": {

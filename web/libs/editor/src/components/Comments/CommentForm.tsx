@@ -1,6 +1,6 @@
 import { FC, RefObject, useCallback, useEffect, useRef } from 'react';
 import { Block, Elem } from '../../utils/bem';
-import { ReactComponent as IconSend } from '../../assets/icons/send.svg';
+import { default as IconSend } from '../../assets/icons/send.svg';
 
 import './CommentForm.styl';
 import { TextArea } from '../../common/TextArea/TextArea';

@@ -21,7 +21,11 @@
     "react": {
       "createClass": "createReactClass",
       "pragma": "React",
-      "fragment": "Fragment"
+      "fragment": "Fragment",
+      "version": "detect"
     }
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off"
   }
 }

@@ -1,1 +1,1 @@
-export { ReactComponent as IconArrow } from './arrow.svg';
+export { default as IconArrow } from './arrow.svg';

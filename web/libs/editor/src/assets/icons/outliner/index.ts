@@ -1,6 +1,6 @@
-export { ReactComponent as IconOutlinerCollapse } from './collapse.svg';
-export { ReactComponent as IconOutlinerExpand } from './expand.svg';
-export { ReactComponent as IconOutlinerDrag } from './drag.svg';
-export { ReactComponent as IconInfo } from './info.svg';
-export { ReactComponent as IconOutlinerEyeOpened } from './eye_opened.svg';
-export { ReactComponent as IconOutlinerEyeClosed } from './eye_closed.svg';
+export { default as IconOutlinerCollapse } from './collapse.svg';
+export { default as IconOutlinerExpand } from './expand.svg';
+export { default as IconOutlinerDrag } from './drag.svg';
+export { default as IconInfo } from './info.svg';
+export { default as IconOutlinerEyeOpened } from './eye_opened.svg';
+export { default as IconOutlinerEyeClosed } from './eye_closed.svg';

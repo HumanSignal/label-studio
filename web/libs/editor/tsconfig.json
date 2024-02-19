@@ -7,9 +7,15 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["vite/client"],
+    "types": [
+      "vite/client"
+    ],
     "noEmit": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
     "allowJs": false,
     "esModuleInterop": false,
     "skipLibCheck": true,
@@ -18,16 +24,17 @@
     "jsx": "react-jsx"
   },
   "files": [],
-  "include": ["src/types", "node_modules/@types", "src"],
+  "include": [
+    "src/types",
+    "node_modules/@types",
+    "src"
+  ],
   "references": [
     {
       "path": "./tsconfig.lib.json"
     },
     {
       "path": "./tsconfig.spec.json"
-    },
-    {
-      "path": "./cypress/tsconfig.json"
     },
     {
       "path": "./tests/integration/tsconfig.json"
