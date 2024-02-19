@@ -1027,33 +1027,6 @@
       "version": 7,
       "deleted": false
     },
-    "ff_front_dev_1470_dm_pagination_010422_short": {
-      "key": "ff_front_dev_1470_dm_pagination_010422_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "15f3942824e14cbea3fa221c8d879766",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "ff_front_dev_1480_created_on_in_review_180122_short": {
       "key": "ff_front_dev_1480_created_on_in_review_180122_short",
       "on": false,
