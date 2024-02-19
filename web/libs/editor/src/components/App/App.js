@@ -5,22 +5,12 @@ import React, { Component } from 'react';
 import { Result, Spin } from 'antd';
 import { getEnv, getRoot } from 'mobx-state-tree';
 import { observer, Provider } from 'mobx-react';
-import { InstructionsModal } from '../InstructionsModal/InstructionsModal';
 
 /**
  * Core
- */
+*/
 import Tree from '../../core/Tree';
-
-/**
- * Components
- */
-import { TopBar } from '../TopBar/TopBar';
-import Debug from '../Debug';
-import Segment from '../Segment/Segment';
-import Settings from '../Settings/Settings';
-import { RelationsOverlay } from '../RelationsOverlay/RelationsOverlay';
-import { BottomBar } from '../BottomBar/BottomBar';
+import { TreeValidation } from '../TreeValidation/TreeValidation';
 
 /**
  * Tags
@@ -30,25 +20,39 @@ import '../../tags/control';
 import '../../tags/visual';
 
 /**
- * Styles
+ * Utils and common components
  */
-import { TreeValidation } from '../TreeValidation/TreeValidation';
+import { Space } from '../../common/Space/Space';
+import { Button } from '../../common/Button/Button';
+import { Block, Elem } from '../../utils/bem';
+import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from '../../utils/feature-flags';
+import { sanitizeHtml } from '../../utils/html';
+import { reactCleaner } from '../../utils/reactCleaner';
 import { guidGenerator } from '../../utils/unique';
-import Grid from './Grid';
-import { SidebarTabs } from '../SidebarTabs/SidebarTabs';
+import { isDefined, sortAnnotations } from '../../utils/utilities';
+
+/**
+ * Components
+ */
+import { Annotation } from './Annotation';
 import { AnnotationTab } from '../AnnotationTab/AnnotationTab';
+import { DynamicPreannotationsControl } from '../AnnotationTab/DynamicPreannotationsControl';
+import { BottomBar } from '../BottomBar/BottomBar';
+import Debug from '../Debug';
+import Grid from './Grid';
+import { InstructionsModal } from '../InstructionsModal/InstructionsModal';
+import { RelationsOverlay } from '../RelationsOverlay/RelationsOverlay';
+import Segment from '../Segment/Segment';
+import Settings from '../Settings/Settings';
+import { SidebarTabs } from '../SidebarTabs/SidebarTabs';
 import { SidePanels } from '../SidePanels/SidePanels';
 import { SideTabsPanels } from '../SidePanels/TabPanels/SideTabsPanels';
-import { Block, Elem } from '../../utils/bem';
+import { TopBar } from '../TopBar/TopBar';
+
+/**
+ * Styles
+ */
 import './App.styl';
-import { Space } from '../../common/Space/Space';
-import { DynamicPreannotationsControl } from '../AnnotationTab/DynamicPreannotationsControl';
-import { isDefined } from '../../utils/utilities';
-import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from '../../utils/feature-flags';
-import { Annotation } from './Annotation';
-import { Button } from '../../common/Button/Button';
-import { reactCleaner } from '../../utils/reactCleaner';
-import { sanitizeHtml } from '../../utils/html';
 
 /**
  * App
@@ -169,7 +173,7 @@ class App extends Component {
 
     if (isFF(FF_SIMPLE_INIT)) {
       // the same sorting we have in AnnotationsCarousel, so we'll see the same order in both places
-      entities.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+      sortAnnotations(entities);
     }
 
     return <Grid store={as} annotations={entities} root={as.root} />;

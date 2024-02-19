@@ -72,7 +72,7 @@ const AnnotationStoreModel = types
           c.editable = false;
         });
       } else {
-        selectAnnotation(self.annotations[0].id, { fromViewAll: true });
+        selectAnnotation(self.annotations.at(isFF(FF_SIMPLE_INIT) ? -1 : 0).id, { fromViewAll: true });
       }
     }
 

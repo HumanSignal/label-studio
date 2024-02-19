@@ -249,3 +249,13 @@ export const destroyMSTObject = (object: any) => {
 // fixes `observe` - it watches only the changes of primitive props of observables used,
 // so pass all the required primitives to this stub and they'll be observed
 export const fixMobxObserve = (..._toObserve: any[]) => {};
+
+/**
+ * Sort annotations by createdDate in place. This function mutates the input array, so don't pass original list.
+ * Use the same ordering in different places to keep it consistent. Just sort to have the latest first.
+ * @param {object[]} annotations
+ * @returns {object[]} sorted list of annotations
+ */
+export const sortAnnotations = (annotations: any[]) => {
+  return annotations.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+};
