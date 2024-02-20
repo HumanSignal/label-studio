@@ -41,7 +41,7 @@ After you [start Label Studio](start) and [create an account](signup), create a 
     By default, reviewers do not need to be assigned to completed tasks, and each task only needs one accepted annotation. To customize this, see the [**Review** section of the project settings](project_settings_lse#Review).
     
 
-5. Add members to your project. 
+5. [Add members to your project](#Add-members-to-a-project). 
 6. [Publish your project](#Publish-project-to-annotators).
 
 </div>
