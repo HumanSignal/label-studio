@@ -61,7 +61,6 @@ class App extends Component {
   relationsRef = React.createRef();
 
   componentDidMount() {
-    
     // Hack to activate app hotkeys
     window.blur();
     document.body.focus();
