@@ -15,7 +15,6 @@
 import {
   FF_DEV_1752,
   FF_DEV_2186,
-  FF_DEV_2715,
   FF_DEV_2887,
   FF_DEV_3034,
   FF_DEV_3734,
@@ -163,8 +162,6 @@ export class LSFWrapper {
     const queuePosition = queueDone ? queueDone + 1 : queueLeft ? queueTotal - queueLeft + 1 : 1;
 
     const lsfProperties = {
-      // ensure that we are able to distinguish at component level if the app has fully hydrated.
-      hydrated: false,
       user: options.user,
       config: this.lsfConfig,
       task: taskToLSFormat(this.task),
@@ -195,7 +192,6 @@ export class LSFWrapper {
       onSelectAnnotation: this.onSelectAnnotation,
       onNextTask: this.onNextTask,
       onPrevTask: this.onPrevTask,
-      panels: this.datamanager.panels,
     };
 
     this.initLabelStudio(lsfProperties);
@@ -378,13 +374,6 @@ export class LSFWrapper {
     this.lsf.initializeStore(lsfTask);
     this.setAnnotation(annotationID, fromHistory || isRejectedQueue);
     this.setLoading(false);
-    if (isFF(FF_DEV_2715)) {
-      this.setHydrated(true);
-    }
-  }
-
-  setHydrated(value) {
-    this.lsf.setHydrated?.(value);
   }
 
   /** @private */

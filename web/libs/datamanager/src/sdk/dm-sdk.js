@@ -33,7 +33,6 @@
  * interfaces: Dict<boolean>,
  * instruments: Dict<any>,
  * toolbar?: string,
- * panels?: Record<string, any>[]
  * spinner?: import("react").ReactNode
  * apiTransform?: Record<string, Record<string, Function>
  * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean },
@@ -159,7 +158,6 @@ export class DataManager {
     this.showPreviews = config.showPreviews ?? false;
     this.polling = config.polling;
     this.toolbar = config.toolbar ?? DEFAULT_TOOLBAR;
-    this.panels = config.panels;
     this.spinner = config.spinner;
     this.spinnerSize = config.spinnerSize;
     this.instruments = prepareInstruments(config.instruments ?? {});

@@ -173,7 +173,7 @@ export const FF_LSDV_1148 = 'fflag_fix_font_lsdv_1148_hotkeys_namespaces_0102202
 export const FF_LSDV_4583 = 'fflag_feat_front_lsdv_4583_multi_image_segmentation_short';
 
 /**
- * Enables new way of preloading/cacheing images
+ * Enables new way of preloading/caching images
  */
 export const FF_LSDV_4583_6 = 'fflag_feat_front_lsdv_4583_6_images_preloading_short';
 
@@ -324,6 +324,9 @@ export const FF_TAXONOMY_SELECTED = 'fflag_fix_front_leap_149_taxonomy_selected_
 
 /** Skip video to region start when it's selected in the outliner */
 export const FF_LEAP_187 = 'fflag_feat_front_leap_187_video_seek_on_select_short';
+
+/** Select annotation only once during store init and trigger the rest from this select */
+export const FF_SIMPLE_INIT = 'fflag_fix_front_leap_443_select_annotation_once';
 
 /**
  * Optimize stage rendering for large number of regions and zoom interactions
