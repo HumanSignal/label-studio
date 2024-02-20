@@ -63,8 +63,12 @@ User roles are set at the organization level. For more information, see [User ro
 * **Managers**--Managers can create workspaces. But other Managers within the organization cannot view the workspace unless they are added as a member. 
 
     Once added, managers can see all projects within a workspace, including unpublished projects. 
-* **Annotators**--Can see cards for all projects, but cannot enter the label stream until the project is published and they have tasks to complete. 
-* **Reviewers**--Can see cards for all projects, but cannot access the project until it is published and they have reviews to annotate. 
+* **Annotators**--Cannot view a workspace until added as member. 
+
+    Once added, they can see cards for all projects, but they cannot enter the label stream until the project is published and they have tasks to annotate. 
+* **Reviewers**--Cannot view a workspace until added as member.
+
+    Once added, they can see cards for all projects, but cannot access the project until it is published and they have tasks to review. 
 
 ## Edit workspaces
 
