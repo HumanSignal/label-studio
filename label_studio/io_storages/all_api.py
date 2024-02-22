@@ -11,6 +11,7 @@ from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from label_studio.core.feature_flags.base import flag_set
 
 from label_studio.core.utils.common import load_func
 
@@ -93,7 +94,11 @@ class AllExportStorageTypesAPI(APIView):
 class AllImportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_required = all_permissions.projects_change
+    is_allow_cloud_storage_for_managers_ff = flag_set('fflag_feat_all_optic_478_access_of_cloud_storage_connectors_short')
+    if is_allow_cloud_storage_for_managers_ff:
+      permission_required = all_permissions.projects_create
+    else:
+      permission_required = all_permissions.projects_change
 
     def _get_response(self, api, request, *args, **kwargs):
         try:
@@ -102,6 +107,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
             payload = response.data
             if not isinstance(payload, list):
                 raise ValueError('Response is not list')
+            raise ValueError('oh no!')          
             return response.data
         except Exception:
             logger.error(f"Can't process {api.__class__.__name__}", exc_info=True)
