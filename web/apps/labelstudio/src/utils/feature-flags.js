@@ -33,6 +33,11 @@ export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
  */
 export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
 
+/**
+ * Control Visibility and Access of Cloud Storage Connectors for Managers
+ */
+export const FF_CLOUD_STORAGE = "fflag_feat_all_optic_478_access_of_cloud_storage_connectors_short";
+
 export function isFF(id) {
   if (id in FEATURE_FLAGS) {
     return FEATURE_FLAGS[id] === true;
