@@ -6,11 +6,12 @@ import { StorageSet } from './StorageSet';
 import './StorageSettings.styl';
 import { FF_CLOUD_STORAGE, isFF } from 'apps/labelstudio/src/utils/feature-flags';
 
+const isAllowCloudStorage = !isFF(FF_CLOUD_STORAGE);
 
 export const StorageSettings = () => {
   const rootClass = cn("storage-settings");
 
-  return isFF(FF_CLOUD_STORAGE) ? (
+  return isAllowCloudStorage ? (
     <Block name="storage-settings">
       <Description style={{ marginTop: 0 }}>
         Use cloud or database storage as the source for your labeling tasks or the target of your completed annotations.

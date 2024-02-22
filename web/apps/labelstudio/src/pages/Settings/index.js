@@ -9,7 +9,7 @@ import { MachineLearningSettings } from './MachineLearningSettings/MachineLearni
 import { StorageSettings } from './StorageSettings/StorageSettings';
 import { FF_CLOUD_STORAGE, isFF } from '../../utils/feature-flags';
 
-const isAllowCloudStorage = isFF(FF_CLOUD_STORAGE);
+const isAllowCloudStorage = !isFF(FF_CLOUD_STORAGE);
 
 export const MenuLayout = ({ children, ...routeProps }) => {
   return (
