@@ -94,8 +94,7 @@ class AllExportStorageTypesAPI(APIView):
 class AllImportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    is_allow_cloud_storage_for_managers_ff = flag_set('fflag_feat_all_optic_478_access_of_cloud_storage_connectors_short')
-    if is_allow_cloud_storage_for_managers_ff:
+    if flag_set('fflag_feat_all_optic_478_access_of_cloud_storage_connectors_short'):
       permission_required = all_permissions.organizations_change
     else:
       permission_required = all_permissions.projects_change
@@ -106,8 +105,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
             response = view(request._request, *args, **kwargs)
             payload = response.data
             if not isinstance(payload, list):
-                raise ValueError('Response is not list')
-            raise ValueError('oh no!')          
+                raise ValueError('Response is not list')     
             return response.data
         except Exception:
             logger.error(f"Can't process {api.__class__.__name__}", exc_info=True)
