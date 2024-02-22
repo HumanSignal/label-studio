@@ -22,6 +22,21 @@ stages:
           organization_id: active_organization
           user_email: email
           user_id: id
+  - name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="Humor"/><Choice value="Not Humor"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
 
   - name: Get initial empty list of models
     request:
@@ -39,6 +54,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -62,6 +81,13 @@ stages:
         created_by:
           id: !int "{user_id}"
           email: "{user_email}"
+        input_fields:
+        - "text"
+        output_classes: 
+        - "Humor"
+        - "Not Humor"
+        associated_projects:
+        - 1
 
   - name: Patch specific model
     request:
@@ -172,6 +198,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -263,6 +293,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -331,6 +365,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -414,6 +452,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -500,6 +542,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -585,6 +631,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -629,6 +679,23 @@ stages:
           user_email: email
           user_id: id
 
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Taxonomy name="taxonomy" toName="text"><Choice value="Archaea" /><Choice value="Bacteria" /><Choice value="Eukarya"><Choice value="Human" /><Choice value="Oppossum" /><Choice value="Extraterrestial" /></Choice></Taxonomy></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+
   - name: Create a model
     request:
       url: "{django_live_url}/api/models"
@@ -636,6 +703,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -831,6 +902,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -1003,6 +1078,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -1197,6 +1276,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -1340,6 +1423,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -1482,6 +1569,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
@@ -1623,6 +1714,10 @@ stages:
       json:
         title: "My model 1"
         description: "My first model"
+        associated_projects: 
+        - !int "{project_pk}"
+        input_fields: ["text"]
+        output_classes: ["Humor", "Not Humor"]
     response:
       status_code: 201
       save:
