@@ -10,6 +10,7 @@ from ml_models.serializers import ModelInterfaceSerializer, ModelRunSerializer, 
 from projects.models import Project
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 
 @method_decorator(
@@ -97,7 +98,21 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         model_interface = ModelInterface.objects.filter(pk=instance.pk)[0]
         for id in associated_projects_data:
             model_interface.associated_projects.add(id)
-       
+    def update(self, reques, *args, **kwargs):
+        try: 
+            instance = self.get_object()
+            data = self.request.data
+            data['organization']=self.request.user.active_organization_id
+            serializer = self.get_serializer(instance, data=data, partial=True)
+            self.perform_update(serializer)
+            return Response(serializer.data, status=200)
+        except ValidationError as e:
+            # Handle validation error
+            return Response({'message': str(e)}, status=400)
+
+    def perform_update(self, serializer):
+        serializer.is_valid(raise_exception=True)
+        serializer.save()       
 
 
 @method_decorator(

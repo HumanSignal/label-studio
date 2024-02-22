@@ -43,8 +43,42 @@ class ModelInterfaceSerializer(serializers.ModelSerializer):
                     project_input_fields.add(input.get('value'))
         
         project_input_fields = sorted(list(project_input_fields))
+        print(project_input_fields, provided_input_fields)
         if project_input_fields != provided_input_fields:
             raise ValidationError(f'input_fields do not match inputs in Project (id:{project.pk})')
+        
+    def validate(self, data):        
+        model_obj = getattr(self, 'instance', None)
+        if model_obj:
+            if 'input_fields' in data:
+                provided_input_fields = sorted(data['input_fields'])
+        
+            if 'output_classes' in data:
+                provided_output_classes = sorted(data['output_classes'])
+                print("here")
+                print(provided_output_classes)
+            model_obj_associated_projects = model_obj.associated_projects.all()
+
+            if "associated_projects" in data:
+                for associated_proj in data['associated_projects']:
+                    projects = Project.objects.filter(pk=associated_proj.id,organization=data["organization"])
+                    if not projects.exists():
+                        ValidationError(f'Project (id:{associated_proj.id}) provided does not belong to your organization')
+                    if 'input_fields' not in data:
+                        provided_input_fields=sorted(model_obj.input_fields)
+                    if 'output_classes' not in data:
+                        provided_output_classes=sorted(model_obj.output_classes)
+                    self.check_input_fields(project=projects[0], provided_input_fields=provided_input_fields)
+                    self.check_output_classes(project=projects[0], provided_output_classes=provided_output_classes)
+            
+            else:
+                if 'input_fields' in data:
+                    for associated_proj in model_obj_associated_projects:
+                        self.check_input_fields(project=associated_proj, provided_input_fields=provided_input_fields)
+                if 'output_classes' in data:
+                    for associated_proj in model_obj_associated_projects:
+                        self.check_output_classes(project=associated_proj, provided_output_classes=provided_output_classes)
+            return data
         
 class ModelInterfaceCreateSerializer(ModelInterfaceSerializer):
     created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='User who created Dataset')

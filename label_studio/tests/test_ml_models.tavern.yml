@@ -38,6 +38,22 @@ stages:
         json:
           project_pk: id
 
+  - name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: compatible_project
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="Humor"/><Choice value="NonHumor"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk2: id
+
   - name: Get initial empty list of models
     request:
       url: "{django_live_url}/api/models"
@@ -99,6 +115,35 @@ stages:
       status_code: 200
       json:
         description: "My updated description"
+
+  - name: Patch specific model with invalid input fields
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        input_fields: ["image"]
+    response:
+      status_code: 400
+
+  - name: Patch specific model with invalid output classes 
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        output_classes: ["Humor"]
+    response:
+      status_code: 400
+
+  # - name: Patch specific model with valid output classes and project  
+  #     url: "{django_live_url}/api/models/{model_id}"
+  #     method: PATCH
+  #     json:
+  #       output_classes: ["Humor", "NonHumor"]
+  #       associated_projects: 
+  #       - !int "{project_pk2}"
+        
+  #   response:
+  #     status_code: 200
 
   - name: Get list of models with one model
     request:
