@@ -239,7 +239,7 @@ const Model = types.model({
       currentArea?.notifyDrawingFinished();
     },
 
-    validateValue(text) {
+    validateText(text) {
       if (isFF(FF_LSDV_4659) && self.skipduplicates && self.hasResult(text)) {
         self.uniqueModal();
         return false;
@@ -248,7 +248,7 @@ const Model = types.model({
     },
 
     addText(text, pid) {
-      if (!self.validateValue(text)) return;
+      if (!self.validateText(text)) return;
 
       self.createRegion(text, pid, self.leadTime);
       // actually creates a new result
@@ -280,7 +280,7 @@ const Model = types.model({
     },
 
     addTextToResult(text, result) {
-      if (!self.validateValue(text)) return;
+      if (!self.validateText(text)) return;
 
       const newValue = result.mainValue.toJSON();
 
