@@ -90,10 +90,7 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
        
         model_interface = ModelInterface.objects.filter(pk=instance.pk)[0]
         for id in associated_projects_data:
-            proj=Project.objects.filter(pk=id)
-          
-            
-            model_interface.associated_projects.add(proj[0].pk)
+            model_interface.associated_projects.add(id)
 
         models = ModelInterface.objects.filter(organization=self.request.user.active_organization)
        
