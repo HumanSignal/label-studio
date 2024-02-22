@@ -2,7 +2,6 @@ import { inject, observer } from "mobx-react";
 import React from "react";
 import { LSPlus } from "../../assets/icons";
 import { Block, Elem } from "../../utils/bem";
-import { FF_LOPS_12, isFF } from "../../utils/feature-flags";
 import { Interface } from "../Common/Interface";
 import { Space } from "../Common/Space/Space";
 import { Spinner } from "../Common/Spinner";
@@ -21,27 +20,14 @@ const injector = inject(({ store }) => {
 });
 
 const summaryInjector = inject(({ store }) => {
-  const { project, taskStore, SDK } = store;
-
-  if (isFF(FF_LOPS_12) && SDK?.type === 'labelops') {
-    return {
-      total: taskStore?.total ?? 0,
-      coverage: taskStore?.coverage ?? 'N/A',
-      precision: taskStore?.precision ?? 'N/A',
-      confidence: taskStore?.confidence ?? 'N/A',
-      cloudSync: project.target_syncing ?? project.source_syncing ?? false,
-      SDK,
-    };
-  } else {
-    return {
-      totalTasks: project?.task_count ?? project?.task_number ?? 0,
-      totalFoundTasks: taskStore?.total ?? 0,
-      totalAnnotations: taskStore?.totalAnnotations ?? 0,
-      totalPredictions: taskStore?.totalPredictions ?? 0,
-      cloudSync: project.target_syncing ?? project.source_syncing ?? false,
-    };
-  }
-
+  const { project, taskStore } = store;
+  return {
+    totalTasks: project?.task_count ?? project?.task_number ?? 0,
+    totalFoundTasks: taskStore?.total ?? 0,
+    totalAnnotations: taskStore?.totalAnnotations ?? 0,
+    totalPredictions: taskStore?.totalPredictions ?? 0,
+    cloudSync: project.target_syncing ?? project.source_syncing ?? false,
+  };
 });
 
 const switchInjector = inject(({ store }) => {
@@ -65,28 +51,15 @@ const ProjectSummary = summaryInjector((props) => {
           <Spinner size="small" />
         </Space>
       )}
-      {isFF(FF_LOPS_12) && props.SDK?.type === 'labelops' ? (
-        <span style={{ display: "flex", alignItems: "center", fontSize: 12 }}>
-          <Space size="compact">
-            <span>
-              Total: {props.total}
-            </span>
-            <span>GT coverage: {props.coverage}</span>
-            <span>Precision: {props.precision}</span>
-            <span>Confidence: {props.confidence}</span>
-          </Space>
-        </span>
-      ) : (
-        <span style={{ display: "flex", alignItems: "center", fontSize: 12 }}>
-          <Space size="compact">
-            <span>
-              Tasks: {props.totalFoundTasks} / {props.totalTasks}
-            </span>
-            <span>Annotations: {props.totalAnnotations}</span>
-            <span>Predictions: {props.totalPredictions}</span>
-          </Space>
-        </span>
-      )}
+      <span style={{ display: "flex", alignItems: "center", fontSize: 12 }}>
+        <Space size="compact">
+          <span>
+            Tasks: {props.totalFoundTasks} / {props.totalTasks}
+          </span>
+          <span>Annotations: {props.totalAnnotations}</span>
+          <span>Predictions: {props.totalPredictions}</span>
+        </Space>
+      </span>
     </Space>
   );
 });
