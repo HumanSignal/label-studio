@@ -8,6 +8,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from tasks.models import Task
 from users.serializers import UserSimpleSerializer
+from core.label_config import get_all_labels
 
 
 class CreatedByFromContext:
@@ -23,8 +24,29 @@ class ModelInterfaceSerializer(serializers.ModelSerializer):
         model = ModelInterface
         fields = '__all__'
         read_only_fields = ['created_by', 'created_at', 'updated_at']
+
+    def check_output_classes(self, project, provided_output_classes):
+        labels, _ = get_all_labels(project.label_config)
+        project_output_classes =  sorted(list(set([label for label_list in labels.values() for label in label_list])))
+        print(project_output_classes)
+        print(provided_output_classes)
+        if project_output_classes != provided_output_classes:
+            raise ValidationError(f'output_classes not compatible with Project (id:{project.pk})')
         
-class ModelInterfaceCreateSerializer(serializers.ModelSerializer):
+
+    def check_input_fields(self, project, provided_input_fields):
+        parsed_config = project.get_parsed_config()
+        project_input_fields = set()
+        for tag in parsed_config:
+            for input in parsed_config[tag]['inputs']:
+                if input.get('type',None) and input.get('value', None):
+                    project_input_fields.add(input.get('value'))
+        
+        project_input_fields = sorted(list(project_input_fields))
+        if project_input_fields != provided_input_fields:
+            raise ValidationError(f'input_fields do not match inputs in Project (id:{project.pk})')
+        
+class ModelInterfaceCreateSerializer(ModelInterfaceSerializer):
     created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='User who created Dataset')
 
     class Meta:
@@ -33,7 +55,6 @@ class ModelInterfaceCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_by', 'created_at', 'updated_at']
 
     def validate(self, data):
-       
         associated_projects = data.pop('associated_projects')
         if model_interface := self.instance:
             for key, value in data.items():
@@ -45,15 +66,19 @@ class ModelInterfaceCreateSerializer(serializers.ModelSerializer):
             ValidationError(f'Associated Projects list should not be empty')
         # check if projects provided belong to this organization
         for project in associated_projects:
-           
-            if not Project.objects.filter(pk=project.id,organization=model_interface.organization).exists():
+            proj = Project.objects.filter(pk=project.id,organization=model_interface.organization)
+            if not proj.exists():
                 ValidationError(f'Project (id:{project.id}) provided does not belong to your organization')
+            self.check_output_classes(project=proj[0], provided_output_classes=model_interface.output_classes)
+            self.check_input_fields(project=proj[0], provided_input_fields=model_interface.input_fields)
+               
             
         return data
 
 
 class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
     created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='User who created Dataset')
+
 
     class Meta:
         model = ThirdPartyModelVersion
@@ -99,7 +124,7 @@ class ModelRunSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_by', 'created_at', 'triggered_at', 'completed_at', 'status']
 
     def validate(self, data):
-
+        print(data)
         if model_run := self.instance:
             for key, value in data.items():
                 setattr(model_run, key, value)

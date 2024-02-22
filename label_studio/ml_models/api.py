@@ -76,9 +76,15 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ModelInterface.objects.filter(organization_id=self.request.user.active_organization_id)
+    
+    def create(self, request, *args, **kwargs):
+        data = self.request.data
+        data['organization']=self.request.user.active_organization_id
+        serializer = self.get_serializer(data=data)
+        self.perform_create(serializer)
+        return Response(serializer.data,status=201)
 
     def perform_create(self, serializer):
-        self.request.data['organization'] = self.request.user.active_organization
         associated_projects_data = self.request.data.get('associated_projects',[])
         serializer.is_valid(raise_exception=True)
 
@@ -91,8 +97,6 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         model_interface = ModelInterface.objects.filter(pk=instance.pk)[0]
         for id in associated_projects_data:
             model_interface.associated_projects.add(id)
-
-        models = ModelInterface.objects.filter(organization=self.request.user.active_organization)
        
 
 
