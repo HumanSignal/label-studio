@@ -33,29 +33,22 @@ class ModelInterfaceCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_by', 'created_at', 'updated_at']
 
     def validate(self, data):
-        print("xln-29")
-        print(data)
+       
         associated_projects = data.pop('associated_projects')
-        print(data)
         if model_interface := self.instance:
             for key, value in data.items():
                 setattr(model_interface, key, value)
 
         else:
             model_interface = self.Meta.model(**data)
-        print("xln-38")
         if not associated_projects:
             ValidationError(f'Associated Projects list should not be empty')
-        print("xln-41")
         # check if projects provided belong to this organization
         for project in associated_projects:
-            print("xln-44")
-            print(project.id)
-            print("xln46")
+           
             if not Project.objects.filter(pk=project.id,organization=model_interface.organization).exists():
                 ValidationError(f'Project (id:{project.id}) provided does not belong to your organization')
             
-            #todo add validation check for input_fields and output_classes for each project 
         return data
 
 

@@ -87,31 +87,16 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         serializer.validated_data['created_by'] = self.request.user
         serializer.save()
         instance = serializer.instance
-        print(instance.pk)
-        print("xln-87")
-        print (associated_projects_data)
+       
         model_interface = ModelInterface.objects.filter(pk=instance.pk)[0]
         for id in associated_projects_data:
             proj=Project.objects.filter(pk=id)
-            print("xln-91")
-            print(proj[0].pk)
+          
             
             model_interface.associated_projects.add(proj[0].pk)
 
-            # instance.associated_projects.add(proj[0].pk)
-        print("xln-85")
         models = ModelInterface.objects.filter(organization=self.request.user.active_organization)
-        print("xln-89")
-        print(len(models))
-        for m in models:
-            print("===")
-            print(m.pk)
-            print(m.title)
-            print(m.input_fields)
-            print(list(m.associated_projects.all()))
-            print(m.associated_projects)
-            print(m.output_classes)
-            print(m.organization)
+       
 
 
 @method_decorator(
