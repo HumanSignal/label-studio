@@ -21,6 +21,7 @@ const injector = inject(({ store }) => {
 
 const summaryInjector = inject(({ store }) => {
   const { project, taskStore } = store;
+
   return {
     totalTasks: project?.task_count ?? project?.task_number ?? 0,
     totalFoundTasks: taskStore?.total ?? 0,
