@@ -158,7 +158,7 @@ class ModelRunSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_by', 'created_at', 'triggered_at', 'completed_at', 'status']
 
     def validate(self, data):
-        print(data)
+        
         if model_run := self.instance:
             for key, value in data.items():
                 setattr(model_run, key, value)
