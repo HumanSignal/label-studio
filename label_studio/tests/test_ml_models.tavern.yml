@@ -130,20 +130,81 @@ stages:
       url: "{django_live_url}/api/models/{model_id}"
       method: PATCH
       json:
-        output_classes: ["Humor"]
+        output_classes:
+        - "Humor"
     response:
       status_code: 400
 
-  # - name: Patch specific model with valid output classes and project  
-  #     url: "{django_live_url}/api/models/{model_id}"
-  #     method: PATCH
-  #     json:
-  #       output_classes: ["Humor", "NonHumor"]
-  #       associated_projects: 
-  #       - !int "{project_pk2}"
-        
-  #   response:
-  #     status_code: 200
+  - name: Patch specific model with valid output classes 
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        associated_projects:
+        - !int "{project_pk2}"
+    response:
+      status_code: 400
+
+  - name: Patch specific model with valid output classes 
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        associated_projects:
+        - !int "{project_pk2}"
+        output_classes:
+        - "Humor"
+        - "NonHumor"
+    response:
+      status_code: 200
+
+  - name: Patch specific model with valid output classes 
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        associated_projects:
+        - !int "{project_pk}"
+        output_classes:
+        - "Humor"
+        - "NotHumor"
+    response:
+      status_code: 400
+
+  - name: Patch specific model with invalid output classes 
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        associated_projects:
+        - !int "{project_pk}"
+        output_classes: []
+    response:
+      status_code: 400
+  
+  - name: Patch specific model with invalid input fields 
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        associated_projects:
+        - !int "{project_pk}"
+        input_fields: []
+    response:
+      status_code: 400
+
+  - name: Patch specific model with valid output classes 
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        associated_projects:
+        - !int "{project_pk}"
+        output_classes:
+        - "Humor"
+        - "Not Humor"
+    response:
+      status_code: 200
 
   - name: Get list of models with one model
     request:
