@@ -33,7 +33,7 @@ jobs:
       commit-message: ${{ steps.commit-details.outputs.commit-message }}
     timeout-minutes: 25
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         if: github.event_name == 'push'
@@ -192,7 +192,7 @@ jobs:
       id: ${{ steps.update-draft-release.outputs.id }}
       rc-version: ${{ steps.create-draft-release.outputs.rc-version }}
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4

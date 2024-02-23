@@ -14,7 +14,7 @@ import { TabFilter } from "./tab_filter";
 import { TabHiddenColumns } from "./tab_hidden_columns";
 import { TabSelectedItems } from "./tab_selected_items";
 import { History } from '../../utils/history';
-import { FF_DEV_1470, FF_LOPS_12, isFF } from "../../utils/feature-flags";
+import { FF_LOPS_12, isFF } from "../../utils/feature-flags";
 import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
 import { clamp } from "../../utils/helpers";
 
@@ -253,7 +253,7 @@ export const Tab = types
     setType(type) {
       self.type = type;
       self.root.SDK.invoke("tabTypeChanged", { tab: self.id, type });
-      self.save({ reload: isFF(FF_DEV_1470) });
+      self.save({ reload: false });
     },
 
     setTarget(target) {

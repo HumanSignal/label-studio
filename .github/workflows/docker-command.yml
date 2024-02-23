@@ -15,7 +15,7 @@ jobs:
     outputs:
       error-msg: ${{ steps.check-membership.outputs.error }}
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Add Workflow link to command comment
         uses: peter-evans/create-or-update-comment@v4
