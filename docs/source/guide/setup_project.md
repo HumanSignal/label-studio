@@ -126,18 +126,25 @@ To avoid getting overwhelmed, focus on the following settings. They have the mos
 
 Annotators are the users who are labeling project tasks. 
 
-Task distribution 
-: Located under **Annotation**, this determines whether annotators must be manually assigned to a task in order to label it. <br/>
-If you are using Auto distribution, project members can begin labeling as soon as the project is published. Otherwise, they must be manually assigned. <br />
+* **Distribute labeling tasks**
 
-Allow empty annotations
-: Located under **Annotation**, this determines whether annotators can complete tasks without first adding a label. <br/>
-By default, annotators are allowed to submit empty annotations. You can change this setting so that all tasks require a label. 
+    Located under **Annotation**, this determines whether annotators must be manually assigned to a task in order to label it. 
 
-Minimum annotations per task
-: (This is only applicable if you are using Auto distribution). <br/>
-Located under **Quality**, this determines how many annotators must submit a task before the task is considered completed. <br/>
-By default, each task only requires one annotator to submit. You can configure a higher task overlap, meaning that each task must have a minimum number of annotators before being considered complete. 
+    If you are using Auto distribution, project members can begin labeling as soon as the project is published. Otherwise, they must be manually assigned. 
+
+* **Allow empty annotations**
+
+    Located under **Annotation**, this determines whether annotators can complete tasks without first adding a label. 
+
+    By default, annotators are allowed to submit empty annotations. You can change this setting so that all tasks require a label. 
+
+* **Annotations per task minimum**
+
+    (This is only applicable if you are using Auto distribution).
+
+    Located under **Quality**, this determines how many annotators must submit a task before the task is considered completed. 
+
+    By default, each task only requires one annotator to submit. You can configure a higher task overlap, meaning that each task must have a minimum number of annotators before being considered complete. 
 
 For a description of all the settings available for annotators, see [Project settings - Annotation](project_settings_lse#Annotation) and [Project settings - Quality](project_settings_lse#Quality). 
 
@@ -146,11 +153,14 @@ For a description of all the settings available for annotators, see [Project set
 
 Reviewers are the users are reviewing the annotators' submissions for accuracy. 
 
-Review completion
-: Configure what action determines that a task has been reviewed. By default, the reviewer only needs to accept one annotation for the task. You can change this so that the reviewer must accept or reject submissions from all annotators. 
+* **Mark task as reviewed after it has at least 1 accepted annotation** or  
+**Mark task as reviewed after all annotations are processed**
 
-Manual review assignment
-: By default, reviewers are able to begin reviewing as soon as there are labeled tasks available to review. However, you can change this so that reviewers must be manually assigned to a task. 
+    Configure what action determines that a task has been reviewed. By default, the reviewer only needs to accept one annotation for the task. You can change this so that the reviewer must accept or reject submissions from all annotators. 
+
+* **Review only manually assigned tasks**
+
+    By default, reviewers are able to begin reviewing as soon as there are labeled tasks available to review. However, you can change this so that reviewers must be manually assigned to a task. 
 
 For a description of all the settings available for reviewers, see [Project settings - Review](project_settings_lse#Review). 
 

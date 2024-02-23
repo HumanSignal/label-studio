@@ -198,15 +198,22 @@ Configure additional settings for reviewers.
 <tr>
 <td>
 
-Review completion
+**Mark task as reviewed after it has at least 1 accepted annotation**
 </td>
 <td>
 
-Select how many annotations need to be processed by a reviewer:
+In a task where multiple annotators submitted labels, the reviewer only needs to accept one to consider the task reviewed. 
 
-* **Mark task as reviewed after it has at least 1 accepted annotation**--In a task where multiple annotators submitted labels, the reviewer only needs to accept one to consider the task reviewed. 
+</td>
+</tr>
+<tr>
+<td>
 
-* **Mark task as reviewed after all annotations are processed**--In a task where multiple annotators submitted labels, the reviewer needs to accept or reject annotations submitted by all annotators. 
+**Mark task as reviewed after all annotations are processed**
+</td>
+<td>
+
+In a task where multiple annotators submitted labels, the reviewer needs to accept or reject annotations submitted by all annotators. 
 
 </td>
 </tr>
