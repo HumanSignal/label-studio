@@ -4,7 +4,7 @@ short: Manage projects
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 59
+order_enterprise: 62
 meta_title: Manage projects in Label Studio Enterprise
 meta_description: A description of various project management actions available.
 section: "Project Management"

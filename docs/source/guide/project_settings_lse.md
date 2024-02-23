@@ -4,7 +4,7 @@ short: Project settings
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 62
+order_enterprise: 59
 meta_title: Project settings
 meta_description: Brief descriptions of all the options available when configuring the project settings
 section: "Project Management"
