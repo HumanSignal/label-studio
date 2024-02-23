@@ -53,7 +53,7 @@ export class LabelStudio {
   root: Element | string;
   store: any;
 
-  destroy: () => void = () => {};
+  destroy: (() => void) | null = () => {};
   events = new EventInvoker();
 
   getRootElement(root: Element | string) {
@@ -164,7 +164,7 @@ export class LabelStudio {
             as well as nulling all these this.store
          */
         this.store = null;
-        this.destroy = () => {};
+        this.destroy = null;
         LabelStudio.instances.delete(this);
       }
     };
