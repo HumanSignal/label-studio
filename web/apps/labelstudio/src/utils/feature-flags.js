@@ -1,4 +1,5 @@
 const FEATURE_FLAGS = window.APP_SETTINGS?.feature_flags || {};
+const ORG_LICENSE_FLAGS = window.APP_SETTINGS?.flags || {};
 
 // Fix displaying of created_at in the review mode
 export const FF_DEV_1480 = "ff_front_dev_1480_created_on_in_review_180122_short";
@@ -36,14 +37,19 @@ export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
 /**
  * Control Visibility and Access of Cloud Storage Connectors for Managers
  */
-export const FF_CLOUD_STORAGE = "fflag_feat_all_optic_478_access_of_cloud_storage_connectors_short";
+export const LOF_CLOUD_STORAGE_FOR_MANAGERS = "hide_storage_settings_for_manager";
+
+function isFlagEnabled(id, flagList) {
+  if (id in flagList) {
+    return flagList[id] === true;
+  }
+}
 
 export function isFF(id) {
-  if (id in FEATURE_FLAGS) {
-    return FEATURE_FLAGS[id] === true;
-  }
-  else {
-    return window.APP_SETTINGS?.feature_flags_default_value === true;
-  }
+  return isFlagEnabled(id, FEATURE_FLAGS) ?? window.APP_SETTINGS?.feature_flags_default_value === true;
+}
+
+export function isOLF() {
+  return isFlagEnabled(id, ORG_LICENSE_FLAGS) ?? false;
 }
 
