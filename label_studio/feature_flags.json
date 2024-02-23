@@ -1878,6 +1878,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_optic_478_access_of_cloud_storage_connectors_short": {
+      "key": "fflag_feat_all_optic_478_access_of_cloud_storage_connectors_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "e88ab9f2bfc04735b11be80609ff2ad8",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_back_dev_3756_queue_enrollment_min_short": {
       "key": "fflag_feat_back_dev_3756_queue_enrollment_min_short",
       "on": false,
