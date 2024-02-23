@@ -50,18 +50,41 @@ After you [start Label Studio](start) and [create an account](signup), create a 
 
 From Label Studio, click **Create Project** in the upper right. A window opens with three tabs:
 
-Project Name
-: This is the only required section.  <br/>
-Here, select your workspace, enter a project name, and (optionally) a project description. <br/>
+<dl>
+
+<dt>Project Name</dt>
+
+<dd>
+
+This is the only required section. 
+
+Here, select your workspace, enter a project name, and (optionally) a project description. 
+
 Once complete, you can click **Save** to create the project, or you can complete the other tabs. 
 
-Data Import
-: From here, you can upload files into Label Studio. You can do this now or after the project has been created.<br/>
-However, for larger projects, we recommend setting up cloud storage or using a different import method. For more information, see [Get data into Label Studio](tasks) and [Sync data from external storage](storage).<br />
+</dd>
 
-Labeling Setup
-: You can select a template to begin your labeling configuration. For easier setup, select a [template](/templates). You can later customize template to meet your needs. See [Configure labeling](setup). <br/>
+<dt>Data Import</dt>
+
+<dd>
+
+From here, you can upload files into Label Studio. You can do this now or after the project has been created.
+
+However, for larger projects, we recommend setting up cloud storage or using a different import method. For more information, see [Get data into Label Studio](tasks) and [Sync data from external storage](storage).
+
+</dd>
+
+<dt>Labeling Setup</dt>
+
+<dd>
+
+You can select a template to begin your labeling configuration. For easier setup, select a [template](/templates). You can later customize template to meet your needs. See [Configure labeling](setup).
+
 You can do this now or after the project has been created.
+
+</dd>
+
+</dl>
 
 When you're done, click **Save**. 
 

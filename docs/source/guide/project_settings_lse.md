@@ -46,7 +46,7 @@ Specify instructions to show the annotators. This field accepts HTML formatting.
 
 Enable **Show before labeling** to display a pop-up message to annotators when they enter the label stream. If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface. 
 
-<dd>
+</dd>
 
 <dt id="distribute-tasks">Distribute Labeling Tasks</dt>
 
@@ -59,7 +59,7 @@ Select how you want to distribute tasks to annotators for labeling.
 | **Auto**         | Annotators are automatically assigned to tasks, and the option to manually assign annotators is disabled. Automatic assignments are distributed to all users with the Annotator role who are project [members](#Members) <br /><br />You can further define the automatic assignment workflow in the [**Quality** settings](#Quality).  |
 | **Manual** | You must [manually assign](manage_data#Assign-annotators-to-tasks) annotators to tasks. Annotators are not be able to view any labeling tasks until they have those tasks manually assigned to them. |
 
-<dd>
+</dd>
 
 <dt>Skip Queue</dt>
 
@@ -133,7 +133,7 @@ Unlike the other skip queue options, in this case skipped tasks are marked as Co
 </tr>
 </table>
 
-<dd>
+</dd>
 
 <dt id="annotating-options">Annotating Options</dt>
 
@@ -149,7 +149,7 @@ Configure additional settings for annotators.
 | **Reveal pre-annotations interactively** | When enabled, pre-annotations are not automatically displayed to an annotator. Instead, annotators can choose when to reveal these pre-annotations as they work on the task, providing them with the opportunity to first assess the image or text without the influence of the model's predictions. |
 | **Annotators must leave a comment on skip** | When enabled, annotators are required to leave a comment when skipping a task. |
 
-<dd>
+</dd>
 
 <dt id="task-sampling">Task Sampling</dt>
 
@@ -163,7 +163,7 @@ Configure the order in which tasks are presented to annotators.
 | **Sequential Sampling** | Tasks are shown to annotators in the same order that they appear on the Data Manager. |
 | **Uniform Sampling** | Tasks are shown in random order.  |
 
-<dd>
+</dd>
 
 </dl>
 
@@ -182,7 +182,7 @@ Specify instructions to show the reviewers. This field accepts HTML formatting.
 
 Enable **Show before reviewing** to display a pop-up message to reviewers when they enter the label stream. If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface.  
 
-<dd>
+</dd>
 
 <dt id="reviewing-options">Reviewing Options</dt>
 
@@ -291,7 +291,7 @@ If reviewers can view the Data Manager, this setting controls whether they can a
 </tr>
 </table>
 
-<dd>
+</dd>
 
 </dl>
 
