@@ -17,6 +17,10 @@ For more project actions, see:
 * [Publish a project](setup_project#Publish-a-project)
 * [Assign annotators to project tasks](manage_data#Assign-annotators-to-tasks)
 
+You can use the **All Projects** page to view projects across all workspaces. 
+
+![Screenshot of the All Projects page](/images/project/projects_page.png)
+
 
 ## Search projects
 
