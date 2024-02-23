@@ -1,3 +1,8 @@
+declare global {
+  interface Window {
+    APP_SETTINGS:any;
+  }
+}
 const FEATURE_FLAGS = window.APP_SETTINGS?.feature_flags || {};
 const ORG_LICENSE_FLAGS = window.APP_SETTINGS?.flags || {};
 
@@ -37,19 +42,19 @@ export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
 /**
  * Control Visibility and Access of Cloud Storage Connectors for Managers
  */
-export const LOF_CLOUD_STORAGE_FOR_MANAGERS = "hide_storage_settings_for_manager";
+export const OLF_CLOUD_STORAGE_FOR_MANAGERS = "hide_storage_settings_for_manager";
 
-function isFlagEnabled(id, flagList) {
+function isFlagEnabled(id: string, flagList: Record<string, boolean>) {
   if (id in flagList) {
     return flagList[id] === true;
   }
 }
 
-export function isFF(id) {
+export function isFF(id: string) {
   return isFlagEnabled(id, FEATURE_FLAGS) ?? window.APP_SETTINGS?.feature_flags_default_value === true;
 }
 
-export function isOLF(id) {
+export function isOLF(id: string) {
   return isFlagEnabled(id, ORG_LICENSE_FLAGS) ?? false;
 }
 

@@ -7,9 +7,9 @@ import { InstructionsSettings } from './InstructionsSettings';
 import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
-import { LOF_CLOUD_STORAGE_FOR_MANAGERS, isOLF } from '../../utils/feature-flags';
+import { OLF_CLOUD_STORAGE_FOR_MANAGERS, isOLF } from '../../utils/feature-flags';
 
-const isAllowCloudStorage = !isOLF(LOF_CLOUD_STORAGE_FOR_MANAGERS);
+const isAllowCloudStorage = !isOLF(OLF_CLOUD_STORAGE_FOR_MANAGERS);
 
 export const MenuLayout = ({ children, ...routeProps }) => {
   return (
