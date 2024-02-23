@@ -1,12 +1,12 @@
 ---
-title: Project Performance Dashboard
-short: Performance Dashboard
+title: Project Dashboard
+short: Dashboard
 tier: enterprise
 type: guide
 order: 0
 order_enterprise: 68
-meta_title: Manage Role-Based Access Control in Label Studio
-meta_description: Manage access and set up permissions with user roles, organizations, and project workspaces for your projects in Label Studio Enterprise.
+meta_title: Project Dashboard
+meta_description: Use the project Dashboard to monitor performance and progress.
 section: "Project Management"
 ---
 
