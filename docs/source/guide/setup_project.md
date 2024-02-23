@@ -1,6 +1,6 @@
 ---
 title: Create and configure projects
-short: Create projects
+short: Create project
 type: guide
 tier: all
 order: 155
