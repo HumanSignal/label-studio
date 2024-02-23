@@ -135,7 +135,7 @@ stages:
     response:
       status_code: 400
 
-  - name: Patch specific model with valid output classes 
+  - name: Patch specific model with invalid output classes 
     request:
       url: "{django_live_url}/api/models/{model_id}"
       method: PATCH
@@ -158,7 +158,7 @@ stages:
     response:
       status_code: 200
 
-  - name: Patch specific model with valid output classes 
+  - name: Patch specific model with invalid output classes 
     request:
       url: "{django_live_url}/api/models/{model_id}"
       method: PATCH
@@ -179,6 +179,16 @@ stages:
         associated_projects:
         - !int "{project_pk}"
         output_classes: []
+    response:
+      status_code: 400
+
+  - name: Patch specific model with invalid project
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: PATCH
+      json:
+        associated_projects:
+        - 5
     response:
       status_code: 400
   
