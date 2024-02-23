@@ -41,6 +41,7 @@ Use these settings to configure what options annotators will see and how their l
 <dt>Instructions</dt>
 
 <dd>
+
 Specify instructions to show the annotators. This field accepts HTML formatting. 
 
 Enable **Show before labeling** to display a pop-up message to annotators when they enter the label stream. If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface. 
@@ -176,6 +177,7 @@ Use these settings to configure what options reviewers will see.
 <dt>Instructions</dt>
 
 <dd>
+
 Specify instructions to show the reviewers. This field accepts HTML formatting. 
 
 Enable **Show before reviewing** to display a pop-up message to reviewers when they enter the label stream. If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface.  
