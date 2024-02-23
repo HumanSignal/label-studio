@@ -63,9 +63,6 @@ class ThirdPartyModelVersionSerializer(serializers.ModelSerializer):
 
 
 class ModelRunSerializer(serializers.ModelSerializer):
-    @property
-    def org(self):
-        return self.context.get('org')
 
     class Meta:
         model = ModelRun
@@ -86,10 +83,10 @@ class ModelRunSerializer(serializers.ModelSerializer):
         if not ThirdPartyModelVersion.objects.filter(
             pk=model_run.model_version.pk, organization=model_run.organization
         ).exists():
-            ValidationError(f'User does not have access to ModelVersion = {data["model_version"]}')
+            ValidationError(f'User does not have access to model version = {data["model_version"]}')
 
         # todo: we may need to update this check to specifically check for project subset conditions
-        if len(Task.objects.filter(project=data['project'])) == 0:
+        if not Task.objects.filter(project=data['project']).exists():
             ValidationError('Project does not have any tasks')
 
         return data

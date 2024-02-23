@@ -124,4 +124,4 @@ class ModelRun(models.Model):
 
     @property
     def output_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/.csv'
+        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output_tasks.csv'
