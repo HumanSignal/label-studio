@@ -4,7 +4,7 @@ import { Description } from '../../../components/Description/Description';
 import { Block, cn } from '../../../utils/bem';
 import { StorageSet } from './StorageSet';
 import './StorageSettings.styl';
-import { OLF_CLOUD_STORAGE_FOR_MANAGERS, isOLF } from 'apps/labelstudio/src/utils/feature-flags';
+import { isOLF, OLF_CLOUD_STORAGE_FOR_MANAGERS } from 'apps/labelstudio/src/utils/feature-flags';
 
 const isAllowCloudStorage = !isOLF(OLF_CLOUD_STORAGE_FOR_MANAGERS);
 
