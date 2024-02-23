@@ -59,3 +59,6 @@ def get_storage_by_url(url: Union[str, List, Dict], storage_objects: Iterable[Im
                     # probably we need to use more advanced can_resolve_url mechanics
                     # that takes into account not only prefixes, but bucket path too
                     return storage_object
+
+def check_permissions_for_storages(request):
+  pass

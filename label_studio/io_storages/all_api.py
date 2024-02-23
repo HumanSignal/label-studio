@@ -94,10 +94,7 @@ class AllExportStorageTypesAPI(APIView):
 class AllImportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    if flag_set('fflag_feat_all_optic_478_access_of_cloud_storage_connectors_short'):
-      permission_required = all_permissions.organizations_change
-    else:
-      permission_required = all_permissions.projects_change
+    permission_required = all_permissions.projects_change
 
     def _get_response(self, api, request, *args, **kwargs):
         try:
@@ -117,6 +114,10 @@ class AllImportStorageListAPI(generics.ListAPIView):
         )
         return Response(list_responses)
 
+    def initial(self, request, *args, **kwargs):
+        CHECK_PERMISSIONS_FOR_STORAGES = load_func(settings.CHECK_PERMISSIONS_FOR_STORAGES)
+        CHECK_PERMISSIONS_FOR_STORAGES(request)
+        super().initial(request, *args, **kwargs)
 
 @method_decorator(
     name='get',
@@ -150,3 +151,8 @@ class AllExportStorageListAPI(generics.ListAPIView):
             [self._get_response(s['export_list_api'], request, *args, **kwargs) for s in _common_storage_list], []
         )
         return Response(list_responses)
+
+    def initial(self, request, *args, **kwargs):
+        CHECK_PERMISSIONS_FOR_STORAGES = load_func(settings.CHECK_PERMISSIONS_FOR_STORAGES)
+        CHECK_PERMISSIONS_FOR_STORAGES(request)
+        super().initial(request, *args, **kwargs)
