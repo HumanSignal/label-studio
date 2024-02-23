@@ -49,7 +49,7 @@ export function isFF(id) {
   return isFlagEnabled(id, FEATURE_FLAGS) ?? window.APP_SETTINGS?.feature_flags_default_value === true;
 }
 
-export function isOLF() {
+export function isOLF(id) {
   return isFlagEnabled(id, ORG_LICENSE_FLAGS) ?? false;
 }
 
