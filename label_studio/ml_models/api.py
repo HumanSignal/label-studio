@@ -232,15 +232,15 @@ class ModelCompatibleProjects(generics.RetrieveAPIView):
     decorator=swagger_auto_schema(
         tags=['Models: Model Runs'],
         operation_summary='Create Model Run object',
-        operation_description='Create a new Model Run for given project_id, model_version_id and project_subset if it does not exist, if it exists delete the record and create new',
+        operation_description='Create a new Model Run for given project_id, model_version_id and project_subset if it does not exist. If it exists, delete the record and create new',
     ),
 )
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
         tags=['Models: Model Runs'],
-        operation_summary='get list of model runs',
-        operation_description='get list of model runs for the organization',
+        operation_summary='Get list of model runs',
+        operation_description='Get list of model runs for the organization',
     ),
 )
 class ModelRunAPI(generics.ListCreateAPIView):
@@ -268,7 +268,6 @@ class ModelRunAPI(generics.ListCreateAPIView):
         serializer.validated_data['created_by'] = self.request.user
         serializer.validated_data['triggered_at'] = datetime.utcnow()
         serializer.validated_data['organization'] = self.request.user.active_organization
-        print(serializer.validated_data)
 
         serializer.save()
 

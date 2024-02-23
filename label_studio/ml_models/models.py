@@ -91,7 +91,7 @@ class ModelRun(models.Model):
         PENDING = 'Pending', _('Pending')
         COMPLETED = 'Completed', ('Completed')
         FAILED = 'Failed', ('Failed')
-        CANCELED = 'CANCELED', ('CANCELED')
+        CANCELED = 'Canceled', ('Canceled')
 
     organization = models.ForeignKey(
         'organizations.Organization', on_delete=models.CASCADE, related_name='model_runs', null=True
@@ -119,9 +119,9 @@ class ModelRun(models.Model):
 
     # todo may need to clean up in future
     @property
-    def get_input_file_name(self):
+    def input_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input_tasks.csv'
 
     @property
-    def get_output_file_name(self):
+    def output_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/.csv'
