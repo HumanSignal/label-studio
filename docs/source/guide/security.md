@@ -122,7 +122,7 @@ Label Studio collects anonymous usage statistics about the number of page visits
 
 <div class="opensource-only">
 
-You can disabled data collection by setting the environment variable `COLLECT_ANALYTICS` to `False`. 
+You can disable data collection by setting the environment variable `COLLECT_ANALYTICS` to `False`. 
 
 </div>
 
