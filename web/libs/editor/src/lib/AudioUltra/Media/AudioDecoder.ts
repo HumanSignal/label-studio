@@ -1,7 +1,7 @@
 import { AudioDecoderWorker, getAudioDecoderWorker } from '@martel/audio-file-decoder';
 // eslint-disable-next-line
 // @ts-ignore
-import DecodeAudioWasm from '@martel/audio-file-decoder/decode-audio.wasm';
+import AudioDecoder from '@martel/audio-file-decoder/decode-audio.wasm';
 import { BaseAudioDecoder } from './BaseAudioDecoder';
 import { clamp, info } from '../Common/Utils';
 import { SplitChannel } from './SplitChannel';

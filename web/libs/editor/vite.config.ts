@@ -3,12 +3,20 @@ import { mergeConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import path from 'path';
 import libConfig from '../../vite.lib.config';
+import wasm from 'vite-plugin-wasm';
+import topLevelAwait from 'vite-plugin-top-level-await';
 
 const MODE = process.env.MODE ?? 'bluild';
 
 export default mergeConfig(libConfig, {
   root: __dirname,
   cacheDir: '../../node_modules/.vite/libs/editor',
+
+  optimizeDeps: {
+    exclude: [
+      "@martel/audio-file-decoder"
+    ]
+  },
 
   css: {
     preprocessorOptions: {
@@ -27,6 +35,8 @@ export default mergeConfig(libConfig, {
   },
 
   plugins: [
+    wasm(),
+    topLevelAwait(),
     dts({
       entryRoot: 'src',
       tsConfigFilePath: path.join(__dirname, 'tsconfig.lib.json'),
@@ -35,10 +45,9 @@ export default mergeConfig(libConfig, {
   ],
 
   build: {
-    outDir: path.join(__dirname, MODE === 'standalone' ? './editor/public' : '../../dist/libs/editor'),
+    outDir: '../../dist/libs/editor',
     lib: {
-      // Could also be a dictionary or array of multiple entry points.
-      entry: path.resolve(__dirname, 'src/index.js'),
+      name: 'editor',
     },
   },
 });

@@ -23,6 +23,8 @@ export default defineConfig({
   },
 
   plugins: [
+    wasm(),
+    topLevelAwait(),
     react(),
     svgr({
       svgrOptions: {
@@ -31,8 +33,6 @@ export default defineConfig({
       include: "**/*.svg"
     }),
     nxViteTsPaths(),
-    wasm(),
-    topLevelAwait(),
   ],
 
 });
