@@ -53,7 +53,7 @@ export class LabelStudio {
   root: Element | string;
   store: any;
 
-  destroy: (() => void) | null = null;
+  destroy: (() => void) | null = () => {};
   events = new EventInvoker();
 
   getRootElement(root: Element | string) {
