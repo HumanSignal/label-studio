@@ -1,10 +1,6 @@
-declare global {
-  interface Window {
-    APP_SETTINGS:any;
-  }
-}
+import { isFlagEnabled } from "./helpers";
+
 const FEATURE_FLAGS = window.APP_SETTINGS?.feature_flags || {};
-const ORG_LICENSE_FLAGS = window.APP_SETTINGS?.flags || {};
 
 // Fix displaying of created_at in the review mode
 export const FF_DEV_1480 = "ff_front_dev_1480_created_on_in_review_180122_short";
@@ -39,22 +35,6 @@ export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
  */
 export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
 
-/**
- * Control Visibility and Access of Cloud Storage Connectors for Managers
- */
-export const OLF_CLOUD_STORAGE_FOR_MANAGERS = "hide_storage_settings_for_manager";
-
-function isFlagEnabled(id: string, flagList: Record<string, boolean>) {
-  if (id in flagList) {
-    return flagList[id] === true;
-  }
-}
-
 export function isFF(id: string) {
-  return isFlagEnabled(id, FEATURE_FLAGS) ?? window.APP_SETTINGS?.feature_flags_default_value === true;
+  return isFlagEnabled(id, FEATURE_FLAGS, window.APP_SETTINGS?.feature_flags_default_value === true);
 }
-
-export function isOLF(id: string) {
-  return isFlagEnabled(id, ORG_LICENSE_FLAGS) ?? false;
-}
-

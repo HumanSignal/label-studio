@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    APP_SETTINGS: any;
+  }
+}
+
 export const formDataToJPO = (formData: FormData) => {
   if (formData instanceof FormData) {
     const entries = formData.entries();
@@ -137,4 +143,11 @@ export const getLastTraceback = (traceback: string): string => {
   }
 
   return lastTraceIndex >= 0 ? lines.slice(lastTraceIndex).join('\n') : traceback;
+};
+
+export const isFlagEnabled = (id: string, flagList: Record<string, boolean>, defaultValue = false) => {
+  if (id in flagList) {
+    return flagList[id] === true ?? defaultValue;
+  }
+  return defaultValue;
 };
