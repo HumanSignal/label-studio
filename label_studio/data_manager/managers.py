@@ -517,23 +517,24 @@ def annotate_completed_at(queryset):
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
     newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
+    project_id = queryset[0].project_id
     if (
         get_tasks_agreement_queryset
         and LseProject
         and queryset
-        and LseProject.objects.filter(project_id=queryset[0].project_id).exists()
+        and LseProject.objects.filter(project_id=project_id).exists()
     ):
         queryset = get_tasks_agreement_queryset(queryset)
 
         # Subquery to get the agreement_threshold for each project
         agreement_threshold_subquery = Subquery(
-            LseProject.objects.filter(project_id=OuterRef('project_id')).values('agreement_threshold')[:1],
+            LseProject.objects.filter(project_id=project_id).values('agreement_threshold')[:1],
             output_field=FloatField(),
         )
 
         # Subquery for max_additional_annotators_assignable + overlap
         max_annotators_subquery = Subquery(
-            LseProject.objects.filter(project_id=OuterRef('project_id'))
+            LseProject.objects.filter(project_id=project_id)
             .annotate(total_max_annotators=F('max_additional_annotators_assignable') + OuterRef('overlap'))
             .values('total_max_annotators')[:1],
             output_field=IntegerField(),
@@ -541,7 +542,7 @@ def annotate_completed_at(queryset):
 
         # Subquery to get the latest Annotation for each task
         agreement_threshold_exists_subquery = Exists(
-            LseProject.objects.filter(project_id=OuterRef('project_id'), agreement_threshold__isnull=False)
+            LseProject.objects.filter(project_id=project_id, agreement_threshold__isnull=False)
         )
 
         completed_at_case = Case(
