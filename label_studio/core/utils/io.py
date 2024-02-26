@@ -197,24 +197,61 @@ def validate_upload_url(url, block_local_urls=True):
 
 
 def validate_ip(ip: str) -> None:
-    """Checks if an IP is local/private.
+    """If settings.USE_DEFAULT_BANNED_SUBNETS is True, this function checks
+    if an IP is reserved for any of the reasons in
+    https://en.wikipedia.org/wiki/Reserved_IP_addresses
+    and raises an exception if so. Additionally, if settings.USER_ADDITIONAL_BANNED_SUBNETS
+    is set, it will also check against those subnets.
+
+    If settings.USE_DEFAULT_BANNED_SUBNETS is False, this function will only check
+    the IP against settings.USER_ADDITIONAL_BANNED_SUBNETS. Turning off the default
+    subnets is **risky** and should only be done if you know what you're doing.
 
     :param ip: IP address to be checked.
     """
 
-    if ip == '0.0.0.0':  # nosec
-        raise InvalidUploadUrlError
-
-    local_subnets = [
-        '127.0.0.0/8',
-        '10.0.0.0/8',
-        '172.16.0.0/12',
-        '192.168.0.0/16',
+    default_banned_subnets = [
+        '0.0.0.0/8',  # current network
+        '10.0.0.0/8',  # private network
+        '100.64.0.0/10',  # shared address space
+        '127.0.0.0/8',  # loopback
+        '169.254.0.0/16',  # link-local
+        '172.16.0.0/12',  # private network
+        '192.0.0.0/24',  # IETF protocol assignments
+        '192.0.2.0/24',  # TEST-NET-1
+        '192.88.99.0/24',  # Reserved, formerly ipv6 to ipv4 relay
+        '192.168.0.0/16',  # private network
+        '198.18.0.0/15',  # network interconnect device benchmark testing
+        '198.51.100.0/24',  # TEST-NET-2
+        '203.0.113.0/24',  # TEST-NET-3
+        '224.0.0.0/4',  # multicast
+        '233.252.0.0/24',  # MCAST-TEST-NET
+        '240.0.0.0/4',  # reserved for future use
+        '255.255.255.255/32',  # limited broadcast
+        '::/128',  # unspecified address
+        '::1/128',  # loopback
+        '::ffff:0:0/96',  # IPv4-mapped address
+        '::ffff:0:0:0/96',  # IPv4-translated address
+        '64:ff9b::/96',  # IPv4/IPv6 translation
+        '64:ff9b:1::/48',  # IPv4/IPv6 translation
+        '100::/64',  # discard prefix
+        '2001:0000::/32',  # Teredo tunneling
+        '2001:20::/28',  # ORCHIDv2
+        '2001:db8::/32',  # documentation
+        '2002::/16',  # 6to4
+        'fc00::/7',  # unique local
+        'fe80::/10',  # link-local
+        'ff00::/8',  # multicast
     ]
 
-    for subnet in local_subnets:
+    banned_subnets = [
+        *(default_banned_subnets if settings.USE_DEFAULT_BANNED_SUBNETS else []),
+        *(settings.USER_ADDITIONAL_BANNED_SUBNETS or []),
+    ]
+
+    for subnet in banned_subnets:
         if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
-            raise InvalidUploadUrlError
+            raise InvalidUploadUrlError(f'URL resolves to a reserved network address (block: {subnet})')
 
 
 def ssrf_safe_get(url, *args, **kwargs):

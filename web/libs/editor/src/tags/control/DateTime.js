@@ -293,53 +293,30 @@ const Model = types
     },
   }))
   .actions(self => {
-    const Super = { validate: self.validate };
+    const Super = { validateValue: self.validateValue };
 
     return {
-      validate() {
-        if (!Super.validate()) return false;
+      validateValue(value) {
+        if (!Super.validateValue(value)) return false;
+
+        const errors = [];
+
+        if (!value) return true;
+
+        let date = self.getISODate(value);
+
+        if (self.only?.includes('year')) date = date.slice(0, 4);
 
         const { min, max } = self;
 
-        if (!min && !max) return true;
+        if (min && date < min) errors.push(`min date is ${min}`);
+        if (max && date > max) errors.push(`max date is ${max}`);
 
-        function validateValue(value) {
-          const errors = [];
-
-          if (!value) return true;
-
-          let date = self.getISODate(value);
-
-          if (self.only?.includes('year')) date = date.slice(0, 4);
-
-          if (min && date < min) errors.push(`min date is ${min}`);
-          if (max && date > max) errors.push(`max date is ${max}`);
-
-          if (errors.length) {
-            InfoModal.warning(`Date "${date}" is not valid: ${errors.join(', ')}.`);
-            return false;
-          }
-          return true;
+        if (errors.length) {
+          InfoModal.warning(`Date "${date}" is not valid: ${errors.join(', ')}.`);
+          return false;
         }
-
-        // per-region results are not visible, so we have to check their values
-        if (self.perregion) {
-          const objectTag = self.toNameTag;
-
-          for (const reg of objectTag.allRegs) {
-            const date = reg.results.find(s => s.from_name === self)?.mainValue;
-            const isValid = validateValue(date);
-
-            if (!isValid) {
-              self.annotation.selectArea(reg);
-              return false;
-            }
-          }
-
-          return true;
-        } else {
-          return validateValue(self.datetime);
-        }
+        return true;
       },
     };
   });

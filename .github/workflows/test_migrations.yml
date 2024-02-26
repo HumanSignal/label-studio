@@ -7,10 +7,6 @@ on:
         required: true
         type: string
 
-env:
-  NODE: '18'
-  CACHE_NAME_PREFIX: v1
-
 jobs:
   migrations:
     name: "migrations"
@@ -30,7 +26,7 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4

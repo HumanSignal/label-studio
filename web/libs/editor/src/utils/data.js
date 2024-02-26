@@ -16,10 +16,10 @@ export const parseValue = (value, task) => {
 
   // value can refer to structures, not only texts, so just replace wouldn't be enough
   if (value.match(reVar)?.[0] === value) {
-    return get(task, value.substr(1)) ?? '';
+    return get(task, value.slice(1)) ?? '';
   }
 
-  return value.replace(reVar, (v) => get(task, v.substr(1) ?? ''));
+  return value.replace(reVar, (v) => get(task, v.slice(1) ?? ''));
 };
 
 /**
@@ -72,9 +72,9 @@ export const parseCSV = (text, separator = 'auto') => {
 
   const re = new RegExp(
     [
-      '"(""|[^"]+)*"', // quoted text with possible quoted quotes inside it ("not a ""value""")
+      '"(?:""|[^"])*"', // quoted text with possible quoted quotes inside it ("not a ""value""")
       `[^"${separator}]+`, // usual value, no quotes, between separators
-      `(?=${separator}(${separator}|$))`, // empty value in the middle or at the end of string
+      `(?=${separator}(?:${separator}|$))`, // empty value in the middle or at the end of string
       `^(?=${separator})`, // empty value at the start of the string
     ].join('|'),
     'g',

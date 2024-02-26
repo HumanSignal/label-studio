@@ -2,7 +2,7 @@
 
 /**
  * The `Text` tag shows text that can be labeled. Use to display any type of text on the labeling interface.
- * You can use `<Style>.htx-text{ white-space: pre-wrap; }</Style>` to preserve all spaces in the text, otherwise spaces are trimmed when displayed.
+ * You can use `<Style>.htx-text{ white-space: pre-wrap; }</Style>` to preserve all spaces in the text, otherwise spaces are trimmed when displayed and saved in the results. 
  * Every space in the text sample is counted when calculating result offsets, for example for NER labeling tasks.
  *
  * Use with the following data types: text.

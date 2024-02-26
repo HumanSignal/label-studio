@@ -122,15 +122,7 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 
 #### Apply frontend changes
 
-The frontend part of Label Studio app lies in the `frontend/` folder and written in React JSX. In case you've made some changes there, the following commands should be run before building / starting the instance:
-
-```
-cd label_studio/frontend/
-yarn install --frozen-lockfile
-npx webpack
-cd ../..
-python label_studio/manage.py collectstatic --no-input
-```
+For information about updating the frontend, see [label-studio/web/README.md](https://github.com/HumanSignal/label-studio/blob/develop/web/README.md#usage-instructions).
 
 ### Troubleshoot installation
 If you see any errors during installation, try to rerun the installation

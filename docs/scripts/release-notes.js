@@ -3,19 +3,16 @@ const concatMd = require("concat-md");
 
 hexo.extend.filter.register("after_init", async function () {
     const compareVersions = (a, b) => {
-        const versionRegExp = /(?<x>\d+)\.(?<y>\d+)\.(?<z>\d+)(\.dev|dev-|-)?(?<n>\d+)?/;
+        const versionRegExp = /(?<x>\d+)?\.(?<y>\d+)?\.(?<z>\d+)?(?<t>\.dev|dev-|-|\.post)?(?<n>\d+)?/;
         const aMatch = a.match(versionRegExp);
         const bMatch = b.match(versionRegExp);
+        const toInt = (a, d) => a.groups[d]? a.groups[d] * 1 : 0;
         for (let d of ['x', 'y', 'z', 'n']) {
-            const aMatchInt = aMatch.groups[d]? aMatch.groups[d] * 1 : -1;
-            const bMatchInt = bMatch.groups[d]? bMatch.groups[d] * 1 : -1;
+            const aMatchInt = toInt(aMatch, d);
+            const bMatchInt = toInt(bMatch, d);
             if (aMatchInt === bMatchInt)
                 continue;
-            if (aMatchInt < 0)
-                return 1;
-            if (bMatchInt < 0)
-                return -1;
-            return aMatchInt - bMatchInt;
+            return bMatchInt - aMatchInt;
         }
         return 0
     };
@@ -43,14 +40,6 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
 
 !!! note 
     Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
-
-## New helm chart
-
-A common chart for LS and LSE has been released and is available as of LSE version 2.3.x. The chart can be accessed at the following repository: https://github.com/HumanSignal/charts/tree/master/heartex/label-studio.
-
-### Migration Process
-
-The migration process can be performed without any downtime. The steps required to carry out the migration are documented in the migration guide, available at: https://github.com/HumanSignal/charts/blob/master/heartex/label-studio/FAQs.md#label-studio-enterprise-upgrade-from-decommissioned-label-studio-enterprise-helm-chart.
 
 `;
 

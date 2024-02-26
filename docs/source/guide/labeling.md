@@ -214,7 +214,7 @@ EDITOR_KEYMAP='{"annotation:submit":{"key": "shift+s","description": "My Custom 
 ```
 This overwrites the existing hotkey mapping with your custom mapping. See [more about how to set environment variables](start.html#Set-environment-variables). 
 
-Refer to the full list of customizable hotkeys in the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) repository to update a different hotkey combination. 
+Refer to the full list of customizable hotkeys in the [`keymap.json` file](https://github.com/HumanSignal/label-studio/blob/develop/web/libs/editor/src/core/settings/keymap.json) to update a different hotkey combination. 
 
 You cannot use this environment variable to remove an existing or add a new keyboard shortcut. 
 
@@ -248,6 +248,7 @@ You can add multiple types of regions to image annotations. You can add any of t
 To add different types of regions to your image annotations, follow this example.
 
 Create a custom template for your labeling interface using the following example:
+
 ```xml
 <View>
   <Image name="image" value="$image" />
@@ -260,13 +261,12 @@ Create a custom template for your labeling interface using the following example
     <Choice value="yes"></Choice>
     <Choice value="no"></Choice>
   </Choices>
-<Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
-  <Label value="building" background="green"></Label>
-  <Label value="vehicle" background="blue"></Label>
+  <Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
+    <Label value="building" background="green"></Label>
+    <Label value="vehicle" background="blue"></Label>
   </Labels>
 </View>
 ```
-
 This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator, along with image classification choices of yes and no, and region labels of building and vehicle.
 
 ### Faster image labeling
@@ -277,20 +277,19 @@ If you accidentally select a point on an image while creating a polygon, just do
 ### Create regions without labels
 When you're annotating images, you can create regions without applying labels. 
 
-1. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
-2. Select the created region in the sidebar or on the image.
-3. Select the label that you want to apply to the region.
-4. Repeat these steps for any regions that you want to create.
+1. Create a custom template using the example provided above under [Add multiple types of regions to image annotations](#Add-multiple-types-of-regions-to-image-annotations).
+2. Select which tool you want to use in the labeling toolbar. You only need to do this for the first task. 
+3. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
+4. Select the created region in the sidebar or on the image.
+5. Select the label that you want to apply to the region.
+6. Repeat these steps for any regions that you want to create.
 
 This can be helpful for two-step labeling, where you want one annotator to create regions and another annotator to label the regions. 
-
-By default, regions without labels appear gray.
 
 ### Erase brush mask labels
 If you make a mistake when labeling with the brush mask, you can erase it. You must select a brush region in the sidebar before you can erase any part of it. 
 
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
-
 
 ## Outliner 
 
