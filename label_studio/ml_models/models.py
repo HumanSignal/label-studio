@@ -87,8 +87,9 @@ class ModelRun(models.Model):
         INPUT = 'Input', _('Input')
         OUTPUT = 'Output', _('Output')
 
-    class ProjectStatus(models.TextChoices):
+    class ModelRunStatus(models.TextChoices):
         PENDING = 'Pending', _('Pending')
+        INPROGRESS = 'InProgress', _('InProgress')
         COMPLETED = 'Completed', ('Completed')
         FAILED = 'Failed', ('Failed')
         CANCELED = 'Canceled', ('Canceled')
@@ -109,7 +110,7 @@ class ModelRun(models.Model):
     )
 
     project_subset = models.CharField(max_length=255, choices=ProjectSubset.choices, default=ProjectSubset.HASGT)
-    status = models.CharField(max_length=255, choices=ProjectStatus.choices, default=ProjectStatus.PENDING)
+    status = models.CharField(max_length=255, choices=ModelRunStatus.choices, default=ModelRunStatus.PENDING)
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
