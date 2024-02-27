@@ -11,7 +11,6 @@ from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from label_studio.core.feature_flags.base import flag_set
 
 from label_studio.core.utils.common import load_func
 
