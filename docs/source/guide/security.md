@@ -181,3 +181,22 @@ rqworker:
 ```
   </div>
 </div>
+
+
+### Add self-signed certificate to trusted root store for S3 storage
+
+Boto library is ussed to connect to cloud storage S3. `AWS_CA_BUNDLE` has to be set as enviroment variable.
+<div class="code-tabs">
+  <div data-name="Docker Compose">
+
+1. Mount your self-signed certificate as a volume into `app` container: (has to be .pem file type)
+
+```yaml
+volumes:
+  - ./ca.pem:/tmp/ca.pem:ro
+```
+2. Add environment variable with the name `AWS_CA_BUNDLE` to be trusted by boto library.
+
+```yaml
+AWS_CA_BUNDLE=/tmp/ca.pem
+```
