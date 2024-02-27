@@ -62,6 +62,7 @@ jobs:
               - '.github/workflows/tests-yarn-e2e.yml'
             docker:
               - 'label_studio/**'
+              - 'web/**'
               - 'deploy/**'
               - 'Dockerfile**'
               - 'poetry.lock'
