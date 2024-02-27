@@ -29,6 +29,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [editable] | <code>boolean</code> | <code>false</code> | Whether to display an editable textarea |
 | [skipDuplicates] | <code>boolean</code> | <code>false</code> | Prevent duplicates in textarea inputs[^1][^2] (see example below) |
 | [transcription] | <code>boolean</code> | <code>false</code> | If false, always show editor |
+| [displayMode] | <code>tag</code> \| <code>region-list</code> | <code>tag</code> | Display mode for the textarea; region-list shows it for every region in regions list |
 | [rows] | <code>number</code> |  | Number of rows in the textarea |
 | [required] | <code>boolean</code> | <code>false</code> | Validate whether content in textarea is required |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
