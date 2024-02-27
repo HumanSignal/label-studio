@@ -192,8 +192,7 @@ export const FF_LSDV_3009 = 'fflag_fix_font_lsdv_3009_draft_saving_stuck_130223_
 export const FF_LEAD_TIME = 'fflag_fix_front_lsdv_4600_lead_time_27072023_short';
 
 /**
- * Adding "skipDuplicates" parameter for <TextArea /> to preventing adding duplicate entries
- *
+ * Adds "skipDuplicates" parameter for <TextArea /> to prevent adding duplicate entries
  * @link https://app.launchdarkly.com/default/production/features/fflag_feat_front_lsdv_4659_skipduplicates_060323_short
  */
 export const FF_LSDV_4659 = 'fflag_feat_front_lsdv_4659_skipduplicates_060323_short';

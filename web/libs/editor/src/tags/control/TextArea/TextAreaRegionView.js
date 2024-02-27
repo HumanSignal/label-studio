@@ -146,7 +146,7 @@ const HtxTextAreaResult = observer(({
         ref={idx === 0 ? firstResultInputRef : null}
         onFocus={onFocus}
         collapsed={collapsed}
-        validate={isFF(FF_LSDV_4712) ? item.from_name.validateValue : null}
+        validate={isFF(FF_LSDV_4712) ? item.from_name.validateText : null}
       />
     );
   });
