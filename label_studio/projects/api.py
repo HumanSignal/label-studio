@@ -16,7 +16,7 @@ from core.utils.io import find_dir, find_file, read_yaml
 from data_manager.functions import filters_ordering_selected_items_exist, get_prepared_queryset
 from django.conf import settings
 from django.db import IntegrityError
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django_filters import CharFilter, FilterSet
@@ -570,6 +570,23 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
             self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance]
         )
         return instance
+
+
+class ProjectGroundTruthTaskListAPI(ProjectTaskListAPI):
+    '''
+    Same as ProjectTaskListAPI with the exception that this API only returns tasks
+    that contain at least one ground truth annotation
+    '''
+
+    def filter_queryset(self, queryset):
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
+        ground_truth_query = Q(annotations__was_cancelled=False) & Q(annotations__result__isnull=False) & Q(annotations__ground_truth=True)
+        tasks = Task.objects.filter(project=project).filter(ground_truth_query).order_by('-updated_at')
+        page = paginator(tasks, self.request)
+        if page:
+            return page
+        else:
+            raise Http404
 
 
 class TemplateListAPI(generics.ListAPIView):
