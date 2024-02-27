@@ -1,77 +1,129 @@
 ---
-title: Project setup
-short: Project setup
+title: Create and configure projects
+short: Create project
 type: guide
 tier: all
 order: 155
-order_enterprise: 55
-section: "Project & Team Management"
+order_enterprise: 56
+section: "Project Management"
 meta_title: Set up your labeling project
 meta_description: Set up data labeling and annotation projects in Label Studio to produce high-quality data for your machine learning and data science projects.
 ---
 
 All labeling activities in Label Studio occur in the context of a project.
 
+## Project setup workflow
+
 <div class="opensource-only">
 
-After you [start Label Studio](start.html) and [create an account](signup.html), create a project to start labeling your data.
+After you [start Label Studio](start) and [create an account](signup), create a project to start labeling your data.
 
 1. [Create a project](#Create-a-project)
-2. [Import data](tasks.html).
-3. Select a template to configure the labeling interface for your dataset. [Set up the labeling interface for your project](setup.html).
-4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project).
+2. Import data into Label Studio. 
+
+    For small projects, testing, or proof of concept work, you can import local files directly into Label Studio. However, for larger projects, we recommend setting up cloud storage. For more information, see [Get data into Label Studio](tasks) and [Sync data from external storage](storage). 
+3. After you have imported your data, then you can [set up the labeling interface for your project](setup).
+4. Finally, you can configure optional settings to such as task sampling and annotation instructions. For more information, see [Project settings](project_settings).
    
 </div>
 
 <div class="enterprise-only">
 
 1. [Create a project](#Create-a-project)
-2. [Import data](tasks.html).
-3. Select a template to configure the labeling interface for your dataset. [Set up the labeling interface for your project](setup.html).
-4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project-1).
-5. (Optional) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
+2. Import data into Label Studio. 
+
+    For small projects, testing, or proof of concept work, you can import local files directly into Label Studio. However, for larger projects, we recommend setting up cloud storage. For more information, see [Get data into Label Studio](tasks) and [Sync data from external storage](storage). 
+3. After you have imported your data, then you can [set up the labeling interface for your project](setup).
+4. Next, you will want to configure what information annotators and reviewers can see, and how automated you want their workflow to be. 
+
+    By default, any annotator who is a member of project can begin labeling as soon as it is published, and each task only requires one annotator before being considered complete. To customize this, see the [**Annotation** section of the project settings](project_settings_lse#Annotation).
+
+    By default, reviewers do not need to be assigned to completed tasks, and each task only needs one accepted annotation. To customize this, see the [**Review** section of the project settings](project_settings_lse#Review).
+    
+
+5. [Add members to your project](#Add-members-to-a-project). 
 6. [Publish your project](#Publish-project-to-annotators).
 
 </div>
 
 ## Create a project
 
-When you're creating a project, you can save your progress at any time. You don't need to import your data and set up the labeling interface all at the same time, but you can.
+From Label Studio, click **Create Project** in the upper right. A window opens with three tabs:
 
-1. In the Label Studio UI, click **Create Project**.
-2. Type a project name and a description. If you want, choose a color for your project.
-3. If you're ready to import your data, click **Data Import** and import data from the Label Studio UI. For details about import formats and data types, see [Get data into Label Studio](tasks.html).
-4. If you're ready to set up the labeling interface, click **Labeling Setup** and choose a template or create a custom configuration for labeling. See [Set up the labeling interface for your project](setup.html).
-5. When you're done, click **Save** to save your project.
+<dl>
 
-You can also create a project from a template by clicking **Use Template**. See more about [project templates](#Create-a-project-template).
+<dt>Project Name</dt>
 
-After you save a project, any other collaborator with access to the Label Studio instance can view your project, perform labeling, and make changes. To use role-based access control, you need to use Label Studio Enterprise Edition.
+<dd>
+
+This is the only required section. 
+
+Here, select your workspace, enter a project name, and (optionally) a project description. 
+
+Once complete, you can click **Save** to create the project, or you can complete the other tabs. 
+
+</dd>
+
+<dt>Data Import</dt>
+
+<dd>
+
+From here, you can upload files into Label Studio. You can do this now or after the project has been created.
+
+However, for larger projects, we recommend setting up cloud storage or using a different import method. For more information, see [Get data into Label Studio](tasks) and [Sync data from external storage](storage).
+
+</dd>
+
+<dt>Labeling Setup</dt>
+
+<dd>
+
+You can select a template to begin your labeling configuration. For easier setup, select a [template](/templates). You can later customize template to meet your needs. See [Configure labeling](setup).
+
+You can do this now or after the project has been created.
+
+</dd>
+
+</dl>
+
+When you're done, click **Save**. 
+
+
+
+<div class="opensource-only">
+
+!!! error Enterprise
+    Workspaces are only available for Label Studio Enterprise users. Label Studio Enterprise also includes many additional configuration options for projects, such as role-based access control and workflow automation. For more information, see [Compare Community and Enterprise Features](label_studio_comparison). 
+
+</div>
+
+<div class="enterprise-only">
+
+!!! info Tip
+    Rather than importing data directly into the project, you can [create a dataset](dataset_create). From here, you can use an AI-powered search to refine your data, which can then be added to different projects as tasks. For more information, see [Data Discovery overview](dataset_overview).
+
+</div>
+
 
 <div class="opensource-only">
 
 ## Set up annotation settings for your project
 
-### Set up instructions for data labelers
+There are several things you can set up before users begin labeling:
 
-In the project settings, you can add instructions and choose whether to show the instructions to annotators before they perform labeling.
+* [Instructions for data labelers](project_settings#Instructions)
 
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Instructions**.
-3. Enter your instructions and choose whether to show the instructions to annotators before labeling. If you want to provide additional details or links for reference, instructions support HTML markup.
-4. Click **Save**. 
+    You also can select whether to show these instructions in a pop-up message when users enter the labeling stream (the labeling stream is when a user clicks **Label All Tasks**). 
+* [Task sampling](project_settings#General)
+  
+    Task sampling determines the order in which tasks are shown to users in the labeling stream.  The default is to use sequential sampling, meaning the users see them in the same order they are sorted in the Data Manager. You can change this to show tasks in random order.  
 
-Annotators can view instructions at any time  by clicking the information icon in the labeling interface.
+From the Data Manager, click **Settings** in the upper right. You can also access the settings from the overflow menu for each project:
 
-### Set up task sampling
+![Screenshot of project overflow menu](/images/project/project_menu_oss.png)
 
-You can set up task sampling from the command line when you start Label Studio or from the Label Studio UI.
 
-- To start a project with specific task sampling, see [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project).
-- To change task sampling settings from the Label Studio UI, do the following:
-  - Within a project on the Label Studio UI, click **Settings**.
-  - On the **General** settings tab, under **Task Sampling**, choose between `Sequential sampling` and `Random sampling`.
-  - Click **Save**.
+For information on all available settings, see [Project settings](project_settings). 
 
 ## Where Label Studio stores your project data and configurations
 
@@ -83,175 +135,80 @@ In versions of Label Studio earlier than 1.0.0, when you start Label Studio for 
 
 `label-studio start ./my_project --init`
 
-
 </div>
 
 <div class="enterprise-only">
 
-## Set up annotation settings for your project
+## Configure high-impact settings
 
-Set up annotation settings to configure how you want annotators to perform labeling for your project.
+By design, Label Studio is highly customizable and there are numerous configuration options for a project. To configure project settings, open a project and click **Settings** in the upper right. 
 
+To avoid getting overwhelmed, focus on the following settings. They have the most impact on your labeling experience.
 
-Some annotation settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
+#### Annotation settings
 
+Annotators are the users who are labeling project tasks. 
 
+* **Distribute labeling tasks**
 
-### Set up instructions for data labelers
+    Located under **Annotation**, this determines whether annotators must be manually assigned to a task in order to label it. 
 
-In the project settings, you can add instructions and choose whether to show the instructions to annotators before they perform labeling.
+    If you are using Auto distribution, project members can begin labeling as soon as the project is published. Otherwise, they must be manually assigned. 
 
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Annotation Settings**.
-3. Enter your instructions and choose whether to show the instructions to annotators before labeling. If you want to provide additional details or links for reference, instructions support HTML markup.
-4. Click **Save**. 
+* **Allow empty annotations**
 
-Annotators can view instructions at any time when labeling by clicking the information icon from the labeling interface.
+    Located under **Annotation**, this determines whether annotators can complete tasks without first adding a label. 
 
-### Set up task distribution for labeling
+    By default, annotators are allowed to submit empty annotations. You can change this setting so that all tasks require a label. 
 
-Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to [assign annotators](manage_data.html##Assign-annotators-to-tasks) before they can start labeling.
+* **Annotations per task minimum**
 
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Annotation Settings**.
-3. Under **Distribute Labeling Tasks**, select one of the following:
-   - Auto, the default option, to distribute tasks automatically to annotators.
-   - Manual, to show tasks to assigned annotators first, then automatically distribute unassigned tasks.
+    (This is only applicable if you are using Auto distribution).
 
-Your changes save automatically.
+    Located under **Quality**, this determines how many annotators must submit a task before the task is considered completed. 
 
-!!! note
-    You can't assign annotators to tasks unless you select the **Manual** option.
+    By default, each task only requires one annotator to submit. You can configure a higher task overlap, meaning that each task must have a minimum number of annotators before being considered complete. 
 
-### Set minimum annotations per task
-
-By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, set the Overlap of Annotations for a project in the project settings.
-
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Quality**.
-3. Under **Overlap of Annotations**, select the number of minimum annotations for a task.
-4. Choose whether to enforce the overlap for the default of 100% of tasks, or a smaller percentage.
-5. Choose whether to show tasks that require multiple annotations, **tasks with overlap**, before other tasks that need to be annotated.
-6. Your changes save automatically. Return to the **Data Manager** and assign annotators to the tasks so that they can annotate the tasks.
-
-#### How task overlap works
-
-For example, if you want all tasks to be annotated by at least 2 annotators:
-
-- Set the minimum number of annotations to **2**
-- Enforce the overlap for 100% of tasks.
-
-If you want at least half of the tasks to be annotated by at least 3 people:
-
-- Set the minimum number of annotations to **3**
-- Enforce the overlap for 50% of tasks.
-
-If you're using manual distribution of tasks, annotators with tasks assigned to them label those tasks first, then Label Studio automatically distributes the remaining tasks to the project annotators so that the desired overlap and minimum number of annotations per task can be achieved.
-
-### Set annotating options
-
-If you want, you can allow empty annotations.
-
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Annotation Settings**.
-3. Under **Annotating Options**, select **Allow empty annotations**. By default, empty annotations are allowed.
-
-### Set up task sampling
-
-You can set up task sampling in the annotation settings for a project.
-
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Annotation Settings**.
-3. Select your preferred method of task sampling:
-   - Uncertainty sampling, where tasks are shown to annotators according to the model uncertainty, or prediction scores.
-   - Sequential sampling, the default, where tasks are shown to annotators in the same order that they appear on the Data Manager.
-   - Uniform sampling, where tasks are shown to annotators in a random order.
-4. You can also choose whether to show tasks with ground truth labels first.
-   Your changes save automatically.
-
-### Define the agreement metrics for annotation statistics
-
-Annotation statistics such as annotator consensus are calculated using an agreement metric. If you want the agreement metric to calculate annotation or prediction agreement by requiring exact matching choices, choose that option in the annotation settings. For more about agreement metrics in Label Studio Enterprise, see [Annotation statistics](stats.html).
-
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Quality**.
-3. Under **Annotation Agreement**, select **Exact matching choices**.
-4. For some types of labeling, you can also select a [specific matching function](stats.html) or add a [custom agreement metric](custom_metric.html).
-
-Your changes save automatically.
+For a description of all the settings available for annotators, see [Project settings - Annotation](project_settings_lse#Annotation) and [Project settings - Quality](project_settings_lse#Quality). 
 
 
-## Set up review settings for your project
+#### Review settings
 
-Set up review settings to guide reviewers when they review annotated tasks. For more about reviewing annotations, see [Review annotations in Label Studio](quality.html)
+Reviewers are the users are reviewing the annotators' submissions for accuracy. 
 
-Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
+* **Mark task as reviewed after it has at least 1 accepted annotation** or  
+**Mark task as reviewed after all annotations are processed**
 
-### Set up instructions for task reviewers
+    Configure what action determines that a task has been reviewed. By default, the reviewer only needs to accept one annotation for the task. You can change this so that the reviewer must accept or reject submissions from all annotators. 
 
-In the project settings, you can add instructions and choose whether to show the instructions to reviewers before they start reviewing annotated tasks.
+* **Review only manually assigned tasks**
 
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Review**.
-3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. If you want to provide additional details or links for reference, instructions support HTML markup.
-4. Click **Save**.
-5. Click **Data Manager** to return to the data manager view.
+    By default, reviewers are able to begin reviewing as soon as there are labeled tasks available to review. However, you can change this so that reviewers must be manually assigned to a task. 
 
-### Set reviewing options
-
-Configure the reviewing settings for your project.
-
-1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Review**.
-3. Under **Reviewing Options**, choose whether to mark a task as reviewed if at least one annotation has been reviewed, or only after all annotations for a task have been processed.
-4. Under **Reviewing Options**, choose whether to anonymize annotators when reviewing tasks.
-
-Your changes save automatically.
+For a description of all the settings available for reviewers, see [Project settings - Review](project_settings_lse#Review). 
 
 ## Add members to a project
 
-In Label Studio Enterprise, you can [add members to a specific workspace](manage_users.html#Add-or-remove-members-to-a-workspace) or add members to a specific project within a workspace.
+You can add members to a project in two ways:
+* [Add members at the workspace level](workspaces#Add-or-remove-workspace-members). Workspace membership is inherited by projects. 
+* Add members at the project level. 
 
-To add members to a specific project, do the following:
+To add members to a specific project:
 
-1. Within a project, click **Members** and then click **Manage Members**.
-2. Locate the user that you want to add to the project.
-3. Select the checkbox next to the user's name and click the `>` arrow so that they appear in the list of users that **Belong to the Workspace**.
+1. Navigate to the project settings and select **Members**. 
+2. Use the search functionality to locate the user that you want to add to the project.
+3. Select the checkbox next to their name and click the `>` arrow to add them. Click the opposite arrow `<` to remove members
 4. Click **Save**.
 
-After adding a member to a project, you can [assign them as a reviewer](quality.html#Assign-reviewers-to-tasks) or [assign them as an annotator](manage_data.html#Assign-annotators-to-tasks) to tasks in the project.
+Users are not sent notifications when they are added to a project. 
 
-## Publish project to annotators
+For more information, see [Project settings - Members](project_settings_lse#Members).
 
-In Label Studio Enterprise, you can hide projects from annotators so that you can fully configure the project before annotators can start labeling. When you're ready for annotators to start labeling, publish the project to annotators.
+## Publish a project 
 
-Before you can open a project to annotators, make sure that you've done the following:
+In Label Studio Enterprise, you can hide projects from annotators so that you can fully configure the project before anyone can start labeling. When you're ready for annotators to start labeling, publish the project.
 
-- [Set up the labeling interface](setup.html).
-- [Imported data](tasks.html).
-- [Moved the project to the correct workspace](manage_users.html#Create-workspaces-to-organize-projects), if it was in your private sandbox.
-
-To publish a project, do the following:
-
-1. Open a project and navigate to the project **Dashboard**.
-2. Click **Publish**. <br/>After the project is published, annotators can view the project and start being assigned tasks according to the method that you use to [distribute tasks for labeling](#Set-up-task-distribution-for-labeling).
-
-## Create a project template
-
-If you want to easily create a project with the same labeling interface as an existing project in Label Studio Enterprise, create and use a project template.
-
-1. In the project that you want to use as a template, open the **Settings**.
-2. In the **General** tab for the project settings, click **Save as Template**.
-3. Add a title and description for the project.
-4. Click **Save**.
-
-After you create a project template, you can use the template when you create a project.
-
-1. When viewing projects or workspaces, click **Use Template**.
-2. Select a template from the list.
-3. Type a project name and description for the new project.
-4. Click **Create**. The project is created and saved in your Sandbox.
-   - Click **Import** to import data.
-   - Click **Data Manager** to start annotating.
+1. Open a project and select **Dashboard** in the upper right.
+2. Click **Publish**. 
 
 </div>
