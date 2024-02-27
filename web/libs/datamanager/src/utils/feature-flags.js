@@ -41,12 +41,6 @@ export const FF_DEV_3734 = 'fflag_fix_front_dev_3734_hide_task_counter_131222_sh
 export const FF_DEV_4008 = "feat_front_dev_4008_quick_task_open_short";
 
 /**
- * Support for LabelOps functionality.
- * @link https://app.launchdarkly.com/default/branch/features/fflag_feat_front_lops_12_label_ops_ui_short
- */
-export const FF_LOPS_12 = "fflag_feat_front_lops_12_label_ops_ui_short";
-
-/**
  * Support for Datasets functionality.
  */
 export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";

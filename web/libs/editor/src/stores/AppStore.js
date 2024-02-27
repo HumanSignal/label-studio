@@ -24,13 +24,11 @@ import Settings from './SettingsStore';
 import Task from './TaskStore';
 import { UserExtended } from './UserStore';
 import { UserLabels } from './UserLabels';
-import { FF_DEV_1536, FF_DEV_2715, FF_LSDV_4620_3_ML, FF_LSDV_4998, isFF } from '../utils/feature-flags';
+import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from '../utils/feature-flags';
 import { CommentStore } from './Comment/CommentStore';
 import { destroy as destroySharedStore } from '../mixins/SharedChoiceStore/mixin';
 
 const hotkeys = Hotkey('AppStore', 'Global Hotkeys');
-
-const isFFDev2715 = isFF(FF_DEV_2715);
 
 export default types
   .model('AppStore', {
@@ -187,6 +185,8 @@ export default types
     initialized: false,
     hydrated: false,
     suggestionsRequest: null,
+    // @todo should be removed along with the FF; it's used to detect FF in other parts
+    simpleInit: isFF(FF_SIMPLE_INIT),
   }))
   .views(self => ({
     get events() {
@@ -676,9 +676,10 @@ export default types
      * Given annotations and predictions
      * `completions` is a fallback for old projects; they'll be saved as `annotations` anyway
      */
-    function initializeStore({ hydrated, annotations, completions, predictions, annotationHistory }) {
+    function initializeStore({ annotations = [], completions = [], predictions = [], annotationHistory }) {
       const as = self.annotationStore;
 
+      // some hacks to properly clear react and mobx structures
       as.afterReset?.();
 
       if (!as.initialized) {
@@ -688,37 +689,74 @@ export default types
         }
       }
 
-      // Allow tags to decide whether to load individual data (audio, video, etc)
-      // based on the task+annotation being hydrated
-      if (isFFDev2715) {
-        self.setHydrated(hydrated);
+      // goal here is to deserialize everything fast and select only first annotation
+      // no extra processes during eserialization and further processes triggered during select
+      if (self.simpleInit) {
+        window.STORE_INIT_OK = false;
+
+        // add predictions and annotations to the store;
+        // `hidden` will stop them from calling any rendering helpers;
+        // correct annotation will be selected at the end and everything will be called inside.
+        predictions.forEach(p => {
+          const obj = as.addPrediction(p);
+          const results = p.result.map(r => ({ ...r, origin: 'prediction' }));
+
+          obj.deserializeResults(results, { hidden: true });
+        });
+
+        [...completions, ...annotations].forEach((c) => {
+          const obj = as.addAnnotation(c);
+
+          obj.deserializeResults(c.draft || c.result, { hidden: true });
+        });
+
+        window.STORE_INIT_OK = true;
+        // simple logging to detect if simple init is used on users' machines
+        console.log('LSF: deserialization is finished');
+
+        // next line might be unclear after removing FF_SIMPLE_INIT
+        // reversing the list caused problems before when task is reloaded and list is reversed again.
+        // AnnotationsCarousel has its own ordering anyway, so we just keep technical order
+        // as simple as possible.
+        const current = as.annotations.at(-1);
+        const currentPrediction = !current && as.predictions.at(-1);
+
+        if (current) {
+          as.selectAnnotation(current.id);
+          // looks like we still need it anyway, but it's fast and harmless,
+          // and we only call it once on already visible annotation
+          current.reinitHistory();
+        } else if (currentPrediction) {
+          as.selectPrediction(currentPrediction.id);
+        }
+
+        // annotation history is set when annotation is selected,
+        // so no need to set it here
+      } else {
+        (predictions ?? []).forEach(p => {
+          const obj = as.addPrediction(p);
+
+          as.selectPrediction(obj.id);
+          obj.deserializeResults(p.result.map(r => ({
+            ...r,
+            origin: 'prediction',
+          })));
+        });
+
+        [...(completions ?? []), ...(annotations ?? [])]?.forEach((c) => {
+          const obj = as.addAnnotation(c);
+
+          as.selectAnnotation(obj.id);
+          obj.deserializeResults(c.draft || c.result);
+          obj.reinitHistory();
+        });
+
+        const current = as.annotations.at(-1);
+
+        if (current) current.setInitialValues();
+
+        self.setHistory(annotationHistory);
       }
-
-      // eslint breaks on some optional chaining https://github.com/eslint/eslint/issues/12822
-      /* eslint-disable no-unused-expressions */
-      (predictions ?? []).forEach(p => {
-        const obj = as.addPrediction(p);
-
-        as.selectPrediction(obj.id);
-        obj.deserializeResults(p.result.map(r => ({
-          ...r,
-          origin: 'prediction',
-        })));
-      });
-
-      [...(completions ?? []), ...(annotations ?? [])]?.forEach((c) => {
-        const obj = as.addAnnotation(c);
-
-        as.selectAnnotation(obj.id);
-        obj.deserializeResults(c.draft || c.result);
-        obj.reinitHistory();
-      });
-
-      const current = as.annotations.at(-1);
-
-      if (current) current.setInitialValues();
-
-      self.setHistory(annotationHistory);
 
       if (!self.initialized) {
         self.initialized = true;
@@ -817,13 +855,8 @@ export default types
       self.setUsers(uniqBy([...getSnapshot(self.users), ...users], 'id'));
     }
 
-    function setHydrated(value) {
-      self.hydrated = value;
-    }
-
     return {
       setFlags,
-      setHydrated,
       addInterface,
       hasInterface,
       toggleInterface,
