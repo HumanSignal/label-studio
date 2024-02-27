@@ -6,11 +6,16 @@ from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from ml_models.models import ModelInterface, ModelRun, ThirdPartyModelVersion
-from ml_models.serializers import ModelInterfaceSerializer, ModelRunSerializer, ThirdPartyModelVersionSerializer, ModelInterfaceCreateSerializer
+from ml_models.serializers import (
+    ModelInterfaceCreateSerializer,
+    ModelInterfaceSerializer,
+    ModelRunSerializer,
+    ThirdPartyModelVersionSerializer,
+)
 from projects.models import Project
 from rest_framework import generics, viewsets
-from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 
 
 @method_decorator(
@@ -70,6 +75,7 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         PUT=all_permissions.models_change,
         POST=all_permissions.models_create,
     )
+
     def get_serializer_class(self):
         if self.action == 'create':
             return ModelInterfaceCreateSerializer
@@ -77,16 +83,16 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ModelInterface.objects.filter(organization_id=self.request.user.active_organization_id)
-    
+
     def create(self, request, *args, **kwargs):
         data = self.request.data
-        data['organization']=self.request.user.active_organization_id
+        data['organization'] = self.request.user.active_organization_id
         serializer = self.get_serializer(data=data)
         self.perform_create(serializer)
-        return Response(serializer.data,status=201)
+        return Response(serializer.data, status=201)
 
     def perform_create(self, serializer):
-        associated_projects_data = self.request.data.get('associated_projects',[])
+        associated_projects_data = self.request.data.get('associated_projects', [])
         serializer.is_valid(raise_exception=True)
 
         # we need to save these fields for faster access and filters without excess joins
@@ -94,15 +100,16 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         serializer.validated_data['created_by'] = self.request.user
         serializer.save()
         instance = serializer.instance
-       
+
         model_interface = ModelInterface.objects.filter(pk=instance.pk)[0]
         for id in associated_projects_data:
             model_interface.associated_projects.add(id)
+
     def update(self, reques, *args, **kwargs):
-        try: 
+        try:
             instance = self.get_object()
             data = self.request.data
-            data['organization']=self.request.user.active_organization_id
+            data['organization'] = self.request.user.active_organization_id
             serializer = self.get_serializer(instance, data=data, partial=True)
             self.perform_update(serializer)
             return Response(serializer.data, status=200)
@@ -112,7 +119,7 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.is_valid(raise_exception=True)
-        serializer.save()       
+        serializer.save()
 
 
 @method_decorator(
@@ -301,7 +308,6 @@ class ModelRunAPI(generics.ListCreateAPIView):
         serializer.validated_data['created_by'] = self.request.user
         serializer.validated_data['triggered_at'] = datetime.utcnow()
         serializer.validated_data['organization'] = self.request.user.active_organization
-        print(serializer.validated_data)
 
         serializer.save()
 

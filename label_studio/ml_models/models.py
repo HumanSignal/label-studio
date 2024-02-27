@@ -8,6 +8,7 @@ from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
 
+
 def validate_string_list(value):
     if not value:
         raise ValidationError('list should not be empty')
