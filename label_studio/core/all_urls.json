@@ -204,7 +204,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/projects/<int:pk>/gt-tasks/",
+        "url": "/api/projects/<int:pk>/ground-truth-tasks/",
         "module": "projects.api.ProjectGroundTruthTaskListAPI",
         "name": "projects:api:project-gt-tasks-list",
         "decorators": ""

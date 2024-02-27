@@ -42,7 +42,7 @@ _api_urlpatterns = [
     # Tasks list for the project: get and destroy
     path('<int:pk>/tasks/', api.ProjectTaskListAPI.as_view(), name='project-tasks-list'),
     # Tasks containing ground truth list for the project: get and destroy
-    path('<int:pk>/gt-tasks/', api.ProjectGroundTruthTaskListAPI.as_view(), name='project-gt-tasks-list'),
+    path('<int:pk>/ground-truth-tasks/', api.ProjectGroundTruthTaskListAPI.as_view(), name='project-gt-tasks-list'),
     # Generate sample task for this project
     path('<int:pk>/sample-task/', api.ProjectSampleTask.as_view(), name='project-sample-task'),
     # List available model versions
