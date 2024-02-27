@@ -118,6 +118,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
         CHECK_PERMISSIONS_FOR_STORAGES(request)
         super().initial(request, *args, **kwargs)
 
+
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
