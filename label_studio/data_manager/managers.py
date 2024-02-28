@@ -510,7 +510,7 @@ class GroupConcat(Aggregate):
 
 
 def annotate_completed_at(queryset):
-    if flag_set('fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short'):
+    if flag_set('fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto'):
         return annotated_completed_at_considering_agreement_threshold(queryset)
 
     from tasks.models import Annotation
@@ -539,8 +539,8 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
         )
 
     lse_project = LseProject.objects.filter(project_id=project_id).first()
-    agreement_threshold = lse_project.agreement_threshold
-    if not (get_tasks_agreement_queryset and lse_project and agreement_threshold):
+    agreement_threshold = lse_project.agreement_threshold if lse_project else None
+    if not (get_tasks_agreement_queryset and agreement_threshold):
         # This project doesn't use task_agreement so don't consider it when determining completed_at
         return queryset.annotate(
             completed_at=Case(When(is_labeled=True, then=Subquery(newest_annotation.values('created_at'))))
