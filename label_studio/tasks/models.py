@@ -250,15 +250,19 @@ class Task(TaskMixin, models.Model):
         return self.locks.filter(expire_at__gt=now()).count()
 
     def overlap_with_agreement_threshold(self, num, num_locks):
-        try:
-            from stats.models import get_task_agreement
-        except (ModuleNotFoundError, ImportError):
-            pass
-
         # Limit to one extra annotator at a time when the task is under the threshold and meets the overlap criteria,
         # regardless of the max_additional_annotators_assignable setting. This ensures recalculating agreement after
         # each annotation and prevents concurrent annotations from dropping the agreement below the threshold.
-        if hasattr(self.project, 'lse_project') and self.project.lse_project.agreement_threshold is not None:
+        if (
+            hasattr(self.project, 'lse_project')
+            and self.project.lse_project
+            and self.project.lse_project.agreement_threshold is not None
+        ):
+            try:
+                from stats.models import get_task_agreement
+            except (ModuleNotFoundError, ImportError):
+                return
+
             agreement = get_task_agreement(self)
             if agreement is not None and agreement < self.project.lse_project.agreement_threshold:
                 return (
