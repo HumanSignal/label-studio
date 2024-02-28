@@ -35,6 +35,14 @@ class AllPermissions(BaseModel):
     labels_view = 'labels.view'
     labels_change = 'labels.change'
     labels_delete = 'labels.delete'
+    models_create = 'models.create'
+    models_view = 'models.view'
+    models_change = 'models.change'
+    models_delete = 'models.delete'
+    model_provider_connection_create = 'model_provider_connection.create'
+    model_provider_connection_view = 'model_provider_connection.view'
+    model_provider_connection_change = 'model_provider_connection.change'
+    model_provider_connection_delete = 'model_provider_connection.delete'
 
 
 all_permissions = AllPermissions()
