@@ -6,6 +6,16 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
+from rest_framework.exceptions import ValidationError
+
+
+def validate_string_list(value):
+    if not value:
+        raise ValidationError('list should not be empty')
+    if not isinstance(value, list):
+        raise ValidationError('Value must be a list')
+    if not all(isinstance(item, str) for item in value):
+        raise ValidationError('All items in the list must be strings')
 
 
 class ModelInterface(models.Model):
@@ -25,6 +35,12 @@ class ModelInterface(models.Model):
     organization = models.ForeignKey(
         'organizations.Organization', on_delete=models.CASCADE, related_name='model_interfaces', null=True
     )
+
+    input_fields = models.JSONField(default=list, validators=[validate_string_list])
+
+    output_classes = models.JSONField(default=list, validators=[validate_string_list])
+
+    associated_projects = models.ManyToManyField('projects.Project', blank=True)
 
     def has_permission(self, user):
         return user.active_organization == self.organization
