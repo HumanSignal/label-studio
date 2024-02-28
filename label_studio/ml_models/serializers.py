@@ -30,7 +30,7 @@ class ModelInterfaceSerializer(serializers.ModelSerializer):
         labels, _ = get_all_labels(project.label_config)
         project_output_classes = sorted(list(set([label for label_list in labels.values() for label in label_list])))
         if project_output_classes != provided_output_classes:
-            raise ValidationError(f'output_classes not compatible with Project (id:{project.pk})')
+            raise ValidationError(f'output_classes: {provided_output_classes} not compatible with Project (id:{project.pk})')
 
     def check_input_fields(self, project, provided_input_fields):
         parsed_config = project.get_parsed_config()
@@ -42,16 +42,20 @@ class ModelInterfaceSerializer(serializers.ModelSerializer):
 
         project_input_fields = sorted(list(project_input_fields))
         if project_input_fields != provided_input_fields:
-            raise ValidationError(f'input_fields do not match inputs in Project (id:{project.pk})')
+            raise ValidationError(f'input_fields: {provided_input_fields} do not match inputs in Project (id:{project.pk})')
 
     def validate(self, data):
         model_obj = getattr(self, 'instance', None)
         if model_obj:
             if 'input_fields' in data:
                 provided_input_fields = sorted(data['input_fields'])
+            else:
+                provided_input_fields = sorted(model_obj.input_fields)
 
             if 'output_classes' in data:
                 provided_output_classes = sorted(data['output_classes'])
+            else:
+                provided_output_classes = sorted(model_obj.output_classes)
             model_obj_associated_projects = model_obj.associated_projects.all()
 
             if 'associated_projects' in data:
@@ -61,10 +65,6 @@ class ModelInterfaceSerializer(serializers.ModelSerializer):
                         ValidationError(
                             f'Project (id:{associated_proj.id}) provided does not belong to your organization'
                         )
-                    if 'input_fields' not in data:
-                        provided_input_fields = sorted(model_obj.input_fields)
-                    if 'output_classes' not in data:
-                        provided_output_classes = sorted(model_obj.output_classes)
                     self.check_input_fields(project=projects[0], provided_input_fields=provided_input_fields)
                     self.check_output_classes(project=projects[0], provided_output_classes=provided_output_classes)
 
@@ -93,7 +93,6 @@ class ModelInterfaceCreateSerializer(ModelInterfaceSerializer):
         if model_interface := self.instance:
             for key, value in data.items():
                 setattr(model_interface, key, value)
-
         else:
             model_interface = self.Meta.model(**data)
         if not associated_projects:

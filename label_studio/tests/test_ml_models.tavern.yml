@@ -157,6 +157,33 @@ stages:
         - "NonHumor"
     response:
       status_code: 200
+      save:
+        json:
+          patch_model_id: id
+          patch_model_updated_at: updated_at
+  
+  - name: Get specific model
+    request:
+      url: "{django_live_url}/api/models/{model_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        id: !int "{patch_model_id}"
+        title: "My model 1"
+        description: "My updated description"
+        created_at: "{model_created_at}"
+        updated_at: "{patch_model_updated_at}"
+        created_by:
+          id: !int "{user_id}"
+          email: "{user_email}"
+        input_fields:
+        - "text"
+        output_classes: 
+        - "Humor"
+        - "NonHumor"
+        associated_projects:
+        - !int "{project_pk2}"
 
   - name: Patch specific model with invalid output classes 
     request:
@@ -171,7 +198,7 @@ stages:
     response:
       status_code: 400
 
-  - name: Patch specific model with invalid output classes 
+  - name: Patch specific model with empty output classes list
     request:
       url: "{django_live_url}/api/models/{model_id}"
       method: PATCH

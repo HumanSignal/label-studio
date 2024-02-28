@@ -88,11 +88,17 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         data = self.request.data
         data['organization'] = self.request.user.active_organization_id
         serializer = self.get_serializer(data=data)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=201)
+        model_interface = self.perform_create(serializer)
+        response_data = serializer.data
+
+        #providing the right updated_at time since projects get added and saved few ms later
+        response_data["updated_at"] = model_interface.updated_at
+      
+        return Response(response_data, status=201)
+
 
     def perform_create(self, serializer):
-        associated_projects_data = self.request.data.get('associated_projects', [])
+        associated_project_ids = self.request.data.get('associated_projects', [])
         serializer.is_valid(raise_exception=True)
 
         # we need to save these fields for faster access and filters without excess joins
@@ -102,8 +108,10 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
         instance = serializer.instance
 
         model_interface = ModelInterface.objects.filter(pk=instance.pk)[0]
-        for id in associated_projects_data:
+        for id in associated_project_ids:
             model_interface.associated_projects.add(id)
+        model_interface.save()
+        return model_interface
 
     def update(self, reques, *args, **kwargs):
         try:
@@ -111,15 +119,28 @@ class ModelInterfaceAPI(viewsets.ModelViewSet):
             data = self.request.data
             data['organization'] = self.request.user.active_organization_id
             serializer = self.get_serializer(instance, data=data, partial=True)
-            self.perform_update(serializer)
-            return Response(serializer.data, status=200)
+            model_interface = self.perform_update(serializer)
+
+            response_data = serializer.data
+
+            #providing the right updated_at time since projects get added and saved few ms later
+            response_data["updated_at"] = model_interface.updated_at
+            
+            return Response(response_data, status=200)
         except ValidationError as e:
             # Handle validation error
             return Response({'message': str(e)}, status=400)
 
     def perform_update(self, serializer):
         serializer.is_valid(raise_exception=True)
+        associated_project_ids = self.request.data.get('associated_projects', [])
         serializer.save()
+        model_interface = ModelInterface.objects.filter(pk=serializer.instance.pk)[0]
+        for id in associated_project_ids:
+            model_interface.associated_projects.add(id)
+        model_interface.save()
+        return model_interface
+       
 
 
 @method_decorator(
