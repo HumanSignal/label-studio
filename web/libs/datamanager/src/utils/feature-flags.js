@@ -1,9 +1,6 @@
 // Outliner + Details
 export const FF_DEV_1170 = "ff_front_1170_outliner_030222_short";
 
-// Switch to page navigation
-export const FF_DEV_1470 = "ff_front_dev_1470_dm_pagination_010422_short";
-
 /**
  * Support for notification links in the Label Steam and the Review Stream.
  * @link https://app.launchdarkly.com/default/branch/features/feat_front_dev_1752_notification_links_in_label_and_review_streams
@@ -42,12 +39,6 @@ export const FF_DEV_3734 = 'fflag_fix_front_dev_3734_hide_task_counter_131222_sh
  * @link https://app.launchdarkly.com/default/production/features/feat_front_dev_4008_quick_task_open_short
  */
 export const FF_DEV_4008 = "feat_front_dev_4008_quick_task_open_short";
-
-/**
- * Support for LabelOps functionality.
- * @link https://app.launchdarkly.com/default/branch/features/fflag_feat_front_lops_12_label_ops_ui_short
- */
-export const FF_LOPS_12 = "fflag_feat_front_lops_12_label_ops_ui_short";
 
 /**
  * Support for Datasets functionality.

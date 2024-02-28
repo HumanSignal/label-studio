@@ -55,6 +55,7 @@ export const EntityTab = observer(forwardRef(({
   );
 }));
 
+/** @deprecated this file is not used; only EntityTab is in use and can be moved out */
 export const AnnotationTabs = observer(({
   store,
   showAnnotations = true,

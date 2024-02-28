@@ -15,6 +15,8 @@ import {
 import Utils from '../../utils';
 import styles from './Annotations.module.scss';
 
+/** @deprecated this file is not used; DraftPanel is moved to separate component */
+
 export const DraftPanel = observer(({ item }) => {
   if (!item.draftSaved && !item.versions.draft) return null;
   const saved = item.draft && item.draftSaved ? ` saved ${Utils.UDate.prettyDate(item.draftSaved)}` : '';
@@ -195,7 +197,7 @@ const Annotation = observer(({ item, store }) => {
             <StopOutlined className={styles.skipped} />
           </Tooltip>
         )}
-        {store.annotationStore.viewingAllAnnotations && (
+        {store.annotationStore.viewingAll && (
           <Button size="small" type="primary" ghost onClick={toggleVisibility}>
             {item.hidden ? <EyeInvisibleOutlined /> : <EyeOutlined />}
           </Button>
@@ -237,7 +239,7 @@ class Annotations extends Component {
           <Tooltip placement="topLeft" title="View all annotations">
             <Button
               size="small"
-              type={store.annotationStore.viewingAllAnnotations ? 'primary' : ''}
+              type={store.annotationStore.viewingAll ? 'primary' : ''}
               onClick={ev => {
                 ev.preventDefault();
                 store.annotationStore.toggleViewingAllAnnotations();

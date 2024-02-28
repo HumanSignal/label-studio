@@ -22,19 +22,25 @@ export const DangerZone = () => {
       buttonLook: "destructive",
       onOk: async () => {
         setProcessing(type);
-        if(type === 'annotations') {
+        if (type === 'annotations') {
           // console.log('delete annotations');
-        } else if(type === 'tasks') {
+        } else if (type === 'tasks') {
           // console.log('delete tasks');
-        } else if(type === 'predictions') {
+        } else if (type === 'predictions') {
           // console.log('delete predictions');
-        } else if(type === 'tabs') {
+        } else if (type === 'reset_cache') {
+          await api.callApi('projectResetCache', {
+            params: {
+              pk: project.id,
+            },
+          });
+        } else if (type === 'tabs') {
           await api.callApi('deleteTabs', {
             body: {
               project: project.id,
             },
           });
-        } else if(type === 'project') {
+        } else if (type === 'project') {
           await api.callApi('deleteProject', {
             params: {
               pk: project.id,
@@ -60,10 +66,19 @@ export const DangerZone = () => {
     disabled: true, //&& !project.total_predictions_number,
     label: `Delete ${project.total_predictions_number} Predictions`,
   }, {
+    type: 'reset_cache',
+    help:
+      'Reset Cache may help in cases like if you are unable to modify the labeling configuration due ' +
+      'to validation errors concerning existing labels, but you are confident that the labels don\'t exist. You can ' +
+      'use this action to reset the cache and try again.',
+    label: `Reset Cache`,
+  }, {
     type: 'tabs',
+    help: 'If the Data Manager is not loading, dropping all Data Manager tabs can help.',
     label: `Drop All Tabs`,
   }, {
     type: 'project',
+    help: 'Deleting a project removes all tasks, annotations, and project data from the database.',
     label: 'Delete Project',
   }], [project]);
 
@@ -82,9 +97,19 @@ export const DangerZone = () => {
             const disabled = btn.disabled || (processing && !waiting);
 
             return (btn.disabled !== true) && (
-              <Button key={btn.type} look="danger" disabled={disabled} waiting={waiting} onClick={handleOnClick(btn.type)}>
-                {btn.label}
-              </Button>
+              <div>
+                {btn.help && <Label description={btn.help} style={{ width: 600, display: 'block' }} />}
+                <Button
+                  key={btn.type}
+                  look="danger"
+                  disabled={disabled}
+                  waiting={waiting}
+                  onClick={handleOnClick(btn.type)}
+                  style={{ marginLeft: 16, marginTop: 10 }}
+                >
+                  {btn.label}
+                </Button>
+              </div>
             );
           })}
         </Space>

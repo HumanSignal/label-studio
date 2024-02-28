@@ -1,26 +1,26 @@
-import { inject, observer } from "mobx-react";
+import { inject } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import { useShortcut } from "../../../sdk/hotkeys";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_DEV_2536, FF_DEV_4008, FF_LOPS_86, FF_OPTIC_2, isFF } from '../../../utils/feature-flags';
 import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
-import { DEFAULT_PAGE_SIZE, getStoredPageSize, Pagination, setStoredPageSize } from "../../Common/Pagination/Pagination";
 import { ImportButton } from "../../Common/SDKButtons";
 import { Spinner } from "../../Common/Spinner";
-import { Table } from "../../Common/Table/Table";
+import { Table } from "../../Common/TableOld/Table";
 import { Tag } from "../../Common/Tag/Tag";
 import { Tooltip } from "../../Common/Tooltip/Tooltip";
 import { GridView } from "../GridView/GridView";
-import "./DataView.styl";
+import "./Table.styl";
 import { Button } from "../../Common/Button/Button";
+import { useState } from "react";
 import { useEffect } from "react";
 
 const injector = inject(({ store }) => {
   const { dataStore, currentView } = store;
-  let props = {
+  const props = {
     store,
     dataStore,
     updated: dataStore.updated,
@@ -43,7 +43,7 @@ const injector = inject(({ store }) => {
 });
 
 export const DataView = injector(
-  observer(({
+  ({
     store,
     data,
     columns,
@@ -60,16 +60,16 @@ export const DataView = injector(
     ...props
   }) => {
     const [datasetStatusID, setDatasetStatusID] = useState(store.SDK.dataset?.status?.id);
-    const [currentPageSize, setPageSize] = useState(getStoredPageSize("tasks", DEFAULT_PAGE_SIZE));
-
-    const setPage = useCallback((page, pageSize) => {
-      setPageSize(pageSize);
-      setStoredPageSize("tasks", pageSize);
-    }, []);
-
     const focusedItem = useMemo(() => {
       return props.focusedItem;
     }, [props.focusedItem]);
+
+    const loadMore = useCallback(async () => {
+      if (!dataStore.hasNextPage || dataStore.loading) return Promise.resolve();
+
+      await dataStore.fetch({ interaction: "scroll" });
+      return Promise.resolve();
+    }, [dataStore]);
 
     const isItemLoaded = useCallback(
       (data, index) => {
@@ -110,13 +110,11 @@ export const DataView = injector(
       [],
     );
 
-    const onSelectAll = useCallback(() => {
-      view.selectAll();
-    }, [view]);
+    const onSelectAll = useCallback(() => view.selectAll(), [view]);
 
-    const onRowSelect = useCallback((id) => {
-      view.toggleSelected(id);
-    }, [view]);
+    const onRowSelect = useCallback((id) => view.toggleSelected(id), [
+      view,
+    ]);
 
     const onRowClick = useCallback(
       async (item, e) => {
@@ -127,82 +125,83 @@ export const DataView = injector(
         } else if (e.metaKey || e.ctrlKey) {
           window.open(`./?task=${itemID}`, "_blank");
         } else {
-          console.log(item);
-          if (isFF(FF_OPTIC_2)) await self.LSF?.saveDraft();
-
+          if (isFF(FF_OPTIC_2)) store._sdk.lsf?.saveDraft();
           getRoot(view).startLabeling(item);
         }
       },
       [view, columns],
     );
 
-    const renderContent = (content) => {
-      if (isLoading && total === 0 && !isLabeling) {
-        return (
-          <Block name="fill-container">
-            <Spinner size="large" />
-          </Block>
-        );
-      } else if (store.SDK.type === 'DE' && ['canceled', 'failed'].includes(datasetStatusID)) {
-        return (
-          <Block name="syncInProgress">
-            <Elem name='title' tag="h3">Failed to sync data</Elem>
-            {isFF(FF_LOPS_86) ? (
-              <>
-                <Elem name='text'>Check your storage settings and resync to import records</Elem>
-                <Button onClick={async () => {
-                  window.open('./settings/storage');
-                }}>Manage Storage</Button>
-              </>
-            ) : (
-              <Elem name='text'>Check your storage settings. You may need to recreate this dataset</Elem>
-            )}
-          </Block>
-        );
-      } else if (store.SDK.type === 'DE' && (total === 0 || data.length === 0 || !hasData) && datasetStatusID === 'completed') {
-        return (
-          <Block name="syncInProgress">
-            <Elem name='title' tag="h3">Nothing found</Elem>
-            <Elem name='text'>Try adjusting the filter or similarity search parameters</Elem>
-          </Block>
-        );
-      } else if (store.SDK.type === 'DE' && (total === 0 || data.length === 0 || !hasData)) {
-        return (
-          <Block name="syncInProgress">
-            <Elem name='title' tag="h3">Hang tight! Records are syncing in the background</Elem>
-            <Elem name='text'>Press the button below to see any synced records</Elem>
-            <Button onClick={async () => {
-              await store.fetchProject({ force: true, interaction: 'refresh' });
-              await store.currentView?.reload();
-            }}>Refresh</Button>
-          </Block>
-        );
-      } else if (total === 0 || !hasData) {
-        return (
-          <Block name="no-results">
-            <Elem name="description">
-              {hasData ? (
+    const renderContent = useCallback(
+      (content) => {
+        if (isLoading && total === 0 && !isLabeling) {
+          return (
+            <Block name="fill-container">
+              <Spinner size="large" />
+            </Block>
+          );
+        } else if (store.SDK.type === 'DE' && ['canceled', 'failed'].includes(datasetStatusID)) {
+          return (
+            <Block name="syncInProgress">
+              <Elem name='title' tag="h3">Failed to sync data</Elem>
+              {isFF(FF_LOPS_86) ? (
                 <>
-                  <h3>Nothing found</h3>
-                    Try adjusting the filter
+                  <Elem name='text'>Check your storage settings and resync to import records</Elem>
+                  <Button onClick={async () => {
+                    window.open('./settings/storage');
+                  }}>Manage Storage</Button>
                 </>
               ) : (
-                "Looks like you have not imported any data yet"
+                <Elem name='text'>Check your storage settings. You may need to recreate this dataset</Elem>
               )}
-            </Elem>
-            {!hasData && (
-              <Elem name="navigation">
-                <ImportButton look="primary" href="./import">
-                    Go to import
-                </ImportButton>
+            </Block>
+          );
+        } else if (store.SDK.type === 'DE' && (total === 0 || data.length === 0 || !hasData) && datasetStatusID === 'completed') {
+          return (
+            <Block name="syncInProgress">
+              <Elem name='title' tag="h3">Nothing found</Elem>
+              <Elem name='text'>Try adjusting the filter or similarity search parameters</Elem>
+            </Block>
+          );
+        } else if (store.SDK.type === 'DE' && (total === 0 || data.length === 0 || !hasData)) {
+          return (
+            <Block name="syncInProgress">
+              <Elem name='title' tag="h3">Hang tight! Records are syncing in the background</Elem>
+              <Elem name='text'>Press the button below to see any synced records</Elem>
+              <Button onClick={async () => {
+                await store.fetchProject({ force: true, interaction: 'refresh' });
+                await store.currentView?.reload();
+              }}>Refresh</Button>
+            </Block>
+          );
+        } else if (total === 0 || !hasData) {
+          return (
+            <Block name="no-results">
+              <Elem name="description">
+                {hasData ? (
+                  <>
+                    <h3>Nothing found</h3>
+                    Try adjusting the filter
+                  </>
+                ) : (
+                  "Looks like you have not imported any data yet"
+                )}
               </Elem>
-            )}
-          </Block>
-        );
-      }
+              {!hasData && (
+                <Elem name="navigation">
+                  <ImportButton look="primary" href="./import">
+                    Go to import
+                  </ImportButton>
+                </Elem>
+              )}
+            </Block>
+          );
+        }
 
-      return content;
-    };
+        return content;
+      },
+      [hasData, isLabeling, isLoading, total, datasetStatusID],
+    );
 
     const decorationContent = (col) => {
       const column = col.original;
@@ -274,6 +273,7 @@ export const DataView = injector(
           data={data}
           rowHeight={70}
           total={total}
+          loadMore={loadMore}
           fitContent={isLabeling}
           columns={columns}
           hiddenColumns={hiddenColumns}
@@ -302,6 +302,7 @@ export const DataView = injector(
           view={view}
           data={data}
           fields={columns}
+          loadMore={loadMore}
           onChange={(id) => view.toggleSelected(id)}
           hiddenFields={hiddenColumns}
           stopInteractions={isLocked}
@@ -348,43 +349,15 @@ export const DataView = injector(
       return () => getRoot(store).SDK.off("datasetUpdated", updateDatasetStatus);
     }, []);
 
-    // Render the UI for the table
+    // Render the UI for your table
     return (
       <Block
         name="data-view"
         className="dm-content"
-        mod={{ loading: dataStore.loading, locked: isLocked }}
+        style={{ pointerEvents: isLocked ? "none" : "auto" }}
       >
         {renderContent(content)}
-
-        {store.mode !== "labelstream" && (
-          <Elem name="footer">
-            <Pagination
-              alwaysVisible
-              label="Tasks"
-              urlParamName="page"
-              page={dataStore.page ?? 1}
-              totalItems={total}
-              showTitle={!isLabeling}
-              showPageSize={!isLabeling}
-              size={isLabeling ? "small" : "medium"}
-              waiting={dataStore.loading}
-              defaultPageSize={currentPageSize}
-              pageSizeOptions={[10, 30, 50, 100]}
-              onInit={setPage}
-              onChange={setPage}
-              onPageLoad={async (page, pageSize) => {
-                if (page !== dataStore.page || pageSize !== dataStore.pageSize) {
-                  await dataStore.fetch({
-                    pageNumber: page,
-                    pageSize,
-                  });
-                }
-              }}
-            />
-          </Elem>
-        )}
       </Block>
     );
-  }),
+  },
 );
