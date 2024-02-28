@@ -525,32 +525,32 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-    if not (get_tasks_agreement_queryset or LseProject or queryset.exists()):
+    if not queryset.exists():
+        # No tasks to annotate. Quit early
         return queryset
 
     project_id = queryset[0].project_id
 
     newest_annotation = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
-    if not (get_tasks_agreement_queryset and LseProject and queryset):
+    if not LseProject:
+        # Not LSE so there will not be agreement_threshold-based task completeness
+        return queryset.annotate(
+            completed_at=Case(When(is_labeled=True, then=Subquery(newest_annotation.values('created_at'))))
+        )
+
+    lse_project = LseProject.objects.filter(project_id=project_id).first()
+    agreement_threshold = lse_project.agreement_threshold
+    if not (get_tasks_agreement_queryset and lse_project and agreement_threshold):
+        # This project doesn't use task_agreement so don't consider it when determining completed_at
         return queryset.annotate(
             completed_at=Case(When(is_labeled=True, then=Subquery(newest_annotation.values('created_at'))))
         )
 
     queryset = get_tasks_agreement_queryset(queryset)
-
-    lse_project = LseProject.objects.filter(project_id=project_id).first()
-    agreement_threshold = lse_project.agreement_threshold
     max_additional_annotators_assignable = lse_project.max_additional_annotators_assignable
 
     # Subquery for max_additional_annotators_assignable + overlap
     max_annotators_subquery = Subquery(max_additional_annotators_assignable + OuterRef('overlap'))
-
-    if not agreement_threshold:
-        # Agreement threshold isn't configured, use the previous annotation
-        return queryset.annotate(
-            completed_at=Case(When(is_labeled=True, then=Subquery(newest_annotation.values('created_at'))))
-        )
-
     completed_at_case = Case(
         When(
             # If agreement_threshold is set, evaluate all conditions
