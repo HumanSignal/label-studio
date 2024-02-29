@@ -7,7 +7,6 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from io_storages.permissions import StoragePermission
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
@@ -23,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 get_storage_list = load_func(settings.GET_STORAGE_LIST)
+StoragePermission = load_func(settings.STORAGE_PERMISSION)
 
 
 def _get_common_storage_list():
@@ -54,7 +54,7 @@ _common_storage_list = _get_common_storage_list()
 )
 class AllImportStorageTypesAPI(APIView):
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
 
     def get(self, request, **kwargs):
         return Response([{'name': s['name'], 'title': s['title']} for s in _common_storage_list])
@@ -71,7 +71,7 @@ class AllImportStorageTypesAPI(APIView):
 )
 class AllExportStorageTypesAPI(APIView):
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
 
     def get(self, request, **kwargs):
         return Response([{'name': s['name'], 'title': s['title']} for s in _common_storage_list])
@@ -97,7 +97,7 @@ class AllExportStorageTypesAPI(APIView):
 class AllImportStorageListAPI(generics.ListAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
 
     def _get_response(self, api, request, *args, **kwargs):
         try:
@@ -139,7 +139,7 @@ class AllExportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
 
     def _get_response(self, api, request, *args, **kwargs):
         view = api.as_view()

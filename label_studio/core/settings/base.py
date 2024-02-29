@@ -552,7 +552,7 @@ STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerial
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
-CHECK_PERMISSIONS_FOR_STORAGES = 'io_storages.functions.check_permissions_for_storages'
+STORAGE_PERMISSION = 'io_storages.permissions.StoragePermission'
 DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 
