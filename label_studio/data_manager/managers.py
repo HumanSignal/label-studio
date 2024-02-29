@@ -532,6 +532,7 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     project_id = queryset[0].project_id
 
     newest_annotation = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
+
     if not LseProject:
         # Not LSE so there will not be agreement_threshold-based task completeness
         return queryset.annotate(
@@ -549,18 +550,20 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     queryset = get_tasks_agreement_queryset(queryset)
     max_additional_annotators_assignable = lse_project.max_additional_annotators_assignable
 
-    # Subquery for max_additional_annotators_assignable + overlap
-    max_annotators_subquery = Subquery(max_additional_annotators_assignable + OuterRef('overlap'))
     completed_at_case = Case(
         When(
             # If agreement_threshold is set, evaluate all conditions
             Q(is_labeled=True)
-            & (Q(_agreement__gte=agreement_threshold) | Q(annotation_count__gte=max_annotators_subquery)),
+            & (
+                Q(_agreement__gte=agreement_threshold)
+                | Q(annotation_count__gte=(F('overlap') + max_additional_annotators_assignable))
+            ),
             then=Subquery(newest_annotation.values('created_at')),
         ),
         default=Value(None),
         output_field=DateTimeField(),
     )
+
     return queryset.annotate(completed_at=completed_at_case)
 
 
