@@ -59,6 +59,17 @@ export const DynamicPreannotationsToggle = injector(observer(({
               </Elem>
             </Space>
           )}
+          <Toggle
+            checked={store.autoAnnotationTooltipActive}
+            onChange={(e) => {
+              const checked = e.target.checked;
+
+              store.setAutoAnnotationTooltipActive(checked);
+
+            }}
+            label="Toggle-Tooltip"
+            style={{ color: '#FF7464' }}
+          />
         </Space>
       </Elem>
     </Block>
