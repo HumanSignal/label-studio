@@ -14,17 +14,16 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
-
 from label_studio.core.utils.common import load_func
 
 from .localfiles.api import LocalFilesExportStorageListAPI, LocalFilesImportStorageListAPI
-
 
 logger = logging.getLogger(__name__)
 # TODO: replace hardcoded apps lists with search over included storage apps
 
 
 get_storage_list = load_func(settings.GET_STORAGE_LIST)
+
 
 def _get_common_storage_list():
     storage_list = get_storage_list()
