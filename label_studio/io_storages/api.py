@@ -9,7 +9,6 @@ from core.utils.io import read_yaml
 from django.conf import settings
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
-from io_storages.permissions import StoragePermission
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from projects.models import Project
 from rest_framework import generics, status
@@ -18,7 +17,11 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
+from label_studio.core.utils.common import load_func
+
 logger = logging.getLogger(__name__)
+
+StoragePermission = load_func(settings.STORAGE_PERMISSION)
 
 
 class ImportStorageListAPI(generics.ListCreateAPIView):
@@ -101,7 +104,6 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 class ImportStorageSyncAPI(generics.GenericAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
 
@@ -124,7 +126,6 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
 class ExportStorageSyncAPI(generics.GenericAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
@@ -147,7 +148,6 @@ class ExportStorageSyncAPI(generics.GenericAPIView):
 class StorageValidateAPI(generics.CreateAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     def create(self, request, *args, **kwargs):
@@ -179,7 +179,6 @@ class StorageValidateAPI(generics.CreateAPIView):
 class StorageFormLayoutAPI(generics.RetrieveAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     swagger_schema = None
     storage_type = None
