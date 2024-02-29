@@ -573,14 +573,18 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
 
 
 class ProjectGroundTruthTaskListAPI(ProjectTaskListAPI):
-    '''
+    """
     Same as ProjectTaskListAPI with the exception that this API only returns tasks
     that contain at least one ground truth annotation
-    '''
+    """
 
     def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
-        ground_truth_query = Q(annotations__was_cancelled=False) & Q(annotations__result__isnull=False) & Q(annotations__ground_truth=True)
+        ground_truth_query = (
+            Q(annotations__was_cancelled=False)
+            & Q(annotations__result__isnull=False)
+            & Q(annotations__ground_truth=True)
+        )
         tasks = Task.objects.filter(project=project).filter(ground_truth_query).order_by('-updated_at')
         page = paginator(tasks, self.request)
         if page:
