@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class ImportStorageListAPI(generics.ListCreateAPIView):
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     serializer_class = ImportStorageSerializer
@@ -44,7 +44,7 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
 
@@ -56,7 +56,7 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 class ExportStorageListAPI(generics.ListCreateAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
@@ -89,8 +89,7 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
@@ -102,7 +101,7 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 class ImportStorageSyncAPI(generics.GenericAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
 
@@ -125,7 +124,7 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
 class ExportStorageSyncAPI(generics.GenericAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
@@ -148,7 +147,7 @@ class ExportStorageSyncAPI(generics.GenericAPIView):
 class StorageValidateAPI(generics.CreateAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     def create(self, request, *args, **kwargs):
@@ -180,7 +179,7 @@ class StorageValidateAPI(generics.CreateAPIView):
 class StorageFormLayoutAPI(generics.RetrieveAPIView):
 
     permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSIONS + [StoragePermission]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     swagger_schema = None
     storage_type = None
