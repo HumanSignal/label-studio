@@ -62,4 +62,5 @@ def get_storage_by_url(url: Union[str, List, Dict], storage_objects: Iterable[Im
 
 
 def check_permissions_for_storages(request):
-    pass
+    """Default enabled for all based on the existing permissions required"""
+    return True
