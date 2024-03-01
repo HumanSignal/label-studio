@@ -11,7 +11,21 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db import models
-from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, TextField, Value, When
+from django.db.models import (
+    Aggregate,
+    Avg,
+    Case,
+    DateTimeField,
+    Exists,
+    F,
+    FloatField,
+    OuterRef,
+    Q,
+    Subquery,
+    TextField,
+    Value,
+    When,
+)
 from django.db.models.functions import Cast, Coalesce, Concat
 from pydantic import BaseModel
 
@@ -496,10 +510,61 @@ class GroupConcat(Aggregate):
 
 
 def annotate_completed_at(queryset):
+    if flag_set('fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto'):
+        return annotated_completed_at_considering_agreement_threshold(queryset)
+
     from tasks.models import Annotation
 
     newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
     return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
+
+
+def annotated_completed_at_considering_agreement_threshold(queryset):
+    from tasks.models import Annotation
+
+    LseProject = load_func(settings.LSE_PROJECT)
+    get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
+
+    if not queryset.exists():
+        # No tasks to annotate. Quit early
+        return queryset
+
+    project_id = queryset[0].project_id
+
+    newest_annotation = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
+
+    if not LseProject:
+        # Not LSE so there will not be agreement_threshold-based task completeness
+        return queryset.annotate(
+            completed_at=Case(When(is_labeled=True, then=Subquery(newest_annotation.values('created_at'))))
+        )
+
+    lse_project = LseProject.objects.filter(project_id=project_id).first()
+    agreement_threshold = lse_project.agreement_threshold if lse_project else None
+    if not (get_tasks_agreement_queryset and agreement_threshold):
+        # This project doesn't use task_agreement so don't consider it when determining completed_at
+        return queryset.annotate(
+            completed_at=Case(When(is_labeled=True, then=Subquery(newest_annotation.values('created_at'))))
+        )
+
+    queryset = get_tasks_agreement_queryset(queryset)
+    max_additional_annotators_assignable = lse_project.max_additional_annotators_assignable
+
+    completed_at_case = Case(
+        When(
+            # If agreement_threshold is set, evaluate all conditions
+            Q(is_labeled=True)
+            & (
+                Q(_agreement__gte=agreement_threshold)
+                | Q(annotation_count__gte=(F('overlap') + max_additional_annotators_assignable))
+            ),
+            then=Subquery(newest_annotation.values('created_at')),
+        ),
+        default=Value(None),
+        output_field=DateTimeField(),
+    )
+
+    return queryset.annotate(completed_at=completed_at_case)
 
 
 def annotate_storage_filename(queryset: TaskQuerySet) -> TaskQuerySet:
