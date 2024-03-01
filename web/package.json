@@ -78,7 +78,7 @@
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.9",
     "react-window-infinite-loader": "^1.0.5",
-    "sanitize-html": "^2.11.0",
+    "sanitize-html": "^2.12.1",
     "strman": "^2.0.1",
     "toml": "^3.0.0",
     "wavesurfer.js": "^6.0.1",
