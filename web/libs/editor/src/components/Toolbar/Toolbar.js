@@ -37,6 +37,21 @@ export const Toolbar = inject('store')(observer(({ store, tools, expanded }) => 
 
   const smartTools = tools.filter(t => t.dynamic);
 
+
+  const annotation = store.annotationStore?.selected;
+  const suggestions = annotation?.suggestions;
+
+  const processAutoAnnotation = {
+    'Y': ['Accept Auto Annotation', () => {
+      console.log('Accepting Auto Annotation')
+      annotation.acceptAllSuggestions();
+    }],
+    'N': ['Reject Auto Annotation', () => {
+      console.log('Rejecting Auto Annotation');
+      annotation.rejectAllSuggestions();
+    }]
+  };
+
   return (
     <ToolbarProvider value={{ expanded, alignment }}>
       <Block ref={(el) => setToolbar(el)} name="toolbar" mod={{ alignment, expanded }}>
@@ -56,14 +71,14 @@ export const Toolbar = inject('store')(observer(({ store, tools, expanded }) => 
           ) : null;
         })}
         {store.autoAnnotation && (
-          <SmartTools tools={smartTools}/>
+          <SmartTools tools={smartTools} shortcuts={suggestions.size > 0 ? processAutoAnnotation : {}}/>
         )}
       </Block>
     </ToolbarProvider>
   );
 }));
 
-const SmartTools = observer(({ tools }) => {
+const SmartTools = observer(({ tools, shortcuts = {} }) => {
   const [selectedIndex, setSelectedIndex] = useState(Math.max(tools.findIndex(t => t.selected), 0));
 
   const selected = useMemo(() => tools[selectedIndex], [selectedIndex]);
@@ -107,6 +122,7 @@ const SmartTools = observer(({ tools }) => {
           setSelectedIndex(nextIndex);
           nextTool.manager.selectTool(nextTool, true);
         }}
+        extraShortcuts={shortcuts}
       />
     </Elem>
   );
