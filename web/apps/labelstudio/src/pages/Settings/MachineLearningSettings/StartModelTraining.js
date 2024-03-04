@@ -19,9 +19,6 @@ export const StartModelTraining = ({ backend }) => {
       },
     });
 
-    window.AA = res;
-    console.log(res.response);
-    
     setResponse(res.response || {});
   }, [api]);
     
