@@ -13,6 +13,7 @@ parent_enterprise: "labeling"
 date: 2024-02-29 14:41:32
 ---
 
+The labeling interface has several panels that provide information about the task and allow you to fine-tune your annotation. 
 
 ## Info panel
 
@@ -48,7 +49,9 @@ If no regions are selected, the panel is blank. You can select a region by click
 </td>
 <td>
 
-Click this to add a relation between two regions. For more information about regions, see the Regions panel below and [Add relations between regions](labeling#Add-relations-between-regions). 
+Click this to add a relation between two regions. After clicking this, select another region in the task display. A connection arrow appears between the two regions. 
+
+For more information about regions, see the [Regions panel](#Regions-panel) below and [Add relations between regions](labeling#Add-relations-between-regions). 
 
 </td>
 </tr>
@@ -129,7 +132,7 @@ This panel displays the annotation history as it progresses through the creation
 
 A region is an area within the data that you as identify as an annotator. For example, this can be a box that you draw on an image, a section of highlighted text, highlighted video segments, and so on. 
 
-Not all tasks require regions. For example, a ranker task, classification tasks, or a task in which you select an option from multiple choices does not require you to create regions. In those cases, the **Regions** panel is empty. 
+Not all tasks require regions. Ranker tasks, classification tasks, or tasks in which you select an option from multiple choices do not require you to create regions. In those cases, the **Regions** panel is empty. 
 
 ![Regions panel](/images/label/regions_panel.png)
 
@@ -138,7 +141,7 @@ For information about adding regions, see [Labeling regions](labeling#Labeling-r
 #### Actions
 
 * Select a region to display it in the **Info** panel. 
-* Click the lock icon to lock a region. You cannot modify the region until it is unlocked. For complex regions, this can help prevent you from making unintentional changes. 
+* Click the lock icon to lock a region. You cannot modify the region until it is unlocked. For complex tasks with multiple regions, this can help prevent you from making unintentional changes. 
 * Click show/hide to control whether the region is visible in the display portion of the labeling interface. This can be useful when you are adding multiple overlapping regions. 
 * With a region selected, press `backspace` to delete the region. 
 

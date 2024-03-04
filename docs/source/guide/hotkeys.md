@@ -13,20 +13,20 @@ parent_enterprise: "labeling"
 date: 2024-02-28 21:14:08
 ---
 
-You can configure your find out which hotkeys are available by clicking **Settings** from within a labeling task: 
+You can configure your settings and find out which hotkeys are available by clicking **Settings** from within a labeling task: 
 
 
 ![Screenshot of labeling settings icon](/images/label/settings.png)
 
 !!! info Tip
-    Use the settings to display the available hotkeys in the labeling interface. For more information, see [Configure your labeling settings](#Configure-your-labeling-settings). 
+    There are multiple options in the settings that allow you to display the hotkeys directly in the labeling interface, so you do not need to memorize any keyboard shortcuts. For more information, see [Configure your labeling settings](#Configure-your-labeling-settings). 
 
 
 ## Use keyboard shortcuts
 
-Use keyboard shortcuts, or hotkeys, to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
+Use keyboard shortcuts, or hotkeys, to improve your labeling performance. When performing a labeling task, click the settings icon to see more details about hotkeys or to enable or disable hotkeys. 
 
-This table describes the hotkeys for a standard keyboard. For a Mac keyboard, use Return instead of Enter, Command instead of Control, Delete instead of Backspace, and Option instead of Alt.
+This table describes the hotkeys for a standard keyboard. For a Mac keyboard, use `Return` instead of `Enter`, `Command` instead of `Control`, `Delete` instead of `Backspace`, and `Option` instead of `Alt`.
 
 | Key | Description |
 | --- | --- | 
@@ -40,10 +40,10 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `alt` + `h` | Hide a selected region. | 
 | `ctrl` + `d` | Duplicate a selected region. |
 | `u` | Unselect a selected region. | 
-| `shift + down` | On the data manager, change the row selection to the next row, 1 below the current row. The quick view for the selected task row appears automatically. |
-| `shift + up` | On the data manager, change the row selection to the previous row, 1 above the current row. The quick view for the selected task row appears automatically. |
-| `shift + right` | On the data manager, open the labeling quick view for the selected task row. | 
-| `shift + left` | On the data manager, close the labeling quick view for the selected task row. |
+| `shift + down` | On the Data Manager, change the row selection to the next row, 1 below the current row. The quick view for the selected task row appears automatically. |
+| `shift + up` | On the Data Manager, change the row selection to the previous row, 1 above the current row. The quick view for the selected task row appears automatically. |
+| `shift + right` | On the Data Manager, open the labeling quick view for the selected task row. | 
+| `shift + left` | On the Data Manager, close the labeling quick view for the selected task row. |
 
 Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels for named entity recognition tasks. 
 
@@ -102,7 +102,7 @@ You can use the [labeling settings](#Configure-your-labeling-settings) to disabl
 * **Show hotkeys on labels**--If hotkeys for labels and choices are enabled, this will display the hotkey value next to the option.
 
 
-For example, in the screenshot below, both settings are enabled. Pressing `4` would select the "Opossum" label. 
+For example, in the screenshot below, both settings are enabled. Pressing `1` would select the "Cat" choice and pressing `4` would select the "Opossum" label. 
 
 ![Screenshot of hotkeys next to labels](/images/label/hotkey_labels.png)
 
