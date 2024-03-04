@@ -138,7 +138,7 @@ Annotate a section of the data by adding a region.
 The following video demonstrates various regions being added to an image:
 
 
-<video src="../images/label/regions.mp4" controls="controls" class="gif-border" />
+<video src="../images/label/regions.mp4" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 ### Label overlapping regions
 
@@ -191,7 +191,7 @@ After you add a relation between two regions, you can modify the relation in the
 - To change the direction of the relation, click the arrow icon between the two related regions.
 - To add labels to the direction arrow indicating the relation between two annotations, click the vertical ellipsis button next to the two related regions to add your predefined labels. You must have a [label configuration that includes relations](/tags/relations.html) to do this.
 
-<video src="../images/label/relations.mp4" controls="controls" style="max-width: 730px;" class="gif-border" />
+<video src="../images/label/relations.mp4" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 
 ## Delete regions and annotations
