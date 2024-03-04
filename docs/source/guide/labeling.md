@@ -15,7 +15,7 @@ After you [set up your project](setup_project), [configure your labeling interfa
 
 1. Open a project in Label Studio and optionally [filter or sort the data](manage_data.html#Filter-or-sort-project-data).    
 2. Click **Label All Tasks** to [start labeling](#Start-labeling).
-3. Use [keyboard shortcuts](#Use-keyboard-shortcuts-to-label-regions-faster) or your mouse to label the data and submit your annotations.
+3. Use [keyboard shortcuts](hotkeys) or your mouse to label the data and submit your annotations.
 4. Follow the project instructions for labeling and deciding whether to skip tasks. 
 5. Click the project name to return to the data manager.
 
@@ -48,7 +48,7 @@ There are several ways you can begin labeling tasks:
 
 !!! note
 
-    An "incomplete task" in this context is one that has not had an annotation submitted and has not been previously skipped by you. You are still shown tasks in you have an unsubmitted annotation draft. 
+    An "incomplete task" in this context is one that has not had an annotation submitted and has not been previously skipped by you. You are still shown tasks if you have an unsubmitted annotation draft. 
 
 </div>
 
@@ -95,7 +95,7 @@ The labeling interface is highly customizable, so the options that available to 
 
 <div class="opensource-only">
 
-* The primary customization point is how the labeling interface has been [configured](setup). The determines which tools are available and what you need to do to complete the task. 
+* The primary customization point is how the labeling interface has been [configured](setup) and what kind of data you are labeling. The determines which tools are available and what you need to do to complete the task. 
 * How you have configured your [labeling settings](hotkeys#Configure-your-labeling-settings). 
 * Whether you are using an [ML backend to assist](label_advanced#Perform-ML-assisted-labeling-with-interactive-preannotations). 
 * Whether you are using Label Studio Enterprise (the Enterprise version has additional customization options and the ability to leave comments). 
@@ -123,7 +123,7 @@ For information on the panels you see in the labeling interface, see [Using the 
 
 ## Labeling regions
 
-A region is an area within the data that you as identify as an annotator. For example, this can be a box you draw on an image or a section of highlighted text. 
+A region is an area within the data that you as identify as an annotator. For example, this can be a box you draw on an image, a section of highlighted text, a video segment, and more. 
 
 
 ### Label a region in the data
@@ -213,11 +213,11 @@ You can reset your working copy of an annotation by clicking the reset action at
 
 Resetting an annotation removes all regions and relations in your working copy. It does not affect comments and does not affect the annotation history. 
 
-Resetting only affects work done in the current working copy of the annotation and does not work that has been previously saved as a draft. 
+Resetting only affects work done in the current working copy of the annotation and does not affect work that has been previously saved as a draft. 
 
 For example, if you add a region, leave the task (automatically saving a draft), and then return to the task, clicking **Reset** does not remove the region you previously added. 
 
-However, if you add a *new* region, the new region becomes part of your working cop. Clicking reset would remove this region. 
+However, if you add a *new* region, the new region becomes part of your working copy. Clicking reset would remove this region. 
 
 ### Delete an annotation
 
@@ -235,6 +235,8 @@ To delete all annotations across all tasks, use the **Actions** menu available f
 
 !!! note
     This action is not available to users in the Annotator or Reviewer role. 
+
+</div>
 
 ## Stop labeling
 
@@ -283,8 +285,3 @@ To label tasks multiple times while the minimum annotations required is set to o
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
 
 
-
-
-
-
-<!-- md annotation_ids.md -->
