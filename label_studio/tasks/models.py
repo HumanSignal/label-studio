@@ -844,7 +844,7 @@ class Prediction(models.Model):
     
     model_version = models.TextField(_('model version'), default='', blank=True, null=True,
                                      help_text='A string value that for model version that produced the prediction. Used in both live models and when uploading offline predictions.')
-
+    
     model = models.ForeignKey('ml.MLBackend', on_delete=models.CASCADE, related_name='predictions', null=True,
                               help_text='An ML Backend instance that created the prediction.')
     

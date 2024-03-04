@@ -1,16 +1,20 @@
 import { format, isValid, formatDistanceToNow, parseISO } from 'date-fns';
 import { useCallback, useContext } from 'react';
-import { FaEllipsisV } from 'react-icons/fa';
+import { LsBulb, LsCheck, LsEllipsis, LsMinus } from '../../../assets/icons';
+
 import truncate from 'truncate-middle';
 import { Button, Card, Dropdown, Menu } from '../../../components';
 import { DescriptionList } from '../../../components/DescriptionList/DescriptionList';
 import { confirm } from '../../../components/Modal/Modal';
 import { Oneof } from '../../../components/Oneof/Oneof';
 import { ApiContext } from '../../../providers/ApiProvider';
-import { cn } from '../../../utils/bem';
+import { Block, cn } from '../../../utils/bem';
 
-export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
-  const rootClass = cn('ml');
+import './MachineLearningList.styl';
+
+
+export const MachineLearningList = ({ backends, fetchBackends, onEdit, onTestRequest, onStartTraining }) => {
+  
   const api = useContext(ApiContext);
 
   const onDeleteModel = useCallback(async (backend) => {
@@ -22,17 +26,8 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
     await fetchBackends();
   }, [fetchBackends, api]);
 
-  const onStartTraining = useCallback(async (backend) => {
-    await api.callApi('trainMLBackend', {
-      params: {
-        pk: backend.id,
-      },
-    });
-    await fetchBackends();
-  }, [fetchBackends, api]);
-
   return (
-    <div className={rootClass}>
+    <div>
       {backends.map(backend => (
         <BackendCard
           key={backend.id}
@@ -40,13 +35,14 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
           onStartTrain={onStartTraining}
           onDelete={onDeleteModel}
           onEdit={onEdit}
+          onTestRequest={onTestRequest}
         />
       ))}
     </div>
   );
 };
 
-const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
+const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest }) => {
   const confirmDelete = useCallback((backend) => {
     confirm({
       title: "Delete ML Backend",
@@ -56,46 +52,42 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
     });
   }, [backend, onDelete]);
 
-  return (
-    <Card style={{ marginTop: 0 }} header={backend.title} extra={(
-      <div className={cn('ml').elem('info')}>
-        <BackendState backend={backend}/>
-
-        <Dropdown.Trigger align="right" content={(
-          <Menu size="small" contextual>
-            <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
-            <Menu.Item onClick={() => confirmDelete(backend)}>Delete</Menu.Item>
-          </Menu>
-        )}>
-        <Button type="link" icon={<FaEllipsisV/>} style={{ padding: "15px" }} />
-        </Dropdown.Trigger>
-      </div>
-    )}>
-      <DescriptionList className={cn('ml').elem('summary')}>
-        <DescriptionList.Item term="URL" termStyle={{ whiteSpace: 'nowrap' }}>
-          {truncate(backend.url, 20, 10, '...')}
-        </DescriptionList.Item>
-        <DescriptionList.Item term="Created" termStyle={{ whiteSpace: 'nowrap' }}>
-          {formatDistanceToNow(parseISO(backend.created_at), { addSuffix: true })}
-        </DescriptionList.Item>
-        {backend.description && (
-          <DescriptionList.Item
-            term="Description"
-            children={backend.description}
-          />
-        )}
-        <DescriptionList.Item term="Version">
-          {backend.model_version && isValid(backend.model_version) ?
-            format(new Date(isNaN(backend.model_version) ? backend.model_version: Number(backend.model_version)), 'MMMM dd, yyyy ∙ HH:mm:ss')
-            : backend.model_version || 'unknown'}
-        </DescriptionList.Item>
-      </DescriptionList>
-
-      <Button disabled={backend.state !== "CO"} onClick={() => onStartTrain(backend)}>
-        Start Training
-      </Button>
-    </Card>
-  );
+  const rootClass = cn("backendCard");
+    
+    return (
+        <Block name="backendCard">
+          <div className={rootClass.elem("titleBlk")}>
+            <div>
+              <BackendState backend={backend}/>
+              <div className={rootClass.elem("title")}>
+                <b>{backend.title}</b>
+              </div>
+              
+            </div>
+            <div className={rootClass.elem("menu")}>
+              <Dropdown.Trigger align="right" content={(
+                <Menu size="medium" contextual>
+                    <Menu.Item onClick={() => onTestRequest(backend)}>Send Test Request</Menu.Item>
+                    <Menu.Item onClick={() => onStartTrain(backend)}>Start Training</Menu.Item>
+                    
+                    <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
+                  <Menu.Item onClick={() => confirmDelete(backend)} isDangerous>Delete</Menu.Item>
+                  </Menu>
+              )}>
+                <Button type="link" icon={<LsEllipsis/>} style={{ padding: "15px" }} />
+              </Dropdown.Trigger>
+              
+            </div>
+          </div>
+          <div className={rootClass.elem("meta")}>
+            <div className={rootClass.elem("group")}>{truncate(backend.url, 20, 10, '...')}</div>
+            <div className={rootClass.elem("group")}></div>
+            <div className={rootClass.elem("group")}>Created &nbsp;
+              {formatDistanceToNow(parseISO(backend.created_at), { addSuffix: true })}              
+            </div>            
+          </div>        
+        </Block>
+    );
 };
 
 const BackendState = ({ backend }) => {

@@ -34,7 +34,7 @@ export const TestRequest = ({ backend }) => {
           <h4>Request</h4>
           <Elem name={'code'}>
             <pre>{ testResponse.url && "POST" } {testResponse.url}
-              
+              <br/><br/>
               {JSON.stringify(testResponse.request, null, 2)}
             </pre>
           </Elem>
@@ -42,7 +42,10 @@ export const TestRequest = ({ backend }) => {
         <Elem name={'right'}>
           <h4>Response</h4>
           <Elem name={'code'}>
-            <pre>{JSON.stringify(testResponse.response, null, 2)}
+            <pre>
+              {testResponse.status}
+              <br/><br/>
+              {JSON.stringify(testResponse.response, null, 2)}
             </pre>
           </Elem>
         </Elem>

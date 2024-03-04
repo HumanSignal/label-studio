@@ -11,7 +11,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from ml.api_connector import MLApi, PREDICT_URL, TIMEOUT_PREDICT
 from projects.models import Project
-from tasks.models import Task, Prediction
+from tasks.models import Task
 from tasks.serializers import PredictionSerializer, TaskSimpleSerializer
 from webhooks.serializers import Webhook, WebhookSerializer
 
@@ -263,14 +263,15 @@ class MLBackend(models.Model):
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
         
-        results = ml_api_result.response['results']
+        results = ml_api_result.response.get('results', None)
         
         return {
-            "status": ml_api_result.status_code,
+            "status": 200,
             "data": {
                 "status": ml_api_result.status_code,
-                "task": task_ser,
+                "error_message": ml_api_result.error_message,
                 "url": ml_api._get_url(PREDICT_URL),
+                "task": task_ser,
                 "request": request_params,
                 "response": results
             }
@@ -365,7 +366,6 @@ class MLBackend(models.Model):
 
         """
         if isinstance(tasks, list):
-            from tasks.models import Task
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         if filter_model_version is None:

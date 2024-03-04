@@ -7,8 +7,7 @@ from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectRe
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
-from tasks.models import Task, Prediction
-from ml.models import MLBackend
+from tasks.models import Task
 from users.serializers import UserSimpleSerializer
 
 

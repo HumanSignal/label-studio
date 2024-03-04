@@ -12,7 +12,7 @@ import { IconEmptyPredictions } from "../../../assets/icons";
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
-import { MachineLearningListNew } from './MachineLearningListNew';
+import { Spinner } from '../../../components/Spinner/Spinner';
 import { CustomBackendForm } from './Forms';
 import { TestRequest } from './TestRequest';
 import { StartModelTraining } from './StartModelTraining';
@@ -25,8 +25,11 @@ export const MachineLearningSettings = () => {
     const api = useAPI();
     const { project, fetchProject } = useContext(ProjectContext);    
     const [backends, setBackends] = useState([]);    
-        
+    const [loading, setLoading] = useState(false);
+    const [loaded, setLoaded] = useState(false);
+  
     const fetchBackends = useCallback(async () => {
+        setLoading(true);
         const models = await api.callApi('mlBackends', {
             params: {
                 project: project.id,
@@ -35,6 +38,8 @@ export const MachineLearningSettings = () => {
         });
         
         if (models) setBackends(models);
+        setLoading(false);
+        setLoaded(true);
     }, [project, setBackends]);
 
     const startTrainingModal = useCallback((backend) => {
@@ -81,36 +86,41 @@ export const MachineLearningSettings = () => {
         if (project.id) {
             fetchBackends();
         }
-    }, [project]);
+    }, [project.id]);
 
     return (
         <Block name="ml-settings">
           <Elem name={'wrapper'}>
-            { backends.length == 0 &&
+            { loading && <Spinner size={32}/> }
+            { loaded && backends.length == 0 &&
               <EmptyState  icon={<IconEmptyPredictions />}
                            title="Let’s connect your first model"
                            description="Connect a machine learning model to generate predictions. These predictions can be compared side by side, used for efficient pre‒labeling and, to aid in active learning, directing users to the most impactful labeling tasks."
                            action={ <Button primary onClick={() => showMLFormModal()}>Connect Model</Button> }
-                           footer={ <div>Need help?<br/><a>Learn more about connecting models in our docs</a></div>} /> }
-                        
-            <MachineLearningListNew onEdit={(backend) => showMLFormModal(backend)}
-                                    onTestRequest={(backend) => showRequestModal(backend) }
-                                    onStartTraining={(backend) => startTrainingModal(backend) }
-                                    fetchBackends={fetchBackends}
-                                    backends={backends} />
+                           footer={ <div>Need help?<br/><a>Learn more about connecting models in our docs</a></div>} /> }                                   
+            <MachineLearningList onEdit={(backend) => showMLFormModal(backend)}
+                                 onTestRequest={(backend) => showRequestModal(backend) }
+                                 onStartTraining={(backend) => startTrainingModal(backend) }
+                                 fetchBackends={fetchBackends}
+                                 backends={backends} />
             
             <Divider height={32}/>
 
             { backends.length > 0 &&
               <Description style={{ marginTop: 0, maxWidth: 680 }}>
-                You have {backends.length} model(s) connected. If you want to retreive predicitions from this models go to data manager, select tasks and click "Retrieve model predictions" from the Actions menu.
+                A connected model has been detected! If you wish to fetch predictions from this model, please follow these steps:
+<br/><br/>
+1. Navigate to the <i>Data Manager</i>.<br/>
+2. Select the desired tasks.<br/>
+3. Click on <i>Retrieve model predictions</i> from the <i>Actions</i> menu.<br/><br/>
+
+Additionally, you can configure the system to use this model for fetching live predictions in the <i>Annotation</i> tab.
               </Description> }
             
             <Form action="updateProject"
                   formData={{ ...project }}
                   params={{ pk: project.id }}
-                  onSubmit={() => fetchProject()}
-                  autosubmit>
+                  onSubmit={() => fetchProject()}>
 
               { backends.length > 0 && (
                   <Form.Row columnCount={1}>

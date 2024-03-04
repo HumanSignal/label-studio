@@ -19,31 +19,29 @@ export const StartModelTraining = ({ backend }) => {
       },
     });
 
-    setResponse(res);
-    // await fetchBackends();
-  }, [api]);
-  
-  // const sendStartModelTraining = useCallback(async (backend) => {
-  //   const response = await api.callApi('predictWithML', {
-  //     params: {
-  //       pk: backend.id,
-  //       random: true
-  //     }
-  //   });
+    window.AA = res;
+    console.log(res.response);
     
-  //   if (response) setTestResponse(response);
-  // }, [setTestResponse]);
-  
+    setResponse(res.response || {});
+  }, [api]);
+    
   return (
     <Block name="test-request">
       <Description style={{ marginTop: 0, maxWidth: 680 }}>
-        You can send a manual request to the model to start training.
+        You're about to manually trigger your model's training process. This action will start the learning phase based on how train method is implemented in the ML Backend. Proceed to begin this process.<br /><br />
+
+*Note: Currently, there is no built-in feedback loop within this interface for tracking the training progress. You'll need to monitor the model's training steps directly through the model's own tools and environment.
+
+
       </Description>
       { response || <Button onClick={() => { onStartTraining(backend) }}>Start Training</Button> }
 
-      { response &&
-        <pre>{JSON.stringify(response, null, 2)}</pre>
-      }
+      { response && (
+        <>
+          <pre>Request Sent!</pre>
+          <pre>Response: { JSON.stringify(response, null, 2) }</pre>
+        </>
+      )}
     </Block>
   );
 };

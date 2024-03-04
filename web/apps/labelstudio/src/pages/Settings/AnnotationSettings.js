@@ -2,10 +2,9 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button } from '../../components';
 import { Form, Label, TextArea, Toggle } from '../../components/Form';
 import { MenubarContext } from '../../components/Menubar/Menubar';
-import { PrelabelingSelector } from './AnnotationSettings/PrelabelingSelector';
 import { Block, cn, Elem } from '../../utils/bem';
 
-import { ProjectModelVersionSelector } from './AnnotationSettings/ProjectModelVersionSelector';
+import { ModelVersionSelector } from './AnnotationSettings/ModelVersionSelector';
 import { ProjectContext } from '../../providers/ProjectProvider';
 import { useAPI } from '../../providers/ApiProvider';
 import { Divider } from '../../components/Divider/Divider';
@@ -21,22 +20,9 @@ export const AnnotationSettings = () => {
   const [activeVersion, setActiveVersion] = useState();
   
   const edittable = ! project.evaluate_predictions_automatically;
-
-  const fetchVersions = useCallback(async () => {
-    // const versions = await api.callApi('projectModelVersions', {
-    //     params: {
-    //       pk: project.id,
-    //       extended: true,
-    //       include_live_models: true
-    //     }
-    // });
-
-    // if (versions) setVersions(versions);
-  }, [project, setVersions]);
-
+  
   useEffect(() => {
     if (project.id) {
-      fetchVersions();
       setActiveVersion(project.model_version);
     }
   }, [project]);
@@ -54,7 +40,7 @@ export const AnnotationSettings = () => {
       <Elem name={'wrapper'}>
       <Form ref={formRef} action="updateProject" formData={{...project}} params={{pk: project.id}} onSubmit={updateProject}>
         <Form.Row columnCount={1}>
-          <h4>Labeling Instructions</h4>
+          <Elem name={"header"}>Labeling Instructions</Elem>
           <div>
             <Toggle label="Show before labeling" name="show_instruction"/>
           </div>
@@ -71,8 +57,8 @@ export const AnnotationSettings = () => {
         <Divider height={32} />
         
         <Form.Row columnCount={1} style={{ borderTop: "1px solid #f1f1f1"}}>
-          <h4>Predictions</h4>
-          
+          <br/>
+          <Elem name={"header"}>Predictions</Elem>          
           <div>        
             <Toggle label="Use predictions to pre-label data"
                     description="Enable and select which set of predictions to use for prelabeling."
@@ -83,7 +69,7 @@ export const AnnotationSettings = () => {
 
           {
             (((collab !== null) ? collab : project.show_collab_predictions)) &&
-            <ProjectModelVersionSelector />
+            <ModelVersionSelector />
           }
         </Form.Row>
         

@@ -952,7 +952,7 @@ class Project(ProjectMixin, models.Model):
     def get_ml_backends(self, *args, **kwargs):
         """
         """
-        from ml.models import MLBackend, MLBackendState
+        from ml.models import MLBackend
         
         return MLBackend.objects.filter(project=self, **kwargs)
     

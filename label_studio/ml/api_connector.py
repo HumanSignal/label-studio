@@ -4,7 +4,6 @@ import logging
 import os
 import urllib
 
-import attr
 import requests
 from core.feature_flags import flag_set
 from core.utils.common import load_func
@@ -108,15 +107,17 @@ class BaseHTTPAPI(object):
     def post(self, *args, **kwargs):
         return self.request('POST', *args, **kwargs)
 
-
-@attr.s
-class MLApiResult(object):
-    url = attr.ib(default='')
-    request = attr.ib(default='')
-    response = attr.ib(default=attr.Factory(dict))
-    headers = attr.ib(default=attr.Factory(dict))
-    type = attr.ib(default='ok')
-    status_code = attr.ib(default=200)
+    
+class MLApiResult():
+    """
+    """
+    def __init__(self, url='', request='', response=None, headers=None, type='ok', status_code=200):
+        self.url = url
+        self.request = request
+        self.response = {} if response is None else response
+        self.headers = {} if headers is None else headers
+        self.type = type
+        self.status_code = status_code
 
     @property
     def is_error(self):
@@ -127,19 +128,9 @@ class MLApiResult(object):
         return self.response.get('error')
 
 
-@attr.s
-class MLApiScheme(object):
-    tag_name = attr.ib()
-    tag_type = attr.ib()
-    source_name = attr.ib()
-    source_type = attr.ib()
-    source_value = attr.ib()
-
-    def to_dict(self):
-        return attr.asdict(self)
-
-
 class MLApi(BaseHTTPAPI):
+    """
+    """
     def __init__(self, **kwargs):
         super(MLApi, self).__init__(**kwargs)
         self._validate_request_timeout = 10
@@ -150,45 +141,46 @@ class MLApi(BaseHTTPAPI):
             url += '/'
         return urllib.parse.urljoin(url, url_suffix)
 
+    def _handle_error(self, e, response, url, headers, request):
+        """
+        """
+        error_string = f"{e} {response.text if response else ''}"
+        status_code = response.status_code if response is not None else 0
+            
+        return MLApiResult(url=url, request=request, response={'error': error_string},
+                           headers=headers, type='error', status_code=status_code)
+
     def _request(self, url_suffix, request=None, verbose=True, method='POST', *args, **kwargs):
+        """
+        """
         assert method in ('POST', 'GET')
         url = self._get_url(url_suffix)
         request = request or {}
         headers = dict(self.http.headers)
-        # if verbose:
-        #     logger.info(f'Request to {url}: {json.dumps(request, indent=2)}')
+
         response = None
         try:
             if method == 'POST':
                 response = self.post(url=url, json=request, *args, **kwargs)
             else:
                 response = self.get(url=url, *args, **kwargs)
-            response.raise_for_status()
+                
+            # response = requests.request(method=method, url=url, json=request, *args, **kwargs)
+            # response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            # Extending error details in case of failed request
-            if flag_set('fix_back_dev_3351_ml_validation_error_extension_short', AnonymousUser):
-                error_string = str(e) + (' ' + str(response.text) if response else '')
-            else:
-                error_string = str(e)
-            status_code = response.status_code if response is not None else 0
-            return MLApiResult(url, request, {'error': error_string}, headers, 'error', status_code=status_code)
+            return self._handle_error(e, response, url, headers, request)
+
         status_code = response.status_code
         try:
             response = response.json()
+            
         except ValueError as e:
-            # logger.warning(f'Error parsing JSON response from {url}. Response: {response.content}', exc_info=True)
-            return MLApiResult(
-                url,
-                request,
-                {'error': str(e), 'response': response.content},
-                headers,
-                'error',
-                status_code=status_code,
-            )
-        # if verbose:
-        #     logger.info(f'Response from {url}: {json.dumps(response, indent=2)}')
-        return MLApiResult(url, request, response, headers, status_code=status_code)
+            return MLApiResult(url=url, request=request, response={'error': str(e), 'response': response.content},
+                               headers=headers, type='error', status_code=status_code)
+        
+        return MLApiResult(url=url, request=request, response=response, headers=headers, status_code=status_code)
 
+    
     def _create_project_uid(self, project):
         time_id = int(project.created_at.timestamp())
         return f'{project.id}.{time_id}'

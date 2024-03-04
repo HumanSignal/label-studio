@@ -5,7 +5,7 @@ import { Form, Label, Select } from '../../../components/Form';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 
 
-export const ProjectModelVersionSelector = ({
+export const ModelVersionSelector = ({
   name = "model_version",
   valueName = "model_version",
   apiName = "projectModelVersions",
@@ -22,15 +22,6 @@ export const ProjectModelVersionSelector = ({
   useEffect(() => {
     setVersion(project?.[valueName] || null);
   }, [project?.[valueName], versions]);
-
-  // const resetMLVersion = useCallback(async (e) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-
-  //   await updateProject({
-  //     model_version: null,
-  //   });
-  // }, [updateProject]);
 
   const fetchMLVersions = useCallback(async () => {
     const pk = project?.id;
@@ -99,10 +90,6 @@ export const ProjectModelVersionSelector = ({
             {...props}
           />          
         </div>
-
-        {/* <Button onClick={resetMLVersion}> */}
-        {/*   Reset */}
-        {/* </Button> */}
       </div>
     </>
   );
