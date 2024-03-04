@@ -17,7 +17,7 @@
     "dm:watch": "nx run datamanager:build:development --watch",
     "dm:unit": "nx run datamanager:unit",
     "build": "NODE_ENV=production nx run-many --target=build --configuration=production",
-    "version": "nx affected -t version --base develop",
+    "version:affected": "nx affected -t version --base develop",
     "watch": "nx run-many --target=build --configuration=production --watch",
     "test:unit": "yarn lsf:unit && yarn ls:unit && yarn dm:unit",
     "test:e2e": "yarn ls:e2e && yarn lsf:e2e",

@@ -86,13 +86,13 @@
           "codeCoverage": true
         }
       }
-    }
-  },
-  "version": {
-    "executor": "nx:run-commands",
-    "options": {
-      "cwd": "apps/labelstudio",
-      "command": "node ../../tools/version.mjs"
+    },
+    "version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/labelstudio",
+        "command": "node ../../tools/version.mjs"
+      }
     }
   },
   "tags": []
