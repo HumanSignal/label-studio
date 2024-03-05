@@ -1,6 +1,6 @@
 {
-  "message": "let CI set the base branch",
-  "commit": "e4426a6d8109a7f2b2f2bc93e400bef5cdbb9d8a",
-  "date": "2024-03-05T13:06:32.000Z",
+  "message": "make the version.mjs generator available as a binary and update ci frontend-build.yml to directly use version:affected to ensure other yarn builds do not trigger this.",
+  "commit": "1b7f404958fa41dcd505f292a860d78ce7867860",
+  "date": "2024-03-05T12:01:35.000Z",
   "branch": "fb-optic-489"
 }
