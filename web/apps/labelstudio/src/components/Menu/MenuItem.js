@@ -17,7 +17,7 @@ export const MenuItem = ({
   onClick,
   ...rest
 }) => {
-  const rootClass = cn("main-menu", {elem: "item"});
+  const rootClass = cn("main-menu", { elem: "item" });
   const classList = [rootClass.toClassName()];
   const isActive = (() => {
     const pathname = location.pathname.replace(/\/$/, '');
@@ -49,7 +49,7 @@ export const MenuItem = ({
     ...rest,
   };
 
-  const activeClassName = rootClass.mod({active: true}).toClassName();
+  const activeClassName = rootClass.mod({ active: true }).toClassName();
   const finalHref = to ?? href;
 
   if (forceReload) {

@@ -72,6 +72,12 @@
         "decorators": ""
     },
     {
+        "url": "/models/",
+        "module": "organizations.views.simple_view",
+        "name": "organizations:models",
+        "decorators": ""
+    },
+    {
         "url": "/api/organizations/",
         "module": "organizations.api.OrganizationListAPI",
         "name": "organizations:api:organization-list",
@@ -174,6 +180,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/summary/reset/",
+        "module": "projects.api.ProjectSummaryResetAPI",
+        "name": "projects:api:project-summary-reset",
+        "decorators": ""
+    },
+    {
         "url": "/api/projects/<int:pk>/imports/<int:import_pk>/",
         "module": "projects.api.ProjectImportAPI",
         "name": "projects:api:project-imports",
@@ -189,6 +201,12 @@
         "url": "/api/projects/<int:pk>/tasks/",
         "module": "projects.api.ProjectTaskListAPI",
         "name": "projects:api:project-tasks-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/ground-truth-tasks/",
+        "module": "projects.api.ProjectGroundTruthTaskListAPI",
+        "name": "projects:api:project-gt-tasks-list",
         "decorators": ""
     },
     {

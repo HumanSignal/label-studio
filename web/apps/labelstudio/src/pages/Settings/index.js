@@ -8,26 +8,39 @@ import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
 import { PredictionsSettings } from './PredictionsSettings/PredictionsSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
+import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from '../../utils/license-flags';
 
+const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
 
-export const MenuLayout = ({children, ...routeProps}) => {
+export const MenuLayout = ({ children, ...routeProps }) => {
   return (
     <SidebarMenu
       menuItems={[
         GeneralSettings,
         LabelingSettings,
-	AnnotationSettings,
+	      AnnotationSettings,
         MachineLearningSettings,
-	PredictionsSettings,
-        StorageSettings,
+        PredictionsSettings,
+        isAllowCloudStorage && StorageSettings,
         WebhookPage,
         DangerZone,
-      ]}
+      ].filter(Boolean)}
       path={routeProps.match.url}
       children={children}
     />
   );
 };
+
+const pages = {
+  AnnotationSettings,
+  LabelingSettings,
+  MachineLearningSettings,
+  PredictionsSettings
+  WebhookPage,
+  DangerZone,
+};
+
+isAllowCloudStorage && (pages.StorageSettings = StorageSettings);
 
 export const SettingsPage = {
   title: "Settings",
@@ -35,13 +48,5 @@ export const SettingsPage = {
   exact: true,
   layout: MenuLayout,
   component: GeneralSettings,
-  pages: {
-    AnnotationSettings,
-    LabelingSettings,
-    MachineLearningSettings,
-    PredictionsSettings,
-    StorageSettings,
-    WebhookPage,
-    DangerZone,
-  },
+  pages,
 };

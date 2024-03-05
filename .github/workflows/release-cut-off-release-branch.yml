@@ -25,7 +25,7 @@ jobs:
       release_version: ${{ steps.calculate_branch_name_and_version.outputs.release_version }}
       release_branch: ${{ steps.calculate_branch_name_and_version.outputs.release_branch }}
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4

@@ -5,22 +5,12 @@ import React, { Component } from 'react';
 import { Result, Spin } from 'antd';
 import { getEnv, getRoot } from 'mobx-state-tree';
 import { observer, Provider } from 'mobx-react';
-import { InstructionsModal } from '../InstructionsModal/InstructionsModal';
 
 /**
  * Core
- */
+*/
 import Tree from '../../core/Tree';
-
-/**
- * Components
- */
-import { TopBar } from '../TopBar/TopBar';
-import Debug from '../Debug';
-import Segment from '../Segment/Segment';
-import Settings from '../Settings/Settings';
-import { RelationsOverlay } from '../RelationsOverlay/RelationsOverlay';
-import { BottomBar } from '../BottomBar/BottomBar';
+import { TreeValidation } from '../TreeValidation/TreeValidation';
 
 /**
  * Tags
@@ -30,25 +20,39 @@ import '../../tags/control';
 import '../../tags/visual';
 
 /**
- * Styles
+ * Utils and common components
  */
-import { TreeValidation } from '../TreeValidation/TreeValidation';
+import { Space } from '../../common/Space/Space';
+import { Button } from '../../common/Button/Button';
+import { Block, Elem } from '../../utils/bem';
+import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from '../../utils/feature-flags';
+import { sanitizeHtml } from '../../utils/html';
+import { reactCleaner } from '../../utils/reactCleaner';
 import { guidGenerator } from '../../utils/unique';
-import Grid from './Grid';
-import { SidebarPage, SidebarTabs } from '../SidebarTabs/SidebarTabs';
+import { isDefined, sortAnnotations } from '../../utils/utilities';
+
+/**
+ * Components
+ */
+import { Annotation } from './Annotation';
 import { AnnotationTab } from '../AnnotationTab/AnnotationTab';
+import { DynamicPreannotationsControl } from '../AnnotationTab/DynamicPreannotationsControl';
+import { BottomBar } from '../BottomBar/BottomBar';
+import Debug from '../Debug';
+import Grid from './Grid';
+import { InstructionsModal } from '../InstructionsModal/InstructionsModal';
+import { RelationsOverlay } from '../RelationsOverlay/RelationsOverlay';
+import Segment from '../Segment/Segment';
+import Settings from '../Settings/Settings';
+import { SidebarTabs } from '../SidebarTabs/SidebarTabs';
 import { SidePanels } from '../SidePanels/SidePanels';
 import { SideTabsPanels } from '../SidePanels/TabPanels/SideTabsPanels';
-import { Block, Elem } from '../../utils/bem';
+import { TopBar } from '../TopBar/TopBar';
+
+/**
+ * Styles
+ */
 import './App.styl';
-import { Space } from '../../common/Space/Space';
-import { DynamicPreannotationsControl } from '../AnnotationTab/DynamicPreannotationsControl';
-import { isDefined } from '../../utils/utilities';
-import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, isFF } from '../../utils/feature-flags';
-import { Annotation } from './Annotation';
-import { Button } from '../../common/Button/Button';
-import { reactCleaner } from '../../utils/reactCleaner';
-import { sanitizeHtml } from '../../utils/html';
 
 /**
  * App
@@ -131,27 +135,23 @@ class App extends Component {
   }
 
   _renderUI(root, as) {
+    if (as.viewingAll) return this.renderAllAnnotations();
+
     return (
-      <>
-        {!as.viewingAllAnnotations && !as.viewingAllPredictions && (
-          <Block
-            key={(as.selectedHistory ?? as.selected)?.id}
-            name="main-view"
-            onScrollCapture={this._notifyScroll}
-          >
-            <Elem name="annotation">
-              {<Annotation root={root} annotation={as.selected} />}
-              {this.renderRelations(as.selected)}
-            </Elem>
-            {(!isFF(FF_DEV_3873)) && getRoot(as).hasInterface('infobar') && this._renderInfobar(as)}
-            {as.selected.hasSuggestionsSupport && (
-              <DynamicPreannotationsControl />
-            )}
-          </Block>
+      <Block
+        key={(as.selectedHistory ?? as.selected)?.id}
+        name="main-view"
+        onScrollCapture={this._notifyScroll}
+      >
+        <Elem name="annotation">
+          {<Annotation root={root} annotation={as.selected} />}
+          {this.renderRelations(as.selected)}
+        </Elem>
+        {(!isFF(FF_DEV_3873)) && getRoot(as).hasInterface('infobar') && this._renderInfobar(as)}
+        {as.selected.hasSuggestionsSupport && (
+          <DynamicPreannotationsControl />
         )}
-        {as.viewingAllAnnotations && this.renderAllAnnotations()}
-        {as.viewingAllPredictions && this.renderAllPredictions()}
-      </>
+      </Block>
     );
   }
 
@@ -168,13 +168,15 @@ class App extends Component {
   }
 
   renderAllAnnotations() {
-    const cs = this.props.store.annotationStore;
+    const as = this.props.store.annotationStore;
+    const entities = [...as.annotations, ...as.predictions];
 
-    return <Grid store={cs} annotations={[...cs.annotations, ...cs.predictions]} root={cs.root} />;
-  }
+    if (isFF(FF_SIMPLE_INIT)) {
+      // the same sorting we have in AnnotationsCarousel, so we'll see the same order in both places
+      sortAnnotations(entities);
+    }
 
-  renderAllPredictions() {
-    return this._renderAll(this.props.store.annotationStore.predictions);
+    return <Grid store={as} annotations={entities} root={as.root} />;
   }
 
   renderRelations(selectedStore) {
@@ -208,7 +210,7 @@ class App extends Component {
 
     if (!root) return this.renderNoAnnotation();
 
-    const viewingAll = as.viewingAllAnnotations || as.viewingAllPredictions;
+    const viewingAll = as.viewingAll;
 
     // tags can be styled in config when user is awaiting for suggestions from ML backend
     const mainContent = (
@@ -259,7 +261,7 @@ class App extends Component {
             }}
           >
             {outlinerEnabled ? (
-              isFF(FF_DEV_3873) ? (
+              newUIEnabled ? (
                 <SideTabsPanels
                   panelsHidden={viewingAll}
                   currentEntity={as.selectedHistory ?? as.selected}
@@ -268,7 +270,7 @@ class App extends Component {
                   focusTab={store.commentStore.tooltipMessage ? 'comments' : null}
                 >
                   {mainContent}
-                  {isDefined(store) && store.hasInterface('topbar') && <BottomBar store={store} />}
+                  {store.hasInterface('topbar') && <BottomBar store={store} />}
                 </SideTabsPanels>
               ) : (
                 <SidePanels
@@ -277,8 +279,6 @@ class App extends Component {
                   regions={as.selected.regionStore}
                 >
                   {mainContent}
-
-                  {isFF(FF_DEV_3873) && isDefined(store) && store.hasInterface('topbar') && <BottomBar store={store} />}
                 </SidePanels>
               )
             ) : (
@@ -288,22 +288,14 @@ class App extends Component {
                 {viewingAll === false && (
                   <Block name="menu" mod={{ bsp: settings.bottomSidePanel }}>
                     {store.hasInterface('side-column') && (
-                      <SidebarTabs active="annotation">
-                        <SidebarPage name="annotation" title="Annotation">
-                          <AnnotationTab store={store} />
-                        </SidebarPage>
-
-                        {this.props.panels.map(({ name, title, Component }) => (
-                          <SidebarPage key={name} name={name} title={title}>
-                            <Component />
-                          </SidebarPage>
-                        ))}
+                      <SidebarTabs>
+                        <AnnotationTab store={store} />
                       </SidebarTabs>
                     )}
                   </Block>
                 )}
 
-                {newUIEnabled && isDefined(store) && store.hasInterface('topbar') && <BottomBar store={store} />}
+                {newUIEnabled && store.hasInterface('topbar') && <BottomBar store={store} />}
               </>
             )}
           </Block>

@@ -63,8 +63,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
                 )
                 
             raise serializers.ValidationError(message)
-
-    
+            
     def _validate_setup(self, attrs):
         """
         """
