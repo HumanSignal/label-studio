@@ -46,6 +46,9 @@ runs:
 
     - name: Set NX Affected Tracking
       uses: nrwl/nx-set-shas@v3
+
+    - name: Track develop branch
+      shell: bash
       run: git branch --track develop origin/develop
 
     - name: Install yarn dependencies
