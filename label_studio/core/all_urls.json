@@ -204,6 +204,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/ground-truth-tasks/",
+        "module": "projects.api.ProjectGroundTruthTaskListAPI",
+        "name": "projects:api:project-gt-tasks-list",
+        "decorators": ""
+    },
+    {
         "url": "/api/projects/<int:pk>/sample-task/",
         "module": "projects.api.ProjectSampleTask",
         "name": "projects:api:project-sample-task",

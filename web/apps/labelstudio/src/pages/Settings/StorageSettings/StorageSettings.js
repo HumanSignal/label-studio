@@ -4,14 +4,16 @@ import { Description } from '../../../components/Description/Description';
 import { Block, cn } from '../../../utils/bem';
 import { StorageSet } from './StorageSet';
 import './StorageSettings.styl';
+import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from '../../../utils/license-flags';
 
+const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
 
 export const StorageSettings = () => {
   const rootClass = cn("storage-settings");
 
-  return (
+  return isAllowCloudStorage ? (
     <Block name="storage-settings">
-      <Description style={{marginTop: 0}}>
+      <Description style={{ marginTop: 0 }}>
         Use cloud or database storage as the source for your labeling tasks or the target of your completed annotations.
       </Description>
 
@@ -30,7 +32,7 @@ export const StorageSettings = () => {
         />
       </Columns>
     </Block>
-  );
+  ) : null;
 };
 
 StorageSettings.title = "Cloud Storage";

@@ -7,7 +7,9 @@ import { InstructionsSettings } from './InstructionsSettings';
 import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
+import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from '../../utils/license-flags';
 
+const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
 
 export const MenuLayout = ({ children, ...routeProps }) => {
   return (
@@ -17,15 +19,25 @@ export const MenuLayout = ({ children, ...routeProps }) => {
         LabelingSettings,
         InstructionsSettings,
         MachineLearningSettings,
-        StorageSettings,
+        isAllowCloudStorage && StorageSettings,
         WebhookPage,
         DangerZone,
-      ]}
+      ].filter(Boolean)}
       path={routeProps.match.url}
       children={children}
     />
   );
 };
+
+const pages = {
+  InstructionsSettings,
+  LabelingSettings,
+  MachineLearningSettings,
+  WebhookPage,
+  DangerZone,
+};
+
+isAllowCloudStorage && (pages.StorageSettings = StorageSettings);
 
 export const SettingsPage = {
   title: "Settings",
@@ -33,12 +45,5 @@ export const SettingsPage = {
   exact: true,
   layout: MenuLayout,
   component: GeneralSettings,
-  pages: {
-    InstructionsSettings,
-    LabelingSettings,
-    MachineLearningSettings,
-    StorageSettings,
-    WebhookPage,
-    DangerZone,
-  },
+  pages,
 };
