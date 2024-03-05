@@ -84,10 +84,6 @@ const getVersionData = async () => {
 const versionLib = async () => {
   const currentPwd = process.cwd();
   const [workspaceRoot, currentProjectPath] = currentPwd.split('web')
-  console.log({
-    workspaceRoot,
-    currentProjectPath,
-  })
   const distPath = path.join(workspaceRoot, 'web', 'dist', currentProjectPath)
 
   try {
