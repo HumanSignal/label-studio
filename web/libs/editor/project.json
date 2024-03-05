@@ -89,7 +89,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/editor",
-        "command": "node ../../tools/version.mjs"
+        "command": "node ../../tools/version/version.mjs"
       }
     }
   }

@@ -44,6 +44,10 @@ runs:
       shell: bash
       run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
 
+    - name: Set NX Affected Tracking
+      uses: nrwl/nx-set-shas@v3
+      run: git branch --track develop origin/develop
+
     - name: Install yarn dependencies
       working-directory: "${{ inputs.directory }}"
       shell: bash
