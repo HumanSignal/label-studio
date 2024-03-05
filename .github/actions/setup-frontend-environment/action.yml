@@ -46,10 +46,8 @@ runs:
 
     - name: Set NX Affected Tracking
       uses: nrwl/nx-set-shas@v3
-
-    - name: Track develop branch
-      shell: bash
-      run: git branch --track develop origin/develop
+      with:
+        main-branch-name: develop
 
     - name: Install yarn dependencies
       working-directory: "${{ inputs.directory }}"
