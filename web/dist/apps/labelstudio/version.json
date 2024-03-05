@@ -1,6 +1,0 @@
-{
-  "message": "fix: OPTIC-489: Enable version.json creation whenever the corresponding FE source changes",
-  "commit": "0556188ac79874d74c737ac31a3ddcb84c001688",
-  "date": "2024-03-04T23:44:00.000Z",
-  "branch": "fb-optic-489"
-}
