@@ -338,7 +338,7 @@ When multiple annotators are labeling a task, the task agreement reflects how mu
 
 For example, if 10 annotators review a task and only 2 select the same choice, then that task would have a low agreement score.  
 
-You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Annotation agreement and how it is calculated](stats). 
+You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Task agreement and how it is calculated](stats). 
 
 <table>
 <thead>
