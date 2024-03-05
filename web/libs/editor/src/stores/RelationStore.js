@@ -63,7 +63,6 @@ const Relation = types
     },
   }))
   .actions(self => ({
-
     rotateDirection() {
       const d = ['left', 'right', 'bi'];
       let idx = d.findIndex(item => item === self.direction);

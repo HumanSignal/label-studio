@@ -2,11 +2,11 @@
 title: Labeling configuration
 type: guide
 tier: all
-order: 160
-order_enterprise: 57
+order: 205
+order_enterprise: 105
 meta_title: Set up labeling configuration interface
 meta_description: Customize your data labeling and annotation interface with templates or custom tag combinations for your machine learning and data science projects.
-section: "Project & Team Management"
+section: "Labeling"
 ---
 
 All labeling activities in Label Studio occur in the context of a project. After you [create a project](setup_project.html#Create-a-project) and [import data](tasks.html), set up the labeling interface and labeling configuration for your project. This setup process is essential to your labeling project.

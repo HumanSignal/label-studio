@@ -2,7 +2,7 @@ import { flow, getRoot, types } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
 import { isDefined } from "../../utils/utils";
 import { DEFAULT_PAGE_SIZE, getStoredPageSize } from "../../components/Common/Pagination/Pagination";
-import { FF_DEV_1470, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
+import { FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 
 const listIncludes = (list, id) => {
   const index =
@@ -197,7 +197,7 @@ export const DataStore = (
 
         self.loading = true;
 
-        if(interaction === "filter" || ((!isFF(FF_DEV_1470)) && interaction === "ordering") || ((!isFF(FF_DEV_1470)) && reload)) {
+        if(interaction === "filter" || interaction === "ordering" || reload) {
           self.page = 1;
         } else if (reload || isDefined(pageNumber)) {
           if (self.page === 0)

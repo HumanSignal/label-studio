@@ -38,7 +38,7 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -94,7 +94,7 @@ jobs:
           poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v4.1.0
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -160,7 +160,7 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -216,7 +216,7 @@ jobs:
           poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v4.1.0
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -254,7 +254,7 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4

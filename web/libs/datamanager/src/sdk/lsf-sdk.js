@@ -15,7 +15,6 @@
 import {
   FF_DEV_1752,
   FF_DEV_2186,
-  FF_DEV_2715,
   FF_DEV_2887,
   FF_DEV_3034,
   FF_DEV_3734,
@@ -163,8 +162,6 @@ export class LSFWrapper {
     const queuePosition = queueDone ? queueDone + 1 : queueLeft ? queueTotal - queueLeft + 1 : 1;
 
     const lsfProperties = {
-      // ensure that we are able to distinguish at component level if the app has fully hydrated.
-      hydrated: false,
       user: options.user,
       config: this.lsfConfig,
       task: taskToLSFormat(this.task),
@@ -195,7 +192,6 @@ export class LSFWrapper {
       onSelectAnnotation: this.onSelectAnnotation,
       onNextTask: this.onNextTask,
       onPrevTask: this.onPrevTask,
-      panels: this.datamanager.panels,
     };
 
     this.initLabelStudio(lsfProperties);
@@ -378,13 +374,6 @@ export class LSFWrapper {
     this.lsf.initializeStore(lsfTask);
     this.setAnnotation(annotationID, fromHistory || isRejectedQueue);
     this.setLoading(false);
-    if (isFF(FF_DEV_2715)) {
-      this.setHydrated(true);
-    }
-  }
-
-  setHydrated(value) {
-    this.lsf.setHydrated?.(value);
   }
 
   /** @private */
@@ -586,11 +575,14 @@ export class LSFWrapper {
         // don't react on duplicated annotations error
         { errorHandler: result => result.status === 409 },
       );
-    }, false, loadNext, exitStream);
+    }, false, loadNext);
     const status = result?.$meta?.status;
 
     if (status === 200 || status === 201) this.datamanager.invoke("toast", { message: "Annotation saved successfully", type: "info" });
     else if (status !== undefined) this.datamanager.invoke("toast", { message: "There was an error saving your Annotation", type: "error" });
+
+    if (exitStream) return this.exitStream();
+
   };
 
   /** @private */
@@ -854,7 +846,7 @@ export class LSFWrapper {
     if (isFF(FF_OPTIC_2)) this.saveDraft();
     this.loadTask(prevTaskId, prevAnnotationId, true);
   }
-  async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true, exitStream) {
+  async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
     const { taskID, currentAnnotation } = this;
     const unique_id = this.task.unique_lock_id;
     const serializedAnnotation = this.prepareData(currentAnnotation, { includeId });
@@ -889,7 +881,6 @@ export class LSFWrapper {
     }
 
     this.setLoading(false);
-    if (exitStream) return this.exitStream();
 
     if (!loadNext || this.datamanager.isExplorer) {
       await this.loadTask(taskID, currentAnnotation.pk, true);

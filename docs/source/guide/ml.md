@@ -71,7 +71,7 @@ After you start the machine learning backend server, add it to your Label Studio
 7. (Optional) Select **Use for interactive preannotation**. See [Get interactive pre-annotations](#Get-interactive-preannotations) for more.
 8. Click **Validate and Save**. 
 
-If you see any errors, see [Troubleshoot machine learning](ml_troubleshooting.html).
+If you see any errors, see [Troubleshooting ML Backends & Predictions](https://support.humansignal.com/hc/en-us/sections/23627938255117-ML-Backend-Predictions) in the HumanSignal support center. 
 
 !!! note
     You can also [add an ML backend using the API](/api/#operation/api_ml_create). You will need the project ID and the machine learning backend URL. 

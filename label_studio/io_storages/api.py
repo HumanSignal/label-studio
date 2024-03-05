@@ -15,13 +15,20 @@ from rest_framework import generics, status
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
+
+from label_studio.core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
 
+StoragePermission = load_func(settings.STORAGE_PERMISSION)
+
 
 class ImportStorageListAPI(generics.ListCreateAPIView):
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
+
     serializer_class = ImportStorageSerializer
 
     def get_queryset(self):
@@ -39,9 +46,10 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
+    permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
-    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
@@ -49,8 +57,10 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ExportStorageListAPI(generics.ListCreateAPIView):
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
+
     permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
     def get_queryset(self):
@@ -81,9 +91,10 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
 class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
+    permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
-    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
@@ -92,8 +103,8 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 class ImportStorageSyncAPI(generics.GenericAPIView):
 
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
 
     def get_queryset(self):
@@ -114,8 +125,8 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
 
 class ExportStorageSyncAPI(generics.GenericAPIView):
 
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
     def get_queryset(self):
@@ -135,8 +146,9 @@ class ExportStorageSyncAPI(generics.GenericAPIView):
 
 
 class StorageValidateAPI(generics.CreateAPIView):
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
+
     permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     def create(self, request, *args, **kwargs):
         storage_id = request.data.get('id')
@@ -166,8 +178,8 @@ class StorageValidateAPI(generics.CreateAPIView):
 
 class StorageFormLayoutAPI(generics.RetrieveAPIView):
 
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
     swagger_schema = None
     storage_type = None
 

@@ -1294,37 +1294,43 @@ class ProjectSummary(models.Model):
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def remove_created_annotations_and_labels(self, annotations):
-        created_annotations = dict(self.created_annotations)
-        labels = dict(self.created_labels)
-        for annotation in annotations:
-            results = get_attr_or_item(annotation, 'result') or []
-            if not isinstance(results, list):
-                continue
+        # we are going to remove all annotations, so we'll reset the corresponding fields on the summary
+        remove_all_annotations = self.project.annotations.count() == len(annotations)
+        created_annotations, created_labels = (
+            ({}, {}) if remove_all_annotations else (dict(self.created_annotations), dict(self.created_labels))
+        )
 
-            for result in results:
-                # reduce annotation counters
-                key = self._get_annotation_key(result)
-                if key in created_annotations:
-                    created_annotations[key] -= 1
-                    if created_annotations[key] == 0:
-                        created_annotations.pop(key)
-
-                # reduce labels counters
-                from_name = result.get('from_name', None)
-                if from_name not in labels:
+        if not remove_all_annotations:
+            for annotation in annotations:
+                results = get_attr_or_item(annotation, 'result') or []
+                if not isinstance(results, list):
                     continue
-                for label in self._get_labels(result):
-                    label = str(label)
-                    if label in labels[from_name]:
-                        labels[from_name][label] -= 1
-                        if labels[from_name][label] == 0:
-                            labels[from_name].pop(label)
-                if not labels[from_name]:
-                    labels.pop(from_name)
+
+                for result in results:
+                    # reduce annotation counters
+                    key = self._get_annotation_key(result)
+                    if key in created_annotations:
+                        created_annotations[key] -= 1
+                        if created_annotations[key] == 0:
+                            created_annotations.pop(key)
+
+                    # reduce labels counters
+                    from_name = result.get('from_name', None)
+                    if from_name not in created_labels:
+                        continue
+                    for label in self._get_labels(result):
+                        label = str(label)
+                        if label in created_labels[from_name]:
+                            created_labels[from_name][label] -= 1
+                            if created_labels[from_name][label] == 0:
+                                created_labels[from_name].pop(label)
+                    if not created_labels[from_name]:
+                        created_labels.pop(from_name)
+
         logger.debug(f'summary.created_annotations = {created_annotations}')
-        logger.debug(f'summary.created_labels = {labels}')
+        logger.debug(f'summary.created_labels = {created_labels}')
         self.created_annotations = created_annotations
-        self.created_labels = labels
+        self.created_labels = created_labels
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def update_created_labels_drafts(self, drafts):
@@ -1351,25 +1357,29 @@ class ProjectSummary(models.Model):
         self.save(update_fields=['created_labels_drafts'])
 
     def remove_created_drafts_and_labels(self, drafts):
-        labels = dict(self.created_labels_drafts)
-        for draft in drafts:
-            results = get_attr_or_item(draft, 'result') or []
-            if not isinstance(results, list):
-                continue
+        # we are going to remove all drafts, so we'll reset the corresponding field on the summary
+        remove_all_drafts = AnnotationDraft.objects.filter(task__project=self.project).count() == len(drafts)
+        labels = {} if remove_all_drafts else dict(self.created_labels_drafts)
 
-            for result in results:
-                # reduce labels counters
-                from_name = result.get('from_name', None)
-                if from_name not in labels:
+        if not remove_all_drafts:
+            for draft in drafts:
+                results = get_attr_or_item(draft, 'result') or []
+                if not isinstance(results, list):
                     continue
-                for label in self._get_labels(result):
-                    label = str(label)
-                    if label in labels[from_name]:
-                        labels[from_name][label] -= 1
-                        if labels[from_name][label] == 0:
-                            labels[from_name].pop(label)
-                if not labels[from_name]:
-                    labels.pop(from_name)
+
+                for result in results:
+                    # reduce labels counters
+                    from_name = result.get('from_name', None)
+                    if from_name not in labels:
+                        continue
+                    for label in self._get_labels(result):
+                        label = str(label)
+                        if label in labels[from_name]:
+                            labels[from_name][label] -= 1
+                            if labels[from_name][label] == 0:
+                                labels[from_name].pop(label)
+                    if not labels[from_name]:
+                        labels.pop(from_name)
         logger.debug(f'summary.created_labels_drafts = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])

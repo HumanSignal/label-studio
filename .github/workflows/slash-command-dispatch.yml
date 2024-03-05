@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 1
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: 'Validate command'
         id: determine_command
@@ -54,7 +54,7 @@ jobs:
       - name: Slash Command Dispatch for Issues
         id: scd_issues
         if: ${{ steps.determine_command.outputs.command_state != 'unknown' && steps.determine_command.outputs.is_issue_command == 'true' }}
-        uses: peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           reaction-token: ${{ secrets.GIT_PAT }}
@@ -65,7 +65,7 @@ jobs:
       - name: Slash Command Dispatch for PRs
         id: scd_prs
         if: ${{ steps.determine_command.outputs.command_state != 'unknown' && steps.determine_command.outputs.is_issue_command != 'true' }}
-        uses: peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           reaction-token: ${{ secrets.GIT_PAT }}
@@ -75,7 +75,7 @@ jobs:
 
       - name: Edit comment with error message
         if: ${{ steps.determine_command.outputs.command_state == 'unknown' }}
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ github.event.comment.id }}
           body: |

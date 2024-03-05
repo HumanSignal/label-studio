@@ -9,13 +9,14 @@ from core.filters import ListFilter
 from core.label_config import config_essential_data_has_changed
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
+from core.redis import start_job_async_or_sync
 from core.utils.common import paginator, paginator_help, temporary_disconnect_all_signals
 from core.utils.exceptions import LabelStudioDatabaseException, ProjectExistException
 from core.utils.io import find_dir, find_file, read_yaml
 from data_manager.functions import filters_ordering_selected_items_exist, get_prepared_queryset
 from django.conf import settings
 from django.db import IntegrityError
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django_filters import CharFilter, FilterSet
@@ -23,6 +24,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from projects.functions.next_task import get_next_task
 from projects.functions.stream_history import get_label_stream_history
+from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
 from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
 from projects.serializers import (
     GetFieldsSerializer,
@@ -399,6 +401,32 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
+class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
+    """This API is useful when we need to reset project.summary.created_labels and created_labels_drafts
+    and recalculate them from scratch. It's hard to correctly follow all changes in annotation region
+    labels and these fields aren't calculated properly after some time. Label config changes are not allowed
+    when these changes touch any labels from these created_labels* dictionaries.
+    """
+
+    parser_classes = (JSONParser,)
+    parent_queryset = Project.objects.all()
+    permission_required = ViewClassPermission(
+        POST=all_permissions.projects_change,
+    )
+
+    @swagger_auto_schema(auto_schema=None)
+    def post(self, *args, **kwargs):
+        project = self.get_parent_object()
+        summary = project.summary
+        start_job_async_or_sync(
+            recalculate_created_annotations_and_labels_from_scratch,
+            project,
+            summary,
+            organization_id=self.request.user.active_organization.id,
+        )
+        return Response(status=status.HTTP_200_OK)
+
+
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
@@ -544,6 +572,27 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
             self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance]
         )
         return instance
+
+
+class ProjectGroundTruthTaskListAPI(ProjectTaskListAPI):
+    """
+    Same as ProjectTaskListAPI with the exception that this API only returns tasks
+    that contain at least one ground truth annotation
+    """
+
+    def filter_queryset(self, queryset):
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
+        ground_truth_query = (
+            Q(annotations__was_cancelled=False)
+            & Q(annotations__result__isnull=False)
+            & Q(annotations__ground_truth=True)
+        )
+        tasks = Task.objects.filter(project=project).filter(ground_truth_query).order_by('-updated_at')
+        page = paginator(tasks, self.request)
+        if page:
+            return page
+        else:
+            raise Http404
 
 
 class TemplateListAPI(generics.ListAPIView):

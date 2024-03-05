@@ -3,7 +3,7 @@
     <% const pages = site.pages.filter(page => !page.hide_menu && page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
     <% if(isEnterpriseTheme) pages.forEach(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
     <% const orderedPages = pages.sort('order') %>
-    <% const parentPages = orderedPages.filter(page => page.parent === undefined) %>
+    <% const parentPages = orderedPages.filter(page => isEnterpriseTheme ? page.parent_enterprise === undefined : page.parent === undefined) %>
     <% const childrenPages = orderedPages.filter(page => page.parent_enterprise !== undefined || page.parent !== undefined ) %>
 
     <% const pagesArray = parentPages.map(page => {
@@ -85,4 +85,24 @@
         <% } %>
       </li>
     <% }) %>
+</ul>
+
+<% if(locals.component === "nav") { %>
+  <button>
+    Support
+    <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+    </svg>
+  </button>
+<% } else { %>
+  <%- partial("component/text", {text: "Support", size: "Eyebrow", tag: "h3"}) %>
+<% } %>
+<ul class="page-sidebar-list">
+  <li>
+    <a href="https://support.humansignal.com" target="_blank">Troubleshooting
+      <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+        <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+      </svg>
+    </a>
+  </li>
 </ul>

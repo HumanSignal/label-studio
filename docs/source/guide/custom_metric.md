@@ -114,7 +114,7 @@ Set up a custom agreement metric for a specific project in Label Studio Enterpri
 4. Write or paste code defining a custom agreement metric in the text box. 
 5. Click **Save & Deploy**.
 
-For information on troubleshooting custom metrics, see [Troubleshoot agreements](quality_troubleshoot). 
+For information on troubleshooting custom metrics, see [Troubleshooting Agreements & Quality Control](https://support.humansignal.com/hc/en-us/sections/23700954373261-Agreements-Quality-Control) in the HumanSignal support center.
 
 ## Set up permissions for a private cloud custom agreement metric
 

@@ -177,6 +177,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         PUT=all_permissions.tasks_change,
         DELETE=all_permissions.tasks_delete,
     )
+    pagination_class = TaskPagination
 
     @staticmethod
     def get_task_serializer_context(request, project):
@@ -228,7 +229,6 @@ class TaskListAPI(generics.ListCreateAPIView):
         context = self.get_task_serializer_context(self.request, project)
 
         # paginated tasks
-        self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
 
         # get request params
