@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import { Block, Elem } from '../../utils/bem';
 import './Toolbar.styl';
 import './Tool.styl';
@@ -85,6 +85,14 @@ const SmartTools = observer(({ tools, shortcuts = {} }) => {
 
   const hasSelected = tools.some(t => t.selected);
 
+  useEffect(() => {
+    console.log('selected index is changed: ', selectedIndex)
+  }, [selectedIndex]);
+
+  useEffect(() => {
+    console.log('has seleclted', hasSelected)
+  }, [hasSelected]);
+
   return tools.length > 0 && (
     <Elem name="group">
       <Tool
@@ -112,13 +120,19 @@ const SmartTools = observer(({ tools, shortcuts = {} }) => {
         ) : null}
         controls={selected.controls}
         onClick={() => {
+
+          if (!hasSelected) {
+            const tool = tools[selectedIndex];
+            tool.manager.selectTool(tool, true);
+             return;  // Reset current tool.
+          }
+
           let nextIndex = selectedIndex + 1;
 
           if (!hasSelected) nextIndex = 0;
           else if (nextIndex >= tools.length) nextIndex = 0;
 
           const nextTool = tools[nextIndex];
-
           setSelectedIndex(nextIndex);
           nextTool.manager.selectTool(nextTool, true);
         }}
