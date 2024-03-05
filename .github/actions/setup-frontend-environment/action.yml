@@ -49,6 +49,12 @@ runs:
       with:
         main-branch-name: develop
 
+    - name: Set Git Branch Base
+      shell: bash
+      run: |
+        git fetch
+        git branch --track develop origin/develop
+
     - name: Install yarn dependencies
       working-directory: "${{ inputs.directory }}"
       shell: bash
