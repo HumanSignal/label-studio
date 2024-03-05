@@ -63,8 +63,7 @@ export const AnnotationSettings = () => {
             <Toggle label="Use predictions to pre-label data"
                     description="Enable and select which set of predictions to use for prelabeling."
                     name="show_collab_predictions"
-                    onChange={(e) => { setCollab(e.target.checked) }}
-                    disabled={! edittable} />            
+                    onChange={(e) => { setCollab(e.target.checked) }} />            
           </div>
 
           {
