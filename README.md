@@ -211,8 +211,6 @@ This lets you:
 
 You can use Label Studio as an independent part of your machine learning workflow or integrate the frontend or backend into your existing tools.  
 
-* Use the [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) as a separate React library. See more in the [Frontend Library documentation](https://labelstud.io/guide/frontend.html). 
-
 ## Ecosystem
 
 | Project | Description |
