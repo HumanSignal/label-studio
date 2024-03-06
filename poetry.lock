@@ -1569,7 +1569,7 @@ description = "Label Studio annotation tool"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "6d7926c4066b586917635f725c01b7d94abdd94a.zip", hash = "sha256:cc7482cf9a8ac01fe04e977c241de8bd1069f2bfe49e064cf79119e795060cda"},
+    {file = "75cde4b047a06c5b4dc911fccc8bb1df2f2e4c85.zip", hash = "sha256:1692359932cfcaa7ca898e7b911188645cd6b59c06ec7f782a7d469e7abf915c"},
 ]
 
 [package.dependencies]
@@ -1582,7 +1582,7 @@ xmljson = ">=0.2.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/6d7926c4066b586917635f725c01b7d94abdd94a.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/75cde4b047a06c5b4dc911fccc8bb1df2f2e4c85.zip"
 
 [[package]]
 name = "label-studio-tools"
@@ -3745,4 +3745,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4"
-content-hash = "5d8654e094d6b6481bdc1eb697c49ec58197707c76593342e81e892a1a128a2f"
+content-hash = "6e76df0c4c5ceea12a37ae5bbd690ab86a51f3fe3399e582f725e9baddd02126"
