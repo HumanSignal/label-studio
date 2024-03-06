@@ -8,7 +8,7 @@ import Canvas from '../utils/canvas';
 import { clamp, findClosestParent } from '../utils/utilities';
 import { DrawingTool } from '../mixins/DrawingTool';
 import { Tool } from '../components/Toolbar/Tool';
-import { Range } from '../common/Range/Range'; 
+import { Range } from '../common/Range/Range';
 import { NodeViews } from '../components/Node/Node';
 import { FF_DEV_3666, FF_DEV_4081, isFF } from '../utils/feature-flags';
 
@@ -38,6 +38,7 @@ const ToolView = observer(({ item }) => {
       icon={item.iconClass}
       tool={item}
       onClick={() => {
+        item.setLastAnnotationIfNull();  // Set last annotation if none is set.
         if (item.selected) return;
 
         item.manager.selectTool(item, true);

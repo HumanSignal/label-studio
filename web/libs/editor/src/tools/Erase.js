@@ -35,8 +35,9 @@ const ToolView = observer(({ item }) => {
       active={item.selected}
       extraShortcuts={item.extraShortcuts}
       tool={item}
-      disabled={!item.getSelectedShape}
+      disabled={!item.hasAnyAnnotation}
       onClick={() => {
+        item.setLastAnnotationIfNull();
         if (item.selected) return;
 
         item.manager.selectTool(item, true);
@@ -96,6 +97,7 @@ const _Tool = types
     let brush;
 
     return {
+
       updateCursor() {
         if (!self.selected || !self.obj?.stageRef) return;
         const val = 24;
