@@ -32,13 +32,13 @@ const git = async (command, options) => {
 }
 
 /**
- * Get the git log for the current project
+ * Get the commits affecting the current project
  * @param options
  * @returns {Promise<string>}
  */
-const gitLog = async (options = []) => {
-  const log = await git('log', options);
-  return log.trim();
+const gitRevList = async (options = []) => {
+  const revList = await git('rev-list', options);
+  return revList.trim();
 }
 
 /**
@@ -65,11 +65,15 @@ const gitRevParse = async (options = []) => {
  * @returns {Promise<CommitVersion>}
  */
 const getVersionData = async () => {
-  const latestCommitInfo = await gitLog(['--all', '--first-parent', '--remotes', '--reflog', '--author-date-order', '-n 1', '--', '.']);
-  let [commit, _author, date, ...message] = latestCommitInfo.split('\n');
-  commit = commit.replace('commit', '').trim();
+  const latestAffectedCommit = await gitRevList(['--all', '--max-count=1', '--', 'src']);
+  const latestCommitInfo = await git('show', [latestAffectedCommit]);
+  const commitInfo = latestCommitInfo.split('\n');
+  let commit = commitInfo.find((line) => line.startsWith('commit'))?.trim().replace('commit', '').trim() ?? '';
+  let date = commitInfo.find((line) => line.startsWith('Date:')) ?? '';
+  // First non-empty line after the Date: line is the commit message
+  let message = commitInfo.slice(commitInfo.indexOf(date) + 1).find((line) => line.trim().length > 0)?.trim() ?? '';
+  // Remove the Date: prefix from the date
   date = date.replace('Date:', '').trim();
-  message = message.find((line) => line.trim().length > 0)?.trim() ?? '';
 
   // Get the current branch of the latest commit
   const branch = await gitRevParse(['--abbrev-ref', 'HEAD']);
