@@ -183,7 +183,7 @@ function exportRLE(region) {
   // Prepare the canvas with sizes of image and stage
   const canvas = document.createElement('canvas');
 
-  // We only care about physical size, so set canvas dimensions to 
+  // We only care about physical size, so set canvas dimensions to
   // image's natural dimensions
   canvas.width = naturalWidth;
   canvas.height = naturalHeight;
@@ -349,19 +349,26 @@ function Region2RLE(region) {
   return rle;
 }
 
-function brushSizeCircle(size) {
+function brushSizeCircle(size, dashes = 0) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
-  canvas.width = size * 4 + 8;
-  canvas.height = size * 4 + 8;
+  canvas.width = size + 8;
+  canvas.height = size + 8;
 
-  ctx.beginPath();
-  ctx.arc(size / 2 + 4, size / 2 + 4, size / 2, 0, 2 * Math.PI, false);
+  const arcStep = 2 * Math.PI / (dashes + 1);
 
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'white';
-  ctx.stroke();
+  for (let i = 0; i < dashes + 1; i++) {
+    const startAngle = i * arcStep;
+    const endAngle = startAngle + (dashes > 0 ? (arcStep / 2) : arcStep);
+
+    ctx.beginPath();
+    ctx.arc(Math.floor(size / 2) + 4, Math.floor(size / 2) + 4, size / 2, startAngle, endAngle, false);
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
+  }
 
   return canvas.toDataURL();
 }

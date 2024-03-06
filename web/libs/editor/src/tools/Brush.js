@@ -4,28 +4,14 @@ import { types } from 'mobx-state-tree';
 
 import BaseTool from './Base';
 import ToolMixin from '../mixins/Tool';
-import Canvas from '../utils/canvas';
-import { clamp, findClosestParent } from '../utils/utilities';
+import { findClosestParent } from '../utils/utilities';
 import { DrawingTool } from '../mixins/DrawingTool';
 import { Tool } from '../components/Toolbar/Tool';
-import { Range } from '../common/Range/Range';
 import { NodeViews } from '../components/Node/Node';
 import { FF_DEV_3666, FF_DEV_4081, isFF } from '../utils/feature-flags';
+import {StrokeTool} from "../mixins/StrokeTool";
 
-const MIN_SIZE = 1;
-const MAX_SIZE = 50;
 
-const IconDot = ({ size }) => {
-  return (
-    <span style={{
-      display: 'block',
-      width: size,
-      height: size,
-      background: 'rgba(0, 0, 0, 0.25)',
-      borderRadius: '100%',
-    }}/>
-  );
-};
 
 const ToolView = observer(({ item }) => {
   return (
@@ -50,6 +36,7 @@ const ToolView = observer(({ item }) => {
 
 const _Tool = types
   .model('BrushTool', {
+    controlKey: 'brush-size',
     strokeWidth: types.optional(types.number, 15),
     group: 'segmentation',
     shortcut: 'B',
@@ -73,34 +60,8 @@ const _Tool = types
         stateTypes: 'brushlabels',
         controlTagTypes: ['brushlabels', 'brush'],
       };
-    },
-    get controls() {
-      return [
-        <Range
-          key="brush-size"
-          value={self.strokeWidth}
-          min={MIN_SIZE}
-          max={MAX_SIZE}
-          reverse
-          align="vertical"
-          minIcon={<IconDot size={8}/>}
-          maxIcon={<IconDot size={16}/>}
-          onChange={(value) => {
-            self.setStroke(value);
-          }}
-        />,
-      ];
-    },
-    get extraShortcuts() {
-      return {
-        '[': ['Decrease size', () => {
-          self.setStroke(clamp(self.strokeWidth - 5, MIN_SIZE, MAX_SIZE));
-        }],
-        ']': ['Increase size', () => {
-          self.setStroke(clamp(self.strokeWidth + 5, MIN_SIZE, MAX_SIZE));
-        }],
-      };
-    },
+    }
+
   }))
   .actions(self => {
     let brush, isFirstBrushStroke;
@@ -118,24 +79,6 @@ const _Tool = types
         self.deleteRegion();
         newArea.notifyDrawingFinished();
         return newArea;
-      },
-
-      updateCursor() {
-        if (!self.selected || !self.obj?.stageRef) return;
-        const val = self.strokeWidth;
-        const stage = self.obj.stageRef;
-        const base64 = Canvas.brushSizeCircle(val);
-        const cursor = ['url(\'', base64, '\')', ' ', Math.floor(val / 2) + 4, ' ', Math.floor(val / 2) + 4, ', auto'];
-
-        stage.container().style.cursor = cursor.join('');
-      },
-
-      setStroke(val) {
-        self.strokeWidth = val;
-      },
-
-      afterUpdateSelected() {
-        self.updateCursor();
       },
 
       addPoint(x, y) {
@@ -163,6 +106,7 @@ const _Tool = types
       },
 
       mousemoveEv(ev, _, [x, y]) {
+        self.requestCursorUpdate();
         if (self.mode !== 'drawing') return;
         if (
           !findClosestParent(
@@ -230,6 +174,6 @@ const _Tool = types
     };
   });
 
-const Brush = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, _Tool);
+const Brush = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, StrokeTool, _Tool);
 
 export { Brush };
