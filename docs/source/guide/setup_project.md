@@ -197,8 +197,11 @@ To add members to a specific project:
 
 1. Navigate to the project settings and select **Members**. 
 2. Use the search functionality to locate the user that you want to add to the project.
-3. Select the checkbox next to their name and click the `>` arrow to add them. Click the opposite arrow `<` to remove members
-4. Click **Save**.
+3. Select the checkbox next to their name and click the `>` arrow to add them. Click the opposite arrow `<` to remove members.
+4. If the user's organization-level role is Annotator or Reviewer, you can use the drop-down menu to assign them a role specific to this project. 
+
+    Project-level roles are Annotator or Reviewer. So, for example, a user can be an Annotator in one project and a Reviewer in another project. 
+5. Click **Save**.
 
 Users are not sent notifications when they are added to a project. 
 
