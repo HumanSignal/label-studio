@@ -1,6 +1,6 @@
 {
-  "message": "Merge remote-tracking branch 'origin/fb-optic-489' into fb-optic-489",
-  "commit": "5242ea5328164f16cf811abe486924dcf2f792dc",
-  "date": "2024-03-05T13:14:50.000Z",
+  "message": "remove error and console reporting",
+  "commit": "4af4b40d55f228e9e253e73b31e33b05001a350f",
+  "date": "2024-03-06T19:25:23.000Z",
   "branch": "fb-optic-489"
 }
