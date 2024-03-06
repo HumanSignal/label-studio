@@ -36,19 +36,19 @@ const git = async (command, options) => {
  * @param options
  * @returns {Promise<string>}
  */
-const gitRevList = async (options = []) => {
-  const revList = await git('rev-list', options);
-  return revList.trim();
+const gitLog = async (options = []) => {
+  const log = await git('log', options);
+  return log.trim();
 }
 
 /**
- * Get the git rev-parse for the current project
+ * Get the branch info of the current project
  * @param options
  * @returns {Promise<string>}
  */
-const gitRevParse = async (options = []) => {
-  const revParse = await git('rev-parse', options);
-  return revParse.trim();
+const gitBranch = async (options = []) => {
+  const branch = await git('branch', options);
+  return branch.trim();
 }
 
 
@@ -65,8 +65,7 @@ const gitRevParse = async (options = []) => {
  * @returns {Promise<CommitVersion>}
  */
 const getVersionData = async () => {
-  const latestAffectedCommit = await gitRevList(['--all', '--max-count=1', '--', 'src']);
-  const latestCommitInfo = await git('show', [latestAffectedCommit]);
+  const latestCommitInfo = await gitLog(['-n 1', '-p', 'src/*']);
   const commitInfo = latestCommitInfo.split('\n');
   let commit = commitInfo.find((line) => line.startsWith('commit'))?.trim().replace('commit', '').trim() ?? '';
   let date = commitInfo.find((line) => line.startsWith('Date:')) ?? '';
@@ -76,7 +75,8 @@ const getVersionData = async () => {
   date = date.replace('Date:', '').trim();
 
   // Get the current branch of the latest commit
-  const branch = await gitRevParse(['--abbrev-ref', 'HEAD']);
+  const contains = (await gitBranch(['--contains', commit])).split('\n')
+  const branch = (contains.find((line) => line.startsWith('develop') || line.startsWith('*')) ?? '').replace('*', '').trim();
 
   return {
     message,
