@@ -510,7 +510,8 @@ Label Studio does not manage the Redis database for you. See the [Redis Quick St
 
 ### Task format for Source Redis Storage
 
-Label Studio supports only string-values for Redis databases and they should represent Label Studio Tasks in JSON format. 
+Label Studio only supports string values for Redis databases, which should represent Label Studio tasks in JSON format. 
+
 For example:
 
 ```
