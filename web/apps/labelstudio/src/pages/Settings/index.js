@@ -35,7 +35,7 @@ const pages = {
   AnnotationSettings,
   LabelingSettings,
   MachineLearningSettings,
-  PredictionsSettings
+  PredictionsSettings,
   WebhookPage,
   DangerZone,
 };
