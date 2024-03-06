@@ -1,6 +1,6 @@
 {
-  "message": "Merge remote-tracking branch 'origin/fb-optic-489' into fb-optic-489",
-  "commit": "20b6e665e182316581aea56e7fadb3ce68f177db",
-  "date": "2024-03-06T20:39:11.000Z",
-  "branch": "fb-optic-489"
+  "message": "fix: LEAP-740: Don't use destroy = null (#5499)",
+  "commit": "892eb7b93824ff63ca4a6959382a54489b617c5c",
+  "date": "2024-02-26T10:57:04.000Z",
+  "branch": "develop"
 }
