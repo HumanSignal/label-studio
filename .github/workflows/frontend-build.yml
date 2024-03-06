@@ -49,7 +49,7 @@ jobs:
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
         run: |
           yarn build
-          yarn version:affected
+          yarn version:libs
 
       - name: Commit and Push
         run: |
