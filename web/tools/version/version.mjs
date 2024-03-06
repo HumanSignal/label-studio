@@ -69,10 +69,8 @@ const getVersionData = async () => {
   let [commit, _author, date, ...message] = latestCommitInfo.split('\n');
   commit = commit.replace('commit', '').trim();
   date = date.replace('Date:', '').trim();
-  console.log(process.cwd())
-  console.log(message.join('\n'))
-  throw new Error('stop')
   message = message.find((line) => line.trim().length > 0)?.trim() ?? '';
+
   // Get the current branch of the latest commit
   const branch = await gitRevParse(['--abbrev-ref', 'HEAD']);
 
