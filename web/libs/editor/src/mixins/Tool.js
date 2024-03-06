@@ -79,6 +79,7 @@ const ToolMixin = types
     },
   }))
   .actions(self => ({
+
     setSelected(selected) {
       self.selected = selected;
       self.afterUpdateSelected();

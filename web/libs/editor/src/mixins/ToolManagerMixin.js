@@ -9,8 +9,7 @@ export const ToolManagerMixin = types.model().actions((self) => {
       const manager = ToolsManager.getInstance({ name: self.toname });
       const env = { manager, control: self };
       const tools = {};
-      console.log('TOOLS')
-      console.log(Tools, toolNames)
+
       toolNames.forEach(toolName => {
 
         if (toolName in Tools) {

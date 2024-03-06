@@ -43,11 +43,9 @@ export const Toolbar = inject('store')(observer(({ store, tools, expanded }) => 
 
   const processAutoAnnotation = {
     'Y': ['Accept Auto Annotation', () => {
-      console.log('Accepting Auto Annotation')
       annotation.acceptAllSuggestions();
     }],
     'N': ['Reject Auto Annotation', () => {
-      console.log('Rejecting Auto Annotation');
       annotation.rejectAllSuggestions();
     }]
   };
@@ -85,14 +83,6 @@ const SmartTools = observer(({ tools, shortcuts = {} }) => {
 
   const hasSelected = tools.some(t => t.selected);
 
-  useEffect(() => {
-    console.log('selected index is changed: ', selectedIndex)
-  }, [selectedIndex]);
-
-  useEffect(() => {
-    console.log('has seleclted', hasSelected)
-  }, [hasSelected]);
-
   return tools.length > 0 && (
     <Elem name="group">
       <Tool
@@ -105,7 +95,6 @@ const SmartTools = observer(({ tools, shortcuts = {} }) => {
           <Elem name="smart">
             {tools.map((t, i) => {
               const ToolView = t.viewClass;
-
               return (
                 <div key={`${i}`} onClickCapture={(e) => {
                   e.preventDefault();

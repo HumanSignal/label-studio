@@ -14,6 +14,7 @@ import {StrokeTool} from "../mixins/StrokeTool";
 
 
 const ToolView = observer(({ item }) => {
+  console.log('brush is active?', item.selected, item.dynamic)
   return (
     <Tool
       label="Brush"
@@ -67,6 +68,7 @@ const _Tool = types
     let brush, isFirstBrushStroke;
 
     return {
+
       commitDrawingRegion() {
         const { currentArea, control, obj } = self;
         const source = currentArea.toJSON();
