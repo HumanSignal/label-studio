@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-478: Implement Feature Flag to Control Visibility and Access of Cloud Storage Connectors for Managers (#5496)",
-  "commit": "0b5e0390867e8369b6d4a8428d3f439a9c50d335",
-  "date": "2024-03-04T15:35:42.000Z",
-  "branch": "develop"
+  "message": "Merge branch 'fb-optic-489' of github.com:heartexlabs/label-studio into fb-optic-489",
+  "commit": "a9da417c8055771b7edda4242bd9336a51d5abd8",
+  "date": "2024-03-06T21:59:33.000Z",
+  "branch": "fb-optic-489"
 }

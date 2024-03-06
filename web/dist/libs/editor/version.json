@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-740: Don't use destroy = null (#5499)",
-  "commit": "892eb7b93824ff63ca4a6959382a54489b617c5c",
-  "date": "2024-02-26T10:57:04.000Z",
-  "branch": "develop"
+  "message": "Merge branch 'fb-optic-489' of github.com:heartexlabs/label-studio into fb-optic-489",
+  "commit": "a9da417c8055771b7edda4242bd9336a51d5abd8",
+  "date": "2024-03-06T21:59:33.000Z",
+  "branch": "fb-optic-489"
 }
