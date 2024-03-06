@@ -44,15 +44,6 @@ runs:
       shell: bash
       run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
 
-    - name: Set Git Branch Base
-      working-directory: "${{ inputs.directory }}"
-      shell: bash
-      run: |
-        git fetch origin develop
-        git log -n 1 -p apps/labelstudio/src/*
-        git log -n 1 -p libs/editor/src/*
-        git log -n 1 -p libs/datamanager/src/*
-
     - name: Install yarn dependencies
       working-directory: "${{ inputs.directory }}"
       shell: bash
