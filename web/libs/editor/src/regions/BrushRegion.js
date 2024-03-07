@@ -439,6 +439,14 @@ const Model = types
 
         return self.parent.createSerializedResult(self, value);
       },
+
+      setVisibility (visible) {
+        if (visible) {
+          self.opacity = 0.6;
+        } else {
+          self.opacity = 0.15;
+        }
+      }
     };
   });
 

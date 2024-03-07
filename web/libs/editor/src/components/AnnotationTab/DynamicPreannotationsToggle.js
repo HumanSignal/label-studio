@@ -70,6 +70,17 @@ export const DynamicPreannotationsToggle = injector(observer(({
             label="Toggle-Tooltip"
             style={{ color: '#FF7464' }}
           />
+          <Toggle
+            checked={annotation.regionStore.hideNonSelectedRegions}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              annotation.regionStore.setHideNonSelectedRegions(checked);
+
+            }}
+            label="Toggle-Non-Selected-Regions"
+            style={{ color: '#7F64FF'}}
+          />
+
         </Space>
       </Elem>
     </Block>

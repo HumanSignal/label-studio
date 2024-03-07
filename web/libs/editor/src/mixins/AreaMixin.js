@@ -209,6 +209,7 @@ export const AreaMixinBase = types
       }
       self.updateAppearenceFromState && self.updateAppearenceFromState();
     },
+
   }));
 
 export const AreaMixin = types.compose('AreaMixin', AreaMixinBase, ReadOnlyRegionMixin);

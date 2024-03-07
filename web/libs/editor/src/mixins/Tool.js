@@ -101,20 +101,7 @@ const ToolMixin = types
       if (typeof self[fn] !== 'undefined') self[fn].call(self, ev, args);
     },
 
-    setLastAnnotationIfNull () {
-      if (self.getSelectedShape !== null) {
-        return;  // No need to set annotation.
-      }
-      const regions = self.control.annotation.regionStore.filteredRegions;
-      let lastRegion = null;
-      regions.forEach(region => {
-        if (lastRegion === null || region.ouid > lastRegion.ouid) {
-          lastRegion = region;
-        }
-      });
-      if (lastRegion === null) return;  // Unable to set region.
-      self.control.annotation.regionStore.selectRegionsByIds([lastRegion.id]);
-    }
+
   }));
 
 export default types.compose(ToolMixin, AnnotationMixin);

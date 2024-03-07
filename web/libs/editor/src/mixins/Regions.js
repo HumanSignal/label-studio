@@ -305,6 +305,10 @@ const RegionsMixin = types
           }, timeout);
         }
       },
+
+      setVisibility (visible) {
+        self.hidden = !visible;
+      }
     };
   });
 

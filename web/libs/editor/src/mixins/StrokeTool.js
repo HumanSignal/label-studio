@@ -144,6 +144,23 @@ const StrokeTool = types
         const cursor = self.obj?.stageRef?.container().style.cursor;
         if (cursor !== 'default') return;  // No update.
         self.updateCursor();
+      },
+
+      setLastAnnotationIfNull () {
+        if (self.getSelectedShape !== null) {
+          return;  // No need to set annotation.
+        }
+        const regionStore = self.control.annotation.regionStore;
+
+        const regions = regionStore.filteredRegions;
+        let lastRegion = null;
+        regions.forEach(region => {
+          if (lastRegion === null || region.ouid > lastRegion.ouid) {
+            lastRegion = region;
+          }
+        });
+        if (lastRegion === null) return;  // Unable to set region.
+        regionStore.selectRegionsByIds([lastRegion.id]);
       }
     }
   });

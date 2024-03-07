@@ -285,7 +285,7 @@ const Model = types
         radiusX: isFF(FF_DEV_3793) ? self.radiusX : self.convertHDimensionToPerc(self.radiusX),
         radiusY: isFF(FF_DEV_3793) ? self.radiusY : self.convertVDimensionToPerc(self.radiusY),
         rotation: self.rotation,
-      }; 
+      };
 
       return self.parent.createSerializedResult(self, value);
     },

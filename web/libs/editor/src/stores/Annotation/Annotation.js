@@ -404,6 +404,7 @@ export const Annotation = types
      * @param {boolean} tryToKeepStates don't unselect labels if such setting is enabled
      */
     unselectAll(tryToKeepStates = false) {
+      console.log('unslecting region!!!!!')
       const keepStates = tryToKeepStates && self.store.settings.continuousLabeling;
 
       self.unselectAreas();
@@ -1033,8 +1034,8 @@ export const Annotation = types
         if (tagNames.has(obj.from_name) && tagNames.has(obj.to_name)) {
           res.push(obj);
         }
-        
-        // Insert image dimensions from result 
+
+        // Insert image dimensions from result
         (() => {
           if (!isDefined(obj.original_width)) return;
           if (!tagNames.has(obj.to_name)) return;
@@ -1043,7 +1044,7 @@ export const Annotation = types
 
           if (tag.type !== 'image') return;
 
-          const imageEntity = tag.findImageEntity(obj.item_index ?? 0); 
+          const imageEntity = tag.findImageEntity(obj.item_index ?? 0);
 
           if (!imageEntity) return;
 
@@ -1346,7 +1347,7 @@ export const Annotation = types
         area.setValue(state);
       });
       self.suggestions.delete(id);
-      
+
     },
 
     rejectSuggestion(id) {

@@ -78,6 +78,7 @@ const SelectionMap = types.model(
 
       // hook for side effects after region selected
       region.object?.afterRegionSelected?.(region);
+
     },
     _updateResultsFromSelection() {
       self._updateResultsFromRegions(self.selected.values());
@@ -153,6 +154,9 @@ export default types.model('RegionStore', {
     window.localStorage.getItem(localStorageKeys.view) ?? 'regions',
   ),
   selection: types.optional(SelectionMap, {}),
+
+  _hideNonSelectedRegions: types.optional(types.boolean,
+    () => window.localStorage.getItem('hideNoneSelectedRegions') === 'true')
 }).views(self => {
   let lastClickedItem;
   const getShiftClickSelectedRange = (item, tree) => {
@@ -416,6 +420,10 @@ export default types.model('RegionStore', {
     get persistantView() {
       return window.localStorage.getItem(localStorageKeys.view) ?? self.view;
     },
+
+    get hideNonSelectedRegions () {
+      return self._hideNonSelectedRegions;
+    }
   };
 }).actions(self => ({
   addRegion(region) {
@@ -461,7 +469,7 @@ export default types.model('RegionStore', {
       self.regions.forEach((region) => region.filtered && region.toggleFiltered());
     } else {
       const filteredIds = filter.map((filter) => filter.id);
-      
+
       self.filter = filter;
 
       self.regions.forEach((region) => {
@@ -588,10 +596,12 @@ export default types.model('RegionStore', {
   },
   highlight(area) {
     self.selection.highlight(area);
+    self.updateRegionVisibility();
   },
 
   clearSelection() {
     self.selection.clear();
+    self.updateRegionVisibility();
   },
 
   selectRegionsByIds(ids) {
@@ -608,6 +618,26 @@ export default types.model('RegionStore', {
     } else {
       self.selection.unselect(region);
     }
+    self.updateRegionVisibility();
   },
+
+  setHideNonSelectedRegions (value) {
+    window.localStorage.setItem('hideNoneSelectedRegions', value);
+    self._hideNonSelectedRegions = value;
+    self.updateRegionVisibility();
+  },
+
+  updateRegionVisibility () {
+    const update = self._hideNonSelectedRegions;
+    const noSelection = self.selectedIds.length === 0;
+    self.filteredRegions.forEach(area => {
+      const active = noSelection || self.selectedIds.includes(area.id);
+      if (!update || active) {
+        area.setVisibility(true);
+      } else {
+        area.setVisibility(false);
+      }
+    });
+  }
 
 }));
