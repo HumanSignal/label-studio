@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import {spawn} from 'node:child_process';
 import fs from 'node:fs/promises';
 
 const git = async (command, options) => {
@@ -76,7 +76,11 @@ const getVersionData = async () => {
 
   // Get the current branch of the latest commit
   const contains = (await gitBranch(['--contains', commit])).split('\n')
-  const branch = (contains.find((line) => line.startsWith('develop') || line.startsWith('*')) ?? '').replace('*', '').trim();
+  let branch = (contains.find((line) => line.startsWith('develop') || line.startsWith('*')) ?? '').replace('*', '').trim();
+
+  if (branch === '' || branch.includes('HEAD')) {
+    branch = 'develop';
+  }
 
   return {
     message,
@@ -88,12 +92,24 @@ const getVersionData = async () => {
 
 const versionLib = async () => {
   const currentPwd = process.cwd();
-  const [workspaceRoot, currentProjectPath] = currentPwd.split('web')
+  // if the currentPwd includes 'node_modules', we are running from within the monorepo package itself
+  // and we have to account for the difference
+  let workspaceRoot, currentProjectPath;
+  if (currentPwd.includes('node_modules')) {
+    const [_workspaceRoot, nodeModulesPath, _currentProjectPath] = currentPwd.split('web')
+    workspaceRoot = path.join(_workspaceRoot, 'web', nodeModulesPath)
+    currentProjectPath = _currentProjectPath
+  } else {
+    const [_workspaceRoot, _currentProjectPath] = currentPwd.split('web')
+    workspaceRoot = _workspaceRoot
+    currentProjectPath = _currentProjectPath
+  }
   const distPath = path.join(workspaceRoot, 'web', 'dist', currentProjectPath)
 
   try {
-    await fs.mkdir(distPath, { recursive: true })
-  } catch { /* ignore */ }
+    await fs.mkdir(distPath, {recursive: true})
+  } catch { /* ignore */
+  }
 
   const versionData = await getVersionData();
   const versionJson = JSON.stringify(versionData, null, 2);
