@@ -2,7 +2,6 @@ import json
 
 import pytest
 from tasks.models import Task
-
 from tests.conftest import project_choices
 from tests.utils import make_project
 
