@@ -8,7 +8,7 @@ from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from data_manager.actions import get_all_actions, perform_action
-from data_manager.functions import retrieve_predictions, get_prepare_params, get_prepared_queryset
+from data_manager.functions import get_prepare_params, get_prepared_queryset
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.models import View
 from data_manager.serializers import DataManagerTaskSerializer, ViewResetSerializer, ViewSerializer

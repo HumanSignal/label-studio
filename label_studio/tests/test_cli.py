@@ -2,9 +2,9 @@
 """
 import pytest
 from server import _create_user
-from tests.utils import make_annotation, make_project, make_task
 
 from label_studio.core.argparser import parse_input_args
+from tests.utils import make_annotation, make_project, make_task
 
 
 @pytest.mark.django_db

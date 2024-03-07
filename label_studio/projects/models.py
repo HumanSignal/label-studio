@@ -30,7 +30,7 @@ from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from django.conf import settings
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.db import models, transaction
-from django.db.models import Avg, BooleanField, Case, Count, JSONField, Q, Sum, Value, When, Max
+from django.db.models import Avg, BooleanField, Case, Count, JSONField, Max, Q, Sum, Value, When
 from django.utils.translation import gettext_lazy as _
 from label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
@@ -983,6 +983,7 @@ class Project(ProjectMixin, models.Model):
             
     def get_active_ml_backends(self):
         """ """
+        from ml.models import MLBackendState
         return self.get_ml_backends(state=MLBackendState.CONNECTED)        
     
     

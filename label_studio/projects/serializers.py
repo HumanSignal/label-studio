@@ -192,7 +192,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         """
         """
         # assume there is a flag, 'is_name_updated', in model to track if a name has been updated
-        if validated_data.get("show_collab_predictions", None) == False:
+        if not validated_data.get("show_collab_predictions"):
             instance.model_version = ""
 
         return super().update(instance, validated_data)

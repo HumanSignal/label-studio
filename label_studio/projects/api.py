@@ -22,6 +22,7 @@ from django.utils.decorators import method_decorator
 from django_filters import CharFilter, FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
+from ml.serializers import MLBackendSerializer
 from projects.functions.next_task import get_next_task
 from projects.functions.stream_history import get_label_stream_history
 from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
@@ -30,10 +31,10 @@ from projects.serializers import (
     GetFieldsSerializer,
     ProjectImportSerializer,
     ProjectLabelConfigSerializer,
+    ProjectModelVersionExtendedSerializer,
     ProjectReimportSerializer,
     ProjectSerializer,
     ProjectSummarySerializer,
-    ProjectModelVersionExtendedSerializer
 )
 from rest_framework import filters, generics, status
 from rest_framework.exceptions import NotFound
@@ -48,9 +49,8 @@ from tasks.serializers import (
     NextTaskSerializer,
     TaskSerializer,
     TaskSimpleSerializer,
-    TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+    TaskWithAnnotationsAndPredictionsAndDraftsSerializer,
 )
-from ml.serializers import MLBackendSerializer
 from webhooks.models import WebhookAction
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 

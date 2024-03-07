@@ -5,11 +5,11 @@ import logging
 from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func, safe_float
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models import JSONField, Count, Q
+from django.db.models import Count, JSONField, Q
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-from ml.api_connector import MLApi, PREDICT_URL, TIMEOUT_PREDICT
+from ml.api_connector import PREDICT_URL, TIMEOUT_PREDICT, MLApi
 from projects.models import Project
 from tasks.models import Task
 from tasks.serializers import PredictionSerializer, TaskSimpleSerializer

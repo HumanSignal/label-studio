@@ -9,7 +9,6 @@ from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import DjangoFilterDescriptionInspector
 from core.utils.params import bool_from_request
 from data_manager.api import TaskListAPI as DMTaskListAPI
-from data_manager.functions import retrieve_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
 from django.db import transaction
@@ -182,7 +181,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk):        
         context = self.get_retrieve_serializer_context(request)
-        context['project'] = project = self.task.project
+        context['project'] = self.task.project
         
         # get prediction
         self.task.refresh_predictions()

@@ -4,8 +4,8 @@ import base64
 import datetime
 import logging
 import numbers
-import random
 import os
+import random
 import uuid
 from typing import Any, Mapping, Optional, cast
 from urllib.parse import urljoin
@@ -1132,8 +1132,6 @@ def update_ml_backend(sender, instance, **kwargs):
 
     project = instance.project
 
-    print("@receiver(post_save, sender=Annotation)")
-    
     if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
         annotation_count = Annotation.objects.filter(project=project).count()
 
