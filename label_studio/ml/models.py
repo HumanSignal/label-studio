@@ -34,7 +34,7 @@ class MLBackendAuth(models.TextChoices):
     NONE = 'NA', _('None')
     BASIC_AUTH = 'BA', _('Basic Auth')
 
-    
+
 class MLBackend(models.Model):
     """ """
 
@@ -87,7 +87,7 @@ class MLBackend(models.Model):
         default='',
         help_text='HTTP Basic Auth password',
     )
-    
+
     description = models.TextField(
         _('description'),
         blank=True,
@@ -101,7 +101,7 @@ class MLBackend(models.Model):
         null=True,
         help_text='Any extra parameters passed to the ML Backend during the setup',
     )
-    
+
     model_version = models.TextField(
         _('model version'),
         blank=True,
@@ -109,7 +109,7 @@ class MLBackend(models.Model):
         default='',
         help_text='Current model version associated with this machine learning backend',
     )
-    
+
     timeout = models.FloatField(
         _('timeout'),
         blank=True,
@@ -141,13 +141,12 @@ class MLBackend(models.Model):
 
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
-            
+
         return api.setup(project, **kwargs)
 
     @staticmethod
     def get_versions_(url, project, auth_method, **kwargs):
-        """
-        """
+        """ """
         api = MLApi(url=url, auth_method=auth_method, **kwargs)
 
         if not isinstance(project, Project):
@@ -160,20 +159,19 @@ class MLBackend(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(MLBackend, self).__init__(*args, **kwargs)
-        self.__original_title = self.title    
-    
+        self.__original_title = self.title
+
     def save(self, *args, **kwargs):
         """
         Overrides the save() method to update the associated project's model_version field.
 
         If the title of the model instance is changed and the model_version
-        of the related project is currently the same as the original title, 
-        the project's model_version is updated to the new title.        
+        of the related project is currently the same as the original title,
+        the project's model_version is updated to the new title.
         """
         p = self.project
-        
-        if self.title != self.__original_title and \
-           p.model_version == self.__original_title:
+
+        if self.title != self.__original_title and p.model_version == self.__original_title:
             with transaction.atomic():
                 p.model_version = self.title
                 p.save()
@@ -182,39 +180,53 @@ class MLBackend(models.Model):
                 self.__original_title = self.title
         else:
             super().save(*args, **kwargs)
-                        
+
     def has_permission(self, user):
         user.project = self.project  # link for activity log
         return self.project.has_permission(user)
-    
-    def healthcheck(self):
-        return self.healthcheck_(self.url, self.auth_method,
-                                 basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass)
 
-    def setup(self):        
-        return self.setup_(self.url, self.project, self.auth_method, extra_params=self.extra_params,
-                           basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass)
+    def healthcheck(self):
+        return self.healthcheck_(
+            self.url, self.auth_method, basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass
+        )
+
+    def setup(self):
+        return self.setup_(
+            self.url,
+            self.project,
+            self.auth_method,
+            extra_params=self.extra_params,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
 
     @property
     def api(self):
-        return MLApi(url=self.url, timeout=self.timeout, auth_method=self.auth_method,
-                     basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass)
+        return MLApi(
+            url=self.url,
+            timeout=self.timeout,
+            auth_method=self.auth_method,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
 
     @property
     def not_ready(self):
         return self.state in (MLBackendState.DISCONNECTED, MLBackendState.ERROR)
-    
-    
+
     def get_versions(self):
-        return self.get_versions_(self.url, self.project, self.auth_method,
-                                  basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass)
-    
-    
+        return self.get_versions_(
+            self.url,
+            self.project,
+            self.auth_method,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
+
     def update_state(self):
-        """
-        """
+        """ """
         model_version = None
-        
+
         if self.healthcheck().is_error:
             self.state = MLBackendState.DISCONNECTED
         else:
@@ -231,7 +243,7 @@ class MLBackend(models.Model):
                 #     logger.debug(f'Changing model version: {self.model_version} -> {model_version}')
                 #     self.model_version = model_version
                 self.error_message = None
-        
+
         self.save()
         return model_version
 
@@ -247,50 +259,46 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-
     def _predict(self, task):
         """This is low level prediction method that is used for debugging"""
         ml_api = self.api
         task_ser = TaskSimpleSerializer(task).data
-        
+
         request_params = ml_api._prep_prediction_req([task_ser], self.project)
-        ml_api_result = ml_api._request(PREDICT_URL, request_params, verbose=False, timeout=TIMEOUT_PREDICT)        
-        
+        ml_api_result = ml_api._request(PREDICT_URL, request_params, verbose=False, timeout=TIMEOUT_PREDICT)
+
         # url=self.url, timeout=self.timeout, auth_method=self.auth_method,
         # basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass
-        
+
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
-        
-        results = ml_api_result.response.get('results', None)
-        
-        return {
-            "status": 200,
-            "data": {
-                "status": ml_api_result.status_code,
-                "error_message": ml_api_result.error_message,
-                "url": ml_api._get_url(PREDICT_URL),
-                "task": task_ser,
-                "request": request_params,
-                "response": results
-            }
-        }    
 
-    
+        results = ml_api_result.response.get('results', None)
+
+        return {
+            'status': 200,
+            'data': {
+                'status': ml_api_result.status_code,
+                'error_message': ml_api_result.error_message,
+                'url': ml_api._get_url(PREDICT_URL),
+                'task': task_ser,
+                'request': request_params,
+                'response': results,
+            },
+        }
+
     def predict_and_save(self, tasks=None):
-        """
-        """
+        """ """
         # update model state, if model is ready it sets appropriate status and return its version
-        model_version = self.update_state()  
+        model_version = self.update_state()
         if not self.ready_for_prediction():
             return
 
         # take only those tasks for which we do not have that version predictions already saved
         tasks_queryset = self.get_filtered_tasks(tasks, filter_model_version=model_version)
         if not tasks_queryset.exists():
-            logger.debug(
-                f'All tasks already have prediction from model version={self.model_version}')
+            logger.debug(f'All tasks already have prediction from model version={self.model_version}')
             return model_version
 
         # serialize data to pass to the model
@@ -311,28 +319,24 @@ class MLBackend(models.Model):
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
                 f'switched to one-by-one task retrieval'
             )
-            
+
             # TODO: this is an artifact from previous code, and
             # clearly not the best idea. You should not be sending a
             # request to the server with all the data only to figure
             # out that the server does not support it, and you need to
             # move to one by one processing
-            instances = [
-                self.predict_one_task(task, model_version=model_version) for task in tasks_queryset
-            ]
-                
+            instances = [self.predict_one_task(task, model_version=model_version) for task in tasks_queryset]
+
             return instances
-        
+
         return self.handle_prediction_results(responses, tasks_queryset, tasks_ser)
 
-
     def predict_one_task(self, task, model_version=None):
-        """
-        """
+        """ """
         if not model_version:
             model_version = self.update_state()
             if not self.ready_for_prediction():
-                return            
+                return
 
         tasks_queryset = self.get_filtered_tasks([task])
         if not tasks_queryset.exists():
@@ -340,7 +344,7 @@ class MLBackend(models.Model):
                 f'Skip creating prediction with ML backend {self} for task {task}: model version '
                 f'{self.model_version} is up-to-date'
             )
-            return 
+            return
 
         task_ser = TaskSimpleSerializer(tasks_queryset.first()).data
         ml_api_result = self.api.make_predictions([task_ser], self.project)
@@ -351,15 +355,13 @@ class MLBackend(models.Model):
         responses = ml_api_result.response['results']
         return self.handle_single_prediction(task, responses[0])
 
-        
     def ready_for_prediction(self):
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
             return False
-        
+
         return True
 
-    
     def get_filtered_tasks(self, tasks, filter_model_version=None):
         """Filter tasks that already contain the current model version
         in predictions
@@ -370,58 +372,55 @@ class MLBackend(models.Model):
 
         if filter_model_version is None:
             filter_model_version = self.model_version
-            
+
         tasks = tasks.annotate(predictions_count=Count('predictions')).exclude(
             Q(predictions_count__gt=0) & Q(predictions__model_version=filter_model_version)
         )
-        
+
         return tasks
 
     def prediction_results_ready(self, ml_api_result):
-        """Given restuls from ML Backend understand and log the status
-        """
+        """Given restuls from ML Backend understand and log the status"""
         if ml_api_result.is_error:
-            logger.info(
-                f'Prediction not created for project {self}: {ml_api_result.error_message}')
+            logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return False
 
         if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
-            logger.info(
-                f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
+            logger.info(f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
             return False
 
         if len(ml_api_result.response['results']) == 0:
-            logger.warning(
-                f'ML backend returned empty prediction for project {self}')
+            logger.warning(f'ML backend returned empty prediction for project {self}')
             return False
 
         return True
 
     def handle_prediction_results(self, responses, tasks_queryset, tasks_ser):
-        """
-        """
+        """ """
         if len(responses) != len(tasks_ser):
-            logger.warning(
-                f'ML backend returned response number {len(responses)} != task number {len(tasks_ser)}')
+            logger.warning(f'ML backend returned response number {len(responses)} != task number {len(tasks_ser)}')
 
         predictions = []
         for task, response in zip(tasks_ser, responses):
             if 'result' not in response:
                 logger.info(
                     f"ML backend returns an incorrect prediction, it should be a dict with the 'result' field:"
-                    f' {response}')
-                
+                    f' {response}'
+                )
+
                 return
 
-            predictions.append({
-                'task': task['id'],
-                'result': response['result'],
-                'score': response.get('score'),
-                'cluster': response.get('cluster'),
-                'neighbors': response.get('neighbors'),
-                'model_version': response.get('model_version', 'undefined'),
-            })
-            
+            predictions.append(
+                {
+                    'task': task['id'],
+                    'result': response['result'],
+                    'score': response.get('score'),
+                    'cluster': response.get('cluster'),
+                    'neighbors': response.get('neighbors'),
+                    'model_version': response.get('model_version', 'undefined'),
+                }
+            )
+
         with conditional_atomic(predicate=db_is_not_sqlite):
             prediction_ser = PredictionSerializer(data=predictions, many=True)
             prediction_ser.is_valid(raise_exception=True)
@@ -429,51 +428,46 @@ class MLBackend(models.Model):
 
             return instances
 
-            
     def handle_single_prediction(self, task, response):
-        """
-        """
+        """ """
         result = response['result']
         score = response.get('score')
 
         with conditional_atomic(predicate=db_is_not_sqlite):
-            prediction_ser = PredictionSerializer(data={
-                "result": result,
-                "score": safe_float(score),
-                "model": self.pk,
-                "model_version": response.get('model_version', 'undefined'),
-                "task": task.pk,
-                "project": task.project.pk,
-                "cluster": response.get('cluster'),
-                "neighbors": response.get('neighbors'),
-                "mislabeling": safe_float(response.get('mislabeling', 0)),
-            })
-            
+            prediction_ser = PredictionSerializer(
+                data={
+                    'result': result,
+                    'score': safe_float(score),
+                    'model': self.pk,
+                    'model_version': response.get('model_version', 'undefined'),
+                    'task': task.pk,
+                    'project': task.project.pk,
+                    'cluster': response.get('cluster'),
+                    'neighbors': response.get('neighbors'),
+                    'mislabeling': safe_float(response.get('mislabeling', 0)),
+                }
+            )
+
             prediction_ser.is_valid(raise_exception=True)
             instance = prediction_ser.save()
-            
+
             logger.debug(f'Prediction {instance} created')
-            
+
             return instance
-    
 
     def interactive_annotating(self, task, context=None, user=None):
-        """Function to annotate a task interactively.
-        """        
+        """Function to annotate a task interactively."""
         if not self.is_interactive:
             return {'errors': ['Model is not set for interactive preannotations']}
-        
+
         options = {'user': user} if user else {}
-        
+
         tasks_ser = InteractiveAnnotatingDataSerializer(
-            [task], 
-            many=True, 
-            expand=['drafts', 'predictions', 'annotations'], 
-            context=options
+            [task], many=True, expand=['drafts', 'predictions', 'annotations'], context=options
         ).data
-        
+
         return self.api.make_predictions(tasks=tasks_ser, project=self.project, context=context)
-        
+
 
 class MLBackendPredictionJob(models.Model):
 
@@ -545,11 +539,11 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
 def modify_project_model_version(sender, instance, **kwargs):
     """ """
     project = instance.project
-    
+
     if project.model_version == instance.title:
         project.model_version = None
         project.save()
-    
+
 
 @receiver(post_save, sender=MLBackend)
 def create_ml_webhook(sender, instance, created, **kwargs):

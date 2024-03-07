@@ -9,3 +9,4 @@ repos:
     rev: v0.9.1
     hooks:
       - id: blue
+        args: [ --verbose ]

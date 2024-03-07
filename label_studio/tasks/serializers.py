@@ -375,7 +375,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
     def add_predictions(self, task_predictions):
         """Save predictions to DB and set the latest model version in the project"""
         db_predictions = []
-        
+
         # add predictions
         last_model_version = None
         for i, predictions in enumerate(task_predictions):
@@ -659,18 +659,18 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
 
     def get_predictions(self, task):
         """ """
-        predictions = task.get_predictions_for_prelabeling()        
+        predictions = task.get_predictions_for_prelabeling()
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
-        
+
     # def get_predictions(self, task):
     #     project = task.project
 
     #     if not project.show_collab_predictions:
     #         return []
-        # else:
-        #     # for ml_backend in project.ml_backends.all():
-        #     #     ml_backend.predict_tasks([task])
-        #     return super().get_predictions(task)
+    # else:
+    #     # for ml_backend in project.ml_backends.all():
+    #     #     ml_backend.predict_tasks([task])
+    #     return super().get_predictions(task)
 
     def get_annotations(self, task):
         result = []

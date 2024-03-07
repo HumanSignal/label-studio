@@ -95,7 +95,7 @@ actions = [
         'title': 'Create Annotations From Predictions',
         'order': 91,
         'dialog': {
-            'modal_title': "Create Annotations From Predictions",
+            'modal_title': 'Create Annotations From Predictions',
             'text': 'Create annotations from predictions using selected predictions set '
             'for each selected task.'
             'Your account will be assigned as an owner to those annotations. ',

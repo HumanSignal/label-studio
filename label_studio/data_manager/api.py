@@ -258,7 +258,7 @@ class TaskListAPI(generics.ListCreateAPIView):
             # TODO MM TODO this needs a discussion, because I'd expect
             # people to retrieve manually instead on DM load, plus it
             # will slow down initial DM load
-            
+
             # retrieve ML predictions if tasks don't have them
             # if not review and project.retrieve_predictions_automatically:
             #     tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
@@ -280,11 +280,11 @@ class TaskListAPI(generics.ListCreateAPIView):
         # all tasks
         # if project.retrieve_predictions_automatically:
         #     retrieve_predictions(queryset.filter(predictions__isnull=True))
-            
+
         queryset = Task.prepared.annotate_queryset(
             queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields, request=request
         )
-        
+
         serializer = self.task_serializer_class(queryset, many=True, context=context)
 
         return Response(serializer.data)
@@ -386,7 +386,7 @@ class ProjectActionsAPI(APIView):
         # perform action and return the result dict
         kwargs = {'request': request}  # pass advanced params to actions
         result = perform_action(action_id, project, queryset, request.user, **kwargs)
-        
+
         code = result.pop('response_code', 200)
 
         return Response(result, status=code)

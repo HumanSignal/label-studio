@@ -648,32 +648,28 @@ class ProjectModelVersions(generics.RetrieveAPIView):
         include_live_models = self.request.query_params.get('include_live_models', False)
         project = self.get_object()
         data = project.get_model_versions(with_counters=True, extended=extended)
-        
+
         if extended:
             serializer_models = None
             serializer = ProjectModelVersionExtendedSerializer(data, many=True)
-            
+
             if include_live_models:
                 ml_models = project.get_ml_backends()
                 serializer_models = MLBackendSerializer(ml_models, many=True)
-            
+
             # serializer.is_valid(raise_exception=True)
-            return Response({
-                "static": serializer.data,
-                "live": serializer_models and serializer_models.data
-            })
+            return Response({'static': serializer.data, 'live': serializer_models and serializer_models.data})
         else:
             return Response(data=data)
 
     def delete(self, request, *args, **kwargs):
-        """
-        """
+        """ """
         project = self.get_object()
-        model_version = request.data.get("model_version", None)
-        
+        model_version = request.data.get('model_version', None)
+
         if not model_version:
-            raise RestValidationError("model_version param is required")
-        
+            raise RestValidationError('model_version param is required')
+
         count = project.delete_predictions(model_version=model_version)
-        
+
         return Response(data=count)

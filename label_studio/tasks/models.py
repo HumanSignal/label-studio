@@ -181,19 +181,18 @@ class Task(TaskMixin, models.Model):
 
     @classmethod
     def get_random(cls, project):
-        """ Get random task from a project, this should not be used lightly as its expensive method to run"""
+        """Get random task from a project, this should not be used lightly as its expensive method to run"""
         if project is None:
             raise Exception('Project id is required')
-        
+
         ids = cls.objects.filter(project=project).values_list('id', flat=True)
         if len(ids) == 0:
             return None
-            
+
         random_id = random.choice(ids)
-        
+
         return cls.objects.get(id=random_id)
 
-    
     @classmethod
     def get_locked_by(cls, user, project=None, tasks=None):
         """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
@@ -211,29 +210,27 @@ class Task(TaskMixin, models.Model):
             return lock.task
 
     def refresh_predictions(self):
-        """This is called to get new predictions from the model if its connected
-        """
+        """This is called to get new predictions from the model if its connected"""
         from data_manager.functions import retrieve_predictions
-        
+
         if self.project.should_retrieve_predictions:
             # TODO where is the check for duplicate lives?
             return retrieve_predictions([self])
-        
+
     def get_predictions_for_prelabeling(self):
         """This is called to return either new predictions from the
         model or grab static predictions if they were set, depending
         on the projects configuration.
 
-        """        
+        """
         from data_manager.functions import retrieve_predictions
-        
+
         project = self.project
         predictions = self.predictions
-        
+
         # if we even
         # TODO if we use live_model on project then we will need to check for it here
-        if project.show_collab_predictions and \
-           project.model_version is not None:
+        if project.show_collab_predictions and project.model_version is not None:
             if project.ml_backend_in_model_version:
                 new_predictions = retrieve_predictions([self])
                 # TODO this is not as clean as I'd want it to
@@ -245,13 +242,12 @@ class Task(TaskMixin, models.Model):
                     model_version = new_predictions
                     return predictions.filter(model_version=model_version)
                 else:
-                    return new_predictions            
+                    return new_predictions
             else:
                 return predictions.filter(model_version=project.model_version)
         else:
-            return []            
+            return []
 
-        
     def has_lock(self, user=None):
         """
         Check whether current task has been locked by some user
@@ -866,13 +862,23 @@ class Prediction(models.Model):
 
     result = JSONField('result', null=True, default=dict, help_text='Prediction result')
     score = models.FloatField(_('score'), default=None, help_text='Prediction score', null=True)
-    
-    model_version = models.TextField(_('model version'), default='', blank=True, null=True,
-                                     help_text='A string value that for model version that produced the prediction. Used in both live models and when uploading offline predictions.')
-    
-    model = models.ForeignKey('ml.MLBackend', on_delete=models.CASCADE, related_name='predictions', null=True,
-                              help_text='An ML Backend instance that created the prediction.')
-    
+
+    model_version = models.TextField(
+        _('model version'),
+        default='',
+        blank=True,
+        null=True,
+        help_text='A string value that for model version that produced the prediction. Used in both live models and when uploading offline predictions.',
+    )
+
+    model = models.ForeignKey(
+        'ml.MLBackend',
+        on_delete=models.CASCADE,
+        related_name='predictions',
+        null=True,
+        help_text='An ML Backend instance that created the prediction.',
+    )
+
     cluster = models.IntegerField(
         _('cluster'),
         default=None,

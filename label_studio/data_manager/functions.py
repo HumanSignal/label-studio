@@ -324,10 +324,10 @@ def retrieve_predictions(tasks, backend=None):
         backend = project.ml_backends.first()
 
     # IMPORTANT change here, ml_backends.all => ml_backends.first
-    # we are using only one ML backend, not multiple    
+    # we are using only one ML backend, not multiple
     if backend:
         return backend.predict_and_save(tasks=tasks)
-    
+
     # for ml_backend in project.ml_backends.first():
     #     # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
     #     ml_backend.predict_and_save(tasks=tasks)

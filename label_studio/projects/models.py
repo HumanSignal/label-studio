@@ -179,7 +179,7 @@ class Project(ProjectMixin, models.Model):
     # use_ml_backend = models.BooleanField(
     #     _('use ml backend'), default=False, help_text='If the project should use ML Backend model for predictions (alternative is to use static predictions uploaded offline).'
     # )
-    
+
     # evaluate is the wrong word here. correct should be retrieve_predictions_automatically
     # depricated
     evaluate_predictions_automatically = models.BooleanField(
@@ -234,7 +234,7 @@ class Project(ProjectMixin, models.Model):
     model_version = models.TextField(
         _('model version'), blank=True, null=True, default='', help_text='Machine learning model version'
     )
-    
+
     data_types = JSONField(_('data_types'), default=dict, null=True)
 
     is_draft = models.BooleanField(
@@ -274,9 +274,8 @@ class Project(ProjectMixin, models.Model):
     pinned_at = models.DateTimeField(_('pinned at'), null=True, default=None, help_text='Pinned date and time')
 
     def __init__(self, *args, **kwargs):
-        """
-        """
-        
+        """ """
+
         super(Project, self).__init__(*args, **kwargs)
         self.__original_label_config = self.label_config
         self.__maximum_annotations = self.maximum_annotations
@@ -285,7 +284,7 @@ class Project(ProjectMixin, models.Model):
 
         # if rpa is not None:
         #     self.evaluate_predictions_automatically = rpa
-        
+
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
         if self.label_config is not None:
@@ -300,24 +299,23 @@ class Project(ProjectMixin, models.Model):
     @property
     def ml_backend(self):
         return self.ml_backends.first()
-    
+
     @property
     def should_retrieve_predictions(self):
-        """ Returns true if the model was set to be used
-        """        
+        """Returns true if the model was set to be used"""
         if self.show_collab_predictions:
             ml = self.ml_backend
             if ml:
                 return ml.title == self.model_version
 
         return False
-    
+
         # if project.show_collab_predictions and \
         #    project.use_live_model and \
         #    project.model_version is not None:
         #     ml = project.ml_backends.filter(title=project.model_version)
         #     return ml if ml.exists() else None
-        
+
     @property
     def num_annotations(self):
         return Annotation.objects.filter(project=self).count()
@@ -669,15 +667,13 @@ class Project(ProjectMixin, models.Model):
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
 
-    
     def should_none_model_version(self, model_version):
         """
-        Returns True if the model version provided matches the object's model version, 
+        Returns True if the model version provided matches the object's model version,
         or no model version is set for the object but model version exists in ML backend.
         """
         return self.model_version == model_version or self.ml_backend_in_model_version
 
-    
     def delete_predictions(self, model_version=None, *args, **kwargs):
         """
         Deletes the predictions based on the provided model version.
@@ -688,23 +684,23 @@ class Project(ProjectMixin, models.Model):
         :return: Dictionary with count of deleted predictions
         :rtype: dict
         """
-        params = { "project": self }
-        
+        params = {'project': self}
+
         if model_version:
-            params.update({ "model_version": model_version })
+            params.update({'model_version': model_version})
 
         predictions = Prediction.objects.filter(**params)
         count = predictions.count()
-        
+
         with transaction.atomic():
             # If we are deleting specific model_version then we need
             # to remove that from the project
             if self.should_none_model_version(model_version):
                 self.model_version = None
-                self.save()                
-                
+                self.save()
+
             predictions.delete()
-        
+
         ## TODO wtf is that returning
         return {'deleted_predictions': count}
 
@@ -919,7 +915,7 @@ class Project(ProjectMixin, models.Model):
         Get model_versions from project predictions.
         :param with_counters: Boolean, if True, counts predictions for each version. Default is False.
         :param extended: Boolean, if True, returns additional information. Default is False.
-        :return: Dict or list containing model versions and their count predictions.        
+        :return: Dict or list containing model versions and their count predictions.
         """
         if flag_set(
             'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
@@ -931,11 +927,13 @@ class Project(ProjectMixin, models.Model):
         # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
 
         if extended:
-            model_versions = list(predictions.values('model_version').annotate(count=Count('model_version'), latest=Max('created_at')))
+            model_versions = list(
+                predictions.values('model_version').annotate(count=Count('model_version'), latest=Max('created_at'))
+            )
 
             # remove the load from the DB side and sort in here
             model_versions.sort(key=lambda x: x['latest'], reverse=True)
-            
+
             return model_versions
         else:
             # TODO this needs to be removed at some point
@@ -950,17 +948,15 @@ class Project(ProjectMixin, models.Model):
             return output if with_counters else list(output.keys())
 
     def get_ml_backends(self, *args, **kwargs):
-        """
-        """
+        """ """
         from ml.models import MLBackend
-        
+
         return MLBackend.objects.filter(project=self, **kwargs)
-    
+
     def has_ml_backend(self, *args, **kwargs):
-        """
-        """
+        """ """
         return self.get_ml_backends(**kwargs).exists()
-    
+
     @property
     def ml_backend_in_model_version(self):
         """
@@ -978,15 +974,15 @@ class Project(ProjectMixin, models.Model):
         ml_backends = self.get_ml_backends()
         for mlb in ml_backends:
             mlb.update_state()
-            
+
         return ml_backends
-            
+
     def get_active_ml_backends(self):
         """ """
         from ml.models import MLBackendState
-        return self.get_ml_backends(state=MLBackendState.CONNECTED)        
-    
-    
+
+        return self.get_ml_backends(state=MLBackendState.CONNECTED)
+
     def get_all_storage_objects(self, type_='import'):
         from io_storages.models import get_storage_classes
 
@@ -1002,7 +998,7 @@ class Project(ProjectMixin, models.Model):
 
     def resolve_storage_uri(self, url: str) -> Optional[Mapping[str, Any]]:
         from io_storages.functions import get_storage_by_url
-        
+
         storage_objects = self.get_all_storage_objects()
         storage = get_storage_by_url(url, storage_objects)
 

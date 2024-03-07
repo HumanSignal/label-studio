@@ -748,7 +748,7 @@ def test_interactive_annotating_failing(business_client, configured_project):
     r.status_code = 200
 
     result = r.json()
-    
+
     assert 'errors' in result
 
     # BAD ML RESPONSE
@@ -770,7 +770,7 @@ def test_interactive_annotating_failing(business_client, configured_project):
         result = r.json()
 
     print(result)
-        
+
     assert 'errors' in result
 
 

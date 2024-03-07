@@ -31,16 +31,16 @@ TIMEOUT_DUPLICATE_MODEL = float(get_env('ML_TIMEOUT_DUPLICATE_MODEL', 1))
 TIMEOUT_DELETE = float(get_env('ML_TIMEOUT_DELETE', 1))
 TIMEOUT_TRAIN_JOB_STATUS = float(get_env('ML_TIMEOUT_TRAIN_JOB_STATUS', 1))
 
-# TODO 
+# TODO
 # we would need to make it configurable on the ML backend side too
-PREDICT_URL = "predict"
-HEALTH_URL = "health"
-VALIDATE_URL = "validate"
-SETUP_URL = "setup"
-DUPLICATE_URL = "duplicate_model"
-DELETE_URL = "delete"
-JOB_STATUS_URL = "job_status"
-VERSIONS_URL = "versions"
+PREDICT_URL = 'predict'
+HEALTH_URL = 'health'
+VALIDATE_URL = 'validate'
+SETUP_URL = 'setup'
+DUPLICATE_URL = 'duplicate_model'
+DELETE_URL = 'delete'
+JOB_STATUS_URL = 'job_status'
+VERSIONS_URL = 'versions'
 
 
 class BaseHTTPAPI(object):
@@ -49,18 +49,19 @@ class BaseHTTPAPI(object):
         'User-Agent': 'heartex/' + (version or ''),
     }
 
-    def __init__(self, url, timeout=None, connection_timeout=None, max_retries=None, headers=None,
-                 auth_method=None, **kwargs):
+    def __init__(
+        self, url, timeout=None, connection_timeout=None, max_retries=None, headers=None, auth_method=None, **kwargs
+    ):
         self._url = url
         self._timeout = timeout or TIMEOUT_DEFAULT
         self._connection_timeout = connection_timeout or CONNECTION_TIMEOUT
         self._headers = headers or {}
         self._auth_method = auth_method
-        
-        if auth_method == "BA":
+
+        if auth_method == 'BA':
             # TODO add kwarg check in here
-            self._basic_auth = (kwargs.get("basic_auth_user"), kwargs.get("basic_auth_pass"))
-        
+            self._basic_auth = (kwargs.get('basic_auth_user'), kwargs.get('basic_auth_pass'))
+
         self._max_retries = max_retries or self.MAX_RETRIES
         self._sessions = {self._session_key(): self.create_session()}
 
@@ -90,9 +91,9 @@ class BaseHTTPAPI(object):
         if 'timeout' not in kwargs:
             kwargs['timeout'] = self._connection_timeout, self._timeout
 
-        if self._auth_method == "BA":
+        if self._auth_method == 'BA':
             kwargs['auth'] = HTTPBasicAuth(*self._basic_auth)
-            
+
         # add connection timeout if it's not presented
         elif isinstance(kwargs['timeout'], float) or isinstance(kwargs['timeout'], int):
             kwargs['timeout'] = (self._connection_timeout, kwargs['timeout'])
@@ -107,10 +108,10 @@ class BaseHTTPAPI(object):
     def post(self, *args, **kwargs):
         return self.request('POST', *args, **kwargs)
 
-    
-class MLApiResult():
-    """
-    """
+
+class MLApiResult:
+    """ """
+
     def __init__(self, url='', request='', response=None, headers=None, type='ok', status_code=200):
         self.url = url
         self.request = request
@@ -129,8 +130,8 @@ class MLApiResult():
 
 
 class MLApi(BaseHTTPAPI):
-    """
-    """
+    """ """
+
     def __init__(self, **kwargs):
         super(MLApi, self).__init__(**kwargs)
         self._validate_request_timeout = 10
@@ -142,17 +143,21 @@ class MLApi(BaseHTTPAPI):
         return urllib.parse.urljoin(url, url_suffix)
 
     def _handle_error(self, e, response, url, headers, request):
-        """
-        """
+        """ """
         error_string = f"{e} {response.text if response else ''}"
         status_code = response.status_code if response is not None else 0
-            
-        return MLApiResult(url=url, request=request, response={'error': error_string},
-                           headers=headers, type='error', status_code=status_code)
+
+        return MLApiResult(
+            url=url,
+            request=request,
+            response={'error': error_string},
+            headers=headers,
+            type='error',
+            status_code=status_code,
+        )
 
     def _request(self, url_suffix, request=None, verbose=True, method='POST', *args, **kwargs):
-        """
-        """
+        """ """
         assert method in ('POST', 'GET')
         url = self._get_url(url_suffix)
         request = request or {}
@@ -164,7 +169,7 @@ class MLApi(BaseHTTPAPI):
                 response = self.post(url=url, json=request, *args, **kwargs)
             else:
                 response = self.get(url=url, *args, **kwargs)
-                
+
             # response = requests.request(method=method, url=url, json=request, *args, **kwargs)
             # response.raise_for_status()
         except requests.exceptions.RequestException as e:
@@ -173,14 +178,19 @@ class MLApi(BaseHTTPAPI):
         status_code = response.status_code
         try:
             response = response.json()
-            
+
         except ValueError as e:
-            return MLApiResult(url=url, request=request, response={'error': str(e), 'response': response.content},
-                               headers=headers, type='error', status_code=status_code)
-        
+            return MLApiResult(
+                url=url,
+                request=request,
+                response={'error': str(e), 'response': response.content},
+                headers=headers,
+                type='error',
+                status_code=status_code,
+            )
+
         return MLApiResult(url=url, request=request, response=response, headers=headers, status_code=status_code)
 
-    
     def _create_project_uid(self, project):
         time_id = int(project.created_at.timestamp())
         return f'{project.id}.{time_id}'
@@ -211,7 +221,7 @@ class MLApi(BaseHTTPAPI):
 
     def _prep_prediction_req(self, tasks, project, context=None):
         request = {
-            'tasks': tasks,            
+            'tasks': tasks,
             'project': self._create_project_uid(project),
             'label_config': project.label_config,
             'params': {
@@ -220,9 +230,9 @@ class MLApi(BaseHTTPAPI):
                 'context': context,
             },
         }
-        
+
         return request
-        
+
     def make_predictions(self, tasks, project, context=None):
         request = self._prep_prediction_req(tasks, project, context=context)
         return self._request(PREDICT_URL, request, verbose=False, timeout=TIMEOUT_PREDICT)
@@ -240,8 +250,8 @@ class MLApi(BaseHTTPAPI):
                 'project': self._create_project_uid(project),
                 'schema': project.label_config,
                 'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
-                'access_token': project.created_by.auth_token.key,                
-                'extra_params': extra_params
+                'access_token': project.created_by.auth_token.key,
+                'extra_params': extra_params,
             },
             timeout=TIMEOUT_SETUP,
         )
@@ -257,7 +267,9 @@ class MLApi(BaseHTTPAPI):
         )
 
     def delete(self, project):
-        return self._request(DELETE_URL, request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_DELETE)
+        return self._request(
+            DELETE_URL, request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_DELETE
+        )
 
     def get_train_job_status(self, train_job):
         return self._request(JOB_STATUS_URL, request={'job': train_job.job_id}, timeout=TIMEOUT_TRAIN_JOB_STATUS)

@@ -94,9 +94,9 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         # FIXME: remake this logic with start_training_on_annotation_update
         initial_data = data
         data = super().to_internal_value(data)
-        
+
         if 'start_training_on_annotation_update' in initial_data:
-            data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])            
+            data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])
 
         if 'expert_instruction' in initial_data:
             data['expert_instruction'] = bleach.clean(
@@ -168,35 +168,35 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         return value
 
     def validate_model_version(self, value):
-        """Custom model_version validation
-        """
+        """Custom model_version validation"""
         p = self.instance
-        
+
         # Only run the validation if model_version is about to change
         # and it contains a string
-        if p is not None and \
-           p.model_version != value and \
-           value != "":            
+        if p is not None and p.model_version != value and value != '':
             # that model_version should either match live ml backend
             # or match version in predictions
-            
-            if p.ml_backends.filter(title=value).exists() or \
-               p.predictions.filter(project=p, model_version=value).exists():
+
+            if (
+                p.ml_backends.filter(title=value).exists()
+                or p.predictions.filter(project=p, model_version=value).exists()
+            ):
                 return value
             else:
-                raise serializers.ValidationError("Model version doesn't exist either as live model or as static predictions.")
-        
+                raise serializers.ValidationError(
+                    "Model version doesn't exist either as live model or as static predictions."
+                )
+
         return value
 
     def update(self, instance, validated_data):
-        """
-        """
+        """ """
         # assume there is a flag, 'is_name_updated', in model to track if a name has been updated
-        if not validated_data.get("show_collab_predictions"):
-            instance.model_version = ""
+        if not validated_data.get('show_collab_predictions'):
+            instance.model_version = ''
 
         return super().update(instance, validated_data)
-    
+
     def get_queue_total(self, project):
         remain = project.tasks.filter(
             Q(is_labeled=False) & ~Q(annotations__completed_by_id=self.user_id)
@@ -252,12 +252,11 @@ class ProjectReimportSerializer(serializers.ModelSerializer):
 
 
 class ProjectModelVersionExtendedSerializer(serializers.Serializer):
-    model_version = serializers.CharField()    
+    model_version = serializers.CharField()
     count = serializers.IntegerField()
     latest = serializers.DateTimeField()
-    
 
-    
+
 class GetFieldsSerializer(serializers.Serializer):
     include = serializers.CharField(required=False)
     filter = serializers.CharField(required=False, default='all')
