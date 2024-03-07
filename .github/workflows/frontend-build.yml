@@ -47,9 +47,7 @@ jobs:
 
       - name: "Monorepo: Build"
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
-        run: |
-          yarn build
-          yarn version:libs
+        run: yarn build
 
       - name: Commit and Push
         run: |
