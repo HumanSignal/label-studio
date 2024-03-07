@@ -1,6 +1,6 @@
 {
-  "message": "Merge remote-tracking branch 'origin/fb-optic-489' into fb-optic-489",
-  "commit": "03f8dcd6ea89ef00520024f6e07c2b7b374eac4a",
-  "date": "2024-03-06T22:32:21.000Z",
+  "message": "update the version.mjs script to be compatible and used within LSE as well",
+  "commit": "9b6a39ff72f29913094ffc19d72ab764394856e4",
+  "date": "2024-03-07T23:36:57.000Z",
   "branch": "fb-optic-489"
 }
