@@ -183,8 +183,9 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         context['project'] = self.task.project
 
         # get prediction
-        self.task.refresh_predictions()
-        self.task.refresh_from_db()
+        if self.task.project.show_collab_predictions:
+            self.task.refresh_predictions()
+            self.task.refresh_from_db()
 
         # predictions = retrieve_predictions([task])
         # if predictions:
