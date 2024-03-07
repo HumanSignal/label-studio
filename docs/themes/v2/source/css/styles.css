@@ -1599,6 +1599,7 @@ details+details {
 
 .templates-card img {
   width: calc(var(--padding) * 2 + 100%);
+  min-height: 14em;
   height: auto;
   margin: calc(-1 * var(--padding)) calc(-1 * var(--padding)) 0.75em calc(-1 * var(--padding));
   transition: border-radius 200ms;
@@ -1607,6 +1608,8 @@ details+details {
 .templates-card p {
   color: var(--color-gray-500);
   margin-bottom: 0;
+  margin-top:.5rem;
+  text-transform: capitalize;
 }
 
 .templates-card a {
@@ -2190,7 +2193,7 @@ code.hljs {
 }
 
 .page-type-playground #basic-templates a:hover {
-  border-bottom: 1px dashed currentColor;
+  /* border-bottom: 1px dashed currentColor; */
 }
 
 .playground-buttons {
