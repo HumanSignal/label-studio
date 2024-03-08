@@ -428,7 +428,7 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         if draft:
             # draft permission check
             if draft.task_id != task.id or not draft.has_permission(user) or draft.user_id != user.id:
-                raise PermissionDenied(f'You have no permission to draft id:{draft_id}')
+                raise PermissionDenied(f'You have no permission to draft id: {draft_id}')
 
         if draft is not None and flag_set(
             'fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'
