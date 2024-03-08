@@ -2,7 +2,7 @@ import { types } from "mobx-state-tree";
 import { FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { CustomCalback, HtmlOrReact, StringOrNumberID } from "./types";
 
-const SelectOptions = types.model('SelectOptions', {
+const SelectOptions = types.model("SelectOptions", {
   label: types.string,
   value: types.string,
 });
@@ -41,10 +41,10 @@ const ActionFormRow = types.model('ActionFormRow', {
 });
 
 const ActionDialog = types.model("ActionDialog", {
+  title: types.maybeNull(types.string),
   text: types.string,
   type: types.enumeration(["confirm", "prompt"]),
   form: types.maybeNull(types.array(ActionFormRow)),
-  modal_title: types.maybeNull(types.string),
 });
 
 const isFFLOPSE3 = isFF(FF_LOPS_E_3);
