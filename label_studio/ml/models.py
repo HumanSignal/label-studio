@@ -334,7 +334,7 @@ class MLBackend(models.Model):
     def predict_one_task(self, task, model_version=None):
         """ """
         if not model_version:
-            model_version = self.update_state()
+            self.update_state()
             if not self.ready_for_prediction():
                 return
 
