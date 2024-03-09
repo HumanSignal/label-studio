@@ -948,9 +948,9 @@
         "decorators": ""
     },
       {
-        "url": "/api/ml/<int:pk>/predict",
+        "url": "/api/ml/<int:pk>/predict/test",
         "module": "ml.api.MLBackendPredictAPI",
-        "name": "ml:api:ml-predict",
+        "name": "ml:api:ml-predict-test",
         "decorators": ""
     },
     {

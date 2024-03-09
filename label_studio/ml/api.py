@@ -210,7 +210,7 @@ class MLBackendTrainAPI(APIView):
         tags=['Machine Learning'],
         operation_summary='Predict',
         operation_description="""
-        After you add an ML backend, call this API with the ML backend ID to run a prediction on specific task data               
+        After you add an ML backend, call this API with the ML backend ID to run a test prediction on specific task data               
         """,
         manual_parameters=[
             openapi.Parameter(
@@ -234,7 +234,7 @@ class MLBackendTrainAPI(APIView):
         },
     ),
 )
-class MLBackendPredictAPI(APIView):
+class MLBackendPredictTestAPI(APIView):
     serializer_class = MLBackendSerializer
     permission_required = all_permissions.projects_change
 
