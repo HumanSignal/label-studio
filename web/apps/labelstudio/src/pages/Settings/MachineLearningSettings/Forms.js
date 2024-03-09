@@ -42,7 +42,7 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
 
       <Form.Row columnCount={2}>
         <Select name="auth_method" label="Select authentication method"
-                options={[ { label: "None", value: "NA" }, { label: "Basic Authentication", value: "BA" } ]}
+                options={[ { label: "No Authentication", value: "NA" }, { label: "Basic Authentication", value: "BA" } ]}
                 onChange={(e) => { setAuthMethod(e.target.value) } } />
       </Form.Row>
       
