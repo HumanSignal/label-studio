@@ -1,14 +1,12 @@
+import {useCallback, useContext, useEffect, useState} from 'react';
+import {Button} from '../../../components';
+import {useAPI} from '../../../providers/ApiProvider';
+import {Caption} from '../../../components/Caption/Caption';
+import {Description} from '../../../components/Description/Description';
+import {Block, cn, Elem} from '../../../utils/bem';
 
 
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button } from '../../../components';
-import { useAPI } from '../../../providers/ApiProvider';
-import { Caption } from '../../../components/Caption/Caption';
-import { Description } from '../../../components/Description/Description';
-import { Block, cn, Elem } from '../../../utils/bem';
-
-
-export const StartModelTraining = ({ backend }) => {
+export const StartModelTraining = ({backend}) => {
   const api = useAPI();
   const [response, setResponse] = useState(null);
 
@@ -21,22 +19,26 @@ export const StartModelTraining = ({ backend }) => {
 
     setResponse(res.response || {});
   }, [api]);
-    
+
   return (
     <Block name="test-request">
-      <Description style={{ marginTop: 0, maxWidth: 680 }}>
-        You're about to manually trigger your model's training process. This action will start the learning phase based on how train method is implemented in the ML Backend. Proceed to begin this process.<br /><br />
+      <Description style={{marginTop: 0, maxWidth: 680}}>
+        You're about to manually trigger your model's training process. This action will start the learning phase based
+        on how the train method is implemented in the ML Backend. Proceed to begin this process.<br/><br/>
 
-*Note: Currently, there is no built-in feedback loop within this interface for tracking the training progress. You'll need to monitor the model's training steps directly through the model's own tools and environment.
+        *Note: Currently, there is no built-in feedback loop within this interface for tracking the training progress.
+        You'll need to monitor the model's training steps directly through the model's own tools and environment.
 
 
       </Description>
-      { response || <Button onClick={() => { onStartTraining(backend) }}>Start Training</Button> }
+      {response || <Button onClick={() => {
+        onStartTraining(backend)
+      }}>Start Training</Button>}
 
-      { response && (
+      {response && (
         <>
           <pre>Request Sent!</pre>
-          <pre>Response: { JSON.stringify(response, null, 2) }</pre>
+          <pre>Response: {JSON.stringify(response, null, 2)}</pre>
         </>
       )}
     </Block>

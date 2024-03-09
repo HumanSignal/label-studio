@@ -28,8 +28,6 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
           onSubmit={async (response) => {
             if (!response.error_message) {
               onSubmit(response);
-              /* await fetchBackends(); */
-              /* modalRef.close(); */
             }
           }}>
       <Input type="hidden" name="project" value={project.id}/>
@@ -42,7 +40,6 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
         <Input name="url" label="Backend URL" required />
       </Form.Row>
 
-      {/* <h4>Authentication Method</h4> */}
       <Form.Row columnCount={2}>
         <Select name="auth_method" label="Select authentication method"
                 options={[ { label: "None", value: "NA" }, { label: "Basic Authentication", value: "BA" } ]}
@@ -61,13 +58,11 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
       </Form.Row>
       
       <Form.Row columnCount={1}>
-        <div>
           <Toggle
             name="is_interactive"
             label="Interactive preannotations"
             description="If enabled some labeling tools will send requests to the ML Backend interactively during the annotation process."
           />
-        </div>
       </Form.Row>
 
       <Form.Actions>

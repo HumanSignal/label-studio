@@ -29,8 +29,6 @@ export const TestRequest = ({ backend }) => {
       </Caption>
       <Elem name={'blocks'}>
         <Elem name={'left'}>
-          {/* <h4>Task</h4> */}
-          {/* <Elem name={'code'} style={{ maxHeight: "100px" }}><pre>{JSON.stringify(testResponse.task, null, 2)}</pre></Elem> */}
           <h4>Request</h4>
           <Elem name={'code'}>
             <pre>{ testResponse.url && "POST" } {testResponse.url}

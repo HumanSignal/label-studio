@@ -42,7 +42,7 @@ export const PredictionsList = ({ project, versions, fetchVersions }) => {
 };
 
 const VersionCard = ({ version, selected, onSelect, edittable, onDelete }) => {
-    const rootClass = cn("predictionCard");
+    const rootClass = cn("prediction-card");
     const disabledStyle = {
         opacity: edittable ? "1" : 0.3
     };
@@ -58,7 +58,7 @@ const VersionCard = ({ version, selected, onSelect, edittable, onDelete }) => {
 
   
     return (
-      <Block name="predictionCard">
+      <Block name="prediction-card">
         <div>
           <div className={rootClass.elem("title")}>
             <b>{version.model_version}</b>
@@ -70,7 +70,7 @@ const VersionCard = ({ version, selected, onSelect, edittable, onDelete }) => {
           </div>
           <div className={rootClass.elem("meta")}>
             <div className={rootClass.elem("group")}><IconPredictions /> {version.count}</div>
-            <div className={rootClass.elem("group")}>Last Prediction: 
+            <div className={rootClass.elem("group")}>Last prediction created:{' '}
               {formatDistanceToNow(parseISO(version.latest), { addSuffix: true })}
             </div>            
           </div>

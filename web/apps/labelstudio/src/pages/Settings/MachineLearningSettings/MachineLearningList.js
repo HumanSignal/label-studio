@@ -52,11 +52,11 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
     });
   }, [backend, onDelete]);
 
-  const rootClass = cn("backendCard");
+  const rootClass = cn("backend-card");
     
     return (
-        <Block name="backendCard">
-          <div className={rootClass.elem("titleBlk")}>
+        <Block name="backend-card">
+          <div className={rootClass.elem("title-container")}>
             <div>
               <BackendState backend={backend}/>
               <div className={rootClass.elem("title")}>
