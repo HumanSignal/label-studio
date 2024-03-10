@@ -54,6 +54,12 @@ const SettingsModel = types
 
     showAnnotationsPanel: types.optional(types.boolean, true),
 
+    hideAutoAnnotationTooltip: types.optional(types.boolean, false),
+
+    hideNonActiveRegions: types.optional(types.boolean, false),
+
+    enableActiveRegionOpacity: types.optional(types.boolean, false),
+
     showPredictionsPanel: types.optional(types.boolean, true),
     // showScore: types.optional(types.boolean, false),
 
@@ -148,6 +154,18 @@ const SettingsModel = types
 
     toggleSelectAfterCreate() {
       self.selectAfterCreate = !self.selectAfterCreate;
+    },
+
+    toggleHideNonSelectedRegions() {
+      self.hideNonActiveRegions = !self.hideNonActiveRegions;
+    },
+
+    toggleActiveRegionOpacity() {
+      self.enableActiveRegionOpacity = !self.enableActiveRegionOpacity;
+    },
+
+    toggleAutoAnnotationTooltip() {
+      self.hideAutoAnnotationTooltip = !self.hideAutoAnnotationTooltip;
     },
 
     toggleSidepanelModel() {

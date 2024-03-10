@@ -155,8 +155,6 @@ export default types.model('RegionStore', {
   ),
   selection: types.optional(SelectionMap, {}),
 
-  _hideNonSelectedRegions: types.optional(types.boolean,
-    () => window.localStorage.getItem('hideNoneSelectedRegions') === 'true')
 }).views(self => {
   let lastClickedItem;
   const getShiftClickSelectedRange = (item, tree) => {
@@ -421,9 +419,6 @@ export default types.model('RegionStore', {
       return window.localStorage.getItem(localStorageKeys.view) ?? self.view;
     },
 
-    get hideNonSelectedRegions () {
-      return self._hideNonSelectedRegions;
-    }
   };
 }).actions(self => ({
   addRegion(region) {
@@ -621,21 +616,21 @@ export default types.model('RegionStore', {
     self.updateRegionVisibility();
   },
 
-  setHideNonSelectedRegions (value) {
-    window.localStorage.setItem('hideNoneSelectedRegions', value);
-    self._hideNonSelectedRegions = value;
-    self.updateRegionVisibility();
-  },
-
   updateRegionVisibility () {
-    const update = self._hideNonSelectedRegions;
-    const noSelection = self.selectedIds.length === 0;
+    // Region visibility while annotating.
+
+    const hidingIsAllowed = self.annotation.store.settings.hideNonActiveRegions;
+    const hasSelection = self.selectedIds.length > 0;
+
+    console.log(hidingIsAllowed)
+
     self.filteredRegions.forEach(area => {
-      const active = noSelection || self.selectedIds.includes(area.id);
-      if (!update || active) {
-        area.setVisibility(true);
-      } else {
-        area.setVisibility(false);
+      const isActive = self.selectedIds.includes(area.id);
+      // Toggle area.
+      if ( (hidingIsAllowed && (isActive === area.hidden && hasSelection)) ||
+           (!hidingIsAllowed && area.hidden) ||
+           (!hasSelection && area.hidden) ) {
+        area.toggleHidden();
       }
     });
   }

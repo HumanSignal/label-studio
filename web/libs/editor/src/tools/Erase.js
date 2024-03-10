@@ -8,7 +8,7 @@ import { findClosestParent } from '../utils/utilities';
 import { DrawingTool } from '../mixins/DrawingTool';
 import { IconEraserTool } from '../assets/icons';
 import { Tool } from '../components/Toolbar/Tool';
-import {StrokeTool} from "../mixins/StrokeTool";
+import {getLocalActiveBrushOpacity, getLocalStrokeWidth, StrokeTool} from "../mixins/StrokeTool";
 
 
 const ToolView = observer(({ item }) => {
@@ -35,10 +35,11 @@ const ToolView = observer(({ item }) => {
 
 const _Tool = types
   .model('EraserTool', {
-    strokeWidth: types.optional(types.number, 10),
+    strokeWidth: getLocalStrokeWidth('eraser-size', 10),
     controlKey: 'eraser-size',
     group: 'segmentation',
     unselectRegionOnToolChange: false,
+    activeBrushOpacity: getLocalActiveBrushOpacity('eraser-size')
   })
   .volatile(() => ({
     index: 9999,
@@ -58,14 +59,15 @@ const _Tool = types
 
     return {
 
-      addPoint(x, y) {
-        brush.addPoint(Math.floor(x), Math.floor(y));
+      addPoint (x, y) {
+        brush.addPoint(x, y);
       },
 
       mouseupEv() {
         if (self.mode !== 'drawing') return;
         self.mode = 'viewing';
         brush.endPath();
+        self.updateRegionOpacity(brush, false);  // Disable region opacity if set.
       },
 
       mousemoveEv(ev, _, [x, y]) {
@@ -105,12 +107,13 @@ const _Tool = types
             opacity: 1,
             strokeWidth: self.strokeWidth,
           });
+          self.updateRegionOpacity(brush, true);  // Enable region opacity if set.
           self.addPoint(x, y);
         }
       },
     };
   });
 
-const Erase = types.compose(_Tool.name, ToolMixin, BaseTool, StrokeTool, DrawingTool, _Tool);
+const Erase = types.compose(_Tool.name, StrokeTool, _Tool);
 
 export { Erase };

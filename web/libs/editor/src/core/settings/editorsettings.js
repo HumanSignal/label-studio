@@ -54,6 +54,33 @@ export default {
     'onChangeEvent': 'toggleSelectAfterCreate',
     'defaultValue': false,
   },
+  'hideNonActiveRegions': {
+    'newUI': {
+      'title': 'Hide non active regions.',
+      'description': 'Hides all non active regions when selecting any regions.',
+    },
+    'description': 'Hides non active regions.',
+    'onChangeEvent': 'toggleHideNonSelectedRegions',
+    'defaultValue': false,
+  },
+  'enableActiveRegionOpacity': {
+    'newUI': {
+      'title': 'Enable active region opacity',
+      'description': 'When using the eraser or brush the opacity can be set to help visual aid',
+    },
+    'description': 'Enable active region opacity',
+    'onChangeEvent': 'toggleActiveRegionOpacity',
+    'defaultValue': false,
+  },
+  'hideAutoAnnotationTooltip': {
+    'newUI': {
+      'title': 'Hide the auto annotation tooltip',
+      'description': 'When auto annotation is enabled, this will hide the tooltip.',
+    },
+    'description': 'Hide the auto annotation tooltip',
+    'onChangeEvent': 'toggleAutoAnnotationTooltip',
+    'defaultValue': false,
+  },
   'showLineNumbers': {
     'newUI': {
       'tags': 'Text Tag',

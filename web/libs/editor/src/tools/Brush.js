@@ -9,7 +9,7 @@ import { DrawingTool } from '../mixins/DrawingTool';
 import { Tool } from '../components/Toolbar/Tool';
 import { NodeViews } from '../components/Node/Node';
 import { FF_DEV_3666, FF_DEV_4081, isFF } from '../utils/feature-flags';
-import {StrokeTool} from "../mixins/StrokeTool";
+import {getLocalActiveBrushOpacity, getLocalStrokeWidth, StrokeTool} from "../mixins/StrokeTool";
 
 
 
@@ -37,7 +37,8 @@ const ToolView = observer(({ item }) => {
 const _Tool = types
   .model('BrushTool', {
     controlKey: 'brush-size',
-    strokeWidth: types.optional(types.number, 15),
+    strokeWidth: getLocalStrokeWidth('brush-size', 15),
+    activeBrushOpacity: getLocalActiveBrushOpacity('brush-size'),
     group: 'segmentation',
     shortcut: 'B',
     smart: true,
@@ -82,8 +83,8 @@ const _Tool = types
         return newArea;
       },
 
-      addPoint(x, y) {
-        brush.addPoint(Math.floor(x), Math.floor(y));
+      addPoint (x, y) {
+        brush.addPoint(x, y);
       },
 
       mouseupEv(ev, _, [x, y]) {
@@ -92,6 +93,7 @@ const _Tool = types
         self.mode = 'viewing';
         brush.setDrawing(false);
         brush.endPath();
+        self.updateRegionOpacity(brush, false);  // Update the region opacity when brush ends.
         if (isFirstBrushStroke) {
           setTimeout(() => {
             const newBrush = self.commitDrawingRegion();
@@ -121,7 +123,7 @@ const _Tool = types
         self.addPoint(x, y);
       },
 
-      mousedownEv(ev, _, [x, y]) {
+      mousedownEv(ev, _, [x, y], canvas) {
         if (
           !findClosestParent(
             ev.target,
@@ -150,7 +152,7 @@ const _Tool = types
             type: 'add',
             strokeWidth: self.strokeWidth || c.strokeWidth,
           });
-
+          self.updateRegionOpacity(brush, true);  // Update the region opacity when brush starts.
           self.addPoint(x, y);
         } else {
           if (isFF(FF_DEV_3666) && !self.canStartDrawing()) return;
@@ -168,13 +170,13 @@ const _Tool = types
             type: 'add',
             strokeWidth: self.strokeWidth || c.strokeWidth,
           });
-
+          self.updateRegionOpacity(brush, true);  // Update the region opacity when brush starts.
           self.addPoint(x, y);
         }
       },
     };
   });
 
-const Brush = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, StrokeTool, _Tool);
+const Brush = types.compose(_Tool.name, StrokeTool, _Tool);
 
 export { Brush };

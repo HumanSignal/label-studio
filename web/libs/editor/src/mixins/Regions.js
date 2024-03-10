@@ -306,9 +306,6 @@ const RegionsMixin = types
         }
       },
 
-      setVisibility (visible) {
-        self.hidden = !visible;
-      }
     };
   });
 

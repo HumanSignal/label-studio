@@ -3,10 +3,60 @@ import {Range} from "../common/Range/Range";
 import Canvas from "../utils/canvas";
 import React from "react";
 import {clamp} from "../utils/utilities";
+import ToolMixin from "./Tool";
+import BaseTool from "../tools/Base";
+import {DrawingTool} from "./DrawingTool";
 
 
 const MIN_SIZE = 1;
 const MAX_SIZE = 50;
+const MAX_CURSOR_SIZE = 120;  // Maximum value sie because any bigger than 128x128 pixels is ignored.
+const STROKE_PREFIX = "stroke-tool-";
+
+
+const setLocalStorageNumber = (key, value, minValue, maxValue, defaultValue, updateIfValid = true) => {
+
+  const _key = STROKE_PREFIX + key;
+
+  if ( isNaN(value) || value < minValue || value > maxValue) {  // Use default value if value is not valid.
+    window.localStorage.setItem(_key, defaultValue.toString());
+    return defaultValue;
+  }
+
+  if (updateIfValid) {
+    window.localStorage.setItem(_key, value.toString());
+  }
+
+  return value;
+}
+
+
+
+const getLocalStorageNumber = (key, defaultNumber, minValue, maxValue) => {
+
+  const parsedValue = parseFloat(window.localStorage.getItem(STROKE_PREFIX + key));
+
+  if ( isNaN(parsedValue) || parsedValue < minValue || parsedValue > maxValue ) return defaultNumber;
+
+  return parsedValue;
+}
+
+
+const getLocalStrokeWidth = (toolKey, defaultSize) => {
+  return getLocalStorageNumber(toolKey + '-width', defaultSize, MIN_SIZE, MAX_SIZE);
+}
+
+const setLocalStrokeWidth = (toolKey, value) => {
+  return setLocalStorageNumber(toolKey + '-width', value, MIN_SIZE, MAX_SIZE, MIN_SIZE, true);
+}
+
+const getLocalActiveBrushOpacity = (toolKey) => {
+  return getLocalStorageNumber(toolKey + '-opacity', 0.6, 0.0, 1.0);
+}
+
+const setLocalActiveBrushOpacity = (toolKey, value) => {
+  return setLocalStorageNumber(toolKey + '-opacity', value, 0.0, 1.0, 0.6, true);
+}
 
 
 const IconDot = ({ size }) => {
@@ -21,17 +71,32 @@ const IconDot = ({ size }) => {
   );
 };
 
-const StrokeTool = types
+const OpacityDot = ({ opacity }) => {
+  return (
+    <span style={{
+      display: 'block',
+      width: 16,
+      height: 16,
+      background: `rgba(0, 0, 0, ${opacity})`,
+      borderRadius: '100%',
+    }}/>
+  );
+};
+
+
+const _Tool = types
   .model('StrokeTool', {
     strokeWidth: types.optional(types.number, 10),
     strokeIncrement: types.optional(types.number, 5),
     fineStrokes: types.optional(types.array(types.number),  [10, 9, 8, 7, 6, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1]),
     controlKey: types.optional(types.string, 'tool-size'),
     unselectRegionOnToolChange: false,
+    activeBrushOpacity: types.optional(types.number, -1),
+    _defaultBrushOpacity: types.optional(types.number, -1)
   })
   .views(self => ({
     get controls() {
-      return [
+      const controls = [
         <Range
           key={self.controlKey}
           value={self.strokeWidth}
@@ -46,6 +111,26 @@ const StrokeTool = types
           }}
         />,
       ];
+      if (!self.annotation.store.settings.enableActiveRegionOpacity) return controls;
+      // TODO change the slider opacity value based on true opacity.
+      controls.unshift(
+        <Range
+          key={'opacity'}
+          value={self.activeBrushOpacity}
+          min={0.0}
+          max={1.0}
+          step={0.05}
+          reverse
+          align="vertical"
+          minIcon={<OpacityDot opacity={0.1}/>}
+          maxIcon={<OpacityDot opacity={0.9}/> }
+          onChange={(value) => {
+            self.setActiveBrushOpacity(value)
+          }}
+        />
+      )
+      return controls;
+
     },
 
     get extraShortcuts() {
@@ -61,11 +146,19 @@ const StrokeTool = types
 
     get hasFineStrokes () {
       return self.fineStrokes.length > 0;
+    },
+
+    get useRegionOpacity () {
+      return self.annotation.store.settings.enableActiveRegionOpacity;
+    },
+
+    get defaultRegionOpacity () {
+      if (self._defaultBrushOpacity === -1) return 0.6;
+      return self._defaultBrushOpacity;
     }
 
   }))
   .actions(self => {
-
     return {
 
       updateCursor() {
@@ -75,15 +168,14 @@ const StrokeTool = types
           val *= self.obj.zoomScale;  // Multiply val by zoom scale.
         }
         let dashes = 0;
-        const MAX_SIZE = 120;  // Maximum value sie because any bigger and the cursor won't be set correctly.
-        if (val > 120) {
+        if (val > MAX_CURSOR_SIZE) {
           // Cap value at 120 for cursor pixels.
-          dashes = Math.floor(Math.max(16, val - MAX_SIZE) / 2);
-          val = MAX_SIZE;
+          dashes = Math.floor(Math.max(16, val - MAX_CURSOR_SIZE) / 2);
+          val = MAX_CURSOR_SIZE;
         }
         const stage = self.obj.stageRef;
         const base64 = Canvas.brushSizeCircle(val, dashes);
-        const cursor = ['url(\'', base64, '\')', ' ', Math.floor(val / 2) + 4, ' ', Math.floor(val / 2) + 4, ', auto'];
+        const cursor = ['url(\'', base64, '\')', ' ', Math.floor(val / 2), ' ', Math.floor(val / 2), ', auto'];
         stage.container().style.cursor = cursor.join('');
       },
 
@@ -114,6 +206,7 @@ const StrokeTool = types
         const strokeWidth = clamp(newStrokeValue, MIN_SIZE, MAX_SIZE);  // Clamp stroke width
         const cursorNeedsUpdate = self.strokeWidth !== strokeWidth;
         self.strokeWidth = strokeWidth;
+        setLocalStrokeWidth(self.controlKey, strokeWidth);
         if (cursorNeedsUpdate) this.updateCursor();
       },
 
@@ -161,9 +254,33 @@ const StrokeTool = types
         });
         if (lastRegion === null) return;  // Unable to set region.
         regionStore.selectRegionsByIds([lastRegion.id]);
+      },
+
+      setDefaultRegionOpacity (value) {
+        if (self._defaultBrushOpacity !== -1) return;  // Default is already set.
+        self._defaultBrushOpacity = value;
+      },
+
+      setActiveBrushOpacity (value) {
+        if ( !self.useRegionOpacity ) return;
+        self.activeBrushOpacity = setLocalActiveBrushOpacity(self.controlKey, value);
+      },
+
+      updateRegionOpacity (region, active) {
+        if ( !self.useRegionOpacity ) return;  // Ignore.
+        if ( active ) {
+          self.setDefaultRegionOpacity(region.opacity);  // Store default region opacity.
+          region.setOpacity(self.activeBrushOpacity);
+        } else {
+          region.setOpacity(self.defaultRegionOpacity);  // Restore default opacity.
+        }
       }
     }
   });
 
-export { StrokeTool };
+
+const StrokeTool = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, _Tool);
+
+
+export { StrokeTool, getLocalStrokeWidth, getLocalActiveBrushOpacity, setLocalStrokeWidth, setLocalActiveBrushOpacity};
 

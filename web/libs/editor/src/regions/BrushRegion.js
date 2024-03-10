@@ -440,12 +440,9 @@ const Model = types
         return self.parent.createSerializedResult(self, value);
       },
 
-      setVisibility (visible) {
-        if (visible) {
-          self.opacity = 0.6;
-        } else {
-          self.opacity = 0.15;
-        }
+      setOpacity (value) {
+        if (isNaN(value) || value > 1.0 || value < 0) return;
+        self.opacity = value;
       }
     };
   });

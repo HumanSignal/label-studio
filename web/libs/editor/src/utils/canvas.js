@@ -356,6 +356,8 @@ function brushSizeCircle(size, dashes = 0) {
   canvas.width = size + 8;
   canvas.height = size + 8;
 
+  const lineWidth = 2;
+
   const arcStep = 2 * Math.PI / (dashes + 1);
 
   for (let i = 0; i < dashes + 1; i++) {
@@ -363,9 +365,9 @@ function brushSizeCircle(size, dashes = 0) {
     const endAngle = startAngle + (dashes > 0 ? (arcStep / 2) : arcStep);
 
     ctx.beginPath();
-    ctx.arc(Math.floor(size / 2) + 4, Math.floor(size / 2) + 4, size / 2, startAngle, endAngle, false);
+    ctx.arc(size / 2, size / 2, (size / 2), startAngle, endAngle, false);
 
-    ctx.lineWidth = 2;
+    ctx.lineWidth = lineWidth;
     ctx.strokeStyle = 'white';
     ctx.stroke();
   }

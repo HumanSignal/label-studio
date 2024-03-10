@@ -404,7 +404,6 @@ export const Annotation = types
      * @param {boolean} tryToKeepStates don't unselect labels if such setting is enabled
      */
     unselectAll(tryToKeepStates = false) {
-      console.log('unslecting region!!!!!')
       const keepStates = tryToKeepStates && self.store.settings.continuousLabeling;
 
       self.unselectAreas();

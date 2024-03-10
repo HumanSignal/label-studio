@@ -358,9 +358,6 @@ const Result = types
       self.hidden = !self.hidden;
     },
 
-    setVisibility (visibile) {
-      console.log('set VISIBLE>EF', visibile)
-    }
   }));
 
 export default types.compose('Result', Result, AnnotationMixin);
