@@ -126,7 +126,10 @@ class ModelRun(models.Model):
     )
 
     project_subset = models.CharField(max_length=255, choices=ProjectSubset.choices, default=ProjectSubset.HASGT)
+
     status = models.CharField(max_length=255, choices=ModelRunStatus.choices, default=ModelRunStatus.PENDING)
+
+    job_id = models.CharField(max_length=255, null=True, blank=True, default=None)
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
@@ -137,8 +140,16 @@ class ModelRun(models.Model):
     # todo may need to clean up in future
     @property
     def input_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input_tasks.csv'
+        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input.csv'
 
     @property
     def output_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output_tasks.csv'
+        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output.csv'
+
+    @property
+    def error_file_name(self):
+        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
+
+    @property
+    def base_file_path(self):
+        return 's3://sandbox2-datasets-for-prompter-workflow/adala/hakan_test'   # TODO decide on path to use for LSE
