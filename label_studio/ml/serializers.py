@@ -10,7 +10,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
     """ """
 
     readable_state = serializers.SerializerMethodField()
-    basic_auth_pass = serializers.CharField(write_only=True, required=False)
+    basic_auth_pass = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
     basic_auth_pass_is_set = serializers.SerializerMethodField()
 
     def get_basic_auth_pass_is_set(self, obj):
@@ -21,8 +21,12 @@ class MLBackendSerializer(serializers.ModelSerializer):
 
     def validate_basic_auth_pass(self, value):
         # Checks if the new password and old password are non-existent.
-        if not value and not self.instance.basic_auth_pass:
-            raise serializers.ValidationError('Basic Auth Password field is required.')
+        if not value:
+            if not self.instance.basic_auth_pass:
+                raise serializers.ValidationError('Authentication password is required for Basic Authentication.')
+            else:
+                # If user is not changing the password, return the old password.
+                return self.instance.basic_auth_pass
         return value
 
     def validate_url(self, value):

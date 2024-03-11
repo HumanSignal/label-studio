@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Button } from '../../../components';
-import { ErrorWrapper } from '../../../components/Error/Error';
-import { InlineError } from '../../../components/Error/InlineError';
+import {useState} from 'react';
+import {Button} from '../../../components';
+import {ErrorWrapper} from '../../../components/Error/Error';
+import {InlineError} from '../../../components/Error/InlineError';
 import {
   Form,
   Input,
@@ -11,29 +11,29 @@ import {
 } from '../../../components/Form';
 import './MachineLearningSettings.styl';
 
-const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
+const CustomBackendForm = ({action, backend, project, onSubmit}) => {
   const [selectedAuthMethod, setAuthMethod] = useState('');
   const [, setMLError] = useState();
 
   return (
     <Form
       action={action}
-      formData={{ ...(backend ?? {}) }}
-      params={{ pk: backend?.id }}
+      formData={{...(backend ?? {})}}
+      params={{pk: backend?.id}}
       onSubmit={async (response) => {
         if (!response.error_message) {
           onSubmit(response);
         }
       }}
     >
-      <Input type="hidden" name="project" value={project.id} />
+      <Input type="hidden" name="project" value={project.id}/>
 
       <Form.Row columnCount={1}>
-        <Input name="title" label="Name" placeholder="Enter a name" required />
+        <Input name="title" label="Name" placeholder="Enter a name" required/>
       </Form.Row>
 
       <Form.Row columnCount={1}>
-        <Input name="url" label="Backend URL" required />
+        <Input name="url" label="Backend URL" required/>
       </Form.Row>
 
       <Form.Row columnCount={2}>
@@ -41,8 +41,8 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
           name="auth_method"
           label="Select authentication method"
           options={[
-            { label: 'No Authentication', value: 'NA' },
-            { label: 'Basic Authentication', value: 'BA' },
+            {label: 'No Authentication', value: 'NA'},
+            {label: 'Basic Authentication', value: 'BA'},
           ]}
           onChange={(e) => {
             setAuthMethod(e.target.value);
@@ -52,11 +52,12 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
 
       {(backend?.auth_method == 'BA' || selectedAuthMethod == 'BA') && (
         <Form.Row columnCount={2}>
-          <Input name="basic_auth_user" label="Basic auth user" />
+          <Input name="basic_auth_user" label="Basic auth user"/>
           {backend?.basic_auth_pass_is_set ? (
-            <Input name="basic_auth_pass" label="Basic auth pass" type="password" defaultValue="********"/>
+            <Input name="basic_auth_pass" label="Basic auth pass" type="password"
+                   placeholder="********" />
           ) : (
-            <Input name="basic_auth_pass" label="Basic auth pass" type="password" required/>
+            <Input name="basic_auth_pass" label="Basic auth pass" type="password"/>
           )}
         </Form.Row>
       )}
@@ -65,7 +66,7 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
         <TextArea
           name="extra_params"
           label="Any extra params to pass during model connection"
-          style={{ minHeight: 120 }}
+          style={{minHeight: 120}}
         />
       </Form.Row>
 
@@ -102,9 +103,9 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
         )}
       </Form.ResponseParser>
 
-      <InlineError />
+      <InlineError/>
     </Form>
   );
 };
 
-export { CustomBackendForm };
+export {CustomBackendForm};
