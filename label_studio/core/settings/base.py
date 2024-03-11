@@ -232,6 +232,7 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
     'core.middleware.DisableCSRF',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'core.middleware.XApiKeySupportMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'

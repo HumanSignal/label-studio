@@ -159,6 +159,17 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         return response
 
 
+class XApiKeySupportMiddleware(CommonMiddleware):
+    """Middleware that adds support for the X-Api-Key header, by having its value supersede
+    anything that's set in the Authorization header."""
+
+    def process_request(self, request):
+        if 'HTTP_X_API_KEY' in request.META:
+            request.META['HTTP_AUTHORIZATION'] = f'Token {request.META["HTTP_X_API_KEY"]}'
+            del request.META['HTTP_X_API_KEY']
+        return super().process_request(request)
+
+
 class UpdateLastActivityMiddleware(CommonMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
         if hasattr(request, 'user') and request.method not in SAFE_METHODS:
