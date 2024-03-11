@@ -159,7 +159,7 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         return response
 
 
-class XApiKeySupportMiddleware(CommonMiddleware):
+class XApiKeySupportMiddleware(MiddlewareMixin):
     """Middleware that adds support for the X-Api-Key header, by having its value supersede
     anything that's set in the Authorization header."""
 
