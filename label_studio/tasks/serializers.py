@@ -576,59 +576,6 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
         exclude = ()
 
 
-class TaskIDWithAnnotationsSerializer(TaskSerializer):
-    """ """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # TODO: this called twice due to base class initializer
-        self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context)
-
-    class Meta:
-        model = Task
-        fields = ['id', 'annotations']
-
-
-class TaskWithPredictionsSerializer(TaskSerializer):
-    """ """
-
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
-
-    class Meta:
-        model = Task
-        fields = '__all__'
-
-
-class TaskWithAnnotationsAndPredictionsSerializer(TaskSerializer):
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
-    annotations = serializers.SerializerMethodField(default=[], read_only=True)
-
-    def get_annotations(self, task):
-        annotations = task.annotations
-
-        if 'request' in self.context:
-            user = self.context['request'].user
-            if user.is_annotator:
-                annotations = annotations.filter(completed_by=user)
-
-        return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
-
-    @staticmethod
-    def generate_prediction(task):
-        """Generate prediction for task and store it to Prediction model"""
-        prediction = task.predictions.filter(model_version=task.project.model_version)
-        if not prediction.exists():
-            task.project.create_prediction(task)
-
-    def to_representation(self, instance):
-        self.generate_prediction(instance)
-        return super().to_representation(instance)
-
-    class Meta:
-        model = Task
-        exclude = ()
-
-
 class AnnotationDraftSerializer(ModelSerializer):
     user = serializers.CharField(default=serializers.CurrentUserDefault())
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
@@ -711,13 +658,19 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
             return lock.unique_id
 
     def get_predictions(self, task):
-        project = task.project
-        if not project.show_collab_predictions:
-            return []
-        else:
-            for ml_backend in project.ml_backends.all():
-                ml_backend.predict_tasks([task])
-            return super().get_predictions(task)
+        """ """
+        predictions = task.get_predictions_for_prelabeling()
+        return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
+
+    # def get_predictions(self, task):
+    #     project = task.project
+
+    #     if not project.show_collab_predictions:
+    #         return []
+    # else:
+    #     # for ml_backend in project.ml_backends.all():
+    #     #     ml_backend.predict_tasks([task])
+    #     return super().get_predictions(task)
 
     def get_annotations(self, task):
         result = []

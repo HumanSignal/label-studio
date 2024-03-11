@@ -13,6 +13,7 @@ export const MenuItem = ({
   exact = false,
   forceReload = false,
   active = false,
+  isDangerous = false,
   onClick,
   ...rest
 }) => {
@@ -31,6 +32,8 @@ export const MenuItem = ({
 
   if (isActive || active) classList.push(rootClass.mod({ active: true }));
 
+  if (isDangerous) classList.push(rootClass.mod({ dangerous: true }));
+  
   if (className) classList.push(className);
 
   const linkContent = (
