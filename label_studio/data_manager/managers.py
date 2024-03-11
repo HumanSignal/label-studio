@@ -257,6 +257,16 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
         return 'continue'
 
 
+def get_alt_field_name(field_name, project, enabled=False):
+    if (
+        enabled
+        and field_name.startswith('data__')
+        and field_name != f'data__{settings.DATA_UNDEFINED_NAME}'
+        and project.one_object_in_label_config
+    ):
+        return f'data__{settings.DATA_UNDEFINED_NAME}'
+
+
 def apply_filters(queryset, filters, project, request):
     if not filters:
         return queryset
@@ -264,6 +274,11 @@ def apply_filters(queryset, filters, project, request):
     # convert conjunction to orm statement
     filter_expressions = []
     custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
+    preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
+    preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
+    handle_alt_fieldname = flag_set(
+        'fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short', user='auto'
+    )
 
     for _filter in filters.items:
 
@@ -272,11 +287,10 @@ def apply_filters(queryset, filters, project, request):
             continue
 
         # django orm loop expression attached to column name
-        preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
         field_name, _ = preprocess_field_name(_filter.filter, project.only_undefined_field)
+        alt_field_name = get_alt_field_name(field_name, project, enabled=handle_alt_fieldname)
 
         # filter pre-processing, value type conversion, etc..
-        preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
         _filter = preprocess_filter(_filter, field_name)
 
         # custom expressions for enterprise
@@ -313,6 +327,9 @@ def apply_filters(queryset, filters, project, request):
             elif 'equal' in _filter.operator:
                 if not _filter.value.isdigit():
                     _filter.value = 0
+                elif handle_alt_fieldname:
+                    _filter.type = 'Number'
+                    _filter.value = int(_filter.value)
 
         # predictions model versions
         if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:
@@ -339,16 +356,34 @@ def apply_filters(queryset, filters, project, request):
         # annotate with cast to number if need
         if _filter.type == 'Number' and field_name.startswith('data__'):
             json_field = field_name.replace('data__', '')
-            queryset = queryset.annotate(
-                **{
-                    f'filter_{json_field.replace("$undefined$", "undefined")}': Cast(
-                        KeyTextTransform(json_field, 'data'), output_field=FloatField()
-                    )
-                }
-            )
+            alt_json_field = alt_field_name.replace('data__', '') if alt_field_name else None
+
+            if alt_json_field:
+                queryset = queryset.annotate(
+                    **{
+                        f'filter_{json_field.replace("$undefined$", "undefined")}': Case(
+                            When(
+                                **{f'{field_name}__isnull': False},
+                                then=Cast(KeyTextTransform(json_field, 'data'), output_field=FloatField()),
+                            ),
+                            default=Cast(KeyTextTransform(alt_json_field, 'data'), output_field=FloatField()),
+                        )
+                    }
+                )
+            else:
+                queryset = queryset.annotate(
+                    **{
+                        f'filter_{json_field.replace("$undefined$", "undefined")}': Cast(
+                            KeyTextTransform(json_field, 'data'), output_field=FloatField()
+                        )
+                    }
+                )
+
             clean_field_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
+            alt_clean_field_name = None
         else:
             clean_field_name = field_name
+            alt_clean_field_name = alt_field_name
 
         # special case: predictions, annotations, cancelled --- for them 0 is equal to is_empty=True
         if (
@@ -358,30 +393,91 @@ def apply_filters(queryset, filters, project, request):
             _filter.operator = 'equal' if cast_bool_from_str(_filter.value) else 'not_equal'
             _filter.value = 0
 
-        # get type of annotated field
-        value_type = 'str'
-        if queryset.exists():
-            value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
+        # When field is a comparison to an id and handle_alt_fieldname is True, treat value as an integer
+        if (
+            handle_alt_fieldname
+            and field_name == 'annotations__id'
+            and _filter.operator in ('equal', 'not_equal', 'empty')
+        ):
+            value_type = 'int'
+        else:
+            # get type of annotated field
+            value_type = 'str'
+            if queryset.exists():
+                value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
         if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
             raise Exception('Not supported filter type')
 
-        # special case: for strings empty is "" or null=True
-        if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
+        # When handle_alt_fieldname is True, this check will be canonical for empty operators of any type
+        # Otherwise it will default to the previous behavior
+        if _filter.operator == 'empty' and (handle_alt_fieldname or _filter.type in ('String', 'Unknown')):
             value = cast_bool_from_str(_filter.value)
-            if value:  # empty = true
-                q = Q(Q(**{field_name: None}) | Q(**{field_name + '__isnull': True}))
-                if value_type == 'str':
-                    q |= Q(**{field_name: ''})
-                if value_type == 'list':
-                    q = Q(**{field_name: [None]})
 
-            else:  # empty = false
-                q = Q(~Q(**{field_name: None}) & ~Q(**{field_name + '__isnull': True}))
-                if value_type == 'str':
-                    q &= ~Q(**{field_name: ''})
+            if handle_alt_fieldname:
+                # Base condition for field_name
                 if value_type == 'list':
-                    q = ~Q(**{field_name: [None]})
+                    base_condition = (
+                        Q(**{field_name: []}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+                    )
+                elif (
+                    value_type == 'str'
+                    or value_type not in ('datetime', 'int')
+                    and _filter.type not in ('Datetime', 'Number')
+                ):
+                    base_condition = (
+                        Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+                    )
+                else:
+                    base_condition = Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+
+                # Include alt_field_name if it is provided
+                if alt_field_name:
+                    if value_type == 'list':
+                        alt_condition = (
+                            Q(**{alt_field_name: []})
+                            | Q(**{alt_field_name: None})
+                            | Q(**{alt_field_name + '__isnull': True})
+                        )
+                    elif (
+                        value_type == 'str'
+                        or value_type not in ('datetime', 'int')
+                        and _filter.type not in ('Datetime', 'Number')
+                    ):
+                        alt_condition = (
+                            Q(**{alt_field_name: ''})
+                            | Q(**{alt_field_name: None})
+                            | Q(**{alt_field_name + '__isnull': True})
+                        )
+                    else:
+                        alt_condition = Q(**{alt_field_name: None}) | Q(**{alt_field_name + '__isnull': True})
+            else:
+                # Original conditions for strictly field_name
+                if value_type == 'str':
+                    base_condition = (
+                        Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+                    )
+                elif value_type == 'list':
+                    base_condition = (
+                        Q(**{field_name: []}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+                    )
+                else:
+                    base_condition = Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
+
+            if value:  # empty = true
+                if alt_field_name:
+                    # Both field_name and alt_field_name should be empty
+                    q = base_condition & alt_condition
+                else:
+                    # Only field_name should be empty
+                    q = base_condition
+            else:  # empty = false
+                if alt_field_name:
+                    # At least one of field_name or alt_field_name should not be empty
+                    q = ~base_condition | ~alt_condition
+                else:
+                    # field_name should not be empty
+                    q = ~base_condition
 
             filter_expressions.append(q)
             continue
@@ -396,42 +492,67 @@ def apply_filters(queryset, filters, project, request):
 
         # append operator
         field_name = f"{clean_field_name}{operators.get(_filter.operator, '')}"
+        if alt_clean_field_name:
+            alt_field_name = f"{alt_clean_field_name}{operators.get(_filter.operator, '')}"
 
         # in
         if _filter.operator == 'in':
             cast_value(_filter)
-            filter_expressions.append(
-                Q(
-                    **{
-                        f'{field_name}__gte': _filter.value.min,
-                        f'{field_name}__lte': _filter.value.max,
-                    }
-                ),
+            # Base condition for field_name being inside the range
+            q = Q(
+                **{
+                    f'{field_name}__gte': _filter.value.min,
+                    f'{field_name}__lte': _filter.value.max,
+                }
             )
+            # If alt_field_name is set, ensure that records are included if either is inside the range
+            if alt_field_name:
+                q |= Q(
+                    **{
+                        f'{alt_field_name}__gte': _filter.value.min,
+                        f'{alt_field_name}__lte': _filter.value.max,
+                    }
+                )
+            filter_expressions.append(q)
 
         # not in
         elif _filter.operator == 'not_in':
             cast_value(_filter)
-            filter_expressions.append(
-                ~Q(
-                    **{
-                        f'{field_name}__gte': _filter.value.min,
-                        f'{field_name}__lte': _filter.value.max,
-                    }
-                ),
+            # Base condition for field_name being outside the range
+            q = ~Q(
+                **{
+                    f'{field_name}__gte': _filter.value.min,
+                    f'{field_name}__lte': _filter.value.max,
+                }
             )
+            # If alt_field_name is set, ensure that records are excluded if either is outside the range
+            if alt_field_name:
+                q &= ~Q(
+                    **{
+                        f'{alt_field_name}__gte': _filter.value.min,
+                        f'{alt_field_name}__lte': _filter.value.max,
+                    }
+                )
+
+            filter_expressions.append(q)
 
         # in list
         elif _filter.operator == 'in_list':
-            filter_expressions.append(
-                Q(**{f'{field_name}__in': _filter.value}),
-            )
+            # Base condition for field_name containing the value
+            q = Q(**{f'{field_name}__in': _filter.value})
+            # If alt_field_name is set, ensure that records are included if either contains the value
+            if alt_field_name:
+                q |= Q(**{f'{alt_field_name}__in': _filter.value})
+            filter_expressions.append(q)
 
         # not in list
         elif _filter.operator == 'not_in_list':
-            filter_expressions.append(
-                ~Q(**{f'{field_name}__in': _filter.value}),
-            )
+            # Base condition for field_name not containing the value
+            q = ~Q(**{f'{field_name}__in': _filter.value})
+            # If alt_field_name is set, ensure that records are excluded if either contains the value
+            if alt_field_name:
+                q |= ~Q(**{f'{alt_field_name}__in': _filter.value})
+            filter_expressions.append(q)
 
         # empty
         elif _filter.operator == 'empty':
@@ -440,15 +561,23 @@ def apply_filters(queryset, filters, project, request):
             else:
                 filter_expressions.append(~Q(**{field_name: True}))
 
-        # starting from not_
         elif _filter.operator.startswith('not_'):
             cast_value(_filter)
-            filter_expressions.append(~Q(**{field_name: _filter.value}))
+            # Negate the condition for field_name
+            q = ~Q(**{field_name: _filter.value})
+            if alt_field_name:
+                # Ensure that records are excluded if either does not contain the value
+                q |= ~Q(**{alt_field_name: _filter.value})
+            filter_expressions.append(q)
 
         # all others
         else:
             cast_value(_filter)
-            filter_expressions.append(Q(**{field_name: _filter.value}))
+            q = Q(**{field_name: _filter.value})
+            if alt_field_name:
+                # Ensure that records are included if either contains the value
+                q |= Q(**{alt_field_name: _filter.value})
+            filter_expressions.append(q)
 
     """WARNING: Stringifying filter_expressions will evaluate the (sub)queryset.
         Do not use a log in the following manner:
@@ -464,6 +593,7 @@ def apply_filters(queryset, filters, project, request):
     else:
         for filter_expression in filter_expressions:
             queryset = queryset.filter(filter_expression)
+
     return queryset
 
 
