@@ -1,6 +1,12 @@
 import { inject, observer } from "mobx-react";
-import { useRef } from "react";
-import { FaAngleDown, FaChevronDown, FaChevronUp, FaTrash } from "react-icons/fa";
+import { useCallback, useRef, useState } from "react";
+import {
+  FaAngleDown,
+  FaChevronDown,
+  FaChevronRight,
+  FaChevronUp,
+  FaTrash
+} from "react-icons/fa";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_LOPS_E_10, FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { Button } from "../../Common/Button/Button";
@@ -8,10 +14,7 @@ import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
 import Form from "../../Common/Form/Form";
 import { Menu } from "../../Common/Menu/Menu";
 import { Modal } from "../../Common/Modal/ModalPopup";
-import { useState } from "react";
-import { FaChevronRight } from "react-icons/fa";
 import "./ActionsButton.styl";
-import { useCallback } from "react";
 
 const isFFLOPSE3 = isFF(FF_LOPS_E_3);
 const isNewUI = isFF(FF_LOPS_E_10);
@@ -48,11 +51,11 @@ export const ActionsButton = injector(observer(({ store, size, hasSelected, ...r
 
   const invokeAction = (action, destructive) => {
     if (action.dialog) {
-      const { type: dialogType, text, form } = action.dialog;
+      const { type: dialogType, text, form, title } = action.dialog;
       const dialog = Modal[dialogType] ?? Modal.confirm;
 
       dialog({
-        title: destructive ? "Destructive action." : "Confirm action.",
+        title: title ? title : destructive ? "Destructive action" : "Confirm action",
         body: buildDialogContent(text, form, formRef),
         buttonLook: destructive ? "destructive" : "primary",
         onOk() {
