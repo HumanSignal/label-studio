@@ -159,15 +159,36 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         return response
 
 
-class XApiKeySupportMiddleware(MiddlewareMixin):
+class SimpleMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # One-time configuration and initialization.
+
+    def __call__(self, request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+
+        response = self.get_response(request)
+
+        # Code to be executed for each request/response after
+        # the view is called.
+
+        return response
+
+
+class XApiKeySupportMiddleware:
     """Middleware that adds support for the X-Api-Key header, by having its value supersede
     anything that's set in the Authorization header."""
 
-    def process_request(self, request):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
         if 'HTTP_X_API_KEY' in request.META:
             request.META['HTTP_AUTHORIZATION'] = f'Token {request.META["HTTP_X_API_KEY"]}'
             del request.META['HTTP_X_API_KEY']
-        return super().process_request(request)
+
+        return self.get_response(request)
 
 
 class UpdateLastActivityMiddleware(CommonMiddleware):
