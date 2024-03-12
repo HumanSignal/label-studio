@@ -9,6 +9,7 @@ from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import DjangoFilterDescriptionInspector
 from core.utils.params import bool_from_request
 from data_manager.api import TaskListAPI as DMTaskListAPI
+from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
 from django.db import transaction
@@ -180,21 +181,18 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk):
         context = self.get_retrieve_serializer_context(request)
-        context['project'] = self.task.project
+        context['project'] = project = self.task.project
 
         # get prediction
-        if self.task.project.show_collab_predictions:
-            self.task.refresh_predictions()
+        if (
+            project.evaluate_predictions_automatically or project.show_collab_predictions
+        ) and not self.task.predictions.exists():
+            evaluate_predictions([self.task])
             self.task.refresh_from_db()
-
-        # predictions = retrieve_predictions([task])
-        # if predictions:
-        #     self.task.refresh_from_db()
 
         serializer = self.get_serializer_class()(
             self.task, many=False, context=context, expand=['annotations.completed_by']
         )
-
         data = serializer.data
         return Response(data)
 
@@ -225,21 +223,20 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         else:
             return TaskSimpleSerializer
 
-    # def retrieve(self, request, *args, **kwargs):
-    #     print("def retrieve(self, request, *args, **kwargs):")
-    #     task = self.get_object()
-    #     project = task.project
+    def retrieve(self, request, *args, **kwargs):
+        task = self.get_object()
+        project = task.project
 
-    #     # call machine learning api and format response
-    #     if project.retrieve_predictions_automatically:
-    #         for ml_backend in task.project.ml_backends.all():
-    #             ml_backend.predict_tasks([task])
+        # call machine learning api and format response
+        if project.evaluate_predictions_automatically:
+            for ml_backend in task.project.ml_backends.all():
+                ml_backend.predict_tasks([task])
 
-    #     result = self.get_serializer(task).data
+        result = self.get_serializer(task).data
 
-    #     # use proxy inlining to task data (for credential access)
-    #     result['data'] = task.resolve_uri(result['data'], project)
-    #     return Response(result)
+        # use proxy inlining to task data (for credential access)
+        result['data'] = task.resolve_uri(result['data'], project)
+        return Response(result)
 
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
