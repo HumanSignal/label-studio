@@ -1,0 +1,481 @@
+---
+test_name: test_ml_backend_creation
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - name: stage
+    request:
+      data:
+        email: test_ml_backend_creation@test.com
+        password: 12345678
+        title: test_ml_backend_creation
+      method: POST
+      url: '{django_live_url}/user/signup'
+    response:
+      status_code: 302
+  - name: stage
+    request:
+      data:
+        is_published: true
+        label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_ml_backend_creation
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        project: '{project_pk}'
+        title: My Testing ML backend
+        url: https://test.heartex.mlbackend.com:9090
+      method: POST
+      url: '{django_live_url}/api/ml'
+    response:
+      json:
+        model_version: ''
+        state: CO
+      save:
+        json:
+          ml_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      method: POST
+      url: '{django_live_url}/api/ml/{ml_pk}/train'
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml/{ml_pk}'
+    response:
+      json:
+        state: CO
+      status_code: 200
+  - name: check versions
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml/{ml_pk}/versions'
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
+      json:
+        url: https://test.heartex.mlbackend.com:9091
+      method: PATCH
+      url: '{django_live_url}/api/ml/{ml_pk}'
+    response:
+      status_code: 400
+  - name: stage
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/ml/{ml_pk}'
+    response:
+      status_code: 204
+---
+test_name: test_ml_backend_multiple_creation
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - name: stage
+    request:
+      data:
+        email: test_ml_backend_creation@test.com
+        password: 12345678
+        title: test_ml_backend_creation
+      method: POST
+      url: '{django_live_url}/user/signup'
+    response:
+      status_code: 302
+  - name: stage
+    request:
+      data:
+        is_published: true
+        label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_ml_backend_creation
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        project: '{project_pk}'
+        title: My Testing ML backend 1
+        url: https://test.heartex.mlbackend.com:9090
+      method: POST
+      url: '{django_live_url}/api/ml'
+    response:
+      json:
+        model_version: ''
+        state: CO
+      save:
+        json:
+          ml_pk1: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        project: '{project_pk}'
+        title: My Testing ML backend 2
+        url: https://test.heartex.mlbackend.com:9090
+      method: POST
+      url: '{django_live_url}/api/ml'
+    response:
+      json:
+        model_version: ''
+        state: CO
+      save:
+        json:
+          ml_pk2: id
+      status_code: 201
+  - name: stage
+    request:
+      method: POST
+      url: '{django_live_url}/api/ml/{ml_pk1}/train'
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      method: POST
+      url: '{django_live_url}/api/ml/{ml_pk2}/train'
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml/{ml_pk1}'
+    response:
+      json:
+        state: CO
+      status_code: 200
+  - name: stage
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml/{ml_pk2}'
+    response:
+      json:
+        state: CO
+      status_code: 200
+  - name: check versions
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml/{ml_pk1}/versions'
+    response:
+      status_code: 200
+  - name: check versions
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml/{ml_pk2}/versions'
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
+      json:
+        url: https://test.heartex.mlbackend.com:9091
+      method: PATCH
+      url: '{django_live_url}/api/ml/{ml_pk1}'
+    response:
+      status_code: 400
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
+      json:
+        url: https://test.heartex.mlbackend.com:9091
+      method: PATCH
+      url: '{django_live_url}/api/ml/{ml_pk2}'
+    response:
+      status_code: 400
+  - name: stage
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/ml/{ml_pk1}'
+    response:
+      status_code: 204
+  - name: stage
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/ml/{ml_pk2}'
+    response:
+      status_code: 204
+
+# Verify model version changes every time an annotation is made when auto update is enabled
+---
+test_name: test_ml_backend_auto_update
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - mock_ml_auto_update
+stages:
+  - id: signup
+    type: ref
+  - name: signup user
+    request:
+      data:
+        email: test_ml_backend_creation@test.com
+        password: 12345678
+        title: test_ml_backend_creation
+      method: POST
+      url: '{django_live_url}/user/signup'
+    response:
+      status_code: 302
+  - name: setup project
+    request:
+      data:
+        is_published: true
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_ml_backend_creation
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: import_task
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/tasks"
+      json:
+        data:
+          text: Test example phrase
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          task_pk: id
+  - name: add ml backend
+    request:
+      data:
+        auto_update: true
+        description: ''
+        is_interactive: false
+        project: '{project_pk}'
+        title: test_ml_backend_creation
+        url: 'http://localhost:9090'
+      method: POST
+      url: '{django_live_url}/api/ml'
+    response:
+      json:
+        auto_update: true
+        project: !int '{project_pk}'
+      save:
+        json:
+          ml_pk: id
+      status_code: 201
+  - name: connect to ml backend
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml?project={project_pk}'
+    response:
+      status_code: 200
+      json:
+        - auto_update: true
+          url: 'http://localhost:9090'
+          model_version: version1
+      save:
+        json:
+          last_model_version: model_version
+  - name: create_annotation
+    request:
+      url: "{django_live_url}/api/tasks/{task_pk}/annotations"
+      json:
+        lead_time: 4.134
+        project: !int "{project_pk}"
+        result:
+        - value:
+            choices:
+            - Negative
+          id: wMmVN7k_47
+          from_name: sentiment
+          to_name: text
+          type: choices
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+  - name: verify model version has changed
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml?project={project_pk}'
+    response:
+      status_code: 200
+      json:
+        - auto_update: true
+          url: 'http://localhost:9090'
+          model_version: "version2"
+  - name: verify model version has changed again
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml?project={project_pk}'
+    response:
+      status_code: 200
+      json:
+        - auto_update: true
+          url: 'http://localhost:9090'
+          model_version: "version3"
+
+# Verify model version stays the same if auto_update is disabled, until explicitly changed
+---
+test_name: test_ml_backend_auto_update_disabled
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - mock_ml_backend_auto_update_disabled
+stages:
+  - id: signup
+    type: ref
+  - name: signup user
+    request:
+      data:
+        email: test_ml_backend_creation@test.com
+        password: 12345678
+        title: test_ml_backend_creation
+      method: POST
+      url: '{django_live_url}/user/signup'
+    response:
+      status_code: 302
+  - name: setup project
+    request:
+      data:
+        is_published: true
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_ml_backend_creation
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: import_task
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/tasks"
+      json:
+        data:
+          text: Test example phrase
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          task_pk: id
+  - name: add ml backend
+    request:
+      data:
+        auto_update: false
+        description: ''
+        is_interactive: false
+        project: '{project_pk}'
+        title: test_ml_backend_creation
+        url: 'http://localhost:9090'
+      method: POST
+      url: '{django_live_url}/api/ml'
+    response:
+      json:
+        auto_update: false
+        project: !int '{project_pk}'
+      save:
+        json:
+          ml_pk: id
+      status_code: 201
+  - name: connect to ml backend
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml?project={project_pk}'
+    response:
+      status_code: 200
+      json:
+        - auto_update: false
+          url: 'http://localhost:9090'
+          model_version: ''
+  - name: create_annotation
+    request:
+      url: "{django_live_url}/api/tasks/{task_pk}/annotations"
+      json:
+        lead_time: 4.134
+        project: !int "{project_pk}"
+        result:
+        - value:
+            choices:
+            - Negative
+          id: wMmVN7k_47
+          from_name: sentiment
+          to_name: text
+          type: choices
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+  - name: verify model version has not changed
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml?project={project_pk}'
+    response:
+      status_code: 200
+      json:
+        - auto_update: false
+          url: 'http://localhost:9090'
+          model_version: ''
+  - name: check versions
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml/{ml_pk}/versions'
+    response:
+      status_code: 200
+      json:
+        versions:
+          - "1"
+          - "2"
+  - name: update version explicitly
+    request:
+      method: PATCH
+      url: '{django_live_url}/api/ml/{ml_pk}'
+      json:
+        model_version: "2"
+        url: 'http://localhost:9090'
+        project: !int '{project_pk}'
+    response:
+      status_code: 200
+      json:
+        model_version: "2"
+  - name: verify model version has now changed
+    request:
+      method: GET
+      url: '{django_live_url}/api/ml?project={project_pk}'
+    response:
+      status_code: 200
+      json:
+        - auto_update: false
+          url: 'http://localhost:9090'
+          model_version: "2"
