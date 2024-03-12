@@ -166,6 +166,9 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
             )
             prioritized_on_agreement, not_solved_tasks = _prioritize_low_agreement_tasks(not_solved_tasks, lse_project)
 
+            if prioritized_on_agreement:
+                queue_info += 'Prioritized low agreement'
+
         # otherwise, filtering out completed tasks is sufficient
         else:
             not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
@@ -176,9 +179,9 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
             # don't output anything - just filter tasks with overlap
             logger.debug(f'User={user} tries overlap first from prepared tasks')
             _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
-            queue_info += 'Show overlap first'
+            queue_info += (' & ' if queue_info else '') + 'Show overlap first'
 
-    return not_solved_tasks, user_solved_tasks_array, queue_info
+    return not_solved_tasks, user_solved_tasks_array, queue_info, prioritized_on_agreement
 
 
 def _prioritize_low_agreement_tasks(tasks, lse_project):
@@ -284,11 +287,14 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
         use_task_lock = True
         queue_info = ''
 
-        not_solved_tasks, user_solved_tasks_array, queue_info = get_not_solved_tasks_qs(
+        not_solved_tasks, user_solved_tasks_array, queue_info, prioritized_low_agreement = get_not_solved_tasks_qs(
             user, project, prepared_tasks, assigned_flag, queue_info
         )
 
-        if not dm_queue:
+        if prioritized_low_agreement:
+            next_task = not_solved_tasks.first()
+
+        if not dm_queue and not next_task:
             next_task, use_task_lock, queue_info = get_next_task_without_dm_queue(
                 user, project, not_solved_tasks, assigned_flag
             )
