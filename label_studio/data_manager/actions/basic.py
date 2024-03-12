@@ -138,7 +138,7 @@ actions = [
         'title': 'Retrieve Predictions',
         'order': 90,
         'dialog': {
-            'modal_title': 'Retrieve Predictions',
+            'title': 'Retrieve Predictions',
             'text': 'Send the selected tasks to all ML backends connected to the project.'
             'This operation might be abruptly interrupted due to a timeout. '
             'The recommended way to get predictions is to update tasks using the Label Studio API.'
