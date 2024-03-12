@@ -1,0 +1,50 @@
+title: "Chat with AI Assistant"
+type: community
+group: Generative AI
+order: 3
+image: /static/templates/chat-completion.png
+details: Generate model response in chat style. It allows you to prompt your LLM and retrieve the generated text on the fly. It works with ML backend from https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/llm_interactive example.
+config: |
+  <View>
+     <Style>
+      .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
+    </Style>
+    <Paragraphs name="chat" value="$messages" layout="dialogue" nameKey="role" textKey="content" />
+    <Header value="User:" />
+    <View className="prompt">
+    <TextArea name="prompt"
+              toName="chat"
+              rows="4"
+              editable="true"
+              maxSubmissions="1"
+              showSubmitButton="false"
+              placeholder="Type user prompt here then Shift+Enter..."
+    />
+    </View>
+    <Header value="Assistant:"/>
+      <TextArea name="response"
+                toName="chat"
+                rows="4"
+                editable="true"
+                maxSubmissions="1"
+                showSubmitButton="false"
+                placeholder="Generated response will appear here..."
+      />
+  
+  </View>
+  
+  <!-- { "data" : {
+    "messages": [
+      {
+          "role": "user",
+          "content": "What ingredients go well with pineapple?"
+      },
+      {
+          "role": "assistant",
+          "content": "Ham, bacon, or chicken are popular choices."
+      }
+  ]}}
+  -->
+
+
+
