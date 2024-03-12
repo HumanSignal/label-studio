@@ -170,8 +170,6 @@ class MLApi(BaseHTTPAPI):
             else:
                 response = self.get(url=url, *args, **kwargs)
 
-            # response = requests.request(method=method, url=url, json=request, *args, **kwargs)
-            # response.raise_for_status()
         except requests.exceptions.RequestException as e:
             return self._handle_error(e, response, url, headers, request)
 

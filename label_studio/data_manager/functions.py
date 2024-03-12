@@ -328,10 +328,6 @@ def retrieve_predictions(tasks, backend=None):
     if backend:
         return backend.predict_and_save(tasks=tasks)
 
-    # for ml_backend in project.ml_backends.first():
-    #     # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
-    #     ml_backend.predict_and_save(tasks=tasks)
-
 
 def filters_ordering_selected_items_exist(data):
     return data.get('filters') or data.get('ordering') or data.get('selectedItems')

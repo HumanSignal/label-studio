@@ -176,12 +176,9 @@ class Project(ProjectMixin, models.Model):
     show_collab_predictions = models.BooleanField(
         _('show predictions to annotator'), default=True, help_text='If set, the annotator can view model predictions'
     )
-    # use_ml_backend = models.BooleanField(
-    #     _('use ml backend'), default=False, help_text='If the project should use ML Backend model for predictions (alternative is to use static predictions uploaded offline).'
-    # )
 
     # evaluate is the wrong word here. correct should be retrieve_predictions_automatically
-    # depricated
+    # deprecated
     evaluate_predictions_automatically = models.BooleanField(
         _('evaluate predictions automatically'),
         default=False,
@@ -309,12 +306,6 @@ class Project(ProjectMixin, models.Model):
                 return ml.title == self.model_version
 
         return False
-
-        # if project.show_collab_predictions and \
-        #    project.use_live_model and \
-        #    project.model_version is not None:
-        #     ml = project.ml_backends.filter(title=project.model_version)
-        #     return ml if ml.exists() else None
 
     @property
     def num_annotations(self):

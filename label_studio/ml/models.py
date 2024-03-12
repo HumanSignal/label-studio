@@ -239,9 +239,6 @@ class MLBackend(models.Model):
                 self.state = MLBackendState.CONNECTED
                 model_version = setup_response.response.get('model_version', 'undefined')
                 logger.info(f'ML backend responds with success: {setup_response.response}')
-                # if self.auto_update:
-                #     logger.debug(f'Changing model version: {self.model_version} -> {model_version}')
-                #     self.model_version = model_version
                 self.error_message = None
 
         self.save()
@@ -266,9 +263,6 @@ class MLBackend(models.Model):
 
         request_params = ml_api._prep_prediction_req([task_ser], self.project)
         ml_api_result = ml_api._request(PREDICT_URL, request_params, verbose=False, timeout=TIMEOUT_PREDICT)
-
-        # url=self.url, timeout=self.timeout, auth_method=self.auth_method,
-        # basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass
 
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')

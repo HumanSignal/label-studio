@@ -662,16 +662,6 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
         predictions = task.get_predictions_for_prelabeling()
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 
-    # def get_predictions(self, task):
-    #     project = task.project
-
-    #     if not project.show_collab_predictions:
-    #         return []
-    # else:
-    #     # for ml_backend in project.ml_backends.all():
-    #     #     ml_backend.predict_tasks([task])
-    #     return super().get_predictions(task)
-
     def get_annotations(self, task):
         result = []
         if self.context.get('annotations', False):
