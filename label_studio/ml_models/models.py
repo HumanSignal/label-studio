@@ -129,7 +129,13 @@ class ModelRun(models.Model):
 
     status = models.CharField(max_length=255, choices=ModelRunStatus.choices, default=ModelRunStatus.PENDING)
 
-    job_id = models.CharField(max_length=255, null=True, blank=True, default=None)
+    job_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,
+        help_text='Job ID for inference job for a ModelRun e.g. Adala job ID',
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
