@@ -6,7 +6,7 @@ from datetime import datetime
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
-from data_manager.functions import retrieve_predictions
+from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
 from tasks.functions import update_tasks_counters
@@ -24,7 +24,7 @@ def retrieve_tasks_predictions(project, queryset, **kwargs):
     :param project: project instance
     :param queryset: filtered tasks db queryset
     """
-    retrieve_predictions(queryset)
+    evaluate_predictions(queryset)
     return {'processed_items': queryset.count(), 'detail': 'Retrieved ' + str(queryset.count()) + ' predictions'}
 
 
@@ -138,7 +138,6 @@ actions = [
         'title': 'Retrieve Predictions',
         'order': 90,
         'dialog': {
-            'modal_title': 'Retrieve Predictions',
             'text': 'Send the selected tasks to all ML backends connected to the project.'
             'This operation might be abruptly interrupted due to a timeout. '
             'The recommended way to get predictions is to update tasks using the Label Studio API.'

@@ -947,12 +947,6 @@
         "name": "ml:api:ml-train",
         "decorators": ""
     },
-      {
-        "url": "/api/ml/<int:pk>/predict/test",
-        "module": "ml.api.MLBackendPredictAPI",
-        "name": "ml:api:ml-predict-test",
-        "decorators": ""
-    },
     {
         "url": "/api/ml/<int:pk>/interactive-annotating",
         "module": "ml.api.MLBackendInteractiveAnnotating",

@@ -127,7 +127,7 @@
     "@swc-node/register": "~1.6.7",
     "@swc/cli": "~0.1.62",
     "@swc/core": "1.3.96",
-    "@testing-library/react": "12",
+    "@testing-library/react": "14.0.0",
     "@types/chroma-js": "^2.1.3",
     "@types/jest": "^29.4.0",
     "@types/mini-css-extract-plugin": "^2.5.1",

@@ -32,7 +32,6 @@ def next_task(project, queryset, **kwargs):
     # serialize task
     context = {'request': request, 'project': project, 'resolve_uri': True, 'annotations': False}
     serializer = NextTaskSerializer(next_task, context=context)
-
     response = serializer.data
     response['queue'] = queue_info
     return response
