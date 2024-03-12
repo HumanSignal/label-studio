@@ -8,7 +8,7 @@ from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from data_manager.actions import get_all_actions, perform_action
-from data_manager.functions import get_prepare_params, get_prepared_queryset
+from data_manager.functions import evaluate_predictions, get_prepare_params, get_prepared_queryset
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.models import View
 from data_manager.serializers import DataManagerTaskSerializer, ViewResetSerializer, ViewSerializer
@@ -255,15 +255,11 @@ class TaskListAPI(generics.ListCreateAPIView):
             # keep ids ordering
             page = [tasks_by_ids[_id] for _id in ids]
 
-            # TODO MM TODO this needs a discussion, because I'd expect
-            # people to retrieve manually instead on DM load, plus it
-            # will slow down initial DM load
-
             # retrieve ML predictions if tasks don't have them
-            # if not review and project.retrieve_predictions_automatically:
-            #     tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
-            #     retrieve_predictions(tasks_for_predictions)
-            #     [tasks_by_ids[_id].refresh_from_db() for _id in ids]
+            if not review and project.evaluate_predictions_automatically:
+                tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
+                evaluate_predictions(tasks_for_predictions)
+                [tasks_by_ids[_id].refresh_from_db() for _id in ids]
 
             if flag_set('fflag_fix_back_leap_24_tasks_api_optimization_05092023_short'):
                 serializer = self.task_serializer_class(
@@ -275,18 +271,13 @@ class TaskListAPI(generics.ListCreateAPIView):
             else:
                 serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
-
-        # TODO
         # all tasks
-        # if project.retrieve_predictions_automatically:
-        #     retrieve_predictions(queryset.filter(predictions__isnull=True))
-
+        if project.evaluate_predictions_automatically:
+            evaluate_predictions(queryset.filter(predictions__isnull=True))
         queryset = Task.prepared.annotate_queryset(
             queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields, request=request
         )
-
         serializer = self.task_serializer_class(queryset, many=True, context=context)
-
         return Response(serializer.data)
 
 
@@ -386,7 +377,6 @@ class ProjectActionsAPI(APIView):
         # perform action and return the result dict
         kwargs = {'request': request}  # pass advanced params to actions
         result = perform_action(action_id, project, queryset, request.user, **kwargs)
-
         code = result.pop('response_code', 200)
 
         return Response(result, status=code)
