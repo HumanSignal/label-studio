@@ -3,15 +3,11 @@ import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
 import { WebhookPage } from '../WebhookPage/WebhookPage';
 import { DangerZone } from './DangerZone';
 import { GeneralSettings } from './GeneralSettings';
-import { AnnotationSettings } from './AnnotationSettings';
+import { InstructionsSettings } from './InstructionsSettings';
 import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
-import { PredictionsSettings } from './PredictionsSettings/PredictionsSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
-import {
-  isInLicense,
-  LF_CLOUD_STORAGE_FOR_MANAGERS
-} from '../../utils/license-flags';
+import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from '../../utils/license-flags';
 
 const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
 
@@ -21,9 +17,8 @@ export const MenuLayout = ({ children, ...routeProps }) => {
       menuItems={[
         GeneralSettings,
         LabelingSettings,
-        AnnotationSettings,
+        InstructionsSettings,
         MachineLearningSettings,
-        PredictionsSettings,
         isAllowCloudStorage && StorageSettings,
         WebhookPage,
         DangerZone,
@@ -35,10 +30,9 @@ export const MenuLayout = ({ children, ...routeProps }) => {
 };
 
 const pages = {
-  AnnotationSettings,
+  InstructionsSettings,
   LabelingSettings,
   MachineLearningSettings,
-  PredictionsSettings,
   WebhookPage,
   DangerZone,
 };
@@ -46,8 +40,8 @@ const pages = {
 isAllowCloudStorage && (pages.StorageSettings = StorageSettings);
 
 export const SettingsPage = {
-  title: 'Settings',
-  path: '/settings',
+  title: "Settings",
+  path: "/settings",
   exact: true,
   layout: MenuLayout,
   component: GeneralSettings,
