@@ -106,27 +106,30 @@ def test_action_remove_duplicates(business_client, project_id):
 
     # task 1: add not a duplicated task
     task_data = {"data": {"image": "normal.jpg"}}
-    make_task(task_data, project)
+    task1 = make_task(task_data, project)
 
     # task 2: add duplicated task, no annotations
     task_data = {"data": {"image": "duplicated.jpg"}}
     make_task(task_data, project)
 
     # task 3: add duplicated task, with annotations
-    task = make_task(task_data, project)
+    task3 = make_task(task_data, project)
     for _ in range(3):
-        make_annotation({"result": []}, task.id)
+        make_annotation({"result": []}, task3.id)
 
     # task 4: add duplicated task, with storage link
-    task = make_task(task_data, project)
-    S3ImportStorageLink.objects.create(task=task, key="duplicated.jpg", storage=storage)
+    task4 = make_task(task_data, project)
+    S3ImportStorageLink.objects.create(task=task4, key="duplicated.jpg", storage=storage)
 
-    # Call the action
+    # call the "remove duplicated tasks" action
     status = business_client.post(
         f"/api/dm/actions?project={project_id}&id=remove_duplicates",
         json={"selectedItems": {"all": True, "excluded": []}},
     )
 
+    # as the result, we should have only 2 tasks left:
+    # task 1 and task 3 with storage link copied from task 4
+    assert  project.tasks.order_by('id').values_list('id', flat=True) == [task1.id, task3.id]
     assert status.status_code == 200
     assert S3ImportStorageLink.objects.count() == 1
     assert project.annotations.count() == 3
