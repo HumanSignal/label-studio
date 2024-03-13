@@ -195,7 +195,8 @@ actions = [
             'text': (
                 'Confirm that you want to remove duplicated tasks with the same data fields. '
                 'Duplicated tasks will be deleted and all annotations will be moved to the first task from duplicated tasks. '
-                'Also Source Storage Links will be restored if at least one duplicated task has a storage link.'
+                'Also Source Storage Links will be restored if at least one duplicated task has a storage link. '
+                'Warning: Task assignments (enterprise only) won\'t be saved.'
             ),
             'type': 'confirm',
         },
