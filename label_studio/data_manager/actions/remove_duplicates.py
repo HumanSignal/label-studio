@@ -89,8 +89,15 @@ def move_annotations(duplicates):
         if len(root) == 1:
             continue
 
-        first = root[0]
-        for task in root[1:]:
+        # find a task with annotations, make it as "first" main one
+        i, first = 0, root[0]
+        for i, task in enumerate(root):
+            first = task
+            if task['total_annotations'] > 0:
+                break
+
+        # move annotations to the first task
+        for task in root[i+1:]:
             if task['total_annotations'] > 0:
                 Task.objects.get(id=task['id']).annotations.update(task_id=first['id'])
                 total_moved_annotations += task['total_annotations']
