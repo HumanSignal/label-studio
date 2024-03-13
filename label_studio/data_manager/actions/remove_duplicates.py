@@ -134,18 +134,19 @@ def restore_storage_links_for_duplicated_tasks(duplicates) -> None:
 
         # add storage links to duplicates
         if source:
-            _class = source[1]  # get link name
+            storage_link_class = source[1]  # get link name
             for task in tasks:
                 if task['id'] != source[0]['id']:
                     # get already existing StorageLink
-                    link_instance = _class.objects.get(id=source[2])
+                    link_instance = storage_link_class.objects.get(id=source[2])
 
                     # assign existing StorageLink to other duplicated tasks
-                    _class.create(
+                    link = storage_link_class(
                         task_id=task['id'],
                         key=link_instance.key,
-                        storage=link_instance.storage,
+                        storage=link_instance.storage
                     )
+                    link.save()
                     total_restored_links += 1
                     logger.info(f"Restored storage link for task {task['id']} from source task {source[0]['id']}")
 
@@ -180,7 +181,7 @@ actions = [
         'permission': all_permissions.projects_change,
         'title': 'Remove Duplicated Tasks',
         'order': 1,
-        'experimental': True,
+        'experimental': False,
         'dialog': {
             'text': (
                 'Confirm that you want to remove duplicated tasks with the same data fields. '

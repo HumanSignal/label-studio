@@ -6,90 +6,94 @@ import json
 import pytest
 from django.db import transaction
 from projects.models import Project
-
+from io_storages.s3.models import S3ImportStorage, S3ImportStorageLink
 from ..utils import make_annotation, make_prediction, make_task, project_id  # noqa
 
 
 @pytest.mark.parametrize(
-    'tasks_count, annotations_count, predictions_count',
+    "tasks_count, annotations_count, predictions_count",
     [
         [10, 2, 2],
     ],
 )
 @pytest.mark.django_db
-def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_action_delete_all_tasks(
+    tasks_count, annotations_count, predictions_count, business_client, project_id
+):
     # create
-    payload = dict(project=project_id, data={'test': 1})
+    payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
-        '/api/dm/views/',
+        "/api/dm/views/",
         data=json.dumps(payload),
-        content_type='application/json',
+        content_type="application/json",
     )
 
     assert response.status_code == 201, response.content
-    response.json()['id']
+    response.json()["id"]
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
-        task_id = make_task({'data': {}}, project).id
-        print('TASK_ID: %s' % task_id)
+        task_id = make_task({"data": {}}, project).id
+        print("TASK_ID: %s" % task_id)
         for _ in range(0, annotations_count):
-            print('COMPLETION')
-            make_annotation({'result': []}, task_id)
+            print("COMPLETION")
+            make_annotation({"result": []}, task_id)
 
         for _ in range(0, predictions_count):
-            make_prediction({'result': []}, task_id)
+            make_prediction({"result": []}, task_id)
     with transaction.atomic():
         business_client.post(
-            f'/api/dm/actions?project={project_id}&id=delete_tasks',
-            json={'selectedItems': {'all': True, 'excluded': []}},
+            f"/api/dm/actions?project={project_id}&id=delete_tasks",
+            json={"selectedItems": {"all": True, "excluded": []}},
         )
     assert project.tasks.count() == 0
 
 
 @pytest.mark.parametrize(
-    'tasks_count, annotations_count, predictions_count',
+    "tasks_count, annotations_count, predictions_count",
     [
         [10, 2, 2],
     ],
 )
 @pytest.mark.django_db
-def test_action_delete_all_annotations(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_action_delete_all_annotations(
+    tasks_count, annotations_count, predictions_count, business_client, project_id
+):
     # create
-    payload = dict(project=project_id, data={'test': 1})
+    payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
-        '/api/dm/views/',
+        "/api/dm/views/",
         data=json.dumps(payload),
-        content_type='application/json',
+        content_type="application/json",
     )
 
     assert response.status_code == 201, response.content
-    response.json()['id']
+    response.json()["id"]
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
-        task_id = make_task({'data': {}}, project).id
-        print('TASK_ID: %s' % task_id)
+        task_id = make_task({"data": {}}, project).id
+        print("TASK_ID: %s" % task_id)
         for _ in range(0, annotations_count):
-            print('COMPLETION')
-            make_annotation({'result': []}, task_id)
+            print("COMPLETION")
+            make_annotation({"result": []}, task_id)
 
         for _ in range(0, predictions_count):
-            make_prediction({'result': []}, task_id)
+            make_prediction({"result": []}, task_id)
     # get next task - should be 0
     status = business_client.post(
-        f'/api/dm/actions?project={project_id}&id=next_task',
-        json={'selectedItems': {'all': True, 'excluded': []}},
+        f"/api/dm/actions?project={project_id}&id=next_task",
+        json={"selectedItems": {"all": True, "excluded": []}},
     )
     assert status.status_code == 404
     business_client.post(
-        f'/api/dm/actions?project={project_id}&id=delete_tasks_annotations',
-        json={'selectedItems': {'all': True, 'excluded': []}},
+        f"/api/dm/actions?project={project_id}&id=delete_tasks_annotations",
+        json={"selectedItems": {"all": True, "excluded": []}},
     )
     # get next task - should be 1
     status = business_client.post(
-        f'/api/dm/actions?project={project_id}&id=next_task',
-        json={'selectedItems': {'all': True, 'excluded': []}},
+        f"/api/dm/actions?project={project_id}&id=next_task",
+        json={"selectedItems": {"all": True, "excluded": []}},
     )
     assert status.status_code == 200
 
@@ -98,23 +102,32 @@ def test_action_delete_all_annotations(tasks_count, annotations_count, predictio
 def test_action_remove_duplicates(business_client, project_id):
     # Setup
     project = Project.objects.get(pk=project_id)
+    storage = S3ImportStorage.objects.create(project=project)
 
-    # add not a duplicated task
-    task_data = {'data': {'image': 'normal.jpg'}}
+    # task 1: add not a duplicated task
+    task_data = {"data": {"image": "normal.jpg"}}
     make_task(task_data, project)
 
+    # task 2: add duplicated task, no annotations
+    task_data = {"data": {"image": "duplicated.jpg"}}
+    make_task(task_data, project)
+
+    # task 3: add duplicated task, with annotations
+    task = make_task(task_data, project)
     for _ in range(3):
-        task_data = {'data': {'image': 'duplicated.jpg'}}
-        task_id = make_task(task_data, project).id
-        for _ in range(2):
-            make_annotation({'result': []}, task_id)
+        make_annotation({"result": []}, task.id)
+
+    # task 4: add duplicated task, with storage link
+    task = make_task(task_data, project)
+    S3ImportStorageLink.objects.create(task=task, key="duplicated.jpg", storage=storage)
 
     # Call the action
     status = business_client.post(
-        f'/api/dm/actions?project={project_id}&id=remove_duplicates',
-        json={'selectedItems': {'all': True, 'excluded': []}},
+        f"/api/dm/actions?project={project_id}&id=remove_duplicates",
+        json={"selectedItems": {"all": True, "excluded": []}},
     )
-    assert status.status_code == 200
 
-    # 1 normal + 1 duplicated + 2 duplicated => should keep 2 only
+    assert status.status_code == 200
+    assert S3ImportStorageLink.objects.count() == 1
+    assert project.annotations.count() == 3
     assert project.tasks.count() == 2
