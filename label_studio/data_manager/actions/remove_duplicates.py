@@ -99,7 +99,7 @@ def move_annotations(duplicates):
                 break
 
         # move annotations to the first task
-        for task in root[i+1:]:
+        for task in root[i + 1 :]:
             if task['total_annotations'] > 0:
                 Task.objects.get(id=task['id']).annotations.update(task_id=first['id'])
                 total_moved_annotations += task['total_annotations']
@@ -150,11 +150,7 @@ def restore_storage_links_for_duplicated_tasks(duplicates) -> None:
                     link_instance = storage_link_class.objects.get(id=source[2])
 
                     # assign existing StorageLink to other duplicated tasks
-                    link = storage_link_class(
-                        task_id=task['id'],
-                        key=link_instance.key,
-                        storage=link_instance.storage
-                    )
+                    link = storage_link_class(task_id=task['id'], key=link_instance.key, storage=link_instance.storage)
                     link.save()
                     total_restored_links += 1
                     logger.info(f"Restored storage link for task {task['id']} from source task {source[0]['id']}")
@@ -189,14 +185,14 @@ actions = [
         'entry_point': remove_duplicates,
         'permission': all_permissions.projects_change,
         'title': 'Remove Duplicated Tasks',
-        'order': 1,
+        'order': 95,
         'experimental': False,
         'dialog': {
             'text': (
                 'Confirm that you want to remove duplicated tasks with the same data fields. '
                 'Duplicated tasks will be deleted and all annotations will be moved to the first task from duplicated tasks. '
                 'Also Source Storage Links will be restored if at least one duplicated task has a storage link. '
-                'Warning: Task assignments (enterprise only) won\'t be saved.'
+                "Warning: Task assignments (enterprise only) won't be saved."
             ),
             'type': 'confirm',
         },
