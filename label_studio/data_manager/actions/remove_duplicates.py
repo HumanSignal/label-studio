@@ -66,8 +66,10 @@ def remove_duplicated_tasks(duplicates, project, queryset):
             else:
                 removing.append(task['id'])
 
-    # remove tasks
+    # get the final queryset for removing tasks
     queryset = queryset.filter(id__in=removing, annotations__isnull=True)
+
+    # check that we don't remove tasks with annotations
     if queryset.count() != len(removing):
         raise Exception(
             f'Remove duplicates failed, operation is not finished: '
