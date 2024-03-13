@@ -1986,6 +1986,33 @@
       "version": 5,
       "deleted": false
     },
+    "fflag_feat_back_optic_506_changing_scim_group_mapping_setting_removes_users_from_lse_group": {
+      "key": "fflag_feat_back_optic_506_changing_scim_group_mapping_setting_removes_users_from_lse_group",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "4c333ad4c9984038b5d92d8ef86159a6",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short": {
       "key": "fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short",
       "on": false,
