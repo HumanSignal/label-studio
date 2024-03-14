@@ -58,9 +58,8 @@ class BaseHTTPAPI(object):
         self._headers = headers or {}
         self._auth_method = auth_method
 
-        if auth_method == 'BA':
-            # TODO add kwarg check in here
-            self._basic_auth = (kwargs.get('basic_auth_user'), kwargs.get('basic_auth_pass'))
+        # TODO add kwarg check in here
+        self._basic_auth = (kwargs.get('basic_auth_user'), kwargs.get('basic_auth_pass'))
 
         self._max_retries = max_retries or self.MAX_RETRIES
         self._sessions = {self._session_key(): self.create_session()}
@@ -91,7 +90,7 @@ class BaseHTTPAPI(object):
         if 'timeout' not in kwargs:
             kwargs['timeout'] = self._connection_timeout, self._timeout
 
-        if self._auth_method == 'BA':
+        if self._basic_auth[0] and self._basic_auth[1]:
             kwargs['auth'] = HTTPBasicAuth(*self._basic_auth)
 
         # add connection timeout if it's not presented
