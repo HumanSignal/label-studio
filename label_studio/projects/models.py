@@ -291,7 +291,7 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def ml_backend(self):
-        return fast_first(self.ml_backends)
+        return fast_first(self.ml_backends.all())
 
     @property
     def should_retrieve_predictions(self):

@@ -55,7 +55,8 @@ stages:
   request:
     method: GET
     url: '{django_live_url}/api/predictions/?task={task_pk}'
-  response:projects.od
+  response:
+    json:
       - id: !int '{prediction_pk}'
         result:
           - value:
