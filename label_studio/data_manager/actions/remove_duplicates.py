@@ -41,7 +41,7 @@ def remove_duplicates_job(project, queryset, **kwargs):
 
 
 def remove_duplicated_tasks(duplicates, project, queryset):
-    ### remove duplicates ###
+    """Remove duplicated tasks from queryset with condition that they don't have annotations"""
     removing = []
     # prepare main tasks which won't be deleted
     for data in duplicates:
@@ -167,16 +167,21 @@ def find_duplicated_tasks_by_data(project, queryset):
         if field.startswith('io_storages_'):
             storages += [field]
 
-    duplicates = defaultdict(list)
+    groups = defaultdict(list)
     tasks = list(queryset.values('data', 'id', 'total_annotations', *storages))
     logger.info(f'Retrieved {len(tasks)} tasks from queryset')
 
     for task in list(tasks):
         replace_task_data_undefined_with_config_field(task['data'], project)
         task['data'] = json.dumps(task['data'])
-        duplicates[task['data']].append(task)
+        groups[task['data']].append(task)
+
+    # make groups of duplicated ids for info print
+    duplicates = {d: groups[d] for d in groups if len(groups[d]) > 1}
+    info = {d: [task['id'] for task in duplicates[d]] for d in duplicates}
 
     logger.info(f'Found {len(duplicates)} duplicated tasks')
+    logger.info(f'Duplicated tasks: {info}')
     return duplicates
 
 
