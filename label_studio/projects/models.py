@@ -665,7 +665,7 @@ class Project(ProjectMixin, models.Model):
         """
         return self.model_version == model_version or self.ml_backend_in_model_version
 
-    def delete_predictions(self, model_version=None, *args, **kwargs):
+    def delete_predictions(self, model_version=None):
         """
         Deletes the predictions based on the provided model version.
         If no model version is provided, it deletes all the predictions for this project.
@@ -681,7 +681,6 @@ class Project(ProjectMixin, models.Model):
             params.update({'model_version': model_version})
 
         predictions = Prediction.objects.filter(**params)
-        count = predictions.count()
 
         with transaction.atomic():
             # If we are deleting specific model_version then we need
@@ -690,7 +689,7 @@ class Project(ProjectMixin, models.Model):
                 self.model_version = None
                 self.save(update_fields=['model_version'])
 
-            count = predictions.delete()
+            count, _ = predictions.delete()
         return {'deleted_predictions': count}
 
     def get_updated_weights(self):
