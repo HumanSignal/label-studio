@@ -1,0 +1,6 @@
+{
+  "message": "feat: OPTIC-478: Implement Feature Flag to Control Visibility and Access of Cloud Storage Connectors for Managers (#5496)",
+  "commit": "0b5e0390867e8369b6d4a8428d3f439a9c50d335",
+  "date": "2024-03-04T15:35:42.000Z",
+  "branch": "develop"
+}
