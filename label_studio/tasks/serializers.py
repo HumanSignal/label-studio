@@ -658,7 +658,6 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
             return lock.unique_id
 
     def get_predictions(self, task):
-        """ """
         predictions = task.get_predictions_for_prelabeling()
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 

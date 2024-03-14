@@ -37,7 +37,6 @@ class MLBackendSerializer(serializers.ModelSerializer):
         return value
 
     def _validate_authentication(self, attrs):
-        """ """
         if attrs.get('auth_method') == MLBackendAuth.BASIC_AUTH:
             required_fields = ['basic_auth_user', 'basic_auth_pass']
 
@@ -47,7 +46,6 @@ class MLBackendSerializer(serializers.ModelSerializer):
                 )
 
     def _validate_healthcheck(self, attrs):
-        """ """
         healthcheck_response = MLBackend.healthcheck_(**attrs)
 
         if healthcheck_response.is_error:
@@ -67,7 +65,6 @@ class MLBackendSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(message)
 
     def _validate_setup(self, attrs):
-        """ """
         setup_response = MLBackend.setup_(**attrs)
 
         if setup_response.is_error:
@@ -81,7 +78,6 @@ class MLBackendSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(message)
 
     def validate(self, attrs):
-        """ """
         attrs = super().validate(attrs)
 
         self._validate_authentication(attrs)

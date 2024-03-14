@@ -125,7 +125,7 @@ class ProjectFilterSet(FilterSet):
         operation_summary='Create new project',
         operation_description="""
     Create a project and set up the labeling interface in Label Studio using the API.
-    
+
     ```bash
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
     --data '{{"label_config": "<View>[...]</View>"}}'
@@ -663,7 +663,6 @@ class ProjectModelVersions(generics.RetrieveAPIView):
             return Response(data=data)
 
     def delete(self, request, *args, **kwargs):
-        """ """
         project = self.get_object()
         model_version = request.data.get('model_version', None)
 

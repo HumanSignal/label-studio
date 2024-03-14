@@ -500,7 +500,6 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
 
 @receiver(pre_delete, sender=MLBackend)
 def modify_project_model_version(sender, instance, **kwargs):
-    """ """
     project = instance.project
 
     if project.model_version == instance.title:

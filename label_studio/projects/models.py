@@ -936,13 +936,11 @@ class Project(ProjectMixin, models.Model):
             return output if with_counters else list(output.keys())
 
     def get_ml_backends(self, *args, **kwargs):
-        """ """
         from ml.models import MLBackend
 
         return MLBackend.objects.filter(project=self, **kwargs)
 
     def has_ml_backend(self, *args, **kwargs):
-        """ """
         return self.get_ml_backends(**kwargs).exists()
 
     @property
