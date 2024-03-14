@@ -325,7 +325,7 @@ def evaluate_predictions(tasks):
 
     project = tasks[0].project
 
-    backend = project.ml_backends.first()
+    backend = project.ml_backend
 
     if backend:
         return backend.predict_tasks(tasks=tasks)

@@ -26,6 +26,7 @@ from core.utils.common import (
     load_func,
     merge_labels_counters,
 )
+from core.utils.db import fast_first
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from django.conf import settings
 from django.core.validators import MaxLengthValidator, MinLengthValidator
@@ -290,7 +291,7 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def ml_backend(self):
-        return self.ml_backends.first()
+        return fast_first(self.ml_backends)
 
     @property
     def should_retrieve_predictions(self):
