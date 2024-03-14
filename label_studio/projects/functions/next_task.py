@@ -176,17 +176,23 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
             # don't output anything - just filter tasks with overlap
             logger.debug(f'User={user} tries overlap first from prepared tasks')
             _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
-            queue_info += 'Show overlap first'
+            queue_info += (' & ' if queue_info else '') + 'Show overlap first'
 
-    return not_solved_tasks, user_solved_tasks_array, queue_info
+    return not_solved_tasks, user_solved_tasks_array, queue_info, prioritized_on_agreement
 
 
 def _prioritize_low_agreement_tasks(tasks, lse_project):
-    low_agreement_tasks = tasks.filter(_agreement__lt=lse_project.agreement_threshold, is_labeled=True)
-    return (True, low_agreement_tasks) if low_agreement_tasks else (False, tasks)
+    # if there are any tasks with agreement below the threshold which are labeled, prioritize them over the rest
+    # and return all tasks to be considered for sampling in order by least agreement
+    prioritized_low_agreement = tasks.filter(_agreement__lt=lse_project.agreement_threshold, is_labeled=True)
+
+    if prioritized_low_agreement.exists():
+        return True, tasks.order_by('-is_labeled', '_agreement')
+
+    return False, tasks
 
 
-def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_flag):
+def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_flag, prioritized_low_agreement):
     next_task = None
     use_task_lock = True
     queue_info = ''
@@ -205,6 +211,11 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
             logger.debug(f'User={user} got already locked for them {next_task}')
             use_task_lock = False
             queue_info += (' & ' if queue_info else '') + 'Task lock'
+
+    if not next_task and prioritized_low_agreement:
+        logger.debug(f'User={user} tries low agreement from prepared tasks')
+        next_task = _get_first_unlocked(not_solved_tasks, user)
+        queue_info += (' & ' if queue_info else '') + 'Low agreement queue'
 
     if not next_task and project.show_ground_truth_first:
         logger.debug(f'User={user} tries ground truth from prepared tasks')
@@ -284,13 +295,13 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
         use_task_lock = True
         queue_info = ''
 
-        not_solved_tasks, user_solved_tasks_array, queue_info = get_not_solved_tasks_qs(
+        not_solved_tasks, user_solved_tasks_array, queue_info, prioritized_low_agreement = get_not_solved_tasks_qs(
             user, project, prepared_tasks, assigned_flag, queue_info
         )
 
         if not dm_queue:
             next_task, use_task_lock, queue_info = get_next_task_without_dm_queue(
-                user, project, not_solved_tasks, assigned_flag
+                user, project, not_solved_tasks, assigned_flag, prioritized_low_agreement
             )
 
         if flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
