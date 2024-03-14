@@ -769,8 +769,6 @@ def test_interactive_annotating_failing(business_client, configured_project):
 
         result = r.json()
 
-    print(result)
-
     assert 'errors' in result
 
 

@@ -7,8 +7,9 @@ from rest_framework import serializers
 
 
 class MLBackendSerializer(serializers.ModelSerializer):
-    """ """
-
+    """
+    Serializer for MLBackend model.
+    """
     readable_state = serializers.SerializerMethodField()
     basic_auth_pass = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
     basic_auth_pass_is_set = serializers.SerializerMethodField()
@@ -114,7 +115,8 @@ class MLBackendSerializer(serializers.ModelSerializer):
 
 
 class MLInteractiveAnnotatingRequest(serializers.Serializer):
-    """ """
-
+    """
+    Serializer for ML interactive annotating request.
+    """
     task = serializers.IntegerField(help_text='ID of task to annotate', required=True)
     context = serializers.JSONField(help_text='Context for ML model', allow_null=True, default=None)

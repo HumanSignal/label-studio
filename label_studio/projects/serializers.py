@@ -94,7 +94,6 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         # FIXME: remake this logic with start_training_on_annotation_update
         initial_data = data
         data = super().to_internal_value(data)
-
         if 'start_training_on_annotation_update' in initial_data:
             data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])
 
@@ -190,8 +189,6 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         return value
 
     def update(self, instance, validated_data):
-        """ """
-        # assume there is a flag, 'is_name_updated', in model to track if a name has been updated
         if not validated_data.get('show_collab_predictions'):
             instance.model_version = ''
 

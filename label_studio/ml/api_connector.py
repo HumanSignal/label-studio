@@ -110,8 +110,9 @@ class BaseHTTPAPI(object):
 
 
 class MLApiResult:
-    """ """
-
+    """
+    Class for storing the result of ML API request
+    """
     def __init__(self, url='', request='', response=None, headers=None, type='ok', status_code=200):
         self.url = url
         self.request = request
@@ -130,8 +131,9 @@ class MLApiResult:
 
 
 class MLApi(BaseHTTPAPI):
-    """ """
-
+    """
+    Class for ML API connector
+    """
     def __init__(self, **kwargs):
         super(MLApi, self).__init__(**kwargs)
         self._validate_request_timeout = 10
@@ -142,22 +144,7 @@ class MLApi(BaseHTTPAPI):
             url += '/'
         return urllib.parse.urljoin(url, url_suffix)
 
-    def _handle_error(self, e, response, url, headers, request):
-        """ """
-        error_string = f"{e} {response.text if response else ''}"
-        status_code = response.status_code if response is not None else 0
-
-        return MLApiResult(
-            url=url,
-            request=request,
-            response={'error': error_string},
-            headers=headers,
-            type='error',
-            status_code=status_code,
-        )
-
     def _request(self, url_suffix, request=None, verbose=True, method='POST', *args, **kwargs):
-        """ """
         assert method in ('POST', 'GET')
         url = self._get_url(url_suffix)
         request = request or {}
@@ -169,14 +156,18 @@ class MLApi(BaseHTTPAPI):
                 response = self.post(url=url, json=request, *args, **kwargs)
             else:
                 response = self.get(url=url, *args, **kwargs)
-
+            response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            return self._handle_error(e, response, url, headers, request)
-
+            # Extending error details in case of failed request
+            if flag_set('fix_back_dev_3351_ml_validation_error_extension_short', AnonymousUser):
+                error_string = str(e) + (' ' + str(response.text) if response else '')
+            else:
+                error_string = str(e)
+            status_code = response.status_code if response is not None else 0
+            return MLApiResult(url, request, {'error': error_string}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()
-
         except ValueError as e:
             return MLApiResult(
                 url=url,

@@ -271,16 +271,11 @@ class Project(ProjectMixin, models.Model):
     pinned_at = models.DateTimeField(_('pinned at'), null=True, default=None, help_text='Pinned date and time')
 
     def __init__(self, *args, **kwargs):
-        """ """
-
         super(Project, self).__init__(*args, **kwargs)
         self.__original_label_config = self.label_config
         self.__maximum_annotations = self.maximum_annotations
         self.__overlap_cohort_percentage = self.overlap_cohort_percentage
         self.__skip_queue = self.skip_queue
-
-        # if rpa is not None:
-        #     self.evaluate_predictions_automatically = rpa
 
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
@@ -314,6 +309,10 @@ class Project(ProjectMixin, models.Model):
     @property
     def num_drafts(self):
         return AnnotationDraft.objects.filter(task__project=self).count()
+
+    @property
+    def has_predictions(self):
+        return self.get_current_predictions().exists()
 
     @property
     def has_any_predictions(self):
@@ -688,11 +687,9 @@ class Project(ProjectMixin, models.Model):
             # to remove that from the project
             if self.should_none_model_version(model_version):
                 self.model_version = None
-                self.save()
+                self.save(update_fields=['model_version'])
 
-            predictions.delete()
-
-        ## TODO wtf is that returning
+            count = predictions.delete()
         return {'deleted_predictions': count}
 
     def get_updated_weights(self):
@@ -969,7 +966,6 @@ class Project(ProjectMixin, models.Model):
         return ml_backends
 
     def get_active_ml_backends(self):
-        """ """
         from ml.models import MLBackendState
 
         return self.get_ml_backends(state=MLBackendState.CONNECTED)

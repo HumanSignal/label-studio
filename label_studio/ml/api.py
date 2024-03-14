@@ -251,9 +251,10 @@ class MLBackendPredictTestAPI(APIView):
             kwargs = ml_backend._predict(task)
             return Response(**kwargs)
 
-        # TODO this needs to be implemented and needs to have a specific task param
-        ml_backend.predict()
-        return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(
+                status=status.HTTP_501_NOT_IMPLEMENTED,
+                data={'error': 'Not implemented - you must provide random=true query parameter'})
 
 
 @method_decorator(
@@ -281,21 +282,21 @@ class MLBackendPredictTestAPI(APIView):
     ),
 )
 class MLBackendInteractiveAnnotating(APIView):
-    """ """
+    """
+    Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+    predicted region based on annotator input.
+    """
 
     permission_required = all_permissions.tasks_view
 
     def _error_response(self, message, log_function=logger.info):
-        """ """
         log_function(message)
         return Response({'errors': [message]}, status=status.HTTP_200_OK)
 
     def _get_task(self, ml_backend, validated_data):
-        """ """
         return generics.get_object_or_404(Task, pk=validated_data['task'], project=ml_backend.project)
 
     def _get_credentials(self, request, context, project):
-        """ """
         if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
             context.update(
                 project_credentials_login=project.task_data_login,
@@ -304,7 +305,6 @@ class MLBackendInteractiveAnnotating(APIView):
         return context
 
     def _get_ml_results(self, ml_api_result):
-        """ """
         results = ml_api_result.response.get('results', [None])
         if isinstance(results, list) and len(results) >= 1:
             return results[0]
@@ -312,10 +312,12 @@ class MLBackendInteractiveAnnotating(APIView):
         return None
 
     def post(self, request, *args, **kwargs):
-        """ """
+        """
+        Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+        predicted region based on annotator input.
+        """
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
-        self.check_object_permissions(request, ml_backend)
-
+        self.check_object_permissions(self.request, ml_backend)
         serializer = MLInteractiveAnnotatingRequest(data=request.data)
         serializer.is_valid(raise_exception=True)
 
