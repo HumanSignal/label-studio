@@ -112,6 +112,7 @@ class MLApiResult:
     """
     Class for storing the result of ML API request
     """
+
     def __init__(self, url='', request='', response=None, headers=None, type='ok', status_code=200):
         self.url = url
         self.request = request
@@ -133,6 +134,7 @@ class MLApi(BaseHTTPAPI):
     """
     Class for ML API connector
     """
+
     def __init__(self, **kwargs):
         super(MLApi, self).__init__(**kwargs)
         self._validate_request_timeout = 10

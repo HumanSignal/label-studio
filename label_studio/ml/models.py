@@ -171,7 +171,9 @@ class MLBackend(models.Model):
         return api.setup(project, **kwargs)
 
     def healthcheck(self):
-        return self.healthcheck_(self.url, self.auth_method, basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass)
+        return self.healthcheck_(
+            self.url, self.auth_method, basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass
+        )
 
     def setup(self):
         return self.setup_(

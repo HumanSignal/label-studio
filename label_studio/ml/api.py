@@ -254,7 +254,8 @@ class MLBackendPredictTestAPI(APIView):
         else:
             return Response(
                 status=status.HTTP_501_NOT_IMPLEMENTED,
-                data={'error': 'Not implemented - you must provide random=true query parameter'})
+                data={'error': 'Not implemented - you must provide random=true query parameter'},
+            )
 
 
 @method_decorator(
