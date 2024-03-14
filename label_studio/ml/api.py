@@ -305,13 +305,6 @@ class MLBackendInteractiveAnnotating(APIView):
             )
         return context
 
-    def _get_ml_results(self, ml_api_result):
-        results = ml_api_result.response.get('results', [None])
-        if isinstance(results, list) and len(results) >= 1:
-            return results[0]
-
-        return None
-
     def post(self, request, *args, **kwargs):
         """
         Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
@@ -325,23 +318,12 @@ class MLBackendInteractiveAnnotating(APIView):
         task = self._get_task(ml_backend, serializer.validated_data)
         context = self._get_credentials(request, serializer.validated_data.get('context', {}), task.project)
 
-        ml_api_result = ml_backend.interactive_annotating(task, context, user=self.request.user)
+        result = ml_backend.interactive_annotating(task, context, user=request.user)
 
-        if ml_api_result.is_error:
-            message = f'Prediction not created for project {self}: {ml_api_result.error_message}'
-            return self._error_response(message)
-
-        if not isinstance(ml_api_result.response, dict) or 'results' not in ml_api_result.response:
-            message = f'Incorrect response from ML service it must be a dict and contain "results" key: {ml_api_result.response}'
-            return self._error_response(message)
-
-        ml_results = self._get_ml_results(ml_api_result)
-
-        if not ml_results:
-            message = f'ML backend has to return a list with at least 1 annotation but it returned: {type(ml_results)}'
-            return self._error_response(message, logger.warning)
-
-        return Response({'data': ml_results}, status=status.HTTP_200_OK)
+        return Response(
+            result,
+            status=status.HTTP_200_OK,
+        )
 
 
 @method_decorator(
