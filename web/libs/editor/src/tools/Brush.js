@@ -2,10 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { types } from 'mobx-state-tree';
 
-import BaseTool from './Base';
-import ToolMixin from '../mixins/Tool';
 import { findClosestParent } from '../utils/utilities';
-import { DrawingTool } from '../mixins/DrawingTool';
 import { Tool } from '../components/Toolbar/Tool';
 import { NodeViews } from '../components/Node/Node';
 import { FF_DEV_3666, FF_DEV_4081, isFF } from '../utils/feature-flags';

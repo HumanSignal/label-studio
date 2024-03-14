@@ -97,10 +97,10 @@ export const FlyoutMenu = ({
       <Elem name="icon" className={`${isClicked ? 'isClicked' : ''}`} title="Zoom presets (click to see options)">
         {icon}
       </Elem>
-      <Block name="tooltips" 
+      <Block name="tooltips"
         tag="div">
         {items.map((childItem, index) => (
-          <Elem name="tooltip" 
+          <Elem name="tooltip"
             key={index}
             onClick={(e) => {
               e.stopPropagation();
@@ -113,7 +113,7 @@ export const FlyoutMenu = ({
               {shortcutView(childItem.shortcut)}
             </Elem>
           </Elem>
-        ))}  
+        ))}
       </Block>
     </Block>
   );

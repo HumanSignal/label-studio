@@ -37,19 +37,6 @@ export const Toolbar = inject('store')(observer(({ store, tools, expanded }) => 
 
   const smartTools = tools.filter(t => t.dynamic);
 
-
-  const annotation = store.annotationStore?.selected;
-  const suggestions = annotation?.suggestions;
-
-  const processAutoAnnotation = {
-    'Y': ['Accept Auto Annotation', () => {
-      annotation.acceptAllSuggestions();
-    }],
-    'N': ['Reject Auto Annotation', () => {
-      annotation.rejectAllSuggestions();
-    }]
-  };
-
   return (
     <ToolbarProvider value={{ expanded, alignment }}>
       <Block ref={(el) => setToolbar(el)} name="toolbar" mod={{ alignment, expanded }}>
@@ -69,19 +56,28 @@ export const Toolbar = inject('store')(observer(({ store, tools, expanded }) => 
           ) : null;
         })}
         {store.autoAnnotation && (
-          <SmartTools tools={smartTools} shortcuts={suggestions.size > 0 ? processAutoAnnotation : {}}/>
+          <SmartTools tools={smartTools}/>
         )}
       </Block>
     </ToolbarProvider>
   );
 }));
 
-const SmartTools = observer(({ tools, shortcuts = {} }) => {
+const SmartTools = observer(({ tools = {} }) => {
   const [selectedIndex, setSelectedIndex] = useState(Math.max(tools.findIndex(t => t.selected), 0));
 
   const selected = useMemo(() => tools[selectedIndex], [selectedIndex]);
 
   const hasSelected = tools.some(t => t.selected);
+
+  const handleSuggestions = (action) => {
+    const annotation = tools.find(t => t.annotation);
+    if (annotation?.suggestions?.size >= 0) {
+      if (action === 'accept') return annotation.acceptAllSugestions;  // Return accept all suggestions callback.
+      if (action === 'reject') return annotation.rejectAllSugestions;  // Return reject all suggestions callback.
+    }
+    return () => void 0;  // Return empty callback.
+  }
 
   return tools.length > 0 && (
     <Elem name="group">
@@ -125,7 +121,10 @@ const SmartTools = observer(({ tools, shortcuts = {} }) => {
           setSelectedIndex(nextIndex);
           nextTool.manager.selectTool(nextTool, true);
         }}
-        extraShortcuts={shortcuts}
+        extraShortcuts={{
+            'y' : ['Accept Auto Annotations', handleSuggestions('accept')],
+            'n' : ['Reject Auto Annotations', handleSuggestions('reject')],
+        }}
       />
     </Elem>
   );

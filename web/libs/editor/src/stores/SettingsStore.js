@@ -60,6 +60,8 @@ const SettingsModel = types
 
     enableActiveRegionOpacity: types.optional(types.boolean, false),
 
+    enableInvertedZoom: types.optional(types.boolean, false),
+
     showPredictionsPanel: types.optional(types.boolean, true),
     // showScore: types.optional(types.boolean, false),
 
@@ -166,6 +168,10 @@ const SettingsModel = types
 
     toggleAutoAnnotationTooltip() {
       self.hideAutoAnnotationTooltip = !self.hideAutoAnnotationTooltip;
+    },
+
+    toggleInvertedZoom() {
+      self.enableInvertedZoom = !self.enableInvertedZoom;
     },
 
     toggleSidepanelModel() {

@@ -919,7 +919,8 @@ const Model = types.model({
         let zoomScale = self.currentZoom;
 
         // Invert value for handling zoom.
-        zoomScale = val * -1 > 0 ? zoomScale * self.zoomBy : zoomScale / self.zoomBy;
+        const zoomDirection = self.store.settings.enableInvertedZoom ? -1.0 : 1.0;
+        zoomScale = val * zoomDirection > 0 ? zoomScale * self.zoomBy : zoomScale / self.zoomBy;
         if (self.negativezoom !== true && zoomScale <= 1) {
           self.setZoom(1);
           self.setZoomPosition(0, 0);

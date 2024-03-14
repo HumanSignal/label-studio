@@ -81,6 +81,15 @@ export default {
     'onChangeEvent': 'toggleAutoAnnotationTooltip',
     'defaultValue': false,
   },
+  'enableInvertedZoom': {
+    'newUI': {
+      'title': 'Invert the zoom direction',
+      'description': 'When enabled, the zoom direction is inverted..',
+    },
+    'description': 'Invert the zoom direction',
+    'onChangeEvent': 'toggleInvertedZoom',
+    'defaultValue': false,
+  },
   'showLineNumbers': {
     'newUI': {
       'tags': 'Text Tag',
