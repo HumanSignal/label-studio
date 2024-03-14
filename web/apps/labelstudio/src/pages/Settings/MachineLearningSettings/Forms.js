@@ -41,8 +41,8 @@ const CustomBackendForm = ({action, backend, project, onSubmit}) => {
           name="auth_method"
           label="Select authentication method"
           options={[
-            {label: 'No Authentication', value: 'NA'},
-            {label: 'Basic Authentication', value: 'BA'},
+            {label: 'No Authentication', value: 'NONE'},
+            {label: 'Basic Authentication', value: 'BASIC_AUTH'},
           ]}
           onChange={(e) => {
             setAuthMethod(e.target.value);
@@ -50,7 +50,7 @@ const CustomBackendForm = ({action, backend, project, onSubmit}) => {
         />
       </Form.Row>
 
-      {(backend?.auth_method == 'BA' || selectedAuthMethod == 'BA') && (
+      {(backend?.auth_method == 'BASIC_AUTH' || selectedAuthMethod == 'BASIC_AUTH') && (
         <Form.Row columnCount={2}>
           <Input name="basic_auth_user" label="Basic auth user"/>
           {backend?.basic_auth_pass_is_set ? (
