@@ -31,8 +31,8 @@ class MLBackendState(models.TextChoices):
 
 
 class MLBackendAuth(models.TextChoices):
-    NONE = 'NA', _('None')
-    BASIC_AUTH = 'BA', _('Basic Auth')
+    NONE = 'NONE', _('None')
+    BASIC_AUTH = 'BASIC_AUTH', _('Basic Auth')
 
 
 class MLBackend(models.Model):
@@ -67,7 +67,7 @@ class MLBackend(models.Model):
     )
 
     auth_method = models.CharField(
-        max_length=2,
+        max_length=255,
         choices=MLBackendAuth.choices,
         default=MLBackendAuth.NONE,
     )
