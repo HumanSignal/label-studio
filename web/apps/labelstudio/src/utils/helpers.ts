@@ -18,10 +18,7 @@ export const formDataToJPO = (formData: FormData) => {
 
 type Uniqueness<T> = (a: T, b: T) => boolean;
 
-export const unique = <T>(
-  list: T[] | undefined,
-  expression: Uniqueness<T>,
-): T[] => {
+export const unique = <T>(list: T[] | undefined, expression: Uniqueness<T>): T[] => {
   const comparator = expression ?? ((a, b) => a === b);
 
   return (list ?? []).reduce<T[]>((res, item) => {
@@ -42,9 +39,7 @@ export const isEmptyString = (value: any) => {
 };
 
 export const objectClean = <T extends AnyObject>(source: T) => {
-  const cleanObject: [keyof T, unknown][] = Object.entries(source).reduce<
-    [keyof T, unknown][]
-  >((res, [key, value]) => {
+  const cleanObject: [keyof T, unknown][] = Object.entries(source).reduce<[keyof T, unknown][]>((res, [key, value]) => {
     const valueIsDefined = isDefined(value) && !isEmptyString(value);
 
     if (!valueIsDefined) {
@@ -60,11 +55,7 @@ export const objectClean = <T extends AnyObject>(source: T) => {
   return Object.fromEntries(cleanObject) as T;
 };
 
-export const numberWithPrecision = (
-  n: number,
-  precision = 1,
-  removeTrailinZero = false,
-) => {
+export const numberWithPrecision = (n: number, precision = 1, removeTrailinZero = false) => {
   if (typeof n !== "number" || Number.isNaN(n)) return "";
 
   let finalNum = n.toFixed(precision);
@@ -101,10 +92,7 @@ export const absoluteURL = (path = "") => {
   if (path.match(/^https?/) || path.match(/^\/\//)) {
     return path;
   }
-  return [
-    APP_SETTINGS.hostname.replace(/([/]+)$/, ""),
-    path.replace(/^([/]+)/, ""),
-  ].join("/");
+  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
 };
 
 export const removePrefix = (path: string) => {
@@ -151,16 +139,10 @@ export const getLastTraceback = (traceback: string): string => {
     }
   }
 
-  return lastTraceIndex >= 0
-    ? lines.slice(lastTraceIndex).join("\n")
-    : traceback;
+  return lastTraceIndex >= 0 ? lines.slice(lastTraceIndex).join("\n") : traceback;
 };
 
-export const isFlagEnabled = (
-  id: string,
-  flagList: Record<string, boolean>,
-  defaultValue = false,
-) => {
+export const isFlagEnabled = (id: string, flagList: Record<string, boolean>, defaultValue = false) => {
   if (id in flagList) {
     return flagList[id] === true ?? defaultValue;
   }

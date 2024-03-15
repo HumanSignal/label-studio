@@ -13,10 +13,7 @@ const DATA_VALIDATORS = {
 };
 
 /** @type {{[key: string]: keyof typeof DATA_VALIDATORS}} */
-export const VALIDATORS = Object.keys(DATA_VALIDATORS).reduce(
-  (res, k) => ({ ...res, [k]: k }),
-  {},
-);
+export const VALIDATORS = Object.keys(DATA_VALIDATORS).reduce((res, k) => ({ ...res, [k]: k }), {});
 
 const ValidType = types.union(types.string, types.array(types.string));
 

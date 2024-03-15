@@ -10,11 +10,7 @@ export class RelationShape {
     Object.assign(this.params, params);
 
     if (this.params.watcher) {
-      this._watcher = new this.params.watcher(
-        this.params.root,
-        this.params.element,
-        this.onChanged,
-      );
+      this._watcher = new this.params.watcher(this.params.root, this.params.element, this.onChanged);
     }
   }
 

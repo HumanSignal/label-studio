@@ -1,12 +1,6 @@
 import { observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
-import React, {
-  Fragment,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import React, { Fragment, useCallback, useContext, useMemo, useState } from "react";
 import { Group, Label, Path, Rect, Tag, Text } from "react-konva";
 
 import Constants from "../../core/Constants";
@@ -46,10 +40,7 @@ const LabelOnBbox = ({
   const paddingRight = 5;
   const scoreSpace = ss ? 34 : 0;
   const horizontalPaddings = paddingLeft + paddingRight;
-  const textMaxWidth = Math.max(
-    0,
-    maxWidth * zoomScale - horizontalPaddings - scoreSpace,
-  );
+  const textMaxWidth = Math.max(0, maxWidth * zoomScale - horizontalPaddings - scoreSpace);
   const isSticking = !!textMaxWidth;
   const { suggestion } = useContext(ImageViewContext) ?? {};
 
@@ -65,15 +56,9 @@ const LabelOnBbox = ({
 
   const tagSceneFunc = useCallback(
     (context, shape) => {
-      const cornerRadius =
-        adjacent && isSticking
-          ? ADJACENT_CORNER_RADIUS
-          : NON_ADJACENT_CORNER_RADIUS;
+      const cornerRadius = adjacent && isSticking ? ADJACENT_CORNER_RADIUS : NON_ADJACENT_CORNER_RADIUS;
       const width = maxWidth
-        ? Math.min(
-            shape.width() + horizontalPaddings,
-            isSticking ? maxWidth * zoomScale : paddingLeft,
-          )
+        ? Math.min(shape.width() + horizontalPaddings, isSticking ? maxWidth * zoomScale : paddingLeft)
         : shape.width() + horizontalPaddings;
       const height = shape.height();
 
@@ -87,11 +72,7 @@ const LabelOnBbox = ({
         let bottomRight = 0;
 
         if (typeof cornerRadius === "number") {
-          topLeft =
-            topRight =
-            bottomLeft =
-            bottomRight =
-              Math.min(cornerRadius, width / 2, height / 2);
+          topLeft = topRight = bottomLeft = bottomRight = Math.min(cornerRadius, width / 2, height / 2);
         } else {
           topLeft = Math.min(cornerRadius[0], width / 2, height / 2);
           topRight = Math.min(cornerRadius[1], width / 2, height / 2);
@@ -100,41 +81,13 @@ const LabelOnBbox = ({
         }
         context.moveTo(topLeft, 0);
         context.lineTo(width - topRight, 0);
-        context.arc(
-          width - topRight,
-          topRight,
-          topRight,
-          (Math.PI * 3) / 2,
-          0,
-          false,
-        );
+        context.arc(width - topRight, topRight, topRight, (Math.PI * 3) / 2, 0, false);
         context.lineTo(width, height - bottomRight);
-        context.arc(
-          width - bottomRight,
-          height - bottomRight,
-          bottomRight,
-          0,
-          Math.PI / 2,
-          false,
-        );
+        context.arc(width - bottomRight, height - bottomRight, bottomRight, 0, Math.PI / 2, false);
         context.lineTo(bottomLeft, height);
-        context.arc(
-          bottomLeft,
-          height - bottomLeft,
-          bottomLeft,
-          Math.PI / 2,
-          Math.PI,
-          false,
-        );
+        context.arc(bottomLeft, height - bottomLeft, bottomLeft, Math.PI / 2, Math.PI, false);
         context.lineTo(0, topLeft);
-        context.arc(
-          topLeft,
-          topLeft,
-          topLeft,
-          Math.PI,
-          (Math.PI * 3) / 2,
-          false,
-        );
+        context.arc(topLeft, topLeft, topLeft, Math.PI, (Math.PI * 3) / 2, false);
       }
       context.closePath();
       context.fillStrokeShape(shape);
@@ -176,12 +129,7 @@ const LabelOnBbox = ({
             onMouseLeave={onClickLabel ? onMouseLeaveLabel : null}
             listening={!suggestion}
           >
-            <Tag
-              fill={color}
-              cornerRadius={4}
-              sceneFunc={tagSceneFunc}
-              offsetX={paddingLeft}
-            />
+            <Tag fill={color} cornerRadius={4} sceneFunc={tagSceneFunc} offsetX={paddingLeft} />
             <Text
               ref={setTextEl}
               text={text}
@@ -221,14 +169,8 @@ const LabelOnEllipse = observer(({ item, color, strokewidth }) => {
 
   return (
     <LabelOnBbox
-      x={
-        obj.internalToCanvasX(item.x - item.radiusX) -
-        strokewidth / 2 / zoomScale
-      }
-      y={
-        obj.internalToCanvasY(item.y - item.radiusY) -
-        strokewidth / 2 / zoomScale
-      }
+      x={obj.internalToCanvasX(item.x - item.radiusX) - strokewidth / 2 / zoomScale}
+      y={obj.internalToCanvasY(item.y - item.radiusY) - strokewidth / 2 / zoomScale}
       isTexting={isTexting}
       text={labelText}
       score={item.score}
@@ -380,39 +322,29 @@ const LabelOnKP = observer(({ item, color }) => {
   );
 });
 
-const LabelOnVideoBbox = observer(
-  ({ reg, box, color, scale, strokeWidth, adjacent = false }) => {
-    const isLabeling = !!reg.labeling;
-    const isTexting = !!reg.texting;
-    const labelText = reg.getLabelText(",");
+const LabelOnVideoBbox = observer(({ reg, box, color, scale, strokeWidth, adjacent = false }) => {
+  const isLabeling = !!reg.labeling;
+  const isTexting = !!reg.texting;
+  const labelText = reg.getLabelText(",");
 
-    if (!isLabeling && !isTexting) return null;
+  if (!isLabeling && !isTexting) return null;
 
-    return (
-      <LabelOnBbox
-        x={box.x}
-        y={box.y}
-        rotation={box.rotation}
-        isTexting={isTexting}
-        text={labelText}
-        score={reg.score}
-        showLabels={reg.store.settings.showLabels}
-        zoomScale={scale}
-        color={color}
-        maxWidth={box.width + strokeWidth}
-        adjacent={adjacent}
-        onClickLabel={reg.onClickRegion}
-      />
-    );
-  },
-);
+  return (
+    <LabelOnBbox
+      x={box.x}
+      y={box.y}
+      rotation={box.rotation}
+      isTexting={isTexting}
+      text={labelText}
+      score={reg.score}
+      showLabels={reg.store.settings.showLabels}
+      zoomScale={scale}
+      color={color}
+      maxWidth={box.width + strokeWidth}
+      adjacent={adjacent}
+      onClickLabel={reg.onClickRegion}
+    />
+  );
+});
 
-export {
-  LabelOnBbox,
-  LabelOnPolygon,
-  LabelOnRect,
-  LabelOnEllipse,
-  LabelOnKP,
-  LabelOnMask,
-  LabelOnVideoBbox,
-};
+export { LabelOnBbox, LabelOnPolygon, LabelOnRect, LabelOnEllipse, LabelOnKP, LabelOnMask, LabelOnVideoBbox };

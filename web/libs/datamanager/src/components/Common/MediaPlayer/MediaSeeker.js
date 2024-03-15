@@ -2,15 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Block, Elem, cn } from "../../../utils/bem";
 import "./MediaSeeker.styl";
 
-export const MediaSeeker = ({
-  currentTime,
-  duration,
-  buffer,
-  onSeekStart,
-  onSeekEnd,
-  onChange,
-  video,
-}) => {
+export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeekEnd, onChange, video }) => {
   /** @type {import("react").RefObject<HTMLElement>} */
   const seekerRef = useRef();
   const progress = duration && currentTime ? (currentTime / duration) * 100 : 0;
@@ -27,8 +19,7 @@ export const MediaSeeker = ({
 
         const { left, width } = seekerRef.current.getBoundingClientRect();
         const initialX = e.pageX - (left + 5);
-        const clickedProgress =
-          duration * Math.max(0, Math.min(initialX / width, 1));
+        const clickedProgress = duration * Math.max(0, Math.min(initialX / width, 1));
 
         const seekProgress = (e) => {
           const newX = e.pageX - (left + 5);
@@ -70,11 +61,7 @@ export const MediaSeeker = ({
   }, [buffer, duration, currentTime]);
 
   return (
-    <Block
-      name="audio-seeker"
-      ref={seekerRef}
-      onMouseDownCapture={handleMouseDown}
-    >
+    <Block name="audio-seeker" ref={seekerRef} onMouseDownCapture={handleMouseDown}>
       <Elem name="wrapper" mod={{ video }}>
         <Elem name="progress" style={{ width: `${progress}%` }} />
         <Elem name="buffer" style={{ width: `${buffered}%` }} />

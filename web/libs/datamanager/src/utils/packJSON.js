@@ -1,5 +1,4 @@
-const CODES =
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.";
+const CODES = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.";
 // Not used symbols _!~*'()
 const NUM_CODES = "0123456789.e+-";
 const NUM_CODES_SIZE = Math.ceil(Math.log(NUM_CODES.length) / Math.log(2));
@@ -28,31 +27,24 @@ Object.defineProperty(PackJSONBuffer.prototype, "lastCell", {
 });
 PackJSONBuffer.prototype.MAX_INT_CHUNK_SIZE = 30;
 PackJSONBuffer.prototype.pushChunk = function (size, val) {
-  if (this.readonly)
-    throw Error("Cannot push the chunk. The value is readonly");
+  if (this.readonly) throw Error("Cannot push the chunk. The value is readonly");
   while (size > 0) {
     if (this.avaliableBufferCellSize === 0) {
       this.buffer.push(0);
       this.avaliableBufferCellSize = this.bufferCellSize;
     }
     if (this.avaliableBufferCellSize >= size) {
-      this.lastCell |=
-        ((1 << this.bufferCellSize) - 1) &
-        (val << (this.avaliableBufferCellSize -= size));
+      this.lastCell |= ((1 << this.bufferCellSize) - 1) & (val << (this.avaliableBufferCellSize -= size));
       size = 0;
     } else {
-      this.lastCell |=
-        ((1 << this.bufferCellSize) - 1) &
-        (val >> (size -= this.avaliableBufferCellSize));
+      this.lastCell |= ((1 << this.bufferCellSize) - 1) & (val >> (size -= this.avaliableBufferCellSize));
       this.avaliableBufferCellSize = 0;
     }
   }
 };
 PackJSONBuffer.prototype.readChunk = function (size) {
   if (size > this.MAX_INT_CHUNK_SIZE)
-    throw Error(
-      `Unsupported size of a chunk. Couldn't be greater than ${this.MAX_INT_CHUNK_SIZE}`,
-    );
+    throw Error(`Unsupported size of a chunk. Couldn't be greater than ${this.MAX_INT_CHUNK_SIZE}`);
   let chunk = 0;
   let cellIdx;
   let cellPos;
@@ -64,9 +56,7 @@ PackJSONBuffer.prototype.readChunk = function (size) {
     cellIdx = (this.pos - cellPos) / this.bufferCellSize;
     cellValueSize = this.bufferCellSize - cellPos;
     cellValue = this.buffer[cellIdx] & ((1 << cellValueSize) - 1);
-    chunk =
-      (chunk << Math.min(cellValueSize, size)) |
-      (cellValue >> Math.max(cellValueSize - size, 0));
+    chunk = (chunk << Math.min(cellValueSize, size)) | (cellValue >> Math.max(cellValueSize - size, 0));
     this.pos += Math.min(cellValueSize, size);
     size -= cellValueSize;
   }
@@ -92,8 +82,7 @@ PackJSONBuffer.prototype.fromString = function (string) {
   this.readonly = true;
   this.pos = 0;
 };
-PackJSONBuffer.fromString = (string, domain) =>
-  new PackJSONBuffer(domain).fromString(string);
+PackJSONBuffer.fromString = (string, domain) => new PackJSONBuffer(domain).fromString(string);
 
 /*
 body:= [...value]
@@ -165,20 +154,14 @@ PackJSON.prototype.makeDictionaries = function (json) {
 PackJSON.prototype.collectObjectWords = function (value) {
   switch (typeof value) {
     case "number": {
-      if (
-        this.tmpSharedValuesSet.has(value) &&
-        this.sharedStringsDict[value] === undefined
-      ) {
+      if (this.tmpSharedValuesSet.has(value) && this.sharedStringsDict[value] === undefined) {
         this.sharedNumbersDict[value] = this.sharedValuesCount++;
       }
       this.tmpSharedValuesSet.add(value);
       break;
     }
     case "string": {
-      if (
-        this.tmpSharedValuesSet.has(value) &&
-        this.sharedStringsDict[value] === undefined
-      ) {
+      if (this.tmpSharedValuesSet.has(value) && this.sharedStringsDict[value] === undefined) {
         this.sharedStringsDict[value] = this.sharedValuesCount++;
       }
       this.tmpSharedValuesSet.add(value);
@@ -270,10 +253,7 @@ PackJSON.prototype.encodeNumber = function (value) {
     this.buffer.pushChunk(NUMBER_TYPE_SIZE, NUMBER_INTEGER_TYPE);
     this.buffer.pushChunk(1, value < 0);
     value = Math.abs(value);
-    this.buffer.pushChunk(
-      MAX_INT_SIZE.toString(2).length,
-      value.toString(2).length,
-    );
+    this.buffer.pushChunk(MAX_INT_SIZE.toString(2).length, value.toString(2).length);
     value
       .toString(32)
       .split("")
@@ -287,10 +267,7 @@ PackJSON.prototype.encodeNumber = function (value) {
 
     if (stringValue.length * NUM_CODES_SIZE < 64) {
       this.buffer.pushChunk(NUMBER_TYPE_SIZE, NUMBER_STRING_TYPE);
-      this.buffer.pushChunk(
-        (64 / NUM_CODES_SIZE - 1).toString(2).length,
-        stringValue.length,
-      );
+      this.buffer.pushChunk((64 / NUM_CODES_SIZE - 1).toString(2).length, stringValue.length);
       stringValue.split("").forEach((ch) => {
         this.buffer.pushChunk(NUM_CODES_SIZE, NUM_CODES.indexOf(ch));
       });
@@ -310,17 +287,13 @@ PackJSON.prototype.decodeNumber = function () {
       const sign = this.buffer.readChunk(1);
       const size = this.buffer.readChunk(MAX_INT_SIZE.toString(2).length);
       const b32 = Array.apply(null, new Array(Math.ceil(size / 5)))
-        .map((v, idx) =>
-          this.buffer.readChunk(idx ? 5 : size % 5 || 5).toString(32),
-        )
+        .map((v, idx) => this.buffer.readChunk(idx ? 5 : size % 5 || 5).toString(32))
         .join("");
 
       return (sign ? -1 : 1) * Number.parseInt(b32, 32);
     }
     case NUMBER_STRING_TYPE: {
-      const length = this.buffer.readChunk(
-        (64 / NUM_CODES_SIZE - 1).toString(2).length,
-      );
+      const length = this.buffer.readChunk((64 / NUM_CODES_SIZE - 1).toString(2).length);
 
       return JSON.parse(
         Array.apply(null, new Array(length))
@@ -348,11 +321,9 @@ PackJSON.prototype.encodeString = function (value) {
     return idx > -1 && idx < CODES.length - 1;
   }).length;
   const unknownCharsCount = value.length - knownCharsCount;
-  const potentialInfrequentCharsStringSize =
-    knownCharsCount * 6 + unknownCharsCount * (6 + 16);
+  const potentialInfrequentCharsStringSize = knownCharsCount * 6 + unknownCharsCount * (6 + 16);
   const potentialOnlyCodesStringSize = value.length * 16;
-  const potentialMarkedCharsStringSize =
-    knownCharsCount * 7 + unknownCharsCount * 17;
+  const potentialMarkedCharsStringSize = knownCharsCount * 7 + unknownCharsCount * 17;
   const minSize = Math.min(
     potentialInfrequentCharsStringSize,
     potentialOnlyCodesStringSize,
@@ -402,15 +373,10 @@ PackJSON.prototype.encodeString = function (value) {
   }
 };
 PackJSON.prototype.encodeStringLen = function (value) {
-  const stringLengthParts = value.length
-    .toString(1 << STRING_LEN_BLOCK_SIZE)
-    .split("");
+  const stringLengthParts = value.length.toString(1 << STRING_LEN_BLOCK_SIZE).split("");
 
   stringLengthParts.forEach((lenBlock, idx) => {
-    this.buffer.pushChunk(
-      STRING_LEN_BLOCK_SIZE,
-      Number.parseInt(lenBlock, 1 << STRING_LEN_BLOCK_SIZE),
-    );
+    this.buffer.pushChunk(STRING_LEN_BLOCK_SIZE, Number.parseInt(lenBlock, 1 << STRING_LEN_BLOCK_SIZE));
     this.buffer.pushChunk(1, idx === stringLengthParts.length - 1); // stop chain marker
   });
 };
@@ -469,17 +435,10 @@ PackJSON.prototype.decodeStringLen = function () {
   let shouldStop = false;
 
   do {
-    stringLengthParts.push(
-      this.buffer
-        .readChunk(STRING_LEN_BLOCK_SIZE)
-        .toString(1 << STRING_LEN_BLOCK_SIZE),
-    );
+    stringLengthParts.push(this.buffer.readChunk(STRING_LEN_BLOCK_SIZE).toString(1 << STRING_LEN_BLOCK_SIZE));
     shouldStop = this.buffer.readChunk(1);
   } while (!shouldStop);
-  return Number.parseInt(
-    stringLengthParts.join(""),
-    1 << STRING_LEN_BLOCK_SIZE,
-  );
+  return Number.parseInt(stringLengthParts.join(""), 1 << STRING_LEN_BLOCK_SIZE);
 };
 
 PackJSON.prototype.packInConstants = function (value) {
@@ -562,9 +521,7 @@ PackJSON.prototype.encodeDefinitions = function () {
   if (!definitions.length) return;
   this.buffer.pushChunk(CODE_SIZE, DEFINITION_CODE);
   this.buffer.pushChunk(DEFINITION_TYPE_SIZE, DICT_DEFINITION_TYPE);
-  this.definitionIndexSize = Math.ceil(
-    Math.log(definitions.length) / Math.log(2),
-  );
+  this.definitionIndexSize = Math.ceil(Math.log(definitions.length) / Math.log(2));
   definitions.forEach((definition) => {
     this.encode(definition);
   });
@@ -578,9 +535,7 @@ PackJSON.prototype.decodeDefinitions = function () {
     this.buffer.seek(this.buffer.pos - (CODE_SIZE + SPEC_SIZE));
     this.definitions.push(this.decode());
   }
-  this.definitionIndexSize = Math.ceil(
-    Math.log(this.definitions.length) / Math.log(2),
-  );
+  this.definitionIndexSize = Math.ceil(Math.log(this.definitions.length) / Math.log(2));
   // decode next as if there weren't any definitions
   return this.decode();
 };

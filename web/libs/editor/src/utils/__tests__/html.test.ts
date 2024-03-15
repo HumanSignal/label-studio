@@ -22,8 +22,7 @@ const htmlSanitizeList = [
     expected: "&gt;",
   },
   {
-    input:
-      '<?xml version="1.0" encoding="ISO-8859-1"?><foo><![CDATA[<script>alert(\'XSS\');</script>]]></foo>',
+    input: '<?xml version="1.0" encoding="ISO-8859-1"?><foo><![CDATA[<script>alert(\'XSS\');</script>]]></foo>',
     expected: "<foo></foo>",
   },
   {

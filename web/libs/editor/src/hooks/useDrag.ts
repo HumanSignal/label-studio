@@ -11,10 +11,7 @@ interface Handlers<T extends HTMLElement = HTMLElement, D = any> {
   onUnmount?: () => void;
 }
 
-export const useDrag = <EL extends HTMLElement = HTMLElement, D = any>(
-  options: Handlers<EL, D>,
-  deps: any[] = [],
-) => {
+export const useDrag = <EL extends HTMLElement = HTMLElement, D = any>(options: Handlers<EL, D>, deps: any[] = []) => {
   useEffect(() => {
     const eventOptions = {
       capture: options.capture,

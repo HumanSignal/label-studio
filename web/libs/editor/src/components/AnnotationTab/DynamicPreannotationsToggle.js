@@ -22,8 +22,7 @@ const injector = inject(({ store }) => {
 
 export const DynamicPreannotationsToggle = injector(
   observer(({ store, annotation, suggestions }) => {
-    const enabled =
-      store.hasInterface("auto-annotation") && !store.forceAutoAnnotation;
+    const enabled = store.hasInterface("auto-annotation") && !store.forceAutoAnnotation;
 
     useEffect(() => {
       if (!enabled) store.setAutoAnnotation(false);
@@ -41,9 +40,7 @@ export const DynamicPreannotationsToggle = injector(
                 store.setAutoAnnotation(checked);
 
                 if (!checked) {
-                  ToolsManager.allInstances().forEach((inst) =>
-                    inst.selectDefault(),
-                  );
+                  ToolsManager.allInstances().forEach((inst) => inst.selectDefault());
                 }
               }}
               label="Auto-Annotation"

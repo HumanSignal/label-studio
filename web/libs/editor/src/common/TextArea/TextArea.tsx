@@ -1,13 +1,5 @@
 import { debounce } from "lodash";
-import {
-  type FC,
-  type FocusEvent,
-  type MutableRefObject,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
+import { type FC, type FocusEvent, type MutableRefObject, type RefObject, useCallback, useEffect, useRef } from "react";
 import { cn } from "../../utils/bem";
 import { isMacOS } from "../../utils/utilities";
 
@@ -51,12 +43,7 @@ export const TextArea: FC<TextAreaProps> = ({
   const inlineAction = !!onSubmit;
 
   const rootClass = cn("textarea");
-  const classList = [
-    rootClass.mod({ inline: inlineAction, autosize: autoSize }),
-    className,
-  ]
-    .join(" ")
-    .trim();
+  const classList = [rootClass.mod({ inline: inlineAction, autosize: autoSize }), className].join(" ").trim();
 
   const autoGrowRef = useRef({
     rows,
@@ -78,10 +65,8 @@ export const TextArea: FC<TextAreaProps> = ({
           const currentValue = textAreaRef.current.value;
 
           textAreaRef.current.value = "";
-          autoGrowRef.current.lineHeight =
-            textAreaRef.current.scrollHeight / autoGrowRef.current.rows;
-          autoGrowRef.current.maxHeight =
-            autoGrowRef.current.lineHeight * autoGrowRef.current.maxRows;
+          autoGrowRef.current.lineHeight = textAreaRef.current.scrollHeight / autoGrowRef.current.rows;
+          autoGrowRef.current.maxHeight = autoGrowRef.current.lineHeight * autoGrowRef.current.maxRows;
 
           textAreaRef.current.value = currentValue;
         }
@@ -165,10 +150,7 @@ export const TextArea: FC<TextAreaProps> = ({
 
     const listener = (event: KeyboardEvent) => {
       if (!textAreaRef.current) return;
-      if (
-        event.key === "Enter" &&
-        (event.ctrlKey || (isMacOS() && event.metaKey))
-      ) {
+      if (event.key === "Enter" && (event.ctrlKey || (isMacOS() && event.metaKey))) {
         onSubmit(textAreaRef.current.value);
       }
     };

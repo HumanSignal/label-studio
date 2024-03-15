@@ -5,22 +5,7 @@ import { isDefined } from "../../../utils/utils";
 import "./Button.styl";
 
 export const Button = forwardRef(
-  (
-    {
-      children,
-      type,
-      extra,
-      className,
-      href,
-      size,
-      waiting,
-      icon,
-      tag,
-      look,
-      ...rest
-    },
-    ref,
-  ) => {
+  ({ children, type, extra, className, href, size, waiting, icon, tag, look, ...rest }, ref) => {
     const finalTag = tag ?? href ? "a" : "button";
 
     const mods = {
@@ -48,15 +33,7 @@ export const Button = forwardRef(
     }, [icon, size]);
 
     return (
-      <Block
-        ref={ref}
-        name="button"
-        tag={finalTag}
-        mod={mods}
-        className={className?.toString()}
-        type={type}
-        {...rest}
-      >
+      <Block ref={ref} name="button" tag={finalTag} mod={mods} className={className?.toString()} type={type} {...rest}>
         <>
           {isDefined(iconElem) && (
             <Elem tag="span" name="icon">

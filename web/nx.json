@@ -16,11 +16,7 @@
       "inputs": ["default", "^production"]
     },
     "lint": {
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore"
-      ]
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json", "{workspaceRoot}/.eslintignore"]
     },
     "test": {
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
@@ -32,12 +28,7 @@
     },
     "build-storybook": {
       "cache": true,
-      "inputs": [
-        "default",
-        "^production",
-        "{projectRoot}/.storybook/**/*",
-        "{projectRoot}/tsconfig.storybook.json"
-      ]
+      "inputs": ["default", "^production", "{projectRoot}/.storybook/**/*", "{projectRoot}/tsconfig.storybook.json"]
     }
   },
   "namedInputs": {

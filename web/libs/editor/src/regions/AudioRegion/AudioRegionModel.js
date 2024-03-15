@@ -102,9 +102,7 @@ export const AudioRegionModel = types
         }
       }
 
-      const classes = [
-        ...new Set([...lastClassList, "htx-highlight", "htx-highlight-last"]),
-      ];
+      const classes = [...new Set([...lastClassList, "htx-highlight", "htx-highlight-last"])];
 
       if (!self.parent.showlabels && !settings.showLabels) {
         classes.push("htx-no-label");
@@ -134,9 +132,7 @@ export const AudioRegionModel = types
         const top = container.scrollTop;
         const left = container.scrollLeft;
 
-        el.scrollIntoViewIfNeeded
-          ? el.scrollIntoViewIfNeeded()
-          : el.scrollIntoView();
+        el.scrollIntoViewIfNeeded ? el.scrollIntoViewIfNeeded() : el.scrollIntoView();
         window.document.scrollingElement.scrollTo(left, top);
       }
     },

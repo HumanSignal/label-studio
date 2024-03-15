@@ -11,13 +11,7 @@ interface TransitionOptions {
  */
 export const aroundTransition = (
   element: HTMLElement,
-  {
-    init,
-    transition,
-    onStart,
-    beforeTransition,
-    afterTransition,
-  }: TransitionOptions = {},
+  { init, transition, onStart, beforeTransition, afterTransition }: TransitionOptions = {},
 ) => {
   return new Promise<true>(async (resolve) => {
     init?.(element);

@@ -87,11 +87,7 @@ const BaseTool = types
 
           smartCopy.makeDynamic();
 
-          getEnv(self).manager.addTool(
-            `${toolType.name}-smart`,
-            smartCopy,
-            self.control.removeDuplicatesNamed,
-          );
+          getEnv(self).manager.addTool(`${toolType.name}-smart`, smartCopy, self.control.removeDuplicatesNamed);
         }
       },
 

@@ -12,6 +12,4 @@ export interface DropdownContextValue {
   close(): void;
 }
 
-export const DropdownContext = React.createContext<DropdownContextValue | null>(
-  null,
-);
+export const DropdownContext = React.createContext<DropdownContextValue | null>(null);

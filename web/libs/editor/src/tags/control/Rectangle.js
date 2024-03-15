@@ -5,12 +5,7 @@ import Registry from "../../core/Registry";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
 import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
-import {
-  FF_DEV_2132,
-  FF_DEV_3793,
-  FF_LSDV_4673,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_DEV_2132, FF_DEV_3793, FF_LSDV_4673, isFF } from "../../utils/feature-flags";
 import ControlBase from "./Base";
 
 /**
@@ -54,10 +49,7 @@ const Model = types
     type: "rectangle",
   })
   .volatile(() => ({
-    toolNames:
-      isFF(FF_DEV_2132) && (!isFF(FF_DEV_3793) || isFF(FF_LSDV_4673))
-        ? ["Rect", "Rect3Point"]
-        : ["Rect"],
+    toolNames: isFF(FF_DEV_2132) && (!isFF(FF_DEV_3793) || isFF(FF_LSDV_4673)) ? ["Rect", "Rect3Point"] : ["Rect"],
   }));
 
 const RectangleModel = types.compose(

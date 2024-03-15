@@ -5,19 +5,7 @@ import { useValueTracker } from "../../Utils";
 import { default as Label } from "../Label/Label";
 
 const RangeField = forwardRef(
-  (
-    {
-      label,
-      className,
-      validate,
-      required,
-      skip,
-      labelProps,
-      description,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ label, className, validate, required, skip, labelProps, description, ...props }, ref) => {
     const [value, setValue] = useValueTracker(props.value, props.defaultValue);
 
     const formField = (

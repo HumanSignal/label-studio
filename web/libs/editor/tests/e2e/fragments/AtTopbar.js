@@ -10,9 +10,7 @@ module.exports = {
   seeAnnotationAt(index = 0) {
     this.openAnnotaions();
 
-    I.seeElement(
-      this._annotationsList.find(this._annotationsListItemSelector).at(index),
-    );
+    I.seeElement(this._annotationsList.find(this._annotationsListItemSelector).at(index));
 
     this.closeAnnotations();
   },
@@ -27,9 +25,7 @@ module.exports = {
     I.dontSee(this._annotationsList);
   },
   selectAnnotationAt(index = 0) {
-    I.click(
-      this._annotationsList.find(this._annotationsListItemSelector).at(index),
-    );
+    I.click(this._annotationsList.find(this._annotationsListItemSelector).at(index));
   },
   see(text) {
     I.see(text, this._topbarLocator);

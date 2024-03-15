@@ -63,41 +63,35 @@ const annotationMoonwalker = {
 // and their own data (`text` in this case)
 const annotationWithPerRegion = {
   id: "1002",
-  result: [
-    annotationMoonwalker.result[0],
-    createRegion("answer", "textarea", { text: ["blah"] }),
-  ],
+  result: [annotationMoonwalker.result[0], createRegion("answer", "textarea", { text: ["blah"] })],
 };
 
 const image =
   "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
 
-Scenario(
-  "Check Rect region for Image",
-  async ({ I, AtImageView, AtSidebar }) => {
-    const params = {
-      config,
-      data: { image },
-      annotations: [annotationMoonwalker],
-    };
+Scenario("Check Rect region for Image", async ({ I, AtImageView, AtSidebar }) => {
+  const params = {
+    config,
+    data: { image },
+    annotations: [annotationMoonwalker],
+  };
 
-    I.amOnPage("/");
-    I.executeScript(initLabelStudio, params);
+  I.amOnPage("/");
+  I.executeScript(initLabelStudio, params);
 
-    AtImageView.waitForImage();
-    await AtImageView.lookForStage();
-    I.executeScript(waitForImage);
-    AtSidebar.seeRegions(1);
-    // select first and only region
-    I.click(locate('[aria-label="region"]'));
-    I.see("Labels:");
+  AtImageView.waitForImage();
+  await AtImageView.lookForStage();
+  I.executeScript(waitForImage);
+  AtSidebar.seeRegions(1);
+  // select first and only region
+  I.click(locate('[aria-label="region"]'));
+  I.see("Labels:");
 
-    // click on region's rect on the canvas
-    AtImageView.clickAt(330, 80);
-    I.wait(1);
-    I.dontSee("Labels:");
-  },
-);
+  // click on region's rect on the canvas
+  AtImageView.clickAt(330, 80);
+  I.wait(1);
+  I.dontSee("Labels:");
+});
 
 Scenario("Image with perRegion tags", async ({ I, AtImageView, AtSidebar }) => {
   let result;
@@ -138,11 +132,7 @@ Scenario("Image with perRegion tags", async ({ I, AtImageView, AtSidebar }) => {
   assert.deepStrictEqual(result[1].value.text, ["blah", "another"]);
 
   // delete first deserialized text and check that only "another" left
-  I.click(
-    locate('[aria-label="Delete Region"]').inside(
-      '[data-testid="textarea-region"]',
-    ),
-  );
+  I.click(locate('[aria-label="Delete Region"]').inside('[data-testid="textarea-region"]'));
   I.dontSeeElement(locate("mark").withText("blah"));
   I.seeElement(locate("mark").withText("another"));
 
@@ -152,11 +142,7 @@ Scenario("Image with perRegion tags", async ({ I, AtImageView, AtSidebar }) => {
   assert.deepStrictEqual(result[1].value.text, ["another"]);
 
   // delete also "another" region
-  I.click(
-    locate('[aria-label="Delete Region"]').inside(
-      '[data-testid="textarea-region"]',
-    ),
-  );
+  I.click(locate('[aria-label="Delete Region"]').inside('[data-testid="textarea-region"]'));
   // there are should be no texts left at all
   I.dontSeeElement(locate("mark"));
 
@@ -208,12 +194,7 @@ Data(outOfBoundsFFs).Scenario(
 
     I.say("Drawing region in the bottom right corner");
     AtLabels.clickLabel("Planet");
-    AtImageView.drawByDrag(
-      stage.width - 100,
-      stage.height - 100,
-      stage.width + 100,
-      stage.height + 100,
-    );
+    AtImageView.drawByDrag(stage.width - 100, stage.height - 100, stage.width + 100, stage.height + 100);
 
     AtSidebar.seeRegions(4);
 
@@ -270,12 +251,7 @@ Data(outOfBoundsFFs).Scenario(
       // bottom-left corner
       [100, stage.height - 100, -100, stage.height + 100],
       // bottom-right corner
-      [
-        stage.width - 100,
-        stage.height - 100,
-        stage.width + 100,
-        stage.height + 100,
-      ],
+      [stage.width - 100, stage.height - 100, stage.width + 100, stage.height + 100],
     ];
 
     for (const ellipse of ellipses) {
@@ -300,10 +276,7 @@ Data(outOfBoundsFFs).Scenario(
       assert.strictEqual(res.radiusY.toFixed(3), radiusY.toFixed(3));
 
       I.say("Make sure that center is in correct spot");
-      const [expectedX, expectedY] = [
-        (region[0] / stage.width) * 100,
-        (region[1] / stage.height) * 100,
-      ];
+      const [expectedX, expectedY] = [(region[0] / stage.width) * 100, (region[1] / stage.height) * 100];
 
       assert.strictEqual(res.x.toFixed(3), expectedX.toFixed(3));
       assert.strictEqual(res.y.toFixed(3), expectedY.toFixed(3));

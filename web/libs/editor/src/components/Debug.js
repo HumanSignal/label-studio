@@ -20,9 +20,7 @@ const DebugComponent = ({ store }) => {
 
   const loadTask = useCallback(() => {
     const config = refConfig.current?.value;
-    const annotations = JSON.parse(
-      refAnnotations.current?.value || '[{ "result": [] }]',
-    );
+    const annotations = JSON.parse(refAnnotations.current?.value || '[{ "result": [] }]');
     const data = JSON.parse(refData.current?.value);
 
     store.resetState();
@@ -60,9 +58,7 @@ const DebugComponent = ({ store }) => {
       <h2>Debug</h2>
       <div>
         <Button onClick={serializeAll}>↓ Serialize All Annotations</Button>
-        <Button onClick={serializeCurrent}>
-          ↓ Serialize Current Annotation
-        </Button>
+        <Button onClick={serializeCurrent}>↓ Serialize Current Annotation</Button>
         <Button onClick={loadTask}>↑ Simulate Loading Task</Button>
       </div>
 

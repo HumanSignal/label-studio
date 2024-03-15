@@ -1,13 +1,5 @@
 import chroma from "chroma-js";
-import {
-  type CSSProperties,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { FF_DEV_1507, isFF } from "../../utils/feature-flags";
 import { isDefined, userDisplayName } from "../../utils/utilities";
@@ -65,10 +57,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
     }
 
     if (size) {
-      style = Object.assign(
-        { width: size, height: size, fontSize: size * 0.4 },
-        style,
-      );
+      style = Object.assign({ width: size, height: size, fontSize: size * 0.4 }, style);
     }
 
     const displayName = useMemo(() => {
@@ -78,8 +67,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const background = useMemo(() => {
       if (isDefined(user.id)) {
         const color =
-          localStorage.getItem(`userpic-color-${user.id}`) ??
-          chroma.average([chroma.random(), "#cfcfcf"]).css();
+          localStorage.getItem(`userpic-color-${user.id}`) ?? chroma.average([chroma.random(), "#cfcfcf"]).css();
 
         localStorage.setItem(`userpic-color-${user.id}`, color);
         return color;
@@ -106,14 +94,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const stylesheet = { ...(style ?? {}), background, color: textColor };
 
     const userpic = (
-      <Block
-        ref={ref}
-        name="userpic"
-        mix={className}
-        mod={{ faded }}
-        style={stylesheet}
-        {...rest}
-      >
+      <Block ref={ref} name="userpic" mix={className} mod={{ faded }} style={stylesheet} {...rest}>
         {children ? (
           children
         ) : (
@@ -160,11 +141,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
       return username;
     }, [user, username]);
 
-    return showUsername && userFullName ? (
-      <Tooltip title={userFullName}>{userpic}</Tooltip>
-    ) : (
-      userpic
-    );
+    return showUsername && userFullName ? <Tooltip title={userFullName}>{userpic}</Tooltip> : userpic;
   },
 );
 

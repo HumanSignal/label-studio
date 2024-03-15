@@ -203,57 +203,54 @@ Scenario("Check required param in complex config", async ({ I }) => {
   I.seeAnnotationSubmitted();
 });
 
-Scenario(
-  "Check required param with visibleWhen='choice-unselected'",
-  async ({ I, LabelStudio }) => {
-    const params = {
-      config: createConfig({ visibleWhen: "choice-unselected" }),
-      data: { text },
-    };
-    const waitForError = (name) => {
-      I.waitForText("OK");
-      I.see("Warning");
-      I.see(`Checkbox "${name}" is required`);
-      I.seeElement(".ant-modal");
-      I.click("OK");
-      I.waitToHide(".ant-modal");
-    };
+Scenario("Check required param with visibleWhen='choice-unselected'", async ({ I, LabelStudio }) => {
+  const params = {
+    config: createConfig({ visibleWhen: "choice-unselected" }),
+    data: { text },
+  };
+  const waitForError = (name) => {
+    I.waitForText("OK");
+    I.see("Warning");
+    I.see(`Checkbox "${name}" is required`);
+    I.seeElement(".ant-modal");
+    I.click("OK");
+    I.waitToHide(".ant-modal");
+  };
 
-    I.amOnPage("/");
-    LabelStudio.init(params);
+  I.amOnPage("/");
+  LabelStudio.init(params);
 
-    // Add new Annotation to be able to submit it
-    I.click('[aria-label="Annotations List Toggle"]');
-    I.click('[aria-label="Create Annotation"]');
+  // Add new Annotation to be able to submit it
+  I.click('[aria-label="Annotations List Toggle"]');
+  I.click('[aria-label="Create Annotation"]');
 
-    // Select one from each choices groups, except the one with visibleWhen condition
-    I.click("Valid");
-    I.click("Don't select me");
+  // Select one from each choices groups, except the one with visibleWhen condition
+  I.click("Valid");
+  I.click("Don't select me");
 
-    // We should get error, cause "easter-egg" is visible and required
-    I.submitAnnotation();
-    waitForError("easter-egg");
+  // We should get error, cause "easter-egg" is visible and required
+  I.submitAnnotation();
+  waitForError("easter-egg");
 
-    // Select the "Me neither" option to make the "easter-egg" block not required
-    I.click("Me neither");
-    I.submitAnnotation();
-    // Annotation is submitted, so now we can only update it
-    I.seeAnnotationSubmitted();
+  // Select the "Me neither" option to make the "easter-egg" block not required
+  I.click("Me neither");
+  I.submitAnnotation();
+  // Annotation is submitted, so now we can only update it
+  I.seeAnnotationSubmitted();
 
-    // Reset to check another scenario
-    LabelStudio.init(params);
-    // LabelStudio is reloaded, there are no new annotation from prev steps
-    I.dontSee("New annotation");
-    I.click('[aria-label="Annotations List Toggle"]');
-    I.click('[aria-label="Create Annotation"]');
+  // Reset to check another scenario
+  LabelStudio.init(params);
+  // LabelStudio is reloaded, there are no new annotation from prev steps
+  I.dontSee("New annotation");
+  I.click('[aria-label="Annotations List Toggle"]');
+  I.click('[aria-label="Create Annotation"]');
 
-    // Select all required options we have
-    I.click("Valid");
-    I.click("Don't select me");
-    I.click("Secret level");
+  // Select all required options we have
+  I.click("Valid");
+  I.click("Don't select me");
+  I.click("Secret level");
 
-    I.submitAnnotation();
-    // Annotation is submitted, so now we can only update it
-    I.seeAnnotationSubmitted();
-  },
-);
+  I.submitAnnotation();
+  // Annotation is submitted, so now we can only update it
+  I.seeAnnotationSubmitted();
+});

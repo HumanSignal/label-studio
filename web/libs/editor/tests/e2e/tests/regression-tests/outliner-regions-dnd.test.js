@@ -30,41 +30,38 @@ function generateResults(n) {
   return results;
 }
 
-Scenario(
-  "Dnd at the outliner after switching annotations",
-  async ({ I, LabelStudio, AtOutliner, AtTopbar }) => {
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags({
-      ff_front_1170_outliner_030222_short: true,
-    });
-    LabelStudio.init({
-      annotations: [
-        {
-          id: "test_02",
-          result: generateResults(10),
-        },
-        {
-          id: "test_01",
-          result: generateResults(10),
-        },
-      ],
-      config: CONFIG,
-      data: { text: TEXT },
-    });
+Scenario("Dnd at the outliner after switching annotations", async ({ I, LabelStudio, AtOutliner, AtTopbar }) => {
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags({
+    ff_front_1170_outliner_030222_short: true,
+  });
+  LabelStudio.init({
+    annotations: [
+      {
+        id: "test_02",
+        result: generateResults(10),
+      },
+      {
+        id: "test_01",
+        result: generateResults(10),
+      },
+    ],
+    config: CONFIG,
+    data: { text: TEXT },
+  });
 
-    AtOutliner.seeRegions(10);
+  AtOutliner.seeRegions(10);
 
-    I.say("Check that drag and drop interaction works");
-    await AtOutliner.dragAndDropRegion(7, 3);
+  I.say("Check that drag and drop interaction works");
+  await AtOutliner.dragAndDropRegion(7, 3);
 
-    I.say("Switch annotation");
-    AtTopbar.openAnnotaions();
-    AtTopbar.selectAnnotationAt(2);
-    AtOutliner.seeRegions(10);
+  I.say("Switch annotation");
+  AtTopbar.openAnnotaions();
+  AtTopbar.selectAnnotationAt(2);
+  AtOutliner.seeRegions(10);
 
-    I.say("Check that we still able to drag and drop regions");
-    await AtOutliner.dragAndDropRegion(7, 3);
+  I.say("Check that we still able to drag and drop regions");
+  await AtOutliner.dragAndDropRegion(7, 3);
 
-    // The potential errors should be caught by `errorsCollector` plugin
-  },
-);
+  // The potential errors should be caught by `errorsCollector` plugin
+});

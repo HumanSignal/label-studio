@@ -10,17 +10,12 @@ const PerRegionMixin = types
   .model({
     perregion: types.optional(types.boolean, false),
     whenlabelvalue: types.maybeNull(types.string),
-    displaymode: types.optional(
-      types.enumeration(Object.values(PER_REGION_MODES)),
-      PER_REGION_MODES.TAG,
-    ),
+    displaymode: types.optional(types.enumeration(Object.values(PER_REGION_MODES)), PER_REGION_MODES.TAG),
   })
   .extend((self) => {
     /* Validation */
     if (self.isClassificationTag !== true) {
-      throw new Error(
-        "The PerRegionMixin mixin should be used only for classification control-tags",
-      );
+      throw new Error("The PerRegionMixin mixin should be used only for classification control-tags");
     }
     return {};
   })
@@ -39,9 +34,7 @@ const PerRegionMixin = types
 
       if (!area) return null;
 
-      return self.annotation.results.find(
-        (r) => r.from_name === self && r.area === area,
-      );
+      return self.annotation.results.find((r) => r.from_name === self && r.area === area);
     },
     perRegionVisible() {
       if (!self.perregion) return true;

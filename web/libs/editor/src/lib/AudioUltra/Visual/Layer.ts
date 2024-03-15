@@ -48,9 +48,7 @@ interface LayerEvents {
   layerUpdated: (layer: Layer) => void;
 }
 
-export type RenderingContext =
-  | CanvasRenderingContext2D
-  | OffscreenCanvasRenderingContext2D;
+export type RenderingContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
 export type TextMetricKeys = keyof TextMetrics;
 
@@ -138,8 +136,7 @@ export class Layer extends Events<LayerEvents> {
     this.offscreen = options.offscreen ?? false;
     this.pixelRatio = options.pixelRatio ?? 1;
     this.index = options.index ?? this.index;
-    this.compositeOperation =
-      options.compositeOperation ?? this.compositeOperation;
+    this.compositeOperation = options.compositeOperation ?? this.compositeOperation;
     this.compositeAsGroup = options.compositeAsGroup ?? this.compositeAsGroup;
     this.opacity = options.opacity ?? this.opacity;
     this.isVisible = options.isVisible ?? true;
@@ -184,21 +181,10 @@ export class Layer extends Events<LayerEvents> {
   }
 
   fillRect(x: number, y: number, width: number, height: number) {
-    this.context?.fillRect(
-      x * this.pixelRatio,
-      y * this.pixelRatio,
-      width * this.pixelRatio,
-      height * this.pixelRatio,
-    );
+    this.context?.fillRect(x * this.pixelRatio, y * this.pixelRatio, width * this.pixelRatio, height * this.pixelRatio);
   }
 
-  roundRect(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    radius: number,
-  ) {
+  roundRect(x: number, y: number, width: number, height: number, radius: number) {
     this.context?.beginPath();
     this.context?.roundRect(
       x * this.pixelRatio,
@@ -211,12 +197,7 @@ export class Layer extends Events<LayerEvents> {
   }
 
   fillText(text: string, x: number, y: number, maxWidth?: number) {
-    this.context?.fillText(
-      text,
-      x * this.pixelRatio,
-      y * this.pixelRatio,
-      maxWidth,
-    );
+    this.context?.fillText(text, x * this.pixelRatio, y * this.pixelRatio, maxWidth);
   }
 
   fitText(text: string, x: number, y: number, maxWidth: number) {
@@ -285,12 +266,7 @@ export class Layer extends Events<LayerEvents> {
 
     // Copy the current canvas to the buffer
     this._bufferContext.imageSmoothingEnabled = false;
-    this._bufferContext.clearRect(
-      0,
-      0,
-      this._bufferCanvas.width,
-      this._bufferCanvas.height,
-    );
+    this._bufferContext.clearRect(0, 0, this._bufferCanvas.width, this._bufferCanvas.height);
     this._bufferContext.drawImage(this.canvas, 0, 0);
   }
 
@@ -299,11 +275,7 @@ export class Layer extends Events<LayerEvents> {
     this.clear();
 
     // Draw the buffer canvas to the current canvas shifted by x and y
-    this.context.drawImage(
-      this._bufferCanvas,
-      x * this.pixelRatio,
-      y * this.pixelRatio,
-    );
+    this.context.drawImage(this._bufferCanvas, x * this.pixelRatio, y * this.pixelRatio);
   }
 
   shift(x: number, y: number) {
@@ -354,9 +326,7 @@ export class Layer extends Events<LayerEvents> {
 
   clear() {
     if (this.context) {
-      this.context.globalAlpha = this.compositeAsGroup
-        ? clamp(this.opacity * 1.5, 0, 1)
-        : this.opacity;
+      this.context.globalAlpha = this.compositeAsGroup ? clamp(this.opacity * 1.5, 0, 1) : this.opacity;
       this.context.globalCompositeOperation = this.compositeOperation;
       this.context.imageSmoothingEnabled = false;
       this.context.clearRect(0, 0, this.width, this.height);
@@ -449,9 +419,7 @@ export class Layer extends Events<LayerEvents> {
 
     this._context = canvas.getContext("2d")!;
 
-    this._context.globalAlpha = this.compositeAsGroup
-      ? clamp(this.opacity * 1.5, 0, 1)
-      : this.opacity;
+    this._context.globalAlpha = this.compositeAsGroup ? clamp(this.opacity * 1.5, 0, 1) : this.opacity;
     this._context.globalCompositeOperation = this.compositeOperation;
     this._context.imageSmoothingEnabled = false;
 
@@ -472,9 +440,7 @@ export class Layer extends Events<LayerEvents> {
 
       this._context = canvas.getContext("2d")!;
 
-      const globalAlpha = this.compositeAsGroup
-        ? clamp(this.opacity * 1.5, 0, 1)
-        : this.opacity;
+      const globalAlpha = this.compositeAsGroup ? clamp(this.opacity * 1.5, 0, 1) : this.opacity;
 
       this._context.globalAlpha = globalAlpha;
       this._context.globalCompositeOperation = this.compositeOperation;
@@ -514,9 +480,7 @@ export class Layer extends Events<LayerEvents> {
 
       this._bufferContext = canvas.getContext("2d")!;
 
-      const globalAlpha = this.compositeAsGroup
-        ? clamp(this.opacity * 1.5, 0, 1)
-        : this.opacity;
+      const globalAlpha = this.compositeAsGroup ? clamp(this.opacity * 1.5, 0, 1) : this.opacity;
 
       this._bufferContext.globalAlpha = globalAlpha;
       this._bufferContext.globalCompositeOperation = this.compositeOperation;

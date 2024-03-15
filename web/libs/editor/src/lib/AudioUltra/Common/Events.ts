@@ -23,10 +23,7 @@ export class Events<ET, ETS extends keyof ET = keyof ET> extends Destructable {
     }
   }
 
-  invoke<T extends ETS, ETF = ET[T]>(
-    eventName: T,
-    args?: Parameters<ToFunction<ETF>>,
-  ) {
+  invoke<T extends ETS, ETF = ET[T]>(eventName: T, args?: Parameters<ToFunction<ETF>>) {
     const events = this.getSubscriptions(eventName);
 
     events.forEach((evt) => evt(...(args ?? [])));

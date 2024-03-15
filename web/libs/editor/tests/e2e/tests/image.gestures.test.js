@@ -1,9 +1,4 @@
-const {
-  initLabelStudio,
-  serialize,
-  convertToFixed,
-  getSizeConvertor,
-} = require("./helpers");
+const { initLabelStudio, serialize, convertToFixed, getSizeConvertor } = require("./helpers");
 
 const assert = require("node:assert");
 
@@ -42,10 +37,7 @@ const createShape = {
       const points = [];
 
       for (let i = 5; i--; ) {
-        points.push([
-          x + Math.sin(((2 * Math.PI) / 5) * i) * radius,
-          y - Math.cos(((2 * Math.PI) / 5) * i) * radius,
-        ]);
+        points.push([x + Math.sin(((2 * Math.PI) / 5) * i) * radius, y - Math.cos(((2 * Math.PI) / 5) * i) * radius]);
         points.push([
           x + (Math.sin(((2 * Math.PI) / 5) * (i - 0.5)) * radius) / 3,
           y - (Math.cos(((2 * Math.PI) / 5) * (i - 0.5)) * radius) / 3,
@@ -74,10 +66,7 @@ const createShape = {
           points: [
             [x, y],
             [x + DEFAULT_DIMENSIONS.polygon.length, y],
-            [
-              x + DEFAULT_DIMENSIONS.polygon.length / 2,
-              y + Math.sin(Math.PI / 3) * DEFAULT_DIMENSIONS.polygon.length,
-            ],
+            [x + DEFAULT_DIMENSIONS.polygon.length / 2, y + Math.sin(Math.PI / 3) * DEFAULT_DIMENSIONS.polygon.length],
           ],
         },
       };
@@ -181,59 +170,50 @@ const createShape = {
   },
 };
 
-Scenario(
-  "Creating regions by various gestures",
-  async ({ I, AtImageView, AtSidebar }) => {
-    const params = {
-      config: getConfigWithShapes(Object.keys(createShape)),
-      data: { image: IMAGE },
-    };
+Scenario("Creating regions by various gestures", async ({ I, AtImageView, AtSidebar }) => {
+  const params = {
+    config: getConfigWithShapes(Object.keys(createShape)),
+    data: { image: IMAGE },
+  };
 
-    I.amOnPage("/");
-    await I.executeScript(initLabelStudio, params);
-    AtImageView.waitForImage();
-    AtSidebar.seeRegions(0);
-    const canvasSize = await AtImageView.getCanvasSize();
-    const convertToImageSize = getSizeConvertor(
-      canvasSize.width,
-      canvasSize.height,
-    );
-    const cellSize = { width: 100, height: 100 };
-    const gridSize = {
-      h: Math.floor(canvasSize.width / cellSize.width),
-      v: Math.floor(canvasSize.height / cellSize.height),
-    };
-    const regions = [];
+  I.amOnPage("/");
+  await I.executeScript(initLabelStudio, params);
+  AtImageView.waitForImage();
+  AtSidebar.seeRegions(0);
+  const canvasSize = await AtImageView.getCanvasSize();
+  const convertToImageSize = getSizeConvertor(canvasSize.width, canvasSize.height);
+  const cellSize = { width: 100, height: 100 };
+  const gridSize = {
+    h: Math.floor(canvasSize.width / cellSize.width),
+    v: Math.floor(canvasSize.height / cellSize.height),
+  };
+  const regions = [];
 
-    Object.keys(createShape).forEach((shapeName, shapeIdx) => {
-      const hotKey = `${shapeIdx + 1}`;
+  Object.keys(createShape).forEach((shapeName, shapeIdx) => {
+    const hotKey = `${shapeIdx + 1}`;
 
-      Object.values(createShape[shapeName]).forEach((creator) => {
-        const i = Math.floor(regions.length / gridSize.h);
-        const j = regions.length % gridSize.h;
-        const region = creator(
-          (j + 0.5) * cellSize.width,
-          (i + 0.5) * cellSize.height,
-          (Math.min(cellSize.width, cellSize.height) / 2) * 0.75,
-          { hotKey, shape: shapeName },
-        );
-
-        region.result[`${shapeName.toLowerCase()}labels`] = [shapeName];
-        regions.push(region);
-      });
-    });
-    for (const [idx, region] of Object.entries(regions)) {
-      I.pressKey(region.hotKey);
-      AtImageView[region.action](...region.params);
-      AtSidebar.seeRegions(+idx + 1);
-    }
-    const result = await I.executeScript(serialize);
-
-    for (let i = 0; i < regions.length; i++) {
-      assert.deepEqual(
-        convertToFixed(result[i].value),
-        convertToImageSize(regions[i].result),
+    Object.values(createShape[shapeName]).forEach((creator) => {
+      const i = Math.floor(regions.length / gridSize.h);
+      const j = regions.length % gridSize.h;
+      const region = creator(
+        (j + 0.5) * cellSize.width,
+        (i + 0.5) * cellSize.height,
+        (Math.min(cellSize.width, cellSize.height) / 2) * 0.75,
+        { hotKey, shape: shapeName },
       );
-    }
-  },
-);
+
+      region.result[`${shapeName.toLowerCase()}labels`] = [shapeName];
+      regions.push(region);
+    });
+  });
+  for (const [idx, region] of Object.entries(regions)) {
+    I.pressKey(region.hotKey);
+    AtImageView[region.action](...region.params);
+    AtSidebar.seeRegions(+idx + 1);
+  }
+  const result = await I.executeScript(serialize);
+
+  for (let i = 0; i < regions.length; i++) {
+    assert.deepEqual(convertToFixed(result[i].value), convertToImageSize(regions[i].result));
+  }
+});

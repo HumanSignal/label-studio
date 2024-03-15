@@ -32,13 +32,11 @@ export const TimeDurationControl: FC<TimerProps> = ({
   const _currentTime = !currentTime ? startTime : currentTime;
 
   const handleChangeCurrentTime = (value: number) => {
-    if (value >= minTime && value <= maxTime && value <= endTime)
-      onChangeStartTime?.(value);
+    if (value >= minTime && value <= maxTime && value <= endTime) onChangeStartTime?.(value);
   };
 
   const handleChangeEndTime = (value: number) => {
-    if (value >= minTime && value <= maxTime && value >= _currentTime)
-      onChangeEndTime?.(value);
+    if (value >= minTime && value <= maxTime && value >= _currentTime) onChangeEndTime?.(value);
   };
 
   return (

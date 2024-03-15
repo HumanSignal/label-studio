@@ -113,10 +113,7 @@ export class Geometry {
 
           res.push({
             distance: avgDistance,
-            bbox: [
-              Geometry.convertToRectBBox(bbox1),
-              Geometry.convertToRectBBox(bbox2),
-            ],
+            bbox: [Geometry.convertToRectBBox(bbox1), Geometry.convertToRectBBox(bbox2)],
           });
         });
 
@@ -193,27 +190,17 @@ export class Geometry {
 
       return [t, t + Math.PI]
         .map((t) => {
-          return (
-            x +
-            (major / 2) * Math.cos(t) * Math.cos(angleRad) -
-            (minor / 2) * Math.sin(t) * Math.sin(angleRad)
-          );
+          return x + (major / 2) * Math.cos(t) * Math.cos(angleRad) - (minor / 2) * Math.sin(t) * Math.sin(angleRad);
         })
         .sort((a, b) => b - a);
     };
 
     const getYLimits = () => {
-      const t = Math.atan(
-        ((minor / 2) * 1.0) / Math.tan(angleRad) / (major / 2),
-      );
+      const t = Math.atan(((minor / 2) * 1.0) / Math.tan(angleRad) / (major / 2));
 
       return [t, t + Math.PI]
         .map((t) => {
-          return (
-            y +
-            (minor / 2) * Math.sin(t) * Math.cos(angleRad) +
-            (major / 2) * Math.cos(t) * Math.sin(angleRad)
-          );
+          return y + (minor / 2) * Math.sin(t) * Math.cos(angleRad) + (major / 2) * Math.cos(t) * Math.sin(angleRad);
         })
         .sort((a, b) => b - a);
     };
@@ -260,10 +247,7 @@ export class Geometry {
    * @return {BBox[]}
    */
   static getPolygonBBox(points) {
-    const coords = points.reduce(
-      (res, point) => [...res, point.x, point.y],
-      [],
-    );
+    const coords = points.reduce((res, point) => [...res, point.x, point.y], []);
     const [x1, y1, x2, y2] = Geometry.getPointsBBox(coords);
 
     return { x: x1, y: y1, width: x2 - x1, height: y2 - y1 };
@@ -336,10 +320,7 @@ export class Geometry {
 
   static clampBBox(bbox, min, max) {
     const p1 = [clamp(bbox.x, min.x, max.x), clamp(bbox.y, min.y, max.y)];
-    const p2 = [
-      clamp(bbox.width + bbox.x, min.x, max.x),
-      clamp(bbox.height + bbox.y, min.y, max.y),
-    ];
+    const p2 = [clamp(bbox.width + bbox.x, min.x, max.x), clamp(bbox.height + bbox.y, min.y, max.y)];
 
     return {
       x: p1[0],
@@ -369,8 +350,6 @@ export class Geometry {
       height: domRect.height,
     });
 
-    return single
-      ? convertDOMRect(bboxes[0])
-      : Array.from(domNode.getClientRects()).map(convertDOMRect);
+    return single ? convertDOMRect(bboxes[0]) : Array.from(domNode.getClientRects()).map(convertDOMRect);
   }
 }

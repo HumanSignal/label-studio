@@ -77,13 +77,7 @@ const trimSelection = (selection) => {
  * @param {Selection} selection
  */
 const findBoundarySelection = (selection, boundary) => {
-  const {
-    range: originalRange,
-    startOffset,
-    startContainer,
-    endOffset,
-    endContainer,
-  } = destructSelection(selection);
+  const { range: originalRange, startOffset, startContainer, endOffset, endContainer } = destructSelection(selection);
 
   const resultRange = {};
   let currentRange;
@@ -91,19 +85,11 @@ const findBoundarySelection = (selection, boundary) => {
   // It's easier to operate the selection when it's collapsed
   selection.collapse(endContainer, endOffset);
   // Looking for maximum displacement
-  while (
-    selection
-      .getRangeAt(0)
-      .compareBoundaryPoints(Range.START_TO_START, originalRange) === 1
-  ) {
+  while (selection.getRangeAt(0).compareBoundaryPoints(Range.START_TO_START, originalRange) === 1) {
     selection.modify("move", "backward", boundary);
   }
   // Going back to find minimum displacement
-  while (
-    selection
-      .getRangeAt(0)
-      .compareBoundaryPoints(Range.START_TO_START, originalRange) < 1
-  ) {
+  while (selection.getRangeAt(0).compareBoundaryPoints(Range.START_TO_START, originalRange) < 1) {
     currentRange = selection.getRangeAt(0);
     Object.assign(resultRange, {
       startContainer: currentRange.startContainer,
@@ -113,18 +99,10 @@ const findBoundarySelection = (selection, boundary) => {
   }
 
   selection.collapse(startContainer, startOffset);
-  while (
-    selection
-      .getRangeAt(0)
-      .compareBoundaryPoints(Range.END_TO_END, originalRange) === -1
-  ) {
+  while (selection.getRangeAt(0).compareBoundaryPoints(Range.END_TO_END, originalRange) === -1) {
     selection.modify("move", "forward", boundary);
   }
-  while (
-    selection
-      .getRangeAt(0)
-      .compareBoundaryPoints(Range.END_TO_END, originalRange) > -1
-  ) {
+  while (selection.getRangeAt(0).compareBoundaryPoints(Range.END_TO_END, originalRange) > -1) {
     currentRange = selection.getRangeAt(0);
     Object.assign(resultRange, {
       endContainer: currentRange.endContainer,
@@ -144,13 +122,7 @@ const findBoundarySelection = (selection, boundary) => {
 };
 
 const closestBoundarySelection = (selection, boundary) => {
-  const {
-    range: originalRange,
-    startOffset,
-    startContainer,
-    endOffset,
-    endContainer,
-  } = destructSelection(selection);
+  const { range: originalRange, startOffset, startContainer, endOffset, endContainer } = destructSelection(selection);
 
   const resultRange = {};
   let currentRange;
@@ -159,11 +131,7 @@ const closestBoundarySelection = (selection, boundary) => {
   selection.collapse(startContainer, startOffset);
   selection.modify("move", "forward", "character");
   selection.modify("move", "backward", boundary);
-  if (
-    selection
-      .getRangeAt(0)
-      .compareBoundaryPoints(Range.START_TO_START, originalRange) === 1
-  ) {
+  if (selection.getRangeAt(0).compareBoundaryPoints(Range.START_TO_START, originalRange) === 1) {
     selection.collapse(startContainer, startOffset);
     selection.modify("move", "backward", boundary);
   }
@@ -176,11 +144,7 @@ const closestBoundarySelection = (selection, boundary) => {
   selection.collapse(endContainer, endOffset);
   selection.modify("move", "backward", "character");
   selection.modify("move", "forward", boundary);
-  if (
-    selection
-      .getRangeAt(0)
-      .compareBoundaryPoints(Range.START_TO_START, originalRange) === -1
-  ) {
+  if (selection.getRangeAt(0).compareBoundaryPoints(Range.START_TO_START, originalRange) === -1) {
     selection.collapse(endContainer, endOffset);
     selection.modify("move", "forward", boundary);
   }
@@ -202,16 +166,8 @@ const closestBoundarySelection = (selection, boundary) => {
 
 const boundarySelection = (selection, boundary) => {
   const wordBoundary = boundary !== "symbol";
-  const {
-    startOffset,
-    startContainer,
-    endOffset,
-    endContainer,
-    firstSymbol,
-    prevSymbol,
-    lastSymbol,
-    nextSymbol,
-  } = destructSelection(selection);
+  const { startOffset, startContainer, endOffset, endContainer, firstSymbol, prevSymbol, lastSymbol, nextSymbol } =
+    destructSelection(selection);
 
   if (wordBoundary) {
     if (boundary.endsWith("boundary")) {
@@ -296,9 +252,7 @@ const applyTextGranularity = (selection, granularity) => {
         return;
     }
   } catch {
-    console.warn(
-      "Probably, you're using browser that doesn't support granularity.",
-    );
+    console.warn("Probably, you're using browser that doesn't support granularity.");
   }
 };
 
@@ -310,20 +264,12 @@ const applyTextGranularity = (selection, granularity) => {
  * @param {string} direction forward, backward, forward-next, backward-next
  *                           "-next" when we need to skip node if it's a text node
  */
-const textNodeLookup = (
-  commonContainer,
-  node,
-  offset,
-  direction = "forward",
-) => {
+const textNodeLookup = (commonContainer, node, offset, direction = "forward") => {
   const startNode = node === commonContainer ? node.childNodes[offset] : node;
 
   if (isTextNode(startNode) && !direction.endsWith("next")) return startNode;
 
-  const walker = commonContainer.ownerDocument.createTreeWalker(
-    commonContainer,
-    NodeFilter.SHOW_ALL,
-  );
+  const walker = commonContainer.ownerDocument.createTreeWalker(commonContainer, NodeFilter.SHOW_ALL);
   let currentNode = walker.nextNode();
   // tree walker can't go backward, so we go forward to startNode and record every text node
   // to find the last one before startNode
@@ -356,12 +302,7 @@ const fixRange = (range) => {
   let { startOffset, startContainer, endContainer } = range;
 
   if (!isTextNode(startContainer)) {
-    startContainer = textNodeLookup(
-      commonContainer,
-      startContainer,
-      startOffset,
-      "forward",
-    );
+    startContainer = textNodeLookup(commonContainer, startContainer, startOffset, "forward");
     if (!startContainer) return null;
     range.setStart(startContainer, 0);
     startOffset = 0;
@@ -375,12 +316,7 @@ const fixRange = (range) => {
 
   if (selectionFromTheEnd || isBasicallyEmpty(startContainer)) {
     do {
-      startContainer = textNodeLookup(
-        commonContainer,
-        startContainer,
-        startOffset,
-        "forward-next",
-      );
+      startContainer = textNodeLookup(commonContainer, startContainer, startOffset, "forward-next");
       if (!startContainer) return null;
     } while (isBasicallyEmpty(startContainer));
 
@@ -389,21 +325,11 @@ const fixRange = (range) => {
   }
 
   if (!isTextNode(endContainer)) {
-    endContainer = textNodeLookup(
-      commonContainer,
-      endContainer,
-      endOffset,
-      "backward",
-    );
+    endContainer = textNodeLookup(commonContainer, endContainer, endOffset, "backward");
     if (!endContainer) return null;
 
     while (/^\s*$/.test(endContainer.wholeText)) {
-      endContainer = textNodeLookup(
-        commonContainer,
-        endContainer,
-        endOffset,
-        "backward-next",
-      );
+      endContainer = textNodeLookup(commonContainer, endContainer, endOffset, "backward-next");
       if (!endContainer) return null;
     }
     // we skip empty whitespace-only text nodes, so we need the found one to be included
@@ -427,23 +353,16 @@ export const highlightRange = (range, { label, classNames }) => {
    * Wrapper with predefined classNames and cssStyles
    * @param  {[Node, number, number]} args
    */
-  const applyStyledHighlight = (...args) =>
-    highlightRangePart(...args, classNames);
+  const applyStyledHighlight = (...args) => highlightRangePart(...args, classNames);
 
   // If start and end nodes are equal, we don't need
   // to perform any additional work, just highlighting as is
   if (startContainer === endContainer) {
-    highlights.push(
-      applyStyledHighlight(startContainer, startOffset, endOffset),
-    );
+    highlights.push(applyStyledHighlight(startContainer, startOffset, endOffset));
   } else {
     // When start and end are different we need to find all
     // nodes between as they could contain text nodes
-    const nodesToHighlight = findNodesBetween(
-      startContainer,
-      endContainer,
-      commonAncestorContainer,
-    );
+    const nodesToHighlight = findNodesBetween(startContainer, endContainer, commonAncestorContainer);
 
     // All nodes between start and end should be fully highlighted
     nodesToHighlight.forEach((node) => {
@@ -474,12 +393,7 @@ export const highlightRange = (range, { label, classNames }) => {
  * @param {object} cssStyles
  * @param {string[]} classNames
  */
-export const highlightRangePart = (
-  container,
-  startOffset,
-  endOffset,
-  classNames,
-) => {
+export const highlightRangePart = (container, startOffset, endOffset, classNames) => {
   let spanHighlight;
   const text = container.textContent;
   const parent = container.parentNode;
@@ -592,8 +506,7 @@ export const findNodesBetween = (startNode, endNode, root) => {
 
   while (currentNode) {
     if (currentNode === startNode) inRange = true;
-    if (inRange && currentNode.nodeType === Node.TEXT_NODE)
-      nodes.push(currentNode);
+    if (inRange && currentNode.nodeType === Node.TEXT_NODE) nodes.push(currentNode);
     if (inRange && currentNode === endNode) break;
     currentNode = walker.nextNode();
   }
@@ -718,10 +631,7 @@ export const fixCodePointsInRange = (range) => {
  * @param {number} position
  */
 export const findOnPosition = (root, position, borderSide = "left") => {
-  const walker = (root.contentDocument ?? root.ownerDocument).createTreeWalker(
-    root,
-    NodeFilter.SHOW_ALL,
-  );
+  const walker = (root.contentDocument ?? root.ownerDocument).createTreeWalker(root, NodeFilter.SHOW_ALL);
 
   let lastPosition = 0;
   let currentNode = walker.nextNode();
@@ -746,11 +656,7 @@ export const findOnPosition = (root, position, borderSide = "left") => {
       const length = [...currentNode.textContent].length;
 
       if (length + lastPosition >= position || !nextNode) {
-        if (
-          borderSide === "right" &&
-          length + lastPosition === position &&
-          nextNode
-        ) {
+        if (borderSide === "right" && length + lastPosition === position && nextNode) {
           finishHere = true;
         } else {
           return {
@@ -788,10 +694,7 @@ export const rangeToGlobalOffset = (range, root) => {
  * @param {Node} root
  */
 const findGlobalOffset = (node, position, root) => {
-  const walker = (root.contentDocument ?? root.ownerDocument).createTreeWalker(
-    root,
-    NodeFilter.SHOW_ALL,
-  );
+  const walker = (root.contentDocument ?? root.ownerDocument).createTreeWalker(root, NodeFilter.SHOW_ALL);
 
   let globalPosition = 0;
   let nodeReached = false;
@@ -812,9 +715,7 @@ const findGlobalOffset = (node, position, root) => {
     }
 
     if (isText || isBR) {
-      let length = isDefined(currentNode.length)
-        ? [...currentNode.textContent].length
-        : 1;
+      let length = isDefined(currentNode.length) ? [...currentNode.textContent].length : 1;
 
       if (atTargetNode) {
         length = Math.min(position, length);

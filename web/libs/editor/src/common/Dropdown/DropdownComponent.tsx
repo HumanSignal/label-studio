@@ -57,13 +57,8 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
 
     const calculatePosition = useCallback(() => {
       const dropdownEl = dropdown.current!;
-      const parent = (triggerRef?.current ??
-        dropdownEl.parentNode) as HTMLElement;
-      const { left, top } = alignElements(
-        parent!,
-        dropdownEl,
-        props.alignment || "bottom-left",
-      );
+      const parent = (triggerRef?.current ?? dropdownEl.parentNode) as HTMLElement;
+      const { left, top } = alignElements(parent!, dropdownEl, props.alignment || "bottom-left");
 
       setOffset({ left, top });
     }, [triggerRef, minIndex]);

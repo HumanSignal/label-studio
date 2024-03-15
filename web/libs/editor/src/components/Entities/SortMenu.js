@@ -35,10 +35,7 @@ export const SortMenu = observer(({ regionStore }) => {
             </Elem>{" "}
             Date
           </Elem>
-          <span>
-            {regionStore.sort === "date" &&
-              (regionStore.sortOrder === "asc" ? "↓" : "↑")}
-          </span>
+          <span>{regionStore.sort === "date" && (regionStore.sortOrder === "asc" ? "↓" : "↑")}</span>
         </Elem>
       </Menu.Item>
       <Menu.Item key="score">
@@ -56,10 +53,7 @@ export const SortMenu = observer(({ regionStore }) => {
             </Elem>{" "}
             Score
           </Elem>
-          <span>
-            {regionStore.sort === "score" &&
-              (regionStore.sortOrder === "asc" ? "↓" : "↑")}
-          </span>
+          <span>{regionStore.sort === "score" && (regionStore.sortOrder === "asc" ? "↓" : "↑")}</span>
         </Elem>
       </Menu.Item>
     </Block>

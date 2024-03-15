@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 const libraryQueue = new Map();
 
@@ -82,11 +75,7 @@ export const LibraryProvider = ({ libraries, children }) => {
     return requestLabelStudio(libraries);
   }, [libraries]);
 
-  return (
-    <LibraryContext.Provider value={{ requestLibrary }}>
-      {children}
-    </LibraryContext.Provider>
-  );
+  return <LibraryContext.Provider value={{ requestLibrary }}>{children}</LibraryContext.Provider>;
 };
 
 export const useLibrary = (libraryName) => {

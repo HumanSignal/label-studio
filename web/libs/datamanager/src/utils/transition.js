@@ -10,10 +10,7 @@
  * afterTransition: (element: HTMLElement) => void
  * }} param2
  */
-export const aroundTransition = (
-  element,
-  { init, transition, onStart, beforeTransition, afterTransition } = {},
-) => {
+export const aroundTransition = (element, { init, transition, onStart, beforeTransition, afterTransition } = {}) => {
   return new Promise(async (resolve) => {
     init?.(element);
 

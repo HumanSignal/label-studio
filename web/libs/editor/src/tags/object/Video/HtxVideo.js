@@ -7,10 +7,7 @@ import { Menu } from "../../../common/Menu/Menu";
 import { ErrorMessage } from "../../../components/ErrorMessage/ErrorMessage";
 import ObjectTag from "../../../components/Tags/Object";
 import { Timeline } from "../../../components/Timeline/Timeline";
-import {
-  VideoCanvas,
-  clampZoom,
-} from "../../../components/VideoCanvas/VideoCanvas";
+import { VideoCanvas, clampZoom } from "../../../components/VideoCanvas/VideoCanvas";
 import {
   MAX_ZOOM_WHEEL,
   MIN_ZOOM_WHEEL,
@@ -93,9 +90,7 @@ function useZoom(videoDimensions, canvasDimentions, shouldClampPan) {
 
   const setZoom = useCallback((value) => {
     return setZoomState(({ zoom, pan }) => {
-      const nextZoom = clampZoom(
-        value instanceof Function ? value(zoom) : value,
-      );
+      const nextZoom = clampZoom(value instanceof Function ? value(zoom) : value);
 
       return {
         zoom: nextZoom,
@@ -150,8 +145,7 @@ const HtxVideoView = ({ item, store }) => {
     limitCanvasDrawingBoundaries,
   );
   const [panMode, setPanMode] = useState(false);
-  const [isFullScreen, enterFullscreen, exitFullscren, handleFullscreenToggle] =
-    useToggle(false);
+  const [isFullScreen, enterFullscreen, exitFullscren, handleFullscreenToggle] = useToggle(false);
   const fullscreen = useFullscreen({
     onEnterFullscreen() {
       enterFullscreen();
@@ -227,10 +221,7 @@ const HtxVideoView = ({ item, store }) => {
     document.addEventListener("keydown", onKeyDown);
 
     const observer = new ResizeObserver(() => onResize());
-    const [vContainer, vBlock] = [
-      videoContainerRef.current,
-      videoBlockRef.current,
-    ];
+    const [vContainer, vBlock] = [videoContainerRef.current, videoBlockRef.current];
 
     observer.observe(vContainer);
     observer.observe(vBlock);
@@ -290,10 +281,7 @@ const HtxVideoView = ({ item, store }) => {
       const startY = e.pageY;
 
       const onMouseMove = (e) => {
-        const position = item.ref.current.adjustPan(
-          pan.x + (e.pageX - startX),
-          pan.y + (e.pageY - startY),
-        );
+        const position = item.ref.current.adjustPan(pan.x + (e.pageX - startX), pan.y + (e.pageY - startY));
 
         requestAnimationFrame(() => {
           setPan(position);
@@ -423,9 +411,7 @@ const HtxVideoView = ({ item, store }) => {
 
   const handleAction = useCallback(
     (_, action, data) => {
-      const regions = item.regs.filter(
-        (reg) => reg.selected || reg.inSelection,
-      );
+      const regions = item.regs.filter((reg) => reg.selected || reg.inSelection);
 
       regions.forEach((region) => {
         switch (action) {
@@ -465,8 +451,7 @@ const HtxVideoView = ({ item, store }) => {
   );
 
   const regions = item.regs.map((reg) => {
-    const color =
-      reg.style?.fillcolor ?? reg.tag?.fillcolor ?? defaultStyle.fillcolor;
+    const color = reg.style?.fillcolor ?? reg.tag?.fillcolor ?? defaultStyle.fillcolor;
     const label = reg.labels.join(", ") || "Empty";
     const sequence = reg.sequence.map((s) => ({
       frame: s.frame,
@@ -485,20 +470,12 @@ const HtxVideoView = ({ item, store }) => {
 
   return (
     <ObjectTag item={item}>
-      <Block
-        name="video-segmentation"
-        ref={mainContentRef}
-        mod={{ fullscreen: isFullScreen }}
-      >
+      <Block name="video-segmentation" ref={mainContentRef} mod={{ fullscreen: isFullScreen }}>
         {item.errors?.map((error, i) => (
           <ErrorMessage key={`err-${i}`} error={error} />
         ))}
 
-        <Block
-          name="video"
-          mod={{ fullscreen: isFullScreen }}
-          ref={videoBlockRef}
-        >
+        <Block name="video" mod={{ fullscreen: isFullScreen }} ref={videoBlockRef}>
           <Elem
             name="main"
             ref={videoContainerRef}
@@ -518,9 +495,7 @@ const HtxVideoView = ({ item, store }) => {
                     width={videoSize[0]}
                     height={videoSize[1]}
                     workingArea={videoDimensions}
-                    allowRegionsOutsideWorkingArea={
-                      !limitCanvasDrawingBoundaries
-                    }
+                    allowRegionsOutsideWorkingArea={!limitCanvasDrawingBoundaries}
                     stageRef={stageRef}
                   />
                 )}

@@ -2,8 +2,7 @@ const assert = require("node:assert");
 
 Feature("Image width parameter").tag("@regress");
 
-const IMAGE =
-  "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg";
+const IMAGE = "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg";
 
 const config = `
   <View>
@@ -29,10 +28,7 @@ Scenario(
 
     // The sizes of the canvas and image element should be equal (or almost equal)
     assert.strictEqual(Math.ceil(imageSize.width), Math.ceil(canvasSize.width));
-    assert.strictEqual(
-      Math.ceil(imageSize.height),
-      Math.ceil(canvasSize.height),
-    );
+    assert.strictEqual(Math.ceil(imageSize.height), Math.ceil(canvasSize.height));
 
     // Create full-size region
     // This step is just for visual identification of the bug
@@ -46,9 +42,6 @@ Scenario(
 
     // The sizes should still be equal (or almost equal)
     assert.strictEqual(Math.ceil(imageSize.width), Math.ceil(canvasSize.width));
-    assert.strictEqual(
-      Math.ceil(imageSize.height),
-      Math.ceil(canvasSize.height),
-    );
+    assert.strictEqual(Math.ceil(imageSize.height), Math.ceil(canvasSize.height));
   },
 );

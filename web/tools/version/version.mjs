@@ -84,11 +84,7 @@ const getVersionData = async () => {
 
   // Get the current branch of the latest commit
   const contains = (await gitBranch(["--contains", commit])).split("\n");
-  let branch = (
-    contains.find(
-      (line) => line.startsWith("develop") || line.startsWith("*"),
-    ) ?? ""
-  )
+  let branch = (contains.find((line) => line.startsWith("develop") || line.startsWith("*")) ?? "")
     .replace("*", "")
     .trim();
 
@@ -111,8 +107,7 @@ const versionLib = async () => {
   let workspaceRoot;
   let currentProjectPath;
   if (currentPwd.includes("node_modules")) {
-    const [_workspaceRoot, nodeModulesPath, _currentProjectPath] =
-      currentPwd.split("web");
+    const [_workspaceRoot, nodeModulesPath, _currentProjectPath] = currentPwd.split("web");
     workspaceRoot = path.join(_workspaceRoot, "web", nodeModulesPath);
     currentProjectPath = _currentProjectPath;
   } else {

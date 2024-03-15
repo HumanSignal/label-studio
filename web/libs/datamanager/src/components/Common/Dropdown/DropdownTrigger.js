@@ -4,23 +4,8 @@ import { Dropdown } from "./DropdownComponent";
 import { DropdownContext } from "./DropdownContext";
 
 export const DropdownTrigger = React.forwardRef(
-  (
-    {
-      tag,
-      children,
-      dropdown,
-      content,
-      toggle,
-      closeOnClickOutside = true,
-      disabled = false,
-      ...props
-    },
-    ref,
-  ) => {
-    if (children.length > 2)
-      throw new Error(
-        "Trigger can't contain more that one child and a dropdown",
-      );
+  ({ tag, children, dropdown, content, toggle, closeOnClickOutside = true, disabled = false, ...props }, ref) => {
+    if (children.length > 2) throw new Error("Trigger can't contain more that one child and a dropdown");
     const dropdownRef = ref ?? dropdown ?? React.useRef();
     const triggerEL = React.Children.only(children);
     const [childset] = React.useState(new Set());
@@ -32,14 +17,10 @@ export const DropdownTrigger = React.forwardRef(
     const targetIsInsideDropdown = React.useCallback(
       (target) => {
         const triggerClicked = triggerRef.current?.contains?.(target);
-        const dropdownClicked =
-          dropdownRef.current?.dropdown?.contains?.(target);
-        const childDropdownClicked = Array.from(childset).reduce(
-          (res, child) => {
-            return res || child.hasTarget(target);
-          },
-          false,
-        );
+        const dropdownClicked = dropdownRef.current?.dropdown?.contains?.(target);
+        const childDropdownClicked = Array.from(childset).reduce((res, child) => {
+          return res || child.hasTarget(target);
+        }, false);
 
         return triggerClicked || dropdownClicked || childDropdownClicked;
       },
@@ -76,10 +57,7 @@ export const DropdownTrigger = React.forwardRef(
       tag,
       key: "dd-trigger",
       ref: triggerRef,
-      className: cn("dropdown")
-        .elem("trigger")
-        .mix(props.className)
-        .mix(triggerEL.props.className),
+      className: cn("dropdown").elem("trigger").mix(props.className).mix(triggerEL.props.className),
       onClickCapture: handleToggle,
     };
 

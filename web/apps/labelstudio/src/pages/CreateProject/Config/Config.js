@@ -13,12 +13,7 @@ import { Block, Elem, cn } from "../../../utils/bem";
 import { Palette } from "../../../utils/colors";
 import "./Config.styl";
 import { Preview } from "./Preview";
-import {
-  DEFAULT_COLUMN,
-  EMPTY_CONFIG,
-  Template,
-  isEmptyConfig,
-} from "./Template";
+import { DEFAULT_COLUMN, EMPTY_CONFIG, Template, isEmptyConfig } from "./Template";
 import { TemplatesList } from "./TemplatesList";
 import { colorNames } from "./colors";
 
@@ -31,12 +26,10 @@ const configClass = cn("configure");
 
 const EmptyConfigPlaceholder = () => (
   <div className={configClass.elem("empty-config")}>
+    <p>Your labeling configuration is empty. It is required to label your data.</p>
     <p>
-      Your labeling configuration is empty. It is required to label your data.
-    </p>
-    <p>
-      Start from one of our predefined templates or create your own config on
-      the Code panel. The labeling config is XML-based and you can{" "}
+      Start from one of our predefined templates or create your own config on the Code panel. The labeling config is
+      XML-based and you can{" "}
       <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
         read about the available tags in our documentation
       </a>
@@ -49,11 +42,7 @@ const Label = ({ label, template, color }) => {
   const value = label.getAttribute("value");
 
   return (
-    <li
-      className={configClass
-        .elem("label")
-        .mod({ choice: label.tagName === "Choice" })}
-    >
+    <li className={configClass.elem("label").mod({ choice: label.tagName === "Choice" })}>
       <label style={{ background: color }}>
         <input
           type="color"
@@ -115,20 +104,12 @@ const ConfigureControl = ({ control, template }) => {
       <form className={configClass.elem("add-labels")} action="">
         <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
         <span>Use new line as a separator to add multiple labels</span>
-        <textarea
-          name="labels"
-          id=""
-          cols="30"
-          rows="5"
-          ref={refLabels}
-          onKeyPress={onKeyPress}
-        />
+        <textarea name="labels" id="" cols="30" rows="5" ref={refLabels} onKeyPress={onKeyPress} />
         <input type="button" value="Add" onClick={onAddLabels} />
       </form>
       <div className={configClass.elem("current-labels")}>
         <h3>
-          {tagname === "Choices" ? "Choices" : "Labels"} (
-          {control.children.length})
+          {tagname === "Choices" ? "Choices" : "Labels"} ({control.children.length})
         </h3>
         <ul>
           {Array.from(control.children).map((label) => (
@@ -162,8 +143,7 @@ const ConfigureSettings = ({ template }) => {
     let value = false;
 
     if (options.value) value = options.value($tag);
-    else if (typeof options.param === "string")
-      value = $tag.getAttribute(options.param);
+    else if (typeof options.param === "string") value = $tag.getAttribute(options.param);
     if (value === "true") value = true;
     if (value === "false") value = false;
     let onChange;
@@ -198,18 +178,14 @@ const ConfigureSettings = ({ template }) => {
           if (typeof options.param === "function") {
             options.param($tag, e.target.checked);
           } else {
-            $object.setAttribute(
-              options.param,
-              e.target.checked ? "true" : "false",
-            );
+            $object.setAttribute(options.param, e.target.checked ? "true" : "false");
           }
           template.render();
         };
         return (
           <li key={key}>
             <label>
-              <input type="checkbox" checked={value} onChange={onChange} />{" "}
-              {options.title}
+              <input type="checkbox" checked={value} onChange={onChange} /> {options.title}
             </label>
           </li>
         );
@@ -227,8 +203,7 @@ const ConfigureSettings = ({ template }) => {
         return (
           <li key={key}>
             <label>
-              {options.title}{" "}
-              <input type="text" onInput={onChange} value={value} size={size} />
+              {options.title} <input type="text" onInput={onChange} value={value} size={size} />
             </label>
           </li>
         );
@@ -253,9 +228,7 @@ const ConfigureColumn = ({ template, obj, columns }) => {
   const value = obj.getAttribute("value")?.replace(/^\$/, "");
   // if there is a value set already and it's not in the columns
   // or data was not uploaded yet
-  const [isManual, setIsManual] = useState(
-    !!value && !columns?.includes(value),
-  );
+  const [isManual, setIsManual] = useState(!!value && !columns?.includes(value));
   // value is stored in state to make input conrollable
   // changes will be sent by Enter and blur
   const [newValue, setNewValue] = useState(`$${value}`);
@@ -316,14 +289,7 @@ const ConfigureColumn = ({ template, obj, columns }) => {
         {!columns?.length && <option value={value}>{"<imported file>"}</option>}
         <option value="-">{"<set manually>"}</option>
       </select>
-      {isManual && (
-        <input
-          value={newValue}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-        />
-      )}
+      {isManual && <input value={newValue} onChange={handleChange} onBlur={handleBlur} onKeyDown={handleKeyDown} />}
     </p>
   );
 };
@@ -334,24 +300,17 @@ const ConfigureColumns = ({ columns, template }) => {
   return (
     <div className={configClass.elem("object")}>
       <h4>Configure data</h4>
-      {template.objects.length > 1 &&
-        columns?.length > 0 &&
-        columns.length < template.objects.length && (
-          <p className={configClass.elem("object-error")}>
-            This template requires more data then you have for now
-          </p>
-        )}
+      {template.objects.length > 1 && columns?.length > 0 && columns.length < template.objects.length && (
+        <p className={configClass.elem("object-error")}>This template requires more data then you have for now</p>
+      )}
       {columns?.length === 0 && (
         <p className={configClass.elem("object-error")}>
-          To select which field(s) to label you need to upload the data.
-          Alternatively, you can provide it using Code mode.
+          To select which field(s) to label you need to upload the data. Alternatively, you can provide it using Code
+          mode.
         </p>
       )}
       {template.objects.map((obj) => (
-        <ConfigureColumn
-          key={obj.getAttribute("name")}
-          {...{ obj, template, columns }}
-        />
+        <ConfigureColumn key={obj.getAttribute("name")} {...{ obj, template, columns }} />
       ))}
     </div>
   );
@@ -369,9 +328,7 @@ const Configurator = ({
   disableSaveButton,
   warning,
 }) => {
-  const [configure, setConfigure] = React.useState(
-    isEmptyConfig(config) ? "code" : "visual",
-  );
+  const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
@@ -391,10 +348,7 @@ const Configurator = ({
 
   React.useEffect(() => {
     // config may change during init, so wait for that, but for a very short time only
-    debounceTimer.current = window.setTimeout(
-      () => setConfigToCheck(config),
-      configToCheck ? 500 : 30,
-    );
+    debounceTimer.current = window.setTimeout(() => setConfigToCheck(config), configToCheck ? 500 : 30);
     return () => window.clearTimeout(debounceTimer.current);
   }, [config]);
 
@@ -486,11 +440,7 @@ const Configurator = ({
     return completeAfter(cm, () => {
       const token = cm.getTokenAt(cm.getCursor());
 
-      if (
-        token.type === "string" &&
-        (!/['"]$/.test(token.string) || token.string.length === 1)
-      )
-        return false;
+      if (token.type === "string" && (!/['"]$/.test(token.string) || token.string.length === 1)) return false;
 
       const inner = CM.innerMode(cm.getMode(), token.state).state;
 
@@ -514,11 +464,7 @@ const Configurator = ({
       <div className={configClass.elem("container")}>
         <header>
           <button onClick={onBrowse}>Browse Templates</button>
-          <ToggleItems
-            items={{ code: "Code", visual: "Visual" }}
-            active={configure}
-            onSelect={onSelect}
-          />
+          <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
         </header>
         <div className={configClass.elem("editor")}>
           {configure === "code" && (
@@ -565,28 +511,16 @@ const Configurator = ({
               }}
             >
               {isEmptyConfig(config) && <EmptyConfigPlaceholder />}
-              <ConfigureColumns
-                columns={columns}
-                project={project}
-                template={template}
-              />
+              <ConfigureColumns columns={columns} project={project} template={template} />
               {template.controls.map((control) => (
-                <ConfigureControl
-                  control={control}
-                  template={template}
-                  key={control.getAttribute("name")}
-                />
+                <ConfigureControl control={control} template={template} key={control.getAttribute("name")} />
               ))}
               <ConfigureSettings template={template} />
             </div>
           )}
         </div>
         {disableSaveButton !== true && onSaveClick && (
-          <Form.Actions
-            size="small"
-            extra={configure === "code" && extra}
-            valid
-          >
+          <Form.Actions size="small" extra={configure === "code" && extra} valid>
             {saved && (
               <Block name="form-indicator">
                 <Elem tag="span" mod={{ type: "success" }} name="item">
@@ -594,13 +528,7 @@ const Configurator = ({
                 </Elem>
               </Block>
             )}
-            <Button
-              look="primary"
-              size="compact"
-              style={{ width: 120 }}
-              onClick={onSave}
-              waiting={waiting}
-            >
+            <Button look="primary" size="compact" style={{ width: 120 }} onClick={onSave} waiting={waiting}>
               {waiting ? "Saving..." : "Save"}
             </Button>
           </Form.Actions>

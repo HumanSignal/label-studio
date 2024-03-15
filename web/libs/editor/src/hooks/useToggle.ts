@@ -9,11 +9,7 @@ type ToggleHookReturn = [boolean, () => any, () => any, () => any];
 export const useToggle = (defaultValue = false): ToggleHookReturn => {
   const [value, setValue] = useState(defaultValue);
   const [setTrue, setFalse, toggleValue] = useMemo(
-    () => [
-      setValue.bind(null, true),
-      setValue.bind(null, false),
-      () => setValue((value) => !value),
-    ],
+    () => [setValue.bind(null, true), setValue.bind(null, false), () => setValue((value) => !value)],
     [],
   );
 

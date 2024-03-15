@@ -1,11 +1,4 @@
-import {
-  type FC,
-  type MouseEvent as RMouseEvent,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type FC, type MouseEvent as RMouseEvent, useCallback, useMemo, useRef, useState } from "react";
 import {
   IconArrowLeftSmall,
   IconArrowRightSmall,
@@ -16,12 +9,7 @@ import {
 import { useDrag } from "../../../hooks/useDrag";
 import { Block, Elem } from "../../../utils/bem";
 import { clamp, isDefined } from "../../../utils/utilities";
-import {
-  DEFAULT_PANEL_HEIGHT,
-  DEFAULT_PANEL_MIN_HEIGHT,
-  DEFAULT_PANEL_WIDTH,
-  PANEL_HEADER_HEIGHT,
-} from "../constants";
+import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MIN_HEIGHT, DEFAULT_PANEL_WIDTH, PANEL_HEADER_HEIGHT } from "../constants";
 import "./PanelTabsBase.styl";
 import { type BaseProps, Side } from "./types";
 import { resizers } from "./utils";
@@ -100,16 +88,8 @@ export const PanelTabsBase: FC<BaseProps> = ({
   const style = useMemo(() => {
     const dynamicStyle = visible
       ? {
-          height: locked
-            ? DEFAULT_PANEL_HEIGHT
-            : collapsed
-              ? "100%"
-              : height ?? "100%",
-          width: locked
-            ? "100%"
-            : !collapsed
-              ? width ?? "100%"
-              : PANEL_HEADER_HEIGHT,
+          height: locked ? DEFAULT_PANEL_HEIGHT : collapsed ? "100%" : height ?? "100%",
+          width: locked ? "100%" : !collapsed ? width ?? "100%" : PANEL_HEADER_HEIGHT,
         }
       : {
           width: collapsed ? "100%" : width ?? DEFAULT_PANEL_WIDTH,
@@ -139,21 +119,9 @@ export const PanelTabsBase: FC<BaseProps> = ({
       disabled: locked,
       collapsed,
       dragTop: dragTop && attachedKeys && attachedKeys[0] === key,
-      dragBottom:
-        dragBottom &&
-        attachedKeys &&
-        attachedKeys[attachedKeys.length - 1] === key,
+      dragBottom: dragBottom && attachedKeys && attachedKeys[attachedKeys.length - 1] === key,
     };
-  }, [
-    alignment,
-    visible,
-    detached,
-    resizing,
-    locked,
-    collapsed,
-    dragTop,
-    dragBottom,
-  ]);
+  }, [alignment, visible, detached, resizing, locked, collapsed, dragTop, dragBottom]);
 
   // Panel positioning
   useDrag(
@@ -165,12 +133,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
         const el = e.target as HTMLElement;
         const collapseClassName = "[class*=__toggle]";
 
-        if (
-          el.matches(collapseClassName) ||
-          el.closest(collapseClassName) ||
-          collapsed
-        )
-          return;
+        if (el.matches(collapseClassName) || el.closest(collapseClassName) || collapsed) return;
 
         const allowDrag = true;
         const panel = panelRef.current!;
@@ -181,21 +144,12 @@ export const PanelTabsBase: FC<BaseProps> = ({
         const ty = e.clientY - clickTarget.top;
 
         const [x, y] = [e.pageX, e.pageY];
-        const [oX, oY] = [
-          bbox.left - parentBBox.left,
-          bbox.top - parentBBox.top,
-        ];
+        const [oX, oY] = [bbox.left - parentBBox.left, bbox.top - parentBBox.top];
 
         const { current: key } = keyRef;
         const [nX, nY] = [x - tx, y - ty];
 
-        handlers.current.onPositionChangeBegin?.(
-          key,
-          nX,
-          nY,
-          alignment,
-          detached,
-        );
+        handlers.current.onPositionChangeBegin?.(key, nX, nY, alignment, detached);
 
         return { x, y, oX, oY, allowDrag, alignment, key };
       },
@@ -209,13 +163,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
         if (dist < 30) return;
         const [nX, nY] = [oX + (mX - x), oY + (mY - y)];
 
-        handlers.current.onPositionChange?.(
-          draggingKey,
-          nY,
-          nX,
-          true,
-          alignment,
-        );
+        handlers.current.onPositionChange?.(draggingKey, nY, nX, true, alignment);
       },
 
       onMouseUp(_, data) {
@@ -275,36 +223,17 @@ export const PanelTabsBase: FC<BaseProps> = ({
       },
       onMouseMove(e, data) {
         if (data) {
-          const {
-            pos,
-            width: w,
-            height: h,
-            maxWidth,
-            top: t,
-            left: l,
-            resizeDirections,
-            shift,
-          } = data;
+          const { pos, width: w, height: h, maxWidth, top: t, left: l, resizeDirections, shift } = data;
           const [sX, sY] = pos;
 
           const wMod = resizeDirections.x ? e.pageX - sX : 0;
           const hMod = resizeDirections.y ? e.pageY - sY : 0;
 
-          const shiftLeft =
-            isDefined(shift) && ["left", "top-left"].includes(shift);
-          const shiftTop =
-            isDefined(shift) && ["top", "top-left"].includes(shift);
+          const shiftLeft = isDefined(shift) && ["left", "top-left"].includes(shift);
+          const shiftTop = isDefined(shift) && ["top", "top-left"].includes(shift);
 
-          const width = clamp(
-            shiftLeft ? w - wMod : w + wMod,
-            DEFAULT_PANEL_WIDTH,
-            maxWidth,
-          );
-          const height = clamp(
-            shiftTop ? h - hMod : h + hMod,
-            DEFAULT_PANEL_MIN_HEIGHT,
-            t + h,
-          );
+          const width = clamp(shiftLeft ? w - wMod : w + wMod, DEFAULT_PANEL_WIDTH, maxWidth);
+          const height = clamp(shiftTop ? h - hMod : h + hMod, DEFAULT_PANEL_MIN_HEIGHT, t + h);
 
           const top = shiftTop ? t + (h - height) : t;
           const left = shiftLeft ? l + (w - width) : l;
@@ -318,18 +247,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
         setResizing(undefined);
       },
     },
-    [
-      handlers,
-      detached,
-      width,
-      maxWidth,
-      height,
-      top,
-      left,
-      visible,
-      locked,
-      positioning,
-    ],
+    [handlers, detached, width, maxWidth, height, top, left, visible, locked, positioning],
   );
 
   // Panel grouped resize height
@@ -359,16 +277,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
         setResizing(undefined);
       },
     },
-    [
-      handlers,
-      width,
-      height,
-      top,
-      left,
-      locked,
-      positioning,
-      resizeGroup.current,
-    ],
+    [handlers, width, height, top, left, locked, positioning, resizeGroup.current],
   );
 
   const handleGroupPanelToggle = () => {
@@ -388,12 +297,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
   );
 
   return (
-    <Block
-      ref={panelRef}
-      name="tabs-panel"
-      mod={mods}
-      style={{ ...style, ...coordinates }}
-    >
+    <Block ref={panelRef} name="tabs-panel" mod={mods} style={{ ...style, ...coordinates }}>
       <Elem name="content">
         {!locked && collapsedHeader && (
           <>
@@ -415,19 +319,8 @@ export const PanelTabsBase: FC<BaseProps> = ({
               name="header"
             >
               <Elem name="header-left">
-                {!collapsed && (
-                  <Elem
-                    name="icon"
-                    style={{ pointerEvents: "none" }}
-                    tag={IconOutlinerDrag}
-                    width={8}
-                  />
-                )}
-                {!visible && !collapsed && (
-                  <Elem name="title">
-                    {panelViews.map((view) => view.title).join(" ")}
-                  </Elem>
-                )}
+                {!collapsed && <Elem name="icon" style={{ pointerEvents: "none" }} tag={IconOutlinerDrag} width={8} />}
+                {!visible && !collapsed && <Elem name="title">{panelViews.map((view) => view.title).join(" ")}</Elem>}
               </Elem>
               <Elem name="header-right">
                 {(!detached || collapsed) && (
@@ -437,11 +330,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
                     onClick={handleGroupPanelToggle}
                     data-tooltip={`${tooltipText} Group`}
                   >
-                    {Side.left === alignment ? (
-                      <IconArrowLeftSmall />
-                    ) : (
-                      <IconArrowRightSmall />
-                    )}
+                    {Side.left === alignment ? <IconArrowLeftSmall /> : <IconArrowRightSmall />}
                   </Elem>
                 )}
                 {!collapsed && (
@@ -466,24 +355,14 @@ export const PanelTabsBase: FC<BaseProps> = ({
         )}
       </Elem>
       {visible && !positioning && !locked && (
-        <Elem
-          name="resizers"
-          ref={resizerRef}
-          mod={{ locked: positioning || locked }}
-        >
+        <Elem name="resizers" ref={resizerRef} mod={{ locked: positioning || locked }}>
           {resizers.map((res) => {
             const shouldRender = collapsed
               ? false
-              : ((res === "left" || res === "right") && alignment !== res) ||
-                detached;
+              : ((res === "left" || res === "right") && alignment !== res) || detached;
 
             return shouldRender ? (
-              <Elem
-                key={res}
-                name="resizer"
-                mod={{ drag: res === resizing }}
-                data-resize={res}
-              />
+              <Elem key={res} name="resizer" mod={{ drag: res === resizing }} data-resize={res} />
             ) : null;
           })}
         </Elem>

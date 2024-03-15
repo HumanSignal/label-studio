@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { isDefined } from "../../utils/helpers";
 import { FormContext } from "./FormContext";
 import * as Validators from "./Validation/Validators";
@@ -99,10 +92,7 @@ export const FormField = forwardRef(
     );
 
     useEffect(() => {
-      const isProtected =
-        skipAutofill &&
-        (!allowEmpty || protectedValue) &&
-        field.current.type === "password";
+      const isProtected = skipAutofill && (!allowEmpty || protectedValue) && field.current.type === "password";
 
       context?.registerField({
         label,

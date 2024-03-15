@@ -26,14 +26,7 @@ export interface ButtonProps extends HTMLButtonProps {
   waiting?: boolean;
   icon?: JSX.Element;
   tag?: CNTagName;
-  look?:
-    | "primary"
-    | "danger"
-    | "destructive"
-    | "alt"
-    | "outlined"
-    | "active"
-    | "disabled";
+  look?: "primary" | "danger" | "destructive" | "alt" | "outlined" | "active" | "disabled";
   primary?: boolean;
   danger?: boolean;
   style?: CSSProperties;
@@ -118,15 +111,7 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
     useHotkey(hotkey, rest.onClick as unknown as Keymaster.KeyHandler);
 
     const buttonBody = (
-      <Block
-        name="button"
-        mod={mods}
-        mix={className}
-        ref={ref}
-        tag={finalTag}
-        type={type}
-        {...rest}
-      >
+      <Block name="button" mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
         <>
           {iconElem && (
             <Elem tag="span" name="icon">

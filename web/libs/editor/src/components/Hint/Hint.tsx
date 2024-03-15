@@ -14,13 +14,7 @@ interface HintProps {
  */
 const Hint: FC<HintProps> = (props) => {
   return (
-    <Block
-      name="hint"
-      tag="sup"
-      className={props.className}
-      data-copy={props.copy}
-      style={props.style}
-    >
+    <Block name="hint" tag="sup" className={props.className} data-copy={props.copy} style={props.style}>
       {props.children}
     </Block>
   );

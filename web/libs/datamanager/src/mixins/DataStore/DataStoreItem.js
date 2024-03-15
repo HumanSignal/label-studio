@@ -5,9 +5,7 @@ import { guidGenerator } from "../../utils/random";
 export const DataStoreItem = types
   .model("DataStoreItem", {
     updated: guidGenerator(),
-    loading: isFF(FF_LOPS_E_3)
-      ? types.maybeNull(types.union(types.string, types.boolean), false)
-      : false,
+    loading: isFF(FF_LOPS_E_3) ? types.maybeNull(types.union(types.string, types.boolean), false) : false,
   })
   .views((self) => ({
     get parent() {

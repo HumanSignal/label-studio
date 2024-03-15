@@ -21,9 +21,7 @@ export const ModelVersionSelector = ({
 
   useEffect(() => {
     if (versions.length && object?.[valueName]) {
-      const selectedVersion = versions.find(
-        (version) => version.value === Number.parseInt(object?.[valueName]),
-      );
+      const selectedVersion = versions.find((version) => version.value === Number.parseInt(object?.[valueName]));
 
       setVersion(selectedVersion);
     }

@@ -1,15 +1,8 @@
 import { isDefined } from "../../utils/utilities";
 import type { FilterListInterface } from "./FilterInterfaces";
 
-export const FilterItemsByOperation = (
-  items: any[],
-  filterItem: FilterListInterface,
-) => {
-  if (
-    (!filterItem.value || filterItem.value === "") &&
-    filterItem.operation !== "empty"
-  )
-    return items;
+export const FilterItemsByOperation = (items: any[], filterItem: FilterListInterface) => {
+  if ((!filterItem.value || filterItem.value === "") && filterItem.operation !== "empty") return items;
 
   switch (filterItem.operation) {
     case "contains":
@@ -41,10 +34,7 @@ export const FilterItemsByOperation = (
   }
 };
 
-export const FilterItems = (
-  items: any[],
-  filterList: FilterListInterface[],
-) => {
+export const FilterItems = (items: any[], filterList: FilterListInterface[]) => {
   const _filteredList = [[...items]];
 
   for (let i = 0; i < filterList.length; i++) {
@@ -61,12 +51,7 @@ export const FilterItems = (
     }
   }
 
-  return _filteredList
-    .flat(1)
-    .reduce(
-      (unique, item) => (unique.includes(item) ? unique : [...unique, item]),
-      [],
-    );
+  return _filteredList.flat(1).reduce((unique, item) => (unique.includes(item) ? unique : [...unique, item]), []);
 };
 
 const contains = (items: any[], filterItem: FilterListInterface) => {
@@ -140,10 +125,7 @@ const equal = (items: any[], filterItem: FilterListInterface) => {
     return items.filter((obj) => {
       const item = getFilteredPath(filterItem.path, obj);
 
-      return (
-        item?.toString().toLowerCase() ===
-        filterItem.value?.toString().toLowerCase()
-      );
+      return item?.toString().toLowerCase() === filterItem.value?.toString().toLowerCase();
     });
   }
   return items;
@@ -199,21 +181,11 @@ const empty = (items: any[], filterItem: FilterListInterface) => {
   return items.filter((obj) => {
     const item = getFilteredPath(filterItem.path, obj);
 
-    return (
-      item === "" ||
-      !item ||
-      item === null ||
-      item === undefined ||
-      item === "blank"
-    );
+    return item === "" || !item || item === null || item === undefined || item === "blank";
   });
 };
 
-const getFilteredPath = (
-  path: string | string[],
-  items: any[],
-  separator = ".",
-) => {
+const getFilteredPath = (path: string | string[], items: any[], separator = ".") => {
   const properties = Array.isArray(path) ? path : path.split(separator);
 
   return properties.reduce((prev, curr) => prev?.[curr], items);

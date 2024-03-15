@@ -18,16 +18,7 @@ export const GeneralSettings = () => {
     if (project.id) fetchProject(project.id, true);
   }, [project]);
 
-  const colors = [
-    "#FFFFFF",
-    "#F52B4F",
-    "#FA8C16",
-    "#F6C549",
-    "#9ACA4F",
-    "#51AAFD",
-    "#7F64FF",
-    "#D55C9D",
-  ];
+  const colors = ["#FFFFFF", "#F52B4F", "#FA8C16", "#F6C549", "#9ACA4F", "#51AAFD", "#7F64FF", "#D55C9D"];
 
   const samplings = [
     {
@@ -45,25 +36,11 @@ export const GeneralSettings = () => {
   return (
     <Block name="general-settings">
       <Elem name={"wrapper"}>
-        <Form
-          action="updateProject"
-          formData={{ ...project }}
-          params={{ pk: project.id }}
-          onSubmit={updateProject}
-        >
+        <Form action="updateProject" formData={{ ...project }} params={{ pk: project.id }} onSubmit={updateProject}>
           <Form.Row columnCount={1} rowGap="32px">
-            <Input
-              name="title"
-              label="Project Name"
-              labelProps={{ large: true }}
-            />
+            <Input name="title" label="Project Name" labelProps={{ large: true }} />
 
-            <TextArea
-              name="description"
-              label="Description"
-              labelProps={{ large: true }}
-              style={{ minHeight: 128 }}
-            />
+            <TextArea name="description" label="Description" labelProps={{ large: true }} style={{ minHeight: 128 }} />
             {isFF(FF_LSDV_E_297) && (
               <Block name="workspace-placeholder">
                 <Elem name="badge-wrapper">
@@ -72,8 +49,7 @@ export const GeneralSettings = () => {
                 </Elem>
                 <Select placeholder="Select an option" disabled options={[]} />
                 <Caption>
-                  Simplify project management by organizing projects into
-                  workspaces.{" "}
+                  Simplify project management by organizing projects into workspaces.{" "}
                   <a
                     target="_blank"
                     href={createURL(
@@ -90,12 +66,7 @@ export const GeneralSettings = () => {
                 </Caption>
               </Block>
             )}
-            <RadioGroup
-              name="color"
-              label="Color"
-              size="large"
-              labelProps={{ size: "large" }}
-            >
+            <RadioGroup name="color" label="Color" size="large" labelProps={{ size: "large" }}>
               {colors.map((color) => (
                 <RadioGroup.Button key={color} value={color}>
                   <Block name="color" style={{ "--background": color }} />
@@ -103,12 +74,7 @@ export const GeneralSettings = () => {
               ))}
             </RadioGroup>
 
-            <RadioGroup
-              label="Task Sampling"
-              labelProps={{ size: "large" }}
-              name="sampling"
-              simple
-            >
+            <RadioGroup label="Task Sampling" labelProps={{ size: "large" }} name="sampling" simple>
               {samplings.map(({ value, label, description }) => (
                 <RadioGroup.Button
                   key={value}
@@ -129,17 +95,13 @@ export const GeneralSettings = () => {
                   disabled
                   description={
                     <>
-                      Tasks are chosen according to model uncertainty score
-                      (active learning mode).{" "}
+                      Tasks are chosen according to model uncertainty score (active learning mode).{" "}
                       <a
                         target="_blank"
-                        href={createURL(
-                          "https://docs.humansignal.com/guide/active_learning",
-                          {
-                            experiment: "project_settings_workspace",
-                            treatment: "workspaces",
-                          },
-                        )}
+                        href={createURL("https://docs.humansignal.com/guide/active_learning", {
+                          experiment: "project_settings_workspace",
+                          treatment: "workspaces",
+                        })}
                         rel="noreferrer"
                       >
                         Learn more

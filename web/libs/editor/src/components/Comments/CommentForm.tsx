@@ -17,14 +17,7 @@ export type CommentFormProps = {
 };
 
 export const CommentForm: FC<CommentFormProps> = observer(
-  ({
-    commentStore,
-    annotationStore,
-    inline = true,
-    onChange,
-    rows = 1,
-    maxRows = 4,
-  }) => {
+  ({ commentStore, annotationStore, inline = true, onChange, rows = 1, maxRows = 4 }) => {
     const formRef = useRef<HTMLFormElement>(null);
     const actionRef = useRef<{
       update?: (text?: string) => void;
@@ -82,17 +75,10 @@ export const CommentForm: FC<CommentFormProps> = observer(
       commentStore.setCommentFormSubmit(() => onSubmit());
     }, [actionRef, commentStore]);
 
-    const value =
-      commentStore.currentComment[annotationStore.selected.id] || "";
+    const value = commentStore.currentComment[annotationStore.selected.id] || "";
 
     return (
-      <Block
-        ref={formRef}
-        tag="form"
-        name="comment-form"
-        mod={{ inline }}
-        onSubmit={onSubmit}
-      >
+      <Block ref={formRef} tag="form" name="comment-form" mod={{ inline }} onSubmit={onSubmit}>
         <TextArea
           actionRef={actionRef}
           name="comment"
@@ -110,9 +96,7 @@ export const CommentForm: FC<CommentFormProps> = observer(
             <IconSend />
           </button>
         </Elem>
-        {commentStore.tooltipMessage && (
-          <Elem name="tooltipMessage">{commentStore.tooltipMessage}</Elem>
-        )}
+        {commentStore.tooltipMessage && <Elem name="tooltipMessage">{commentStore.tooltipMessage}</Elem>}
       </Block>
     );
   },

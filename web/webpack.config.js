@@ -7,12 +7,7 @@ const { merge } = require("webpack-merge");
 require("dotenv").config();
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const {
-  EnvironmentPlugin,
-  DefinePlugin,
-  ProgressPlugin,
-  optimize,
-} = require("webpack");
+const { EnvironmentPlugin, DefinePlugin, ProgressPlugin, optimize } = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
@@ -37,14 +32,9 @@ const LOCAL_ENV = {
   RELEASE_NAME: RELEASE,
 };
 
-const devtool =
-  process.env.NODE_ENV === "production"
-    ? "source-map"
-    : "cheap-module-source-map";
+const devtool = process.env.NODE_ENV === "production" ? "source-map" : "cheap-module-source-map";
 
-const DEFAULT_NODE_ENV = process.env.BUILD_MODULE
-  ? "production"
-  : process.env.NODE_ENV || "development";
+const DEFAULT_NODE_ENV = process.env.BUILD_MODULE ? "production" : process.env.NODE_ENV || "development";
 const isDevelopment = DEFAULT_NODE_ENV !== "production";
 const customDistDir = !!process.env.WORK_DIR;
 
@@ -147,9 +137,7 @@ module.exports = composePlugins(
       if (isScss) {
         rule.oneOf.forEach((loader) => {
           if (loader.use) {
-            const cssLoader = loader.use.find((use) =>
-              use.loader?.includes("css-loader"),
-            );
+            const cssLoader = loader.use.find((use) => use.loader?.includes("css-loader"));
 
             if (cssLoader?.options) {
               cssLoader.options.modules = {
@@ -175,16 +163,11 @@ module.exports = composePlugins(
           if (testString.match(/module/)) return false;
 
           // we only target pre-processors that has 'css-loader included'
-          return (
-            testString.match(/scss|sass|styl/) &&
-            r.use.some((u) => u.loader?.includes("css-loader"))
-          );
+          return testString.match(/scss|sass|styl/) && r.use.some((u) => u.loader?.includes("css-loader"));
         });
 
         r.forEach((_r) => {
-          const cssLoader = _r.use.find((use) =>
-            use.loader?.includes("css-loader"),
-          );
+          const cssLoader = _r.use.find((use) => use.loader?.includes("css-loader"));
 
           if (!cssLoader) return;
 
@@ -204,9 +187,7 @@ module.exports = composePlugins(
       }
 
       if (rule.test.toString().includes("styl")) {
-        const r = rule.oneOf.filter((r) =>
-          r.use?.find((u) => u.loader?.includes("stylus-loader")),
-        );
+        const r = rule.oneOf.filter((r) => r.use?.find((u) => u.loader?.includes("stylus-loader")));
 
         r.forEach((_r) => {
           const l = _r.use.filter((u) => u.loader?.includes("stylus-loader"));
@@ -216,12 +197,7 @@ module.exports = composePlugins(
               ..._l.options,
               stylusOptions: {
                 ..._l.options.stylusOptions,
-                import: [
-                  path.resolve(
-                    __dirname,
-                    "apps/labelstudio/src/themes/default/variables.styl",
-                  ),
-                ],
+                import: [path.resolve(__dirname, "apps/labelstudio/src/themes/default/variables.styl")],
               },
             };
           });

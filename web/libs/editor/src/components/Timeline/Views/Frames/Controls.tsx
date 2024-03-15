@@ -1,10 +1,4 @@
-import {
-  type FC,
-  type MouseEvent,
-  useCallback,
-  useContext,
-  useMemo,
-} from "react";
+import { type FC, type MouseEvent, useCallback, useContext, useMemo } from "react";
 import {
   IconInterpolationAdd,
   IconInterpolationRemove,
@@ -15,26 +9,18 @@ import { TimelineContext } from "../../Context";
 import { ControlButton } from "../../Controls";
 import type { TimelineExtraControls } from "../../Types";
 
-type Actions =
-  | "keypoint_add"
-  | "keypoint_remove"
-  | "lifespan_add"
-  | "lifespan_remove";
+type Actions = "keypoint_add" | "keypoint_remove" | "lifespan_add" | "lifespan_remove";
 type DataType = {
   frame: number;
 };
 
-export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({
-  onAction,
-}) => {
+export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({ onAction }) => {
   const { position, regions } = useContext(TimelineContext);
   const hasSelectedRegion = regions.some(({ selected }) => selected);
   const closestKeypoint = useMemo(() => {
     const region = regions.find((r) => r.selected);
 
-    return region?.sequence
-      .filter(({ frame }) => frame <= position)
-      .slice(-1)[0];
+    return region?.sequence.filter(({ frame }) => frame <= position).slice(-1)[0];
   }, [regions, position]);
 
   const canAddKeypoint = closestKeypoint?.frame !== position;
@@ -88,19 +74,11 @@ export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({
 
   return (
     <>
-      <ControlButton
-        onClick={onKeypointToggle}
-        disabled={!hasSelectedRegion}
-        tooltip="Toggle Keypoint"
-      >
+      <ControlButton onClick={onKeypointToggle} disabled={!hasSelectedRegion} tooltip="Toggle Keypoint">
         {keypointIcon}
       </ControlButton>
 
-      <ControlButton
-        onClick={onLifespanToggle}
-        disabled={!closestKeypoint}
-        tooltip="Toggle Interpolation"
-      >
+      <ControlButton onClick={onLifespanToggle} disabled={!closestKeypoint} tooltip="Toggle Interpolation">
         {interpolationIcon}
       </ControlButton>
     </>

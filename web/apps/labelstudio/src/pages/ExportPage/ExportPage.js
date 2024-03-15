@@ -184,15 +184,8 @@ export const ExportPage = () => {
             <Elem name="recent">{/* {exportHistory} */}</Elem>
             <Elem name="actions">
               <Space>
-                {downloadingMessage &&
-                  "Files are being prepared. It might take some time."}
-                <Elem
-                  tag={Button}
-                  name="finish"
-                  look="primary"
-                  onClick={proceedExport}
-                  waiting={downloading}
-                >
+                {downloadingMessage && "Files are being prepared. It might take some time."}
+                <Elem tag={Button} name="finish" look="primary" onClick={proceedExport} waiting={downloading}>
                   Export
                 </Elem>
               </Space>
@@ -207,9 +200,7 @@ export const ExportPage = () => {
 const FormatInfo = ({ availableFormats, selected, onClick }) => {
   return (
     <Block name="formats">
-      <Elem name="info">
-        You can export dataset in one of the following formats:
-      </Elem>
+      <Elem name="info">You can export dataset in one of the following formats:</Elem>
       <Elem name="list">
         {availableFormats.map((format) => (
           <Elem
@@ -233,9 +224,7 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
               </Space>
             </Elem>
 
-            {format.description && (
-              <Elem name="description">{format.description}</Elem>
-            )}
+            {format.description && <Elem name="description">{format.description}</Elem>}
           </Elem>
         ))}
       </Elem>
@@ -243,17 +232,11 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
         Can't find an export format?
         <br />
         Please let us know in{" "}
-        <a
-          className="no-go"
-          href="https://slack.labelstud.io/?source=product-export"
-        >
+        <a className="no-go" href="https://slack.labelstud.io/?source=product-export">
           Slack
         </a>{" "}
         or submit an issue to the{" "}
-        <a
-          className="no-go"
-          href="https://github.com/heartexlabs/label-studio-converter/issues"
-        >
+        <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">
           Repository
         </a>
       </Elem>

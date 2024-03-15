@@ -7,17 +7,12 @@ import styles from "./Paragraphs.module.scss";
 
 const AuthorTag = ({ name, selected }) => {
   const itemStyle = {
-    border: `2px solid ${Utils.Colors.convertToRGBA(
-      ColorScheme.make_color({ seed: name })[0],
-    )}`,
+    border: `2px solid ${Utils.Colors.convertToRGBA(ColorScheme.make_color({ seed: name })[0])}`,
   };
 
   return (
     <span
-      className={[
-        styles.authorFilter__select__item,
-        selected && styles.authorFilter__select__item_selected,
-      ].join(" ")}
+      className={[styles.authorFilter__select__item, selected && styles.authorFilter__select__item_selected].join(" ")}
       style={itemStyle}
     >
       {name}
@@ -38,28 +33,14 @@ const renderMultipleSelected = (selected) => {
 };
 
 export const AuthorFilter = observer(({ item, onChange }) => {
-  const placeholder = useMemo(
-    () => (
-      <span className={styles.authorFilter__placeholder}>Show all authors</span>
-    ),
-    [],
-  );
+  const placeholder = useMemo(() => <span className={styles.authorFilter__placeholder}>Show all authors</span>, []);
   const value = item.filterByAuthor;
   const options = useMemo(
-    () =>
-      item._value
-        .reduce(
-          (all, v) =>
-            all.includes(v[item.namekey]) ? all : [...all, v[item.namekey]],
-          [],
-        )
-        .sort(),
+    () => item._value.reduce((all, v) => (all.includes(v[item.namekey]) ? all : [...all, v[item.namekey]]), []).sort(),
     [item._value, item.namekey],
   );
   const filteredOptions = item.searchAuthor
-    ? options.filter((o) =>
-        o.toLowerCase().includes(item.searchAuthor.toLowerCase()),
-      )
+    ? options.filter((o) => o.toLowerCase().includes(item.searchAuthor.toLowerCase()))
     : options;
   const onFilterChange = useCallback(
     (next) => {

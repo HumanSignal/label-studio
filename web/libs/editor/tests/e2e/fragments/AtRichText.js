@@ -22,9 +22,7 @@ module.exports = {
     I.dblClickOnElement(this.locate(locator));
   },
   locate(locator) {
-    return locator
-      ? locate(locator).inside(this.locateRoot())
-      : this.locateRoot();
+    return locator ? locate(locator).inside(this.locateRoot()) : this.locateRoot();
   },
   locateRoot() {
     return locate(this._rootSelector);

@@ -25,8 +25,7 @@ function createRectangleConfig(params = {}) {
 </View>`;
 }
 
-const IMAGE =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Html_headers.png/640px-Html_headers.png";
+const IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Html_headers.png/640px-Html_headers.png";
 
 function getRectangleSuggestions(reg, group) {
   const allSuggestions = [
@@ -198,9 +197,7 @@ function getRectangleSuggestions(reg, group) {
         width: 60.9375,
         height: 4.930966469428008,
         rotation: 0,
-        text: [
-          'This paragraph, also contained within "p"tag, contains an unordered list:',
-        ],
+        text: ['This paragraph, also contained within "p"tag, contains an unordered list:'],
       },
       id: "2Goh8lkpid",
       from_name: "ocr",
@@ -447,9 +444,7 @@ function getRectangleSuggestions(reg, group) {
         width: 64.375,
         height: 4.536489151873767,
         rotation: 0,
-        text: [
-          'Another paragraf contained within the "p" tag. This one\'s shorter than the rest.',
-        ],
+        text: ['Another paragraf contained within the "p" tag. This one\'s shorter than the rest.'],
       },
       id: "H58PCLk6in",
       from_name: "ocr",
@@ -530,14 +525,10 @@ function getRectangleSuggestions(reg, group) {
   ];
   const annotation = window.labelStudio.store.annotationStore.selected;
   const ids = group.map((r) => r.id);
-  const results = annotation
-    .serializeAnnotation()
-    .filter((res) => ids.includes(res.id));
+  const results = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
   const suggestions = allSuggestions.filter((predictionResult) => {
-    const targetCenterX =
-      predictionResult.value.x + predictionResult.value.width / 2;
-    const targetCenterY =
-      predictionResult.value.y + predictionResult.value.height / 2;
+    const targetCenterX = predictionResult.value.x + predictionResult.value.width / 2;
+    const targetCenterY = predictionResult.value.y + predictionResult.value.height / 2;
     const targetWidth = predictionResult.value.width;
     const targetHeight = predictionResult.value.height;
 
@@ -548,69 +539,61 @@ function getRectangleSuggestions(reg, group) {
       const resultHeight = result.value.height;
 
       return (
-        Math.abs(resultCenterX - targetCenterX) * 2 <
-          resultWidth + targetWidth &&
-        Math.abs(resultCenterY - targetCenterY) * 2 <
-          resultHeight + targetHeight
+        Math.abs(resultCenterX - targetCenterX) * 2 < resultWidth + targetWidth &&
+        Math.abs(resultCenterY - targetCenterY) * 2 < resultHeight + targetHeight
       );
     });
   });
 
-  window.labelStudio.store.loadSuggestions(
-    new Promise((resolve) => resolve(suggestions)),
-    (x) => x,
-  );
+  window.labelStudio.store.loadSuggestions(new Promise((resolve) => resolve(suggestions)), (x) => x);
 }
 
-Scenario(
-  "Undo regions auto-annotated from predictions",
-  async ({ I, LabelStudio, AtImageView, AtSidebar }) => {
-    I.amOnPage("/");
-    LabelStudio.init({
-      config: createRectangleConfig({
-        smartonly: true,
-      }),
-      data: {
-        image: IMAGE,
-      },
-      additionalInterfaces: ["auto-annotation"],
-      events: {
-        regionFinishedDrawing: getRectangleSuggestions,
-      },
-      params: {
-        forceAutoAnnotation: true,
-        forceAutoAcceptSuggestions: true,
-      },
-    });
-    LabelStudio.setFeatureFlags({
-      fflag_fix_front_dev_1284_auto_detect_undo_281022_short: true,
-    });
-    AtImageView.waitForImage();
-    AtSidebar.seeRegions(0);
-    await AtImageView.lookForStage();
-    I.say("Select magic tool");
-    I.pressKey("M");
-    I.seeElement('[disabled][aria-label="Undo"]');
-    I.say("Draw region over 5 potential suggestion area");
-    AtImageView.drawByDrag(19, 192, 140, 150);
-    I.say("Get that suggestions as result instead of drawn region");
-    AtSidebar.seeRegions(5);
-    I.seeElement(':not([disabled])[aria-label="Undo"]');
-    I.seeElement('[disabled][aria-label="Redo"]');
-    I.say("Go back through history");
-    I.pressKey(["ctrl", "z"]);
-    I.say("Should see nothing");
-    AtSidebar.seeRegions(0);
-    I.seeElement('[disabled][aria-label="Undo"]');
-    I.seeElement(':not([disabled])[aria-label="Redo"]');
-    I.say("Go forward through history");
-    I.pressKey(["ctrl", "shift", "z"]);
-    I.say("Regions must be restored");
-    AtSidebar.seeRegions(5);
-    I.seeElement(':not([disabled])[aria-label="Undo"]');
-    I.seeElement('[disabled][aria-label="Redo"]');
-  },
-);
+Scenario("Undo regions auto-annotated from predictions", async ({ I, LabelStudio, AtImageView, AtSidebar }) => {
+  I.amOnPage("/");
+  LabelStudio.init({
+    config: createRectangleConfig({
+      smartonly: true,
+    }),
+    data: {
+      image: IMAGE,
+    },
+    additionalInterfaces: ["auto-annotation"],
+    events: {
+      regionFinishedDrawing: getRectangleSuggestions,
+    },
+    params: {
+      forceAutoAnnotation: true,
+      forceAutoAcceptSuggestions: true,
+    },
+  });
+  LabelStudio.setFeatureFlags({
+    fflag_fix_front_dev_1284_auto_detect_undo_281022_short: true,
+  });
+  AtImageView.waitForImage();
+  AtSidebar.seeRegions(0);
+  await AtImageView.lookForStage();
+  I.say("Select magic tool");
+  I.pressKey("M");
+  I.seeElement('[disabled][aria-label="Undo"]');
+  I.say("Draw region over 5 potential suggestion area");
+  AtImageView.drawByDrag(19, 192, 140, 150);
+  I.say("Get that suggestions as result instead of drawn region");
+  AtSidebar.seeRegions(5);
+  I.seeElement(':not([disabled])[aria-label="Undo"]');
+  I.seeElement('[disabled][aria-label="Redo"]');
+  I.say("Go back through history");
+  I.pressKey(["ctrl", "z"]);
+  I.say("Should see nothing");
+  AtSidebar.seeRegions(0);
+  I.seeElement('[disabled][aria-label="Undo"]');
+  I.seeElement(':not([disabled])[aria-label="Redo"]');
+  I.say("Go forward through history");
+  I.pressKey(["ctrl", "shift", "z"]);
+  I.say("Regions must be restored");
+  AtSidebar.seeRegions(5);
+  I.seeElement(':not([disabled])[aria-label="Undo"]');
+  I.seeElement('[disabled][aria-label="Redo"]');
+});
 
 Scenario(
   "Undo if there are no regions auto-annotated from predictions",

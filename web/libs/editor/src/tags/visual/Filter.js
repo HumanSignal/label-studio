@@ -112,19 +112,12 @@ const Model = types
     },
   }));
 
-const FilterModel = types.compose(
-  "FilterModel",
-  Model,
-  TagAttrs,
-  ProcessAttrsMixin,
-  AnnotationMixin,
-);
+const FilterModel = types.compose("FilterModel", Model, TagAttrs, ProcessAttrsMixin, AnnotationMixin);
 
 const HtxFilter = observer(({ item }) => {
   const tag = item.toTag;
 
-  if (tag.type.indexOf("labels") === -1 && tag.type.indexOf("choices") === -1)
-    return null;
+  if (tag.type.indexOf("labels") === -1 && tag.type.indexOf("choices") === -1) return null;
 
   return (
     <Input

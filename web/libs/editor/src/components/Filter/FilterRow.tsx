@@ -46,15 +46,11 @@ export const FilterRow: FC<FilterRowInterface> = ({
   }, [_selectedField]);
 
   useEffect(() => {
-    const _operationItems =
-      FilterInputs?.[availableFilters[_selectedField].type];
-    const _operation = _operationItems.findIndex(
-      (item: any) => (item.key ?? item.label) === _selectedOperation,
-    );
+    const _operationItems = FilterInputs?.[availableFilters[_selectedField].type];
+    const _operation = _operationItems.findIndex((item: any) => (item.key ?? item.label) === _selectedOperation);
 
     if (!isDefined(_operation) || _operation < 0) return;
-    const _filterInputs =
-      FilterInputs?.[availableFilters[_selectedField].type][_operation];
+    const _filterInputs = FilterInputs?.[availableFilters[_selectedField].type][_operation];
 
     onChange(index, { operation: _filterInputs?.key });
     setInputComponent(_filterInputs?.input);
@@ -84,11 +80,7 @@ export const FilterRow: FC<FilterRowInterface> = ({
           dataTestid={"field-dropdown"}
           style={{ width: "140px" }}
           onChange={(value: any) => {
-            setSelectedField(
-              availableFilters.findIndex(
-                (item: any) => (item.key ?? item.label) === value,
-              ),
-            );
+            setSelectedField(availableFilters.findIndex((item: any) => (item.key ?? item.label) === value));
 
             onChange(index, { value: null });
           }}

@@ -1,11 +1,5 @@
 import type React from "react";
-import {
-  type RefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { VariableSizeList } from "react-window";
 import { FF_DEV_4075, isFF } from "../../utils/feature-flags";
 
@@ -180,12 +174,8 @@ const TreeStructure = ({
     const dimensionCallback = useCallback(
       (rowRef) => {
         const key = `${index}`;
-        const scrollbarWidth =
-          scrollableElement?.offsetWidth - scrollableElement?.clientWidth || 0;
-        const itemWidth =
-          (isFF(FF_DEV_4075) ? rowRef.scrollWidth : rowRef.offsetWidth) +
-          scrollbarWidth +
-          5;
+        const scrollbarWidth = scrollableElement?.offsetWidth - scrollableElement?.clientWidth || 0;
+        const itemWidth = (isFF(FF_DEV_4075) ? rowRef.scrollWidth : rowRef.offsetWidth) + scrollbarWidth + 5;
         const itemHeight = rowRef.scrollHeight;
 
         if (width < itemWidth) {
@@ -202,11 +192,7 @@ const TreeStructure = ({
       [width],
     );
 
-    return (
-      <RowComponent
-        {...{ isEditable, item, style, dimensionCallback, maxWidth }}
-      />
-    );
+    return <RowComponent {...{ isEditable, item, style, dimensionCallback, maxWidth }} />;
   };
 
   const recursiveTreeWalker = ({
@@ -227,11 +213,7 @@ const TreeStructure = ({
       const definedDepth = depth || 0;
       const id = `${label}-${definedDepth}`;
       const addInside = addInsideId === id;
-      const isOpen =
-        toggleItem?.[id] ||
-        openNodes[id] ||
-        addInside ||
-        (defaultExpanded ? 1 : 2);
+      const isOpen = toggleItem?.[id] || openNodes[id] || addInside || (defaultExpanded ? 1 : 2);
 
       const transformedData: ExtendedData = transformationCallback({
         node: items[i],
@@ -289,14 +271,7 @@ const TreeStructure = ({
           addInside,
         })}
       >
-        {({ data, index, style }) => (
-          <Row
-            data={data}
-            rowStyle={style}
-            index={index}
-            rowComponent={rowComponent}
-          />
-        )}
+        {({ data, index, style }) => <Row data={data} rowStyle={style} index={index} rowComponent={rowComponent} />}
       </VariableSizeList>
     </div>
   );

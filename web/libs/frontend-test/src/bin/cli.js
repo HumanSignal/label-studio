@@ -14,12 +14,7 @@ const relativePath = (p) => path.resolve(assetsDir, p);
 
 const CREATE_DIRS = ["./cypress/support", "./specs"];
 
-const CREATE_FILES = [
-  "./cypress/support/e2e.ts",
-  "./specs/example.cy.ts",
-  "./cypress.config.js",
-  "./tsconfig.json",
-];
+const CREATE_FILES = ["./cypress/support/e2e.ts", "./specs/example.cy.ts", "./cypress.config.js", "./tsconfig.json"];
 
 const COPY_CONTENTS = [
   [relativePath("spec.cy.ts"), "./specs/example.cy.ts"],
@@ -58,35 +53,19 @@ yargs(hideBin(process.argv))
     async (args) => {
       console.log("Preparing environment");
 
-      await Promise.all(
-        CREATE_DIRS.map((dir) =>
-          runCommand("mkdir", ["-p", dir], `Creating ${dir}`),
-        ),
-      );
+      await Promise.all(CREATE_DIRS.map((dir) => runCommand("mkdir", ["-p", dir], `Creating ${dir}`)));
 
-      await Promise.all(
-        CREATE_FILES.map((file) =>
-          runCommand("touch", [file], `Creating ${file}`),
-        ),
-      );
+      await Promise.all(CREATE_FILES.map((file) => runCommand("touch", [file], `Creating ${file}`)));
 
       await Promise.all(
         COPY_CONTENTS.map(([source, dest]) =>
-          runCommand(
-            `/bin/cat ${source} >> ${dest}`,
-            [],
-            `Copying ${path.basename(dest)}`,
-          ),
+          runCommand(`/bin/cat ${source} >> ${dest}`, [], `Copying ${path.basename(dest)}`),
         ),
       );
 
       console.log("Adding test commands");
-      const sourcePkg = JSON.parse(
-        fs.readFileSync(path.resolve(assetsDir, "package.json")).toString(),
-      );
-      const destPkg = JSON.parse(
-        fs.readFileSync(path.resolve(workspaceDir, "package.json")).toString(),
-      );
+      const sourcePkg = JSON.parse(fs.readFileSync(path.resolve(assetsDir, "package.json")).toString());
+      const destPkg = JSON.parse(fs.readFileSync(path.resolve(workspaceDir, "package.json")).toString());
 
       destPkg.type = "module";
       destPkg.scripts = {
@@ -98,14 +77,7 @@ yargs(hideBin(process.argv))
 
       await runCommand(
         "yarn",
-        [
-          "add",
-          "--dev",
-          "webpack@5",
-          "webpack-cli@5",
-          "typescript@5",
-          "ts-loader@9.4",
-        ],
+        ["add", "--dev", "webpack@5", "webpack-cli@5", "typescript@5", "ts-loader@9.4"],
         "Installing packages",
       );
     },

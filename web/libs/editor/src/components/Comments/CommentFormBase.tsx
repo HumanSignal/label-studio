@@ -17,15 +17,7 @@ export type CommentFormProps = {
 };
 
 export const CommentFormBase: FC<CommentFormProps> = observer(
-  ({
-    value = "",
-    inline = true,
-    onChange,
-    onSubmit,
-    onBlur,
-    rows = 1,
-    maxRows = 4,
-  }) => {
+  ({ value = "", inline = true, onChange, onSubmit, onBlur, rows = 1, maxRows = 4 }) => {
     const formRef = useRef<HTMLFormElement>(null);
     const actionRef = useRef<{
       update?: (text?: string) => void;
@@ -38,9 +30,7 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
 
         if (!formRef.current) return;
 
-        const comment = (
-          new FormData(formRef.current).get("comment") as string
-        )?.trim();
+        const comment = (new FormData(formRef.current).get("comment") as string)?.trim();
 
         if (!comment) return;
 
@@ -57,13 +47,7 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
     );
 
     return (
-      <Block
-        ref={formRef}
-        tag="form"
-        name="comment-form"
-        mod={{ inline }}
-        onSubmit={submitHandler}
-      >
+      <Block ref={formRef} tag="form" name="comment-form" mod={{ inline }} onSubmit={submitHandler}>
         <TextArea
           actionRef={actionRef}
           name="comment"

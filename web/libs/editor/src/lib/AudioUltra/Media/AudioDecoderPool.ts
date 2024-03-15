@@ -15,11 +15,7 @@ function decoderProxy(
   decoderType: "webaudio" | "ffmpeg" = "ffmpeg",
 ) {
   const key = `${src}:${splitChannels}:${decoderType}`;
-  const decoder =
-    cache.get(key) ??
-    (decoderType === "ffmpeg"
-      ? new AudioDecoder(src)
-      : new WebAudioDecoder(src));
+  const decoder = cache.get(key) ?? (decoderType === "ffmpeg" ? new AudioDecoder(src) : new WebAudioDecoder(src));
 
   decoder.renew();
   cache.set(key, decoder);
@@ -65,17 +61,8 @@ function decoderProxy(
 export class AudioDecoderPool {
   static cache: DecoderCache = new Map();
 
-  getDecoder(
-    src: string,
-    splitChannels: boolean,
-    decoderType: "webaudio" | "ffmpeg" = "ffmpeg",
-  ): DecoderProxy {
-    const decoder = decoderProxy(
-      AudioDecoderPool.cache,
-      src,
-      splitChannels,
-      decoderType,
-    );
+  getDecoder(src: string, splitChannels: boolean, decoderType: "webaudio" | "ffmpeg" = "ffmpeg"): DecoderProxy {
+    const decoder = decoderProxy(AudioDecoderPool.cache, src, splitChannels, decoderType);
 
     return decoder;
   }

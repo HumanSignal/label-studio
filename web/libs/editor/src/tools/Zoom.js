@@ -2,12 +2,7 @@ import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 import React, { Fragment } from "react";
 
-import {
-  IconExpand,
-  IconHandTool,
-  IconZoomIn,
-  IconZoomOut,
-} from "../assets/icons";
+import { IconExpand, IconHandTool, IconZoomIn, IconZoomOut } from "../assets/icons";
 import { FlyoutMenu } from "../components/Toolbar/FlyoutMenu";
 import { Tool } from "../components/Toolbar/Tool";
 import ToolMixin from "../mixins/Tool";

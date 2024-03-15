@@ -49,17 +49,14 @@ const RequiredMixin = types
           // validating when choices labeling is done per item,
           const objectTag = self.toNameTag;
           const maxItemIndex = objectTag.maxItemIndex;
-          const existingResultsIndexes = self.annotation.regions.reduce(
-            (existingResultsIndexes, reg) => {
-              const result = reg.results.find((s) => s.from_name === self);
+          const existingResultsIndexes = self.annotation.regions.reduce((existingResultsIndexes, reg) => {
+            const result = reg.results.find((s) => s.from_name === self);
 
-              if (result?.hasValue) {
-                existingResultsIndexes.add(reg.item_index);
-              }
-              return existingResultsIndexes;
-            },
-            new Set(),
-          );
+            if (result?.hasValue) {
+              existingResultsIndexes.add(reg.item_index);
+            }
+            return existingResultsIndexes;
+          }, new Set());
 
           for (let idx = 0; idx <= maxItemIndex; idx++) {
             if (!existingResultsIndexes.has(idx)) {
@@ -71,11 +68,7 @@ const RequiredMixin = types
         } else {
           // validation when its classifying the whole object
           // isVisible can be undefined (so comparison is true) or boolean (so check for visibility)
-          if (
-            !self.holdsState &&
-            self.isVisible !== false &&
-            getParent(self, 2)?.isVisible !== false
-          ) {
+          if (!self.holdsState && self.isVisible !== false && getParent(self, 2)?.isVisible !== false) {
             self.requiredModal();
             return false;
           }

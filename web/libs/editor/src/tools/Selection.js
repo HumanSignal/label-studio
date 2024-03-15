@@ -70,12 +70,6 @@ const _Tool = types
     };
   });
 
-const Selection = types.compose(
-  "MoveTool",
-  ToolMixin,
-  BaseTool,
-  AnnotationMixin,
-  _Tool,
-);
+const Selection = types.compose("MoveTool", ToolMixin, BaseTool, AnnotationMixin, _Tool);
 
 export { Selection };

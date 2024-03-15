@@ -1,21 +1,10 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { ErrorWrapper } from "../../components/Error/Error";
 import { modal } from "../../components/Modal/Modal";
 import { ConfigContext } from "../../providers/ConfigProvider";
 import { absoluteURL, removePrefix } from "../../utils/helpers";
-import {
-  clearScriptsCache,
-  isScriptValid,
-  reInsertScripts,
-  replaceScript,
-} from "../../utils/scripts";
+import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from "../../utils/scripts";
 
 const pageCache = new Map();
 
@@ -147,17 +136,12 @@ const swapHeadScripts = async (oldHead, newHead) => {
  * @param {Document} newPage
  */
 const swapStylesheets = async (oldPage, newPage) => {
-  const linkSelector = [
-    "style:not([data-replaced])",
-    "link[rel=stylesheet]:not([data-replaced])",
-  ].join(", ");
+  const linkSelector = ["style:not([data-replaced])", "link[rel=stylesheet]:not([data-replaced])"].join(", ");
   const oldStyles = Array.from(oldPage.querySelectorAll(linkSelector));
   const newStyles = Array.from(newPage.querySelectorAll(linkSelector));
 
   const existingSignatures = nodesToSignatures(oldStyles);
-  const stylesToReplace = newStyles.filter(
-    (style) => !existingSignatures.has(style.outerHTML),
-  );
+  const stylesToReplace = newStyles.filter((style) => !existingSignatures.has(style.outerHTML));
 
   await Promise.all(
     stylesToReplace.map(
@@ -233,10 +217,7 @@ export const AsyncPage = ({ children }) => {
   const onLoadCallback = useCallback(() => {
     config.update(window.APP_SETTINGS);
   }, []);
-  const [staticContent, fetchStatic] = useStaticContent(
-    initialContent,
-    onLoadCallback,
-  );
+  const [staticContent, fetchStatic] = useStaticContent(initialContent, onLoadCallback);
 
   const onLinkClick = useCallback(async (e) => {
     /**@type {HTMLAnchorElement} */
@@ -277,9 +258,5 @@ export const AsyncPage = ({ children }) => {
     };
   }, []);
 
-  return (
-    <AsyncPageContext.Provider value={staticContent}>
-      {children}
-    </AsyncPageContext.Provider>
-  );
+  return <AsyncPageContext.Provider value={staticContent}>{children}</AsyncPageContext.Provider>;
 };

@@ -11,11 +11,7 @@ import {
   useState,
 } from "react";
 import { cn } from "../../utils/bem";
-import {
-  Dropdown,
-  type DropdownProps,
-  type DropdownRef,
-} from "./DropdownComponent";
+import { Dropdown, type DropdownProps, type DropdownRef } from "./DropdownComponent";
 import { DropdownContext, type DropdownContextValue } from "./DropdownContext";
 
 const getMinIndex = (element?: HTMLElement) => {
@@ -50,41 +46,23 @@ interface DropdownTriggerProps extends DropdownProps {
 }
 
 export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
-  (
-    {
-      tag,
-      children,
-      content,
-      toggle,
-      closeOnClickOutside = true,
-      disabled = false,
-      ...props
-    },
-    ref,
-  ) => {
-    const dropdownRef = (ref ??
-      useRef<DropdownRef>()) as RefObject<DropdownRef>;
+  ({ tag, children, content, toggle, closeOnClickOutside = true, disabled = false, ...props }, ref) => {
+    const dropdownRef = (ref ?? useRef<DropdownRef>()) as RefObject<DropdownRef>;
     const triggerEL = Children.only(children);
     const childset = useRef(new Set<DropdownContextValue>());
     const [minIndex, setMinIndex] = useState(1000);
 
-    const triggerRef = useRef<HTMLElement>(
-      (triggerEL as any)?.props?.ref?.current,
-    );
+    const triggerRef = useRef<HTMLElement>((triggerEL as any)?.props?.ref?.current);
     const parentDropdown = useContext(DropdownContext);
 
     const targetIsInsideDropdown = useCallback(
       (target: HTMLElement) => {
         const triggerClicked = triggerRef.current?.contains?.(target);
-        const dropdownClicked =
-          dropdownRef.current?.dropdown?.contains?.(target);
+        const dropdownClicked = dropdownRef.current?.dropdown?.contains?.(target);
 
-        const childDropdownClicked = Array.from(childset.current).reduce(
-          (res, child) => {
-            return res || child.hasTarget(target);
-          },
-          false,
-        );
+        const childDropdownClicked = Array.from(childset.current).reduce((res, child) => {
+          return res || child.hasTarget(target);
+        }, false);
 
         return triggerClicked || dropdownClicked || childDropdownClicked;
       },

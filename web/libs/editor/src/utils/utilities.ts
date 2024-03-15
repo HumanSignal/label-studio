@@ -50,8 +50,7 @@ export const isStringJSON = (value: string) => {
  */
 export function getUrl(i: number, text: string) {
   const stringToTest = text.slice(i);
-  const myRegexp =
-    /^(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/g; // eslint-disable-line no-useless-escape
+  const myRegexp = /^(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/g; // eslint-disable-line no-useless-escape
   const match = myRegexp.exec(stringToTest);
 
   return match?.length ? match[1] : "";
@@ -82,8 +81,7 @@ export function toTimeString(ms: number) {
 
 export function flatten(arr: any[]): any[] {
   return arr.reduce<any>(
-    (flat, toFlatten) =>
-      flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten),
+    (flat, toFlatten) => flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten),
     [],
   );
 }
@@ -133,10 +131,7 @@ export function escapeHtml(unsafe: string) {
  * @param {T[]} arr2 array 2
  */
 export function isArraysEqual(arr1: any[], arr2: any[]) {
-  return (
-    arr1.length === arr2.length &&
-    arr1.every((value, index) => arr2[index] === value)
-  );
+  return arr1.length === arr2.length && arr1.every((value, index) => arr2[index] === value);
 }
 
 /**
@@ -177,10 +172,7 @@ export function clamp(x: number, min: number, max: number) {
   return Math.min(max, Math.max(min, x));
 }
 
-export const chunks = <T extends any[]>(
-  source: T,
-  chunkSize: number,
-): T[][] => {
+export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => {
   const result = [];
   let i;
   let j;
@@ -269,8 +261,5 @@ export const fixMobxObserve = (..._toObserve: any[]) => {};
  * @returns {object[]} sorted list of annotations
  */
 export const sortAnnotations = (annotations: any[]) => {
-  return annotations.sort(
-    (a, b) =>
-      new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime(),
-  );
+  return annotations.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
 };

@@ -6,9 +6,7 @@ const DynamicChildrenMixin = types
   .model({})
   .views(() => ({
     get defaultChildType() {
-      console.error(
-        "DynamicChildrenMixin needs to implement defaultChildType getter in views",
-      );
+      console.error("DynamicChildrenMixin needs to implement defaultChildType getter in views");
       return undefined;
     },
   }))

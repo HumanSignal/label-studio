@@ -10,12 +10,7 @@ import { Block, Elem } from "../../utils/bem";
 import { WebhookDeleteModal } from "./WebhookDeleteModal";
 import "./WebhookPage.styl";
 
-const WebhookList = ({
-  onSelectActive,
-  onAddWebhook,
-  webhooks,
-  fetchWebhooks,
-}) => {
+const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) => {
   const api = useAPI();
 
   if (webhooks === null) return <></>;
@@ -45,24 +40,14 @@ const WebhookList = ({
             {webhooks.map((obj) => (
               <Elem key={obj.id} name="item">
                 <Elem name="item-active">
-                  <Toggle
-                    name={obj.id}
-                    checked={obj.is_active}
-                    onChange={onActiveChange}
-                  />
+                  <Toggle name={obj.id} checked={obj.is_active} onChange={onActiveChange} />
                 </Elem>
                 <Elem name="item-url" onClick={() => onSelectActive(obj.id)}>
                   {obj.url}
                 </Elem>
-                <Elem name="item-date">
-                  Created{" "}
-                  {format(new Date(obj.created_at), "dd MMM yyyy, HH:mm")}
-                </Elem>
+                <Elem name="item-date">Created {format(new Date(obj.created_at), "dd MMM yyyy, HH:mm")}</Elem>
                 <Elem name="item-control">
-                  <Button
-                    onClick={() => onSelectActive(obj.id)}
-                    icon={<LsPencil />}
-                  >
+                  <Button onClick={() => onSelectActive(obj.id)} icon={<LsPencil />}>
                     Edit
                   </Button>
                   <Button

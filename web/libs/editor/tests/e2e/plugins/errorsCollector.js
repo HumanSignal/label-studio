@@ -58,28 +58,16 @@ const INTERRUPT_ACTION = "interrupt";
 module.exports = (config) => {
   const helpers = Container.helpers();
   // find the first helper which is currently supported
-  const helper =
-    helpers[
-      Object.keys(helpers).find((helper) => supportedHelpers.includes(helper))
-    ];
+  const helper = helpers[Object.keys(helpers).find((helper) => supportedHelpers.includes(helper))];
 
   if (!helper) {
-    console.error(
-      `Errors collector plugin is only supported in ${supportedHelpers.join(
-        ", ",
-      )}`,
-    );
+    console.error(`Errors collector plugin is only supported in ${supportedHelpers.join(", ")}`);
     return;
   }
 
   const options = Object.assign({}, defaultConfig, config);
 
-  for (const key of [
-    "filter",
-    "uncaughtErrorFilter",
-    "consoleErrorFilter",
-    "consoleWarningFilter",
-  ]) {
+  for (const key of ["filter", "uncaughtErrorFilter", "consoleErrorFilter", "consoleWarningFilter"]) {
     options[key] = Object.assign({}, defaultConfig[key], options[key]);
   }
 
@@ -96,11 +84,7 @@ module.exports = (config) => {
     return false;
   };
 
-  ErrorCollector.prototype.should = function (
-    actionType,
-    messageType,
-    message,
-  ) {
+  ErrorCollector.prototype.should = function (actionType, messageType, message) {
     return (
       this.testMessage(options.filter?.[actionType], message) ||
       this.testMessage(options[`${messageType}Filter`]?.[actionType], message)

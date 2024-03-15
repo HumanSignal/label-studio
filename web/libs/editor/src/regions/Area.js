@@ -23,9 +23,7 @@ const ClassificationArea = types.compose(
   AreaMixin,
   types
     .model({
-      object: types.late(() =>
-        types.reference(types.union(...Registry.objectTypes())),
-      ),
+      object: types.late(() => types.reference(types.union(...Registry.objectTypes()))),
       // true only for global classifications
       classification: true,
     })

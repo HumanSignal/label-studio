@@ -53,8 +53,7 @@ export class Playhead extends Events<PlayheadEvents> {
 
   constructor(options: PlayheadOptions, visualizer: Visualizer, wf: Waveform) {
     super();
-    if ((options?.x ?? 0) < 0)
-      throw new Error("Playhead start must be greater than 0");
+    if ((options?.x ?? 0) < 0) throw new Error("Playhead start must be greater than 0");
 
     this.id = nanoid(5);
     this._x = options.x ?? 0;
@@ -92,19 +91,13 @@ export class Playhead extends Events<PlayheadEvents> {
         if (this.isDragging) {
           e.preventDefault();
           e.stopPropagation();
-          const parentOffset = (
-            this.visualizer.container as HTMLElement
-          ).getBoundingClientRect();
+          const parentOffset = (this.visualizer.container as HTMLElement).getBoundingClientRect();
           const cursorOffset = e.clientX - parentOffset.left;
           const x = clamp(cursorOffset, 0, this.visualizer.width);
 
           if (x !== this._x) {
             this.setX(x);
-            this.wf.currentTime = getCursorTime(
-              e,
-              this.visualizer,
-              this.wf.duration,
-            );
+            this.wf.currentTime = getCursorTime(e, this.visualizer, this.wf.duration);
             this.render();
           }
         }
@@ -217,15 +210,7 @@ export class Playhead extends Events<PlayheadEvents> {
    * Render the playhead on the canvas
    */
   render() {
-    const {
-      color,
-      fillColor,
-      layer,
-      _x,
-      isHovered,
-      width,
-      hoveredStrokeMultiplier,
-    } = this;
+    const { color, fillColor, layer, _x, isHovered, width, hoveredStrokeMultiplier } = this;
     const { reservedSpace } = this.visualizer;
 
     if (layer?.isVisible) {

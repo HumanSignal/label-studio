@@ -7,25 +7,16 @@ import { Oneof } from "../../../components/Oneof/Oneof";
 import { Tooltip } from "../../../components/Tooltip/Tooltip";
 import { getLastTraceback } from "../../../utils/helpers";
 
-export const StorageSummary = ({
-  target,
-  storage,
-  className,
-  storageTypes = [],
-}) => {
-  const storageStatus = storage.status
-    .replace(/_/g, " ")
-    .replace(/(^\w)/, (match) => match.toUpperCase());
+export const StorageSummary = ({ target, storage, className, storageTypes = [] }) => {
+  const storageStatus = storage.status.replace(/_/g, " ").replace(/(^\w)/, (match) => match.toUpperCase());
   const last_sync_count = storage.last_sync_count ? storage.last_sync_count : 0;
 
   const tasks_existed =
-    typeof storage.meta?.tasks_existed !== "undefined" &&
-    storage.meta?.tasks_existed !== null
+    typeof storage.meta?.tasks_existed !== "undefined" && storage.meta?.tasks_existed !== null
       ? storage.meta.tasks_existed
       : 0;
   const total_annotations =
-    typeof storage.meta?.total_annotations !== "undefined" &&
-    storage.meta?.total_annotations !== null
+    typeof storage.meta?.total_annotations !== "undefined" && storage.meta?.total_annotations !== null
       ? storage.meta.total_annotations
       : 0;
 
@@ -99,8 +90,7 @@ export const StorageSummary = ({
     <div className={className}>
       <DescriptionList>
         <DescriptionList.Item term="Type">
-          {(storageTypes ?? []).find((s) => s.name === storage.type)?.title ??
-            storage.type}
+          {(storageTypes ?? []).find((s) => s.name === storage.type)?.title ?? storage.type}
         </DescriptionList.Item>
 
         <Oneof value={storage.type}>
@@ -137,10 +127,7 @@ export const StorageSummary = ({
         </DescriptionList.Item>
 
         {target === "export" ? (
-          <DescriptionList.Item
-            term="Annotations"
-            help={`${annotations_help}\n${total_annotations_help}`}
-          >
+          <DescriptionList.Item term="Annotations" help={`${annotations_help}\n${total_annotations_help}`}>
             <Tooltip title={annotations_help}>
               <span>{last_sync_count}</span>
             </Tooltip>
@@ -149,14 +136,8 @@ export const StorageSummary = ({
             </Tooltip>
           </DescriptionList.Item>
         ) : (
-          <DescriptionList.Item
-            term="Tasks"
-            help={`${tasks_added_help}\n${tasks_total_help}`}
-          >
-            <Tooltip
-              title={`${tasks_added_help}\n${tasks_total_help}`}
-              style={{ whiteSpace: "pre-wrap" }}
-            >
+          <DescriptionList.Item term="Tasks" help={`${tasks_added_help}\n${tasks_total_help}`}>
+            <Tooltip title={`${tasks_added_help}\n${tasks_total_help}`} style={{ whiteSpace: "pre-wrap" }}>
               <span>{last_sync_count + tasks_existed}</span>
             </Tooltip>
             <Tooltip title={tasks_added_help}>
@@ -166,9 +147,7 @@ export const StorageSummary = ({
         )}
 
         <DescriptionList.Item term="Last Sync">
-          {storage.last_sync
-            ? format(new Date(storage.last_sync), "MMMM dd, yyyy ∙ HH:mm:ss")
-            : "Not synced yet"}
+          {storage.last_sync ? format(new Date(storage.last_sync), "MMMM dd, yyyy ∙ HH:mm:ss") : "Not synced yet"}
         </DescriptionList.Item>
       </DescriptionList>
     </div>
@@ -176,23 +155,15 @@ export const StorageSummary = ({
 };
 
 const SummaryS3 = ({ storage }) => {
-  return (
-    <DescriptionList.Item term="Bucket">{storage.bucket}</DescriptionList.Item>
-  );
+  return <DescriptionList.Item term="Bucket">{storage.bucket}</DescriptionList.Item>;
 };
 
 const GSCStorage = ({ storage }) => {
-  return (
-    <DescriptionList.Item term="Bucket">{storage.bucket}</DescriptionList.Item>
-  );
+  return <DescriptionList.Item term="Bucket">{storage.bucket}</DescriptionList.Item>;
 };
 
 const AzureStorage = ({ storage }) => {
-  return (
-    <DescriptionList.Item term="Container">
-      {storage.container}
-    </DescriptionList.Item>
-  );
+  return <DescriptionList.Item term="Container">{storage.container}</DescriptionList.Item>;
 };
 
 const RedisStorage = ({ storage }) => {
@@ -208,7 +179,5 @@ const RedisStorage = ({ storage }) => {
 };
 
 const LocalStorage = ({ storage }) => {
-  return (
-    <DescriptionList.Item term="Path">{storage.path}</DescriptionList.Item>
-  );
+  return <DescriptionList.Item term="Path">{storage.path}</DescriptionList.Item>;
 };

@@ -27,8 +27,6 @@ export type PageSettings = {
 
 export type PageLayoutSettingt = Omit<PageSettings, "path">;
 
-export type PageLayout =
-  | PageLayoutSettingt
-  | (PageComponent & PageLayoutSettingt);
+export type PageLayout = PageLayoutSettingt | (PageComponent & PageLayoutSettingt);
 
 export type Page = PageSettings | (PageComponent & PageSettings);

@@ -13,9 +13,7 @@ describe("styleToProp should works well", () => {
   });
 
   it("Test quotes", () => {
-    const result = styleToProp(
-      'background-image: url("https://example.com/image.png");',
-    );
+    const result = styleToProp('background-image: url("https://example.com/image.png");');
 
     expect(result).toEqual({
       backgroundImage: 'url("https://example.com/image.png")',

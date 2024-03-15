@@ -10,8 +10,7 @@ export const line = (x, y) =>
 
 export const idFromValue = (value) => value.substr(1);
 
-export const getOptimalWidth = () =>
-  (window.screen?.width || 1440) * (window.devicePixelRatio || 2);
+export const getOptimalWidth = () => (window.screen?.width || 1440) * (window.devicePixelRatio || 2);
 
 export const sparseValues = (values, max = 1e6) => {
   if (values.length <= max) return values;

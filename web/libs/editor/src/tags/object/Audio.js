@@ -94,14 +94,7 @@ const Model = types
     },
   }));
 
-const AudioModel = types.compose(
-  "AudioModel",
-  Model,
-  TagAttrs,
-  ProcessAttrsMixin,
-  ObjectBase,
-  AnnotationMixin,
-);
+const AudioModel = types.compose("AudioModel", Model, TagAttrs, ProcessAttrsMixin, ObjectBase, AnnotationMixin);
 
 const HtxAudioView = ({ store, item }) => {
   if (!item._value) return null;

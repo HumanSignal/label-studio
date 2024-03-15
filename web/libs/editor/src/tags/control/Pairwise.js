@@ -97,9 +97,7 @@ const Model = types
 
     afterCreate() {
       if (self.names.length !== 2 || self.names[0] === self.names[1]) {
-        InfoModal.error(
-          "Incorrect toName parameter on Pairwise, must be two names separated by a comma: name1,name2",
-        );
+        InfoModal.error("Incorrect toName parameter on Pairwise, must be two names separated by a comma: name1,name2");
       }
 
       let selection = {};
@@ -135,13 +133,7 @@ const Model = types
     },
   }));
 
-const PairwiseModel = types.compose(
-  "PairwiseModel",
-  ControlBase,
-  TagAttrs,
-  Model,
-  AnnotationMixin,
-);
+const PairwiseModel = types.compose("PairwiseModel", ControlBase, TagAttrs, Model, AnnotationMixin);
 
 const HtxPairwise = () => {
   return null;

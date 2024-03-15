@@ -1,11 +1,5 @@
 import { useCallback } from "react";
-import {
-  IconCopy,
-  IconInfo,
-  IconViewAll,
-  LsSettings,
-  LsTrash,
-} from "../../assets/icons";
+import { IconCopy, IconInfo, IconViewAll, LsSettings, LsTrash } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { confirm } from "../../common/Modal/Modal";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
@@ -43,13 +37,9 @@ export const Actions = ({ store }) => {
         </Tooltip>
       )}
 
-      {!isViewAll && store.hasInterface("ground-truth") && (
-        <GroundTruth entity={entity} />
-      )}
+      {!isViewAll && store.hasInterface("ground-truth") && <GroundTruth entity={entity} />}
 
-      {!isPrediction && !isViewAll && store.hasInterface("edit-history") && (
-        <EditingHistory entity={entity} />
-      )}
+      {!isPrediction && !isViewAll && store.hasInterface("edit-history") && <EditingHistory entity={entity} />}
 
       {!isViewAll && store.hasInterface("annotations:delete") && (
         <Tooltip title="Delete annotation">

@@ -13,18 +13,7 @@ import { Dropdown } from "./DropdownComponent";
 import { DropdownContext } from "./DropdownContext";
 
 export const DropdownTrigger = forwardRef(
-  (
-    {
-      tag,
-      children,
-      dropdown,
-      content,
-      toggle,
-      closeOnClickOutside = true,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ tag, children, dropdown, content, toggle, closeOnClickOutside = true, ...props }, ref) => {
     const dropdownRef = ref ?? dropdown ?? useRef();
     const triggerEL = Children.only(children);
     const [childset] = useState(new Set());
@@ -36,14 +25,10 @@ export const DropdownTrigger = forwardRef(
     const targetIsInsideDropdown = useCallback(
       (target) => {
         const triggerClicked = triggerRef.current?.contains?.(target);
-        const dropdownClicked =
-          dropdownRef.current?.dropdown?.contains?.(target);
-        const childDropdownClicked = Array.from(childset).reduce(
-          (res, child) => {
-            return res || child.hasTarget(target);
-          },
-          false,
-        );
+        const dropdownClicked = dropdownRef.current?.dropdown?.contains?.(target);
+        const childDropdownClicked = Array.from(childset).reduce((res, child) => {
+          return res || child.hasTarget(target);
+        }, false);
 
         return triggerClicked || dropdownClicked || childDropdownClicked;
       },

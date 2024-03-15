@@ -100,26 +100,16 @@ const Tab = ({
           ghostTabRef.current?.style.top = `${newY}px`;
           ghostTabRef.current?.style.left = `${newX}px`;
         }
-        const dropTargets = document.elementsFromPoint(
-          event.clientX,
-          event.clientY,
-        );
-        const dropTarget = dropTargets.find(
-          (target, index) => target.id.includes("droppable") && index > 0,
-        );
+        const dropTargets = document.elementsFromPoint(event.clientX, event.clientY);
+        const dropTarget = dropTargets.find((target, index) => target.id.includes("droppable") && index > 0);
         let side: Side | undefined = determineLeftOrRight(event, dropTarget);
         const tabHeight = ghostTabRef.current?.getBoundingClientRect().height;
 
         tabHeight && checkSnap(newX, panelWidth, newY, tabHeight);
 
         removeHoverClasses();
-        if (
-          (dropTarget as HTMLElement)?.id ===
-          `${panelKey}_${tabIndex}_droppable`
-        )
-          return;
-        if ((dropTarget as HTMLElement)?.id.includes("droppable-space"))
-          side = undefined;
+        if ((dropTarget as HTMLElement)?.id === `${panelKey}_${tabIndex}_droppable`) return;
+        if ((dropTarget as HTMLElement)?.id.includes("droppable-space")) side = undefined;
         addHoverClasses(side, dropTarget);
       },
       onMouseUp(event, data) {
@@ -140,28 +130,19 @@ const Tab = ({
         const left = nX < 0 ? 0 : nX;
         const implementedHeight = nY - headerHeight;
         const top = implementedHeight < 0 ? 0 : implementedHeight;
-        const droppedOver = document.elementFromPoint(
-          event.clientX,
-          event.clientY,
-        );
+        const droppedOver = document.elementFromPoint(event.clientX, event.clientY);
         const isDropArea = determineDroppableArea(droppedOver as HTMLElement);
 
         if (!isDropArea) createNewPanel(name, panelKey, tabIndex, left, top);
         else {
-          const dropTarget = document.elementFromPoint(
-            event.clientX,
-            event.clientY,
-          );
+          const dropTarget = document.elementFromPoint(event.clientX, event.clientY);
           const dropTargetId = dropTarget?.id;
 
           if (!dropTargetId || !dropTargetId?.includes("droppable")) return;
           const droppedOnIndices = dropTargetId.split("_");
           const receivingPanel = droppedOnIndices[0];
           const receivingTab = Number.parseInt(droppedOnIndices[1]);
-          const dropSide = determineLeftOrRight(
-            event,
-            dropTarget as HTMLElement,
-          );
+          const dropSide = determineLeftOrRight(event, dropTarget as HTMLElement);
 
           if (
             (tabIndex === receivingTab && panelKey === receivingPanel) ||
@@ -169,14 +150,7 @@ const Tab = ({
           )
             return;
 
-          dropSide &&
-            transferTab(
-              tabIndex,
-              panelKey,
-              receivingPanel,
-              receivingTab,
-              dropSide,
-            );
+          dropSide && transferTab(tabIndex, panelKey, receivingPanel, receivingTab, dropSide);
         }
       },
     },
@@ -223,20 +197,13 @@ export const Tabs = (props: BaseProps) => {
 
   return (
     <>
-      <Block
-        name="tabs"
-        mix={isFF(FF_OUTLINER_OPTIM) ? "ff_outliner_optim" : void 0}
-      >
+      <Block name="tabs" mix={isFF(FF_OUTLINER_OPTIM) ? "ff_outliner_optim" : void 0}>
         <Elem name="tabs-row">
           {props.panelViews.map((view, index) => {
             const { component: Component } = view;
 
             return (
-              <Elem
-                name="tab-container"
-                key={`${view.title}-${index}-tab`}
-                mod={{ active: view.active }}
-              >
+              <Elem name="tab-container" key={`${view.title}-${index}-tab`} mod={{ active: view.active }}>
                 <Tab
                   name={view.name}
                   rootRef={props.root}
@@ -256,24 +223,15 @@ export const Tabs = (props: BaseProps) => {
                   setBreakPointActiveTab={props.setBreakPointActiveTab}
                 >
                   <Elem name="content">
-                    <Component
-                      key={`${view.title}-${index}-ghost`}
-                      {...props}
-                      name={"outliner"}
-                    />
+                    <Component key={`${view.title}-${index}-ghost`} {...props} name={"outliner"} />
                   </Elem>
                 </Tab>
               </Elem>
             );
           })}
-          <Elem
-            id={`${props.name}_${props.panelViews.length}-droppable-space`}
-            name="drop-space-after"
-          />
+          <Elem id={`${props.name}_${props.panelViews.length}-droppable-space`} name="drop-space-after" />
         </Elem>
-        <Elem name="contents">
-          {ActiveComponent && <ActiveComponent {...props} />}
-        </Elem>
+        <Elem name="contents">{ActiveComponent && <ActiveComponent {...props} />}</Elem>
       </Block>
     </>
   );

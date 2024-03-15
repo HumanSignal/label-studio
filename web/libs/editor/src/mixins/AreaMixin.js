@@ -2,11 +2,7 @@ import { destroy, isAlive, types } from "mobx-state-tree";
 import { defaultStyle } from "../core/Constants";
 import { guidGenerator } from "../core/Helpers";
 import Result from "../regions/Result";
-import {
-  FF_LSDV_4930,
-  FF_TAXONOMY_LABELING,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_LSDV_4930, FF_TAXONOMY_LABELING, isFF } from "../utils/feature-flags";
 import { PER_REGION_MODES } from "./PerRegion";
 import { ReadOnlyRegionMixin } from "./ReadOnlyMixin";
 
@@ -43,15 +39,11 @@ export const AreaMixinBase = types
     },
 
     get emptyLabel() {
-      return self.results.find((r) => r.from_name?.emptyLabel)?.from_name
-        ?.emptyLabel;
+      return self.results.find((r) => r.from_name?.emptyLabel)?.from_name?.emptyLabel;
     },
 
     get texting() {
-      return (
-        isAlive(self) &&
-        self.results.find((r) => r.type === "textarea" && r.hasValue)
-      );
+      return isAlive(self) && self.results.find((r) => r.type === "textarea" && r.hasValue);
     },
 
     get tag() {
@@ -71,34 +63,22 @@ export const AreaMixinBase = types
     },
 
     get perRegionTags() {
-      return (
-        self.annotation.toNames
-          .get(self.object.name)
-          ?.filter((tag) => tag.perregion) || []
-      );
+      return self.annotation.toNames.get(self.object.name)?.filter((tag) => tag.perregion) || [];
     },
 
     // special tags that can be used for labeling (only <Taxonomy isLabeling/> for now)
     get labelingTags() {
       if (!isFF(FF_TAXONOMY_LABELING)) return [];
 
-      return (
-        self.annotation.toNames
-          .get(self.object.name)
-          ?.filter((tag) => tag.classification && tag.isLabeling) || []
-      );
+      return self.annotation.toNames.get(self.object.name)?.filter((tag) => tag.classification && tag.isLabeling) || [];
     },
 
     get perRegionDescControls() {
-      return self.perRegionTags.filter(
-        (tag) => tag.displaymode === PER_REGION_MODES.REGION_LIST,
-      );
+      return self.perRegionTags.filter((tag) => tag.displaymode === PER_REGION_MODES.REGION_LIST);
     },
 
     get perRegionFocusTarget() {
-      return self.perRegionTags.find(
-        (tag) => tag.isVisible !== false && tag.focusable,
-      );
+      return self.perRegionTags.find((tag) => tag.isVisible !== false && tag.focusable);
     },
 
     get labelName() {
@@ -146,9 +126,7 @@ export const AreaMixinBase = types
         return emptyStyled.emptyStyle;
       }
 
-      const controlStyled = self.results.find((r) =>
-        self.type.startsWith(r.type),
-      );
+      const controlStyled = self.results.find((r) => self.type.startsWith(r.type));
 
       return controlStyled?.controlStyle;
     },
@@ -163,14 +141,11 @@ export const AreaMixinBase = types
     },
 
     get highlighted() {
-      return self.parent?.selectionArea?.isActive
-        ? self.isInSelectionArea
-        : self._highlighted;
+      return self.parent?.selectionArea?.isActive ? self.isInSelectionArea : self._highlighted;
     },
 
     get isInSelectionArea() {
-      return (!isFF(FF_LSDV_4930) || !self.hidden) &&
-        self.parent?.selectionArea?.isActive
+      return (!isFF(FF_LSDV_4930) || !self.hidden) && self.parent?.selectionArea?.isActive
         ? self.parent.selectionArea.intersectsBbox(self.bboxCoords)
         : false;
     },
@@ -237,8 +212,4 @@ export const AreaMixinBase = types
     },
   }));
 
-export const AreaMixin = types.compose(
-  "AreaMixin",
-  AreaMixinBase,
-  ReadOnlyRegionMixin,
-);
+export const AreaMixin = types.compose("AreaMixin", AreaMixinBase, ReadOnlyRegionMixin);

@@ -15,8 +15,7 @@ async function initLabelStudio({
   additionalInterfaces = [],
   params = {},
 }) {
-  if (window.Konva?.stages.length)
-    window.Konva.stages.forEach((stage) => stage.destroy());
+  if (window.Konva?.stages.length) window.Konva.stages.forEach((stage) => stage.destroy());
 
   const interfaces = [
     "panel",
@@ -85,10 +84,7 @@ const prepareInitialParams = (value, prefix = FN_PREFIX) => {
 
     Object.keys(value).forEach((key) => {
       const param = value[key];
-      const [resParam, resFns] = prepareInitialParams(
-        param,
-        `${prefix}_${key}`,
-      );
+      const [resParam, resFns] = prepareInitialParams(param, `${prefix}_${key}`);
 
       result[key] = resParam;
       functions = [...functions, ...resFns];
@@ -141,8 +137,7 @@ const setFeatureFlagsDefaultValue = (value) => {
 
 const setFeatureFlags = (featureFlags) => {
   if (!window.APP_SETTINGS) window.APP_SETTINGS = {};
-  if (!window.APP_SETTINGS.feature_flags)
-    window.APP_SETTINGS.feature_flags = {};
+  if (!window.APP_SETTINGS.feature_flags) window.APP_SETTINGS.feature_flags = {};
   window.APP_SETTINGS.feature_flags = {
     ...window.APP_SETTINGS.feature_flags,
     ...featureFlags,
@@ -214,9 +209,7 @@ const waitForAudio = async () => {
 const waitForObjectsReady = async () => {
   await new Promise((resolve) => {
     const watchObjectsReady = () => {
-      const isReady = window.Htx.annotationStore.selected.objects.every(
-        (object) => object.isReady,
-      );
+      const isReady = window.Htx.annotationStore.selected.objects.every((object) => object.isReady);
 
       if (isReady) {
         resolve(true);
@@ -255,11 +248,7 @@ const convertToFixed = (data, fractionDigits = 2) => {
   if (["string", "number"].includes(typeof data)) {
     const n = Number(data);
 
-    return Number.isNaN(n)
-      ? data
-      : Number.isInteger(n)
-        ? n
-        : +Number(n).toFixed(fractionDigits);
+    return Number.isNaN(n) ? data : Number.isInteger(n) ? n : +Number(n).toFixed(fractionDigits);
   }
   if (Array.isArray(data)) {
     return data.map((n) => convertToFixed(n, fractionDigits));
@@ -292,8 +281,7 @@ const getSizeConvertor = (width, height) =>
   function convert(data, size = width) {
     if (typeof data === "number") return convertToFixed((data * 100) / size);
     if (Array.isArray(data)) {
-      if (data.length === 2)
-        return [convert(data[0]), convert(data[1], height)];
+      if (data.length === 2) return [convert(data[0]), convert(data[1], height)];
       return data.map((n) => convert(n));
     }
     if (typeof data === "object") {
@@ -301,8 +289,7 @@ const getSizeConvertor = (width, height) =>
 
       for (const key in data) {
         if (key === "rotation") result[key] = data[key];
-        else if (key.startsWith("height") || key === "y" || key.endsWith("Y"))
-          result[key] = convert(data[key], height);
+        else if (key.startsWith("height") || key === "y" || key.endsWith("Y")) result[key] = convert(data[key], height);
         else result[key] = convert(data[key]);
       }
       return result;
@@ -366,8 +353,7 @@ const clickKonva = ([x, y]) => {
  */
 const clickMultipleKonva = async (points) => {
   const stage = window.Konva.stages[0];
-  const delay = (timeout = 0) =>
-    new Promise((resolve) => setTimeout(resolve, timeout));
+  const delay = (timeout = 0) => new Promise((resolve) => setTimeout(resolve, timeout));
   let lastPoint;
 
   for (const point of points) {
@@ -415,8 +401,7 @@ const clickMultipleKonva = async (points) => {
  */
 const polygonKonva = async (points) => {
   try {
-    const delay = (timeout = 0) =>
-      new Promise((resolve) => setTimeout(resolve, timeout));
+    const delay = (timeout = 0) => new Promise((resolve) => setTimeout(resolve, timeout));
     const stage = window.Konva.stages[0];
 
     for (const point of points) {
@@ -473,8 +458,7 @@ const polygonKonva = async (points) => {
  */
 const dragKonva = async ([x, y, shiftX, shiftY]) => {
   const stage = window.Konva.stages[0];
-  const delay = (timeout = 0) =>
-    new Promise((resolve) => setTimeout(resolve, timeout));
+  const delay = (timeout = 0) => new Promise((resolve) => setTimeout(resolve, timeout));
 
   stage.fire("mousedown", { evt: { offsetX: x, offsetY: y } });
   await delay();
@@ -611,9 +595,7 @@ async function generateImageUrl({ width, height }) {
 }
 
 const getCanvasSize = () => {
-  const imageObject = window.Htx.annotationStore.selected.objects.find(
-    (o) => o.type === "image",
-  );
+  const imageObject = window.Htx.annotationStore.selected.objects.find((o) => o.type === "image");
 
   return {
     width: imageObject.canvasSize.width,
@@ -640,9 +622,7 @@ const getImageFrameSize = () => {
 };
 const setZoom = ([scale, x, y]) => {
   return new Promise((resolve) => {
-    Htx.annotationStore.selected.objects
-      .find((o) => o.type === "image")
-      .setZoom(scale, x, y);
+    Htx.annotationStore.selected.objects.find((o) => o.type === "image").setZoom(scale, x, y);
     setTimeout(resolve, 30);
   });
 };
@@ -657,9 +637,7 @@ const countKonvaShapes = async () => {
   let count = 0;
 
   regions.forEach((region) => {
-    count += stage
-      .find(`.${region.id}`)
-      .filter((node) => node.isVisible()).length;
+    count += stage.find(`.${region.id}`).filter((node) => node.isVisible()).length;
   });
 
   return count;
@@ -667,27 +645,21 @@ const countKonvaShapes = async () => {
 
 const isTransformerExist = async () => {
   const stage = window.Konva.stages[0];
-  const anchors = stage
-    .find("._anchor")
-    .filter((shape) => shape.getAttr("visible") !== false);
+  const anchors = stage.find("._anchor").filter((shape) => shape.getAttr("visible") !== false);
 
   return !!anchors.length;
 };
 
 const isRotaterExist = async () => {
   const stage = window.Konva.stages[0];
-  const rotaters = stage
-    .find(".rotater")
-    .filter((shape) => shape.getAttr("visible") !== false);
+  const rotaters = stage.find(".rotater").filter((shape) => shape.getAttr("visible") !== false);
 
   return !!rotaters.length;
 };
 
 const getRegionAbsoultePosition = async (shapeId) => {
   const stage = window.Konva.stages[0];
-  const region = stage.findOne(
-    (shape) => String(shape._id) === String(shapeId),
-  );
+  const region = stage.findOne((shape) => String(shape._id) === String(shapeId));
 
   if (!region) return null;
 
@@ -705,8 +677,7 @@ const switchRegionTreeView = (viewName) => {
   Htx.annotationStore.selected.regionStore.setView(viewName);
 };
 
-const serialize = () =>
-  window.Htx.annotationStore.selected.serializeAnnotation();
+const serialize = () => window.Htx.annotationStore.selected.serializeAnnotation();
 
 const selectText = async ({ selector, rangeStart, rangeEnd }) => {
   let [doc, win] = [document, window];
@@ -734,18 +705,12 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
         const length = currentNode.length ? currentNode.length : 1;
 
         if (length + lastPosition >= position || !nextNode) {
-          if (
-            borderSide === "right" &&
-            length + lastPosition === position &&
-            nextNode
-          ) {
+          if (borderSide === "right" && length + lastPosition === position && nextNode) {
             return { node: nextNode, position: 0 };
           }
           return {
             node: currentNode,
-            position: isBR
-              ? 0
-              : Math.min(Math.max(position - lastPosition, 0), length),
+            position: isBR ? 0 : Math.min(Math.max(position - lastPosition, 0), length),
           };
         }
         lastPosition += length;
@@ -801,18 +766,12 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
         const length = currentNode.length ? currentNode.length : 1;
 
         if (length + lastPosition >= position || !nextNode) {
-          if (
-            borderSide === "right" &&
-            length + lastPosition === position &&
-            nextNode
-          ) {
+          if (borderSide === "right" && length + lastPosition === position && nextNode) {
             return { node: nextNode, position: 0 };
           }
           return {
             node: currentNode,
-            position: isBR
-              ? 0
-              : Math.min(Math.max(position - lastPosition, 0), length),
+            position: isBR ? 0 : Math.min(Math.max(position - lastPosition, 0), length),
           };
         }
         lastPosition += length;
@@ -837,9 +796,7 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
 
   const rangeRects = Array.from(range.getClientRects());
   const bboxes = [rangeRects.at(0), rangeRects.at(-1)];
-  const iframeOffset = isIFrame
-    ? elem.getBoundingClientRect()
-    : { left: 0, top: 0 };
+  const iframeOffset = isIFrame ? elem.getBoundingClientRect() : { left: 0, top: 0 };
 
   return bboxes.map((bbox) => ({
     x: bbox.left + iframeOffset.left,

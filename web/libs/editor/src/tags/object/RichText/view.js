@@ -8,11 +8,7 @@ import ObjectTag from "../../../components/Tags/Object";
 import Utils from "../../../utils";
 import { Block, Elem, cn } from "../../../utils/bem";
 import { FF_LSDV_4620_3, isFF } from "../../../utils/feature-flags";
-import {
-  htmlEscape,
-  matchesSelector,
-  moveStylesBetweenHeadTags,
-} from "../../../utils/html";
+import { htmlEscape, matchesSelector, moveStylesBetweenHeadTags } from "../../../utils/html";
 import { fixCodePointsInRange } from "../../../utils/selection-tools";
 import "./RichText.styl";
 
@@ -40,11 +36,7 @@ class RichTextPieceView extends Component {
 
       if (
         node.nodeName === "SPAN" &&
-        node.matches(
-          isFF(FF_LSDV_4620_3)
-            ? this._regionVisibleSpanSelector
-            : this._regionSpanSelector,
-        ) &&
+        node.matches(isFF(FF_LSDV_4620_3) ? this._regionVisibleSpanSelector : this._regionSpanSelector) &&
         selection.containsNode(node)
       ) {
         const region = this._determineRegion(node);
@@ -77,12 +69,7 @@ class RichTextPieceView extends Component {
 
     Utils.Selection.captureSelection(
       ({ selectionText, range }) => {
-        if (
-          !range ||
-          range.collapsed ||
-          !root.contains(range.startContainer) ||
-          !root.contains(range.endContainer)
-        ) {
+        if (!range || range.collapsed || !root.contains(range.startContainer) || !root.contains(range.endContainer)) {
           return;
         }
 
@@ -131,10 +118,7 @@ class RichTextPieceView extends Component {
       this._selectionMode = false;
       return;
     }
-    if (
-      !this.props.item.clickablelinks &&
-      matchesSelector(event.target, "a[href]")
-    ) {
+    if (!this.props.item.clickablelinks && matchesSelector(event.target, "a[href]")) {
       event.preventDefault();
       return;
     }
@@ -234,13 +218,7 @@ class RichTextPieceView extends Component {
     const root = rootEl?.contentDocument?.body ?? rootEl;
 
     if (!item.inline) {
-      if (
-        !root ||
-        root.tagName === "IFRAME" ||
-        !root.childNodes.length ||
-        item.isLoaded === false
-      )
-        return;
+      if (!root || root.tagName === "IFRAME" || !root.childNodes.length || item.isLoaded === false) return;
     }
 
     // Apply highlight to ranges of a current tag
@@ -265,14 +243,11 @@ class RichTextPieceView extends Component {
    * @param {HTMLElement} element
    */
   _determineRegion(element) {
-    const spanSelector = isFF(FF_LSDV_4620_3)
-      ? this._regionVisibleSpanSelector
-      : this._regionSpanSelector;
+    const spanSelector = isFF(FF_LSDV_4620_3) ? this._regionVisibleSpanSelector : this._regionSpanSelector;
 
     if (matchesSelector(element, spanSelector)) {
       const span =
-        element.tagName === "SPAN" &&
-        (!isFF(FF_LSDV_4620_3) || element.matches(spanSelector))
+        element.tagName === "SPAN" && (!isFF(FF_LSDV_4620_3) || element.matches(spanSelector))
           ? element
           : element.closest(spanSelector);
       const { item } = this.props;
@@ -285,19 +260,11 @@ class RichTextPieceView extends Component {
     const { item } = this.props;
 
     if (!isFF(FF_LSDV_4620_3)) {
-      item.setNeedsUpdateCallbacks(
-        this._moveElementsToWorkingNode,
-        this._returnElementsFromWorkingNode,
-      );
+      item.setNeedsUpdateCallbacks(this._moveElementsToWorkingNode, this._returnElementsFromWorkingNode);
     }
 
     if (!item.inline) {
-      this.dispose = observe(
-        item,
-        "_isReady",
-        this.updateLoadingVisibility,
-        true,
-      );
+      this.dispose = observe(item, "_isReady", this.updateLoadingVisibility, true);
     }
   }
 
@@ -337,8 +304,7 @@ class RichTextPieceView extends Component {
   };
 
   _passHotkeys = (e) => {
-    const props =
-      "key code keyCode location ctrlKey shiftKey altKey metaKey".split(" ");
+    const props = "key code keyCode location ctrlKey shiftKey altKey metaKey".split(" ");
     const init = {};
 
     for (const prop of props) init[prop] = e[prop];
@@ -386,10 +352,7 @@ class RichTextPieceView extends Component {
     if (body.scrollHeight) {
       // body dimensions sometimes doesn't count some inner content offsets
       // but html's offsetHeight sometimes is zero, so get the max of both
-      iframe.style.height = `${Math.max(
-        body.scrollHeight,
-        htmlEl.offsetHeight,
-      )}px`;
+      iframe.style.height = `${Math.max(body.scrollHeight, htmlEl.offsetHeight)}px`;
     }
 
     this.markObjectAsLoaded();
@@ -430,9 +393,7 @@ class RichTextPieceView extends Component {
               item.visibleNodeRef.current = el;
               el && this.markObjectAsLoaded();
             }}
-            data-linenumbers={
-              isText && settings.showLineNumbers ? "enabled" : "disabled"
-            }
+            data-linenumbers={isText && settings.showLineNumbers ? "enabled" : "disabled"}
             className="htx-richtext"
             dangerouslySetInnerHTML={{ __html: val }}
             {...eventHandlers}
@@ -446,12 +407,7 @@ class RichTextPieceView extends Component {
                 className="htx-richtext-orig"
                 dangerouslySetInnerHTML={{ __html: val }}
               />
-              <Elem
-                key="work"
-                name="work-container"
-                ref={item.workingNodeRef}
-                className="htx-richtext-work"
-              />
+              <Elem key="work" name="work-container" ref={item.workingNodeRef} className="htx-richtext-work" />
             </>
           )}
         </Block>

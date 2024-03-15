@@ -4,16 +4,7 @@ import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
 import "./Input.styl";
 
-const Input = ({
-  label,
-  className,
-  validate,
-  required,
-  skip,
-  labelProps,
-  ghost,
-  ...props
-}) => {
+const Input = ({ label, className, validate, required, skip, labelProps, ghost, ...props }) => {
   const mods = {
     ghost,
     newUI: isFF(FF_LOPS_E_10),
@@ -21,14 +12,7 @@ const Input = ({
   const classList = [cn("form-input").mod(mods), className].join(" ").trim();
 
   const input = (
-    <FormField
-      label={label}
-      name={props.name}
-      validate={validate}
-      required={required}
-      skip={skip}
-      {...props}
-    >
+    <FormField label={label} name={props.name} validate={validate} required={required} skip={skip} {...props}>
       {({ ref }) => <input {...props} ref={ref} className={classList} />}
     </FormField>
   );

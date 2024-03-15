@@ -1,8 +1,4 @@
-import {
-  LabelStudio,
-  Taxonomy,
-  Tooltip,
-} from "@humansignal/frontend-test/helpers/LSF/index";
+import { LabelStudio, Taxonomy, Tooltip } from "@humansignal/frontend-test/helpers/LSF/index";
 import {
   dataWithPrediction,
   simpleData,
@@ -12,11 +8,7 @@ import {
 
 describe("Control Tags - Taxonomy", () => {
   it("should show hint for <Choice />", () => {
-    LabelStudio.params()
-      .config(taxonomyConfig)
-      .data(simpleData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(taxonomyConfig).data(simpleData).withResult([]).init();
 
     Taxonomy.open();
     Taxonomy.findItem("Choice 2").trigger("mouseenter");

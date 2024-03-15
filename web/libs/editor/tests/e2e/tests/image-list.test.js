@@ -113,86 +113,76 @@ Scenario("Image list rendering", async ({ I, LabelStudio, AtImageView }) => {
   I.seeElement(`img[src="${data.images[0]}"]`);
 });
 
-Scenario(
-  "Image list with page navigation",
-  async ({ I, AtImageView, LabelStudio }) => {
-    const params = {
-      config: rectConfig,
-      data,
-      annotations: [{ id: 1, result: [] }],
-    };
+Scenario("Image list with page navigation", async ({ I, AtImageView, LabelStudio }) => {
+  const params = {
+    config: rectConfig,
+    data,
+    annotations: [{ id: 1, result: [] }],
+  };
 
-    const prevPageButton = locate(
-      ".lsf-pagination__btn.lsf-pagination__btn_arrow-left",
-    );
-    const nextPageButton = locate(
-      ".lsf-pagination__btn.lsf-pagination__btn_arrow-right",
-    );
+  const prevPageButton = locate(".lsf-pagination__btn.lsf-pagination__btn_arrow-left");
+  const nextPageButton = locate(".lsf-pagination__btn.lsf-pagination__btn_arrow-right");
 
-    I.amOnPage("/");
-    await LabelStudio.init(params);
+  I.amOnPage("/");
+  await LabelStudio.init(params);
 
-    await AtImageView.waitForImage();
-    await AtImageView.lookForStage();
+  await AtImageView.waitForImage();
+  await AtImageView.lookForStage();
 
-    I.say("Loading first image");
-    I.seeElement(`img[src="${data.images[0]}"]`);
+  I.say("Loading first image");
+  I.seeElement(`img[src="${data.images[0]}"]`);
 
-    I.say("Pagination is visible");
-    I.seeElement(".lsf-pagination");
+  I.say("Pagination is visible");
+  I.seeElement(".lsf-pagination");
 
-    I.say("The number of pages is correct");
-    I.see("1 of 4");
+  I.say("The number of pages is correct");
+  I.see("1 of 4");
 
-    I.say("Clicking on the next page");
-    I.click(nextPageButton);
+  I.say("Clicking on the next page");
+  I.click(nextPageButton);
 
-    I.say("Loading second image");
-    I.seeElement(`img[src="${data.images[1]}"]`);
-    I.see("2 of 4");
+  I.say("Loading second image");
+  I.seeElement(`img[src="${data.images[1]}"]`);
+  I.see("2 of 4");
 
-    I.say("Clicking on the previous page");
-    I.click(prevPageButton);
-    I.seeElement(`img[src="${data.images[0]}"]`);
-    I.see("1 of 4");
-  },
-);
+  I.say("Clicking on the previous page");
+  I.click(prevPageButton);
+  I.seeElement(`img[src="${data.images[0]}"]`);
+  I.see("1 of 4");
+});
 
-Scenario(
-  "Image list with hotkey navigation",
-  async ({ I, AtImageView, LabelStudio }) => {
-    const params = {
-      config: rectConfig,
-      data,
-      annotations: [{ id: 1, result: [] }],
-    };
+Scenario("Image list with hotkey navigation", async ({ I, AtImageView, LabelStudio }) => {
+  const params = {
+    config: rectConfig,
+    data,
+    annotations: [{ id: 1, result: [] }],
+  };
 
-    I.amOnPage("/");
-    await LabelStudio.init(params);
+  I.amOnPage("/");
+  await LabelStudio.init(params);
 
-    await AtImageView.waitForImage();
-    await AtImageView.lookForStage();
+  await AtImageView.waitForImage();
+  await AtImageView.lookForStage();
 
-    I.say("Loading first image");
-    I.seeElement(`img[src="${data.images[0]}"]`);
+  I.say("Loading first image");
+  I.seeElement(`img[src="${data.images[0]}"]`);
 
-    I.say("Pagination is visible");
-    I.seeElement(".lsf-pagination");
+  I.say("Pagination is visible");
+  I.seeElement(".lsf-pagination");
 
-    I.say("The number of pages is correct");
-    I.see("1 of 4");
+  I.say("The number of pages is correct");
+  I.see("1 of 4");
 
-    await AtImageView.multiImageGoForwardWithHotkey();
+  await AtImageView.multiImageGoForwardWithHotkey();
 
-    I.say("Loading second image");
-    I.seeElement(`img[src="${data.images[1]}"]`);
-    I.see("2 of 4");
+  I.say("Loading second image");
+  I.seeElement(`img[src="${data.images[1]}"]`);
+  I.see("2 of 4");
 
-    await AtImageView.multiImageGoBackwardWithHotkey();
-    I.seeElement(`img[src="${data.images[0]}"]`);
-    I.see("1 of 4");
-  },
-);
+  await AtImageView.multiImageGoBackwardWithHotkey();
+  I.seeElement(`img[src="${data.images[0]}"]`);
+  I.see("1 of 4");
+});
 
 Scenario(
   "Ensure that results are the same when exporting existing regions",
@@ -214,99 +204,90 @@ Scenario(
   },
 );
 
-Scenario(
-  "Image list exports correct data",
-  async ({ I, LabelStudio, AtImageView }) => {
-    const params = {
-      config: rectConfig,
-      data,
-      annotations: [{ id: 1, result }],
-    };
+Scenario("Image list exports correct data", async ({ I, LabelStudio, AtImageView }) => {
+  const params = {
+    config: rectConfig,
+    data,
+    annotations: [{ id: 1, result }],
+  };
 
-    I.amOnPage("/");
-    LabelStudio.init(params);
+  I.amOnPage("/");
+  LabelStudio.init(params);
 
-    await AtImageView.waitForImage();
-    await AtImageView.lookForStage();
+  await AtImageView.waitForImage();
+  await AtImageView.lookForStage();
 
-    AtImageView.multiImageGoForwardWithHotkey();
+  AtImageView.multiImageGoForwardWithHotkey();
 
-    await AtImageView.waitForImage();
-    await AtImageView.lookForStage();
-    I.seeElement(`img[src="${data.images[1]}"]`);
+  await AtImageView.waitForImage();
+  await AtImageView.lookForStage();
+  I.seeElement(`img[src="${data.images[1]}"]`);
 
-    await LabelStudio.resultsNotChanged(result);
-  },
-);
+  await LabelStudio.resultsNotChanged(result);
+});
 
-Scenario(
-  "Regions are not changes when duplicating an annotation",
-  async ({ I, LabelStudio, AtImageView }) => {
-    const params = {
-      config: rectConfig,
-      data,
-      annotations: [{ id: 1, result }],
-    };
+Scenario("Regions are not changes when duplicating an annotation", async ({ I, LabelStudio, AtImageView }) => {
+  const params = {
+    config: rectConfig,
+    data,
+    annotations: [{ id: 1, result }],
+  };
 
-    I.amOnPage("/");
-    LabelStudio.init(params);
+  I.amOnPage("/");
+  LabelStudio.init(params);
 
-    await AtImageView.waitForImage();
-    await AtImageView.lookForStage();
+  await AtImageView.waitForImage();
+  await AtImageView.lookForStage();
 
-    I.say("Attempting to duplicate an annotaion");
-    I.click('[aria-label="Copy Annotation"]');
+  I.say("Attempting to duplicate an annotaion");
+  I.click('[aria-label="Copy Annotation"]');
 
-    await AtImageView.waitForImage();
-    await AtImageView.lookForStage();
+  await AtImageView.waitForImage();
+  await AtImageView.lookForStage();
 
-    I.say("Confirm that result is not changed");
-    await LabelStudio.resultsNotChanged(result);
-  },
-);
+  I.say("Confirm that result is not changed");
+  await LabelStudio.resultsNotChanged(result);
+});
 
-Scenario(
-  "No errors during brush export in MIG",
-  async ({ I, LabelStudio, AtImageView, AtLabels }) => {
-    const params = {
-      config: brushConfig,
-      data,
-      annotations: [{ id: 1, result: [] }],
-    };
+Scenario("No errors during brush export in MIG", async ({ I, LabelStudio, AtImageView, AtLabels }) => {
+  const params = {
+    config: brushConfig,
+    data,
+    annotations: [{ id: 1, result: [] }],
+  };
 
-    const brushRegionPoints = [
-      [20, 20],
-      [20, 40],
-      [40, 40],
-      [40, 20],
-      [20, 20],
-    ];
+  const brushRegionPoints = [
+    [20, 20],
+    [20, 40],
+    [40, 40],
+    [40, 20],
+    [20, 20],
+  ];
 
-    I.amOnPage("/");
-    LabelStudio.init(params);
+  I.amOnPage("/");
+  LabelStudio.init(params);
 
-    await AtImageView.waitForImage();
-    await AtImageView.lookForStage();
+  await AtImageView.waitForImage();
+  await AtImageView.lookForStage();
 
-    I.say("Create brush regions on the first image");
-    AtLabels.clickLabel("Moonwalker");
-    AtImageView.drawThroughPoints(brushRegionPoints);
+  I.say("Create brush regions on the first image");
+  AtLabels.clickLabel("Moonwalker");
+  AtImageView.drawThroughPoints(brushRegionPoints);
 
-    // @todo: We cannot use these hotkeys due to duplicating regions action used the same hotkey
-    // await AtImageView.multiImageGoForwardWithHotkey();
-    await AtImageView.multiImageGoForward();
+  // @todo: We cannot use these hotkeys due to duplicating regions action used the same hotkey
+  // await AtImageView.multiImageGoForwardWithHotkey();
+  await AtImageView.multiImageGoForward();
 
-    I.pressKey("u");
-    I.say("Create brush regions on the second image");
-    AtLabels.clickLabel("Planet");
-    AtImageView.drawThroughPoints(brushRegionPoints);
+  I.pressKey("u");
+  I.say("Create brush regions on the second image");
+  AtLabels.clickLabel("Planet");
+  AtImageView.drawThroughPoints(brushRegionPoints);
 
-    // Brush might not have a chanve to finish whatewer it's
-    // doing, so it's safer to wait a little before exporting it
-    I.wait(2);
+  // Brush might not have a chanve to finish whatewer it's
+  // doing, so it's safer to wait a little before exporting it
+  I.wait(2);
 
-    const result = await LabelStudio.serialize();
+  const result = await LabelStudio.serialize();
 
-    assert.equal(result.length, 2);
-  },
-);
+  assert.equal(result.length, 2);
+});

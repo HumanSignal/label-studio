@@ -26,12 +26,7 @@ type SequenceItem = {
  *   'rotation'
  * ); // will return -175
  */
-export const interpolateProp = (
-  start: SequenceItem,
-  end: SequenceItem,
-  frame: number,
-  prop: string,
-): any => {
+export const interpolateProp = (start: SequenceItem, end: SequenceItem, frame: number, prop: string): any => {
   // @todo edge cases
   const r = (frame - start.frame) / (end.frame - start.frame);
 

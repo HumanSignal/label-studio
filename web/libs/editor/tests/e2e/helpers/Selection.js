@@ -8,16 +8,10 @@ class Selection extends Helper {
   async dblClickOnWord(text, parent = "*") {
     const page = getPage(this.helpers);
     const { mouse } = page;
-    const xpath = [
-      locate(parent).toXPath(),
-      `//text()[contains(., '${text}')]`,
-      "[last()]",
-    ].join("");
+    const xpath = [locate(parent).toXPath(), `//text()[contains(., '${text}')]`, "[last()]"].join("");
     const point = await page.evaluate(
       ({ xpath, text }) => {
-        const textEl = document
-          .evaluate(xpath, document, null, XPathResult.ANY_TYPE, null)
-          .iterateNext();
+        const textEl = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null).iterateNext();
         const pos = textEl.wholeText.search(text);
         const range = new Range();
 
@@ -44,9 +38,7 @@ class Selection extends Helper {
     const { mouse } = page;
     const elsXpath = locate(elementLocator).toXPath();
     const point = await page.evaluate((elsXpath) => {
-      const el = document
-        .evaluate(elsXpath, document, null, XPathResult.ANY_TYPE, null)
-        .iterateNext();
+      const el = document.evaluate(elsXpath, document, null, XPathResult.ANY_TYPE, null).iterateNext();
       const bbox = el.getBoundingClientRect();
 
       return {
@@ -69,22 +61,10 @@ class Selection extends Helper {
     await page.evaluate(
       ({ startContainerXPath, startOffset, endContainerXPath, endOffset }) => {
         const startContainer = document
-          .evaluate(
-            startContainerXPath,
-            document,
-            null,
-            XPathResult.ANY_TYPE,
-            null,
-          )
+          .evaluate(startContainerXPath, document, null, XPathResult.ANY_TYPE, null)
           .iterateNext();
         const endContainer = document
-          .evaluate(
-            endContainerXPath,
-            document,
-            null,
-            XPathResult.ANY_TYPE,
-            null,
-          )
+          .evaluate(endContainerXPath, document, null, XPathResult.ANY_TYPE, null)
           .iterateNext();
         const range = new Range();
 

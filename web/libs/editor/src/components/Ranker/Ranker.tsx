@@ -13,39 +13,23 @@ interface BoardProps {
   collapsible?: boolean;
 }
 type CollapsedMap = Record<string, boolean>;
-type CollapsedContextType = [
-  boolean,
-  CollapsedMap,
-  (idOrIds: string | string[], value: boolean) => void,
-];
+type CollapsedContextType = [boolean, CollapsedMap, (idOrIds: string | string[], value: boolean) => void];
 
-const CollapsedContext = createContext<CollapsedContextType>([
-  true,
-  {},
-  (_id, _value) => {},
-]);
+const CollapsedContext = createContext<CollapsedContextType>([true, {}, (_id, _value) => {}]);
 
 // Component for a drag and drop board with 1+ columns
-const Ranker = ({
-  inputData,
-  handleChange,
-  readonly,
-  collapsible = true,
-}: BoardProps) => {
+const Ranker = ({ inputData, handleChange, readonly, collapsible = true }: BoardProps) => {
   const [data, setData] = useState(inputData);
   // items in different columns are different components, so collapsed state should be stored
   // separately; also it's better to not mutate items itself, so here is the map
   const [collapsed, setCollapsed] = useState<CollapsedMap>({});
   // array of ids is used by columns
-  const toggleCollapsed = useCallback(
-    (idOrIds: string | string[], value: boolean) => {
-      const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
-      const values = ids.reduce((acc, id) => ({ ...acc, [id]: value }), {});
+  const toggleCollapsed = useCallback((idOrIds: string | string[], value: boolean) => {
+    const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
+    const values = ids.reduce((acc, id) => ({ ...acc, [id]: value }), {});
 
-      setCollapsed((c) => ({ ...c, ...values }));
-    },
-    [],
-  );
+    setCollapsed((c) => ({ ...c, ...values }));
+  }, []);
 
   // Update data when inputData changes
   useEffect(() => {
@@ -57,20 +41,14 @@ const Ranker = ({
     const { destination, source, draggableId } = result;
 
     // Check if user dropped item outside of columns or in same location as starting location
-    if (
-      !destination ||
-      (destination.droppableId === source.droppableId &&
-        destination.index === source.index)
-    ) {
+    if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
       return;
     }
 
     // handle reorder when item was dragged to a new position
     // determine which column item was moved from
     const startCol = data.columns.find((col) => col.id === source.droppableId);
-    const endCol = data.columns.find(
-      (col) => col.id === destination.droppableId,
-    );
+    const endCol = data.columns.find((col) => col.id === destination.droppableId);
 
     if (startCol === endCol) {
       // get original items list
@@ -122,25 +100,14 @@ const Ranker = ({
   };
 
   return (
-    <CollapsedContext.Provider
-      value={[collapsible, collapsed, toggleCollapsed]}
-    >
+    <CollapsedContext.Provider value={[collapsible, collapsed, toggleCollapsed]}>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className={styles.board}>
           <>
             {data.columns.map((column) => {
-              const items =
-                data.itemIds[column.id]?.map((itemId) => data.items[itemId]) ??
-                [];
+              const items = data.itemIds[column.id]?.map((itemId) => data.items[itemId]) ?? [];
 
-              return (
-                <Column
-                  key={column.id}
-                  column={column}
-                  items={items}
-                  readonly={readonly}
-                />
-              );
+              return <Column key={column.id} column={column} items={items} readonly={readonly} />;
             })}
           </>
         </div>

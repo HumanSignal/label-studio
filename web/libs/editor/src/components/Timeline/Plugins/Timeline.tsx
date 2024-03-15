@@ -25,8 +25,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   }
 
   get wrapperHeight() {
-    const { fontSize, height, labelPadding, labelPlacement } = this
-      .params as any;
+    const { fontSize, height, labelPadding, labelPlacement } = this.params as any;
 
     if (labelPlacement === "top") {
       return height;
@@ -48,10 +47,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
       params,
     );
     if (this.params.labelPlacement === "top") {
-      this.params.height =
-        this.params.fontSize! +
-        (this.params.height as number) +
-        this.params.labelPadding! * 2;
+      this.params.height = this.params.fontSize! + (this.params.height as number) + this.params.labelPadding! * 2;
     }
   }
 
@@ -61,9 +57,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     if (this.container instanceof HTMLElement) {
       this.container.innerHTML = "";
 
-      (this.wrapper as any) = this.container.appendChild(
-        document.createElement("timeline"),
-      );
+      (this.wrapper as any) = this.container.appendChild(document.createElement("timeline"));
     }
     if (this.wrapper) {
       this.util.style(this.wrapper, {
@@ -112,10 +106,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     const baseOffset = (this.params as any).offset;
     const pixelsPerSecond = width / duration;
     const totalSeconds = Number.parseInt(duration as any, 10) + 1;
-    const timeInterval = this.intervalFnOrVal(
-      this.params.timeInterval,
-      pixelsPerSecond,
-    );
+    const timeInterval = this.intervalFnOrVal(this.params.timeInterval, pixelsPerSecond);
 
     let curPixel = pixelsPerSecond * (this.params as any).offset;
     let curSeconds = 0;
@@ -126,8 +117,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     this.positioning = [];
 
     // render until end in case we have a negative offset
-    const renderSeconds =
-      baseOffset < 0 ? totalSeconds - baseOffset : totalSeconds;
+    const renderSeconds = baseOffset < 0 ? totalSeconds - baseOffset : totalSeconds;
 
     for (i = 0; i < renderSeconds / timeInterval; i++) {
       this.positioning.push([i, curSeconds, curPixel]);
@@ -190,15 +180,9 @@ export class TimelinePlugin extends BaseTimelinePlugin {
       labelPlacement,
     } = this.params;
 
-    const primaryLabelInterval = this.intervalFnOrVal(
-      this.params.primaryLabelInterval,
-      pixelsPerSecond,
-    );
+    const primaryLabelInterval = this.intervalFnOrVal(this.params.primaryLabelInterval, pixelsPerSecond);
     const pxRatio = (this as any).pixelRatio;
-    const height =
-      (labelPlacement === "top"
-        ? (notchHeight as number)
-        : (baseHeight as number)) * pxRatio;
+    const height = (labelPlacement === "top" ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
 
     this.setFonts(`${this.fontSize}px ${this.params.fontFamily}`);
 
@@ -221,11 +205,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
             this.setFillStyles(primaryColor!);
             this.fillRect(curPixel, 0, 1, height);
             this.setFillStyles(primaryFontColor!);
-            this.fillText(
-              (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel + labelPadding! * pxRatio,
-              height,
-            );
+            this.fillText((formatTime as any)(curSeconds, pixelsPerSecond), curPixel + labelPadding! * pxRatio, height);
             break;
         }
       }
@@ -245,15 +225,9 @@ export class TimelinePlugin extends BaseTimelinePlugin {
       labelPlacement,
     } = this.params;
 
-    const secondaryLabelInterval = this.intervalFnOrVal(
-      this.params.secondaryLabelInterval,
-      pixelsPerSecond,
-    );
+    const secondaryLabelInterval = this.intervalFnOrVal(this.params.secondaryLabelInterval, pixelsPerSecond);
     const pxRatio = (this as any).pixelRatio;
-    const height =
-      (labelPlacement === "top"
-        ? (notchHeight as number)
-        : (baseHeight as number)) * pxRatio;
+    const height = (labelPlacement === "top" ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
 
     this.setFonts(`${this.fontSize}px ${this.params.fontFamily}`);
 
@@ -276,11 +250,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
             this.setFillStyles(secondaryColor!);
             this.fillRect(curPixel, 0, 1, height);
             this.setFillStyles(secondaryFontColor!);
-            this.fillText(
-              (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel + labelPadding! * pxRatio,
-              height,
-            );
+            this.fillText((formatTime as any)(curSeconds, pixelsPerSecond), curPixel + labelPadding! * pxRatio, height);
             break;
         }
       }
@@ -289,26 +259,13 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     return secondaryLabelInterval;
   }
 
-  renderTertiaryNotches(
-    primaryLabelInterval: number,
-    secondaryLabelInterval: number,
-  ) {
-    const {
-      height: _baseHeight,
-      notchHeight,
-      unlabeledNotchColor,
-      notchPercentHeight,
-      labelPlacement,
-    } = this.params;
+  renderTertiaryNotches(primaryLabelInterval: number, secondaryLabelInterval: number) {
+    const { height: _baseHeight, notchHeight, unlabeledNotchColor, notchPercentHeight, labelPlacement } = this.params;
 
     const pxRatio = (this as any).pixelRatio;
 
-    const baseHeight =
-      labelPlacement === "top"
-        ? (notchHeight as number)
-        : (_baseHeight as number);
-    const height =
-      (baseHeight as number) * (notchPercentHeight! / 100) * pxRatio;
+    const baseHeight = labelPlacement === "top" ? (notchHeight as number) : (_baseHeight as number);
+    const height = (baseHeight as number) * (notchPercentHeight! / 100) * pxRatio;
 
     this.setFillStyles(unlabeledNotchColor!);
 
@@ -340,10 +297,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     const pixelsPerSecond = this.updatePositioning(width, duration);
 
     const primaryLabelInterval = this.renderPrimaryLabels(pixelsPerSecond);
-    const secondaryLabelInterval = this.renderSecondaryLabels(
-      pixelsPerSecond,
-      primaryLabelInterval,
-    );
+    const secondaryLabelInterval = this.renderSecondaryLabels(pixelsPerSecond, primaryLabelInterval);
 
     this.renderTertiaryNotches(primaryLabelInterval, secondaryLabelInterval);
   }

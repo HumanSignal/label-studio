@@ -1,13 +1,7 @@
 import { nanoid } from "nanoid";
 import { type RgbaColorArray, rgba } from "../Common/Color";
 import { Events } from "../Common/Events";
-import {
-  clamp,
-  defaults,
-  getCursorPositionX,
-  getCursorTime,
-  pixelsToTime,
-} from "../Common/Utils";
+import { clamp, defaults, getCursorPositionX, getCursorTime, pixelsToTime } from "../Common/Utils";
 import { CursorSymbol } from "../Cursor/Cursor";
 import type { Layer } from "../Visual/Layer";
 import type { Visualizer } from "../Visual/Visualizer";
@@ -74,16 +68,10 @@ export class Segment extends Events<SegmentEvents> {
   };
   protected isGrabbingEdge: { isRightEdge: boolean; isLeftEdge: boolean };
 
-  constructor(
-    options: SegmentOptions,
-    waveform: Waveform,
-    visualizer: Visualizer,
-    controller: Regions,
-  ) {
+  constructor(options: SegmentOptions, waveform: Waveform, visualizer: Visualizer, controller: Regions) {
     super();
 
-    if (options.start < 0)
-      throw new Error("Segment start must be greater than 0");
+    if (options.start < 0) throw new Error("Segment start must be greater than 0");
     if (options.end < 0) throw new Error("Segment end must be greater than 0");
 
     this.id = options.id ?? nanoid(5);
@@ -111,12 +99,7 @@ export class Segment extends Events<SegmentEvents> {
   }
 
   update(options: Partial<SegmentOptions>) {
-    if (
-      !this.updateable &&
-      options.updateable !== undefined &&
-      !options.updateable
-    )
-      return;
+    if (!this.updateable && options.updateable !== undefined && !options.updateable) return;
 
     if (options.updateable !== undefined) {
       this.updateable = options.updateable;
@@ -240,10 +223,7 @@ export class Segment extends Events<SegmentEvents> {
   }
 
   switchCursor = (symbol: CursorSymbol, shouldGrabFocus = true) => {
-    this.waveform.cursor.set(
-      symbol,
-      shouldGrabFocus && this.requiresCursorFocus(symbol) ? this.layerName : "",
-    );
+    this.waveform.cursor.set(symbol, shouldGrabFocus && this.requiresCursorFocus(symbol) ? this.layerName : "");
   };
 
   private edgeGrabCheck = (e: MouseEvent) => {
@@ -263,8 +243,7 @@ export class Segment extends Events<SegmentEvents> {
     const isEdgeGrab = this.edgeGrabCheck(e);
 
     if (this.isDragging) return;
-    if (isEdgeGrab.isRightEdge || isEdgeGrab.isLeftEdge)
-      this.switchCursor(CursorSymbol.colResize);
+    if (isEdgeGrab.isRightEdge || isEdgeGrab.isLeftEdge) this.switchCursor(CursorSymbol.colResize);
     else this.switchCursor(CursorSymbol.grab);
   };
 
@@ -292,8 +271,7 @@ export class Segment extends Events<SegmentEvents> {
       e.preventDefault();
       e.stopPropagation();
       this.isDragging = true;
-      const { isRightEdge: freezeStart, isLeftEdge: freezeEnd } =
-        this.isGrabbingEdge;
+      const { isRightEdge: freezeStart, isLeftEdge: freezeEnd } = this.isGrabbingEdge;
       const { grabPosition, start, end } = this.draggingStartPosition;
       const isResizing = freezeStart || freezeEnd;
       const { container, zoomedWidth } = this.visualizer;
@@ -307,32 +285,20 @@ export class Segment extends Events<SegmentEvents> {
       const newPosition = currentPosition - grabPosition; //relative to the grabPosition
       const seconds = pixelsToTime(newPosition, zoomedWidth, duration); //seconds adjusted relative to grabPosition
       const timeDiff = end - start; //segment duration
-      const newStart = freezeEnd
-        ? start + seconds
-        : clamp(start + seconds, 0, this.duration - timeDiff);
+      const newStart = freezeEnd ? start + seconds : clamp(start + seconds, 0, this.duration - timeDiff);
       const startTime = freezeStart ? start : newStart;
-      const endTime = freezeEnd
-        ? end
-        : clamp(
-            end + seconds,
-            newStart + (isResizing ? 0 : timeDiff),
-            this.duration,
-          );
+      const endTime = freezeEnd ? end : clamp(end + seconds, newStart + (isResizing ? 0 : timeDiff), this.duration);
 
       if (freezeStart || freezeEnd) this.switchCursor(CursorSymbol.colResize);
       else this.switchCursor(CursorSymbol.grabbing);
 
-      this.updatePosition(
-        clamp(startTime, 0, duration),
-        clamp(endTime, 0, duration),
-      );
+      this.updatePosition(clamp(startTime, 0, duration), clamp(endTime, 0, duration));
     }
   };
 
   private mouseDown = (_: Segment, e: MouseEvent) => {
     if (!this.updateable || !this.controller.layerGroup.isVisible) return;
-    if (this.controller.isOverrideKeyPressed(e) || this.controller.isLocked)
-      return;
+    if (this.controller.isOverrideKeyPressed(e) || this.controller.isLocked) return;
     const { container } = this.visualizer;
     const scrollLeft = this.visualizer.getScrollLeft();
     const x = getCursorPositionX(e, container) + scrollLeft;
@@ -363,13 +329,7 @@ export class Segment extends Events<SegmentEvents> {
       return;
     }
 
-    const {
-      color: _color,
-      selected,
-      highlighted,
-      timelinePlacement,
-      timelineHeight,
-    } = this;
+    const { color: _color, selected, highlighted, timelinePlacement, timelineHeight } = this;
     const { height } = this.visualizer;
 
     const color = _color.clone();
@@ -387,9 +347,7 @@ export class Segment extends Events<SegmentEvents> {
     layer.fillRect(this.xStart, top, this.width, height);
 
     // Render grab lines
-    layer.fillStyle = selected
-      ? color.toString()
-      : color.clone().translucent(0.6).toString();
+    layer.fillStyle = selected ? color.toString() : color.clone().translucent(0.6).toString();
     layer.fillRect(this.xStart, top, this.handleWidth, height);
     layer.fillRect(this.xEnd - this.handleWidth, top, this.handleWidth, height);
   }

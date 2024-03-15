@@ -19,11 +19,7 @@ const UrlNode = (props) => {
       overlap={props.overlap}
       style={style}
     >
-      <a
-        data-position={props.charIndex + props.url.length}
-        href={props.url}
-        target="blank"
-      >
+      <a data-position={props.charIndex + props.url.length} href={props.url} target="blank">
         {props.url}
       </a>
     </HtxTextNode>

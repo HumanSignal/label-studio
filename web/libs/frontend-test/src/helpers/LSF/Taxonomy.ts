@@ -43,9 +43,7 @@ class TaxonomyHelper {
     return this.root.find(this.selectors.input);
   }
   get dropdown() {
-    return this.isNew
-      ? cy.get(this.selectors.dropdown)
-      : this.root.find(this.selectors.dropdown);
+    return this.isNew ? cy.get(this.selectors.dropdown) : this.root.find(this.selectors.dropdown);
   }
   findItem(text) {
     return this.dropdown.contains(this.selectors.item, text).scrollIntoView();

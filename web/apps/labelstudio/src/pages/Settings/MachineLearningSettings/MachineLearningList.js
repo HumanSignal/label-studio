@@ -80,9 +80,7 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
             content={
               <Menu size="small">
                 <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
-                <Menu.Item onClick={() => confirmDelete(backend)}>
-                  Delete
-                </Menu.Item>
+                <Menu.Item onClick={() => confirmDelete(backend)}>Delete</Menu.Item>
               </Menu>
             }
           >
@@ -95,30 +93,18 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
         <DescriptionList.Item term="URL" termStyle={{ whiteSpace: "nowrap" }}>
           {truncate(backend.url, 20, 10, "...")}
         </DescriptionList.Item>
-        {backend.description && (
-          <DescriptionList.Item
-            term="Description"
-            children={backend.description}
-          />
-        )}
+        {backend.description && <DescriptionList.Item term="Description" children={backend.description} />}
         <DescriptionList.Item term="Version">
           {backend.model_version && isValid(backend.model_version)
             ? format(
-                new Date(
-                  Number.isNaN(backend.model_version)
-                    ? backend.model_version
-                    : Number(backend.model_version),
-                ),
+                new Date(Number.isNaN(backend.model_version) ? backend.model_version : Number(backend.model_version)),
                 "MMMM dd, yyyy ∙ HH:mm:ss",
               )
             : backend.model_version || "unknown"}
         </DescriptionList.Item>
       </DescriptionList>
 
-      <Button
-        disabled={backend.state !== "CO"}
-        onClick={() => onStartTrain(backend)}
-      >
+      <Button disabled={backend.state !== "CO"} onClick={() => onStartTrain(backend)}>
         Start Training
       </Button>
     </Card>

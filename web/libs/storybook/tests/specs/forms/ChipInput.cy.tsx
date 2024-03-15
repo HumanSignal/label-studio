@@ -126,9 +126,6 @@ describe("Basic rendering", () => {
 
     input().type("one@example.com{enter}");
 
-    cy.get("@handler").should(
-      "have.been.calledWithMatch",
-      sinon.match(["one@example.com"]),
-    );
+    cy.get("@handler").should("have.been.calledWithMatch", sinon.match(["one@example.com"]));
   });
 });

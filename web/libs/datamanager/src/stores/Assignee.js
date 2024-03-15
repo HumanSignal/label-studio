@@ -6,9 +6,7 @@ export const Assignee = types
   .model("Assignee", {
     id: StringOrNumberID,
     user: types.late(() => types.reference(User)),
-    review: types.maybeNull(
-      types.enumeration(["accepted", "rejected", "fixed"]),
-    ),
+    review: types.maybeNull(types.enumeration(["accepted", "rejected", "fixed"])),
     reviewed: types.maybeNull(types.boolean),
     annotated: types.maybeNull(types.boolean),
   })

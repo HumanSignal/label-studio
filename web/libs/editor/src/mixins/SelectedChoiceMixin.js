@@ -25,9 +25,7 @@ const SelectedChoiceMixin = types.model().views((self) => ({
   hasChoiceSelectionSimple(choiceValue) {
     if (choiceValue?.length) {
       // grab the string value; for taxonomy, it's the last value in the array
-      const selectedValues = self
-        .selectedValues()
-        .map((s) => (Array.isArray(s) ? s.at(-1) : s));
+      const selectedValues = self.selectedValues().map((s) => (Array.isArray(s) ? s.at(-1) : s));
 
       return choiceValue.some((value) => selectedValues.includes(value));
     }
@@ -54,9 +52,7 @@ const SelectedChoiceMixin = types.model().views((self) => ({
             v = item?.alias || item?.value || v;
           }
 
-          return selectedValues
-            .map((s) => (Array.isArray(s) ? s.at(-1) : s))
-            .includes(v);
+          return selectedValues.map((s) => (Array.isArray(s) ? s.at(-1) : s)).includes(v);
         };
 
         return choiceValue.some(includesValue);

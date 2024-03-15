@@ -24,11 +24,7 @@ import styles from "./Panel.module.scss";
 export default observer(({ store }) => {
   const annotation = store.annotationStore.selected;
   const { history } = annotation;
-  const classname = [
-    styles.block,
-    styles.block__controls,
-    store.annotationStore.viewingAll ? styles.hidden : "",
-  ]
+  const classname = [styles.block, styles.block__controls, store.annotationStore.viewingAll ? styles.hidden : ""]
     .filter(Boolean)
     .join(" ");
 
@@ -45,9 +41,7 @@ export default observer(({ store }) => {
           }}
         >
           Undo
-          {store.settings.enableHotkeys && store.settings.enableTooltips && (
-            <Hint>[ Ctrl+z ]</Hint>
-          )}
+          {store.settings.enableHotkeys && store.settings.enableTooltips && <Hint>[ Ctrl+z ]</Hint>}
         </Button>
         <Button
           type="ghost"
@@ -119,13 +113,7 @@ export default observer(({ store }) => {
         />
         <Button
           className="ls-fs"
-          icon={
-            store.settings.fullscreen ? (
-              <FullscreenExitOutlined />
-            ) : (
-              <FullscreenOutlined />
-            )
-          }
+          icon={store.settings.fullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
           onClick={(ev) => {
             store.settings.toggleFullscreen();
             ev.preventDefault();

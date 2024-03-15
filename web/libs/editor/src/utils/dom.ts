@@ -45,11 +45,7 @@ const positioner = (source: HTMLElement, target: HTMLElement) => {
       return sourcePosition.top + sourcePosition.height;
     },
     get horizontalCenter() {
-      return (
-        sourcePosition.left +
-        sourcePosition.width / 2 -
-        targetPosition.width / 2
-      );
+      return sourcePosition.left + sourcePosition.width / 2 - targetPosition.width / 2;
     },
     get horizontalLeft() {
       return sourcePosition.left;
@@ -68,12 +64,7 @@ export type ElementAlignment =
   | "bottom-left"
   | "bottom-right";
 
-export const alignElements = (
-  elem: HTMLElement,
-  target: HTMLElement,
-  align: ElementAlignment,
-  padding = 0,
-) => {
+export const alignElements = (elem: HTMLElement, target: HTMLElement, align: ElementAlignment, padding = 0) => {
   let offsetLeft = 0;
   let offsetTop = 0;
 
@@ -112,10 +103,7 @@ export const alignElements = (
   if (offsetTop < window.scrollX) {
     offsetTop = pos.bottom + padding;
     resultAlign[0] = "bottom";
-  } else if (
-    offsetTop + pos.target.height >
-    window.scrollX + window.innerHeight
-  ) {
+  } else if (offsetTop + pos.target.height > window.scrollX + window.innerHeight) {
     offsetTop = pos.top - padding;
     resultAlign[0] = "top";
   }

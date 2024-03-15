@@ -13,14 +13,7 @@ export const Columns = ({ children, count, size, gap }) => {
     "--column-gap": gap,
   };
 
-  return (
-    <div
-      ref={ref}
-      className={cn("columns")}
-      style={style}
-      children={children}
-    />
-  );
+  return <div ref={ref} className={cn("columns")} style={style} children={children} />;
 };
 
 Columns.Column = ({ title, children }) => {

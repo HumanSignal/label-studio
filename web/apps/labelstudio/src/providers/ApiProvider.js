@@ -1,12 +1,4 @@
-import {
-  createContext,
-  forwardRef,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ErrorWrapper } from "../components/Error/Error";
 import { modal } from "../components/Modal/Modal";
 import { API_CONFIG } from "../config/ApiConfig";
@@ -22,8 +14,7 @@ let apiLocked = false;
 
 const errorFormatter = (result) => {
   const { response } = result;
-  const isShutdown =
-    String(response?.detail ?? result?.error) === "Failed to fetch";
+  const isShutdown = String(response?.detail ?? result?.error) === "Failed to fetch";
 
   return {
     isShutdown,
@@ -72,37 +63,34 @@ const handleError = async (response, showModal = true) => {
 export const ApiProvider = forwardRef(({ children }, ref) => {
   const [error, setError] = useState(null);
 
-  const callApi = useCallback(
-    async (method, { params = {}, errorFilter, ...rest } = {}) => {
-      if (apiLocked) return;
+  const callApi = useCallback(async (method, { params = {}, errorFilter, ...rest } = {}) => {
+    if (apiLocked) return;
 
-      setError(null);
+    setError(null);
 
-      const result = await API[method](params, rest);
+    const result = await API[method](params, rest);
 
-      if (result.status === 401) {
-        apiLocked = true;
-        location.href = absoluteURL("/");
-        return;
+    if (result.status === 401) {
+      apiLocked = true;
+      location.href = absoluteURL("/");
+      return;
+    }
+
+    if (result.error) {
+      const shouldCatchError = errorFilter?.(result) === false;
+
+      if (!errorFilter || shouldCatchError) {
+        setError(result);
+        const isShutdown = await handleError(result, contextValue.showModal);
+
+        apiLocked = apiLocked || isShutdown;
+
+        return null;
       }
+    }
 
-      if (result.error) {
-        const shouldCatchError = errorFilter?.(result) === false;
-
-        if (!errorFilter || shouldCatchError) {
-          setError(result);
-          const isShutdown = await handleError(result, contextValue.showModal);
-
-          apiLocked = apiLocked || isShutdown;
-
-          return null;
-        }
-      }
-
-      return result;
-    },
-    [],
-  );
+    return result;
+  }, []);
 
   const contextValue = useMemo(
     () => ({
@@ -125,9 +113,7 @@ export const ApiProvider = forwardRef(({ children }, ref) => {
     }
   }, [ref]);
 
-  return (
-    <ApiContext.Provider value={contextValue}>{children}</ApiContext.Provider>
-  );
+  return <ApiContext.Provider value={contextValue}>{children}</ApiContext.Provider>;
 });
 
 export const useAPI = () => {

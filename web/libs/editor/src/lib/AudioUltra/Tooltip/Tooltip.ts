@@ -26,9 +26,7 @@ export class Tooltip {
   constructor(options?: TooltipOptions) {
     this.id = `tooltip-${nanoid()}`;
     this.color = options?.color ? rgba(options.color) : this.color;
-    this.backgroundColor = options?.backgroundColor
-      ? rgba(options.backgroundColor)
-      : this.backgroundColor;
+    this.backgroundColor = options?.backgroundColor ? rgba(options.backgroundColor) : this.backgroundColor;
     this.paddingInline = options?.paddingInline ?? this.paddingInline;
     this.paddingBlock = options?.paddingBlock ?? this.paddingBlock;
     this.borderRadius = options?.borderRadius ?? this.borderRadius;
@@ -54,9 +52,7 @@ export class Tooltip {
     const span = document.getElementById(this.id);
 
     this.color = options?.color ? rgba(options.color) : this.color;
-    this.backgroundColor = options?.backgroundColor
-      ? rgba(options.backgroundColor)
-      : this.backgroundColor;
+    this.backgroundColor = options?.backgroundColor ? rgba(options.backgroundColor) : this.backgroundColor;
     this.paddingInline = options?.paddingInline ?? this.paddingInline;
     this.paddingBlock = options?.paddingBlock ?? this.paddingBlock;
     this.borderRadius = options?.borderRadius ?? this.borderRadius;

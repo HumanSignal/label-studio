@@ -2971,10 +2971,8 @@ const store = {
     auth: null,
     data: {
       text: "A U.S. short seller took aim at China’s most valuable sportswear company, accusing it of improper accounting and tr",
-      audio:
-        "https://data.heartex.net/librispeech/dev-clean/3536/8226/3536-8226-0020.flac.wav",
-      image:
-        "https://data.heartex.net/open-images/train_0/mini/00a4080429b17126.jpg",
+      audio: "https://data.heartex.net/librispeech/dev-clean/3536/8226/3536-8226-0020.flac.wav",
+      image: "https://data.heartex.net/open-images/train_0/mini/00a4080429b17126.jpg",
     },
     queue: null,
   },
@@ -6215,8 +6213,7 @@ const store = {
       username: "reviewer",
       email: "reviewer@heartex.com",
       lastActivity: "2022-11-15T18:38:28.281694Z",
-      avatar:
-        "http://localhost:8001/data/avatars/85f82b2b-Screen_Shot_2022-09-28_at_8.12.37_AM.png",
+      avatar: "http://localhost:8001/data/avatars/85f82b2b-Screen_Shot_2022-09-28_at_8.12.37_AM.png",
       initials: "re",
       phone: null,
     },

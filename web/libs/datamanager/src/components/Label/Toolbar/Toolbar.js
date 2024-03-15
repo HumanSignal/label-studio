@@ -22,68 +22,60 @@ import "./Toolbar.styl";
 
 const TOOLTIP_DELAY = 0.8;
 
-export const Toolbar = observer(
-  ({ view, history, lsf, isLabelStream, hasInstruction }) => {
-    const annotation = lsf?.annotationStore?.selected;
+export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruction }) => {
+  const annotation = lsf?.annotationStore?.selected;
 
-    const task = view.dataStore.selected;
+  const task = view.dataStore.selected;
 
-    const { viewingAll: viewAll } = lsf?.annotationStore ?? {};
+  const { viewingAll: viewAll } = lsf?.annotationStore ?? {};
 
-    return lsf?.noTask === false && task ? (
-      <Block name="label-toolbar" mod={{ labelStream: isLabelStream }}>
-        <Elem name="task">
-          <Space size="large">
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <History history={history}>
-                <div style={{ margin: history ? "0 10px" : 0 }}>
-                  Task #{task.id}
-                </div>
-              </History>
-            </div>
+  return lsf?.noTask === false && task ? (
+    <Block name="label-toolbar" mod={{ labelStream: isLabelStream }}>
+      <Elem name="task">
+        <Space size="large">
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <History history={history}>
+              <div style={{ margin: history ? "0 10px" : 0 }}>Task #{task.id}</div>
+            </History>
+          </div>
 
-            {!viewAll && <LSFOperations history={annotation?.history} />}
-          </Space>
-        </Elem>
+          {!viewAll && <LSFOperations history={annotation?.history} />}
+        </Space>
+      </Elem>
 
-        {!!lsf && !!annotation && annotation.type === "annotation" && (
-          <Elem name="actions">
-            {!viewAll && (
-              <SubmissionButtons
-                lsf={lsf}
-                annotation={annotation}
-                isLabelStream={isLabelStream}
-                disabled={lsf.isLoading}
-              />
-            )}
+      {!!lsf && !!annotation && annotation.type === "annotation" && (
+        <Elem name="actions">
+          {!viewAll && (
+            <SubmissionButtons
+              lsf={lsf}
+              annotation={annotation}
+              isLabelStream={isLabelStream}
+              disabled={lsf.isLoading}
+            />
+          )}
 
-            <Elem name="tools">
-              <Space>
-                {hasInstruction && (
-                  <Tooltip title="Labeling Instructions">
-                    <Button
-                      look={lsf.showingDescription ? "primary" : "dashed"}
-                      icon={<Icon icon={FaInfoCircle} />}
-                      onClick={() => lsf.toggleDescription()}
-                    />
-                  </Tooltip>
-                )}
-
-                <Tooltip title="Settings">
+          <Elem name="tools">
+            <Space>
+              {hasInstruction && (
+                <Tooltip title="Labeling Instructions">
                   <Button
-                    look="dashed"
-                    icon={<Icon icon={FaCog} />}
-                    onClick={() => lsf.toggleSettings()}
+                    look={lsf.showingDescription ? "primary" : "dashed"}
+                    icon={<Icon icon={FaInfoCircle} />}
+                    onClick={() => lsf.toggleDescription()}
                   />
                 </Tooltip>
-              </Space>
-            </Elem>
+              )}
+
+              <Tooltip title="Settings">
+                <Button look="dashed" icon={<Icon icon={FaCog} />} onClick={() => lsf.toggleSettings()} />
+              </Tooltip>
+            </Space>
           </Elem>
-        )}
-      </Block>
-    ) : null;
-  },
-);
+        </Elem>
+      )}
+    </Block>
+  ) : null;
+});
 
 const LSFOperations = observer(({ history }) => {
   useShortcut("lsf.undo", () => history?.undo(), {}, [history]);
@@ -91,94 +83,57 @@ const LSFOperations = observer(({ history }) => {
 
   return history ? (
     <Button.Group>
-      <Button
-        icon={<Icon icon={FaUndo} />}
-        disabled={!history.canUndo}
-        onClick={() => history.undo()}
-      />
-      <Button
-        icon={<Icon icon={FaRedo} />}
-        disabled={!history.canRedo}
-        onClick={() => history.redo()}
-      />
-      <Button
-        icon={<Icon icon={FaTrashAlt} />}
-        disabled={!history.canUndo}
-        onClick={() => history.reset()}
-      />
+      <Button icon={<Icon icon={FaUndo} />} disabled={!history.canUndo} onClick={() => history.undo()} />
+      <Button icon={<Icon icon={FaRedo} />} disabled={!history.canRedo} onClick={() => history.redo()} />
+      <Button icon={<Icon icon={FaTrashAlt} />} disabled={!history.canUndo} onClick={() => history.reset()} />
     </Button.Group>
   ) : null;
 });
 
-const SubmissionButtons = observer(
-  ({ lsf, annotation, isLabelStream, disabled }) => {
-    const { userGenerate, sentUserGenerate } = annotation;
-    const isNewTask = userGenerate && !sentUserGenerate;
+const SubmissionButtons = observer(({ lsf, annotation, isLabelStream, disabled }) => {
+  const { userGenerate, sentUserGenerate } = annotation;
+  const isNewTask = userGenerate && !sentUserGenerate;
 
-    const saveAnnotation = React.useCallback(() => {
-      if (!disabled) {
-        isNewTask ? lsf.submitAnnotation() : lsf.updateAnnotation();
-      }
-    }, [disabled, isNewTask, lsf]);
+  const saveAnnotation = React.useCallback(() => {
+    if (!disabled) {
+      isNewTask ? lsf.submitAnnotation() : lsf.updateAnnotation();
+    }
+  }, [disabled, isNewTask, lsf]);
 
-    const skipTask = React.useCallback(() => {
-      if (!disabled) {
-        lsf.skipTask();
-      }
-    }, [disabled, lsf]);
+  const skipTask = React.useCallback(() => {
+    if (!disabled) {
+      lsf.skipTask();
+    }
+  }, [disabled, lsf]);
 
-    const buttons = [];
+  const buttons = [];
 
-    const submitShortcut = useShortcut(
-      "lsf.save-annotation",
-      saveAnnotation,
-      { showShortcut: true },
-      [disabled],
-    );
-    const rejectShortcut = useShortcut(
-      "lsf.reject-task",
-      skipTask,
-      { showShortcut: true },
-      [disabled],
-    );
+  const submitShortcut = useShortcut("lsf.save-annotation", saveAnnotation, { showShortcut: true }, [disabled]);
+  const rejectShortcut = useShortcut("lsf.reject-task", skipTask, { showShortcut: true }, [disabled]);
 
-    buttons.push(
-      <Tooltip
-        key="skip"
-        title={rejectShortcut}
-        mouseEnterDelay={TOOLTIP_DELAY}
+  buttons.push(
+    <Tooltip key="skip" title={rejectShortcut} mouseEnterDelay={TOOLTIP_DELAY}>
+      <Button look="danger" onClick={skipTask} disabled={disabled} icon={<Icon icon={FaBan} />}>
+        Skip
+      </Button>
+    </Tooltip>,
+  );
+
+  buttons.push(
+    <Tooltip key="submit" title={submitShortcut} mouseEnterDelay={TOOLTIP_DELAY}>
+      <Button
+        look="primary"
+        disabled={disabled}
+        icon={<Icon icon={isNewTask ? FaCheck : FaCheckCircle} />}
+        onClick={saveAnnotation}
       >
-        <Button
-          look="danger"
-          onClick={skipTask}
-          disabled={disabled}
-          icon={<Icon icon={FaBan} />}
-        >
-          Skip
-        </Button>
-      </Tooltip>,
-    );
+        {isNewTask || isLabelStream ? "Submit" : "Update"}
+      </Button>
+    </Tooltip>,
+  );
 
-    buttons.push(
-      <Tooltip
-        key="submit"
-        title={submitShortcut}
-        mouseEnterDelay={TOOLTIP_DELAY}
-      >
-        <Button
-          look="primary"
-          disabled={disabled}
-          icon={<Icon icon={isNewTask ? FaCheck : FaCheckCircle} />}
-          onClick={saveAnnotation}
-        >
-          {isNewTask || isLabelStream ? "Submit" : "Update"}
-        </Button>
-      </Tooltip>,
-    );
-
-    return <Space>{buttons}</Space>;
-  },
-);
+  return <Space>{buttons}</Space>;
+});
 
 const HistoryButton = ({ children, ...rest }) => (
   <Button {...rest} shape="circle">
@@ -207,17 +162,9 @@ const History = observer(({ history, children }) => {
 
   return renderable ? (
     <React.Fragment>
-      <HistoryButton
-        disabled={!canGoBack}
-        onClick={() => history.goBackward()}
-        icon={<Icon icon={FaArrowLeft} />}
-      />
+      <HistoryButton disabled={!canGoBack} onClick={() => history.goBackward()} icon={<Icon icon={FaArrowLeft} />} />
       {children}
-      <HistoryButton
-        disabled={!canGoForward}
-        onClick={() => history.goForward()}
-        icon={<Icon icon={FaArrowRight} />}
-      />
+      <HistoryButton disabled={!canGoForward} onClick={() => history.goForward()} icon={<Icon icon={FaArrowRight} />} />
     </React.Fragment>
   ) : (
     children

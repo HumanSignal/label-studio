@@ -37,9 +37,7 @@ export const Seeker: FC<SeekerProps> = ({
 
   // The indicator width is set wider by 1.5, to account for the pixel sizing of the position indicator width and placement
   // to align better with the viewable timeline scroll.
-  const width = `${
-    ((Math.ceil(seekVisible) - Math.floor(leftOffset) + 1.5) / length) * 100
-  }%`;
+  const width = `${((Math.ceil(seekVisible) - Math.floor(leftOffset) + 1.5) / length) * 100}%`;
   const offsetLimit = length - (seekVisible - leftOffset);
   const windowOffset = `${(Math.min(seekOffset, offsetLimit) / length) * 100}%`;
   const seekerOffset = (position / length) * 100;
@@ -55,11 +53,7 @@ export const Seeker: FC<SeekerProps> = ({
       const parentWidth = dimensions.width;
       const limit = parentWidth - indicatorWidth;
 
-      const jump = clamp(
-        Math.ceil(length * (startOffset / parentWidth)),
-        0,
-        limit,
-      );
+      const jump = clamp(Math.ceil(length * (startOffset / parentWidth)), 0, limit);
 
       onIndicatorMove?.(jump);
 
@@ -134,18 +128,8 @@ export const Seeker: FC<SeekerProps> = ({
   return (
     <Block name="seeker" ref={rootRef} onMouseDown={onDrag}>
       <Elem name="track" />
-      {showIndicator && (
-        <Elem
-          name="indicator"
-          ref={viewRef}
-          style={{ left: windowOffset, width }}
-        />
-      )}
-      <Elem
-        name="position"
-        ref={seekerRef}
-        style={{ left: `${seekerOffset}%` }}
-      />
+      {showIndicator && <Elem name="indicator" ref={viewRef} style={{ left: windowOffset, width }} />}
+      <Elem name="position" ref={seekerRef} style={{ left: `${seekerOffset}%` }} />
       <Elem name="minimap">{minimap}</Elem>
     </Block>
   );

@@ -11,25 +11,18 @@ const { localStorage } = window;
 const localStoreName = "collapsed-label-pos";
 
 export const LabelList = observer(({ regionStore }) => {
-  const treeData = regionStore.asLabelsTree(
-    (item, idx, isLabel, children, onClick) => {
-      return {
-        key: item.id,
-        title: (data) => {
-          return isLabel ? (
-            <LabelItem
-              item={item}
-              idx={idx}
-              regions={data.children}
-              regionStore={regionStore}
-            />
-          ) : (
-            <RegionItem item={item} idx={idx} onClick={onClick} />
-          );
-        },
-      };
-    },
-  );
+  const treeData = regionStore.asLabelsTree((item, idx, isLabel, children, onClick) => {
+    return {
+      key: item.id,
+      title: (data) => {
+        return isLabel ? (
+          <LabelItem item={item} idx={idx} regions={data.children} regionStore={regionStore} />
+        ) : (
+          <RegionItem item={item} idx={idx} onClick={onClick} />
+        );
+      },
+    };
+  });
 
   if (isFF(FF_DEV_2755)) {
     const [collapsedPos, setCollapsedPos] = useState(
@@ -56,10 +49,7 @@ export const LabelList = observer(({ regionStore }) => {
       setCollapsedPos(newCollapsedPos);
       updateLocalStorage(newCollapsedPos);
     };
-    const expandedKeys =
-      treeData
-        .filter((item) => !collapsedPos.includes(item.pos))
-        .map((item) => item.key) ?? [];
+    const expandedKeys = treeData.filter((item) => !collapsedPos.includes(item.pos)).map((item) => item.key) ?? [];
 
     return (
       <Tree
@@ -70,9 +60,7 @@ export const LabelList = observer(({ regionStore }) => {
         defaultExpandAll={true}
         autoExpandParent={true}
         expandedKeys={expandedKeys}
-        switcherIcon={
-          <LsChevron className={styles.switcherIcon} opacity="0.25" />
-        }
+        switcherIcon={<LsChevron className={styles.switcherIcon} opacity="0.25" />}
         onExpand={(internalExpandedKeys, { node }) => {
           const region = treeData.find((region) => region.key === node.key);
           const pos = region.pos;

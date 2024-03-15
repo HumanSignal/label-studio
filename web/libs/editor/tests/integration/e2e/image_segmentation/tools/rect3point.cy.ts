@@ -1,12 +1,6 @@
 import { ImageView, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
-import {
-  FF_DEV_2132,
-  FF_DEV_3793,
-} from "../../../../../src/utils/feature-flags";
-import {
-  rect3Config,
-  simpleImageData,
-} from "../../../data/image_segmentation/tools/rect3point";
+import { FF_DEV_2132, FF_DEV_3793 } from "../../../../../src/utils/feature-flags";
+import { rect3Config, simpleImageData } from "../../../data/image_segmentation/tools/rect3point";
 
 describe("Rect3Point tool", () => {
   beforeEach(() => {
@@ -16,11 +10,7 @@ describe("Rect3Point tool", () => {
     });
   });
   it("Should be able to draw region with rotation 0", () => {
-    LabelStudio.params()
-      .config(rect3Config)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -39,11 +29,7 @@ describe("Rect3Point tool", () => {
     });
   });
   it("Should be able to draw region with rotation 90", () => {
-    LabelStudio.params()
-      .config(rect3Config)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -60,11 +46,7 @@ describe("Rect3Point tool", () => {
     });
   });
   it("Should be able to draw region with rotation 180", () => {
-    LabelStudio.params()
-      .config(rect3Config)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -83,11 +65,7 @@ describe("Rect3Point tool", () => {
     });
   });
   it("Should be able to draw region with rotation 270", () => {
-    LabelStudio.params()
-      .config(rect3Config)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -104,11 +82,7 @@ describe("Rect3Point tool", () => {
     });
   });
   it("Should be able to draw region with rotation 45+90*k deg", () => {
-    LabelStudio.params()
-      .config(rect3Config)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -138,11 +112,7 @@ describe("Rect3Point tool", () => {
     });
   });
   it("Should display line of zero height (2 points)", () => {
-    LabelStudio.params()
-      .config(rect3Config)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -155,11 +125,7 @@ describe("Rect3Point tool", () => {
     ImageView.canvasShouldChange("canvas", 0);
   });
   it("Should draw by dblclick at the target point", () => {
-    LabelStudio.params()
-      .config(rect3Config)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 

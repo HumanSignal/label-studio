@@ -1,15 +1,7 @@
 import { Tooltip } from "antd";
 import { when } from "mobx";
 import { inject, observer } from "mobx-react";
-import {
-  type FC,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   IconAnnotationAccepted,
   IconAnnotationImported,
@@ -118,18 +110,11 @@ const AnnotationHistoryComponent: FC<any> = ({
 
   // if user makes changes at the first time there are no draft yet
   const isDraftSelected =
-    !annotationStore.selectedHistory &&
-    (annotation.draftSelected || (!annotation.versions.draft && hasChanges));
+    !annotationStore.selectedHistory && (annotation.draftSelected || (!annotation.versions.draft && hasChanges));
 
   return (
     <Block name="annotation-history" mod={{ inline }}>
-      {showDraft && (
-        <DraftState
-          annotation={annotation}
-          isSelected={isDraftSelected}
-          inline={inline}
-        />
-      )}
+      {showDraft && <DraftState annotation={annotation} isSelected={isDraftSelected} inline={inline} />}
 
       {enabled &&
         history.length > 0 &&
@@ -137,9 +122,7 @@ const AnnotationHistoryComponent: FC<any> = ({
           const { id, user, createdDate } = item;
           const isLastItem = lastItem?.id === item.id;
           const isSelected =
-            isLastItem && !selectedHistory && showDraft
-              ? !isDraftSelected
-              : selectedHistory?.id === item.id;
+            isLastItem && !selectedHistory && showDraft ? !isDraftSelected : selectedHistory?.id === item.id;
 
           return (
             <HistoryItem
@@ -242,11 +225,7 @@ const HistoryItemComponent: FC<{
   );
 
   return (
-    <Block
-      name="history-item"
-      mod={{ inline, selected, disabled }}
-      onClick={handleClick}
-    >
+    <Block name="history-item" mod={{ inline, selected, disabled }} onClick={handleClick}>
       <Space spread size="medium" truncated>
         <Space size="small" truncated>
           <Elem
@@ -268,10 +247,7 @@ const HistoryItemComponent: FC<{
           {extra && <Elem name="date">{extra}</Elem>}
           {date && (
             <Elem name="date">
-              <Tooltip
-                placement="topRight"
-                title={new Date(date).toLocaleString()}
-              >
+              <Tooltip placement="topRight" title={new Date(date).toLocaleString()}>
                 {humanDateDiff(date)}
               </Tooltip>
             </Elem>
@@ -309,10 +285,7 @@ const HistoryComment: FC<{
 
   return (
     <Elem name="comment" ref={commentRef} mod={{ collapsed }}>
-      <Elem
-        name="comment-content"
-        data-reason={`${reason}${comment ? ": " : ""}`}
-      >
+      <Elem name="comment-content" data-reason={`${reason}${comment ? ": " : ""}`}>
         {comment}
       </Elem>
 

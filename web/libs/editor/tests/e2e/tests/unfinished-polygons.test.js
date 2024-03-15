@@ -33,394 +33,367 @@ const FLAGS = {
   ff_front_dev_2432_auto_save_polygon_draft_210622_short: true,
 };
 
-Scenario(
-  "Drafts for unfinished polygons",
-  async ({ I, LabelStudio, AtLabels, AtImageView }) => {
-    I.amOnPage("/");
-    LabelStudio.init({
-      config: CONFIG,
-      data: {
-        image: IMAGE,
-      },
-      params: {
-        onSubmitDraft: saveDraftLocally,
-      },
-    });
-    LabelStudio.setFeatureFlags(FLAGS);
+Scenario("Drafts for unfinished polygons", async ({ I, LabelStudio, AtLabels, AtImageView }) => {
+  I.amOnPage("/");
+  LabelStudio.init({
+    config: CONFIG,
+    data: {
+      image: IMAGE,
+    },
+    params: {
+      onSubmitDraft: saveDraftLocally,
+    },
+  });
+  LabelStudio.setFeatureFlags(FLAGS);
 
-    AtImageView.waitForImage();
+  AtImageView.waitForImage();
 
-    await AtImageView.lookForStage();
+  await AtImageView.lookForStage();
 
-    I.say("start drawing polygon without finishing it");
-    AtLabels.clickLabel("Hello");
-    AtImageView.drawByClickingPoints([
-      [50, 50],
-      [100, 50],
-      [100, 80],
-    ]);
+  I.say("start drawing polygon without finishing it");
+  AtLabels.clickLabel("Hello");
+  AtImageView.drawByClickingPoints([
+    [50, 50],
+    [100, 50],
+    [100, 80],
+  ]);
 
-    I.say("wait until autosave");
-    I.waitForFunction(() => !!window.LSDraft, 0.5);
-    I.say("check result");
-    const draft = await I.executeScript(getLocallySavedDraft);
+  I.say("wait until autosave");
+  I.waitForFunction(() => !!window.LSDraft, 0.5);
+  I.say("check result");
+  const draft = await I.executeScript(getLocallySavedDraft);
 
-    assert.strictEqual(draft[0].value.points.length, 3);
-    assert.strictEqual(draft[0].value.closed, false);
-  },
-);
+  assert.strictEqual(draft[0].value.points.length, 3);
+  assert.strictEqual(draft[0].value.closed, false);
+});
 
-Scenario(
-  "Saving polygon drawing steps to history",
-  async ({ I, LabelStudio, AtLabels, AtImageView }) => {
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags(FLAGS);
-    LabelStudio.init({
-      config: CONFIG,
-      data: {
-        image: IMAGE,
-      },
-    });
+Scenario("Saving polygon drawing steps to history", async ({ I, LabelStudio, AtLabels, AtImageView }) => {
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags(FLAGS);
+  LabelStudio.init({
+    config: CONFIG,
+    data: {
+      image: IMAGE,
+    },
+  });
 
-    AtImageView.waitForImage();
+  AtImageView.waitForImage();
 
-    await AtImageView.lookForStage();
+  await AtImageView.lookForStage();
 
-    I.say("put one point of polygon");
-    AtLabels.clickLabel("Hello");
-    AtImageView.drawByClick(50, 50);
+  I.say("put one point of polygon");
+  AtLabels.clickLabel("Hello");
+  AtImageView.drawByClick(50, 50);
 
-    I.say("check current history size");
-    let historyStepsCount = await I.executeScript(
-      () => window.Htx.annotationStore.selected.history.history.length,
-    );
+  I.say("check current history size");
+  let historyStepsCount = await I.executeScript(() => window.Htx.annotationStore.selected.history.history.length);
 
-    assert.strictEqual(historyStepsCount, 2);
+  assert.strictEqual(historyStepsCount, 2);
 
-    I.say("try to draw some more points and close polygon");
-    AtImageView.drawByClick(100, 50);
-    AtImageView.drawByClick(125, 100);
-    AtImageView.drawByClick(50, 50);
+  I.say("try to draw some more points and close polygon");
+  AtImageView.drawByClick(100, 50);
+  AtImageView.drawByClick(125, 100);
+  AtImageView.drawByClick(50, 50);
 
-    I.say("check current history size and result");
-    historyStepsCount = await I.executeScript(
-      () => window.Htx.annotationStore.selected.history.history.length,
-    );
-    assert.strictEqual(historyStepsCount, 5);
-    let result = await LabelStudio.serialize();
+  I.say("check current history size and result");
+  historyStepsCount = await I.executeScript(() => window.Htx.annotationStore.selected.history.history.length);
+  assert.strictEqual(historyStepsCount, 5);
+  let result = await LabelStudio.serialize();
 
-    assert.strictEqual(result[0].value.points.length, 3);
-    assert.strictEqual(result[0].value.closed, true);
+  assert.strictEqual(result[0].value.points.length, 3);
+  assert.strictEqual(result[0].value.closed, true);
 
-    I.say("try to undo closing and 2 last points");
-    I.click("button[aria-label=Undo]");
-    I.click("button[aria-label=Undo]");
-    I.click("button[aria-label=Undo]");
-    I.say("check current history index and result");
-    historyStepsCount = await I.executeScript(
-      () => window.Htx.annotationStore.selected.history.undoIdx,
-    );
-    assert.strictEqual(historyStepsCount, 1);
-    result = await LabelStudio.serialize();
-    assert.strictEqual(result[0].value.points.length, 1);
-    assert.strictEqual(result[0].value.closed, false);
-  },
-);
+  I.say("try to undo closing and 2 last points");
+  I.click("button[aria-label=Undo]");
+  I.click("button[aria-label=Undo]");
+  I.click("button[aria-label=Undo]");
+  I.say("check current history index and result");
+  historyStepsCount = await I.executeScript(() => window.Htx.annotationStore.selected.history.undoIdx);
+  assert.strictEqual(historyStepsCount, 1);
+  result = await LabelStudio.serialize();
+  assert.strictEqual(result[0].value.points.length, 1);
+  assert.strictEqual(result[0].value.closed, false);
+});
 
-Scenario(
-  "Init an annotation with old format of closed polygon result",
-  async ({ I, LabelStudio, AtImageView }) => {
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags(FLAGS);
-    LabelStudio.init({
-      config: CONFIG,
-      data: {
-        image: IMAGE,
-      },
-      annotations: [
-        {
-          id: "test",
-          result: [
-            {
-              original_width: 2242,
-              original_height: 2802,
-              image_rotation: 0,
-              value: {
-                points: [
-                  [22.38442822384428, 27.042801556420233],
-                  [77.61557177615572, 24.90272373540856],
-                  [48.90510948905109, 76.07003891050584],
-                ],
-                polygonlabels: ["Hello"],
-              },
-              id: "tNe7Bjmydb",
-              from_name: "tag",
-              to_name: "img",
-              type: "polygonlabels",
-              origin: "manual",
+Scenario("Init an annotation with old format of closed polygon result", async ({ I, LabelStudio, AtImageView }) => {
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags(FLAGS);
+  LabelStudio.init({
+    config: CONFIG,
+    data: {
+      image: IMAGE,
+    },
+    annotations: [
+      {
+        id: "test",
+        result: [
+          {
+            original_width: 2242,
+            original_height: 2802,
+            image_rotation: 0,
+            value: {
+              points: [
+                [22.38442822384428, 27.042801556420233],
+                [77.61557177615572, 24.90272373540856],
+                [48.90510948905109, 76.07003891050584],
+              ],
+              polygonlabels: ["Hello"],
             },
-          ],
-        },
-      ],
-    });
-
-    AtImageView.waitForImage();
-
-    const result = await LabelStudio.serialize();
-
-    assert.strictEqual(result[0].value.points.length, 3);
-    assert.strictEqual(result[0].value.closed, true);
-  },
-);
-
-Scenario(
-  "Init an annotation with result of new format of polygon results",
-  async ({ I, LabelStudio, AtImageView }) => {
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags(FLAGS);
-    LabelStudio.init({
-      config: CONFIG,
-      data: {
-        image: IMAGE,
+            id: "tNe7Bjmydb",
+            from_name: "tag",
+            to_name: "img",
+            type: "polygonlabels",
+            origin: "manual",
+          },
+        ],
       },
-      annotations: [
-        {
-          id: "test",
-          result: [
-            {
-              original_width: 2242,
-              original_height: 2802,
-              image_rotation: 0,
-              value: {
-                points: [
-                  [40, 40],
-                  [50, 40],
-                  [50, 50],
-                  [40, 50],
-                ],
-                closed: true,
-                polygonlabels: ["World"],
-              },
-              id: "tNe7Bjmydb_2",
-              from_name: "tag",
-              to_name: "img",
-              type: "polygonlabels",
-              origin: "manual",
+    ],
+  });
+
+  AtImageView.waitForImage();
+
+  const result = await LabelStudio.serialize();
+
+  assert.strictEqual(result[0].value.points.length, 3);
+  assert.strictEqual(result[0].value.closed, true);
+});
+
+Scenario("Init an annotation with result of new format of polygon results", async ({ I, LabelStudio, AtImageView }) => {
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags(FLAGS);
+  LabelStudio.init({
+    config: CONFIG,
+    data: {
+      image: IMAGE,
+    },
+    annotations: [
+      {
+        id: "test",
+        result: [
+          {
+            original_width: 2242,
+            original_height: 2802,
+            image_rotation: 0,
+            value: {
+              points: [
+                [40, 40],
+                [50, 40],
+                [50, 50],
+                [40, 50],
+              ],
+              closed: true,
+              polygonlabels: ["World"],
             },
-            {
-              original_width: 2242,
-              original_height: 2802,
-              image_rotation: 0,
-              value: {
-                points: [
-                  [10, 10],
-                  [30, 10],
-                  [20, 20],
-                ],
-                closed: false,
-                polygonlabels: ["Hello"],
-              },
-              id: "tNe7Bjmydb",
-              from_name: "tag",
-              to_name: "img",
-              type: "polygonlabels",
-              origin: "manual",
+            id: "tNe7Bjmydb_2",
+            from_name: "tag",
+            to_name: "img",
+            type: "polygonlabels",
+            origin: "manual",
+          },
+          {
+            original_width: 2242,
+            original_height: 2802,
+            image_rotation: 0,
+            value: {
+              points: [
+                [10, 10],
+                [30, 10],
+                [20, 20],
+              ],
+              closed: false,
+              polygonlabels: ["Hello"],
             },
-          ],
-        },
-      ],
-    });
-
-    AtImageView.waitForImage();
-
-    I.say("check loaded regions");
-    let result = await LabelStudio.serialize();
-
-    assert.strictEqual(result.length, 2);
-    assert.strictEqual(result[0].value.points.length, 4);
-    assert.strictEqual(result[0].value.closed, true);
-    assert.strictEqual(result[1].value.points.length, 3);
-    assert.strictEqual(result[1].value.closed, false);
-
-    I.say("try to continue drawing loaded unfinished region");
-    await AtImageView.lookForStage();
-    const canvasSize = await AtImageView.getCanvasSize();
-
-    AtImageView.drawByClick(canvasSize.width * 0.1, canvasSize.height * 0.4);
-    result = await LabelStudio.serialize();
-    assert.strictEqual(result[1].value.points.length, 4);
-    assert.strictEqual(result[1].value.closed, false);
-
-    I.say("try to close loaded region");
-    AtImageView.drawByClick(canvasSize.width * 0.1, canvasSize.height * 0.1);
-    result = await LabelStudio.serialize();
-    assert.strictEqual(result[1].value.points.length, 4);
-    assert.strictEqual(result[1].value.closed, true);
-
-    // I.say("check that it is possible to go back throught history");
-    // I.pressKey(['CommandOrControl', 'Z']);
-    // result = await LabelStudio.serialize();
-    // assert.strictEqual(result[1].value.points.length, 4);
-    // assert.strictEqual(result[1].value.closed, false);
-    //
-    // I.say("check that it is possible to close this region again");
-    // AtImageView.drawByClick(canvasSize.width * .10, canvasSize.height * .10);
-    // result = await LabelStudio.serialize();
-    // assert.strictEqual(result[1].value.points.length, 4);
-    // assert.strictEqual(result[1].value.closed, true);
-  },
-);
-
-Scenario(
-  "Removing a polygon by going back through history",
-  async ({ I, LabelStudio, AtLabels, AtImageView }) => {
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags(FLAGS);
-    LabelStudio.init({
-      config: CONFIG,
-      data: {
-        image: IMAGE,
+            id: "tNe7Bjmydb",
+            from_name: "tag",
+            to_name: "img",
+            type: "polygonlabels",
+            origin: "manual",
+          },
+        ],
       },
-      params: {
-        onSubmitDraft: saveDraftLocally,
-      },
-    });
+    ],
+  });
 
-    AtImageView.waitForImage();
+  AtImageView.waitForImage();
 
-    await AtImageView.lookForStage();
+  I.say("check loaded regions");
+  let result = await LabelStudio.serialize();
 
-    I.say("start drawing polygon");
-    AtLabels.clickLabel("Hello");
-    AtImageView.drawByClickingPoints([
-      [50, 50],
-      [100, 50],
-    ]);
+  assert.strictEqual(result.length, 2);
+  assert.strictEqual(result[0].value.points.length, 4);
+  assert.strictEqual(result[0].value.closed, true);
+  assert.strictEqual(result[1].value.points.length, 3);
+  assert.strictEqual(result[1].value.closed, false);
 
-    I.say("revert all changes and creating of the region");
-    I.pressKey(["CommandOrControl", "Z"]);
-    I.pressKey(["CommandOrControl", "Z"]);
+  I.say("try to continue drawing loaded unfinished region");
+  await AtImageView.lookForStage();
+  const canvasSize = await AtImageView.getCanvasSize();
 
-    I.say("polygon should disappear and polygon tool should be switched of");
-    let result = await LabelStudio.serialize();
+  AtImageView.drawByClick(canvasSize.width * 0.1, canvasSize.height * 0.4);
+  result = await LabelStudio.serialize();
+  assert.strictEqual(result[1].value.points.length, 4);
+  assert.strictEqual(result[1].value.closed, false);
 
-    assert.strictEqual(result.length, 0);
+  I.say("try to close loaded region");
+  AtImageView.drawByClick(canvasSize.width * 0.1, canvasSize.height * 0.1);
+  result = await LabelStudio.serialize();
+  assert.strictEqual(result[1].value.points.length, 4);
+  assert.strictEqual(result[1].value.closed, true);
 
-    I.say("try to draw after that");
-    AtImageView.drawByClickingPoints([
-      [50, 50],
-      [100, 50],
-    ]);
+  // I.say("check that it is possible to go back throught history");
+  // I.pressKey(['CommandOrControl', 'Z']);
+  // result = await LabelStudio.serialize();
+  // assert.strictEqual(result[1].value.points.length, 4);
+  // assert.strictEqual(result[1].value.closed, false);
+  //
+  // I.say("check that it is possible to close this region again");
+  // AtImageView.drawByClick(canvasSize.width * .10, canvasSize.height * .10);
+  // result = await LabelStudio.serialize();
+  // assert.strictEqual(result[1].value.points.length, 4);
+  // assert.strictEqual(result[1].value.closed, true);
+});
 
-    I.say("check if it was possible to do this (it shouldn't)");
-    result = await LabelStudio.serialize();
-    assert.strictEqual(result.length, 0);
+Scenario("Removing a polygon by going back through history", async ({ I, LabelStudio, AtLabels, AtImageView }) => {
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags(FLAGS);
+  LabelStudio.init({
+    config: CONFIG,
+    data: {
+      image: IMAGE,
+    },
+    params: {
+      onSubmitDraft: saveDraftLocally,
+    },
+  });
 
-    I.say("check if there were any errors");
-    // The potential errors should be caught by `errorsCollector` plugin
-  },
-);
+  AtImageView.waitForImage();
 
-Scenario(
-  "Continue annotating after closing region from draft",
-  async ({ I, LabelStudio, AtLabels, AtImageView }) => {
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags(FLAGS);
-    LabelStudio.init({
-      config: CONFIG,
-      data: {
-        image: IMAGE,
-      },
-      annotations: [
-        {
-          id: "test",
-          result: [
-            {
-              original_width: 2242,
-              original_height: 2802,
-              image_rotation: 0,
-              value: {
-                points: [
-                  [10, 10],
-                  [30, 10],
-                  [20, 20],
-                ],
-                closed: false,
-                polygonlabels: ["Hello"],
-              },
-              id: "tNe7Bjmydb",
-              from_name: "tag",
-              to_name: "img",
-              type: "polygonlabels",
-              origin: "manual",
+  await AtImageView.lookForStage();
+
+  I.say("start drawing polygon");
+  AtLabels.clickLabel("Hello");
+  AtImageView.drawByClickingPoints([
+    [50, 50],
+    [100, 50],
+  ]);
+
+  I.say("revert all changes and creating of the region");
+  I.pressKey(["CommandOrControl", "Z"]);
+  I.pressKey(["CommandOrControl", "Z"]);
+
+  I.say("polygon should disappear and polygon tool should be switched of");
+  let result = await LabelStudio.serialize();
+
+  assert.strictEqual(result.length, 0);
+
+  I.say("try to draw after that");
+  AtImageView.drawByClickingPoints([
+    [50, 50],
+    [100, 50],
+  ]);
+
+  I.say("check if it was possible to do this (it shouldn't)");
+  result = await LabelStudio.serialize();
+  assert.strictEqual(result.length, 0);
+
+  I.say("check if there were any errors");
+  // The potential errors should be caught by `errorsCollector` plugin
+});
+
+Scenario("Continue annotating after closing region from draft", async ({ I, LabelStudio, AtLabels, AtImageView }) => {
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags(FLAGS);
+  LabelStudio.init({
+    config: CONFIG,
+    data: {
+      image: IMAGE,
+    },
+    annotations: [
+      {
+        id: "test",
+        result: [
+          {
+            original_width: 2242,
+            original_height: 2802,
+            image_rotation: 0,
+            value: {
+              points: [
+                [10, 10],
+                [30, 10],
+                [20, 20],
+              ],
+              closed: false,
+              polygonlabels: ["Hello"],
             },
-          ],
-        },
-      ],
-    });
-
-    AtImageView.waitForImage();
-    await AtImageView.lookForStage();
-    const canvasSize = await AtImageView.getCanvasSize();
-
-    I.say("close loaded region");
-    AtImageView.drawByClick(canvasSize.width * 0.1, canvasSize.height * 0.1);
-
-    I.say("try to create another region");
-    AtLabels.clickLabel("World");
-
-    AtImageView.drawByClickingPoints([
-      [canvasSize.width * 0.4, canvasSize.height * 0.4],
-      [canvasSize.width * 0.5, canvasSize.height * 0.4],
-      [canvasSize.width * 0.5, canvasSize.height * 0.5],
-      [canvasSize.width * 0.4, canvasSize.height * 0.5],
-      [canvasSize.width * 0.4, canvasSize.height * 0.4],
-    ]);
-
-    const result = await LabelStudio.serialize();
-
-    assert.strictEqual(result.length, 2);
-    assert.strictEqual(result[1].value.points.length, 4);
-    assert.strictEqual(result[1].value.closed, true);
-  },
-);
-
-Scenario(
-  "Change label on unfinished polygons",
-  async ({ I, LabelStudio, AtLabels, AtImageView }) => {
-    I.amOnPage("/");
-    LabelStudio.init({
-      config: CONFIG,
-      data: {
-        image: IMAGE,
+            id: "tNe7Bjmydb",
+            from_name: "tag",
+            to_name: "img",
+            type: "polygonlabels",
+            origin: "manual",
+          },
+        ],
       },
-      params: {
-        onSubmitDraft: saveDraftLocally,
-      },
-    });
-    LabelStudio.setFeatureFlags(FLAGS);
+    ],
+  });
 
-    AtImageView.waitForImage();
+  AtImageView.waitForImage();
+  await AtImageView.lookForStage();
+  const canvasSize = await AtImageView.getCanvasSize();
 
-    await AtImageView.lookForStage();
+  I.say("close loaded region");
+  AtImageView.drawByClick(canvasSize.width * 0.1, canvasSize.height * 0.1);
 
-    I.say("start drawing polygon without finishing it");
-    AtLabels.clickLabel("Hello");
-    AtImageView.drawByClickingPoints([
-      [50, 50],
-      [100, 50],
-      [100, 80],
-    ]);
-    AtLabels.clickLabel("World");
+  I.say("try to create another region");
+  AtLabels.clickLabel("World");
 
-    I.say("wait until autosave");
-    I.waitForFunction(() => !!window.LSDraft, 0.5);
-    I.say("check result");
-    const draft = await I.executeScript(getLocallySavedDraft);
+  AtImageView.drawByClickingPoints([
+    [canvasSize.width * 0.4, canvasSize.height * 0.4],
+    [canvasSize.width * 0.5, canvasSize.height * 0.4],
+    [canvasSize.width * 0.5, canvasSize.height * 0.5],
+    [canvasSize.width * 0.4, canvasSize.height * 0.5],
+    [canvasSize.width * 0.4, canvasSize.height * 0.4],
+  ]);
 
-    assert.strictEqual(draft[0].value.polygonlabels[0], "World");
-  },
-);
+  const result = await LabelStudio.serialize();
+
+  assert.strictEqual(result.length, 2);
+  assert.strictEqual(result[1].value.points.length, 4);
+  assert.strictEqual(result[1].value.closed, true);
+});
+
+Scenario("Change label on unfinished polygons", async ({ I, LabelStudio, AtLabels, AtImageView }) => {
+  I.amOnPage("/");
+  LabelStudio.init({
+    config: CONFIG,
+    data: {
+      image: IMAGE,
+    },
+    params: {
+      onSubmitDraft: saveDraftLocally,
+    },
+  });
+  LabelStudio.setFeatureFlags(FLAGS);
+
+  AtImageView.waitForImage();
+
+  await AtImageView.lookForStage();
+
+  I.say("start drawing polygon without finishing it");
+  AtLabels.clickLabel("Hello");
+  AtImageView.drawByClickingPoints([
+    [50, 50],
+    [100, 50],
+    [100, 80],
+  ]);
+  AtLabels.clickLabel("World");
+
+  I.say("wait until autosave");
+  I.waitForFunction(() => !!window.LSDraft, 0.5);
+  I.say("check result");
+  const draft = await I.executeScript(getLocallySavedDraft);
+
+  assert.strictEqual(draft[0].value.polygonlabels[0], "World");
+});
 
 const selectedLabelsVariants = new DataTable(["labels"]);
 
@@ -471,9 +444,7 @@ Data(selectedLabelsVariants).Scenario(
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();
 
-    I.say(
-      "check if we see an indication of selected labels after resuming from draft",
-    );
+    I.say("check if we see an indication of selected labels after resuming from draft");
     for (const label of labels) {
       AtLabels.seeSelectedLabel(label);
     }
@@ -481,16 +452,12 @@ Data(selectedLabelsVariants).Scenario(
     I.say("close loaded region");
     AtImageView.drawByClick(canvasSize.width * 0.1, canvasSize.height * 0.1);
 
-    I.say(
-      "check that we do not see an indication of selected after region completion",
-    );
+    I.say("check that we do not see an indication of selected after region completion");
     for (const label of labels) {
       AtLabels.dontSeeSelectedLabel(label);
     }
 
-    I.say(
-      "check if we see an indication of selected labels after going back through the history",
-    );
+    I.say("check if we see an indication of selected labels after going back through the history");
     I.pressKey(["CommandOrControl", "Z"]);
     for (const label of labels) {
       AtLabels.seeSelectedLabel(label);
@@ -498,10 +465,7 @@ Data(selectedLabelsVariants).Scenario(
   },
 );
 
-const selectedPolygonAfterCreatingVariants = new DataTable([
-  "shouldSelect",
-  "description",
-]);
+const selectedPolygonAfterCreatingVariants = new DataTable(["shouldSelect", "description"]);
 
 selectedPolygonAfterCreatingVariants.add([false, "Without set setting"]);
 selectedPolygonAfterCreatingVariants.add([true, "With set setting"]);

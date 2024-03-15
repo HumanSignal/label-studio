@@ -31,10 +31,7 @@ export const Range = forwardRef(
     ref,
   ) => {
     const initialValue = value ?? defaultValue ?? (multi ? [0, 100] : 0);
-    const [currentValue, setValue] = useValueTracker(
-      initialValue,
-      defaultValue ?? initialValue,
-    );
+    const [currentValue, setValue] = useValueTracker(initialValue, defaultValue ?? initialValue);
     let currentValueShadow = currentValue;
 
     const roundToStep = (value) => {
@@ -123,12 +120,7 @@ export const Range = forwardRef(
           style={{ [sizeProperty]: size }}
         >
           <Elem name="line" />
-          <RangeIndicator
-            align={align}
-            reverse={reverse}
-            value={currentValue}
-            valueConvert={valueToPercentage}
-          />
+          <RangeIndicator align={align} reverse={reverse} value={currentValue} valueConvert={valueToPercentage} />
           {multi ? (
             arrayReverse(currentValue, reverse).map((value, i, list) => {
               const index = reverse ? (i === 0 ? 1 : 0) : i;
@@ -138,10 +130,7 @@ export const Range = forwardRef(
                 const result = [];
                 const secondValue = currentValue[preservedValueIndex];
 
-                result[index] =
-                  index === 0
-                    ? clamp(val, min, secondValue)
-                    : clamp(val, secondValue, max);
+                result[index] = index === 0 ? clamp(val, min, secondValue) : clamp(val, secondValue, max);
                 result[preservedValueIndex] = currentValue[preservedValueIndex];
 
                 return result;
@@ -192,14 +181,7 @@ const RangeHandle = ({
   reverse = false,
 }) => {
   const currentOffset = valueConvert(value);
-  const offsetProperty =
-    align === "horizontal"
-      ? reverse
-        ? "right"
-        : "left"
-      : reverse
-        ? "bottom"
-        : "top";
+  const offsetProperty = align === "horizontal" ? (reverse ? "right" : "left") : reverse ? "bottom" : "top";
   const mouseProperty = align === "horizontal" ? "pageX" : "pageY";
 
   const handleMouseDown = (e) => {
@@ -207,14 +189,8 @@ const RangeHandle = ({
     let newValue;
 
     const handleMouseMove = (e) => {
-      const mouseOffset = reverse
-        ? initialOffset - e[mouseProperty]
-        : e[mouseProperty] - initialOffset;
-      const offset = clamp(
-        mouseOffset + (currentOffset / 100) * bodySize,
-        0,
-        bodySize,
-      );
+      const mouseOffset = reverse ? initialOffset - e[mouseProperty] : e[mouseProperty] - initialOffset;
+      const offset = clamp(mouseOffset + (currentOffset / 100) * bodySize, 0, bodySize);
 
       newValue = offsetConvert(offset);
 
@@ -256,8 +232,7 @@ const RangeIndicator = ({ value, valueConvert, align, reverse }) => {
       style.right = `${100 - valueConvert(value)}%`;
     }
 
-    if (reverse && !multi)
-      [style.left, style.right] = [style.right, style.left];
+    if (reverse && !multi) [style.left, style.right] = [style.right, style.left];
   } else if (align === "vertical") {
     if (multi) {
       style.top = `${valueConvert(value[0])}%`;
@@ -267,8 +242,7 @@ const RangeIndicator = ({ value, valueConvert, align, reverse }) => {
       style.bottom = `${100 - valueConvert(value)}%`;
     }
 
-    if (reverse && !multi)
-      [style.top, style.bottom] = [style.bottom, style.top];
+    if (reverse && !multi) [style.top, style.bottom] = [style.bottom, style.top];
   }
 
   return <Elem name="indicator" style={style} />;

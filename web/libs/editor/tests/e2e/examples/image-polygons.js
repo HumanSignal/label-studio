@@ -9,8 +9,7 @@ const config = `
 `;
 
 const data = {
-  image:
-    "https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg",
+  image: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg",
 };
 
 const result = [

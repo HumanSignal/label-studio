@@ -1,10 +1,7 @@
 import { types } from "mobx-state-tree";
 
 import throttle from "lodash.throttle";
-import {
-  RELATIVE_STAGE_HEIGHT,
-  RELATIVE_STAGE_WIDTH,
-} from "../components/ImageView/Image";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { MIN_SIZE } from "../tools/Base";
 import Utils from "../utils";
 import { FF_DEV_3666, FF_DEV_3793, isFF } from "../utils/feature-flags";
@@ -29,16 +26,11 @@ const DrawingTool = types
         };
       },
       get tagTypes() {
-        console.error(
-          "Drawing tool model needs to implement tagTypes getter in views",
-        );
+        console.error("Drawing tool model needs to implement tagTypes getter in views");
         return {};
       },
       isIncorrectControl() {
-        return (
-          self.tagTypes.stateTypes === self.control.type &&
-          !self.control.isSelected
-        );
+        return self.tagTypes.stateTypes === self.control.type && !self.control.isSelected;
       },
       isIncorrectLabel() {
         return !self.obj.checkLabels();
@@ -59,20 +51,14 @@ const DrawingTool = types
         return !self.isDrawing && !self.annotation.isReadOnly();
       },
       get defaultDimensions() {
-        console.warn(
-          "Drawing tool model needs to implement defaultDimentions getter in views",
-        );
+        console.warn("Drawing tool model needs to implement defaultDimentions getter in views");
         return {};
       },
       get MIN_SIZE() {
         if (isFF(FF_DEV_3793)) {
           return {
-            X:
-              (MIN_SIZE.X / self.obj.stageScale / self.obj.stageWidth) *
-              RELATIVE_STAGE_WIDTH,
-            Y:
-              (MIN_SIZE.Y / self.obj.stageScale / self.obj.stageHeight) *
-              RELATIVE_STAGE_HEIGHT,
+            X: (MIN_SIZE.X / self.obj.stageScale / self.obj.stageWidth) * RELATIVE_STAGE_WIDTH,
+            Y: (MIN_SIZE.Y / self.obj.stageScale / self.obj.stageHeight) * RELATIVE_STAGE_HEIGHT,
           };
         }
 
@@ -96,37 +82,24 @@ const DrawingTool = types
         if (ev.button > 0 || ev.shiftKey) return;
         let fn = `${name}Ev`;
 
-        if (typeof self[fn] !== "undefined")
-          self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
+        if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
 
         // Emulating of dblclick event, 'cause redrawing will crush the the original one
         if (name === "click") {
           const ts = ev.timeStamp;
 
-          if (
-            ts - lastClick.ts < 300 &&
-            self.comparePointsWithThreshold(lastClick, { x, y })
-          ) {
+          if (ts - lastClick.ts < 300 && self.comparePointsWithThreshold(lastClick, { x, y })) {
             fn = `dbl${fn}`;
-            if (typeof self[fn] !== "undefined")
-              self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
+            if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
           }
           lastClick = { ts, x, y };
         }
       },
 
-      comparePointsWithThreshold(
-        p1,
-        p2,
-        threshold = { x: self.MIN_SIZE.X, y: self.MIN_SIZE.Y },
-      ) {
+      comparePointsWithThreshold(p1, p2, threshold = { x: self.MIN_SIZE.X, y: self.MIN_SIZE.Y }) {
         if (!p1 || !p2) return;
-        if (typeof threshold === "number")
-          threshold = { x: threshold, y: threshold };
-        return (
-          Math.abs(p1.x - p2.x) < threshold.x &&
-          Math.abs(p1.y - p2.y) < threshold.y
-        );
+        if (typeof threshold === "number") threshold = { x: threshold, y: threshold };
+        return Math.abs(p1.x - p2.x) < threshold.x && Math.abs(p1.y - p2.y) < threshold.y;
       },
     };
   })
@@ -136,12 +109,7 @@ const DrawingTool = types
         const control = self.control;
         const resultValue = control.getResultValue();
 
-        self.currentArea = self.obj.createDrawingRegion(
-          opts,
-          resultValue,
-          control,
-          false,
-        );
+        self.currentArea = self.obj.createDrawingRegion(opts, resultValue, control, false);
         self.currentArea.setDrawing(true);
 
         self.applyActiveStates(self.currentArea);
@@ -151,9 +119,7 @@ const DrawingTool = types
       resumeUnfinishedRegion(existingUnclosedPolygon) {
         self.currentArea = existingUnclosedPolygon;
         self.currentArea.setDrawing(true);
-        self.annotation.regionStore.selection._updateResultsFromRegions([
-          self.currentArea,
-        ]);
+        self.annotation.regionStore.selection._updateResultsFromRegions([self.currentArea]);
         self.mode = "drawing";
         self.annotation.setIsDrawing(true);
         self.annotation.regionStore.selection.drawingSelect(self.currentArea);
@@ -173,12 +139,7 @@ const DrawingTool = types
         );
 
         const [main, ...rest] = currentArea.results;
-        const newArea = self.annotation.createResult(
-          value,
-          main.value.toJSON(),
-          control,
-          obj,
-        );
+        const newArea = self.annotation.createResult(value, main.value.toJSON(), control, obj);
 
         //when user is using two different labels tag to draw a region, the other labels will be added to the region
         rest.forEach((r) => newArea.addResult(r.toJSON()));
@@ -192,13 +153,7 @@ const DrawingTool = types
         const control = self.control;
         const resultValue = control.getResultValue();
 
-        self.currentArea = self.annotation.createResult(
-          opts,
-          resultValue,
-          control,
-          self.obj,
-          skipAfterCreate,
-        );
+        self.currentArea = self.annotation.createResult(opts, resultValue, control, self.obj, skipAfterCreate);
         self.applyActiveStates(self.currentArea);
         return self.currentArea;
       },
@@ -230,15 +185,12 @@ const DrawingTool = types
       startDrawing(x, y) {
         self.annotation.history.freeze();
         self.mode = "drawing";
-        self.currentArea = self.createDrawingRegion(
-          self.createRegionOptions({ x, y }),
-        );
+        self.currentArea = self.createDrawingRegion(self.createRegionOptions({ x, y }));
       },
       finishDrawing() {
         if (!self.beforeCommitDrawing()) {
           self.deleteRegion();
-          if (self.control.type === self.tagTypes.stateTypes)
-            self.annotation.unselectAll(true);
+          if (self.control.type === self.tagTypes.stateTypes) self.annotation.unselectAll(true);
           self._resetState();
         } else {
           self._finishDrawing();
@@ -288,12 +240,8 @@ const TwoPointsDrawingTool = DrawingTool.named("TwoPointsDrawingTool")
 
         if (!shape) return;
         const isEllipse = shape.type.includes("ellipse");
-        const maxStageWidth = isFF(FF_DEV_3793)
-          ? RELATIVE_STAGE_WIDTH
-          : self.obj.stageWidth;
-        const maxStageHeight = isFF(FF_DEV_3793)
-          ? RELATIVE_STAGE_HEIGHT
-          : self.obj.stageHeight;
+        const maxStageWidth = isFF(FF_DEV_3793) ? RELATIVE_STAGE_WIDTH : self.obj.stageWidth;
+        const maxStageHeight = isFF(FF_DEV_3793) ? RELATIVE_STAGE_HEIGHT : self.obj.stageHeight;
 
         let { x1, y1, x2, y2 } = isEllipse
           ? {
@@ -302,10 +250,7 @@ const TwoPointsDrawingTool = DrawingTool.named("TwoPointsDrawingTool")
               x2: x,
               y2: y,
             }
-          : Utils.Image.reverseCoordinates(
-              { x: shape.startX, y: shape.startY },
-              { x, y },
-            );
+          : Utils.Image.reverseCoordinates({ x: shape.startX, y: shape.startY }, { x, y });
 
         x1 = Math.max(0, x1);
         y1 = Math.max(0, y1);
@@ -368,12 +313,7 @@ const TwoPointsDrawingTool = DrawingTool.named("TwoPointsDrawingTool")
         if (!self.canStartDrawing()) return;
         // @todo: here is a potential problem with endPoint
         // it may be incorrect due to it may be not set at this moment
-        if (
-          startPoint &&
-          endPoint &&
-          !self.comparePointsWithThreshold(startPoint, endPoint)
-        )
-          return;
+        if (startPoint && endPoint && !self.comparePointsWithThreshold(startPoint, endPoint)) return;
         if (currentMode === DEFAULT_MODE) {
           modeAfterMouseMove = TWO_CLICKS_MODE;
         } else if (self.isDrawing && currentMode === TWO_CLICKS_MODE) {
@@ -427,34 +367,22 @@ const MultipleClicksDrawingTool = DrawingTool.named("MultipleClicksMixin")
 
     return {
       canStartDrawing() {
-        return (
-          Super.canStartDrawing() && !self.annotation.regionStore.hasSelection
-        );
+        return Super.canStartDrawing() && !self.annotation.regionStore.hasSelection;
       },
       nextPoint(x, y) {
         const area = self.getCurrentArea();
         const object = self.obj;
 
-        if (
-          area &&
-          object &&
-          object.multiImage &&
-          area.item_index !== object.currentImage
-        )
-          return;
+        if (area && object && object.multiImage && area.item_index !== object.currentImage) return;
 
         self.getCurrentArea().addPoint(x, y);
         pointsCount++;
       },
       listenForClose() {
-        console.error(
-          "MultipleClicksMixin model needs to implement listenForClose method in actions",
-        );
+        console.error("MultipleClicksMixin model needs to implement listenForClose method in actions");
       },
       closeCurrent() {
-        console.error(
-          "MultipleClicksMixin model needs to implement closeCurrent method in actions",
-        );
+        console.error("MultipleClicksMixin model needs to implement closeCurrent method in actions");
       },
       finishDrawing() {
         if (!self.isDrawing) return;
@@ -469,8 +397,7 @@ const MultipleClicksDrawingTool = DrawingTool.named("MultipleClicksMixin")
       },
       cleanupUncloseableShape() {
         self.deleteRegion();
-        if (self.control.type === self.tagTypes.stateTypes)
-          self.annotation.unselectAll(true);
+        if (self.control.type === self.tagTypes.stateTypes) self.annotation.unselectAll(true);
         self._resetState();
       },
       mousedownEv(ev, [x, y]) {
@@ -478,10 +405,7 @@ const MultipleClicksDrawingTool = DrawingTool.named("MultipleClicksMixin")
         lastEvent = MOUSE_DOWN_EVENT;
       },
       mouseupEv(ev, [x, y]) {
-        if (
-          lastEvent === MOUSE_DOWN_EVENT &&
-          self.comparePointsWithThreshold(lastPoint, { x, y })
-        ) {
+        if (lastEvent === MOUSE_DOWN_EVENT && self.comparePointsWithThreshold(lastPoint, { x, y })) {
           self._clickEv(ev, [x, y]);
           lastEvent = MOUSE_UP_EVENT;
         }
@@ -576,8 +500,7 @@ const ThreePointsDrawingTool = DrawingTool.named("ThreePointsDrawingTool")
         return !self.isIncorrectControl();
       },
       updateDraw: (x, y) => {
-        if (currentMode === DEFAULT_MODE)
-          self.getCurrentArea()?.draw(x, y, points);
+        if (currentMode === DEFAULT_MODE) self.getCurrentArea()?.draw(x, y, points);
         else if (currentMode === DRAG_MODE) self.draw(x, y);
       },
 
@@ -589,17 +512,10 @@ const ThreePointsDrawingTool = DrawingTool.named("ThreePointsDrawingTool")
         const shape = self.getCurrentArea();
 
         if (!shape) return;
-        const maxStageWidth = isFF(FF_DEV_3793)
-          ? RELATIVE_STAGE_WIDTH
-          : self.obj.stageWidth;
-        const maxStageHeight = isFF(FF_DEV_3793)
-          ? RELATIVE_STAGE_HEIGHT
-          : self.obj.stageHeight;
+        const maxStageWidth = isFF(FF_DEV_3793) ? RELATIVE_STAGE_WIDTH : self.obj.stageWidth;
+        const maxStageHeight = isFF(FF_DEV_3793) ? RELATIVE_STAGE_HEIGHT : self.obj.stageHeight;
 
-        let { x1, y1, x2, y2 } = Utils.Image.reverseCoordinates(
-          { x: shape.startX, y: shape.startY },
-          { x, y },
-        );
+        let { x1, y1, x2, y2 } = Utils.Image.reverseCoordinates({ x: shape.startX, y: shape.startY }, { x, y });
 
         x1 = Math.max(0, x1);
         y1 = Math.max(0, y1);
@@ -693,9 +609,4 @@ const ThreePointsDrawingTool = DrawingTool.named("ThreePointsDrawingTool")
     };
   });
 
-export {
-  DrawingTool,
-  TwoPointsDrawingTool,
-  MultipleClicksDrawingTool,
-  ThreePointsDrawingTool,
-};
+export { DrawingTool, TwoPointsDrawingTool, MultipleClicksDrawingTool, ThreePointsDrawingTool };

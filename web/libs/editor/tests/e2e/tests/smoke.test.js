@@ -36,25 +36,13 @@ Feature("Smoke test through all the examples");
 examples.slice(1).forEach((example) =>
   Scenario(
     example.title || "Noname smoke test",
-    async ({
-      I,
-      LabelStudio,
-      AtImageView,
-      AtAudioView,
-      AtSidebar,
-      AtTopbar,
-    }) => {
+    async ({ I, LabelStudio, AtImageView, AtAudioView, AtSidebar, AtTopbar }) => {
       LabelStudio.setFeatureFlags({
         ff_front_dev_2715_audio_3_280722_short: true,
       });
 
       // @todo optional predictions in example
-      const {
-        annotations,
-        config,
-        data,
-        result = annotations[0].result,
-      } = example;
+      const { annotations, config, data, result = annotations[0].result } = example;
       const params = {
         annotations: [{ id: "test", result }],
         config,
@@ -65,12 +53,7 @@ examples.slice(1).forEach((example) =>
       // add all unique ids from non-classification results
       // @todo some classifications will be reflected in Results list soon
 
-      result.forEach(
-        (r) =>
-          !ids.includes(r.id) &&
-          Object.keys(r.value).length > 1 &&
-          ids.push(r.id),
-      );
+      result.forEach((r) => !ids.includes(r.id) && Object.keys(r.value).length > 1 && ids.push(r.id));
       const count = ids.length;
 
       await I.amOnPage("/");
@@ -89,11 +72,7 @@ examples.slice(1).forEach((example) =>
         await AtAudioView.waitForAudio();
       }
 
-      if (
-        Utils.xmlFindBy(configTree, (node) =>
-          ["text", "hypertext"].includes(node["#name"].toLowerCase()),
-        )
-      ) {
+      if (Utils.xmlFindBy(configTree, (node) => ["text", "hypertext"].includes(node["#name"].toLowerCase()))) {
         I.waitForVisible(".lsf-htx-richtext", 5);
       }
 

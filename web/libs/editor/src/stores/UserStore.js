@@ -41,8 +41,7 @@ const UserStore = types
   })
   .views((self) => ({
     get displayName() {
-      if (self.firstName || self.lastName)
-        return `${self.firstName} ${self.lastName}`;
+      if (self.firstName || self.lastName) return `${self.firstName} ${self.lastName}`;
 
       return "";
     },

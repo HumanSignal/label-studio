@@ -27,9 +27,7 @@ const AudioNextView: FC<AudioNextProps> = ({ item }) => {
   const [audioLength, setAudioLength] = useState(0);
 
   const [zoom, setZoom] = useState(numberify(item.defaultzoom, WS_ZOOM_X));
-  const [volume, setVolume] = useState(
-    numberify(item.defaultvolume, WS_VOLUME),
-  );
+  const [volume, setVolume] = useState(numberify(item.defaultvolume, WS_VOLUME));
   const [speed, setSpeed] = useState(numberify(item.defaultspeed, WS_SPEED));
 
   const handleReady = useCallback((data: any) => {

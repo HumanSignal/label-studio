@@ -57,10 +57,7 @@ export const CurrentEntity = injector(
             <Elem name="id">#{entity.pk ?? entity.id}</Elem>
           </Elem>
         )}
-        <AnnotationHistory
-          enabled={showHistory}
-          showDraft={showDraftInHistory}
-        />
+        <AnnotationHistory enabled={showHistory} showDraft={showDraftInHistory} />
       </Block>
     ) : null;
   }),

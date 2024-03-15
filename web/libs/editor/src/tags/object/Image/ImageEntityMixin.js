@@ -22,12 +22,7 @@ export const ImageEntityMixin = types
     get imageIsLoaded() {
       const imageEntity = self.currentImageEntity;
 
-      return (
-        !imageEntity.downloading &&
-        !imageEntity.error &&
-        imageEntity.downloaded &&
-        imageEntity.imageLoaded
-      );
+      return !imageEntity.downloading && !imageEntity.error && imageEntity.downloaded && imageEntity.imageLoaded;
     },
     get rotation() {
       if (!isAlive(self)) {

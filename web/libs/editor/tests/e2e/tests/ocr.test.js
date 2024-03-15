@@ -6,10 +6,7 @@ const createConfig = ({ shapes = ["Rectangle"], textareaProps = "" } = {}) => {
   return `<View>
     <Image name="image" value="$image" zoomcontrol="true"></Image>
     ${shapes
-      .map(
-        (shapeName) =>
-          `<${shapeName} name="image${shapeName}" toName="image"/>`,
-      )
+      .map((shapeName) => `<${shapeName} name="image${shapeName}" toName="image"/>`)
       .join(`
     `)}
     <Labels name="imageLabels" toName="image" allowEmpty="true">
@@ -23,8 +20,7 @@ const createConfig = ({ shapes = ["Rectangle"], textareaProps = "" } = {}) => {
 };
 
 const data = {
-  image:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Html_headers.png/640px-Html_headers.png",
+  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Html_headers.png/640px-Html_headers.png",
 };
 
 const H3_POINTS = [
@@ -34,52 +30,44 @@ const H3_POINTS = [
   [1.40625, 55.226824457593686],
 ];
 
-Scenario(
-  "Basic scenario",
-  async ({ I, LabelStudio, AtImageView, AtSettings, AtLabels, AtSidebar }) => {
-    I.amOnPage("/");
+Scenario("Basic scenario", async ({ I, LabelStudio, AtImageView, AtSettings, AtLabels, AtSidebar }) => {
+  I.amOnPage("/");
 
-    LabelStudio.init({
-      config: createConfig({ shapes: ["Polygon"] }),
-      data,
-      settings: {
-        preserveSelectedTool: false,
-      },
-    });
-    AtImageView.waitForImage();
-    AtSettings.open();
-    AtSettings.setGeneralSettings({
-      [AtSettings.GENERAL_SETTINGS.AUTO_SELECT_REGION]: true,
-      [AtSettings.GENERAL_SETTINGS.SHOW_LABELS]: true,
-    });
-    AtSettings.close();
-    AtLabels.clickLabel("Paragraph");
-    const canvasSize = await AtImageView.getCanvasSize();
+  LabelStudio.init({
+    config: createConfig({ shapes: ["Polygon"] }),
+    data,
+    settings: {
+      preserveSelectedTool: false,
+    },
+  });
+  AtImageView.waitForImage();
+  AtSettings.open();
+  AtSettings.setGeneralSettings({
+    [AtSettings.GENERAL_SETTINGS.AUTO_SELECT_REGION]: true,
+    [AtSettings.GENERAL_SETTINGS.SHOW_LABELS]: true,
+  });
+  AtSettings.close();
+  AtLabels.clickLabel("Paragraph");
+  const canvasSize = await AtImageView.getCanvasSize();
 
-    await AtImageView.lookForStage();
-    AtImageView.drawByClickingPoints(
-      [...H3_POINTS, H3_POINTS[0]].map(([x, y]) => [
-        (x * canvasSize.width) / 100,
-        (y * canvasSize.height) / 100,
-      ]),
-    );
-    AtSidebar.seeRegions(1);
-    AtSidebar.seeElement('[placeholder="Recognized Text"]');
-    const Text = 'The "H3" header';
+  await AtImageView.lookForStage();
+  AtImageView.drawByClickingPoints(
+    [...H3_POINTS, H3_POINTS[0]].map(([x, y]) => [(x * canvasSize.width) / 100, (y * canvasSize.height) / 100]),
+  );
+  AtSidebar.seeRegions(1);
+  AtSidebar.seeElement('[placeholder="Recognized Text"]');
+  const Text = 'The "H3" header';
 
-    I.pressKey("Enter");
-    for (const key of 'The "H3" header') {
-      I.pressKey(key);
-    }
-    I.pressKey("Enter");
-    const results = await LabelStudio.serialize();
-    const hasText = results.find(
-      (result) => result?.value?.text && result.value.text[0] === Text,
-    );
+  I.pressKey("Enter");
+  for (const key of 'The "H3" header') {
+    I.pressKey(key);
+  }
+  I.pressKey("Enter");
+  const results = await LabelStudio.serialize();
+  const hasText = results.find((result) => result?.value?.text && result.value.text[0] === Text);
 
-    assert(hasText, true);
-  },
-);
+  assert(hasText, true);
+});
 
 const REGIONS = [
   {
@@ -204,26 +192,17 @@ Scenario(
 
     I.say("Labeling");
     for (const region of Object.values(regions)) {
-      AtImageView.dblClickAt(
-        region.x + region.width / 2,
-        region.y + region.height / 2,
-      );
+      AtImageView.dblClickAt(region.x + region.width / 2, region.y + region.height / 2);
       AtLabels.clickLabel(region.label);
       if (region.text) {
-        I.fillField(
-          AtOutliner.locateSelectedItem().find(".lsf-textarea-tag__input"),
-          region.text,
-        );
+        I.fillField(AtOutliner.locateSelectedItem().find(".lsf-textarea-tag__input"), region.text);
       }
     }
     const results = await LabelStudio.serialize();
 
     for (const region of regions) {
       if (region.text) {
-        const hasText = results.find(
-          (result) =>
-            result?.value?.text && result.value.text[0] === region.text,
-        );
+        const hasText = results.find((result) => result?.value?.text && result.value.text[0] === region.text);
 
         assert(hasText, true);
       }
@@ -239,12 +218,7 @@ Scenario(
       AtOutliner.seeRegions(regions.length);
       for (const [idx, region] of Object.entries(regions)) {
         if (region.text) {
-          I.seeInField(
-            AtOutliner.locateRegionIndex(+idx + 1).find(
-              ".lsf-textarea-tag__input",
-            ),
-            region.text,
-          );
+          I.seeInField(AtOutliner.locateRegionIndex(+idx + 1).find(".lsf-textarea-tag__input"), region.text);
         }
       }
     });

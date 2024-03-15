@@ -16,10 +16,7 @@ import PerRegionMixin, { PER_REGION_MODES } from "../../../mixins/PerRegion";
 import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import { ReadOnlyControlMixin } from "../../../mixins/ReadOnlyMixin";
 import RequiredMixin from "../../../mixins/Required";
-import {
-  HtxTextAreaRegion,
-  TextAreaRegionModel,
-} from "../../../regions/TextAreaRegion";
+import { HtxTextAreaRegion, TextAreaRegionModel } from "../../../regions/TextAreaRegion";
 import {
   FF_DEV_1564_DEV_1565,
   FF_DEV_3730,
@@ -196,16 +193,11 @@ const Model = types
       },
 
       requiredModal() {
-        InfoModal.warning(
-          self.requiredmessage ||
-            `Input for the textarea "${self.name}" is required.`,
-        );
+        InfoModal.warning(self.requiredmessage || `Input for the textarea "${self.name}" is required.`);
       },
 
       uniqueModal() {
-        InfoModal.warning(
-          "There is already an entry with that text. Please enter unique text.",
-        );
+        InfoModal.warning("There is already an entry with that text. Please enter unique text.");
       },
 
       setResult(value) {
@@ -288,10 +280,7 @@ const Model = types
         if (!result) return;
 
         // add current stored leadTime to the main stored lead_time
-        result.setMetaValue(
-          "lead_time",
-          (result.meta?.lead_time ?? 0) + self.leadTime / 1000,
-        );
+        result.setMetaValue("lead_time", (result.meta?.lead_time ?? 0) + self.leadTime / 1000);
 
         self.leadTime = 0;
         self.resetLeadTimeCounters();
@@ -328,8 +317,7 @@ const Model = types
             if (isFF(FF_DEV_3730)) {
               // Try to use main textarea element
               const textareaElement =
-                self.textareaRef.current?.input ||
-                self.textareaRef.current?.resizableTextArea?.textArea;
+                self.textareaRef.current?.input || self.textareaRef.current?.resizableTextArea?.textArea;
 
               if (isAvailableElement(textareaElement, self)) {
                 lastActiveElement = textareaElement;
@@ -418,13 +406,7 @@ const HtxTextArea = observer(({ item }) => {
   if (rows > 1) {
     // allow to add multiline text with shift+enter
     props.onKeyDown = (e) => {
-      if (
-        e.key === "Enter" &&
-        e.shiftKey &&
-        item.allowsubmit &&
-        item._value &&
-        !item.annotation.isReadOnly()
-      ) {
+      if (e.key === "Enter" && e.shiftKey && item.allowsubmit && item._value && !item.annotation.isReadOnly()) {
         e.preventDefault();
         e.stopPropagation();
         item.addText(item._value);
@@ -437,8 +419,7 @@ const HtxTextArea = observer(({ item }) => {
 
   const visibleStyle = item.perRegionVisible() ? {} : { display: "none" };
 
-  const showAddButton =
-    !item.isReadOnly() && (item.showsubmitbutton ?? rows !== 1);
+  const showAddButton = !item.isReadOnly() && (item.showsubmitbutton ?? rows !== 1);
   const itemStyle = {};
 
   if (showAddButton) itemStyle.marginBottom = 0;
@@ -452,11 +433,7 @@ const HtxTextArea = observer(({ item }) => {
       {item.showSubmit && (
         <Form
           onFinish={() => {
-            if (
-              item.allowsubmit &&
-              item._value &&
-              !item.annotation.isReadOnly()
-            ) {
+            if (item.allowsubmit && item._value && !item.annotation.isReadOnly()) {
               item.addText(item._value);
               item.setValue("");
             }
@@ -472,11 +449,7 @@ const HtxTextArea = observer(({ item }) => {
             )}
             {showAddButton && (
               <Form.Item>
-                <Button
-                  style={{ marginTop: "10px" }}
-                  type="primary"
-                  htmlType="submit"
-                >
+                <Button style={{ marginTop: "10px" }} type="primary" htmlType="submit">
                   Add
                 </Button>
               </Form.Item>

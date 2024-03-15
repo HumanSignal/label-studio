@@ -107,9 +107,7 @@ const Model = types
 
     serialize() {
       // convert to original format from data/csv
-      const format = self.parent.timeformat
-        ? d3.utcFormat(self.parent.timeformat)
-        : Number;
+      const format = self.parent.timeformat ? d3.utcFormat(self.parent.timeformat) : Number;
       const res = {
         value: {
           start: format(self.start),

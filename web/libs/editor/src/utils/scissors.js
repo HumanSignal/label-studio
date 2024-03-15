@@ -56,8 +56,7 @@ dwv.math.computeGreyscale = (data, width, height) => {
 
     lap += this[y - 2][x];
     lap += this[y - 1][x - 1] + 2 * this[y - 1][x] + this[y - 1][x + 1];
-    lap +=
-      this[y][x - 2] + 2 * this[y][x - 1] + 2 * this[y][x + 1] + this[y][x + 2];
+    lap += this[y][x - 2] + 2 * this[y][x - 1] + 2 * this[y][x + 1] + this[y][x + 2];
     lap += this[y + 1][x - 1] + 2 * this[y + 1][x] + this[y + 1][x + 1];
     lap += this[y + 2][x];
 
@@ -270,27 +269,17 @@ dwv.math.computeSides = (dist, gradX, gradY, greyscale) => {
 dwv.math.gaussianBlur = (buffer, out) => {
   // Smooth values over to fill in gaps in the mapping
   out[0] = 0.4 * buffer[0] + 0.5 * buffer[1] + 0.1 * buffer[1];
-  out[1] =
-    0.25 * buffer[0] + 0.4 * buffer[1] + 0.25 * buffer[2] + 0.1 * buffer[3];
+  out[1] = 0.25 * buffer[0] + 0.4 * buffer[1] + 0.25 * buffer[2] + 0.1 * buffer[3];
 
   for (let i = 2; i < buffer.length - 2; i++) {
     out[i] =
-      0.05 * buffer[i - 2] +
-      0.25 * buffer[i - 1] +
-      0.4 * buffer[i] +
-      0.25 * buffer[i + 1] +
-      0.05 * buffer[i + 2];
+      0.05 * buffer[i - 2] + 0.25 * buffer[i - 1] + 0.4 * buffer[i] + 0.25 * buffer[i + 1] + 0.05 * buffer[i + 2];
   }
 
   const len = buffer.length;
 
-  out[len - 2] =
-    0.25 * buffer[len - 1] +
-    0.4 * buffer[len - 2] +
-    0.25 * buffer[len - 3] +
-    0.1 * buffer[len - 4];
-  out[len - 1] =
-    0.4 * buffer[len - 1] + 0.5 * buffer[len - 2] + 0.1 * buffer[len - 3];
+  out[len - 2] = 0.25 * buffer[len - 1] + 0.4 * buffer[len - 2] + 0.25 * buffer[len - 3] + 0.1 * buffer[len - 4];
+  out[len - 1] = 0.4 * buffer[len - 1] + 0.5 * buffer[len - 2] + 0.1 * buffer[len - 3];
 };
 
 /**
@@ -349,8 +338,7 @@ dwv.math.Scissors = function () {
 }; // Scissors class
 
 // Begin training methods //
-dwv.math.Scissors.prototype.getTrainingIdx = (granularity, value) =>
-  Math.round((granularity - 1) * value);
+dwv.math.Scissors.prototype.getTrainingIdx = (granularity, value) => Math.round((granularity - 1) * value);
 
 dwv.math.Scissors.prototype.getTrainedEdge = function (edge) {
   return this.edgeTraining[this.getTrainingIdx(this.edgeGran, edge)];
@@ -391,12 +379,7 @@ dwv.math.Scissors.prototype.setData = function (data) {
   this.gradX = dwv.math.computeGradX(this.greyscale);
   this.gradY = dwv.math.computeGradY(this.greyscale);
 
-  const sides = dwv.math.computeSides(
-    this.edgeWidth,
-    this.gradX,
-    this.gradY,
-    this.greyscale,
-  );
+  const sides = dwv.math.computeSides(this.edgeWidth, this.gradX, this.gradY, this.greyscale);
 
   this.inside = sides.inside;
   this.outside = sides.outside;
@@ -434,30 +417,10 @@ dwv.math.Scissors.prototype.doTraining = function (p) {
 
   const buffer = [];
 
-  this.calculateTraining(
-    buffer,
-    this.edgeGran,
-    this.greyscale,
-    this.edgeTraining,
-  );
-  this.calculateTraining(
-    buffer,
-    this.gradGran,
-    this.gradient,
-    this.gradTraining,
-  );
-  this.calculateTraining(
-    buffer,
-    this.insideGran,
-    this.inside,
-    this.insideTraining,
-  );
-  this.calculateTraining(
-    buffer,
-    this.outsideGran,
-    this.outside,
-    this.outsideTraining,
-  );
+  this.calculateTraining(buffer, this.edgeGran, this.greyscale, this.edgeTraining);
+  this.calculateTraining(buffer, this.gradGran, this.gradient, this.gradTraining);
+  this.calculateTraining(buffer, this.insideGran, this.inside, this.insideTraining);
+  this.calculateTraining(buffer, this.outsideGran, this.outside, this.outsideTraining);
 
   if (this.trainingPoints.length < this.gradPointsNeeded) {
     // If we have two few training points, the gradient weight map might not
@@ -468,12 +431,7 @@ dwv.math.Scissors.prototype.doTraining = function (p) {
   this.trained = true;
 };
 
-dwv.math.Scissors.prototype.calculateTraining = function (
-  buffer,
-  granularity,
-  input,
-  output,
-) {
+dwv.math.Scissors.prototype.calculateTraining = function (buffer, granularity, input, output) {
   let i = 0;
   // Build a map of raw-weights to trained-weights by favoring input values
 
@@ -506,10 +464,7 @@ dwv.math.Scissors.prototype.addInStaticGrad = function (have, need) {
   // Average gradient raw-weights to trained-weights map with standard weight
   // map so that we don't end up with something to spiky
   for (let i = 0; i < this.gradGran; i++) {
-    this.gradTraining[i] = Math.min(
-      this.gradTraining[i],
-      1 - (i * (need - have)) / (need * this.gradGran),
-    );
+    this.gradTraining[i] = Math.min(this.gradTraining[i], 1 - (i * (need - have)) / (need * this.gradGran));
   }
 };
 

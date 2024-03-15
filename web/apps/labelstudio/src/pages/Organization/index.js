@@ -3,8 +3,7 @@ import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
 import { WebhookPage } from "../WebhookPage/WebhookPage";
 import { PeoplePage } from "./PeoplePage/PeoplePage";
 
-const ALLOW_ORGANIZATION_WEBHOOKS =
-  window.APP_SETTINGS.flags?.allow_organization_webhooks;
+const ALLOW_ORGANIZATION_WEBHOOKS = window.APP_SETTINGS.flags?.allow_organization_webhooks;
 
 const MenuLayout = ({ children, ...routeProps }) => {
   const menuItems = [PeoplePage];
@@ -12,13 +11,7 @@ const MenuLayout = ({ children, ...routeProps }) => {
   if (ALLOW_ORGANIZATION_WEBHOOKS) {
     menuItems.push(WebhookPage);
   }
-  return (
-    <SidebarMenu
-      menuItems={menuItems}
-      path={routeProps.match.url}
-      children={children}
-    />
-  );
+  return <SidebarMenu menuItems={menuItems} path={routeProps.match.url} children={children} />;
 };
 
 const organizationPages = {};

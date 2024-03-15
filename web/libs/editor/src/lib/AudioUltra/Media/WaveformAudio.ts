@@ -2,10 +2,7 @@ import { FF_LSDV_4711, isFF } from "../../../utils/feature-flags";
 import { Events } from "../Common/Events";
 import { __DEBUG__ } from "../Common/Utils";
 import { audioDecoderPool } from "./AudioDecoderPool";
-import {
-  type BaseAudioDecoder,
-  DEFAULT_FREQUENCY_HZ,
-} from "./BaseAudioDecoder";
+import { type BaseAudioDecoder, DEFAULT_FREQUENCY_HZ } from "./BaseAudioDecoder";
 
 export interface WaveformAudioOptions {
   src?: string;
@@ -133,9 +130,7 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
     return this.decoderPromise;
   }
 
-  async decodeAudioData(
-    options: { multiChannel?: boolean; captureAudioBuffer?: boolean } = {},
-  ) {
+  async decodeAudioData(options: { multiChannel?: boolean; captureAudioBuffer?: boolean } = {}) {
     if (!this.decoder) return;
 
     // need to capture the actual AudioBuffer from the decoder
@@ -206,11 +201,7 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
   private createAudioDecoder() {
     if (!this.src || this.decoder) return;
 
-    this.decoder = audioDecoderPool.getDecoder(
-      this.src,
-      this.splitChannels,
-      this.decoderType,
-    );
+    this.decoder = audioDecoderPool.getDecoder(this.src, this.splitChannels, this.decoderType);
 
     this.decoder.on("progress", (chunk, total) => {
       this.invoke("decodingProgress", [chunk, total]);

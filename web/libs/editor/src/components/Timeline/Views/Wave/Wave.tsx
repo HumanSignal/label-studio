@@ -15,29 +15,17 @@ import CursorPlugin from "wavesurfer.js/src/plugin/cursor";
 import RegionsPlugin from "wavesurfer.js/src/plugin/regions";
 import TimelinePlugin from "wavesurfer.js/src/plugin/timeline";
 import type { WaveSurferParams } from "wavesurfer.js/types/params";
-import {
-  IconFast,
-  IconSlow,
-  IconZoomIn,
-  IconZoomOut,
-} from "../../../../assets/icons";
+import { IconFast, IconSlow, IconZoomIn, IconZoomOut } from "../../../../assets/icons";
 import { Range } from "../../../../common/Range/Range";
 import { Space } from "../../../../common/Space/Space";
 import { useMemoizedHandlers } from "../../../../hooks/useMemoizedHandlers";
-import {
-  WS_SPEED,
-  WS_ZOOM_X,
-} from "../../../../tags/object/AudioNext/constants";
+import { WS_SPEED, WS_ZOOM_X } from "../../../../tags/object/AudioNext/constants";
 import { Block, Elem } from "../../../../utils/bem";
 import ResizeObserver from "../../../../utils/resize-observer";
 import { clamp, isDefined, isMacOS } from "../../../../utils/utilities";
 import { TimelineContext } from "../../Context";
 import type { TimelineContextValue, TimelineViewProps } from "../../Types";
-import {
-  formatTimeCallback,
-  secondaryLabelInterval,
-  timeInterval,
-} from "./Utils";
+import { formatTimeCallback, secondaryLabelInterval, timeInterval } from "./Utils";
 import "./Wave.styl";
 
 export const Wave: FC<TimelineViewProps> = ({
@@ -68,9 +56,7 @@ export const Wave: FC<TimelineViewProps> = ({
   const [loading, setLoading] = useState(true);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [scale, setScale] = useState(
-    Number.parseInt(data.defaultscale, 10) || 1,
-  );
+  const [scale, setScale] = useState(Number.parseInt(data.defaultscale, 10) || 1);
   const storedPosition = useRef({
     zoom: currentZoom,
     scroll: scrollOffset,
@@ -193,8 +179,7 @@ export const Wave: FC<TimelineViewProps> = ({
     const surfer = waveRef.current?.querySelector("wave")!;
     const offset = surfer.getBoundingClientRect().left;
     const duration = ws.current?.getDuration();
-    const relativeOffset =
-      (surfer.scrollLeft + (e.clientX - offset)) / surfer.scrollWidth;
+    const relativeOffset = (surfer.scrollLeft + (e.clientX - offset)) / surfer.scrollWidth;
     const time = relativeOffset * (duration ?? 0);
 
     ws.current?.setCurrentTime(time);
@@ -239,8 +224,7 @@ export const Wave: FC<TimelineViewProps> = ({
     requestAnimationFrame(() => {
       const wsi = ws.current;
 
-      if (wsi && wsi.params.minPxPerSec !== currentZoom)
-        ws.current?.zoom(currentZoom);
+      if (wsi && wsi.params.minPxPerSec !== currentZoom) ws.current?.zoom(currentZoom);
       scrollTo(storedPosition.current.scroll);
     });
   }, [currentZoom, scrollOffset]);
@@ -309,8 +293,7 @@ export const Wave: FC<TimelineViewProps> = ({
         return;
       }
 
-      if ((isHorizontal && isMac) || isVertical || e.shiftKey)
-        e.preventDefault();
+      if ((isHorizontal && isMac) || isVertical || e.shiftKey) e.preventDefault();
 
       const newScroll = () => {
         const delta = !isMac || e.shiftKey ? e.deltaY : e.deltaX;
@@ -366,11 +349,7 @@ export const Wave: FC<TimelineViewProps> = ({
       <Elem name="wrapper">
         <Elem name="body" ref={bodyRef} onClick={onTimelineClick}>
           <Elem name="cursor" style={cursorStyle} />
-          <Elem
-            name="surfer"
-            ref={waveRef}
-            onClick={(e: RMouseEvent<HTMLElement>) => e.stopPropagation()}
-          />
+          <Elem name="surfer" ref={waveRef} onClick={(e: RMouseEvent<HTMLElement>) => e.stopPropagation()} />
           <Elem name="timeline" ref={timelineRef} />
           {loading && <Elem name="loader" mod={{ animated: true }} />}
         </Elem>
@@ -491,9 +470,7 @@ const useWaveSurfer = ({
     };
 
     const getDetachedRegions = () => {
-      return Object.values(wsi.regions.list).filter(
-        (reg: any) => !isDefined(reg._region),
-      );
+      return Object.values(wsi.regions.list).filter((reg: any) => !isDefined(reg._region));
     };
 
     const removeDetachedRegions = () => {

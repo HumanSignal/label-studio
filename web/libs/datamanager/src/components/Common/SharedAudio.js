@@ -72,14 +72,8 @@ export class SharedAudio extends Component {
     const paused = this.state.paused || this.state.audio === null;
 
     return (
-      <Space
-        size="small"
-        style={{ width: "100%", alignItems: "center" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Button onClick={paused ? this.play : this.pause}>
-          {paused ? <FaPlay /> : <FaPause />}
-        </Button>
+      <Space size="small" style={{ width: "100%", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+        <Button onClick={paused ? this.play : this.pause}>{paused ? <FaPlay /> : <FaPause />}</Button>
 
         {this.state.error ? (
           <div>Unable to play</div>

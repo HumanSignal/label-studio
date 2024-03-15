@@ -7,26 +7,14 @@ const EVENTS_NAME = "tr-konva";
 // Copies of local methods from Konva's original implementation
 function getCenter(shape) {
   return {
-    x:
-      shape.x +
-      (shape.width / 2) * Math.cos(shape.rotation) +
-      (shape.height / 2) * Math.sin(-shape.rotation),
-    y:
-      shape.y +
-      (shape.height / 2) * Math.cos(shape.rotation) +
-      (shape.width / 2) * Math.sin(shape.rotation),
+    x: shape.x + (shape.width / 2) * Math.cos(shape.rotation) + (shape.height / 2) * Math.sin(-shape.rotation),
+    y: shape.y + (shape.height / 2) * Math.cos(shape.rotation) + (shape.width / 2) * Math.sin(shape.rotation),
   };
 }
 
 function rotateAroundPoint(shape, angleRad, point) {
-  const x =
-    point.x +
-    (shape.x - point.x) * Math.cos(angleRad) -
-    (shape.y - point.y) * Math.sin(angleRad);
-  const y =
-    point.y +
-    (shape.x - point.x) * Math.sin(angleRad) +
-    (shape.y - point.y) * Math.cos(angleRad);
+  const x = point.x + (shape.x - point.x) * Math.cos(angleRad) - (shape.y - point.y) * Math.sin(angleRad);
+  const y = point.y + (shape.x - point.x) * Math.sin(angleRad) + (shape.y - point.y) * Math.cos(angleRad);
 
   return {
     ...shape,

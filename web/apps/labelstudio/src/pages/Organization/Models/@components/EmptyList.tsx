@@ -12,9 +12,7 @@ export const EmptyList: FC = () => {
           <HeidiAi />
         </Elem>
         <Elem name="title">Create a Model</Elem>
-        <Elem name="caption">
-          Build a high quality model to auto-label your data using LLMs
-        </Elem>
+        <Elem name="caption">Build a high quality model to auto-label your data using LLMs</Elem>
         <Button look="primary">Create a Model</Button>
       </Elem>
     </Block>

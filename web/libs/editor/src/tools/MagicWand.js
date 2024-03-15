@@ -10,10 +10,7 @@ import { guidGenerator } from "../core/Helpers";
 import { DrawingTool } from "../mixins/DrawingTool";
 import ToolMixin from "../mixins/Tool";
 import Canvas from "../utils/canvas";
-import {
-  getActualZoomingPosition,
-  getTransformedImageData,
-} from "../utils/image";
+import { getActualZoomingPosition, getTransformedImageData } from "../utils/image";
 import { drawMask } from "../utils/magic-wand";
 import BaseTool from "./Base";
 
@@ -167,9 +164,7 @@ const _Tool = types
 
       if (!states.length) return color;
 
-      const selectedEntry = states.find(
-        (entry) => typeof entry.selectedColor !== "undefined",
-      );
+      const selectedEntry = states.find((entry) => typeof entry.selectedColor !== "undefined");
 
       color = selectedEntry ? selectedEntry.selectedColor : defaultColor;
       return chroma(color).hex();
@@ -210,9 +205,7 @@ const _Tool = types
      * this cache.
      */
     shouldInvalidateCache() {
-      return (
-        self.existingRegion && self.existingRegion.id !== self.cachedRegionId
-      );
+      return self.existingRegion && self.existingRegion.id !== self.cachedRegionId;
     },
   }))
   .actions((self) => ({
@@ -267,12 +260,7 @@ const _Tool = types
       // as otherwise the escape key gets eaten by other keyboard listeners.
       window.addEventListener("keydown", self.keydownEv, true /* useCapture */);
 
-      [
-        self.anchorImgX,
-        self.anchorImgY,
-        self.anchorScreenX,
-        self.anchorScreenY,
-      ] = self.getEventCoords(ev);
+      [self.anchorImgX, self.anchorImgY, self.anchorScreenX, self.anchorScreenY] = self.getEventCoords(ev);
       self.initCache();
       self.initCanvas();
       self.initCurrentRegion();
@@ -282,8 +270,7 @@ const _Tool = types
       // If we are in magic wand mode, change the threshold based on the mouse movement.
       if (self.mode !== "drawing") return;
 
-      const [_newImgX, _newImgY, newScreenX, newScreenY] =
-        self.getEventCoords(ev);
+      const [_newImgX, _newImgY, newScreenX, newScreenY] = self.getEventCoords(ev);
 
       self.threshold(newScreenX, newScreenY, self.fillcolor, self.opacity);
     },
@@ -298,11 +285,7 @@ const _Tool = types
 
       // Finish magic wand thresholding.
       self.mode = "viewing";
-      window.removeEventListener(
-        "keydown",
-        self.keydownEv,
-        true /* useCapture */,
-      );
+      window.removeEventListener("keydown", self.keydownEv, true /* useCapture */);
 
       yield self.setupFinalMask();
     }),
@@ -316,17 +299,8 @@ const _Tool = types
         e.stopPropagation();
 
         self.mode = "viewing";
-        window.removeEventListener(
-          "keydown",
-          self.keydownEv,
-          true /* useCapture */,
-        );
-        self.overlayCtx.clearRect(
-          0,
-          0,
-          self.overlay.width,
-          self.overlay.height,
-        );
+        window.removeEventListener("keydown", self.keydownEv, true /* useCapture */);
+        self.overlayCtx.clearRect(0, 0, self.overlay.width, self.overlay.height);
       }
     },
 
@@ -355,9 +329,7 @@ const _Tool = types
      */
     initCache() {
       // Has the user previously used the Magic Wand for the current class setting?
-      self.isFirstWand =
-        self.existingRegion === null ||
-        self.existingRegion.id !== self.cachedRegionId;
+      self.isFirstWand = self.existingRegion === null || self.existingRegion.id !== self.cachedRegionId;
 
       if (self.isFirstWand) {
         self.cachedNaturalCanvas = document.createElement("canvas");
@@ -472,10 +444,7 @@ const _Tool = types
      * @param {int} newScreenY Same, but for Y direction.
      */
     threshold(newScreenX, newScreenY) {
-      if (
-        newScreenX !== self.anchorScreenX ||
-        newScreenY !== self.anchorScreenY
-      ) {
+      if (newScreenX !== self.anchorScreenX || newScreenY !== self.anchorScreenY) {
         // Get the offset of where we've dragged the mouse to update the threshold.
         const dx = Math.abs(newScreenX - self.anchorScreenX);
         const dy = Math.abs(newScreenY - self.anchorScreenY);
@@ -486,10 +455,7 @@ const _Tool = types
 
         sign = sign < 0 ? sign / 5 : sign / 3;
 
-        const newThreshold = Math.min(
-          Math.max(self.defaultthreshold + Math.floor(sign * len), 1),
-          255,
-        );
+        const newThreshold = Math.min(Math.max(self.defaultthreshold + Math.floor(sign * len), 1), 255);
 
         if (newThreshold !== self.currentThreshold) {
           self.currentThreshold = newThreshold;
@@ -521,25 +487,14 @@ const _Tool = types
       let canvasHeight;
 
       if (self.negativezoom) {
-        canvasWidth = Math.min(
-          self.viewportWidth,
-          self.imageDisplayedInBrowserWidth,
-        );
-        canvasHeight = Math.min(
-          self.viewportHeight,
-          self.imageDisplayedInBrowserHeight,
-        );
+        canvasWidth = Math.min(self.viewportWidth, self.imageDisplayedInBrowserWidth);
+        canvasHeight = Math.min(self.viewportHeight, self.imageDisplayedInBrowserHeight);
       } else {
         canvasWidth = self.viewportWidth;
         canvasHeight = self.viewportHeight;
       }
 
-      const scaledDataURL = Canvas.mask2DataURL(
-        singleChannelMask.data,
-        canvasWidth,
-        canvasHeight,
-        "#FFFFFF",
-      );
+      const scaledDataURL = Canvas.mask2DataURL(singleChannelMask.data, canvasWidth, canvasHeight, "#FFFFFF");
 
       // Get the mask onto a canvas surface we can work with, to blit and upscale/downscale
       // the final results.
@@ -579,12 +534,10 @@ const _Tool = types
         self.zoomingPositionY,
       );
       const viewportNaturalWidth = Math.ceil(
-        (self.transformedCanvas.width / self.imageDisplayedInBrowserWidth) *
-          self.naturalWidth,
+        (self.transformedCanvas.width / self.imageDisplayedInBrowserWidth) * self.naturalWidth,
       );
       const viewportNaturalHeight = Math.ceil(
-        (self.transformedCanvas.height / self.imageDisplayedInBrowserHeight) *
-          self.naturalHeight,
+        (self.transformedCanvas.height / self.imageDisplayedInBrowserHeight) * self.naturalHeight,
       );
 
       // Now efficiently draw this mask over onto the full, naturally sized image.
@@ -599,17 +552,7 @@ const _Tool = types
       const dWidth = viewportNaturalWidth;
       const dHeight = viewportNaturalHeight;
 
-      naturalCtx.drawImage(
-        blitImg,
-        sx,
-        sy,
-        sWidth,
-        sHeight,
-        dx,
-        dy,
-        dWidth,
-        dHeight,
-      );
+      naturalCtx.drawImage(blitImg, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
 
       // Turn this into a data URL that we can use to initialize a real brush region, as well
       // as the bounding coordinates of the mask in natural coordinate space.
@@ -643,12 +586,7 @@ const _Tool = types
       setTimeout(() => {
         // Clear our overlay to reset state _after_ we've drawn the actual region,
         // to prevent a clear 'flash' and to increase apparent performance.
-        self.overlayCtx.clearRect(
-          0,
-          0,
-          self.overlay.width,
-          self.overlay.height,
-        );
+        self.overlayCtx.clearRect(0, 0, self.overlay.width, self.overlay.height);
       });
     },
 
@@ -673,12 +611,6 @@ const _Tool = types
     },
   }));
 
-const MagicWand = types.compose(
-  _Tool.name,
-  ToolMixin,
-  BaseTool,
-  DrawingTool,
-  _Tool,
-);
+const MagicWand = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, _Tool);
 
 export { MagicWand };

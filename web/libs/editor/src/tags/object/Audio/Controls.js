@@ -23,17 +23,17 @@ const AudioControls = ({ item, store }) => {
         {item.playing && (
           <Fragment>
             <PauseCircleOutlined /> <span>Pause</span>
-            {store.settings.enableTooltips &&
-              store.settings.enableHotkeys &&
-              item.hotkey && <Hint>[{item.hotkey}]</Hint>}
+            {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && (
+              <Hint>[{item.hotkey}]</Hint>
+            )}
           </Fragment>
         )}
         {!item.playing && (
           <Fragment>
             <PlayCircleOutlined /> <span>Play</span>
-            {store.settings.enableTooltips &&
-              store.settings.enableHotkeys &&
-              item.hotkey && <Hint>[{item.hotkey}]</Hint>}
+            {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && (
+              <Hint>[{item.hotkey}]</Hint>
+            )}
           </Fragment>
         )}
       </Button>

@@ -24,9 +24,7 @@ module.exports = (config) => {
   }
 
   if (!helper) {
-    console.error(
-      `Feature flags is only supported in ${supportedHelpers.join(", ")}`,
-    );
+    console.error(`Feature flags is only supported in ${supportedHelpers.join(", ")}`);
     return;
   }
 
@@ -53,15 +51,13 @@ module.exports = (config) => {
             helper.page.evaluate(
               (config) => {
                 if (!window.APP_SETTINGS) window.APP_SETTINGS = {};
-                if (!window.APP_SETTINGS.feature_flags)
-                  window.APP_SETTINGS.feature_flags = {};
+                if (!window.APP_SETTINGS.feature_flags) window.APP_SETTINGS.feature_flags = {};
                 window.APP_SETTINGS.feature_flags = {
                   ...window.APP_SETTINGS.feature_flags,
                   ...config.feature_flags,
                 };
                 if (typeof config.feature_flags_default_value === "boolean") {
-                  window.APP_SETTINGS.feature_flags_default_value =
-                    config.feature_flags_default_value;
+                  window.APP_SETTINGS.feature_flags_default_value = config.feature_flags_default_value;
                 }
               },
               {

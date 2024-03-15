@@ -17,10 +17,7 @@ const exitFullscreen = () => {
 };
 
 const getElement = (): HTMLElement => {
-  return (
-    (document as any).webkitCurrentFullScreenElement ??
-    document.fullscreenElement
-  );
+  return (document as any).webkitCurrentFullScreenElement ?? document.fullscreenElement;
 };
 
 export interface FullscreenProps {
@@ -35,10 +32,7 @@ export interface FullscreenHook {
   setHandlers: (options?: FullscreenProps) => void;
 }
 
-export const useFullscreen = (
-  options: FullscreenProps,
-  deps: any[],
-): FullscreenHook => {
+export const useFullscreen = (options: FullscreenProps, deps: any[]): FullscreenHook => {
   const handlers = useRef(options);
 
   useEffect(() => {
@@ -56,10 +50,7 @@ export const useFullscreen = (
       }
     };
 
-    const evt =
-      "onwebkitfullscreenchange" in document
-        ? "webkitfullscreenchange"
-        : "fullscreenchange";
+    const evt = "onwebkitfullscreenchange" in document ? "webkitfullscreenchange" : "fullscreenchange";
 
     document.addEventListener(evt, onChangeFullscreen);
 

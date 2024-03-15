@@ -1,9 +1,4 @@
-import {
-  CompressOutlined,
-  DeleteOutlined,
-  LinkOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { CompressOutlined, DeleteOutlined, LinkOutlined, PlusOutlined } from "@ant-design/icons";
 import { Badge, Form, Input } from "antd";
 import { Typography } from "antd";
 import { observer } from "mobx-react";
@@ -50,10 +45,7 @@ const renderResult = (result) => {
   }
   if (
     result.type === "textarea" &&
-    !(
-      result.from_name.perregion &&
-      result.from_name.displaymode === PER_REGION_MODES.REGION_LIST
-    )
+    !(result.from_name.perregion && result.from_name.displaymode === PER_REGION_MODES.REGION_LIST)
   ) {
     return (
       <Paragraph className={styles.row}>
@@ -72,28 +64,18 @@ const renderResult = (result) => {
 };
 
 export default observer(({ store, annotation }) => {
-  const {
-    highlightedNode: node,
-    selectedRegions: nodes,
-    selectionSize,
-  } = annotation;
+  const { highlightedNode: node, selectedRegions: nodes, selectionSize } = annotation;
   const [editMode, setEditMode] = React.useState(false);
 
   const entityButtons = [];
   const hasEditableNodes = !!nodes.find((node) => !node.isReadOnly());
-  const hasEditableRegions = !!nodes.find(
-    (node) => !node.isReadOnly() && !node.classification,
-  );
+  const hasEditableRegions = !!nodes.find((node) => !node.isReadOnly() && !node.classification);
 
   const Node = window.HTX_DEBUG ? NodeDebug : NodeMinimal;
 
   if (hasEditableRegions) {
     entityButtons.push(
-      <Hotkey.Tooltip
-        key="relations"
-        placement="topLeft"
-        name="region:relation"
-      >
+      <Hotkey.Tooltip key="relations" placement="topLeft" name="region:relation">
         <Button
           aria-label="Create Relation"
           className={styles.button}
@@ -104,9 +86,7 @@ export default observer(({ store, annotation }) => {
         >
           <LinkOutlined />
 
-          {store.settings.enableHotkeys && store.settings.enableTooltips && (
-            <Hint>[ alt + r ]</Hint>
-          )}
+          {store.settings.enableHotkeys && store.settings.enableTooltips && <Hint>[ alt + r ]</Hint>}
         </Button>
       </Hotkey.Tooltip>,
     );
@@ -150,14 +130,10 @@ export default observer(({ store, annotation }) => {
               <Node node={node} /> (ID: {node.id})
             </>
           ) : (
-            `${selectionSize} Region${
-              selectionSize > 1 ? "s are" : " is"
-            } selected`
+            `${selectionSize} Region${selectionSize > 1 ? "s are" : " is"} selected`
           )}
         </Elem>
-        {!hasEditableNodes && (
-          <Badge count={"readonly"} style={{ backgroundColor: "#ccc" }} />
-        )}
+        {!hasEditableNodes && <Badge count={"readonly"} style={{ backgroundColor: "#ccc" }} />}
       </Elem>
       <div className={`${styles.statesblk} ls-entity-states`}>
         {node?.score && (
@@ -188,9 +164,7 @@ export default observer(({ store, annotation }) => {
       {node?.isDrawing && (
         <Elem name="warning">
           <IconWarning />
-          <Elem name="warning-text">
-            Incomplete {node.type.replace("region", "")}
-          </Elem>
+          <Elem name="warning-text">Incomplete {node.type.replace("region", "")}</Elem>
         </Elem>
       )}
 
@@ -249,11 +223,7 @@ export default observer(({ store, annotation }) => {
             placeholder="Meta Information"
           />
 
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{ marginRight: "0.5em" }}
-          >
+          <Button type="primary" htmlType="submit" style={{ marginRight: "0.5em" }}>
             Add
           </Button>
 

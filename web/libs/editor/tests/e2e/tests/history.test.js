@@ -37,9 +37,7 @@ Scenario(
     AtSidebar.seeRegions(1);
     AtSidebar.seeSelectedRegion();
 
-    I.say(
-      "Add a brush stroke to the last created region (2 strokes, 1 region)",
-    );
+    I.say("Add a brush stroke to the last created region (2 strokes, 1 region)");
     AtImageView.drawThroughPoints([
       [50, 100],
       [100, 100],
@@ -100,9 +98,7 @@ Scenario(
     AtImageView.drawByDrag(200, 200, 100, 0);
     AtImageView.drawByDrag(300, 200, 0, -100);
 
-    I.say(
-      "When we move region we should do not create any other region or loose the selection (moved 2 times)",
-    );
+    I.say("When we move region we should do not create any other region or loose the selection (moved 2 times)");
     AtSidebar.seeRegions(1);
     AtSidebar.seeSelectedRegion();
 

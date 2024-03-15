@@ -64,9 +64,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
           task,
           interfaces: ["side-column", "annotations:comments"],
           // with SharedStore we should use more late event
-          [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](
-            LS,
-          ) {
+          [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](LS) {
             LS.settings.bottomSidePanel = true;
 
             const initAnnotation = () => {
@@ -163,14 +161,8 @@ export const Preview = ({ config, data, error, loading, project }) => {
           ))}
         </div>
       )}
-      {!data && loading && (
-        <Spinner style={{ width: "100%", height: "50vh" }} />
-      )}
-      <div
-        id="label-studio"
-        className={configClass.elem("preview-ui")}
-        ref={rootRef}
-      />
+      {!data && loading && <Spinner style={{ width: "100%", height: "50vh" }} />}
+      <div id="label-studio" className={configClass.elem("preview-ui")} ref={rootRef} />
     </div>
   );
 };

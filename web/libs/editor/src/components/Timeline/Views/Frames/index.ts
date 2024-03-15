@@ -5,11 +5,7 @@ import { Frames } from "./Frames";
 import { Minimap } from "./Minimap";
 import { findClosestKeypoint } from "./Utils";
 
-const getKeyframePosition = (
-  position: number,
-  regions: TimelineRegion[],
-  direction: -1 | 1,
-) => {
+const getKeyframePosition = (position: number, regions: TimelineRegion[], direction: -1 | 1) => {
   const selectedRegion = regions.find((r) => r.selected);
   let frames: number[];
 

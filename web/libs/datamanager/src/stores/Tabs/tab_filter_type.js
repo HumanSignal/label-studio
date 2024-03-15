@@ -4,11 +4,7 @@ import { isDefined } from "../../utils/utils";
 import { StringOrNumberID } from "../types";
 import { TabColumn, ViewColumnType } from "./tab_column";
 
-export const FilterValue = types.union(
-  types.string,
-  types.number,
-  types.boolean,
-);
+export const FilterValue = types.union(types.string, types.number, types.boolean);
 
 export const FilterItemValue = types.model("FilterItemValue", {
   value: FilterValue,
@@ -95,9 +91,7 @@ export const TabFilterType = types
 
     get currentType() {
       const view = getRoot(self).currentView;
-      const viewColumnDisplayType = view?.columnsDisplayType?.get?.(
-        self.field.id,
-      );
+      const viewColumnDisplayType = view?.columnsDisplayType?.get?.(self.field.id);
 
       return viewColumnDisplayType ?? self.field.type;
     },

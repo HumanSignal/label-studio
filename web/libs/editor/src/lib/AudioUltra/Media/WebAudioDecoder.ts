@@ -29,28 +29,21 @@ export class WebAudioDecoder extends BaseAudioDecoder {
       return;
     }
     if (this.sourceDecodeCancelled) {
-      throw new Error(
-        "WebAudioDecoder decode cancelled and contains no data, did you call decoder.renew()?",
-      );
+      throw new Error("WebAudioDecoder decode cancelled and contains no data, did you call decoder.renew()?");
     }
     // The decoding process is already in progress, so wait for it to finish
     if (this.decodingPromise) {
       info("decode:inprogress", this.src);
       return this.decodingPromise;
     }
-    if (!this.arraybuffer)
-      throw new Error(
-        "WebAudioDecoder not initialized, did you call decoder.init()?",
-      );
+    if (!this.arraybuffer) throw new Error("WebAudioDecoder not initialized, did you call decoder.init()?");
 
     info("decode:start", this.src);
 
     // Generate a unique id for this decode operation
     this.decodeId = Date.now();
     // This is a shared promise which will be observed by all instances of the same source
-    this.decodingPromise = new Promise(
-      (resolve) => (this.decodingResolve = resolve as any),
-    );
+    this.decodingPromise = new Promise((resolve) => (this.decodingResolve = resolve as any));
 
     try {
       const buffer = (await new Promise((resolve, reject) => {
@@ -58,11 +51,7 @@ export class WebAudioDecoder extends BaseAudioDecoder {
           this.context = this.createOfflineAudioContext();
         }
         if (!this.context || !this.arraybuffer)
-          return reject(
-            new Error(
-              "WebAudioDecoder not initialized, did you call decoder.init()?",
-            ),
-          );
+          return reject(new Error("WebAudioDecoder not initialized, did you call decoder.init()?"));
         // Safari doesn't support promise based decodeAudioData by default
         if ("webkitAudioContext" in window) {
           this.context?.decodeAudioData(
@@ -71,10 +60,7 @@ export class WebAudioDecoder extends BaseAudioDecoder {
             (err) => reject(err),
           );
         } else {
-          this.context
-            ?.decodeAudioData(this.arraybuffer)
-            .then(resolve)
-            .catch(reject);
+          this.context?.decodeAudioData(this.arraybuffer).then(resolve).catch(reject);
         }
       })) as AudioBuffer;
 
@@ -82,9 +68,7 @@ export class WebAudioDecoder extends BaseAudioDecoder {
       this._sampleRate = buffer.sampleRate;
       this._duration = buffer.duration;
 
-      const chunks = Array.from({ length: this._channelCount }).map(
-        () => Array.from({ length: 1 }) as Float32Array[],
-      );
+      const chunks = Array.from({ length: this._channelCount }).map(() => Array.from({ length: 1 }) as Float32Array[]);
 
       chunks.forEach((_, index) => {
         chunks[index] = [buffer.getChannelData(index)];

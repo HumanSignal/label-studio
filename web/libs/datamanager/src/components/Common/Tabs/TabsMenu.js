@@ -1,13 +1,7 @@
 import { useMemo } from "react";
 import { Menu } from "../Menu/Menu";
 
-export const TabsMenu = ({
-  onClick,
-  editable = true,
-  closable = true,
-  clonable = true,
-  virtual = false,
-}) => {
+export const TabsMenu = ({ onClick, editable = true, closable = true, clonable = true, virtual = false }) => {
   const items = useMemo(
     () => [
       {
@@ -32,10 +26,7 @@ export const TabsMenu = ({
     [editable, closable, clonable, virtual],
   );
 
-  const showDivider = useMemo(
-    () => closable && items.some(({ enabled }) => enabled),
-    [items],
-  );
+  const showDivider = useMemo(() => closable && items.some(({ enabled }) => enabled), [items]);
 
   return (
     <Menu size="medium" onClick={(e) => e.domEvent.stopPropagation()}>

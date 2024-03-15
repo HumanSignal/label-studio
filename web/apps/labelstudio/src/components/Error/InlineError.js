@@ -3,12 +3,7 @@ import { ApiContext } from "../../providers/ApiProvider";
 import { Block } from "../../utils/bem";
 import { ErrorWrapper } from "./Error";
 
-export const InlineError = ({
-  children,
-  includeValidation,
-  className,
-  style,
-}) => {
+export const InlineError = ({ children, includeValidation, className, style }) => {
   const context = React.useContext(ApiContext);
 
   React.useEffect(() => {

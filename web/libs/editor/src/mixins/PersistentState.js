@@ -31,9 +31,7 @@ const PersistentStateMixin = types
     },
 
     restoreValues() {
-      const stored = JSON.parse(
-        localStorage.getItem(self.persistentValuesKey) || "{}",
-      );
+      const stored = JSON.parse(localStorage.getItem(self.persistentValuesKey) || "{}");
 
       if (!stored || stored.task !== getRoot(self).task?.id) return;
       const values = stored.values || {};

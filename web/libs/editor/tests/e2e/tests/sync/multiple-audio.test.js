@@ -23,211 +23,179 @@ const params = {
   data,
 };
 
-Scenario(
-  "Play/pause of multiple synced audio stay in sync",
-  async ({ I, LabelStudio, AtAudioView }) => {
-    LabelStudio.setFeatureFlags({
-      fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
-      ff_front_dev_2715_audio_3_280722_short: true,
-      fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
-    });
+Scenario("Play/pause of multiple synced audio stay in sync", async ({ I, LabelStudio, AtAudioView }) => {
+  LabelStudio.setFeatureFlags({
+    fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
+    ff_front_dev_2715_audio_3_280722_short: true,
+    fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
+  });
 
-    I.amOnPage("/");
+  I.amOnPage("/");
 
-    LabelStudio.init(params);
+  LabelStudio.init(params);
 
-    await AtAudioView.waitForAudio();
-    await AtAudioView.lookForStage();
+  await AtAudioView.waitForAudio();
+  await AtAudioView.lookForStage();
 
-    {
-      const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] =
-        await AtAudioView.getCurrentAudio();
+  {
+    const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
 
-      assert.equal(audioTime1, audioTime2);
-      assert.equal(audioTime1, 0);
-    }
+    assert.equal(audioTime1, audioTime2);
+    assert.equal(audioTime1, 0);
+  }
 
-    AtAudioView.clickPlayButton();
-    I.wait(1);
-    {
-      const [{ paused: audioPaused1 }, { paused: audioPaused2 }] =
-        await AtAudioView.getCurrentAudio();
+  AtAudioView.clickPlayButton();
+  I.wait(1);
+  {
+    const [{ paused: audioPaused1 }, { paused: audioPaused2 }] = await AtAudioView.getCurrentAudio();
 
-      assert.equal(audioPaused1, audioPaused2);
-      assert.equal(audioPaused1, false);
-    }
+    assert.equal(audioPaused1, audioPaused2);
+    assert.equal(audioPaused1, false);
+  }
 
-    I.wait(1);
-    AtAudioView.clickPauseButton();
-    I.wait(1);
-    {
-      const [
-        { currentTime: audioTime1, paused: audioPaused1 },
-        { currentTime: audioTime2, paused: audioPaused2 },
-      ] = await AtAudioView.getCurrentAudio();
+  I.wait(1);
+  AtAudioView.clickPauseButton();
+  I.wait(1);
+  {
+    const [{ currentTime: audioTime1, paused: audioPaused1 }, { currentTime: audioTime2, paused: audioPaused2 }] =
+      await AtAudioView.getCurrentAudio();
 
-      assert.equal(audioPaused1, audioPaused2);
-      assert.equal(audioPaused1, true);
-      assert.equal(
-        Math.abs(audioTime1 - audioTime2) < 0.3,
-        true,
-        `Audio 1 currentTime and audio 2 currentTime drifted too far. Got audio1=${audioTime1} audio2=${audioTime2}`,
-      );
-      assert.notEqual(audioTime1, 0);
-      assert.notEqual(audioTime2, 0);
-    }
-  },
-);
-
-Scenario(
-  "Looping of multiple synced audio stay in sync",
-  async ({ I, LabelStudio, AtAudioView }) => {
-    LabelStudio.setFeatureFlags({
-      fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
-      ff_front_dev_2715_audio_3_280722_short: true,
-      fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
-    });
-
-    I.amOnPage("/");
-
-    LabelStudio.init(params);
-
-    await AtAudioView.waitForAudio();
-    await AtAudioView.lookForStage();
-
-    I.say("Draw an audio segment to start looping");
-    AtAudioView.dragAudioElement(160, 80);
-    {
-      const [
-        { paused: audioPaused1, currentTime: audioTime1 },
-        { paused: audioPaused2, currentTime: audioTime2 },
-      ] = await AtAudioView.getCurrentAudio();
-
-      I.say("Audio is playing");
-
-      // Check that the audio timing is within 0.3 seconds of each other (to account for rounding errors, and the fact
-      // that playback timers will not be perfectly precise)
-      assert.notEqual(audioTime1, 0);
-      assert.notEqual(audioTime2, 0);
-      assert.ok(
-        Math.abs(audioTime1 - audioTime2) < 0.3,
-        `Audio time difference has drifted by ${
-          (audioTime1 - audioTime2) * 1000
-        }ms`,
-      );
-
-      assert.equal(audioPaused1, audioPaused2);
-      assert.equal(audioPaused1, false);
-    }
-
-    I.say("Audio played to the same point in time");
-    AtAudioView.clickPauseButton();
-    {
-      const [
-        { paused: audioPaused1, currentTime: audioTime1 },
-        { paused: audioPaused2, currentTime: audioTime2 },
-      ] = await AtAudioView.getCurrentAudio();
-
-      I.say("Audio is paused");
-
-      assert.equal(audioPaused1, audioPaused2);
-      assert.equal(audioPaused1, true);
-      assert.ok(
-        Math.abs(audioTime1 - audioTime2) < 0.3,
-        `Audio time difference has drifted by ${
-          (audioTime1 - audioTime2) * 1000
-        }ms`,
-      );
-      assert.notEqual(audioTime1, 0);
-      assert.notEqual(audioTime2, 0);
-    }
-
-    I.say(
-      "Clicking outside of the audio segment and then clicking play should restart the audio from the beginning of the segment",
+    assert.equal(audioPaused1, audioPaused2);
+    assert.equal(audioPaused1, true);
+    assert.equal(
+      Math.abs(audioTime1 - audioTime2) < 0.3,
+      true,
+      `Audio 1 currentTime and audio 2 currentTime drifted too far. Got audio1=${audioTime1} audio2=${audioTime2}`,
     );
-    AtAudioView.clickAt(250);
-    AtAudioView.clickPlayButton();
-    {
-      const [
-        { paused: audioPaused1, currentTime: audioTime1 },
-        { paused: audioPaused2, currentTime: audioTime2 },
-      ] = await AtAudioView.getCurrentAudio();
+    assert.notEqual(audioTime1, 0);
+    assert.notEqual(audioTime2, 0);
+  }
+});
 
-      I.say("Audio is playing");
+Scenario("Looping of multiple synced audio stay in sync", async ({ I, LabelStudio, AtAudioView }) => {
+  LabelStudio.setFeatureFlags({
+    fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
+    ff_front_dev_2715_audio_3_280722_short: true,
+    fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
+  });
 
-      assert.equal(audioPaused1, audioPaused2);
-      assert.equal(audioPaused1, false);
-      assert.ok(
-        Math.abs(audioTime1 - audioTime2) < 0.3,
-        `Audio time difference has drifted by ${
-          (audioTime1 - audioTime2) * 1000
-        }ms`,
-      );
-      assert.notEqual(audioTime1, 0);
-      assert.notEqual(audioTime2, 0);
-    }
-  },
-);
+  I.amOnPage("/");
 
-Scenario(
-  "Seeking of multiple synced audio stay in sync",
-  async ({ I, LabelStudio, AtAudioView }) => {
-    LabelStudio.setFeatureFlags({
-      fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
-      ff_front_dev_2715_audio_3_280722_short: true,
-      fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
-    });
+  LabelStudio.init(params);
 
-    I.amOnPage("/");
+  await AtAudioView.waitForAudio();
+  await AtAudioView.lookForStage();
 
-    LabelStudio.init(params);
+  I.say("Draw an audio segment to start looping");
+  AtAudioView.dragAudioElement(160, 80);
+  {
+    const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] =
+      await AtAudioView.getCurrentAudio();
 
-    await AtAudioView.waitForAudio();
-    await AtAudioView.lookForStage();
-    {
-      const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] =
-        await AtAudioView.getCurrentAudio();
+    I.say("Audio is playing");
 
-      assert.equal(audioTime1, audioTime2);
-      assert.equal(audioTime1, 0);
-    }
+    // Check that the audio timing is within 0.3 seconds of each other (to account for rounding errors, and the fact
+    // that playback timers will not be perfectly precise)
+    assert.notEqual(audioTime1, 0);
+    assert.notEqual(audioTime2, 0);
+    assert.ok(
+      Math.abs(audioTime1 - audioTime2) < 0.3,
+      `Audio time difference has drifted by ${(audioTime1 - audioTime2) * 1000}ms`,
+    );
 
-    AtAudioView.clickAt(100);
-    {
-      const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] =
-        await AtAudioView.getCurrentAudio();
+    assert.equal(audioPaused1, audioPaused2);
+    assert.equal(audioPaused1, false);
+  }
 
-      assert.equal(audioTime1, audioTime2);
-      assert.notEqual(audioTime1, 0);
-    }
+  I.say("Audio played to the same point in time");
+  AtAudioView.clickPauseButton();
+  {
+    const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] =
+      await AtAudioView.getCurrentAudio();
 
-    AtAudioView.clickAtBeginning();
-    {
-      const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] =
-        await AtAudioView.getCurrentAudio();
+    I.say("Audio is paused");
 
-      assert.equal(audioTime1, audioTime2);
-      assert.equal(audioTime1, 0);
-    }
+    assert.equal(audioPaused1, audioPaused2);
+    assert.equal(audioPaused1, true);
+    assert.ok(
+      Math.abs(audioTime1 - audioTime2) < 0.3,
+      `Audio time difference has drifted by ${(audioTime1 - audioTime2) * 1000}ms`,
+    );
+    assert.notEqual(audioTime1, 0);
+    assert.notEqual(audioTime2, 0);
+  }
 
-    AtAudioView.clickAtEnd();
-    {
-      const [
-        { currentTime: audioTime1 },
-        { currentTime: audioTime2, duration },
-      ] = await AtAudioView.getCurrentAudio();
+  I.say(
+    "Clicking outside of the audio segment and then clicking play should restart the audio from the beginning of the segment",
+  );
+  AtAudioView.clickAt(250);
+  AtAudioView.clickPlayButton();
+  {
+    const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] =
+      await AtAudioView.getCurrentAudio();
 
-      assert.equal(audioTime1, audioTime2);
-      assert.equal(audioTime1, duration);
-    }
+    I.say("Audio is playing");
 
-    AtAudioView.clickAt(300);
-    {
-      const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] =
-        await AtAudioView.getCurrentAudio();
+    assert.equal(audioPaused1, audioPaused2);
+    assert.equal(audioPaused1, false);
+    assert.ok(
+      Math.abs(audioTime1 - audioTime2) < 0.3,
+      `Audio time difference has drifted by ${(audioTime1 - audioTime2) * 1000}ms`,
+    );
+    assert.notEqual(audioTime1, 0);
+    assert.notEqual(audioTime2, 0);
+  }
+});
 
-      assert.equal(audioTime1, audioTime2);
-      assert.notEqual(audioTime1, 0);
-    }
-  },
-);
+Scenario("Seeking of multiple synced audio stay in sync", async ({ I, LabelStudio, AtAudioView }) => {
+  LabelStudio.setFeatureFlags({
+    fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
+    ff_front_dev_2715_audio_3_280722_short: true,
+    fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
+  });
+
+  I.amOnPage("/");
+
+  LabelStudio.init(params);
+
+  await AtAudioView.waitForAudio();
+  await AtAudioView.lookForStage();
+  {
+    const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
+
+    assert.equal(audioTime1, audioTime2);
+    assert.equal(audioTime1, 0);
+  }
+
+  AtAudioView.clickAt(100);
+  {
+    const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
+
+    assert.equal(audioTime1, audioTime2);
+    assert.notEqual(audioTime1, 0);
+  }
+
+  AtAudioView.clickAtBeginning();
+  {
+    const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
+
+    assert.equal(audioTime1, audioTime2);
+    assert.equal(audioTime1, 0);
+  }
+
+  AtAudioView.clickAtEnd();
+  {
+    const [{ currentTime: audioTime1 }, { currentTime: audioTime2, duration }] = await AtAudioView.getCurrentAudio();
+
+    assert.equal(audioTime1, audioTime2);
+    assert.equal(audioTime1, duration);
+  }
+
+  AtAudioView.clickAt(300);
+  {
+    const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
+
+    assert.equal(audioTime1, audioTime2);
+    assert.notEqual(audioTime1, 0);
+  }
+});

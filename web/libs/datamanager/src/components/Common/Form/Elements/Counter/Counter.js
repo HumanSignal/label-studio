@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { Block, Elem } from "../../../../../utils/bem";
 import { isDefined } from "../../../../../utils/utils";
@@ -31,10 +25,7 @@ const Counter = ({
   defaultValue,
   ...props
 }) => {
-  const [min, max] = [
-    props.min ?? Number.NEGATIVE_INFINITY,
-    props.max ?? Number.POSITIVE_INFINITY,
-  ];
+  const [min, max] = [props.min ?? Number.NEGATIVE_INFINITY, props.max ?? Number.POSITIVE_INFINITY];
 
   const normalizeValue = (value) => {
     const val = Number(String(value).replace(` ${postfix}`, ""));
@@ -65,9 +56,7 @@ const Counter = ({
 
   /**@type {(e: import('react').SyntheticEvent<HTMLInputElement, KeyboardEvent>)} */
   const onInputHandler = (e) => {
-    const allowedKey = allowedKeys.find((k) =>
-      k instanceof RegExp ? k.test(e.key) : k === e.key,
-    );
+    const allowedKey = allowedKeys.find((k) => (k instanceof RegExp ? k.test(e.key) : k === e.key));
 
     if (!allowedKey && !e.metaKey) e.preventDefault();
 
@@ -116,8 +105,7 @@ const Counter = ({
     input.current.focus();
     getSelection().removeAllRanges();
 
-    const value =
-      type === "increase" ? increase() : type === "decrease" ? decrease() : 0;
+    const value = type === "increase" ? increase() : type === "decrease" ? decrease() : 0;
 
     if (isDefined(input.current)) {
       input.current.value = value;
@@ -148,9 +136,7 @@ const Counter = ({
       {...props}
     >
       {({ ref, dependency }) => {
-        const depDisabled =
-          (dependency?.type === "checkbox" && dependency?.checked === false) ||
-          false;
+        const depDisabled = (dependency?.type === "checkbox" && dependency?.checked === false) || false;
         const fieldDisabled = disabled ?? depDisabled;
         const contextValue = {
           currentValue,
@@ -166,12 +152,7 @@ const Counter = ({
 
         return (
           <CounterContext.Provider value={contextValue}>
-            <Block
-              name="counter"
-              mod={{ focused, disabled: fieldDisabled }}
-              mix={className}
-              style={style}
-            >
+            <Block name="counter" mod={{ focused, disabled: fieldDisabled }} mix={className} style={style}>
               <CounterButton type="decrease" />
 
               <Elem
@@ -210,21 +191,11 @@ const Counter = ({
     </FormField>
   );
 
-  return label ? (
-    <Label
-      {...(labelProps ?? {})}
-      text={label}
-      required={required}
-      children={field}
-    />
-  ) : (
-    field
-  );
+  return label ? <Label {...(labelProps ?? {})} text={label} required={required} children={field} /> : field;
 };
 
 const CounterButton = ({ type }) => {
-  const { currentValue, min, max, disabled, ref, onClickHandler } =
-    useContext(CounterContext);
+  const { currentValue, min, max, disabled, ref, onClickHandler } = useContext(CounterContext);
 
   const compareLimit = type === "increase" ? max : min;
 

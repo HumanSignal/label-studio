@@ -18,11 +18,7 @@ export const ProjectCell = (cell) => {
   const { original, value } = cell;
   const root = getRoot(original);
   const projectList = value
-    .map((projectRef) =>
-      root.taskStore.associatedList.find(
-        (proj) => proj.id === projectRef.project_id,
-      ),
-    )
+    .map((projectRef) => root.taskStore.associatedList.find((proj) => proj.id === projectRef.project_id))
     .filter(Boolean);
 
   return (

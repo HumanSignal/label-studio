@@ -163,10 +163,7 @@ xScenario("Simple shapes on Image", async ({ I, AtImageView, AtSidebar }) => {
 
     for (let i = 0; i < shape.regions.length; i++) {
       assert.equal(result[i].type, shape.shape.toLowerCase());
-      assert.deepEqual(
-        convertToFixed(result[i].value),
-        convertToImageSize(shape.regions[i].result),
-      );
+      assert.deepEqual(convertToFixed(result[i].value), convertToImageSize(shape.regions[i].result));
     }
   }
 });

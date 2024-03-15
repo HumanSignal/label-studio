@@ -29,18 +29,13 @@ export const ProjectsPage = () => {
   const [currentPage, setCurrentPage] = useState(getCurrentPage());
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
-  const defaultPageSize = Number.parseInt(
-    localStorage.getItem("pages:projects-list") ?? 30,
-  );
+  const defaultPageSize = Number.parseInt(localStorage.getItem("pages:projects-list") ?? 30);
 
   const [modal, setModal] = React.useState(false);
   const openModal = setModal.bind(null, true);
   const closeModal = setModal.bind(null, false);
 
-  const fetchProjects = async (
-    page = currentPage,
-    pageSize = defaultPageSize,
-  ) => {
+  const fetchProjects = async (page = currentPage, pageSize = defaultPageSize) => {
     setNetworkState("loading");
     abortController.renew(); // Cancel any in flight requests
 

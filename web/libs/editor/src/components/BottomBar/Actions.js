@@ -14,9 +14,7 @@ export const Actions = ({ store }) => {
 
   return (
     <Elem name="section">
-      {!isPrediction && !isViewAll && store.hasInterface("edit-history") && (
-        <EditingHistory entity={entity} />
-      )}
+      {!isPrediction && !isViewAll && store.hasInterface("edit-history") && <EditingHistory entity={entity} />}
 
       {store.description && store.hasInterface("instruction") && (
         <Tooltip placement="topLeft" title="Show instructions">

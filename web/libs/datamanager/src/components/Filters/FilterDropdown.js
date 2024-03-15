@@ -11,12 +11,7 @@ const TagRender =
     const color = items.find((el) => el.value === rest.value)?.color;
 
     return (
-      <Tag
-        color={color ?? "#000"}
-        {...rest}
-        size="small"
-        className="filter-data-tag"
-      >
+      <Tag color={color ?? "#000"} {...rest} size="small" className="filter-data-tag">
         <div className="ant-tag-text">{label}</div>
       </Tag>
     );
@@ -36,12 +31,7 @@ const renderOptions = (OptionRender) => (item) => {
   }
 
   return (
-    <Select.Option
-      key={`${value}-${label}`}
-      value={value}
-      style={{ fontSize: 12 }}
-      title={label}
-    >
+    <Select.Option key={`${value}-${label}`} value={value} style={{ fontSize: 12 }} title={label}>
       {OptionRender ? <OptionRender item={item} /> : label}
     </Select.Option>
   );

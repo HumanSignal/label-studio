@@ -21,6 +21,5 @@ TextNode.propTypes = {
   overlap: PropTypes.string,
   key: PropTypes.string,
   style: PropTypes.object,
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
-    .isRequired,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
 };

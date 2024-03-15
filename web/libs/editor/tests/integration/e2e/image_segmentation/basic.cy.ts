@@ -1,9 +1,4 @@
-import {
-  ImageView,
-  LabelStudio,
-  Labels,
-  Sidebar,
-} from "@humansignal/frontend-test/helpers/LSF";
+import { ImageView, LabelStudio, Labels, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 
 const config = `
   <View>

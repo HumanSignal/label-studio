@@ -48,12 +48,7 @@ class ToolsManager {
     return root.annotationStore.names.get(this.name);
   }
 
-  addTool(
-    toolName,
-    tool,
-    removeDuplicatesNamed = null,
-    prefix = guidGenerator(),
-  ) {
+  addTool(toolName, tool, removeDuplicatesNamed = null, prefix = guidGenerator()) {
     if (tool.smart && tool.control?.smartonly) return;
     // todo: It seems that key is used only for storing,
     // but not for finding tools, so may be there might
@@ -61,11 +56,7 @@ class ToolsManager {
     const name = tool.toolName ?? toolName;
     const key = `${prefix ?? this._prefix}#${name}`;
 
-    if (
-      isFF(FF_DEV_4081) &&
-      removeDuplicatesNamed &&
-      toolName === removeDuplicatesNamed
-    ) {
+    if (isFF(FF_DEV_4081) && removeDuplicatesNamed && toolName === removeDuplicatesNamed) {
       const findme = new RegExp(`^.*?#${name}.*$`);
 
       if (Object.keys(this.tools).some((entry) => findme.test(entry))) {

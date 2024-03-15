@@ -19,12 +19,7 @@ import { Dropdown } from "../../../common/Dropdown/Dropdown";
 // @ts-ignore
 import { Menu } from "../../../common/Menu/Menu";
 import { BemWithSpecifiContext } from "../../../utils/bem";
-import {
-  FF_DEV_3873,
-  FF_LSDV_3025,
-  FF_LSDV_4992,
-  isFF,
-} from "../../../utils/feature-flags";
+import { FF_DEV_3873, FF_LSDV_3025, FF_LSDV_4992, isFF } from "../../../utils/feature-flags";
 import { Filter } from "../../Filter/Filter";
 import { SidePanelsContext } from "../SidePanelsContext";
 import "./ViewControls.styl";
@@ -47,72 +42,51 @@ interface ViewControlsProps {
 }
 
 export const ViewControls: FC<ViewControlsProps> = observer(
-  ({
-    ordering,
-    regions,
-    orderingDirection,
-    onOrderingChange,
-    onGroupingChange,
-    onFilterChange,
-  }) => {
+  ({ ordering, regions, orderingDirection, onOrderingChange, onGroupingChange, onFilterChange }) => {
     const grouping = regions.group;
     const context = useContext(SidePanelsContext);
-    const getGroupingLabels = useCallback(
-      (value: GroupingOptions): LabelInfo => {
-        switch (value) {
-          case "manual":
-            return {
-              label: "Group Manually",
-              selectedLabel: isFF(FF_DEV_3873) ? "Manual" : "Manual Grouping",
-              icon: <IconList />,
-              tooltip: "Manually Grouped",
-            };
-          case "label":
-            return {
-              label: "Group by Label",
-              selectedLabel: isFF(FF_DEV_3873)
-                ? isFF(FF_LSDV_4992)
-                  ? "By Label"
-                  : "Label"
-                : "Grouped by Label",
-              icon: <IconTagAlt />,
-              tooltip: "Grouped by Label",
-            };
-          case "type":
-            return {
-              label: "Group by Tool",
-              selectedLabel: isFF(FF_DEV_3873)
-                ? isFF(FF_LSDV_4992)
-                  ? "By Tool"
-                  : "Tool"
-                : "Grouped by Tool",
-              icon: <IconCursor />,
-              tooltip: "Grouped by Tool",
-            };
-        }
-      },
-      [],
-    );
+    const getGroupingLabels = useCallback((value: GroupingOptions): LabelInfo => {
+      switch (value) {
+        case "manual":
+          return {
+            label: "Group Manually",
+            selectedLabel: isFF(FF_DEV_3873) ? "Manual" : "Manual Grouping",
+            icon: <IconList />,
+            tooltip: "Manually Grouped",
+          };
+        case "label":
+          return {
+            label: "Group by Label",
+            selectedLabel: isFF(FF_DEV_3873) ? (isFF(FF_LSDV_4992) ? "By Label" : "Label") : "Grouped by Label",
+            icon: <IconTagAlt />,
+            tooltip: "Grouped by Label",
+          };
+        case "type":
+          return {
+            label: "Group by Tool",
+            selectedLabel: isFF(FF_DEV_3873) ? (isFF(FF_LSDV_4992) ? "By Tool" : "Tool") : "Grouped by Tool",
+            icon: <IconCursor />,
+            tooltip: "Grouped by Tool",
+          };
+      }
+    }, []);
 
-    const getOrderingLabels = useCallback(
-      (value: OrderingOptions): LabelInfo => {
-        switch (value) {
-          case "date":
-            return {
-              label: "Order by Time",
-              selectedLabel: "By Time",
-              icon: <IconDetails />,
-            };
-          case "score":
-            return {
-              label: "Order by Score",
-              selectedLabel: "By Score",
-              icon: <IconSpeed />,
-            };
-        }
-      },
-      [],
-    );
+    const getOrderingLabels = useCallback((value: OrderingOptions): LabelInfo => {
+      switch (value) {
+        case "date":
+          return {
+            label: "Order by Time",
+            selectedLabel: "By Time",
+            icon: <IconDetails />,
+          };
+        case "score":
+          return {
+            label: "Order by Score",
+            selectedLabel: "By Score",
+            icon: <IconSpeed />,
+          };
+      }
+    }, []);
 
     const renderOrderingDirectionIcon =
       orderingDirection === "asc" ? (
@@ -166,9 +140,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             ]}
           />
         )}
-        {isFF(FF_LSDV_4992) ? (
-          <ToggleRegionsVisibilityButton regions={regions} />
-        ) : null}
+        {isFF(FF_LSDV_4992) ? <ToggleRegionsVisibilityButton regions={regions} /> : null}
       </Block>
     );
   },
@@ -259,12 +231,7 @@ const Grouping = <T extends string>({
           isFF(FF_DEV_3873) ? (
             extraIcon
           ) : (
-            <DirectionIndicator
-              direction={direction}
-              name={value}
-              value={value}
-              wrap={false}
-            />
+            <DirectionIndicator direction={direction} name={value} value={value} wrap={false} />
           )
         }
         tooltip={(isFF(FF_LSDV_4992) && readableValue.tooltip) || undefined}
@@ -284,13 +251,7 @@ interface GroupingMenuItemProps<T extends string> {
   onChange: (key: T) => void;
 }
 
-const GroupingMenuItem = <T extends string>({
-  value,
-  name,
-  label,
-  direction,
-  onChange,
-}: GroupingMenuItemProps<T>) => {
+const GroupingMenuItem = <T extends string>({ value, name, label, direction, onChange }: GroupingMenuItemProps<T>) => {
   return (
     <Menu.Item name={name} onClick={() => onChange(name)}>
       <Elem name="label">
@@ -308,12 +269,7 @@ interface DirectionIndicator {
   wrap?: boolean;
 }
 
-const DirectionIndicator: FC<DirectionIndicator> = ({
-  direction,
-  value,
-  name,
-  wrap = true,
-}) => {
+const DirectionIndicator: FC<DirectionIndicator> = ({ direction, value, name, wrap = true }) => {
   const content = direction === "asc" ? <IconSortUp /> : <IconSortDown />;
 
   if (!direction || value !== name || isFF(FF_DEV_3873)) return null;
@@ -326,9 +282,7 @@ interface ToggleRegionsVisibilityButton {
   regions: any;
 }
 
-const ToggleRegionsVisibilityButton = observer<
-  FC<ToggleRegionsVisibilityButton>
->(({ regions }) => {
+const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>>(({ regions }) => {
   const toggleRegionsVisibility = useCallback(
     (e) => {
       e.preventDefault();

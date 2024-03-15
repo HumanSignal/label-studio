@@ -13,9 +13,7 @@ const intersectionObserverMock = () => ({
   disconnect: () => null,
 });
 
-window.IntersectionObserver = jest
-  .fn()
-  .mockImplementation(intersectionObserverMock);
+window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock);
 
 jest.mock("mobx-state-tree", () => ({
   ...jest.requireActual("mobx-state-tree"),
@@ -58,18 +56,10 @@ describe("Phrases Component", () => {
     const playingId = 0;
     const contextScroll = false;
 
-    render(
-      <Phrases
-        item={item}
-        playingId={playingId}
-        contextScroll={contextScroll}
-      />,
-    );
+    render(<Phrases item={item} playingId={playingId} contextScroll={contextScroll} />);
 
     const phraseElements = screen.getAllByTestId(/^phrase:/);
-    const phraseTextContext = phraseElements.map(
-      (element) => element.textContent,
-    );
+    const phraseTextContext = phraseElements.map((element) => element.textContent);
 
     expect(phraseElements).toHaveLength(2);
     expect(phraseTextContext[0]).toContain("phrase1");

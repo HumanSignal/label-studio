@@ -1,11 +1,5 @@
 import type React from "react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { shallowEqualObjects } from "shallow-equal";
 import { type WrappedResponse, useAPI } from "./ApiProvider";
 import { useAppStore } from "./AppStoreProvider";
@@ -15,10 +9,7 @@ type Empty = Record<string, never>;
 
 type Context = {
   project: APIProject | Empty;
-  fetchProject: (
-    id?: string | number,
-    force?: boolean,
-  ) => Promise<APIProject | void>;
+  fetchProject: (id?: string | number, force?: boolean) => Promise<APIProject | void>;
   updateProject: (fields: APIProject) => Promise<WrappedResponse<APIProject>>;
   invalidateCache: () => void;
 };
@@ -33,9 +24,7 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
   const params = useParams();
   const { update: updateStore } = useAppStore();
   // @todo use null for missed project data
-  const [projectData, setProjectData] = useState<APIProject | Empty>(
-    projectCache.get(+params.id) ?? {},
-  );
+  const [projectData, setProjectData] = useState<APIProject | Empty>(projectCache.get(+params.id) ?? {});
 
   const fetchProject: Context["fetchProject"] = useCallback(
     async (id, force = false) => {

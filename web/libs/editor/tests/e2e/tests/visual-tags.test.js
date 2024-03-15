@@ -38,8 +38,7 @@ Feature("Visual tags");
 Scenario("Check Collapse, Header and Style", async ({ I }) => {
   // @todo usual click should work because of role=button
   // @todo or at least locate('[role=button]'), but both of them are failing
-  const clickCollapse = (text) =>
-    I.click(locate(".ant-collapse-header").withText(text));
+  const clickCollapse = (text) => I.click(locate(".ant-collapse-header").withText(text));
 
   await I.amOnPage("/");
   I.executeScript(initLabelStudio, { config, data });

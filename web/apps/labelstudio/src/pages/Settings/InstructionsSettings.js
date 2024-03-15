@@ -33,10 +33,7 @@ export const InstructionsSettings = () => {
           </div>
           <div style={{ color: "rgba(0,0,0,0.4)", paddingLeft: 16 }}>
             <p>Write instructions to help users complete labeling tasks.</p>
-            <p>
-              The instruction field supports HTML markup and it allows to
-              integrate with images, iframes (pdf).
-            </p>
+            <p>The instruction field supports HTML markup and it allows to integrate with images, iframes (pdf).</p>
           </div>
         </Form.Row>
 

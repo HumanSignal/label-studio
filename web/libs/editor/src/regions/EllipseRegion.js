@@ -7,10 +7,7 @@ import Registry from "../core/Registry";
 import NormalizationMixin from "../mixins/Normalization";
 import RegionsMixin from "../mixins/Regions";
 
-import {
-  RELATIVE_STAGE_HEIGHT,
-  RELATIVE_STAGE_WIDTH,
-} from "../components/ImageView/Image";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 import { LabelOnEllipse } from "../components/ImageView/LabelOnRegion";
 import { guidGenerator } from "../core/Helpers";
@@ -55,13 +52,7 @@ const EllipseRegionAbsoluteCoordsDEV3793 = types
           const { stageWidth, stageHeight } = self.parent;
 
           if (stageWidth && stageHeight) {
-            self.setPosition(
-              self.x,
-              self.y,
-              self.radiusX,
-              self.radiusY,
-              self.rotation,
-            );
+            self.setPosition(self.x, self.y, self.radiusX, self.radiusY, self.rotation);
           }
           break;
         }
@@ -78,10 +69,8 @@ const EllipseRegionAbsoluteCoordsDEV3793 = types
       self.relativeX = (x / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
       self.relativeY = (y / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
 
-      self.relativeRadiusX =
-        (radiusX / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeRadiusY =
-        (radiusY / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
+      self.relativeRadiusX = (radiusX / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
+      self.relativeRadiusY = (radiusY / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
 
       self.rotation = (rotation + 360) % 360;
     },
@@ -175,32 +164,19 @@ const Model = types
 
       if (self.rotation === 0) return bboxCoords;
 
-      return rotateBboxCoords(
-        bboxCoords,
-        self.rotation,
-        { x: self.x, y: self.y },
-        self.parent.whRatio,
-      );
+      return rotateBboxCoords(bboxCoords, self.rotation, { x: self.x, y: self.y }, self.parent.whRatio);
     },
     get canvasX() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasX(self.x)
-        : self.x;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.x) : self.x;
     },
     get canvasY() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasY(self.y)
-        : self.y;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.y) : self.y;
     },
     get canvasRadiusX() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasX(self.radiusX)
-        : self.radiusX;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.radiusX) : self.radiusX;
     },
     get canvasRadiusY() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasY(self.radiusY)
-        : self.radiusY;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.radiusY) : self.radiusY;
     },
   }))
   .actions((self) => ({
@@ -224,12 +200,8 @@ const Model = types
       //going to system where our ellipse has angle 0 to X-Axis via rotate matrix
       const theta = self.rotation;
 
-      rel_x =
-        rel_x * Math.cos(Math.unit(theta, "deg")) -
-        rel_y * Math.sin(Math.unit(theta, "deg"));
-      rel_y =
-        rel_x * Math.sin(Math.unit(theta, "deg")) +
-        rel_y * Math.cos(Math.unit(theta, "deg"));
+      rel_x = rel_x * Math.cos(Math.unit(theta, "deg")) - rel_y * Math.sin(Math.unit(theta, "deg"));
+      rel_y = rel_x * Math.sin(Math.unit(theta, "deg")) + rel_y * Math.cos(Math.unit(theta, "deg"));
 
       if (Math.abs(rel_x) < a) {
         if (rel_y ** 2 < b ** 2 * (1 - rel_x ** 2 / a ** 2)) {
@@ -310,12 +282,8 @@ const Model = types
       const value = {
         x: isFF(FF_DEV_3793) ? self.x : self.convertXToPerc(self.x),
         y: isFF(FF_DEV_3793) ? self.y : self.convertYToPerc(self.y),
-        radiusX: isFF(FF_DEV_3793)
-          ? self.radiusX
-          : self.convertHDimensionToPerc(self.radiusX),
-        radiusY: isFF(FF_DEV_3793)
-          ? self.radiusY
-          : self.convertVDimensionToPerc(self.radiusY),
+        radiusX: isFF(FF_DEV_3793) ? self.radiusX : self.convertHDimensionToPerc(self.radiusX),
+        radiusY: isFF(FF_DEV_3793) ? self.radiusY : self.convertVDimensionToPerc(self.radiusY),
         rotation: self.rotation,
       };
 
@@ -437,11 +405,7 @@ const HtxEllipseView = ({ item, setShapeRef }) => {
         draggable={!item.isReadOnly()}
         listening={!suggestion}
       />
-      <LabelOnEllipse
-        item={item}
-        color={regionStyles.strokeColor}
-        strokewidth={regionStyles.strokeWidth}
-      />
+      <LabelOnEllipse item={item} color={regionStyles.strokeColor} strokewidth={regionStyles.strokeWidth} />
     </Fragment>
   );
 };

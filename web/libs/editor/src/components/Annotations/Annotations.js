@@ -19,10 +19,7 @@ import styles from "./Annotations.module.scss";
 
 export const DraftPanel = observer(({ item }) => {
   if (!item.draftSaved && !item.versions.draft) return null;
-  const saved =
-    item.draft && item.draftSaved
-      ? ` saved ${Utils.UDate.prettyDate(item.draftSaved)}`
-      : "";
+  const saved = item.draft && item.draftSaved ? ` saved ${Utils.UDate.prettyDate(item.draftSaved)}` : "";
 
   if (!item.selected) {
     if (!item.draft) return null;
@@ -35,17 +32,9 @@ export const DraftPanel = observer(({ item }) => {
     <div>
       <Tooltip
         placement="topLeft"
-        title={
-          item.draftSelected
-            ? "switch to submitted result"
-            : "switch to current draft"
-        }
+        title={item.draftSelected ? "switch to submitted result" : "switch to current draft"}
       >
-        <Button
-          type="link"
-          onClick={item.toggleDraft}
-          className={styles.draftbtn}
-        >
+        <Button type="link" onClick={item.toggleDraft} className={styles.draftbtn}>
           {item.draftSelected ? "draft" : "submitted"}
         </Button>
       </Tooltip>
@@ -71,9 +60,7 @@ const Annotation = observer(({ item, store }) => {
   );
 
   const setHoney = () => {
-    const title = item.ground_truth
-      ? "Unset this result as a ground truth"
-      : "Set this result as a ground truth";
+    const title = item.ground_truth ? "Unset this result as a ground truth" : "Set this result as a ground truth";
 
     return (
       <Tooltip placement="topLeft" title={title}>
@@ -158,8 +145,7 @@ const Annotation = observer(({ item, store }) => {
 
     return (
       <div className={styles.buttons}>
-        {store.hasInterface("ground-truth") &&
-          (item.ground_truth ? removeHoney() : setHoney())}
+        {store.hasInterface("ground-truth") && (item.ground_truth ? removeHoney() : setHoney())}
         &nbsp;
         {store.hasInterface("annotations:delete") && (
           <Tooltip placement="topLeft" title="Delete selected annotation">
@@ -184,11 +170,7 @@ const Annotation = observer(({ item, store }) => {
   return (
     <List.Item
       key={item.id}
-      className={
-        item.selected
-          ? `${styles.annotation} ${styles.annotation_selected}`
-          : styles.annotation
-      }
+      className={item.selected ? `${styles.annotation} ${styles.annotation_selected}` : styles.annotation}
       onClick={() => {
         !item.selected && store.annotationStore.selectAnnotation(item.id);
       }}
@@ -202,11 +184,7 @@ const Annotation = observer(({ item, store }) => {
             {annotationID}
           </div>
           {item.pk ? "Created" : "Started"}
-          <i>
-            {item.createdAgo
-              ? ` ${item.createdAgo} ago`
-              : ` ${Utils.UDate.prettyDate(item.createdDate)}`}
-          </i>
+          <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
           {item.createdBy && item.pk ? ` by ${item.createdBy}` : null}
           <DraftPanel item={item} />
         </div>
@@ -271,23 +249,11 @@ class Annotations extends Component {
       </div>
     );
 
-    const content = store.annotationStore.annotations.map((c) => (
-      <Annotation key={c.id} item={c} store={store} />
-    ));
+    const content = store.annotationStore.annotations.map((c) => <Annotation key={c.id} item={c} store={store} />);
 
     return (
-      <Card
-        title={title}
-        size="small"
-        bodyStyle={{ padding: "0", paddingTop: "1px" }}
-      >
-        <List>
-          {store.annotationStore.annotations ? (
-            content
-          ) : (
-            <p>No annotations submitted yet</p>
-          )}
-        </List>
+      <Card title={title} size="small" bodyStyle={{ padding: "0", paddingTop: "1px" }}>
+        <List>{store.annotationStore.annotations ? content : <p>No annotations submitted yet</p>}</List>
       </Card>
     );
   }

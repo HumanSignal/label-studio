@@ -20,10 +20,7 @@ this.mousedown = (event) => {
     path.addControlPoint(p0);
   } else {
     // final point: at 'tolerance' of the initial point
-    if (
-      Math.abs(event._x - self.x0) < tolerance &&
-      Math.abs(event._y - self.y0) < tolerance
-    ) {
+    if (Math.abs(event._x - self.x0) < tolerance && Math.abs(event._y - self.y0) < tolerance) {
       // draw
       self.mousemove(event);
       // listen
@@ -103,11 +100,7 @@ this.mousemove = (event) => {
   posGroup.add(shapeGroup);
 
   // draw shape command
-  command = new dwv.tool.DrawGroupCommand(
-    shapeGroup,
-    "livewire",
-    app.getDrawController().getDrawLayer(),
-  );
+  command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getDrawController().getDrawLayer());
   // draw
   command.execute();
 };

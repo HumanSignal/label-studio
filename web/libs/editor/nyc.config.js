@@ -1,7 +1,5 @@
 const defaultExtension = [".js", ".cjs", ".mjs", ".ts", ".tsx", ".jsx"];
-const testFileExtensions = defaultExtension
-  .map((extension) => extension.slice(1))
-  .join(",");
+const testFileExtensions = defaultExtension.map((extension) => extension.slice(1)).join(",");
 const defaultExclude = [
   "coverage/**",
   "packages/*/test{,s}/**",

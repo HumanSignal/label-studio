@@ -1,13 +1,4 @@
-import React, {
-  type FC,
-  memo,
-  type MouseEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { type FC, memo, type MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   IconBackward,
   IconChevronLeft,
@@ -99,8 +90,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
 
     const customControls = useCustomControls(props.customControls);
     const stepHandlerWrapper =
-      (handler: TimelineControlsStepHandler, stepSize?: TimelineStepFunction) =>
-      (e: MouseEvent<HTMLButtonElement>) => {
+      (handler: TimelineControlsStepHandler, stepSize?: TimelineStepFunction) => (e: MouseEvent<HTMLButtonElement>) => {
         handler(e, stepSize ?? undefined);
       };
 
@@ -125,12 +115,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
 
     const renderControls = () => {
       return (
-        <Elem
-          name="group"
-          tag={Space}
-          size="small"
-          style={{ gridAutoColumns: "auto" }}
-        >
+        <Elem name="group" tag={Space} size="small" style={{ gridAutoColumns: "auto" }}>
           <ConfigControl
             onSetModal={onSetConfigModal}
             onAmpChange={props.onAmpChange}
@@ -184,27 +169,16 @@ export const Controls: FC<TimelineControlsProps> = memo(
     };
 
     return (
-      <Block
-        name="timeline-controls"
-        tag={Space}
-        spread
-        style={{ gridAutoColumns: "auto" }}
-      >
+      <Block name="timeline-controls" tag={Space} spread style={{ gridAutoColumns: "auto" }}>
         {isFF(FF_DEV_2715) && mediaType === "audio" ? (
           renderControls()
         ) : (
-          <Elem
-            name="group"
-            tag={Space}
-            size="small"
-            style={{ gridAutoColumns: "auto" }}
-          >
+          <Elem name="group" tag={Space} size="small" style={{ gridAutoColumns: "auto" }}>
             {props.controls &&
               Object.entries(props.controls).map(([name, enabled]) => {
                 if (enabled === false) return;
 
-                const Component =
-                  SideControls[name as keyof typeof SideControls];
+                const Component = SideControls[name as keyof typeof SideControls];
 
                 return (
                   isDefined(Component) && (
@@ -234,10 +208,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                 <>
                   {settings?.stepSize && !disableFrames && (
                     <ControlButton
-                      onClick={stepHandlerWrapper(
-                        onStepBackward,
-                        settings.stepSize,
-                      )}
+                      onClick={stepHandlerWrapper(onStepBackward, settings.stepSize)}
                       hotkey={settings?.stepAltBack}
                       disabled={startReached}
                     >
@@ -294,10 +265,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                   {settings?.stepSize && !disableFrames && (
                     <ControlButton
                       disabled={endReached}
-                      onClick={stepHandlerWrapper(
-                        onStepForward,
-                        settings.stepSize,
-                      )}
+                      onClick={stepHandlerWrapper(onStepForward, settings.stepSize)}
                       hotkey={settings?.stepAltForward}
                     >
                       <IconNext />
@@ -314,11 +282,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                   >
                     <IconForward />
                   </ControlButton>
-                  <ControlButton
-                    onClick={() => onForward?.()}
-                    disabled={endReached}
-                    hotkey={settings?.skipToEnd}
-                  >
+                  <ControlButton onClick={() => onForward?.()} disabled={endReached} hotkey={settings?.skipToEnd}>
                     <IconFastForward />
                   </ControlButton>
                 </>
@@ -328,18 +292,12 @@ export const Controls: FC<TimelineControlsProps> = memo(
           </Elem>
           <Elem name="group" tag={Space} collapsed>
             {!disableFrames && allowViewCollapse && (
-              <ControlButton
-                tooltip="Toggle Timeline"
-                onClick={() => onToggleCollapsed?.(!collapsed)}
-              >
+              <ControlButton tooltip="Toggle Timeline" onClick={() => onToggleCollapsed?.(!collapsed)}>
                 {collapsed ? <IconExpand /> : <IconCollapse />}
               </ControlButton>
             )}
             {allowFullscreen && (
-              <ControlButton
-                tooltip="Fullscreen"
-                onClick={() => onFullScreenToggle?.(false)}
-              >
+              <ControlButton tooltip="Fullscreen" onClick={() => onFullScreenToggle?.(false)}>
                 {fullscreen ? <IconFullscreenExit /> : <IconFullscreen />}
               </ControlButton>
             )}
@@ -379,16 +337,9 @@ export const Controls: FC<TimelineControlsProps> = memo(
   },
 );
 
-export const ControlButton: FC<ButtonProps & { disabled?: boolean }> = ({
-  children,
-  ...props
-}) => {
+export const ControlButton: FC<ButtonProps & { disabled?: boolean }> = ({ children, ...props }) => {
   return (
-    <Button
-      {...props}
-      type="text"
-      style={{ width: 36, height: 36, padding: 0 }}
-    >
+    <Button {...props} type="text" style={{ width: 36, height: 36, padding: 0 }}>
       {children}
     </Button>
   );
@@ -403,14 +354,7 @@ interface TimeDisplay {
   formatPosition?: TimelineProps["formatPosition"];
 }
 
-const TimeDisplay: FC<TimeDisplay> = ({
-  currentTime,
-  position,
-  duration,
-  framerate,
-  length,
-  formatPosition,
-}) => {
+const TimeDisplay: FC<TimeDisplay> = ({ currentTime, position, duration, framerate, length, formatPosition }) => {
   const pos = position - 1;
   const formatter = formatPosition ?? positionFromTime;
   const commonOptions = { position: pos, fps: framerate, length };
@@ -434,8 +378,7 @@ const TimeDisplay: FC<TimeDisplay> = ({
 
 const Time: FC<{ time: number; position: string }> = ({ time, position }) => {
   const timeDate = new Date(time * 1000).toISOString();
-  const formatted =
-    time > 3600 ? timeDate.substr(11, 8) : timeDate.substr(14, 5);
+  const formatted = time > 3600 ? timeDate.substr(11, 8) : timeDate.substr(14, 5);
 
   return (
     <>
@@ -459,15 +402,12 @@ const AltControls: FC<AltControlsProps> = (props) => {
 
 type ControlGroups = Record<TimelineCustomControls["position"], JSX.Element[]>;
 
-const useCustomControls = (
-  customControls?: TimelineCustomControls[],
-): ControlGroups | null => {
+const useCustomControls = (customControls?: TimelineCustomControls[]): ControlGroups | null => {
   if (!customControls) return null;
 
   const groups = customControls?.reduce<ControlGroups>((groups, item) => {
     const group = groups[item.position] ?? [];
-    const component =
-      item.component instanceof Function ? item.component() : item.component;
+    const component = item.component instanceof Function ? item.component() : item.component;
 
     group.push(component);
     groups[item.position] = group;

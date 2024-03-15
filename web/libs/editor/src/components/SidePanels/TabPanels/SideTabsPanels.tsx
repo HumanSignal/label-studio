@@ -1,13 +1,5 @@
 import { observer } from "mobx-react";
-import {
-  type FC,
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMedia } from "../../../hooks/useMedia";
 import { useRegionsCopyPaste } from "../../../hooks/useRegionsCopyPaste";
 import { Block, Elem } from "../../../utils/bem";
@@ -69,9 +61,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   const snapThreshold = 5;
   const regions = currentEntity.regionStore;
   const viewportSize = useRef<ViewportSize>({ width: 0, height: 0 });
-  const screenSizeMatch = useMedia(
-    `screen and (max-width: ${maxWindowWidth}px)`,
-  );
+  const screenSizeMatch = useMedia(`screen and (max-width: ${maxWindowWidth}px)`);
   const [panelMaxWidth, setPanelMaxWidth] = useState(DEFAULT_PANEL_MAX_WIDTH);
   const [viewportSizeMatch, setViewportSizeMatch] = useState(false);
   const [lockPanelContents, setLockPanelContents] = useState(false);
@@ -79,16 +69,9 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   const [initialized, setInitialized] = useState(false);
   const rootRef = useRef<HTMLDivElement>();
   const [snap, setSnap] = useState<DropSide | Side | undefined>();
-  const initialState = useMemo(
-    () => restorePanel(showComments),
-    [showComments],
-  );
-  const [panelData, setPanelData] = useState<Record<string, PanelBBox>>(
-    initialState.panelData,
-  );
-  const [collapsedSide, setCollapsedSide] = useState(
-    initialState.collapsedSide,
-  );
+  const initialState = useMemo(() => restorePanel(showComments), [showComments]);
+  const [panelData, setPanelData] = useState<Record<string, PanelBBox>>(initialState.panelData);
+  const [collapsedSide, setCollapsedSide] = useState(initialState.collapsedSide);
   const [breakPointActiveTab, setBreakPointActiveTab] = useState(0);
   const localSnap = useRef(snap);
   const collapsedSideRef = useRef(collapsedSide);
@@ -117,24 +100,13 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   );
 
   const transferTab = useCallback(
-    (
-      movingTab: number,
-      movingPanel: string,
-      receivingPanel: string,
-      receivingTab: number,
-      dropSide: Side,
-    ) => {
+    (movingTab: number, movingPanel: string, receivingPanel: string, receivingTab: number, dropSide: Side) => {
       setPanelData((state) => {
         const movingTabComponent = state[movingPanel].panelViews[movingTab];
 
         if (movingTabComponent) movingTabComponent.active = true;
-        const stateWithRemovals = stateRemovedTab(
-          state,
-          movingPanel,
-          movingTab,
-        );
-        const panelsWithRemovals =
-          stateRemovePanelEmptyViews(stateWithRemovals);
+        const stateWithRemovals = stateRemovedTab(state, movingPanel, movingTab);
+        const panelsWithRemovals = stateRemovePanelEmptyViews(stateWithRemovals);
         const stateWithAdditions = stateAddedTab(
           panelsWithRemovals,
           movingPanel,
@@ -147,10 +119,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
         const renamedKeys = renameKeys(adjustZIndex);
         const activeDefaults = setActiveDefaults(renamedKeys);
 
-        const restorePanelHeights = getSnappedHeights(
-          activeDefaults,
-          viewportSize.current.height,
-        );
+        const restorePanelHeights = getSnappedHeights(activeDefaults, viewportSize.current.height);
 
         return restorePanelHeights;
       });
@@ -160,68 +129,32 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   );
 
   const createNewPanel = useCallback(
-    (
-      name: string,
-      movingPanel: string,
-      movingTab: number,
-      left: number,
-      top: number,
-    ) => {
+    (name: string, movingPanel: string, movingTab: number, left: number, top: number) => {
       if (localSnap.current) {
         const snapSide = localSnap.current.split("-");
         const side = snapSide[0] as Side;
 
         if (collapsedSideRef.current?.[side]) return;
-        const joinOrder =
-          snapSide[1] === "top" ? JoinOrder.top : JoinOrder.bottom;
+        const joinOrder = snapSide[1] === "top" ? JoinOrder.top : JoinOrder.bottom;
         const height = viewportSize.current.height;
 
         setPanelData((state) => {
-          const newPanel = newPanelInState(
-            state,
-            name,
-            movingPanel,
-            movingTab,
-            left,
-            top,
-            viewportSize,
-          );
+          const newPanel = newPanelInState(state, name, movingPanel, movingTab, left, top, viewportSize);
 
-          return joinPanelColumns(
-            newPanel,
-            name,
-            side,
-            DEFAULT_PANEL_WIDTH,
-            height,
-            joinOrder,
-          );
+          return joinPanelColumns(newPanel, name, side, DEFAULT_PANEL_WIDTH, height, joinOrder);
         });
       } else {
         setPanelData((state) => {
-          return newPanelInState(
-            state,
-            name,
-            movingPanel,
-            movingTab,
-            left,
-            top,
-            viewportSize,
-          );
+          return newPanelInState(state, name, movingPanel, movingTab, left, top, viewportSize);
         });
       }
       setSnap(undefined);
     },
-    [
-      panelData,
-      collapsedSide,
-      collapsedSide[Side.left],
-      collapsedSide[Side.right],
-    ],
+    [panelData, collapsedSide, collapsedSide[Side.left], collapsedSide[Side.right]],
   );
 
   const setActiveTab = useCallback(
-    (key: string, tabIndex: number) =>
-      setPanelData((state) => setActive(state, key, tabIndex)),
+    (key: string, tabIndex: number) => setPanelData((state) => setActive(state, key, tabIndex)),
     [panelData],
   );
 
@@ -241,11 +174,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
           },
         };
 
-        return redistributeHeights(
-          newState,
-          viewportSize.current.height,
-          panel.alignment,
-        );
+        return redistributeHeights(newState, viewportSize.current.height, panel.alignment);
       });
     },
     [setPanelData, panelData],
@@ -258,13 +187,9 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       const parentWidth = viewportSize.current.width ?? 0;
       const parentHeight = viewportSize.current.height ?? 0;
       const targetRightWidth =
-        Object.entries(panelData).find(
-          ([_, panelData]) => panelData.alignment === Side.right,
-        )?.[1].width || 0;
+        Object.entries(panelData).find(([_, panelData]) => panelData.alignment === Side.right)?.[1].width || 0;
       const targetLeftWidth =
-        Object.entries(panelData).find(
-          ([_, panelData]) => panelData.alignment === Side.left,
-        )?.[1].width || 0;
+        Object.entries(panelData).find(([_, panelData]) => panelData.alignment === Side.left)?.[1].width || 0;
       const panelRightHit = right >= parentWidth - targetRightWidth;
       const panelLeftHit = left <= targetLeftWidth;
       const topHit = top <= snapThreshold;
@@ -290,19 +215,12 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
     (key: string, top: number, left: number, visible?: boolean) => {
       const panel = panelData[key];
       const parentWidth = rootRef.current?.clientWidth ?? 0;
-      const visibleHeight =
-        visible ?? panel.visible ? panel.height : PANEL_HEADER_HEIGHT;
+      const visibleHeight = visible ?? panel.visible ? panel.height : PANEL_HEADER_HEIGHT;
       const detachedHeight = panel.detached ? visibleHeight : panel.height;
       const adjustedHeight =
-        panel.height === rootRef.current?.clientHeight || !panel.detached
-          ? DEFAULT_PANEL_HEIGHT
-          : detachedHeight;
+        panel.height === rootRef.current?.clientHeight || !panel.detached ? DEFAULT_PANEL_HEIGHT : detachedHeight;
       const normalizedLeft = clamp(left, 0, parentWidth - panel.width);
-      const normalizedTop = clamp(
-        top,
-        0,
-        (rootRef.current?.clientHeight ?? 0) - adjustedHeight,
-      );
+      const normalizedTop = clamp(top, 0, (rootRef.current?.clientHeight ?? 0) - adjustedHeight);
 
       return {
         left: normalizedLeft,
@@ -362,9 +280,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   const onGroupHeightResize = useCallback(
     (key: string, h: number, t: number) => {
       requestAnimationFrame(() => {
-        setPanelData((state) =>
-          resizePanelColumns(state, key, h, t, viewportSize.current.height),
-        );
+        setPanelData((state) => resizePanelColumns(state, key, h, t, viewportSize.current.height));
       });
     },
     [setPanelData],
@@ -372,10 +288,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
 
   const findPanelsOnSameSide = useCallback(
     (panelAlignment: string) => {
-      return Object.keys(panelData).filter(
-        (panelName) =>
-          panelData[panelName as string]?.alignment === panelAlignment,
-      );
+      return Object.keys(panelData).filter((panelName) => panelData[panelName as string]?.alignment === panelAlignment);
     },
     [panelData],
   );
@@ -387,9 +300,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
 
       requestAnimationFrame(() => {
         const detached = panelData[key].detached;
-        const panelsToAdjust = detached
-          ? [key]
-          : findPanelsOnSameSide(panelData[key]?.alignment);
+        const panelsToAdjust = detached ? [key] : findPanelsOnSameSide(panelData[key]?.alignment);
 
         panelsToAdjust.forEach((panelKey) => {
           updatePanel(panelKey, {
@@ -419,20 +330,11 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       const snap = localSnap.current.split("-");
       const side = snap[0] as Side;
       const joinOrder = snap[1] === "top" ? JoinOrder.top : JoinOrder.bottom;
-      const sameSidePanelKeys = getAttachedPerSide(panelData, side)?.filter(
-        (panelName) => panelName !== key,
-      );
+      const sameSidePanelKeys = getAttachedPerSide(panelData, side)?.filter((panelName) => panelName !== key);
 
       if (sameSidePanelKeys && sameSidePanelKeys.length > 0) {
         setPanelData((state) =>
-          joinPanelColumns(
-            state,
-            key,
-            side,
-            DEFAULT_PANEL_WIDTH,
-            viewportSize.current.height,
-            joinOrder,
-          ),
+          joinPanelColumns(state, key, side, DEFAULT_PANEL_WIDTH, viewportSize.current.height, joinOrder),
         );
       } else
         updatePanel(key, {
@@ -488,29 +390,15 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
     const leftKeys = getLeftKeys(panelData);
     const rightKeys = getRightKeys(panelData);
     const allLeftNotVisible = leftKeys.every((key) => !panelData[key].visible);
-    const allRightNotVisible = rightKeys.every(
-      (key) => !panelData[key].visible,
-    );
+    const allRightNotVisible = rightKeys.every((key) => !panelData[key].visible);
     const { left: leftCollapsed, right: rightCollapsed } = collapsedSide;
 
-    const panelLeftWidth =
-      (leftKeys.length && panelData[leftKeys[0]].width) || 0;
-    const panelRightWidth =
-      (rightKeys.length && panelData[rightKeys[0]].width) || 0;
+    const panelLeftWidth = (leftKeys.length && panelData[leftKeys[0]].width) || 0;
+    const panelRightWidth = (rightKeys.length && panelData[rightKeys[0]].width) || 0;
     const visibilityLeft = allLeftNotVisible ? 0 : panelLeftWidth;
     const visibilityRight = allRightNotVisible ? 0 : panelRightWidth;
-    const paddingLeft =
-      panelBreakPoint || panelsHidden
-        ? 0
-        : leftCollapsed
-          ? PANEL_HEADER_HEIGHT
-          : visibilityLeft;
-    const paddingRight =
-      panelBreakPoint || panelsHidden
-        ? 0
-        : rightCollapsed
-          ? PANEL_HEADER_HEIGHT
-          : visibilityRight;
+    const paddingLeft = panelBreakPoint || panelsHidden ? 0 : leftCollapsed ? PANEL_HEADER_HEIGHT : visibilityLeft;
+    const paddingRight = panelBreakPoint || panelsHidden ? 0 : rightCollapsed ? PANEL_HEADER_HEIGHT : visibilityRight;
 
     return {
       paddingLeft,
@@ -550,14 +438,8 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
         breakPointActiveTab,
         sidePanelCollapsed: collapsedSide,
         setSidePanelCollapsed: setCollapsedSide,
-        dragTop:
-          alignment === Side.left
-            ? snap === DropSide.topLeft
-            : snap === DropSide.topRight,
-        dragBottom:
-          alignment === Side.left
-            ? snap === DropSide.bottomLeft
-            : snap === DropSide.bottomRight,
+        dragTop: alignment === Side.left ? snap === DropSide.topLeft : snap === DropSide.topRight,
+        dragBottom: alignment === Side.left ? snap === DropSide.bottomLeft : snap === DropSide.bottomRight,
       };
 
       if (detached) result.detached.push(props);
@@ -590,10 +472,8 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       const { panelName, tab, panelViewIndex } = foundTab;
       const { alignment, detached, visible } = state[panelName];
 
-      if (!tab.active)
-        setPanelData(setActive(state, panelName, panelViewIndex));
-      if (!detached && collapsedSide[alignment])
-        setCollapsedSide({ ...collapsedSide, [alignment]: false });
+      if (!tab.active) setPanelData(setActive(state, panelName, panelViewIndex));
+      if (!detached && collapsedSide[alignment]) setCollapsedSide({ ...collapsedSide, [alignment]: false });
       if (!visible) onVisibilityChange(panelName, true);
     }
   }, [focusTab]);
@@ -610,8 +490,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       // we don't need to check or resize anything in collapsed state
       if (clientWidth <= maxWindowWidth) return;
 
-      if (viewportSize.current.height !== clientHeight)
-        setPanelData(getSnappedHeights(panelData, clientHeight));
+      if (viewportSize.current.height !== clientHeight) setPanelData(getSnappedHeights(panelData, clientHeight));
       // Remember current width and height of the viewport
       viewportSize.current.width = clientWidth ?? 0;
       viewportSize.current.height = clientHeight ?? 0;
@@ -670,10 +549,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       >
         {initialized && (
           <>
-            <Elem
-              name="content"
-              mod={{ resizing: lockPanelContents || positioning }}
-            >
+            <Elem name="content" mod={{ resizing: lockPanelContents || positioning }}>
               {children}
             </Elem>
             {panelsHidden !== true && panelBreakPoint ? (
@@ -691,10 +567,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
                     .sort((a, b) => a.order - b.order)
                     .map((baseProps, index) => {
                       return (
-                        <PanelTabsBase
-                          key={`${panelType}-${index}-${iterator}`}
-                          {...baseProps}
-                        >
+                        <PanelTabsBase key={`${panelType}-${index}-${iterator}`} {...baseProps}>
                           <Tabs {...baseProps} />
                         </PanelTabsBase>
                       );

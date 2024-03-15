@@ -100,32 +100,18 @@ const Model = types
           }
           break;
         default:
-          self._value =
-            typeof originData === "string"
-              ? JSON.parse(originData)
-              : originData;
+          self._value = typeof originData === "string" ? JSON.parse(originData) : originData;
           break;
       }
     }),
   }));
 
-const TableModel = types.compose(
-  "TableModel",
-  Base,
-  ProcessAttrsMixin,
-  AnnotationMixin,
-  Model,
-);
+const TableModel = types.compose("TableModel", Base, ProcessAttrsMixin, AnnotationMixin, Model);
 
 const HtxTable = inject("store")(
   observer(({ item }) => {
     return (
-      <Table
-        bordered
-        dataSource={item.dataSource}
-        columns={item.columns}
-        pagination={{ hideOnSinglePage: true }}
-      />
+      <Table bordered dataSource={item.dataSource} columns={item.columns} pagination={{ hideOnSinglePage: true }} />
     );
   }),
 );

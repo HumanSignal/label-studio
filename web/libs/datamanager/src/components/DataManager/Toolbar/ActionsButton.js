@@ -2,12 +2,7 @@ import { inject, observer } from "mobx-react";
 import { useRef } from "react";
 import { useState } from "react";
 import { useCallback } from "react";
-import {
-  FaAngleDown,
-  FaChevronDown,
-  FaChevronUp,
-  FaTrash,
-} from "react-icons/fa";
+import { FaAngleDown, FaChevronDown, FaChevronUp, FaTrash } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_LOPS_E_3, FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
@@ -31,12 +26,7 @@ const buildDialogContent = (text, form, formRef) => {
       <Elem name="text">{text}</Elem>
       {form && (
         <Elem name="form" style={{ paddingTop: 16 }}>
-          <Form.Builder
-            ref={formRef}
-            fields={form.toJSON()}
-            autosubmit={false}
-            withActions={false}
-          />
+          <Form.Builder ref={formRef} fields={form.toJSON()} autosubmit={false} withActions={false} />
         </Elem>
       )}
     </Block>
@@ -48,9 +38,7 @@ export const ActionsButton = injector(
     const formRef = useRef();
     const [isOpen, setIsOpen] = useState(false);
     const selectedCount = store.currentView.selectedCount;
-    const actions = store.availableActions
-      .filter((a) => !a.hidden)
-      .sort((a, b) => a.order - b.order);
+    const actions = store.availableActions.filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
 
     const invokeAction = (action, destructive) => {
       if (action.dialog) {
@@ -105,10 +93,7 @@ export const ActionsButton = injector(
           }}
           name="actionButton"
         >
-          <Elem
-            name="titleContainer"
-            {...(action.disabled ? { title: action.disabledReason } : {})}
-          >
+          <Elem name="titleContainer" {...(action.disabled ? { title: action.disabledReason } : {})}>
             <Elem name="title">{action.title}</Elem>
             {hasChildren ? <Elem name="icon" tag={FaChevronRight} /> : null}
           </Elem>
@@ -122,11 +107,7 @@ export const ActionsButton = injector(
           toggle={false}
           ref={submenuRef}
           content={
-            <Block
-              name="actionButton-submenu"
-              tag="ul"
-              mod={{ newUI: isNewUI }}
-            >
+            <Block name="actionButton-submenu" tag="ul" mod={{ newUI: isNewUI }}>
               {action.children.map(ActionButton, parentRef)}
             </Block>
           }
@@ -140,11 +121,7 @@ export const ActionsButton = injector(
           toggle={false}
           ref={submenuRef}
           content={
-            <Block
-              name="actionButton-submenu"
-              tag="ul"
-              mod={{ newUI: isNewUI }}
-            >
+            <Block name="actionButton-submenu" tag="ul" mod={{ newUI: isNewUI }}>
               {(action?.children ?? []).map(ActionButton, parentRef)}
             </Block>
           }
@@ -157,13 +134,9 @@ export const ActionsButton = injector(
           key={action.id}
           danger={isDeleteAction}
           onClick={onClick}
-          className={`actionButton${
-            action.isSeparator
-              ? "_isSeparator"
-              : action.isTitle
-                ? "_isTitle"
-                : ""
-          } ${action.disabled ? "actionButton_disabled" : ""}`}
+          className={`actionButton${action.isSeparator ? "_isSeparator" : action.isTitle ? "_isTitle" : ""} ${
+            action.disabled ? "actionButton_disabled" : ""
+          }`}
           icon={isDeleteAction && <FaTrash />}
           title={action.disabled ? action.disabledReason : null}
         >
@@ -173,19 +146,13 @@ export const ActionsButton = injector(
     };
 
     const actionButtons = actions.map(ActionButton);
-    const recordTypeLabel =
-      isFFLOPSE3 && store.SDK.type === "DE" ? "Record" : "Task";
+    const recordTypeLabel = isFFLOPSE3 && store.SDK.type === "DE" ? "Record" : "Task";
 
     return (
       <Dropdown.Trigger
         content={
           isNewUI ? (
-            <Block
-              tag={Menu}
-              name="actionmenu"
-              size="compact"
-              mod={{ newUI: isNewUI }}
-            >
+            <Block tag={Menu} name="actionmenu" size="compact" mod={{ newUI: isNewUI }}>
               {actionButtons}
             </Block>
           ) : (
@@ -195,28 +162,13 @@ export const ActionsButton = injector(
         disabled={!hasSelected}
         onToggle={(visible) => isFFLOPSE3 && setIsOpen(visible)}
       >
-        <Button
-          {...(isNewUI ? { className: "actionButtonPrime" } : {})}
-          size={size}
-          disabled={!hasSelected}
-          {...rest}
-        >
-          {selectedCount > 0
-            ? `${selectedCount} ${recordTypeLabel}${
-                selectedCount > 1 ? "s" : ""
-              }`
-            : "Actions"}
+        <Button {...(isNewUI ? { className: "actionButtonPrime" } : {})} size={size} disabled={!hasSelected} {...rest}>
+          {selectedCount > 0 ? `${selectedCount} ${recordTypeLabel}${selectedCount > 1 ? "s" : ""}` : "Actions"}
           {isNewUI ? (
             isOpen ? (
-              <FaChevronUp
-                size="12"
-                style={{ marginLeft: 4, marginRight: -7 }}
-              />
+              <FaChevronUp size="12" style={{ marginLeft: 4, marginRight: -7 }} />
             ) : (
-              <FaChevronDown
-                size="12"
-                style={{ marginLeft: 4, marginRight: -7 }}
-              />
+              <FaChevronDown size="12" style={{ marginLeft: 4, marginRight: -7 }} />
             )
           ) : (
             <FaAngleDown size="16" style={{ marginLeft: 4 }} color="#0077FF" />

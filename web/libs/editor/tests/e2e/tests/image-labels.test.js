@@ -167,12 +167,7 @@ DataStore.Scenario(
         return results.reduce((counter, result) => {
           const { type, value } = result;
 
-          return (
-            counter +
-            (type.endsWith("labels") &&
-              value[type] &&
-              value[type].includes(currentLabelName))
-          );
+          return counter + (type.endsWith("labels") && value[type] && value[type].includes(currentLabelName));
         }, 0);
       };
 
@@ -205,11 +200,7 @@ DataStore.Scenario(
 
       const results1 = await LabelStudio.serialize();
 
-      assert.strictEqual(
-        labelsCounter(results1, currentLabelName),
-        3,
-        "Labels number don't match",
-      );
+      assert.strictEqual(labelsCounter(results1, currentLabelName), 3, "Labels number don't match");
 
       regions.forEach((region, idx) => {
         I.say(`Click label ${idx}`);
@@ -219,11 +210,7 @@ DataStore.Scenario(
 
       const results = await LabelStudio.serialize();
 
-      assert.strictEqual(
-        labelsCounter(results, "Label"),
-        3,
-        "Labels number don't match",
-      );
+      assert.strictEqual(labelsCounter(results, "Label"), 3, "Labels number don't match");
     }
   },
 );

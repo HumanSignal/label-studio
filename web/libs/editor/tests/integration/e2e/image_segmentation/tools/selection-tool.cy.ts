@@ -1,8 +1,4 @@
-import {
-  ImageView,
-  LabelStudio,
-  Sidebar,
-} from "@humansignal/frontend-test/helpers/LSF";
+import { ImageView, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { FF_DEV_1442 } from "../../../../../src/utils/feature-flags";
 import {
   fourRectanglesResult,
@@ -20,11 +16,7 @@ import {
 describe("Image segmentation - Tools - Selection tool", () => {
   describe("Сlick interactions", () => {
     it("Should select rectangle region by clicking on center", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(simpleRectangleResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -33,11 +25,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should select rectangle region by clicking on edge", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(simpleRectangleResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -46,11 +34,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should select ellipse region by clicking on center", () => {
-      LabelStudio.params()
-        .config(simpleEllipseConfig)
-        .data(simpleImageData)
-        .withResult(simpleEllipseResult)
-        .init();
+      LabelStudio.params().config(simpleEllipseConfig).data(simpleImageData).withResult(simpleEllipseResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -59,11 +43,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should not select ellipse region by clicking inside it's bbox but outside region itself", () => {
-      LabelStudio.params()
-        .config(simpleEllipseConfig)
-        .data(simpleImageData)
-        .withResult(simpleEllipseResult)
-        .init();
+      LabelStudio.params().config(simpleEllipseConfig).data(simpleImageData).withResult(simpleEllipseResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -72,11 +52,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should select polygon region by clicking on it", () => {
-      LabelStudio.params()
-        .config(simplePolygonConfig)
-        .data(simpleImageData)
-        .withResult(simplePolygonResult)
-        .init();
+      LabelStudio.params().config(simplePolygonConfig).data(simpleImageData).withResult(simplePolygonResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -85,11 +61,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should not select polygon region by clicking inside it's bbox but outside region itself", () => {
-      LabelStudio.params()
-        .config(simplePolygonConfig)
-        .data(simpleImageData)
-        .withResult(simplePolygonResult)
-        .init();
+      LabelStudio.params().config(simplePolygonConfig).data(simpleImageData).withResult(simplePolygonResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -98,11 +70,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should select keypoint region by clicking on it", () => {
-      LabelStudio.params()
-        .config(simplePointConfig)
-        .data(simpleImageData)
-        .withResult(simplePointResult)
-        .init();
+      LabelStudio.params().config(simplePointConfig).data(simpleImageData).withResult(simplePointResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -111,11 +79,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should not select hidden region by click", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(simpleRectangleResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -126,11 +90,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should select a couple of regions by clicking with Ctrl pressed", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -147,11 +107,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should select regions inside transformer area by clicking with Ctrl pressed", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -179,11 +135,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should deselect regions by clicking with Ctrl pressed", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -221,11 +173,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
         [FF_DEV_1442]: true,
       });
 
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
 
@@ -242,11 +190,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
         [FF_DEV_1442]: true,
       });
 
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
 
@@ -262,11 +206,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should be able to select one region from the group of selected regions by click on it", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -279,11 +219,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
   });
   describe("Selecting area", () => {
     it("Should be able to select just one region", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -292,11 +228,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should be able to select all regions", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -305,11 +237,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should not select hidden region by selecting area", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(simpleRectangleResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -320,11 +248,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should disappear after mouseup", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult([]).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -335,11 +259,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should add regions to selection with Ctrl pressed", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -365,11 +285,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
     });
 
     it("Should not reset selection with Ctrl pressed", () => {
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult(fourRectanglesResult)
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(fourRectanglesResult).init();
 
       ImageView.waitForImage();
       ImageView.selectMoveToolByButton();
@@ -388,11 +304,7 @@ describe("Image segmentation - Tools - Selection tool", () => {
         [FF_DEV_1442]: true,
       });
 
-      LabelStudio.params()
-        .config(simpleRectangleConfig)
-        .data(simpleImageData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult([]).init();
 
       ImageView.waitForImage();
       ImageView.selectRectangleToolByButton();

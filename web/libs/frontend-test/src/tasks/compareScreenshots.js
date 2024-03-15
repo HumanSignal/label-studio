@@ -12,17 +12,16 @@ const readFile = (path) => {
 };
 
 const runComparison = async (options) => {
-  const files = await Promise.all([
-    readFile(options.initialScreenshot),
-    readFile(options.currentScreenshot),
-  ]).then((files) => {
-    return files.map((f) => {
-      return {
-        ...f,
-        file: PNG.sync.read(f.file),
-      };
-    });
-  });
+  const files = await Promise.all([readFile(options.initialScreenshot), readFile(options.currentScreenshot)]).then(
+    (files) => {
+      return files.map((f) => {
+        return {
+          ...f,
+          file: PNG.sync.read(f.file),
+        };
+      });
+    },
+  );
 
   const img1 = files.find(({ path }) => path.match("-orig")).file;
   const img2 = files.find(({ path }) => path.match("-comp")).file;
@@ -31,14 +30,9 @@ const runComparison = async (options) => {
 
   const totalPixels = width * height;
 
-  const changedPixels = pixelmatch(
-    img1.data,
-    img2.data,
-    diff.data,
-    img1.width,
-    img1.height,
-    { treshold: options.treshold },
-  );
+  const changedPixels = pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, {
+    treshold: options.treshold,
+  });
   const changeRatio = changedPixels / totalPixels;
 
   switch (options.compare) {

@@ -1,6 +1,5 @@
 function checkISO(value) {
-  const regExpISO =
-    /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
+  const regExpISO = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
 
   return regExpISO.test(value);
 }
@@ -30,8 +29,7 @@ export function msToHMS(ms) {
  * Helper function to pretty date
  */
 export function prettyDate(time) {
-  if (typeof time !== "string" && !(time instanceof Date) && !checkISO(time))
-    return;
+  if (typeof time !== "string" && !(time instanceof Date) && !checkISO(time)) return;
 
   const date = new Date(time);
   const diff = (new Date().getTime() - date.getTime()) / 1000;
@@ -57,9 +55,7 @@ export function toISODateString(date) {
   date = date || new Date();
 
   const tzOffest = date.getTimezoneOffset() * 60000;
-  const localISOTime = new Date(date.getTime() - tzOffest)
-    .toISOString()
-    .slice(0, -1);
+  const localISOTime = new Date(date.getTime() - tzOffest).toISOString().slice(0, -1);
 
   return localISOTime;
 }

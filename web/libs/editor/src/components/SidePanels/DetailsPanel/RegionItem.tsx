@@ -1,12 +1,7 @@
 import chroma from "chroma-js";
 import { observer } from "mobx-react";
 import { type FC, useMemo, useState } from "react";
-import {
-  IconLink,
-  IconPlusAlt,
-  IconTrash,
-  IconWarning,
-} from "../../../assets/icons";
+import { IconLink, IconPlusAlt, IconTrash, IconWarning } from "../../../assets/icons";
 import { IconEyeClosed, IconEyeOpened } from "../../../assets/icons/timeline";
 import { Button, type ButtonProps } from "../../../common/Button/Button";
 import { Block, Elem } from "../../../utils/bem";
@@ -42,9 +37,7 @@ export const RegionItem: FC<RegionItemProps> = observer(
     const [editMode, setEditMode] = useState(false);
 
     const hasEditableRegions = useMemo(() => {
-      return !!nodes.find(
-        (node: any) => !node.isReadOnly() && !node.classification,
-      );
+      return !!nodes.find((node: any) => !node.isReadOnly() && !node.classification);
     }, [nodes]);
 
     const color = useMemo(() => {
@@ -72,9 +65,7 @@ export const RegionItem: FC<RegionItemProps> = observer(
         {region.isDrawing && (
           <Elem name="warning">
             <IconWarning />
-            <Elem name="warning-text">
-              Incomplete {region.type?.replace("region", "") ?? "region"}
-            </Elem>
+            <Elem name="warning-text">Incomplete {region.type?.replace("region", "") ?? "region"}</Elem>
           </Elem>
         )}
         {withActions && (
@@ -101,71 +92,69 @@ export const RegionItem: FC<RegionItemProps> = observer(
   },
 );
 
-const RegionAction: FC<any> = observer(
-  ({ region, annotation, editMode, onEditModeChange }) => {
-    const entityButtons: JSX.Element[] = [];
+const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditModeChange }) => {
+  const entityButtons: JSX.Element[] = [];
 
-    entityButtons.push(
-      <RegionActionButton
-        key="relation"
-        icon={<IconLink />}
-        primary={annotation.relationMode}
-        onClick={(_e: any, hotkey?: any) => {
-          // If this is triggered by a hotkey, defer to the global bound handler for relations to avoid contention.
-          if (hotkey) return;
-          if (annotation.relationMode) {
-            annotation.stopRelationMode();
-          } else {
-            annotation.startRelationMode(region);
-          }
-        }}
-        hotkey="region:relation"
-        aria-label="Create Relation"
-      />,
-    );
+  entityButtons.push(
+    <RegionActionButton
+      key="relation"
+      icon={<IconLink />}
+      primary={annotation.relationMode}
+      onClick={(_e: any, hotkey?: any) => {
+        // If this is triggered by a hotkey, defer to the global bound handler for relations to avoid contention.
+        if (hotkey) return;
+        if (annotation.relationMode) {
+          annotation.stopRelationMode();
+        } else {
+          annotation.startRelationMode(region);
+        }
+      }}
+      hotkey="region:relation"
+      aria-label="Create Relation"
+    />,
+  );
 
-    entityButtons.push(
-      <RegionActionButton
-        key="meta"
-        icon={<IconPlusAlt />}
-        primary={editMode}
-        onClick={() => onEditModeChange(!editMode)}
-        hotkey="region:meta"
-        aria-label="Edit region's meta"
-      />,
-    );
+  entityButtons.push(
+    <RegionActionButton
+      key="meta"
+      icon={<IconPlusAlt />}
+      primary={editMode}
+      onClick={() => onEditModeChange(!editMode)}
+      hotkey="region:meta"
+      aria-label="Edit region's meta"
+    />,
+  );
 
-    return (
-      <Block name="region-actions">
-        <Elem name="group" mod={{ align: "left" }}>
-          {!region.isReadOnly() && entityButtons}
-        </Elem>
-        <Elem name="group" mod={{ align: "right" }}>
-          <LockButton
-            item={region}
-            annotation={region?.annotation}
-            hovered={true}
-            locked={region?.locked}
-            onClick={() => region.setLocked(!region.locked)}
-            hotkey="region:lock"
-            look="alt"
-            style={{ width: 36, height: 32 }}
-          />
-          <RegionActionButton
-            icon={region.hidden ? <IconEyeClosed /> : <IconEyeOpened />}
-            onClick={region.toggleHidden}
-          />
-          <RegionActionButton
-            danger
-            disabled={region.isReadOnly()}
-            icon={<IconTrash />}
-            onClick={() => annotation.deleteRegion(region)}
-          />
-        </Elem>
-      </Block>
-    );
-  },
-);
+  return (
+    <Block name="region-actions">
+      <Elem name="group" mod={{ align: "left" }}>
+        {!region.isReadOnly() && entityButtons}
+      </Elem>
+      <Elem name="group" mod={{ align: "right" }}>
+        <LockButton
+          item={region}
+          annotation={region?.annotation}
+          hovered={true}
+          locked={region?.locked}
+          onClick={() => region.setLocked(!region.locked)}
+          hotkey="region:lock"
+          look="alt"
+          style={{ width: 36, height: 32 }}
+        />
+        <RegionActionButton
+          icon={region.hidden ? <IconEyeClosed /> : <IconEyeOpened />}
+          onClick={region.toggleHidden}
+        />
+        <RegionActionButton
+          danger
+          disabled={region.isReadOnly()}
+          icon={<IconTrash />}
+          onClick={() => annotation.deleteRegion(region)}
+        />
+      </Elem>
+    </Block>
+  );
+});
 
 const RegionActionButton: FC<ButtonProps> = ({ children, ...props }) => {
   return (

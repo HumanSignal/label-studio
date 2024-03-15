@@ -137,9 +137,7 @@ module.exports = (config) => {
     global[options.actionCoverage.beginActionName] = performActionBegin;
     global[options.actionCoverage.endActionName] = performActionEnd;
   } else {
-    global[options.actionCoverage.beginActionName] = global[
-      options.actionCoverage.endActionName
-    ] = () => {};
+    global[options.actionCoverage.beginActionName] = global[options.actionCoverage.endActionName] = () => {};
   }
 
   const getCoverage = async () => {
@@ -154,17 +152,12 @@ module.exports = (config) => {
 
   function hasActionChanges() {
     return (
-      actionsStack.length !== prevActionsStack.length ||
-      actionsStack.some((val, key) => val !== prevActionsStack[key])
+      actionsStack.length !== prevActionsStack.length || actionsStack.some((val, key) => val !== prevActionsStack[key])
     );
   }
 
   function filterActionCoverage(actionCoverage) {
-    return Object.fromEntries(
-      Object.entries(actionCoverage).filter(([path]) =>
-        excludeTester.shouldInstrument(path),
-      ),
-    );
+    return Object.fromEntries(Object.entries(actionCoverage).filter(([path]) => excludeTester.shouldInstrument(path)));
   }
   async function collectLastCoverage(actionKeys, endOfTest = false) {
     const coverageInfo = await getCoverage();
@@ -180,18 +173,12 @@ module.exports = (config) => {
 
     for (const lastActionKey of lastActionKeys) {
       if (endOfTest || actionKeys.indexOf(lastActionKey) === -1) {
-        const additionalCoverage = subCoverage(
-          actionCoverageInfo,
-          lastCoverages[lastActionKey],
-        );
+        const additionalCoverage = subCoverage(actionCoverageInfo, lastCoverages[lastActionKey]);
 
         if (!actionCoverages[lastActionKey]) {
           actionCoverages[lastActionKey] = additionalCoverage;
         } else {
-          actionCoverages[lastActionKey] = addCoverage(
-            actionCoverages[lastActionKey],
-            additionalCoverage,
-          );
+          actionCoverages[lastActionKey] = addCoverage(actionCoverages[lastActionKey], additionalCoverage);
         }
 
         lastCoverages[lastActionKey] = undefined;
@@ -223,9 +210,7 @@ module.exports = (config) => {
         resultFileCoverage.f[key] = op(value, bFileCoverage.f[key]);
       }
       for (const [key, values] of Object.entries(aFileCoverage.b)) {
-        resultFileCoverage.b[key] = values.map((val, idx) =>
-          op(val, bFileCoverage.b[key][idx]),
-        );
+        resultFileCoverage.b[key] = values.map((val, idx) => op(val, bFileCoverage.b[key][idx]));
       }
       resultCoverage[filePath] = resultFileCoverage;
     }
@@ -251,22 +236,14 @@ module.exports = (config) => {
       "saving action coverage",
       async () => {
         try {
-          const coverageDir = path.resolve(
-            process.cwd(),
-            options.actionCoverage.coverageDir,
-          );
+          const coverageDir = path.resolve(process.cwd(), options.actionCoverage.coverageDir);
 
           if (!fs.existsSync(coverageDir)) {
             fs.mkdirSync(coverageDir, { recursive: true });
           }
 
-          for (const [actionName, coverage] of Object.entries(
-            actionCoverages,
-          )) {
-            const coveragePath = path.resolve(
-              coverageDir,
-              `${actionName}.coverage.json`,
-            );
+          for (const [actionName, coverage] of Object.entries(actionCoverages)) {
+            const coveragePath = path.resolve(coverageDir, `${actionName}.coverage.json`);
 
             output.print(`writing ${coveragePath}`);
             fs.writeFileSync(coveragePath, JSON.stringify(coverage));
@@ -299,10 +276,7 @@ module.exports = (config) => {
             fs.mkdirSync(coverageDir, { recursive: true });
           }
 
-          const coveragePath = path.resolve(
-            coverageDir,
-            buildFileName(test, options.uniqueFileName),
-          );
+          const coveragePath = path.resolve(coverageDir, buildFileName(test, options.uniqueFileName));
 
           output.print(`writing ${coveragePath}`);
           fs.writeFileSync(coveragePath, JSON.stringify(coverageInfo));

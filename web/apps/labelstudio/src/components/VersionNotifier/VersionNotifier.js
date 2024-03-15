@@ -1,11 +1,5 @@
 import { format } from "date-fns";
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useReducer,
-} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useReducer } from "react";
 import { Link } from "react-router-dom";
 import { IconBell } from "../../assets/icons";
 import { useAPI } from "../../providers/ApiProvider";
@@ -35,10 +29,7 @@ export const VersionProvider = ({ children }) => {
           version: data.version,
           latestVersion: data.latest_version_from_pypi,
           newVersion: data.current_version_is_outdated,
-          updateTime: format(
-            new Date(data.latest_version_upload_time),
-            "MMM d",
-          ),
+          updateTime: format(new Date(data.latest_version_upload_time), "MMM d"),
         },
       });
     }
@@ -48,15 +39,12 @@ export const VersionProvider = ({ children }) => {
     fetchVersion();
   }, []);
 
-  return (
-    <VersionContext.Provider value={state}>{children}</VersionContext.Provider>
-  );
+  return <VersionContext.Provider value={state}>{children}</VersionContext.Provider>;
 };
 
 export const VersionNotifier = ({ showNewVersion, showCurrentVersion }) => {
   const url = "https://pypi.org/project/label-studio/#history";
-  const { newVersion, updateTime, latestVersion, version } =
-    useContext(VersionContext) ?? {};
+  const { newVersion, updateTime, latestVersion, version } = useContext(VersionContext) ?? {};
 
   return newVersion && showNewVersion ? (
     <Block tag="li" name="version-notifier">

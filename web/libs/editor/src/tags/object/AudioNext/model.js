@@ -100,9 +100,7 @@ export const AudioModel = types.compose(
       activeStates() {
         const states = self.states();
 
-        return states?.filter(
-          (s) => getType(s).name === "LabelsModel" && s.isSelected,
-        );
+        return states?.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
       },
     }))
     ////// Sync actions
@@ -201,8 +199,7 @@ export const AudioModel = types.compose(
         let bgColor = self.selectedregionbg;
         const st = states.find((s) => s.type === "labels");
 
-        if (st)
-          bgColor = Utils.Colors.convertToRGBA(st.getSelectedColor(), 0.3);
+        if (st) bgColor = Utils.Colors.convertToRGBA(st.getSelectedColor(), 0.3);
 
         const r = AudioRegionModel.create({
           id: wsRegion.id ? wsRegion.id : guidGenerator(),
@@ -227,9 +224,7 @@ export const AudioModel = types.compose(
       },
 
       selectRange(ev, ws_region) {
-        const selectedRegions = self.regs.filter(
-          (r) => r.start >= ws_region.start && r.end <= ws_region.end,
-        );
+        const selectedRegions = self.regs.filter((r) => r.start >= ws_region.start && r.end <= ws_region.end);
 
         ws_region.remove?.();
         if (!selectedRegions.length) return;
@@ -276,9 +271,7 @@ export const AudioModel = types.compose(
       handlePlay() {
         if (self._ws) {
           self.playing = !self.playing;
-          self._ws.isPlaying()
-            ? self.triggerSync("play")
-            : self.triggerSync("pause");
+          self._ws.isPlaying() ? self.triggerSync("play") : self.triggerSync("pause");
         }
       },
 

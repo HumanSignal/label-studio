@@ -7,7 +7,5 @@ export const ProjectRoutes = ({ content }) => {
   const routes = useRoutesMap();
   const resolvedRoutes = resolveRoutes(routes, { content });
 
-  return resolvedRoutes ? (
-    <RouteWithStaticFallback path="/" children={resolvedRoutes} />
-  ) : null;
+  return resolvedRoutes ? <RouteWithStaticFallback path="/" children={resolvedRoutes} /> : null;
 };

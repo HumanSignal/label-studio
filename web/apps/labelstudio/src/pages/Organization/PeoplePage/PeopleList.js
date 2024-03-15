@@ -2,10 +2,7 @@ import { formatDistance } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 import { Pagination, Spinner, Userpic } from "../../../components";
 import { CopyableTooltip } from "../../../components/CopyableTooltip/CopyableTooltip";
-import {
-  usePage,
-  usePageSize,
-} from "../../../components/Pagination/Pagination";
+import { usePage, usePageSize } from "../../../components/Pagination/Pagination";
 import { useAPI } from "../../../providers/ApiProvider";
 import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/helpers";
@@ -54,9 +51,7 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
 
   useEffect(() => {
     if (isDefined(defaultSelected) && usersList) {
-      const selected = usersList.find(
-        ({ user }) => user.id === Number(defaultSelected),
-      );
+      const selected = usersList.find(({ user }) => user.id === Number(defaultSelected));
 
       if (selected) selectUser(selected.user);
     }
@@ -85,17 +80,9 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
                   const active = user.id === selectedUser?.id;
 
                   return (
-                    <Elem
-                      key={`user-${user.id}`}
-                      name="user"
-                      mod={{ active }}
-                      onClick={() => selectUser(user)}
-                    >
+                    <Elem key={`user-${user.id}`} name="user" mod={{ active }} onClick={() => selectUser(user)}>
                       <Elem name="field" mix="avatar">
-                        <CopyableTooltip
-                          title={`User ID: ${user.id}`}
-                          textForCopy={user.id}
-                        >
+                        <CopyableTooltip title={`User ID: ${user.id}`} textForCopy={user.id}>
                           <Userpic
                             user={user}
                             style={{
@@ -112,11 +99,7 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
                         {user.first_name} {user.last_name}
                       </Elem>
                       <Elem name="field" mix="last-activity">
-                        {formatDistance(
-                          new Date(user.last_activity),
-                          new Date(),
-                          { addSuffix: true },
-                        )}
+                        {formatDistance(new Date(user.last_activity), new Date(), { addSuffix: true })}
                       </Elem>
                     </Elem>
                   );

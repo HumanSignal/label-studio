@@ -111,10 +111,7 @@ const TagAttrs = types.model({
   autocenter: types.optional(types.boolean, true),
   scrollparent: types.optional(types.boolean, true),
   splitchannels: types.optional(types.boolean, false),
-  decoder: types.optional(
-    types.enumeration(["ffmpeg", "webaudio"]),
-    "webaudio",
-  ),
+  decoder: types.optional(types.enumeration(["ffmpeg", "webaudio"]), "webaudio"),
   player: types.optional(types.enumeration(["html5", "webaudio"]), "html5"),
 });
 
@@ -153,17 +150,13 @@ export const AudioModel = types.compose(
       activeStates() {
         const states = self.states();
 
-        return states?.filter(
-          (s) => getType(s).name === "LabelsModel" && s.isSelected,
-        );
+        return states?.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
       },
 
       get activeState() {
         const states = self.states();
 
-        return states?.filter(
-          (s) => getType(s).name === "LabelsModel" && s.isSelected,
-        )[0];
+        return states?.filter((s) => getType(s).name === "LabelsModel" && s.isSelected)[0];
       },
 
       get activeLabel() {
@@ -289,9 +282,7 @@ export const AudioModel = types.compose(
                   labels: labels ?? [],
                 });
 
-                const region = r.isRegion
-                  ? self.updateRegion(r)
-                  : self.addRegion(r);
+                const region = r.isRegion ? self.updateRegion(r) : self.addRegion(r);
 
                 self.annotation.selectArea(region);
               });
@@ -337,23 +328,18 @@ export const AudioModel = types.compose(
 
           // find synced paragraphs if any
           // and add their regions to the audio
-          const syncedParagraphs = Array.from(
-            self.syncManager.syncTargets,
-            ([, value]) => value,
-          ).filter(
+          const syncedParagraphs = Array.from(self.syncManager.syncTargets, ([, value]) => value).filter(
             (target) => target.type === "paragraphs" && target.contextscroll,
           );
 
           syncedParagraphs.forEach((paragraph) => {
-            const segments = Object.values(paragraph.regionsStartEnd).map(
-              ({ start, end }) => ({
-                start,
-                end,
-                showInTimeline: true,
-                external: true,
-                locked: true,
-              }),
-            );
+            const segments = Object.values(paragraph.regionsStartEnd).map(({ start, end }) => ({
+              start,
+              end,
+              showInTimeline: true,
+              external: true,
+              locked: true,
+            }));
 
             self._ws.addRegions(segments);
           });
@@ -403,8 +389,7 @@ export const AudioModel = types.compose(
           let bgColor = self.selectedregionbg;
           const st = states.find((s) => s.type === "labels");
 
-          if (st)
-            bgColor = Utils.Colors.convertToRGBA(st.getSelectedColor(), 0.3);
+          if (st) bgColor = Utils.Colors.convertToRGBA(st.getSelectedColor(), 0.3);
 
           const r = AudioRegionModel.create({
             id: wsRegion.id ? wsRegion.id : guidGenerator(),
@@ -453,12 +438,7 @@ export const AudioModel = types.compose(
           const labels = {
             [control.valueType]: control.selectedValues(),
           };
-          const r = self.annotation.createResult(
-            wsRegion,
-            labels,
-            control,
-            self,
-          );
+          const r = self.annotation.createResult(wsRegion, labels, control, self);
           const updatedRegion = wsRegion.convertToRegion(labels.labels);
 
           r._ws_region = updatedRegion;

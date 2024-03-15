@@ -2,11 +2,7 @@ import type { Waveform } from "..";
 import { rgba } from "../Common/Color";
 import type { Visualizer } from "../Visual/Visualizer";
 import type { Regions } from "./Regions";
-import {
-  Segment,
-  type SegmentGlobalEvents,
-  type SegmentOptions,
-} from "./Segment";
+import { Segment, type SegmentGlobalEvents, type SegmentOptions } from "./Segment";
 
 export interface RegionGlobalEvents extends SegmentGlobalEvents {
   regionCreated: (region: Region | Segment) => void;
@@ -24,12 +20,7 @@ export interface RegionOptions extends SegmentOptions {
 export class Region extends Segment {
   labels: string[] | undefined = undefined;
 
-  constructor(
-    options: RegionOptions,
-    waveform: Waveform,
-    visualizer: Visualizer,
-    controller: Regions,
-  ) {
+  constructor(options: RegionOptions, waveform: Waveform, visualizer: Visualizer, controller: Regions) {
     super(options, waveform, visualizer, controller);
     this.labels = options.labels ?? this.labels;
     this.color = options.color ? rgba(options.color) : this.color;
@@ -54,54 +45,26 @@ export class Region extends Segment {
       const timelineTop = this.timelinePlacement;
       const timelineLayer = this.visualizer.getLayer("timeline");
       const timelineHeight = this.timelineHeight;
-      const top =
-        (timelineLayer?.isVisible && timelineTop ? timelineHeight : 0) + 4;
-      const labelMeasures = this.labels.map((label) =>
-        layer.context.measureText(label),
-      );
+      const top = (timelineLayer?.isVisible && timelineTop ? timelineHeight : 0) + 4;
+      const labelMeasures = this.labels.map((label) => layer.context.measureText(label));
 
-      const allVerticalStackedLabelsHeight = labelMeasures.reduce(
-        (accumulator, currentValue) => {
-          return (
-            accumulator +
-            currentValue.fontBoundingBoxAscent +
-            currentValue.fontBoundingBoxDescent +
-            2
-          );
-        },
-        0,
-      );
+      const allVerticalStackedLabelsHeight = labelMeasures.reduce((accumulator, currentValue) => {
+        return accumulator + currentValue.fontBoundingBoxAscent + currentValue.fontBoundingBoxDescent + 2;
+      }, 0);
       const start = this.xStart + this.handleWidth + 2;
       const width = labelMeasures[0].width + 10;
       const rangeWidth = this.xEnd - this.xStart - this.handleWidth * 2;
       const adjustedWidth = rangeWidth < width ? rangeWidth : width;
       const selectedAdjustmentWidth = this.selected ? width : adjustedWidth;
 
-      layer.fillStyle = `rgba(${color.r + color.r}, ${color.g + color.g}, ${
-        color.b + color.b
-      })`;
-      this.selected &&
-        layer.roundRect(
-          start,
-          top,
-          selectedAdjustmentWidth,
-          allVerticalStackedLabelsHeight + 5,
-          4,
-        );
+      layer.fillStyle = `rgba(${color.r + color.r}, ${color.g + color.g}, ${color.b + color.b})`;
+      this.selected && layer.roundRect(start, top, selectedAdjustmentWidth, allVerticalStackedLabelsHeight + 5, 4);
       layer.fillStyle = this.selected ? "white" : "black";
       layer.font = "12px Arial";
       this.labels.forEach((label, iterator) => {
-        const stackedLabelHeight =
-          (allVerticalStackedLabelsHeight / labelMeasures.length) *
-            (iterator + 1) -
-          1;
+        const stackedLabelHeight = (allVerticalStackedLabelsHeight / labelMeasures.length) * (iterator + 1) - 1;
 
-        layer.fitText(
-          label,
-          start + 6,
-          top + stackedLabelHeight,
-          selectedAdjustmentWidth - this.handleWidth - 6,
-        );
+        layer.fitText(label, start + 6, top + stackedLabelHeight, selectedAdjustmentWidth - this.handleWidth - 6);
       });
     }
   }

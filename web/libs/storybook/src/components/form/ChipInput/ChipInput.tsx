@@ -70,12 +70,7 @@ const Chip = ({ value, onClose }: ChipProps) => {
   return (
     <Elem tag="span" name="chip" data-testid="chip">
       {value}
-      <Elem
-        tag="button"
-        name="remove"
-        data-testid="chip-remove"
-        onClick={onClose}
-      >
+      <Elem tag="button" name="remove" data-testid="chip-remove" onClick={onClose}>
         <IconCross />
       </Elem>
     </Elem>
@@ -98,9 +93,7 @@ export const ChipInput = ({
   const [selectedValues, _setSelectedValues] = useState<string[]>([]);
   const [currentValue, setCurrentValue] = useState("");
 
-  const setSelectedValues = (
-    input: string[] | ((current: string[]) => string[]),
-  ) => {
+  const setSelectedValues = (input: string[] | ((current: string[]) => string[])) => {
     _setSelectedValues((current) => {
       const updated = input instanceof Function ? input(current) : input;
       onChange?.(updated);
@@ -205,9 +198,7 @@ export const ChipInput = ({
   };
 
   const deleteItem = (value: string) =>
-    setSelectedValues(
-      selectedValues.filter((currentValue) => currentValue !== value),
-    );
+    setSelectedValues(selectedValues.filter((currentValue) => currentValue !== value));
 
   // in order to properly simulate paste event we need to subscribe to
   // native one instead of synthetic event from React

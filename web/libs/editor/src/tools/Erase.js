@@ -109,16 +109,7 @@ const _Tool = types
         const val = 24;
         const stage = self.obj.stageRef;
         const base64 = Canvas.brushSizeCircle(val);
-        const cursor = [
-          "url('",
-          base64,
-          "')",
-          " ",
-          Math.floor(val / 2) + 4,
-          " ",
-          Math.floor(val / 2) + 4,
-          ", auto",
-        ];
+        const cursor = ["url('", base64, "')", " ", Math.floor(val / 2) + 4, " ", Math.floor(val / 2) + 4, ", auto"];
 
         stage.container().style.cursor = cursor.join("");
       },
@@ -183,12 +174,6 @@ const _Tool = types
     };
   });
 
-const Erase = types.compose(
-  _Tool.name,
-  ToolMixin,
-  BaseTool,
-  DrawingTool,
-  _Tool,
-);
+const Erase = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, _Tool);
 
 export { Erase };

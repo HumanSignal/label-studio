@@ -97,8 +97,7 @@ export class LSFWrapper {
     this.labelStream = options.isLabelStream ?? false;
     this.initialAnnotation = options.annotation;
     this.interfacesModifier = options.interfacesModifier;
-    this.isInteractivePreannotations =
-      options.isInteractivePreannotations ?? false;
+    this.isInteractivePreannotations = options.isInteractivePreannotations ?? false;
 
     let interfaces = [...DEFAULT_INTERFACES];
 
@@ -109,10 +108,7 @@ export class LSFWrapper {
     if (this.labelStream) {
       interfaces.push("infobar");
       interfaces.push("topbar:prevnext");
-      if (
-        FF_DEV_2186 &&
-        this.project.review_settings?.require_comment_on_reject
-      ) {
+      if (FF_DEV_2186 && this.project.review_settings?.require_comment_on_reject) {
         interfaces.push("comments:update");
       }
       if (this.project.show_skip_button) {
@@ -158,15 +154,10 @@ export class LSFWrapper {
 
     console.log([...interfaces]);
     console.groupEnd();
-    const queueTotal =
-      dm.store.project.reviewer_queue_total || dm.store.project.queue_total;
+    const queueTotal = dm.store.project.reviewer_queue_total || dm.store.project.queue_total;
     const queueDone = dm.store.project.queue_done;
     const queueLeft = dm.store.project.queue_left;
-    const queuePosition = queueDone
-      ? queueDone + 1
-      : queueLeft
-        ? queueTotal - queueLeft + 1
-        : 1;
+    const queuePosition = queueDone ? queueDone + 1 : queueLeft ? queueTotal - queueLeft + 1 : 1;
 
     const lsfProperties = {
       user: options.user,
@@ -213,9 +204,7 @@ export class LSFWrapper {
 
       this.lsfInstance.on("presignUrlForProject", this.onPresignUrlForProject);
 
-      const names = Array.from(this.datamanager.callbacks.keys()).filter((k) =>
-        k.startsWith("lsf:"),
-      );
+      const names = Array.from(this.datamanager.callbacks.keys()).filter((k) => k.startsWith("lsf:"));
 
       names.forEach((name) => {
         this.datamanager.getEventCallbacks(name).forEach((clb) => {
@@ -244,11 +233,8 @@ export class LSFWrapper {
 
     if (params) {
       const task = await api.call("task", { params });
-      const noData =
-        !task || (!task.annotations?.length && !task.drafts?.length);
-      const body = `Task #${taskID}${
-        commentId ? ` with comment #${commentId}` : ""
-      } was not found!`;
+      const noData = !task || (!task.annotations?.length && !task.drafts?.length);
+      const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ""} was not found!`;
 
       if (noData) {
         Modal.modal({
@@ -433,9 +419,7 @@ export class LSFWrapper {
     // if we have annotations created automatically, we don't need to create another one
     // automatically === created here and haven't saved yet, so they don't have pk
     // @todo because of some weird reason pk may be string uid, so check flags then
-    const hasAutoAnnotations =
-      !!first &&
-      (!first.pk || (first.userGenerate && first.sentUserGenerate === false));
+    const hasAutoAnnotations = !!first && (!first.pk || (first.userGenerate && first.sentUserGenerate === false));
     const showPredictions = this.project.show_collab_predictions === true;
 
     if (this.labelStream) {
@@ -444,28 +428,17 @@ export class LSFWrapper {
         annotation = first;
       } else if (isDefined(annotationID) && selectAnnotation) {
         annotation = this.annotations.find(({ pk }) => pk === annotationID);
-      } else if (
-        showPredictions &&
-        this.predictions.length > 0 &&
-        !this.isInteractivePreannotations
-      ) {
+      } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
       } else {
         annotation = cs.createAnnotation();
       }
     } else {
-      if (
-        this.annotations.length === 0 &&
-        this.predictions.length > 0 &&
-        !this.isInteractivePreannotations
-      ) {
+      if (this.annotations.length === 0 && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
       } else if (this.annotations.length > 0 && id && id !== "auto") {
         annotation = this.annotations.find((c) => c.pk === id || c.id === id);
-      } else if (
-        this.annotations.length > 0 &&
-        (id === "auto" || hasAutoAnnotations)
-      ) {
+      } else if (this.annotations.length > 0 && (id === "auto" || hasAutoAnnotations)) {
         annotation = first;
       } else {
         annotation = cs.createAnnotation();
@@ -531,11 +504,9 @@ export class LSFWrapper {
 
     if (!this.lsf.task) this.setLoading(true);
 
-    const _taskHistory = await this.datamanager.store.taskStore.loadTaskHistory(
-      {
-        projectId: this.datamanager.store.project.id,
-      },
-    );
+    const _taskHistory = await this.datamanager.store.taskStore.loadTaskHistory({
+      projectId: this.datamanager.store.project.id,
+    });
 
     this.lsf.setTaskHistory(_taskHistory);
 
@@ -581,10 +552,7 @@ export class LSFWrapper {
 
     if (this.task && this.labelStream === false) {
       const annotationID =
-        this.initialAnnotation?.pk ??
-        this.task.lastAnnotation?.pk ??
-        this.task.lastAnnotation?.id ??
-        "auto";
+        this.initialAnnotation?.pk ?? this.task.lastAnnotation?.pk ?? this.task.lastAnnotation?.id ?? "auto";
 
       this.setAnnotation(annotationID);
     }
@@ -708,8 +676,7 @@ export class LSFWrapper {
     }
 
     if (response.ok) {
-      const lastAnnotation =
-        this.annotations[this.annotations.length - 1] ?? {};
+      const lastAnnotation = this.annotations[this.annotations.length - 1] ?? {};
       const annotationID = lastAnnotation.pk ?? undefined;
 
       this.setAnnotation(annotationID);
@@ -733,8 +700,7 @@ export class LSFWrapper {
     if (annotation.history?.hasChanges && !annotation.draftSaved) return true;
     if (
       annotation.history?.hasChanges &&
-      new Date(annotation.history.lastAdditionTime) >
-        new Date(annotation.draftSaved)
+      new Date(annotation.history.lastAdditionTime) > new Date(annotation.draftSaved)
     )
       return true;
     return false;
@@ -770,11 +736,7 @@ export class LSFWrapper {
 
     if (annotation.draftId > 0) {
       // draft has been already created
-      const res = await this.datamanager.apiCall(
-        "updateDraft",
-        { draftID: annotation.draftId },
-        data,
-      );
+      const res = await this.datamanager.apiCall("updateDraft", { draftID: annotation.draftId }, data);
 
       showToast && this.draftToast(res?.$meta?.status);
       return res;
@@ -782,11 +744,7 @@ export class LSFWrapper {
     let response;
 
     if (annotationDoesntExist) {
-      response = await this.datamanager.apiCall(
-        "createDraftForTask",
-        { taskID: this.task.id },
-        data,
-      );
+      response = await this.datamanager.apiCall("createDraftForTask", { taskID: this.task.id }, data);
     } else {
       response = await this.datamanager.apiCall(
         "createDraftForAnnotation",
@@ -894,36 +852,21 @@ export class LSFWrapper {
     searchParams.delete(paramName);
     let newRelativePathQuery = window.location.pathname;
 
-    if (searchParams.toString())
-      newRelativePathQuery += `?${searchParams.toString()}`;
+    if (searchParams.toString()) newRelativePathQuery += `?${searchParams.toString()}`;
     window.history.pushState(null, "", newRelativePathQuery);
     return !!urlParam;
   };
 
   // Proxy events that are unused by DM integration
-  onEntityCreate = (...args) =>
-    this.datamanager.invoke("onEntityCreate", ...args);
-  onEntityDelete = (...args) =>
-    this.datamanager.invoke("onEntityDelete", ...args);
+  onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);
+  onEntityDelete = (...args) => this.datamanager.invoke("onEntityDelete", ...args);
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
     if (isFF(FF_OPTIC_2) && !!nextAnnotation?.history?.undoIdx) {
       this.saveDraft(nextAnnotation).then(() => {
-        this.datamanager.invoke(
-          "onSelectAnnotation",
-          prevAnnotation,
-          nextAnnotation,
-          options,
-          this,
-        );
+        this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
       });
     } else {
-      this.datamanager.invoke(
-        "onSelectAnnotation",
-        prevAnnotation,
-        nextAnnotation,
-        options,
-        this,
-      );
+      this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
     }
   };
 
@@ -935,12 +878,7 @@ export class LSFWrapper {
     if (isFF(FF_OPTIC_2)) this.saveDraft();
     this.loadTask(prevTaskId, prevAnnotationId, true);
   };
-  async submitCurrentAnnotation(
-    eventName,
-    submit,
-    includeId = false,
-    loadNext = true,
-  ) {
+  async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
     const { taskID, currentAnnotation } = this;
     const unique_id = this.task.unique_lock_id;
     const serializedAnnotation = this.prepareData(currentAnnotation, {
@@ -992,8 +930,7 @@ export class LSFWrapper {
 
   /** @private */
   prepareData(annotation, { includeId, draft } = {}) {
-    const userGenerate =
-      !annotation.userGenerate || annotation.sentUserGenerate;
+    const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
 
     const sessionTime = (new Date() - annotation.loadedDate) / 1000;
     const submittedTime = Number(annotation.leadTime ?? 0);
@@ -1002,10 +939,7 @@ export class LSFWrapper {
 
     const result = {
       lead_time,
-      result:
-        (draft
-          ? annotation.versions.draft
-          : annotation.serializeAnnotation()) ?? [],
+      result: (draft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
       draft_id: annotation.draftId,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
@@ -1078,13 +1012,7 @@ export class LSFWrapper {
 
   /** @returns {string|null} */
   get instruction() {
-    return (
-      (
-        this.project.instruction ??
-        this.project.expert_instruction ??
-        ""
-      ).trim() || null
-    );
+    return (this.project.instruction ?? this.project.expert_instruction ?? "").trim() || null;
   }
 
   get canPreloadTask() {

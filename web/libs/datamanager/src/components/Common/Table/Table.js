@@ -5,12 +5,7 @@ import { RiCodeLine } from "react-icons/ri";
 import { LsGear, LsGearNewUI } from "../../../assets/icons";
 import { useSDK } from "../../../providers/SDKProvider";
 import { Block, Elem } from "../../../utils/bem";
-import {
-  FF_DEV_3873,
-  FF_LOPS_E_3,
-  FF_LOPS_E_10,
-  isFF,
-} from "../../../utils/feature-flags";
+import { FF_DEV_3873, FF_LOPS_E_3, FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
 import { isDefined } from "../../../utils/utils";
 import { Button } from "../Button/Button";
 import { FieldsButton } from "../FieldsButton";
@@ -42,46 +37,31 @@ const Decorator = (decoration) => {
   };
 };
 
-const RowRenderer = observer(
-  ({
-    row,
-    index,
-    stopInteractions,
-    rowHeight,
-    fitContent,
-    onRowClick,
-    decoration,
-  }) => {
-    const isEven = index % 2 === 0;
-    const mods = {
-      even: isEven,
-      selected: row.isSelected,
-      highlighted: row.isHighlighted,
-      loading: row.isLoading,
-      disabled: stopInteractions,
-    };
+const RowRenderer = observer(({ row, index, stopInteractions, rowHeight, fitContent, onRowClick, decoration }) => {
+  const isEven = index % 2 === 0;
+  const mods = {
+    even: isEven,
+    selected: row.isSelected,
+    highlighted: row.isHighlighted,
+    loading: row.isLoading,
+    disabled: stopInteractions,
+  };
 
-    return (
-      <TableElem
-        key={`${row.id}-${index}`}
-        name="row-wrapper"
-        mod={mods}
-        onClick={(e) => onRowClick?.(row, e)}
-      >
-        <TableRow
-          key={row.id}
-          data={row}
-          even={index % 2 === 0}
-          style={{
-            height: rowHeight,
-            width: fitContent ? "fit-content" : "auto",
-          }}
-          decoration={decoration}
-        />
-      </TableElem>
-    );
-  },
-);
+  return (
+    <TableElem key={`${row.id}-${index}`} name="row-wrapper" mod={mods} onClick={(e) => onRowClick?.(row, e)}>
+      <TableRow
+        key={row.id}
+        data={row}
+        even={index % 2 === 0}
+        style={{
+          height: rowHeight,
+          width: fitContent ? "fit-content" : "auto",
+        }}
+        decoration={decoration}
+      />
+    </TableElem>
+  );
+});
 
 const SelectionObserver = observer(({ id, selection, onSelect, className }) => {
   return (
@@ -110,9 +90,7 @@ export const Table = observer(
   }) => {
     const colOrderKey = "dm:columnorder";
     const tableHead = useRef();
-    const [colOrder, setColOrder] = useState(
-      JSON.parse(localStorage.getItem(colOrderKey)) ?? {},
-    );
+    const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const columns = prepareColumns(props.columns, props.hiddenColumns);
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
     const { api, type } = useSDK();
@@ -133,21 +111,11 @@ export const Table = observer(
         },
         onClick: (e) => e.stopPropagation(),
         Header: () => {
-          return (
-            <SelectionObserver
-              selection={selectedItems}
-              onSelect={props.onSelectAll}
-              className="select-all"
-            />
-          );
+          return <SelectionObserver selection={selectedItems} onSelect={props.onSelectAll} className="select-all" />;
         },
         Cell: ({ data }) => {
           return (
-            <SelectionObserver
-              id={data.id}
-              selection={selectedItems}
-              onSelect={() => props.onSelectRow(data.id)}
-            />
+            <SelectionObserver id={data.id} selection={selectedItems} onSelect={() => props.onSelectRow(data.id)} />
           );
         },
       });
@@ -193,13 +161,7 @@ export const Table = observer(
                 modal({
                   title: `Source for task ${out?.id}`,
                   style: { width: 800 },
-                  body: (
-                    <TaskSourceView
-                      content={out}
-                      onTaskLoad={onTaskLoad}
-                      sdkType={type}
-                    />
-                  ),
+                  body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
                 });
               }}
               icon={
@@ -231,8 +193,7 @@ export const Table = observer(
 
     useEffect(() => {
       const highlightedIndex = data.indexOf(focusedItem) - 1;
-      const highlightedElement =
-        tableWrapper.current?.children[highlightedIndex];
+      const highlightedElement = tableWrapper.current?.children[highlightedIndex];
 
       if (highlightedElement)
         highlightedElement.scrollIntoView({
@@ -266,11 +227,7 @@ export const Table = observer(
             )}
           </Block>
         )}
-        <TableBlock
-          ref={tableWrapper}
-          name="table"
-          mod={{ fit: props.fitToContent }}
-        >
+        <TableBlock ref={tableWrapper} name="table" mod={{ fit: props.fitToContent }}>
           <TableContext.Provider value={contextValue}>
             <TableHead
               ref={tableHead}

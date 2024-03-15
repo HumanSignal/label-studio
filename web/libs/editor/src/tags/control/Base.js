@@ -44,9 +44,7 @@ const ControlBase = types
     },
 
     selectedValues() {
-      throw new Error(
-        "Control tag needs to implement selectedValues method in views",
-      );
+      throw new Error("Control tag needs to implement selectedValues method in views");
     },
 
     get result() {

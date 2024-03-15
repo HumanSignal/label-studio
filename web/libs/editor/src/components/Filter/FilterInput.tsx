@@ -12,14 +12,7 @@ interface FilterInputInterface {
   style?: any;
 }
 
-export const FilterInput: FC<FilterInputInterface> = ({
-  value,
-  type,
-  onChange,
-  placeholder,
-  schema,
-  style,
-}) => {
+export const FilterInput: FC<FilterInputInterface> = ({ value, type, onChange, placeholder, schema, style }) => {
   const inputRef = React.useRef();
   const onChangeHandler = () => {
     const value = inputRef.current?.value ?? inputRef.current?.input?.value;

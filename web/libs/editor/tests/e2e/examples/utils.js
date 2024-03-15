@@ -23,8 +23,7 @@ function renderXml(doc) {
     nodes.forEach((node) => {
       const elem = xml.ele(node["#name"]);
 
-      if (node.$)
-        Object.keys(node.$).forEach((key) => elem.att(key, node.$[key]));
+      if (node.$) Object.keys(node.$).forEach((key) => elem.att(key, node.$[key]));
       if (node.$$) renderChildren(node.$$, elem);
     });
   };
@@ -36,10 +35,7 @@ function renderXml(doc) {
 function countRegionsInResult(result) {
   return result.reduce(
     (res, r) => {
-      if (
-        (!res.ids[r.id] && Object.keys(r.value).length > 1) ||
-        !!r.value.points
-      ) {
+      if ((!res.ids[r.id] && Object.keys(r.value).length > 1) || !!r.value.points) {
         res.count++;
         res.ids[r.id] = true;
       }

@@ -96,12 +96,10 @@ export class MediaLoader extends Destructable {
     }
 
     // Get the audio data from the url src
-    const req = await this.performRequest(this.options.src).catch(
-      (err: any) => {
-        console.error("An audio loading error occurred", err);
-        return null;
-      },
-    );
+    const req = await this.performRequest(this.options.src).catch((err: any) => {
+      console.error("An audio loading error occurred", err);
+      return null;
+    });
 
     if (req) {
       try {
@@ -191,10 +189,7 @@ export class MediaLoader extends Destructable {
       });
 
       // Handle relative urls, by converting them to absolute so any query params can be preserved
-      const newUrl = new URL(
-        url,
-        /^https?/.exec(url) ? undefined : window.location.href,
-      );
+      const newUrl = new URL(url, /^https?/.exec(url) ? undefined : window.location.href);
 
       const signedUrlParams = [
         "X-Goog-Signature", // Google Cloud Storage

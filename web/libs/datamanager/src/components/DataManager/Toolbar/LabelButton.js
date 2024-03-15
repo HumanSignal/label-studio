@@ -19,8 +19,7 @@ const Arrow = ({ rotate }) => (
 
 const injector = inject(({ store }) => {
   const { dataStore, currentView } = store;
-  const totalTasks =
-    store.project?.task_count ?? store.project?.task_number ?? 0;
+  const totalTasks = store.project?.task_count ?? store.project?.task_number ?? 0;
   const foundTasks = dataStore?.total ?? 0;
 
   return {
@@ -32,116 +31,109 @@ const injector = inject(({ store }) => {
   };
 });
 
-export const LabelButton = injector(
-  ({ store, canLabel, size, target, selectedCount }) => {
-    // const all = selectedCount === 0 || allSelected;
-    const disabled = target === "annotations";
-    const triggerRef = useRef();
-    const [isOpen, setIsOpen] = useState(false);
+export const LabelButton = injector(({ store, canLabel, size, target, selectedCount }) => {
+  // const all = selectedCount === 0 || allSelected;
+  const disabled = target === "annotations";
+  const triggerRef = useRef();
+  const [isOpen, setIsOpen] = useState(false);
 
-    const toggleOpen = useCallback(() => setIsOpen((isOpen) => !isOpen), []);
+  const toggleOpen = useCallback(() => setIsOpen((isOpen) => !isOpen), []);
 
-    const handleClickOutside = useCallback((e) => {
-      const el = triggerRef.current;
+  const handleClickOutside = useCallback((e) => {
+    const el = triggerRef.current;
 
-      if (el && !el.contains(e.target)) {
-        setIsOpen(false);
-      }
-    }, []);
+    if (el && !el.contains(e.target)) {
+      setIsOpen(false);
+    }
+  }, []);
 
-    useEffect(() => {
-      document.addEventListener("click", handleClickOutside, {
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside, {
+      capture: true,
+    });
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside, {
         capture: true,
       });
-
-      return () => {
-        document.removeEventListener("click", handleClickOutside, {
-          capture: true,
-        });
-      };
-    }, []);
-
-    const onLabelAll = () => {
-      localStorage.setItem("dm:labelstream:mode", "all");
-      store.startLabelStream();
     };
+  }, []);
 
-    const onLabelVisible = () => {
-      localStorage.setItem("dm:labelstream:mode", "filtered");
-      store.startLabelStream();
-    };
+  const onLabelAll = () => {
+    localStorage.setItem("dm:labelstream:mode", "all");
+    store.startLabelStream();
+  };
 
-    const triggerStyle = {
-      width: 20,
-      padding: 0,
-      borderTopLeftRadius: 0,
-      borderBottomLeftRadius: 0,
-      borderBottomRightRadius: isOpen ? 0 : undefined,
-      boxShadow: "none",
-    };
+  const onLabelVisible = () => {
+    localStorage.setItem("dm:labelstream:mode", "filtered");
+    store.startLabelStream();
+  };
 
-    const primaryStyle = {
-      width: 160,
-      padding: 0,
-      borderTopRightRadius: 0,
-      borderBottomRightRadius: 0,
-      borderBottomLeftRadius: isOpen ? 0 : undefined,
-    };
+  const triggerStyle = {
+    width: 20,
+    padding: 0,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: isOpen ? 0 : undefined,
+    boxShadow: "none",
+  };
 
-    const secondStyle = {
-      width: 180,
-      padding: 0,
-      display: isOpen ? "flex" : "none",
-      position: "absolute",
-      zIndex: 10,
-      borderTopLeftRadius: 0,
-      borderTopRightRadius: 0,
-    };
+  const primaryStyle = {
+    width: 160,
+    padding: 0,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    borderBottomLeftRadius: isOpen ? 0 : undefined,
+  };
 
-    selectedCount;
+  const secondStyle = {
+    width: 180,
+    padding: 0,
+    display: isOpen ? "flex" : "none",
+    position: "absolute",
+    zIndex: 10,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+  };
 
-    return canLabel ? (
-      <Interface name="labelButton">
-        <div>
-          <div style={{ display: "flex" }}>
-            <Button
-              size={size}
-              disabled={disabled}
-              mod={{
-                size: size ?? "medium",
-                look: "primary",
-                disabled,
-              }}
-              style={primaryStyle}
-              onClick={onLabelAll}
-            >
-              Label {selectedCount ? selectedCount : "All"} Task
-              {!selectedCount || selectedCount > 1 ? "s" : ""}
-            </Button>
-            <Button
-              ref={triggerRef}
-              size={size}
-              mod={{
-                size: size ?? "medium",
-                look: "primary",
-                disabled,
-              }}
-              style={triggerStyle}
-              onClick={toggleOpen}
-            >
-              <Arrow rotate={isOpen} />
-            </Button>
-          </div>
+  selectedCount;
+
+  return canLabel ? (
+    <Interface name="labelButton">
+      <div>
+        <div style={{ display: "flex" }}>
           <Button
             size={size}
-            style={secondStyle}
-            mod={{ size: size ?? "medium", disabled }}
-            onClick={onLabelVisible}
+            disabled={disabled}
+            mod={{
+              size: size ?? "medium",
+              look: "primary",
+              disabled,
+            }}
+            style={primaryStyle}
+            onClick={onLabelAll}
           >
-            Label Tasks As Displayed
+            Label {selectedCount ? selectedCount : "All"} Task
+            {!selectedCount || selectedCount > 1 ? "s" : ""}
+          </Button>
+          <Button
+            ref={triggerRef}
+            size={size}
+            mod={{
+              size: size ?? "medium",
+              look: "primary",
+              disabled,
+            }}
+            style={triggerStyle}
+            onClick={toggleOpen}
+          >
+            <Arrow rotate={isOpen} />
           </Button>
         </div>
-      </Interface>
-    ) : null;
-  },
-);
+        <Button size={size} style={secondStyle} mod={{ size: size ?? "medium", disabled }} onClick={onLabelVisible}>
+          Label Tasks As Displayed
+        </Button>
+      </div>
+    </Interface>
+  ) : null;
+});

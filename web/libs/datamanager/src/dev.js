@@ -1,8 +1,7 @@
 import { Button } from "./components/Common/Button/Button";
 
 const API_GATEWAY = process.env.API_GATEWAY || process.env.NX_API_GATEWAY;
-const LS_ACCESS_TOKEN =
-  process.env.LS_ACCESS_TOKEN || process.env.NX_LS_ACCESS_TOKEN;
+const LS_ACCESS_TOKEN = process.env.LS_ACCESS_TOKEN || process.env.NX_LS_ACCESS_TOKEN;
 
 /**
  * @param {import("../src/sdk/dm-sdk").DataManager} DataManager

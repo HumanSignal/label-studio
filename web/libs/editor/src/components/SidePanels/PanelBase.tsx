@@ -8,55 +8,26 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  IconOutlinerCollapse,
-  IconOutlinerExpand,
-} from "../../assets/icons";
+import { IconArrowLeft, IconArrowRight, IconOutlinerCollapse, IconOutlinerExpand } from "../../assets/icons";
 import { Block, Elem } from "../../utils/bem";
 
 import { useDrag } from "../../hooks/useDrag";
 import { clamp, isDefined } from "../../utils/utilities";
 import "./PanelBase.styl";
 import type { PanelType } from "./SidePanels";
-import {
-  DEFAULT_PANEL_HEIGHT,
-  DEFAULT_PANEL_WIDTH,
-  PANEL_HEADER_HEIGHT_PADDED,
-} from "./constants";
+import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH, PANEL_HEADER_HEIGHT_PADDED } from "./constants";
 
 export type PanelBaseExclusiveProps = "name" | "title";
 
-type ResizeHandler = (
-  name: PanelType,
-  width: number,
-  height: number,
-  top: number,
-  left: number,
-) => void;
+type ResizeHandler = (name: PanelType, width: number, height: number, top: number, left: number) => void;
 
 type SnapHandler = (name: PanelType) => void;
 
-type PositonChangeHandler = (
-  name: PanelType,
-  top: number,
-  left: number,
-  detached: boolean,
-) => void;
+type PositonChangeHandler = (name: PanelType, top: number, left: number, detached: boolean) => void;
 
 type VisibilityChangeHandler = (name: PanelType, visible: boolean) => void;
 
-const resizers = [
-  "top-left",
-  "top-right",
-  "bottom-left",
-  "bottom-right",
-  "top",
-  "bottom",
-  "right",
-  "left",
-];
+const resizers = ["top-left", "top-right", "bottom-left", "bottom-right", "top", "bottom", "right", "left"];
 
 interface PanelBaseProps {
   root: MutableRefObject<HTMLDivElement | undefined>;
@@ -187,12 +158,9 @@ export const PanelBase: FC<PanelBaseProps> = ({
   }, [alignment, visible, detached, resizing, locked]);
 
   const currentIcon = useMemo(() => {
-    if (detached)
-      return visible ? <IconOutlinerCollapse /> : <IconOutlinerExpand />;
-    if (alignment === "left")
-      return visible ? <IconArrowLeft /> : <IconArrowRight />;
-    if (alignment === "right")
-      return visible ? <IconArrowRight /> : <IconArrowLeft />;
+    if (detached) return visible ? <IconOutlinerCollapse /> : <IconOutlinerExpand />;
+    if (alignment === "left") return visible ? <IconArrowLeft /> : <IconArrowRight />;
+    if (alignment === "right") return visible ? <IconArrowRight /> : <IconArrowLeft />;
 
     return null;
   }, [detached, visible, alignment]);
@@ -211,15 +179,7 @@ export const PanelBase: FC<PanelBaseProps> = ({
       onVisibilityChange,
       onSnap,
     });
-  }, [
-    onResize,
-    onResizeStart,
-    onResizeEnd,
-    onPositionChange,
-    onVisibilityChange,
-    onPositionChangeBegin,
-    onSnap,
-  ]);
+  }, [onResize, onResizeStart, onResizeEnd, onPositionChange, onVisibilityChange, onPositionChangeBegin, onSnap]);
 
   // Panel positioning
   useDrag(
@@ -240,10 +200,7 @@ export const PanelBase: FC<PanelBaseProps> = ({
         const parentBBox = root.current?.getBoundingClientRect();
         const bbox = panel.getBoundingClientRect();
         const [x, y] = [e.pageX, e.pageY];
-        const [oX, oY] = [
-          bbox.left - parentBBox.left,
-          bbox.top - parentBBox.top,
-        ];
+        const [oX, oY] = [bbox.left - parentBBox.left, bbox.top - parentBBox.top];
 
         handlers.current.onPositionChangeBegin?.(name, top, left, detached);
 
@@ -325,37 +282,18 @@ export const PanelBase: FC<PanelBaseProps> = ({
       },
       onMouseMove(e, data) {
         if (data) {
-          const {
-            pos,
-            width: w,
-            height: h,
-            maxWidth,
-            top: t,
-            left: l,
-            resizeDirections,
-            shift,
-          } = data;
+          const { pos, width: w, height: h, maxWidth, top: t, left: l, resizeDirections, shift } = data;
 
           const [sX, sY] = pos;
 
           const wMod = resizeDirections.x ? e.pageX - sX : 0;
           const hMod = resizeDirections.y ? e.pageY - sY : 0;
 
-          const shiftLeft =
-            isDefined(shift) && ["left", "top-left"].includes(shift);
-          const shiftTop =
-            isDefined(shift) && ["top", "top-left"].includes(shift);
+          const shiftLeft = isDefined(shift) && ["left", "top-left"].includes(shift);
+          const shiftTop = isDefined(shift) && ["top", "top-left"].includes(shift);
 
-          const width = clamp(
-            shiftLeft ? w - wMod : w + wMod,
-            DEFAULT_PANEL_WIDTH,
-            maxWidth,
-          );
-          const height = clamp(
-            shiftTop ? h - hMod : h + hMod,
-            DEFAULT_PANEL_HEIGHT,
-            t + h,
-          );
+          const width = clamp(shiftLeft ? w - wMod : w + wMod, DEFAULT_PANEL_WIDTH, maxWidth);
+          const height = clamp(shiftTop ? h - hMod : h + hMod, DEFAULT_PANEL_HEIGHT, t + h);
 
           const top = shiftTop ? t + (h - height) : t;
           const left = shiftLeft ? l + (w - width) : l;
@@ -368,35 +306,14 @@ export const PanelBase: FC<PanelBaseProps> = ({
         setResizing(undefined);
       },
     },
-    [
-      handlers,
-      detached,
-      width,
-      maxWidth,
-      height,
-      top,
-      left,
-      visible,
-      locked,
-      positioning,
-    ],
+    [handlers, detached, width, maxWidth, height, top, left, visible, locked, positioning],
   );
 
   return (
-    <Block
-      ref={panelRef}
-      name="panel"
-      mix={name}
-      mod={mods}
-      style={{ ...style, ...coordinates }}
-    >
+    <Block ref={panelRef} name="panel" mix={name} mod={mods} style={{ ...style, ...coordinates }}>
       <Elem name="content">
         {!locked && (
-          <Elem
-            ref={headerRef}
-            name="header"
-            onClick={!detached ? handleExpand : undefined}
-          >
+          <Elem ref={headerRef} name="header" onClick={!detached ? handleExpand : undefined}>
             {(visible || detached) && <Elem name="title">{title}</Elem>}
 
             <Elem
@@ -419,24 +336,12 @@ export const PanelBase: FC<PanelBaseProps> = ({
       </Elem>
 
       {visible && !positioning && !locked && (
-        <Elem
-          name="resizers"
-          ref={resizerRef}
-          mod={{ locked: positioning || locked }}
-        >
+        <Elem name="resizers" ref={resizerRef} mod={{ locked: positioning || locked }}>
           {resizers.map((res) => {
-            const shouldRender =
-              ((res === "left" || res === "right") && alignment !== res) ||
-              detached ||
-              detached;
+            const shouldRender = ((res === "left" || res === "right") && alignment !== res) || detached || detached;
 
             return shouldRender ? (
-              <Elem
-                key={res}
-                name="resizer"
-                mod={{ drag: res === resizing }}
-                data-resize={res}
-              />
+              <Elem key={res} name="resizer" mod={{ drag: res === resizing }} data-resize={res} />
             ) : null;
           })}
         </Elem>

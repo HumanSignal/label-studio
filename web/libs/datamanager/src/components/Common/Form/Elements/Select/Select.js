@@ -59,12 +59,7 @@ const Select = ({
                 const hidden = option.hidden ?? false;
 
                 return (
-                  <option
-                    key={value}
-                    value={value}
-                    disabled={disabled}
-                    hidden={hidden}
-                  >
+                  <option key={value} value={value} disabled={disabled} hidden={hidden}>
                     {label}
                   </option>
                 );

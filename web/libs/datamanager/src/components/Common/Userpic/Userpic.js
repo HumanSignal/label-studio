@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../../utils/bem";
 import { Tooltip } from "../Tooltip/Tooltip";
 import "./Userpic.styl";
@@ -14,21 +7,7 @@ const FALLBACK_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 export const Userpic = forwardRef(
-  (
-    {
-      badge = null,
-      className,
-      faded = false,
-      showUsername,
-      size,
-      src,
-      style,
-      user,
-      username,
-      ...rest
-    },
-    ref,
-  ) => {
+  ({ badge = null, className, faded = false, showUsername, size, src, style, user, username, ...rest }, ref) => {
     const imgRef = useRef();
     const [finalUsername, setFinalUsername] = useState(username);
     const [finalSrc, setFinalSrc] = useState(user?.avatar ?? src);
@@ -36,10 +15,7 @@ export const Userpic = forwardRef(
     const [nameVisible, setNameVisible] = useState(true);
 
     if (size) {
-      style = Object.assign(
-        { width: size, height: size, fontSize: size * 0.4 },
-        style,
-      );
+      style = Object.assign({ width: size, height: size, fontSize: size * 0.4 }, style);
     }
 
     useEffect(() => {
@@ -69,14 +45,7 @@ export const Userpic = forwardRef(
     }, [finalSrc]);
 
     const userpic = (
-      <Block
-        ref={ref}
-        name="userpic"
-        mix={className}
-        mod={{ faded }}
-        style={style}
-        {...rest}
-      >
+      <Block ref={ref} name="userpic" mix={className} mod={{ faded }} style={style} {...rest}>
         <Elem
           tag="img"
           name="avatar"
@@ -115,11 +84,7 @@ export const Userpic = forwardRef(
       return username;
     }, [user, username]);
 
-    return showUsername && userFullName ? (
-      <Tooltip title={userFullName}>{userpic}</Tooltip>
-    ) : (
-      userpic
-    );
+    return showUsername && userFullName ? <Tooltip title={userFullName}>{userpic}</Tooltip> : userpic;
   },
 );
 

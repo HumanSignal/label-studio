@@ -5,18 +5,8 @@ import { IconHelp } from "../../../assets/icons";
 import Toggle from "../../../common/Toggle/Toggle";
 import { Tooltip } from "../../../common/Tooltip/Tooltip";
 import ObjectTag from "../../../components/Tags/Object";
-import {
-  FF_DEV_2669,
-  FF_DEV_2918,
-  FF_LSDV_4711,
-  FF_LSDV_E_278,
-  isFF,
-} from "../../../utils/feature-flags";
-import {
-  findNodeAt,
-  matchesSelector,
-  splitBoundaries,
-} from "../../../utils/html";
+import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_4711, FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
+import { findNodeAt, matchesSelector, splitBoundaries } from "../../../utils/html";
 import { isSelectionContainsSpan } from "../../../utils/selection-tools";
 import { AuthorFilter } from "./AuthorFilter";
 import styles from "./Paragraphs.module.scss";
@@ -49,17 +39,12 @@ class HtxParagraphsView extends Component {
   getPhraseElement(node) {
     const cls = this.props.item.layoutClasses;
 
-    while (node && (!node.classList || !node.classList.contains(cls.text)))
-      node = node.parentNode;
+    while (node && (!node.classList || !node.classList.contains(cls.text))) node = node.parentNode;
     return node;
   }
 
   get phraseElements() {
-    return [
-      ...this.myRef.current.getElementsByClassName(
-        this.props.item.layoutClasses.text,
-      ),
-    ];
+    return [...this.myRef.current.getElementsByClassName(this.props.item.layoutClasses.text)];
   }
 
   /**
@@ -89,12 +74,7 @@ class HtxParagraphsView extends Component {
     // move the offset to the end of the previous phrase
     if (!isStart && fullOffset === 0) {
       phraseNode = this.phraseElements[phraseIndex - 1];
-      return [
-        phraseNode.textContent.length,
-        phraseNode,
-        phraseIndex - 1,
-        phraseIndex,
-      ];
+      return [phraseNode.textContent.length, phraseNode, phraseIndex - 1, phraseIndex];
     }
 
     return [fullOffset, phraseNode, phraseIndex, phraseIndex];
@@ -150,34 +130,22 @@ class HtxParagraphsView extends Component {
 
       try {
         splitBoundaries(r);
-        const [startOffset, , start, originalStart] =
-          this.getOffsetInPhraseElement(r.startContainer, r.startOffset);
-        const [endOffset, , end, _originalEnd] = this.getOffsetInPhraseElement(
-          r.endContainer,
-          r.endOffset,
-          false,
-        );
+        const [startOffset, , start, originalStart] = this.getOffsetInPhraseElement(r.startContainer, r.startOffset);
+        const [endOffset, , end, _originalEnd] = this.getOffsetInPhraseElement(r.endContainer, r.endOffset, false);
 
         // if this shifts backwards, we need to take the lesser index.
         const originalEnd = Math.min(end, _originalEnd);
 
         if (isFF(FF_DEV_2918)) {
-          const visibleIndexes = item._value.reduce(
-            (visibleIndexes, v, idx) => {
-              const isContentVisible = item.isVisibleForAuthorFilter(v);
+          const visibleIndexes = item._value.reduce((visibleIndexes, v, idx) => {
+            const isContentVisible = item.isVisibleForAuthorFilter(v);
 
-              if (
-                isContentVisible &&
-                originalStart <= idx &&
-                originalEnd >= idx
-              ) {
-                visibleIndexes.push(idx);
-              }
+            if (isContentVisible && originalStart <= idx && originalEnd >= idx) {
+              visibleIndexes.push(idx);
+            }
 
-              return visibleIndexes;
-            },
-            [],
-          );
+            return visibleIndexes;
+          }, []);
 
           if (visibleIndexes.length !== originalEnd - originalStart + 1) {
             const texts = this.phraseElements;
@@ -199,10 +167,7 @@ class HtxParagraphsView extends Component {
                 } else {
                   anchorOffset = 0;
 
-                  const walker = texts[fromIdx].ownerDocument.createTreeWalker(
-                    texts[fromIdx],
-                    NodeFilter.SHOW_ALL,
-                  );
+                  const walker = texts[fromIdx].ownerDocument.createTreeWalker(texts[fromIdx], NodeFilter.SHOW_ALL);
 
                   while (walker.firstChild());
 
@@ -216,10 +181,7 @@ class HtxParagraphsView extends Component {
                   curRange.selectNode(texts[curIdx]);
                   focusOffset = curRange.toString().length;
 
-                  const walker = texts[curIdx].ownerDocument.createTreeWalker(
-                    texts[curIdx],
-                    NodeFilter.SHOW_ALL,
-                  );
+                  const walker = texts[curIdx].ownerDocument.createTreeWalker(texts[curIdx], NodeFilter.SHOW_ALL);
 
                   while (walker.lastChild());
 
@@ -229,9 +191,7 @@ class HtxParagraphsView extends Component {
                 selection.removeAllRanges();
                 selection.addRange(_range);
 
-                const text = this.removeSurroundingNewlines(
-                  selection.toString(),
-                );
+                const text = this.removeSurroundingNewlines(selection.toString());
 
                 // Sometimes the selection is empty, which is the case for dragging from the end of a line above the
                 // target line, while having collapsed lines between.
@@ -302,11 +262,7 @@ class HtxParagraphsView extends Component {
     while (walker.nextNode()) {
       const node = walker.currentNode;
 
-      if (
-        node.nodeName === "SPAN" &&
-        node.matches(this._regionSpanSelector) &&
-        isSelectionContainsSpan(node)
-      ) {
+      if (node.nodeName === "SPAN" && node.matches(this._regionSpanSelector) && isSelectionContainsSpan(node)) {
         const region = this._determineRegion(node);
 
         regions.push(region);
@@ -324,10 +280,7 @@ class HtxParagraphsView extends Component {
 
   _determineRegion(element) {
     if (matchesSelector(element, this._regionSpanSelector)) {
-      const span =
-        element.tagName === "SPAN"
-          ? element
-          : element.closest(this._regionSpanSelector);
+      const span = element.tagName === "SPAN" ? element : element.closest(this._regionSpanSelector);
       const { item } = this.props;
 
       return item.regs.find((region) => region.find(span));
@@ -387,8 +340,7 @@ class HtxParagraphsView extends Component {
   _getResultText(start, end, startOffset, endOffset) {
     const phrases = this.phraseElements;
 
-    if (start === end)
-      return phrases[start].innerText.slice(startOffset, endOffset);
+    if (start === end) return phrases[start].innerText.slice(startOffset, endOffset);
 
     return [
       phrases[start].innerText.slice(startOffset),
@@ -415,30 +367,16 @@ class HtxParagraphsView extends Component {
       try {
         const phrases = root.children;
         const range = document.createRange();
-        const startNode = phrases[r.start].getElementsByClassName(
-          item.layoutClasses.text,
-        )[0];
-        const endNode = phrases[r.end].getElementsByClassName(
-          item.layoutClasses.text,
-        )[0];
+        const startNode = phrases[r.start].getElementsByClassName(item.layoutClasses.text)[0];
+        const endNode = phrases[r.end].getElementsByClassName(item.layoutClasses.text)[0];
 
         let { startOffset, endOffset } = r;
 
         range.setStart(...findNodeAt(startNode, startOffset));
         range.setEnd(...findNodeAt(endNode, endOffset));
 
-        if (
-          r.text &&
-          range.toString().replace(/\s+/g, "") !== r.text.replace(/\s+/g, "")
-        ) {
-          console.info(
-            "Restore broken position",
-            i,
-            range.toString(),
-            "->",
-            r.text,
-            r,
-          );
+        if (r.text && range.toString().replace(/\s+/g, "") !== r.text.replace(/\s+/g, "")) {
+          console.info("Restore broken position", i, range.toString(), "->", r.text, r);
           if (
             // span breaks the mock-up by its end, so the start of next one is wrong
             item.regs.slice(0, i).some((other) => r.start === other.end) &&
@@ -446,17 +384,13 @@ class HtxParagraphsView extends Component {
             r.start === r.end
           ) {
             // find region's text in the node (disregarding spaces)
-            const match = startNode.textContent.match(
-              new RegExp(r.text.replace(/\s+/g, "\\s+")),
-            );
+            const match = startNode.textContent.match(new RegExp(r.text.replace(/\s+/g, "\\s+")));
 
             if (!match) console.warn("Can't find the text", r);
             const { index = 0 } = match || {};
 
             if (r.endOffset - r.startOffset !== r.text.length)
-              console.warn(
-                "Text length differs from region length; possible regions overlap",
-              );
+              console.warn("Text length differs from region length; possible regions overlap");
             startOffset = index;
             endOffset = startOffset + r.text.length;
 
@@ -465,9 +399,7 @@ class HtxParagraphsView extends Component {
             r.fixOffsets(startOffset, endOffset);
           }
         } else if (!r.text && range.toString()) {
-          r.setText(
-            this._getResultText(+r.start, +r.end, startOffset, endOffset),
-          );
+          r.setText(this._getResultText(+r.start, +r.end, startOffset, endOffset));
         }
 
         splitBoundaries(range);
@@ -496,24 +428,15 @@ class HtxParagraphsView extends Component {
       this.state.canScroll
     ) {
       const _padding =
-        Number.parseInt(
-          window
-            .getComputedStyle(this.myRef.current)
-            ?.getPropertyValue("padding-top"),
-        ) || 0;
+        Number.parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue("padding-top")) || 0;
       const _playingItem = this.props.item._value[item.playingId];
       const _start = _playingItem.start;
       const _end = _playingItem.end;
       const _phaseHeight = this.activeRef.current?.offsetHeight || 0;
-      const _duration =
-        this.props.item._value[item.playingId].duration || _end - _start;
+      const _duration = this.props.item._value[item.playingId].duration || _end - _start;
       const _wrapperHeight = root.offsetHeight;
       const _wrapperOffsetTop = this.activeRef.current?.offsetTop - _padding;
-      const _splittedText =
-        Math.ceil(
-          this.activeRef.current?.offsetHeight /
-            this.myRef.current?.offsetHeight,
-        ) + 1; // +1 to make sure the last line is scrolled to the top
+      const _splittedText = Math.ceil(this.activeRef.current?.offsetHeight / this.myRef.current?.offsetHeight) + 1; // +1 to make sure the last line is scrolled to the top
 
       this._disposeTimeout();
 
@@ -522,8 +445,7 @@ class HtxParagraphsView extends Component {
           this.scrollTimeout.push(
             setTimeout(
               () => {
-                const _pos =
-                  _wrapperOffsetTop + _phaseHeight * (i * (1 / _splittedText));
+                const _pos = _wrapperOffsetTop + _phaseHeight * (i * (1 / _splittedText));
 
                 if (this.state.inViewPort && this.state.canScroll) {
                   root.scrollTo({
@@ -550,12 +472,7 @@ class HtxParagraphsView extends Component {
   }
 
   _handleScrollToPhrase() {
-    const _padding =
-      Number.parseInt(
-        window
-          .getComputedStyle(this.myRef.current)
-          ?.getPropertyValue("padding-top"),
-      ) || 0;
+    const _padding = Number.parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue("padding-top")) || 0;
     const _wrapperOffsetTop = this.activeRef.current?.offsetTop - _padding;
 
     this.myRef.current.scrollTo({
@@ -571,34 +488,19 @@ class HtxParagraphsView extends Component {
     const visibleHeight = document.documentElement.clientHeight - mainRect.top;
     const annotationView = document.querySelector(".lsf-main-view__annotation");
     const totalVisibleSpace = Math.floor(
-      visibleHeight < mainRect.height
-        ? visibleHeight
-        : mainContentView?.offsetHeight || 0,
+      visibleHeight < mainRect.height ? visibleHeight : mainContentView?.offsetHeight || 0,
     );
-    const filledSpace =
-      annotationView?.offsetHeight ||
-      mainContentView.firstChild?.offsetHeight ||
-      0;
+    const filledSpace = annotationView?.offsetHeight || mainContentView.firstChild?.offsetHeight || 0;
     const containerHeight = container?.offsetHeight || 0;
     const viewPadding =
-      Number.parseInt(
-        window
-          .getComputedStyle(mainContentView)
-          ?.getPropertyValue("padding-bottom"),
-      ) || 0;
-    const height =
-      totalVisibleSpace - (filledSpace - containerHeight) - viewPadding;
+      Number.parseInt(window.getComputedStyle(mainContentView)?.getPropertyValue("padding-bottom")) || 0;
+    const height = totalVisibleSpace - (filledSpace - containerHeight) - viewPadding;
     const minHeight = 100;
 
-    if (container)
-      this.myRef.current.style.maxHeight = `${
-        height < minHeight ? minHeight : height
-      }px`;
+    if (container) this.myRef.current.style.maxHeight = `${height < minHeight ? minHeight : height}px`;
   }
 
-  _resizeObserver = new ResizeObserver(() =>
-    this._handleScrollContainerHeight(),
-  );
+  _resizeObserver = new ResizeObserver(() => this._handleScrollContainerHeight());
 
   componentDidUpdate() {
     this._handleUpdate();
@@ -632,10 +534,7 @@ class HtxParagraphsView extends Component {
             onChange={() => {
               if (!this.activeRef.current) return;
               const _timeoutDelay =
-                Number.parseFloat(
-                  window.getComputedStyle(this.activeRef.current)
-                    .transitionDuration,
-                ) * 1000;
+                Number.parseFloat(window.getComputedStyle(this.activeRef.current).transitionDuration) * 1000;
 
               setTimeout(() => {
                 this._handleScrollToPhrase();
@@ -657,10 +556,7 @@ class HtxParagraphsView extends Component {
               }}
               label={"Auto-scroll"}
             />
-            <Tooltip
-              placement="topLeft"
-              title="Automatically sync transcript scrolling with audio playback"
-            >
+            <Tooltip placement="topLeft" title="Automatically sync transcript scrolling with audio playback">
               <IconHelp />
             </Tooltip>
           </div>
@@ -694,9 +590,7 @@ class HtxParagraphsView extends Component {
             onCanPlay={item.handleCanPlay}
           />
         )}
-        {isFF(FF_LSDV_E_278)
-          ? this.renderWrapperHeader()
-          : isFF(FF_DEV_2669) && <AuthorFilter item={item} />}
+        {isFF(FF_LSDV_E_278) ? this.renderWrapperHeader() : isFF(FF_DEV_2669) && <AuthorFilter item={item} />}
         <div
           ref={this.myRef}
           data-testid="phrases-wrapper"

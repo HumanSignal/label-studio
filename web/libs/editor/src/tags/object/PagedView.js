@@ -114,11 +114,7 @@ const updateQueryPage = (page, currentTaskId = null) => {
     params.delete(PAGE_QUERY_PARAM);
   }
 
-  window.history.replaceState(
-    undefined,
-    undefined,
-    `${window.location.pathname}?${params}`,
-  );
+  window.history.replaceState(undefined, undefined, `${window.location.pathname}?${params}`);
 };
 
 const HtxPagedView = observer(({ item }) => {
@@ -184,12 +180,7 @@ const HtxPagedView = observer(({ item }) => {
     const pageView = [];
 
     for (let i = 0; i < pageSize; i++) {
-      pageView.push(
-        Tree.renderChildren(
-          item.children[i + pageSize * (page - 1)],
-          item.annotation,
-        ),
-      );
+      pageView.push(Tree.renderChildren(item.children[i + pageSize * (page - 1)], item.annotation));
     }
 
     return pageView;

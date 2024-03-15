@@ -39,26 +39,16 @@ class Panel {
     return locate(this.root + stateSelector);
   }
   locate(locator) {
-    return locator
-      ? locate(locator).inside(this.locatePanel())
-      : this.locatePanel();
+    return locator ? locate(locator).inside(this.locatePanel()) : this.locatePanel();
   }
   seePanel() {
     I.seeElement(this.locatePanel());
   }
   seePanelAttachedLeft() {
-    I.seeElement(
-      this.locatePanel(`${this.aligmentLeft}:not(${this.detached})`).inside(
-        this.leftZone,
-      ),
-    );
+    I.seeElement(this.locatePanel(`${this.aligmentLeft}:not(${this.detached})`).inside(this.leftZone));
   }
   seePanelAttachedRight() {
-    I.seeElement(
-      this.locatePanel(`${this.aligmentRight}:not(${this.detached})`).inside(
-        this.rightZone,
-      ),
-    );
+    I.seeElement(this.locatePanel(`${this.aligmentRight}:not(${this.detached})`).inside(this.rightZone));
   }
   seePanelDetached() {
     I.seeElement(this.locatePanel(this.detached));
@@ -132,9 +122,7 @@ class Panel {
   }
 
   async dragResizerBy(shiftX, shiftY, resizerSelector, steps = 1) {
-    const fromBbox = await I.grabElementBoundingRect(
-      this.locate(resizerSelector),
-    );
+    const fromBbox = await I.grabElementBoundingRect(this.locate(resizerSelector));
     const fromPoint = centerOfBbox(fromBbox);
     const toPoint = {
       x: fromPoint.x + shiftX,

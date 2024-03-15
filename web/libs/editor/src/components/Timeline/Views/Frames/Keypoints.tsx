@@ -1,13 +1,5 @@
 import chroma from "chroma-js";
-import {
-  type CSSProperties,
-  type FC,
-  type MouseEvent,
-  memo,
-  useCallback,
-  useContext,
-  useMemo,
-} from "react";
+import { type CSSProperties, type FC, type MouseEvent, memo, useCallback, useContext, useMemo } from "react";
 import { Block, Elem } from "../../../../utils/bem";
 import { clamp } from "../../../../utils/utilities";
 import { TimelineContext } from "../../Context";
@@ -20,22 +12,11 @@ export interface KeypointsProps {
   region: TimelineRegion;
   startOffset: number;
   renderable: boolean;
-  onSelectRegion?: (
-    e: MouseEvent<HTMLDivElement>,
-    id: string,
-    select?: boolean,
-  ) => void;
+  onSelectRegion?: (e: MouseEvent<HTMLDivElement>, id: string, select?: boolean) => void;
 }
 
-export const Keypoints: FC<KeypointsProps> = ({
-  idx,
-  region,
-  startOffset,
-  renderable,
-  onSelectRegion,
-}) => {
-  const { step, seekOffset, visibleWidth, length } =
-    useContext(TimelineContext);
+export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, renderable, onSelectRegion }) => {
+  const { step, seekOffset, visibleWidth, length } = useContext(TimelineContext);
   const { label, color, visible, sequence, selected } = region;
 
   const extraSteps = useMemo(() => {
@@ -71,22 +52,12 @@ export const Keypoints: FC<KeypointsProps> = ({
 
     return visualizeLifespans(sequence, step).map((span) => {
       span.points = span.points.filter(({ frame }) => {
-        return (
-          frame >= minVisibleKeypointPosition &&
-          frame <= maxVisibleKeypointPosition
-        );
+        return frame >= minVisibleKeypointPosition && frame <= maxVisibleKeypointPosition;
       });
 
       return span;
     });
-  }, [
-    sequence,
-    start,
-    step,
-    renderable,
-    minVisibleKeypointPosition,
-    maxVisibleKeypointPosition,
-  ]);
+  }, [sequence, start, step, renderable, minVisibleKeypointPosition, maxVisibleKeypointPosition]);
 
   const onSelectRegionHandler = useCallback(
     (e: MouseEvent<HTMLDivElement>, select?: boolean) => {
@@ -106,16 +77,8 @@ export const Keypoints: FC<KeypointsProps> = ({
           </Elem>
         </Elem>
       </Elem>
-      <Elem
-        name="keypoints"
-        onClick={(e: any) => onSelectRegionHandler(e, true)}
-      >
-        <LifespansList
-          lifespans={lifespans}
-          step={step}
-          visible={visible}
-          offset={offset}
-        />
+      <Elem name="keypoints" onClick={(e: any) => onSelectRegionHandler(e, true)}>
+        <LifespansList lifespans={lifespans} step={step} visible={visible} offset={offset} />
       </Elem>
     </Block>
   );
@@ -128,12 +91,7 @@ interface LifespansListProps {
   visible: boolean;
 }
 
-const LifespansList: FC<LifespansListProps> = ({
-  lifespans,
-  step,
-  offset,
-  visible,
-}) => {
+const LifespansList: FC<LifespansListProps> = ({ lifespans, step, offset, visible }) => {
   return (
     <>
       {lifespans.map((lifespan, i) => {
@@ -169,17 +127,7 @@ interface LifespanItemProps {
 }
 
 const LifespanItem: FC<LifespanItemProps> = memo(
-  ({
-    mainOffset,
-    width,
-    start,
-    step,
-    offset,
-    enabled,
-    visible,
-    isLast,
-    points,
-  }) => {
+  ({ mainOffset, width, start, step, offset, enabled, visible, isLast, points }) => {
     const left = useMemo(() => {
       return mainOffset + offset + step / 2;
     }, [mainOffset, offset, step]);

@@ -4,11 +4,7 @@ import { createBrowserHistory } from "history";
 import React from "react";
 import { render } from "react-dom";
 import { Router } from "react-router-dom";
-import {
-  DRAFT_GUARD_KEY,
-  DraftGuard,
-  draftGuardCallback,
-} from "../components/DraftGuard/DraftGuard";
+import { DRAFT_GUARD_KEY, DraftGuard, draftGuardCallback } from "../components/DraftGuard/DraftGuard";
 import { ToastProvider, ToastViewport } from "../components/Toast/Toast";
 import { initSentry } from "../config/Sentry";
 import { ApiProvider } from "../providers/ApiProvider";

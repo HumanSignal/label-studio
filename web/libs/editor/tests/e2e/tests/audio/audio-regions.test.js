@@ -83,11 +83,42 @@ const paramsSpeech = {
   data,
 };
 
-FFlagMatrix(
-  ["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"],
-  (flags) => {
+FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) => {
+  FFlagScenario("Check if regions are selected", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+    LabelStudio.setFeatureFlags({
+      ff_front_dev_2715_audio_3_280722_short: true,
+      ...flags,
+    });
+    I.amOnPage("/");
+
+    LabelStudio.init(params);
+
+    await AtAudioView.waitForAudio();
+    await AtAudioView.lookForStage();
+
+    AtSidebar.seeRegions(1);
+
+    // creating a new region
+    I.pressKey("1");
+    AtAudioView.dragAudioElement(160, 80);
+    I.pressKey("u");
+
+    AtSidebar.seeRegions(2);
+
+    AtAudioView.clickAt(170);
+    AtSidebar.seeSelectedRegion();
+    AtAudioView.clickAt(170);
+    AtSidebar.dontSeeSelectedRegion();
+    AtAudioView.dragAudioElement(170, 40);
+    AtSidebar.seeSelectedRegion();
+    AtAudioView.clickAt(220);
+    AtSidebar.dontSeeSelectedRegion();
+  });
+
+  // Don't need to test this for both scenarios of flags, as it is the same code and is verified in the above test
+  if (!flags.fflag_feat_front_lsdv_e_278_contextual_scrolling_short) {
     FFlagScenario(
-      "Check if regions are selected",
+      "Check if multiple regions are working changing labels",
       async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
@@ -95,229 +126,183 @@ FFlagMatrix(
         });
         I.amOnPage("/");
 
-        LabelStudio.init(params);
+        LabelStudio.init(paramsSpeech);
 
         await AtAudioView.waitForAudio();
         await AtAudioView.lookForStage();
 
-        AtSidebar.seeRegions(1);
+        for (let i = 0; i < 20; i++) {
+          // creating a new region
+          I.pressKey("1");
+          AtAudioView.dragAudioElement(40 * i + 10, 30);
+          AtAudioView.clickAt(40 * i + 20);
+          I.pressKey("2");
+          I.pressKey("1");
+          I.pressKey("u");
+        }
 
-        // creating a new region
-        I.pressKey("1");
-        AtAudioView.dragAudioElement(160, 80);
+        AtSidebar.seeRegions(20);
+
+        for (let i = 0; i < 20; i++) {
+          // creating a new region
+          AtAudioView.clickAt(40 * i + 20);
+          AtSidebar.seeSelectedRegion();
+          I.pressKey("u");
+        }
+
+        AtSidebar.seeRegions(20);
+
         I.pressKey("u");
 
-        AtSidebar.seeRegions(2);
-
-        AtAudioView.clickAt(170);
-        AtSidebar.seeSelectedRegion();
-        AtAudioView.clickAt(170);
-        AtSidebar.dontSeeSelectedRegion();
-        AtAudioView.dragAudioElement(170, 40);
-        AtSidebar.seeSelectedRegion();
-        AtAudioView.clickAt(220);
         AtSidebar.dontSeeSelectedRegion();
       },
     );
 
-    // Don't need to test this for both scenarios of flags, as it is the same code and is verified in the above test
-    if (!flags.fflag_feat_front_lsdv_e_278_contextual_scrolling_short) {
-      FFlagScenario(
-        "Check if multiple regions are working changing labels",
-        async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ...flags,
-          });
-          I.amOnPage("/");
+    FFlagScenario("Can select a region below a hidden region", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+      LabelStudio.setFeatureFlags({
+        ff_front_dev_2715_audio_3_280722_short: true,
+        ...flags,
+      });
+      I.amOnPage("/");
 
-          LabelStudio.init(paramsSpeech);
+      LabelStudio.init(paramsSpeech);
 
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
+      await AtAudioView.waitForAudio();
+      await AtAudioView.lookForStage();
 
-          for (let i = 0; i < 20; i++) {
-            // creating a new region
-            I.pressKey("1");
-            AtAudioView.dragAudioElement(40 * i + 10, 30);
-            AtAudioView.clickAt(40 * i + 20);
-            I.pressKey("2");
-            I.pressKey("1");
-            I.pressKey("u");
-          }
+      // create a new region
+      I.pressKey("1");
+      AtAudioView.dragAudioElement(50, 80);
+      I.pressKey("u");
 
-          AtSidebar.seeRegions(20);
+      AtSidebar.seeRegions(1);
 
-          for (let i = 0; i < 20; i++) {
-            // creating a new region
-            AtAudioView.clickAt(40 * i + 20);
-            AtSidebar.seeSelectedRegion();
-            I.pressKey("u");
-          }
+      // create a new region above the first one
+      I.pressKey("2");
+      AtAudioView.dragAudioElement(49, 81);
+      I.pressKey("u");
 
-          AtSidebar.seeRegions(20);
+      AtSidebar.seeRegions(2);
 
-          I.pressKey("u");
+      // click on the top-most region visible to select it
+      AtAudioView.clickAt(50);
+      AtSidebar.seeSelectedRegion("Noise");
 
-          AtSidebar.dontSeeSelectedRegion();
-        },
-      );
+      // hide the region
+      AtSidebar.hideRegion("Noise");
 
-      FFlagScenario(
-        "Can select a region below a hidden region",
-        async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ...flags,
-          });
-          I.amOnPage("/");
+      // click on the region below the hidden one to select it
+      AtAudioView.clickAt(50);
+      AtSidebar.seeSelectedRegion("Speech");
+    });
 
-          LabelStudio.init(paramsSpeech);
+    FFlagScenario(
+      "Selecting a region brings it to the front of the stack",
+      async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+        LabelStudio.setFeatureFlags({
+          ff_front_dev_2715_audio_3_280722_short: true,
+          ...flags,
+        });
+        I.amOnPage("/");
 
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
+        LabelStudio.init(paramsSpeech);
 
-          // create a new region
-          I.pressKey("1");
-          AtAudioView.dragAudioElement(50, 80);
-          I.pressKey("u");
+        await AtAudioView.waitForAudio();
+        await AtAudioView.lookForStage();
 
-          AtSidebar.seeRegions(1);
+        // create a new region
+        I.pressKey("1");
+        AtAudioView.dragAudioElement(50, 80);
+        I.pressKey("u");
 
-          // create a new region above the first one
-          I.pressKey("2");
-          AtAudioView.dragAudioElement(49, 81);
-          I.pressKey("u");
+        AtSidebar.seeRegions(1);
 
-          AtSidebar.seeRegions(2);
+        // create a new region above the first one
+        I.pressKey("2");
+        AtAudioView.dragAudioElement(49, 81);
+        I.pressKey("u");
 
-          // click on the top-most region visible to select it
-          AtAudioView.clickAt(50);
-          AtSidebar.seeSelectedRegion("Noise");
+        AtSidebar.seeRegions(2);
 
-          // hide the region
-          AtSidebar.hideRegion("Noise");
+        // click on the top-most region visible to select it
+        AtAudioView.clickAt(50);
+        AtSidebar.seeSelectedRegion("Noise");
 
-          // click on the region below the hidden one to select it
-          AtAudioView.clickAt(50);
-          AtSidebar.seeSelectedRegion("Speech");
-        },
-      );
+        // Select the bottom most region to bring it to the top
+        AtSidebar.clickRegion("Speech");
+        AtSidebar.seeSelectedRegion("Speech");
 
-      FFlagScenario(
-        "Selecting a region brings it to the front of the stack",
-        async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ...flags,
-          });
-          I.amOnPage("/");
+        // click on the overlapping region will deselect it, which shows that it is now the top in the list
+        AtAudioView.clickAt(50);
+        AtSidebar.dontSeeSelectedRegion("Speech");
+        AtSidebar.dontSeeSelectedRegion("Noise");
 
-          LabelStudio.init(paramsSpeech);
+        // click on the overlapping region will select the top item of the list, which will now be the item which was brought to the front by the original interaction.
+        AtAudioView.clickAt(50);
+        AtSidebar.seeSelectedRegion("Speech");
+      },
+    );
 
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
+    FFlagScenario("Delete region by pressing delete hotkey", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+      LabelStudio.setFeatureFlags({
+        ff_front_dev_2715_audio_3_280722_short: true,
+        ...flags,
+      });
+      I.amOnPage("/");
 
-          // create a new region
-          I.pressKey("1");
-          AtAudioView.dragAudioElement(50, 80);
-          I.pressKey("u");
+      LabelStudio.init(params);
 
-          AtSidebar.seeRegions(1);
+      await AtAudioView.waitForAudio();
+      await AtAudioView.lookForStage();
 
-          // create a new region above the first one
-          I.pressKey("2");
-          AtAudioView.dragAudioElement(49, 81);
-          I.pressKey("u");
+      AtSidebar.seeRegions(1);
 
-          AtSidebar.seeRegions(2);
+      // creating a new region
+      AtAudioView.dragAudioElement(160, 80);
 
-          // click on the top-most region visible to select it
-          AtAudioView.clickAt(50);
-          AtSidebar.seeSelectedRegion("Noise");
+      I.pressKey("Delete");
 
-          // Select the bottom most region to bring it to the top
-          AtSidebar.clickRegion("Speech");
-          AtSidebar.seeSelectedRegion("Speech");
+      I.pressKey("1");
 
-          // click on the overlapping region will deselect it, which shows that it is now the top in the list
-          AtAudioView.clickAt(50);
-          AtSidebar.dontSeeSelectedRegion("Speech");
-          AtSidebar.dontSeeSelectedRegion("Noise");
+      AtSidebar.seeRegions(1);
+    });
 
-          // click on the overlapping region will select the top item of the list, which will now be the item which was brought to the front by the original interaction.
-          AtAudioView.clickAt(50);
-          AtSidebar.seeSelectedRegion("Speech");
-        },
-      );
+    FFlagScenario("Check if there are ghost regions", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+      LabelStudio.setFeatureFlags({
+        ff_front_dev_2715_audio_3_280722_short: true,
+        ...flags,
+      });
+      I.amOnPage("/");
 
-      FFlagScenario(
-        "Delete region by pressing delete hotkey",
-        async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ...flags,
-          });
-          I.amOnPage("/");
+      LabelStudio.init(paramsSpeech);
 
-          LabelStudio.init(params);
+      await AtAudioView.waitForAudio();
+      await AtAudioView.lookForStage();
 
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
+      // creating a new region
+      I.pressKey("1");
+      AtAudioView.dragAudioElement(300, 80);
+      I.pressKey("u");
 
-          AtSidebar.seeRegions(1);
+      // creating a ghost region
+      I.pressKey("1");
+      AtAudioView.dragAudioElement(160, 80, false);
+      I.pressKey("1");
+      I.wait(1);
+      I.pressMouseUp();
+      I.wait(1);
 
-          // creating a new region
-          AtAudioView.dragAudioElement(160, 80);
+      // checking if the created region is selected
+      AtAudioView.clickAt(310);
+      AtSidebar.seeSelectedRegion();
 
-          I.pressKey("Delete");
+      // trying to select the ghost region, if there is no ghost region, the region will keep selected
+      // as ghost region is not selectable and impossible to change the label, the created region will be deselected if there is a ghost region created.
+      AtAudioView.clickAt(170);
+      I.pressKey("2");
+      AtSidebar.seeSelectedRegion();
 
-          I.pressKey("1");
-
-          AtSidebar.seeRegions(1);
-        },
-      );
-
-      FFlagScenario(
-        "Check if there are ghost regions",
-        async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ...flags,
-          });
-          I.amOnPage("/");
-
-          LabelStudio.init(paramsSpeech);
-
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
-
-          // creating a new region
-          I.pressKey("1");
-          AtAudioView.dragAudioElement(300, 80);
-          I.pressKey("u");
-
-          // creating a ghost region
-          I.pressKey("1");
-          AtAudioView.dragAudioElement(160, 80, false);
-          I.pressKey("1");
-          I.wait(1);
-          I.pressMouseUp();
-          I.wait(1);
-
-          // checking if the created region is selected
-          AtAudioView.clickAt(310);
-          AtSidebar.seeSelectedRegion();
-
-          // trying to select the ghost region, if there is no ghost region, the region will keep selected
-          // as ghost region is not selectable and impossible to change the label, the created region will be deselected if there is a ghost region created.
-          AtAudioView.clickAt(170);
-          I.pressKey("2");
-          AtSidebar.seeSelectedRegion();
-
-          AtSidebar.seeRegions(2);
-        },
-      );
-    }
-  },
-);
+      AtSidebar.seeRegions(2);
+    });
+  }
+});

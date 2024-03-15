@@ -61,9 +61,7 @@ const TagAttrs = types.model({
   size: types.optional(types.string, "medium"),
   background: types.optional(customTypes.color, Constants.LABEL_BACKGROUND),
   selectedcolor: types.optional(customTypes.color, "#ffffff"),
-  granularity: types.maybeNull(
-    types.enumeration(["symbol", "word", "sentence", "paragraph"]),
-  ),
+  granularity: types.maybeNull(types.enumeration(["symbol", "word", "sentence", "paragraph"])),
   groupcancontain: types.maybeNull(types.string),
   // childrencheck: types.optional(types.enumeration(["any", "all"]), "any")
   ...(isFF(FF_DEV_2128) ? { html: types.maybeNull(types.string) } : {}),
@@ -130,16 +128,13 @@ const Model = types
           the way that new drawing region and a finished regions work is similar, but new drawing region
           doesn't visualy select the polygons when you are drawing.
        */
-        sameObjectSelectedRegions =
-          self.annotation.selectedDrawingRegions.filter((region) => {
-            return region.parent?.name === self.parent?.toname;
-          });
+        sameObjectSelectedRegions = self.annotation.selectedDrawingRegions.filter((region) => {
+          return region.parent?.name === self.parent?.toname;
+        });
       } else if (self.annotation.selectedRegions.length > 0) {
-        sameObjectSelectedRegions = self.annotation.selectedRegions.filter(
-          (region) => {
-            return region.parent?.name === self.parent?.toname;
-          },
-        );
+        sameObjectSelectedRegions = self.annotation.selectedRegions.filter((region) => {
+          return region.parent?.name === self.parent?.toname;
+        });
       }
 
       const affectedRegions = sameObjectSelectedRegions.filter((region) => {
@@ -149,20 +144,15 @@ const Model = types
       // one more check if that label can be selected
       if (self.annotation.isReadOnly()) return;
 
-      if (sameObjectSelectedRegions.length > 0 && affectedRegions.length === 0)
-        return;
+      if (sameObjectSelectedRegions.length > 0 && affectedRegions.length === 0) return;
 
       // don't select if it can not be used
       if (
         !!affectedRegions.length &&
         !self.selected &&
-        !self.canBeUsed(
-          affectedRegions.filter((region) => region.results).length,
-        )
+        !self.canBeUsed(affectedRegions.filter((region) => region.results).length)
       ) {
-        InfoModal.warning(
-          `You can't use ${self.value} more than ${self.maxUsages} time(s)`,
-        );
+        InfoModal.warning(`You can't use ${self.value} more than ${self.maxUsages} time(s)`);
         return;
       }
 
@@ -190,18 +180,13 @@ const Model = types
         // @todo lot of tests!
         if (self.selected) return true; // we are unselecting a label which is always ok
         if (labels.type === "labels") return true; // universal labels are fine to select
-        if (labels.type.includes(region.type.replace(/region$/, "")))
-          return true; // region type is in label type
+        if (labels.type.includes(region.type.replace(/region$/, ""))) return true; // region type is in label type
         if (labels.type.includes(region.results[0].type)) return true; // any result type of the region is in label type
 
         return false;
       });
 
-      if (
-        sameObjectSelectedRegions.length > 0 &&
-        applicableRegions.length === 0
-      )
-        return;
+      if (sameObjectSelectedRegions.length > 0 && applicableRegions.length === 0) return;
 
       // if we are going to select label and it would be the first in this labels group
       if (!labels.selectedLabels.length && !self.selected) {
@@ -209,9 +194,7 @@ const Model = types
 
         self.annotation.toNames
           .get(labels.toname)
-          .filter(
-            (tag) => tag.type?.endsWith("labels") && tag.name !== labels.name,
-          );
+          .filter((tag) => tag.type?.endsWith("labels") && tag.name !== labels.name);
 
         // unselect other tools if they exist and selected
         const manager = ToolsManager.getInstance({
@@ -220,13 +203,8 @@ const Model = types
         const tool = Object.values(self.parent?.tools || {})[0];
 
         const selectedTool = manager.findSelectedTool();
-        const sameType =
-          tool && selectedTool
-            ? getType(selectedTool).name === getType(tool).name
-            : false;
-        const sameLabel = selectedTool
-          ? tool?.control?.name === selectedTool?.control?.name
-          : false;
+        const sameType = tool && selectedTool ? getType(selectedTool).name === getType(tool).name : false;
+        const sameLabel = selectedTool ? tool?.control?.name === selectedTool?.control?.name : false;
         const isNotSameTool = selectedTool && (!sameType || !sameLabel);
 
         if (tool && (isNotSameTool || !selectedTool)) {
@@ -309,8 +287,7 @@ const Model = types
     },
 
     _updateBackgroundColor(val) {
-      if (self.background === Constants.LABEL_BACKGROUND)
-        self.background = ColorScheme.make_color({ seed: val })[0];
+      if (self.background === Constants.LABEL_BACKGROUND) self.background = ColorScheme.make_color({ seed: val })[0];
     },
 
     afterCreate() {
@@ -318,19 +295,11 @@ const Model = types
     },
 
     updateValue(store) {
-      self._value =
-        parseValue(self.value, store.task.dataObj) || Constants.EMPTY_LABEL;
+      self._value = parseValue(self.value, store.task.dataObj) || Constants.EMPTY_LABEL;
     },
   }));
 
-const LabelModel = types.compose(
-  "LabelModel",
-  TagParentMixin,
-  TagAttrs,
-  ProcessAttrsMixin,
-  Model,
-  AnnotationMixin,
-);
+const LabelModel = types.compose("LabelModel", TagParentMixin, TagAttrs, ProcessAttrsMixin, Model, AnnotationMixin);
 
 const HtxLabelView = inject("store")(
   observer(({ item, store }) => {
@@ -360,9 +329,7 @@ const HtxLabelView = inject("store")(
           item._value
         )}
         {item.showalias === true && item.alias && (
-          <span style={Utils.styleToProp(item.aliasstyle)}>
-            &nbsp;{item.alias}
-          </span>
+          <span style={Utils.styleToProp(item.aliasstyle)}>&nbsp;{item.alias}</span>
         )}
       </Label>
     );

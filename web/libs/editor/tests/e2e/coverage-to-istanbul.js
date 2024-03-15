@@ -5,10 +5,7 @@ const v8toIstanbul = require("v8-to-istanbul");
 const covDir = "./output/coverage";
 const resDir = "../coverage";
 const basePath = path.resolve("../");
-const basePathRegExp = new RegExp(
-  `${basePath}\\LabelStudio`.replace(/\\/g, "\\\\"),
-  "g",
-);
+const basePathRegExp = new RegExp(`${basePath}\\LabelStudio`.replace(/\\/g, "\\\\"), "g");
 
 const fixBasePath = (path) => {
   return path.replace(basePathRegExp, basePath);
@@ -35,8 +32,7 @@ const convertCoverage = async (fileName) => {
 
   for (const entry of coverage) {
     // Used to get file name
-    const sourceFileName = entry.url.match(/(?:http(s)*:\/\/.*\/)(?<file>.*)/)
-      .groups.file;
+    const sourceFileName = entry.url.match(/(?:http(s)*:\/\/.*\/)(?<file>.*)/).groups.file;
 
     if (!sourceFileName) continue;
 

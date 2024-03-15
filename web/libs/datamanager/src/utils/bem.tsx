@@ -36,10 +36,7 @@ interface CNOptions {
   mix?: CNMix | CNMix[] | undefined | undefined;
 }
 
-type ComponentType =
-  | FC<any>
-  | ComponentClass<unknown, unknown>
-  | FunctionComponent<unknown>;
+type ComponentType = FC<any> | ComponentClass<unknown, unknown> | FunctionComponent<unknown>;
 type TagNameType = keyof ReactHTML | keyof ReactSVG | string;
 type TagNames = keyof JSX.IntrinsicElements;
 type TagAttrs<T extends keyof JSX.IntrinsicElements> = JSX.IntrinsicElements[T];
@@ -65,12 +62,7 @@ type WrappedComponentProps<CN extends FC<any>, TN extends TagNames> = {
 
 const CSS_PREFIX = process.env.CSS_PREFIX ?? "dm-";
 
-const assembleClass = (
-  block: string,
-  elem?: string,
-  mix?: CNMix | CNMix[],
-  mod?: CNMod,
-) => {
+const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?: CNMod) => {
   const rootName = block;
   const elemName = elem ? `${rootName}__${elem}` : null;
 
@@ -203,9 +195,7 @@ export const BemWithSpecifiContext = (context?: Context<CN | null>) => {
         .mix(...(finalMix as CNMix[]), rest.className)
         .toClassName();
       const finalProps =
-        tag.toString() === "Symbol(react.fragment)"
-          ? { ...rest, ref }
-          : ({ ...rest, ref, className } as any);
+        tag.toString() === "Symbol(react.fragment)" ? { ...rest, ref } : ({ ...rest, ref, className } as any);
 
       return createElement(
         Context.Provider,
@@ -219,15 +209,7 @@ export const BemWithSpecifiContext = (context?: Context<CN | null>) => {
 
   const Elem = forwardRef(
     <T extends FC<any>, D extends TagNames>(
-      {
-        tag = "div",
-        component,
-        block,
-        name,
-        mod,
-        mix,
-        ...rest
-      }: WrappedComponentProps<T, D>,
+      { tag = "div", component, block, name, mod, mix, ...rest }: WrappedComponentProps<T, D>,
       ref: any,
     ) => {
       const blockCtx = useContext(Context);

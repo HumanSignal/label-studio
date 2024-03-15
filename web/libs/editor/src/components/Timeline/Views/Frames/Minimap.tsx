@@ -1,11 +1,4 @@
-import {
-  type FC,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type FC, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
 import { TimelineContext } from "../../Context";
@@ -41,16 +34,9 @@ export const Minimap: FC<any> = () => {
             {lifespans.map((connection, i) => {
               const isLast = i + 1 === lifespans.length;
               const left = connection.start * step;
-              const width =
-                isLast && connection.enabled ? "100%" : connection.width;
+              const width = isLast && connection.enabled ? "100%" : connection.width;
 
-              return (
-                <Elem
-                  key={`${id}${i}`}
-                  name="connection"
-                  style={{ left, width }}
-                />
-              );
+              return <Elem key={`${id}${i}`} name="connection" style={{ left, width }} />;
             })}
           </Elem>
         );

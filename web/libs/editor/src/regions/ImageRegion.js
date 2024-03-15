@@ -84,8 +84,7 @@ const RegionMixin = types
     unselectRegion(tryToKeepStates = false) {
       const annotation = self.annotation;
       const parent = self.parent;
-      const keepStates =
-        tryToKeepStates && self.store.settings.continuousLabeling;
+      const keepStates = tryToKeepStates && self.store.settings.continuousLabeling;
 
       if (annotation.relationMode) {
         annotation.stopRelationMode();

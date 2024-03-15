@@ -5,14 +5,7 @@ import { Space } from "../../../components/Space/Space";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { StorageSummary } from "./StorageSummary";
 
-export const StorageCard = ({
-  rootClass,
-  target,
-  storage,
-  onEditStorage,
-  onDeleteStorage,
-  storageTypes,
-}) => {
+export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDeleteStorage, storageTypes }) => {
   const [syncing, setSyncing] = useState(false);
   const api = useContext(ApiContext);
   const [storageData, setStorageData] = useState({ ...storage });
@@ -42,8 +35,7 @@ export const StorageCard = ({
     setStorageData(storage);
   }, [storage]);
 
-  const notSyncedYet =
-    synced !== null || ["in_progress", "queued"].includes(storageData.status);
+  const notSyncedYet = synced !== null || ["in_progress", "queued"].includes(storageData.status);
 
   return (
     <Card
@@ -53,20 +45,12 @@ export const StorageCard = ({
           align="right"
           content={
             <Menu size="compact" style={{ width: 110 }}>
-              <Menu.Item onClick={() => onEditStorage(storageData)}>
-                Edit
-              </Menu.Item>
-              <Menu.Item onClick={() => onDeleteStorage(storageData)}>
-                Delete
-              </Menu.Item>
+              <Menu.Item onClick={() => onEditStorage(storageData)}>Edit</Menu.Item>
+              <Menu.Item onClick={() => onDeleteStorage(storageData)}>Delete</Menu.Item>
             </Menu>
           }
         >
-          <Button
-            type="link"
-            style={{ width: 32, height: 32, marginRight: -10 }}
-            icon={<FaEllipsisV />}
-          />
+          <Button type="link" style={{ width: 32, height: 32, marginRight: -10 }} icon={<FaEllipsisV />} />
         </Dropdown.Trigger>
       }
     >
@@ -83,8 +67,7 @@ export const StorageCard = ({
           </Button>
           {notSyncedYet && (
             <div className={rootClass.elem("sync-count")}>
-              Syncing may take some time, please refresh the page to see the
-              current status.
+              Syncing may take some time, please refresh the page to see the current status.
             </div>
           )}
         </div>

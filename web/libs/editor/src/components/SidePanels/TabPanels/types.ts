@@ -1,9 +1,5 @@
 import type { FC, MutableRefObject, ReactNode } from "react";
-import {
-  DEFAULT_PANEL_HEIGHT,
-  DEFAULT_PANEL_MAX_HEIGHT,
-  DEFAULT_PANEL_WIDTH,
-} from "../constants";
+import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT, DEFAULT_PANEL_WIDTH } from "../constants";
 
 export type TabProps = {
   name: string;
@@ -82,21 +78,9 @@ export interface EventHandlers {
   onGroupHeightResize: (key: string, h: number, t: number) => void;
   onResizeStart: () => void;
   onResizeEnd: () => void;
-  onPositionChange: (
-    key: string,
-    t: number,
-    l: number,
-    detached: boolean,
-    alignment: Side,
-  ) => void;
+  onPositionChange: (key: string, t: number, l: number, detached: boolean, alignment: Side) => void;
   onVisibilityChange: (key: string, visible: boolean) => void;
-  onPositionChangeBegin: (
-    key: string,
-    x: number,
-    y: number,
-    side: Side,
-    detached: boolean,
-  ) => void;
+  onPositionChangeBegin: (key: string, x: number, y: number, side: Side, detached: boolean) => void;
   onSnap: (key: string) => void;
   transferTab: (
     movingTab: number,
@@ -105,20 +89,9 @@ export interface EventHandlers {
     receivingTab: number,
     dropSide: Side,
   ) => void;
-  createNewPanel(
-    name: string,
-    movingPanel: string,
-    movingTab: number,
-    left: number,
-    top: number,
-  ): void;
+  createNewPanel(name: string, movingPanel: string, movingTab: number, left: number, top: number): void;
   setActiveTab: (key: string, tabIndex: number) => void;
-  checkSnap: (
-    left: number,
-    panelWidth: number,
-    top: number,
-    height: number,
-  ) => void;
+  checkSnap: (left: number, panelWidth: number, top: number, height: number) => void;
 }
 export type CommonProps = EventHandlers & {
   root: MutableRefObject<HTMLDivElement | undefined>;
@@ -153,9 +126,7 @@ export type BaseProps = PanelBBox &
     sidePanelCollapsed: PanelsCollapsed;
     breakPointActiveTab: number;
     setBreakPointActiveTab?: React.Dispatch<React.SetStateAction<number>>;
-    setSidePanelCollapsed: React.Dispatch<
-      React.SetStateAction<PanelsCollapsed>
-    >;
+    setSidePanelCollapsed: React.Dispatch<React.SetStateAction<PanelsCollapsed>>;
     dragTop: boolean;
     dragBottom: boolean;
     lockPanelContents: boolean;
@@ -185,21 +156,10 @@ export const emptyPanel: PanelBBox = {
 
 export type PanelBaseExclusiveProps = "name" | "title";
 
-export type ResizeHandler = (
-  name: string,
-  width: number,
-  height: number,
-  top: number,
-  left: number,
-) => void;
+export type ResizeHandler = (name: string, width: number, height: number, top: number, left: number) => void;
 
 export type SnapHandler = (name: string) => void;
 
-export type PositionChangeHandler = (
-  name: string,
-  top: number,
-  left: number,
-  detached: boolean,
-) => void;
+export type PositionChangeHandler = (name: string, top: number, left: number, detached: boolean) => void;
 
 export type VisibilityChangeHandler = (name: string, visible: boolean) => void;

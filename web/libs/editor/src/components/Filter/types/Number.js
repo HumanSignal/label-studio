@@ -4,15 +4,7 @@ import { FilterInput } from "../FilterInput";
 import { Common } from "./Common";
 
 const NumberInput = observer((props) => {
-  return (
-    <FilterInput
-      {...props}
-      type="number"
-      value={props.value}
-      pattern={"[0-9*]"}
-      onChange={props.onChange}
-    />
-  );
+  return <FilterInput {...props} type="number" value={props.value} pattern={"[0-9*]"} onChange={props.onChange} />;
 });
 
 const RangeInput = observer((props) => {
@@ -34,21 +26,9 @@ const RangeInput = observer((props) => {
 
   return (
     <>
-      <NumberInput
-        placeholder="Min"
-        value={min}
-        onChange={onChangeMin}
-        schema={props.schema}
-        style={{ flex: 1 }}
-      />
+      <NumberInput placeholder="Min" value={min} onChange={onChangeMin} schema={props.schema} style={{ flex: 1 }} />
       <span style={{ padding: "0 10px" }}>and</span>
-      <NumberInput
-        placeholder="Max"
-        value={max}
-        onChange={onChangeMax}
-        schema={props.schema}
-        style={{ flex: 1 }}
-      />
+      <NumberInput placeholder="Max" value={max} onChange={onChangeMax} schema={props.schema} style={{ flex: 1 }} />
     </>
   );
 });

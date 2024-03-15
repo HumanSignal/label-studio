@@ -11,8 +11,7 @@ export const initSentry = (history: RouterHistory) => {
     dsn: "https://5f51920ff82a4675a495870244869c6b@o227124.ingest.sentry.io/5838868",
     integrations: [
       new Integrations.BrowserTracing({
-        routingInstrumentation:
-          ReactSentry.reactRouterV5Instrumentation(history),
+        routingInstrumentation: ReactSentry.reactRouterV5Instrumentation(history),
       }),
     ],
     environment: process.env.NODE_ENV,
@@ -35,18 +34,16 @@ const setTags = () => {
   }
 
   if (APP_SETTINGS.version) {
-    Object.entries(APP_SETTINGS.version).forEach(
-      ([packageName, data]: [string, any]) => {
-        const { version, commit } = data ?? {};
+    Object.entries(APP_SETTINGS.version).forEach(([packageName, data]: [string, any]) => {
+      const { version, commit } = data ?? {};
 
-        if (version) {
-          tags[`version-${packageName}`] = version;
-        }
-        if (commit) {
-          tags[`commit-${packageName}`] = commit;
-        }
-      },
-    );
+      if (version) {
+        tags[`version-${packageName}`] = version;
+      }
+      if (commit) {
+        tags[`commit-${packageName}`] = commit;
+      }
+    });
   }
 
   Sentry.setTags(tags);

@@ -1,11 +1,7 @@
 import type { FC } from "react";
 import { Button, type ButtonProps } from "../../../common/Button/Button";
 
-export const RegionControlButton: FC<ButtonProps> = ({
-  children,
-  onClick,
-  ...props
-}) => {
+export const RegionControlButton: FC<ButtonProps> = ({ children, onClick, ...props }) => {
   return (
     <Button
       {...props}

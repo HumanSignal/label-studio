@@ -1,10 +1,4 @@
-import {
-  destroy,
-  getParentOfType,
-  getRoot,
-  isAlive,
-  types,
-} from "mobx-state-tree";
+import { destroy, getParentOfType, getRoot, isAlive, types } from "mobx-state-tree";
 
 import { guidGenerator } from "../core/Helpers";
 import Tree, { TRAVERSE_SKIP } from "../core/Tree";
@@ -21,10 +15,7 @@ const Relation = types
     node1: types.reference(Area),
     node2: types.reference(Area),
 
-    direction: types.optional(
-      types.enumeration(["left", "right", "bi"]),
-      "right",
-    ),
+    direction: types.optional(types.enumeration(["left", "right", "bi"]), "right"),
 
     // labels
     labels: types.maybeNull(types.array(types.string)),
@@ -60,19 +51,9 @@ const Relation = types
       // as we don't currently have a unified solution for multi-object segmentation
       // and the Image tag is the only one to support it, we rely on its API
       // TODO: make multi-object solution more generic
-      if (
-        isDefined(sIdx) &&
-        start.object.multiImage &&
-        sIdx !== start.object.currentImage
-      )
-        return false;
+      if (isDefined(sIdx) && start.object.multiImage && sIdx !== start.object.currentImage) return false;
 
-      if (
-        isDefined(eIdx) &&
-        end.object.multiImage &&
-        eIdx !== end.object.currentImage
-      )
-        return false;
+      if (isDefined(eIdx) && end.object.multiImage && eIdx !== end.object.currentImage) return false;
 
       return true;
     },

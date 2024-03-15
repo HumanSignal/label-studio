@@ -43,10 +43,7 @@ export interface NewBoardData {
  * body: string
  */
 
-export const transformData = (
-  columns: Array<InputItem[]>,
-  titles: string[],
-) => {
+export const transformData = (columns: Array<InputItem[]>, titles: string[]) => {
   /* loop through input data and create query data object used for ranker component */
 
   const queryData: BoardData = {

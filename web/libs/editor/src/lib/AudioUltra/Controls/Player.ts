@@ -240,10 +240,7 @@ export abstract class Player extends Destructable {
     this.playing = true;
 
     if (this.loop) {
-      if (
-        this.currentTime < this.loop.start ||
-        this.currentTime > this.loop.end
-      ) {
+      if (this.currentTime < this.loop.start || this.currentTime > this.loop.end) {
         this.currentTime = this.loop.start;
       }
 

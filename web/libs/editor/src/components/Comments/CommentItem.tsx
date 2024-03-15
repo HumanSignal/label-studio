@@ -30,9 +30,7 @@ interface Comment {
     setEditMode: (isGoingIntoEditMode: boolean) => void;
     toggleResolve: () => void;
   };
-  listComments: ({
-    suppressClearComments,
-  }: { suppressClearComments: boolean }) => void;
+  listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
 }
 
 export const CommentItem: FC<any> = observer(
@@ -73,10 +71,7 @@ export const CommentItem: FC<any> = observer(
       if (isPersisted && time)
         return (
           <Elem name="date">
-            <Tooltip
-              placement="topRight"
-              title={new Date(time).toLocaleString()}
-            >
+            <Tooltip placement="topRight" title={new Date(time).toLocaleString()}>
               {`${isEdited ? "updated" : ""} ${humanDateDiff(time)}`}
             </Tooltip>
           </Elem>
@@ -88,13 +83,7 @@ export const CommentItem: FC<any> = observer(
       <Block name="comment-item" mod={{ resolved }}>
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Elem
-              tag={Userpic}
-              user={createdBy}
-              name="userpic"
-              showUsername
-              username={createdBy}
-            />
+            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy} />
             <Elem name="name" tag="span">
               {userDisplayName(createdBy)}
             </Elem>
@@ -126,12 +115,7 @@ export const CommentItem: FC<any> = observer(
               <Elem name="confirmForm">
                 <Elem name="question">Are you sure?</Elem>
                 <Elem name="controls">
-                  <Button
-                    onClick={() => deleteComment()}
-                    size="compact"
-                    look="danger"
-                    autoFocus
-                  >
+                  <Button onClick={() => deleteComment()} size="compact" look="danger" autoFocus>
                     Yes
                   </Button>
                   <Button onClick={() => setConfirmMode(false)} size="compact">
@@ -155,9 +139,7 @@ export const CommentItem: FC<any> = observer(
               <Dropdown.Trigger
                 content={
                   <Menu size="auto">
-                    <Menu.Item onClick={toggleResolve}>
-                      {resolved ? "Unresolve" : "Resolve"}
-                    </Menu.Item>
+                    <Menu.Item onClick={toggleResolve}>{resolved ? "Unresolve" : "Resolve"}</Menu.Item>
                     {currentUser?.id === createdBy.id && (
                       <>
                         <Menu.Item

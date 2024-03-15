@@ -17,12 +17,7 @@ const renderOptions = (item: any, index: number) => {
   const key = index;
 
   return (
-    <Select.Option
-      key={`${key}`}
-      value={value}
-      style={{ fontSize: 12 }}
-      title={value}
-    >
+    <Select.Option key={`${key}`} value={value} style={{ fontSize: 12 }} title={value}>
       {item.label}
     </Select.Option>
   );

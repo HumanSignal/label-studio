@@ -24,8 +24,7 @@ export const Annotators = (cell) => {
         const { annotated, reviewed, review } = item;
 
         const userpicIsFaded =
-          (isDefined(annotated) && annotated === false) ||
-          (isDefined(reviewed) && reviewed === false);
+          (isDefined(annotated) && annotated === false) || (isDefined(reviewed) && reviewed === false);
         const suppressStats = column.alias === "comment_authors";
 
         return (
@@ -35,14 +34,7 @@ export const Annotators = (cell) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              sdk.invoke(
-                "userCellClick",
-                e,
-                column.alias,
-                task,
-                user,
-                suppressStats,
-              );
+              sdk.invoke("userCellClick", e, column.alias, task, user, suppressStats);
             }}
           >
             <Tooltip title={user.fullName || user.email}>

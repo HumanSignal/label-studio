@@ -101,14 +101,8 @@ const { Option } = Select;
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
   showinline: types.maybeNull(types.boolean),
-  choice: types.optional(
-    types.enumeration(["single", "single-radio", "multiple"]),
-    "single",
-  ),
-  layout: types.optional(
-    types.enumeration(["select", "inline", "vertical"]),
-    "vertical",
-  ),
+  choice: types.optional(types.enumeration(["single", "single-radio", "multiple"]), "single"),
+  layout: types.optional(types.enumeration(["select", "inline", "vertical"]), "vertical"),
   value: types.optional(types.string, ""),
   allownested: types.optional(types.boolean, false),
 });
@@ -140,9 +134,7 @@ const Model = types
     },
 
     get preselectedValues() {
-      return self.tiedChildren
-        .filter((c) => c.selected === true && !c.isSkipped)
-        .map((c) => c.resultValue);
+      return self.tiedChildren.filter((c) => c.selected === true && !c.isSkipped).map((c) => c.resultValue);
     },
 
     get selectedLabels() {
@@ -186,9 +178,7 @@ const Model = types
     },
 
     requiredModal() {
-      InfoModal.warning(
-        self.requiredmessage || `Checkbox "${self.name}" is required.`,
-      );
+      InfoModal.warning(self.requiredmessage || `Checkbox "${self.name}" is required.`);
     },
 
     // this is not labels, unselect affects result, so don't unselect on random reason
@@ -211,9 +201,7 @@ const Model = types
           isSelected = values?.some?.((value) => {
             if (Array.isArray(value) && Array.isArray(choice.resultValue)) {
               if (value.length !== choice.resultValue.length) return false;
-              return value.every?.(
-                (val, idx) => val === choice.resultValue?.[idx],
-              );
+              return value.every?.((val, idx) => val === choice.resultValue?.[idx]);
             }
             return value === choice.resultValue;
           });
@@ -230,11 +218,7 @@ const Model = types
 
     return {
       validate() {
-        if (
-          !Super.validate() ||
-          (self.choice !== "multiple" && self.checkResultLength() > 1)
-        )
-          return false;
+        if (!Super.validate() || (self.choice !== "multiple" && self.checkResultLength() > 1)) return false;
       },
 
       checkResultLength() {
@@ -312,11 +296,7 @@ const HtxChoices = observer(({ item }) => {
         layout: item.layout,
       }}
     >
-      {item.layout === "select" ? (
-        <ChoicesSelectLayout item={item} />
-      ) : (
-        Tree.renderChildren(item, item.annotation)
-      )}
+      {item.layout === "select" ? <ChoicesSelectLayout item={item} /> : Tree.renderChildren(item, item.annotation)}
     </Block>
   );
 });

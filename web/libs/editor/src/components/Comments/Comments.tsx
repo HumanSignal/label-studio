@@ -32,8 +32,7 @@ export const Comments: FC<{
   useEffect(() => {
     const confirmCommentsLoss = (e: any) => {
       if (commentStore.hasUnsaved) {
-        e.returnValue =
-          "You have unpersisted comments which will be lost if continuing.";
+        e.returnValue = "You have unpersisted comments which will be lost if continuing.";
       }
 
       return e;
@@ -48,11 +47,7 @@ export const Comments: FC<{
 
   return (
     <Block name="comments">
-      <CommentForm
-        commentStore={commentStore}
-        annotationStore={annotationStore}
-        inline
-      />
+      <CommentForm commentStore={commentStore} annotationStore={annotationStore} inline />
       <CommentsList commentStore={commentStore} />
     </Block>
   );

@@ -14,9 +14,6 @@ export const Labels = {
   },
   selectWithHotkey(hotkey: string) {
     cy.get("body").type(`${hotkey}`);
-    this.selectedLabel
-      .contains(`${hotkey}`)
-      .should("be.visible")
-      .should("have.length.gt", 0);
+    this.selectedLabel.contains(`${hotkey}`).should("be.visible").should("have.length.gt", 0);
   },
 };

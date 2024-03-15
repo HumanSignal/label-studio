@@ -1,9 +1,6 @@
 import React from "react";
 import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
-import {
-  LF_CLOUD_STORAGE_FOR_MANAGERS,
-  isInLicense,
-} from "../../utils/license-flags";
+import { LF_CLOUD_STORAGE_FOR_MANAGERS, isInLicense } from "../../utils/license-flags";
 import { WebhookPage } from "../WebhookPage/WebhookPage";
 import { DangerZone } from "./DangerZone";
 import { GeneralSettings } from "./GeneralSettings";

@@ -47,9 +47,7 @@ const Model = types
   }))
   .actions((self) => ({
     updateShape() {
-      throw new Error(
-        "Method updateShape must be implemented on a shape level",
-      );
+      throw new Error("Method updateShape must be implemented on a shape level");
     },
 
     onSelectInOutliner() {
@@ -118,9 +116,7 @@ const Model = types
     },
 
     removeKeypoint(frame) {
-      self.sequence = self.sequence.filter(
-        (closestKeypoint) => closestKeypoint.frame !== frame,
-      );
+      self.sequence = self.sequence.filter((closestKeypoint) => closestKeypoint.frame !== frame);
     },
 
     isInLifespan(targetFrame) {
@@ -151,12 +147,6 @@ const Model = types
     },
   }));
 
-const VideoRegion = types.compose(
-  "VideoRegionModel",
-  RegionsMixin,
-  AreaMixin,
-  NormalizationMixin,
-  Model,
-);
+const VideoRegion = types.compose("VideoRegionModel", RegionsMixin, AreaMixin, NormalizationMixin, Model);
 
 export { VideoRegion };

@@ -55,8 +55,7 @@ function createClass(name, rules) {
 
   style.type = "text/css";
   document.getElementsByTagName("head")[0].appendChild(style);
-  if (!style.sheet?.insertRule)
-    (style.styleSheet || style.sheet).addRule(name, rules);
+  if (!style.sheet?.insertRule) (style.styleSheet || style.sheet).addRule(name, rules);
   else style.sheet.insertRule(`${name}{${rules}}`, 0);
 }
 
@@ -98,8 +97,7 @@ function getNextNode(node) {
 export function isValidTreeNode(node, commonAncestor) {
   while (node) {
     if (commonAncestor && node === commonAncestor) return true;
-    if (node.nodeType === Node.ELEMENT_NODE && node.dataset.skipNode === "true")
-      return false;
+    if (node.nodeType === Node.ELEMENT_NODE && node.dataset.skipNode === "true") return false;
     node = node.parentNode;
   }
   return true;
@@ -223,11 +221,7 @@ function highlightRange(normedRange, cssClass, cssStyle) {
 
   let nlen = nodes.length;
 
-  if (
-    nlen > 1 &&
-    nodes[nodes.length - 1].length !== normedRange._range.endOffset
-  )
-    nlen = nlen - 1;
+  if (nlen > 1 && nodes[nodes.length - 1].length !== normedRange._range.endOffset) nlen = nlen - 1;
 
   const results = [];
 
@@ -311,8 +305,7 @@ const mainOffsets = (element) => {
 
   const traverse = (node) => {
     if (node.nodeName === "#text") {
-      if (node !== range.startContainer && !passedStart)
-        start = start + node.length;
+      if (node !== range.startContainer && !passedStart) start = start + node.length;
       if (node === range.startContainer) passedStart = true;
 
       if (node !== range.endContainer && !passedEnd) end = end + node.length;
@@ -377,8 +370,7 @@ function removeSpans(spans) {
 
   if (spans) {
     spans.forEach((span) => {
-      while (span.firstChild)
-        span.parentNode.insertBefore(span.firstChild, span);
+      while (span.firstChild) span.parentNode.insertBefore(span.firstChild, span);
 
       norm.push(span.parentNode);
       span.parentNode.removeChild(span);
@@ -456,9 +448,7 @@ export const findByXpath = (xpath, root = document) => {
     xpath = `.${xpath}`;
   }
 
-  return document
-    .evaluate(xpath, root, null, XPathResult.ANY_TYPE, null)
-    .iterateNext();
+  return document.evaluate(xpath, root, null, XPathResult.ANY_TYPE, null).iterateNext();
 };
 
 export const htmlEscape = (string) => {

@@ -38,12 +38,7 @@ const Model = types.model({
   data: types.map(Replica),
 });
 
-const DialogModel = types.compose(
-  "DialogModel",
-  TagAttrs,
-  Model,
-  AnnotationMixin,
-);
+const DialogModel = types.compose("DialogModel", TagAttrs, Model, AnnotationMixin);
 
 const HtxDialogView = inject("store")(
   observer(({ store, item }) => {

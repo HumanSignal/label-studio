@@ -116,8 +116,7 @@ const SettingsModel = types
       onSnapshot(self, (ss) => {
         // it's necessary to wait 1 tick before check if self.isDestroying is true
         setTimeout(() => {
-          if (!self.isDestroying)
-            localStorage.setItem(lsKey, JSON.stringify(ss));
+          if (!self.isDestroying) localStorage.setItem(lsKey, JSON.stringify(ss));
         });
       });
     },
@@ -152,13 +151,9 @@ const SettingsModel = types
 
     toggleSidepanelModel() {
       self.sidePanelMode =
-        self.sidePanelMode === SIDEPANEL_MODE_LABELS
-          ? SIDEPANEL_MODE_REGIONS
-          : SIDEPANEL_MODE_LABELS;
+        self.sidePanelMode === SIDEPANEL_MODE_LABELS ? SIDEPANEL_MODE_REGIONS : SIDEPANEL_MODE_LABELS;
       // apply immediately
-      self.annotation.regionStore.setView(
-        self.displayLabelsByDefault ? "labels" : "regions",
-      );
+      self.annotation.regionStore.setView(self.displayLabelsByDefault ? "labels" : "regions");
     },
 
     toggleAutoSave() {

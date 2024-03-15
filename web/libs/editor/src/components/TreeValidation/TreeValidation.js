@@ -10,10 +10,7 @@ export const TreeValidation = inject("store")(
     return (
       <div className="ls-errors">
         {errors.map((error, index) => (
-          <ErrorMessage
-            key={`error-${index}`}
-            error={getEnv(store).messages[error.error](error)}
-          />
+          <ErrorMessage key={`error-${index}`} error={getEnv(store).messages[error.error](error)} />
         ))}
       </div>
     );

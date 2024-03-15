@@ -39,51 +39,40 @@ const annotations = [
   },
 ];
 
-Scenario(
-  "Check if audio decoder error handler is showing",
-  async ({ I, LabelStudio, AtAudioView }) => {
-    LabelStudio.setFeatureFlags({
-      ff_front_dev_2715_audio_3_280722_short: true,
-    });
-    I.amOnPage("/");
+Scenario("Check if audio decoder error handler is showing", async ({ I, LabelStudio, AtAudioView }) => {
+  LabelStudio.setFeatureFlags({
+    ff_front_dev_2715_audio_3_280722_short: true,
+  });
+  I.amOnPage("/");
 
-    LabelStudio.init({
-      annotations: [{ id: "test", result: annotations }],
-      config,
-      data: {
-        url: "/public/files/video.mp4", // mp4 is not supported by audio decoder
-      },
-    });
+  LabelStudio.init({
+    annotations: [{ id: "test", result: annotations }],
+    config,
+    data: {
+      url: "/public/files/video.mp4", // mp4 is not supported by audio decoder
+    },
+  });
 
-    await AtAudioView.lookForStage();
+  await AtAudioView.lookForStage();
 
-    await AtAudioView.seeErrorHandler(
-      "An error occurred while decoding the audio file",
-    );
-  },
-);
+  await AtAudioView.seeErrorHandler("An error occurred while decoding the audio file");
+});
 
-Scenario(
-  "Check if audio http error handler is showing",
-  async ({ I, LabelStudio, AtAudioView }) => {
-    LabelStudio.setFeatureFlags({
-      ff_front_dev_2715_audio_3_280722_short: true,
-    });
-    I.amOnPage("/");
+Scenario("Check if audio http error handler is showing", async ({ I, LabelStudio, AtAudioView }) => {
+  LabelStudio.setFeatureFlags({
+    ff_front_dev_2715_audio_3_280722_short: true,
+  });
+  I.amOnPage("/");
 
-    LabelStudio.init({
-      annotations: [{ id: "test", result: annotations }],
-      config,
-      data: {
-        url: "/files/doesnt_exist.mp3",
-      },
-    });
+  LabelStudio.init({
+    annotations: [{ id: "test", result: annotations }],
+    config,
+    data: {
+      url: "/files/doesnt_exist.mp3",
+    },
+  });
 
-    await AtAudioView.lookForStage();
+  await AtAudioView.lookForStage();
 
-    await AtAudioView.seeErrorHandler(
-      "HTTP error status: 404",
-      "_httpErrorSelector",
-    );
-  },
-);
+  await AtAudioView.seeErrorHandler("HTTP error status: 404", "_httpErrorSelector");
+});

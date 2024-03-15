@@ -60,9 +60,7 @@ module.exports = (config) => {
   };
 
   function replaceArgsStepToString(replacer) {
-    return `${this.prefix}${this.actor} ${this.humanize()} ${replacer}${
-      this.suffix
-    }`;
+    return `${this.prefix}${this.actor} ${this.humanize()} ${replacer}${this.suffix}`;
   }
   function replaceArgsStepToCode(replacer) {
     return `${this.prefix}${this.actor}.${this.name}(${replacer})${this.suffix}`;
@@ -72,8 +70,7 @@ module.exports = (config) => {
     if (typeof matcher === "boolean") return matcher;
     if (typeof matcher === "string") return matcher === stepName;
     if (matcher instanceof RegExp) return matcher.test(stepName);
-    if (Array.isArray(matcher))
-      return matcher.some((f) => testStep(f, stepName));
+    if (Array.isArray(matcher)) return matcher.some((f) => testStep(f, stepName));
     return false;
   }
 
@@ -89,11 +86,7 @@ module.exports = (config) => {
           if (RULES[modifierParams.rule]) {
             RULES[modifierParams.rule](step, ...(modifierParams.params || []));
           } else {
-            console.error(
-              "There is no step modifier rule called `",
-              modifierParams.rule,
-              "`",
-            );
+            console.error("There is no step modifier rule called `", modifierParams.rule, "`");
           }
         }
       }

@@ -45,17 +45,11 @@ export class Regions {
   showLabels = false;
   layerGroup: LayerGroup;
 
-  constructor(
-    options: RegionsOptions,
-    waveform: Waveform,
-    visualizer: Visualizer,
-  ) {
+  constructor(options: RegionsOptions, waveform: Waveform, visualizer: Visualizer) {
     this.waveform = waveform;
     this.visualizer = visualizer;
     this.initialRegions = options?.regions ?? [];
-    this.defaultColor = options?.defaultColor
-      ? rgba(options.defaultColor)
-      : this.defaultColor;
+    this.defaultColor = options?.defaultColor ? rgba(options.defaultColor) : this.defaultColor;
     this.labels = undefined;
     this.createable = options?.createable ?? this.createable;
     this.updateable = options?.updateable ?? this.updateable;
@@ -71,10 +65,7 @@ export class Regions {
     this.waveform.on("regionRemoved", this.handleRegionRemoved);
     this.waveform.on("regionUpdated", this.handleRegionUpdated);
 
-    this.visualizer.container.addEventListener(
-      "mousedown",
-      this.handleDrawRegion,
-    );
+    this.visualizer.container.addEventListener("mousedown", this.handleDrawRegion);
 
     // Regions specific events
     const { container } = this.visualizer;
@@ -95,8 +86,7 @@ export class Regions {
     const currentTime = this.waveform.currentTime;
 
     this.regions.forEach((region) => {
-      region.highlighted =
-        region.start <= currentTime && region.end >= currentTime;
+      region.highlighted = region.start <= currentTime && region.end >= currentTime;
       region.render();
     });
   }
@@ -115,11 +105,7 @@ export class Regions {
 
   clearSegments(selectedOnly = false) {
     this.regions = this.regions.filter((region) => {
-      if (
-        !region.isRegion &&
-        (!selectedOnly || region.selected) &&
-        !region.external
-      ) {
+      if (!region.isRegion && (!selectedOnly || region.selected) && !region.external) {
         region.destroy();
         return false;
       }
@@ -162,12 +148,7 @@ export class Regions {
 
     const regionIndex = this.regions.findIndex((region) => region.id === id);
 
-    region = new Region(
-      { ...region.options, labels },
-      this.waveform,
-      this.visualizer,
-      this,
-    );
+    region = new Region({ ...region.options, labels }, this.waveform, this.visualizer, this);
 
     this.regions[regionIndex] = region;
 
@@ -183,12 +164,7 @@ export class Regions {
 
     const regionIndex = this.regions.findIndex((region) => region.id === id);
 
-    segment = new Segment(
-      segment.options,
-      this.waveform,
-      this.visualizer,
-      this,
-    );
+    segment = new Segment(segment.options, this.waveform, this.visualizer, this);
 
     this.regions[regionIndex] = segment;
 
@@ -334,11 +310,7 @@ export class Regions {
       const { autoPlayNewSegments, duration } = this.waveform;
       const scrollLeft = this.visualizer.getScrollLeftPx();
 
-      startX = clamp(
-        getCursorPositionX(e, container) + scrollLeft,
-        0,
-        fullWidth,
-      );
+      startX = clamp(getCursorPositionX(e, container) + scrollLeft, 0, fullWidth);
       const start = pixelsToTime(startX, zoomedWidth, duration);
       const end = pixelsToTime(startX, zoomedWidth, duration);
 
@@ -358,11 +330,7 @@ export class Regions {
     const handleMouseMove = (e: MouseEvent) => {
       const { container, fullWidth } = this.visualizer;
       const scrollLeft = this.visualizer.getScrollLeftPx();
-      const currentX = clamp(
-        getCursorPositionX(e, container) + scrollLeft,
-        0,
-        fullWidth,
-      );
+      const currentX = clamp(getCursorPositionX(e, container) + scrollLeft, 0, fullWidth);
 
       if (!region) {
         addRegion();
@@ -432,10 +400,7 @@ export class Regions {
   };
 
   private get cursorLockedByPlayhead() {
-    return (
-      this.waveform.cursor.hasFocus() &&
-      this.waveform.cursor.isFocused("playhead")
-    );
+    return this.waveform.cursor.hasFocus() && this.waveform.cursor.isFocused("playhead");
   }
 
   private handleMouseDown = (e: MouseEvent) => {
@@ -486,12 +451,7 @@ export class Regions {
    */
   private cursorInRegion(e: MouseEvent, region: Segment) {
     const { xStart, width } = region;
-    const {
-      container,
-      timelinePlacement,
-      timelineHeight = 0,
-      height,
-    } = this.visualizer;
+    const { container, timelinePlacement, timelineHeight = 0, height } = this.visualizer;
     const timelineLayer = this.visualizer.getLayer("timeline");
     const timelineTop = timelinePlacement === defaults.timelinePlacement;
     const yStart = timelineTop && timelineLayer?.isVisible ? timelineHeight : 0;

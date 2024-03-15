@@ -1,10 +1,4 @@
-import {
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-  DeleteOutlined,
-  MoreOutlined,
-  SwapOutlined,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, MoreOutlined, SwapOutlined } from "@ant-design/icons";
 import { Button, List, Select } from "antd";
 import { observer } from "mobx-react";
 import { getRoot, isValidReference } from "mobx-state-tree";
@@ -72,11 +66,7 @@ const Relation = observer(({ rl }) => {
         <div>
           <NodeMinimal node={rl.node1} />
         </div>
-        <Button
-          onClick={() => rl.rotateDirection()}
-          size="small"
-          className={styles.relationbtn}
-        >
+        <Button onClick={() => rl.rotateDirection()} size="small" className={styles.relationbtn}>
           {iconMap[rl.direction]}
         </Button>
         <div>
@@ -157,14 +147,9 @@ const RelationsComponent = ({ store }) => {
           <Button
             size="small"
             type="link"
-            icon={
-              relationsUIVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />
-            }
+            icon={relationsUIVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
             onClick={() => annotation.relationStore.toggleConnections()}
-            className={[
-              relationsUIVisible ? styles.uihidden : styles.uivisible,
-              globalStyles.link,
-            ]}
+            className={[relationsUIVisible ? styles.uihidden : styles.uivisible, globalStyles.link]}
           />
         )}
       </Elem>

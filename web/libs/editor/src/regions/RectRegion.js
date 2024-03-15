@@ -1,10 +1,7 @@
 import { getRoot, isAlive, types } from "mobx-state-tree";
 import React, { useContext } from "react";
 import { Rect } from "react-konva";
-import {
-  RELATIVE_STAGE_HEIGHT,
-  RELATIVE_STAGE_WIDTH,
-} from "../components/ImageView/Image";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 import { LabelOnRect } from "../components/ImageView/LabelOnRegion";
 import Constants from "../core/Constants";
@@ -48,13 +45,7 @@ const RectRegionAbsoluteCoordsDEV3793 = types
           const { stageWidth, stageHeight } = self.parent;
 
           if (stageWidth && stageHeight) {
-            self.setPosition(
-              self.x,
-              self.y,
-              self.width,
-              self.height,
-              self.rotation,
-            );
+            self.setPosition(self.x, self.y, self.width, self.height, self.rotation);
           }
           break;
         }
@@ -71,10 +62,8 @@ const RectRegionAbsoluteCoordsDEV3793 = types
       self.relativeX = (x / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
       self.relativeY = (y / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
 
-      self.relativeWidth =
-        (width / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeHeight =
-        (height / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
+      self.relativeWidth = (width / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
+      self.relativeHeight = (height / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
 
       self.rotation = (rotation + 360) % 360;
     },
@@ -101,8 +90,7 @@ const RectRegionAbsoluteCoordsDEV3793 = types
 
       if (points.length === 1) {
         self.width = self.getDistanceBetweenPoints({ x, y }, self);
-        self.rotation = self.rotationAtCreation =
-          Math.atan2(y - self.y, x - self.x) * (180 / Math.PI);
+        self.rotation = self.rotationAtCreation = Math.atan2(y - self.y, x - self.x) * (180 / Math.PI);
       } else if (points.length === 2) {
         const { y: firstPointY, x: firstPointX } = points[0];
         const { y: secondPointY, x: secondPointX } = points[1];
@@ -223,32 +211,19 @@ const Model = types
 
       if (self.rotation === 0 || !self.parent) return bboxCoords;
 
-      return rotateBboxCoords(
-        bboxCoords,
-        self.rotation,
-        { x: self.x, y: self.y },
-        self.parent.whRatio,
-      );
+      return rotateBboxCoords(bboxCoords, self.rotation, { x: self.x, y: self.y }, self.parent.whRatio);
     },
     get canvasX() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasX(self.x)
-        : self.x;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.x) : self.x;
     },
     get canvasY() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasY(self.y)
-        : self.y;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.y) : self.y;
     },
     get canvasWidth() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasX(self.width)
-        : self.width;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.width) : self.width;
     },
     get canvasHeight() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasY(self.height)
-        : self.height;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.height) : self.height;
     },
   }))
   .actions((self) => ({
@@ -269,12 +244,7 @@ const Model = types
     getHeightOnPerpendicular(pointA, pointB, cursor) {
       const dX = pointB.x - pointA.x;
       const dY = pointB.y - pointA.y;
-      const s2 = Math.abs(
-        dY * cursor.x -
-          dX * cursor.y +
-          pointB.x * pointA.y -
-          pointB.y * pointA.x,
-      );
+      const s2 = Math.abs(dY * cursor.x - dX * cursor.y + pointB.x * pointA.y - pointB.y * pointA.x);
       const ab = Math.sqrt(dY * dY + dX * dX);
 
       return s2 / ab;
@@ -300,8 +270,7 @@ const Model = types
 
         self.width = self.parent.canvasToInternalX(canvasWidth);
         self.rotation = self.rotationAtCreation =
-          Math.atan2(canvasY - self.canvasY, canvasX - self.canvasX) *
-          (180 / Math.PI);
+          Math.atan2(canvasY - self.canvasY, canvasX - self.canvasX) * (180 / Math.PI);
       } else if (points.length === 2) {
         const canvasPoints = points.map(({ x, y }) => ({
           x: self.parent.internalToCanvasX(x),
@@ -324,24 +293,14 @@ const Model = types
           self.y = firstPointY;
           self.rotation = self.rotationAtCreation;
         }
-        const canvasHeight = self.getHeightOnPerpendicular(
-          canvasPoints[0],
-          canvasPoints[1],
-          {
-            x: canvasX,
-            y: canvasY,
-          },
-        );
+        const canvasHeight = self.getHeightOnPerpendicular(canvasPoints[0], canvasPoints[1], {
+          x: canvasX,
+          y: canvasY,
+        });
 
         self.height = self.parent.canvasToInternalY(canvasHeight);
       }
-      self.setPositionInternal(
-        self.x,
-        self.y,
-        self.width,
-        self.height,
-        self.rotation,
-      );
+      self.setPositionInternal(self.x, self.y, self.width, self.height, self.rotation);
 
       const areaBBoxCoords = self?.bboxCoords;
 
@@ -440,22 +399,11 @@ const Model = types
      */
     serialize() {
       const value = {
-        x:
-          self.parent.stageWidth > 1 && !isFF(FF_DEV_3793)
-            ? self.convertXToPerc(self.x)
-            : self.x,
-        y:
-          self.parent.stageWidth > 1 && !isFF(FF_DEV_3793)
-            ? self.convertYToPerc(self.y)
-            : self.y,
-        width:
-          self.parent.stageWidth > 1 && !isFF(FF_DEV_3793)
-            ? self.convertHDimensionToPerc(self.width)
-            : self.width,
+        x: self.parent.stageWidth > 1 && !isFF(FF_DEV_3793) ? self.convertXToPerc(self.x) : self.x,
+        y: self.parent.stageWidth > 1 && !isFF(FF_DEV_3793) ? self.convertYToPerc(self.y) : self.y,
+        width: self.parent.stageWidth > 1 && !isFF(FF_DEV_3793) ? self.convertHDimensionToPerc(self.width) : self.width,
         height:
-          self.parent.stageWidth > 1 && !isFF(FF_DEV_3793)
-            ? self.convertVDimensionToPerc(self.height)
-            : self.height,
+          self.parent.stageWidth > 1 && !isFF(FF_DEV_3793) ? self.convertVDimensionToPerc(self.height) : self.height,
         rotation: self.rotation,
       };
 
@@ -520,13 +468,7 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
     eventHandlers.onDragEnd = (e) => {
       const t = e.target;
 
-      item.setPosition(
-        t.getAttr("x"),
-        t.getAttr("y"),
-        t.getAttr("width"),
-        t.getAttr("height"),
-        t.getAttr("rotation"),
-      );
+      item.setPosition(t.getAttr("x"), t.getAttr("y"), t.getAttr("width"), t.getAttr("height"), t.getAttr("rotation"));
       item.setScale(t.getAttr("scaleX"), t.getAttr("scaleY"));
       item.annotation.history.unfreeze(item.id);
 
@@ -588,11 +530,7 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
         }}
         listening={!suggestion && !item.annotation?.isDrawing}
       />
-      <LabelOnRect
-        item={item}
-        color={regionStyles.strokeColor}
-        strokewidth={regionStyles.strokeWidth}
-      />
+      <LabelOnRect item={item} color={regionStyles.strokeColor} strokewidth={regionStyles.strokeWidth} />
     </RegionWrapper>
   );
 };

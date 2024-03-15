@@ -39,13 +39,9 @@ export const CustomPlaceholder: Story = {
   async play({ canvasElement }) {
     const canvas = within(canvasElement);
 
-    await userEvent.type(
-      canvas.getByTestId("chip-input-field"),
-      "hello@world.com another@email.com ",
-      {
-        delay: 50,
-      },
-    );
+    await userEvent.type(canvas.getByTestId("chip-input-field"), "hello@world.com another@email.com ", {
+      delay: 50,
+    });
   },
 };
 

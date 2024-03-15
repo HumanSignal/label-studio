@@ -133,10 +133,7 @@ describe("Filter", () => {
 
     fireEvent.change(filterInput, { target: { value: "Plane" } });
 
-    expect(filteredContent).toStrictEqual([
-      { labelName: "Car" },
-      { labelName: "AirCar" },
-    ]);
+    expect(filteredContent).toStrictEqual([{ labelName: "Car" }, { labelName: "AirCar" }]);
   });
 
   test("Should hide dropdown filter", async () => {
@@ -243,8 +240,6 @@ describe("Filter", () => {
 
     fireEvent.click(FilterButton);
 
-    expect(FilterButton.classList.contains("dm-filter-button_active")).toBe(
-      true,
-    );
+    expect(FilterButton.classList.contains("dm-filter-button_active")).toBe(true);
   });
 });

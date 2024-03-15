@@ -1,13 +1,5 @@
 import deepEqual from "deep-equal";
-import {
-  clone,
-  destroy,
-  flow,
-  getParent,
-  getRoot,
-  getSnapshot,
-  types,
-} from "mobx-state-tree";
+import { clone, destroy, flow, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
 import { clamp } from "../../utils/helpers";
 import { History } from "../../utils/history";
 import { guidGenerator } from "../../utils/random";
@@ -31,10 +23,7 @@ export const Tab = types
 
     type: types.optional(types.enumeration(["list", "grid"]), "list"),
 
-    target: types.optional(
-      types.enumeration(["tasks", "annotations"]),
-      "tasks",
-    ),
+    target: types.optional(types.enumeration(["tasks", "annotations"]), "tasks"),
 
     filters: types.array(types.late(() => TabFilter)),
     conjunction: types.optional(types.enumeration(["and", "or"]), "and"),
@@ -62,9 +51,7 @@ export const Tab = types
       .replace("px", "")
       .trim();
 
-    const labelingTableWidth = Number.parseInt(
-      localStorage.getItem("labelingTableWidth") ?? defaultWidth ?? 200,
-    );
+    const labelingTableWidth = Number.parseInt(localStorage.getItem("labelingTableWidth") ?? defaultWidth ?? 200);
 
     return {
       labelingTableWidth,
@@ -154,11 +141,7 @@ export const Tab = types
           type: el.filter.currentType,
         };
 
-        filterItem.value = normalizeFilterValue(
-          filterItem.type,
-          filterItem.operator,
-          filterItem.value,
-        );
+        filterItem.value = normalizeFilterValue(filterItem.type, filterItem.operator, filterItem.value);
 
         return filterItem;
       });
@@ -321,23 +304,13 @@ export const Tab = types
       }
       /* if we have a min and max we need to make sure we save that too.
       this prevents firing 2 view save requests to accomplish the same thing */
-      return !Number.isNaN(min) && !Number.isNaN(max)
-        ? self.setSemanticSearchThreshold(min, max)
-        : self.save();
+      return !Number.isNaN(min) && !Number.isNaN(max) ? self.setSemanticSearchThreshold(min, max) : self.save();
     },
 
     setSemanticSearchThreshold(_min, max) {
-      const min = clamp(
-        _min ?? THRESHOLD_MIN,
-        THRESHOLD_MIN,
-        max - THRESHOLD_MIN_DIFF,
-      );
+      const min = clamp(_min ?? THRESHOLD_MIN, THRESHOLD_MIN, max - THRESHOLD_MIN_DIFF);
 
-      if (
-        self.semantic_search?.length &&
-        !Number.isNaN(min) &&
-        !Number.isNaN(max)
-      ) {
+      if (self.semantic_search?.length && !Number.isNaN(min) && !Number.isNaN(max)) {
         self.threshold = { min, max };
         return self.save();
       }
@@ -425,8 +398,7 @@ export const Tab = types
     },
 
     afterAttach() {
-      self.hiddenColumns =
-        self.hiddenColumns ?? clone(self.parent.defaultHidden);
+      self.hiddenColumns = self.hiddenColumns ?? clone(self.parent.defaultHidden);
     },
 
     afterCreate() {
@@ -447,10 +419,7 @@ export const Tab = types
 
           // Save the virtual tab of the project to local storage to persist between page navigations
           if (projectId) {
-            localStorage.setItem(
-              `virtual-tab-${projectId}`,
-              JSON.stringify(snapshot),
-            );
+            localStorage.setItem(`virtual-tab-${projectId}`, JSON.stringify(snapshot));
           }
 
           History.navigate({ tab: self.key }, true);

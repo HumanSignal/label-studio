@@ -184,9 +184,7 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
   I.say("Select image region");
   AtOutliner.clickRegion(3);
 
-  const isRelativeCoords = await LabelStudio.hasFF(
-    "fflag_fix_front_dev_3793_relative_coords_short",
-  );
+  const isRelativeCoords = await LabelStudio.hasFF("fflag_fix_front_dev_3793_relative_coords_short");
 
   if (isRelativeCoords) {
     AtDetails.seeFieldWithValue("X", "25");
@@ -202,16 +200,7 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
   I.say("Add new meta and check result");
   AtDetails.clickEditMeta();
 
-  fillByPressKeyDown([
-    ["M"],
-    ["Space"],
-    ["1"],
-    ["Shift", "Enter"],
-    ["M"],
-    ["Space"],
-    ["2"],
-    ["Enter"],
-  ]);
+  fillByPressKeyDown([["M"], ["Space"], ["1"], ["Shift", "Enter"], ["M"], ["Space"], ["2"], ["Enter"]]);
   AtDetails.seeMeta("M 1");
   AtDetails.seeMeta("M 2");
 
@@ -311,9 +300,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   I.say("But it should detach dragged panel");
   AtOutlinerPanel.seePanelDetached();
   {
-    I.say(
-      "And x coordinate of panels should be equal due to limitation of moving panel through the border",
-    );
+    I.say("And x coordinate of panels should be equal due to limitation of moving panel through the border");
     const panel1HeaderBbox = await AtOutlinerPanel.grabHeaderBbox();
     const panel2HeaderBbox = await AtOutlinerPanel.grabHeaderBbox();
 
@@ -325,20 +312,13 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     const panelsContainerBbox = await AtPanels.grabPanelsContainerBbox();
     const panelsContainerCenter = centerOfBbox(panelsContainerBbox);
 
-    await AtOutlinerPanel.dragPanelTo(
-      panelsContainerCenter.x,
-      panelsContainerCenter.y - panelBbox.height / 2,
-    );
+    await AtOutlinerPanel.dragPanelTo(panelsContainerCenter.x, panelsContainerCenter.y - panelBbox.height / 2);
 
     I.say("Try to resize panel in all directions");
     panelBbox = await AtOutlinerPanel.grabPanelBbox();
     {
       I.say("drag TopLeft corner");
-      await AtOutlinerPanel.dragResizerBy(
-        -1,
-        -2,
-        AtOutlinerPanel.resizeTopLeft,
-      );
+      await AtOutlinerPanel.dragResizerBy(-1, -2, AtOutlinerPanel.resizeTopLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
       assert.strictEqual(newPanelBbox.x - panelBbox.x, -1);
@@ -349,11 +329,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     }
     {
       I.say("drag TopRight corner");
-      await AtOutlinerPanel.dragResizerBy(
-        -1,
-        -2,
-        AtOutlinerPanel.resizeTopRight,
-      );
+      await AtOutlinerPanel.dragResizerBy(-1, -2, AtOutlinerPanel.resizeTopRight);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
       assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
@@ -364,11 +340,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     }
     {
       I.say("drag BottomRight corner");
-      await AtOutlinerPanel.dragResizerBy(
-        3,
-        5,
-        AtOutlinerPanel.resizeBottomRight,
-      );
+      await AtOutlinerPanel.dragResizerBy(3, 5, AtOutlinerPanel.resizeBottomRight);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
       assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
@@ -379,11 +351,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     }
     {
       I.say("drag BottomLeft corner");
-      await AtOutlinerPanel.dragResizerBy(
-        3,
-        -5,
-        AtOutlinerPanel.resizeBottomLeft,
-      );
+      await AtOutlinerPanel.dragResizerBy(3, -5, AtOutlinerPanel.resizeBottomLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
       assert.strictEqual(newPanelBbox.x - panelBbox.x, 3);
@@ -394,12 +362,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     }
     {
       I.say("drag Top border");
-      await AtOutlinerPanel.dragResizerBy(
-        10,
-        -10,
-        AtOutlinerPanel.resizeTop,
-        2,
-      );
+      await AtOutlinerPanel.dragResizerBy(10, -10, AtOutlinerPanel.resizeTop, 2);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
       assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
@@ -410,12 +373,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     }
     {
       I.say("drag Right border");
-      await AtOutlinerPanel.dragResizerBy(
-        100,
-        -7,
-        AtOutlinerPanel.resizeRight,
-        2,
-      );
+      await AtOutlinerPanel.dragResizerBy(100, -7, AtOutlinerPanel.resizeRight, 2);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
       assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
@@ -448,11 +406,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     }
     {
       I.say("Check maximal size restriction");
-      await AtOutlinerPanel.dragResizerBy(
-        -1000,
-        -1000,
-        AtOutlinerPanel.resizeTopLeft,
-      );
+      await AtOutlinerPanel.dragResizerBy(-1000, -1000, AtOutlinerPanel.resizeTopLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
       assert(newPanelBbox.x - panelBbox.x < 500);
@@ -463,11 +417,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     }
     {
       I.say("Check minimal size restriction");
-      await AtOutlinerPanel.dragResizerBy(
-        panelBbox.width,
-        panelBbox.height + 50,
-        AtOutlinerPanel.resizeTopLeft,
-      );
+      await AtOutlinerPanel.dragResizerBy(panelBbox.width, panelBbox.height + 50, AtOutlinerPanel.resizeTopLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
       assert(newPanelBbox.width > 100);
@@ -483,18 +433,12 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   AtDetailsPanel.seePanelAttachedLeft();
 
   {
-    I.say(
-      "Move outliner to the right socket by moving to the left (check that there is some gap)",
-    );
+    I.say("Move outliner to the right socket by moving to the left (check that there is some gap)");
     const panelBbox = await AtOutlinerPanel.grabPanelBbox();
-    const panelContainerWidth =
-      await AtOutlinerPanel.grabPanelsContainerBbox("width");
+    const panelContainerWidth = await AtOutlinerPanel.grabPanelsContainerBbox("width");
     const shiftX = 50;
 
-    await AtOutlinerPanel.dragPanelTo(
-      panelContainerWidth - panelBbox.width / 2 - shiftX,
-      panelBbox.y,
-    );
+    await AtOutlinerPanel.dragPanelTo(panelContainerWidth - panelBbox.width / 2 - shiftX, panelBbox.y);
     AtOutlinerPanel.seePanelDetached();
     await AtOutlinerPanel.dragResizerBy(shiftX, 0, AtOutlinerPanel.resizeRight);
     AtOutlinerPanel.seePanelDetached();
@@ -531,10 +475,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     const panelsContainerBbox = await AtPanels.grabPanelsContainerBbox();
     const panelsContainerCenter = centerOfBbox(panelsContainerBbox);
 
-    await AtDetailsPanel.dragPanelTo(
-      panelsContainerCenter.x,
-      panelsContainerCenter.y - panelBbox.height / 2,
-    );
+    await AtDetailsPanel.dragPanelTo(panelsContainerCenter.x, panelsContainerCenter.y - panelBbox.height / 2);
     AtDetailsPanel.seePanelDetached();
   }
   I.say("Collapse detached panel");

@@ -5,10 +5,7 @@ import { Group, Line } from "react-konva";
 
 import { green } from "@ant-design/colors";
 import { observer } from "mobx-react";
-import {
-  RELATIVE_STAGE_HEIGHT,
-  RELATIVE_STAGE_WIDTH,
-} from "../components/ImageView/Image";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 import { LabelOnPolygon } from "../components/ImageView/LabelOnRegion";
 import Constants from "../core/Constants";
@@ -60,10 +57,7 @@ const Model = types
     type: "polygonregion",
     object: types.late(() => types.reference(ImageModel)),
 
-    points: types.array(
-      types.union(PolygonPoint, types.array(types.number)),
-      [],
-    ),
+    points: types.array(types.union(PolygonPoint, types.array(types.number)), []),
     closed: true,
   })
   .volatile(() => ({
@@ -148,10 +142,7 @@ const Model = types
 
       handleMouseMove({ e, flattenedPoints }) {
         const { offsetX, offsetY } = e.evt;
-        const [cursorX, cursorY] = self.parent.fixZoomedCoords([
-          offsetX,
-          offsetY,
-        ]);
+        const [cursorX, cursorY] = self.parent.fixZoomedCoords([offsetX, offsetY]);
         const [x, y] = getAnchorPoint({
           flattenedPoints,
           cursorX,
@@ -178,10 +169,7 @@ const Model = types
 
         const { offsetX, offsetY } = e.evt;
 
-        const [cursorX, cursorY] = self.parent.fixZoomedCoords([
-          offsetX,
-          offsetY,
-        ]);
+        const [cursorX, cursorY] = self.parent.fixZoomedCoords([offsetX, offsetY]);
         const point = getAnchorPoint({
           flattenedPoints,
           cursorX,
@@ -192,8 +180,7 @@ const Model = types
       },
 
       deletePoint(point) {
-        const willNotEliminateClosedShape =
-          self.points.length <= 3 && point.parent.closed;
+        const willNotEliminateClosedShape = self.points.length <= 3 && point.parent.closed;
         const isLastPoint = self.points.length === 1;
         const isSelected = self.selectedPoint === point;
 
@@ -223,11 +210,9 @@ const Model = types
           y: self.parent.canvasToInternalY(y),
         });
         const isMatchWithPrevPoint =
-          self.points[insertIdx - 1] &&
-          self.parent.isSamePixel(pointCoords, self.points[insertIdx - 1]);
+          self.points[insertIdx - 1] && self.parent.isSamePixel(pointCoords, self.points[insertIdx - 1]);
         const isMatchWithNextPoint =
-          self.points[insertIdx] &&
-          self.parent.isSamePixel(pointCoords, self.points[insertIdx]);
+          self.points[insertIdx] && self.parent.isSamePixel(pointCoords, self.points[insertIdx]);
 
         if (isMatchWithPrevPoint || isMatchWithNextPoint) {
           return;
@@ -335,10 +320,7 @@ const Model = types
         const value = {
           points: isFF(FF_DEV_3793)
             ? self.points.map((p) => [p.x, p.y])
-            : self.points.map((p) => [
-                self.convertXToPerc(p.x),
-                self.convertYToPerc(p.y),
-              ]),
+            : self.points.map((p) => [self.convertXToPerc(p.x), self.convertYToPerc(p.y)]),
           ...(isFF(FF_DEV_2432) ? { closed: self.closed } : {}),
         };
 
@@ -369,17 +351,12 @@ function getAnchorPoint({ flattenedPoints, cursorX, cursorY }) {
     ((point2X - point1X) * (point2X * point1Y - point1X * point2Y) +
       (point2X - point1X) * (point2Y - point1Y) * cursorX +
       (point2Y - point1Y) * (point2Y - point1Y) * cursorY) /
-    ((point2Y - point1Y) * (point2Y - point1Y) +
-      (point2X - point1X) * (point2X - point1X));
+    ((point2Y - point1Y) * (point2Y - point1Y) + (point2X - point1X) * (point2X - point1X));
   const x =
     cursorX -
     ((point2Y - point1Y) *
-      (point2X * point1Y -
-        point1X * point2Y +
-        cursorX * (point2Y - point1Y) -
-        cursorY * (point2X - point1X))) /
-      ((point2Y - point1Y) * (point2Y - point1Y) +
-        (point2X - point1X) * (point2X - point1X));
+      (point2X * point1Y - point1X * point2Y + cursorX * (point2Y - point1Y) - cursorY * (point2X - point1X))) /
+      ((point2Y - point1Y) * (point2Y - point1Y) + (point2X - point1X) * (point2X - point1X));
 
   return [x, y];
 }
@@ -387,10 +364,7 @@ function getAnchorPoint({ flattenedPoints, cursorX, cursorY }) {
 function getFlattenedPoints(points) {
   const p = points.map((p) => [p.canvasX, p.canvasY]);
 
-  return p.reduce(
-    (flattenedPoints, point) => flattenedPoints.concat(point),
-    [],
-  );
+  return p.reduce((flattenedPoints, point) => flattenedPoints.concat(point), []);
 }
 
 function getHoverAnchor({ layer }) {
@@ -420,9 +394,7 @@ function createHoverAnchor({ point, group, layer, zoom }) {
 }
 
 function moveHoverAnchor({ point, group, layer, zoom }) {
-  const hoverAnchor =
-    getHoverAnchor({ layer }) ||
-    createHoverAnchor({ point, group, layer, zoom });
+  const hoverAnchor = getHoverAnchor({ layer }) || createHoverAnchor({ point, group, layer, zoom });
 
   hoverAnchor.to({ x: point[0], y: point[1], duration: 0 });
 }
@@ -471,9 +443,7 @@ const Poly = memo(
                 if (isXCoord) {
                   const point = item.control?.getSnappedPoint({
                     x: item.parent.canvasToInternalX(coord * scale[0] + d[0]),
-                    y: item.parent.canvasToInternalY(
-                      points[idx + 1] * scale[1] + d[1],
-                    ),
+                    y: item.parent.canvasToInternalY(points[idx + 1] * scale[1] + d[1]),
                   });
 
                   result.push(point.x, point.y);
@@ -651,8 +621,7 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
   }, [item.bboxCoords.left, item.bboxCoords.top]);
 
   useEffect(() => {
-    if (isFF(FF_DEV_2432) && !item.closed)
-      item.control.tools.Polygon.resumeUnfinishedRegion(item);
+    if (isFF(FF_DEV_2432) && !item.closed) item.control.tools.Polygon.resumeUnfinishedRegion(item);
   }, [item.closed]);
 
   if (!item.parent) return null;
@@ -697,10 +666,7 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
         item.onClickRegion(e);
       }}
       {...dragProps}
-      draggable={
-        !item.isReadOnly() &&
-        (!item.inSelection || item.parent?.selectedRegions?.length === 1)
-      }
+      draggable={!item.isReadOnly() && (!item.inSelection || item.parent?.selectedRegions?.length === 1)}
       listening={!suggestion}
     >
       <LabelOnPolygon item={item} color={regionStyles.strokeColor} />
@@ -712,16 +678,10 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
           item={item}
           colors={regionStyles}
           dragProps={dragProps}
-          draggable={
-            !item.isReadOnly() &&
-            item.inSelection &&
-            item.parent?.selectedRegions?.length > 1
-          }
+          draggable={!item.isReadOnly() && item.inSelection && item.parent?.selectedRegions?.length > 1}
         />
       ) : null}
-      {item.points && !item.isReadOnly() ? (
-        <Edges item={item} regionStyles={regionStyles} />
-      ) : null}
+      {item.points && !item.isReadOnly() ? <Edges item={item} regionStyles={regionStyles} /> : null}
       {item.points && !item.isReadOnly() ? renderCircles(item.points) : null}
     </Group>
   );

@@ -1,12 +1,6 @@
 import { TreeSelect } from "antd";
 import type React from "react";
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 
@@ -79,10 +73,7 @@ const convert = (
     const color = (item: TaxonomyItem) => (
       // no BEM here to make it more lightweight
       // global classname to allow to change it in Style tag
-      <span
-        className="htx-taxonomy-item-color"
-        style={{ background: item.color }}
-      >
+      <span className="htx-taxonomy-item-color" style={{ background: item.color }}>
         {item.label}
       </span>
     );
@@ -98,10 +89,8 @@ const convert = (
 
   const convertItem = (item: TaxonomyItem): AntTaxonomyItem => {
     const value = item.path.join(options.pathSeparator);
-    const disabledNode =
-      options.leafsOnly && (item.isLeaf === false || !!item.children);
-    const maxUsagesReached =
-      options.maxUsagesReached && !selectedPaths.includes(value);
+    const disabledNode = options.leafsOnly && (item.isLeaf === false || !!item.children);
+    const maxUsagesReached = options.maxUsagesReached && !selectedPaths.includes(value);
 
     return {
       title: enrich(item),
@@ -131,27 +120,19 @@ const NewTaxonomy = ({
 }: TaxonomyProps) => {
   const refInput = useRef<TaxonomySearchRef>(null);
   const [treeData, setTreeData] = useState<AntTaxonomyItem[]>([]);
-  const [filteredTreeData, setFilteredTreeData] = useState<AntTaxonomyItem[]>(
-    [],
-  );
+  const [filteredTreeData, setFilteredTreeData] = useState<AntTaxonomyItem[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[] | undefined>([]);
   const separator = options.pathSeparator;
   const style = {
     minWidth: options.minWidth ?? 200,
     maxWidth: options.maxWidth,
   };
-  const dropdownWidth =
-    options.dropdownWidth === undefined ? true : +options.dropdownWidth;
-  const maxUsagesReached =
-    !!options.maxUsages && selected.length >= options.maxUsages;
-  const value = selected.map((path) =>
-    path.map((p) => p.value).join(separator),
-  );
+  const dropdownWidth = options.dropdownWidth === undefined ? true : +options.dropdownWidth;
+  const maxUsagesReached = !!options.maxUsages && selected.length >= options.maxUsages;
+  const value = selected.map((path) => path.map((p) => p.value).join(separator));
   const displayed = selected.map((path) => ({
     value: path.map((p) => p.value).join(separator),
-    label: options.showFullPath
-      ? path.map((p) => p.label).join(separator)
-      : path.at(-1).label,
+    label: options.showFullPath ? path.map((p) => p.label).join(separator) : path.at(-1).label,
   }));
 
   useEffect(() => {
@@ -162,26 +143,17 @@ const NewTaxonomy = ({
     return onLoadData?.(node.value.split(separator));
   }, []);
 
-  const handleSearch = useCallback(
-    (list: AntTaxonomyItem[], expandedKeys: React.Key[] | null) => {
-      setFilteredTreeData(list);
-      if (expandedKeys?.length) setExpandedKeys(expandedKeys);
-      else setExpandedKeys(undefined);
-    },
-    [],
-  );
+  const handleSearch = useCallback((list: AntTaxonomyItem[], expandedKeys: React.Key[] | null) => {
+    setFilteredTreeData(list);
+    if (expandedKeys?.length) setExpandedKeys(expandedKeys);
+    else setExpandedKeys(undefined);
+  }, []);
 
   const renderDropdown = useCallback(
     (origin: ReactNode) => {
       return (
         <>
-          {!defaultSearch && (
-            <TaxonomySearch
-              ref={refInput}
-              treeData={treeData}
-              onChange={handleSearch}
-            />
-          )}
+          {!defaultSearch && <TaxonomySearch ref={refInput} treeData={treeData} onChange={handleSearch} />}
           {origin}
         </>
       );

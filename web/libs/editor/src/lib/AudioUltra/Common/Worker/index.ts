@@ -1,10 +1,6 @@
 type MessengerResponder = (result: Record<string, any>) => void;
 
-type MessengerCallback = (
-  data: any,
-  storage: Record<string, any>,
-  respond: MessengerResponder,
-) => void;
+type MessengerCallback = (data: any, storage: Record<string, any>, respond: MessengerResponder) => void;
 
 type MessengerInput = {
   compute: MessengerCallback;
@@ -15,10 +11,7 @@ export class ComputeWorker {
   private worker: Worker;
 
   static Messenger = {
-    receive({
-      compute: computeCallback,
-      precompute: precomputeCallback,
-    }: MessengerInput) {
+    receive({ compute: computeCallback, precompute: precomputeCallback }: MessengerInput) {
       const storage: Record<string, any> = {};
 
       const storeData = (e: MessageEvent) => {
@@ -119,11 +112,7 @@ export class ComputeWorker {
     this.worker.terminate();
   }
 
-  private sendMessage(
-    worker: Worker,
-    data: Record<string, any>,
-    waitResponse = false,
-  ) {
+  private sendMessage(worker: Worker, data: Record<string, any>, waitResponse = false) {
     return new Promise<MessageEvent | undefined>((resolve) => {
       const eventId = Math.random().toString();
 

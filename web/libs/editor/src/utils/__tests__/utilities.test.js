@@ -1,12 +1,5 @@
 /* global it, describe, expect, test */
-import {
-  emailFromCreatedBy,
-  getUrl,
-  isString,
-  isStringEmpty,
-  isStringJSON,
-  toTimeString,
-} from "../utilities";
+import { emailFromCreatedBy, getUrl, isString, isStringEmpty, isStringJSON, toTimeString } from "../utilities";
 
 describe("Helper function emailFromCreatedBy", () => {
   expect(emailFromCreatedBy("abc@def.com, 12")).toBe("abc@def.com");
@@ -14,13 +7,9 @@ describe("Helper function emailFromCreatedBy", () => {
   expect(emailFromCreatedBy(" abc@def.com, 12")).toBe("abc@def.com");
   expect(emailFromCreatedBy("usrnm abc@def.com, 12")).toBe("abc@def.com");
   // first and last name
-  expect(emailFromCreatedBy("Abc Def ab.c+12@def.com.pt, 12")).toBe(
-    "ab.c+12@def.com.pt",
-  );
+  expect(emailFromCreatedBy("Abc Def ab.c+12@def.com.pt, 12")).toBe("ab.c+12@def.com.pt");
   // complex case
-  expect(emailFromCreatedBy("Ab.C D@E.F ab.c+12@def.com.pt, 12")).toBe(
-    "ab.c+12@def.com.pt",
-  );
+  expect(emailFromCreatedBy("Ab.C D@E.F ab.c+12@def.com.pt, 12")).toBe("ab.c+12@def.com.pt");
   // just a email, should not be a real case though
   expect(emailFromCreatedBy("ab.c+12@def.com.pt")).toBe("ab.c+12@def.com.pt");
 });
@@ -75,15 +64,11 @@ describe("Helper function isStrinJSON", () => {
  */
 describe("Helper function getUrl", () => {
   test("Correct https", () => {
-    expect(getUrl(0, "https://heartex.net testing value")).toBe(
-      "https://heartex.net",
-    );
+    expect(getUrl(0, "https://heartex.net testing value")).toBe("https://heartex.net");
   });
 
   test("Correct http", () => {
-    expect(getUrl(0, "http://heartex.net testing value")).toBe(
-      "http://heartex.net",
-    );
+    expect(getUrl(0, "http://heartex.net testing value")).toBe("http://heartex.net");
   });
 
   test("Correct wwww", () => {

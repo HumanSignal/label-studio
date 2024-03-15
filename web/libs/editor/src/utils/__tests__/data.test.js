@@ -49,10 +49,7 @@ describe("parseCSV; csv with header", () => {
     const expected = { ...data };
 
     expected.gender = ["M", "F", "F"];
-    expect(parseCSV(csv)).toStrictEqual([
-      expected,
-      ["timestamp", "cases", "rate", "gender"],
-    ]);
+    expect(parseCSV(csv)).toStrictEqual([expected, ["timestamp", "cases", "rate", "gender"]]);
   });
 
   test("Date + numbers + text, commas, auto separator", () => {
@@ -78,30 +75,19 @@ describe("parseCSV; csv with header", () => {
     expected.time = expected.timestamp.map(dateISO);
     expected.timestamp = undefined;
     expected.gender = ["M", "F", "F"];
-    expect(parseCSV(csv, ",")).toStrictEqual([
-      expected,
-      ["time", "cases", "rate", "gender"],
-    ]);
+    expect(parseCSV(csv, ",")).toStrictEqual([expected, ["time", "cases", "rate", "gender"]]);
   });
 });
 
 describe("parseCSV; headless csv", () => {
   test("Numbers, commas, auto separator", () => {
-    const csv = [
-      `${now},123,0.01`,
-      `${now + minute},125,0.02`,
-      `${now + minute * 2},135,0.04`,
-    ].join("\n");
+    const csv = [`${now},123,0.01`, `${now + minute},125,0.02`, `${now + minute * 2},135,0.04`].join("\n");
 
     expect(parseCSV(csv)).toStrictEqual([dataHeadless, ["0", "1", "2"]]);
   });
 
   test("Numbers, tabs, auto separator", () => {
-    const csv = [
-      `${now}\t123\t0.01`,
-      `${now + minute}\t125\t0.02`,
-      `${now + minute * 2}\t135\t0.04`,
-    ].join("\n");
+    const csv = [`${now}\t123\t0.01`, `${now + minute}\t125\t0.02`, `${now + minute * 2}\t135\t0.04`].join("\n");
 
     expect(parseCSV(csv)).toStrictEqual([dataHeadless, ["0", "1", "2"]]);
   });
@@ -160,14 +146,10 @@ describe("parseValue", () => {
   });
 
   test("Text with variables", () => {
-    expect(parseValue("URL of $name is $url", data)).toEqual(
-      "URL of Label Studio is https://labelstud.io",
-    );
+    expect(parseValue("URL of $name is $url", data)).toEqual("URL of Label Studio is https://labelstud.io");
   });
 
   test("Nested values", () => {
-    expect(
-      parseValue("$messages.greeting $messages.error [error]", data),
-    ).toEqual("Hey! It's broken. [error]");
+    expect(parseValue("$messages.greeting $messages.error [error]", data)).toEqual("Hey! It's broken. [error]");
   });
 });

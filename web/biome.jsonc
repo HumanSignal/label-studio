@@ -4,15 +4,13 @@
     "enabled": true
   },
   "files": {
-    "ignore": [
-      "node_modules/**",
-      "**/dist/**"
-    ],
+    "ignore": ["node_modules/**", "**/dist/**"],
     "maxSize": 3670016
   },
   "formatter": {
     "indentStyle": "space",
-    "indentWidth": 2
+    "indentWidth": 2,
+    "lineWidth": 120
   },
   "linter": {
     "enabled": true,

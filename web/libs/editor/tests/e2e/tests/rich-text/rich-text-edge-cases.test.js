@@ -67,8 +67,7 @@ Data(featureFlags).Scenario(
     const { FF_LSDV_4620_3 } = current;
 
     LabelStudio.setFeatureFlags({
-      fflag_feat_front_lsdv_4620_richtext_opimization_060423_short:
-        FF_LSDV_4620_3,
+      fflag_feat_front_lsdv_4620_richtext_opimization_060423_short: FF_LSDV_4620_3,
     });
 
     I.amOnPage("/");
@@ -112,11 +111,7 @@ Data(featureFlags).Scenario(
     AtOutliner.clickRegion(2);
     I.seeElement(locate(".lsf-region-meta__content").withText("f H"));
     AtOutliner.clickRegion(3);
-    I.seeElement(
-      locate(".lsf-region-meta__content").withText(
-        "This is an example\nof HTML",
-      ),
-    );
+    I.seeElement(locate(".lsf-region-meta__content").withText("This is an example\nof HTML"));
     AtOutliner.clickRegion(4);
     I.seeElement(locate(".lsf-region-meta__content").withText("example"));
 
@@ -155,11 +150,7 @@ Data(featureFlags).Scenario(
       AtOutliner.clickRegion(2);
       I.seeElement(locate(".lsf-region-meta__content").withText("f H"));
       AtOutliner.clickRegion(3);
-      I.seeElement(
-        locate(".lsf-region-meta__content").withText(
-          "This is an example\nof HTML",
-        ),
-      );
+      I.seeElement(locate(".lsf-region-meta__content").withText("This is an example\nof HTML"));
       AtOutliner.clickRegion(4);
       I.seeElement(locate(".lsf-region-meta__content").withText("example"));
 

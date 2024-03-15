@@ -1,20 +1,10 @@
-import {
-  type FC,
-  type MutableRefObject,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type FC, type MutableRefObject, useMemo, useRef, useState } from "react";
 import { Block } from "../../../utils/bem";
 import { clamp } from "../../../utils/utilities";
 import type { TimelineSideControlProps } from "../Types";
 import "./FramesControl.styl";
 
-export const FramesControl: FC<TimelineSideControlProps> = ({
-  position = 0,
-  length = 0,
-  onPositionChange,
-}) => {
+export const FramesControl: FC<TimelineSideControlProps> = ({ position = 0, length = 0, onPositionChange }) => {
   const [inputMode, setInputMode] = useState(false);
   const duration = useMemo(() => {
     return length - 1;
@@ -35,8 +25,7 @@ export const FramesControl: FC<TimelineSideControlProps> = ({
         />
       ) : (
         <>
-          {clamp(Math.round(position + 1), 1, duration + 1)}{" "}
-          <span>of {duration + 1}</span>
+          {clamp(Math.round(position + 1), 1, duration + 1)} <span>of {duration + 1}</span>
         </>
       )}
     </Block>
@@ -50,23 +39,10 @@ interface FrameInputProps {
   onFinishEditing: () => void;
 }
 
-const allowedKeys = [
-  "ArrowUp",
-  "ArrowDown",
-  "Backspace",
-  "Delete",
-  "Enter",
-  /[0-9]/,
-];
+const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", "Enter", /[0-9]/];
 
-const FrameInput: FC<FrameInputProps> = ({
-  length,
-  position,
-  onChange,
-  onFinishEditing,
-}) => {
-  const input =
-    useRef<HTMLInputElement>() as MutableRefObject<HTMLInputElement>;
+const FrameInput: FC<FrameInputProps> = ({ length, position, onChange, onFinishEditing }) => {
+  const input = useRef<HTMLInputElement>() as MutableRefObject<HTMLInputElement>;
 
   const notifyChange = (value: number) => {
     onChange?.(clamp(value, 1, length));
@@ -79,9 +55,7 @@ const FrameInput: FC<FrameInputProps> = ({
       defaultValue={position + 1}
       onFocus={() => input.current?.select()}
       onKeyDown={(e) => {
-        const allowedKey = allowedKeys.find((k) =>
-          k instanceof RegExp ? k.test(e.key) : k === e.key,
-        );
+        const allowedKey = allowedKeys.find((k) => (k instanceof RegExp ? k.test(e.key) : k === e.key));
 
         if (!allowedKey && !e.metaKey) e.preventDefault();
 

@@ -1,13 +1,4 @@
-import {
-  type MutableRefObject,
-  forwardRef,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type MutableRefObject, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { FF_LSDV_4711, isFF } from "../../utils/feature-flags";
 import { clamp, isDefined } from "../../utils/utilities";
@@ -61,12 +52,8 @@ type VideoDimentions = {
 
 export const clampZoom = (value: number) => clamp(value, MIN_ZOOM, MAX_ZOOM);
 
-const zoomRatio = (
-  canvasWidth: number,
-  canvasHeight: number,
-  width: number,
-  height: number,
-) => Math.min(1, Math.min(canvasWidth / width, canvasHeight / height));
+const zoomRatio = (canvasWidth: number, canvasHeight: number, width: number, height: number) =>
+  Math.min(1, Math.min(canvasWidth / width, canvasHeight / height));
 
 export interface VideoRef {
   currentFrame: number;
@@ -144,23 +131,11 @@ export const VideoCanvas = memo(
         const resultWidth = width * zoom;
         const resultHeight = height * zoom;
 
-        const xMinMax = clamp(
-          (resultWidth - canvasWidth) / 2,
-          0,
-          Number.POSITIVE_INFINITY,
-        );
-        const yMinMax = clamp(
-          (resultHeight - canvasHeight) / 2,
-          0,
-          Number.POSITIVE_INFINITY,
-        );
+        const xMinMax = clamp((resultWidth - canvasWidth) / 2, 0, Number.POSITIVE_INFINITY);
+        const yMinMax = clamp((resultHeight - canvasHeight) / 2, 0, Number.POSITIVE_INFINITY);
 
-        const panX = props.allowPanOffscreen
-          ? pan.x
-          : clamp(pan.x, -xMinMax, xMinMax);
-        const panY = props.allowPanOffscreen
-          ? pan.y
-          : clamp(pan.y, -yMinMax, yMinMax);
+        const panX = props.allowPanOffscreen ? pan.x : clamp(pan.x, -xMinMax, xMinMax);
+        const panY = props.allowPanOffscreen ? pan.y : clamp(pan.y, -yMinMax, yMinMax);
 
         return { x: panX, y: panY };
       },
@@ -184,17 +159,7 @@ export const VideoCanvas = memo(
           context.clearRect(0, 0, canvasWidth, canvasHeight);
 
           context.filter = filters;
-          context.drawImage(
-            videoRef.current,
-            0,
-            0,
-            width,
-            height,
-            offsetLeft,
-            offsetTop,
-            resultWidth,
-            resultHeight,
-          );
+          context.drawImage(videoRef.current, 0, 0, width, height, offsetLeft, offsetTop, resultWidth, resultHeight);
         }
       } catch (e) {
         console.log("Error rendering video", e);
@@ -310,8 +275,7 @@ export const VideoCanvas = memo(
     }, [playing]);
 
     useEffect(() => {
-      if (videoRef.current && props.speed)
-        videoRef.current.playbackRate = props.speed;
+      if (videoRef.current && props.speed) videoRef.current.playbackRate = props.speed;
     }, [props.speed]);
 
     // Handle extrnal state change [position]
@@ -587,9 +551,7 @@ export const VideoCanvas = memo(
           preload="auto"
           src={props.src}
           muted={props.muted ?? false}
-          canPlayType={(supported) =>
-            (supportedFileTypeRef.current = supported)
-          }
+          canPlayType={(supported) => (supportedFileTypeRef.current = supported)}
           onPlay={handleVideoPlay}
           onPause={handleVideoPause}
           onLoadedData={delayedUpdate}

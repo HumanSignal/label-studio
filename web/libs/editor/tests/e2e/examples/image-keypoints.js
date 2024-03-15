@@ -9,8 +9,7 @@ const config = `
 `;
 
 const data = {
-  image:
-    "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg",
+  image: "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg",
 };
 
 const result = [

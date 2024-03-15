@@ -7,9 +7,7 @@ function getKey(collection: string) {
   return `${STORE_KEY}:${collection}`;
 }
 
-export function getRandomTip(
-  collection: keyof typeof TipsCollection,
-): Tip | null {
+export function getRandomTip(collection: keyof typeof TipsCollection): Tip | null {
   if (isTipDismissed(collection)) return null;
 
   const tips = TipsCollection[collection];
@@ -40,18 +38,13 @@ export function dismissTip(collection: string) {
 }
 
 export function isTipDismissed(collection: string) {
-  const cookies = Object.fromEntries(
-    document.cookie.split(";").map((item) => item.trim().split("=")),
-  );
+  const cookies = Object.fromEntries(document.cookie.split(";").map((item) => item.trim().split("=")));
   const finalKey = getKey(collection);
 
   return cookies[finalKey] === "true";
 }
 
-export function createURL(
-  url: string,
-  params?: Record<string, string>,
-): string {
+export function createURL(url: string, params?: Record<string, string>): string {
   const base = new URL(url);
 
   Object.entries(params ?? {}).forEach(([key, value]) => {

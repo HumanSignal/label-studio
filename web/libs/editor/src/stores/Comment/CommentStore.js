@@ -1,13 +1,6 @@
 import uniqBy from "lodash/uniqBy";
 import { when } from "mobx";
-import {
-  flow,
-  getEnv,
-  getParent,
-  getRoot,
-  getSnapshot,
-  types,
-} from "mobx-state-tree";
+import { flow, getEnv, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
 import Utils from "../../utils";
 import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
 import { Comment } from "./Comment";
@@ -65,10 +58,7 @@ export const CommentStore = types
     get queuedComments() {
       const queued = self.comments.filter((comment) => !comment.isPersisted);
 
-      return queued.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+      return queued.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     },
     get hasUnsaved() {
       return self.queuedComments.length > 0;
@@ -81,9 +71,7 @@ export const CommentStore = types
         queueComments: false,
       },
     ) {
-      const serializedComments = getSnapshot(
-        commentsFilter === "queued" ? self.queuedComments : self.comments,
-      );
+      const serializedComments = getSnapshot(commentsFilter === "queued" ? self.queuedComments : self.comments);
 
       return {
         comments: queueComments
@@ -166,10 +154,7 @@ export const CommentStore = types
           } else {
             comment.task = self.taskId;
           }
-          const [persistedComment] = await self.sdk.invoke(
-            "comments:create",
-            comment,
-          );
+          const [persistedComment] = await self.sdk.invoke("comments:create", comment);
 
           if (persistedComment) {
             self.replaceId(comment.id, persistedComment);
@@ -231,10 +216,7 @@ export const CommentStore = types
       self.setAddedCommentThisSession(true);
       if (self.canPersist) {
         try {
-          const [newComment] = yield self.sdk.invoke(
-            "comments:create",
-            comment,
-          );
+          const [newComment] = yield self.sdk.invoke("comments:create", comment);
 
           if (newComment) {
             self.replaceId(now, newComment);
@@ -272,14 +254,8 @@ export const CommentStore = types
       localStorage.removeItem(`commentStore.${key}`);
     }
 
-    function toCache(
-      key,
-      options = { commentsFilter: "all", queueComments: true },
-    ) {
-      localStorage.setItem(
-        `commentStore.${key}`,
-        JSON.stringify(self.serialize(options)),
-      );
+    function toCache(key, options = { commentsFilter: "all", queueComments: true }) {
+      localStorage.setItem(`commentStore.${key}`, JSON.stringify(self.serialize(options)));
     }
 
     function fromCache(key, { merge = true, queueRestored = false } = {}) {
@@ -295,13 +271,8 @@ export const CommentStore = types
             restoreIds = restored.comments.map((comment) => comment.id);
           }
           if (merge) {
-            restored.comments = uniqBy(
-              [...restored.comments, ...getSnapshot(self.comments)],
-              "id",
-            ).sort(
-              (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime(),
+            restored.comments = uniqBy([...restored.comments, ...getSnapshot(self.comments)], "id").sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
             );
           }
           if (restoreIds.length) {
@@ -323,10 +294,7 @@ export const CommentStore = types
       self.fromCache(key, { merge: true, queueRestored: true });
     }
 
-    const listComments = flow(function* ({
-      mounted = { current: true },
-      suppressClearComments,
-    } = {}) {
+    const listComments = flow(function* ({ mounted = { current: true }, suppressClearComments } = {}) {
       if (!suppressClearComments) self.setComments([]);
       if (!self.draftId && !self.annotationId) return;
 

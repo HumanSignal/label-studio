@@ -22,13 +22,7 @@ Cypress.Commands.add(
   {
     prevSubject: ["element"],
   },
-  (
-    subject,
-    name,
-    screenshotCaptureOptions: Partial<
-      Loggable & Timeoutable & CompareScreenshotOptions
-    > = {},
-  ) => {
+  (subject, name, screenshotCaptureOptions: Partial<Loggable & Timeoutable & CompareScreenshotOptions> = {}) => {
     const { withHidden = [], ...screenshotOptions } = screenshotCaptureOptions;
     const log = Cypress.log({
       $el: subject,
@@ -41,9 +35,7 @@ Cypress.Commands.add(
     const screenshotName = getName(name);
 
     if (Screenshots.has(screenshotName)) {
-      throw new Error(
-        "Screenshot already taken. Did you forget to call `compareScreenshot`?",
-      );
+      throw new Error("Screenshot already taken. Did you forget to call `compareScreenshot`?");
     }
 
     const obj = cy.wrap(subject, { log: false });
@@ -79,15 +71,9 @@ Cypress.Commands.add(
     subject,
     name,
     compare,
-    screenshotCompareOptions: Partial<
-      Loggable & Timeoutable & CompareScreenshotOptions & Tresholdable
-    > = {},
+    screenshotCompareOptions: Partial<Loggable & Timeoutable & CompareScreenshotOptions & Tresholdable> = {},
   ) => {
-    const {
-      treshold = 0.1,
-      withHidden = [],
-      ...screenshotOptions
-    } = screenshotCompareOptions;
+    const { treshold = 0.1, withHidden = [], ...screenshotOptions } = screenshotCompareOptions;
     const screenshotName = getName(name);
     const log = Cypress.log({
       $el: subject,

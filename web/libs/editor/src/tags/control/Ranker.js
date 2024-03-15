@@ -97,9 +97,7 @@ const Model = types
      * @returns {string | undefined}
      */
     get defaultBucket() {
-      return self.buckets.length > 0
-        ? self.buckets.find((b) => b.default)?.name
-        : self.name;
+      return self.buckets.length > 0 ? self.buckets.find((b) => b.default)?.name : self.name;
     },
     get rankOnly() {
       return !self.buckets.length;
@@ -130,9 +128,7 @@ const Model = types
       const ids = Object.keys(items);
       const columns = self.columns;
       /** @type {Record<string, string[]>} */
-      const columnStubs = Object.fromEntries(
-        self.columns.map((c) => [c.id, []]),
-      );
+      const columnStubs = Object.fromEntries(self.columns.map((c) => [c.id, []]));
       /** @type {Record<string, string[]>} */
       const result = self.result?.value.ranker;
       let itemIds = {};
@@ -160,10 +156,7 @@ const Model = types
 
           if (left.length) {
             // there are might be already some items in result
-            itemIds[ORIGINAL_ITEMS_KEY] = [
-              ...(itemIds[ORIGINAL_ITEMS_KEY] ?? []),
-              ...left,
-            ];
+            itemIds[ORIGINAL_ITEMS_KEY] = [...(itemIds[ORIGINAL_ITEMS_KEY] ?? []), ...left];
           }
         }
       }
@@ -206,13 +199,7 @@ const Model = types
     },
   }));
 
-const RankerModel = types.compose(
-  "RankerModel",
-  Base,
-  AnnotationMixin,
-  Model,
-  ReadOnlyControlMixin,
-);
+const RankerModel = types.compose("RankerModel", Base, AnnotationMixin, Model, ReadOnlyControlMixin);
 
 const HtxRanker = inject("store")(
   observer(({ item }) => {

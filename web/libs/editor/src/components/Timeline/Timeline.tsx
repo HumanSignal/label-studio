@@ -8,11 +8,7 @@ import { TimelineContextProvider } from "./Context";
 import { Controls } from "./Controls";
 import { Seeker } from "./Seeker";
 import "./Timeline.styl";
-import type {
-  TimelineContextValue,
-  TimelineControlsStepHandler,
-  TimelineProps,
-} from "./Types";
+import type { TimelineContextValue, TimelineControlsStepHandler, TimelineProps } from "./Types";
 import { default as Views } from "./Views";
 
 const TimelineComponent: FC<TimelineProps> = ({
@@ -39,23 +35,17 @@ const TimelineComponent: FC<TimelineProps> = ({
 }) => {
   const View = Views[mode];
 
-  const [currentPosition, setCurrentPosition] = useState(
-    clamp(position, 1, Number.POSITIVE_INFINITY),
-  );
+  const [currentPosition, setCurrentPosition] = useState(clamp(position, 1, Number.POSITIVE_INFINITY));
   const [seekOffset, setSeekOffset] = useState(0);
   const [seekVisibleWidth, setSeekVisibleWidth] = useState(0);
-  const [viewCollapsed, setViewCollapsed] = useLocalStorageState(
-    "video-timeline",
-    false,
-    {
-      fromString(value) {
-        return value === "true" ? true : false;
-      },
-      toString(value) {
-        return String(value);
-      },
+  const [viewCollapsed, setViewCollapsed] = useLocalStorageState("video-timeline", false, {
+    fromString(value) {
+      return value === "true" ? true : false;
     },
-  );
+    toString(value) {
+      return String(value);
+    },
+  });
   const getCurrentPosition = useRef(() => {
     return currentPosition;
   });
@@ -91,17 +81,13 @@ const TimelineComponent: FC<TimelineProps> = ({
   };
 
   const increasePosition: TimelineControlsStepHandler = (_, stepSize) => {
-    const nextPosition =
-      stepSize?.(length, currentPosition, regions, 1) ??
-      currentPosition + hopSize;
+    const nextPosition = stepSize?.(length, currentPosition, regions, 1) ?? currentPosition + hopSize;
 
     setInternalPosition(nextPosition);
   };
 
   const decreasePosition: TimelineControlsStepHandler = (_, stepSize) => {
-    const nextPosition =
-      stepSize?.(length, currentPosition, regions, -1) ??
-      currentPosition - hopSize;
+    const nextPosition = stepSize?.(length, currentPosition, regions, -1) ?? currentPosition - hopSize;
 
     setInternalPosition(nextPosition);
   };
@@ -118,17 +104,7 @@ const TimelineComponent: FC<TimelineProps> = ({
       settings: View.settings,
       visibleWidth: seekVisibleWidth,
     }),
-    [
-      position,
-      seekOffset,
-      seekVisibleWidth,
-      length,
-      regions,
-      step,
-      playing,
-      View.settings,
-      data,
-    ],
+    [position, seekOffset, seekVisibleWidth, length, regions, step, playing, View.settings, data],
   );
 
   useEffect(() => {
@@ -159,20 +135,12 @@ const TimelineComponent: FC<TimelineProps> = ({
         disableFrames={disableView}
         allowFullscreen={allowFullscreen}
         allowViewCollapse={allowViewCollapse}
-        onFullScreenToggle={(fullscreen) =>
-          handlers.onFullscreenToggle?.(fullscreen)
-        }
+        onFullScreenToggle={(fullscreen) => handlers.onFullscreenToggle?.(fullscreen)}
         onVolumeChange={props.onVolumeChange}
         onStepBackward={decreasePosition}
         onStepForward={increasePosition}
-        onRewind={(steps) =>
-          setInternalPosition(isDefined(steps) ? currentPosition - steps : 0)
-        }
-        onForward={(steps) =>
-          setInternalPosition(
-            isDefined(steps) ? currentPosition + steps : length,
-          )
-        }
+        onRewind={(steps) => setInternalPosition(isDefined(steps) ? currentPosition - steps : 0)}
+        onForward={(steps) => setInternalPosition(isDefined(steps) ? currentPosition + steps : length)}
         onPositionChange={setInternalPosition}
         onToggleCollapsed={setViewCollapsed}
         formatPosition={formatPosition}
@@ -225,14 +193,10 @@ const TimelineComponent: FC<TimelineProps> = ({
         onPlay={() => handlers.onPlay?.()}
         onPause={() => handlers.onPause?.()}
         onSeek={(position) => handlers.onSeek?.(position)}
-        onToggleVisibility={(id, visible) =>
-          handlers.onToggleVisibility?.(id, visible)
-        }
+        onToggleVisibility={(id, visible) => handlers.onToggleVisibility?.(id, visible)}
         onAddRegion={(reg) => handlers.onAddRegion?.(reg)}
         onDeleteRegion={(id) => handlers.onDeleteRegion?.(id)}
-        onSelectRegion={(e, id, select) =>
-          handlers.onSelectRegion?.(e, id, select)
-        }
+        onSelectRegion={(e, id, select) => handlers.onSelectRegion?.(e, id, select)}
         onSpeedChange={(speed) => handlers.onSpeedChange?.(speed)}
         onZoom={props.onZoom}
       />

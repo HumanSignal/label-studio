@@ -22,15 +22,12 @@ const data = {
 
 const params = { annotations: [{ id: "test", result: [] }], config, data };
 
-Scenario(
-  "Check if the table is sorted",
-  async ({ I, LabelStudio, AtTableView }) => {
-    const _sortedArr = ["aaTest", "ATest", "bbbTest", "cTest"];
+Scenario("Check if the table is sorted", async ({ I, LabelStudio, AtTableView }) => {
+  const _sortedArr = ["aaTest", "ATest", "bbbTest", "cTest"];
 
-    I.amOnPage("/");
+  I.amOnPage("/");
 
-    LabelStudio.init(params);
+  LabelStudio.init(params);
 
-    await AtTableView.seeKeys(_sortedArr);
-  },
-);
+  await AtTableView.seeKeys(_sortedArr);
+});

@@ -40,32 +40,21 @@ export const AnnotationTab = observer(({ store }) => {
         </p>
       ) : null}
 
-      {hasSegmentation && (
-        <Entities
-          store={store}
-          annotation={annotation}
-          regionStore={annotation.regionStore}
-        />
-      )}
+      {hasSegmentation && <Entities store={store} annotation={annotation} regionStore={annotation.regionStore} />}
 
       {hasSegmentation && <Relations store={store} item={annotation} />}
 
-      {store.hasInterface("annotations:comments") &&
-        store.commentStore.isCommentable && (
-          <Block name="comments-section">
-            <Elem name="header">
-              <Elem name="title">Comments</Elem>
-            </Elem>
+      {store.hasInterface("annotations:comments") && store.commentStore.isCommentable && (
+        <Block name="comments-section">
+          <Elem name="header">
+            <Elem name="title">Comments</Elem>
+          </Elem>
 
-            <Elem name="content">
-              <Comments
-                annotationStore={as}
-                commentStore={store.commentStore}
-                cacheKey={`task.${store.task.id}`}
-              />
-            </Elem>
-          </Block>
-        )}
+          <Elem name="content">
+            <Comments annotationStore={as} commentStore={store.commentStore} cacheKey={`task.${store.task.id}`} />
+          </Elem>
+        </Block>
+      )}
     </>
   );
 });

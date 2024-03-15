@@ -15,15 +15,7 @@ export interface SliderProps {
   onChange: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
-export const Slider: FC<SliderProps> = ({
-  description,
-  info,
-  max,
-  min,
-  value,
-  step = 1,
-  onChange,
-}) => {
+export const Slider: FC<SliderProps> = ({ description, info, max, min, value, step = 1, onChange }) => {
   const sliderRef = useRef<HTMLDivElement>();
   const [valueError, setValueError] = useState<number | string | undefined>();
 
@@ -32,10 +24,7 @@ export const Slider: FC<SliderProps> = ({
   }, [value]);
 
   const changeBackgroundSize = () => {
-    if (sliderRef.current)
-      sliderRef.current.style.backgroundSize = `${
-        ((value - min) * 100) / (max - min)
-      }% 100%`;
+    if (sliderRef.current) sliderRef.current.style.backgroundSize = `${((value - min) * 100) / (max - min)}% 100%`;
   };
 
   const handleChangeInputValue = (e: React.FormEvent<HTMLInputElement>) => {
@@ -50,9 +39,7 @@ export const Slider: FC<SliderProps> = ({
     }
 
     const noZero = e.currentTarget.value.match(/^\.[0-9]*$/);
-    const normalizedValue = noZero
-      ? `0${e.currentTarget.value}`
-      : e.currentTarget.value;
+    const normalizedValue = noZero ? `0${e.currentTarget.value}` : e.currentTarget.value;
 
     const newValue = Number.parseFloat(normalizedValue);
 
@@ -80,9 +67,7 @@ export const Slider: FC<SliderProps> = ({
           type="text"
           mod={
             valueError !== undefined &&
-            (typeof valueError === "string" ||
-              valueError > max ||
-              valueError < min) && { error: "control" }
+            (typeof valueError === "string" || valueError > max || valueError < min) && { error: "control" }
           }
           min={min}
           max={max}

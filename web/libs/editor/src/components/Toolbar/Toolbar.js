@@ -43,11 +43,7 @@ export const Toolbar = inject("store")(
 
     return (
       <ToolbarProvider value={{ expanded, alignment }}>
-        <Block
-          ref={(el) => setToolbar(el)}
-          name="toolbar"
-          mod={{ alignment, expanded }}
-        >
+        <Block ref={(el) => setToolbar(el)} name="toolbar" mod={{ alignment, expanded }}>
           {Object.entries(toolGroups).map(([name, tools], i) => {
             const visibleTools = tools.filter((t) => t.viewClass);
 

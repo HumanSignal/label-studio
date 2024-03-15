@@ -38,20 +38,10 @@ interface TagProps {
   children?: React.ReactNode;
 }
 
-export const Tag: FC<TagProps> = ({
-  className,
-  style,
-  size,
-  color,
-  solid = false,
-  children,
-}) => {
+export const Tag: FC<TagProps> = ({ className, style, size, color, solid = false, children }) => {
   const preparedColor = prepareColor(getColor(color), solid);
 
-  const finalColor = Object.entries(preparedColor).reduce(
-    (res, [key, color]) => ({ ...res, [`--${key}`]: color }),
-    {},
-  );
+  const finalColor = Object.entries(preparedColor).reduce((res, [key, color]) => ({ ...res, [`--${key}`]: color }), {});
 
   const styles = { ...(style ?? {}), ...finalColor };
 

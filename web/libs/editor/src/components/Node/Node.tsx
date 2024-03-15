@@ -1,9 +1,4 @@
-import {
-  ApartmentOutlined,
-  AudioOutlined,
-  LineChartOutlined,
-  MessageOutlined,
-} from "@ant-design/icons";
+import { ApartmentOutlined, AudioOutlined, LineChartOutlined, MessageOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react";
 import { getRoot, getType } from "mobx-state-tree";
 import React, { type FC } from "react";
@@ -33,9 +28,7 @@ const NodeViews = {
   RichTextRegionModel: {
     name: "HTML",
     icon: IconText,
-    getContent: (node: any) => (
-      <span style={{ color: "#5a5a5a" }}>{node.text}</span>
-    ),
+    getContent: (node: any) => <span style={{ color: "#5a5a5a" }}>{node.text}</span>,
     fullContent: (node: any) => (
       <div>
         {/* <div style={{ color: "#5a5a5a" }}>{node.text}</div> */}
@@ -65,9 +58,7 @@ const NodeViews = {
   TextAreaRegionModel: NodeView({
     name: "Input",
     icon: MessageOutlined,
-    getContent: (node) => (
-      <span style={{ color: "#5a5a5a" }}>{node._value}</span>
-    ),
+    getContent: (node) => <span style={{ color: "#5a5a5a" }}>{node._value}</span>,
   }),
 
   RectRegionModel: NodeView({
@@ -86,11 +77,7 @@ const NodeViews = {
     name: "Video Rect",
     icon: IconRectangleTool,
     altIcon: IconRectangleToolSmart,
-    getContent: (node) => (
-      <span style={{ color: "#5a5a5a" }}>
-        from {node.sequence[0]?.frame} frame
-      </span>
-    ),
+    getContent: (node) => <span style={{ color: "#5a5a5a" }}>from {node.sequence[0]?.frame} frame</span>,
   }),
 
   PolygonRegionModel: NodeView({
@@ -163,9 +150,7 @@ const Node: FC<any> = observer(({ className, node }) => {
       {labelName}
       {node.isDrawing && (
         <Elem tag="span" name="incomplete">
-          <Tooltip
-            title={`Incomplete ${node.type?.replace("region", "") ?? "region"}`}
-          >
+          <Tooltip title={`Incomplete ${node.type?.replace("region", "") ?? "region"}`}>
             <IconWarning />
           </Tooltip>
         </Elem>

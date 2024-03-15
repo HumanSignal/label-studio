@@ -2,10 +2,7 @@ import { types } from "mobx-state-tree";
 
 import { NodeViews } from "../components/Node/Node";
 import { AnnotationMixin } from "../mixins/AnnotationMixin";
-import {
-  ThreePointsDrawingTool,
-  TwoPointsDrawingTool,
-} from "../mixins/DrawingTool";
+import { ThreePointsDrawingTool, TwoPointsDrawingTool } from "../mixins/DrawingTool";
 import ToolMixin from "../mixins/Tool";
 import { FF_DEV_3793, isFF } from "../utils/feature-flags";
 import BaseTool, { DEFAULT_DIMENSIONS } from "./Base";
@@ -84,9 +81,7 @@ const _Tool = types
       return "Rectangle";
     },
     get iconComponent() {
-      return self.dynamic
-        ? NodeViews.RectRegionModel.altIcon
-        : NodeViews.RectRegionModel.icon;
+      return self.dynamic ? NodeViews.RectRegionModel.altIcon : NodeViews.RectRegionModel.icon;
     },
   }));
 
@@ -99,9 +94,7 @@ const _Tool3Point = types
       return "3 Point Rectangle";
     },
     get iconComponent() {
-      return self.dynamic
-        ? NodeViews.Rect3PointRegionModel.altIcon
-        : NodeViews.Rect3PointRegionModel.icon;
+      return self.dynamic ? NodeViews.Rect3PointRegionModel.altIcon : NodeViews.Rect3PointRegionModel.icon;
     },
   }));
 

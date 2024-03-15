@@ -70,8 +70,7 @@ export const ProjectModelVersionSelector = ({
         text="Model Version"
         description={
           <>
-            Model version allows you to specify which prediction will be shown
-            to the annotators.
+            Model version allows you to specify which prediction will be shown to the annotators.
             {version && (
               <>
                 <br />

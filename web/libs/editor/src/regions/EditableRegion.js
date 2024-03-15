@@ -30,9 +30,7 @@ export const EditableRegion = types
       if (self.isPropertyEditable(propName)) {
         self[propName] = value;
       } else {
-        throw new Error(
-          `Property ${propName} of model ${self.type} is not editable`,
-        );
+        throw new Error(`Property ${propName} of model ${self.type} is not editable`);
       }
     },
   }));

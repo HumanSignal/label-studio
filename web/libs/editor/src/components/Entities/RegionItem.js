@@ -1,13 +1,7 @@
 import { Badge, List } from "antd";
 import { observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
-import {
-  LsCollapse,
-  LsExpand,
-  LsInvisible,
-  LsSparks,
-  LsVisible,
-} from "../../assets/icons";
+import { LsCollapse, LsExpand, LsInvisible, LsSparks, LsVisible } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import Utils from "../../utils";
 import { Node, NodeIcon } from "../Node/Node";
@@ -46,29 +40,14 @@ const RegionItemDesc = observer(({ item, setDraggable }) => {
     >
       <Elem name="controls">
         {controls.map((tag, idx) => {
-          const View = Registry.getPerRegionView(
-            tag.type,
-            PER_REGION_MODES.REGION_LIST,
-          );
+          const View = Registry.getPerRegionView(tag.type, PER_REGION_MODES.REGION_LIST);
 
           return View ? (
-            <View
-              key={idx}
-              item={tag}
-              area={item}
-              collapsed={collapsed}
-              setCollapsed={setCollapsed}
-            />
+            <View key={idx} item={tag} area={item} collapsed={collapsed} setCollapsed={setCollapsed} />
           ) : null;
         })}
       </Elem>
-      <Elem
-        name="collapse"
-        tag={Button}
-        size="small"
-        type="text"
-        onClick={toggleCollapsed}
-      >
+      <Elem name="collapse" tag={Button} size="small" type="text" onClick={toggleCollapsed}>
         {collapsed ? <LsExpand /> : <LsCollapse />}
       </Elem>
     </Elem>
@@ -106,14 +85,10 @@ const RegionItemContent = observer(({ idx, item, setDraggable }) => {
           </Elem>
 
           <Elem name="prediction">
-            {item.origin === "prediction" && (
-              <LsSparks style={{ width: 16, height: 16 }} />
-            )}
+            {item.origin === "prediction" && <LsSparks style={{ width: 16, height: 16 }} />}
           </Elem>
 
-          {item.isReadOnly() && (
-            <Badge count={"ro"} style={{ backgroundColor: "#ccc" }} />
-          )}
+          {item.isReadOnly() && <Badge count={"ro"} style={{ backgroundColor: "#ccc" }} />}
 
           {item.score && (
             <Elem
@@ -146,51 +121,49 @@ const RegionItemContent = observer(({ idx, item, setDraggable }) => {
   );
 });
 
-export const RegionItem = observer(
-  ({ item, idx, flat, setDraggable, onClick }) => {
-    const getVars = useMemo(() => {
-      let vars;
+export const RegionItem = observer(({ item, idx, flat, setDraggable, onClick }) => {
+  const getVars = useMemo(() => {
+    let vars;
 
-      return () => {
-        if (!vars) {
-          const color = item.getOneColor();
+    return () => {
+      if (!vars) {
+        const color = item.getOneColor();
 
-          vars = color
-            ? asVars({
-                labelColor: color,
-                labelBgColor: chroma(color).alpha(0.15),
-              })
-            : null;
-        }
-        return vars;
-      };
-    }, [isAlive(item) && item.getOneColor()]);
+        vars = color
+          ? asVars({
+              labelColor: color,
+              labelBgColor: chroma(color).alpha(0.15),
+            })
+          : null;
+      }
+      return vars;
+    };
+  }, [isAlive(item) && item.getOneColor()]);
 
-    if (!isAlive(item)) return null;
+  if (!isAlive(item)) return null;
 
-    const classnames = [
-      styles.lstitem,
-      flat && styles.flat,
-      item.hidden === true && styles.hidden,
-      item.inSelection && styles.selected,
-    ].filter(Boolean);
+  const classnames = [
+    styles.lstitem,
+    flat && styles.flat,
+    item.hidden === true && styles.hidden,
+    item.inSelection && styles.selected,
+  ].filter(Boolean);
 
-    const vars = getVars();
+  const vars = getVars();
 
-    return (
-      <List.Item
-        key={item.id}
-        className={classnames.join(" ")}
-        onClick={(e) => {
-          onClick(e, item);
-        }}
-        onMouseOver={() => item.setHighlight(true)}
-        onMouseOut={() => item.setHighlight(false)}
-        style={vars}
-        aria-label="region"
-      >
-        <RegionItemContent idx={idx} item={item} setDraggable={setDraggable} />
-      </List.Item>
-    );
-  },
-);
+  return (
+    <List.Item
+      key={item.id}
+      className={classnames.join(" ")}
+      onClick={(e) => {
+        onClick(e, item);
+      }}
+      onMouseOver={() => item.setHighlight(true)}
+      onMouseOut={() => item.setHighlight(false)}
+      style={vars}
+      aria-label="region"
+    >
+      <RegionItemContent idx={idx} item={item} setDraggable={setDraggable} />
+    </List.Item>
+  );
+});

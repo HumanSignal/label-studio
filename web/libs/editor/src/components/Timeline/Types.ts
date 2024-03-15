@@ -2,9 +2,7 @@ import type { FC, MouseEvent } from "react";
 import type * as Controls from "./SideControls";
 import type { ViewTypes } from "./Views";
 
-export type TimelineControls = Partial<
-  Record<keyof typeof Controls, boolean>
-> & {
+export type TimelineControls = Partial<Record<keyof typeof Controls, boolean>> & {
   ZoomControl: boolean;
   SpeedControl: boolean;
 };
@@ -42,11 +40,7 @@ export interface TimelineProps<D extends ViewTypes = "frames"> {
   onAddRegion?: (region: Record<string, any>) => any;
   onDeleteRegion?: (id: string) => void;
   onZoom?: (zoom: number) => void;
-  onSelectRegion?: (
-    event: MouseEvent<HTMLDivElement>,
-    id: string,
-    select?: boolean,
-  ) => void;
+  onSelectRegion?: (event: MouseEvent<HTMLDivElement>, id: string, select?: boolean) => void;
   onAction?: (event: MouseEvent, action: string, data?: any) => void;
   onVolumeChange?: (volume: number) => void;
   onFullscreenToggle?: (fullscreen: boolean) => void;
@@ -141,18 +135,14 @@ export interface TimelineExtraControls<A extends string, D> {
   onAction?: <T extends Element>(e: MouseEvent<T>, action: A, data?: D) => void;
 }
 
-export type TimelineView<D extends FC<TimelineExtraControls<any, any>> = any> =
-  {
-    View: FC<TimelineViewProps>;
-    Minimap?: FC<any>;
-    Controls?: D;
-    settings?: TimelineSettings;
-  };
+export type TimelineView<D extends FC<TimelineExtraControls<any, any>> = any> = {
+  View: FC<TimelineViewProps>;
+  Minimap?: FC<any>;
+  Controls?: D;
+  settings?: TimelineSettings;
+};
 
-export type TimelineControlsStepHandler = (
-  e?: MouseEvent<HTMLButtonElement>,
-  stepSize?: TimelineStepFunction,
-) => void;
+export type TimelineControlsStepHandler = (e?: MouseEvent<HTMLButtonElement>, stepSize?: TimelineStepFunction) => void;
 
 export interface TimelineControlsProps {
   length: number;

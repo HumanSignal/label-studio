@@ -2,10 +2,7 @@ import type React from "react";
 import { type FC, type MouseEvent, useEffect, useState } from "react";
 import { Block, Elem } from "../../../utils/bem";
 
-import {
-  IconSoundConfig,
-  IconSoundMutedConfig,
-} from "../../../assets/icons/timeline";
+import { IconSoundConfig, IconSoundMutedConfig } from "../../../assets/icons/timeline";
 import { ControlButton } from "../Controls";
 import "./AudioControl.styl";
 import { Slider } from "./Slider";
@@ -19,12 +16,7 @@ export interface AudioControlProps {
   onSetModal?: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const AudioControl: FC<AudioControlProps> = ({
-  volume,
-  onVolumeChange,
-  onSetModal,
-  audioModal,
-}) => {
+export const AudioControl: FC<AudioControlProps> = ({ volume, onVolumeChange, onSetModal, audioModal }) => {
   const [isMuted, setMute] = useState(false);
 
   useEffect(() => {
@@ -86,14 +78,8 @@ export const AudioControl: FC<AudioControlProps> = ({
   };
 
   return (
-    <Block
-      name="audio-control"
-      onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
-    >
-      <ControlButton
-        look={audioModal ? "active" : undefined}
-        onClick={onSetModal}
-      >
+    <Block name="audio-control" onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}>
+      <ControlButton look={audioModal ? "active" : undefined} onClick={onSetModal}>
         {isMuted ? <IconSoundMutedConfig /> : <IconSoundConfig />}
       </ControlButton>
       {audioModal && renderModal()}

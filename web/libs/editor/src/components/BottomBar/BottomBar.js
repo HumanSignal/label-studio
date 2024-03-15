@@ -23,12 +23,11 @@ export const BottomBar = observer(({ store }) => {
         <Actions store={store} />
       </Elem>
       <Elem name="group">
-        {store.hasInterface("controls") &&
-          (store.hasInterface("review") || !isPrediction) && (
-            <Elem name="section" mod={{ flat: true }}>
-              <Controls annotation={entity} />
-            </Elem>
-          )}
+        {store.hasInterface("controls") && (store.hasInterface("review") || !isPrediction) && (
+          <Elem name="section" mod={{ flat: true }}>
+            <Controls annotation={entity} />
+          </Elem>
+        )}
       </Elem>
     </Block>
   ) : null;

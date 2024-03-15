@@ -11,12 +11,7 @@ interface SkeletonLoaderProps {
   darkColor?: string;
 }
 
-export const SkeletonLoader = ({
-  children,
-  gap = "4px",
-  lightColor,
-  darkColor,
-}: SkeletonLoaderProps) => {
+export const SkeletonLoader = ({ children, gap = "4px", lightColor, darkColor }: SkeletonLoaderProps) => {
   const styles: any = { "--skeleton-gap": gap };
 
   lightColor && (styles["--skeleton-light-color"] = lightColor);

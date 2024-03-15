@@ -16,10 +16,7 @@ interface ColumnProps {
 /**
  * Separate component to incapsulate all the logic related to collapsible column titles.
  */
-const CollapsibleColumnTitle = ({
-  items,
-  title,
-}: { items: InputItem[]; title: string }) => {
+const CollapsibleColumnTitle = ({ items, title }: { items: InputItem[]; title: string }) => {
   const [, collapsedMap, toggleCollapsed] = useContext(CollapsedContext);
   const collapsed = items.every((item) => collapsedMap[item.id]);
   const toggle = () =>
@@ -29,12 +26,7 @@ const CollapsibleColumnTitle = ({
     );
 
   return (
-    <h1
-      className={[
-        styles.columnTitle,
-        collapsed ? styles.collapsed : styles.expanded,
-      ].join(" ")}
-    >
+    <h1 className={[styles.columnTitle, collapsed ? styles.collapsed : styles.expanded].join(" ")}>
       {title}
       <button onClick={toggle}>
         <span />
@@ -62,18 +54,9 @@ const Column = (props: ColumnProps) => {
       {title}
       <StrictModeDroppable droppableId={column.id}>
         {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className={styles.dropArea}
-          >
+          <div ref={provided.innerRef} {...provided.droppableProps} className={styles.dropArea}>
             {items.map((item, index) => (
-              <Item
-                key={item.id}
-                item={item}
-                index={index}
-                readonly={readonly}
-              />
+              <Item key={item.id} item={item} index={index} readonly={readonly} />
             ))}
             {provided.placeholder}
           </div>

@@ -30,8 +30,7 @@ export default class ChoiceComponent extends React.Component {
 }
 
 ChoiceComponent.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element])
-    .isRequired,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   value: PropTypes.string.isRequired,
   checked: PropTypes.bool,
   defaultChecked: PropTypes.bool,

@@ -1,12 +1,4 @@
-import {
-  applySnapshot,
-  clone,
-  destroy,
-  flow,
-  getRoot,
-  getSnapshot,
-  types,
-} from "mobx-state-tree";
+import { applySnapshot, clone, destroy, flow, getRoot, getSnapshot, types } from "mobx-state-tree";
 import { isEmpty } from "../../utils/helpers";
 import { History } from "../../utils/history";
 import { packJSON } from "../../utils/packJSON";
@@ -184,29 +176,15 @@ export const TabStore = types
 
     createSnapshot(viewSnapshot = {}) {
       const isVirtual = !!viewSnapshot?.virtual;
-      const tabStorageKey =
-        isVirtual && viewSnapshot.projectId
-          ? `virtual-tab-${viewSnapshot.projectId}`
-          : null;
-      const existingTabStorage =
-        isVirtual && localStorage.getItem(tabStorageKey);
-      const existingTabStorageParsed = existingTabStorage
-        ? JSON.parse(existingTabStorage)
-        : null;
-      const urlTabIsVirtualCandidate = !!(
-        viewSnapshot?.tab && Number.isNaN(viewSnapshot.tab)
-      );
+      const tabStorageKey = isVirtual && viewSnapshot.projectId ? `virtual-tab-${viewSnapshot.projectId}` : null;
+      const existingTabStorage = isVirtual && localStorage.getItem(tabStorageKey);
+      const existingTabStorageParsed = existingTabStorage ? JSON.parse(existingTabStorage) : null;
+      const urlTabIsVirtualCandidate = !!(viewSnapshot?.tab && Number.isNaN(viewSnapshot.tab));
       const existingTabUrlParsed =
-        isVirtual && urlTabIsVirtualCandidate
-          ? self.snapshotFromUrl(viewSnapshot.tab)
-          : null;
+        isVirtual && urlTabIsVirtualCandidate ? self.snapshotFromUrl(viewSnapshot.tab) : null;
       const urlTabNotEmpty = !isEmpty(existingTabUrlParsed);
-      const existingTab = urlTabNotEmpty
-        ? existingTabUrlParsed
-        : existingTabStorageParsed;
-      const existingTabKey = urlTabNotEmpty
-        ? viewSnapshot.tab
-        : existingTabStorageParsed?.tab;
+      const existingTab = urlTabNotEmpty ? existingTabUrlParsed : existingTabStorageParsed;
+      const existingTabKey = urlTabNotEmpty ? viewSnapshot.tab : existingTabStorageParsed?.tab;
       const snapshot = {
         ...viewSnapshot,
         key: existingTabKey,
@@ -234,11 +212,7 @@ export const TabStore = types
     },
 
     addView: flow(function* (viewSnapshot, options) {
-      const {
-        autoselect = true,
-        autosave = true,
-        reload = true,
-      } = options ?? {};
+      const { autoselect = true, autosave = true, reload = true } = options ?? {};
 
       const newSnapshot = self.createSnapshot(viewSnapshot);
 
@@ -323,8 +297,7 @@ export const TabStore = types
       if (interaction !== undefined) Object.assign(params, { interaction });
 
       const root = getRoot(self);
-      const apiMethod =
-        !view.saved && root.apiVersion === 2 ? "createTab" : "updateTab";
+      const apiMethod = !view.saved && root.apiVersion === 2 ? "createTab" : "updateTab";
 
       const result = yield root.apiCall(apiMethod, params, body, {
         allowToCancel: root.SDK.type === "DE",
@@ -409,9 +382,7 @@ export const TabStore = types
 
         if (column?.parent) {
           const parentColums = columns.find((c) => {
-            return (
-              !c.parent && c.id === column.parent && c.target === column.target
-            );
+            return !c.parent && c.id === column.parent && c.target === column.target;
           });
 
           result.push(createColumnPath(columns, parentColums).columnPath);
@@ -447,9 +418,7 @@ export const TabStore = types
 
         const parent = parentPath ? `${target}:${parentPath}` : undefined;
 
-        const children = col.children
-          ? col.children.map((ch) => `${target}:${columnPath}.${ch}`)
-          : undefined;
+        const children = col.children ? col.children.map((ch) => `${target}:${columnPath}.${ch}`) : undefined;
 
         const colsList = self.columnsTargetMap.get(col.target);
 
@@ -465,11 +434,7 @@ export const TabStore = types
 
         addedColumns.add(column.id);
 
-        if (
-          !col.children &&
-          column.filterable &&
-          (col?.visibility_defaults?.filter ?? true)
-        ) {
+        if (!col.children && column.filterable && (col?.visibility_defaults?.filter ?? true)) {
           self.availableFilters.push({
             id: `filter:${columnID}`,
             type: col.type,

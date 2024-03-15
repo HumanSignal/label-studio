@@ -58,49 +58,31 @@ export const MachineLearningSettings = () => {
             </Form.Row>
 
             <Form.Row columnCount={1}>
-              <TextArea
-                name="description"
-                label="Description"
-                style={{ minHeight: 120 }}
-              />
+              <TextArea name="description" label="Description" style={{ minHeight: 120 }} />
             </Form.Row>
 
             {isFF(FF_DEV_1682) && !!backend && (
               <Form.Row columnCount={2}>
-                <ModelVersionSelector
-                  object={backend}
-                  apiName="modelVersions"
-                  label="Version"
-                />
+                <ModelVersionSelector object={backend} apiName="modelVersions" label="Version" />
               </Form.Row>
             )}
 
             {isFF(FF_DEV_1682) && (
               <Form.Row columnCount={1}>
                 <div>
-                  <Toggle
-                    name="auto_update"
-                    label="Allow version auto-update"
-                  />
+                  <Toggle name="auto_update" label="Allow version auto-update" />
                 </div>
               </Form.Row>
             )}
 
             <Form.Row columnCount={1}>
               <div>
-                <Toggle
-                  name="is_interactive"
-                  label="Use for interactive preannotations"
-                />
+                <Toggle name="is_interactive" label="Use for interactive preannotations" />
               </div>
             </Form.Row>
 
             <Form.Actions>
-              <Button
-                type="submit"
-                look="primary"
-                onClick={() => setMLError(null)}
-              >
+              <Button type="submit" look="primary" onClick={() => setMLError(null)}>
                 Validate and Save
               </Button>
             </Form.Actions>
@@ -112,9 +94,7 @@ export const MachineLearningSettings = () => {
                     <ErrorWrapper
                       error={{
                         response: {
-                          detail: `Failed to ${
-                            backend ? "save" : "add new"
-                          } ML backend.`,
+                          detail: `Failed to ${backend ? "save" : "add new"} ML backend.`,
                           exc_info: response.error_message,
                         },
                       }}
@@ -143,13 +123,9 @@ export const MachineLearningSettings = () => {
   return (
     <>
       <Description style={{ marginTop: 0, maxWidth: 680 }}>
-        Add one or more machine learning models to predict labels for your data.
-        To import predictions without connecting a model,{" "}
-        <a
-          href="https://labelstud.io/guide/predictions.html"
-          target="_blank"
-          rel="noreferrer"
-        >
+        Add one or more machine learning models to predict labels for your data. To import predictions without
+        connecting a model,{" "}
+        <a href="https://labelstud.io/guide/predictions.html" target="_blank" rel="noreferrer">
           see the documentation
         </a>
         .
@@ -190,9 +166,7 @@ export const MachineLearningSettings = () => {
           </div>
         </Form.Row>
 
-        {(!isFF(FF_DEV_1682) || !backends.length) && (
-          <ProjectModelVersionSelector />
-        )}
+        {(!isFF(FF_DEV_1682) || !backends.length) && <ProjectModelVersionSelector />}
 
         <Form.Actions>
           <Form.Indicator>

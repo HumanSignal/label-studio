@@ -21,9 +21,7 @@ const exportedModel = types.model({
 
 export const create = (columns) => {
   const TaskModelBase = DynamicModel("TaskModelBase", columns, {
-    ...(isFF(FF_DEV_2536)
-      ? { comment_authors: types.optional(types.array(Assignee), []) }
-      : {}),
+    ...(isFF(FF_DEV_2536) ? { comment_authors: types.optional(types.array(Assignee), []) } : {}),
     annotators: types.optional(types.array(Assignee), []),
     reviewers: types.optional(types.array(Assignee), []),
     annotations: types.optional(types.array(CustomJSON), []),
@@ -42,10 +40,7 @@ export const create = (columns) => {
       ? {
           _additional: types.optional(fileAttributes, {}),
           candidate_task_id: types.optional(types.string, ""),
-          project: types.union(
-            types.number,
-            types.optional(types.array(exportedModel), []),
-          ), //number for Projects, array of exportedModel for Datasets
+          project: types.union(types.number, types.optional(types.array(exportedModel), [])), //number for Projects, array of exportedModel for Datasets
         }
       : {}),
   })
@@ -60,9 +55,7 @@ export const create = (columns) => {
         self.annotations = annotations
           .filter((a) => a.pk)
           .map((c) => {
-            const existingAnnotation = self.annotations.find(
-              (ec) => ec.id === Number(c.pk),
-            );
+            const existingAnnotation = self.annotations.find((ec) => ec.id === Number(c.pk));
 
             if (existingAnnotation) {
               return existingAnnotation;
@@ -107,9 +100,7 @@ export const create = (columns) => {
       },
 
       loadAnnotations: flow(function* () {
-        const annotations = yield Promise.all([
-          getRoot(self).apiCall("annotations", { taskID: self.id }),
-        ]);
+        const annotations = yield Promise.all([getRoot(self).apiCall("annotations", { taskID: self.id })]);
 
         self.annotations = annotations[0];
       }),
@@ -176,9 +167,7 @@ export const create = (columns) => {
         }
 
         const labelStreamModeChanged =
-          self.selected &&
-          self.selected.assigned_task !== taskData.assigned_task &&
-          taskData.assigned_task === false;
+          self.selected && self.selected.assigned_task !== taskData.assigned_task && taskData.assigned_task === false;
 
         const task = self.applyTaskSnapshot(taskData);
 
@@ -227,30 +216,18 @@ export const create = (columns) => {
       },
 
       postProcessData(data) {
-        const {
-          total_annotations,
-          total_predictions,
-          similarity_score_upper_limit,
-        } = data;
+        const { total_annotations, total_predictions, similarity_score_upper_limit } = data;
 
-        if (total_annotations !== null)
-          self.totalAnnotations = total_annotations;
-        if (total_predictions !== null)
-          self.totalPredictions = total_predictions;
+        if (total_annotations !== null) self.totalAnnotations = total_annotations;
+        if (total_predictions !== null) self.totalPredictions = total_predictions;
         if (!Number.isNaN(similarity_score_upper_limit))
           self.similarityUpperLimit =
-            Math.ceil(
-              similarity_score_upper_limit * SIMILARITY_UPPER_LIMIT_PRECISION,
-            ) / SIMILARITY_UPPER_LIMIT_PRECISION;
+            Math.ceil(similarity_score_upper_limit * SIMILARITY_UPPER_LIMIT_PRECISION) /
+            SIMILARITY_UPPER_LIMIT_PRECISION;
       },
     }))
     .preProcessSnapshot((snapshot) => {
-      const {
-        total_annotations,
-        total_predictions,
-        similarity_score_upper_limit,
-        ...sn
-      } = snapshot;
+      const { total_annotations, total_predictions, similarity_score_upper_limit, ...sn } = snapshot;
 
       return {
         ...sn,

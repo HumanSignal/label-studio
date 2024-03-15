@@ -23,9 +23,7 @@ function getNextTick(passedTime = 0) {
   const baseLimit = idx > 0 ? STAGES[idx - 1][0] : 0;
   const baseStep = STAGES[idx][1];
 
-  return (
-    Math.ceil((passedTime - baseLimit + 1) / baseStep) * baseStep + baseLimit
-  );
+  return Math.ceil((passedTime - baseLimit + 1) / baseStep) * baseStep + baseLimit;
 }
 
 type TimeAgoProps = React.ComponentPropsWithoutRef<"time"> & {
@@ -57,17 +55,12 @@ export const TimeAgo = ({ date, ...rest }: TimeAgoProps) => {
   // Replace the longer english text when less than a minute in time. This is done this way due to a limiting API
   // with the date-fns function. If we require an entire overhaul to the messaging for the en-US locale, revisit this and replace with an entire locale override option.
   const text =
-    formatDistanceToNow(fromTS, { addSuffix: true }) ===
-    "less than a minute ago"
+    formatDistanceToNow(fromTS, { addSuffix: true }) === "less than a minute ago"
       ? "seconds ago"
       : formatDistanceToNow(fromTS, { addSuffix: true });
 
   return (
-    <time
-      dateTime={format(fromTS, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}
-      title={format(fromTS, "PPpp")}
-      {...rest}
-    >
+    <time dateTime={format(fromTS, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")} title={format(fromTS, "PPpp")} {...rest}>
       {text}
     </time>
   );

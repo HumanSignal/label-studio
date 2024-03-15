@@ -9,17 +9,8 @@ import { ToastContext } from "../../components/Toast/Toast";
 import { useAPI } from "../../providers/ApiProvider";
 import { useLibrary } from "../../providers/LibraryProvider";
 import { useProject } from "../../providers/ProjectProvider";
-import {
-  useContextProps,
-  useFixedLocation,
-  useParams,
-} from "../../providers/RoutesProvider";
-import {
-  addAction,
-  addCrumb,
-  deleteAction,
-  deleteCrumb,
-} from "../../services/breadrumbs";
+import { useContextProps, useFixedLocation, useParams } from "../../providers/RoutesProvider";
+import { addAction, addCrumb, deleteAction, deleteCrumb } from "../../services/breadrumbs";
 import { Block, Elem } from "../../utils/bem";
 import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
 import { isDefined } from "../../utils/helpers";
@@ -30,8 +21,7 @@ import { APIConfig } from "./api-config";
 import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
-  if (!window.LabelStudio)
-    throw Error("Label Studio Frontend doesn't exist on the page");
+  if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
   if (!root && root.dataset.dmInitialized) return;
 
   root.dataset.dmInitialized = true;
@@ -93,9 +83,7 @@ export const DataManagerPage = ({ ...props }) => {
       params: { project: project.id },
     });
 
-    const interactiveBacked = (mlBackends ?? []).find(
-      ({ is_interactive }) => is_interactive,
-    );
+    const interactiveBacked = (mlBackends ?? []).find(({ is_interactive }) => is_interactive);
 
     const dataManager = (dataManagerRef.current =
       dataManagerRef.current ??
@@ -140,9 +128,7 @@ export const DataManagerPage = ({ ...props }) => {
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
         const ids = group.map((r) => r.cleanId);
-        const result = annotation
-          .serializeAnnotation()
-          .filter((res) => ids.includes(res.id));
+        const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
         const suggestionsRequest = api.callApi("mlInteractive", {
           params: { pk: interactiveBacked.id },
@@ -294,13 +280,7 @@ DataManagerPage.context = ({ dmRef }) => {
       )}
 
       {Object.entries(links).map(([path, label]) => (
-        <Button
-          key={path}
-          tag={NavLink}
-          size="compact"
-          to={`/projects/${project.id}${path}`}
-          data-external
-        >
+        <Button key={path} tag={NavLink} size="compact" to={`/projects/${project.id}${path}`} data-external>
           {label}
         </Button>
       ))}

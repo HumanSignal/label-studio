@@ -13,11 +13,7 @@ const TOOLTIP_DELAY = 0.8;
 const ButtonTooltip = inject("store")(
   observer(({ store, title, children }) => {
     return (
-      <Tooltip
-        title={title}
-        enabled={store.settings.enableTooltips}
-        mouseEnterDelay={TOOLTIP_DELAY}
-      >
+      <Tooltip title={title} enabled={store.settings.enableTooltips} mouseEnterDelay={TOOLTIP_DELAY}>
         {children}
       </Tooltip>
     );
@@ -36,26 +32,18 @@ export const Controls = controlsInjector(
     const isReview = store.hasInterface("review");
 
     const historySelected = isDefined(store.annotationStore.selectedHistory);
-    const { userGenerate, sentUserGenerate, versions, results, editable } =
-      annotation;
+    const { userGenerate, sentUserGenerate, versions, results, editable } = annotation;
     const buttons = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
 
     // const isReady = store.annotationStore.selected.objects.every(object => object.isReady === undefined || object.isReady);
-    const disabled =
-      !editable || store.isSubmitting || historySelected || isInProgress; // || !isReady;
-    const submitDisabled =
-      store.hasInterface("annotations:deny-empty") && results.length === 0;
+    const disabled = !editable || store.isSubmitting || historySelected || isInProgress; // || !isReady;
+    const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
 
     const buttonHandler = useCallback(
       async (e, callback, tooltipMessage) => {
-        const {
-          addedCommentThisSession,
-          currentComment,
-          commentFormSubmit,
-          inputRef,
-        } = store.commentStore;
+        const { addedCommentThisSession, currentComment, commentFormSubmit, inputRef } = store.commentStore;
 
         if (isInProgress) return;
         setIsInProgress(true);
@@ -96,11 +84,7 @@ export const Controls = controlsInjector(
             look="danger"
             onClick={async (e) => {
               if (store.hasInterface("comments:reject") ?? true) {
-                buttonHandler(
-                  e,
-                  () => store.rejectAnnotation({}),
-                  "Please enter a comment before rejecting",
-                );
+                buttonHandler(e, () => store.rejectAnnotation({}), "Please enter a comment before rejecting");
               } else {
                 console.log("rejecting");
                 await store.commentStore.commentFormSubmit();
@@ -163,11 +147,7 @@ export const Controls = controlsInjector(
               look="danger"
               onClick={async (e) => {
                 if (store.hasInterface("comments:skip") ?? true) {
-                  buttonHandler(
-                    e,
-                    () => store.skipTask({}),
-                    "Please enter a comment before skipping",
-                  );
+                  buttonHandler(e, () => store.skipTask({}), "Please enter a comment before skipping");
                 } else {
                   await store.commentStore.commentFormSubmit();
                   store.skipTask({});
@@ -180,13 +160,8 @@ export const Controls = controlsInjector(
         );
       }
 
-      if (
-        (userGenerate && !sentUserGenerate) ||
-        (store.explore && !userGenerate && store.hasInterface("submit"))
-      ) {
-        const title = submitDisabled
-          ? "Empty annotations denied in this project"
-          : "Save results: [ Ctrl+Enter ]";
+      if ((userGenerate && !sentUserGenerate) || (store.explore && !userGenerate && store.hasInterface("submit"))) {
+        const title = submitDisabled ? "Empty annotations denied in this project" : "Save results: [ Ctrl+Enter ]";
         // span is to display tooltip for disabled button
 
         buttons.push(
@@ -208,10 +183,7 @@ export const Controls = controlsInjector(
         );
       }
 
-      if (
-        (userGenerate && sentUserGenerate) ||
-        (!userGenerate && store.hasInterface("update"))
-      ) {
+      if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
         const isUpdate = sentUserGenerate || versions.result;
         const button = (
           <ButtonTooltip key="update" title="Update this task: [ Alt+Enter ]">

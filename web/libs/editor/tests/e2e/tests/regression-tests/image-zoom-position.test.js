@@ -25,15 +25,7 @@ relativeCoordsFF.add([false]);
 
 Data(relativeCoordsFF).Scenario(
   "Zoomed image should keep center image in center of canvas on resizes",
-  async ({
-    I,
-    LabelStudio,
-    AtImageView,
-    AtOutliner,
-    AtDetails,
-    AtPanels,
-    current,
-  }) => {
+  async ({ I, LabelStudio, AtImageView, AtOutliner, AtDetails, AtPanels, current }) => {
     const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
     const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
     const FF3793 = current;
@@ -200,12 +192,7 @@ Data(relativeCoordsFF).Scenario(
       [100, 3],
       [-100, 3],
     ]) {
-      await AtDetailsPanel.dragResizerBy(
-        shiftX,
-        0,
-        AtDetailsPanel.resizeLeft,
-        steps,
-      );
+      await AtDetailsPanel.dragResizerBy(shiftX, 0, AtDetailsPanel.resizeLeft, steps);
     }
     for (const [shiftX, steps] of [
       [-200, 25],
@@ -213,12 +200,7 @@ Data(relativeCoordsFF).Scenario(
       [-200, 1],
       [200, 1],
     ]) {
-      await AtOutlinerPanel.dragResizerBy(
-        shiftX,
-        0,
-        AtOutlinerPanel.resizeRight,
-        steps,
-      );
+      await AtOutlinerPanel.dragResizerBy(shiftX, 0, AtOutlinerPanel.resizeRight, steps);
     }
     await AtImageView.lookForStage();
 
@@ -240,11 +222,7 @@ Scenario(
       const currentStokeColor = await I.executeScript(getStrokeColor);
       const colorIsChanged = currentStokeColor !== strokecolor;
 
-      assert.strictEqual(
-        colorIsChanged,
-        true,
-        "Stroke color must be changed if we are able to select keypoint",
-      );
+      assert.strictEqual(colorIsChanged, true, "Stroke color must be changed if we are able to select keypoint");
     };
 
     const params = {

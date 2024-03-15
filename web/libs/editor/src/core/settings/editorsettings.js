@@ -58,8 +58,7 @@ export default {
     newUI: {
       tags: "Text Tag",
       title: "Show line numbers",
-      description:
-        "Identify and reference specific lines of text in your document",
+      description: "Identify and reference specific lines of text in your document",
     },
     description: "Show line numbers for Text",
     onChangeEvent: "toggleShowLineNumbers",

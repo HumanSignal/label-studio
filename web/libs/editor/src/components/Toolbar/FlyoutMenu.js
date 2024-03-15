@@ -96,11 +96,7 @@ export const FlyoutMenu = ({ items, icon }) => {
         setClicked(!isClicked);
       }}
     >
-      <Elem
-        name="icon"
-        className={`${isClicked ? "isClicked" : ""}`}
-        title="Zoom presets (click to see options)"
-      >
+      <Elem name="icon" className={`${isClicked ? "isClicked" : ""}`} title="Zoom presets (click to see options)">
         {icon}
       </Elem>
       <Block name="tooltips" tag="div">

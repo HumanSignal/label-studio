@@ -14,9 +14,7 @@ const ClassificationBase = types
   .extend((self) => {
     /* Validation */
     if (self.isControlTag !== true) {
-      throw new Error(
-        "The ClassificationBase mixin should be used only for ControlTags",
-      );
+      throw new Error("The ClassificationBase mixin should be used only for ControlTags");
     }
 
     const REQUIRED_PROPERTIES = ["toname"];
@@ -34,9 +32,7 @@ const ClassificationBase = types
   .views((self) => {
     return {
       selectedValues() {
-        throw new Error(
-          "ClassificationBase mixin model needs to implement selectedValues method in views",
-        );
+        throw new Error("ClassificationBase mixin model needs to implement selectedValues method in views");
       },
 
       get result() {
@@ -112,12 +108,7 @@ const ClassificationBase = types
         return self.validateValue(self.selectedValues());
       },
       createPerObjectResult(areaValues = {}) {
-        self.annotation.createResult(
-          areaValues,
-          { [self.valueType]: self.selectedValues() },
-          self,
-          self.toname,
-        );
+        self.annotation.createResult(areaValues, { [self.valueType]: self.selectedValues() }, self, self.toname);
       },
 
       // update result in the store with current set value

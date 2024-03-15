@@ -1,22 +1,9 @@
-import {
-  LabelStudio,
-  Labels,
-  Sidebar,
-  VideoView,
-} from "@humansignal/frontend-test/helpers/LSF/index";
-import {
-  simpleVideoConfig,
-  simpleVideoData,
-  simpleVideoResult,
-} from "../../data/video_segmentation/regions";
+import { LabelStudio, Labels, Sidebar, VideoView } from "@humansignal/frontend-test/helpers/LSF/index";
+import { simpleVideoConfig, simpleVideoData, simpleVideoResult } from "../../data/video_segmentation/regions";
 
 describe("Video segmentation", () => {
   it("Should be able to draw a simple rectangle", () => {
-    LabelStudio.params()
-      .config(simpleVideoConfig)
-      .data(simpleVideoData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleVideoConfig).data(simpleVideoData).withResult([]).init();
 
     LabelStudio.waitForObjectsReady();
     Sidebar.hasNoRegions();
@@ -29,11 +16,7 @@ describe("Video segmentation", () => {
   });
 
   it("Should have changes in canvas", () => {
-    LabelStudio.params()
-      .config(simpleVideoConfig)
-      .data(simpleVideoData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleVideoConfig).data(simpleVideoData).withResult([]).init();
     LabelStudio.waitForObjectsReady();
     Sidebar.hasNoRegions();
     VideoView.captureCanvas("canvas");
@@ -46,11 +29,7 @@ describe("Video segmentation", () => {
 
   describe("Rectangle", () => {
     it("Should be invisible out of the lifespan", () => {
-      LabelStudio.params()
-        .config(simpleVideoConfig)
-        .data(simpleVideoData)
-        .withResult(simpleVideoResult)
-        .init();
+      LabelStudio.params().config(simpleVideoConfig).data(simpleVideoData).withResult(simpleVideoResult).init();
       LabelStudio.waitForObjectsReady();
       Sidebar.hasRegions(1);
       VideoView.captureCanvas("canvas");
@@ -62,11 +41,7 @@ describe("Video segmentation", () => {
 
   describe("Transformer", () => {
     it.only("Should be invisible out of the lifespan", () => {
-      LabelStudio.params()
-        .config(simpleVideoConfig)
-        .data(simpleVideoData)
-        .withResult(simpleVideoResult)
-        .init();
+      LabelStudio.params().config(simpleVideoConfig).data(simpleVideoData).withResult(simpleVideoResult).init();
       LabelStudio.waitForObjectsReady();
       Sidebar.hasRegions(1);
 

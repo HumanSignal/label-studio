@@ -1,11 +1,4 @@
-import React, {
-  type ChangeEvent,
-  type FC,
-  forwardRef,
-  type KeyboardEvent,
-  useCallback,
-  useState,
-} from "react";
+import React, { type ChangeEvent, type FC, forwardRef, type KeyboardEvent, useCallback, useState } from "react";
 import { Hotkey } from "../../core/Hotkey";
 import { useHotkey } from "../../hooks/useHotkey";
 import { Block, Elem } from "../../utils/bem";
@@ -105,10 +98,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
                     }
 
                     setInputMode(false);
-                  } else if (
-                    e.code.match(/[0-9]/) === null &&
-                    !isSystemEvent(e)
-                  ) {
+                  } else if (e.code.match(/[0-9]/) === null && !isSystemEvent(e)) {
                     e.preventDefault();
                     e.stopPropagation();
                   }
@@ -173,12 +163,7 @@ type NavigationButtonProps = {
   hotkey?: string;
 };
 
-const NavigationButton: FC<NavigationButtonProps> = ({
-  mod,
-  disabled,
-  hotkey,
-  onClick,
-}) => {
+const NavigationButton: FC<NavigationButtonProps> = ({ mod, disabled, hotkey, onClick }) => {
   const buttonMod = Object.fromEntries(mod.map((m) => [m, true]));
 
   const actionHandler = useCallback(() => {

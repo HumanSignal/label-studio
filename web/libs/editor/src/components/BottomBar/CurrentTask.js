@@ -60,9 +60,7 @@ export const CurrentTask = observer(({ store }) => {
               }}
               type="link"
               disabled={!store.canGoNextTask && !canPostpone}
-              onClick={
-                store.canGoNextTask ? store.nextTask : store.postponeTask
-              }
+              onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
               style={{
                 background: "none",
                 backgroundColor: "none",

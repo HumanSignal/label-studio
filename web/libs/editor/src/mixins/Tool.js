@@ -69,10 +69,7 @@ const ToolMixin = types
     },
 
     get isPreserved() {
-      return (
-        window.localStorage.getItem(`selected-tool:${self.obj?.name}`) ===
-        self.fullName
-      );
+      return window.localStorage.getItem(`selected-tool:${self.obj?.name}`) === self.fullName;
     },
   }))
   .actions((self) => ({

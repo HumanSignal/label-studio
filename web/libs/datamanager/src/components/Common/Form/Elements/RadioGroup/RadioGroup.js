@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Label } from "..";
 import { BemWithSpecifiContext } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
@@ -57,17 +51,8 @@ export const RadioGroup = ({
             isSimple: simple === true,
           }}
         >
-          <Block
-            name="radio-group"
-            mod={{ size, simple, horizontal }}
-            mix={className}
-          >
-            <input
-              ref={ref}
-              name={props.name}
-              type="hidden"
-              defaultValue={currentValue}
-            />
+          <Block name="radio-group" mod={{ size, simple, horizontal }} mix={className}>
+            <input ref={ref} name={props.name} type="hidden" defaultValue={currentValue} />
             <Elem name="buttons">{children}</Elem>
           </Block>
         </RadioContext.Provider>
@@ -76,12 +61,7 @@ export const RadioGroup = ({
   );
 
   return label ? (
-    <Label
-      {...(labelProps ?? {})}
-      text={label}
-      simple={simple}
-      required={required}
-    >
+    <Label {...(labelProps ?? {})} text={label} simple={simple} required={required}>
       {field}
     </Label>
   ) : (
@@ -89,20 +69,8 @@ export const RadioGroup = ({
   );
 };
 
-const RadioButton = ({
-  value,
-  disabled,
-  children,
-  label,
-  description,
-  ...props
-}) => {
-  const {
-    onChange,
-    setValue,
-    value: currentValue,
-    isSimple,
-  } = useContext(RadioContext);
+const RadioButton = ({ value, disabled, children, label, description, ...props }) => {
+  const { onChange, setValue, value: currentValue, isSimple } = useContext(RadioContext);
   const checked = value === currentValue;
 
   const clickHandler = useCallback(
@@ -119,20 +87,10 @@ const RadioButton = ({
   }, [props.checked]);
 
   return (
-    <Elem
-      name="button"
-      mod={{ checked, disabled }}
-      onClickCapture={clickHandler}
-    >
+    <Elem name="button" mod={{ checked, disabled }} onClickCapture={clickHandler}>
       {isSimple ? (
         <Label placement="right" text={label} description={description}>
-          <input
-            type="radio"
-            value={value}
-            checked={checked}
-            readOnly
-            style={{ pointerEvents: "none" }}
-          />
+          <input type="radio" value={value} checked={checked} readOnly style={{ pointerEvents: "none" }} />
         </Label>
       ) : (
         children

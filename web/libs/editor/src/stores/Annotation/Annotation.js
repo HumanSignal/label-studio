@@ -1,14 +1,4 @@
-import {
-  destroy,
-  detach,
-  flow,
-  getEnv,
-  getParent,
-  getRoot,
-  isAlive,
-  onSnapshot,
-  types,
-} from "mobx-state-tree";
+import { destroy, detach, flow, getEnv, getParent, getRoot, isAlive, onSnapshot, types } from "mobx-state-tree";
 
 import throttle from "lodash.throttle";
 import Constants from "../../core/Constants";
@@ -62,10 +52,7 @@ export const Annotation = types
     createdDate: types.optional(types.string, Utils.UDate.currentISODate()),
     createdAgo: types.maybeNull(types.string),
     createdBy: types.optional(types.string, "Admin"),
-    user: types.optional(
-      types.maybeNull(types.safeReference(UserExtended)),
-      null,
-    ),
+    user: types.optional(types.maybeNull(types.safeReference(UserExtended)), null),
 
     parent_prediction: types.maybeNull(types.integer),
     parent_annotation: types.maybeNull(types.integer),
@@ -205,8 +192,7 @@ export const Annotation = types
     get results() {
       const results = [];
 
-      if (isAlive(self))
-        self.areas.forEach((a) => a.results.forEach((r) => results.push(r)));
+      if (isAlive(self)) self.areas.forEach((a) => a.results.forEach((r) => results.push(r)));
       return results;
     },
 
@@ -257,9 +243,7 @@ export const Annotation = types
 
     // existing annotation which can be updated
     get exists() {
-      const dataExists =
-        (self.userGenerate && self.sentUserGenerate) ||
-        isDefined(self.versions.result);
+      const dataExists = (self.userGenerate && self.sentUserGenerate) || isDefined(self.versions.result);
       const pkExists = isDefined(self.pk);
 
       return dataExists && pkExists;
@@ -421,8 +405,7 @@ export const Annotation = types
      * @param {boolean} tryToKeepStates don't unselect labels if such setting is enabled
      */
     unselectAll(tryToKeepStates = false) {
-      const keepStates =
-        tryToKeepStates && self.store.settings.continuousLabeling;
+      const keepStates = tryToKeepStates && self.store.settings.continuousLabeling;
 
       self.unselectAreas();
       if (!keepStates) self.unselectStates();
@@ -467,8 +450,7 @@ export const Annotation = types
         return;
       }
 
-      if (deleteReadOnly === false)
-        regions = regions.filter((r) => r.readonly === false);
+      if (deleteReadOnly === false) regions = regions.filter((r) => r.readonly === false);
 
       regions.forEach((r) => r.deleteRegion());
       self.updateObjects();
@@ -541,8 +523,7 @@ export const Annotation = types
 
       children?.forEach((r) => r.setParentID(region.parentID));
 
-      if (!region.classification)
-        getEnv(self).events.invoke("entityDelete", region);
+      if (!region.classification) getEnv(self).events.invoke("entityDelete", region);
 
       self.relationStore.deleteNodeRelation(region);
 
@@ -568,8 +549,7 @@ export const Annotation = types
         let stopDrawingAfterNextUndo = false;
         const selectedIds = regionStore.selectedIds;
         const currentRegion = regionStore.findRegion(
-          selectedIds[selectedIds.length - 1] ??
-            regionStore.regions[regionStore.regions.length - 1]?.id,
+          selectedIds[selectedIds.length - 1] ?? regionStore.regions[regionStore.regions.length - 1]?.id,
         );
 
         if (currentRegion?.type === "polygonregion") {
@@ -623,9 +603,7 @@ export const Annotation = types
       self.names.forEach((tag) => {
         if (tag.type.endsWith("labels")) {
           // @todo check for choice="multiple" and multiple preselected labels
-          const preselected = tag.children?.find(
-            (label) => label.initiallySelected,
-          );
+          const preselected = tag.children?.find((label) => label.initiallySelected);
 
           if (preselected) preselected.setSelected(true);
         }
@@ -636,17 +614,9 @@ export const Annotation = types
 
     setDefaultValues() {
       self.names.forEach((tag) => {
-        if (
-          ["choices", "taxonomy"].includes(tag?.type) &&
-          tag.preselectedValues?.length
-        ) {
+        if (["choices", "taxonomy"].includes(tag?.type) && tag.preselectedValues?.length) {
           // <Choice selected="true"/>
-          self.createResult(
-            {},
-            { [tag?.type]: tag.preselectedValues },
-            tag,
-            tag.toname,
-          );
+          self.createResult({}, { [tag?.type]: tag.preselectedValues }, tag, tag.toname);
         }
       });
     },
@@ -839,33 +809,19 @@ export const Annotation = types
       // Hotkeys setup
       self.traverseTree((node) => {
         if (node?.onHotKey && node.hotkey) {
-          hotkeys.addKey(
-            node.hotkey,
-            node.onHotKey,
-            undefined,
-            node.hotkeyScope,
-          );
+          hotkeys.addKey(node.hotkey, node.onHotKey, undefined, node.hotkeyScope);
         }
       });
 
       self.traverseTree((node) => {
         // add Space hotkey for playbacks of audio, there might be
         // multiple audios on the screen
-        if (
-          node &&
-          !node.hotkey &&
-          (node.type === "audio" || node.type === "audioplus")
-        ) {
+        if (node && !node.hotkey && (node.type === "audio" || node.type === "audioplus")) {
           if (audiosNum > 0) comb = `${mod}+${audiosNum + 1}`;
           else audioNode = node;
 
           node.hotkey = comb;
-          hotkeys.addKey(
-            comb,
-            node.onHotKey,
-            "Play an audio",
-            `${Hotkey.DEFAULT_SCOPE},${Hotkey.INPUT_SCOPE}`,
-          );
+          hotkeys.addKey(comb, node.onHotKey, "Play an audio", `${Hotkey.DEFAULT_SCOPE},${Hotkey.INPUT_SCOPE}`);
 
           audiosNum++;
         }
@@ -905,13 +861,7 @@ export const Annotation = types
       Hotkey.setScope(Hotkey.DEFAULT_SCOPE);
     },
 
-    createResult(
-      areaValue,
-      resultValue,
-      control,
-      object,
-      skipAfrerCreate = false,
-    ) {
+    createResult(areaValue, resultValue, control, object, skipAfrerCreate = false) {
       // Without correct validation object may be null, but it it shouldn't be so in results - so we should find any
       if (isFF(FF_DEV_1598) && !object && control.type === "textarea") {
         object = self.objects[0];
@@ -945,8 +895,7 @@ export const Annotation = types
 
       if (!area) return;
 
-      if (!area.classification)
-        getEnv(self).events.invoke("entityCreate", area);
+      if (!area.classification) getEnv(self).events.invoke("entityCreate", area);
       if (!skipAfrerCreate) self.afterCreateResult(area, control);
 
       return area;
@@ -1013,8 +962,7 @@ export const Annotation = types
         }
 
         if (obj.type === "htmllabels") obj.type = "hypertextlabels";
-        if (obj.normalization)
-          obj.meta = { ...obj.meta, text: [obj.normalization] };
+        if (obj.normalization) obj.meta = { ...obj.meta, text: [obj.normalization] };
         const tagNames = self.names;
 
         // Clear non-existent labels
@@ -1023,24 +971,19 @@ export const Annotation = types
 
           for (let key of keys) {
             if (key.endsWith("labels")) {
-              const hasControlTag =
-                tagNames.has(obj.from_name) || tagNames.has("labels");
+              const hasControlTag = tagNames.has(obj.from_name) || tagNames.has("labels");
 
               // remove non-existent labels, it actually breaks dynamic labels
               // and makes no reason overall — labels from predictions can be out of config
               if (!isFF(FF_LSDV_4988) && hasControlTag) {
-                const labelsContainer =
-                  tagNames.get(obj.from_name) ?? tagNames.get("labels");
+                const labelsContainer = tagNames.get(obj.from_name) ?? tagNames.get("labels");
                 const value = obj.value[key];
 
                 if (value?.length && labelsContainer.type.endsWith("labels")) {
-                  const filteredValue = value.filter(
-                    (labelName) => !!labelsContainer.findLabel(labelName),
-                  );
+                  const filteredValue = value.filter((labelName) => !!labelsContainer.findLabel(labelName));
                   const oldKey = key;
 
-                  key =
-                    key === labelsContainer.type ? key : labelsContainer.type;
+                  key = key === labelsContainer.type ? key : labelsContainer.type;
 
                   if (oldKey !== key) {
                     obj.type = key;
@@ -1057,11 +1000,7 @@ export const Annotation = types
               // detect most relevant label tags if that one from from_name is missing
               // can be useful for predictions in old format with config in new format:
               // Rectangle + Labels -> RectangleLabels
-              if (
-                !tagNames.has(obj.from_name) ||
-                (!obj.value[key].length &&
-                  !tagNames.get(obj.from_name).allowempty)
-              ) {
+              if (!tagNames.has(obj.from_name) || (!obj.value[key].length && !tagNames.get(obj.from_name).allowempty)) {
                 delete obj.value[key];
                 if (tagNames.has(obj.to_name)) {
                   // Redirect references to existent tool
@@ -1070,21 +1009,12 @@ export const Annotation = types
                   const states = self.toNames.get(targetObject.name);
 
                   if (states?.length) {
-                    const altToolsControllerType = obj.type.replace(
-                      /labels$/,
-                      "",
-                    );
+                    const altToolsControllerType = obj.type.replace(/labels$/, "");
                     const sameLabelsType = obj.type;
                     const simpleLabelsType = "labels";
 
-                    for (const altType of [
-                      altToolsControllerType,
-                      sameLabelsType,
-                      simpleLabelsType,
-                    ]) {
-                      const state = states.find(
-                        (state) => state.type === altType,
-                      );
+                    for (const altType of [altToolsControllerType, sameLabelsType, simpleLabelsType]) {
+                      const state = states.find((state) => state.type === altType);
 
                       if (state) {
                         obj.type = altType;
@@ -1178,12 +1108,9 @@ export const Annotation = types
 
         if (a.classification) {
           if (classificationAreasByControlName[controlName]?.[itemIndex]) {
-            duplicateAreaIds.push(
-              classificationAreasByControlName[controlName][itemIndex],
-            );
+            duplicateAreaIds.push(classificationAreasByControlName[controlName][itemIndex]);
           }
-          classificationAreasByControlName[controlName] =
-            classificationAreasByControlName[controlName] || {};
+          classificationAreasByControlName[controlName] = classificationAreasByControlName[controlName] || {};
           classificationAreasByControlName[controlName][itemIndex] = a.id;
         }
       });
@@ -1216,9 +1143,7 @@ export const Annotation = types
         if (isFF(FF_DEV_2100)) self.cleanClassificationAreas();
 
         !hidden &&
-          self.results
-            .filter((r) => r.area.classification)
-            .forEach((r) => r.from_name.updateFromResult?.(r.mainValue));
+          self.results.filter((r) => r.area.classification).forEach((r) => r.from_name.updateFromResult?.(r.mainValue));
 
         objAnnotation.forEach((obj) => {
           if (obj.type === "relation") {
@@ -1237,9 +1162,7 @@ export const Annotation = types
     },
 
     deserializeAnnotation(...args) {
-      console.warn(
-        "deserializeAnnotation() is deprecated. Use deserializeResults() instead",
-      );
+      console.warn("deserializeAnnotation() is deprecated. Use deserializeResults() instead");
       return self.deserializeResults(...args);
     },
 
@@ -1318,24 +1241,14 @@ export const Annotation = types
 
         // if there is merged result with region data and type and also with the labels
         // and object allows such merge — create new result with these labels
-        if (
-          !type.endsWith("labels") &&
-          value.labels &&
-          object.mergeLabelsAndResults
-        ) {
+        if (!type.endsWith("labels") && value.labels && object.mergeLabelsAndResults) {
           const labels = value.labels;
-          const controls = self.toNames
-            .get(object.name)
-            .filter((s) => s.type.endsWith("labels"));
-          const labelControl = controls.find((control) =>
-            control?.findLabel(labels[0]),
-          );
+          const controls = self.toNames.get(object.name).filter((s) => s.type.endsWith("labels"));
+          const labelControl = controls.find((control) => control?.findLabel(labels[0]));
 
           if (labelControl) {
             area.setValue(labelControl);
-            area.results
-              .find((r) => r.type.endsWith("labels"))
-              ?.setValue(labels);
+            area.results.find((r) => r.type.endsWith("labels"))?.setValue(labels);
           }
         }
       }
@@ -1347,8 +1260,7 @@ export const Annotation = types
         case "hypertext":
         case "richtext": {
           const hasStartEnd = isDefined(value.start) && isDefined(value.end);
-          const lacksOffsets =
-            !isDefined(value.startOffset) && !isDefined(value.endOffset);
+          const lacksOffsets = !isDefined(value.startOffset) && !isDefined(value.endOffset);
 
           // @todo move this Text regions offsets transform to RichTextRegion
           if (hasStartEnd && lacksOffsets) {

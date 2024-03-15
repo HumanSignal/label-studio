@@ -90,11 +90,7 @@ shapes.forEach(({ shape, props = "", action, regions }) => {
 function convertParamsToPixels(params, canvasSize, key = "width") {
   if (Array.isArray(params)) {
     for (const idx in params) {
-      params[idx] = convertParamsToPixels(
-        params[idx],
-        canvasSize,
-        idx % 2 ? "height" : "width",
-      );
+      params[idx] = convertParamsToPixels(params[idx], canvasSize, idx % 2 ? "height" : "width");
     }
   } else {
     params = (canvasSize[key] / 100) * params;
@@ -104,15 +100,7 @@ function convertParamsToPixels(params, canvasSize, key = "width") {
 
 Data(shapesTable).Scenario(
   "Selecting after creation",
-  async ({
-    I,
-    AtImageView,
-    AtSidebar,
-    Labels,
-    Regions,
-    LabelStudio,
-    current,
-  }) => {
+  async ({ I, AtImageView, AtSidebar, Labels, Regions, LabelStudio, current }) => {
     const params = {
       config: getConfigWithShape(current.shape, current.props),
       data: { image: IMAGE },
@@ -130,9 +118,7 @@ Data(shapesTable).Scenario(
     for (const region of current.regions) {
       Regions.unselectWithHotkey();
       Labels.selectWithHotkey("1");
-      AtImageView[current.action](
-        ...convertParamsToPixels(region.params, canvasSize),
-      );
+      AtImageView[current.action](...convertParamsToPixels(region.params, canvasSize));
     }
     // Check regions to be sure there is something to unselect already
     AtSidebar.seeRegions(current.regions.length);

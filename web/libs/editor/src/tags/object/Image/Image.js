@@ -1,11 +1,7 @@
 import { inject } from "mobx-react";
 import { destroy, getRoot, getType, types } from "mobx-state-tree";
 
-import {
-  RELATIVE_STAGE_HEIGHT,
-  RELATIVE_STAGE_WIDTH,
-  SNAP_TO_PIXEL_MODE,
-} from "../../../components/ImageView/Image";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH, SNAP_TO_PIXEL_MODE } from "../../../components/ImageView/Image";
 import ImageView from "../../../components/ImageView/ImageView";
 import { customTypes } from "../../../core/CustomTypes";
 import Registry from "../../../core/Registry";
@@ -125,23 +121,11 @@ const TagAttrs = types.model({
   // this property is just to turn lazyload off to e2e tests
   lazyoff: types.optional(types.boolean, false),
 
-  horizontalalignment: types.optional(
-    types.enumeration(["left", "center", "right"]),
-    "left",
-  ),
-  verticalalignment: types.optional(
-    types.enumeration(["top", "center", "bottom"]),
-    "top",
-  ),
-  defaultzoom: types.optional(
-    types.enumeration(["auto", "original", "fit"]),
-    "fit",
-  ),
+  horizontalalignment: types.optional(types.enumeration(["left", "center", "right"]), "left"),
+  verticalalignment: types.optional(types.enumeration(["top", "center", "bottom"]), "top"),
+  defaultzoom: types.optional(types.enumeration(["auto", "original", "fit"]), "fit"),
 
-  crossorigin: types.optional(
-    types.enumeration(["none", "anonymous", "use-credentials"]),
-    "none",
-  ),
+  crossorigin: types.optional(types.enumeration(["none", "anonymous", "use-credentials"]), "none"),
 });
 
 const IMAGE_CONSTANTS = {
@@ -181,19 +165,10 @@ const Model = types
      * brush for Image Segmentation
      * eraser for Image Segmentation
      */
-    mode: types.optional(
-      types.enumeration(["drawing", "viewing", "brush", "eraser"]),
-      "viewing",
-    ),
+    mode: types.optional(types.enumeration(["drawing", "viewing", "brush", "eraser"]), "viewing"),
 
     regions: types.array(
-      types.union(
-        BrushRegionModel,
-        RectRegionModel,
-        EllipseRegionModel,
-        PolygonRegionModel,
-        KeyPointRegionModel,
-      ),
+      types.union(BrushRegionModel, RectRegionModel, EllipseRegionModel, PolygonRegionModel, KeyPointRegionModel),
       [],
     ),
 
@@ -289,11 +264,7 @@ const Model = types
     },
 
     get suggestions() {
-      return (
-        self.annotation?.regionStore.suggestions.filter(
-          (r) => r.object === self,
-        ) || []
-      );
+      return self.annotation?.regionStore.suggestions.filter((r) => r.object === self) || [];
     },
 
     get useTransformer() {
@@ -322,8 +293,7 @@ const Model = types
     get imageCrossOrigin() {
       const value = self.crossorigin.toLowerCase();
 
-      if (isFF(FF_LSDV_4711) && (!value || value === "none"))
-        return "anonymous";
+      if (isFF(FF_LSDV_4711) && (!value || value === "none")) return "anonymous";
 
       if (!isFF(FF_DEV_4081)) {
         return null;
@@ -337,9 +307,7 @@ const Model = types
     get fillerHeight() {
       const { naturalWidth, naturalHeight } = self;
 
-      return self.isSideways
-        ? `${(naturalWidth / naturalHeight) * 100}%`
-        : `${(naturalHeight / naturalWidth) * 100}%`;
+      return self.isSideways ? `${(naturalWidth / naturalHeight) * 100}%` : `${(naturalHeight / naturalWidth) * 100}%`;
     },
 
     get zoomedPixelSize() {
@@ -362,10 +330,7 @@ const Model = types
       const zoomedPixelSizeX = self.zoomedPixelSize.x;
       const zoomedPixelSizeY = self.zoomedPixelSize.y;
 
-      return (
-        Math.abs(x1 - x2) < zoomedPixelSizeX / 2 &&
-        Math.abs(y1 - y2) < zoomedPixelSizeY / 2
-      );
+      return Math.abs(x1 - x2) < zoomedPixelSizeX / 2 && Math.abs(y1 - y2) < zoomedPixelSizeY / 2;
     },
 
     snapPointToPixel({ x, y }, snapMode = SNAP_TO_PIXEL_MODE.EDGE) {
@@ -381,12 +346,8 @@ const Model = types
         }
         case SNAP_TO_PIXEL_MODE.CENTER: {
           return {
-            x:
-              Math.floor(x / zoomedPixelSizeX) * zoomedPixelSizeX +
-              zoomedPixelSizeX / 2,
-            y:
-              Math.floor(y / zoomedPixelSizeY) * zoomedPixelSizeY +
-              zoomedPixelSizeY / 2,
+            x: Math.floor(x / zoomedPixelSizeX) * zoomedPixelSizeX + zoomedPixelSizeX / 2,
+            y: Math.floor(y / zoomedPixelSizeY) * zoomedPixelSizeY + zoomedPixelSizeY / 2,
           };
         }
       }
@@ -411,8 +372,7 @@ const Model = types
       // As the serialization also happens during region creation,
       // we have to forsee this scenario and avoid using raw result
       // as it can only be present for already created (submitter) regions
-      const useRawResult =
-        !currentImageEntity.imageLoaded && isDefined(region._rawResult);
+      const useRawResult = !currentImageEntity.imageLoaded && isDefined(region._rawResult);
 
       return useRawResult
         ? structuredClone(region._rawResult)
@@ -550,9 +510,7 @@ const Model = types
       if (self.zoomScale !== 1) {
         const { zoomingPositionX = 0, zoomingPositionY = 0 } = self;
 
-        imgTransform.push(
-          `translate3d(${zoomingPositionX}px,${zoomingPositionY}px, 0)`,
-        );
+        imgTransform.push(`translate3d(${zoomingPositionX}px,${zoomingPositionY}px, 0)`);
       }
 
       if (self.rotation) {
@@ -575,26 +533,14 @@ const Model = types
 
     get maxScale() {
       return self.isSideways
-        ? Math.min(
-            self.containerWidth / self.naturalHeight,
-            self.containerHeight / self.naturalWidth,
-          )
-        : Math.min(
-            self.containerWidth / self.naturalWidth,
-            self.containerHeight / self.naturalHeight,
-          );
+        ? Math.min(self.containerWidth / self.naturalHeight, self.containerHeight / self.naturalWidth)
+        : Math.min(self.containerWidth / self.naturalWidth, self.containerHeight / self.naturalHeight);
     },
 
     get coverScale() {
       return self.isSideways
-        ? Math.max(
-            self.containerWidth / self.naturalHeight,
-            self.containerHeight / self.naturalWidth,
-          )
-        : Math.max(
-            self.containerWidth / self.naturalWidth,
-            self.containerHeight / self.naturalHeight,
-          );
+        ? Math.max(self.containerWidth / self.naturalHeight, self.containerHeight / self.naturalWidth)
+        : Math.max(self.containerWidth / self.naturalWidth, self.containerHeight / self.naturalHeight);
     },
 
     get viewPortBBoxCoords() {
@@ -603,8 +549,7 @@ const Model = types
       const leftOffset = -self.zoomingPositionX / self.zoomScale;
       const topOffset = -self.zoomingPositionY / self.zoomScale;
       const rightOffset = self.stageComponentSize.width - (leftOffset + width);
-      const bottomOffset =
-        self.stageComponentSize.height - (topOffset + height);
+      const bottomOffset = self.stageComponentSize.height - (topOffset + height);
       const offsets = [leftOffset, topOffset, rightOffset, bottomOffset];
 
       if (self.isSideways) {
@@ -639,9 +584,7 @@ const Model = types
     function createImageEntities() {
       if (!self.store.task) return;
 
-      const parsedValue = self.multiImage
-        ? self.parsedValueList
-        : self.parsedValue;
+      const parsedValue = self.multiImage ? self.parsedValueList : self.parsedValue;
 
       if (Array.isArray(parsedValue)) {
         parsedValue.forEach((src, index) => {
@@ -663,20 +606,15 @@ const Model = types
     }
 
     function afterAttach() {
-      if (self.selectioncontrol)
-        manager.addTool("MoveTool", Tools.Selection.create({}, env));
+      if (self.selectioncontrol) manager.addTool("MoveTool", Tools.Selection.create({}, env));
 
-      if (self.zoomcontrol)
-        manager.addTool("ZoomPanTool", Tools.Zoom.create({}, env));
+      if (self.zoomcontrol) manager.addTool("ZoomPanTool", Tools.Zoom.create({}, env));
 
-      if (self.brightnesscontrol)
-        manager.addTool("BrightnessTool", Tools.Brightness.create({}, env));
+      if (self.brightnesscontrol) manager.addTool("BrightnessTool", Tools.Brightness.create({}, env));
 
-      if (self.contrastcontrol)
-        manager.addTool("ContrastTool", Tools.Contrast.create({}, env));
+      if (self.contrastcontrol) manager.addTool("ContrastTool", Tools.Contrast.create({}, env));
 
-      if (self.rotatecontrol)
-        manager.addTool("RotateTool", Tools.Rotate.create({}, env));
+      if (self.rotatecontrol) manager.addTool("RotateTool", Tools.Rotate.create({}, env));
 
       createImageEntities();
     }
@@ -720,8 +658,7 @@ const Model = types
           }
           const manager = self.getToolsManager();
 
-          const isPanning =
-            manager.findSelectedTool()?.toolName === "ZoomPanTool";
+          const isPanning = manager.findSelectedTool()?.toolName === "ZoomPanTool";
 
           return skipInteractions || isPanning;
         },
@@ -734,9 +671,7 @@ const Model = types
           const currentTool = self.getToolsManager().findSelectedTool();
 
           if (currentTool?.shouldSkipInteractions) {
-            return self.setSkipInteractions(
-              currentTool.shouldSkipInteractions(e),
-            );
+            return self.setSkipInteractions(currentTool.shouldSkipInteractions(e));
           }
           self.setSkipInteractions(e.evt && (e.evt.metaKey || e.evt.ctrlKey));
         },
@@ -839,20 +774,9 @@ const Model = types
       self.currentImageEntity.preload();
 
       if (self.multiImage) {
-        const [currentIndex, length] = [
-          self.currentImage,
-          self.imageEntities.length,
-        ];
-        const prevSliceIndex = clamp(
-          currentIndex - IMAGE_PRELOAD_COUNT,
-          0,
-          currentIndex,
-        );
-        const nextSliceIndex = clamp(
-          currentIndex + 1 + IMAGE_PRELOAD_COUNT,
-          currentIndex,
-          length - 1,
-        );
+        const [currentIndex, length] = [self.currentImage, self.imageEntities.length];
+        const prevSliceIndex = clamp(currentIndex - IMAGE_PRELOAD_COUNT, 0, currentIndex);
+        const nextSliceIndex = clamp(currentIndex + 1 + IMAGE_PRELOAD_COUNT, currentIndex, length - 1);
 
         const images = [
           ...self.imageEntities.slice(prevSliceIndex, currentIndex),
@@ -912,10 +836,7 @@ const Model = types
         // zoomScale scales image above maxScale, so scale the rest of stage the same way
         const z = Math.min(maxScale * self.zoomScale, coverScale);
 
-        if (
-          self.containerWidth / self.naturalWidth >
-          self.containerHeight / self.naturalHeight
-        ) {
+        if (self.containerWidth / self.naturalWidth > self.containerHeight / self.naturalHeight) {
           self.stageZoomX = z;
           self.stageZoomY = self.stageZoom;
         } else {
@@ -965,10 +886,7 @@ const Model = types
         ? [self.canvasSize.width, self.canvasSize.height]
         : [self.containerWidth, self.containerHeight];
 
-      self.setZoomPosition(
-        (containerWidth - width * zoomScale) / 2,
-        (containerHeight - height * zoomScale) / 2,
-      );
+      self.setZoomPosition((containerWidth - width * zoomScale) / 2, (containerHeight - height * zoomScale) / 2);
     },
 
     sizeToFit() {
@@ -1033,12 +951,8 @@ const Model = types
         stageScale = self.zoomScale;
 
         const zoomingPosition = {
-          x:
-            -(mouseAbsolutePos.x - mouseRelativePos.x / stageScale) *
-            stageScale,
-          y:
-            -(mouseAbsolutePos.y - mouseRelativePos.y / stageScale) *
-            stageScale,
+          x: -(mouseAbsolutePos.x - mouseRelativePos.x / stageScale) * stageScale,
+          y: -(mouseAbsolutePos.y - mouseRelativePos.y / stageScale) * stageScale,
         };
 
         self.setZoomPosition(zoomingPosition.x, zoomingPosition.y);
@@ -1145,10 +1059,8 @@ const Model = types
         const changeRatio = zoomChangeRatio * scaleChangeRatio;
 
         self.setZoomPosition(
-          self.zoomingPositionX * changeRatio +
-            (self.canvasSize.width / 2 - (prevWidth / 2) * changeRatio),
-          self.zoomingPositionY * changeRatio +
-            (self.canvasSize.height / 2 - (prevHeight / 2) * changeRatio),
+          self.zoomingPositionX * changeRatio + (self.canvasSize.width / 2 - (prevWidth / 2) * changeRatio),
+          self.zoomingPositionY * changeRatio + (self.canvasSize.height / 2 - (prevHeight / 2) * changeRatio),
         );
       }
 
@@ -1162,42 +1074,18 @@ const Model = types
       });
     },
 
-    _updateRegionsSizes({
-      width,
-      height,
-      naturalWidth,
-      naturalHeight,
-      userResize,
-    }) {
+    _updateRegionsSizes({ width, height, naturalWidth, naturalHeight, userResize }) {
       const _historyLength = self.annotation?.history?.history?.length;
 
       self.annotation.history.freeze();
 
       self.regions.forEach((shape) => {
-        shape.updateImageSize(
-          width / naturalWidth,
-          height / naturalHeight,
-          width,
-          height,
-          userResize,
-        );
+        shape.updateImageSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
       });
       self.regs.forEach((shape) => {
-        shape.updateImageSize(
-          width / naturalWidth,
-          height / naturalHeight,
-          width,
-          height,
-          userResize,
-        );
+        shape.updateImageSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
       });
-      self.drawingRegion?.updateImageSize(
-        width / naturalWidth,
-        height / naturalHeight,
-        width,
-        height,
-        userResize,
-      );
+      self.drawingRegion?.updateImageSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
 
       setTimeout(self.annotation.history.unfreeze, 0);
 
@@ -1238,9 +1126,7 @@ const Model = types
         labelStates = self.activeStates() || [];
       } else {
         // there is should be at least one state selected for *labels object
-        labelStates = (self.states() || []).filter((s) =>
-          s.type.includes("labels"),
-        );
+        labelStates = (self.states() || []).filter((s) => s.type.includes("labels"));
       }
       const selectedStates = self.getAvailableStates();
 
@@ -1283,11 +1169,7 @@ const CoordsCalculations = types
       }
 
       // good official way, but maybe a bit slower and with repeating cloning
-      const p = self.stageRef
-        .getAbsoluteTransform()
-        .copy()
-        .invert()
-        .point({ x, y });
+      const p = self.stageRef.getAbsoluteTransform().copy().invert().point({ x, y });
 
       return [p.x, p.y];
     },
@@ -1323,9 +1205,7 @@ const CoordsCalculations = types
       const asArray = p.x === undefined;
       const [x, y] = self.fixZoomedCoords(asArray ? p : [p.x, p.y]);
       const modified = fn(asArray ? [x, y] : { x, y });
-      const zoomed = self.zoomOriginalCoords(
-        asArray ? modified : [modified.x, modified.y],
-      );
+      const zoomed = self.zoomOriginalCoords(asArray ? modified : [modified.x, modified.y]);
 
       return asArray ? zoomed : { x: zoomed[0], y: zoomed[1] };
     },

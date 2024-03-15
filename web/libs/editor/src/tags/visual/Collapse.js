@@ -102,11 +102,7 @@ const HtxCollapse = observer(({ item }) => {
   );
 });
 
-Registry.addTag(
-  "panel",
-  types.compose("PanelModel", PanelModel, ProcessAttrsMixin),
-  () => {},
-);
+Registry.addTag("panel", types.compose("PanelModel", PanelModel, ProcessAttrsMixin), () => {});
 Registry.addTag("collapse", CollapseModel, HtxCollapse);
 
 export { HtxCollapse, CollapseModel };

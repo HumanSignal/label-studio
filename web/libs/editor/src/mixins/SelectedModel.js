@@ -44,9 +44,7 @@ const SelectedModelMixin = types
     },
 
     selectedValues() {
-      return self.selectedLabels
-        .map((c) => (c.alias ? c.alias : c.value))
-        .filter((val) => isDefined(val));
+      return self.selectedLabels.map((c) => (c.alias ? c.alias : c.value)).filter((val) => isDefined(val));
     },
 
     getResultValue() {
@@ -67,9 +65,7 @@ const SelectedModelMixin = types
     findLabel(value) {
       return self.tiedChildren.find(
         (c) =>
-          (c.alias === value && isDefined(value)) ||
-          c.value === value ||
-          (!isDefined(c.value) && !isDefined(value)),
+          (c.alias === value && isDefined(value)) || c.value === value || (!isDefined(c.value) && !isDefined(value)),
       );
     },
 
@@ -109,16 +105,10 @@ const SelectedModelMixin = types
      */
     updateFromResult(value) {
       self.unselectAll();
-      const values = Array.isArray(value)
-        ? value.length
-          ? value
-          : [null]
-        : [value];
+      const values = Array.isArray(value) ? (value.length ? value : [null]) : [value];
 
       if (values.length) {
-        values
-          .map((v) => self.findLabel(v))
-          .forEach((label) => label?.setSelected(true));
+        values.map((v) => self.findLabel(v)).forEach((label) => label?.setSelected(true));
       } else if (self.allowempty) {
         self.findLabel(null)?.setSelected(true);
       }

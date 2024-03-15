@@ -31,12 +31,7 @@ describe("VirtualVideo", () => {
   it("should call canPlayUrl and return true if valid relative url specified", async () => {
     const canPlayType = jest.fn();
 
-    render(
-      <VirtualVideo.VirtualVideo
-        src="/files/opossum_intro.webm"
-        canPlayType={canPlayType}
-      />,
-    );
+    render(<VirtualVideo.VirtualVideo src="/files/opossum_intro.webm" canPlayType={canPlayType} />);
 
     await new Promise((resolve) => setTimeout(resolve, 10));
 
@@ -78,10 +73,7 @@ describe("VirtualVideo", () => {
     });
 
     render(
-      <VirtualVideo.VirtualVideo
-        src="https://app.heartex.ai/static/samples/opossum_snow"
-        canPlayType={canPlayType}
-      />,
+      <VirtualVideo.VirtualVideo src="https://app.heartex.ai/static/samples/opossum_snow" canPlayType={canPlayType} />,
     );
 
     await new Promise((resolve) => setTimeout(resolve, 10));

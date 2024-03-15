@@ -20,10 +20,7 @@ const PROJECTS_FETCH_PERIOD = 10 * 1000; // 10 seconds
 
 export const AppStore = types
   .model("AppStore", {
-    mode: types.optional(
-      types.enumeration(["explorer", "labelstream", "labeling"]),
-      "explorer",
-    ),
+    mode: types.optional(types.enumeration(["explorer", "labelstream", "labeling"]), "explorer"),
 
     viewsStore: types.optional(TabStore, {
       views: [],
@@ -82,11 +79,7 @@ export const AppStore = types
     },
 
     get isLabeling() {
-      return (
-        !!self.dataStore?.selected ||
-        self.isLabelStreamMode ||
-        self.mode === "labeling"
-      );
+      return !!self.dataStore?.selected || self.isLabelStreamMode || self.mode === "labeling";
     },
 
     get isLabelStreamMode() {
@@ -147,8 +140,7 @@ export const AppStore = types
       if (self.SDK.polling === false) return;
 
       const poll = async (self) => {
-        if (networkActivity.active)
-          await self.fetchProject({ interaction: "timer" });
+        if (networkActivity.active) await self.fetchProject({ interaction: "timer" });
         self._poll = setTimeout(() => poll(self), PROJECTS_FETCH_PERIOD);
       };
 
@@ -285,10 +277,7 @@ export const AppStore = types
         }
       };
 
-      if (
-        isFF(FF_DEV_2887) &&
-        self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved
-      ) {
+      if (isFF(FF_DEV_2887) && self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
         Modal.confirm({
           title: "You have unsaved changes",
           body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
@@ -333,10 +322,7 @@ export const AppStore = types
         }
       };
 
-      if (
-        isFF(FF_DEV_2887) &&
-        self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved
-      ) {
+      if (isFF(FF_DEV_2887) && self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
         Modal.confirm({
           title: "You have unsaved changes",
           body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
@@ -458,16 +444,12 @@ export const AppStore = types
             ? self.project.task_count !== newProject.task_count ||
               self.project.task_number !== newProject.task_number ||
               self.project.annotation_count !== newProject.annotation_count ||
-              self.project.num_tasks_with_annotations !==
-                newProject.num_tasks_with_annotations
+              self.project.num_tasks_with_annotations !== newProject.num_tasks_with_annotations
             : false;
 
         if (options.interaction === "timer") {
           self.project = Object.assign(self.project ?? {}, newProject);
-        } else if (
-          JSON.stringify(newProject ?? {}) !==
-          JSON.stringify(self.project ?? {})
-        ) {
+        } else if (JSON.stringify(newProject ?? {}) !== JSON.stringify(self.project ?? {})) {
           self.project = newProject;
         }
         if (isFF(FF_LOPS_E_3)) {
@@ -513,11 +495,7 @@ export const AppStore = types
           requests.push(self.fetchActions());
         }
 
-        if (
-          self.SDK.settings?.onlyVirtualTabs &&
-          self.project?.show_annotation_history &&
-          !task
-        ) {
+        if (self.SDK.settings?.onlyVirtualTabs && self.project?.show_annotation_history && !task) {
           requests.push(
             self.viewsStore.addView(
               {
@@ -576,8 +554,7 @@ export const AppStore = types
       const apiTransform = self.SDK.apiTransform?.[methodName];
       const requestParams = apiTransform?.params?.(params) ?? params ?? {};
       const requestBody = apiTransform?.body?.(body) ?? body ?? {};
-      const requestHeaders =
-        apiTransform?.headers?.(options?.headers) ?? options?.headers ?? {};
+      const requestHeaders = apiTransform?.headers?.(options?.headers) ?? options?.headers ?? {};
       const requestKey = `${methodName}_${JSON.stringify(params || {})}`;
 
       if (isAllowCancel) {
@@ -639,8 +616,7 @@ export const AppStore = types
     invokeAction: flow(function* (actionId, options = {}) {
       const view = self.currentView ?? {};
 
-      const needsLock =
-        self.availableActions.findIndex((a) => a.id === actionId) >= 0;
+      const needsLock = self.availableActions.findIndex((a) => a.id === actionId) >= 0;
 
       const { selected } = view;
       const actionCallback = self.SDK.getAction(actionId);
@@ -667,10 +643,7 @@ export const AppStore = types
         if (labelStreamMode === "all") {
           actionParams.filters = undefined;
 
-          if (
-            actionParams.selectedItems.all === false &&
-            actionParams.selectedItems.included.length === 0
-          ) {
+          if (actionParams.selectedItems.all === false && actionParams.selectedItems.included.length === 0) {
             actionParams.selectedItems = undefined;
             actionParams.ordering = undefined;
           }

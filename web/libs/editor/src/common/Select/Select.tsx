@@ -62,10 +62,7 @@ const SelectContext = createContext<SelectContextProps>({
 
 const { Block, Elem } = BemWithSpecifiContext();
 
-const findSelectedChild = (
-  children: ReactNode,
-  value?: string | string[],
-): FoundChild | null => {
+const findSelectedChild = (children: ReactNode, value?: string | string[]): FoundChild | null => {
   return Children.toArray(children).reduce<FoundChild | null>((res, child) => {
     if (res !== null) return res;
 
@@ -102,9 +99,7 @@ export const Select: SelectComponent<SelectProps> = ({
 }) => {
   const dropdown = useRef<any>();
   const rootRef = useRef();
-  const [currentValue, setCurrentValue] = useState(
-    multiple ? ([] as string[]).concat(value ?? []).flat(10) : value,
-  );
+  const [currentValue, setCurrentValue] = useState(multiple ? ([] as string[]).concat(value ?? []).flat(10) : value);
   const [focused, setFocused] = useState<string | null>();
 
   const options = Children.toArray(children).filter((child: any) => {
@@ -144,18 +139,13 @@ export const Select: SelectComponent<SelectProps> = ({
 
   const selected = useMemo(() => {
     if (isFF(FF_DEV_2669) && multiple && renderMultipleSelected) {
-      return renderMultipleSelected(
-        Array.isArray(currentValue) ? currentValue : [currentValue || ""],
-      );
+      return renderMultipleSelected(Array.isArray(currentValue) ? currentValue : [currentValue || ""]);
     }
     if (multiple && Array.isArray(currentValue) && currentValue?.length > 1) {
       return <>Multiple values selected</>;
     }
 
-    const foundChild = findSelectedChild(
-      children,
-      defaultValue ?? currentValue,
-    ) as any;
+    const foundChild = findSelectedChild(children, defaultValue ?? currentValue) as any;
 
     const result = foundChild?.props?.children;
 
@@ -170,9 +160,7 @@ export const Select: SelectComponent<SelectProps> = ({
 
   const focusNext = useCallback(
     (direction) => {
-      const selectedIndex = options.findIndex(
-        (c: any) => c.props.value === focused,
-      );
+      const selectedIndex = options.findIndex((c: any) => c.props.value === focused);
 
       let nextIndex = selectedIndex === -1 ? 0 : selectedIndex + direction;
 
@@ -199,10 +187,7 @@ export const Select: SelectComponent<SelectProps> = ({
         dropdown.current?.open();
         focusItem();
       }
-    } else if (
-      (e.code === "Space" || e.code === "Enter") &&
-      isDefined(focused)
-    ) {
+    } else if ((e.code === "Space" || e.code === "Enter") && isDefined(focused)) {
       context.setCurrentValue(focused);
     }
   };
@@ -256,8 +241,7 @@ interface SelectOptionProps {
 }
 
 const SelectOption: FC<SelectOptionProps> = ({ value, children, style }) => {
-  const { setCurrentValue, multiple, currentValue, focused } =
-    useContext(SelectContext);
+  const { setCurrentValue, multiple, currentValue, focused } = useContext(SelectContext);
 
   const isSelected = useMemo(() => {
     const option = String(value);
@@ -298,11 +282,7 @@ interface SelectioOptGroupProps {
   style?: CSSProperties;
 }
 
-const SelectOptGroup: FC<SelectioOptGroupProps> = ({
-  label,
-  children,
-  style,
-}) => {
+const SelectOptGroup: FC<SelectioOptGroupProps> = ({ label, children, style }) => {
   return (
     <Elem name="optgroup" style={style}>
       <Elem name="optgroup-label">{label}</Elem>

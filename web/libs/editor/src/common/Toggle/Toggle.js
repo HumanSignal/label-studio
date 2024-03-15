@@ -5,28 +5,12 @@ import "./Toggle.styl";
 
 const Toggle = forwardRef(
   (
-    {
-      className,
-      label,
-      labelProps,
-      description,
-      checked,
-      defaultChecked,
-      onChange,
-      required,
-      style,
-      ...props
-    },
+    { className, label, labelProps, description, checked, defaultChecked, onChange, required, style, ...props },
     ref,
   ) => {
     const rootClass = cn("toggle");
-    const initialChecked = useMemo(
-      () => defaultChecked ?? checked ?? false,
-      [defaultChecked, checked],
-    );
-    const [isChecked, setIsChecked] = useState(
-      defaultChecked ?? checked ?? false,
-    );
+    const initialChecked = useMemo(() => defaultChecked ?? checked ?? false, [defaultChecked, checked]);
+    const [isChecked, setIsChecked] = useState(defaultChecked ?? checked ?? false);
 
     const mods = {};
 

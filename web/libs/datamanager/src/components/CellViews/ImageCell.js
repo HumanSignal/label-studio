@@ -14,8 +14,7 @@ export const ImageCell = (column) => {
   } = column;
   const root = getRoot(original);
 
-  const renderImagePreview =
-    original.total_annotations === 0 || !root.showPreviews;
+  const renderImagePreview = original.total_annotations === 0 || !root.showPreviews;
   const imgSrc = Array.isArray(value) ? value[0] : value;
 
   if (!imgSrc) return null;

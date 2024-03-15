@@ -1,13 +1,5 @@
 import { observer } from "mobx-react";
-import React, {
-  createContext,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCode } from "react-icons/fa";
 import { RiCodeLine } from "react-icons/ri";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -16,12 +8,7 @@ import InfiniteLoader from "react-window-infinite-loader";
 import { LsGear, LsGearNewUI } from "../../../assets/icons";
 import { useSDK } from "../../../providers/SDKProvider";
 import { Block } from "../../../utils/bem";
-import {
-  FF_DEV_3873,
-  FF_LOPS_E_3,
-  FF_LOPS_E_10,
-  isFF,
-} from "../../../utils/feature-flags";
+import { FF_DEV_3873, FF_LOPS_E_3, FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
 import { isDefined } from "../../../utils/utils";
 import { Button } from "../Button/Button";
 import { FieldsButton } from "../FieldsButton";
@@ -69,9 +56,7 @@ export const Table = observer(
   }) => {
     const colOrderKey = "dm:columnorder";
     const tableHead = useRef();
-    const [colOrder, setColOrder] = useState(
-      JSON.parse(localStorage.getItem(colOrderKey)) ?? {},
-    );
+    const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const listRef = useRef();
     const columns = prepareColumns(props.columns, props.hiddenColumns);
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
@@ -153,13 +138,7 @@ export const Table = observer(
                 modal({
                   title: `Source for task ${out?.id}`,
                   style: { width: 800 },
-                  body: (
-                    <TaskSourceView
-                      content={out}
-                      onTaskLoad={onTaskLoad}
-                      sdkType={type}
-                    />
-                  ),
+                  body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
                 });
               }}
               icon={
@@ -301,8 +280,7 @@ export const Table = observer(
 
     const right =
       tableWrapper.current?.firstChild?.firstChild.offsetWidth -
-        tableWrapper.current?.firstChild?.firstChild?.firstChild.offsetWidth ||
-      0;
+        tableWrapper.current?.firstChild?.firstChild?.firstChild.offsetWidth || 0;
 
     return (
       <>
@@ -337,11 +315,7 @@ export const Table = observer(
             )}
           </Block>
         )}
-        <TableBlock
-          ref={tableWrapper}
-          name="table"
-          mod={{ fit: props.fitToContent }}
-        >
+        <TableBlock ref={tableWrapper} name="table" mod={{ fit: props.fitToContent }}>
           <TableContext.Provider value={contextValue}>
             <StickyList
               ref={listRef}

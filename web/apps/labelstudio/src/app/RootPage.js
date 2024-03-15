@@ -11,9 +11,7 @@ export const RootPage = ({ content }) => {
       enabled={true}
       defaultOpened={opened}
       defaultPinned={pinned}
-      onSidebarToggle={(visible) =>
-        localStorage.setItem("sidebar-opened", visible)
-      }
+      onSidebarToggle={(visible) => localStorage.setItem("sidebar-opened", visible)}
       onSidebarPin={(pinned) => localStorage.setItem("sidebar-pinned", pinned)}
     >
       <ProjectRoutes content={content} />

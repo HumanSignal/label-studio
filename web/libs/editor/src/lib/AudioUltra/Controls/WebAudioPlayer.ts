@@ -30,10 +30,7 @@ export class WebAudioPlayer extends Player {
    */
   get rate() {
     // restore the correct rate
-    if (
-      this.audioBufferSource?.playbackRate &&
-      this._rate !== this.audioBufferSource.playbackRate.value
-    ) {
+    if (this.audioBufferSource?.playbackRate && this._rate !== this.audioBufferSource.playbackRate.value) {
       this.audioBufferSource.playbackRate.value = this._rate;
     }
     return this._rate;
@@ -90,14 +87,7 @@ export class WebAudioPlayer extends Player {
   }
 
   protected connectSource() {
-    if (
-      this.isDestroyed ||
-      !this.audioContext ||
-      !this.audio?.buffer ||
-      !this.gainNode ||
-      this.connected
-    )
-      return;
+    if (this.isDestroyed || !this.audioContext || !this.audio?.buffer || !this.gainNode || this.connected) return;
     this.connected = true;
     this.audioBufferSource = this.audioContext.createBufferSource();
     this.audioBufferSource.buffer = this.audio.buffer;
@@ -106,8 +96,7 @@ export class WebAudioPlayer extends Player {
   }
 
   protected disconnectSource(): boolean {
-    if (this.isDestroyed || !this.connected || !this.audioBufferSource)
-      return false;
+    if (this.isDestroyed || !this.connected || !this.audioBufferSource) return false;
     this.connected = false;
 
     try {

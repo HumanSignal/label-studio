@@ -59,19 +59,11 @@ function configureApplication(params) {
     messages: { ...Messages, ...params.messages },
 
     // callbacks and event handlers
-    onSubmitAnnotation: params.onSubmitAnnotation
-      ? osCB
-      : External.onSubmitAnnotation,
-    onUpdateAnnotation: params.onUpdateAnnotation
-      ? ouCB
-      : External.onUpdateAnnotation,
-    onDeleteAnnotation: params.onDeleteAnnotation
-      ? odCB
-      : External.onDeleteAnnotation,
+    onSubmitAnnotation: params.onSubmitAnnotation ? osCB : External.onSubmitAnnotation,
+    onUpdateAnnotation: params.onUpdateAnnotation ? ouCB : External.onUpdateAnnotation,
+    onDeleteAnnotation: params.onDeleteAnnotation ? odCB : External.onDeleteAnnotation,
     onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
-    onUnskipTask: params.onUnskipTask
-      ? params.onUnskipTask
-      : External.onUnskipTask,
+    onUnskipTask: params.onUnskipTask ? params.onUnskipTask : External.onUnskipTask,
     onSubmitDraft: params.onSubmitDraft,
     onPresignUrlForProject: params.onPresignUrlForProject,
     onTaskLoad: params.onTaskLoad || External.onTaskLoad,
@@ -79,14 +71,10 @@ function configureApplication(params) {
     onEntityCreate: params.onEntityCreate || External.onEntityCreate,
     onEntityDelete: params.onEntityDelete || External.onEntityDelete,
     onGroundTruth: params.onGroundTruth || External.onGroundTruth,
-    onSelectAnnotation:
-      params.onSelectAnnotation || External.onSelectAnnotation,
-    onAcceptAnnotation:
-      params.onAcceptAnnotation || External.onAcceptAnnotation,
-    onRejectAnnotation:
-      params.onRejectAnnotation || External.onRejectAnnotation,
-    onStorageInitialized:
-      params.onStorageInitialized || External.onStorageInitialized,
+    onSelectAnnotation: params.onSelectAnnotation || External.onSelectAnnotation,
+    onAcceptAnnotation: params.onAcceptAnnotation || External.onAcceptAnnotation,
+    onRejectAnnotation: params.onRejectAnnotation || External.onRejectAnnotation,
+    onStorageInitialized: params.onStorageInitialized || External.onStorageInitialized,
     onNextTask: params.onNextTask || External.onNextTask,
     onPrevTask: params.onPrevTask || External.onPrevTask,
 

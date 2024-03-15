@@ -1,9 +1,4 @@
-import {
-  type CSSProperties,
-  type FC,
-  type MouseEvent as RMouseEvent,
-  useCallback,
-} from "react";
+import { type CSSProperties, type FC, type MouseEvent as RMouseEvent, useCallback } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/utilities";
 import { useValueTracker } from "../Utils/useValueTracker";
@@ -56,10 +51,7 @@ export const Range: FC<RangeProps> = ({
 }) => {
   const initialValue = value ?? defaultValue ?? (multi ? [0, 100] : 0);
 
-  const [currentValue, setValue] = useValueTracker<RangeValueType>(
-    initialValue,
-    defaultValue ?? initialValue,
-  );
+  const [currentValue, setValue] = useValueTracker<RangeValueType>(initialValue, defaultValue ?? initialValue);
 
   let currentValueShadow = currentValue;
 
@@ -70,10 +62,7 @@ export const Range: FC<RangeProps> = ({
   };
 
   const updateValue = (value: RangeValueType, notify = true, force = false) => {
-    const newValue =
-      multi && Array.isArray(value)
-        ? value.map(roundToStep)
-        : roundToStep(value as number);
+    const newValue = multi && Array.isArray(value) ? value.map(roundToStep) : roundToStep(value as number);
 
     if (currentValueShadow !== newValue || force) {
       setValue(newValue);
@@ -163,12 +152,7 @@ export const Range: FC<RangeProps> = ({
           )}
       <Elem name="body" onClick={onClick}>
         <Elem name="line" />
-        <RangeIndicator
-          align={align}
-          reverse={reverse}
-          value={currentValue}
-          valueConvert={valueToPercentage}
-        />
+        <RangeIndicator align={align} reverse={reverse} value={currentValue} valueConvert={valueToPercentage} />
         {isMultiArray ? (
           arrayReverse(currentValue, reverse).map((value, i) => {
             const index = reverse ? (i === 0 ? 1 : 0) : i;
@@ -178,10 +162,7 @@ export const Range: FC<RangeProps> = ({
               const result = [];
               const secondValue = currentValue[preservedValueIndex];
 
-              result[index] =
-                index === 0
-                  ? clamp(val, min, secondValue)
-                  : clamp(val, secondValue, max);
+              result[index] = index === 0 ? clamp(val, min, secondValue) : clamp(val, secondValue, max);
               result[preservedValueIndex] = currentValue[preservedValueIndex];
 
               return result;
@@ -255,14 +236,7 @@ const RangeHandle: FC<RangeHandleProps> = ({
   reverse = false,
 }) => {
   const currentOffset = valueConvert(value);
-  const offsetProperty =
-    align === "horizontal"
-      ? reverse
-        ? "right"
-        : "left"
-      : reverse
-        ? "bottom"
-        : "top";
+  const offsetProperty = align === "horizontal" ? (reverse ? "right" : "left") : reverse ? "bottom" : "top";
   const mouseProperty = align === "horizontal" ? "pageX" : "pageY";
 
   const handleMouseDown = (e: MouseEvent) => {
@@ -272,14 +246,8 @@ const RangeHandle: FC<RangeHandleProps> = ({
     let newValue: number;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const mouseOffset = reverse
-        ? initialOffset - e[mouseProperty]
-        : e[mouseProperty] - initialOffset;
-      const offset = clamp(
-        mouseOffset + (currentOffset / 100) * bodySize,
-        0,
-        bodySize,
-      );
+      const mouseOffset = reverse ? initialOffset - e[mouseProperty] : e[mouseProperty] - initialOffset;
+      const offset = clamp(mouseOffset + (currentOffset / 100) * bodySize, 0, bodySize);
 
       newValue = offsetConvert(offset);
 
@@ -324,12 +292,7 @@ export interface RangeIndicatorProps {
   reverse: boolean;
 }
 
-const RangeIndicator: FC<RangeIndicatorProps> = ({
-  value,
-  valueConvert,
-  align,
-  reverse,
-}) => {
+const RangeIndicator: FC<RangeIndicatorProps> = ({ value, valueConvert, align, reverse }) => {
   const style: CSSProperties = {};
   const multi = Array.isArray(value);
 
@@ -342,8 +305,7 @@ const RangeIndicator: FC<RangeIndicatorProps> = ({
       style.right = `${100 - valueConvert(value)}%`;
     }
 
-    if (reverse && !multi)
-      [style.left, style.right] = [style.right, style.left];
+    if (reverse && !multi) [style.left, style.right] = [style.right, style.left];
   } else if (align === "vertical") {
     if (multi) {
       style.top = `${valueConvert(value[0])}%`;
@@ -353,8 +315,7 @@ const RangeIndicator: FC<RangeIndicatorProps> = ({
       style.bottom = `${100 - valueConvert(value)}%`;
     }
 
-    if (reverse && !multi)
-      [style.top, style.bottom] = [style.bottom, style.top];
+    if (reverse && !multi) [style.top, style.bottom] = [style.bottom, style.top];
   }
 
   return <Elem name="indicator" style={style} />;

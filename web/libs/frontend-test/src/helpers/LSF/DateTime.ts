@@ -30,10 +30,7 @@ class DateTimeHelper {
   type(datetime: string) {
     const parts = datetime
       .split(/[^\d\-:]/)
-      .filter(
-        (value) =>
-          value.match(this._dateRegExp) || value.match(this._timeRegExp),
-      );
+      .filter((value) => value.match(this._dateRegExp) || value.match(this._timeRegExp));
 
     cy.wrap(parts).should("have.lengthOf.at.least", 1);
 
@@ -53,10 +50,7 @@ class DateTimeHelper {
   hasValue(datetime: string) {
     const parts = datetime
       .split(/[^\d\-:]/)
-      .filter(
-        (value) =>
-          value.match(this._dateRegExp) || value.match(this._timeRegExp),
-      );
+      .filter((value) => value.match(this._dateRegExp) || value.match(this._timeRegExp));
 
     cy.wrap(parts).should("have.lengthOf.at.least", 1);
 

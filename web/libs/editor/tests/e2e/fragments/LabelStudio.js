@@ -40,33 +40,21 @@ module.exports = {
   async resultsNotChanged(result, fractionDigits = 2) {
     const serialized = await this.serialize();
 
-    I.assertDeepEqualWithTolerance(
-      result,
-      serialized,
-      fractionDigits,
-      "Results must be equal",
-    );
+    I.assertDeepEqualWithTolerance(result, serialized, fractionDigits, "Results must be equal");
   },
 
   async resultsChanged(result, fractionDigits = 2) {
     const serialized = await this.serialize();
 
-    I.assertNotDeepEqualWithTolerance(
-      result,
-      serialized,
-      fractionDigits,
-      "Results must be different",
-    );
+    I.assertNotDeepEqualWithTolerance(result, serialized, fractionDigits, "Results must be different");
   },
 
   async grabUserLabels() {
     const userLabels = await I.executeScript(() => {
       return Object.fromEntries(
-        Object.entries(window.Htx.userLabels?.controls).map(
-          ([control, labels]) => {
-            return [control, labels.map((label) => label.path)];
-          },
-        ),
+        Object.entries(window.Htx.userLabels?.controls).map(([control, labels]) => {
+          return [control, labels.map((label) => label.path)];
+        }),
       );
     });
 

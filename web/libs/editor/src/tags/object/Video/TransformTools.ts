@@ -3,13 +3,7 @@ import type { Box, Transformer } from "konva/lib/shapes/Transformer";
 import type { WorkingArea } from "./types";
 
 // define several math function
-export const getCorner = (
-  pivotX: number,
-  pivotY: number,
-  diffX: number,
-  diffY: number,
-  angle: number,
-) => {
+export const getCorner = (pivotX: number, pivotY: number, diffX: number, diffY: number, angle: number) => {
   const distance = Math.sqrt(diffX * diffX + diffY * diffY);
 
   /// find angle from pivot to corner
@@ -95,10 +89,7 @@ export const createBoundingBoxGetter =
     return result;
   };
 
-export const createOnDragMoveHandler = (
-  workingArea: WorkingArea,
-  enabled = true,
-) =>
+export const createOnDragMoveHandler = (workingArea: WorkingArea, enabled = true) =>
   function (this: Transformer, e: KonvaEventObject<DragEvent>) {
     if (!enabled) return;
 

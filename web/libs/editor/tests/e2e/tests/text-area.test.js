@@ -18,28 +18,21 @@ const data = {
 
 const params = { annotations: [{ id: "test", result: [] }], config, data };
 
-Scenario(
-  "Check if text area is saving lead_time",
-  async ({ I, LabelStudio, AtTextAreaView }) => {
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags({
-      fflag_fix_front_lsdv_4600_lead_time_27072023_short: true,
-    });
+Scenario("Check if text area is saving lead_time", async ({ I, LabelStudio, AtTextAreaView }) => {
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags({
+    fflag_fix_front_lsdv_4600_lead_time_27072023_short: true,
+  });
 
-    LabelStudio.init(params);
+  LabelStudio.init(params);
 
-    AtTextAreaView.addNewTextTag("abcabc");
+  AtTextAreaView.addNewTextTag("abcabc");
 
-    AtTextAreaView.addNewTextTag("abc abc abc abc");
+  AtTextAreaView.addNewTextTag("abc abc abc abc");
 
-    AtTextAreaView.addNewTextTag("cba cba cba");
+  AtTextAreaView.addNewTextTag("cba cba cba");
 
-    const result = await I.executeScript(serialize);
+  const result = await I.executeScript(serialize);
 
-    assert.notEqual(
-      result[0]?.meta?.lead_time ?? 0,
-      0,
-      "Lead time is not saved",
-    );
-  },
-);
+  assert.notEqual(result[0]?.meta?.lead_time ?? 0, 0, "Lead time is not saved");
+});

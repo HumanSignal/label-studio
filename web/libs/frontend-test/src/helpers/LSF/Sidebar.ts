@@ -22,9 +22,7 @@ export const Sidebar = {
       if (isFFDEV1170) {
         return this.outliner
           .should("be.visible")
-          .get(
-            ".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper",
-          );
+          .get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper");
       }
 
       return this.legacySidebar.should("be.visible").get(".lsf-region-item");
@@ -37,9 +35,7 @@ export const Sidebar = {
     return this.findRegion(`:eq(${idx})`);
   },
   get hiddenRegions() {
-    return this.outliner
-      .should("be.visible")
-      .get(".lsf-tree__node_hidden .lsf-tree-node-content-wrapper");
+    return this.outliner.should("be.visible").get(".lsf-tree__node_hidden .lsf-tree-node-content-wrapper");
   },
   hasRegions(value: number) {
     this.regions.should("have.length", value);
@@ -71,20 +67,14 @@ export const Sidebar = {
   },
   toggleRegionSelection(selectorOrIndex: string | number) {
     const regionFinder =
-      typeof selectorOrIndex === "number"
-        ? this.findRegionByIndex.bind(this)
-        : this.findRegion.bind(this);
+      typeof selectorOrIndex === "number" ? this.findRegionByIndex.bind(this) : this.findRegion.bind(this);
 
     regionFinder(selectorOrIndex).click();
   },
   collapseDetailsRightPanel() {
-    cy.get(".lsf-sidepanels__wrapper_align_right .lsf-panel__toggle")
-      .should("be.visible")
-      .click();
+    cy.get(".lsf-sidepanels__wrapper_align_right .lsf-panel__toggle").should("be.visible").click();
   },
   expandDetailsRightPanel() {
-    cy.get(".lsf-sidepanels__wrapper_align_right .lsf-panel__header")
-      .should("be.visible")
-      .click();
+    cy.get(".lsf-sidepanels__wrapper_align_right .lsf-panel__header").should("be.visible").click();
   },
 };

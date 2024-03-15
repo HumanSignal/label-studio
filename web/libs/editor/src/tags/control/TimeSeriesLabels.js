@@ -87,10 +87,7 @@ const Composition = types.compose(
   SelectedModelMixin.props({ _child: "LabelModel" }),
 );
 
-const TimeSeriesLabelsModel = types.compose(
-  "TimeSeriesLabelsModel",
-  Composition,
-);
+const TimeSeriesLabelsModel = types.compose("TimeSeriesLabelsModel", Composition);
 
 const HtxTimeSeriesLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;

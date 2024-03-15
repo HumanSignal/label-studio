@@ -99,11 +99,7 @@ export const Labeling = injector(
     return (
       <Block name="label-view" mod={{ loading }}>
         {SDK.interfaceEnabled("labelingHeader") && (
-          <LabelingHeader
-            SDK={SDK}
-            onClick={closeLabeling}
-            isExplorerMode={isExplorerMode}
-          />
+          <LabelingHeader SDK={SDK} onClick={closeLabeling} isExplorerMode={isExplorerMode} />
         )}
 
         <Elem name="content">
@@ -129,10 +125,7 @@ export const Labeling = injector(
             </Elem>
           )}
 
-          <Elem
-            name="lsf-wrapper"
-            mod={{ mode: isExplorerMode ? "explorer" : "labeling" }}
-          >
+          <Elem name="lsf-wrapper" mod={{ mode: isExplorerMode ? "explorer" : "labeling" }}>
             {loading && <Elem name="waiting" mod={{ animated: true }} />}
             <Elem
               ref={lsfRef}

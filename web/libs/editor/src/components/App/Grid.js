@@ -43,9 +43,7 @@ class Item extends Component {
   }
 
   render() {
-    return (
-      <Annotation root={this.props.root} annotation={this.props.annotation} />
-    );
+    return <Annotation root={this.props.root} annotation={this.props.annotation} />;
   }
 }
 
@@ -65,10 +63,7 @@ export default class Grid extends Component {
   }
 
   componentDidMount() {
-    if (
-      !isFF(FF_DEV_3391) &&
-      this.props.annotations[0] !== this.props.store.selected
-    ) {
+    if (!isFF(FF_DEV_3391) && this.props.annotations[0] !== this.props.store.selected) {
       this.startRenderCycle();
     }
   }
@@ -118,13 +113,8 @@ export default class Grid extends Component {
 
     clonedIframe.forEach((iframe, idx) => {
       iframe.contentWindow.document.open();
-      iframe.contentWindow.document.write(
-        sourceIframe[idx].contentDocument.documentElement.outerHTML,
-      );
-      moveStylesBetweenHeadTags(
-        sourceIframe[idx].contentDocument.head,
-        iframe.contentDocument.head,
-      );
+      iframe.contentWindow.document.write(sourceIframe[idx].contentDocument.documentElement.outerHTML);
+      moveStylesBetweenHeadTags(sourceIframe[idx].contentDocument.head, iframe.contentDocument.head);
     });
 
     this.setState((state) => {
@@ -141,9 +131,7 @@ export default class Grid extends Component {
     const container = this.container.current;
     const children = container.children;
 
-    const current = Array.from(children).findIndex(
-      (child) => container.scrollLeft <= child.offsetLeft,
-    );
+    const current = Array.from(children).findIndex((child) => container.scrollLeft <= child.offsetLeft);
 
     if (!container) return;
 
@@ -167,17 +155,14 @@ export default class Grid extends Component {
   select = (c) => {
     const { store } = this.props;
 
-    c.type === "annotation"
-      ? store.selectAnnotation(c.id)
-      : store.selectPrediction(c.id);
+    c.type === "annotation" ? store.selectAnnotation(c.id) : store.selectPrediction(c.id);
   };
 
   render() {
     const i = this.state.item;
     const { annotations } = this.props;
     const selected = isFF(FF_DEV_3391) ? null : this.props.store.selected;
-    const isRenderingNext =
-      i < annotations.length && annotations[i] === selected;
+    const isRenderingNext = i < annotations.length && annotations[i] === selected;
 
     return (
       <div className={styles.container}>
@@ -185,11 +170,7 @@ export default class Grid extends Component {
           {annotations
             .filter((c) => !c.hidden)
             .map((c) => (
-              <div
-                id={`c-${c.id}`}
-                key={`anno-${c.id}`}
-                style={{ position: "relative" }}
-              >
+              <div id={`c-${c.id}`} key={`anno-${c.id}`} style={{ position: "relative" }}>
                 <EntityTab
                   entity={c}
                   onClick={() => this.select(c)}
@@ -235,27 +216,12 @@ export default class Grid extends Component {
                 bordered={false}
                 style={{ height: 44 }}
               />
-              <Item
-                root={this.props.root}
-                onFinish={this.onFinish}
-                key={i}
-                annotation={selected}
-              />
+              <Item root={this.props.root} onFinish={this.onFinish} key={i} annotation={selected} />
             </div>
           )}
         </div>
-        <Button
-          type="text"
-          onClick={this.left}
-          className={styles.left}
-          icon={<LeftCircleOutlined />}
-        />
-        <Button
-          type="text"
-          onClick={this.right}
-          className={styles.right}
-          icon={<RightCircleOutlined />}
-        />
+        <Button type="text" onClick={this.left} className={styles.left} icon={<LeftCircleOutlined />} />
+        <Button type="text" onClick={this.right} className={styles.right} icon={<RightCircleOutlined />} />
       </div>
     );
   }

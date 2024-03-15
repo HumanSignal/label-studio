@@ -11,24 +11,16 @@ import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import RegionsMixin from "../../../mixins/Regions";
 import Utils from "../../../utils";
 import { parseValue } from "../../../utils/data";
-import {
-  FF_LSDV_4620_3,
-  FF_SAFE_TEXT,
-  isFF,
-} from "../../../utils/feature-flags";
+import { FF_LSDV_4620_3, FF_SAFE_TEXT, isFF } from "../../../utils/feature-flags";
 import { sanitizeHtml } from "../../../utils/html";
 import messages from "../../../utils/messages";
-import {
-  findRangeNative,
-  rangeToGlobalOffset,
-} from "../../../utils/selection-tools";
+import { findRangeNative, rangeToGlobalOffset } from "../../../utils/selection-tools";
 import { escapeHtml, isValidObjectURL } from "../../../utils/utilities";
 import ObjectBase from "../Base";
 import DomManager from "./domManager";
 
 const WARNING_MESSAGES = {
-  dataTypeMistmatch: () =>
-    "Do not put text directly in task data if you use valueType=url.",
+  dataTypeMistmatch: () => "Do not put text directly in task data if you use valueType=url.",
   badURL: (url) => `URL (${escapeHtml(url)}) is not valid.`,
   secureMode: () => 'In SECURE MODE valueType is set to "url" by default.',
   loadingError: (url, error) => `Loading URL (${url}) unsuccessful: ${error}`,
@@ -61,16 +53,13 @@ const TagAttrs = types.model("RichTextModel", {
   value: types.maybeNull(types.string),
 
   /** Defines the type of data to be shown */
-  valuetype: types.optional(types.enumeration(["text", "url"]), () =>
-    window.LS_SECURE_MODE ? "url" : "text",
-  ),
+  valuetype: types.optional(types.enumeration(["text", "url"]), () => (window.LS_SECURE_MODE ? "url" : "text")),
 
   inline: false,
 
   /** Whether or not to save selected text to the serialized data */
-  savetextresult: types.optional(
-    types.enumeration(["none", "no", "yes"]),
-    () => (window.LS_SECURE_MODE ? "no" : "none"),
+  savetextresult: types.optional(types.enumeration(["none", "no", "yes"]), () =>
+    window.LS_SECURE_MODE ? "no" : "none",
   ),
 
   selectionenabled: types.optional(types.boolean, true),
@@ -81,15 +70,9 @@ const TagAttrs = types.model("RichTextModel", {
 
   showlabels: types.maybeNull(types.boolean),
 
-  encoding: types.optional(
-    types.enumeration(["none", "base64", "base64unicode"]),
-    "none",
-  ),
+  encoding: types.optional(types.enumeration(["none", "base64", "base64unicode"]), "none"),
 
-  granularity: types.optional(
-    types.enumeration(["symbol", "word", "sentence", "paragraph"]),
-    "symbol",
-  ),
+  granularity: types.optional(types.enumeration(["symbol", "word", "sentence", "paragraph"]), "symbol"),
 });
 
 const Model = types
@@ -115,9 +98,7 @@ const Model = types
     },
 
     get isLoaded() {
-      return (
-        self._isLoaded && self._loadedForAnnotation === self.annotation?.id
-      );
+      return self._isLoaded && self._loadedForAnnotation === self.annotation?.id;
     },
 
     get isReady() {
@@ -206,17 +187,11 @@ const Model = types
           const url = value;
 
           if (!isValidObjectURL(url, true)) {
-            const message = [
-              WARNING_MESSAGES.badURL(url),
-              WARNING_MESSAGES.dataTypeMistmatch(),
-            ];
+            const message = [WARNING_MESSAGES.badURL(url), WARNING_MESSAGES.dataTypeMistmatch()];
 
-            if (window.LS_SECURE_MODE)
-              message.unshift(WARNING_MESSAGES.secureMode());
+            if (window.LS_SECURE_MODE) message.unshift(WARNING_MESSAGES.secureMode());
 
-            self.annotationStore.addErrors([
-              errorBuilder.generalError(message.join("<br/>\n")),
-            ]);
+            self.annotationStore.addErrors([errorBuilder.generalError(message.join("<br/>\n"))]);
             self.setRemoteValue("");
             return;
           }
@@ -235,9 +210,7 @@ const Model = types
               url,
             });
 
-            self.annotationStore.addErrors([
-              errorBuilder.generalError(message),
-            ]);
+            self.annotationStore.addErrors([errorBuilder.generalError(message)]);
             self.setRemoteValue("");
           }
         } else {
@@ -249,8 +222,7 @@ const Model = types
         self.loaded = true;
 
         if (self.encoding === "base64") val = atob(val);
-        if (self.encoding === "base64unicode")
-          val = Utils.Checkers.atobUnicode(val);
+        if (self.encoding === "base64unicode") val = Utils.Checkers.atobUnicode(val);
 
         // clean up the html — remove scripts and iframes
         // nodes count better be the same, so replace them with stubs
@@ -262,9 +234,7 @@ const Model = types
         }
 
         self._regionsCache.forEach(({ region, annotation }) => {
-          region.setText(
-            self._value.substring(region.startOffset, region.endOffset),
-          );
+          region.setText(self._value.substring(region.startOffset, region.endOffset));
           self.regions.push(region);
           annotation.addRegion(region);
         });
@@ -364,12 +334,7 @@ const Model = types
       },
 
       relativeOffsetsToGlobalOffsets(start, startOffset, end, endOffset) {
-        return domManager.relativeOffsetsToGlobalOffsets(
-          start,
-          startOffset,
-          end,
-          endOffset,
-        );
+        return domManager.relativeOffsetsToGlobalOffsets(start, startOffset, end, endOffset);
       },
 
       rangeToGlobalOffset(range) {

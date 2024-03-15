@@ -76,21 +76,15 @@ const Model = types
     },
 
     control() {
-      return self.annotation.toNames
-        .get(self.name)
-        ?.find((s) => !s.type.endsWith("labels"));
+      return self.annotation.toNames.get(self.name)?.find((s) => !s.type.endsWith("labels"));
     },
 
     videoControl() {
-      return self.annotation.toNames
-        .get(self.name)
-        ?.find((s) => s.type.includes("video"));
+      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video"));
     },
 
     states() {
-      return self.annotation.toNames
-        .get(self.name)
-        ?.filter((s) => s.type.endsWith("labels"));
+      return self.annotation.toNames.get(self.name)?.filter((s) => s.type.endsWith("labels"));
     },
 
     activeStates() {
@@ -108,9 +102,7 @@ const Model = types
   .actions((self) => ({
     afterCreate() {
       // normalize framerate — should be string with number of frames per second
-      const framerate = Number(
-        parseValue(self.framerate, self.store.task?.dataObj),
-      );
+      const framerate = Number(parseValue(self.framerate, self.store.task?.dataObj));
 
       if (!framerate || Number.isNaN(framerate)) self.framerate = "24";
       else if (framerate < 1) self.framerate = String(1 / framerate);
@@ -222,12 +214,7 @@ const Model = types
           return;
         }
 
-        const area = self.annotation.createResult(
-          { sequence },
-          {},
-          control,
-          self,
-        );
+        const area = self.annotation.createResult({ sequence }, {}, control, self);
 
         // add labels
         self.activeStates().forEach((state) => {

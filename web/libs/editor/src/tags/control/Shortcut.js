@@ -10,11 +10,7 @@ import { guidGenerator } from "../../core/Helpers";
 import { Hotkey } from "../../core/Hotkey";
 import Registry from "../../core/Registry";
 import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
-import {
-  FF_DEV_1564_DEV_1565,
-  FF_DEV_1566,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_DEV_1564_DEV_1565, FF_DEV_1566, isFF } from "../../utils/feature-flags";
 
 /**
  * The `Shortcut` tag to define a shortcut that annotators can use to add a predefined object, such as a specific label value, with a hotkey or keyboard shortcut.
@@ -81,11 +77,7 @@ const Model = types
       const name = (event.target || event.srcElement).name;
       // fired on a wrong element
 
-      if (
-        textarea.name !== name &&
-        (!isFF(FF_DEV_1566) || !name.startsWith(`${textarea.name}:`))
-      )
-        return;
+      if (textarea.name !== name && (!isFF(FF_DEV_1566) || !name.startsWith(`${textarea.name}:`))) return;
       if (isFF(FF_DEV_1564_DEV_1565)) {
         event.preventDefault();
       }
@@ -93,12 +85,7 @@ const Model = types
     },
   }));
 
-const ShortcutModel = types.compose(
-  "ShortcutModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const ShortcutModel = types.compose("ShortcutModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxShortcutView = inject("store")(
   observer(({ item, store }) => {
@@ -123,9 +110,7 @@ const HtxShortcutView = inject("store")(
         style={bg}
       >
         {item.alias ? item.alias : item._value}
-        {store.settings.enableTooltips &&
-          store.settings.enableHotkeys &&
-          item.hotkey && <Hint>[{item.hotkey}]</Hint>}
+        {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && <Hint>[{item.hotkey}]</Hint>}
       </Tag>
     );
   }),

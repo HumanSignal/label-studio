@@ -2,9 +2,7 @@ import TriggerOptions = Cypress.TriggerOptions;
 import ObjectLike = Cypress.ObjectLike;
 import ClickOptions = Cypress.ClickOptions;
 
-type MouseInteractionOptions = Partial<
-  TriggerOptions & ObjectLike & MouseEvent
->;
+type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>;
 
 export const ImageView = {
   get image() {
@@ -19,9 +17,7 @@ export const ImageView = {
   },
   get drawingArea() {
     cy.log("Get Konva.js root");
-    return this.drawingFrame
-      .siblings()
-      .get('[class^="image-element--"] .konvajs-content');
+    return this.drawingFrame.siblings().get('[class^="image-element--"] .konvajs-content');
   },
   get toolBar() {
     cy.log("Get tool bar");
@@ -31,21 +27,15 @@ export const ImageView = {
     return this.root.get('[class^="pagination--"]');
   },
   get paginationPrevBtn() {
-    return this.pagination.get(
-      ".lsf-pagination__btn_arrow-left:not(.lsf-pagination__btn_arrow-left-double)",
-    );
+    return this.pagination.get(".lsf-pagination__btn_arrow-left:not(.lsf-pagination__btn_arrow-left-double)");
   },
   get paginationNextBtn() {
-    return this.pagination.get(
-      ".lsf-pagination__btn_arrow-right:not(.lsf-pagination__btn_arrow-right-double)",
-    );
+    return this.pagination.get(".lsf-pagination__btn_arrow-right:not(.lsf-pagination__btn_arrow-right-double)");
   },
   waitForImage() {
     cy.log("Make sure that the image is visible and loaded");
     this.image.should("be.visible").and((img) => {
-      return expect(
-        (img[0] as HTMLImageElement).naturalWidth,
-      ).to.be.greaterThan(0);
+      return expect((img[0] as HTMLImageElement).naturalWidth).to.be.greaterThan(0);
     });
 
     this.drawingArea.get("canvas").should("be.visible");
@@ -90,13 +80,7 @@ export const ImageView = {
    * @param {number} width
    * @param {number} height
    */
-  drawRect(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    options: MouseInteractionOptions = {},
-  ) {
+  drawRect(x: number, y: number, width: number, height: number, options: MouseInteractionOptions = {}) {
     cy.log(`Draw rectangle at (${x}, ${y}) of size ${width}x${height}`);
     this.drawingArea
       .scrollIntoView()
@@ -124,13 +108,7 @@ export const ImageView = {
    * @param {number} width
    * @param {number} height
    */
-  drawRectRelative(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    options: MouseInteractionOptions = {},
-  ) {
+  drawRectRelative(x: number, y: number, width: number, height: number, options: MouseInteractionOptions = {}) {
     this.drawingFrame.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
@@ -191,24 +169,14 @@ export const ImageView = {
   },
 
   selectMoveToolByButton() {
-    this.toolBar
-      .find('[aria-label="move-tool"]')
-      .should("be.visible")
-      .click()
-      .should("have.class", "lsf-tool_active");
+    this.toolBar.find('[aria-label="move-tool"]').should("be.visible").click().should("have.class", "lsf-tool_active");
   },
 
   rotateLeft() {
-    this.toolBar
-      .find('[aria-label="rotate-left"]')
-      .should("be.visible")
-      .click();
+    this.toolBar.find('[aria-label="rotate-left"]').should("be.visible").click();
   },
 
   rotateRight() {
-    this.toolBar
-      .find('[aria-label="rotate-right"]')
-      .should("be.visible")
-      .click();
+    this.toolBar.find('[aria-label="rotate-right"]').should("be.visible").click();
   },
 };

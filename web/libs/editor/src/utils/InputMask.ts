@@ -15,12 +15,7 @@ export class MaskUtil {
    * @param {string} pattern - The pattern to validate against
    * @param {string} proxyChar - The placeholder string
    */
-  constructor(
-    input: HTMLInputElement,
-    pattern: string,
-    onChange: (value: string) => void,
-    proxyChar = "_",
-  ) {
+  constructor(input: HTMLInputElement, pattern: string, onChange: (value: string) => void, proxyChar = "_") {
     this.input = input;
     this.maskPattern = pattern;
     this.proxyChar = proxyChar;
@@ -100,10 +95,7 @@ export class MaskUtil {
     if (filteredData.length === this.validators.length) {
       const isValid = filteredData
         .split("")
-        .map(
-          (char: any, index: any) =>
-            !!char.match(this.validators[index].validator),
-        )
+        .map((char: any, index: any) => !!char.match(this.validators[index].validator))
         .reduce((accumulator: any, currentValue: any) => {
           if (currentValue === false) {
             return false;
@@ -208,21 +200,11 @@ export class MaskUtil {
   __inputKeydownMask(event: any) {
     const { selectionStart, selectionEnd } = event.target;
     const key = event.key;
-    let index =
-      selectionStart > this.mask.length - 1
-        ? this.mask.length - 1
-        : selectionStart;
+    let index = selectionStart > this.mask.length - 1 ? this.mask.length - 1 : selectionStart;
     let mask = this.mask[index];
 
     /** Set up which keys to ignore */
-    const ignored = [
-      "Tab",
-      "Enter",
-      "Escape",
-      "ArrowLeft",
-      "ArrowRight",
-      "Shift",
-    ];
+    const ignored = ["Tab", "Enter", "Escape", "ArrowLeft", "ArrowRight", "Shift"];
 
     if (ignored.includes(key) || event.metaKey) {
       return;
@@ -241,21 +223,10 @@ export class MaskUtil {
         const previous = this.mask[selectionStart - _removingKey];
 
         if (previous) {
-          const replacement = previous.validator
-            ? this.proxyChar
-            : previous.char;
+          const replacement = previous.validator ? this.proxyChar : previous.char;
 
-          this.onChange(
-            this.splice(
-              event.target.value,
-              selectionStart - _removingKey,
-              replacement,
-            ),
-          );
-          event.target.setSelectionRange(
-            selectionStart - _removingKey,
-            selectionStart - _removingKey,
-          );
+          this.onChange(this.splice(event.target.value, selectionStart - _removingKey, replacement));
+          event.target.setSelectionRange(selectionStart - _removingKey, selectionStart - _removingKey);
         }
 
         return;
@@ -282,21 +253,13 @@ export class MaskUtil {
 
       /** Splice in the added data */
       this.onChange(this.splice(event.target.value, index, key));
-      setTimeout(
-        (target) => target.setSelectionRange(index + 1, index + 1),
-        0,
-        event.target,
-      );
+      setTimeout((target) => target.setSelectionRange(index + 1, index + 1), 0, event.target);
     } else {
       /** If this input replaces multiple items, check its validity and format if possible */
       setTimeout(() => {
         let partialValue = event.target.value;
-        const newKey =
-          key === "Backspace" || key === "Delete" ? this.proxyChar : key;
-        const selectionPosition =
-          key === "Backspace" || key === "Delete"
-            ? selectionStart
-            : selectionStart + 1;
+        const newKey = key === "Backspace" || key === "Delete" ? this.proxyChar : key;
+        const selectionPosition = key === "Backspace" || key === "Delete" ? selectionStart : selectionStart + 1;
 
         for (let i = selectionStart; i < selectionEnd; i++) {
           if (partialValue[i] !== ":") {

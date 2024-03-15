@@ -7,11 +7,7 @@ import { WebAudioPlayer } from "./Controls/WebAudioPlayer";
 import { Cursor, type CursorOptions, CursorSymbol } from "./Cursor/Cursor";
 import { MediaLoader } from "./Media/MediaLoader";
 import type { RegionGlobalEvents, RegionOptions } from "./Regions/Region";
-import {
-  Regions,
-  type RegionsGlobalEvents,
-  type RegionsOptions,
-} from "./Regions/Regions";
+import { Regions, type RegionsGlobalEvents, type RegionsOptions } from "./Regions/Regions";
 import { Timeline, type TimelineOptions } from "./Timeline/Timeline";
 import { Tooltip, type TooltipOptions } from "./Tooltip/Tooltip";
 import type { Layer } from "./Visual/Layer";
@@ -208,8 +204,7 @@ export class Waveform extends Events<WaveformEventTypes> {
     params.decoderType = params.decoderType ?? "webaudio";
     // Need to restrict ffmpeg to html5 player as it doesn't support webaudio
     // because of chunked decoding raw Float32Arrays and no AudioBuffer support
-    params.playerType =
-      params.decoderType === "ffmpeg" ? "html5" : params.playerType ?? "html5";
+    params.playerType = params.decoderType === "ffmpeg" ? "html5" : params.playerType ?? "html5";
 
     this.src = params.src;
     this.params = params;
@@ -250,13 +245,9 @@ export class Waveform extends Events<WaveformEventTypes> {
       this.visualizer,
     );
 
-    this.autoPlayNewSegments =
-      this.params.autoPlayNewSegments ?? this.autoPlayNewSegments;
+    this.autoPlayNewSegments = this.params.autoPlayNewSegments ?? this.autoPlayNewSegments;
 
-    this.player =
-      this.params.playerType === "html5"
-        ? new Html5Player(this)
-        : new WebAudioPlayer(this);
+    this.player = this.params.playerType === "html5" ? new Html5Player(this) : new WebAudioPlayer(this);
 
     this.initEvents();
 
@@ -486,9 +477,7 @@ export class Waveform extends Events<WaveformEventTypes> {
    * @default 1
    */
   get scroll() {
-    return (
-      ((this.duration * this.visualizer.getScrollLeft()) / this.zoom) * 1000
-    );
+    return ((this.duration * this.visualizer.getScrollLeft()) / this.zoom) * 1000;
   }
 
   set scroll(time: number) {
@@ -559,9 +548,7 @@ export class Waveform extends Events<WaveformEventTypes> {
    */
   private initEvents() {
     this.cursor.on("mouseMove", this.handleCursorMove);
-    this.visualizer.on("layersUpdated", () =>
-      this.invoke("layersUpdated", [this.getLayers()]),
-    );
+    this.visualizer.on("layersUpdated", () => this.invoke("layersUpdated", [this.getLayers()]));
   }
 
   /**

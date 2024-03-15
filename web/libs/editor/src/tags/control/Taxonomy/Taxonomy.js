@@ -165,9 +165,7 @@ const TaxonomyLabelingResult = types
 
       if (!area) return null;
 
-      return self.annotation.results.find(
-        (r) => r.from_name === self && r.area === area,
-      );
+      return self.annotation.results.find((r) => r.from_name === self && r.area === area);
     },
     get canRemoveItems() {
       if (!self.isLabeling) return true;
@@ -202,10 +200,7 @@ const TaxonomyLabelingResult = types
           if (!item) return null;
 
           items = item.children;
-          title =
-            self.showfullpath && title
-              ? title + self.pathseparator + item.label
-              : item.label;
+          title = self.showfullpath && title ? title + self.pathseparator + item.label : item.label;
         }
 
         const label = {
@@ -229,9 +224,7 @@ const Model = types
     pid: types.optional(types.string, guidGenerator),
 
     type: "taxonomy",
-    [isFF(FF_DEV_3617) ? "_children" : "children"]: Types.unionArray([
-      "choice",
-    ]),
+    [isFF(FF_DEV_3617) ? "_children" : "children"]: Types.unionArray(["choice"]),
   })
   .volatile(() => ({
     maxUsagesReached: false,
@@ -281,9 +274,7 @@ const Model = types
     },
 
     get preselectedValues() {
-      return self.tiedChildren
-        .filter((c) => c.selected === true && !c.isSkipped)
-        .map((c) => c.resultValue);
+      return self.tiedChildren.filter((c) => c.selected === true && !c.isSkipped).map((c) => c.resultValue);
     },
 
     get isLoadedByApi() {
@@ -302,9 +293,7 @@ const Model = types
         const lastIndex = path.length - 1;
 
         for (let depth = 0; depth < lastIndex; depth++) {
-          current = current.children?.find(
-            (item) => item.label === path[depth],
-          );
+          current = current.children?.find((item) => item.label === path[depth]);
           if (!current) break;
         }
 
@@ -384,11 +373,7 @@ const Model = types
 
       const children = ChildrenSnapshots.get(self.name) ?? [];
 
-      if (
-        isFF(FF_DEV_3617) &&
-        self.store &&
-        children.length !== self.children.length
-      ) {
+      if (isFF(FF_DEV_3617) && self.store && children.length !== self.children.length) {
         if (isFF(FF_TAXONOMY_SELECTED)) {
           // we have to update it during config parsing to let other code work
           // with correctly added children.
@@ -523,9 +508,7 @@ const Model = types
     },
 
     requiredModal() {
-      Infomodal.warning(
-        self.requiredmessage || `Taxonomy "${self.name}" is required.`,
-      );
+      Infomodal.warning(self.requiredmessage || `Taxonomy "${self.name}" is required.`);
     },
 
     needsUpdate() {
@@ -567,11 +550,7 @@ const Model = types
 
     return {
       validate() {
-        if (
-          !Super.validate() ||
-          (self.maxusages && self.selected.length > self.maxusages)
-        )
-          return false;
+        if (!Super.validate() || (self.maxusages && self.selected.length > self.maxusages)) return false;
       },
 
       beforeSend() {
@@ -639,15 +618,10 @@ const TaxonomyModel = types.compose(
 
 const HtxTaxonomy = observer(({ item }) => {
   // literal "taxonomy" class name is for external styling
-  const className = [
-    styles.taxonomy,
-    "taxonomy",
-    isFF(FF_TAXONOMY_ASYNC) ? styles.taxonomy__new : "",
-  ]
+  const className = [styles.taxonomy, "taxonomy", isFF(FF_TAXONOMY_ASYNC) ? styles.taxonomy__new : ""]
     .filter(Boolean)
     .join(" ");
-  const visibleStyle =
-    item.perRegionVisible() && item.isVisible ? {} : { display: "none" };
+  const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: "none" };
   const options = {
     showFullPath: item.showfullpath,
     leafsOnly: item.leafsonly,

@@ -30,15 +30,7 @@ const GridBody = observer(({ row, fields }) => {
     const valuePath = field.id.split(":")[1] ?? field.id;
     const value = getProperty(row, valuePath);
 
-    return (
-      <GridDataGroup
-        key={`${row.id}-${index}`}
-        type={field.currentType}
-        value={value}
-        field={field}
-        row={row}
-      />
-    );
+    return <GridDataGroup key={`${row.id}-${index}`} type={field.currentType} value={value} field={field} row={row} />;
   });
 });
 
@@ -54,149 +46,117 @@ const GridDataGroup = observer(({ type, value, field, row }) => {
   );
 });
 
-const GridCell = observer(
-  ({ view, selected, row, fields, onClick, ...props }) => {
-    return (
-      <Elem
-        {...props}
-        name="cell"
-        onClick={onClick}
-        mod={{ selected: selected.isSelected(row.id) }}
-      >
-        <Elem name="cell-content">
-          <GridHeader
-            view={view}
-            row={row}
-            fields={fields}
-            selected={view.selected}
-          />
-          <GridBody view={view} row={row} fields={fields} />
-        </Elem>
+const GridCell = observer(({ view, selected, row, fields, onClick, ...props }) => {
+  return (
+    <Elem {...props} name="cell" onClick={onClick} mod={{ selected: selected.isSelected(row.id) }}>
+      <Elem name="cell-content">
+        <GridHeader view={view} row={row} fields={fields} selected={view.selected} />
+        <GridBody view={view} row={row} fields={fields} />
       </Elem>
-    );
-  },
-);
+    </Elem>
+  );
+});
 
-export const GridView = observer(
-  ({ data, view, loadMore, fields, onChange, hiddenFields }) => {
-    const columnCount = view.gridWidth ?? 4;
+export const GridView = observer(({ data, view, loadMore, fields, onChange, hiddenFields }) => {
+  const columnCount = view.gridWidth ?? 4;
 
-    const getCellIndex = (row, column) => columnCount * row + column;
+  const getCellIndex = (row, column) => columnCount * row + column;
 
-    const fieldsData = React.useMemo(() => {
-      return prepareColumns(fields, hiddenFields);
-    }, [fields, hiddenFields]);
+  const fieldsData = React.useMemo(() => {
+    return prepareColumns(fields, hiddenFields);
+  }, [fields, hiddenFields]);
 
-    const rowHeight = fieldsData
-      .filter((f) => f.parent?.alias === "data")
-      .reduce((res, f) => {
-        const height = (DataGroups[f.currentType] ?? DataGroups.TextDataGroup)
-          .height;
+  const rowHeight = fieldsData
+    .filter((f) => f.parent?.alias === "data")
+    .reduce((res, f) => {
+      const height = (DataGroups[f.currentType] ?? DataGroups.TextDataGroup).height;
 
-        return res + height;
-      }, 16);
+      return res + height;
+    }, 16);
 
-    const renderItem = React.useCallback(
-      ({ style, rowIndex, columnIndex }) => {
-        const index = getCellIndex(rowIndex, columnIndex);
-        const row = data[index];
+  const renderItem = React.useCallback(
+    ({ style, rowIndex, columnIndex }) => {
+      const index = getCellIndex(rowIndex, columnIndex);
+      const row = data[index];
 
-        if (!row) return null;
+      if (!row) return null;
 
-        const props = {
-          style: {
-            ...style,
-            marginLeft: "1em",
-          },
-        };
-
-        return (
-          <GridCell
-            {...props}
-            view={view}
-            row={row}
-            fields={fieldsData}
-            selected={view.selected}
-            onClick={() => onChange?.(row.id)}
-          />
-        );
-      },
-      [
-        data,
-        fieldsData,
-        view.selected,
-        view,
-        view.selected.list,
-        view.selected.all,
-        columnCount,
-      ],
-    );
-
-    const onItemsRenderedWrap =
-      (cb) =>
-      ({
-        visibleRowStartIndex,
-        visibleRowStopIndex,
-        overscanRowStopIndex,
-        overscanRowStartIndex,
-      }) => {
-        cb({
-          overscanStartIndex: overscanRowStartIndex,
-          overscanStopIndex: overscanRowStopIndex,
-          visibleStartIndex: visibleRowStartIndex,
-          visibleStopIndex: visibleRowStopIndex,
-        });
+      const props = {
+        style: {
+          ...style,
+          marginLeft: "1em",
+        },
       };
 
-    const itemCount = Math.ceil(data.length / columnCount);
+      return (
+        <GridCell
+          {...props}
+          view={view}
+          row={row}
+          fields={fieldsData}
+          selected={view.selected}
+          onClick={() => onChange?.(row.id)}
+        />
+      );
+    },
+    [data, fieldsData, view.selected, view, view.selected.list, view.selected.all, columnCount],
+  );
 
-    const isItemLoaded = React.useCallback(
-      (index) => {
-        const rowIndex = index * columnCount;
-        const rowFullfilled =
-          data.slice(rowIndex, columnCount).length === columnCount;
+  const onItemsRenderedWrap =
+    (cb) =>
+    ({ visibleRowStartIndex, visibleRowStopIndex, overscanRowStopIndex, overscanRowStartIndex }) => {
+      cb({
+        overscanStartIndex: overscanRowStartIndex,
+        overscanStopIndex: overscanRowStopIndex,
+        visibleStartIndex: visibleRowStartIndex,
+        visibleStopIndex: visibleRowStopIndex,
+      });
+    };
 
-        return !view.dataStore.hasNextPage || rowFullfilled;
-      },
-      [columnCount, data, view.dataStore.hasNextPage],
-    );
+  const itemCount = Math.ceil(data.length / columnCount);
 
-    return (
-      <Block
-        name="grid-view"
-        style={{ flex: 1, "--column-count": `${columnCount}n` }}
-      >
-        <Elem tag={AutoSizer} name="resize">
-          {({ width, height }) => (
-            <InfiniteLoader
-              itemCount={itemCount}
-              isItemLoaded={isItemLoaded}
-              loadMoreItems={loadMore}
-              threshold={Math.floor(view.dataStore.pageSize / 2)}
-              minimumBatchSize={view.dataStore.pageSize}
-            >
-              {({ onItemsRendered, ref }) => (
-                <Elem
-                  tag={FixedSizeGrid}
-                  ref={ref}
-                  width={width}
-                  height={height}
-                  name="list"
-                  rowHeight={rowHeight + 42}
-                  overscanRowCount={view.dataStore.pageSize}
-                  columnCount={columnCount}
-                  columnWidth={width / columnCount - 9.5}
-                  rowCount={itemCount}
-                  onItemsRendered={onItemsRenderedWrap(onItemsRendered)}
-                  style={{ overflowX: "hidden" }}
-                >
-                  {renderItem}
-                </Elem>
-              )}
-            </InfiniteLoader>
-          )}
-        </Elem>
-      </Block>
-    );
-  },
-);
+  const isItemLoaded = React.useCallback(
+    (index) => {
+      const rowIndex = index * columnCount;
+      const rowFullfilled = data.slice(rowIndex, columnCount).length === columnCount;
+
+      return !view.dataStore.hasNextPage || rowFullfilled;
+    },
+    [columnCount, data, view.dataStore.hasNextPage],
+  );
+
+  return (
+    <Block name="grid-view" style={{ flex: 1, "--column-count": `${columnCount}n` }}>
+      <Elem tag={AutoSizer} name="resize">
+        {({ width, height }) => (
+          <InfiniteLoader
+            itemCount={itemCount}
+            isItemLoaded={isItemLoaded}
+            loadMoreItems={loadMore}
+            threshold={Math.floor(view.dataStore.pageSize / 2)}
+            minimumBatchSize={view.dataStore.pageSize}
+          >
+            {({ onItemsRendered, ref }) => (
+              <Elem
+                tag={FixedSizeGrid}
+                ref={ref}
+                width={width}
+                height={height}
+                name="list"
+                rowHeight={rowHeight + 42}
+                overscanRowCount={view.dataStore.pageSize}
+                columnCount={columnCount}
+                columnWidth={width / columnCount - 9.5}
+                rowCount={itemCount}
+                onItemsRendered={onItemsRenderedWrap(onItemsRendered)}
+                style={{ overflowX: "hidden" }}
+              >
+                {renderItem}
+              </Elem>
+            )}
+          </InfiniteLoader>
+        )}
+      </Elem>
+    </Block>
+  );
+});

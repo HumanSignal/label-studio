@@ -13,10 +13,7 @@ export const LabelItem = observer(({ item, regions, regionStore }) => {
   const color = item.background;
   const vars = asVars({ color });
 
-  const isHidden = Object.values(regions).reduce(
-    (acc, item) => acc && item.hidden,
-    true,
-  );
+  const isHidden = Object.values(regions).reduce((acc, item) => acc && item.hidden, true);
   const count = Object.values(regions).length;
 
   return (
@@ -30,9 +27,7 @@ export const LabelItem = observer(({ item, regions, regionStore }) => {
           ) : (
             <>Not labeled</>
           )}
-          <Elem name="counter">
-            {`${count} Region${count === 0 || count > 1 ? "s" : ""}`}
-          </Elem>
+          <Elem name="counter">{`${count} Region${count === 0 || count > 1 ? "s" : ""}`}</Elem>
         </Elem>
         <Elem
           name="visibility"

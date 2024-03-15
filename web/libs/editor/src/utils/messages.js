@@ -3,8 +3,7 @@ import React from "react";
 
 import { htmlEscape } from "./html";
 
-const URL_CORS_DOCS =
-  "https://labelstud.io/guide/storage.html#Troubleshoot-CORS-and-access-problems";
+const URL_CORS_DOCS = "https://labelstud.io/guide/storage.html#Troubleshoot-CORS-and-access-problems";
 const URL_TAGS_DOCS = "https://labelstud.io/tags";
 
 export default {
@@ -13,8 +12,7 @@ export default {
   NO_NEXT_TASK: "No More Tasks Left in Queue",
   NO_ACCESS: "You don't have access to this task",
 
-  CONFIRM_TO_DELETE_ALL_REGIONS:
-    "Please confirm you want to delete all labeled regions",
+  CONFIRM_TO_DELETE_ALL_REGIONS: "Please confirm you want to delete all labeled regions",
 
   // Tree validation messages
   ERR_REQUIRED: ({ modelName, field }) => {
@@ -36,9 +34,7 @@ export default {
   },
 
   ERR_PARENT_TAG_UNEXPECTED: ({ validType, value }) => {
-    return `Tag <b>${value}</b> must be a child of one of the tags <b>${[]
-      .concat(validType)
-      .join(", ")}</b>.`;
+    return `Tag <b>${value}</b> must be a child of one of the tags <b>${[].concat(validType).join(", ")}</b>.`;
   },
 
   ERR_BAD_TYPE: ({ modelName, field, validType }) => {
@@ -77,9 +73,7 @@ export default {
         The request parameters are invalid.
         If you are using S3, make sure you’ve specified the right bucket region name.
       </p>
-      <p>URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(
-        url,
-      )}</a></code></p>
+      <p>URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code></p>
     </div>`;
   },
 
@@ -98,9 +92,7 @@ export default {
           <li>Network is reachable</li>
         </ul>
       </p>
-      <p>URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(
-        url,
-      )}</a></code></p>
+      <p>URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code></p>
     </div>`;
   },
 
@@ -124,9 +116,7 @@ export default {
       <p>
         Technical description: <code>${error}</code>
         <br />
-        URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(
-          url,
-        )}</a></code>
+        URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code>
       </p>
     </div>`;
   },

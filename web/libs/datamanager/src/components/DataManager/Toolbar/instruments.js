@@ -37,9 +37,7 @@ export const instruments = {
     return (
       <FieldsButton
         wrapper={FieldsButton.Checkbox}
-        trailingIcon={
-          <Icon {...iconProps} icon={isNewUI ? FaChevronDown : FaCaretDown} />
-        }
+        trailingIcon={<Icon {...iconProps} icon={isNewUI ? FaChevronDown : FaCaretDown} />}
         title={"Columns"}
         size={size}
         style={style}

@@ -26,9 +26,7 @@ const _Tool = types
         return "Ellipse region";
       },
       get iconComponent() {
-        return self.dynamic
-          ? NodeViews.EllipseRegionModel.altIcon
-          : NodeViews.EllipseRegionModel.icon;
+        return self.dynamic ? NodeViews.EllipseRegionModel.altIcon : NodeViews.EllipseRegionModel.icon;
       },
       get defaultDimensions() {
         const { radius } = DEFAULT_DIMENSIONS.ellipse;
@@ -56,12 +54,6 @@ const _Tool = types
     },
   }));
 
-const Ellipse = types.compose(
-  _Tool.name,
-  ToolMixin,
-  BaseTool,
-  TwoPointsDrawingTool,
-  _Tool,
-);
+const Ellipse = types.compose(_Tool.name, ToolMixin, BaseTool, TwoPointsDrawingTool, _Tool);
 
 export { Ellipse };

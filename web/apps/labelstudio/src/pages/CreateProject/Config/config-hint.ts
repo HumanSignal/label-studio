@@ -127,9 +127,7 @@ function getHints(cm: any, options: CMHintOptions) {
   let tagType: "open" | "close" | null = null;
 
   if (tagName) {
-    const before = cm
-      .getLine(cur.line)
-      .slice(Math.max(0, token.start - 2), token.start);
+    const before = cm.getLine(cur.line).slice(Math.max(0, token.start - 2), token.start);
 
     tagType = /<\/$/.test(before) ? "close" : /<$/.test(before) ? "open" : null;
 
@@ -148,9 +146,7 @@ function getHints(cm: any, options: CMHintOptions) {
       prefix = token.string;
     }
     replaceToken = !!tagType;
-    const context = inner.mode.xmlCurrentContext
-      ? inner.mode.xmlCurrentContext(inner.state)
-      : [];
+    const context = inner.mode.xmlCurrentContext ? inner.mode.xmlCurrentContext(inner.state) : [];
 
     inner = context.length && context[context.length - 1];
 
@@ -168,10 +164,7 @@ function getHints(cm: any, options: CMHintOptions) {
           });
     } else if (tagType !== "close") {
       for (const name in tags)
-        if (
-          name !== "!attrs" &&
-          (!prefix || matches(name, prefix, matchInMiddle))
-        )
+        if (name !== "!attrs" && (!prefix || matches(name, prefix, matchInMiddle)))
           result.push({
             text: `<${name}`,
             name,
@@ -179,11 +172,7 @@ function getHints(cm: any, options: CMHintOptions) {
             render: richHint,
           });
     }
-    if (
-      inner &&
-      (!prefix ||
-        (tagType === "close" && matches(inner, prefix, matchInMiddle)))
-    )
+    if (inner && (!prefix || (tagType === "close" && matches(inner, prefix, matchInMiddle))))
       result.push({ text: `</${inner}>`, render: richHint });
   } else {
     // Attribute completion
@@ -200,8 +189,7 @@ function getHints(cm: any, options: CMHintOptions) {
       const atName = before.match(/([^\s\u00a0=<>"']+)=$/);
       const atValues = atName?.[1] ? attrs[atName[1]]?.type : undefined;
 
-      if (!atName || !Object.prototype.hasOwnProperty.call(attrs, atName[1]))
-        return;
+      if (!atName || !Object.prototype.hasOwnProperty.call(attrs, atName[1])) return;
       if (!atValues || !Array.isArray(atValues)) return;
       if (token.type === "string") {
         prefix = token.string;
@@ -222,8 +210,7 @@ function getHints(cm: any, options: CMHintOptions) {
           // an opening quote
           const line = cm.getLine(cur.line);
 
-          if (line.length > token.end && line.charAt(token.end) === quote)
-            token.end++; // include a closing quote
+          if (line.length > token.end && line.charAt(token.end) === quote) token.end++; // include a closing quote
         }
         replaceToken = true;
       }
@@ -262,9 +249,7 @@ function getHints(cm: any, options: CMHintOptions) {
   function returnHints() {
     return {
       list: result,
-      from: replaceToken
-        ? Pos(cur.line, tagStart === undefined ? token.start : tagStart)
-        : cur,
+      from: replaceToken ? Pos(cur.line, tagStart === undefined ? token.start : tagStart) : cur,
       to: replaceToken ? Pos(cur.line, token.end) : cur,
     };
   }

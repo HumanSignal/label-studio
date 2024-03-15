@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { FaEllipsisV } from "react-icons/fa";
 import { BemWithSpecifiContext } from "../../../utils/bem";
 import { Button } from "../Button/Button";
@@ -19,15 +12,7 @@ const { Block, Elem } = BemWithSpecifiContext();
 
 const TabsContext = createContext();
 
-export const Tabs = ({
-  children,
-  activeTab,
-  onChange,
-  onAdd,
-  tabBarExtraContent,
-  allowedActions,
-  addIcon,
-}) => {
+export const Tabs = ({ children, activeTab, onChange, onAdd, tabBarExtraContent, allowedActions, addIcon }) => {
   const [selectedTab, setSelectedTab] = useState(activeTab);
 
   const switchTab = useCallback((tab) => {
@@ -54,15 +39,7 @@ export const Tabs = ({
         <Elem name="list">
           {children}
 
-          {allowedActions.add !== false && (
-            <Elem
-              tag={Button}
-              name="add"
-              type="text"
-              onClick={onAdd}
-              icon={addIcon}
-            />
-          )}
+          {allowedActions.add !== false && <Elem tag={Button} name="add" type="text" onClick={onAdd} icon={addIcon} />}
         </Elem>
         <Elem name="extra">{tabBarExtraContent}</Elem>
       </Block>
@@ -83,18 +60,14 @@ export const TabsItem = ({
   managable = true,
   virtual = false,
 }) => {
-  const { switchTab, selectedTab, lastTab, allowedActions } =
-    useContext(TabsContext);
+  const { switchTab, selectedTab, lastTab, allowedActions } = useContext(TabsContext);
   const [currentTitle, setCurrentTitle] = useState(title);
   const [renameMode, setRenameMode] = useState(false);
   const [hover, setHover] = useState(false);
 
   const active = tab === selectedTab;
 
-  const tabIsEditable = useMemo(
-    () => editable && allowedActions.edit,
-    [editable, allowedActions],
-  );
+  const tabIsEditable = useMemo(() => editable && allowedActions.edit, [editable, allowedActions]);
 
   const tabIsDeletable = useMemo(
     () => !lastTab && deletable && allowedActions.delete,

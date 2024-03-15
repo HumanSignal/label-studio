@@ -23,12 +23,8 @@ const ToolView = observer(({ item }) => {
           align="vertical"
           reverse
           continuous
-          minIcon={
-            <IconContrastTool style={{ width: 22, height: 22, opacity: 0.2 }} />
-          }
-          maxIcon={
-            <IconContrastTool style={{ width: 22, height: 22, opacity: 0.8 }} />
-          }
+          minIcon={<IconContrastTool style={{ width: 22, height: 22, opacity: 0.2 }} />}
+          maxIcon={<IconContrastTool style={{ width: 22, height: 22, opacity: 0.8 }} />}
           value={item.contrast}
           max={Constants.CONTRAST_MAX}
           onChange={(val) => {

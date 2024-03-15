@@ -13,21 +13,12 @@ export const ViewToggle = viewInjector(
     const isDatasetsFF = isFF(FF_LOPS_E_10);
 
     return (
-      <RadioGroup
-        size={size}
-        value={view.type}
-        onChange={(e) => view.setType(e.target.value)}
-        {...rest}
-      >
+      <RadioGroup size={size} value={view.type} onChange={(e) => view.setType(e.target.value)} {...rest}>
         <RadioGroup.Button value="list">
-          <Tooltip title="List view">
-            {isDatasetsFF ? <LsList /> : <span>List</span>}
-          </Tooltip>
+          <Tooltip title="List view">{isDatasetsFF ? <LsList /> : <span>List</span>}</Tooltip>
         </RadioGroup.Button>
         <RadioGroup.Button value="grid">
-          <Tooltip title="Grid view">
-            {isDatasetsFF ? <LsGrid /> : <span>Grid</span>}
-          </Tooltip>
+          <Tooltip title="Grid view">{isDatasetsFF ? <LsGrid /> : <span>Grid</span>}</Tooltip>
         </RadioGroup.Button>
       </RadioGroup>
     );
@@ -36,12 +27,7 @@ export const ViewToggle = viewInjector(
 
 export const DataStoreToggle = viewInjector(({ view, size, ...rest }) => {
   return (
-    <RadioGroup
-      value={view.target}
-      size={size}
-      onChange={(e) => view.setTarget(e.target.value)}
-      {...rest}
-    >
+    <RadioGroup value={view.target} size={size} onChange={(e) => view.setTarget(e.target.value)} {...rest}>
       <RadioGroup.Button value="tasks">Tasks</RadioGroup.Button>
       <RadioGroup.Button value="annotations" disabled>
         Annotations

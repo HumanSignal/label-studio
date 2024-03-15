@@ -5,8 +5,7 @@ export const valueToString = (value) => {
   if (typeof value === "string") return value;
   /* if undefined or null we'll treat it as empty string */
   if (value === undefined || value === null) return "";
-  if (value instanceof Date && isValid(value))
-    return format(value, dateTimeFormat);
+  if (value instanceof Date && isValid(value)) return format(value, dateTimeFormat);
 
   try {
     /* JSON.stringify will handle JSON and non-strings, non-null, non-undefined */

@@ -66,12 +66,7 @@ async function magicWand(I, { msg, fromX, fromY, toX, toY }) {
 }
 
 async function assertMagicWandPixel(I, x, y, assertValue, rgbArray, msg) {
-  const hasPixel = await I.executeScript(hasKonvaPixelColorAtPoint, [
-    x,
-    y,
-    rgbArray,
-    1,
-  ]);
+  const hasPixel = await I.executeScript(hasKonvaPixelColorAtPoint, [x, y, rgbArray, 1]);
 
   assert.equal(hasPixel, assertValue, msg);
 }
@@ -124,9 +119,7 @@ Scenario(
       toY: 650,
     });
 
-    I.say(
-      "Ensuring repeated magic wands back to back with same class collapsed into single region",
-    );
+    I.say("Ensuring repeated magic wands back to back with same class collapsed into single region");
     AtSidebar.seeRegions(1);
     AtSidebar.see("Cloud");
 
@@ -142,22 +135,8 @@ Scenario(
       CLOUD.rgbArray,
       "Far upper left corner should not have magic wand cloud class",
     );
-    await assertMagicWandPixel(
-      I,
-      260,
-      50,
-      true,
-      CLOUD.rgbArray,
-      "Upper left should have magic wand cloud class",
-    );
-    await assertMagicWandPixel(
-      I,
-      300,
-      620,
-      true,
-      CLOUD.rgbArray,
-      "Lower left should have magic wand cloud class",
-    );
+    await assertMagicWandPixel(I, 260, 50, true, CLOUD.rgbArray, "Upper left should have magic wand cloud class");
+    await assertMagicWandPixel(I, 300, 620, true, CLOUD.rgbArray, "Lower left should have magic wand cloud class");
     await assertMagicWandPixel(
       I,
       675,
@@ -193,14 +172,7 @@ Scenario(
       CLOUD.rgbArray,
       "Undone lower left should not have magic wand cloud class anymore",
     );
-    await assertMagicWandPixel(
-      I,
-      260,
-      50,
-      true,
-      CLOUD.rgbArray,
-      "Upper left should still have magic wand cloud class",
-    );
+    await assertMagicWandPixel(I, 260, 50, true, CLOUD.rgbArray, "Upper left should still have magic wand cloud class");
     AtSidebar.seeRegions(1);
 
     I.say("Redoing last cloud magic wand and ensuring it worked correctly");
@@ -214,14 +186,7 @@ Scenario(
       CLOUD.rgbArray,
       "Redone lower left should have magic wand cloud class again",
     );
-    await assertMagicWandPixel(
-      I,
-      260,
-      50,
-      true,
-      CLOUD.rgbArray,
-      "Upper left should still have magic wand cloud class",
-    );
+    await assertMagicWandPixel(I, 260, 50, true, CLOUD.rgbArray, "Upper left should still have magic wand cloud class");
     AtSidebar.seeRegions(1);
 
     I.say("Unselecting last magic wand region");
@@ -242,9 +207,7 @@ Scenario(
     I.say("Selecting cloud shadow class");
     I.pressKey("2");
 
-    I.say(
-      "Magic wanding cloud shadows with cloud shadow class in center of zoomed image",
-    );
+    I.say("Magic wanding cloud shadows with cloud shadow class in center of zoomed image");
     await magicWand(I, {
       msg: "Cloud shadow in middle of image",
       fromX: 390,
@@ -277,21 +240,12 @@ Scenario(
     );
 
     // Make sure if you have a region selected then change the class the region class changes.
-    I.say(
-      "Changing class of existing selected region to Haze should change it to new class",
-    );
+    I.say("Changing class of existing selected region to Haze should change it to new class");
     I.pressKey("3");
     AtSidebar.seeRegions(2);
     AtSidebar.dontSee("Cloud Shadow");
     AtSidebar.see("Haze");
     await I.executeScript(setKonvaLayersOpacity, [1.0]);
-    await assertMagicWandPixel(
-      I,
-      350,
-      360,
-      true,
-      HAZE.rgbArray,
-      "Center area should have magic wand haze class",
-    );
+    await assertMagicWandPixel(I, 350, 360, true, HAZE.rgbArray, "Center area should have magic wand haze class");
   },
 );

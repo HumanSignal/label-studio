@@ -27,11 +27,7 @@ const standaloneModal = (props) => {
         providers={
           props.simple
             ? []
-            : [
-                <ConfigProvider key="config" />,
-                <ApiProvider key="api" />,
-                <CurrentUserProvider key="current-user" />,
-              ]
+            : [<ConfigProvider key="config" />, <ApiProvider key="api" />, <CurrentUserProvider key="current-user" />]
         }
       >
         <Modal
@@ -64,14 +60,7 @@ const standaloneModal = (props) => {
   };
 };
 
-export const confirm = ({
-  okText,
-  onOk,
-  cancelText,
-  onCancel,
-  buttonLook,
-  ...props
-}) => {
+export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...props }) => {
   const modal = standaloneModal({
     ...props,
     allowClose: false,

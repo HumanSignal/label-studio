@@ -13,29 +13,17 @@ import { Block, Elem, cn } from "../../utils/bem";
 import { WebhookDeleteModal } from "./WebhookDeleteModal";
 import "./WebhookPage.styl";
 
-const WebhookDetail = ({
-  webhook,
-  webhooksInfo,
-  fetchWebhooks,
-  onBack,
-  onSelectActive,
-}) => {
+const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectActive }) => {
   // if webhook === null - create mod
   // else update
   const rootClass = cn("webhook-detail");
 
   const api = useAPI();
-  const [headers, setHeaders] = useState(
-    Object.entries(webhook?.headers || []),
-  );
-  const [sendForAllActions, setSendForAllActions] = useState(
-    webhook ? webhook.send_for_all_actions : true,
-  );
+  const [headers, setHeaders] = useState(Object.entries(webhook?.headers || []));
+  const [sendForAllActions, setSendForAllActions] = useState(webhook ? webhook.send_for_all_actions : true);
   const [actions, setActions] = useState(new Set(webhook?.actions));
   const [isActive, setIsActive] = useState(webhook ? webhook.is_active : true);
-  const [sendPayload, setSendPayload] = useState(
-    webhook ? webhook.send_payload : true,
-  );
+  const [sendPayload, setSendPayload] = useState(webhook ? webhook.send_payload : true);
   const { project } = useProject();
   const [projectId, setProjectId] = useState(project.id);
 
@@ -123,9 +111,7 @@ const WebhookDetail = ({
                 ...data,
                 project: projectId,
                 send_for_all_actions: sendForAllActions,
-                headers: Object.fromEntries(
-                  headers.filter(([key]) => key !== ""),
-                ),
+                headers: Object.fromEntries(headers.filter(([key]) => key !== "")),
                 actions: Array.from(actions),
                 is_active: isActive,
                 send_payload: sendPayload,
@@ -141,15 +127,9 @@ const WebhookDetail = ({
             <Form.Row style={{ marginBottom: "40px" }} columnCount={1}>
               <Label text="Payload URL" style={{ marginLeft: "-16px" }} large />
               <Space className={rootClass.elem("url-space")}>
-                <Input
-                  name="url"
-                  className={rootClass.elem("url-input")}
-                  placeholder="URL"
-                />
+                <Input name="url" className={rootClass.elem("url-input")} placeholder="URL" />
                 <Space align="end" className={rootClass.elem("activator")}>
-                  <span className={rootClass.elem("black-text")}>
-                    Is Active
-                  </span>
+                  <span className={rootClass.elem("black-text")}>Is Active</span>
                   <Toggle
                     skip
                     checked={isActive}
@@ -174,11 +154,7 @@ const WebhookDetail = ({
                   </Space>
                   {headers.map(([headKey, headValue], index) => {
                     return (
-                      <Space
-                        key={index}
-                        className={rootClass.elem("headers-row")}
-                        columnCount={3}
-                      >
+                      <Space key={index} className={rootClass.elem("headers-row")} columnCount={3}>
                         <Input
                           className={rootClass.elem("headers-input")}
                           skip
@@ -287,11 +263,7 @@ const WebhookDetail = ({
               <div className={rootClass.elem("status")}>
                 <Form.Indicator />
               </div>
-              <Button
-                type="button"
-                className={rootClass.elem("cancel-button")}
-                onClick={onBack}
-              >
+              <Button type="button" className={rootClass.elem("cancel-button")} onClick={onBack}>
                 Cancel
               </Button>
               <Button primary className={rootClass.elem("save-button")}>

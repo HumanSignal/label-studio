@@ -1,7 +1,6 @@
 Feature("Max usage");
 
-const IMAGE =
-  "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg";
+const IMAGE = "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg";
 
 const createImageToolsConfig = ({ maxUsage }) => `
 <View> 
@@ -11,9 +10,7 @@ const createImageToolsConfig = ({ maxUsage }) => `
   <Brush name="Brush" toName="img" />
   <KeyPoint name="KeyPoint" toName="img" />
   <Polygon name="Polygon" toName="img" />
-  <Labels name="Labels" toName="img" ${
-    maxUsage ? ` maxUsages="${maxUsage}"` : ""
-  }>
+  <Labels name="Labels" toName="img" ${maxUsage ? ` maxUsages="${maxUsage}"` : ""}>
     <Label value="Label_0" />
     <Label value="Label_1" hotkey="1" />
   </Labels>
@@ -22,33 +19,23 @@ const createImageToolsConfig = ({ maxUsage }) => `
 const createImageLabelsConfig = ({ maxUsage }) => `
 <View>
   <Image name="img" value="$image" width="50%" />
-  <RectangleLabels name="Rectangle" toName="img" ${
-    maxUsage ? ` maxUsages="${maxUsage}"` : ""
-  }>
+  <RectangleLabels name="Rectangle" toName="img" ${maxUsage ? ` maxUsages="${maxUsage}"` : ""}>
     <Label value="Rectangle_0" />
     <Label value="Rectangle_1" hotkey="1" />
   </RectangleLabels>
-  <EllipseLabels name="Ellipse" toName="img" ${
-    maxUsage ? ` maxUsages="${maxUsage}"` : ""
-  }>
+  <EllipseLabels name="Ellipse" toName="img" ${maxUsage ? ` maxUsages="${maxUsage}"` : ""}>
     <Label value="Ellipse_0" />
     <Label value="Ellipse_1" hotkey="2" />
   </EllipseLabels>
-  <BrushLabels name="Brush" toName="img" ${
-    maxUsage ? ` maxUsages="${maxUsage}"` : ""
-  }>
+  <BrushLabels name="Brush" toName="img" ${maxUsage ? ` maxUsages="${maxUsage}"` : ""}>
     <Label value="Brush_0" />
     <Label value="Brush_1" hotkey="3" />
   </BrushLabels>
-  <KeyPointLabels name="KeyPoint" toName="img" ${
-    maxUsage ? ` maxUsages="${maxUsage}"` : ""
-  }>
+  <KeyPointLabels name="KeyPoint" toName="img" ${maxUsage ? ` maxUsages="${maxUsage}"` : ""}>
     <Label value="KeyPoint_0" />
     <Label value="KeyPoint_1" hotkey="4" />
   </KeyPointLabels>
-  <PolygonLabels name="Polygon" toName="img" ${
-    maxUsage ? ` maxUsages="${maxUsage}"` : ""
-  }>
+  <PolygonLabels name="Polygon" toName="img" ${maxUsage ? ` maxUsages="${maxUsage}"` : ""}>
     <Label value="Polygon_0" />
     <Label value="Polygon_1" hotkey="5" />
   </PolygonLabels>
@@ -234,8 +221,7 @@ Data(maxUsageDataTable).Scenario(
   <Audio name="audio" value="$audio" />
 </View>`,
       data: {
-        audio:
-          "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3",
+        audio: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3",
       },
     });
 

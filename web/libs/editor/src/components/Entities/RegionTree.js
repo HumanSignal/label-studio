@@ -33,15 +33,7 @@ export const RegionTree = observer(({ regionStore }) => {
   const regions = regionStore.asTree((item, idx, onClick) => {
     return {
       key: item.id,
-      title: (
-        <RegionItem
-          item={item}
-          idx={idx}
-          flat={isFlat}
-          setDraggable={setDraggable}
-          onClick={onClick}
-        />
-      ),
+      title: <RegionItem item={item} idx={idx} flat={isFlat} setDraggable={setDraggable} onClick={onClick} />,
     };
   });
 
@@ -76,8 +68,7 @@ export const RegionTree = observer(({ regionStore }) => {
         const dragKey = dragNode.props.eventKey;
         const dropPos = node.props.pos.split("-");
 
-        dropPosition =
-          dropPosition - Number.parseInt(dropPos[dropPos.length - 1]);
+        dropPosition = dropPosition - Number.parseInt(dropPos[dropPos.length - 1]);
         const treeDepth = dropPos.length;
 
         const dropReg = regionStore.findRegionID(dropKey);
@@ -95,15 +86,10 @@ export const RegionTree = observer(({ regionStore }) => {
           if (labelWithConstraint.length) {
             const selDrag = dragReg.labeling.selectedLabels;
 
-            const set1 = Utils.Checkers.flatten(
-              labelWithConstraint.map((l) => l.groupcancontain.split(",")),
-            );
-            const set2 = Utils.Checkers.flatten(
-              selDrag.map((l) => (l.alias ? [l.alias, l.value] : [l.value])),
-            );
+            const set1 = Utils.Checkers.flatten(labelWithConstraint.map((l) => l.groupcancontain.split(",")));
+            const set2 = Utils.Checkers.flatten(selDrag.map((l) => (l.alias ? [l.alias, l.value] : [l.value])));
 
-            if (set1.filter((value) => -1 !== set2.indexOf(value)).length === 0)
-              return;
+            if (set1.filter((value) => -1 !== set2.indexOf(value)).length === 0) return;
           }
 
           // check drop regions tree depth
@@ -118,9 +104,7 @@ export const RegionTree = observer(({ regionStore }) => {
               if (!node) return 0;
 
               // TODO this can blow up if we have lots of stuff there
-              const childrenHeight = regionStore
-                .filterByParentID(node.pid)
-                .map((c) => treeHeight(c));
+              const childrenHeight = regionStore.filterByParentID(node.pid).map((c) => treeHeight(c));
 
               if (!childrenHeight.length) return 0;
 

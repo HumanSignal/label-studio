@@ -22,14 +22,8 @@ const configSimple = `
 `;
 
 const url = "https://htx-pub.s3.amazonaws.com/example.txt";
-const configUrl = configSimple.replace(
-  'value="$text"',
-  'valueType="url" value="$url"',
-);
-const configUrlSaveText = configUrl.replace(
-  'valueType="url"',
-  'valueType="url" saveTextResult="yes"',
-);
+const configUrl = configSimple.replace('value="$text"', 'valueType="url" value="$url"');
+const configUrlSaveText = configUrl.replace('valueType="url"', 'valueType="url" saveTextResult="yes"');
 
 const resultsFromUrl = [
   {
@@ -232,31 +226,28 @@ Scenario("NER Text from url with text saved", async ({ I }) => {
   assert.deepEqual(result, resultsFromUrl);
 });
 
-Scenario(
-  "NER Text with SECURE MODE and wrong valueType",
-  async ({ I, LabelStudio }) => {
-    const params = {
-      annotations: [{ id: "TestCmpl", result: results }],
-      config: configSimple,
-      data: { url },
-    };
+Scenario("NER Text with SECURE MODE and wrong valueType", async ({ I, LabelStudio }) => {
+  const params = {
+    annotations: [{ id: "TestCmpl", result: results }],
+    config: configSimple,
+    data: { url },
+  };
 
-    I.amOnPage("/");
-    I.executeScript(() => {
-      window.OLD_LS_SECURE_MODE = window.LS_SECURE_MODE;
-      window.LS_SECURE_MODE = true;
-    });
+  I.amOnPage("/");
+  I.executeScript(() => {
+    window.OLD_LS_SECURE_MODE = window.LS_SECURE_MODE;
+    window.LS_SECURE_MODE = true;
+  });
 
-    LabelStudio.init(params);
+  LabelStudio.init(params);
 
-    I.see("In SECURE MODE"); // error about valueType in secure mode
-    I.dontSee("American political leader");
+  I.see("In SECURE MODE"); // error about valueType in secure mode
+  I.dontSee("American political leader");
 
-    I.executeScript(() => {
-      window.LS_SECURE_MODE = window.OLD_LS_SECURE_MODE;
-    });
-  },
-);
+  I.executeScript(() => {
+    window.LS_SECURE_MODE = window.OLD_LS_SECURE_MODE;
+  });
+});
 
 Scenario("NER Text with SECURE MODE", async ({ I, LabelStudio }) => {
   const params = {

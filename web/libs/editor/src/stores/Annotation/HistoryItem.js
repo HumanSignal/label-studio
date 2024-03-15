@@ -37,8 +37,7 @@ export const HistoryItem = types
       pk: guidGenerator(),
       user: snapshot.created_by,
       createdDate: snapshot.created_at,
-      actionType:
-        snapshot.action ?? snapshot.action_type ?? snapshot.actionType,
+      actionType: snapshot.action ?? snapshot.action_type ?? snapshot.actionType,
       readonly: true,
       editable: false,
     };

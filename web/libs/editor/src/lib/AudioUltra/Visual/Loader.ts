@@ -140,9 +140,7 @@ export class Loader extends HTMLElement {
     const text = this.shadowRoot.querySelector("#text") as HTMLElement;
     const loadedText = this.shadowRoot.querySelector("#loaded") as HTMLElement;
     const totalText = this.shadowRoot.querySelector("#total") as HTMLElement;
-    const percentageText = this.shadowRoot.querySelector(
-      "#percentage",
-    ) as HTMLElement;
+    const percentageText = this.shadowRoot.querySelector("#percentage") as HTMLElement;
 
     if (!bar) return;
 
@@ -167,13 +165,10 @@ export class Loader extends HTMLElement {
 
       // Indeterminate progress bar is given if no calculable total available.
       if (total < 0) {
-        if (!bar.classList.contains("progress-bar-indeterminate"))
-          bar.classList.add("progress-bar-indeterminate");
+        if (!bar.classList.contains("progress-bar-indeterminate")) bar.classList.add("progress-bar-indeterminate");
 
         if (this.loaded > 0) {
-          loadedText.innerText = `${this.convertBytesToMegabytes(
-            this.loaded,
-          )} MB`;
+          loadedText.innerText = `${this.convertBytesToMegabytes(this.loaded)} MB`;
         }
         return;
       }
@@ -184,12 +179,8 @@ export class Loader extends HTMLElement {
       if (value === 100) {
         this._initializing = true;
         if (this.total > 0) {
-          loadedText.innerText = `${this.convertBytesToMegabytes(
-            this.loaded,
-          )} MB`;
-          totalText.innerText = `${this.convertBytesToMegabytes(
-            this.total,
-          )} MB`;
+          loadedText.innerText = `${this.convertBytesToMegabytes(this.loaded)} MB`;
+          totalText.innerText = `${this.convertBytesToMegabytes(this.total)} MB`;
           percentageText.innerText = `(${value}%)`;
         }
         text.innerText = "Initializing...";
@@ -203,9 +194,7 @@ export class Loader extends HTMLElement {
         percentageText.innerText = `(${value}%)`;
       }
       if (this.loaded > 0) {
-        loadedText.innerText = `${this.convertBytesToMegabytes(
-          this.loaded,
-        )} MB`;
+        loadedText.innerText = `${this.convertBytesToMegabytes(this.loaded)} MB`;
       }
       if (this.total > 0) {
         totalText.innerText = `${this.convertBytesToMegabytes(this.total)} MB`;

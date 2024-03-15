@@ -42,15 +42,9 @@ const switchInjector = inject(({ store }) => {
 
 const ProjectSummary = summaryInjector((props) => {
   return (
-    <Space
-      size="large"
-      style={{ paddingRight: "1em", color: "rgba(0,0,0,0.3)" }}
-    >
+    <Space size="large" style={{ paddingRight: "1em", color: "rgba(0,0,0,0.3)" }}>
       {props.cloudSync && (
-        <Space
-          size="small"
-          style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}
-        >
+        <Space size="small" style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>
           Storage sync
           <Spinner size="small" />
         </Space>

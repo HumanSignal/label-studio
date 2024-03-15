@@ -38,13 +38,7 @@ export const DateTimeInput = observer(({ value, range, time, onChange }) => {
   }, [range, value]);
 
   return (
-    <DatePicker
-      size="small"
-      value={dateValue}
-      selectRange={range}
-      showTime={time === true}
-      onChange={onValueChange}
-    />
+    <DatePicker size="small" value={dateValue} selectRange={range} showTime={time === true} onChange={onValueChange} />
   );
 });
 
@@ -66,17 +60,13 @@ export const DateFields = (extraProps) => {
       key: "in",
       label: "is between",
       valueType: "range",
-      input: (props) => (
-        <DateTimeInput range {...props} {...(extraProps ?? {})} />
-      ),
+      input: (props) => <DateTimeInput range {...props} {...(extraProps ?? {})} />,
     },
     {
       key: "not_in",
       label: "not between",
       valueType: "range",
-      input: (props) => (
-        <DateTimeInput range {...props} {...(extraProps ?? {})} />
-      ),
+      input: (props) => <DateTimeInput range {...props} {...(extraProps ?? {})} />,
     },
   ];
 };

@@ -17,13 +17,7 @@ class DDTextElement {
   public content: string[];
   public path?: string;
 
-  constructor(
-    node: Text,
-    start: number,
-    end: number,
-    content: string[],
-    path?: string,
-  ) {
+  constructor(node: Text, start: number, end: number, content: string[], path?: string) {
     this.node = node;
     this.start = start;
     this.end = end;
@@ -32,10 +26,7 @@ class DDTextElement {
   }
 
   getContent(start: number, end: number): string[] {
-    return this.content.slice(
-      Math.max(start - this.start, 0),
-      Math.min(end - this.start, this.end),
-    );
+    return this.content.slice(Math.max(start - this.start, 0), Math.min(end - this.start, this.end));
   }
 
   get text(): string {
@@ -55,10 +46,7 @@ class DDTextElement {
     const content = this.getContent(start, end);
 
     if (newNode.textContent) {
-      newNode.textContent = newNode.textContent.substring(
-        start - this.start,
-        end - this.start,
-      );
+      newNode.textContent = newNode.textContent.substring(start - this.start, end - this.start);
     }
 
     return new DDTextElement(newNode, start, end, content);
@@ -82,10 +70,7 @@ class DDTextElement {
     return spanElement;
   }
 
-  createSpanElements(
-    start: number,
-    end: number,
-  ): Array<DDSpanElement | DDTextElement> {
+  createSpanElements(start: number, end: number): Array<DDSpanElement | DDTextElement> {
     const { node } = this;
     const doc = node.ownerDocument;
     const parent = node.parentNode as Node;
@@ -137,13 +122,8 @@ class DDBlock {
     this.end = end;
   }
 
-  findTextElement(
-    pos: number,
-    avoid: "start" | "end" = "start",
-  ): DDTextElement | undefined {
-    const el = this.children.find(
-      (child) => child.start <= pos && child.end >= pos && child[avoid] !== pos,
-    );
+  findTextElement(pos: number, avoid: "start" | "end" = "start"): DDTextElement | undefined {
+    const el = this.children.find((child) => child.start <= pos && child.end >= pos && child[avoid] !== pos);
 
     if (el instanceof DDSpanElement) {
       return el.findTextElement(pos, avoid);
@@ -194,11 +174,7 @@ class DDBlock {
     });
     parent.replaceChild(span, dummyReplacer);
 
-    const spanElement = new DDSpanElement(
-      span,
-      firstElement.start,
-      lastElement.end,
-    );
+    const spanElement = new DDSpanElement(span, firstElement.start, lastElement.end);
 
     spanElement.children.push(...elements);
     return spanElement;
@@ -223,19 +199,12 @@ class DDBlock {
         spans.push(spanElement.node);
         wrappableNodes = [];
       }
-      if (
-        (start >= node.start && start < node.end) ||
-        (end > node.start && end <= node.end)
-      ) {
+      if ((start >= node.start && start < node.end) || (end > node.start && end <= node.end)) {
         if (isTextNode) {
           const elements = node.createSpanElements(start, end);
 
           children.push(...elements);
-          spans.push(
-            ...elements
-              .filter((el) => el instanceof DDSpanElement)
-              .map((el) => el.node as HTMLSpanElement),
-          );
+          spans.push(...elements.filter((el) => el instanceof DDSpanElement).map((el) => el.node as HTMLSpanElement));
         } else {
           children.push(node);
           spans.push(...node.createSpans(start, end));
@@ -289,11 +258,7 @@ class DDBlock {
     };
 
     for (const el of this.children) {
-      if (
-        el instanceof DDTextElement &&
-        (stack.length === 0 ||
-          stack[stack.length - 1].node.nextSibling === el.node)
-      ) {
+      if (el instanceof DDTextElement && (stack.length === 0 || stack[stack.length - 1].node.nextSibling === el.node)) {
         stack.push(el);
       } else {
         checkStack();
@@ -335,13 +300,7 @@ class DDDynamicBlock extends DDBlock {
     this.path = path;
   }
 
-  addTextNode(
-    textNode: Text,
-    start: number,
-    end: number,
-    content: string[],
-    path: string,
-  ) {
+  addTextNode(textNode: Text, start: number, end: number, content: string[], path: string) {
     this.children.push(new DDTextElement(textNode, start, end, content, path));
     this.end = end;
   }
@@ -387,18 +346,13 @@ class DomData {
   }
 
   addStaticElement(currentNode: HTMLElement, path: Path) {
-    this.elements.push(
-      new DDStaticElement(currentNode, this.endPos, path.toString()),
-    );
+    this.elements.push(new DDStaticElement(currentNode, this.endPos, path.toString()));
   }
 
   addExtraText(text: DDExtraText) {
     let lastIdxOfTextBlock = this.elements.length - 1;
 
-    while (
-      !(this.elements[lastIdxOfTextBlock] instanceof DDDynamicBlock) &&
-      lastIdxOfTextBlock > -1
-    ) {
+    while (!(this.elements[lastIdxOfTextBlock] instanceof DDDynamicBlock) && lastIdxOfTextBlock > -1) {
       --lastIdxOfTextBlock;
     }
     this.elements.splice(lastIdxOfTextBlock + 1, 0, normalizeText(text));
@@ -415,10 +369,7 @@ class DomData {
     let toIdx = fromIdx;
 
     for (const char of text) {
-      if (
-        displayedText[toIdx] === char ||
-        (displayedText[toIdx] === " " && char === LF)
-      ) {
+      if (displayedText[toIdx] === char || (displayedText[toIdx] === " " && char === LF)) {
         contentParts.push(displayedText[toIdx]);
         toIdx++;
       } else {
@@ -450,11 +401,7 @@ class DomData {
       // that means that it contains some \n or other symbols that are trimmed by browser
 
       // calc the offsets of the part of displayedText that matches the text in terms of displayed symbols
-      const {
-        fromIdx,
-        toIdx,
-        content: newContent,
-      } = this.findProjectionOnDisplayedText(text);
+      const { fromIdx, toIdx, content: newContent } = this.findProjectionOnDisplayedText(text);
 
       pos = fromIdx;
       displayedTextLength = toIdx - fromIdx;
@@ -463,20 +410,12 @@ class DomData {
     }
 
     if (pos !== this.displayedTextPos) {
-      this.addExtraText(
-        this.displayedText.substring(this.displayedTextPos, pos),
-      );
+      this.addExtraText(this.displayedText.substring(this.displayedTextPos, pos));
       this.displayedTextPos = pos;
     }
     const dynamicBlock = this.createDynamicBlock(path.toString());
 
-    dynamicBlock.addTextNode(
-      textNode,
-      this.endPos,
-      this.endPos + contentLength,
-      content,
-      path.toString(),
-    );
+    dynamicBlock.addTextNode(textNode, this.endPos, this.endPos + contentLength, content, path.toString());
     this.endPos += contentLength;
     this.displayedTextPos += displayedTextLength;
   }
@@ -488,10 +427,7 @@ class DomData {
     this.endPos += 1;
   }
 
-  findTextElement(
-    pos: number,
-    avoid: "start" | "end" = "start",
-  ): DDTextElement | undefined {
+  findTextElement(pos: number, avoid: "start" | "end" = "start"): DDTextElement | undefined {
     return this.findTextBlock(pos, avoid)?.findTextElement(pos, avoid);
   }
 
@@ -521,16 +457,9 @@ class DomData {
     return void 0;
   }
 
-  findTextBlock(
-    pos: number,
-    avoid: "start" | "end" = "start",
-  ): DDDynamicBlock | undefined {
+  findTextBlock(pos: number, avoid: "start" | "end" = "start"): DDDynamicBlock | undefined {
     const block = this.elements.find(
-      (el) =>
-        el instanceof DDDynamicBlock &&
-        el.start <= pos &&
-        el.end >= pos &&
-        el[avoid] !== pos,
+      (el) => el instanceof DDDynamicBlock && el.start <= pos && el.end >= pos && el[avoid] !== pos,
     );
 
     if (isDefined(block)) {
@@ -541,11 +470,7 @@ class DomData {
 
   indexOfTextBlock(pos: number, avoid: "start" | "end" = "start"): number {
     return this.elements.findIndex(
-      (el) =>
-        el instanceof DDDynamicBlock &&
-        el.start <= pos &&
-        el.end >= pos &&
-        el[avoid] !== pos,
+      (el) => el instanceof DDDynamicBlock && el.start <= pos && el.end >= pos && el[avoid] !== pos,
     );
   }
 
@@ -704,10 +629,7 @@ export default class DomManager {
 
   initDataMap() {
     const { doc, root, domData } = this;
-    const walker: TreeWalker = (this.walker = doc.createTreeWalker(
-      root,
-      NodeFilter.SHOW_ALL,
-    ));
+    const walker: TreeWalker = (this.walker = doc.createTreeWalker(root, NodeFilter.SHOW_ALL));
     let currentNode: Node | null;
 
     this.currentPath = new Path();
@@ -785,12 +707,7 @@ export default class DomManager {
     return undefined;
   }
 
-  relativeOffsetsToGlobalOffsets(
-    start: string,
-    startOffset: number,
-    end: string,
-    endOffset: number,
-  ) {
+  relativeOffsetsToGlobalOffsets(start: string, startOffset: number, end: string, endOffset: number) {
     const startEl = this.domData.findElementByPath(start);
     const endEl = this.domData.findElementByPath(end);
 

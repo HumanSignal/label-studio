@@ -114,11 +114,7 @@ const Model = types
       const date = self.parseDateTime(value);
 
       // we can't use toISOString() because it may shift timezone and return different day
-      return [
-        date.getFullYear(),
-        zero(date.getMonth() + 1),
-        zero(date.getDate()),
-      ].join("-");
+      return [date.getFullYear(), zero(date.getMonth() + 1), zero(date.getDate())].join("-");
     },
 
     /**
@@ -230,9 +226,7 @@ const Model = types
     },
 
     validDateFormat(dateString) {
-      const dateNumberArray = dateString
-        .split("-")
-        .map((dateString) => Number.parseInt(dateString, 10));
+      const dateNumberArray = dateString.split("-").map((dateString) => Number.parseInt(dateString, 10));
       const year = dateNumberArray[0];
       const isADate = !Number.isNaN(new Date(dateString));
       const fourPositiveIntegersYear = year <= 9999 && year >= 1000;
@@ -295,9 +289,7 @@ const Model = types
     },
 
     requiredModal() {
-      InfoModal.warning(
-        self.requiredmessage || `DateTime "${self.name}" is required.`,
-      );
+      InfoModal.warning(self.requiredmessage || `DateTime "${self.name}" is required.`);
     },
   }))
   .actions((self) => {
@@ -321,9 +313,7 @@ const Model = types
         if (max && date > max) errors.push(`max date is ${max}`);
 
         if (errors.length) {
-          InfoModal.warning(
-            `Date "${date}" is not valid: ${errors.join(", ")}.`,
-          );
+          InfoModal.warning(`Date "${date}" is not valid: ${errors.join(", ")}.`);
           return false;
         }
         return true;
@@ -347,9 +337,7 @@ const DateTimeModel = types.compose(
 const HtxDateTime = inject("store")(
   observer(({ item }) => {
     const disabled = item.isReadOnly();
-    const visibleStyle = item.perRegionVisible()
-      ? { margin: "0 0 1em" }
-      : { display: "none" };
+    const visibleStyle = item.perRegionVisible() ? { margin: "0 0 1em" } : { display: "none" };
     const visual = {
       style: {
         width: "auto",
@@ -358,9 +346,7 @@ const HtxDateTime = inject("store")(
       },
       className: "ant-input",
     };
-    const [minTime, maxTime] = [item.min, item.max].map(
-      (s) => s?.match(/\d?\d:\d\d/)?.[0],
-    );
+    const [minTime, maxTime] = [item.min, item.max].map((s) => s?.match(/\d?\d:\d\d/)?.[0]);
     const [dateInputValue, setDateInputValue] = useState("");
 
     const handleDateInputValueChange = (event) => {
@@ -372,10 +358,7 @@ const HtxDateTime = inject("store")(
     };
 
     if (item.updateValue) {
-      if (
-        item.showDate &&
-        (item.date === undefined || item.date !== dateInputValue)
-      ) {
+      if (item.showDate && (item.date === undefined || item.date !== dateInputValue)) {
         setDateInputValue(item.date || "");
       }
       item.setNeedsUpdate(false);

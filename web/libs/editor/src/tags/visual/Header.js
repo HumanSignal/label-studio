@@ -43,9 +43,7 @@ const HeaderModel = types.compose("HeaderModel", Model, ProcessAttrsMixin);
 
 const HtxHeader = observer(({ item }) => {
   const size = clamp(Number.parseInt(item.size), 1, 5);
-  const style = item.style
-    ? Tree.cssConverter(item.style)
-    : { margin: "10px 0" };
+  const style = item.style ? Tree.cssConverter(item.style) : { margin: "10px 0" };
 
   if (!style.fontSize && size > 4) {
     style.fontSize = size === 5 ? "1.2em" : "1.1em";

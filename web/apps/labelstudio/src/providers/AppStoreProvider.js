@@ -21,11 +21,7 @@ export const AppStoreProvider = ({ children }) => {
     [store, update],
   );
 
-  return (
-    <AppStoreContext.Provider value={contextValue}>
-      {children}
-    </AppStoreContext.Provider>
-  );
+  return <AppStoreContext.Provider value={contextValue}>{children}</AppStoreContext.Provider>;
 };
 
 export const useAppStore = () => {

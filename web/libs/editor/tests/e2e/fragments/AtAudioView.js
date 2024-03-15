@@ -11,18 +11,12 @@ module.exports = {
   _volumeSliderSelector: ".lsf-audio-slider__range",
   _volumeInputSelector: ".lsf-audio-slider__input",
   _muteButtonSelector: ".lsf-audio-control__mute-button",
-  _playbackSpeedSliderSelector:
-    ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(1) .lsf-audio-slider__range",
-  _playbackSpeedInputSelector:
-    ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(1) .lsf-audio-slider__input",
-  _amplitudeSliderSelector:
-    ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__range",
-  _amplitudeInputSelector:
-    ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__input",
-  _hideTimelineButtonSelector:
-    ".lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(1)",
-  _hideWaveformButtonSelector:
-    ".lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(2)",
+  _playbackSpeedSliderSelector: ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(1) .lsf-audio-slider__range",
+  _playbackSpeedInputSelector: ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(1) .lsf-audio-slider__input",
+  _amplitudeSliderSelector: ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__range",
+  _amplitudeInputSelector: ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__input",
+  _hideTimelineButtonSelector: ".lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(1)",
+  _hideWaveformButtonSelector: ".lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(2)",
   _audioElementSelector: '[data-testid="waveform-audio"]',
   _seekBackwardButtonSelector:
     ".lsf-audio-tag .lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(1)",
@@ -59,16 +53,9 @@ module.exports = {
    */
   dragAudioElement(x, shiftX, shouldRelease = true) {
     I.scrollPageToTop();
-    I.moveMouse(
-      this._stageBbox.x + x,
-      this._stageBbox.y + this._stageBbox.height / 2,
-    );
+    I.moveMouse(this._stageBbox.x + x, this._stageBbox.y + this._stageBbox.height / 2);
     I.pressMouseDown();
-    I.moveMouse(
-      this._stageBbox.x + x + shiftX,
-      this._stageBbox.y + this._stageBbox.height / 2,
-      3,
-    );
+    I.moveMouse(this._stageBbox.x + x + shiftX, this._stageBbox.y + this._stageBbox.height / 2, 3);
     if (shouldRelease === false) return;
     I.pressMouseUp();
     I.wait(1);
@@ -135,9 +122,7 @@ module.exports = {
 
   async moveRegion(regionId, offset = 30) {
     const regionPosition = await I.executeScript((regionId) => {
-      const region = Htx.annotationStore.selected.regions.find(
-        (r) => r.cleanId === regionId,
-      );
+      const region = Htx.annotationStore.selected.regions.find((r) => r.cleanId === regionId);
       const element = region.getRegionElement();
       const rect = element.getBoundingClientRect();
 
@@ -156,9 +141,7 @@ module.exports = {
   async moveRegionV3(regionId, offset = 30) {
     const regionPosition = await I.executeScript(
       ({ regionId, stageBbox }) => {
-        const region = Htx.annotationStore.selected.regions.find(
-          (r) => r.cleanId === regionId,
-        );
+        const region = Htx.annotationStore.selected.regions.find((r) => r.cleanId === regionId);
 
         const wsRegion = region._ws_region;
 
@@ -218,10 +201,7 @@ module.exports = {
 
     const stageBBox = await I.grabElementBoundingRect(this._stageSelector);
 
-    I.clickAt(
-      stageBBox.x + stageBBox.width * x,
-      stageBBox.y + stageBBox.height * y,
-    ); // click to focus the canvas
+    I.clickAt(stageBBox.x + stageBBox.width * x, stageBBox.y + stageBBox.height * y); // click to focus the canvas
 
     I.pressKeyDown("Control");
     I.mouseWheel({ deltaY });
@@ -240,23 +220,13 @@ module.exports = {
     this.toggleControlsMenu();
     I.seeInField(this._volumeInputSelector, value);
     I.seeInField(this._volumeSliderSelector, value);
-    const volume = await I.grabAttributeFrom(
-      this._audioElementSelector,
-      "volume",
-    );
-    const muted = await I.grabAttributeFrom(
-      this._audioElementSelector,
-      "muted",
-    );
+    const volume = await I.grabAttributeFrom(this._audioElementSelector, "volume");
+    const muted = await I.grabAttributeFrom(this._audioElementSelector, "muted");
 
     if (muted) {
       assert.equal(volume, null, "Volume doesn't match in audio element");
     } else {
-      assert.equal(
-        volume,
-        value / 100,
-        "Volume doesn't match in audio element",
-      );
+      assert.equal(volume, value / 100, "Volume doesn't match in audio element");
     }
     this.toggleControlsMenu();
   },
@@ -289,16 +259,9 @@ module.exports = {
     I.seeInField(this._playbackSpeedInputSelector, value);
     I.seeInField(this._playbackSpeedSliderSelector, value);
 
-    const playbackSpeed = await I.grabAttributeFrom(
-      this._audioElementSelector,
-      "playbackRate",
-    );
+    const playbackSpeed = await I.grabAttributeFrom(this._audioElementSelector, "playbackRate");
 
-    assert.equal(
-      playbackSpeed,
-      value,
-      "Playback speed doesn't match in audio element",
-    );
+    assert.equal(playbackSpeed, value, "Playback speed doesn't match in audio element");
 
     this.toggleSettingsMenu();
   },
@@ -377,15 +340,8 @@ module.exports = {
    * @returns {Promise<void>}
    */
   async seeIsPlaying(playing) {
-    const isPaused = await I.grabAttributeFrom(
-      this._audioElementSelector,
-      "paused",
-    );
+    const isPaused = await I.grabAttributeFrom(this._audioElementSelector, "paused");
 
-    assert.equal(
-      !isPaused,
-      playing,
-      playing ? "Audio is not playing" : "Audio is playing",
-    );
+    assert.equal(!isPaused, playing, playing ? "Audio is not playing" : "Audio is playing");
   },
 };

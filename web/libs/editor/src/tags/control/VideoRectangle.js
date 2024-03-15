@@ -36,12 +36,7 @@ const ModelAttrs = types.model("VideoRectangleModel", {
   type: "videorectangle",
 });
 
-const VideoRectangleModel = types.compose(
-  "VideoRectangleModel",
-  ControlBase,
-  ModelAttrs,
-  TagAttrs,
-);
+const VideoRectangleModel = types.compose("VideoRectangleModel", ControlBase, ModelAttrs, TagAttrs);
 
 const HtxVideoRectangle = observer(() => {
   return null;

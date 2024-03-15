@@ -16,11 +16,7 @@ export function cutFibers(object) {
       const isWritable = descriptors[key].writable;
 
       if (prop && isWritable) {
-        if (
-          key !== "_debugOwner" &&
-          typeof prop === "object" &&
-          {}.hasOwnProperty.call(prop, "stateNode")
-        ) {
+        if (key !== "_debugOwner" && typeof prop === "object" && {}.hasOwnProperty.call(prop, "stateNode")) {
           objects.push(obj[key]);
         }
         if (typeof prop === "object" || typeof prop === "function") {
@@ -53,8 +49,7 @@ export function cleanDomAfterReact(nodes, reactKey) {
     const reactPropKeys = Object.keys(node).filter(
       (key) =>
         key.startsWith("__react") &&
-        (!RegExp(/^(?:__reactProps|__reactFiber)/).exec(key) ||
-          RegExp(new RegExp(`\\${reactKey}$`)).exec(key)),
+        (!RegExp(/^(?:__reactProps|__reactFiber)/).exec(key) || RegExp(new RegExp(`\\${reactKey}$`)).exec(key)),
     );
 
     if (reactPropKeys.length) {

@@ -55,13 +55,7 @@ export const MenuItem = ({
   return (
     <li>
       {to ? (
-        <NavLink
-          to={finalHref}
-          {...linkAttributes}
-          exact={exact}
-          activeClassName={activeClassName}
-          data-external
-        >
+        <NavLink to={finalHref} {...linkAttributes} exact={exact} activeClassName={activeClassName} data-external>
           {linkContent}
         </NavLink>
       ) : finalHref ? (

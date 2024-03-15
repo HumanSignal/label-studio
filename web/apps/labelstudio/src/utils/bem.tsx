@@ -60,12 +60,7 @@ export type BemComponent = FunctionComponent<CNComponentProps>;
 
 const CSS_PREFIX = process.env.CSS_PREFIX ?? "dm-";
 
-const assembleClass = (
-  block: string,
-  elem?: string,
-  mix?: CNMix | CNMix[],
-  mod?: CNMod,
-) => {
+const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?: CNMod) => {
   const rootName = block;
   const elemName = elem ? `${rootName}__${elem}` : null;
 
@@ -184,46 +179,38 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
 export const BemWithSpecifiContext = (context: Context<CN | null>) => {
   const LocalContext = context ?? createContext<CN | null>(null);
 
-  const Block: BemComponent = forwardRef(
-    ({ tag = "div", name, mod, mix, ...rest }, ref) => {
-      const rootClass = cn(name);
-      const finalMix = ([] as [CNMix?]).concat(mix).filter((cnm) => !!cnm);
-      const className = rootClass
-        .mod(mod)
-        .mix(...(finalMix as CNMix[]), rest.className)
-        .toClassName();
-      const finalProps = { ...rest, ref, className } as any;
+  const Block: BemComponent = forwardRef(({ tag = "div", name, mod, mix, ...rest }, ref) => {
+    const rootClass = cn(name);
+    const finalMix = ([] as [CNMix?]).concat(mix).filter((cnm) => !!cnm);
+    const className = rootClass
+      .mod(mod)
+      .mix(...(finalMix as CNMix[]), rest.className)
+      .toClassName();
+    const finalProps = { ...rest, ref, className } as any;
 
-      return (
-        <LocalContext.Provider value={rootClass}>
-          {createElement(tag, finalProps)}
-        </LocalContext.Provider>
-      );
-    },
-  );
+    return <LocalContext.Provider value={rootClass}>{createElement(tag, finalProps)}</LocalContext.Provider>;
+  });
 
   Block.displayName = "Block";
 
-  const Elem: BemComponent = forwardRef(
-    ({ component, block, name, mod, mix, ...rest }, ref) => {
-      const blockCtx = useContext(LocalContext);
+  const Elem: BemComponent = forwardRef(({ component, block, name, mod, mix, ...rest }, ref) => {
+    const blockCtx = useContext(LocalContext);
 
-      const finalMix = ([] as [CNMix?]).concat(mix).filter((cnm) => !!cnm);
-      const finalTag = rest.tag ?? "div";
+    const finalMix = ([] as [CNMix?]).concat(mix).filter((cnm) => !!cnm);
+    const finalTag = rest.tag ?? "div";
 
-      const className = (block ? cn(block) : blockCtx)
-        ?.elem(name)
-        .mod(mod)
-        .mix(...(finalMix as CNMix[]), rest.className)
-        .toClassName();
+    const className = (block ? cn(block) : blockCtx)
+      ?.elem(name)
+      .mod(mod)
+      .mix(...(finalMix as CNMix[]), rest.className)
+      .toClassName();
 
-      const finalProps: any = { ...rest, ref, className };
+    const finalProps: any = { ...rest, ref, className };
 
-      if (typeof finalTag !== "string") finalProps.block = blockCtx;
+    if (typeof finalTag !== "string") finalProps.block = blockCtx;
 
-      return createElement(component ?? finalTag, finalProps);
-    },
-  );
+    return createElement(component ?? finalTag, finalProps);
+  });
 
   Elem.displayName = "Elem";
 

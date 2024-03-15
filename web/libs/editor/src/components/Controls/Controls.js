@@ -30,11 +30,7 @@ export default inject("store")(
     let taskInformation;
 
     if (store.task) {
-      taskInformation = (
-        <h4 className={`${styles.task} ls-task-info`}>
-          Task ID: {store.task.id}
-        </h4>
-      );
+      taskInformation = <h4 className={`${styles.task} ls-task-info`}>Task ID: {store.task.id}</h4>;
     }
 
     /**
@@ -59,31 +55,17 @@ export default inject("store")(
 
       if (store.hasInterface("skip")) {
         skipButton = (
-          <Tooltip
-            title="Cancel (skip) task: [ Ctrl+Space ]"
-            mouseEnterDelay={TOOLTIP_DELAY}
-          >
-            <Button
-              disabled={disabled}
-              look="danger"
-              onClick={store.skipTask}
-              className={`${styles.skip} ls-skip-btn`}
-            >
+          <Tooltip title="Cancel (skip) task: [ Ctrl+Space ]" mouseEnterDelay={TOOLTIP_DELAY}>
+            <Button disabled={disabled} look="danger" onClick={store.skipTask} className={`${styles.skip} ls-skip-btn`}>
               Skip {buttons.skip}
             </Button>
           </Tooltip>
         );
       }
 
-      if (
-        (userGenerate && !sentUserGenerate) ||
-        (store.explore && !userGenerate && store.hasInterface("submit"))
-      ) {
+      if ((userGenerate && !sentUserGenerate) || (store.explore && !userGenerate && store.hasInterface("submit"))) {
         submitButton = (
-          <Tooltip
-            title="Save results: [ Ctrl+Enter ]"
-            mouseEnterDelay={TOOLTIP_DELAY}
-          >
+          <Tooltip title="Save results: [ Ctrl+Enter ]" mouseEnterDelay={TOOLTIP_DELAY}>
             <Button
               disabled={disabled}
               look="primary"
@@ -97,15 +79,9 @@ export default inject("store")(
         );
       }
 
-      if (
-        (userGenerate && sentUserGenerate) ||
-        (!userGenerate && store.hasInterface("update"))
-      ) {
+      if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
         updateButton = (
-          <Tooltip
-            title="Update this task: [ Alt+Enter ]"
-            mouseEnterDelay={TOOLTIP_DELAY}
-          >
+          <Tooltip title="Update this task: [ Alt+Enter ]" mouseEnterDelay={TOOLTIP_DELAY}>
             <Button
               disabled={disabled}
               look="primary"
@@ -113,8 +89,7 @@ export default inject("store")(
               onClick={store.updateAnnotation}
               className="ls-update-btn"
             >
-              {sentUserGenerate || versions.result ? "Update" : "Submit"}{" "}
-              {buttons.update}
+              {sentUserGenerate || versions.result ? "Update" : "Submit"} {buttons.update}
             </Button>
           </Tooltip>
         );

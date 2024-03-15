@@ -1,9 +1,4 @@
-import {
-  ImageView,
-  LabelStudio,
-  Labels,
-  Sidebar,
-} from "@humansignal/frontend-test/helpers/LSF";
+import { ImageView, LabelStudio, Labels, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { FF_LSDV_E_278 } from "../../../../src/utils/feature-flags";
 
 const config = `
@@ -273,9 +268,7 @@ describe("Filter outliner scenario", () => {
     cy.get('[data-testid="logic-dropdown"]').click();
     cy.get(".lsf-select__list").contains("Or").click();
     cy.contains("Select value").click();
-    cy.get(".lsf-select__dropdown.lsf-visible > .lsf-select__list")
-      .contains("contains")
-      .click();
+    cy.get(".lsf-select__dropdown.lsf-visible > .lsf-select__list").contains("contains").click();
     cy.get('[data-testid="filter-input"]').eq(1).type("Planet");
     Sidebar.hasRegions(3);
     cy.get('[data-testid="delete-row-0"]').click();

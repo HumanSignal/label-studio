@@ -97,15 +97,11 @@ const swapScripts = (targetScript, sourceScript) => {
  * @param {HTMLScriptElement} scriptTag
  * @param {Function} onReplace
  */
-export const replaceScript = async (
-  scriptTag,
-  { sourceScript, forceUpdate = false } = {},
-) => {
+export const replaceScript = async (scriptTag, { sourceScript, forceUpdate = false } = {}) => {
   sourceScript = sourceScript ?? scriptTag;
 
   if (!isScriptValid(scriptTag, forceUpdate)) return;
-  if (sourceScript !== scriptTag && !isScriptValid(sourceScript, forceUpdate))
-    return;
+  if (sourceScript !== scriptTag && !isScriptValid(sourceScript, forceUpdate)) return;
 
   return swapScripts(scriptTag, sourceScript);
 };

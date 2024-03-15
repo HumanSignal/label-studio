@@ -17,29 +17,17 @@ interface DetailsPanelProps extends PanelProps {
   selection: any;
 }
 
-const DetailsPanelComponent: FC<DetailsPanelProps> = ({
-  currentEntity,
-  regions,
-  ...props
-}) => {
+const DetailsPanelComponent: FC<DetailsPanelProps> = ({ currentEntity, regions, ...props }) => {
   const selectedRegions = regions.selection;
 
   return (
-    <PanelBase
-      {...props}
-      currentEntity={currentEntity}
-      name="details"
-      title="Details"
-    >
+    <PanelBase {...props} currentEntity={currentEntity} name="details" title="Details">
       <Content selection={selectedRegions} currentEntity={currentEntity} />
     </PanelBase>
   );
 };
 
-const DetailsComponent: FC<DetailsPanelProps> = ({
-  currentEntity,
-  regions,
-}) => {
+const DetailsComponent: FC<DetailsPanelProps> = ({ currentEntity, regions }) => {
   const selectedRegions = regions.selection;
 
   return (
@@ -50,35 +38,26 @@ const DetailsComponent: FC<DetailsPanelProps> = ({
 };
 
 const Content: FC<any> = observer(({ selection, currentEntity }) => {
-  return (
-    <>
-      {selection.size ? (
-        <RegionsPanel regions={selection} />
-      ) : (
-        <GeneralPanel currentEntity={currentEntity} />
-      )}
-    </>
-  );
+  return <>{selection.size ? <RegionsPanel regions={selection} /> : <GeneralPanel currentEntity={currentEntity} />}</>;
 });
 
 const CommentsTab: FC<any> = inject("store")(
   observer(({ store }) => {
     return (
       <>
-        {store.hasInterface("annotations:comments") &&
-          store.commentStore.isCommentable && (
-            <Block name="comments-panel">
-              <Elem name="section-tab">
-                <Elem name="section-content">
-                  <CommentsComponent
-                    annotationStore={store.annotationStore}
-                    commentStore={store.commentStore}
-                    cacheKey={`task.${store.task.id}`}
-                  />
-                </Elem>
+        {store.hasInterface("annotations:comments") && store.commentStore.isCommentable && (
+          <Block name="comments-panel">
+            <Elem name="section-tab">
+              <Elem name="section-content">
+                <CommentsComponent
+                  annotationStore={store.annotationStore}
+                  commentStore={store.commentStore}
+                  cacheKey={`task.${store.task.id}`}
+                />
               </Elem>
-            </Block>
-          )}
+            </Elem>
+          </Block>
+        )}
       </>
     );
   }),
@@ -120,11 +99,7 @@ const HistoryTab: FC<any> = inject("store")(
                 <span>#{currentEntity.pk ?? currentEntity.id}</span>
               </Elem>
               <Elem name="section-content">
-                <AnnotationHistory
-                  inline
-                  showDraft={showDraftInHistory}
-                  enabled={showAnnotationHistory}
-                />
+                <AnnotationHistory inline showDraft={showDraftInHistory} enabled={showAnnotationHistory} />
               </Elem>
             </Elem>
           )}
@@ -166,11 +141,7 @@ const GeneralPanel: FC<any> = inject("store")(
               <span>#{currentEntity.pk ?? currentEntity.id}</span>
             </Elem>
             <Elem name="section-content">
-              <AnnotationHistory
-                inline
-                showDraft={showDraftInHistory}
-                enabled={showAnnotationHistory}
-              />
+              <AnnotationHistory inline showDraft={showDraftInHistory} enabled={showAnnotationHistory} />
             </Elem>
           </Elem>
         )}
@@ -180,19 +151,18 @@ const GeneralPanel: FC<any> = inject("store")(
             <RelationsComponent relationStore={relationStore} />
           </Elem>
         </Elem>
-        {store.hasInterface("annotations:comments") &&
-          store.commentStore.isCommentable && (
-            <Elem name="section">
-              <Elem name="section-head">Comments</Elem>
-              <Elem name="section-content">
-                <CommentsComponent
-                  annotationStore={store.annotationStore}
-                  commentStore={store.commentStore}
-                  cacheKey={`task.${store.task.id}`}
-                />
-              </Elem>
+        {store.hasInterface("annotations:comments") && store.commentStore.isCommentable && (
+          <Elem name="section">
+            <Elem name="section-head">Comments</Elem>
+            <Elem name="section-content">
+              <CommentsComponent
+                annotationStore={store.annotationStore}
+                commentStore={store.commentStore}
+                cacheKey={`task.${store.task.id}`}
+              />
             </Elem>
-          )}
+          </Elem>
+        )}
       </>
     );
   }),
@@ -211,13 +181,7 @@ const RegionsPanel: FC<{ regions: any }> = observer(({ regions }) => {
 });
 
 const SelectedRegion: FC<{ region: any }> = observer(({ region }) => {
-  return (
-    <RegionItem
-      region={region}
-      mainDetails={RegionDetailsMain}
-      metaDetails={RegionDetailsMeta}
-    />
-  );
+  return <RegionItem region={region} mainDetails={RegionDetailsMain} metaDetails={RegionDetailsMeta} />;
 });
 
 export const Comments = observer(CommentsTab);

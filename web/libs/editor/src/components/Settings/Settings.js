@@ -53,11 +53,7 @@ const HotkeysDescription = () => {
           }
           return (
             <Tabs.TabPane key={ns} tab={data.description ?? ns}>
-              <Table
-                columns={columns}
-                dataSource={getData(data.descriptions)}
-                size="small"
-              />
+              <Table columns={columns} dataSource={getData(data.descriptions)} size="small" />
             </Tabs.TabPane>
           );
         })}
@@ -71,18 +67,13 @@ const newUI = isFF(FF_DEV_3873) ? { newUI: true } : {};
 const editorSettingsKeys = Object.keys(EditorSettings);
 
 if (isFF(FF_DEV_3873)) {
-  const enableTooltipsIndex = editorSettingsKeys.findIndex(
-    (key) => key === "enableTooltips",
-  );
-  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex(
-    (key) => key === "enableLabelTooltips",
-  );
+  const enableTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableTooltips");
+  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableLabelTooltips");
 
   // swap these in the array
   const tmp = editorSettingsKeys[enableTooltipsIndex];
 
-  editorSettingsKeys[enableTooltipsIndex] =
-    editorSettingsKeys[enableLabelTooltipsIndex];
+  editorSettingsKeys[enableTooltipsIndex] = editorSettingsKeys[enableLabelTooltipsIndex];
   editorSettingsKeys[enableLabelTooltipsIndex] = tmp;
 }
 
@@ -105,9 +96,7 @@ const GeneralSettings = observer(({ store }) => {
                       <SettingsTag key={tag}>{tag}</SettingsTag>
                     ))}
                   </Elem>
-                  <Block name="description">
-                    {EditorSettings[obj].newUI.description}
-                  </Block>
+                  <Block name="description">{EditorSettings[obj].newUI.description}</Block>
                 </Block>
                 <Toggle
                   key={index}
@@ -151,10 +140,7 @@ const LayoutSettings = observer(({ store }) => {
       </Elem>
 
       <Elem name="field">
-        <Checkbox
-          checked={store.settings.displayLabelsByDefault}
-          onChange={store.settings.toggleSidepanelModel}
-        >
+        <Checkbox checked={store.settings.displayLabelsByDefault} onChange={store.settings.toggleSidepanelModel}>
           Display Labels by default in Results panel
         </Checkbox>
       </Elem>
@@ -229,9 +215,7 @@ export default observer(({ store }) => {
 
     return availableTags.reduce((res, tagName) => {
       const tagType = store.annotationStore.names.get(tagName).type;
-      const settings = settingsScreens.find(
-        ({ tagName }) => tagName.toLowerCase() === tagType.toLowerCase(),
-      );
+      const settings = settingsScreens.find(({ tagName }) => tagName.toLowerCase() === tagType.toLowerCase());
 
       if (settings) res.push(settings);
 

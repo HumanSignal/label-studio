@@ -3,10 +3,7 @@ import { getParent, getRoot, hasParent, types } from "mobx-state-tree";
 import React, { useState } from "react";
 import { Circle, Rect } from "react-konva";
 
-import {
-  RELATIVE_STAGE_HEIGHT,
-  RELATIVE_STAGE_WIDTH,
-} from "../components/ImageView/Image";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { guidGenerator } from "../core/Helpers";
 import { useRegionStyles } from "../hooks/useRegionColor";
 import { FF_DEV_2431, FF_DEV_3793, isFF } from "../utils/feature-flags";
@@ -28,10 +25,8 @@ const PolygonPointAbsoluteCoordsDEV3793 = types
         self.relativeX = self.x;
         self.relativeY = self.y;
       } else {
-        self.relativeX =
-          (self.x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
-        self.relativeY =
-          (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
+        self.relativeX = (self.x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
+        self.relativeY = (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
       }
     },
     movePoint(offsetX, offsetY) {
@@ -41,8 +36,7 @@ const PolygonPointAbsoluteCoordsDEV3793 = types
       self.y = self.y + offsetY;
 
       self.relativeX = (self.x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeY =
-        (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
+      self.relativeY = (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
     },
     _setPos(x, y) {
       self.initX = x;
@@ -204,11 +198,7 @@ const PolygonPointRelativeCoords = types
 
 const PolygonPoint = isFF(FF_DEV_3793)
   ? PolygonPointRelativeCoords
-  : types.compose(
-      "PolygonPoint",
-      PolygonPointRelativeCoords,
-      PolygonPointAbsoluteCoordsDEV3793,
-    );
+  : types.compose("PolygonPoint", PolygonPointRelativeCoords, PolygonPointAbsoluteCoordsDEV3793);
 
 const PolygonPointView = observer(({ item, name }) => {
   if (!item.parent) return;
@@ -319,8 +309,7 @@ const PolygonPointView = observer(({ item, name }) => {
           item.parent.deletePoint(item);
         }}
         onClick={(ev) => {
-          if (isFF(FF_DEV_2431) && ev.evt.altKey)
-            return item.parent.deletePoint(item);
+          if (isFF(FF_DEV_2431) && ev.evt.altKey) return item.parent.deletePoint(item);
           if (item.parent.isDrawing && item.parent.points.length === 1) return;
           // don't unselect polygon on point click
           ev.evt.preventDefault();

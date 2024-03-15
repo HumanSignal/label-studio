@@ -1,25 +1,19 @@
 import { Checkbox, Input } from "antd";
 import { observer } from "mobx-react";
 import type { FC } from "react";
-import type {
-  SettingsProperties,
-  SettingsProperty,
-} from "../../../core/settings/types";
+import type { SettingsProperties, SettingsProperty } from "../../../core/settings/types";
 import { Block, Elem } from "../../../utils/bem";
 import { isFF } from "../../../utils/feature-flags";
 
-const SettingsRendererPure: FC<{ store: any; settings: SettingsProperties }> =
-  ({ store, settings }) => {
-    return (
-      <Block name="settings">
-        {Object.entries(settings).map(([key, value]) => {
-          return value.ff && !isFF(value.ff) ? null : (
-            <SettingsField key={key} name={key} store={store} value={value} />
-          );
-        })}
-      </Block>
-    );
-  };
+const SettingsRendererPure: FC<{ store: any; settings: SettingsProperties }> = ({ store, settings }) => {
+  return (
+    <Block name="settings">
+      {Object.entries(settings).map(([key, value]) => {
+        return value.ff && !isFF(value.ff) ? null : <SettingsField key={key} name={key} store={store} value={value} />;
+      })}
+    </Block>
+  );
+};
 
 const SettingsField: FC<{
   store: any;
@@ -32,8 +26,7 @@ const SettingsField: FC<{
     } else if (value.type === "boolean") {
       store.settings.toggleProperty(name);
     } else {
-      const newValue =
-        value.type === "number" ? Number(e.target.value) : e.target.value;
+      const newValue = value.type === "number" ? Number(e.target.value) : e.target.value;
 
       store.settings.setProperty(name, newValue);
     }

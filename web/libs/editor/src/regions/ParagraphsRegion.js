@@ -22,16 +22,7 @@ const Model = types
     endOffset: types.integer,
     end: types.string,
 
-    states: types.maybeNull(
-      types.array(
-        types.union(
-          ParagraphLabelsModel,
-          TextAreaModel,
-          ChoicesModel,
-          RatingModel,
-        ),
-      ),
-    ),
+    states: types.maybeNull(types.array(types.union(ParagraphLabelsModel, TextAreaModel, ChoicesModel, RatingModel))),
   })
   .volatile(() => ({
     text: "",

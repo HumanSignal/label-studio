@@ -1,8 +1,4 @@
-type OnProgressCallback = (
-  total: number,
-  loaded: number,
-  progress: number,
-) => void;
+type OnProgressCallback = (total: number, loaded: number, progress: number) => void;
 
 /**
  * @class FileLoader

@@ -295,15 +295,9 @@ export const removeAlpha = (r, g, b, a, base = [255, 255, 255, 1]) => {
   const mix = [];
 
   mix[3] = 1 - (1 - a) * (1 - base[3]); // alpha
-  mix[0] = Math.round(
-    (r * a) / mix[3] + (base[0] * base[3] * (1 - a)) / mix[3],
-  ); // red
-  mix[1] = Math.round(
-    (g * a) / mix[3] + (base[1] * base[3] * (1 - a)) / mix[3],
-  ); // green
-  mix[2] = Math.round(
-    (b * a) / mix[3] + (base[2] * base[3] * (1 - a)) / mix[3],
-  ); // blue
+  mix[0] = Math.round((r * a) / mix[3] + (base[0] * base[3] * (1 - a)) / mix[3]); // red
+  mix[1] = Math.round((g * a) / mix[3] + (base[1] * base[3] * (1 - a)) / mix[3]); // green
+  mix[2] = Math.round((b * a) / mix[3] + (base[2] * base[3] * (1 - a)) / mix[3]); // blue
 
   return mix;
 };
@@ -360,9 +354,7 @@ export function colorToRGBAArray(value) {
  * @param {string} color
  */
 export function rgbArrayToHex(value) {
-  const color = value
-    .slice(0, 3)
-    .map((x) => (x | (1 << 8)).toString(16).slice(1));
+  const color = value.slice(0, 3).map((x) => (x | (1 << 8)).toString(16).slice(1));
 
   color.unshift("#");
   return color.join("");
@@ -380,8 +372,5 @@ export function over(color, bgColor = "white") {
   const k12 = k1 + k2;
   const bgRGB = bgColor.rgb() || [];
 
-  return chroma([
-    ...color.rgb().map((c, idx) => (k1 * c + k2 * bgRGB[idx]) / k12),
-    k12,
-  ]);
+  return chroma([...color.rgb().map((c, idx) => (k1 * c + k2 * bgRGB[idx]) / k12), k12]);
 }

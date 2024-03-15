@@ -51,15 +51,8 @@ const RelationConnector = ({ id, command, color, direction, highlight }) => {
       <defs>
         <ArrowMarker id={id} color={pathColor} />
       </defs>
-      {highlight && (
-        <path {...pathSettings} stroke={color} opacity={0.1} strokeWidth={6} />
-      )}
-      <path
-        {...pathSettings}
-        opacity={highlight ? 1 : 0.6}
-        strokeWidth={2}
-        {...markers}
-      />
+      {highlight && <path {...pathSettings} stroke={color} opacity={0.1} strokeWidth={6} />}
+      <path {...pathSettings} opacity={highlight ? 1 : 0.6} strokeWidth={2} {...markers} />
     </>
   );
 };
@@ -107,26 +100,13 @@ const RelationLabel = ({ label, position }) => {
   );
 };
 
-const RelationItem = ({
-  id,
-  startNode,
-  endNode,
-  direction,
-  rootRef,
-  highlight,
-  dimm,
-  labels,
-  visible,
-}) => {
+const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, dimm, labels, visible }) => {
   const root = rootRef.current;
   const nodesHidden = startNode.hidden === true || endNode.hidden === true;
   const hideConnection = nodesHidden || !visible;
   const [, forceUpdate] = useState();
 
-  const relation = NodesConnector.connect(
-    { id, startNode, endNode, direction, labels },
-    root,
-  );
+  const relation = NodesConnector.connect({ id, startNode, endNode, direction, labels }, root);
   const { start, end } = NodesConnector.getNodesBBox({ root, ...relation });
   const [path, textPosition] = NodesConnector.calculatePath(start, end);
 
@@ -134,13 +114,9 @@ const RelationItem = ({
     relation.onChange(() => forceUpdate({}));
     return () => relation.destroy();
   }, []);
-  if (start.width < 1 || start.height < 1 || end.width < 1 || end.height < 1)
-    return null;
+  if (start.width < 1 || start.height < 1 || end.width < 1 || end.height < 1) return null;
   return (
-    <g
-      opacity={dimm && !highlight ? 0.5 : 1}
-      visibility={hideConnection ? "hidden" : "visible"}
-    >
+    <g opacity={dimm && !highlight ? 0.5 : 1} visibility={hideConnection ? "hidden" : "visible"}>
       <RelationItemRect {...start} />
       <RelationItemRect {...end} />
       <RelationConnector
@@ -150,9 +126,7 @@ const RelationItem = ({
         direction={relation.direction}
         highlight={highlight}
       />
-      {relation.label && (
-        <RelationLabel label={relation.label} position={textPosition} />
-      )}
+      {relation.label && <RelationLabel label={relation.label} position={textPosition} />}
     </g>
   );
 };
@@ -163,48 +137,46 @@ const RelationItem = ({
  * rootRef: React.RefObject<HTMLElement>
  * }}
  */
-const RelationItemObserver = observer(
-  ({ relation, startNode, endNode, visible, ...rest }) => {
-    const nodes = [
-      startNode.getRegionElement ? startNode.getRegionElement() : startNode,
-      endNode.getRegionElement ? endNode.getRegionElement() : endNode,
-    ];
+const RelationItemObserver = observer(({ relation, startNode, endNode, visible, ...rest }) => {
+  const nodes = [
+    startNode.getRegionElement ? startNode.getRegionElement() : startNode,
+    endNode.getRegionElement ? endNode.getRegionElement() : endNode,
+  ];
 
-    const [render, setRender] = useState(nodes[0] && nodes[1]);
+  const [render, setRender] = useState(nodes[0] && nodes[1]);
 
-    useEffect(() => {
-      let timer;
+  useEffect(() => {
+    let timer;
 
-      const watchRegionAppear = () => {
-        const nodesExist = isDefined(nodes[0]) && isDefined(nodes[1]);
+    const watchRegionAppear = () => {
+      const nodesExist = isDefined(nodes[0]) && isDefined(nodes[1]);
 
-        if (render !== nodesExist) {
-          setRender(nodesExist);
-        } else if (render === false) {
-          timer = setTimeout(watchRegionAppear, 30);
-        }
-      };
+      if (render !== nodesExist) {
+        setRender(nodesExist);
+      } else if (render === false) {
+        timer = setTimeout(watchRegionAppear, 30);
+      }
+    };
 
-      timer = setTimeout(watchRegionAppear, 30);
+    timer = setTimeout(watchRegionAppear, 30);
 
-      return () => clearTimeout(timer);
-    }, [nodes, render]);
+    return () => clearTimeout(timer);
+  }, [nodes, render]);
 
-    const visibility = visible && relation.visible;
+  const visibility = visible && relation.visible;
 
-    return render && relation.shouldRender ? (
-      <RelationItem
-        id={relation.id}
-        startNode={startNode}
-        endNode={endNode}
-        direction={relation.direction}
-        visible={visibility}
-        labels={relation.selectedValues}
-        {...rest}
-      />
-    ) : null;
-  },
-);
+  return render && relation.shouldRender ? (
+    <RelationItem
+      id={relation.id}
+      startNode={startNode}
+      endNode={endNode}
+      direction={relation.direction}
+      visible={visibility}
+      labels={relation.selectedValues}
+      {...rest}
+    />
+  ) : null;
+});
 
 class RelationsOverlay extends PureComponent {
   /** @type {React.RefObject<HTMLElement>} */
@@ -238,19 +210,8 @@ class RelationsOverlay extends PureComponent {
     return (
       <AutoSizer onResize={this.onResize}>
         {() => (
-          <svg
-            className="relations-overlay"
-            ref={this.rootNode}
-            xmlns="http://www.w3.org/2000/svg"
-            style={style}
-          >
-            {this.state.shouldRender &&
-              this.renderRelations(
-                relations,
-                visible,
-                hasHighlight,
-                highlighted,
-              )}
+          <svg className="relations-overlay" ref={this.rootNode} xmlns="http://www.w3.org/2000/svg" style={style}>
+            {this.state.shouldRender && this.renderRelations(relations, visible, hasHighlight, highlighted)}
           </svg>
         )}
       </AutoSizer>

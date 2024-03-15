@@ -10,12 +10,7 @@ interface ObjectTagViewProps {
 /**
  * Object Tag Component
  */
-const ObjectTagView: FC<ObjectTagViewProps> = ({
-  item,
-  style,
-  className,
-  children,
-}) => {
+const ObjectTagView: FC<ObjectTagViewProps> = ({ item, style, className, children }) => {
   const moreProps = item.getProps?.();
 
   return (

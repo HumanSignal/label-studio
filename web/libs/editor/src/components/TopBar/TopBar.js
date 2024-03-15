@@ -79,11 +79,7 @@ export const TopBar = observer(({ store }) => {
           <Elem name="group">
             <CurrentTask store={store} />
             {!isViewAll && (
-              <Annotations
-                store={store}
-                annotationStore={store.annotationStore}
-                commentStore={store.commentStore}
-              />
+              <Annotations store={store} annotationStore={store.annotationStore} commentStore={store.commentStore} />
             )}
             <Actions store={store} />
           </Elem>
@@ -93,20 +89,18 @@ export const TopBar = observer(({ store }) => {
                 <DynamicPreannotationsToggle />
               </Elem>
             )}
-            {!isViewAll &&
-              store.hasInterface("controls") &&
-              (store.hasInterface("review") || !isPrediction) && (
-                <Elem
-                  name="section"
-                  mod={{ flat: true }}
-                  style={{
-                    width: 320,
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <Controls annotation={entity} />
-                </Elem>
-              )}
+            {!isViewAll && store.hasInterface("controls") && (store.hasInterface("review") || !isPrediction) && (
+              <Elem
+                name="section"
+                mod={{ flat: true }}
+                style={{
+                  width: 320,
+                  boxSizing: "border-box",
+                }}
+              >
+                <Controls annotation={entity} />
+              </Elem>
+            )}
           </Elem>
         </>
       )}

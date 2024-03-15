@@ -5,56 +5,44 @@ import "./Menu.styl";
 import { Block, Elem, MenuContext } from "./MenuContext";
 import { MenuItem } from "./MenuItem";
 
-export const Menu = forwardRef(
-  (
-    {
-      children,
-      className,
-      style,
-      size,
-      selectedKeys,
-      closeDropdownOnItemClick,
+export const Menu = forwardRef(({ children, className, style, size, selectedKeys, closeDropdownOnItemClick }, ref) => {
+  const dropdown = useDropdown();
+
+  const selected = useMemo(() => {
+    return new Set(selectedKeys ?? []);
+  }, [selectedKeys]);
+
+  const clickHandler = useCallback(
+    (e) => {
+      const elem = cn("main-menu").elem("item").closest(e.target);
+
+      if (dropdown && elem && closeDropdownOnItemClick !== false) {
+        dropdown.close();
+      }
     },
-    ref,
-  ) => {
-    const dropdown = useDropdown();
+    [dropdown],
+  );
 
-    const selected = useMemo(() => {
-      return new Set(selectedKeys ?? []);
-    }, [selectedKeys]);
+  const collapsed = useMemo(() => {
+    return !!dropdown;
+  }, [dropdown]);
 
-    const clickHandler = useCallback(
-      (e) => {
-        const elem = cn("main-menu").elem("item").closest(e.target);
-
-        if (dropdown && elem && closeDropdownOnItemClick !== false) {
-          dropdown.close();
-        }
-      },
-      [dropdown],
-    );
-
-    const collapsed = useMemo(() => {
-      return !!dropdown;
-    }, [dropdown]);
-
-    return (
-      <MenuContext.Provider value={{ selected }}>
-        <Block
-          ref={ref}
-          tag="ul"
-          name="main-menu"
-          mod={{ size, collapsed }}
-          mix={className}
-          style={style}
-          onClick={clickHandler}
-        >
-          {children}
-        </Block>
-      </MenuContext.Provider>
-    );
-  },
-);
+  return (
+    <MenuContext.Provider value={{ selected }}>
+      <Block
+        ref={ref}
+        tag="ul"
+        name="main-menu"
+        mod={{ size, collapsed }}
+        mix={className}
+        style={style}
+        onClick={clickHandler}
+      >
+        {children}
+      </Block>
+    </MenuContext.Provider>
+  );
+});
 
 Menu.Item = MenuItem;
 Menu.Spacer = () => <Elem block="main-menu" tag="li" name="spacer" />;

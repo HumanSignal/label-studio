@@ -36,12 +36,7 @@ export const parseCSV = (text, separator = "auto") => {
   let names;
 
   if (separator !== "auto" && !lines[0].includes(separator)) {
-    throw new Error(
-      [
-        `Cannot find provided separator "${separator}".`,
-        `Row 1: ${lines[0]}`,
-      ].join("\n"),
-    );
+    throw new Error([`Cannot find provided separator "${separator}".`, `Row 1: ${lines[0]}`].join("\n"));
   }
 
   // detect separator (2nd line is definitely with data)

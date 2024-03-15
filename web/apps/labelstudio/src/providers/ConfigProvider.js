@@ -21,11 +21,7 @@ export const ConfigProvider = ({ children }) => {
     };
   }, [config]);
 
-  return (
-    <ConfigContext.Provider value={contextValue}>
-      {children}
-    </ConfigContext.Provider>
-  );
+  return <ConfigContext.Provider value={contextValue}>{children}</ConfigContext.Provider>;
 };
 
 export const useConfig = () => {

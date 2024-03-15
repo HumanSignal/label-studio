@@ -24,9 +24,7 @@ const _Tool = types
       return "Key Point";
     },
     get iconComponent() {
-      return self.dynamic
-        ? NodeViews.KeyPointRegionModel.altIcon
-        : NodeViews.KeyPointRegionModel.icon;
+      return self.dynamic ? NodeViews.KeyPointRegionModel.altIcon : NodeViews.KeyPointRegionModel.icon;
     },
   }))
   .actions((self) => ({
@@ -61,12 +59,6 @@ const _Tool = types
     },
   }));
 
-const KeyPoint = types.compose(
-  _Tool.name,
-  ToolMixin,
-  BaseTool,
-  DrawingTool,
-  _Tool,
-);
+const KeyPoint = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, _Tool);
 
 export { KeyPoint };

@@ -4,8 +4,7 @@ export const TipsCollection: Record<string, Tip[]> = {
   projectCreation: [
     {
       title: "Did you know?",
-      content:
-        "It’s easier to find the projects when you organize them into workspaces using Label Studio Enterprise.",
+      content: "It’s easier to find the projects when you organize them into workspaces using Label Studio Enterprise.",
       closable: true,
       link: {
         label: "Learn more",
@@ -74,8 +73,7 @@ export const TipsCollection: Record<string, Tip[]> = {
     },
     {
       title: "Did you know?",
-      content:
-        "You can label tasks with collaborators by setting the minimum number of annotations to more than one. ",
+      content: "You can label tasks with collaborators by setting the minimum number of annotations to more than one. ",
       closable: true,
       link: {
         label: "Learn more",
@@ -104,8 +102,7 @@ export const TipsCollection: Record<string, Tip[]> = {
     },
     {
       title: "Want to simplify and secure logging in?",
-      content:
-        "Enable Single Sign-On for your team using SAML, SCIM2 or LDAP with Label Studio Enterprise.",
+      content: "Enable Single Sign-On for your team using SAML, SCIM2 or LDAP with Label Studio Enterprise.",
       closable: true,
       link: {
         label: "Learn more",
@@ -232,8 +229,7 @@ export const TipsCollection: Record<string, Tip[]> = {
     },
     {
       title: "Did you know?",
-      content:
-        "You can connect ML models using the backend SDK to save time with pre-labeling or active learning.",
+      content: "You can connect ML models using the backend SDK to save time with pre-labeling or active learning.",
       closable: true,
       link: {
         label: "Learn more",

@@ -1,10 +1,7 @@
 import { MIN_SIZE } from "../../../tools/Base";
 import type { KonvaNode, WorkingArea } from "./types";
 
-export const getNodeAbsoluteDimensions = (
-  node: KonvaNode,
-  workingArea: WorkingArea,
-) => {
+export const getNodeAbsoluteDimensions = (node: KonvaNode, workingArea: WorkingArea) => {
   const { realWidth: width, realHeight: height } = workingArea;
 
   const result = {
@@ -18,10 +15,7 @@ export const getNodeAbsoluteDimensions = (
   return result;
 };
 
-export const normalizeNodeDimentions = <T extends KonvaNode>(
-  node: T,
-  shapeType: "rect",
-) => {
+export const normalizeNodeDimentions = <T extends KonvaNode>(node: T, shapeType: "rect") => {
   const scaleX = node.scaleX();
   const scaleY = node.scaleY();
 

@@ -31,27 +31,17 @@ export function reverseCoordinates(r1, r2) {
  * @param {object} shape
  */
 export function canvasToBinaryMatrix(canvas, shape) {
-  const currentLayer = canvas.stageRef
-    .getLayers()
-    .filter((layer) => layer.attrs.id === shape.id);
+  const currentLayer = canvas.stageRef.getLayers().filter((layer) => layer.attrs.id === shape.id);
 
   const canv = currentLayer[0].canvas.context;
 
-  const initialArray = canv.getImageData(
-    0,
-    0,
-    canv.canvas.width,
-    canv.canvas.height,
-  );
+  const initialArray = canv.getImageData(0, 0, canv.canvas.width, canv.canvas.height);
 
   const binaryMatrix = [];
 
   for (
     let i = 0;
-    i <
-    canvas.stageRef.bufferCanvas.context.canvas.width *
-      canvas.stageRef.bufferCanvas.context.canvas.height *
-      4;
+    i < canvas.stageRef.bufferCanvas.context.canvas.width * canvas.stageRef.bufferCanvas.context.canvas.height * 4;
     i += 4
   ) {
     const alpha = initialArray.data[i + 0];
@@ -162,12 +152,7 @@ export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
       y -= offset.y;
       const singleRegionDragging = item.selected || !item.inSelection;
       const { top, left, right, bottom } = item.bboxCoords;
-      const {
-        top: srTop,
-        left: srLeft,
-        right: srRight,
-        bottom: srBottom,
-      } = image?.selectedRegionsBBox || {};
+      const { top: srTop, left: srLeft, right: srRight, bottom: srBottom } = image?.selectedRegionsBBox || {};
       const bbox = singleRegionDragging
         ? { x, y, width: right - left, height: bottom - top }
         : {
@@ -298,12 +283,8 @@ export function getTransformedImageData(
     viewportNaturalWidth = naturalWidth;
     viewportNaturalHeight = naturalHeight;
   } else {
-    viewportNaturalWidth = Math.ceil(
-      (viewportWidth / imageDisplayedInBrowserWidth) * naturalWidth,
-    );
-    viewportNaturalHeight = Math.ceil(
-      (viewportHeight / imageDisplayedInBrowserHeight) * naturalHeight,
-    );
+    viewportNaturalWidth = Math.ceil((viewportWidth / imageDisplayedInBrowserWidth) * naturalWidth);
+    viewportNaturalHeight = Math.ceil((viewportHeight / imageDisplayedInBrowserHeight) * naturalHeight);
   }
 
   // Only draw the part of the image under transformations to the viewport that we will actually
@@ -330,8 +311,7 @@ export function getTransformedImageData(
   try {
     transformedData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   } catch (err) {
-    const msg =
-      "Please configure CORS cross-domain headers correctly for getting image labeling data";
+    const msg = "Please configure CORS cross-domain headers correctly for getting image labeling data";
 
     alert(msg);
     console.error(msg);
@@ -371,10 +351,8 @@ export function getActualZoomingPosition(
   // actually being displayed in the browser (which could be scaled down or up),
   // so turn it into a percentage then re-apply it to the full natural size to get the
   // correct upper-left pixel offsets.
-  const zoomPercentageX =
-    Math.abs(zoomingPositionX) / imageDisplayedInBrowserWidth;
-  const zoomPercentageY =
-    Math.abs(zoomingPositionY) / imageDisplayedInBrowserHeight;
+  const zoomPercentageX = Math.abs(zoomingPositionX) / imageDisplayedInBrowserWidth;
+  const zoomPercentageY = Math.abs(zoomingPositionY) / imageDisplayedInBrowserHeight;
   const viewportNaturalX = Math.floor(zoomPercentageX * naturalWidth);
   const viewportNaturalY = Math.floor(zoomPercentageY * naturalHeight);
 

@@ -102,9 +102,7 @@ export class APIProxy {
       if (url[0] === "/") {
         gateway.pathname = url.replace(/([/])$/, "");
       } else {
-        gateway.pathname = `${gateway.pathname}/${url}`
-          .replace(/([/]+)/g, "/")
-          .replace(/([/])$/, "");
+        gateway.pathname = `${gateway.pathname}/${url}`.replace(/([/]+)/g, "/").replace(/([/])$/, "");
       }
 
       return gateway.toString();
@@ -141,11 +139,7 @@ export class APIProxy {
           value: this.createApiCallExecutor(restSettings, [parentPath], true),
         });
 
-        if (scope)
-          this.resolveMethods(scope, [
-            ...(parentPath ?? []),
-            restSettings.path,
-          ]);
+        if (scope) this.resolveMethods(scope, [...(parentPath ?? []), restSettings.path]);
       });
     }
   }
@@ -174,8 +168,7 @@ export class APIProxy {
           methodSettings.gateway,
         );
 
-        const requestMethod =
-          method ?? (methodSettings.method ?? "get").toUpperCase();
+        const requestMethod = method ?? (methodSettings.method ?? "get").toUpperCase();
 
         const initialheaders = Object.assign(
           this.getDefaultHeaders(requestMethod),
@@ -229,17 +222,8 @@ export class APIProxy {
         /** @type {Response} */
         let rawResponse;
 
-        if (
-          methodSettings.mock &&
-          process.env.NODE_ENV === "development" &&
-          !this.mockDisabled
-        ) {
-          rawResponse = await this.mockRequest(
-            apiCallURL,
-            urlParams,
-            requestParams,
-            methodSettings,
-          );
+        if (methodSettings.mock && process.env.NODE_ENV === "development" && !this.mockDisabled) {
+          rawResponse = await this.mockRequest(apiCallURL, urlParams, requestParams, methodSettings);
         } else {
           rawResponse = await fetch(apiCallURL, requestParams);
         }
@@ -258,9 +242,7 @@ export class APIProxy {
           try {
             const responseData =
               rawResponse.status !== 204
-                ? JSON.parse(
-                    this.alwaysExpectJSON ? responseText : responseText || "{}",
-                  )
+                ? JSON.parse(this.alwaysExpectJSON ? responseText : responseText || "{}")
                 : { ok: true };
 
             if (methodSettings.convert instanceof Function) {
@@ -339,10 +321,7 @@ export class APIProxy {
     const url = new URL(gateway ? this.resolveGateway(gateway) : this.gateway);
     const usedKeys = [];
 
-    const { path: resolvedPath, method: resolvedMethod } = this.resolveEndpoint(
-      endpoint,
-      data,
-    );
+    const { path: resolvedPath, method: resolvedMethod } = this.resolveEndpoint(endpoint, data);
 
     const path = []
       .concat(...(parentPath ?? []), resolvedPath)

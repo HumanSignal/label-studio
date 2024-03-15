@@ -8,9 +8,7 @@ import { disableChromeGPU } from "./plugins/disable_gpu";
 import { setupTypescript } from "./plugins/typescript";
 import * as tasks from "./tasks";
 
-const COLLECT_COVERAGE =
-  process.env.COLLECT_COVERAGE === "true" ||
-  process.env.COLLECT_COVERAGE === "1";
+const COLLECT_COVERAGE = process.env.COLLECT_COVERAGE === "true" || process.env.COLLECT_COVERAGE === "1";
 const localPath = (p) => path.resolve(process.cwd(), p);
 
 /**
@@ -64,9 +62,7 @@ export default function (configModifier, setupNodeEvents) {
     },
   };
 
-  const finalConfig = configModifier
-    ? configModifier(defaultConfig)
-    : defaultConfig;
+  const finalConfig = configModifier ? configModifier(defaultConfig) : defaultConfig;
 
   return defineConfig(finalConfig);
 }

@@ -39,9 +39,7 @@ Data(imageExamples).Scenario(
     I.pressKey("Backspace");
     await LabelStudio.resultsNotChanged(result);
 
-    const wrapperPosition = await Tools.getElementPosition(
-      ".htx-timeseries-channel .overlay",
-    );
+    const wrapperPosition = await Tools.getElementPosition(".htx-timeseries-channel .overlay");
 
     AtLabels.clickLabel("Run");
 

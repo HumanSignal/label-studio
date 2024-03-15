@@ -1,12 +1,4 @@
-import {
-  createRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { createRef, useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { forwardRef } from "react";
 import { FaPause, FaPlay } from "react-icons/fa";
 import { Block, Elem } from "../../../utils/bem";
@@ -128,13 +120,10 @@ export const MediaPlayer = ({ src, video = false }) => {
     preload: "metadata",
     onPlay: () => dispatch({ type: "play" }),
     onPause: () => dispatch({ type: "pause" }),
-    onTimeUpdate: () =>
-      dispatch({ type: "current", payload: media.current.currentTime }),
-    onDurationChange: () =>
-      dispatch({ type: "duration", payload: media.current.duration }),
+    onTimeUpdate: () => dispatch({ type: "current", payload: media.current.currentTime }),
+    onDurationChange: () => dispatch({ type: "duration", payload: media.current.duration }),
     onCanPlay: () => dispatch({ type: "loaded" }),
-    onProgress: () =>
-      dispatch({ type: "buffer", payload: media.current.buffered }),
+    onProgress: () => dispatch({ type: "buffer", payload: media.current.buffered }),
     onError: () => dispatch({ type: "error" }),
   };
 
@@ -163,15 +152,11 @@ export const MediaPlayer = ({ src, video = false }) => {
     }
   }, [state.loaded]);
 
-  const showError = isFF(FF_LSDV_4711)
-    ? !state.resetSource && state.error
-    : state.error;
+  const showError = isFF(FF_LSDV_4711) ? !state.resetSource && state.error : state.error;
 
   return enabled ? (
     <Block name="player" mod={{ video }} onClick={(e) => e.stopPropagation()}>
-      {video && (
-        <MediaSource type="video" onClick={togglePlay} {...mediaProps} />
-      )}
+      {video && <MediaSource type="video" onClick={togglePlay} {...mediaProps} />}
       {showError ? (
         <Elem name="loading">Unable to play</Elem>
       ) : state.loaded ? (

@@ -11,12 +11,7 @@ import type { FilterInterface, FilterListInterface } from "./FilterInterfaces";
 import { FilterRow } from "./FilterRow";
 import { FilterItems } from "./filter-util";
 
-export const Filter: FC<FilterInterface> = ({
-  availableFilters,
-  filterData,
-  onChange,
-  animated = true,
-}) => {
+export const Filter: FC<FilterInterface> = ({ availableFilters, filterData, onChange, animated = true }) => {
   const [filterList, setFilterList] = useState<FilterListInterface[]>([]);
   const [active, setActive] = useState(false);
 
@@ -38,10 +33,7 @@ export const Filter: FC<FilterInterface> = ({
   }, [setFilterList, availableFilters]);
 
   const onChangeRow = useCallback(
-    (
-      index: number,
-      { field, operation, value, path, logic }: Partial<FilterListInterface>,
-    ) => {
+    (index: number, { field, operation, value, path, logic }: Partial<FilterListInterface>) => {
       setFilterList((oldList) => {
         const newList = [...oldList];
 
@@ -101,17 +93,8 @@ export const Filter: FC<FilterInterface> = ({
   const renderFilter = useMemo(() => {
     return (
       <Block name={"filter"}>
-        {filterList.length > 0 ? (
-          renderFilterList
-        ) : (
-          <Elem name="empty">No filters applied</Elem>
-        )}
-        <Button
-          look="alt"
-          size="small"
-          type={"text"}
-          onClick={addNewFilterListItem}
-        >
+        {filterList.length > 0 ? renderFilterList : <Elem name="empty">No filters applied</Elem>}
+        <Button look="alt" size="small" type={"text"} onClick={addNewFilterListItem}>
           Add {filterList.length ? "Another Filter" : "Filter"}
         </Button>
       </Block>
@@ -123,17 +106,8 @@ export const Filter: FC<FilterInterface> = ({
   }, []);
 
   return (
-    <Dropdown.Trigger
-      content={renderFilter}
-      dataTestId={"dropdown"}
-      animated={animated}
-      onToggle={onToggle}
-    >
-      <Block
-        data-testid={"filter-button"}
-        name={"filter-button"}
-        mod={{ active }}
-      >
+    <Dropdown.Trigger content={renderFilter} dataTestId={"dropdown"} animated={animated} onToggle={onToggle}>
+      <Block data-testid={"filter-button"} name={"filter-button"} mod={{ active }}>
         <Elem name={"icon"}>
           <IconFilter />
         </Elem>

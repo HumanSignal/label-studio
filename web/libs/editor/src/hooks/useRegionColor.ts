@@ -48,18 +48,13 @@ export const getRegionStyles = ({
   const opacity = isDefined(fillopacity) ? fillopacity : style?.opacity;
 
   const fillColor = shouldFill
-    ? chroma(
-        (useStrokeAsFill ? style?.strokecolor : style?.fillcolor) ??
-          defaultFillColor,
-      )
+    ? chroma((useStrokeAsFill ? style?.strokecolor : style?.fillcolor) ?? defaultFillColor)
         .darken(0.3)
         .alpha(+(opacity ?? defaultOpacity ?? 0.5))
         .css()
     : null;
 
-  const strokeColor = selected
-    ? defaultStrokeColorHighlighted
-    : chroma(style?.strokecolor ?? defaultStrokeColor).css();
+  const strokeColor = selected ? defaultStrokeColorHighlighted : chroma(style?.strokecolor ?? defaultStrokeColor).css();
 
   const strokeWidth = (() => {
     if (suggestion) {
@@ -78,15 +73,10 @@ export const getRegionStyles = ({
   };
 };
 
-export const useRegionStyles = (
-  region: any,
-  options: Partial<StyleOptions> = {},
-) => {
+export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}) => {
   const { suggestion } = useContext(ImageViewContext) ?? {};
   const [highlighted, setHighlighted] = useState(region.highlighted);
-  const [shouldFill, setShouldFill] = useState(
-    region.fill ?? (options.useStrokeAsFill || options.includeFill),
-  );
+  const [shouldFill, setShouldFill] = useState(region.fill ?? (options.useStrokeAsFill || options.includeFill));
 
   const styles = useMemo(() => {
     return getRegionStyles({

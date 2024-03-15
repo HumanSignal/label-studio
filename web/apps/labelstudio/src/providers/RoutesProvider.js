@@ -82,8 +82,7 @@ export const RoutesProvider = ({ children }) => {
             path: route.path,
           });
           const path = generatePath(route.path, params.params);
-          const title =
-            route.title instanceof Function ? route.title() : route.title;
+          const title = route.title instanceof Function ? route.title() : route.title;
           const key = route.component?.displayName ?? route.key ?? path;
 
           return { path, title, key };
@@ -96,11 +95,7 @@ export const RoutesProvider = ({ children }) => {
     }
   }, [location, routesMap, currentContextProps, routesChain, lastRoute]);
 
-  return (
-    <RoutesContext.Provider value={contextValue}>
-      {children}
-    </RoutesContext.Provider>
-  );
+  return <RoutesContext.Provider value={contextValue}>{children}</RoutesContext.Provider>;
 };
 
 export const useRoutesMap = () => {
@@ -144,8 +139,7 @@ export const useParams = () => {
 
 export const useContextComponent = () => {
   const ctx = useContext(RoutesContext);
-  const { component: ContextComponent, props: contextProps } =
-    ctx?.currentContext ?? {};
+  const { component: ContextComponent, props: contextProps } = ctx?.currentContext ?? {};
 
   return { ContextComponent, contextProps };
 };

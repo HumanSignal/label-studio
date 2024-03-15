@@ -57,74 +57,71 @@ const params = {
   data,
 };
 
-Scenario(
-  "Check the audio controls work",
-  async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
-    async function doNotSeeErrors() {
-      await I.wait(2);
-      // The potential errors should be caught by `errorsCollector` plugin
-    }
+Scenario("Check the audio controls work", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+  async function doNotSeeErrors() {
+    await I.wait(2);
+    // The potential errors should be caught by `errorsCollector` plugin
+  }
 
-    LabelStudio.setFeatureFlags({
-      ff_front_dev_2715_audio_3_280722_short: true,
-    });
-    I.amOnPage("/");
+  LabelStudio.setFeatureFlags({
+    ff_front_dev_2715_audio_3_280722_short: true,
+  });
+  I.amOnPage("/");
 
-    LabelStudio.init(params);
+  LabelStudio.init(params);
 
-    await AtAudioView.waitForAudio();
-    await AtAudioView.lookForStage();
+  await AtAudioView.waitForAudio();
+  await AtAudioView.lookForStage();
 
-    AtSidebar.seeRegions(1);
+  AtSidebar.seeRegions(1);
 
-    I.say("Check the volume updates");
+  I.say("Check the volume updates");
 
-    await AtAudioView.seeVolume(100);
+  await AtAudioView.seeVolume(100);
 
-    AtAudioView.setVolumeInput(50);
+  AtAudioView.setVolumeInput(50);
 
-    await AtAudioView.seeVolume(50);
+  await AtAudioView.seeVolume(50);
 
-    I.say("Check can be muted");
+  I.say("Check can be muted");
 
-    AtAudioView.clickMuteButton();
+  AtAudioView.clickMuteButton();
 
-    await AtAudioView.seeVolume(0);
+  await AtAudioView.seeVolume(0);
 
-    I.say("Check the playback speed updates");
+  I.say("Check the playback speed updates");
 
-    await AtAudioView.seePlaybackSpeed(1);
+  await AtAudioView.seePlaybackSpeed(1);
 
-    AtAudioView.setPlaybackSpeedInput(2);
+  AtAudioView.setPlaybackSpeedInput(2);
 
-    await AtAudioView.seePlaybackSpeed(2);
+  await AtAudioView.seePlaybackSpeed(2);
 
-    I.say("Check the amplitude updates");
+  I.say("Check the amplitude updates");
 
-    await AtAudioView.seeAmplitude(1);
+  await AtAudioView.seeAmplitude(1);
 
-    AtAudioView.setAmplitudeInput(2);
+  AtAudioView.setAmplitudeInput(2);
 
-    await AtAudioView.seeAmplitude(2);
+  await AtAudioView.seeAmplitude(2);
 
-    I.say("Check can be played");
+  I.say("Check can be played");
 
-    await AtAudioView.seeIsPlaying(false);
+  await AtAudioView.seeIsPlaying(false);
 
-    AtAudioView.clickPlayButton();
+  AtAudioView.clickPlayButton();
 
-    await AtAudioView.seeIsPlaying(true);
+  await AtAudioView.seeIsPlaying(true);
 
-    I.say("Check can be paused");
+  I.say("Check can be paused");
 
-    AtAudioView.clickPauseButton();
+  AtAudioView.clickPauseButton();
 
-    await AtAudioView.seeIsPlaying(false);
+  await AtAudioView.seeIsPlaying(false);
 
-    I.say("Check the waveform can be zoomed without error");
+  I.say("Check the waveform can be zoomed without error");
 
-    await AtAudioView.zoomToPoint(-120);
+  await AtAudioView.zoomToPoint(-120);
 
-    await doNotSeeErrors();
-  },
-);
+  await doNotSeeErrors();
+});

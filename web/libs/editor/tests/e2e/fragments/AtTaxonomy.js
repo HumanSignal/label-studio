@@ -25,9 +25,7 @@ class Taxonomy {
   }
 
   locate(locator) {
-    return locator
-      ? locate(locator).inside(this.locateTaxonomy())
-      : this.locateTaxonomy();
+    return locator ? locate(locator).inside(this.locateTaxonomy()) : this.locateTaxonomy();
   }
 
   locateInput() {
@@ -35,15 +33,11 @@ class Taxonomy {
   }
 
   locateItemByText(itemText) {
-    return this.locate(this.item).withDescendant(
-      `.//label[text()='${itemText}']`,
-    );
+    return this.locate(this.item).withDescendant(`.//label[text()='${itemText}']`);
   }
 
   locateSelectedByText(itemText) {
-    return this.locate(this.selectedList)
-      .find("./div")
-      .withDescendant(`.//*[text()='${itemText}']`);
+    return this.locate(this.selectedList).find("./div").withDescendant(`.//*[text()='${itemText}']`);
   }
 
   locateActions(itemLocator) {
@@ -84,15 +78,11 @@ class Taxonomy {
   }
 
   seeCheckedItemByText(itemText) {
-    I.seeElement(
-      this.locateItemByText(itemText).withDescendant(".//input[@checked]"),
-    );
+    I.seeElement(this.locateItemByText(itemText).withDescendant(".//input[@checked]"));
   }
 
   dontSeeCheckedItemByText(itemText) {
-    I.dontSeeElement(
-      this.locateItemByText(itemText).withDescendant(".//input[@checked]"),
-    );
+    I.dontSeeElement(this.locateItemByText(itemText).withDescendant(".//input[@checked]"));
   }
 
   seeSelectedValues(selectedValues) {

@@ -1,17 +1,11 @@
 import { flow, getRoot, types } from "mobx-state-tree";
-import {
-  DEFAULT_PAGE_SIZE,
-  getStoredPageSize,
-} from "../../components/Common/Pagination/Pagination";
+import { DEFAULT_PAGE_SIZE, getStoredPageSize } from "../../components/Common/Pagination/Pagination";
 import { FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/random";
 import { isDefined } from "../../utils/utils";
 
 const listIncludes = (list, id) => {
-  const index =
-    id !== undefined
-      ? Array.from(list).findIndex((item) => item.id === id)
-      : -1;
+  const index = id !== undefined ? Array.from(list).findIndex((item) => item.id === id) : -1;
 
   return index >= 0;
 };
@@ -19,10 +13,7 @@ const listIncludes = (list, id) => {
 const MixinBase = types
   .model("InfiniteListMixin", {
     page: types.optional(types.integer, 0),
-    pageSize: types.optional(
-      types.integer,
-      getStoredPageSize("tasks", DEFAULT_PAGE_SIZE),
-    ),
+    pageSize: types.optional(types.integer, getStoredPageSize("tasks", DEFAULT_PAGE_SIZE)),
     total: types.optional(types.integer, 0),
     loading: false,
     loadingItem: false,
@@ -137,10 +128,7 @@ const MixinBase = types
     },
   }));
 
-export const DataStore = (
-  modelName,
-  { listItemType, apiMethod, properties, associatedItemType },
-) => {
+export const DataStore = (modelName, { listItemType, apiMethod, properties, associatedItemType }) => {
   const model = types
     .model(modelName, {
       ...(properties ?? {}),
@@ -149,10 +137,7 @@ export const DataStore = (
       highlightedId: types.optional(types.maybeNull(types.number), null),
       ...(associatedItemType
         ? {
-            associatedList: types.optional(
-              types.maybeNull(types.array(associatedItemType)),
-              [],
-            ),
+            associatedList: types.optional(types.maybeNull(types.array(associatedItemType)), []),
           }
         : {}),
     })
@@ -190,14 +175,7 @@ export const DataStore = (
         return item;
       },
 
-      fetch: flow(function* ({
-        id,
-        query,
-        pageNumber = null,
-        reload = false,
-        interaction,
-        pageSize,
-      } = {}) {
+      fetch: flow(function* ({ id, query, pageNumber = null, reload = false, interaction, pageSize } = {}) {
         let currentViewId;
         let currentViewQuery;
         const requestId = (self.requestId = guidGenerator());
@@ -245,12 +223,7 @@ export const DataStore = (
 
         if (interaction) Object.assign(params, { interaction });
 
-        const data = yield root.apiCall(
-          apiMethod,
-          params,
-          {},
-          { allowToCancel: root.SDK.type === "DE" },
-        );
+        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === "DE" });
 
         // We cancel current request processing if request id
         // changed during the request. It indicates that something
@@ -277,10 +250,7 @@ export const DataStore = (
             associatedList,
           });
 
-        if (
-          isDefined(highlightedID) &&
-          !listIncludes(self.list, highlightedID)
-        ) {
+        if (isDefined(highlightedID) && !listIncludes(self.list, highlightedID)) {
           self.highlighted = null;
         }
 
@@ -305,10 +275,7 @@ export const DataStore = (
       },
 
       focusNext() {
-        const index = Math.min(
-          self.list.length - 1,
-          self.list.indexOf(self.highlighted) + 1,
-        );
+        const index = Math.min(self.list.length - 1, self.list.indexOf(self.highlighted) + 1);
 
         self.highlighted = self.list[index];
         self.updated = guidGenerator();

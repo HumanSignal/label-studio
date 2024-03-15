@@ -40,11 +40,7 @@ const Model = types
   }))
   .actions((self) => ({
     setValue(val) {
-      if (
-        isFF(FF_LSDV_4712) &&
-        (self._value === val || !self.parent.validateText(val))
-      )
-        return;
+      if (isFF(FF_LSDV_4712) && (self._value === val || !self.parent.validateText(val))) return;
 
       self._value = val;
       self.parent.onChange();
@@ -63,12 +59,7 @@ const Model = types
     },
   }));
 
-const TextAreaRegionModel = types.compose(
-  "TextAreaRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const TextAreaRegionModel = types.compose("TextAreaRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 const HtxTextAreaRegionView = ({ item, onFocus }) => {
   const classes = [styles.mark];

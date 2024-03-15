@@ -1,9 +1,4 @@
-import {
-  ImageView,
-  LabelStudio,
-  Labels,
-  Sidebar,
-} from "@humansignal/frontend-test/helpers/LSF";
+import { ImageView, LabelStudio, Labels, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 
 const config = `
   <View>
@@ -143,11 +138,7 @@ describe("Image Regions scenario", () => {
   });
 
   it("should be able to select multi label for a region", () => {
-    LabelStudio.params()
-      .config(configWithMultipleRegions)
-      .data({ image })
-      .withResult([])
-      .init();
+    LabelStudio.params().config(configWithMultipleRegions).data({ image }).withResult([]).init();
 
     ImageView.waitForImage();
     Labels.select("Moonwalker 2");
@@ -156,16 +147,10 @@ describe("Image Regions scenario", () => {
     Labels.select("Planet");
     Sidebar.hasRegions(1);
     cy.contains("Moonwalker 2, Planet").should("exist");
-    cy.get(".lsf-outliner-item")
-      .contains("Moonwalker 2")
-      .should("have.css", "color", "rgb(255, 192, 203)");
-    cy.get(".lsf-outliner-item")
-      .contains("Planet")
-      .should("have.css", "color", "rgb(114, 191, 178)");
+    cy.get(".lsf-outliner-item").contains("Moonwalker 2").should("have.css", "color", "rgb(255, 192, 203)");
+    cy.get(".lsf-outliner-item").contains("Planet").should("have.css", "color", "rgb(114, 191, 178)");
     Labels.select("Planet");
     cy.contains("Moonwalker 2, No label").should("exist");
-    cy.get(".lsf-outliner-item")
-      .contains("No label")
-      .should("have.css", "color", "rgb(102, 102, 102)");
+    cy.get(".lsf-outliner-item").contains("No label").should("have.css", "color", "rgb(102, 102, 102)");
   });
 });

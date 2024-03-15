@@ -5,10 +5,7 @@ const OBJECTS = {
       strokeWidth: {
         title: "Width of region borders",
         type: Number,
-        param: ($obj, value) =>
-          $obj.$controls.forEach(($control) =>
-            $control.setAttribute("strokeWidth", value),
-          ),
+        param: ($obj, value) => $obj.$controls.forEach(($control) => $control.setAttribute("strokeWidth", value)),
         value: ($obj) => $obj.$controls[0]?.getAttribute("strokeWidth") ?? 1,
       },
       zoom: {
@@ -35,12 +32,9 @@ const OBJECTS = {
         title: "Select text by words",
         type: Boolean,
         param: ($obj, value) =>
-          value
-            ? $obj.setAttribute("granularity", "word")
-            : $obj.removeAttribute("granularity"),
+          value ? $obj.setAttribute("granularity", "word") : $obj.removeAttribute("granularity"),
         value: ($obj) => $obj.getAttribute("granularity") === "word",
-        when: ($obj) =>
-          $obj.$controls.filter((c) => c.tagName.endsWith("Labels")).length > 0,
+        when: ($obj) => $obj.$controls.filter((c) => c.tagName.endsWith("Labels")).length > 0,
       },
     },
   },
@@ -89,11 +83,8 @@ const Labels = {
         const $obj = $control.$object;
         const inline = ["top", "bottom"].includes(value);
         const reversed = ["top", "left"].includes(value);
-        const direction =
-          (inline ? "column" : "row") + (reversed ? "-reverse" : "");
-        const alreadyApplied = $container
-          .getAttribute("style")
-          ?.includes("flex");
+        const direction = (inline ? "column" : "row") + (reversed ? "-reverse" : "");
+        const alreadyApplied = $container.getAttribute("style")?.includes("flex");
 
         if (!alreadyApplied) {
           $container = $obj.ownerDocument.createElement("View");
@@ -102,10 +93,7 @@ const Labels = {
           $container.appendChild($labels);
         }
         $control.setAttribute("showInline", JSON.stringify(inline));
-        $container.setAttribute(
-          "style",
-          `display:flex;align-items:start;gap:8px;flex-direction:${direction}`,
-        );
+        $container.setAttribute("style", `display:flex;align-items:start;gap:8px;flex-direction:${direction}`);
       },
       value: ($control) => {
         let $container = $control.parentNode;
@@ -151,8 +139,7 @@ const Labels = {
           }
         }
       },
-      value: ($control) =>
-        $control.previousElementSibling?.tagName.toUpperCase() === "FILTER",
+      value: ($control) => $control.previousElementSibling?.tagName.toUpperCase() === "FILTER",
     },
   },
 };

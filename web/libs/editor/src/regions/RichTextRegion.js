@@ -76,9 +76,7 @@ const Model = types
       } else {
         try {
           if (isFF(FF_LSDV_4620_3)) {
-            const xpathRange = self.parent.globalOffsetsToRelativeOffsets(
-              self.globalOffsets,
-            );
+            const xpathRange = self.parent.globalOffsetsToRelativeOffsets(self.globalOffsets);
 
             Object.assign(res.value, {
               ...xpathRange,
@@ -87,11 +85,7 @@ const Model = types
           } else {
             // Calculate proper XPath right before serialization
             const root = self._getRootNode(true);
-            const range = findRangeNative(
-              self.globalOffsets.start,
-              self.globalOffsets.end,
-              root,
-            );
+            const range = findRangeNative(self.globalOffsets.start, self.globalOffsets.end, root);
 
             if (!range) throw new Error();
 
@@ -163,9 +157,7 @@ const Model = types
     },
 
     updateXPathsFromGlobalOffsets() {
-      const xPathRange = self.parent.globalOffsetsToRelativeOffsets(
-        self.globalOffsets,
-      );
+      const xPathRange = self.parent.globalOffsetsToRelativeOffsets(self.globalOffsets);
 
       if (xPathRange) {
         self._setXPaths(xPathRange);
@@ -291,12 +283,8 @@ const Model = types
 
     _getRange({ useOriginalContent = false, useCache = true } = {}) {
       const rootNode = self._getRootNode(useOriginalContent);
-      const hasCache =
-        isDefined(self._cachedRange) && !useOriginalContent && useCache;
-      const rootNodeExists =
-        hasCache &&
-        rootNode &&
-        !rootNode.contains(self._cachedRange.commonAncestorContainer);
+      const hasCache = isDefined(self._cachedRange) && !useOriginalContent && useCache;
+      const rootNodeExists = hasCache && rootNode && !rootNode.contains(self._cachedRange.commonAncestorContainer);
 
       if (hasCache === false || rootNodeExists) {
         const foundRange = self._createNativeRange(useOriginalContent);

@@ -15,12 +15,7 @@ const getItemPosition = (item) => {
   let y;
 
   if (isDefined(bbox)) {
-    [width, height, x, y] = [
-      bbox.right - bbox.left,
-      bbox.bottom - bbox.top,
-      bbox.left,
-      bbox.top,
-    ];
+    [width, height, x, y] = [bbox.right - bbox.left, bbox.bottom - bbox.top, bbox.left, bbox.top];
   } else if (isDefined(shape)) {
     [width, height] = [shape?.width() ?? 0, shape?.height() ?? 0];
     [x, y] = [item.x + width / 2 - 32, item.x + width / 2 - 32];
@@ -76,14 +71,7 @@ export const SuggestionControls = observer(({ item, useLayer }) => {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <Rect
-          x={0}
-          y={0}
-          width={64}
-          height={32}
-          fill="#000"
-          cornerRadius={16}
-        />
+        <Rect x={0} y={0} width={64} height={32} fill="#000" cornerRadius={16} />
         <ControlButton
           onClick={() => item.annotation.rejectSuggestion(item.id)}
           fill="#DD0000"
@@ -158,13 +146,7 @@ const ControlButton = ({ x = 0, fill, iconColor, onClick, icon }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <Circle
-        x={16}
-        y={16}
-        radius={14}
-        opacity={hovered ? 1 : 0.2}
-        fill={hovered ? fill : "#fff"}
-      />
+      <Circle x={16} y={16} radius={14} opacity={hovered ? 1 : 0.2} fill={hovered ? fill : "#fff"} />
       <Image
         ref={(node) => applyFilter(node)}
         x={imageOffset}

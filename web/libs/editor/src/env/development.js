@@ -146,36 +146,22 @@ function configureApplication(params) {
   const options = {
     settings: params.settings || {},
     messages: { ...Messages, ...params.messages },
-    onSubmitAnnotation: params.onSubmitAnnotation
-      ? params.onSubmitAnnotation
-      : External.onSubmitAnnotation,
-    onUpdateAnnotation: params.onUpdateAnnotation
-      ? params.onUpdateAnnotation
-      : External.onUpdateAnnotation,
-    onDeleteAnnotation: params.onDeleteAnnotation
-      ? params.onDeleteAnnotation
-      : External.onDeleteAnnotation,
+    onSubmitAnnotation: params.onSubmitAnnotation ? params.onSubmitAnnotation : External.onSubmitAnnotation,
+    onUpdateAnnotation: params.onUpdateAnnotation ? params.onUpdateAnnotation : External.onUpdateAnnotation,
+    onDeleteAnnotation: params.onDeleteAnnotation ? params.onDeleteAnnotation : External.onDeleteAnnotation,
     onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
-    onUnskipTask: params.onUnskipTask
-      ? params.onUnskipTask
-      : External.onUnskipTask,
+    onUnskipTask: params.onUnskipTask ? params.onUnskipTask : External.onUnskipTask,
     onPresignUrlForProject: params.onPresignUrlForProject,
     onSubmitDraft: params.onSubmitDraft,
     onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
-    onLabelStudioLoad: params.onLabelStudioLoad
-      ? params.onLabelStudioLoad
-      : External.onLabelStudioLoad,
+    onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
     onEntityCreate: params.onEntityCreate || External.onEntityCreate,
     onEntityDelete: params.onEntityDelete || External.onEntityDelete,
     onGroundTruth: params.onGroundTruth || External.onGroundTruth,
-    onSelectAnnotation:
-      params.onSelectAnnotation || External.onSelectAnnotation,
-    onAcceptAnnotation:
-      params.onAcceptAnnotation || External.onAcceptAnnotation,
-    onRejectAnnotation:
-      params.onRejectAnnotation || External.onRejectAnnotation,
-    onStorageInitialized:
-      params.onStorageInitialized || External.onStorageInitialized,
+    onSelectAnnotation: params.onSelectAnnotation || External.onSelectAnnotation,
+    onAcceptAnnotation: params.onAcceptAnnotation || External.onAcceptAnnotation,
+    onRejectAnnotation: params.onRejectAnnotation || External.onRejectAnnotation,
+    onStorageInitialized: params.onStorageInitialized || External.onStorageInitialized,
     onNextTask: params.onNextTask || External.onNextTask,
     onPrevTask: params.onPrevTask || External.onPrevTask,
     // other settings aka flags

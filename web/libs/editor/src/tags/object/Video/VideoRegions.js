@@ -8,10 +8,7 @@ import Constants from "../../../core/Constants";
 import { Annotation } from "../../../stores/Annotation/Annotation";
 import { fixMobxObserve } from "../../../utils/utilities";
 import { Rectangle } from "./Rectangle";
-import {
-  createBoundingBoxGetter,
-  createOnDragMoveHandler,
-} from "./TransformTools";
+import { createBoundingBoxGetter, createOnDragMoveHandler } from "./TransformTools";
 
 export const MIN_SIZE = 5;
 
@@ -19,13 +16,7 @@ const SelectionRect = (props) => {
   return (
     <>
       <Rect {...props} strokeWidth={2} stroke="#fff" />
-      <Rect
-        {...props}
-        fill={chroma("#0099FF").alpha(0.1).css()}
-        strokeWidth={2}
-        stroke="#0099FF"
-        dash={[2, 2]}
-      />
+      <Rect {...props} fill={chroma("#0099FF").alpha(0.1).css()} strokeWidth={2} stroke="#0099FF" dash={[2, 2]} />
     </>
   );
 };
@@ -46,12 +37,7 @@ const VideoRegionsPure = ({
   const [isDrawing, setDrawingMode] = useState(false);
 
   const selected = regions.filter((reg) => {
-    return (
-      (reg.selected || reg.inSelection) &&
-      !reg.hidden &&
-      !reg.isReadOnly() &&
-      reg.isInLifespan(item.frame)
-    );
+    return (reg.selected || reg.inSelection) && !reg.hidden && !reg.isReadOnly() && reg.isInLifespan(item.frame);
   });
   const listenToEvents = !locked;
 
@@ -66,10 +52,8 @@ const VideoRegionsPure = ({
     const overshotY = Math.abs(pan.y) >= Math.abs((height - resultHeight) / 2);
     const panXDirection = pan.x > 0 ? 1 : -1;
     const panYDirection = pan.y > 0 ? 1 : -1;
-    const overshotXAmmount =
-      (Math.abs(pan.x) - Math.abs((width - resultWidth) / 2)) * panXDirection;
-    const overshotYAmmount =
-      (Math.abs(pan.y) - Math.abs((height - resultHeight) / 2)) * panYDirection;
+    const overshotXAmmount = (Math.abs(pan.x) - Math.abs((width - resultWidth) / 2)) * panXDirection;
+    const overshotYAmmount = (Math.abs(pan.y) - Math.abs((height - resultHeight) / 2)) * panYDirection;
     const edgeZoomOffestX = overshotX ? overshotXAmmount : 0;
     const edgeZoomOffestY = overshotY ? overshotYAmmount : 0;
     const offsetLeft = (width - resultWidth) / 2 + pan.x - edgeZoomOffestX;
@@ -140,12 +124,7 @@ const VideoRegionsPure = ({
   const inBounds = (x, y) => {
     if (allowRegionsOutsideWorkingArea) return true;
 
-    return (
-      x > 0 &&
-      y > 0 &&
-      x < workinAreaCoordinates.realWidth &&
-      y < workinAreaCoordinates.realHeight
-    );
+    return x > 0 && y > 0 && x < workinAreaCoordinates.realWidth && y < workinAreaCoordinates.realHeight;
   };
 
   const limitCoordinates = ({ x, y }) => {
@@ -160,9 +139,7 @@ const VideoRegionsPure = ({
   const handleMouseDown = (e) => {
     if (e.target !== stageRef.current || item.annotation?.isReadOnly()) return;
 
-    const { x, y } = limitCoordinates(
-      normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY),
-    );
+    const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
 
     const isInBounds = inBounds(x, y);
 
@@ -176,9 +153,7 @@ const VideoRegionsPure = ({
   const handleMouseMove = (e) => {
     if (!isDrawing || item.annotation?.isReadOnly()) return false;
 
-    const { x, y } = limitCoordinates(
-      normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY),
-    );
+    const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
 
     setNewRegion((region) => ({
       ...region,
@@ -190,14 +165,9 @@ const VideoRegionsPure = ({
   const handleMouseUp = (e) => {
     if (!isDrawing || item.annotation?.isReadOnly()) return false;
 
-    const { x, y } = limitCoordinates(
-      normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY),
-    );
+    const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
 
-    if (
-      Math.abs(newRegion.x - x) < MIN_SIZE &&
-      Math.abs(newRegion.y - y) < MIN_SIZE
-    ) {
+    if (Math.abs(newRegion.x - x) < MIN_SIZE && Math.abs(newRegion.y - y) < MIN_SIZE) {
       setNewRegion(null);
     } else {
       setNewRegion((region) => ({
@@ -215,9 +185,7 @@ const VideoRegionsPure = ({
     const stage = tr.getStage();
     // @todo not an obvious way to not render transformer for hidden regions
     // @todo could it be rewritten to usual react way?
-    const shapes = selected
-      .map((shape) => stage.findOne(`#${shape.id}`))
-      .filter(Boolean);
+    const shapes = selected.map((shape) => stage.findOne(`#${shape.id}`)).filter(Boolean);
 
     tr.nodes(shapes);
     tr.getLayer().batchDraw();
@@ -248,10 +216,7 @@ const VideoRegionsPure = ({
           locked={locked}
           isDrawing={isDrawing}
           workinAreaCoordinates={workinAreaCoordinates}
-          onDragMove={createOnDragMoveHandler(
-            workinAreaCoordinates,
-            !allowRegionsOutsideWorkingArea,
-          )}
+          onDragMove={createOnDragMoveHandler(workinAreaCoordinates, !allowRegionsOutsideWorkingArea)}
           stageRef={stageRef}
         />
       </Layer>
@@ -267,14 +232,8 @@ const VideoRegionsPure = ({
             keepRatio={false}
             ignoreStroke
             flipEnabled={false}
-            boundBoxFunc={createBoundingBoxGetter(
-              workinAreaCoordinates,
-              !allowRegionsOutsideWorkingArea,
-            )}
-            onDragMove={createOnDragMoveHandler(
-              workinAreaCoordinates,
-              !allowRegionsOutsideWorkingArea,
-            )}
+            boundBoxFunc={createBoundingBoxGetter(workinAreaCoordinates, !allowRegionsOutsideWorkingArea)}
+            onDragMove={createOnDragMoveHandler(workinAreaCoordinates, !allowRegionsOutsideWorkingArea)}
           />
         </Layer>
       ) : null}
@@ -282,36 +241,26 @@ const VideoRegionsPure = ({
   );
 };
 
-const RegionsLayer = observer(
-  ({
-    regions,
-    item,
-    locked,
-    isDrawing,
-    workinAreaCoordinates,
-    stageRef,
-    onDragMove,
-  }) => {
-    return (
-      <>
-        {regions.map((reg) => (
-          <Shape
-            id={reg.id}
-            key={reg.id}
-            reg={reg}
-            frame={item.frame}
-            workingArea={workinAreaCoordinates}
-            draggable={!reg.isReadOnly() && !isDrawing && !locked}
-            selected={reg.selected || reg.inSelection}
-            listening={!reg.locked && !reg.hidden}
-            stageRef={stageRef}
-            onDragMove={onDragMove}
-          />
-        ))}
-      </>
-    );
-  },
-);
+const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove }) => {
+  return (
+    <>
+      {regions.map((reg) => (
+        <Shape
+          id={reg.id}
+          key={reg.id}
+          reg={reg}
+          frame={item.frame}
+          workingArea={workinAreaCoordinates}
+          draggable={!reg.isReadOnly() && !isDrawing && !locked}
+          selected={reg.selected || reg.inSelection}
+          listening={!reg.locked && !reg.hidden}
+          stageRef={stageRef}
+          onDragMove={onDragMove}
+        />
+      ))}
+    </>
+  );
+});
 
 const Shape = observer(({ reg, frame, stageRef, ...props }) => {
   const box = reg.getShape(frame);
@@ -327,8 +276,7 @@ const Shape = observer(({ reg, frame, stageRef, ...props }) => {
           const annotation = getParentOfType(reg, Annotation);
 
           if (annotation?.relationMode) {
-            stageRef.current.container().style.cursor =
-              Constants.DEFAULT_CURSOR;
+            stageRef.current.container().style.cursor = Constants.DEFAULT_CURSOR;
           }
 
           reg.setHighlight(false);

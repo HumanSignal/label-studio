@@ -95,14 +95,7 @@ const TagAttrs = types.model({
 const ModelAttrs = types.model({
   pid: types.optional(types.string, guidGenerator),
   type: "labels",
-  children: Types.unionArray([
-    "label",
-    "header",
-    "view",
-    "text",
-    "hypertext",
-    "richtext",
-  ]),
+  children: Types.unionArray(["label", "header", "view", "text", "hypertext", "richtext"]),
 
   visible: types.optional(types.boolean, true),
 });
@@ -154,10 +147,7 @@ const LabelsModel = types.compose(
 
 const HtxLabels = observer(({ item }) => {
   return (
-    <Block
-      name="labels"
-      mod={{ hidden: !item.visible, inline: item.showinline }}
-    >
+    <Block name="labels" mod={{ hidden: !item.visible, inline: item.showinline }}>
       {Tree.renderChildren(item, item.annotation)}
     </Block>
   );

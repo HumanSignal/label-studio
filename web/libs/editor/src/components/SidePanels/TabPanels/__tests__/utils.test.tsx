@@ -158,11 +158,7 @@ describe("stateRemovedTab", () => {
   it("should return the same state if the specified panel or tab does not exist", () => {
     const nonExistentPanelName = "nonexistent";
     const nonExistentTab = 5;
-    const newState = stateRemovedTab(
-      state,
-      nonExistentPanelName,
-      nonExistentTab,
-    );
+    const newState = stateRemovedTab(state, nonExistentPanelName, nonExistentTab);
 
     expect(newState).toEqual(state);
   });
@@ -197,9 +193,7 @@ describe("setActive", () => {
     const stateBefore = { ...dummyPanels };
     const newState = setActive(stateBefore, panelName, tabIndex);
 
-    expect(JSON.stringify(newState[panelName].panelViews)).toEqual(
-      JSON.stringify(expectedState),
-    );
+    expect(JSON.stringify(newState[panelName].panelViews)).toEqual(JSON.stringify(expectedState));
   });
 
   it("should not modify the original state object", () => {
@@ -365,14 +359,7 @@ describe("stateAddedTab", () => {
       },
     };
 
-    const newState = stateAddedTab(
-      state,
-      panelName,
-      receivingPanel,
-      movingTabData,
-      receivingTab,
-      dropSide,
-    );
+    const newState = stateAddedTab(state, panelName, receivingPanel, movingTabData, receivingTab, dropSide);
 
     expect(JSON.stringify(newState)).toEqual(JSON.stringify(expectedState));
   });
@@ -422,14 +409,7 @@ describe("stateAddedTab", () => {
       },
     };
 
-    const newState = stateAddedTab(
-      state,
-      panelName,
-      receivingPanel,
-      movingTabData,
-      receivingTab,
-      dropSide,
-    );
+    const newState = stateAddedTab(state, panelName, receivingPanel, movingTabData, receivingTab, dropSide);
 
     expect(JSON.stringify(newState)).toEqual(JSON.stringify(expectedState));
   });
@@ -437,9 +417,7 @@ describe("stateAddedTab", () => {
 
 describe("stateRemovePanelEmptyViews", () => {
   const panelName = "panel1";
-  const initialPanelViews = [
-    { title: "Tab 1", name: "Tab1", component: () => null, active: true },
-  ];
+  const initialPanelViews = [{ title: "Tab 1", name: "Tab1", component: () => null, active: true }];
 
   const state: Record<string, PanelBBox> = {
     [panelName]: { panelViews: initialPanelViews } as unknown as PanelBBox,
@@ -504,9 +482,7 @@ describe("splitPanelColumns", () => {
 
     const newState = splitPanelColumns(initialPanels, removingKey, totalHeight);
 
-    expect(JSON.stringify(newState[removingKey])).toEqual(
-      JSON.stringify(expectedState[removingKey]),
-    );
+    expect(JSON.stringify(newState[removingKey])).toEqual(JSON.stringify(expectedState[removingKey]));
   });
 
   it("should split the columns when removing a panel from a column with multiple panels", () => {
@@ -654,14 +630,7 @@ describe("joinPanelColumns", () => {
   });
 
   it("should adjust the order when joining two columns", () => {
-    const result = joinPanelColumns(
-      state,
-      "panel4",
-      Side.left,
-      300,
-      600,
-      JoinOrder.top,
-    );
+    const result = joinPanelColumns(state, "panel4", Side.left, 300, 600, JoinOrder.top);
 
     expect(result.panel1.order).toBe(1);
     expect(result.panel2.order).toBe(2);
@@ -938,10 +907,7 @@ describe("checkCollapsedPanelsHaveData", () => {
     };
     const expected = { ...collapsedSideWithNoData };
 
-    const result = checkCollapsedPanelsHaveData(
-      collapsedSideWithNoData,
-      panelData,
-    );
+    const result = checkCollapsedPanelsHaveData(collapsedSideWithNoData, panelData);
 
     expect(result).toEqual(expected);
   });

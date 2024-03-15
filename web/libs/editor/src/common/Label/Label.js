@@ -3,21 +3,7 @@ import { Block, Elem } from "../../utils/bem";
 import "./Label.styl";
 
 export const Label = forwardRef(
-  (
-    {
-      text,
-      children,
-      required,
-      placement,
-      description,
-      size,
-      large,
-      style,
-      simple,
-      flat,
-    },
-    ref,
-  ) => {
+  ({ text, children, required, placement, description, size, large, style, simple, flat }, ref) => {
     const tagName = simple ? "div" : "label";
     const mods = {
       size,
@@ -29,14 +15,7 @@ export const Label = forwardRef(
     };
 
     return (
-      <Block
-        ref={ref}
-        name="field-label"
-        mod={mods}
-        tag={tagName}
-        style={style}
-        data-required={required}
-      >
+      <Block ref={ref} name="field-label" mod={mods} tag={tagName} style={style} data-required={required}>
         <Elem name="text">
           <Elem name="content">
             {text}

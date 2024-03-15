@@ -28,10 +28,7 @@ const ObjectBase = types
      * it is using for validation purposes
      */
     get allRegs() {
-      return (
-        self.annotation?.regionStore.regions.filter((r) => r.object === self) ||
-        []
-      );
+      return self.annotation?.regionStore.regions.filter((r) => r.object === self) || [];
     },
     /**
      * A list of regions related to the current object state
@@ -72,15 +69,12 @@ const ObjectBase = types
     // return all states left untouched - available labels and others
     function getAvailableStates() {
       // `checkMaxUsages` may unselect labels with already reached `maxUsages`
-      const checkAndCollect = (list, s) =>
-        s.checkMaxUsages ? list.concat(s.checkMaxUsages()) : list;
+      const checkAndCollect = (list, s) => (s.checkMaxUsages ? list.concat(s.checkMaxUsages()) : list);
       const allStates = self.states() || [];
       let exceeded;
 
       if (isFF(FF_DEV_3666)) {
-        exceeded = allStates
-          .reduce(checkAndCollect, [])
-          .filter((e) => e.selected);
+        exceeded = allStates.reduce(checkAndCollect, []).filter((e) => e.selected);
         exceeded.forEach((e) => e.setSelected(false));
       } else {
         exceeded = allStates.reduce(checkAndCollect, []);
@@ -92,9 +86,7 @@ const ObjectBase = types
         if (exceeded.length) {
           const label = exceeded[0];
 
-          InfoModal.warning(
-            `You can't use ${label.value} more than ${label.maxUsages} time(s)`,
-          );
+          InfoModal.warning(`You can't use ${label.value} more than ${label.maxUsages} time(s)`);
         }
         self.annotation.unselectAll();
       }

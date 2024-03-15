@@ -40,14 +40,7 @@ const standaloneModal = (props) => {
   };
 };
 
-export const confirm = ({
-  okText,
-  onOk,
-  cancelText,
-  onCancel,
-  buttonLook,
-  ...props
-}) => {
+export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...props }) => {
   const modal = standaloneModal({
     ...props,
     allowClose: false,

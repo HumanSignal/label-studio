@@ -1,16 +1,6 @@
 /* global LSF_VERSION */
 
-import {
-  destroy,
-  detach,
-  flow,
-  getEnv,
-  getParent,
-  getSnapshot,
-  isRoot,
-  types,
-  walk,
-} from "mobx-state-tree";
+import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, walk } from "mobx-state-tree";
 
 import uniqBy from "lodash/uniqBy";
 import InfoModal from "../components/Infomodal/Infomodal";
@@ -18,13 +8,7 @@ import { Hotkey } from "../core/Hotkey";
 import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
 import ToolsManager from "../tools/Manager";
 import Utils from "../utils";
-import {
-  FF_DEV_1536,
-  FF_LSDV_4620_3_ML,
-  FF_LSDV_4998,
-  FF_SIMPLE_INIT,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { guidGenerator } from "../utils/unique";
 import { clamp, delay, isDefined } from "../utils/utilities";
 import AnnotationStore from "./Annotation/store";
@@ -91,10 +75,7 @@ export default types
     /**
      * User of Label Studio
      */
-    user: types.optional(
-      types.maybeNull(types.safeReference(UserExtended)),
-      null,
-    ),
+    user: types.optional(types.maybeNull(types.safeReference(UserExtended)), null),
 
     /**
      * Debug for development environment
@@ -164,9 +145,7 @@ export default types
 
     users: types.optional(types.array(UserExtended), []),
 
-    userLabels: isFF(FF_DEV_1536)
-      ? types.optional(UserLabels, { controls: {} })
-      : types.undefined,
+    userLabels: isFF(FF_DEV_1536) ? types.optional(UserLabels, { controls: {} }) : types.undefined,
 
     queueTotal: types.optional(types.number, 0),
 
@@ -190,8 +169,7 @@ export default types
     return {
       ...sn,
       _autoAnnotation: localStorage.getItem("autoAnnotation") === "true",
-      _autoAcceptSuggestions:
-        localStorage.getItem("autoAcceptSuggestions") === "true",
+      _autoAcceptSuggestions: localStorage.getItem("autoAcceptSuggestions") === "true",
     };
   })
   .volatile(() => ({
@@ -208,16 +186,12 @@ export default types
     },
     get hasSegmentation() {
       // not an object and not a classification
-      const isSegmentation = (t) =>
-        !t.getAvailableStates && !t.perRegionVisible;
+      const isSegmentation = (t) => !t.getAvailableStates && !t.perRegionVisible;
 
-      return Array.from(self.annotationStore.names.values()).some(
-        isSegmentation,
-      );
+      return Array.from(self.annotationStore.names.values()).some(isSegmentation);
     },
     get canGoNextTask() {
-      const hasHistory =
-        self.task && self.taskHistory && self.taskHistory.length > 1;
+      const hasHistory = self.task && self.taskHistory && self.taskHistory.length > 1;
 
       if (hasHistory) {
         const lastTaskId = self.taskHistory[self.taskHistory.length - 1].taskId;
@@ -227,8 +201,7 @@ export default types
       return false;
     },
     get canGoPrevTask() {
-      const hasHistory =
-        self.task && self.taskHistory && self.taskHistory.length > 1;
+      const hasHistory = self.task && self.taskHistory && self.taskHistory.length > 1;
 
       if (hasHistory) {
         const firstTaskId = self.taskHistory[0].taskId;
@@ -388,9 +361,7 @@ export default types
       hotkeys.addNamed("region:delete-all", () => {
         const { selected } = self.annotationStore;
 
-        if (
-          window.confirm(getEnv(self).messages.CONFIRM_TO_DELETE_ALL_REGIONS)
-        ) {
+        if (window.confirm(getEnv(self).messages.CONFIRM_TO_DELETE_ALL_REGIONS)) {
           selected.deleteAllRegions();
         }
       });
@@ -557,11 +528,7 @@ export default types
         .then(() => self.setFlags({ isSubmitting: false }));
     }
     function incrementQueuePosition(number = 1) {
-      self.queuePosition = clamp(
-        self.queuePosition + number,
-        1,
-        self.queueTotal,
-      );
+      self.queuePosition = clamp(self.queuePosition + number, 1, self.queueTotal);
     }
 
     function submitAnnotation() {
@@ -592,12 +559,7 @@ export default types
       if (!entity.validate()) return;
 
       handleSubmittingFlag(async () => {
-        await getEnv(self).events.invoke(
-          "updateAnnotation",
-          self,
-          entity,
-          extraData,
-        );
+        await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
         self.incrementQueuePosition();
       });
       entity.dropDraft();
@@ -712,12 +674,7 @@ export default types
      * Given annotations and predictions
      * `completions` is a fallback for old projects; they'll be saved as `annotations` anyway
      */
-    function initializeStore({
-      annotations = [],
-      completions = [],
-      predictions = [],
-      annotationHistory,
-    }) {
+    function initializeStore({ annotations = [], completions = [], predictions = [], annotationHistory }) {
       const as = self.annotationStore;
 
       // some hacks to properly clear react and mobx structures
@@ -853,9 +810,7 @@ export default types
     });
 
     function addAnnotationToTaskHistory(annotationId) {
-      const taskIndex = self.taskHistory.findIndex(
-        ({ taskId }) => taskId === self.task.id,
-      );
+      const taskIndex = self.taskHistory.findIndex(({ taskId }) => taskId === self.task.id);
 
       if (taskIndex >= 0) {
         self.taskHistory[taskIndex].annotationId = annotationId;
@@ -875,9 +830,7 @@ export default types
     function nextTask() {
       if (self.canGoNextTask) {
         const { taskId, annotationId } =
-          self.taskHistory[
-            self.taskHistory.findIndex((x) => x.taskId === self.task.id) + 1
-          ];
+          self.taskHistory[self.taskHistory.findIndex((x) => x.taskId === self.task.id) + 1];
 
         getEnv(self).events.invoke("nextTask", taskId, annotationId);
         self.incrementQueuePosition();

@@ -1,8 +1,4 @@
-import {
-  LabelStudio,
-  Sidebar,
-  Textarea,
-} from "@humansignal/frontend-test/helpers/LSF";
+import { LabelStudio, Sidebar, Textarea } from "@humansignal/frontend-test/helpers/LSF";
 import { FF_LEAD_TIME } from "../../../../src/utils/feature-flags";
 import {
   simpleData,
@@ -19,11 +15,7 @@ describe("Control Tags - TextArea - Lead Time", () => {
   });
 
   it("should calculate lead_time for global TextArea", () => {
-    LabelStudio.params()
-      .config(textareaConfigSimple)
-      .data(simpleData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
 
     Textarea.type("This is a test{enter}");
     Textarea.hasValue("This is a test");
@@ -43,11 +35,7 @@ describe("Control Tags - TextArea - Lead Time", () => {
   });
 
   it("should calculate lead_time for per-region TextArea", () => {
-    LabelStudio.params()
-      .config(textareaConfigPerRegion)
-      .data(simpleData)
-      .withResult(textareaResultsPerRegion)
-      .init();
+    LabelStudio.params().config(textareaConfigPerRegion).data(simpleData).withResult(textareaResultsPerRegion).init();
 
     Sidebar.findRegionByIndex(0).click();
 

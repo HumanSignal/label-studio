@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { isDefined } from "../../../utils/utils";
 import { FormContext } from "./FormContext";
 import * as Validators from "./Validation/Validators";
@@ -79,15 +72,11 @@ export const FormField = forwardRef(
         /**@type {HTMLInputElement|HTMLTextAreaElement} */
         const formField = field.current;
 
-        if (!(formField instanceof HTMLElement))
-          console.log({ formField, value });
+        if (!(formField instanceof HTMLElement)) console.log({ formField, value });
 
         if (setValue instanceof Function) {
           setValue(value);
-        } else if (
-          formField.type === "checkbox" ||
-          formField.type === "radio"
-        ) {
+        } else if (formField.type === "checkbox" || formField.type === "radio") {
           formField.checked = value ?? formField.checked;
         } else if (value === null) {
           formField.value = "";
@@ -104,8 +93,7 @@ export const FormField = forwardRef(
     );
 
     useEffect(() => {
-      const isProtected =
-        skipAutofill && !allowEmpty && field.current.type === "password";
+      const isProtected = skipAutofill && !allowEmpty && field.current.type === "password";
 
       context?.registerField({
         label,

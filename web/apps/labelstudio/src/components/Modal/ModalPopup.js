@@ -95,39 +95,19 @@ export class Modal extends React.Component {
 
     const modalContent = (
       <ModalContext.Provider value={this}>
-        <Block
-          name="modal"
-          ref={this.modalRef}
-          mod={mods}
-          mix={mixes}
-          onClick={this.onClickOutside}
-        >
+        <Block name="modal" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
           <Elem name="wrapper">
-            <Elem
-              name="content"
-              style={Object.assign({}, this.props.style, modalSizeStyle)}
-            >
+            <Elem name="content" style={Object.assign({}, this.props.style, modalSizeStyle)}>
               {!bare && (
                 <Modal.Header>
                   <Elem name="title">{this.state.title}</Elem>
-                  {this.props.allowClose !== false && (
-                    <Elem
-                      tag={Button}
-                      name="close"
-                      type="text"
-                      icon={<LsCross />}
-                    />
-                  )}
+                  {this.props.allowClose !== false && <Elem tag={Button} name="close" type="text" icon={<LsCross />} />}
                 </Modal.Header>
               )}
               <Elem name="body" mod={{ bare }}>
                 {this.body}
               </Elem>
-              {this.props.footer && (
-                <Modal.Footer bare={this.props.bareFooter}>
-                  {this.footer}
-                </Modal.Footer>
-              )}
+              {this.props.footer && <Modal.Footer bare={this.props.bareFooter}>{this.footer}</Modal.Footer>}
             </Elem>
           </Elem>
         </Block>
@@ -145,11 +125,7 @@ export class Modal extends React.Component {
     const content = cn("modal").elem("content").closest(e.target);
     const close = cn("modal").elem("close").closest(e.target);
 
-    if (
-      allowClose &&
-      ((isInModal && close) ||
-        (content === null && closeOnClickOutside !== false))
-    ) {
+    if (allowClose && ((isInModal && close) || (content === null && closeOnClickOutside !== false))) {
       this.hide();
     }
   };
@@ -180,13 +156,10 @@ export class Modal extends React.Component {
         }),
       afterTransition: async () =>
         new Promise((resolve) => {
-          this.setState(
-            { transition: type === "appear" ? "visible" : null },
-            () => {
-              onFinish?.();
-              resolve();
-            },
-          );
+          this.setState({ transition: type === "appear" ? "visible" : null }, () => {
+            onFinish?.();
+            resolve();
+          });
         }),
     });
   }

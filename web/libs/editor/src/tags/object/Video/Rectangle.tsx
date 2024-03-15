@@ -39,11 +39,7 @@ const RectanglePure: FC<RectProps> = ({
 }) => {
   const style = useRegionStyles(reg, { includeFill: true });
 
-  const {
-    realWidth: waWidth,
-    realHeight: waHeight,
-    scale: waScale,
-  } = workingArea;
+  const { realWidth: waWidth, realHeight: waHeight, scale: waScale } = workingArea;
 
   const newBox = useMemo(
     () => ({

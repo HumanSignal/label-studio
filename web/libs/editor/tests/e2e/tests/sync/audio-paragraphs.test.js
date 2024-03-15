@@ -155,11 +155,51 @@ const params = {
   data,
 };
 
-FFlagMatrix(
-  ["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"],
-  (flags) => {
+FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) => {
+  FFlagScenario(
+    "Audio clip is played when selecting the play button next to a paragraph segment",
+    async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+      LabelStudio.setFeatureFlags({
+        ff_front_dev_2715_audio_3_280722_short: true,
+        ...flags,
+      });
+
+      I.amOnPage("/");
+
+      LabelStudio.init(params);
+
+      await AtAudioView.waitForAudio();
+      await AtAudioView.lookForStage();
+
+      AtSidebar.seeRegions(2);
+
+      const [{ currentTime: startingAudioTime }, { currentTime: startingParagraphAudioTime }] =
+        await AtAudioView.getCurrentAudio();
+
+      assert.equal(startingAudioTime, startingParagraphAudioTime);
+      assert.equal(startingParagraphAudioTime, 0);
+
+      I.click('[aria-label="play"]');
+      I.wait(1);
+
+      I.click('[aria-label="play"]');
+      I.wait(1);
+
+      const [{ currentTime: seekAudioTime }, { currentTime: seekParagraphAudioTime }] =
+        await AtAudioView.getCurrentAudio();
+
+      assert.notEqual(seekAudioTime, 0);
+      I.assertTimesInSync(
+        seekAudioTime,
+        seekParagraphAudioTime,
+        `Expected seek time to be ${seekAudioTime} but was ${seekParagraphAudioTime}`,
+      );
+    },
+  );
+
+  if (flags.fflag_feat_front_lsdv_e_278_contextual_scrolling_short) {
     FFlagScenario(
-      "Audio clip is played when selecting the play button next to a paragraph segment",
+      "Playback button states continually change over time according to the paragraph segment which is being played",
       async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
@@ -175,292 +215,225 @@ FFlagMatrix(
 
         AtSidebar.seeRegions(2);
 
-        const [
-          { currentTime: startingAudioTime },
-          { currentTime: startingParagraphAudioTime },
-        ] = await AtAudioView.getCurrentAudio();
+        const [{ currentTime: startingAudioTime }, { currentTime: startingParagraphAudioTime }] =
+          await AtAudioView.getCurrentAudio();
 
         assert.equal(startingAudioTime, startingParagraphAudioTime);
         assert.equal(startingParagraphAudioTime, 0);
 
-        I.click('[aria-label="play"]');
-        I.wait(1);
+        AtAudioView.clickPauseButton();
 
-        I.click('[aria-label="play"]');
-        I.wait(1);
+        // Plays the first paragraph segment when the audio interface is played
+        I.seeElement('[data-testid="phrase:0"] [aria-label="pause"]');
+        I.seeElement('[data-testid="phrase:1"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:2"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:3"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:4"] [aria-label="play"]');
 
-        const [
-          { currentTime: seekAudioTime },
-          { currentTime: seekParagraphAudioTime },
-        ] = await AtAudioView.getCurrentAudio();
+        I.wait(2);
 
-        assert.notEqual(seekAudioTime, 0);
-        I.assertTimesInSync(
-          seekAudioTime,
-          seekParagraphAudioTime,
-          `Expected seek time to be ${seekAudioTime} but was ${seekParagraphAudioTime}`,
-        );
+        // Plays the second paragraph segment when the audio progresses to the second paragraph segment
+        I.seeElement('[data-testid="phrase:1"] [aria-label="pause"]');
+        I.seeElement('[data-testid="phrase:0"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:2"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:3"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:4"] [aria-label="play"]');
+
+        I.wait(2);
+
+        // Plays the third paragraph segment when the audio progresses to the third paragraph segment
+        I.seeElement('[data-testid="phrase:2"] [aria-label="pause"]');
+        I.seeElement('[data-testid="phrase:0"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:1"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:3"] [aria-label="play"]');
+        I.seeElement('[data-testid="phrase:4"] [aria-label="play"]');
       },
     );
 
-    if (flags.fflag_feat_front_lsdv_e_278_contextual_scrolling_short) {
-      FFlagScenario(
-        "Playback button states continually change over time according to the paragraph segment which is being played",
-        async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ...flags,
-          });
-
-          I.amOnPage("/");
-
-          LabelStudio.init(params);
-
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
-
-          AtSidebar.seeRegions(2);
-
-          const [
-            { currentTime: startingAudioTime },
-            { currentTime: startingParagraphAudioTime },
-          ] = await AtAudioView.getCurrentAudio();
-
-          assert.equal(startingAudioTime, startingParagraphAudioTime);
-          assert.equal(startingParagraphAudioTime, 0);
-
-          AtAudioView.clickPauseButton();
-
-          // Plays the first paragraph segment when the audio interface is played
-          I.seeElement('[data-testid="phrase:0"] [aria-label="pause"]');
-          I.seeElement('[data-testid="phrase:1"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:2"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:3"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:4"] [aria-label="play"]');
+    FFlagScenario(
+      "Check if paragraph is scrolling automatically following the audio",
+      async ({ I, LabelStudio, AtAudioView }) => {
+        LabelStudio.setFeatureFlags({
+          ff_front_dev_2715_audio_3_280722_short: true,
+          ff_front_1170_outliner_030222_short: true,
+          ...flags,
+        });
 
-          I.wait(2);
+        params.config = configWithScroll;
 
-          // Plays the second paragraph segment when the audio progresses to the second paragraph segment
-          I.seeElement('[data-testid="phrase:1"] [aria-label="pause"]');
-          I.seeElement('[data-testid="phrase:0"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:2"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:3"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:4"] [aria-label="play"]');
+        I.amOnPage("/");
 
-          I.wait(2);
+        LabelStudio.init(params);
 
-          // Plays the third paragraph segment when the audio progresses to the third paragraph segment
-          I.seeElement('[data-testid="phrase:2"] [aria-label="pause"]');
-          I.seeElement('[data-testid="phrase:0"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:1"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:3"] [aria-label="play"]');
-          I.seeElement('[data-testid="phrase:4"] [aria-label="play"]');
-        },
-      );
+        await AtAudioView.waitForAudio();
+        await AtAudioView.lookForStage();
 
-      FFlagScenario(
-        "Check if paragraph is scrolling automatically following the audio",
-        async ({ I, LabelStudio, AtAudioView }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ff_front_1170_outliner_030222_short: true,
-            ...flags,
-          });
+        const [{ currentTime: startingAudioTime }, { currentTime: startingParagraphAudioTime }] =
+          await AtAudioView.getCurrentAudio();
 
-          params.config = configWithScroll;
+        assert.equal(startingAudioTime, startingParagraphAudioTime);
+        assert.equal(startingParagraphAudioTime, 0);
 
-          I.amOnPage("/");
+        AtAudioView.clickPlayButton();
 
-          LabelStudio.init(params);
+        I.wait(10);
+        // Plays the first paragraph segment when the audio interface is played
+        const scrollPosition = await I.executeScript((selector) => {
+          const element = document.querySelector(selector);
 
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
+          return {
+            scrollTop: element.scrollTop,
+            scrollLeft: element.scrollLeft,
+          };
+        }, '[data-testid="phrases-wrapper"]');
 
-          const [
-            { currentTime: startingAudioTime },
-            { currentTime: startingParagraphAudioTime },
-          ] = await AtAudioView.getCurrentAudio();
+        await assert(scrollPosition.scrollTop > 200, "Scroll position should be greater than 200");
+      },
+    );
 
-          assert.equal(startingAudioTime, startingParagraphAudioTime);
-          assert.equal(startingParagraphAudioTime, 0);
+    FFlagScenario(
+      "Paragraph should automatically scroll if user seeks audio player",
+      async ({ I, LabelStudio, AtAudioView }) => {
+        LabelStudio.setFeatureFlags({
+          ff_front_dev_2715_audio_3_280722_short: true,
+          ff_front_1170_outliner_030222_short: true,
+          ...flags,
+        });
 
-          AtAudioView.clickPlayButton();
+        params.config = configWithScroll;
 
-          I.wait(10);
-          // Plays the first paragraph segment when the audio interface is played
-          const scrollPosition = await I.executeScript((selector) => {
-            const element = document.querySelector(selector);
+        I.amOnPage("/");
 
-            return {
-              scrollTop: element.scrollTop,
-              scrollLeft: element.scrollLeft,
-            };
-          }, '[data-testid="phrases-wrapper"]');
+        LabelStudio.init(params);
 
-          await assert(
-            scrollPosition.scrollTop > 200,
-            "Scroll position should be greater than 200",
-          );
-        },
-      );
+        await AtAudioView.waitForAudio();
+        await AtAudioView.lookForStage();
 
-      FFlagScenario(
-        "Paragraph should automatically scroll if user seeks audio player",
-        async ({ I, LabelStudio, AtAudioView }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ff_front_1170_outliner_030222_short: true,
-            ...flags,
-          });
+        const [{ currentTime: startingAudioTime }, { currentTime: startingParagraphAudioTime }] =
+          await AtAudioView.getCurrentAudio();
 
-          params.config = configWithScroll;
+        assert.equal(startingAudioTime, startingParagraphAudioTime);
+        assert.equal(startingParagraphAudioTime, 0);
 
-          I.amOnPage("/");
+        AtAudioView.clickPlayButton();
 
-          LabelStudio.init(params);
+        I.wait(10);
 
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
+        AtAudioView.clickAtBeginning();
 
-          const [
-            { currentTime: startingAudioTime },
-            { currentTime: startingParagraphAudioTime },
-          ] = await AtAudioView.getCurrentAudio();
+        I.wait(1);
 
-          assert.equal(startingAudioTime, startingParagraphAudioTime);
-          assert.equal(startingParagraphAudioTime, 0);
+        AtAudioView.clickPauseButton();
 
-          AtAudioView.clickPlayButton();
+        const scrollPosition = await I.executeScript((selector) => {
+          const element = document.querySelector(selector);
 
-          I.wait(10);
+          return {
+            scrollTop: element.scrollTop,
+            scrollLeft: element.scrollLeft,
+          };
+        }, '[data-testid="phrases-wrapper"]');
 
-          AtAudioView.clickAtBeginning();
+        await assert.equal(scrollPosition.scrollTop, 0);
+      },
+    );
 
-          I.wait(1);
+    FFlagScenario(
+      "Paragraph shouldnt automatically scroll if user disable the auto-scroll toggle",
+      async ({ I, LabelStudio, AtAudioView }) => {
+        LabelStudio.setFeatureFlags({
+          ff_front_dev_2715_audio_3_280722_short: true,
+          ff_front_1170_outliner_030222_short: true,
+          ...flags,
+        });
 
-          AtAudioView.clickPauseButton();
+        params.config = configWithScroll;
 
-          const scrollPosition = await I.executeScript((selector) => {
-            const element = document.querySelector(selector);
+        I.amOnPage("/");
 
-            return {
-              scrollTop: element.scrollTop,
-              scrollLeft: element.scrollLeft,
-            };
-          }, '[data-testid="phrases-wrapper"]');
+        LabelStudio.init(params);
 
-          await assert.equal(scrollPosition.scrollTop, 0);
-        },
-      );
+        await AtAudioView.waitForAudio();
+        await AtAudioView.lookForStage();
 
-      FFlagScenario(
-        "Paragraph shouldnt automatically scroll if user disable the auto-scroll toggle",
-        async ({ I, LabelStudio, AtAudioView }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ff_front_1170_outliner_030222_short: true,
-            ...flags,
-          });
+        const [{ currentTime: startingAudioTime }, { currentTime: startingParagraphAudioTime }] =
+          await AtAudioView.getCurrentAudio();
 
-          params.config = configWithScroll;
+        assert.equal(startingAudioTime, startingParagraphAudioTime);
+        assert.equal(startingParagraphAudioTime, 0);
 
-          I.amOnPage("/");
+        I.click('[data-testid="auto-scroll-toggle"]');
 
-          LabelStudio.init(params);
+        AtAudioView.clickPlayButton();
 
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
+        I.wait(10);
 
-          const [
-            { currentTime: startingAudioTime },
-            { currentTime: startingParagraphAudioTime },
-          ] = await AtAudioView.getCurrentAudio();
+        const scrollPosition = await I.executeScript((selector) => {
+          const element = document.querySelector(selector);
 
-          assert.equal(startingAudioTime, startingParagraphAudioTime);
-          assert.equal(startingParagraphAudioTime, 0);
+          return {
+            scrollTop: element.scrollTop,
+            scrollLeft: element.scrollLeft,
+          };
+        }, '[data-testid="phrases-wrapper"]');
 
-          I.click('[data-testid="auto-scroll-toggle"]');
+        await assert.equal(scrollPosition.scrollTop, 0);
+      },
+    );
 
-          AtAudioView.clickPlayButton();
+    FFlagScenario(
+      "Paragraph shouldnt automatically scroll if user manually scroll and the current paragraph is not in the screen",
+      async ({ I, LabelStudio, AtAudioView }) => {
+        LabelStudio.setFeatureFlags({
+          ff_front_dev_2715_audio_3_280722_short: true,
+          ff_front_1170_outliner_030222_short: true,
+          ...flags,
+        });
 
-          I.wait(10);
+        params.config = configWithScroll;
 
-          const scrollPosition = await I.executeScript((selector) => {
-            const element = document.querySelector(selector);
+        I.amOnPage("/");
 
-            return {
-              scrollTop: element.scrollTop,
-              scrollLeft: element.scrollLeft,
-            };
-          }, '[data-testid="phrases-wrapper"]');
+        LabelStudio.init(params);
 
-          await assert.equal(scrollPosition.scrollTop, 0);
-        },
-      );
+        await AtAudioView.waitForAudio();
+        await AtAudioView.lookForStage();
 
-      FFlagScenario(
-        "Paragraph shouldnt automatically scroll if user manually scroll and the current paragraph is not in the screen",
-        async ({ I, LabelStudio, AtAudioView }) => {
-          LabelStudio.setFeatureFlags({
-            ff_front_dev_2715_audio_3_280722_short: true,
-            ff_front_1170_outliner_030222_short: true,
-            ...flags,
-          });
+        const [{ currentTime: startingAudioTime }, { currentTime: startingParagraphAudioTime }] =
+          await AtAudioView.getCurrentAudio();
 
-          params.config = configWithScroll;
+        assert.equal(startingAudioTime, startingParagraphAudioTime);
+        assert.equal(startingParagraphAudioTime, 0);
 
-          I.amOnPage("/");
+        AtAudioView.clickPlayButton();
 
-          LabelStudio.init(params);
+        I.wait(2);
 
-          await AtAudioView.waitForAudio();
-          await AtAudioView.lookForStage();
+        I.executeScript(() => {
+          document.querySelector('[data-testid="phrases-wrapper"]').scrollTo(0, 1000);
 
-          const [
-            { currentTime: startingAudioTime },
-            { currentTime: startingParagraphAudioTime },
-          ] = await AtAudioView.getCurrentAudio();
+          const wheelEvt = document.createEvent("MouseEvents");
 
-          assert.equal(startingAudioTime, startingParagraphAudioTime);
-          assert.equal(startingParagraphAudioTime, 0);
+          wheelEvt.initEvent("wheel", true, true);
 
-          AtAudioView.clickPlayButton();
+          wheelEvt.deltaY = 1200;
 
-          I.wait(2);
+          document.querySelector('[data-testid="phrases-wrapper"]').dispatchEvent(wheelEvt);
+        });
 
-          I.executeScript(() => {
-            document
-              .querySelector('[data-testid="phrases-wrapper"]')
-              .scrollTo(0, 1000);
+        I.wait(5);
 
-            const wheelEvt = document.createEvent("MouseEvents");
+        const scrollPosition = await I.executeScript((selector) => {
+          const element = document.querySelector(selector);
 
-            wheelEvt.initEvent("wheel", true, true);
+          return {
+            scrollTop: element.scrollTop,
+            scrollLeft: element.scrollLeft,
+          };
+        }, '[data-testid="phrases-wrapper"]');
 
-            wheelEvt.deltaY = 1200;
-
-            document
-              .querySelector('[data-testid="phrases-wrapper"]')
-              .dispatchEvent(wheelEvt);
-          });
-
-          I.wait(5);
-
-          const scrollPosition = await I.executeScript((selector) => {
-            const element = document.querySelector(selector);
-
-            return {
-              scrollTop: element.scrollTop,
-              scrollLeft: element.scrollLeft,
-            };
-          }, '[data-testid="phrases-wrapper"]');
-
-          await assert(
-            scrollPosition.scrollTop > 400,
-            "Scroll position should be greater than 200",
-          );
-        },
-      );
-    }
-  },
-);
+        await assert(scrollPosition.scrollTop > 400, "Scroll position should be greater than 200");
+      },
+    );
+  }
+});

@@ -41,9 +41,7 @@ Scenario("Switching states at nested choices", async ({ I, LabelStudio }) => {
 
     // Should be checked only one item
     assert.deepStrictEqual(result[0].value.choices.length, 1);
-    assert.deepStrictEqual(result[0].value.choices, [
-      ["Header 1", "Option 1.1"],
-    ]);
+    assert.deepStrictEqual(result[0].value.choices, [["Header 1", "Option 1.1"]]);
 
     // There might be checkbox with indeterminate state
     I.seeElement(".ant-checkbox-indeterminate [name='Header 1']");
@@ -74,11 +72,9 @@ Scenario("Switching states at nested choices", async ({ I, LabelStudio }) => {
   }
 });
 
-Scenario(
-  "Nested choices states from the annotation",
-  async ({ I, LabelStudio }) => {
-    const params = {
-      config: `
+Scenario("Nested choices states from the annotation", async ({ I, LabelStudio }) => {
+  const params = {
+    config: `
 <View>
   <Text name="text" value="$text"></Text>
   <Choices name="choices" toName="text" allownested="true" >
@@ -96,68 +92,67 @@ Scenario(
     </Choice>
   </Choices>
 </View>`,
-      data: {
-        text: "Some text",
-      },
-    };
+    data: {
+      text: "Some text",
+    },
+  };
 
-    I.amOnPage("/");
+  I.amOnPage("/");
 
-    // Load annotation with each type of selection for branches (fully checked, fully unchecked, partly checked)
-    LabelStudio.init({
-      ...params,
-      annotations: [
-        {
-          id: "test",
-          result: [
-            {
-              id: "choices_test",
-              from_name: "choices",
-              to_name: "text",
-              type: "choices",
-              value: {
-                choices: [
-                  ["Header 1"],
-                  ["Header 1", "Option 1.1"],
-                  ["Header 1", "Option 1.2"],
-                  ["Header 3", "Option 3.1"],
-                ],
-              },
+  // Load annotation with each type of selection for branches (fully checked, fully unchecked, partly checked)
+  LabelStudio.init({
+    ...params,
+    annotations: [
+      {
+        id: "test",
+        result: [
+          {
+            id: "choices_test",
+            from_name: "choices",
+            to_name: "text",
+            type: "choices",
+            value: {
+              choices: [
+                ["Header 1"],
+                ["Header 1", "Option 1.1"],
+                ["Header 1", "Option 1.2"],
+                ["Header 3", "Option 3.1"],
+              ],
             },
-          ],
-        },
-      ],
-    });
+          },
+        ],
+      },
+    ],
+  });
 
-    // Check loaded results:
+  // Check loaded results:
 
-    // Fully checked branch of choices
-    I.dontSeeElement(".ant-checkbox-indeterminate [name='Header 1']");
-    I.seeElement(".ant-checkbox-checked [name='Header 1']");
-    I.seeElement(".ant-checkbox-checked [name='Option 1.1']");
-    I.seeElement(".ant-checkbox-checked [name='Option 1.2']");
+  // Fully checked branch of choices
+  I.dontSeeElement(".ant-checkbox-indeterminate [name='Header 1']");
+  I.seeElement(".ant-checkbox-checked [name='Header 1']");
+  I.seeElement(".ant-checkbox-checked [name='Option 1.1']");
+  I.seeElement(".ant-checkbox-checked [name='Option 1.2']");
 
-    // Fully unchecked branch of choices
-    I.dontSeeElement(".ant-checkbox-indeterminate [name='Header 2']");
-    I.dontSeeElement(".ant-checkbox-checked [name='Header 2']");
-    I.dontSeeElement(".ant-checkbox-checked [name='Option 2.1']");
-    I.dontSeeElement(".ant-checkbox-checked [name='Option 2.2']");
+  // Fully unchecked branch of choices
+  I.dontSeeElement(".ant-checkbox-indeterminate [name='Header 2']");
+  I.dontSeeElement(".ant-checkbox-checked [name='Header 2']");
+  I.dontSeeElement(".ant-checkbox-checked [name='Option 2.1']");
+  I.dontSeeElement(".ant-checkbox-checked [name='Option 2.2']");
 
-    // Partly checked branch of choices
-    I.seeElement(".ant-checkbox-indeterminate [name='Header 3']");
-    I.dontSeeElement(".ant-checkbox-checked [name='Header 3']");
-    I.seeElement(".ant-checkbox-checked [name='Option 3.1']");
-    I.dontSeeElement(".ant-checkbox-checked [name='Option 3.2']");
+  // Partly checked branch of choices
+  I.seeElement(".ant-checkbox-indeterminate [name='Header 3']");
+  I.dontSeeElement(".ant-checkbox-checked [name='Header 3']");
+  I.seeElement(".ant-checkbox-checked [name='Option 3.1']");
+  I.dontSeeElement(".ant-checkbox-checked [name='Option 3.2']");
 
-    const result = await LabelStudio.serialize();
+  const result = await LabelStudio.serialize();
 
-    // Should be checked only one item
-    assert.deepStrictEqual(result[0].value.choices.length, 4);
-    assert.deepStrictEqual(result[0].value.choices, [
-      ["Header 1"],
-      ["Header 1", "Option 1.1"],
-      ["Header 1", "Option 1.2"],
-      ["Header 3", "Option 3.1"],
-    ]);
-  },
-);
+  // Should be checked only one item
+  assert.deepStrictEqual(result[0].value.choices.length, 4);
+  assert.deepStrictEqual(result[0].value.choices, [
+    ["Header 1"],
+    ["Header 1", "Option 1.1"],
+    ["Header 1", "Option 1.2"],
+    ["Header 3", "Option 3.1"],
+  ]);
+});

@@ -8,9 +8,7 @@ Cypress.on("uncaught:exception", (err, runnable) => {
 
 beforeEach(() => {
   cy.on("uncaught:exception", (err) => {
-    return !err.message.includes(
-      "ResizeObserver loop completed with undelivered notifications.",
-    );
+    return !err.message.includes("ResizeObserver loop completed with undelivered notifications.");
   });
   cy.on("window:before:load", (win) => {
     console.log("Setting feature flags", CURRENT_FLAGS);

@@ -1,7 +1,6 @@
 import type { Visualizer } from "../Visual/Visualizer";
 
-export const __DEBUG__ =
-  process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
+export const __DEBUG__ = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 export const OFFSCREEN_CANVAS_SUPPORTED = "OffscreenCanvas" in globalThis;
 
 const TIME_TOLERANCE = 0.000001;
@@ -37,10 +36,7 @@ export const toPrecision = (value: number, precision = 2) => {
   return Math.round(value * multiplier) / multiplier;
 };
 
-export const filterData = (
-  audioBuffer: AudioBuffer | null,
-  channel?: number,
-) => {
+export const filterData = (audioBuffer: AudioBuffer | null, channel?: number) => {
   if (!audioBuffer) return new Float32Array(0);
 
   return audioBuffer.getChannelData(channel ?? 0);
@@ -50,10 +46,7 @@ export const isInRange = (value: number, min: number, max: number) => {
   return value >= min && value <= max;
 };
 
-export const findLast = <T = any>(
-  array: T[],
-  predicate: (item: T) => boolean,
-): T | undefined => {
+export const findLast = <T = any>(array: T[], predicate: (item: T) => boolean): T | undefined => {
   for (let i = array.length - 1; i >= 0; i--) {
     if (predicate(array[i])) {
       return array[i];
@@ -86,11 +79,7 @@ export const repeat = (str: string, times: number) =>
     .map(() => str)
     .join("");
 
-export const roundToStep = (
-  value: number,
-  step: number,
-  roundFunction: "floor" | "ceil" | "round" = "round",
-) => {
+export const roundToStep = (value: number, step: number, roundFunction: "floor" | "ceil" | "round" = "round") => {
   switch (roundFunction) {
     case "floor":
       return Math.floor(value / step) * step;
@@ -200,45 +189,26 @@ export const getOffsetTop = (element: HTMLElement) => {
   return element.getBoundingClientRect().top;
 };
 
-export const getCursorPositionX = (
-  e: MouseEvent,
-  offsetElement: HTMLElement,
-) => {
+export const getCursorPositionX = (e: MouseEvent, offsetElement: HTMLElement) => {
   return e.clientX - getOffsetLeft(offsetElement);
 };
 
-export const getCursorPositionY = (
-  e: MouseEvent,
-  offsetElement: HTMLElement,
-) => {
+export const getCursorPositionY = (e: MouseEvent, offsetElement: HTMLElement) => {
   return e.clientY - getOffsetTop(offsetElement);
 };
 
-export const pixelsToTime = (
-  pixels: number,
-  zoomedWidth: number,
-  duration: number,
-) => {
+export const pixelsToTime = (pixels: number, zoomedWidth: number, duration: number) => {
   return (pixels / zoomedWidth) * duration;
 };
 
-export const getCursorTime = (
-  e: MouseEvent,
-  visualizer: Visualizer,
-  duration: number,
-) => {
+export const getCursorTime = (e: MouseEvent, visualizer: Visualizer, duration: number) => {
   const { zoomedWidth, container } = visualizer;
-  const cursorPosition =
-    getCursorPositionX(e, container) + visualizer.getScrollLeftPx();
+  const cursorPosition = getCursorPositionX(e, container) + visualizer.getScrollLeftPx();
   const time = pixelsToTime(cursorPosition, zoomedWidth, duration);
 
   return time;
 };
 
-export const isTimeSimilar = (a: number, b: number) =>
-  Math.abs(a - b) < TIME_TOLERANCE;
-export const isTimeRelativelySimilar = (
-  a: number,
-  b: number,
-  observedDuration: number,
-) => isTimeSimilar(a / observedDuration, b / observedDuration);
+export const isTimeSimilar = (a: number, b: number) => Math.abs(a - b) < TIME_TOLERANCE;
+export const isTimeRelativelySimilar = (a: number, b: number, observedDuration: number) =>
+  isTimeSimilar(a / observedDuration, b / observedDuration);

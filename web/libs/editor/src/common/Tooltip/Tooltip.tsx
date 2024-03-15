@@ -50,9 +50,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
 
     const refIsObject = !!ref && Object.hasOwnProperty.call(ref, "current");
     const refIsFunction = ref instanceof Function;
-    const triggerElement = (
-      refIsObject ? ref : useRef<HTMLElement>()
-    ) as MutableRefObject<HTMLElement>;
+    const triggerElement = (refIsObject ? ref : useRef<HTMLElement>()) as MutableRefObject<HTMLElement>;
     const forwardingRef = !refIsFunction
       ? triggerElement
       : (el) => {
@@ -61,9 +59,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
         };
     const tooltipElement = useRef<HTMLElement>();
     const [offset, setOffset] = useState({});
-    const [visibility, setVisibility] = useState(
-      defaultVisible ? "visible" : null,
-    );
+    const [visibility, setVisibility] = useState(defaultVisible ? "visible" : null);
     const [injected, setInjected] = useState(false);
     const [align, setAlign] = useState<ElementAlignment>("top-center");
     const mouseEnterTimeoutRef = useRef<number | undefined>();
@@ -73,12 +69,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
         left,
         top,
         align: resultAlign,
-      } = alignElements(
-        triggerElementGetter(triggerElement.current),
-        tooltipElement.current!,
-        align,
-        10,
-      );
+      } = alignElements(triggerElementGetter(triggerElement.current), tooltipElement.current!, align, 10);
 
       setOffset({ left, top });
       setAlign(resultAlign);
@@ -167,9 +158,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
         if (enabled === false) return;
 
         if (mouseEnterTimeoutRef.current) {
-          mouseEnterTimeoutRef.current = window.clearTimeout(
-            mouseEnterTimeoutRef.current,
-          );
+          mouseEnterTimeoutRef.current = window.clearTimeout(mouseEnterTimeoutRef.current);
         }
         performAnimation(false);
       };

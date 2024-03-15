@@ -58,10 +58,7 @@ const DEFAULT_TOOLBAR =
   "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button view-toggle";
 
 const prepareInstruments = (instruments) => {
-  const result = Object.entries(instruments).map(([name, builder]) => [
-    name,
-    builder({ inject, observer }),
-  ]);
+  const result = Object.entries(instruments).map(([name, builder]) => [name, builder({ inject, observer })]);
 
   return objectToMap(Object.fromEntries(result));
 };
@@ -214,13 +211,7 @@ export class DataManager {
     this._projectId = value;
   }
 
-  apiConfig({
-    apiGateway,
-    apiEndpoints,
-    apiMockDisabled,
-    apiSharedParams,
-    apiHeaders,
-  }) {
+  apiConfig({ apiGateway, apiEndpoints, apiMockDisabled, apiSharedParams, apiHeaders }) {
     const config = Object.assign({}, APIConfig);
 
     config.gateway = apiGateway ?? config.gateway;
@@ -256,9 +247,7 @@ export class DataManager {
 
     this.actions.set(id, { action, callback });
 
-    const actions = Array.from(this.actions.values()).map(
-      ({ action }) => action,
-    );
+    const actions = Array.from(this.actions.values()).map(({ action }) => action);
 
     this.store?.setActions(actions);
   }
@@ -347,9 +336,7 @@ export class DataManager {
   }
 
   removeAllListeners() {
-    const lsfEvents = Array.from(this.callbacks.keys()).filter((evt) =>
-      evt.startsWith("lsf:"),
-    );
+    const lsfEvents = Array.from(this.callbacks.keys()).filter((evt) => evt.startsWith("lsf:"));
 
     lsfEvents.forEach((evt) => {
       const callbacks = Array.from(this.getEventCallbacks(evt));
@@ -398,9 +385,7 @@ export class DataManager {
   async invoke(eventName, ...args) {
     if (eventName.startsWith("lsf:")) return;
 
-    this.getEventCallbacks(eventName).forEach((callback) =>
-      callback.apply(this, args),
-    );
+    this.getEventCallbacks(eventName).forEach((callback) => callback.apply(this, args));
   }
 
   /**
@@ -438,10 +423,7 @@ export class DataManager {
   async startLabeling() {
     if (!this.lsf) return;
 
-    const [task, annotation] = [
-      this.store.taskStore.selected,
-      this.store.annotationStore.selected,
-    ];
+    const [task, annotation] = [this.store.taskStore.selected, this.store.annotationStore.selected];
 
     const isLabelStream = this.mode === "labelstream";
     const taskExists = isDefined(this.lsf.task) && isDefined(task);
@@ -508,9 +490,7 @@ export class DataManager {
         const customInstrument = !!this.instruments.has(instrument);
 
         if (!nativeInstrument && !customInstrument) {
-          console.warn(
-            `Unknwown instrument detected: ${instrument}. Did you forget to register it?`,
-          );
+          console.warn(`Unknwown instrument detected: ${instrument}. Did you forget to register it?`);
         }
 
         return nativeInstrument || customInstrument;

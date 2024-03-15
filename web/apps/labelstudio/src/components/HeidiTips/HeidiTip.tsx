@@ -40,12 +40,7 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss }) => {
             /* @ts-ignore-next-line */
             <Tooltip title="Don't show">
               {/* @ts-ignore-next-line */}
-              <Elem
-                name="dismiss"
-                tag={Button}
-                type="text"
-                onClick={handleClick}
-              >
+              <Elem name="dismiss" tag={Button} type="text" onClick={handleClick}>
                 <LsCross />
               </Elem>
             </Tooltip>

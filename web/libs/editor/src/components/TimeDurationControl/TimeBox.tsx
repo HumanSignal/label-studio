@@ -21,9 +21,7 @@ export const TimeBox: FC<TimerProps> = ({
   ...props
 }) => {
   const inputRef = React.createRef<HTMLInputElement>();
-  const [currentInputTime, setCurrentInputTime] = useState<
-    string | number | undefined
-  >(value);
+  const [currentInputTime, setCurrentInputTime] = useState<string | number | undefined>(value);
 
   useEffect(() => {
     if (inputRef.current)
@@ -38,15 +36,12 @@ export const TimeBox: FC<TimerProps> = ({
 
   const formatTime = useCallback((time: number, input = false): any => {
     const timeDate = new Date(time * 1000).toISOString();
-    let formatted =
-      time > 3600 ? timeDate.substr(11, 8) : `00:${timeDate.substr(14, 5)}`;
+    let formatted = time > 3600 ? timeDate.substr(11, 8) : `00:${timeDate.substr(14, 5)}`;
 
     if (input) {
       const isHour = timeDate.substr(11, 2) !== "00";
 
-      formatted = timeDate
-        .substr(isHour ? 11 : 14, isHour ? 12 : 9)
-        .replace(".", ":");
+      formatted = timeDate.substr(isHour ? 11 : 14, isHour ? 12 : 9).replace(".", ":");
 
       formatted = !isHour ? `00:${formatted}` : formatted;
     }
@@ -60,12 +55,7 @@ export const TimeBox: FC<TimerProps> = ({
 
     if (value.indexOf("_") >= 0) return;
 
-    const calcs = [
-      (x: number) => x / 1000,
-      (x: number) => x,
-      (x: number) => x * 60,
-      (x: number) => x * 60 * 60,
-    ];
+    const calcs = [(x: number) => x / 1000, (x: number) => x, (x: number) => x * 60, (x: number) => x * 60 * 60];
 
     splittedValue.forEach((value, index) => {
       totalTime += calcs[index](Number.parseFloat(value));
@@ -78,9 +68,7 @@ export const TimeBox: FC<TimerProps> = ({
     const splittedValue = e.currentTarget.value.split(":");
 
     splittedValue[0] =
-      splittedValue[0].toString().length === 1
-        ? `0${splittedValue[0].toString()}`
-        : `${splittedValue[0]}`;
+      splittedValue[0].toString().length === 1 ? `0${splittedValue[0].toString()}` : `${splittedValue[0]}`;
 
     convertTextToTime(splittedValue.join(":"));
     setCurrentInputTime(formatTime(value || 0, true));

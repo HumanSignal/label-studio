@@ -2,12 +2,7 @@ import { observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
 
 import type { IReactComponent } from "mobx-react/dist/types/IReactComponent";
-import {
-  type ExoticComponent,
-  Fragment,
-  type ReactNode,
-  useCallback,
-} from "react";
+import { type ExoticComponent, Fragment, type ReactNode, useCallback } from "react";
 import { Portal } from "react-konva-utils";
 import { FF_DBLCLICK_DELAY, isFF } from "../utils/feature-flags";
 
@@ -35,19 +30,13 @@ type PortalProps = {
   children: ReactNode;
 };
 
-export const AliveRegion = (
-  RegionComponent: IReactComponent<RegionComponentProps>,
-  options?: Options,
-) => {
+export const AliveRegion = (RegionComponent: IReactComponent<RegionComponentProps>, options?: Options) => {
   const ObservableRegion = observer(RegionComponent);
 
   return observer(({ item, ...rest }: RegionComponentProps) => {
     const canRender = options?.renderHidden || !item.hidden;
-    const shouldNotUsePortal =
-      !isFF(FF_DBLCLICK_DELAY) || options?.shouldNotUsePortal;
-    const Wrapper = (
-      shouldNotUsePortal ? Fragment : Portal
-    ) as ExoticComponent<PortalProps>;
+    const shouldNotUsePortal = !isFF(FF_DBLCLICK_DELAY) || options?.shouldNotUsePortal;
+    const Wrapper = (shouldNotUsePortal ? Fragment : Portal) as ExoticComponent<PortalProps>;
     const wrapperProps = shouldNotUsePortal
       ? {}
       : {

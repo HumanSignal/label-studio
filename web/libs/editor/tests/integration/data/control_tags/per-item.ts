@@ -1,6 +1,5 @@
 export const simpleImageData = {
-  image:
-    "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg",
+  image: "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg",
 };
 export const simpleMIGData = {
   images: [
@@ -845,5 +844,4 @@ export const CHOICES_REQUIRED_WARNING = 'Checkbox "choices" is required.';
 export const NUMBER_REQUIRED_WARNING = 'Number "number" is required.';
 export const RATING_REQUIRED_WARNING = 'Rating "rating" is required.';
 export const TAXONOMY_REQUIRED_WARNING = 'Taxonomy "taxonomy" is required.';
-export const TEXTAREA_REQUIRED_WARNING =
-  'Input for the textarea "textarea" is required.';
+export const TEXTAREA_REQUIRED_WARNING = 'Input for the textarea "textarea" is required.';

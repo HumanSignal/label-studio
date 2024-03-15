@@ -6,10 +6,7 @@ import Registry from "../core/Registry";
 import NormalizationMixin from "../mixins/Normalization";
 import RegionsMixin from "../mixins/Regions";
 
-import {
-  RELATIVE_STAGE_HEIGHT,
-  RELATIVE_STAGE_WIDTH,
-} from "../components/ImageView/Image";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 import { LabelOnKP } from "../components/ImageView/LabelOnRegion";
 import Constants from "../core/Constants";
@@ -58,10 +55,8 @@ const KeyPointRegionAbsoluteCoordsDEV3793 = types
       self.x = point.x;
       self.y = point.y;
 
-      self.relativeX =
-        (point.x / self.parent.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeY =
-        (point.y / self.parent.stageHeight) * RELATIVE_STAGE_HEIGHT;
+      self.relativeX = (point.x / self.parent.stageWidth) * RELATIVE_STAGE_WIDTH;
+      self.relativeY = (point.y / self.parent.stageHeight) * RELATIVE_STAGE_HEIGHT;
     },
 
     updateImageSize(wp, hp, sw, sh) {
@@ -116,19 +111,13 @@ const Model = types
       };
     },
     get canvasX() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasX(self.x)
-        : self.x;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.x) : self.x;
     },
     get canvasY() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasY(self.y)
-        : self.y;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.y) : self.y;
     },
     get canvasWidth() {
-      return isFF(FF_DEV_3793)
-        ? self.parent?.internalToCanvasX(self.width)
-        : self.width;
+      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.width) : self.width;
     },
   }))
   .actions((self) => ({
@@ -174,9 +163,7 @@ const Model = types
       const value = {
         x: isFF(FF_DEV_3793) ? self.x : self.convertXToPerc(self.x),
         y: isFF(FF_DEV_3793) ? self.y : self.convertYToPerc(self.y),
-        width: isFF(FF_DEV_3793)
-          ? self.width
-          : self.convertHDimensionToPerc(self.width),
+        width: isFF(FF_DEV_3793) ? self.width : self.convertHDimensionToPerc(self.width),
       };
 
       const result = self.parent.createSerializedResult(self, value);
@@ -308,8 +295,7 @@ Registry.addTag("keypointregion", KeyPointRegionModel, HtxKeyPoint);
 Registry.addRegionType(
   KeyPointRegionModel,
   "image",
-  (value) =>
-    "x" in value && "y" in value && "width" in value && !("height" in value),
+  (value) => "x" in value && "y" in value && "width" in value && !("height" in value),
 );
 
 export { KeyPointRegionModel, HtxKeyPoint };

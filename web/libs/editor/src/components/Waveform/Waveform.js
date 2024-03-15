@@ -371,8 +371,7 @@ export default class Waveform extends React.Component {
         // but WS can generate such error even after network errors, so skip it
         if (this.wavesurfer.hadNetworkError) return;
         // "Error loading media element"
-        body =
-          "Error while processing audio. Check media format and availability.";
+        body = "Error while processing audio. Check media format and availability.";
       }
 
       if (this.props.onError) this.props.onError(body);
@@ -476,11 +475,7 @@ export default class Waveform extends React.Component {
       this.props.onLoad(this.wavesurfer);
     }
 
-    this.hotkeys.addNamed(
-      "audio:back",
-      this.onBack,
-      `${Hotkey.DEFAULT_SCOPE},${Hotkey.INPUT_SCOPE}`,
-    );
+    this.hotkeys.addNamed("audio:back", this.onBack, `${Hotkey.DEFAULT_SCOPE},${Hotkey.INPUT_SCOPE}`);
   }
 
   componentWillUnmount() {
@@ -512,10 +507,7 @@ export default class Waveform extends React.Component {
                   }}
                 >
                   <Tooltip placement="topLeft" title="Horizontal zoom out">
-                    <ZoomOutOutlined
-                      onClick={this.onZoomMinus}
-                      className={globalStyles.link}
-                    />
+                    <ZoomOutOutlined onClick={this.onZoomMinus} className={globalStyles.link} />
                   </Tooltip>
                 </div>
                 <div style={{ width: "100%" }}>
@@ -523,9 +515,7 @@ export default class Waveform extends React.Component {
                     min={0}
                     step={10}
                     max={500}
-                    value={
-                      typeof this.state.zoom === "number" ? this.state.zoom : 0
-                    }
+                    value={typeof this.state.zoom === "number" ? this.state.zoom : 0}
                     onChange={(value) => {
                       this.onChangeZoom(value);
                     }}
@@ -538,10 +528,7 @@ export default class Waveform extends React.Component {
                   }}
                 >
                   <Tooltip placement="topLeft" title="Horizontal zoom in">
-                    <ZoomInOutlined
-                      onClick={this.onZoomPlus}
-                      className={globalStyles.link}
-                    />
+                    <ZoomInOutlined onClick={this.onZoomPlus} className={globalStyles.link} />
                   </Tooltip>
                 </div>
               </div>
@@ -555,10 +542,7 @@ export default class Waveform extends React.Component {
                   }}
                 >
                   <Tooltip placement="topLeft" title="Vertical zoom out">
-                    <ZoomOutOutlined
-                      onClick={this.onZoomYMinus}
-                      className={globalStyles.link}
-                    />
+                    <ZoomOutOutlined onClick={this.onZoomYMinus} className={globalStyles.link} />
                   </Tooltip>
                 </div>
                 <div style={{ width: "100%" }}>
@@ -566,11 +550,7 @@ export default class Waveform extends React.Component {
                     min={MIN_ZOOM_Y}
                     step={0.1}
                     max={MAX_ZOOM_Y}
-                    value={
-                      typeof this.state.zoomY === "number"
-                        ? this.state.zoomY
-                        : MIN_ZOOM_Y
-                    }
+                    value={typeof this.state.zoomY === "number" ? this.state.zoomY : MIN_ZOOM_Y}
                     onChange={(value) => {
                       this.onChangeZoomY(value);
                     }}
@@ -583,10 +563,7 @@ export default class Waveform extends React.Component {
                   }}
                 >
                   <Tooltip placement="topLeft" title="Vertical zoom in">
-                    <ZoomInOutlined
-                      onClick={this.onZoomYPlus}
-                      className={globalStyles.link}
-                    />
+                    <ZoomInOutlined onClick={this.onZoomYPlus} className={globalStyles.link} />
                   </Tooltip>
                 </div>
               </div>
@@ -604,11 +581,7 @@ export default class Waveform extends React.Component {
                       min={0}
                       max={1}
                       step={0.1}
-                      value={
-                        typeof this.state.volume === "number"
-                          ? this.state.volume
-                          : 1
-                      }
+                      value={typeof this.state.volume === "number" ? this.state.volume : 1}
                       onChange={(value) => {
                         this.onChangeVolume(value);
                       }}

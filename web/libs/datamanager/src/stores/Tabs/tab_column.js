@@ -94,9 +94,7 @@ export const TabColumn = types
     displayType: types.optional(types.maybeNull(ViewColumnType), null),
     defaultHidden: types.optional(types.boolean, false),
     parent: types.maybeNull(types.late(() => types.reference(TabColumn))),
-    children: types.maybeNull(
-      types.array(types.late(() => types.reference(TabColumn))),
-    ),
+    children: types.maybeNull(types.array(types.late(() => types.reference(TabColumn)))),
     target: types.enumeration(["tasks", "annotations"]),
     orderable: types.optional(types.boolean, true),
     help: types.maybeNull(types.string),
@@ -106,10 +104,7 @@ export const TabColumn = types
       if (self.children) {
         return all(self.children, (c) => c.hidden);
       }
-      return (
-        self.parentView?.hiddenColumns.hasColumn(self) ??
-        (self.parent.hidden || false)
-      );
+      return self.parentView?.hiddenColumns.hasColumn(self) ?? (self.parent.hidden || false);
     },
 
     get parentView() {
@@ -168,9 +163,7 @@ export const TabColumn = types
       const result = [];
 
       if (self.children) {
-        const childColumns = [].concat(
-          ...self.children.map((subColumn) => subColumn.asField),
-        );
+        const childColumns = [].concat(...self.children.map((subColumn) => subColumn.asField));
 
         result.push(...childColumns);
       } else {
@@ -193,41 +186,21 @@ export const TabColumn = types
         default:
           return null;
         case "total_annotations":
-          return (
-            <LsAnnotation width="20" height="20" style={{ color: "#0099FF" }} />
-          );
+          return <LsAnnotation width="20" height="20" style={{ color: "#0099FF" }} />;
         case "cancelled_annotations":
-          return (
-            <LsBanSquare width="20" height="20" style={{ color: "#DD0000" }} />
-          );
+          return <LsBanSquare width="20" height="20" style={{ color: "#DD0000" }} />;
         case "total_predictions":
-          return (
-            <LsSparkSquare
-              width="20"
-              height="20"
-              style={{ color: "#944BFF" }}
-            />
-          );
+          return <LsSparkSquare width="20" height="20" style={{ color: "#944BFF" }} />;
         case "reviews_accepted":
-          return (
-            <LsThumbsUp width="20" height="20" style={{ color: "#2AA000" }} />
-          );
+          return <LsThumbsUp width="20" height="20" style={{ color: "#2AA000" }} />;
         case "reviews_rejected":
-          return (
-            <LsThumbsDown width="20" height="20" style={{ color: "#DD0000" }} />
-          );
+          return <LsThumbsDown width="20" height="20" style={{ color: "#DD0000" }} />;
         case "ground_truth":
-          return (
-            <LsStarSquare width="20" height="20" style={{ color: "#FFB700" }} />
-          );
+          return <LsStarSquare width="20" height="20" style={{ color: "#FFB700" }} />;
         case "comment_count":
-          return (
-            <CommentCheck width="20" height="20" style={{ color: "#FFB700" }} />
-          );
+          return <CommentCheck width="20" height="20" style={{ color: "#FFB700" }} />;
         case "unresolved_comment_count":
-          return (
-            <CommentRed width="20" height="20" style={{ color: "#FFB700" }} />
-          );
+          return <CommentRed width="20" height="20" style={{ color: "#FFB700" }} />;
       }
     },
 
@@ -240,10 +213,7 @@ export const TabColumn = types
     },
 
     get filterable() {
-      return (
-        (CellViews[self.type] ?? CellViews[toStudlyCaps(self.alias)])
-          ?.filterable !== false
-      );
+      return (CellViews[self.type] ?? CellViews[toStudlyCaps(self.alias)])?.filterable !== false;
     },
   }))
   .actions((self) => ({

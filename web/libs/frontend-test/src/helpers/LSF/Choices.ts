@@ -43,10 +43,7 @@ class ChoicesHelper {
   }
 
   findOption(text: string) {
-    return cy
-      .get(".ant-select-dropdown")
-      .find(".ant-select-item-option")
-      .contains(text);
+    return cy.get(".ant-select-dropdown").find(".ant-select-item-option").contains(text);
   }
 }
 

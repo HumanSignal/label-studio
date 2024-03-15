@@ -108,51 +108,47 @@ const createShape = {
   },
 };
 
-Scenario(
-  "Drawing shapes and undoing after that",
-  async ({ I, LabelStudio, AtSidebar, AtImageView }) => {
-    const params = {
-      config: getConfigWithShapes(Object.keys(createShape), 'strokewidth="5"'),
-      data: { image: IMAGE },
-    };
+Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtSidebar, AtImageView }) => {
+  const params = {
+    config: getConfigWithShapes(Object.keys(createShape), 'strokewidth="5"'),
+    data: { image: IMAGE },
+  };
 
-    I.amOnPage("/");
+  I.amOnPage("/");
+  LabelStudio.init(params);
+  AtImageView.waitForImage();
+  AtSidebar.seeRegions(0);
+  const canvasSize = await AtImageView.getCanvasSize();
+  const size = Math.min(canvasSize.width, canvasSize.height);
+  const regions = [];
+
+  // Prepare shapes params
+  Object.keys(createShape).forEach((shapeName, shapeIdx) => {
+    const hotKey = `${shapeIdx + 1}`;
+
+    Object.values(createShape[shapeName]).forEach((creator) => {
+      const region = creator(50, 50, size - 50 * 2, size - 50 * 2, {
+        hotKey,
+        shape: shapeName,
+      });
+
+      if (region.result) region.result[`${shapeName.toLowerCase()}labels`] = [shapeName];
+      regions.push(region);
+    });
+  });
+
+  // Running a test scenario for each shape type
+  for (const region of regions) {
     LabelStudio.init(params);
     AtImageView.waitForImage();
     AtSidebar.seeRegions(0);
-    const canvasSize = await AtImageView.getCanvasSize();
-    const size = Math.min(canvasSize.width, canvasSize.height);
-    const regions = [];
-
-    // Prepare shapes params
-    Object.keys(createShape).forEach((shapeName, shapeIdx) => {
-      const hotKey = `${shapeIdx + 1}`;
-
-      Object.values(createShape[shapeName]).forEach((creator) => {
-        const region = creator(50, 50, size - 50 * 2, size - 50 * 2, {
-          hotKey,
-          shape: shapeName,
-        });
-
-        if (region.result)
-          region.result[`${shapeName.toLowerCase()}labels`] = [shapeName];
-        regions.push(region);
-      });
-    });
-
-    // Running a test scenario for each shape type
-    for (const region of regions) {
-      LabelStudio.init(params);
-      AtImageView.waitForImage();
-      AtSidebar.seeRegions(0);
-      I.say(`Drawing ${region.shape}`);
-      await AtImageView.lookForStage();
-      I.pressKey(region.hotKey);
-      AtImageView[region.action](...region.params);
-      AtSidebar.seeRegions(1);
-      I.say(`Try to undo ${region.shape}`);
-      I.pressKey(["CommandOrControl", "Z"]);
-      AtSidebar.seeRegions(0);
-    }
-  },
-).retry(2);
+    I.say(`Drawing ${region.shape}`);
+    await AtImageView.lookForStage();
+    I.pressKey(region.hotKey);
+    AtImageView[region.action](...region.params);
+    AtSidebar.seeRegions(1);
+    I.say(`Try to undo ${region.shape}`);
+    I.pressKey(["CommandOrControl", "Z"]);
+    AtSidebar.seeRegions(0);
+  }
+}).retry(2);

@@ -48,9 +48,7 @@ const Model = types
   })
   .views((self) => ({
     get ranker() {
-      return self.annotation.toNames
-        .get(self.name)
-        ?.filter((t) => t.type === "ranker");
+      return self.annotation.toNames.get(self.name)?.filter((t) => t.type === "ranker");
     },
     // index of all items from _value
     get items() {
@@ -83,13 +81,7 @@ const Model = types
     },
   }));
 
-const ListModel = types.compose(
-  "ListModel",
-  Base,
-  ProcessAttrsMixin,
-  AnnotationMixin,
-  Model,
-);
+const ListModel = types.compose("ListModel", Base, ProcessAttrsMixin, AnnotationMixin, Model);
 
 const HtxList = inject("store")(
   observer(({ item }) => {

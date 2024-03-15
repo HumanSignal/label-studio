@@ -2,10 +2,7 @@ Feature("Readonly Annotation");
 
 const imageExamples = new DataTable(["example", "regionName"]);
 
-imageExamples.add([
-  require("../../../examples/timeseries-url-indexed"),
-  "Walk",
-]);
+imageExamples.add([require("../../../examples/timeseries-url-indexed"), "Walk"]);
 
 Data(imageExamples).Scenario(
   "Timeseries Readonly Annotations",
@@ -42,9 +39,7 @@ Data(imageExamples).Scenario(
     I.pressKey("Backspace");
     await LabelStudio.resultsNotChanged(result);
 
-    const wrapperPosition = await Tools.getElementPosition(
-      ".htx-timeseries-channel",
-    );
+    const wrapperPosition = await Tools.getElementPosition(".htx-timeseries-channel");
 
     AtLabels.clickLabel("Run");
 

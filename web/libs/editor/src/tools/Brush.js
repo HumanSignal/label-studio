@@ -65,9 +65,7 @@ const _Tool = types
       return () => <ToolView item={self} />;
     },
     get iconComponent() {
-      return self.dynamic
-        ? NodeViews.BrushRegionModel.altIcon
-        : NodeViews.BrushRegionModel.icon;
+      return self.dynamic ? NodeViews.BrushRegionModel.altIcon : NodeViews.BrushRegionModel.icon;
     },
     get tagTypes() {
       return {
@@ -123,12 +121,7 @@ const _Tool = types
           touches: source.touches,
           dynamic: source.dynamic,
         };
-        const newArea = self.annotation.createResult(
-          value,
-          currentArea.results[0].value.toJSON(),
-          control,
-          obj,
-        );
+        const newArea = self.annotation.createResult(value, currentArea.results[0].value.toJSON(), control, obj);
 
         currentArea.setDrawing(false);
         self.applyActiveStates(newArea);
@@ -142,16 +135,7 @@ const _Tool = types
         const val = self.strokeWidth;
         const stage = self.obj.stageRef;
         const base64 = Canvas.brushSizeCircle(val);
-        const cursor = [
-          "url('",
-          base64,
-          "')",
-          " ",
-          Math.floor(val / 2) + 4,
-          " ",
-          Math.floor(val / 2) + 4,
-          ", auto",
-        ];
+        const cursor = ["url('", base64, "')", " ", Math.floor(val / 2) + 4, " ", Math.floor(val / 2) + 4, ", auto"];
 
         stage.container().style.cursor = cursor.join("");
       },
@@ -218,8 +202,7 @@ const _Tool = types
 
         // prevent drawing when current image is
         // different from image where the brush was started
-        if (o && brush && o.multiImage && o.currentImage !== brush.item_index)
-          return;
+        if (o && brush && o.multiImage && o.currentImage !== brush.item_index) return;
 
         // Reset the timer if a user started drawing again
         if (brush && brush.type === "brushregion") {
@@ -236,11 +219,7 @@ const _Tool = types
           self.addPoint(x, y);
         } else {
           if (isFF(FF_DEV_3666) && !self.canStartDrawing()) return;
-          if (
-            self.tagTypes.stateTypes === self.control.type &&
-            !self.control.isSelected
-          )
-            return;
+          if (self.tagTypes.stateTypes === self.control.type && !self.control.isSelected) return;
           self.annotation.history.freeze();
           self.mode = "drawing";
           isFirstBrushStroke = true;
@@ -261,12 +240,6 @@ const _Tool = types
     };
   });
 
-const Brush = types.compose(
-  _Tool.name,
-  ToolMixin,
-  BaseTool,
-  DrawingTool,
-  _Tool,
-);
+const Brush = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, _Tool);
 
 export { Brush };

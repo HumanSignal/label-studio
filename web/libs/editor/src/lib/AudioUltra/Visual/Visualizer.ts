@@ -1,22 +1,12 @@
 import { rgba } from "../Common/Color";
 import { Events } from "../Common/Events";
 import type { Padding } from "../Common/Style";
-import {
-  averageMinMax,
-  clamp,
-  debounce,
-  defaults,
-  warn,
-} from "../Common/Utils";
+import { averageMinMax, clamp, debounce, defaults, warn } from "../Common/Utils";
 import type { Cursor } from "../Cursor/Cursor";
 import type { WaveformAudio } from "../Media/WaveformAudio";
 import type { TimelineOptions } from "../Timeline/Timeline";
 import type { Waveform, WaveformOptions } from "../Waveform";
-import {
-  type CanvasCompositeOperation,
-  Layer,
-  type RenderingContext,
-} from "./Layer";
+import { type CanvasCompositeOperation, Layer, type RenderingContext } from "./Layer";
 import { LayerGroup } from "./LayerGroup";
 import "./Loader";
 import { Playhead } from "./PlayHead";
@@ -101,9 +91,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
     this.wf = waveform;
     this.waveContainer = options.container;
-    this.waveColor = options.waveColor
-      ? rgba(options.waveColor)
-      : this.waveColor;
+    this.waveColor = options.waveColor ? rgba(options.waveColor) : this.waveColor;
     this.padding = { ...this.padding, ...options.padding };
     this.playheadPadding = options.playhead?.padding ?? this.playheadPadding;
     this.zoomToCursor = options.zoomToCursor ?? this.zoomToCursor;
@@ -113,15 +101,10 @@ export class Visualizer extends Events<VisualizerEvents> {
     this.originalWaveHeight = this.baseWaveHeight;
     this.timelineHeight = options.timeline?.height ?? this.timelineHeight;
     this.waveHeight = options.waveHeight ?? this.waveHeight;
-    this.timelinePlacement =
-      options?.timeline?.placement ?? this.timelinePlacement;
-    this.gridColor = options.gridColor
-      ? rgba(options.gridColor)
-      : this.gridColor;
+    this.timelinePlacement = options?.timeline?.placement ?? this.timelinePlacement;
+    this.gridColor = options.gridColor ? rgba(options.gridColor) : this.gridColor;
     this.gridWidth = options.gridWidth ?? this.gridWidth;
-    this.backgroundColor = options.backgroundColor
-      ? rgba(options.backgroundColor)
-      : this.backgroundColor;
+    this.backgroundColor = options.backgroundColor ? rgba(options.backgroundColor) : this.backgroundColor;
     this.zoom = options.zoom ?? this.zoom;
     this.amp = options.amp ?? this.amp;
     this.playhead = new Playhead(
@@ -351,12 +334,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   /**
    * Render the waveform for a single channel
    */
-  private renderWave(
-    channelNumber: number,
-    layer: Layer,
-    iStart: number,
-    iEnd: number,
-  ): Promise<boolean> {
+  private renderWave(channelNumber: number, layer: Layer, iStart: number, iEnd: number): Promise<boolean> {
     const renderId = this.renderId;
     const height = this.baseWaveHeight / (this.audio?.channelCount ?? 1);
     const scrollLeftPx = this.getScrollLeftPx();
@@ -374,14 +352,7 @@ export class Visualizer extends Events<VisualizerEvents> {
       if (channelNumber === 0) {
         layer.clear();
       }
-      const renderIterator = this.renderSlice(
-        layer,
-        height,
-        iStart,
-        iEnd,
-        channelNumber,
-        x,
-      );
+      const renderIterator = this.renderSlice(layer, height, iStart, iEnd, channelNumber, x);
 
       // Render iterator, allowing it to be cancelled if a new render is requested
       const render = () => {
@@ -447,14 +418,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
         sEnd = clamp(sEnd + this.samplesPerPx * BUFFER_SAMPLES, 0, dataLength);
 
-        const renderIterator = this.renderSlice(
-          layer,
-          height,
-          sStart,
-          sEnd,
-          channelNumber,
-          x,
-        );
+        const renderIterator = this.renderSlice(layer, height, sStart, sEnd, channelNumber, x);
 
         // Render iterator, allowing it to be cancelled if a new render is requested
         const render = () => {
@@ -493,9 +457,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     const bufferChunkSize = bufferChunks.length;
     const paddingTop = this.padding?.top ?? 0;
     const paddingLeft = this.padding?.left ?? 0;
-    const zero =
-      height * channelNumber +
-      ((defaults.timelinePlacement as number) ? this.reservedSpace : 0);
+    const zero = height * channelNumber + ((defaults.timelinePlacement as number) ? this.reservedSpace : 0);
     const y = zero + paddingTop + height / 2;
     let total = 0;
 
@@ -554,13 +516,7 @@ export class Visualizer extends Events<VisualizerEvents> {
    * Render a single chunk of waveform data, which is a small set of contiguous samples.
    * This takes an average min and max value for the chunk and draws a line between them.
    */
-  private renderChunk(
-    chunk: Float32Array,
-    layer: Layer,
-    height: number,
-    offset: number,
-    zero: number,
-  ) {
+  private renderChunk(chunk: Float32Array, layer: Layer, height: number, offset: number, zero: number) {
     layer.save();
 
     const renderable = averageMinMax(chunk);
@@ -621,9 +577,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     const waveformHeight =
       Math.max(
         this.originalWaveHeight,
-        this.waveHeight *
-          (this.splitChannels ? this.audio?.channelCount ?? 1 : 1) +
-          this.timelineHeight,
+        this.waveHeight * (this.splitChannels ? this.audio?.channelCount ?? 1 : 1) + this.timelineHeight,
       ) - this.timelineHeight;
 
     if (this.baseWaveHeight !== waveformHeight) {
@@ -723,17 +677,9 @@ export class Visualizer extends Events<VisualizerEvents> {
     compositeOperation?: CanvasCompositeOperation;
     isVisible?: boolean;
   }) {
-    const {
-      name,
-      offscreen = false,
-      zIndex = 1,
-      opacity = 1,
-      compositeOperation = "source-over",
-      isVisible,
-    } = options;
+    const { name, offscreen = false, zIndex = 1, opacity = 1, compositeOperation = "source-over", isVisible } = options;
 
-    if (!options.groupName && this.layers.has(name))
-      throw new Error(`Layer ${name} already exists.`);
+    if (!options.groupName && this.layers.has(name)) throw new Error(`Layer ${name} already exists.`);
 
     const layerOptions = {
       groupName: options.groupName,
@@ -753,8 +699,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     if (options.groupName) {
       const group = this.layers.get(options.groupName);
 
-      if (!group || !group.isGroup)
-        throw new Error(`LayerGroup ${options.groupName} does not exist.`);
+      if (!group || !group.isGroup) throw new Error(`LayerGroup ${options.groupName} does not exist.`);
 
       layer = (group as LayerGroup).addLayer(layerOptions);
     } else {
@@ -794,8 +739,7 @@ export class Visualizer extends Events<VisualizerEvents> {
       compositeAsGroup = true,
     } = options;
 
-    if (this.layers.has(name))
-      throw new Error(`LayerGroup ${name} already exists.`);
+    if (this.layers.has(name)) throw new Error(`LayerGroup ${name} already exists.`);
 
     const layer = new LayerGroup({
       name,
@@ -818,8 +762,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   }
 
   removeLayer(name: string) {
-    if (!this.layers.has(name))
-      throw new Error(`Layer ${name} does not exist.`);
+    if (!this.layers.has(name)) throw new Error(`Layer ${name} does not exist.`);
     const layer = this.layers.get(name);
 
     if (layer) {
@@ -838,10 +781,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     return this.layers;
   }
 
-  useLayer(
-    name: string,
-    callback: (layer: Layer, context: RenderingContext) => void,
-  ) {
+  useLayer(name: string, callback: (layer: Layer, context: RenderingContext) => void) {
     const layer = this.layers.get(name)!;
 
     if (layer) {
@@ -904,8 +844,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     if (e.target && this.container.contains(e.target)) {
       const { x, y } = cursor;
       const { playhead, playheadPadding, height } = this;
-      const playHeadTop =
-        this.reservedSpace - playhead.capHeight - playhead.capPadding;
+      const playHeadTop = this.reservedSpace - playhead.capHeight - playhead.capPadding;
 
       if (
         x >= playhead.x - playheadPadding &&
@@ -927,17 +866,11 @@ export class Visualizer extends Events<VisualizerEvents> {
   private handleSeek = (e: MouseEvent) => {
     const mainLayer = this.getLayer("main");
 
-    if (
-      !this.wf.loaded ||
-      this.seekLocked ||
-      !(e.target && mainLayer?.canvas?.contains(e.target))
-    )
-      return;
+    if (!this.wf.loaded || this.seekLocked || !(e.target && mainLayer?.canvas?.contains(e.target))) return;
     const offset = this.wrapper.getBoundingClientRect().left;
     const x = e.clientX - offset;
     const duration = this.wf.duration;
-    const currentPosition =
-      this.scrollLeft + x / this.container.clientWidth / this.zoom;
+    const currentPosition = this.scrollLeft + x / this.container.clientWidth / this.zoom;
     const playheadX = clamp(x, 0, this.width);
 
     this.playhead.setX(playheadX);
@@ -967,18 +900,13 @@ export class Visualizer extends Events<VisualizerEvents> {
       // Base values
       const maxScroll = this.scrollWidth;
       const maxRelativeScroll = (maxScroll / this.fullWidth) * this.zoom;
-      const delta =
-        (Math.abs(e.deltaX) === 0 ? e.deltaY : e.deltaX) * this.zoom * 1.25;
+      const delta = (Math.abs(e.deltaX) === 0 ? e.deltaY : e.deltaX) * this.zoom * 1.25;
       const position = this.scrollLeft * this.zoom;
 
       // Values for the update
       const currentSroll = maxScroll * position;
       const newPosition = Math.max(0, currentSroll + delta);
-      const newRelativePosition = clamp(
-        newPosition / maxScroll,
-        0,
-        maxRelativeScroll,
-      );
+      const newRelativePosition = clamp(newPosition / maxScroll, 0, maxRelativeScroll);
       const scrollLeft = newRelativePosition / this.zoom;
 
       if (scrollLeft !== this.scrollLeft) {
@@ -1057,9 +985,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     this.lastRenderedScrollLeftPx = 0;
   }
 
-  private transferImage(
-    layers: string[] = ["background", "waveform", "regions", "controls"],
-  ) {
+  private transferImage(layers: string[] = ["background", "waveform", "regions", "controls"]) {
     const main = this.layers.get("main")!;
 
     main.clear();

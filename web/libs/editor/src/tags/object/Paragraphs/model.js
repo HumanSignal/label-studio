@@ -9,13 +9,7 @@ import { SyncableMixin } from "../../../mixins/Syncable";
 import { ParagraphsRegionModel } from "../../../regions/ParagraphsRegion";
 import Utils from "../../../utils";
 import { parseValue } from "../../../utils/data";
-import {
-  FF_DEV_2669,
-  FF_DEV_2918,
-  FF_DEV_3666,
-  FF_LSDV_E_278,
-  isFF,
-} from "../../../utils/feature-flags";
+import { FF_DEV_2669, FF_DEV_2918, FF_DEV_3666, FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
 import messages from "../../../utils/messages";
 import { clamp, isDefined, isValidObjectURL } from "../../../utils/utilities";
 import ObjectBase from "../Base";
@@ -77,9 +71,7 @@ import styles from "./Paragraphs.module.scss";
  */
 const TagAttrs = types.model("ParagraphsModel", {
   value: types.maybeNull(types.string),
-  valuetype: types.optional(types.enumeration(["json", "url"]), () =>
-    window.LS_SECURE_MODE ? "url" : "json",
-  ),
+  valuetype: types.optional(types.enumeration(["json", "url"]), () => (window.LS_SECURE_MODE ? "url" : "json")),
   audiourl: types.maybeNull(types.string),
   showplayer: false,
 
@@ -89,9 +81,8 @@ const TagAttrs = types.model("ParagraphsModel", {
   layout: types.optional(types.enumeration(["none", "dialogue"]), "none"),
 
   // @todo add `valueType=url` to Paragraphs and make autodetection of `savetextresult`
-  savetextresult: types.optional(
-    types.enumeration(["none", "no", "yes"]),
-    () => (window.LS_SECURE_MODE ? "no" : "yes"),
+  savetextresult: types.optional(types.enumeration(["none", "no", "yes"]), () =>
+    window.LS_SECURE_MODE ? "no" : "yes",
   ),
 
   namekey: types.optional(types.string, "author"),
@@ -182,18 +173,13 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states?.filter(
-        (s) => s.isSelected && s._type === "paragraphlabels",
-      );
+      return states?.filter((s) => s.isSelected && s._type === "paragraphlabels");
     },
 
     isVisibleForAuthorFilter(data) {
       if (!isFF(FF_DEV_2669)) return true;
 
-      return (
-        !self.filterByAuthor.length ||
-        self.filterByAuthor.includes(data[self.namekey])
-      );
+      return !self.filterByAuthor.length || self.filterByAuthor.includes(data[self.namekey]);
     },
   }));
 
@@ -239,9 +225,7 @@ const PlayableAndSyncable = types
         if (value.start === undefined) return {};
 
         const start = clamp(value.start ?? 0, 0, self.audioDuration);
-        const _end = value.duration
-          ? start + value.duration
-          : value.end ?? self.audioDuration;
+        const _end = value.duration ? start + value.duration : value.end ?? self.audioDuration;
         const end = clamp(_end, start, self.audioDuration);
 
         return { start, end };
@@ -362,11 +346,7 @@ const PlayableAndSyncable = types
       const currentTime = audio?.currentTime;
       const endTime = audio?.duration;
 
-      if (
-        !isDefined(currentTime) ||
-        !isDefined(endTime) ||
-        currentTime >= endTime
-      ) {
+      if (!isDefined(currentTime) || !isDefined(endTime) || currentTime >= endTime) {
         self.reset();
         return;
       }
@@ -454,17 +434,12 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
 
         if (url) {
           message.push(`URL (${url}) is not valid.`);
-          message.push(
-            'You should not put data directly into your task if you use valuetype="url".',
-          );
+          message.push('You should not put data directly into your task if you use valuetype="url".');
         } else {
           message.push(`URL is empty, check ${value} in data JSON.`);
         }
-        if (window.LS_SECURE_MODE)
-          message.unshift('In SECURE MODE valuetype set to "url" by default.');
-        store.annotationStore.addErrors([
-          errorBuilder.generalError(message.join("\n")),
-        ]);
+        if (window.LS_SECURE_MODE) message.unshift('In SECURE MODE valuetype set to "url" by default.');
+        store.annotationStore.addErrors([errorBuilder.generalError(message.join("\n"))]);
         self.setRemoteValue("");
         return;
       }
@@ -496,14 +471,10 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
       errors.push("Provided data is not an array");
     } else {
       if (!(self.namekey in val[0])) {
-        errors.push(
-          `"${self.namekey}" field not found in task data; check your <b>nameKey</b> parameter`,
-        );
+        errors.push(`"${self.namekey}" field not found in task data; check your <b>nameKey</b> parameter`);
       }
       if (!(self.textkey in val[0])) {
-        errors.push(
-          `"${self.textkey}" field not found in task data; check your <b>textKey</b> parameter`,
-        );
+        errors.push(`"${self.textkey}" field not found in task data; check your <b>textKey</b> parameter`);
       }
     }
     if (errors.length) {
@@ -515,11 +486,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
       ].join(" ");
 
       self.store.annotationStore.addErrors([
-        errorBuilder.generalError(
-          `${general}<ul>${errors
-            .map((error) => `<li>${error}</li>`)
-            .join("")}</ul>`,
-        ),
+        errorBuilder.generalError(`${general}<ul>${errors.map((error) => `<li>${error}</li>`).join("")}</ul>`),
       ]);
       return;
     }
@@ -557,9 +524,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
 
   addRegions(ranges) {
     const areas = [];
-    const states = isFF(FF_DEV_3666)
-      ? self.getAvailableStates()
-      : self.activeStates();
+    const states = isFF(FF_DEV_3666) ? self.getAvailableStates() : self.activeStates();
 
     if (states.length === 0) return;
 
@@ -583,9 +548,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
     if (isFF(FF_DEV_2918)) {
       return self.addRegions([range])[0];
     }
-    const states = isFF(FF_DEV_3666)
-      ? self.getAvailableStates()
-      : self.activeStates();
+    const states = isFF(FF_DEV_3666) ? self.getAvailableStates() : self.activeStates();
 
     if (states.length === 0) return;
 
@@ -613,7 +576,4 @@ const paragraphModelMixins = [
   ParagraphsLoadingModel,
 ].filter(Boolean);
 
-export const ParagraphsModel = types.compose(
-  "ParagraphsModel",
-  ...paragraphModelMixins,
-);
+export const ParagraphsModel = types.compose("ParagraphsModel", ...paragraphModelMixins);

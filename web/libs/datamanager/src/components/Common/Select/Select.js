@@ -36,21 +36,10 @@ const findSelectedChild = (children, value) => {
   }, null);
 };
 
-export const Select = ({
-  value,
-  defaultValue,
-  size,
-  children,
-  onChange,
-  style,
-  multiple,
-  tabIndex = 0,
-}) => {
+export const Select = ({ value, defaultValue, size, children, onChange, style, multiple, tabIndex = 0 }) => {
   const dropdown = useRef();
   const rootRef = useRef();
-  const [currentValue, setCurrentValue] = useState(
-    multiple ? [].concat(value ?? []).flat(10) : value,
-  );
+  const [currentValue, setCurrentValue] = useState(multiple ? [].concat(value ?? []).flat(10) : value);
   const [focused, setFocused] = useState();
 
   const options = Children.toArray(children);
@@ -90,10 +79,7 @@ export const Select = ({
       return <>Multiple values selected</>;
     }
 
-    const foundChild = findSelectedChild(
-      children,
-      defaultValue ?? currentValue,
-    );
+    const foundChild = findSelectedChild(children, defaultValue ?? currentValue);
 
     const result = foundChild?.props?.children;
 
@@ -132,10 +118,7 @@ export const Select = ({
         dropdown.current?.open();
         focusItem();
       }
-    } else if (
-      (e.code === "Space" || e.code === "Enter") &&
-      isDefined(focused)
-    ) {
+    } else if ((e.code === "Space" || e.code === "Enter") && isDefined(focused)) {
       context.setCurrentValue(focused);
     }
   };
@@ -152,14 +135,7 @@ export const Select = ({
 
   return (
     <SelectContext.Provider value={context}>
-      <Block
-        ref={rootRef}
-        name="select"
-        mod={{ size }}
-        style={style}
-        tabIndex={tabIndex}
-        onKeyDown={handleKeyboard}
-      >
+      <Block ref={rootRef} name="select" mod={{ size }} style={style} tabIndex={tabIndex} onKeyDown={handleKeyboard}>
         <Dropdown.Trigger
           ref={dropdown}
           style={{ maxHeight: 280, overflow: "auto" }}
@@ -180,8 +156,7 @@ export const Select = ({
 Select.displayName = "Select";
 
 Select.Option = ({ value, children, style }) => {
-  const { setCurrentValue, multiple, currentValue, focused } =
-    useContext(SelectContext);
+  const { setCurrentValue, multiple, currentValue, focused } = useContext(SelectContext);
 
   const isSelected = useMemo(() => {
     const option = String(value);

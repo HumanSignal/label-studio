@@ -120,15 +120,11 @@ const Webhook = () => {
         </Elem>
         <Elem name="footer-text">
           <p>
-            Webhooks allow external services to be notified when certain events
-            happen. When the specified events occur, a POST request is sent to
-            each of the URLs you provide.
+            Webhooks allow external services to be notified when certain events happen. When the specified events occur,
+            a POST request is sent to each of the URLs you provide.
           </p>
           <p>
-            <a href="https://labelstud.io/guide/webhooks.html">
-              Read more in the documentation
-            </a>
-            .
+            <a href="https://labelstud.io/guide/webhooks.html">Read more in the documentation</a>.
           </p>
         </Elem>
       </Elem>

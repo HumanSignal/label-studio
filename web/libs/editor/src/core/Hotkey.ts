@@ -5,11 +5,7 @@ import { Fragment, createElement } from "react";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import Hint from "../components/Hint/Hint";
 import { Block, Elem } from "../utils/bem";
-import {
-  FF_LSDV_1148,
-  FF_MULTI_OBJECT_HOTKEYS,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_LSDV_1148, FF_MULTI_OBJECT_HOTKEYS, isFF } from "../utils/feature-flags";
 import { isDefined, isMacOS } from "../utils/utilities";
 import defaultKeymap from "./settings/keymap.json";
 
@@ -26,13 +22,7 @@ if (!isFF(FF_MULTI_OBJECT_HOTKEYS)) {
 }
 
 // Validate keymap integrity
-const allowedKeympaKeys = [
-  "key",
-  "mac",
-  "description",
-  "modifier",
-  "modifierDescription",
-];
+const allowedKeympaKeys = ["key", "mac", "description", "modifier", "modifierDescription"];
 
 const validateKeymap = (keymap: Keymap) => {
   Object.entries(keymap).forEach(([name, settings]) => {
@@ -84,9 +74,7 @@ const translateNumpad = (event: any) => {
   const numPadKeyCode = event.keyCode;
   const translatedToDigit = numPadKeyCode - 48;
 
-  document.dispatchEvent(
-    new KeyboardEvent("keydown", { keyCode: translatedToDigit }),
-  );
+  document.dispatchEvent(new KeyboardEvent("keydown", { keyCode: translatedToDigit }));
 };
 
 keymaster.filter = (event) => {
@@ -97,9 +85,7 @@ keymaster.filter = (event) => {
 
   if (inNumberPadCodeRange) translateNumpad(event);
   if (tag) {
-    keymaster.setScope(
-      /^(INPUT|TEXTAREA|SELECT)$/.test(tag) ? INPUT_SCOPE : DEFAULT_SCOPE,
-    );
+    keymaster.setScope(/^(INPUT|TEXTAREA|SELECT)$/.test(tag) ? INPUT_SCOPE : DEFAULT_SCOPE);
   }
 
   return true;
@@ -122,14 +108,11 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
       return _hotkeys_map;
     },
     get descriptions() {
-      const descriptions = Object.keys(this.keys).reduce<[string, string][]>(
-        (res, key) => {
-          if (_hotkeys_desc[key]) res.push([key, _hotkeys_desc[key]]);
+      const descriptions = Object.keys(this.keys).reduce<[string, string][]>((res, key) => {
+        if (_hotkeys_desc[key]) res.push([key, _hotkeys_desc[key]]);
 
-          return res;
-        },
-        [],
-      );
+        return res;
+      }, []);
 
       return Object.fromEntries(descriptions);
     },
@@ -137,11 +120,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
 
   // Saving handlers of current namespace to the global list for the further rebinding by necessity
   // We need this since `keymaster.unbind` works with all handlers at the same time but our logic is based on namespaces
-  const addKeyHandlerRef = (
-    scopeName: string,
-    keyName: string,
-    func: keymaster.KeyHandler,
-  ) => {
+  const addKeyHandlerRef = (scopeName: string, keyName: string, func: keymaster.KeyHandler) => {
     if (!isDefined(_scopes[scopeName])) {
       _scopes[scopeName] = {};
     }
@@ -180,9 +159,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
   const getKeys = (key: string) => {
     const tokenRegex = /((?:\w+\+)*(?:[^,]+|,)),?/g;
 
-    return [...key.replace(/\s/, "").matchAll(tokenRegex)].map(
-      (match) => match[1],
-    );
+    return [...key.replace(/\s/, "").matchAll(tokenRegex)].map((match) => match[1]);
   };
 
   const unbind = () => {
@@ -224,12 +201,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
     /**
      * Add key
      */
-    addKey(
-      key: string,
-      func: keymaster.KeyHandler,
-      desc?: string,
-      scope: string = DEFAULT_SCOPE,
-    ) {
+    addKey(key: string, func: keymaster.KeyHandler, desc?: string, scope: string = DEFAULT_SCOPE) {
       if (!isDefined(key)) return;
 
       if (_hotkeys_map[key]) {
@@ -266,12 +238,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
      * Given a key temp overwrites the function, the overwrite is removed
      * after the returning function is called
      */
-    overwriteKey(
-      key: string,
-      func: keymaster.KeyHandler,
-      desc?: string,
-      scope: string = DEFAULT_SCOPE,
-    ) {
+    overwriteKey(key: string, func: keymaster.KeyHandler, desc?: string, scope: string = DEFAULT_SCOPE) {
       if (!isDefined(key)) return;
 
       if (this.hasKey(key)) {
@@ -321,12 +288,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
         this.addKey(shortcut, func, hotkey.description, scope);
 
         if (hotkey.modifier) {
-          this.addKey(
-            `${hotkey.modifier}+${shortcut}`,
-            func,
-            hotkey.modifierDescription,
-            scope,
-          );
+          this.addKey(`${hotkey.modifier}+${shortcut}`, func, hotkey.modifierDescription, scope);
         }
       } else {
         throw new Error(`Unknown named hotkey ${hotkey}`);
@@ -367,12 +329,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
         this.overwriteKey(shortcut, func, hotkey.description, scope);
 
         if (hotkey.modifier) {
-          this.overwriteKey(
-            `${hotkey.modifier}+${shortcut}`,
-            func,
-            hotkey.modifierDescription,
-            scope,
-          );
+          this.overwriteKey(`${hotkey.modifier}+${shortcut}`, func, hotkey.modifierDescription, scope);
         }
       } else {
         throw new Error(`Unknown named hotkey ${name}`);
@@ -472,8 +429,7 @@ Hotkey.setScope = (scope: string) => {
 Hotkey.Tooltip = inject("store")(
   observer(({ store, name, children, ...props }: any) => {
     const hotkey = Hotkey.keymap[name as string];
-    const enabled =
-      store.settings.enableTooltips && store.settings.enableHotkeys;
+    const enabled = store.settings.enableTooltips && store.settings.enableHotkeys;
 
     if (isDefined(hotkey)) {
       const shortcut = isMacOS() ? hotkey.mac ?? hotkey.key : hotkey.key;
@@ -529,8 +485,7 @@ Hotkey.Tooltip = inject("store")(
 Hotkey.Hint = inject("store")(
   observer(({ store, name }: any) => {
     const hotkey = Hotkey.keymap[name];
-    const enabled =
-      store.settings.enableTooltips && store.settings.enableHotkeys;
+    const enabled = store.settings.enableTooltips && store.settings.enableHotkeys;
 
     if (isDefined(hotkey) && enabled) {
       const shortcut = isMacOS() ? hotkey.mac ?? hotkey.key : hotkey.key;

@@ -1,8 +1,4 @@
-import {
-  AudioView,
-  LabelStudio,
-  Sidebar,
-} from "@humansignal/frontend-test/helpers/LSF";
+import { AudioView, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { FF_LSDV_E_278 } from "../../../../src/utils/feature-flags";
 import * as audioFixtures from "../../data/audio/audio_paragraphs";
 
@@ -14,11 +10,7 @@ describe("Audio: Paragraphs Sync", () => {
   });
 
   it("Correctly loads with Paragraph segments as Audio segments", () => {
-    LabelStudio.params()
-      .config(audioFixtures.config)
-      .data(audioFixtures.data)
-      .withResult(audioFixtures.result)
-      .init();
+    LabelStudio.params().config(audioFixtures.config).data(audioFixtures.data).withResult(audioFixtures.result).init();
 
     LabelStudio.waitForObjectsReady();
 
@@ -31,11 +23,7 @@ describe("Audio: Paragraphs Sync", () => {
   });
 
   it("Highlights the correct Audio segment whenever it is played or seeked", () => {
-    LabelStudio.params()
-      .config(audioFixtures.config)
-      .data(audioFixtures.data)
-      .withResult(audioFixtures.result)
-      .init();
+    LabelStudio.params().config(audioFixtures.config).data(audioFixtures.data).withResult(audioFixtures.result).init();
 
     LabelStudio.waitForObjectsReady();
 

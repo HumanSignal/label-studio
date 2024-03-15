@@ -95,10 +95,7 @@ Scenario(
       I.see("is not valid");
       I.see(error);
       I.click("OK");
-      assert.strictEqual(
-        await I.grabCssPropertyFrom("[type=date]", "border-color"),
-        "rgb(255, 0, 0)",
-      );
+      assert.strictEqual(await I.grabCssPropertyFrom("[type=date]", "border-color"), "rgb(255, 0, 0)");
     }
 
     for (const [correct] of checks.correct) {
@@ -109,10 +106,7 @@ Scenario(
     }
 
     // this value will be asserted at the end
-    I.fillField(
-      "input[type=date]",
-      formatDateValue(createdDate.correctMax, format),
-    );
+    I.fillField("input[type=date]", formatDateValue(createdDate.correctMax, format));
 
     ////// PER-REGION
     I.say("Create regions but leave dates empty");
@@ -136,10 +130,7 @@ Scenario(
 
     // invalid region is selected on validation to reveal per-region control with error
     AtSidebar.seeSelectedRegion(regions[0].label);
-    I.fillField(
-      "input[name=date-date]",
-      formatDateValue(regions[0].dateValue, format),
-    );
+    I.fillField("input[name=date-date]", formatDateValue(regions[0].dateValue, format));
     I.updateAnnotation();
     // next region with empty required date is selected and error is shown
     I.see('DateTime "date" is required');
@@ -149,10 +140,7 @@ Scenario(
     I.say("Fill all per-region date fields and check it's all good");
     regions.forEach((region) => {
       I.click(locate("li").withText(region.text));
-      I.fillField(
-        "input[name=date-date]",
-        formatDateValue(region.dateValue, format),
-      );
+      I.fillField("input[name=date-date]", formatDateValue(region.dateValue, format));
     });
 
     I.click(locate("li").withText(regions[0].text));

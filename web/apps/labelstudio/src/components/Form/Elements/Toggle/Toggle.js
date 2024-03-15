@@ -23,14 +23,8 @@ const Toggle = forwardRef(
     ref,
   ) => {
     const rootClass = cn("toggle");
-    const initialChecked = useMemo(
-      () => defaultChecked ?? checked ?? false,
-      [defaultChecked, checked],
-    );
-    const [isChecked, setIsChecked] = useValueTracker(
-      checked,
-      defaultChecked ?? false,
-    );
+    const initialChecked = useMemo(() => defaultChecked ?? checked ?? false, [defaultChecked, checked]);
+    const [isChecked, setIsChecked] = useValueTracker(checked, defaultChecked ?? false);
 
     const classList = [rootClass];
     const mods = {};

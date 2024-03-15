@@ -20,10 +20,7 @@ export const ToggleItems = ({
   const rootClass = cn("toggle-items");
 
   return (
-    <ul
-      className={rootClass.mod({ big }).mix(className).toString()}
-      style={style}
-    >
+    <ul className={rootClass.mod({ big }).mix(className).toString()} style={style}>
       {Object.keys(items).map((item) => (
         <li
           key={item}

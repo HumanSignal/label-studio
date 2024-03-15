@@ -1,8 +1,5 @@
 import { getParentOfType, getType } from "mobx-state-tree";
-import type {
-  IAnyComplexType,
-  IAnyStateTreeNode,
-} from "mobx-state-tree/dist/internal";
+import type { IAnyComplexType, IAnyStateTreeNode } from "mobx-state-tree/dist/internal";
 import React from "react";
 
 import { parseValue } from "../utils/data";
@@ -39,11 +36,7 @@ function detectParseError(doc?: Document) {
   }
 }
 
-const deepReplaceAttributes = (
-  root: Element,
-  idx: number,
-  indexFlag: string,
-) => {
+const deepReplaceAttributes = (root: Element, idx: number, indexFlag: string) => {
   function recursiveClone(node: Element) {
     if (node.attributes === undefined) return;
 
@@ -61,17 +54,11 @@ const deepReplaceAttributes = (
   recursiveClone(root);
 };
 
-function tagIntoObject(
-  node: Element,
-  taskData: Record<string, any>,
-  replaces?: Record<string, string>,
-): ConfigNode {
+function tagIntoObject(node: Element, taskData: Record<string, any>, replaces?: Record<string, string>): ConfigNode {
   const props = attrsToProps(node, replaces);
   const type = node.tagName.toLowerCase();
   const indexFlag = props.indexflag ?? "{{idx}}";
-  const id = isFF(FF_DEV_3391)
-    ? node.getAttribute("name") ?? guidGenerator()
-    : guidGenerator();
+  const id = isFF(FF_DEV_3391) ? node.getAttribute("name") ?? guidGenerator() : guidGenerator();
   const data: ConfigNode = {
     ...props,
     id,
@@ -115,15 +102,10 @@ function tagIntoObject(
     data.children = views;
   }
   // contains only text nodes; HyperText can contain any structure
-  else if (
-    node.childNodes.length &&
-    (!node.children.length || type === "hypertext")
-  ) {
+  else if (node.childNodes.length && (!node.children.length || type === "hypertext")) {
     data.value = node.innerHTML?.trim() || data.value || "";
   } else if (node.children.length) {
-    data.children = [...node.children].map((child) =>
-      tagIntoObject(child, taskData),
-    );
+    data.children = [...node.children].map((child) => tagIntoObject(child, taskData));
   }
 
   return data;
@@ -175,10 +157,7 @@ function cssConverter(style: string) {
  *
  * @param {*} attrs
  */
-function attrsToProps(
-  node: Element,
-  replaces?: Record<string, string>,
-): Record<string, any> {
+function attrsToProps(node: Element, replaces?: Record<string, string>): Record<string, any> {
   const props: Record<string, any> = {};
 
   if (!node) return props;
@@ -210,10 +189,7 @@ function attrsToProps(
  *
  * @param {string} html
  */
-function treeToModel(
-  html: string,
-  store: { task: { dataObj: Record<string, any> } },
-): ConfigNode {
+function treeToModel(html: string, store: { task: { dataObj: Record<string, any> } }): ConfigNode {
   const parser = new DOMParser();
 
   const doc = parser.parseFromString(html, "application/xml");
@@ -242,11 +218,7 @@ function treeToModel(
  * Render items of tree
  * @param {*} el
  */
-function renderItem(
-  ref: IAnyStateTreeNode,
-  annotation: IAnnotation,
-  includeKey = true,
-) {
+function renderItem(ref: IAnyStateTreeNode, annotation: IAnnotation, includeKey = true) {
   let el = ref;
 
   if (isFF(FF_DEV_3391)) {
@@ -256,11 +228,7 @@ function renderItem(
   }
 
   if (!el) {
-    console.error(
-      `Can't find element ${ref.id ?? ref.name} in annotation ${
-        annotation?.id
-      }`,
-    );
+    console.error(`Can't find element ${ref.id ?? ref.name} in annotation ${annotation?.id}`);
     return null;
   }
 
@@ -272,8 +240,7 @@ function renderItem(
   if (!View) {
     throw new Error(`No view for model: ${typeName}`);
   }
-  const key =
-    (identifierAttribute && el[identifierAttribute]) || guidGenerator();
+  const key = (identifierAttribute && el[identifierAttribute]) || guidGenerator();
 
   return <View key={includeKey ? key : undefined} item={el} />;
 }
@@ -296,10 +263,7 @@ function renderChildren(item: IAnyStateTreeNode, annotation: IAnnotation) {
  * @param {*} obj
  * @param {*} classes
  */
-export function findParentOfType(
-  obj: IAnyStateTreeNode,
-  classes: IAnyComplexType[],
-) {
+export function findParentOfType(obj: IAnyStateTreeNode, classes: IAnyComplexType[]) {
   for (const c of classes) {
     try {
       const p = getParentOfType(obj, c);
@@ -318,10 +282,7 @@ export function findParentOfType(
  * @param {*} obj
  * @param {*} classes
  */
-function filterChildrenOfType(
-  obj: IAnyStateTreeNode,
-  classes: string | string[],
-) {
+function filterChildrenOfType(obj: IAnyStateTreeNode, classes: string | string[]) {
   const res: IAnyStateTreeNode[] = [];
   const cls = Array.isArray(classes) ? classes : [classes];
 
@@ -336,10 +297,7 @@ function filterChildrenOfType(
 
 type TraverseResult = void | typeof TRAVERSE_SKIP | typeof TRAVERSE_STOP;
 
-function traverseTree(
-  root: IAnyStateTreeNode,
-  cb: (node: IAnyStateTreeNode) => TraverseResult,
-) {
+function traverseTree(root: IAnyStateTreeNode, cb: (node: IAnyStateTreeNode) => TraverseResult) {
   const visitNode = (node: IAnyStateTreeNode): TraverseResult => {
     const res = cb(node);
 
@@ -366,9 +324,7 @@ function extractNames(root: IAnyStateTreeNode) {
   const toNames = new Map<string, IAnyStateTreeNode[]>();
 
   // hacky way to get all the available object tag names
-  const objectTypes = Registry.objectTypes().map((type) =>
-    type.name.replace("Model", "").toLowerCase(),
-  );
+  const objectTypes = Registry.objectTypes().map((type) => type.name.replace("Model", "").toLowerCase());
 
   traverseTree(root, (node) => {
     if (node.name) {

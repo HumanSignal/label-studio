@@ -42,9 +42,7 @@ const _Tool = types
         return "Polygon region";
       },
       get iconComponent() {
-        return self.dynamic
-          ? NodeViews.PolygonRegionModel.altIcon
-          : NodeViews.PolygonRegionModel.icon;
+        return self.dynamic ? NodeViews.PolygonRegionModel.altIcon : NodeViews.PolygonRegionModel.icon;
       },
 
       get defaultDimensions() {
@@ -87,10 +85,7 @@ const _Tool = types
     return {
       handleToolSwitch(tool) {
         self.stopListening();
-        if (
-          self.getCurrentArea()?.isDrawing &&
-          tool.toolName !== "ZoomPanTool"
-        ) {
+        if (self.getCurrentArea()?.isDrawing && tool.toolName !== "ZoomPanTool") {
           const shape = self.getCurrentArea()?.toJSON();
 
           if (shape?.points?.length > 2) self.finishDrawing();
@@ -125,10 +120,7 @@ const _Tool = types
 
         if (isFF(FF_DEV_2432)) {
           self.mode = "drawing";
-          self.currentArea = self.createRegion(
-            self.createRegionOptions({ x: point.x, y: point.y }),
-            true,
-          );
+          self.currentArea = self.createRegion(self.createRegionOptions({ x: point.x, y: point.y }), true);
           self.setDrawing(true);
           self.applyActiveStates(self.currentArea);
         } else {
@@ -171,12 +163,6 @@ const _Tool = types
     };
   });
 
-const Polygon = types.compose(
-  _Tool.name,
-  ToolMixin,
-  BaseTool,
-  MultipleClicksDrawingTool,
-  _Tool,
-);
+const Polygon = types.compose(_Tool.name, ToolMixin, BaseTool, MultipleClicksDrawingTool, _Tool);
 
 export { Polygon };

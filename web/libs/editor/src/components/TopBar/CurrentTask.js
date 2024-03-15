@@ -4,12 +4,7 @@ import React, { useMemo } from "react";
 import { useEffect, useState } from "react";
 import { Button } from "../../common/Button/Button";
 import { Block, Elem } from "../../utils/bem";
-import {
-  FF_DEV_3873,
-  FF_DEV_4174,
-  FF_TASK_COUNT_FIX,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_DEV_3873, FF_DEV_4174, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import "./CurrentTask.styl";
@@ -54,10 +49,7 @@ export const CurrentTask = observer(({ store }) => {
     store.hasInterface("postpone");
 
   if (store.hasInterface("annotations:comments") && isFF(FF_DEV_4174)) {
-    canPostpone =
-      canPostpone &&
-      store.commentStore.addedCommentThisSession &&
-      visibleComments >= initialCommentLength;
+    canPostpone = canPostpone && store.commentStore.addedCommentThisSession && visibleComments >= initialCommentLength;
   }
 
   return (
@@ -113,9 +105,7 @@ export const CurrentTask = observer(({ store }) => {
               }}
               type="link"
               disabled={!store.canGoNextTask && !canPostpone}
-              onClick={
-                store.canGoNextTask ? store.nextTask : store.postponeTask
-              }
+              onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
               style={{
                 background: !isFF(FF_DEV_3873) && "none",
                 backgroundColor: isFF(FF_DEV_3873) && "none",

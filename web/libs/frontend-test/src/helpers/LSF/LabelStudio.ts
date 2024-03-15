@@ -166,19 +166,11 @@ export const LabelStudio = {
     Cypress.on("window:before:load", windowLoadCallback);
 
     cy.visit("/").then((win) => {
-      cy.log(
-        `Default feature flags set ${JSON.stringify(
-          win.APP_SETTINGS.feature_flags,
-          null,
-          "  ",
-        )}`,
-      );
+      cy.log(`Default feature flags set ${JSON.stringify(win.APP_SETTINGS.feature_flags, null, "  ")}`);
       const labelStudio = new win.LabelStudio("label-studio", win.LSF_CONFIG);
 
       if (win.LSF_CONFIG.eventListeners) {
-        for (const [event, listener] of Object.entries(
-          win.LSF_CONFIG.eventListeners,
-        )) {
+        for (const [event, listener] of Object.entries(win.LSF_CONFIG.eventListeners)) {
           labelStudio.on(event, listener);
         }
       }
@@ -209,9 +201,7 @@ export const LabelStudio = {
     cy.window().then((win) => {
       return new Promise((resolve) => {
         const watchObjectsReady = () => {
-          const isReady = win.Htx.annotationStore.selected.objects.every(
-            (object) => object.isReady,
-          );
+          const isReady = win.Htx.annotationStore.selected.objects.every((object) => object.isReady);
 
           if (isReady) {
             resolve(true);
@@ -286,15 +276,10 @@ export const LabelStudio = {
    */
   getFeatureFlag(flagName: string) {
     return cy.window().then((win) => {
-      const featureFlags = (win.APP_SETTINGS?.feature_flags ?? {}) as Record<
-        string,
-        boolean
-      >;
+      const featureFlags = (win.APP_SETTINGS?.feature_flags ?? {}) as Record<string, boolean>;
 
       const flagValue =
-        flagName in featureFlags
-          ? featureFlags[flagName]
-          : window.APP_SETTINGS?.feature_flags_default_value === true;
+        flagName in featureFlags ? featureFlags[flagName] : window.APP_SETTINGS?.feature_flags_default_value === true;
 
       return flagValue;
     });

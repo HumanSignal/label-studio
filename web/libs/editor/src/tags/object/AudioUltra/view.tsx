@@ -29,14 +29,8 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
     backgroundColor: "#fafafa",
     autoCenter: true,
     zoomToCursor: true,
-    height:
-      item.height && !Number.isNaN(Number(item.height))
-        ? Number(item.height)
-        : 96,
-    waveHeight:
-      item.waveheight && !Number.isNaN(Number(item.waveheight))
-        ? Number(item.waveheight)
-        : 32,
+    height: item.height && !Number.isNaN(Number(item.height)) ? Number(item.height) : 96,
+    waveHeight: item.waveheight && !Number.isNaN(Number(item.waveheight)) ? Number(item.waveheight) : 32,
     splitChannels: item.splitchannels,
     decoderType: item.decoder,
     playerType: item.player,
@@ -95,17 +89,12 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
     const selectRegion = (region: Region | Segment, event: MouseEvent) => {
       const growSelection = event.metaKey || event.ctrlKey;
 
-      if (!growSelection || (!region.selected && !region.isRegion))
-        item.annotation.regionStore.unselectAll();
+      if (!growSelection || (!region.selected && !region.isRegion)) item.annotation.regionStore.unselectAll();
 
       // to select or unselect region
       const itemRegion = item.regs.find((obj: any) => obj.id === region.id);
 
-      itemRegion &&
-        item.annotation.regionStore.toggleSelection(
-          itemRegion,
-          region.selected,
-        );
+      itemRegion && item.annotation.regionStore.toggleSelection(itemRegion, region.selected);
 
       // to select or unselect unlabeled segments
       const targetInWave = item._ws.regions.findRegion(region.id);

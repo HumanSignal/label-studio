@@ -12,16 +12,12 @@ declare namespace Cypress {
      */
     captureScreenshot(
       name: string,
-      screenshotCaptureOptions?: Partial<
-        Loggable & Timeoutable & CompareScreenshotOptions
-      >,
+      screenshotCaptureOptions?: Partial<Loggable & Timeoutable & CompareScreenshotOptions>,
     ): Chainable<JQuery<Element>>;
     compareScreenshot(
       name: string,
       assert: "shouldChange" | "shouldNotChange" | "diff",
-      screenshotCompareOptions?: Partial<
-        Loggable & Timeoutable & CompareScreenshotOptions & Tresholdable
-      >,
+      screenshotCompareOptions?: Partial<Loggable & Timeoutable & CompareScreenshotOptions & Tresholdable>,
     ): Chainable<JQuery<Element>>;
     matchImageSnapshot(options?: {
       name?: string;

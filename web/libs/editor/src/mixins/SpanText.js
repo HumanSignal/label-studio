@@ -16,10 +16,7 @@ export default types
           }
 
           if (opacity) {
-            span.style.backgroundColor = Utils.Colors.rgbaChangeAlpha(
-              span.style.backgroundColor,
-              opacity,
-            );
+            span.style.backgroundColor = Utils.Colors.rgbaChangeAlpha(span.style.backgroundColor, opacity);
           }
         });
       }
@@ -51,9 +48,7 @@ export default types
     },
 
     getLabelColor() {
-      let labelColor =
-        self.parent.highlightcolor ||
-        (self.style || self.tag || defaultStyle).fillcolor;
+      let labelColor = self.parent.highlightcolor || (self.style || self.tag || defaultStyle).fillcolor;
 
       if (labelColor) {
         labelColor = Utils.Colors.convertToRGBA(labelColor, 0.3);
@@ -159,11 +154,7 @@ export default types
         const lspan = self._spans[len - 1];
         const mspans = self._spans.slice(1, len - 1);
 
-        const set = (
-          span,
-          s,
-          { top = true, bottom = true, right = true, left = true } = {},
-        ) => {
+        const set = (span, s, { top = true, bottom = true, right = true, left = true } = {}) => {
           if (right) span.style.borderRight = s;
           if (left) span.style.borderLeft = s;
           if (top) span.style.borderTop = s;
@@ -176,16 +167,14 @@ export default types
           set(fspan, h, { right: false });
           set(lspan, h, { left: false });
 
-          if (mspans.length)
-            mspans.forEach((s) => set(s, h, { left: false, right: false }));
+          if (mspans.length) mspans.forEach((s) => set(s, h, { left: false, right: false }));
         } else {
           const zpx = "0px";
 
           set(fspan, zpx);
           set(lspan, zpx);
 
-          if (mspans.length)
-            mspans.forEach((s) => set(s, zpx, { left: false, right: false }));
+          if (mspans.length) mspans.forEach((s) => set(s, zpx, { left: false, right: false }));
         }
       }
     },

@@ -47,9 +47,7 @@ export class HtxTextBox extends React.Component {
     const el = e?.target;
     const isShortcut = el?.dataset?.shortcut;
     const shouldSkip =
-      !this.state.editing ||
-      (this.props.ignoreShortcuts && isShortcut) ||
-      el === this.inputRef.current;
+      !this.state.editing || (this.props.ignoreShortcuts && isShortcut) || el === this.inputRef.current;
 
     if (!shouldSkip) {
       this.setEditing(false);
@@ -156,17 +154,11 @@ export class HtxTextBox extends React.Component {
     this.updateHeight();
 
     return (
-      <Paragraph
-        {...props}
-        className={`${className} ant-typography-edit-content ${styles.editing}`}
-      >
+      <Paragraph {...props} className={`${className} ant-typography-edit-content ${styles.editing}`}>
         {rows > 1 ? <textarea {...inputProps} /> : <input {...inputProps} />}
         {!onlyEdit && (
           <Tooltip title="Save: [shift+enter]">
-            <EnterOutlined
-              className={`ant-typography-edit-content-confirm ${styles.enter}`}
-              onClick={this.save}
-            />
+            <EnterOutlined className={`ant-typography-edit-content-confirm ${styles.enter}`} onClick={this.save} />
           </Tooltip>
         )}
       </Paragraph>
@@ -193,27 +185,17 @@ export class HtxTextBox extends React.Component {
         <Paragraph {...props}>
           <span ref={this.textRef}>{text}</span>
           {isEditable && onChange && (
-            <EditOutlined
-              onClick={this.startEditing}
-              aria-label="Edit Region"
-              className="ant-typography-edit"
-            />
+            <EditOutlined onClick={this.startEditing} aria-label="Edit Region" className="ant-typography-edit" />
           )}
         </Paragraph>
         {isDeleteable && onDelete && (
-          <DeleteOutlined
-            className={styles.delete}
-            aria-label="Delete Region"
-            onClick={onDelete}
-          />
+          <DeleteOutlined className={styles.delete} aria-label="Delete Region" onClick={onDelete} />
         )}
       </>
     );
   }
 
   render() {
-    return (this.state.editing || this.props.onlyEdit) && this.props.isEditable
-      ? this.renderEdit()
-      : this.renderView();
+    return (this.state.editing || this.props.onlyEdit) && this.props.isEditable ? this.renderEdit() : this.renderView();
   }
 }

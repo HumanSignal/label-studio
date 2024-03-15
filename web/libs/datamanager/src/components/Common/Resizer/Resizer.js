@@ -43,13 +43,7 @@ export const Resizer = ({
 
       /** @param {MouseEvent} evt */
       const onResize = (evt) => {
-        newWidth = calculateWidth(
-          width,
-          minWidth,
-          maxWidth,
-          initialX,
-          evt.pageX,
-        );
+        newWidth = calculateWidth(width, minWidth, maxWidth, initialX, evt.pageX);
 
         setWidth(newWidth);
         onResizeCallback?.(newWidth);
@@ -60,13 +54,7 @@ export const Resizer = ({
         document.removeEventListener("mouseup", stopResize);
         document.body.style.removeProperty("user-select");
 
-        newWidth = calculateWidth(
-          width,
-          minWidth,
-          maxWidth,
-          initialX,
-          evt.pageX,
-        );
+        newWidth = calculateWidth(width, minWidth, maxWidth, initialX, evt.pageX);
 
         setIsResizing(false);
 

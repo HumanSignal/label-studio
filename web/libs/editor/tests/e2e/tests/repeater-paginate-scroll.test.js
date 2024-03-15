@@ -108,11 +108,7 @@ const annotations = [
 ];
 
 const checkScrollToSelectedPersists = (I, label, outliner) => {
-  I.click(
-    locate(`.lsf-${outliner ? "outliner" : "region"}-item__title`).withText(
-      label,
-    ),
-  );
+  I.click(locate(`.lsf-${outliner ? "outliner" : "region"}-item__title`).withText(label));
   I.waitForVisible(locate(".lsf-label_selected").withText(label));
 };
 
@@ -139,86 +135,74 @@ const checkSubmit = (I) => {
   I.seeAnnotationSubmitted();
 };
 
-Scenario(
-  "Outliner Regions will paginate view window on region click and page advance",
-  async ({ I, LabelStudio }) => {
-    const params = { config: configPagination, annotations, data };
+Scenario("Outliner Regions will paginate view window on region click and page advance", async ({ I, LabelStudio }) => {
+  const params = { config: configPagination, annotations, data };
 
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags({
-      ff_front_1170_outliner_030222_short: true,
-    });
-    I.executeScript(initLabelStudio, params);
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags({
+    ff_front_1170_outliner_030222_short: true,
+  });
+  I.executeScript(initLabelStudio, params);
 
-    annotations[0].result.forEach((result) => {
-      const label = result.value?.rectanglelabels[0];
+  annotations[0].result.forEach((result) => {
+    const label = result.value?.rectanglelabels[0];
 
-      checkPaginateToSelectedPersists(I, label, result.page, true);
-    });
+    checkPaginateToSelectedPersists(I, label, result.page, true);
+  });
 
-    checkPaginationButtons(I);
-    checkSubmit(I);
-  },
-);
+  checkPaginationButtons(I);
+  checkSubmit(I);
+});
 
-Scenario(
-  "Regions will paginate view window on region click and page advance",
-  async ({ I, LabelStudio }) => {
-    const params = { config: configPagination, annotations, data };
+Scenario("Regions will paginate view window on region click and page advance", async ({ I, LabelStudio }) => {
+  const params = { config: configPagination, annotations, data };
 
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags({
-      ff_front_1170_outliner_030222_short: false,
-    });
-    I.executeScript(initLabelStudio, params);
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags({
+    ff_front_1170_outliner_030222_short: false,
+  });
+  I.executeScript(initLabelStudio, params);
 
-    annotations[0].result.forEach((result) => {
-      const label = result.value?.rectanglelabels[0];
+  annotations[0].result.forEach((result) => {
+    const label = result.value?.rectanglelabels[0];
 
-      checkPaginateToSelectedPersists(I, label, result.page, false);
-    });
+    checkPaginateToSelectedPersists(I, label, result.page, false);
+  });
 
-    checkPaginationButtons(I);
-    checkSubmit(I);
-  },
-);
+  checkPaginationButtons(I);
+  checkSubmit(I);
+});
 
-Scenario(
-  "Outliner Regions will scroll view window on region click",
-  async ({ I, LabelStudio }) => {
-    const params = { config: configScroll, annotations, data };
+Scenario("Outliner Regions will scroll view window on region click", async ({ I, LabelStudio }) => {
+  const params = { config: configScroll, annotations, data };
 
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags({
-      ff_front_1170_outliner_030222_short: true,
-    });
-    I.executeScript(initLabelStudio, params);
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags({
+    ff_front_1170_outliner_030222_short: true,
+  });
+  I.executeScript(initLabelStudio, params);
 
-    annotations[0].result.forEach((result) => {
-      const label = result.value?.rectanglelabels[0];
+  annotations[0].result.forEach((result) => {
+    const label = result.value?.rectanglelabels[0];
 
-      checkScrollToSelectedPersists(I, label, true);
-    });
-    checkSubmit(I);
-  },
-);
+    checkScrollToSelectedPersists(I, label, true);
+  });
+  checkSubmit(I);
+});
 
-Scenario(
-  "Regions will scroll view window on region click",
-  async ({ I, LabelStudio }) => {
-    const params = { config: configScroll, annotations, data };
+Scenario("Regions will scroll view window on region click", async ({ I, LabelStudio }) => {
+  const params = { config: configScroll, annotations, data };
 
-    I.amOnPage("/");
-    LabelStudio.setFeatureFlags({
-      ff_front_1170_outliner_030222_short: false,
-    });
-    I.executeScript(initLabelStudio, params);
+  I.amOnPage("/");
+  LabelStudio.setFeatureFlags({
+    ff_front_1170_outliner_030222_short: false,
+  });
+  I.executeScript(initLabelStudio, params);
 
-    annotations[0].result.forEach((result) => {
-      const label = result.value?.rectanglelabels[0];
+  annotations[0].result.forEach((result) => {
+    const label = result.value?.rectanglelabels[0];
 
-      checkScrollToSelectedPersists(I, label, false);
-    });
-    checkSubmit(I);
-  },
-);
+    checkScrollToSelectedPersists(I, label, false);
+  });
+  checkSubmit(I);
+});

@@ -99,9 +99,7 @@ const Model = types
     },
 
     requiredModal() {
-      InfoModal.warning(
-        self.requiredmessage || `Rating "${self.name}" is required.`,
-      );
+      InfoModal.warning(self.requiredmessage || `Rating "${self.name}" is required.`);
     },
 
     increaseValue() {
@@ -170,9 +168,9 @@ const HtxRating = inject("store")(
           defaultValue={Number(item.defaultvalue)}
           onChange={item.setRating}
         />
-        {store.settings.enableTooltips &&
-          store.settings.enableHotkeys &&
-          item.hotkey && <sup style={{ fontSize: "9px" }}>[{item.hotkey}]</sup>}
+        {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && (
+          <sup style={{ fontSize: "9px" }}>[{item.hotkey}]</sup>
+        )}
       </div>
     );
   }),

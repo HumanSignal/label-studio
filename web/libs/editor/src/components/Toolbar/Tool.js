@@ -111,10 +111,7 @@ export const Tool = ({
     return smart && extra ? <Elem name="extra">{extra}</Elem> : null;
   }, [smart, extra]);
 
-  const showControls =
-    dynamic === false &&
-    controls?.length &&
-    (active || (controlsOnHover && hovered));
+  const showControls = dynamic === false && controls?.length && (active || (controlsOnHover && hovered));
   const isAnnotationDrawing = tool?.annotation?.isDrawing;
   const isDisabled = disabled || isAnnotationDrawing;
 

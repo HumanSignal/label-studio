@@ -24,10 +24,7 @@ export const Toolbar = injector(
                 const Instrument = store.SDK.getInstrument(instrument);
 
                 return Instrument ? (
-                  <Instrument
-                    key={`instrument-${instrument}-${i}`}
-                    size={isNewUI ? "large" : "medium"}
-                  />
+                  <Instrument key={`instrument-${instrument}-${i}`} size={isNewUI ? "large" : "medium"} />
                 ) : null;
               })}
             </Space>

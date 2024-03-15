@@ -103,9 +103,7 @@ const RegionEditorComponent: FC<RegionEditorProps> = ({ region }) => {
 
   return (
     <Block name="region-editor" mod={{ disabled: region.isReadOnly() }}>
-      {isAudioModel && isFF(FF_DEV_2715)
-        ? renderAudioTimeControls()
-        : renderRegionProperty()}
+      {isAudioModel && isFF(FF_DEV_2715) ? renderAudioTimeControls() : renderRegionProperty()}
     </Block>
   );
 };
@@ -116,11 +114,7 @@ interface RegionPropertyProps {
   region: any;
 }
 
-const RegionProperty: FC<RegionPropertyProps> = ({
-  property,
-  label,
-  region,
-}) => {
+const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) => {
   const block = useBEM();
   const [value, setValue] = useState(region.getProperty(property));
 
@@ -142,16 +136,10 @@ const RegionProperty: FC<RegionPropertyProps> = ({
 
     if (isEnum) {
       const isOptional = isOptionalType(propertyType) as boolean;
-      const valuesList = isOptional
-        ? propertyType.getSubTypes().getSubTypes()
-        : propertyType.getSubTypes();
-      const hasOptions = valuesList.some(
-        (t: any) => isLiteralType(t) || isPrimitiveType(t),
-      );
+      const valuesList = isOptional ? propertyType.getSubTypes().getSubTypes() : propertyType.getSubTypes();
+      const hasOptions = valuesList.some((t: any) => isLiteralType(t) || isPrimitiveType(t));
 
-      result = hasOptions
-        ? (valuesList as any[]).map((t: any) => t.value)
-        : null;
+      result = hasOptions ? (valuesList as any[]).map((t: any) => t.value) : null;
     }
 
     return result;
@@ -160,9 +148,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({
   const isBoolean = useMemo(() => {
     if (!isPrimitive) return false;
 
-    const coreType = isOptionalType(propertyType)
-      ? propertyType.getSubTypes()
-      : propertyType;
+    const coreType = isOptionalType(propertyType) ? propertyType.getSubTypes() : propertyType;
 
     return coreType === types.boolean;
   }, [propertyType, isPrimitive]);
@@ -181,14 +167,9 @@ const RegionProperty: FC<RegionPropertyProps> = ({
   );
 
   useEffect(() => {
-    const cancelObserve = observe(
-      region,
-      property,
-      ({ newValue, oldValue }) => {
-        if (oldValue.storedValue !== newValue.storedValue)
-          setValue(newValue.storedValue);
-      },
-    );
+    const cancelObserve = observe(region, property, ({ newValue, oldValue }) => {
+      if (oldValue.storedValue !== newValue.storedValue) setValue(newValue.storedValue);
+    });
 
     return () => cancelObserve();
   }, [region]);
@@ -232,13 +213,7 @@ interface RegionInputProps extends InputHTMLAttributes<HTMLInputElement> {
   onChange?: (newValue: any) => void;
 }
 
-const RegionInput: FC<RegionInputProps> = ({
-  onChange: onChangeValue,
-  type,
-  value,
-  step,
-  ...props
-}) => {
+const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, value, step, ...props }) => {
   const block = useBEM();
   const [currentValue, setValue] = useState(value);
 
@@ -284,8 +259,7 @@ const RegionInput: FC<RegionInputProps> = ({
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         e.preventDefault();
 
-        const step =
-          e.altKey && e.shiftKey ? 0.01 : e.shiftKey ? 10 : e.altKey ? 0.1 : 1;
+        const step = e.altKey && e.shiftKey ? 0.01 : e.shiftKey ? 10 : e.altKey ? 0.1 : 1;
         let newValue = Number(currentValue);
 
         if (e.key === "ArrowUp") {

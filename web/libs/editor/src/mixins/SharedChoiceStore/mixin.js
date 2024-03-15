@@ -22,10 +22,7 @@ const SharedStoreID = types.optional(types.maybeNull(types.string), null);
 /**
  * Defines the Store model referenced from the Annotation Store
  */
-const Store = types.optional(
-  types.maybeNull(types.late(() => types.reference(SharedStoreModel))),
-  null,
-);
+const Store = types.optional(types.maybeNull(types.late(() => types.reference(SharedStoreModel))), null);
 
 /**
  * SharedStoreMixin, when injected into the model, provides an AnnotationStore level shared storages to
@@ -78,10 +75,7 @@ export const SharedStoreMixin = types
     afterCreate() {
       if (!self.store) {
         const store = Stores.get(self.storeId);
-        const annotationStore = Types.getParentOfTypeString(
-          self,
-          "AnnotationStore",
-        );
+        const annotationStore = Types.getParentOfTypeString(self, "AnnotationStore");
 
         annotationStore.addSharedStore(store);
         StoreIds.add(self.storeId);

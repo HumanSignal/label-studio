@@ -10,25 +10,12 @@ const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", /[0-9]/];
 
 const CounterContext = React.createContext(null);
 
-const Counter = ({
-  label,
-  className,
-  validate,
-  required,
-  skip,
-  labelProps,
-  ...props
-}) => {
-  const [min, max] = [
-    props.min ?? Number.NEGATIVE_INFINITY,
-    props.max ?? Number.POSITIVE_INFINITY,
-  ];
+const Counter = ({ label, className, validate, required, skip, labelProps, ...props }) => {
+  const [min, max] = [props.min ?? Number.NEGATIVE_INFINITY, props.max ?? Number.POSITIVE_INFINITY];
 
   const normalizeValue = (value) => Math.max(min, Math.min(max, value));
 
-  const [currentValue, setCurrentValue] = React.useState(
-    normalizeValue(props.value ?? 0),
-  );
+  const [currentValue, setCurrentValue] = React.useState(normalizeValue(props.value ?? 0));
   const [focused, setFocused] = React.useState(props.autofocus ?? false);
   const [disabled, setDisabled] = React.useState(props.disabled ?? null);
 
@@ -46,9 +33,7 @@ const Counter = ({
 
   /**@type {(e: import('react').SyntheticEvent<HTMLInputElement, KeyboardEvent>)} */
   const onInputHandler = (e) => {
-    const allowedKey = allowedKeys.find((k) =>
-      k instanceof RegExp ? k.test(e.key) : k === e.key,
-    );
+    const allowedKey = allowedKeys.find((k) => (k instanceof RegExp ? k.test(e.key) : k === e.key));
 
     if (!allowedKey && !e.metaKey) e.preventDefault();
 
@@ -114,8 +99,7 @@ const Counter = ({
       {...props}
     >
       {(ref, dep) => {
-        const depDisabled =
-          (dep?.type === "checkbox" && dep?.checked === false) || false;
+        const depDisabled = (dep?.type === "checkbox" && dep?.checked === false) || false;
         const fieldDisabled = disabled ?? depDisabled;
         const contextValue = {
           currentValue,
@@ -128,11 +112,7 @@ const Counter = ({
 
         return (
           <CounterContext.Provider value={contextValue}>
-            <Block
-              name="counter"
-              mod={{ focused, disabled: fieldDisabled }}
-              mix={className}
-            >
+            <Block name="counter" mod={{ focused, disabled: fieldDisabled }} mix={className}>
               <CounterButton type="decrease" />
 
               <Elem
@@ -157,21 +137,11 @@ const Counter = ({
     </FormField>
   );
 
-  return label ? (
-    <Label
-      {...(labelProps ?? {})}
-      text={label}
-      required={required}
-      children={field}
-    />
-  ) : (
-    field
-  );
+  return label ? <Label {...(labelProps ?? {})} text={label} required={required} children={field} /> : field;
 };
 
 const CounterButton = ({ type }) => {
-  const { currentValue, min, max, disabled, ref, onClickHandler } =
-    React.useContext(CounterContext);
+  const { currentValue, min, max, disabled, ref, onClickHandler } = React.useContext(CounterContext);
 
   const compareLimit = type === "increase" ? max : min;
 

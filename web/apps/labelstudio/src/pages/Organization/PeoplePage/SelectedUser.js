@@ -68,8 +68,7 @@ export const SelectedUser = ({ user, onClose }) => {
       )}
 
       <Elem tag="p" name="last-active">
-        Last activity on:{" "}
-        {format(new Date(user.last_activity), "dd MMM yyyy, KK:mm a")}
+        Last activity on: {format(new Date(user.last_activity), "dd MMM yyyy, KK:mm a")}
       </Elem>
     </Block>
   );

@@ -138,16 +138,12 @@ const getTypeDescription = (type, withNullType = true) => {
 const flattenTree = (tree, parent, parentParentTypes, result) => {
   if (!tree.children) return [];
 
-  const children =
-    tree.type === "pagedview" ? tree.children.slice(0, 1) : tree.children;
+  const children = tree.type === "pagedview" ? tree.children.slice(0, 1) : tree.children;
 
   for (const child of children) {
     /* Create a child without children and
     assign id of the parent for quick mathcing */
-    const parentTypes = [
-      ...parentParentTypes,
-      ...(parent?.type ? [parent?.type] : []),
-    ];
+    const parentTypes = [...parentParentTypes, ...(parent?.type ? [parent?.type] : [])];
     const flatChild = { ...child, parent: parent?.id ?? null, parentTypes };
 
     flatChild.children = undefined;
@@ -202,12 +198,7 @@ const validateToNameTag = (element, model, flatTree) => {
     }
 
     if (controlledTags?.validate(controlledTag.tagName).length) {
-      return errorBuilder.tagUnsupported(
-        model.name,
-        "toname",
-        controlledTag.tagName,
-        controlledTags,
-      );
+      return errorBuilder.tagUnsupported(model.name, "toname", controlledTag.tagName, controlledTags);
     }
   }
 
@@ -232,12 +223,7 @@ const validateParentTag = (element, model) => {
   ) {
     return null;
   }
-  return errorBuilder.parentTagUnexpected(
-    model.name,
-    "parent",
-    element.tagName,
-    model.properties.parentTypes,
-  );
+  return errorBuilder.parentTagUnexpected(model.name, "parent", element.tagName, model.properties.parentTypes);
 };
 
 /**
@@ -259,9 +245,7 @@ const validateAttributes = (child, model, fieldsToSkip) => {
 
     if (mstValidationResult.length === 0) continue;
 
-    result.push(
-      errorBuilder.badAttributeValueType(model.name, key, value, modelProperty),
-    );
+    result.push(errorBuilder.badAttributeValueType(model.name, key, value, modelProperty));
   }
 
   return result;
@@ -304,14 +288,7 @@ export class ConfigValidator {
     const flatTree = [];
 
     flattenTree(root, null, [], flatTree);
-    const propertiesToSkip = [
-      "id",
-      "children",
-      "name",
-      "toname",
-      "controlledTags",
-      "parentTypes",
-    ];
+    const propertiesToSkip = ["id", "children", "name", "toname", "controlledTags", "parentTypes"];
     const validationResult = [];
 
     for (const child of flatTree) {
@@ -334,13 +311,9 @@ export class ConfigValidator {
 
         validationResult.push(...validatePerRegion(child));
 
-        validationResult.push(
-          ...validateAttributes(child, model, propertiesToSkip),
-        );
+        validationResult.push(...validateAttributes(child, model, propertiesToSkip));
       } catch (e) {
-        validationResult.push(
-          errorBuilder.unknownTag(child.type, child.name, child.type),
-        );
+        validationResult.push(errorBuilder.unknownTag(child.type, child.name, child.type));
       }
     }
 

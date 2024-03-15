@@ -12,19 +12,14 @@ const PerItemMixin = types
   .extend((self) => {
     /* Validation */
     if (self.isClassificationTag !== true) {
-      throw new Error(
-        "The PerItemMixin mixin should be used only for classification control-tags",
-      );
+      throw new Error("The PerItemMixin mixin should be used only for classification control-tags");
     }
     return {};
   })
   .views((self) => ({
     get _perItemResult() {
       return self.annotation.results.find((r) => {
-        return (
-          r.from_name === self &&
-          r.area.item_index === self.toNameTag.currentItemIndex
-        );
+        return r.from_name === self && r.area.item_index === self.toNameTag.currentItemIndex;
       });
     },
   }))

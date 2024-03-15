@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { shallowEqualObjects } from "shallow-equal";
 import { ApiProvider } from "../../providers/ApiProvider";
 import { MultiProvider } from "../../providers/MultiProvider";
@@ -57,10 +51,7 @@ export default class Form extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const equal = shallowEqualObjects(
-      prevProps.formData ?? {},
-      this.props.formData ?? {},
-    );
+    const equal = shallowEqualObjects(prevProps.formData ?? {}, this.props.formData ?? {});
 
     if (!equal) {
       this.fillFormData();
@@ -70,22 +61,10 @@ export default class Form extends React.Component {
   render() {
     const providers = [
       <FormContext.Provider key="form-ctx" value={this} />,
-      <FormValidationContext.Provider
-        key="form-validation-ctx"
-        value={this.state.validation}
-      />,
-      <FormSubmissionContext.Provider
-        key="form-submission-ctx"
-        value={this.state.submitting}
-      />,
-      <FormStateContext.Provider
-        key="form-state-ctx"
-        value={this.state.state}
-      />,
-      <FormResponseContext.Provider
-        key="form-response"
-        value={this.state.lastResponse}
-      />,
+      <FormValidationContext.Provider key="form-validation-ctx" value={this.state.validation} />,
+      <FormSubmissionContext.Provider key="form-submission-ctx" value={this.state.submitting} />,
+      <FormStateContext.Provider key="form-state-ctx" value={this.state.state} />,
+      <FormResponseContext.Provider key="form-response" value={this.state.lastResponse} />,
       <ApiProvider key="form-api" ref={this.apiRef} />,
     ];
 
@@ -168,9 +147,7 @@ export default class Form extends React.Component {
     }
   };
 
-  onAutoSubmit = this.props.debounce
-    ? debounce(this._onAutoSubmit, this.props.debounce)
-    : this._onAutoSubmit;
+  onAutoSubmit = this.props.debounce ? debounce(this._onAutoSubmit, this.props.debounce) : this._onAutoSubmit;
 
   onFormChanged = async (e) => {
     e.stopPropagation();
@@ -188,58 +165,40 @@ export default class Form extends React.Component {
     }
   }
 
-  assembleFormData({
-    asJSON = false,
-    full = false,
-    booleansAsNumbers = false,
-    fieldsFilter,
-  } = {}) {
+  assembleFormData({ asJSON = false, full = false, booleansAsNumbers = false, fieldsFilter } = {}) {
     let fields = Array.from(this.fields);
 
     if (fieldsFilter instanceof Function) {
       fields = fields.filter(fieldsFilter);
     }
 
-    const requestBody = fields.reduce(
-      (res, { name, field, skip, allowEmpty, isProtected }) => {
-        const skipProtected =
-          isProtected && field.value === PASSWORD_PROTECTED_VALUE;
-        const skipField =
-          skip ||
-          skipProtected ||
-          ((this.props.skipEmpty || allowEmpty === false) && !field.value);
+    const requestBody = fields.reduce((res, { name, field, skip, allowEmpty, isProtected }) => {
+      const skipProtected = isProtected && field.value === PASSWORD_PROTECTED_VALUE;
+      const skipField = skip || skipProtected || ((this.props.skipEmpty || allowEmpty === false) && !field.value);
 
-        if (full === true || !skipField) {
-          const value = (() => {
-            const inputValue = field.value;
+      if (full === true || !skipField) {
+        const value = (() => {
+          const inputValue = field.value;
 
-            if (["checkbox", "radio"].includes(field.type)) {
-              if (
-                isDefined(inputValue) &&
-                !["", "on", "off", "true", "false"].includes(inputValue)
-              ) {
-                return field.checked ? inputValue : null;
-              }
-
-              return booleansAsNumbers ? Number(field.checked) : field.checked;
+          if (["checkbox", "radio"].includes(field.type)) {
+            if (isDefined(inputValue) && !["", "on", "off", "true", "false"].includes(inputValue)) {
+              return field.checked ? inputValue : null;
             }
 
-            return inputValue;
-          })();
+            return booleansAsNumbers ? Number(field.checked) : field.checked;
+          }
 
-          if (value !== null) res.push([name, value]);
-        }
+          return inputValue;
+        })();
 
-        return res;
-      },
-      [],
-    );
+        if (value !== null) res.push([name, value]);
+      }
+
+      return res;
+    }, []);
 
     if (asJSON) {
-      return requestBody.reduce(
-        (res, [key, value]) => ({ ...res, [key]: value }),
-        {},
-      );
+      return requestBody.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
     }
     const formData = new FormData();
 
@@ -384,11 +343,7 @@ export default class Form extends React.Component {
 
     if (field.isProtected && this.props.formData) {
       field.setValue(PASSWORD_PROTECTED_VALUE);
-    } else if (
-      isDefined(value) &&
-      field.value !== value &&
-      !field.skipAutofill
-    ) {
+    } else if (isDefined(value) && field.value !== value && !field.skipAutofill) {
       field.setValue(value);
     }
   }
@@ -400,11 +355,7 @@ const ValidationRenderer = ({ validation }) => {
   return (
     <div className={rootClass}>
       {Array.from(validation).map(([name, result]) => (
-        <div
-          key={name}
-          className={rootClass.elem("group")}
-          onClick={() => result.field.focus()}
-        >
+        <div key={name} className={rootClass.elem("group")} onClick={() => result.field.focus()}>
           <div className={rootClass.elem("field")}>{result.label}</div>
 
           <div className={rootClass.elem("messages")}>
@@ -429,10 +380,7 @@ Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   if (rowGap) styles["--row-gap"] = rowGap;
 
   return (
-    <div
-      className={cn("form").elem("row").mod({ spread })}
-      style={{ ...(style ?? {}), ...styles }}
-    >
+    <div className={cn("form").elem("row").mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
@@ -462,13 +410,10 @@ Form.Builder = React.forwardRef(
         if (!field) return <div key={`spacer-${index}`} />;
 
         const currentValue = formData?.[field.name] ?? undefined;
-        const triggerUpdate =
-          props.autosubmit !== true && field.trigger_form_update === true;
+        const triggerUpdate = props.autosubmit !== true && field.trigger_form_update === true;
         const getValue = () => {
           const isProtected =
-            field.skipAutofill &&
-            (!field.allowEmpty || field.protectedValue) &&
-            field.type === "password";
+            field.skipAutofill && (!field.allowEmpty || field.protectedValue) && field.type === "password";
 
           if (isProtected) {
             return PASSWORD_PROTECTED_VALUE;
@@ -514,23 +459,13 @@ Form.Builder = React.forwardRef(
           commonProps.defaultValue = getValue();
         }
 
-        return (
-          <InputComponent
-            key={field.name ?? index}
-            {...field}
-            {...commonProps}
-          />
-        );
+        return <InputComponent key={field.name ?? index} {...field} {...commonProps} />;
       });
     };
 
     const renderColumns = (columns) => {
       return columns.map((col, index) => (
-        <div
-          className={cn("form").elem("column")}
-          key={index}
-          style={{ width: col.width }}
-        >
+        <div className={cn("form").elem("column")} key={index} style={{ width: col.width }}>
           {renderFields(col.fields)}
         </div>
       ));
@@ -580,12 +515,7 @@ Form.Builder = React.forwardRef(
     return (
       <Form {...props} onSubmit={handleOnSubmit} ref={formRef}>
         {(fields ?? []).map(({ columnCount, fields, columns }, index) => (
-          <Form.Row
-            key={index}
-            columnCount={columnCount}
-            style={formRowStyle}
-            spread
-          >
+          <Form.Row key={index} columnCount={columnCount} style={formRowStyle} spread>
             {columns ? renderColumns(columns) : renderFields(fields)}
           </Form.Row>
         ))}

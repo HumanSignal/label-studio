@@ -328,20 +328,13 @@ const MagicWand = (() => {
 
     // walk through points on the boundary of the image if necessary
     // if the "black" point is adjacent to the boundary of the image, it is a border point
-    if (minX === 0)
-      for (y = minY; y < maxY + 1; y++)
-        if (data[y * w] === 1) border.push(y * w);
+    if (minX === 0) for (y = minY; y < maxY + 1; y++) if (data[y * w] === 1) border.push(y * w);
 
-    if (maxX === w - 1)
-      for (y = minY; y < maxY + 1; y++)
-        if (data[y * w + maxX] === 1) border.push(y * w + maxX);
+    if (maxX === w - 1) for (y = minY; y < maxY + 1; y++) if (data[y * w + maxX] === 1) border.push(y * w + maxX);
 
-    if (minY === 0)
-      for (x = minX; x < maxX + 1; x++) if (data[x] === 1) border.push(x);
+    if (minY === 0) for (x = minX; x < maxX + 1; x++) if (data[x] === 1) border.push(x);
 
-    if (maxY === h - 1)
-      for (x = minX; x < maxX + 1; x++)
-        if (data[maxY * w + x] === 1) border.push(maxY * w + x);
+    if (maxY === h - 1) for (x = minX; x < maxX + 1; x++) if (data[maxY * w + x] === 1) border.push(maxY * w + x);
 
     const result = []; // border points with radius-neighbors
     let start;
@@ -544,22 +537,15 @@ const MagicWand = (() => {
 
     // walk through points on the boundary of the image if necessary
     // if the "black" point is adjacent to the boundary of the image, it is a border point
-    if (minX === 0)
-      for (y = minY; y < maxY + 1; y++)
-        if (data[y * w] === 1) result[(y - minY) * rw] = 1;
+    if (minX === 0) for (y = minY; y < maxY + 1; y++) if (data[y * w] === 1) result[(y - minY) * rw] = 1;
 
     if (maxX === w - 1)
-      for (y = minY; y < maxY + 1; y++)
-        if (data[y * w + maxX] === 1)
-          result[(y - minY) * rw + (maxX - minX)] = 1;
+      for (y = minY; y < maxY + 1; y++) if (data[y * w + maxX] === 1) result[(y - minY) * rw + (maxX - minX)] = 1;
 
-    if (minY === 0)
-      for (x = minX; x < maxX + 1; x++) if (data[x] === 1) result[x - minX] = 1;
+    if (minY === 0) for (x = minX; x < maxX + 1; x++) if (data[x] === 1) result[x - minX] = 1;
 
     if (maxY === h - 1)
-      for (x = minX; x < maxX + 1; x++)
-        if (data[maxY * w + x] === 1)
-          result[(maxY - minY) * rw + (x - minX)] = 1;
+      for (x = minX; x < maxX + 1; x++) if (data[maxY * w + x] === 1) result[(maxY - minY) * rw + (x - minX)] = 1;
 
     return {
       data: result,
@@ -646,8 +632,7 @@ const MagicWand = (() => {
     // walk through inner values and copy only "black" points to the result mask
     for (y = minY; y < maxY + 1; y++)
       for (x = minX; x < maxX + 1; x++) {
-        if (data[y * w + x] === 1)
-          result[(y - minY + 1) * rw + (x - minX + 1)] = 1;
+        if (data[y * w + x] === 1) result[(y - minY + 1) * rw + (x - minX + 1)] = 1;
       }
 
     return {
@@ -864,10 +849,7 @@ const MagicWand = (() => {
           r12 = Math.sqrt(dx * dx + dy * dy);
           if (r1 >= Math.sqrt(r2 * r2 + r12 * r12)) dist = r2;
           else if (r2 >= Math.sqrt(r1 * r1 + r12 * r12)) dist = r1;
-          else
-            dist = Math.abs(
-              (dy * pi.x - dx * pi.y + pf.x * pl.y - pl.x * pf.y) / r12,
-            );
+          else dist = Math.abs((dy * pi.x - dx * pi.y + pf.x * pl.y - pl.x * pf.y) / r12);
 
           if (dist > maxd) {
             maxi = i; // save the index of maximally distant point
@@ -958,19 +940,7 @@ function paint(ctx, w, h, mask, color, alpha) {
  *  it can save some performance time.
  * @returns The mask as {Uint8Array} data, {int} width, {int} height, {Object} bounds.
  */
-export function drawMask(
-  imageData,
-  ctx,
-  width,
-  height,
-  x,
-  y,
-  threshold,
-  color,
-  alpha,
-  blurRadius,
-  doPaint,
-) {
+export function drawMask(imageData, ctx, width, height, x, y, threshold, color, alpha, blurRadius, doPaint) {
   const image = {
     data: imageData.data,
     width,
@@ -980,8 +950,7 @@ export function drawMask(
   const existingMask = null;
   let mask = MagicWand.floodFill(image, x, y, threshold, existingMask);
 
-  if (mask)
-    mask = MagicWand.gaussBlurOnlyBorder(mask, blurRadius, existingMask);
+  if (mask) mask = MagicWand.gaussBlurOnlyBorder(mask, blurRadius, existingMask);
   if (doPaint) paint(ctx, width, height, mask, color, alpha);
 
   return mask;

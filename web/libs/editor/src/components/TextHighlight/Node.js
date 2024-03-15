@@ -4,16 +4,7 @@ import React from "react";
 import Utils from "../../utils";
 import TextNode from "../TextNode/TextNode";
 
-const HtxTextNodeView = ({
-  store,
-  range,
-  id,
-  highlightStyle,
-  style,
-  charIndex,
-  children,
-  overlap,
-}) => {
+const HtxTextNodeView = ({ store, range, id, highlightStyle, style, charIndex, children, overlap }) => {
   const getStyle = (range) => (range ? highlightStyle : style);
   const getRangeKey = () => `${id}-${range.start}-${charIndex}`;
   const getNormalKey = () => `${id}-${charIndex}`;

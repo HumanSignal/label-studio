@@ -1,12 +1,7 @@
 import { nanoid } from "nanoid";
 import { type RgbaColorArray, rgba } from "../Common/Color";
 import { Events } from "../Common/Events";
-import {
-  getCursorPositionX,
-  getCursorPositionY,
-  getOffsetLeft,
-  getOffsetTop,
-} from "../Common/Utils";
+import { getCursorPositionX, getCursorPositionY, getOffsetLeft, getOffsetTop } from "../Common/Utils";
 import type { Visualizer } from "../Visual/Visualizer";
 
 interface CursorEvents {

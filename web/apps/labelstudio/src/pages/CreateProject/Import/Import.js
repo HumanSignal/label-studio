@@ -65,11 +65,7 @@ function getFiles(files) {
 
     Promise.all(entries.map(traverseFileTree))
       .then(flatten)
-      .then((fileEntries) =>
-        fileEntries.map(
-          (fileEntry) => new Promise((res) => fileEntry.file(res)),
-        ),
-      )
+      .then((fileEntries) => fileEntries.map((fileEntry) => new Promise((res) => fileEntry.file(res))))
       .then((filePromises) => Promise.all(filePromises))
       .then(resolve);
   });
@@ -78,25 +74,13 @@ function getFiles(files) {
 const Footer = () => {
   return (
     <Modal.Footer>
-      <IconInfo
-        className={importClass.elem("info-icon")}
-        width="20"
-        height="20"
-      />
+      <IconInfo className={importClass.elem("info-icon")} width="20" height="20" />
       See the&nbsp;documentation to{" "}
-      <a
-        target="_blank"
-        href="https://labelstud.io/guide/predictions.html"
-        rel="noreferrer"
-      >
+      <a target="_blank" href="https://labelstud.io/guide/predictions.html" rel="noreferrer">
         import preannotated data
       </a>{" "}
       or&nbsp;to{" "}
-      <a
-        target="_blank"
-        href="https://labelstud.io/guide/storage.html"
-        rel="noreferrer"
-      >
+      <a target="_blank" href="https://labelstud.io/guide/storage.html" rel="noreferrer">
         sync data from a&nbsp;database or&nbsp;cloud storage
       </a>
       .
@@ -189,10 +173,7 @@ export const ImportPage = ({
     if (action.uploaded) {
       return {
         ...state,
-        uploaded: unique(
-          [...state.uploaded, ...action.uploaded],
-          (a, b) => a.id === b.id,
-        ),
+        uploaded: unique([...state.uploaded, ...action.uploaded], (a, b) => a.id === b.id),
       };
     }
     if (action.ids) {
@@ -299,9 +280,7 @@ export const ImportPage = ({
 
       for (const f of files) {
         if (!allSupportedExtensions.includes(getFileExtension(f.name))) {
-          onError(
-            new Error(`The filetype of file "${f.name}" is not supported.`),
-          );
+          onError(new Error(`The filetype of file "${f.name}" is not supported.`));
           return;
         }
         fd.append(f.name, f);
@@ -343,10 +322,7 @@ export const ImportPage = ({
       loadFilesList().then((files) => {
         if (csvHandling) return;
         // empirical guess on start if we have some possible tasks list/time series problem
-        if (
-          Array.isArray(files) &&
-          files.some(({ file }) => /\.[ct]sv$/.test(file))
-        ) {
+        if (Array.isArray(files) && files.some(({ file }) => /\.[ct]sv$/.test(file))) {
           setCsvHandling("choose");
         }
       });
@@ -366,24 +342,11 @@ export const ImportPage = ({
 
   return (
     <div className={importClass}>
-      {highlightCsvHandling && (
-        <div className={importClass.elem("csv-splash")} />
-      )}
-      <input
-        id="file-input"
-        type="file"
-        name="file"
-        multiple
-        onChange={onUpload}
-        style={{ display: "none" }}
-      />
+      {highlightCsvHandling && <div className={importClass.elem("csv-splash")} />}
+      <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }} />
 
       <header>
-        <form
-          className={`${importClass.elem("url-form")} inline`}
-          method="POST"
-          onSubmit={onLoadURL}
-        >
+        <form className={`${importClass.elem("url-form")} inline`} method="POST" onSubmit={onLoadURL}>
           <input placeholder="Dataset URL" name="url" ref={urlRef} />
           <button type="submit">Add URL</button>
         </form>
@@ -392,11 +355,7 @@ export const ImportPage = ({
           onClick={() => document.getElementById("file-input").click()}
           className={importClass.elem("upload-button")}
         >
-          <IconUpload
-            width="16"
-            height="16"
-            className={importClass.elem("upload-icon")}
-          />
+          <IconUpload width="16" height="16" className={importClass.elem("upload-icon")} />
           Upload {files.uploaded.length ? "More " : ""}Files
         </button>
         <div
@@ -407,22 +366,14 @@ export const ImportPage = ({
         >
           <span>Treat CSV/TSV as</span>
           <label>
-            <input
-              {...csvProps}
-              value="tasks"
-              checked={csvHandling === "tasks"}
-            />{" "}
-            List of tasks
+            <input {...csvProps} value="tasks" checked={csvHandling === "tasks"} /> List of tasks
           </label>
           <label>
-            <input {...csvProps} value="ts" checked={csvHandling === "ts"} />{" "}
-            Time Series or Whole Text File
+            <input {...csvProps} value="ts" checked={csvHandling === "ts"} /> Time Series or Whole Text File
           </label>
         </div>
         <div className={importClass.elem("status")}>
-          {files.uploaded.length
-            ? `${files.uploaded.length} files uploaded`
-            : ""}
+          {files.uploaded.length ? `${files.uploaded.length} files uploaded` : ""}
         </div>
       </header>
 
@@ -438,20 +389,14 @@ export const ImportPage = ({
                   <br />
                   or click to browse
                 </header>
-                <IconUpload
-                  height="64"
-                  className={dropzoneClass.elem("icon")}
-                />
+                <IconUpload height="64" className={dropzoneClass.elem("icon")} />
                 <dl>
                   <dt>Text</dt>
                   <dd>{supportedExtensions.text.join(", ")}</dd>
                   <dt>Audio</dt>
                   <dd>{supportedExtensions.audio.join(", ")}</dd>
                   <dt>Video</dt>
-                  <dd>
-                    mpeg4/H.264 webp, webm*{" "}
-                    {/* Keep in sync with supportedExtensions.video */}
-                  </dd>
+                  <dd>mpeg4/H.264 webp, webm* {/* Keep in sync with supportedExtensions.video */}</dd>
                   <dt>Images</dt>
                   <dd>{supportedExtensions.image.join(", ")}</dd>
                   <dt>HTML</dt>
@@ -464,11 +409,7 @@ export const ImportPage = ({
                 <b>
                   * – Support depends on the browser
                   <br />* – Use{" "}
-                  <a
-                    href="https://labelstud.io/guide/storage.html"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a href="https://labelstud.io/guide/storage.html" target="_blank" rel="noreferrer">
                     Cloud Storages
                   </a>{" "}
                   if you want to import a large number of files
@@ -484,11 +425,7 @@ export const ImportPage = ({
                   <tr key={`${idx}-${file.name}`}>
                     <td>{file.name}</td>
                     <td>
-                      <span
-                        className={importClass
-                          .elem("file-status")
-                          .mod({ uploading: true })}
-                      />
+                      <span className={importClass.elem("file-status").mod({ uploading: true })} />
                     </td>
                   </tr>
                 ))}

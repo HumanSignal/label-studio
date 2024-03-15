@@ -1,9 +1,4 @@
-const {
-  initLabelStudio,
-  dragKonva,
-  waitForImage,
-  serialize,
-} = require("../helpers");
+const { initLabelStudio, dragKonva, waitForImage, serialize } = require("../helpers");
 const assert = require("node:assert");
 
 const config = `
@@ -27,23 +22,20 @@ const data = {
 
 Feature("Two or more same named tools referred same image").tag("@regress");
 
-Scenario(
-  "Two RectangleLabels",
-  async ({ I, AtImageView, AtLabels, AtSidebar }) => {
-    I.amOnPage("/");
-    I.executeScript(initLabelStudio, { config, data });
+Scenario("Two RectangleLabels", async ({ I, AtImageView, AtLabels, AtSidebar }) => {
+  I.amOnPage("/");
+  I.executeScript(initLabelStudio, { config, data });
 
-    AtImageView.waitForImage();
-    I.executeScript(waitForImage);
+  AtImageView.waitForImage();
+  I.executeScript(waitForImage);
 
-    AtLabels.clickLabel("Plane");
-    I.executeScript(dragKonva, [300, 300, 50, 50]);
-    AtLabels.clickLabel("Car");
-    I.executeScript(dragKonva, [100, 600, 400, -300]);
-    AtSidebar.seeRegions(2);
+  AtLabels.clickLabel("Plane");
+  I.executeScript(dragKonva, [300, 300, 50, 50]);
+  AtLabels.clickLabel("Car");
+  I.executeScript(dragKonva, [100, 600, 400, -300]);
+  AtSidebar.seeRegions(2);
 
-    const result = await I.executeScript(serialize);
+  const result = await I.executeScript(serialize);
 
-    assert.deepStrictEqual(result.length, 2);
-  },
-);
+  assert.deepStrictEqual(result.length, 2);
+});

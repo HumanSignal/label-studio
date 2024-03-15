@@ -25,13 +25,7 @@ import { Button } from "../../common/Button/Button";
  */
 import { Space } from "../../common/Space/Space";
 import { Block, Elem } from "../../utils/bem";
-import {
-  FF_DEV_1170,
-  FF_DEV_3873,
-  FF_LSDV_4620_3_ML,
-  FF_SIMPLE_INIT,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
@@ -75,10 +69,7 @@ class App extends Component {
   renderSuccess() {
     return (
       <Block name="editor">
-        <Result
-          status="success"
-          title={getEnv(this.props.store).messages.DONE}
-        />
+        <Result status="success" title={getEnv(this.props.store).messages.DONE} />
       </Block>
     );
   }
@@ -86,10 +77,7 @@ class App extends Component {
   renderNoAnnotation() {
     return (
       <Block name="editor">
-        <Result
-          status="success"
-          title={getEnv(this.props.store).messages.NO_COMP_LEFT}
-        />
+        <Result status="success" title={getEnv(this.props.store).messages.NO_COMP_LEFT} />
       </Block>
     );
   }
@@ -106,18 +94,9 @@ class App extends Component {
           paddingBottom: "30vh",
         }}
       >
-        <Result
-          status="success"
-          title={getEnv(this.props.store).messages.NO_NEXT_TASK}
-        />
-        <Block name="sub__result">
-          You have completed all tasks in the queue!
-        </Block>
-        <Button
-          onClick={(e) => store.prevTask(e, true)}
-          look="outlined"
-          style={{ margin: "16px 0" }}
-        >
+        <Result status="success" title={getEnv(this.props.store).messages.NO_NEXT_TASK} />
+        <Block name="sub__result">You have completed all tasks in the queue!</Block>
+        <Button onClick={(e) => store.prevTask(e, true)} look="outlined" style={{ margin: "16px 0" }}>
           Go to Previous Task
         </Button>
       </Block>
@@ -127,10 +106,7 @@ class App extends Component {
   renderNoAccess() {
     return (
       <Block name="editor">
-        <Result
-          status="warning"
-          title={getEnv(this.props.store).messages.NO_ACCESS}
-        />
+        <Result status="warning" title={getEnv(this.props.store).messages.NO_ACCESS} />
       </Block>
     );
   }
@@ -139,13 +115,9 @@ class App extends Component {
     return (
       <Block name="main-view">
         <Elem name="annotation">
-          <TreeValidation
-            errors={this.props.store.annotationStore.validation}
-          />
+          <TreeValidation errors={this.props.store.annotationStore.validation} />
         </Elem>
-        {!isFF(FF_DEV_3873) && store.hasInterface("infobar") && (
-          <Elem name="infobar">Task #{store.task.id}</Elem>
-        )}
+        {!isFF(FF_DEV_3873) && store.hasInterface("infobar") && <Elem name="infobar">Task #{store.task.id}</Elem>}
       </Block>
     );
   }
@@ -155,10 +127,7 @@ class App extends Component {
   }
 
   _renderAll(obj) {
-    if (obj.length === 1)
-      return (
-        <Segment annotation={obj[0]}>{[Tree.renderItem(obj[0].root)]}</Segment>
-      );
+    if (obj.length === 1) return <Segment annotation={obj[0]}>{[Tree.renderItem(obj[0].root)]}</Segment>;
 
     return (
       <div className="ls-renderall">
@@ -175,18 +144,12 @@ class App extends Component {
     if (as.viewingAll) return this.renderAllAnnotations();
 
     return (
-      <Block
-        key={(as.selectedHistory ?? as.selected)?.id}
-        name="main-view"
-        onScrollCapture={this._notifyScroll}
-      >
+      <Block key={(as.selectedHistory ?? as.selected)?.id} name="main-view" onScrollCapture={this._notifyScroll}>
         <Elem name="annotation">
           {<Annotation root={root} annotation={as.selected} />}
           {this.renderRelations(as.selected)}
         </Elem>
-        {!isFF(FF_DEV_3873) &&
-          getRoot(as).hasInterface("infobar") &&
-          this._renderInfobar(as)}
+        {!isFF(FF_DEV_3873) && getRoot(as).hasInterface("infobar") && this._renderInfobar(as)}
         {as.selected.hasSuggestionsSupport && <DynamicPreannotationsControl />}
       </Block>
     );
@@ -251,10 +214,7 @@ class App extends Component {
 
     // tags can be styled in config when user is awaiting for suggestions from ML backend
     const mainContent = (
-      <Block
-        name="main-content"
-        mix={store.awaitingSuggestions ? ["requesting"] : []}
-      >
+      <Block name="main-content" mix={store.awaitingSuggestions ? ["requesting"] : []}>
         {as.validation === null
           ? this._renderUI(as.selectedHistory?.root ?? root, as)
           : this.renderConfigValidationException(store)}
@@ -297,9 +257,7 @@ class App extends Component {
             </>
           )}
 
-          {isDefined(store) && store.hasInterface("topbar") && (
-            <TopBar store={store} />
-          )}
+          {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
           <Block
             name="wrapper"
             mod={{
@@ -316,9 +274,7 @@ class App extends Component {
                   currentEntity={as.selectedHistory ?? as.selected}
                   regions={as.selected.regionStore}
                   showComments={store.hasInterface("annotations:comments")}
-                  focusTab={
-                    store.commentStore.tooltipMessage ? "comments" : null
-                  }
+                  focusTab={store.commentStore.tooltipMessage ? "comments" : null}
                 >
                   {mainContent}
                   {store.hasInterface("topbar") && <BottomBar store={store} />}
@@ -346,9 +302,7 @@ class App extends Component {
                   </Block>
                 )}
 
-                {newUIEnabled && store.hasInterface("topbar") && (
-                  <BottomBar store={store} />
-                )}
+                {newUIEnabled && store.hasInterface("topbar") && <BottomBar store={store} />}
               </>
             )}
           </Block>

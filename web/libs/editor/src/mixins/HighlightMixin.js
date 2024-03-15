@@ -16,9 +16,7 @@ export const HighlightMixin = types
   .views((self) => ({
     get _hasSpans() {
       // @todo is it possible that only some spans are connected?
-      return self._spans
-        ? self._spans.every((span) => span.isConnected)
-        : false;
+      return self._spans ? self._spans.every((span) => span.isConnected) : false;
     },
     get identifier() {
       return `${self.id.split("#")[0]}-${self.ouid}`;
@@ -44,10 +42,7 @@ export const HighlightMixin = types
       const { className } = self;
       const activeColorOpacity = 0.8;
       const color = self.getLabelColor();
-      const initialActiveColor = Utils.Colors.rgbaChangeAlpha(
-        color,
-        activeColorOpacity,
-      );
+      const initialActiveColor = Utils.Colors.rgbaChangeAlpha(color, activeColorOpacity);
 
       return `
         .${className} {
@@ -72,12 +67,8 @@ export const HighlightMixin = types
           return void 0;
         }
 
-        self._spans = self.parent.createSpansByGlobalOffsets(
-          self.globalOffsets,
-        );
-        self._spans?.forEach(
-          (span) => (span.className = self.classNames.join(" ")),
-        );
+        self._spans = self.parent.createSpansByGlobalOffsets(self.globalOffsets);
+        self._spans?.forEach((span) => (span.className = self.classNames.join(" ")));
         self.updateSpans();
         if (!init) {
           self.parent.setStyles({ [self.identifier]: self.styles });
@@ -91,9 +82,7 @@ export const HighlightMixin = types
 
       // spans in iframe disappear on every annotation switch, so check for it
       // in iframe spans still isConnected, but window is missing
-      const isReallyConnected = Boolean(
-        self._spans?.[0]?.ownerDocument?.defaultView,
-      );
+      const isReallyConnected = Boolean(self._spans?.[0]?.ownerDocument?.defaultView);
 
       // Avoid calling this method twice
       if (self._hasSpans && isReallyConnected) {
@@ -116,11 +105,7 @@ export const HighlightMixin = types
       const labelColor = self.getLabelColor();
       const identifier = guidGenerator(IDENTIFIER_LENGTH);
       // @todo use label-based stylesheets created only once
-      const stylesheet = createSpanStylesheet(
-        root.ownerDocument,
-        identifier,
-        labelColor,
-      );
+      const stylesheet = createSpanStylesheet(root.ownerDocument, identifier, labelColor);
       const classNames = ["htx-highlight", stylesheet.className];
 
       if (!(self.parent.showlabels ?? self.store.settings.showLabels)) {
@@ -179,10 +164,7 @@ export const HighlightMixin = types
     removeHighlight() {
       if (isFF(FF_LSDV_4620_3)) {
         if (self.globalOffsets) {
-          self.parent?.removeSpansInGlobalOffsets(
-            self._spans,
-            self.globalOffsets,
-          );
+          self.parent?.removeSpansInGlobalOffsets(self._spans, self.globalOffsets);
         }
         self.parent?.removeStyles([self.identifier]);
       } else {
@@ -235,11 +217,7 @@ export const HighlightMixin = types
      * Unselect text region
      */
     afterUnselectRegion() {
-      self.removeClass(
-        isFF(FF_LSDV_4620_3)
-          ? STATE_CLASS_MODS.active
-          : self._stylesheet?.state.active,
-      );
+      self.removeClass(isFF(FF_LSDV_4620_3) ? STATE_CLASS_MODS.active : self._stylesheet?.state.active);
     },
 
     /**
@@ -294,20 +272,13 @@ export const HighlightMixin = types
     },
 
     getLabels() {
-      return (self.labeling?.selectedLabels ?? [])
-        .map((label) => label.value)
-        .join(",");
+      return (self.labeling?.selectedLabels ?? []).map((label) => label.value).join(",");
     },
 
     getLabelColor() {
-      const labelColor =
-        self.parent.highlightcolor ||
-        (self.style || self.tag || defaultStyle).fillcolor;
+      const labelColor = self.parent.highlightcolor || (self.style || self.tag || defaultStyle).fillcolor;
 
-      return Utils.Colors.convertToRGBA(
-        labelColor ?? "#DA935D",
-        LABEL_COLOR_ALPHA,
-      );
+      return Utils.Colors.convertToRGBA(labelColor ?? "#DA935D", LABEL_COLOR_ALPHA);
     },
 
     find(span) {
@@ -378,8 +349,7 @@ const createSpanStylesheet = (document, identifier, color) => {
   };
 
   const activeColorOpacity = 0.8;
-  const toActiveColor = (color) =>
-    Utils.Colors.rgbaChangeAlpha(color, activeColorOpacity);
+  const toActiveColor = (color) => Utils.Colors.rgbaChangeAlpha(color, activeColorOpacity);
 
   const initialActiveColor = toActiveColor(color);
 
@@ -440,10 +410,7 @@ const createSpanStylesheet = (document, identifier, color) => {
       continue;
     }
     if (supportInsertion) {
-      stylesheet.insertRule(
-        `${ruleName} { ${rules[ruleName]} } `,
-        lastRuleIndex++,
-      );
+      stylesheet.insertRule(`${ruleName} { ${rules[ruleName]} } `, lastRuleIndex++);
     } else {
       stylesheet.addRule(ruleName, rules);
     }
@@ -458,16 +425,11 @@ const createSpanStylesheet = (document, identifier, color) => {
     // sheet could change during iframe transfers, so look up in the tag
     const stylesheet = styleTag.sheet ?? styleTag.styleSheet;
     // they are on different positions for old/new regions
-    const rule = [...stylesheet.rules].find((rule) =>
-      rule.selectorText.includes("__active"),
-    );
+    const rule = [...stylesheet.rules].find((rule) => rule.selectorText.includes("__active"));
     const { style } = rule;
 
     // document in a closure may be a working iframe, so go up from the tag
-    styleTag.ownerDocument.documentElement.style.setProperty(
-      variables.color,
-      color,
-    );
+    styleTag.ownerDocument.documentElement.style.setProperty(variables.color, color);
 
     style.setProperty(variables.color, newActiveColor);
     style.color = Utils.Colors.contrastColor(newActiveColor);
@@ -478,10 +440,7 @@ const createSpanStylesheet = (document, identifier, color) => {
    * @param {string} cursor
    */
   const setCursor = (cursor) => {
-    styleTag.ownerDocument.documentElement.style.setProperty(
-      variables.cursor,
-      cursor,
-    );
+    styleTag.ownerDocument.documentElement.style.setProperty(variables.cursor, cursor);
   };
 
   /**

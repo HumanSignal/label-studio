@@ -22,9 +22,8 @@ const InvitationModal = ({ link }) => {
       <Input value={link} style={{ width: "100%" }} readOnly />
 
       <Description style={{ width: "70%", marginTop: 16 }}>
-        Invite people to join your Label Studio instance. People that you invite
-        have full access to all of your projects.{" "}
-        <a href="https://labelstud.io/guide/signup.html">Learn more</a>.
+        Invite people to join your Label Studio instance. People that you invite have full access to all of your
+        projects. <a href="https://labelstud.io/guide/signup.html">Learn more</a>.
       </Description>
     </Block>
   );

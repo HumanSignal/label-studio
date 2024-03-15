@@ -104,9 +104,7 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
     finalColor = (red << 24) | (green << 16) | (blue << 8) | alpha;
   } else {
     // The most common architectures (x86 and ARM) are both little endian, so just assume that.
-    console.error(
-      `Unknown platform endianness (${endian}), assuming little endian`,
-    );
+    console.error(`Unknown platform endianness (${endian}), assuming little endian`);
     finalColor = (alpha << 24) | (blue << 16) | (green << 8) | red;
   }
 
@@ -239,9 +237,7 @@ function exportRLE(region) {
       ctx.moveTo(...relativeToAbsolutePoint(points[0], points[1]));
 
       for (let i = 0; i < points.length / 2; i++) {
-        ctx.lineTo(
-          ...relativeToAbsolutePoint(points[2 * i], points[2 * i + 1]),
-        );
+        ctx.lineTo(...relativeToAbsolutePoint(points[2 * i], points[2 * i + 1]));
       }
 
       ctx.strokeStyle = "#000";
@@ -257,10 +253,7 @@ function exportRLE(region) {
 
   // Grayscale pixels respecting the opacity
   for (let i = imageData.length / 4; i--; ) {
-    imageData[i * 4] =
-      imageData[i * 4 + 1] =
-      imageData[i * 4 + 2] =
-        imageData[i * 4 + 3];
+    imageData[i * 4] = imageData[i * 4 + 1] = imageData[i * 4 + 2] = imageData[i * 4 + 3];
   }
 
   // When finished, remove the canvas
@@ -333,10 +326,7 @@ function Region2RLE(region) {
   const data = ctx.getImageData(0, 0, nw, nh);
 
   for (let i = data.data.length / 4; i--; ) {
-    data.data[i * 4] =
-      data.data[i * 4 + 1] =
-      data.data[i * 4 + 2] =
-        data.data[i * 4 + 3];
+    data.data[i * 4] = data.data[i * 4 + 1] = data.data[i * 4 + 2] = data.data[i * 4 + 3];
   }
   layer.findOne(".highlight").show();
   stage
@@ -391,10 +381,7 @@ function encodeSVG(data) {
 
   function addNameSpace(data) {
     if (data.indexOf("http://www.w3.org/2000/svg") < 0) {
-      data = data.replace(
-        /<svg/g,
-        `<svg xmlns=${quotes.level2}http://www.w3.org/2000/svg${quotes.level2}`,
-      );
+      data = data.replace(/<svg/g, `<svg xmlns=${quotes.level2}http://www.w3.org/2000/svg${quotes.level2}`);
     }
 
     return data;
@@ -427,8 +414,7 @@ const labelToSVG = (() => {
     const svg = document.createElement("svg");
     const svgText = document.createElement("text");
 
-    svgText.style =
-      "font-size: 9.5px; font-weight: bold; color: red; fill: red; font-family: Monaco";
+    svgText.style = "font-size: 9.5px; font-weight: bold; color: red; fill: red; font-family: Monaco";
     svgText.innerHTML = text;
 
     svg.appendChild(svgText);
@@ -454,14 +440,8 @@ const labelToSVG = (() => {
     if (score !== null && score !== undefined) {
       const fillColor = Colors.getScaleGradient(score);
 
-      items.push(
-        `<rect x="0" y="0" rx="2" ry="2" width="24" height="14" style="fill:${fillColor};opacity:0.5" />`,
-      );
-      items.push(
-        `<text x="3" y="10" style="font-size: 8px; font-family: Monaco">${score.toFixed(
-          2,
-        )}</text>`,
-      );
+      items.push(`<rect x="0" y="0" rx="2" ry="2" width="24" height="14" style="fill:${fillColor};opacity:0.5" />`);
+      items.push(`<text x="3" y="10" style="font-size: 8px; font-family: Monaco">${score.toFixed(2)}</text>`);
       width = width + 26;
     }
 
@@ -587,9 +567,7 @@ function checkEndian() {
     return "big endian";
   }
   // The most common architectures (x86 and ARM) are both little endian, so just assume that.
-  console.error(
-    "Can not determine platform endianness, assuming little endian",
-  );
+  console.error("Can not determine platform endianness, assuming little endian");
   return "little endian";
 }
 

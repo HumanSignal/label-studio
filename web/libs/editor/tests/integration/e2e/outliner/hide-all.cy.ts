@@ -1,43 +1,23 @@
-import {
-  LabelStudio,
-  Sidebar,
-  Tooltip,
-} from "@humansignal/frontend-test/helpers/LSF/index";
-import {
-  simpleRegionsConfig,
-  simpleRegionsData,
-  simpleRegionsResult,
-} from "../../data/outliner/hide-all";
+import { LabelStudio, Sidebar, Tooltip } from "@humansignal/frontend-test/helpers/LSF/index";
+import { simpleRegionsConfig, simpleRegionsData, simpleRegionsResult } from "../../data/outliner/hide-all";
 
 describe("Outliner - Hide all regions", () => {
   it("should exist", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     Sidebar.hasRegions(3);
     Sidebar.hideAllRegionsButton.should("be.visible").should("be.enabled");
   });
 
   it("should be disabled without existed regions", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult([]).init();
 
     Sidebar.hasRegions(0);
     Sidebar.hideAllRegionsButton.should("be.visible").should("be.disabled");
   });
 
   it("should hide all regions", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     Sidebar.hasRegions(3);
     Sidebar.hasHiddenRegion(0);
@@ -46,11 +26,7 @@ describe("Outliner - Hide all regions", () => {
   });
 
   it("should show all regions", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     Sidebar.hasRegions(3);
     Sidebar.hideAllRegionsButton.click();
@@ -60,11 +36,7 @@ describe("Outliner - Hide all regions", () => {
   });
 
   it("should hide rest regions", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     Sidebar.hasRegions(3);
     Sidebar.toggleRegionVisibility(1);
@@ -74,11 +46,7 @@ describe("Outliner - Hide all regions", () => {
   });
 
   it("should have tooltip for hide action", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     Sidebar.hasRegions(3);
     Sidebar.hideAllRegionsButton.trigger("mouseenter");
@@ -86,11 +54,7 @@ describe("Outliner - Hide all regions", () => {
   });
 
   it("should have tooltip for show action", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     Sidebar.hasRegions(3);
     Sidebar.hideAllRegionsButton.click();
@@ -98,11 +62,7 @@ describe("Outliner - Hide all regions", () => {
     Tooltip.hasText("Show all regions");
   });
   it("should react to changes in regions' visibility", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     Sidebar.hasRegions(3);
     Sidebar.hideAllRegionsButton.click();
@@ -113,11 +73,7 @@ describe("Outliner - Hide all regions", () => {
   });
 
   it("should toggle visibility when its grouped by tool ", () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     Sidebar.hasRegions(3);
 

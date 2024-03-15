@@ -1,11 +1,4 @@
-import {
-  destroy,
-  detach,
-  getEnv,
-  getParent,
-  onPatch,
-  types,
-} from "mobx-state-tree";
+import { destroy, detach, getEnv, getParent, onPatch, types } from "mobx-state-tree";
 
 import { Hotkey } from "../core/Hotkey";
 import Tree, { TRAVERSE_STOP } from "../core/Tree";
@@ -25,14 +18,8 @@ const localStorageKeys = {
 
 const SelectionMap = types
   .model({
-    selected: types.optional(
-      types.map(types.safeReference(AllRegionsType)),
-      {},
-    ),
-    drawingSelected: types.optional(
-      types.map(types.safeReference(AllRegionsType)),
-      {},
-    ),
+    selected: types.optional(types.map(types.safeReference(AllRegionsType)), {}),
+    drawingSelected: types.optional(types.map(types.safeReference(AllRegionsType)), {}),
   })
   .views((self) => {
     return {
@@ -43,9 +30,7 @@ const SelectionMap = types
         return getParent(self).annotation;
       },
       get highlighted() {
-        return self.selected.size === 1
-          ? self.selected.values().next().value
-          : null;
+        return self.selected.size === 1 ? self.selected.values().next().value : null;
       },
       get size() {
         return self.selected.size;
@@ -85,13 +70,9 @@ const SelectionMap = types
         if (self.highlighted) {
           // @todo some backward compatibility, should be rewritten to state handling
           // @todo but there are some actions should be performed like scroll to region
-          self.highlighted.perRegionTags.forEach((tag) =>
-            tag.updateFromResult?.(undefined),
-          );
+          self.highlighted.perRegionTags.forEach((tag) => tag.updateFromResult?.(undefined));
           // special case for Taxonomy as labeling tool
-          self.highlighted.labelingTags.forEach((tag) =>
-            tag.updateFromResult?.(undefined),
-          );
+          self.highlighted.labelingTags.forEach((tag) => tag.updateFromResult?.(undefined));
           updateResultsFromSelection();
         } else {
           updateResultsFromSelection();
@@ -113,8 +94,7 @@ const SelectionMap = types
             const currentValue = valuesFromControls[controlName];
 
             if (currentValue !== undefined) {
-              valuesFromControls[controlName] =
-                result.mergeMainValue(currentValue);
+              valuesFromControls[controlName] = result.mergeMainValue(currentValue);
             } else {
               controlsByName[controlName] = result.from_name;
               valuesFromControls[controlName] = result.mainValue;
@@ -169,10 +149,7 @@ export default types
       () => window.localStorage.getItem(localStorageKeys.group) ?? "manual",
     ),
 
-    filter: types.maybeNull(
-      types.array(types.safeReference(AllRegionsType)),
-      null,
-    ),
+    filter: types.maybeNull(types.array(types.safeReference(AllRegionsType)), null),
 
     view: types.optional(
       types.enumeration(["regions", "labels"]),
@@ -188,11 +165,7 @@ export default types
 
       Tree.traverseTree({ children: tree }, (node) => {
         if (!node.isArea) return;
-        if (
-          node.item === lastClickedItem ||
-          node.item === item ||
-          clickedRegionsFound === 1
-        ) {
+        if (node.item === lastClickedItem || node.item === item || clickedRegionsFound === 1) {
           if (node.item) regions.push(node.item);
           if (node.item === lastClickedItem) ++clickedRegionsFound;
           if (node.item === item) ++clickedRegionsFound;
@@ -244,9 +217,7 @@ export default types
       },
 
       get regions() {
-        return Array.from(self.annotation.areas.values()).filter(
-          (area) => !area.classification,
-        );
+        return Array.from(self.annotation.areas.values()).filter((area) => !area.classification);
       },
 
       get filteredRegions() {
@@ -254,9 +225,7 @@ export default types
       },
 
       get suggestions() {
-        return Array.from(self.annotation.suggestions.values()).filter(
-          (area) => !area.classification,
-        );
+        return Array.from(self.annotation.suggestions.values()).filter((area) => !area.classification);
       },
 
       get isAllHidden() {
@@ -266,15 +235,9 @@ export default types
       get sortedRegions() {
         const sorts = {
           date: (isDesc) =>
-            [...self.filteredRegions].sort(
-              isDesc ? (a, b) => b.ouid - a.ouid : (a, b) => a.ouid - b.ouid,
-            ),
+            [...self.filteredRegions].sort(isDesc ? (a, b) => b.ouid - a.ouid : (a, b) => a.ouid - b.ouid),
           score: (isDesc) =>
-            [...self.filteredRegions].sort(
-              isDesc
-                ? (a, b) => b.score - a.score
-                : (a, b) => a.score - b.score,
-            ),
+            [...self.filteredRegions].sort(isDesc ? (a, b) => b.score - a.score : (a, b) => a.score - b.score),
         };
 
         const sorted = sorts[self.sort](self.sortOrder === "desc");
@@ -321,9 +284,7 @@ export default types
 
         lookup.forEach((el) => {
           const pid = el.item.parentID;
-          const parent = pid
-            ? lookup.get(pid) ?? lookup.get(pid.replace(/#(.+)/i, ""))
-            : null;
+          const parent = pid ? lookup.get(pid) ?? lookup.get(pid.replace(/#(.+)/i, "")) : null;
 
           if (parent) return parent.children.push(el);
 
@@ -353,8 +314,7 @@ export default types
           });
         };
         const getRegionLabel = (region) =>
-          region.labeling?.selectedLabels ||
-          (region.emptyLabel && [region.emptyLabel]);
+          region.labeling?.selectedLabels || (region.emptyLabel && [region.emptyLabel]);
         const addToLabelGroup = (key, label, region) => {
           const group = getLabelGroup(label, key);
           const groupId = group.id;
@@ -389,9 +349,7 @@ export default types
         const groupsArray = Object.values(groups);
 
         if (isFF(FF_DEV_2755)) {
-          groupsArray.sort((a, b) =>
-            a.hotkey > b.hotkey ? 1 : a.hotkey < b.hotkey ? -1 : 0,
-          );
+          groupsArray.sort((a, b) => (a.hotkey > b.hotkey ? 1 : a.hotkey < b.hotkey ? -1 : 0));
         }
         result.push(...groupsArray);
 
@@ -458,9 +416,7 @@ export default types
       },
 
       get selectedIds() {
-        return Array.from(self.selection.selected.values()).map(
-          (reg) => reg.id,
-        );
+        return Array.from(self.selection.selected.values()).map((reg) => reg.id);
       },
 
       get persistantView() {
@@ -495,10 +451,7 @@ export default types
       }
 
       window.localStorage.setItem(localStorageKeys.sort, self.sort);
-      window.localStorage.setItem(
-        localStorageKeys.sortDirection,
-        self.sortOrder,
-      );
+      window.localStorage.setItem(localStorageKeys.sortDirection, self.sortOrder);
 
       self.initHotkeys();
     },
@@ -511,9 +464,7 @@ export default types
     setFilteredRegions(filter) {
       if (self.regions.length === filter.length) {
         self.filter = null;
-        self.regions.forEach(
-          (region) => region.filtered && region.toggleFiltered(),
-        );
+        self.regions.forEach((region) => region.filtered && region.toggleFiltered());
       } else {
         const filteredIds = filter.map((filter) => filter.id);
 
@@ -521,8 +472,7 @@ export default types
 
         self.regions.forEach((region) => {
           if (!region.hideable || (region.hidden && !region.filtered)) return;
-          if (filteredIds.includes(region.id))
-            region.hidden && region.toggleFiltered();
+          if (filteredIds.includes(region.id)) region.hidden && region.toggleFiltered();
           else if (!region.hidden) region.toggleFiltered();
         });
       }
@@ -560,18 +510,13 @@ export default types
 
     afterCreate() {
       onPatch(self, (patch) => {
-        if (
-          (patch.op === "add" || patch.op === "delete") &&
-          patch.path.indexOf("/regions/") !== -1
-        ) {
+        if ((patch.op === "add" || patch.op === "delete") && patch.path.indexOf("/regions/") !== -1) {
           self.initHotkeys();
         }
       });
       self.view =
         window.localStorage.getItem(localStorageKeys.view) ??
-        (self.annotation.store.settings.displayLabelsByDefault
-          ? "labels"
-          : "regions");
+        (self.annotation.store.settings.displayLabelsByDefault ? "labels" : "regions");
     },
 
     // init Alt hotkeys for regions selection
@@ -612,9 +557,7 @@ export default types
 
         region && self.annotation.selectArea(region);
       } else {
-        const next = isDefined(regions[idx + 1])
-          ? regions[idx + 1]
-          : regions[0];
+        const next = isDefined(regions[idx + 1]) ? regions[idx + 1] : regions[0];
 
         next && self.annotation.selectArea(next);
       }
@@ -667,8 +610,7 @@ export default types
     },
 
     toggleSelection(region, isSelected) {
-      if (!isDefined(isSelected))
-        isSelected = !self.selection.isSelected(region);
+      if (!isDefined(isSelected)) isSelected = !self.selection.isSelected(region);
       if (isSelected) {
         self.selection.select(region);
       } else {

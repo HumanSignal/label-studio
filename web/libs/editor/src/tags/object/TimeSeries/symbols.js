@@ -58,10 +58,7 @@ export const markerSymbol = (item, symbol, size, color) => {
             .type(d3.symbolTriangle)
             .size(2 * size),
         )
-        .attr(
-          "transform",
-          `translate(${size / 2}, ${size / 2}) rotate(180 0 0)`,
-        )
+        .attr("transform", `translate(${size / 2}, ${size / 2}) rotate(180 0 0)`)
         .attr("stroke", "none")
         .attr("fill", color);
       break;

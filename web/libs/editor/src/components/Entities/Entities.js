@@ -18,8 +18,7 @@ import { SortMenu, SortMenuIcon } from "./SortMenu";
 
 export default observer(({ regionStore, annotation }) => {
   const { classifications, regions, view } = regionStore;
-  const count =
-    regions.length + (view === "regions" ? classifications.length : 0);
+  const count = regions.length + (view === "regions" ? classifications.length : 0);
   const toggleVisibility = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -75,17 +74,12 @@ export default observer(({ regionStore, annotation }) => {
         <Elem name="header">
           <Space spread align={view === "regions" ? null : "end"}>
             {view === "regions" && (
-              <Dropdown
-                overlay={<SortMenu regionStore={regionStore} />}
-                placement="bottomLeft"
-              >
+              <Dropdown overlay={<SortMenu regionStore={regionStore} />} placement="bottomLeft">
                 <Elem name="sort" onClick={(e) => e.preventDefault()}>
                   <Elem name="sort-icon">
                     <SortMenuIcon sortKey={regionStore.sort} />
                   </Elem>{" "}
-                  {`Sorted by ${regionStore.sort[0].toUpperCase()}${regionStore.sort.slice(
-                    1,
-                  )}`}
+                  {`Sorted by ${regionStore.sort[0].toUpperCase()}${regionStore.sort.slice(1)}`}
                 </Elem>
               </Dropdown>
             )}
@@ -111,18 +105,10 @@ export default observer(({ regionStore, annotation }) => {
 
       <Oneof value={view}>
         <Elem name="regions" case="regions">
-          {count ? (
-            <RegionTree regionStore={regionStore} />
-          ) : (
-            <Elem name="empty">No Regions created yet</Elem>
-          )}
+          {count ? <RegionTree regionStore={regionStore} /> : <Elem name="empty">No Regions created yet</Elem>}
         </Elem>
         <Elem name="labels" case="labels">
-          {count ? (
-            <LabelList regionStore={regionStore} />
-          ) : (
-            <Elem name="empty">No Labeled Regions created yet</Elem>
-          )}
+          {count ? <LabelList regionStore={regionStore} /> : <Elem name="empty">No Labeled Regions created yet</Elem>}
         </Elem>
       </Oneof>
     </Block>

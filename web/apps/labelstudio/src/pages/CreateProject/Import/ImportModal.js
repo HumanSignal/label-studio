@@ -4,10 +4,7 @@ import { Button } from "../../../components";
 import { Modal } from "../../../components/Modal/Modal";
 import { Space } from "../../../components/Space/Space";
 import { useAPI } from "../../../providers/ApiProvider";
-import {
-  ProjectProvider,
-  useProject,
-} from "../../../providers/ProjectProvider";
+import { ProjectProvider, useProject } from "../../../providers/ProjectProvider";
 import { useFixedLocation } from "../../../providers/RoutesProvider";
 import { Elem } from "../../../utils/bem";
 import { useRefresh } from "../../../utils/hooks";
@@ -23,8 +20,7 @@ export const Inner = () => {
   const [waiting, setWaitingStatus] = useState(false);
   const api = useAPI();
 
-  const { uploading, uploadDisabled, finishUpload, fileIds, pageProps } =
-    useImportPage(project);
+  const { uploading, uploadDisabled, finishUpload, fileIds, pageProps } = useImportPage(project);
 
   const backToDM = useCallback(() => {
     const path = location.pathname.replace(ImportModal.path, "");
@@ -75,12 +71,7 @@ export const Inner = () => {
           <Button waiting={waiting} onClick={onCancel}>
             Cancel
           </Button>
-          <Button
-            look="primary"
-            onClick={onFinish}
-            waiting={waiting || uploading}
-            disabled={uploadDisabled}
-          >
+          <Button look="primary" onClick={onFinish} waiting={waiting || uploading} disabled={uploadDisabled}>
             Import
           </Button>
         </Space>

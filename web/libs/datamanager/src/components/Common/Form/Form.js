@@ -1,13 +1,4 @@
-import {
-  Component,
-  createRef,
-  forwardRef,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Component, createRef, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { shallowEqualObjects } from "shallow-equal";
 import { MultiProvider } from "../../../providers/MultiProvider";
 import { SDKContext } from "../../../providers/SDKProvider";
@@ -59,10 +50,7 @@ export default class Form extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const equal = shallowEqualObjects(
-      prevProps.formData ?? {},
-      this.props.formData ?? {},
-    );
+    const equal = shallowEqualObjects(prevProps.formData ?? {}, this.props.formData ?? {});
 
     if (!equal) {
       this.fillFormData();
@@ -72,22 +60,10 @@ export default class Form extends Component {
   render() {
     const providers = [
       <FormContext.Provider key="form-ctx" value={this} />,
-      <FormValidationContext.Provider
-        key="form-validation-ctx"
-        value={this.state.validation}
-      />,
-      <FormSubmissionContext.Provider
-        key="form-submission-ctx"
-        value={this.state.submitting}
-      />,
-      <FormStateContext.Provider
-        key="form-state-ctx"
-        value={this.state.state}
-      />,
-      <FormResponseContext.Provider
-        key="form-response"
-        value={this.state.lastResponse}
-      />,
+      <FormValidationContext.Provider key="form-validation-ctx" value={this.state.validation} />,
+      <FormSubmissionContext.Provider key="form-submission-ctx" value={this.state.submitting} />,
+      <FormStateContext.Provider key="form-state-ctx" value={this.state.state} />,
+      <FormResponseContext.Provider key="form-response" value={this.state.lastResponse} />,
     ];
 
     return (
@@ -118,11 +94,7 @@ export default class Form extends Component {
     if (!existingField) {
       this.fields.add(field);
 
-      if (
-        field.name &&
-        this.props.formData &&
-        field.name in this.props.formData
-      ) {
+      if (field.name && this.props.formData && field.name in this.props.formData) {
         setTimeout(() => {
           this.fillWithFormData(field);
         }, 0);
@@ -200,43 +172,36 @@ export default class Form extends Component {
       fields = fields.filter(fieldsFilter);
     }
 
-    const requestBody = fields.reduce(
-      (res, { name, field, skip, allowEmpty, isProtected }) => {
-        const { skipEmpty } = this.props;
-        const skipProtected =
-          isProtected && field.value === PASSWORD_PROTECTED_VALUE;
-        const skipField =
-          skip ||
-          skipProtected ||
-          ((this.props.skipEmpty || allowEmpty === false) && !field.value);
-        const fieldType = field.dataset.type ?? field.type;
+    const requestBody = fields.reduce((res, { name, field, skip, allowEmpty, isProtected }) => {
+      const { skipEmpty } = this.props;
+      const skipProtected = isProtected && field.value === PASSWORD_PROTECTED_VALUE;
+      const skipField = skip || skipProtected || ((this.props.skipEmpty || allowEmpty === false) && !field.value);
+      const fieldType = field.dataset.type ?? field.type;
 
-        if (full === true || !skipField) {
-          const value = (() => {
-            const inputValue = field.value;
+      if (full === true || !skipField) {
+        const value = (() => {
+          const inputValue = field.value;
 
-            if (fieldType === "checkbox") {
-              return field.checked;
-            }
-            if (fieldType === "radio") {
-              return inputValue;
-            }
-            if (["number", "range"].includes(fieldType)) {
-              return Number(field.value);
-            }
-
-            return inputValue;
-          })();
-
-          if (value !== null || skipEmpty !== true) {
-            res.push([name, value]);
+          if (fieldType === "checkbox") {
+            return field.checked;
           }
-        }
+          if (fieldType === "radio") {
+            return inputValue;
+          }
+          if (["number", "range"].includes(fieldType)) {
+            return Number(field.value);
+          }
 
-        return res;
-      },
-      [],
-    );
+          return inputValue;
+        })();
+
+        if (value !== null || skipEmpty !== true) {
+          res.push([name, value]);
+        }
+      }
+
+      return res;
+    }, []);
 
     if (asJSON) {
       return Object.fromEntries(requestBody);
@@ -388,11 +353,7 @@ export default class Form extends Component {
 
     if (field.isProtected && this.props.formData) {
       field.setValue(PASSWORD_PROTECTED_VALUE);
-    } else if (
-      isDefined(value) &&
-      field.value !== value &&
-      !field.skipAutofill
-    ) {
+    } else if (isDefined(value) && field.value !== value && !field.skipAutofill) {
       field.setValue(value);
     }
   }
@@ -404,11 +365,7 @@ const ValidationRenderer = ({ validation }) => {
   return (
     <div className={rootClass}>
       {Array.from(validation).map(([name, result]) => (
-        <div
-          key={name}
-          className={rootClass.elem("group")}
-          onClick={() => result.field.focus()}
-        >
+        <div key={name} className={rootClass.elem("group")} onClick={() => result.field.focus()}>
           <div className={rootClass.elem("field")}>{result.label}</div>
 
           <div className={rootClass.elem("messages")}>
@@ -433,10 +390,7 @@ Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   if (rowGap) styles["--row-gap"] = rowGap;
 
   return (
-    <div
-      className={cn("form").elem("row").mod({ spread })}
-      style={{ ...(style ?? {}), ...styles }}
-    >
+    <div className={cn("form").elem("row").mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
@@ -468,13 +422,9 @@ Form.Builder = forwardRef(
         const { trigger_form_update, ...restProps } = field;
 
         const currentValue = formData?.[field.name] ?? undefined;
-        const triggerUpdate =
-          props.autosubmit !== true && trigger_form_update === true;
+        const triggerUpdate = props.autosubmit !== true && trigger_form_update === true;
         const getValue = () => {
-          const isProtected =
-            field.skipAutofill &&
-            !field.allowEmpty &&
-            field.type === "password";
+          const isProtected = field.skipAutofill && !field.allowEmpty && field.type === "password";
 
           if (isProtected) {
             return PASSWORD_PROTECTED_VALUE;
@@ -519,23 +469,13 @@ Form.Builder = forwardRef(
           commonProps.defaultValue = getValue();
         }
 
-        return (
-          <InputComponent
-            key={field.name ?? index}
-            {...restProps}
-            {...commonProps}
-          />
-        );
+        return <InputComponent key={field.name ?? index} {...restProps} {...commonProps} />;
       });
     };
 
     const renderColumns = (columns) => {
       return columns.map((col, index) => (
-        <div
-          className={cn("form").elem("column")}
-          key={index}
-          style={{ width: col.width }}
-        >
+        <div className={cn("form").elem("column")} key={index} style={{ width: col.width }}>
           {renderFields(col.fields)}
         </div>
       ));
@@ -589,12 +529,7 @@ Form.Builder = forwardRef(
     return (
       <Form {...props} onSubmit={handleOnSubmit} ref={formRef}>
         {(fields ?? []).map(({ columnCount, fields, columns }, index) => (
-          <Form.Row
-            key={index}
-            columnCount={columnCount}
-            style={formRowStyle}
-            spread
-          >
+          <Form.Row key={index} columnCount={columnCount} style={formRowStyle} spread>
             {columns ? renderColumns(columns) : renderFields(fields)}
           </Form.Row>
         ))}

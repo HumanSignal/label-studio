@@ -1,8 +1,5 @@
 import { getEnv, getParent, getRoot, getType, types } from "mobx-state-tree";
-import {
-  RELATIVE_STAGE_HEIGHT,
-  RELATIVE_STAGE_WIDTH,
-} from "../components/ImageView/Image";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { guidGenerator } from "../core/Helpers";
 import { isDefined } from "../utils/utilities";
 import { AnnotationMixin } from "./AnnotationMixin";
@@ -24,10 +21,7 @@ const RegionsMixin = types
     // Dynamic preannotations enabled
     dynamic: false,
 
-    origin: types.optional(
-      types.enumeration(["prediction", "prediction-changed", "manual"]),
-      "manual",
-    ),
+    origin: types.optional(types.enumeration(["prediction", "prediction-changed", "manual"]), "manual"),
 
     item_index: types.maybeNull(types.number),
   })
@@ -86,9 +80,7 @@ const RegionsMixin = types
 
       const result = regions.filter((region) => {
         if (excludeSelf && region === self) return false;
-        const canBePartOfNotification = self.supportSuggestions
-          ? self.dynamic
-          : true;
+        const canBePartOfNotification = self.supportSuggestions ? self.dynamic : true;
 
         return (
           canBePartOfNotification &&
@@ -115,9 +107,7 @@ const RegionsMixin = types
       // There are two modes:
       // If object tag support suggestions - the region should be marked as a dynamic one to make notifications
       // If object tag doesn't support suggestions - every region works as dynamic with auto suggestions
-      const canBeReasonOfNotification = self.supportSuggestions
-        ? self.dynamic && !self.fromSuggestion
-        : true;
+      const canBeReasonOfNotification = self.supportSuggestions ? self.dynamic && !self.fromSuggestion : true;
 
       const isSmartEnabled = self.results.some((r) => r.from_name.smartEnabled);
 
@@ -140,8 +130,7 @@ const RegionsMixin = types
       },
 
       setItemIndex(index) {
-        if (!isDefined(index))
-          throw new Error("Index must be provided for", self);
+        if (!isDefined(index)) throw new Error("Index must be provided for", self);
         self.item_index = index;
       },
 
@@ -180,23 +169,15 @@ const RegionsMixin = types
       },
 
       convertYToPerc(y) {
-        return (
-          (y * RELATIVE_STAGE_HEIGHT) / self.currentImageEntity.stageHeight
-        );
+        return (y * RELATIVE_STAGE_HEIGHT) / self.currentImageEntity.stageHeight;
       },
 
       convertHDimensionToPerc(hd) {
-        return (
-          (hd * (self.scaleX || 1) * RELATIVE_STAGE_WIDTH) /
-          self.currentImageEntity.stageWidth
-        );
+        return (hd * (self.scaleX || 1) * RELATIVE_STAGE_WIDTH) / self.currentImageEntity.stageWidth;
       },
 
       convertVDimensionToPerc(vd) {
-        return (
-          (vd * (self.scaleY || 1) * RELATIVE_STAGE_HEIGHT) /
-          self.currentImageEntity.stageHeight
-        );
+        return (vd * (self.scaleY || 1) * RELATIVE_STAGE_HEIGHT) / self.currentImageEntity.stageHeight;
       },
 
       // update region appearence based on it's current states, for
@@ -221,8 +202,7 @@ const RegionsMixin = types
         if (1) return;
         const annotation = self.annotation;
         const parent = self.parent;
-        const keepStates =
-          tryToKeepStates && self.store.settings.continuousLabeling;
+        const keepStates = tryToKeepStates && self.store.settings.continuousLabeling;
 
         if (annotation.relationMode) {
           annotation.stopRelationMode();
@@ -246,8 +226,7 @@ const RegionsMixin = types
       onClickRegion(ev) {
         const annotation = self.annotation;
 
-        if (!self.isReadOnly() && (self.isDrawing || annotation.isDrawing))
-          return;
+        if (!self.isReadOnly() && (self.isDrawing || annotation.isDrawing)) return;
 
         if (!self.isReadOnly() && annotation.relationMode) {
           annotation.addRelation(self);
@@ -327,8 +306,4 @@ const RegionsMixin = types
     };
   });
 
-export default types.compose(
-  RegionsMixin,
-  ReadOnlyRegionMixin,
-  AnnotationMixin,
-);
+export default types.compose(RegionsMixin, ReadOnlyRegionMixin, AnnotationMixin);

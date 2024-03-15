@@ -19,9 +19,7 @@ module.exports = {
     return locate(this._rootSelector);
   },
   locate(locator) {
-    return locator
-      ? locate(locator).inside(this.locateDetailPanel())
-      : this.locateDetailPanel();
+    return locator ? locate(locator).inside(this.locateDetailPanel()) : this.locateDetailPanel();
   },
   locateMeta() {
     return this.locate(this._metaField);
@@ -35,20 +33,14 @@ module.exports = {
     return this.locate(this._resultBlockSelector);
   },
   locateResultRating(rating) {
-    const locator = this.locateResultBlock().withDescendant(
-      locate(this._resultTitleSelector).withText("Rating"),
-    );
+    const locator = this.locateResultBlock().withDescendant(locate(this._resultTitleSelector).withText("Rating"));
 
     if (typeof rating === "undefined") return locator;
 
-    return locator.withDescendant(
-      locate(this._resultValueSelector).withText(`${rating}`),
-    );
+    return locator.withDescendant(locate(this._resultValueSelector).withText(`${rating}`));
   },
   locateResultTextarea(text) {
-    const locator = this.locateResultBlock().withDescendant(
-      locate(this._resultTitleSelector).withText("Text"),
-    );
+    const locator = this.locateResultBlock().withDescendant(locate(this._resultTitleSelector).withText("Text"));
 
     if (typeof text === "undefined") return locator;
 
@@ -59,27 +51,19 @@ module.exports = {
     return locator;
   },
   locateResultChoices(value) {
-    const locator = this.locateResultBlock().withDescendant(
-      locate(this._resultTitleSelector).withText("Choices"),
-    );
+    const locator = this.locateResultBlock().withDescendant(locate(this._resultTitleSelector).withText("Choices"));
 
     if (typeof value === "undefined") return locator;
 
     if (!Array.isArray(value)) value = [value];
 
-    return locator.withDescendant(
-      locate(this._resultValueSelector).withText(value.join(", ")),
-    );
+    return locator.withDescendant(locate(this._resultValueSelector).withText(value.join(", ")));
   },
   locateLabel(text) {
-    return text
-      ? locate(this._labelSelector).withText(`${text}`)
-      : locate(this._labelSelector);
+    return text ? locate(this._labelSelector).withText(`${text}`) : locate(this._labelSelector);
   },
   locateText(text) {
-    return text
-      ? locate(this._textSelector).withText(`${text}`)
-      : locate(this._textSelector);
+    return text ? locate(this._textSelector).withText(`${text}`) : locate(this._textSelector);
   },
   clickEditMeta() {
     I.click(this.locate(this._editMetaSelector));

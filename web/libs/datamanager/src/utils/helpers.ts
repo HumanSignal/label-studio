@@ -36,9 +36,7 @@ export const isEmptyString = (value: any) => {
 };
 
 export const isEmptyObject = (value: any) => {
-  return (
-    (typeof value === "object" && !value) || Object.keys(value).length === 0
-  );
+  return (typeof value === "object" && !value) || Object.keys(value).length === 0;
 };
 
 export const isEmptyArray = (value: any) => {
@@ -49,15 +47,12 @@ export const isEmpty = (value: any) => {
   return isEmptyString(value) || isEmptyObject(value) || isEmptyArray(value);
 };
 
-type CamelCase<S extends string> =
-  S extends `${infer P1}_${infer P2}${infer P3}`
-    ? `${Lowercase<P1>}${Uppercase<P2>}${CamelCase<P3>}`
-    : Lowercase<S>;
+type CamelCase<S extends string> = S extends `${infer P1}_${infer P2}${infer P3}`
+  ? `${Lowercase<P1>}${Uppercase<P2>}${CamelCase<P3>}`
+  : Lowercase<S>;
 
 type ObjectToCamel<T> = {
-  [K in keyof T as CamelCase<string & K>]: T[K] extends Record<string, any>
-    ? KeysToCamelCase<T[K]>
-    : T[K];
+  [K in keyof T as CamelCase<string & K>]: T[K] extends Record<string, any> ? KeysToCamelCase<T[K]> : T[K];
 };
 
 type KeysToCamelCase<T> = {
@@ -66,9 +61,7 @@ type KeysToCamelCase<T> = {
     : ObjectToCamel<T[K]>;
 };
 
-export const camelizeKeys = <T extends AnyObject>(
-  source: T,
-): KeysToCamelCase<T> => {
+export const camelizeKeys = <T extends AnyObject>(source: T): KeysToCamelCase<T> => {
   type Pair = [string, unknown];
 
   const split = Object.entries(source);
@@ -84,11 +77,7 @@ export const camelizeKeys = <T extends AnyObject>(
   return Object.fromEntries(pairs) as KeysToCamelCase<T>;
 };
 
-export const hasProperties = (
-  obj: AnyObject,
-  properties: string[],
-  all?: boolean,
-) => {
+export const hasProperties = (obj: AnyObject, properties: string[], all?: boolean) => {
   if (!isDefined(obj)) return false;
 
   return all
@@ -101,9 +90,7 @@ export const hasProperties = (
 };
 
 export const objectClean = <T extends AnyObject>(source: T) => {
-  const cleanObject: [keyof T, unknown][] = Object.entries(source).reduce<
-    [keyof T, unknown][]
-  >((res, [key, value]) => {
+  const cleanObject: [keyof T, unknown][] = Object.entries(source).reduce<[keyof T, unknown][]>((res, [key, value]) => {
     const valueIsDefined = isDefined(value) && !isEmptyString(value);
 
     if (!valueIsDefined) {
@@ -127,10 +114,7 @@ export const absoluteURL = (path = "") => {
   if (path.match(/^https?/) || path.match(/^\/\//)) {
     return path;
   }
-  return [
-    APP_SETTINGS.hostname.replace(/([/]+)$/, ""),
-    path.replace(/^([/]+)/, ""),
-  ].join("/");
+  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
 };
 
 export const isDefined = <T>(value?: T): value is NonNullable<T> => {

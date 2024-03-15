@@ -58,8 +58,7 @@ export class SyncManager {
    */
   sync(data: SyncData, event: SyncEvent, origin: string) {
     // @todo remove
-    if (!this.locked || this.locked === origin)
-      console.log("SYNC", { event, locked: this.locked, data, origin });
+    if (!this.locked || this.locked === origin) console.log("SYNC", { event, locked: this.locked, data, origin });
 
     ///// locking mechanism
     // also send events came from original tag even when sync window is locked,
@@ -156,9 +155,7 @@ const SyncableMixin = types
         // while other synced tags should be muted, otherwise volume can't be controlled.
         // But if there are no Audio tags in group, the tag triggered sync
         // should be the main tag with volume active, and others should be muted.
-        self.syncMuted(
-          self.type !== "audio" && self.syncManager?.audioTags > 0,
-        );
+        self.syncMuted(self.type !== "audio" && self.syncManager?.audioTags > 0);
       }
     },
 

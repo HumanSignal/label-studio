@@ -2,9 +2,7 @@ import TriggerOptions = Cypress.TriggerOptions;
 import ObjectLike = Cypress.ObjectLike;
 import ClickOptions = Cypress.ClickOptions;
 
-type MouseInteractionOptions = Partial<
-  TriggerOptions & ObjectLike & MouseEvent
->;
+type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>;
 
 // The width of the frame item on the timeline
 const FRAME_WIDTH = 16;
@@ -63,13 +61,7 @@ export const VideoView = {
    * @param {number} width
    * @param {number} height
    */
-  drawRect(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    options: MouseInteractionOptions = {},
-  ) {
+  drawRect(x: number, y: number, width: number, height: number, options: MouseInteractionOptions = {}) {
     cy.log(`Draw rectangle at (${x}, ${y}) of size ${width}x${height}`);
     this.drawingArea
       .scrollIntoView()
@@ -101,13 +93,7 @@ export const VideoView = {
    * @param {number} width
    * @param {number} height
    */
-  drawRectRelative(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    options: MouseInteractionOptions = {},
-  ) {
+  drawRectRelative(x: number, y: number, width: number, height: number, options: MouseInteractionOptions = {}) {
     this.drawingArea.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
@@ -129,10 +115,7 @@ export const VideoView = {
       const pointX = bbox.width + (idx - 0.5) * FRAME_WIDTH;
       const pointY = FRAME_RESERVED_HEIGHT / 2;
 
-      this.timeframesArea
-        .scrollIntoView()
-        .trigger("mouseover", pointX, pointY)
-        .click(pointX, pointY, options);
+      this.timeframesArea.scrollIntoView().trigger("mouseover", pointX, pointY).click(pointX, pointY, options);
     });
   },
 

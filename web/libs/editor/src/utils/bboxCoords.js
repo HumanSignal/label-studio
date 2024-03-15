@@ -21,12 +21,7 @@ import { minMax } from "./utilities";
  * @param {number} whRatio
  * @returns {BBox}
  */
-export function rotateBboxCoords(
-  bboxCoords,
-  rotation,
-  pivot = { x: bboxCoords.left, y: bboxCoords.top },
-  whRatio = 1,
-) {
+export function rotateBboxCoords(bboxCoords, rotation, pivot = { x: bboxCoords.left, y: bboxCoords.top }, whRatio = 1) {
   if (!bboxCoords) return bboxCoords;
   const a = (rotation * Math.PI) / 180;
   const cosA = Math.cos(a);

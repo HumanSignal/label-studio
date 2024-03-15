@@ -8,12 +8,7 @@ export class CommentsSdk {
   }
 
   bindEventHandlers() {
-    [
-      "comments:create",
-      "comments:update",
-      "comments:delete",
-      "comments:list",
-    ].forEach((evt) => this.lsf.off(evt));
+    ["comments:create", "comments:update", "comments:delete", "comments:list"].forEach((evt) => this.lsf.off(evt));
 
     this.lsf.on("comments:create", this.createComment);
     this.lsf.on("comments:update", this.updateComment);
@@ -32,13 +27,9 @@ export class CommentsSdk {
     } else if (isFF(FF_DEV_3034) && comment.draft) {
       body.draft = comment.draft;
     }
-    const { $meta: _, ...newComment } = await this.dm.apiCall(
-      "createComment",
-      undefined,
-      {
-        body,
-      },
-    );
+    const { $meta: _, ...newComment } = await this.dm.apiCall("createComment", undefined, {
+      body,
+    });
 
     return newComment;
   };
@@ -46,11 +37,7 @@ export class CommentsSdk {
   updateComment = async (comment) => {
     if (!comment.id || comment.id < 0) return; // Don't allow an update with an incorrect id
 
-    const res = await this.dm.apiCall(
-      "updateComment",
-      { id: comment.id },
-      { body: comment },
-    );
+    const res = await this.dm.apiCall("updateComment", { id: comment.id }, { body: comment });
 
     return res;
   };
@@ -87,11 +74,7 @@ export class CommentsSdk {
   deleteComment = async (comment) => {
     if (!comment.id || comment.id < 0) return; // Don't allow an update with an incorrect id
 
-    const res = await this.dm.apiCall(
-      "deleteComment",
-      { id: comment.id },
-      { body: comment },
-    );
+    const res = await this.dm.apiCall("deleteComment", { id: comment.id }, { body: comment });
 
     return res;
   };

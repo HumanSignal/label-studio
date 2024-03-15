@@ -4,14 +4,7 @@ import "./RadioGroup.styl";
 
 const RadioContext = React.createContext();
 
-export const RadioGroup = ({
-  size,
-  value,
-  defaultValue,
-  onChange,
-  children,
-  ...props
-}) => {
+export const RadioGroup = ({ size, value, defaultValue, onChange, children, ...props }) => {
   const [currentValue, setCurrentValue] = useState(defaultValue);
 
   const onRadioChange = (e) => {
@@ -39,9 +32,7 @@ const RadioButton = ({ value, disabled, children }) => {
   const checked = value === currentValue;
 
   return (
-    <label
-      className={cn("radio-group").elem("button").mod({ checked, disabled })}
-    >
+    <label className={cn("radio-group").elem("button").mod({ checked, disabled })}>
       <input
         className={cn("radio-group").elem("input")}
         type="radio"

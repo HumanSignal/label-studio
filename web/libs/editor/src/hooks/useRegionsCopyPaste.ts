@@ -7,13 +7,8 @@ export const useRegionsCopyPaste = (entity: any) => {
       if ((el as Node).nodeType !== Node.ELEMENT_NODE) return false;
 
       const element = el as HTMLElement;
-      const tabIndex = Number.parseInt(
-        element.getAttribute("tabindex") ?? "",
-        10,
-      );
-      const isFocusable = element.matches(
-        "a, button, input, textarea, select, details, [tabindex], [contenteditable]",
-      );
+      const tabIndex = Number.parseInt(element.getAttribute("tabindex") ?? "", 10);
+      const isFocusable = element.matches("a, button, input, textarea, select, details, [tabindex], [contenteditable]");
 
       return isFocusable || tabIndex > -1;
     };
@@ -25,9 +20,7 @@ export const useRegionsCopyPaste = (entity: any) => {
       const activeElementIsFocusable = isFocusable(document.activeElement);
       const selectionIsCollapsed = selection?.isCollapsed ?? true;
 
-      return (
-        selectionIsCollapsed && !nodeIsFocusable && !activeElementIsFocusable
-      );
+      return selectionIsCollapsed && !nodeIsFocusable && !activeElementIsFocusable;
     };
 
     const copyToClipboard = (ev: ClipboardEvent) => {

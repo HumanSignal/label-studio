@@ -5,13 +5,7 @@ import { RelationShape } from "./RelationShape";
 import { DOMWatcher, createPropertyWatcher } from "./watchers";
 
 const parentImagePropsWatch = {
-  parent: [
-    "zoomScale",
-    "zoomingPositionX",
-    "zoomingPositionY",
-    "rotation",
-    "currentImage",
-  ],
+  parent: ["zoomScale", "zoomingPositionX", "zoomingPositionY", "rotation", "currentImage"],
 };
 
 const obtainWatcher = (node) => {
@@ -21,45 +15,17 @@ const obtainWatcher = (node) => {
     case "paragraphs":
       return DOMWatcher;
     case "rectangleregion":
-      return createPropertyWatcher([
-        "x",
-        "y",
-        "width",
-        "height",
-        "hidden",
-        parentImagePropsWatch,
-      ]);
+      return createPropertyWatcher(["x", "y", "width", "height", "hidden", parentImagePropsWatch]);
     case "ellipseregion":
-      return createPropertyWatcher([
-        "x",
-        "y",
-        "radiusX",
-        "radiusY",
-        "rotation",
-        "hidden",
-        parentImagePropsWatch,
-      ]);
+      return createPropertyWatcher(["x", "y", "radiusX", "radiusY", "rotation", "hidden", parentImagePropsWatch]);
     case "polygonregion":
-      return createPropertyWatcher([
-        "hidden",
-        { points: ["x", "y"] },
-        parentImagePropsWatch,
-      ]);
+      return createPropertyWatcher(["hidden", { points: ["x", "y"] }, parentImagePropsWatch]);
     case "keypointregion":
       return createPropertyWatcher(["x", "y", "hidden", parentImagePropsWatch]);
     case "brushregion":
-      return createPropertyWatcher([
-        "needsUpdate",
-        "hidden",
-        "touchesLength",
-        parentImagePropsWatch,
-      ]);
+      return createPropertyWatcher(["needsUpdate", "hidden", "touchesLength", parentImagePropsWatch]);
     case "timeseriesregion":
-      return createPropertyWatcher([
-        "start",
-        "end",
-        { parent: ["zoomedRange"] },
-      ]);
+      return createPropertyWatcher(["start", "end", { parent: ["zoomedRange"] }]);
     default:
       return null;
   }
@@ -115,10 +81,7 @@ const calculateBBox = (shape, root) => {
 };
 
 const getNodesBBox = ({ start, end, root }) => {
-  const [startBBox, endBBox] = Geometry.closestRects(
-    calculateBBox(start, root),
-    calculateBBox(end, root),
-  );
+  const [startBBox, endBBox] = Geometry.closestRects(calculateBBox(start, root), calculateBBox(end, root));
 
   return {
     start: startBBox,
@@ -187,10 +150,7 @@ const calculateSidePath = ({ x1, y1, w1, h1, x2, y2, w2, h2, limit }) => {
   return { x1: xs1, x2: xs2, y1: ys1, y2: ys2, l1, l2, toEnd, renderingSide };
 };
 
-const buildPathCommand = (
-  { x1, y1, x2, y2, l1, l2, toEnd, renderingSide },
-  orientation,
-) => {
+const buildPathCommand = ({ x1, y1, x2, y2, l1, l2, toEnd, renderingSide }, orientation) => {
   const radius = 5;
   const vertical = orientation === "vertical";
 
@@ -285,9 +245,7 @@ const calculatePath = (start, end) => {
     w2,
   });
 
-  const coordinatesCalculator = intersecting
-    ? calculateSidePath
-    : calculateTopPath;
+  const coordinatesCalculator = intersecting ? calculateSidePath : calculateTopPath;
   const coordinates = coordinatesCalculator({
     x1,
     y1,
@@ -300,10 +258,7 @@ const calculatePath = (start, end) => {
     limit,
   });
 
-  const pathCommand = buildPathCommand(
-    coordinates,
-    intersecting ? "horizontal" : "vertical",
-  );
+  const pathCommand = buildPathCommand(coordinates, intersecting ? "horizontal" : "vertical");
 
   return pathCommand;
 };

@@ -8,21 +8,8 @@ import "./AnnotationTabs.styl";
 
 export const EntityTab = observer(
   forwardRef(
-    (
-      {
-        entity,
-        selected,
-        style,
-        onClick,
-        bordered = true,
-        prediction = false,
-        displayGroundTruth = false,
-      },
-      ref,
-    ) => {
-      const isUnsaved =
-        (entity.userGenerate && !entity.sentUserGenerate) ||
-        entity.draftSelected;
+    ({ entity, selected, style, onClick, bordered = true, prediction = false, displayGroundTruth = false }, ref) => {
+      const isUnsaved = (entity.userGenerate && !entity.sentUserGenerate) || entity.draftSelected;
 
       return (
         <Block
@@ -52,9 +39,7 @@ export const EntityTab = observer(
               ID {entity.pk ?? entity.id} {isUnsaved && "*"}
             </Elem>
 
-            {displayGroundTruth && entity.ground_truth && (
-              <Elem name="ground-truth" tag={LsStar} />
-            )}
+            {displayGroundTruth && entity.ground_truth && <Elem name="ground-truth" tag={LsStar} />}
 
             {entity.skipped && <Elem name="skipped" tag={IconBan} />}
           </Space>
@@ -66,13 +51,7 @@ export const EntityTab = observer(
 
 /** @deprecated this file is not used; only EntityTab is in use and can be moved out */
 export const AnnotationTabs = observer(
-  ({
-    store,
-    showAnnotations = true,
-    showPredictions = true,
-    allowCreateNew = true,
-    allowViewAll = true,
-  }) => {
+  ({ store, showAnnotations = true, showPredictions = true, allowCreateNew = true, allowViewAll = true }) => {
     const listRef = useRef();
     const selectedRef = useRef();
 
@@ -107,15 +86,13 @@ export const AnnotationTabs = observer(
     if (showPredictions) list.push(...as.predictions);
     if (showAnnotations) list.push(...as.annotations);
 
-    const tabsDisabled =
-      !showPredictions && !showAnnotations && !allowViewAll && !allowCreateNew;
+    const tabsDisabled = !showPredictions && !showAnnotations && !allowViewAll && !allowCreateNew;
 
     useEffect(() => {
       if (selectedRef.current) {
         const list = listRef.current;
         const elem = selectedRef.current;
-        const xOffset =
-          elem.offsetLeft + elem.clientWidth / 2 - list.clientWidth / 2;
+        const xOffset = elem.offsetLeft + elem.clientWidth / 2 - list.clientWidth / 2;
 
         list.scrollTo({
           left: xOffset,
@@ -151,12 +128,7 @@ export const AnnotationTabs = observer(
         </Elem>
 
         {allowViewAll && (
-          <Elem
-            tag="button"
-            name="all"
-            mod={{ active: as.viewingAll }}
-            onClick={onToggleVisibility}
-          >
+          <Elem tag="button" name="all" mod={{ active: as.viewingAll }} onClick={onToggleVisibility}>
             <LsGrid />
           </Elem>
         )}

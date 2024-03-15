@@ -11,11 +11,9 @@ export class EllipseWatcher {
   }
 
   handleUpdate() {
-    this.disposers = ["x", "y", "radiusX", "radiusY", "rotation"].map(
-      (property) => {
-        return observe(this.element, property, this.onUpdate, true);
-      },
-    );
+    this.disposers = ["x", "y", "radiusX", "radiusY", "rotation"].map((property) => {
+      return observe(this.element, property, this.onUpdate, true);
+    });
   }
 
   onUpdate = debounce(() => {

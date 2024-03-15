@@ -91,15 +91,11 @@ const Model = types
     },
 
     get sel() {
-      return self.isLeaf
-        ? self._sel
-        : self.children.every((child) => child.sel === true);
+      return self.isLeaf ? self._sel : self.children.every((child) => child.sel === true);
     },
 
     get indeterminate() {
-      return self.isLeaf
-        ? false
-        : !self.sel && self.children.some((child) => child.sel === true);
+      return self.isLeaf ? false : !self.sel && self.children.some((child) => child.sel === true);
     },
 
     get parentChoice() {
@@ -172,14 +168,7 @@ const Model = types
     return {};
   });
 
-const ChoiceModel = types.compose(
-  "ChoiceModel",
-  TagParentMixin,
-  TagAttrs,
-  ProcessAttrsMixin,
-  Model,
-  AnnotationMixin,
-);
+const ChoiceModel = types.compose("ChoiceModel", TagParentMixin, TagAttrs, ProcessAttrsMixin, Model, AnnotationMixin);
 
 // `name` can't be passed into bem components
 const nameWrapper = (Component, name) => {
@@ -203,10 +192,7 @@ const HtxNewChoiceView = ({ item, store }) => {
   }, []);
 
   const [collapsed, setCollapsed] = useState(false);
-  const toogleCollapsed = useCallback(
-    () => setCollapsed((collapsed) => !collapsed),
-    [],
-  );
+  const toogleCollapsed = useCallback(() => setCollapsed((collapsed) => !collapsed), []);
 
   return (
     <Block
@@ -221,10 +207,7 @@ const HtxNewChoiceView = ({ item, store }) => {
       <Elem name="item" mod={{ notLeaf: !item.isLeaf }} style={style}>
         <Elem
           name="checkbox"
-          component={nameWrapper(
-            item.isCheckbox ? Checkbox : Radio,
-            item._value,
-          )}
+          component={nameWrapper(item.isCheckbox ? Checkbox : Radio, item._value)}
           mod={{ notLeaf: !item.isLeaf }}
           checked={item.sel}
           indeterminate={!item.sel && item.indeterminate}
@@ -245,13 +228,7 @@ const HtxNewChoiceView = ({ item, store }) => {
           </HintTooltip>
         </Elem>
         {!item.isLeaf ? (
-          <Elem
-            name="toggle"
-            mod={{ collapsed }}
-            component={Button}
-            type="text"
-            onClick={toogleCollapsed}
-          >
+          <Elem name="toggle" mod={{ collapsed }} component={Button} type="text" onClick={toogleCollapsed}>
             <LsChevron />
           </Elem>
         ) : (

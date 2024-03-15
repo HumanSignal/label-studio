@@ -11,10 +11,7 @@ import {
   ToolBar,
 } from "@humansignal/frontend-test/helpers/LSF";
 import { ImageView } from "@humansignal/frontend-test/helpers/LSF";
-import {
-  FF_DEV_2100,
-  FF_LSDV_4583,
-} from "../../../../../src/utils/feature-flags";
+import { FF_DEV_2100, FF_LSDV_4583 } from "../../../../../src/utils/feature-flags";
 import {
   CHOICES_REQUIRED_WARNING,
   DATETIME_REQUIRED_WARNING,
@@ -97,11 +94,7 @@ beforeEach(() => {
 /* <DateTime /> */
 describe("Classification - single image - DateTime", () => {
   it("should create result without item_index", () => {
-    LabelStudio.params()
-      .config(simpleImageDateTimeConfig)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleImageDateTimeConfig).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -131,11 +124,7 @@ describe("Classification - single image - DateTime", () => {
 });
 describe("Classification - MIG perTag - DateTime", () => {
   it("should not have item_index in result", () => {
-    LabelStudio.params()
-      .config(perTagMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGDateTimeConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -147,11 +136,7 @@ describe("Classification - MIG perTag - DateTime", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(perTagMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult(perTagDateTimeResult)
-      .init();
+    LabelStudio.params().config(perTagMIGDateTimeConfig).data(simpleMIGData).withResult(perTagDateTimeResult).init();
 
     ImageView.waitForImage();
 
@@ -164,11 +149,7 @@ describe("Classification - MIG perTag - DateTime", () => {
   });
 
   it("should keep value between items", () => {
-    LabelStudio.params()
-      .config(perTagMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGDateTimeConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -181,11 +162,7 @@ describe("Classification - MIG perTag - DateTime", () => {
   });
 
   it("should require result", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGDateTimeConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -194,11 +171,7 @@ describe("Classification - MIG perTag - DateTime", () => {
   });
 
   it("should not require result if there is one", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGDateTimeConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -306,11 +279,7 @@ describe("Control Tags - MIG perRegion - DateTime", () => {
 });
 describe("Control Tags - MIG perItem - DateTime", () => {
   it("should create result with item_index", () => {
-    LabelStudio.params()
-      .config(perItemMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGDateTimeConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -322,11 +291,7 @@ describe("Control Tags - MIG perItem - DateTime", () => {
   });
 
   it("should load perItem result correctly", () => {
-    LabelStudio.params()
-      .config(perItemMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult(perItemDateTimeResult)
-      .init();
+    LabelStudio.params().config(perItemMIGDateTimeConfig).data(simpleMIGData).withResult(perItemDateTimeResult).init();
 
     ImageView.waitForImage();
 
@@ -344,11 +309,7 @@ describe("Control Tags - MIG perItem - DateTime", () => {
   });
 
   it("should be able to create result for second item", () => {
-    LabelStudio.params()
-      .config(perItemMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGDateTimeConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -363,11 +324,7 @@ describe("Control Tags - MIG perItem - DateTime", () => {
   });
 
   it("should be able to create more that one result", () => {
-    LabelStudio.params()
-      .config(perItemMIGDateTimeConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGDateTimeConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -460,11 +417,7 @@ describe("Control Tags - MIG perItem - DateTime", () => {
 /* <Choices /> */
 describe("Classification - single image - Choices", () => {
   it("should create result without item_index", () => {
-    LabelStudio.params()
-      .config(simpleImageChoicesConfig)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleImageChoicesConfig).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -476,11 +429,7 @@ describe("Classification - single image - Choices", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(simpleImageChoicesConfig)
-      .data(simpleImageData)
-      .withResult(perTagChoicesResult)
-      .init();
+    LabelStudio.params().config(simpleImageChoicesConfig).data(simpleImageData).withResult(perTagChoicesResult).init();
 
     ImageView.waitForImage();
 
@@ -494,11 +443,7 @@ describe("Classification - single image - Choices", () => {
 });
 describe("Classification - MIG perTag - Choices", () => {
   it("should not have item_index in result", () => {
-    LabelStudio.params()
-      .config(perTagMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGChoicesConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -510,11 +455,7 @@ describe("Classification - MIG perTag - Choices", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(perTagMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult(perTagChoicesResult)
-      .init();
+    LabelStudio.params().config(perTagMIGChoicesConfig).data(simpleMIGData).withResult(perTagChoicesResult).init();
 
     ImageView.waitForImage();
 
@@ -527,11 +468,7 @@ describe("Classification - MIG perTag - Choices", () => {
   });
 
   it("should keep value between items", () => {
-    LabelStudio.params()
-      .config(perTagMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGChoicesConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -544,11 +481,7 @@ describe("Classification - MIG perTag - Choices", () => {
   });
 
   it("should require result", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGChoicesConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -557,11 +490,7 @@ describe("Classification - MIG perTag - Choices", () => {
   });
 
   it("should not require result if there is one", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGChoicesConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -669,11 +598,7 @@ describe("Control Tags - MIG perRegion - Choices", () => {
 });
 describe("Control Tags - MIG perItem - Choices", () => {
   it("should create result with item_index", () => {
-    LabelStudio.params()
-      .config(perItemMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGChoicesConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -685,11 +610,7 @@ describe("Control Tags - MIG perItem - Choices", () => {
   });
 
   it("should load perItem result correctly", () => {
-    LabelStudio.params()
-      .config(perItemMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult(perItemChoicesResult)
-      .init();
+    LabelStudio.params().config(perItemMIGChoicesConfig).data(simpleMIGData).withResult(perItemChoicesResult).init();
 
     ImageView.waitForImage();
 
@@ -707,11 +628,7 @@ describe("Control Tags - MIG perItem - Choices", () => {
   });
 
   it("should be able to create result for second item", () => {
-    LabelStudio.params()
-      .config(perItemMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGChoicesConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -726,11 +643,7 @@ describe("Control Tags - MIG perItem - Choices", () => {
   });
 
   it("should be able to create more that one result", () => {
-    LabelStudio.params()
-      .config(perItemMIGChoicesConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGChoicesConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -821,11 +734,7 @@ describe("Control Tags - MIG perItem - Choices", () => {
 /* <Number /> */
 describe("Classification - single image - Number", () => {
   it("should create result without item_index", () => {
-    LabelStudio.params()
-      .config(simpleImageNumberConfig)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleImageNumberConfig).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -837,11 +746,7 @@ describe("Classification - single image - Number", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(simpleImageNumberConfig)
-      .data(simpleImageData)
-      .withResult(perTagNumberResult)
-      .init();
+    LabelStudio.params().config(simpleImageNumberConfig).data(simpleImageData).withResult(perTagNumberResult).init();
 
     ImageView.waitForImage();
 
@@ -855,11 +760,7 @@ describe("Classification - single image - Number", () => {
 });
 describe("Classification - MIG perTag - Number", () => {
   it("should not have item_index in result", () => {
-    LabelStudio.params()
-      .config(perTagMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGNumberConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -871,11 +772,7 @@ describe("Classification - MIG perTag - Number", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(perTagMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult(perTagNumberResult)
-      .init();
+    LabelStudio.params().config(perTagMIGNumberConfig).data(simpleMIGData).withResult(perTagNumberResult).init();
 
     ImageView.waitForImage();
 
@@ -888,11 +785,7 @@ describe("Classification - MIG perTag - Number", () => {
   });
 
   it("should keep value between items", () => {
-    LabelStudio.params()
-      .config(perTagMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGNumberConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -905,11 +798,7 @@ describe("Classification - MIG perTag - Number", () => {
   });
 
   it("should require result", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGNumberConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -918,11 +807,7 @@ describe("Classification - MIG perTag - Number", () => {
   });
 
   it("should not require result if there is one", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGNumberConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -934,11 +819,7 @@ describe("Classification - MIG perTag - Number", () => {
 });
 describe("Control Tags - MIG perRegion - Number", () => {
   it("should create result with item_index", () => {
-    LabelStudio.params()
-      .config(perRegionMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult(perRegionRegionsResult)
-      .init();
+    LabelStudio.params().config(perRegionMIGNumberConfig).data(simpleMIGData).withResult(perRegionRegionsResult).init();
 
     ImageView.waitForImage();
     Sidebar.hasRegions(2);
@@ -957,11 +838,7 @@ describe("Control Tags - MIG perRegion - Number", () => {
   });
 
   it("should load result correctly", () => {
-    LabelStudio.params()
-      .config(perRegionMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult(perRegionNumberResult)
-      .init();
+    LabelStudio.params().config(perRegionMIGNumberConfig).data(simpleMIGData).withResult(perRegionNumberResult).init();
 
     ImageView.waitForImage();
     Sidebar.hasRegions(2);
@@ -1030,11 +907,7 @@ describe("Control Tags - MIG perRegion - Number", () => {
 });
 describe("Control Tags - MIG perItem - Number", () => {
   it("should create result with item_index", () => {
-    LabelStudio.params()
-      .config(perItemMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGNumberConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1046,11 +919,7 @@ describe("Control Tags - MIG perItem - Number", () => {
   });
 
   it("should load perItem result correctly", () => {
-    LabelStudio.params()
-      .config(perItemMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult(perItemNumberResult)
-      .init();
+    LabelStudio.params().config(perItemMIGNumberConfig).data(simpleMIGData).withResult(perItemNumberResult).init();
 
     ImageView.waitForImage();
 
@@ -1068,11 +937,7 @@ describe("Control Tags - MIG perItem - Number", () => {
   });
 
   it("should be able to create result for second item", () => {
-    LabelStudio.params()
-      .config(perItemMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGNumberConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1087,11 +952,7 @@ describe("Control Tags - MIG perItem - Number", () => {
   });
 
   it("should be able to create more that one result", () => {
-    LabelStudio.params()
-      .config(perItemMIGNumberConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGNumberConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1176,11 +1037,7 @@ describe("Control Tags - MIG perItem - Number", () => {
 /* <Rating /> */
 describe("Classification - single image - Rating", () => {
   it("should create result without item_index", () => {
-    LabelStudio.params()
-      .config(simpleImageRatingConfig)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleImageRatingConfig).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1192,11 +1049,7 @@ describe("Classification - single image - Rating", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(simpleImageRatingConfig)
-      .data(simpleImageData)
-      .withResult(perTagRatingResult)
-      .init();
+    LabelStudio.params().config(simpleImageRatingConfig).data(simpleImageData).withResult(perTagRatingResult).init();
 
     ImageView.waitForImage();
 
@@ -1210,11 +1063,7 @@ describe("Classification - single image - Rating", () => {
 });
 describe("Classification - MIG perTag - Rating", () => {
   it("should not have item_index in result", () => {
-    LabelStudio.params()
-      .config(perTagMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGRatingConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1226,11 +1075,7 @@ describe("Classification - MIG perTag - Rating", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(perTagMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult(perTagRatingResult)
-      .init();
+    LabelStudio.params().config(perTagMIGRatingConfig).data(simpleMIGData).withResult(perTagRatingResult).init();
 
     ImageView.waitForImage();
 
@@ -1243,11 +1088,7 @@ describe("Classification - MIG perTag - Rating", () => {
   });
 
   it("should keep value between items", () => {
-    LabelStudio.params()
-      .config(perTagMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGRatingConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1260,11 +1101,7 @@ describe("Classification - MIG perTag - Rating", () => {
   });
 
   it("should require result", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGRatingConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1273,11 +1110,7 @@ describe("Classification - MIG perTag - Rating", () => {
   });
 
   it("should not require result if there is one", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGRatingConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1289,11 +1122,7 @@ describe("Classification - MIG perTag - Rating", () => {
 });
 describe("Control Tags - MIG perRegion - Rating", () => {
   it("should create result with item_index", () => {
-    LabelStudio.params()
-      .config(perRegionMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult(perRegionRegionsResult)
-      .init();
+    LabelStudio.params().config(perRegionMIGRatingConfig).data(simpleMIGData).withResult(perRegionRegionsResult).init();
 
     ImageView.waitForImage();
     Sidebar.hasRegions(2);
@@ -1312,11 +1141,7 @@ describe("Control Tags - MIG perRegion - Rating", () => {
   });
 
   it("should load result correctly", () => {
-    LabelStudio.params()
-      .config(perRegionMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult(perRegionRatingResult)
-      .init();
+    LabelStudio.params().config(perRegionMIGRatingConfig).data(simpleMIGData).withResult(perRegionRatingResult).init();
 
     ImageView.waitForImage();
     Sidebar.hasRegions(2);
@@ -1385,11 +1210,7 @@ describe("Control Tags - MIG perRegion - Rating", () => {
 });
 describe("Control Tags - MIG perItem - Rating", () => {
   it("should create result with item_index", () => {
-    LabelStudio.params()
-      .config(perItemMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGRatingConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1401,11 +1222,7 @@ describe("Control Tags - MIG perItem - Rating", () => {
   });
 
   it("should load perItem result correctly", () => {
-    LabelStudio.params()
-      .config(perItemMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult(perItemRatingResult)
-      .init();
+    LabelStudio.params().config(perItemMIGRatingConfig).data(simpleMIGData).withResult(perItemRatingResult).init();
 
     ImageView.waitForImage();
 
@@ -1423,11 +1240,7 @@ describe("Control Tags - MIG perItem - Rating", () => {
   });
 
   it("should be able to create result for second item", () => {
-    LabelStudio.params()
-      .config(perItemMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGRatingConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1442,11 +1255,7 @@ describe("Control Tags - MIG perItem - Rating", () => {
   });
 
   it("should be able to create more that one result", () => {
-    LabelStudio.params()
-      .config(perItemMIGRatingConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGRatingConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1531,11 +1340,7 @@ describe("Control Tags - MIG perItem - Rating", () => {
 /* <Taxonomy /> */
 describe("Classification - single image - Taxonomy", () => {
   it("should create result without item_index", () => {
-    LabelStudio.params()
-      .config(simpleImageTaxonomyConfig)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleImageTaxonomyConfig).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1567,11 +1372,7 @@ describe("Classification - single image - Taxonomy", () => {
 });
 describe("Classification - MIG perTag - Taxonomy", () => {
   it("should not have item_index in result", () => {
-    LabelStudio.params()
-      .config(perTagMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGTaxonomyConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1585,11 +1386,7 @@ describe("Classification - MIG perTag - Taxonomy", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(perTagMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult(perTagTaxonomyResult)
-      .init();
+    LabelStudio.params().config(perTagMIGTaxonomyConfig).data(simpleMIGData).withResult(perTagTaxonomyResult).init();
 
     ImageView.waitForImage();
 
@@ -1602,11 +1399,7 @@ describe("Classification - MIG perTag - Taxonomy", () => {
   });
 
   it("should keep value between items", () => {
-    LabelStudio.params()
-      .config(perTagMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGTaxonomyConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1621,11 +1414,7 @@ describe("Classification - MIG perTag - Taxonomy", () => {
   });
 
   it("should require result", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGTaxonomyConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1634,11 +1423,7 @@ describe("Classification - MIG perTag - Taxonomy", () => {
   });
 
   it("should not require result if there is one", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGTaxonomyConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1753,11 +1538,7 @@ describe("Control Tags - MIG perRegion - Taxonomy", () => {
 });
 describe("Control Tags - MIG perItem - Taxonomy", () => {
   it("should create result with item_index", () => {
-    LabelStudio.params()
-      .config(perItemMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGTaxonomyConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1770,11 +1551,7 @@ describe("Control Tags - MIG perItem - Taxonomy", () => {
   });
 
   it("should load perItem result correctly", () => {
-    LabelStudio.params()
-      .config(perItemMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult(perItemTaxonomyResult)
-      .init();
+    LabelStudio.params().config(perItemMIGTaxonomyConfig).data(simpleMIGData).withResult(perItemTaxonomyResult).init();
 
     ImageView.waitForImage();
 
@@ -1794,11 +1571,7 @@ describe("Control Tags - MIG perItem - Taxonomy", () => {
   });
 
   it("should be able to create result for second item", () => {
-    LabelStudio.params()
-      .config(perItemMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGTaxonomyConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1814,11 +1587,7 @@ describe("Control Tags - MIG perItem - Taxonomy", () => {
   });
 
   it("should be able to create more that one result", () => {
-    LabelStudio.params()
-      .config(perItemMIGTaxonomyConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGTaxonomyConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1911,11 +1680,7 @@ describe("Control Tags - MIG perItem - Taxonomy", () => {
 /* <Textarea /> */
 describe("Classification - single image - Textarea", () => {
   it("should create result without item_index", () => {
-    LabelStudio.params()
-      .config(simpleImageTextareaConfig)
-      .data(simpleImageData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(simpleImageTextareaConfig).data(simpleImageData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1945,11 +1710,7 @@ describe("Classification - single image - Textarea", () => {
 });
 describe("Classification - MIG perTag - Textarea", () => {
   it("should not have item_index in result", () => {
-    LabelStudio.params()
-      .config(perTagMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGTextareaConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1961,11 +1722,7 @@ describe("Classification - MIG perTag - Textarea", () => {
   });
 
   it("should load perTag result correctly", () => {
-    LabelStudio.params()
-      .config(perTagMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult(perTagTextareaResult)
-      .init();
+    LabelStudio.params().config(perTagMIGTextareaConfig).data(simpleMIGData).withResult(perTagTextareaResult).init();
 
     ImageView.waitForImage();
 
@@ -1978,11 +1735,7 @@ describe("Classification - MIG perTag - Textarea", () => {
   });
 
   it("should keep value between items", () => {
-    LabelStudio.params()
-      .config(perTagMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perTagMIGTextareaConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -1995,11 +1748,7 @@ describe("Classification - MIG perTag - Textarea", () => {
   });
 
   it("should require result", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGTextareaConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -2008,11 +1757,7 @@ describe("Classification - MIG perTag - Textarea", () => {
   });
 
   it("should not require result if there is one", () => {
-    LabelStudio.params()
-      .config(requiredPerTagMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(requiredPerTagMIGTextareaConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -2119,11 +1864,7 @@ describe("Control Tags - MIG perRegion - Textarea", () => {
 });
 describe("Control Tags - MIG perItem - Textarea", () => {
   it("should create result with item_index", () => {
-    LabelStudio.params()
-      .config(perItemMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGTextareaConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -2135,11 +1876,7 @@ describe("Control Tags - MIG perItem - Textarea", () => {
   });
 
   it("should load perItem result correctly", () => {
-    LabelStudio.params()
-      .config(perItemMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult(perItemTextareaResult)
-      .init();
+    LabelStudio.params().config(perItemMIGTextareaConfig).data(simpleMIGData).withResult(perItemTextareaResult).init();
 
     ImageView.waitForImage();
 
@@ -2159,11 +1896,7 @@ describe("Control Tags - MIG perItem - Textarea", () => {
   });
 
   it("should be able to create result for second item", () => {
-    LabelStudio.params()
-      .config(perItemMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGTextareaConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 
@@ -2178,11 +1911,7 @@ describe("Control Tags - MIG perItem - Textarea", () => {
   });
 
   it("should be able to create more that one result", () => {
-    LabelStudio.params()
-      .config(perItemMIGTextareaConfig)
-      .data(simpleMIGData)
-      .withResult([])
-      .init();
+    LabelStudio.params().config(perItemMIGTextareaConfig).data(simpleMIGData).withResult([]).init();
 
     ImageView.waitForImage();
 

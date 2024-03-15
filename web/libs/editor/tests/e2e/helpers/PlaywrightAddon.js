@@ -23,11 +23,7 @@ class PlaywrightAddon extends Helper {
    * @returns {Promise<string>} CSS value
    */
   async grabCssPropertyFromPseudo(locator, cssProperty, pseudoElement) {
-    const cssValues = await this.grabCssPropertyFromAllPseudo(
-      locator,
-      cssProperty,
-      pseudoElement,
-    );
+    const cssValues = await this.grabCssPropertyFromAllPseudo(locator, cssProperty, pseudoElement);
 
     assertElementExists(cssValues, locator);
     this.helpers.Playwright.debugSection("CSS", cssValues[0]);
@@ -55,8 +51,7 @@ class PlaywrightAddon extends Helper {
       els.map((el) =>
         el.$eval(
           "xpath=.",
-          (el, { cssProperty, pseudoElement }) =>
-            getComputedStyle(el, pseudoElement).getPropertyValue(cssProperty),
+          (el, { cssProperty, pseudoElement }) => getComputedStyle(el, pseudoElement).getPropertyValue(cssProperty),
           { cssProperty, pseudoElement },
         ),
       ),

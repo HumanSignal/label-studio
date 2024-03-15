@@ -10,9 +10,7 @@ export const Card = ({ header, extra, children, style }) => {
         <div className={rootClass.elem("header")}>
           <div className={rootClass.elem("header-content")}>{header}</div>
 
-          {extra && (
-            <div className={rootClass.elem("header-extra")}>{extra}</div>
-          )}
+          {extra && <div className={rootClass.elem("header-extra")}>{extra}</div>}
         </div>
       )}
       <div className={rootClass.elem("content")}>{children}</div>

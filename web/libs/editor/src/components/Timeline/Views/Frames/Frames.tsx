@@ -1,13 +1,5 @@
 import { clamp } from "lodash";
-import {
-  type FC,
-  type MouseEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type FC, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMemoizedHandlers } from "../../../../hooks/useMemoizedHandlers";
 import { Block, Elem } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
@@ -59,14 +51,7 @@ export const Frames: FC<TimelineViewProps> = ({
   }, [length, step]);
 
   const framesInView = useMemo(
-    () =>
-      toSteps(
-        roundToStep(
-          (scrollable.current?.clientWidth ?? 0) - timelineStartOffset,
-          step,
-        ),
-        step,
-      ),
+    () => toSteps(roundToStep((scrollable.current?.clientWidth ?? 0) - timelineStartOffset, step), step),
     [scrollable.current, step, timelineStartOffset],
   );
 
@@ -76,11 +61,9 @@ export const Frames: FC<TimelineViewProps> = ({
 
   const background = useMemo(() => {
     const bg = [
-      `repeating-linear-gradient(90deg, #fff 1px, #fff ${
+      `repeating-linear-gradient(90deg, #fff 1px, #fff ${step - 1}px, rgba(255,255,255,0) ${
         step - 1
-      }px, rgba(255,255,255,0) ${step - 1}px, rgba(255,255,255,0) ${
-        step + 1
-      }px)`,
+      }px, rgba(255,255,255,0) ${step + 1}px)`,
       "linear-gradient(0deg, #FAFAFA, rgba(255,255,255,0) 50%)",
     ];
 
@@ -123,20 +106,12 @@ export const Frames: FC<TimelineViewProps> = ({
 
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         const limit = scroll.scrollWidth - scroll.clientWidth;
-        const newOffsetX = clamp(
-          offsetX + e.deltaX * scrollMultiplier,
-          0,
-          limit,
-        );
+        const newOffsetX = clamp(offsetX + e.deltaX * scrollMultiplier, 0, limit);
 
         setScroll({ left: newOffsetX });
       } else {
         const limit = scroll.scrollHeight - scroll.clientHeight;
-        const newOffsetY = clamp(
-          offsetY + e.deltaY * scrollMultiplier,
-          0,
-          limit,
-        );
+        const newOffsetY = clamp(offsetY + e.deltaY * scrollMultiplier, 0, limit);
 
         setScroll({ top: newOffsetY });
       }
@@ -190,10 +165,7 @@ export const Frames: FC<TimelineViewProps> = ({
   const hoverHandler = useCallback(
     (e) => {
       if (scrollable.current) {
-        const currentOffset =
-          e.pageX -
-          scrollable.current.getBoundingClientRect().left -
-          timelineStartOffset;
+        const currentOffset = e.pageX - scrollable.current.getBoundingClientRect().left - timelineStartOffset;
 
         if (currentOffset > 0) {
           setHoverOffset(currentOffset);
@@ -277,9 +249,7 @@ export const Frames: FC<TimelineViewProps> = ({
       const { deltaY: delta } = e;
 
       const allowScroll =
-        !horizontalScroll &&
-        ((currentScroll === 0 && delta < 0) ||
-          (currentScroll === maxScroll && delta > 0));
+        !horizontalScroll && ((currentScroll === 0 && delta < 0) || (currentScroll === maxScroll && delta > 0));
 
       if (!allowScroll) e.preventDefault();
     };
@@ -297,11 +267,7 @@ export const Frames: FC<TimelineViewProps> = ({
     const scroll = scrollable.current;
 
     if (isDefined(scroll)) {
-      const nextScrollOffset = clamp(
-        offset * step,
-        0,
-        scroll.scrollWidth - scroll.clientWidth,
-      );
+      const nextScrollOffset = clamp(offset * step, 0, scroll.scrollWidth - scroll.clientWidth);
 
       lastScrollPosition.current = roundToStep(nextScrollOffset, step);
 
@@ -327,19 +293,11 @@ export const Frames: FC<TimelineViewProps> = ({
     // this ensures the calculation of offset is kept correct.
     // This is needed because the position is not always a multiple of the step
     // and the offset used to calculate the position is always a multiple of the step.
-    if (
-      positionDelta === 1 &&
-      position >= firstFrame &&
-      position <= lastFrame
-    ) {
+    if (positionDelta === 1 && position >= firstFrame && position <= lastFrame) {
       // set to previous frame scroll
       // if position is 0, then it will be set to 0
       if (position <= firstFrame) {
-        const prevLeft = clamp(
-          (firstFrame - 1 - framesInView) * step,
-          0,
-          scroll.scrollWidth - scroll.clientWidth,
-        );
+        const prevLeft = clamp((firstFrame - 1 - framesInView) * step, 0, scroll.scrollWidth - scroll.clientWidth);
 
         lastScrollPosition.current = roundToStep(prevLeft, step);
 
@@ -348,11 +306,7 @@ export const Frames: FC<TimelineViewProps> = ({
         // set to next frame scroll
         // if position is last frame, then it will be set to last frame scroll
       } else if (position > lastFrame) {
-        const nextLeft = clamp(
-          lastFrame * step,
-          0,
-          scroll.scrollWidth - scroll.clientWidth,
-        );
+        const nextLeft = clamp(lastFrame * step, 0, scroll.scrollWidth - scroll.clientWidth);
 
         lastScrollPosition.current = roundToStep(nextLeft, step);
 
@@ -386,11 +340,7 @@ export const Frames: FC<TimelineViewProps> = ({
           name="indicator"
           onMouseDown={handleMovement}
           style={{
-            left: clamp(
-              seekerOffset - step,
-              timelineStartOffset - step,
-              viewWidth,
-            ),
+            left: clamp(seekerOffset - step, timelineStartOffset - step, viewWidth),
           }}
         />
 
@@ -441,23 +391,14 @@ interface KeypointsVirtualProps {
   onSelectRegion: TimelineViewProps["onSelectRegion"];
 }
 
-const KeypointsVirtual: FC<KeypointsVirtualProps> = ({
-  regions,
-  startOffset,
-  scrollTop,
-  disabled,
-  onSelectRegion,
-}) => {
+const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scrollTop, disabled, onSelectRegion }) => {
   const extra = 5;
   const height = 24;
   const bounds = useMemo(() => {
     const sIdx = clamp(Math.ceil(scrollTop / height) - 1, 0, regions.length);
     const eIdx = clamp(sIdx + (Math.ceil(165 / height) - 1), 0, regions.length);
 
-    return [
-      clamp(sIdx - extra, 0, regions.length),
-      clamp(eIdx + extra, 0, regions.length),
-    ];
+    return [clamp(sIdx - extra, 0, regions.length), clamp(eIdx + extra, 0, regions.length)];
   }, [scrollTop, regions.length]);
 
   return (

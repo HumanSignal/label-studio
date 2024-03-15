@@ -27,17 +27,11 @@ export const createPropertyWatcher = (props) => {
       return propsList.reduce((res, property) => {
         if (typeof property !== "string") {
           Object.keys(property).forEach((propertyName) => {
-            this._watchProperties(
-              element[propertyName],
-              property[propertyName],
-              disposers,
-            );
+            this._watchProperties(element[propertyName], property[propertyName], disposers);
           });
         } else {
           if (Array.isArray(element)) {
-            element.forEach((el) =>
-              this._watchProperties(el, propsList, disposers),
-            );
+            element.forEach((el) => this._watchProperties(el, propsList, disposers));
           } else {
             res.push(observe(element, property, this.onUpdate, true));
           }
