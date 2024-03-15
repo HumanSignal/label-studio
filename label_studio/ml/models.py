@@ -503,7 +503,7 @@ def modify_project_model_version(sender, instance, **kwargs):
     project = instance.project
 
     if project.model_version == instance.title:
-        project.model_version = None
+        project.model_version = ''
         project.save(update_fields=['model_version'])
 
 
