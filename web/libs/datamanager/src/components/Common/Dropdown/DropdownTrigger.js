@@ -32,9 +32,8 @@ export const DropdownTrigger = React.forwardRef(
     const targetIsInsideDropdown = React.useCallback(
       (target) => {
         const triggerClicked = triggerRef.current?.contains?.(target);
-        const dropdownClicked = dropdownRef.current?.dropdown?.contains?.(
-          target,
-        );
+        const dropdownClicked =
+          dropdownRef.current?.dropdown?.contains?.(target);
         const childDropdownClicked = Array.from(childset).reduce(
           (res, child) => {
             return res || child.hasTarget(target);
@@ -77,7 +76,10 @@ export const DropdownTrigger = React.forwardRef(
       tag,
       key: "dd-trigger",
       ref: triggerRef,
-      className: cn("dropdown").elem("trigger").mix(props.className).mix(triggerEL.props.className),
+      className: cn("dropdown")
+        .elem("trigger")
+        .mix(props.className)
+        .mix(triggerEL.props.className),
       onClickCapture: handleToggle,
     };
 
@@ -92,7 +94,9 @@ export const DropdownTrigger = React.forwardRef(
     React.useEffect(() => {
       document.addEventListener("click", handleClick, { capture: true });
       return () =>
-        document.removeEventListener("click", handleClick, { capture: true });
+        document.removeEventListener("click", handleClick, {
+          capture: true,
+        });
     }, [handleClick]);
 
     const contextValue = React.useMemo(

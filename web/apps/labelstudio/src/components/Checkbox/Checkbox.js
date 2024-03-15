@@ -1,6 +1,6 @@
-import React from 'react';
-import { cn } from '../../utils/bem';
-import './Checkbox.styl';
+import React from "react";
+import { cn } from "../../utils/bem";
+import "./Checkbox.styl";
 
 export const Checkbox = ({
   checked,
@@ -32,7 +32,7 @@ export const Checkbox = ({
       />
       <span
         className={rootClass.elem("check").mod({ checked, indeterminate })}
-      ></span>
+      />
     </span>
   );
 

@@ -1,27 +1,35 @@
-import { destroy as destroyNode, flow, types } from 'mobx-state-tree';
-import { createRef } from 'react';
-import { customTypes } from '../../../core/CustomTypes';
-import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
-import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
-import IsReadyMixin from '../../../mixins/IsReadyMixin';
-import ProcessAttrsMixin from '../../../mixins/ProcessAttrs';
-import RegionsMixin from '../../../mixins/Regions';
-import Utils from '../../../utils';
-import { parseValue } from '../../../utils/data';
-import { sanitizeHtml } from '../../../utils/html';
-import messages from '../../../utils/messages';
-import { findRangeNative, rangeToGlobalOffset } from '../../../utils/selection-tools';
-import { escapeHtml, isValidObjectURL } from '../../../utils/utilities';
-import ObjectBase from '../Base';
-import { cloneNode } from '../../../core/Helpers';
-import { FF_LSDV_4620_3, FF_SAFE_TEXT, isFF } from '../../../utils/feature-flags';
-import DomManager from './domManager';
-import { STATE_CLASS_MODS } from '../../../mixins/HighlightMixin';
-import Constants from '../../../core/Constants';
+import { destroy as destroyNode, flow, types } from "mobx-state-tree";
+import { createRef } from "react";
+import Constants from "../../../core/Constants";
+import { customTypes } from "../../../core/CustomTypes";
+import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
+import { cloneNode } from "../../../core/Helpers";
+import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
+import { STATE_CLASS_MODS } from "../../../mixins/HighlightMixin";
+import IsReadyMixin from "../../../mixins/IsReadyMixin";
+import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
+import RegionsMixin from "../../../mixins/Regions";
+import Utils from "../../../utils";
+import { parseValue } from "../../../utils/data";
+import {
+  FF_LSDV_4620_3,
+  FF_SAFE_TEXT,
+  isFF,
+} from "../../../utils/feature-flags";
+import { sanitizeHtml } from "../../../utils/html";
+import messages from "../../../utils/messages";
+import {
+  findRangeNative,
+  rangeToGlobalOffset,
+} from "../../../utils/selection-tools";
+import { escapeHtml, isValidObjectURL } from "../../../utils/utilities";
+import ObjectBase from "../Base";
+import DomManager from "./domManager";
 
 const WARNING_MESSAGES = {
-  dataTypeMistmatch: () => 'Do not put text directly in task data if you use valueType=url.',
-  badURL: url => `URL (${escapeHtml(url)}) is not valid.`,
+  dataTypeMistmatch: () =>
+    "Do not put text directly in task data if you use valueType=url.",
+  badURL: (url) => `URL (${escapeHtml(url)}) is not valid.`,
   secureMode: () => 'In SECURE MODE valueType is set to "url" by default.',
   loadingError: (url, error) => `Loading URL (${url}) unsuccessful: ${error}`,
 };
@@ -49,17 +57,20 @@ const WARNING_MESSAGES = {
  * @param {none|base64|base64unicode} [encoding]          - decode value from an encoded string
  * @param {symbol|word|sentence|paragraph} [granularity]  - control region selection granularity
  */
-const TagAttrs = types.model('RichTextModel', {
+const TagAttrs = types.model("RichTextModel", {
   value: types.maybeNull(types.string),
 
   /** Defines the type of data to be shown */
-  valuetype: types.optional(types.enumeration(['text', 'url']), () => (window.LS_SECURE_MODE ? 'url' : 'text')),
+  valuetype: types.optional(types.enumeration(["text", "url"]), () =>
+    window.LS_SECURE_MODE ? "url" : "text",
+  ),
 
   inline: false,
 
   /** Whether or not to save selected text to the serialized data */
-  savetextresult: types.optional(types.enumeration(['none', 'no', 'yes']), () =>
-    window.LS_SECURE_MODE ? 'no' : 'none',
+  savetextresult: types.optional(
+    types.enumeration(["none", "no", "yes"]),
+    () => (window.LS_SECURE_MODE ? "no" : "none"),
   ),
 
   selectionenabled: types.optional(types.boolean, true),
@@ -70,17 +81,23 @@ const TagAttrs = types.model('RichTextModel', {
 
   showlabels: types.maybeNull(types.boolean),
 
-  encoding: types.optional(types.enumeration(['none', 'base64', 'base64unicode']), 'none'),
+  encoding: types.optional(
+    types.enumeration(["none", "base64", "base64unicode"]),
+    "none",
+  ),
 
-  granularity: types.optional(types.enumeration(['symbol', 'word', 'sentence', 'paragraph']), 'symbol'),
+  granularity: types.optional(
+    types.enumeration(["symbol", "word", "sentence", "paragraph"]),
+    "symbol",
+  ),
 });
 
 const Model = types
-  .model('RichTextModel', {
-    type: 'richtext',
-    _value: types.optional(types.string, ''),
+  .model("RichTextModel", {
+    type: "richtext",
+    _value: types.optional(types.string, ""),
   })
-  .views(self => ({
+  .views((self) => ({
     get hasStates() {
       const states = self.states();
 
@@ -94,11 +111,13 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states ? states.filter(s => s.isLabeling && s.isSelected) : null;
+      return states ? states.filter((s) => s.isLabeling && s.isSelected) : null;
     },
 
     get isLoaded() {
-      return self._isLoaded && self._loadedForAnnotation === self.annotation?.id;
+      return (
+        self._isLoaded && self._loadedForAnnotation === self.annotation?.id
+      );
     },
 
     get isReady() {
@@ -156,8 +175,10 @@ const Model = types
     _isLoaded: false,
     _loadedForAnnotation: null,
   }))
-  .actions(self => {
-    let beforeNeedsUpdateCallback, afterNeedsUpdateCallback, domManager;
+  .actions((self) => {
+    let beforeNeedsUpdateCallback;
+    let afterNeedsUpdateCallback;
+    let domManager;
 
     return {
       setWorkingMode(mode) {
@@ -177,20 +198,26 @@ const Model = types
         }
       },
 
-      updateValue: flow(function * (store) {
+      updateValue: flow(function* (store) {
         const valueFromTask = parseValue(self.value, store.task.dataObj);
         const value = yield self.resolveValue(valueFromTask);
 
-        if (self.valuetype === 'url') {
+        if (self.valuetype === "url") {
           const url = value;
 
           if (!isValidObjectURL(url, true)) {
-            const message = [WARNING_MESSAGES.badURL(url), WARNING_MESSAGES.dataTypeMistmatch()];
+            const message = [
+              WARNING_MESSAGES.badURL(url),
+              WARNING_MESSAGES.dataTypeMistmatch(),
+            ];
 
-            if (window.LS_SECURE_MODE) message.unshift(WARNING_MESSAGES.secureMode());
+            if (window.LS_SECURE_MODE)
+              message.unshift(WARNING_MESSAGES.secureMode());
 
-            self.annotationStore.addErrors([errorBuilder.generalError(message.join('<br/>\n'))]);
-            self.setRemoteValue('');
+            self.annotationStore.addErrors([
+              errorBuilder.generalError(message.join("<br/>\n")),
+            ]);
+            self.setRemoteValue("");
             return;
           }
 
@@ -202,10 +229,16 @@ const Model = types
 
             self.setRemoteValue(yield response.text());
           } catch (error) {
-            const message = messages.ERR_LOADING_HTTP({ attr: self.value, error: String(error), url });
+            const message = messages.ERR_LOADING_HTTP({
+              attr: self.value,
+              error: String(error),
+              url,
+            });
 
-            self.annotationStore.addErrors([errorBuilder.generalError(message)]);
-            self.setRemoteValue('');
+            self.annotationStore.addErrors([
+              errorBuilder.generalError(message),
+            ]);
+            self.setRemoteValue("");
           }
         } else {
           self.setRemoteValue(value);
@@ -215,20 +248,23 @@ const Model = types
       setRemoteValue(val) {
         self.loaded = true;
 
-        if (self.encoding === 'base64') val = atob(val);
-        if (self.encoding === 'base64unicode') val = Utils.Checkers.atobUnicode(val);
+        if (self.encoding === "base64") val = atob(val);
+        if (self.encoding === "base64unicode")
+          val = Utils.Checkers.atobUnicode(val);
 
         // clean up the html — remove scripts and iframes
         // nodes count better be the same, so replace them with stubs
         // we should not sanitize text tasks because we already have htmlEscape in view.js
-        if (isFF(FF_SAFE_TEXT) && self.type === 'text') {
+        if (isFF(FF_SAFE_TEXT) && self.type === "text") {
           self._value = String(val);
         } else {
           self._value = sanitizeHtml(String(val));
         }
 
         self._regionsCache.forEach(({ region, annotation }) => {
-          region.setText(self._value.substring(region.startOffset, region.endOffset));
+          region.setText(
+            self._value.substring(region.startOffset, region.endOffset),
+          );
           self.regions.push(region);
           annotation.addRegion(region);
         });
@@ -239,14 +275,14 @@ const Model = types
       afterCreate() {
         self._regionsCache = [];
 
-        if (self.type === 'text') self.inline = true;
+        if (self.type === "text") self.inline = true;
 
         // security measure, if valuetype is set to url then LS
         // doesn't save the text into the result, otherwise it does
         // can be aslo directly configured
-        if (self.savetextresult === 'none') {
-          if (self.valuetype === 'url') self.savetextresult = 'no';
-          else if (self.valuetype === 'text') self.savetextresult = 'yes';
+        if (self.savetextresult === "none") {
+          if (self.valuetype === "url") self.savetextresult = "no";
+          else if (self.valuetype === "text") self.savetextresult = "yes";
         }
       },
 
@@ -277,7 +313,7 @@ const Model = types
             [self.name]: self.styles,
           };
 
-          self.regs.forEach(region => {
+          self.regs.forEach((region) => {
             try {
               // will be initialized only once
               region.initRangeAndOffsets();
@@ -292,7 +328,7 @@ const Model = types
         } else {
           // init and render regions into working node, then move them to visible one
           beforeNeedsUpdateCallback?.();
-          self.regs.forEach(region => {
+          self.regs.forEach((region) => {
             try {
               // will be initialized only once
               region.initRangeAndOffsets();
@@ -304,7 +340,7 @@ const Model = types
           afterNeedsUpdateCallback?.();
 
           // node texts can be only retrieved from the visible node
-          self.regs.forEach(region => {
+          self.regs.forEach((region) => {
             try {
               region.updateHighlightedText();
             } catch (err) {
@@ -328,7 +364,12 @@ const Model = types
       },
 
       relativeOffsetsToGlobalOffsets(start, startOffset, end, endOffset) {
-        return domManager.relativeOffsetsToGlobalOffsets(start, startOffset, end, endOffset);
+        return domManager.relativeOffsetsToGlobalOffsets(
+          start,
+          startOffset,
+          end,
+          endOffset,
+        );
       },
 
       rangeToGlobalOffset(range) {
@@ -352,7 +393,7 @@ const Model = types
       },
 
       setHighlight(region) {
-        self.regs.forEach(r => r.setHighlight(false));
+        self.regs.forEach((r) => r.setHighlight(false));
         if (!region) return;
 
         if (region.annotation.relationMode) {
@@ -369,14 +410,14 @@ const Model = types
         const values = doubleClickLabel?.value ?? control.selectedValues();
         const labels = { [control.valueType]: values };
         // Clone labels nodes to avoid unselecting them on creating result
-        const restSelectedStates = rest.map(state => cloneNode(state));
+        const restSelectedStates = rest.map((state) => cloneNode(state));
 
         const area = self.annotation.createResult(range, labels, control, self);
         const rootEl = self.visibleNodeRef.current;
         const root = rootEl?.contentDocument?.body ?? rootEl;
 
         //when user is using two different labels tag to draw a region, the other labels will be added to the region
-        restSelectedStates.forEach(state => {
+        restSelectedStates.forEach((state) => {
           area.setValue(state);
           destroyNode(state);
         });
@@ -411,4 +452,13 @@ const Model = types
     };
   });
 
-export const RichTextModel = types.compose('RichTextModel', ProcessAttrsMixin, ObjectBase, RegionsMixin, AnnotationMixin, IsReadyMixin, TagAttrs, Model);
+export const RichTextModel = types.compose(
+  "RichTextModel",
+  ProcessAttrsMixin,
+  ObjectBase,
+  RegionsMixin,
+  AnnotationMixin,
+  IsReadyMixin,
+  TagAttrs,
+  Model,
+);

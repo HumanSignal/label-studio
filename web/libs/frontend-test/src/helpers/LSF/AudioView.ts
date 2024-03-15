@@ -17,10 +17,14 @@ export const AudioView = {
     return this.root.get(".lsf-timeline-controls");
   },
   get currentTimebox() {
-    return cy.get('[data-testid="timebox-current-time"] > .lsf-time-box__input-time')
+    return cy.get(
+      '[data-testid="timebox-current-time"] > .lsf-time-box__input-time',
+    );
   },
   get endTimebox() {
-    return cy.get('[data-testid="timebox-end-time"] > .lsf-time-box__input-time')
+    return cy.get(
+      '[data-testid="timebox-end-time"] > .lsf-time-box__input-time',
+    );
   },
   get configButton() {
     return this.timelineControls.get(".lsf-audio-config > .lsf-button");
@@ -41,10 +45,14 @@ export const AudioView = {
     return cy.get(`[data-testid="playback-button:pause"]`);
   },
   seekCurrentTimebox(to: number) {
-    let timeString = ''
+    let timeString = "";
     timeString = `0000${to}000`;
 
-    this.currentTimebox.click({force: true }).clear().type(timeString, { force: true}).blur();
+    this.currentTimebox
+      .click({ force: true })
+      .clear()
+      .type(timeString, { force: true })
+      .blur();
   },
   pause() {
     this.pauseButton.click();
@@ -74,7 +82,7 @@ export const AudioView = {
    * @param {number} y
    */
   clickAtRelative(x: number, y: number, options?: Partial<ClickOptions>) {
-    this.drawingArea.then(el => {
+    this.drawingArea.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
       const realY = y * bbox.height;
@@ -95,7 +103,7 @@ export const AudioView = {
     y: number,
     width: number,
     height: number,
-    options: MouseInteractionOptions = {}
+    options: MouseInteractionOptions = {},
   ) {
     cy.log(`Draw rectangle at (${x}, ${y}) of size ${width}x${height}`);
     this.drawingArea
@@ -103,17 +111,17 @@ export const AudioView = {
       .trigger("mousedown", x, y, {
         eventConstructor: "MouseEvent",
         buttons: 1,
-        ...options
+        ...options,
       })
       .trigger("mousemove", x + width, y + height, {
         eventConstructor: "MouseEvent",
         buttons: 1,
-        ...options
+        ...options,
       })
       .trigger("mouseup", x + width, y + height, {
         eventConstructor: "MouseEvent",
         buttons: 1,
-        ...options
+        ...options,
       })
       .wait(0);
   },
@@ -130,9 +138,9 @@ export const AudioView = {
     y: number,
     width: number,
     height: number,
-    options: MouseInteractionOptions = {}
+    options: MouseInteractionOptions = {},
   ) {
-    this.drawingArea.then(el => {
+    this.drawingArea.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
       const realY = y * bbox.height;
@@ -148,18 +156,18 @@ export const AudioView = {
    */
   toMatchImageSnapshot(
     el?: Cypress.Chainable<JQuery<HTMLElement>>,
-    options?: { name?: string, threshold?: number }
+    options?: { name?: string; threshold?: number },
   ) {
     el = el || this.root;
     let name;
-    if (options && options.name) {
+    if (options?.name) {
       name = options.name;
-      delete options.name;
+      options.name = undefined;
     }
     if (name) {
       el.wait(0).matchImageSnapshot(name, options);
     } else {
       el.wait(0).matchImageSnapshot(options);
     }
-  }
+  },
 };

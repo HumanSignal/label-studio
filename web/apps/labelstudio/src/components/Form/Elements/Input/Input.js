@@ -1,14 +1,20 @@
-import React from 'react';
-import { cn } from '../../../../utils/bem';
-import { FormField } from '../../FormField';
-import { default as Label } from '../Label/Label';
-import './Input.styl';
+import React from "react";
+import { cn } from "../../../../utils/bem";
+import { FormField } from "../../FormField";
+import { default as Label } from "../Label/Label";
+import "./Input.styl";
 
-const Input = ({label, className, validate, required, skip, labelProps, ghost, ...props}) => {
-  const classList = [
-    cn('input').mod({ghost}),
-    className,
-  ].join(" ").trim();
+const Input = ({
+  label,
+  className,
+  validate,
+  required,
+  skip,
+  labelProps,
+  ghost,
+  ...props
+}) => {
+  const classList = [cn("input").mod({ ghost }), className].join(" ").trim();
 
   const input = (
     <FormField
@@ -19,13 +25,17 @@ const Input = ({label, className, validate, required, skip, labelProps, ghost, .
       skip={skip}
       {...props}
     >
-      {ref => (
-        <input {...props} ref={ref} className={classList}/>
-      )}
+      {(ref) => <input {...props} ref={ref} className={classList} />}
     </FormField>
   );
 
-  return label ? <Label {...(labelProps ?? {})} text={label} required={required}>{input}</Label> : input;
+  return label ? (
+    <Label {...(labelProps ?? {})} text={label} required={required}>
+      {input}
+    </Label>
+  ) : (
+    input
+  );
 };
 
 export default Input;

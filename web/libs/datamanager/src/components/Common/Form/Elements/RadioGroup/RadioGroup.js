@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { Label } from "..";
 import { BemWithSpecifiContext } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
@@ -36,7 +42,7 @@ export const RadioGroup = ({
       validate={validate}
       required={required}
       skip={skip}
-      setValue={value => setCurrentValue(value)}
+      setValue={(value) => setCurrentValue(value)}
       {...props}
     >
       {({ ref, context }) => (
@@ -51,41 +57,86 @@ export const RadioGroup = ({
             isSimple: simple === true,
           }}
         >
-          <Block name="radio-group" mod={{ size, simple, horizontal }} mix={className}>
-            <input ref={ref} name={props.name} type="hidden" defaultValue={currentValue}/>
-            <Elem name="buttons">
-              {children}
-            </Elem>
+          <Block
+            name="radio-group"
+            mod={{ size, simple, horizontal }}
+            mix={className}
+          >
+            <input
+              ref={ref}
+              name={props.name}
+              type="hidden"
+              defaultValue={currentValue}
+            />
+            <Elem name="buttons">{children}</Elem>
           </Block>
         </RadioContext.Provider>
       )}
     </FormField>
   );
 
-  return label ? <Label {...(labelProps ?? {})} text={label} simple={simple} required={required}>{field}</Label> : field;
+  return label ? (
+    <Label
+      {...(labelProps ?? {})}
+      text={label}
+      simple={simple}
+      required={required}
+    >
+      {field}
+    </Label>
+  ) : (
+    field
+  );
 };
 
-const RadioButton = ({ value, disabled, children, label, description, ...props }) => {
-  const { onChange, setValue, value: currentValue, isSimple } = useContext(RadioContext);
+const RadioButton = ({
+  value,
+  disabled,
+  children,
+  label,
+  description,
+  ...props
+}) => {
+  const {
+    onChange,
+    setValue,
+    value: currentValue,
+    isSimple,
+  } = useContext(RadioContext);
   const checked = value === currentValue;
 
-  const clickHandler = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onChange(value);
-  }, [value]);
+  const clickHandler = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onChange(value);
+    },
+    [value],
+  );
 
   useEffect(() => {
     if (props.checked) setValue(value);
   }, [props.checked]);
 
   return (
-    <Elem name="button" mod={{ checked, disabled }} onClickCapture={clickHandler}>
+    <Elem
+      name="button"
+      mod={{ checked, disabled }}
+      onClickCapture={clickHandler}
+    >
       {isSimple ? (
         <Label placement="right" text={label} description={description}>
-          <input type="radio" value={value} checked={checked} readOnly style={{ pointerEvents: 'none' }}/>
+          <input
+            type="radio"
+            value={value}
+            checked={checked}
+            readOnly
+            style={{ pointerEvents: "none" }}
+          />
         </Label>
-      ) : children}
+      ) : (
+        children
+      )}
     </Elem>
   );
 };

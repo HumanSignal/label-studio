@@ -1,12 +1,12 @@
-import { observer } from 'mobx-react';
-import { isAlive } from 'mobx-state-tree';
-import { createRef, forwardRef, PureComponent, useEffect, useRef } from 'react';
-import { useState } from 'react';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import { observer } from "mobx-react";
+import { isAlive } from "mobx-state-tree";
+import { PureComponent, createRef, forwardRef, useEffect, useRef } from "react";
+import { useState } from "react";
+import AutoSizer from "react-virtualized-auto-sizer";
 
-import { FF_DEV_3391, isFF } from '../../utils/feature-flags';
-import { isDefined } from '../../utils/utilities';
-import NodesConnector from './NodesConnector';
+import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
+import { isDefined } from "../../utils/utilities";
+import NodesConnector from "./NodesConnector";
 
 const ArrowMarker = ({ id, color }) => {
   return (
@@ -29,20 +29,20 @@ const RelationItemRect = ({ x, y, width, height }) => {
 };
 
 const RelationConnector = ({ id, command, color, direction, highlight }) => {
-  const pathColor = highlight ? '#fa541c' : color;
+  const pathColor = highlight ? "#fa541c" : color;
   const pathSettings = {
     d: command,
     stroke: pathColor,
-    fill: 'none',
-    strokeLinecap: 'round',
+    fill: "none",
+    strokeLinecap: "round",
   };
 
   const markers = {};
 
-  if (direction === 'bi' || direction === 'right') {
+  if (direction === "bi" || direction === "right") {
     markers.markerEnd = `url(#arrow-${id})`;
   }
-  if (direction === 'bi' || direction === 'left') {
+  if (direction === "bi" || direction === "left") {
     markers.markerStart = `url(#arrow-${id})`;
   }
 
@@ -51,8 +51,15 @@ const RelationConnector = ({ id, command, color, direction, highlight }) => {
       <defs>
         <ArrowMarker id={id} color={pathColor} />
       </defs>
-      {highlight && <path {...pathSettings} stroke={color} opacity={0.1} strokeWidth={6} />}
-      <path {...pathSettings} opacity={highlight ? 1 : 0.6} strokeWidth={2} {...markers} />
+      {highlight && (
+        <path {...pathSettings} stroke={color} opacity={0.1} strokeWidth={6} />
+      )}
+      <path
+        {...pathSettings}
+        opacity={highlight ? 1 : 0.6}
+        strokeWidth={2}
+        {...markers}
+      />
     </>
   );
 };
@@ -60,17 +67,22 @@ const RelationConnector = ({ id, command, color, direction, highlight }) => {
 const RelationLabel = ({ label, position }) => {
   const [x, y] = position;
   const textRef = useRef();
-  const [background, setBackground] = useState({ width: 0, height: 0, x: 0, y: 0 });
+  const [background, setBackground] = useState({
+    width: 0,
+    height: 0,
+    x: 0,
+    y: 0,
+  });
 
   const groupAttributes = {
     transform: `translate(${x}, ${y})`,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
+    textAnchor: "middle",
+    dominantBaseline: "middle",
   };
 
   const textAttributes = {
-    fill: 'white',
-    style: { fontSize: 12, fontFamily: 'arial' },
+    fill: "white",
+    style: { fontSize: 12, fontFamily: "arial" },
   };
 
   useEffect(() => {
@@ -95,13 +107,26 @@ const RelationLabel = ({ label, position }) => {
   );
 };
 
-const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, dimm, labels, visible }) => {
+const RelationItem = ({
+  id,
+  startNode,
+  endNode,
+  direction,
+  rootRef,
+  highlight,
+  dimm,
+  labels,
+  visible,
+}) => {
   const root = rootRef.current;
   const nodesHidden = startNode.hidden === true || endNode.hidden === true;
   const hideConnection = nodesHidden || !visible;
   const [, forceUpdate] = useState();
 
-  const relation = NodesConnector.connect({ id, startNode, endNode, direction, labels }, root);
+  const relation = NodesConnector.connect(
+    { id, startNode, endNode, direction, labels },
+    root,
+  );
   const { start, end } = NodesConnector.getNodesBBox({ root, ...relation });
   const [path, textPosition] = NodesConnector.calculatePath(start, end);
 
@@ -109,9 +134,13 @@ const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, d
     relation.onChange(() => forceUpdate({}));
     return () => relation.destroy();
   }, []);
-  if (start.width < 1 || start.height < 1 || end.width < 1 || end.height < 1) return null;
+  if (start.width < 1 || start.height < 1 || end.width < 1 || end.height < 1)
+    return null;
   return (
-    <g opacity={dimm && !highlight ? 0.5 : 1} visibility={hideConnection ? 'hidden' : 'visible'}>
+    <g
+      opacity={dimm && !highlight ? 0.5 : 1}
+      visibility={hideConnection ? "hidden" : "visible"}
+    >
       <RelationItemRect {...start} />
       <RelationItemRect {...end} />
       <RelationConnector
@@ -121,7 +150,9 @@ const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, d
         direction={relation.direction}
         highlight={highlight}
       />
-      {relation.label && <RelationLabel label={relation.label} position={textPosition} />}
+      {relation.label && (
+        <RelationLabel label={relation.label} position={textPosition} />
+      )}
     </g>
   );
 };
@@ -132,50 +163,48 @@ const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, d
  * rootRef: React.RefObject<HTMLElement>
  * }}
  */
-const RelationItemObserver = observer(({ relation, startNode, endNode, visible, ...rest }) => {
-  const nodes = [
-    startNode.getRegionElement
-      ? startNode.getRegionElement()
-      : startNode,
-    endNode.getRegionElement
-      ? endNode.getRegionElement()
-      : endNode,
-  ];
+const RelationItemObserver = observer(
+  ({ relation, startNode, endNode, visible, ...rest }) => {
+    const nodes = [
+      startNode.getRegionElement ? startNode.getRegionElement() : startNode,
+      endNode.getRegionElement ? endNode.getRegionElement() : endNode,
+    ];
 
-  const [render, setRender] = useState(nodes[0] && nodes[1]);
+    const [render, setRender] = useState(nodes[0] && nodes[1]);
 
-  useEffect(() => {
-    let timer;
+    useEffect(() => {
+      let timer;
 
-    const watchRegionAppear = () => {
-      const nodesExist = isDefined(nodes[0]) && isDefined(nodes[1]);
+      const watchRegionAppear = () => {
+        const nodesExist = isDefined(nodes[0]) && isDefined(nodes[1]);
 
-      if (render !== nodesExist) {
-        setRender(nodesExist);
-      } else if (render === false) {
-        timer = setTimeout(watchRegionAppear, 30);
-      }
-    };
+        if (render !== nodesExist) {
+          setRender(nodesExist);
+        } else if (render === false) {
+          timer = setTimeout(watchRegionAppear, 30);
+        }
+      };
 
-    timer = setTimeout(watchRegionAppear, 30);
+      timer = setTimeout(watchRegionAppear, 30);
 
-    return () => clearTimeout(timer);
-  }, [nodes, render]);
+      return () => clearTimeout(timer);
+    }, [nodes, render]);
 
-  const visibility = visible && relation.visible;
+    const visibility = visible && relation.visible;
 
-  return (render && relation.shouldRender) ? (
-    <RelationItem
-      id={relation.id}
-      startNode={startNode}
-      endNode={endNode}
-      direction={relation.direction}
-      visible={visibility}
-      labels={relation.selectedValues}
-      {...rest}
-    />
-  ) : null;
-});
+    return render && relation.shouldRender ? (
+      <RelationItem
+        id={relation.id}
+        startNode={startNode}
+        endNode={endNode}
+        direction={relation.direction}
+        visible={visibility}
+        labels={relation.selectedValues}
+        {...rest}
+      />
+    ) : null;
+  },
+);
 
 class RelationsOverlay extends PureComponent {
   /** @type {React.RefObject<HTMLElement>} */
@@ -199,20 +228,29 @@ class RelationsOverlay extends PureComponent {
     const style = {
       top: 0,
       left: 0,
-      width: '100%',
-      height: '100%',
-      position: 'absolute',
-      pointerEvents: 'none',
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      pointerEvents: "none",
       zIndex: 100,
     };
 
     return (
       <AutoSizer onResize={this.onResize}>
         {() => (
-          <svg className="relations-overlay" ref={this.rootNode} xmlns="http://www.w3.org/2000/svg" style={style}>
-            {(this.state.shouldRender) && (
-              this.renderRelations(relations, visible, hasHighlight, highlighted)
-            )}
+          <svg
+            className="relations-overlay"
+            ref={this.rootNode}
+            xmlns="http://www.w3.org/2000/svg"
+            style={style}
+          >
+            {this.state.shouldRender &&
+              this.renderRelations(
+                relations,
+                visible,
+                hasHighlight,
+                highlighted,
+              )}
           </svg>
         )}
       </AutoSizer>
@@ -220,7 +258,7 @@ class RelationsOverlay extends PureComponent {
   }
 
   renderRelations(relations, visible, hasHighlight, highlightedRelation) {
-    return relations.map(relation => {
+    return relations.map((relation) => {
       const highlighted = highlightedRelation === relation;
 
       return (
@@ -298,9 +336,7 @@ const EnsureTagsReady = observer(
       return () => clearTimeout(readinessTimer);
     }, [taskData, tags]);
 
-    return ready && (
-      <RelationsOverlayObserver ref={ref} {...props} />
-    );
+    return ready && <RelationsOverlayObserver ref={ref} {...props} />;
   }),
 );
 

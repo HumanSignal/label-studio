@@ -14,11 +14,8 @@ declare module "shallow-equal" {
   }
   export function shallowEqualObjects(
     obj1: primitiveObject,
-    obj2: primitiveObject
+    obj2: primitiveObject,
   );
 
-  export function shallowEqualObjects(
-    obj1: unknown,
-    obj2: unknown
-  );
+  export function shallowEqualObjects(obj1: unknown, obj2: unknown);
 }

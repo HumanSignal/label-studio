@@ -9,10 +9,10 @@ export class CommentsSdk {
 
   bindEventHandlers() {
     [
-      'comments:create',
-      'comments:update',
-      'comments:delete',
-      'comments:list',
+      "comments:create",
+      "comments:update",
+      "comments:delete",
+      "comments:list",
     ].forEach((evt) => this.lsf.off(evt));
 
     this.lsf.on("comments:create", this.createComment);
@@ -29,23 +29,31 @@ export class CommentsSdk {
 
     if (comment.annotation) {
       body.annotation = comment.annotation;
-    } else if(isFF(FF_DEV_3034) && comment.draft) {
-      body.draft =  comment.draft;
+    } else if (isFF(FF_DEV_3034) && comment.draft) {
+      body.draft = comment.draft;
     }
-    const { $meta: _, ...newComment } = await this.dm.apiCall("createComment", undefined, {
-      body,
-    });
+    const { $meta: _, ...newComment } = await this.dm.apiCall(
+      "createComment",
+      undefined,
+      {
+        body,
+      },
+    );
 
     return newComment;
-  }
+  };
 
   updateComment = async (comment) => {
     if (!comment.id || comment.id < 0) return; // Don't allow an update with an incorrect id
 
-    const res = await this.dm.apiCall("updateComment", { id: comment.id }, {  body: comment });
+    const res = await this.dm.apiCall(
+      "updateComment",
+      { id: comment.id },
+      { body: comment },
+    );
 
     return res;
-  }
+  };
 
   listComments = async (params) => {
     const listParams = {
@@ -74,14 +82,17 @@ export class CommentsSdk {
     }
 
     return comments;
-  }
+  };
 
   deleteComment = async (comment) => {
     if (!comment.id || comment.id < 0) return; // Don't allow an update with an incorrect id
 
-    const res = await this.dm.apiCall("deleteComment", { id: comment.id }, {  body: comment });
+    const res = await this.dm.apiCall(
+      "deleteComment",
+      { id: comment.id },
+      { body: comment },
+    );
 
     return res;
-  }
+  };
 }
-

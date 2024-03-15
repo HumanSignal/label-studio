@@ -1,11 +1,11 @@
 const { I } = inject();
 
 module.exports = {
-  _rootSelector: '.htx-timeseries',
-  _channelSelector: '.htx-timeseries-channel .overlay',
-  _overviewSelector: '.htx-timeseries-overview .overlay',
-  _westHandleSelector: '.htx-timeseries-overview .handle--w',
-  _eastHandleSelector: '.htx-timeseries-overview .handle--e',
+  _rootSelector: ".htx-timeseries",
+  _channelSelector: ".htx-timeseries-channel .overlay",
+  _overviewSelector: ".htx-timeseries-overview .overlay",
+  _westHandleSelector: ".htx-timeseries-overview .handle--w",
+  _eastHandleSelector: ".htx-timeseries-overview .handle--e",
   _stickSelector: '[text-anchor="start"]',
 
   get _channelStageSelector() {
@@ -16,8 +16,8 @@ module.exports = {
   },
   _stageBBox: { x: 0, y: 0, width: 0, height: 0 },
 
-  WEST: 'west',
-  EAST: 'east',
+  WEST: "west",
+  EAST: "east",
 
   async lookForStage() {
     I.scrollPageToTop();
@@ -39,7 +39,7 @@ module.exports = {
    */
   grabStickTime() {
     // xPath cannot find `text` tag so we exchange it with `*`
-    return I.grabTextFrom(locate(this._channelStickSelector).find('*').at(2));
+    return I.grabTextFrom(locate(this._channelStickSelector).find("*").at(2));
   },
 
   /**
@@ -54,11 +54,20 @@ module.exports = {
    */
   async selectOverviewRange(from, to) {
     I.scrollPageToTop();
-    const overviewBBox = await I.grabElementBoundingRect(this._overviewSelector);
+    const overviewBBox = await I.grabElementBoundingRect(
+      this._overviewSelector,
+    );
 
-    I.moveMouse(overviewBBox.x + overviewBBox.width * from, overviewBBox.y + overviewBBox.height / 2);
+    I.moveMouse(
+      overviewBBox.x + overviewBBox.width * from,
+      overviewBBox.y + overviewBBox.height / 2,
+    );
     I.pressMouseDown();
-    I.moveMouse(overviewBBox.x + overviewBBox.width * to, overviewBBox.y + overviewBBox.height / 2, 3);
+    I.moveMouse(
+      overviewBBox.x + overviewBBox.width * to,
+      overviewBBox.y + overviewBBox.height / 2,
+      3,
+    );
     I.pressMouseUp();
   },
 
@@ -69,9 +78,14 @@ module.exports = {
    */
   async clickOverview(where) {
     I.scrollPageToTop();
-    const overviewBBox = await I.grabElementBoundingRect(this._overviewSelector);
+    const overviewBBox = await I.grabElementBoundingRect(
+      this._overviewSelector,
+    );
 
-    I.clickAt(overviewBBox.x + overviewBBox.width * where, overviewBBox.y + overviewBBox.height / 2);
+    I.clickAt(
+      overviewBBox.x + overviewBBox.width * where,
+      overviewBBox.y + overviewBBox.height / 2,
+    );
   },
 
   /**
@@ -86,12 +100,23 @@ module.exports = {
    */
   async moveHandle(where, which = this.WEST) {
     I.scrollPageToTop();
-    const handlerBBox = await I.grabElementBoundingRect(this[`_${which}HandleSelector`]);
-    const overviewBBox = await I.grabElementBoundingRect(this._overviewSelector);
+    const handlerBBox = await I.grabElementBoundingRect(
+      this[`_${which}HandleSelector`],
+    );
+    const overviewBBox = await I.grabElementBoundingRect(
+      this._overviewSelector,
+    );
 
-    I.moveMouse(handlerBBox.x + handlerBBox.width / 2, handlerBBox.y + handlerBBox.height / 2);
+    I.moveMouse(
+      handlerBBox.x + handlerBBox.width / 2,
+      handlerBBox.y + handlerBBox.height / 2,
+    );
     I.pressMouseDown();
-    I.moveMouse(overviewBBox.x + overviewBBox.width * where, overviewBBox.y + overviewBBox.height / 2, 3);
+    I.moveMouse(
+      overviewBBox.x + overviewBBox.width * where,
+      overviewBBox.y + overviewBBox.height / 2,
+      3,
+    );
     I.pressMouseUp();
   },
 
@@ -116,10 +141,13 @@ module.exports = {
     I.scrollPageToTop();
     const channelBBox = await I.grabElementBoundingRect(this._channelSelector);
 
-    I.moveMouse(channelBBox.x + channelBBox.width * x, channelBBox.y + channelBBox.height * y);
-    I.pressKeyDown('Control');
+    I.moveMouse(
+      channelBBox.x + channelBBox.width * x,
+      channelBBox.y + channelBBox.height * y,
+    );
+    I.pressKeyDown("Control");
     I.mouseWheel({ deltaY });
-    I.pressKeyUp('Control');
+    I.pressKeyUp("Control");
   },
 
   /**
@@ -139,7 +167,10 @@ module.exports = {
     I.scrollPageToTop();
     const channelBBox = await I.grabElementBoundingRect(this._channelSelector);
 
-    I.moveMouse(channelBBox.x + channelBBox.width * x, channelBBox.y + channelBBox.height * y);
+    I.moveMouse(
+      channelBBox.x + channelBBox.width * x,
+      channelBBox.y + channelBBox.height * y,
+    );
   },
 
   /**
@@ -150,11 +181,18 @@ module.exports = {
    * @param x
    * @param shiftX
    */
-  drawByDrag(x,shiftX) {
+  drawByDrag(x, shiftX) {
     I.scrollPageToTop();
-    I.moveMouse(this._stageBBox.x + x, this._stageBBox.y + this._stageBBox.height / 2);
+    I.moveMouse(
+      this._stageBBox.x + x,
+      this._stageBBox.y + this._stageBBox.height / 2,
+    );
     I.pressMouseDown();
-    I.moveMouse(this._stageBBox.x + x + shiftX, this._stageBBox.y + this._stageBBox.height / 2, 3);
+    I.moveMouse(
+      this._stageBBox.x + x + shiftX,
+      this._stageBBox.y + this._stageBBox.height / 2,
+      3,
+    );
     I.pressMouseUp();
   },
 };

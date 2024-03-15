@@ -1,40 +1,46 @@
-import React from 'react';
-import { Button, List, Select } from 'antd';
-import { getRoot, isValidReference } from 'mobx-state-tree';
-import { observer } from 'mobx-react';
-import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, MoreOutlined, SwapOutlined } from '@ant-design/icons';
+import {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  SwapOutlined,
+} from "@ant-design/icons";
+import { Button, List, Select } from "antd";
+import { observer } from "mobx-react";
+import { getRoot, isValidReference } from "mobx-state-tree";
+import React from "react";
 
-import styles from './Relations.module.scss';
-import { NodeMinimal } from '../Node/Node';
-import { wrapArray } from '../../utils/utilities';
-import globalStyles from '../../styles/global.module.scss';
+import globalStyles from "../../styles/global.module.scss";
+import { wrapArray } from "../../utils/utilities";
+import { NodeMinimal } from "../Node/Node";
+import styles from "./Relations.module.scss";
 
-import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
-import { Block, Elem } from '../../utils/bem';
-import './Relations.styl';
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import { Block, Elem } from "../../utils/bem";
+import "./Relations.styl";
 
 const { Option } = Select;
 
 const RelationMeta = observer(({ rl }) => {
   const r = rl.relations;
-  const selected = r.getSelected().map(v => v.value);
+  const selected = r.getSelected().map((v) => v.value);
 
   return (
-    <div style={{ marginTop: '10px' }}>
+    <div style={{ marginTop: "10px" }}>
       <h4 className={styles.header}>LABELS</h4>
       <Select
-        mode={r.choice === 'multiple' ? 'multiple' : ''}
-        style={{ width: '100%' }}
+        mode={r.choice === "multiple" ? "multiple" : ""}
+        style={{ width: "100%" }}
         placeholder="Please select"
         defaultValue={selected}
         onChange={(val) => {
           const values = wrapArray(val);
 
           r.unselectAll();
-          values.forEach(v => r.findRelation(v).setSelected(true));
+          values.forEach((v) => r.findRelation(v).setSelected(true));
         }}
       >
-        {r.children.map(c => (
+        {r.children.map((c) => (
           <Option key={c.value} style={{ background: c.background }}>
             {c.value}
           </Option>
@@ -66,7 +72,11 @@ const Relation = observer(({ rl }) => {
         <div>
           <NodeMinimal node={rl.node1} />
         </div>
-        <Button onClick={() => rl.rotateDirection()} size="small" className={styles.relationbtn}>
+        <Button
+          onClick={() => rl.rotateDirection()}
+          size="small"
+          className={styles.relationbtn}
+        >
           {iconMap[rl.direction]}
         </Button>
         <div>
@@ -147,9 +157,14 @@ const RelationsComponent = ({ store }) => {
           <Button
             size="small"
             type="link"
-            icon={relationsUIVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+            icon={
+              relationsUIVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />
+            }
             onClick={() => annotation.relationStore.toggleConnections()}
-            className={[relationsUIVisible ? styles.uihidden : styles.uivisible, globalStyles.link]}
+            className={[
+              relationsUIVisible ? styles.uihidden : styles.uivisible,
+              globalStyles.link,
+            ]}
           />
         )}
       </Elem>
@@ -162,7 +177,7 @@ const RelationsComponent = ({ store }) => {
             itemLayout="vertical"
             className={styles.list}
             dataSource={annotation.relationStore.relations}
-            renderItem={item => <ListItem item={item} />}
+            renderItem={(item) => <ListItem item={item} />}
           />
         ) : (
           <p>No Relations added yet</p>

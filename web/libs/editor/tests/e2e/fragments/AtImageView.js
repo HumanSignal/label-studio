@@ -1,21 +1,22 @@
 const { I } = inject();
 
-const assert = require('assert');
-const Helpers = require('../tests/helpers');
+const assert = require("node:assert");
+const Helpers = require("../tests/helpers");
 
 module.exports = {
-  _stageSelector: '.konvajs-content',
+  _stageSelector: ".konvajs-content",
   _stageFrameSelector: '[class^="frame--"]',
   _stageBBox: null,
 
-  _toolBarSelector: '.lsf-toolbar',
+  _toolBarSelector: ".lsf-toolbar",
   _zoomPresetsSelector: '[title^="Zoom presets"]',
 
   _rootSelector: '[class^="lsf-object wrapperComponent--"]',
   _paginationSelector: '[class^="pagination--"]',
-  _paginationPrevBtnSelector: '.lsf-pagination__btn_arrow-left:not(.lsf-pagination__btn_arrow-left-double)',
-  _paginationNextBtnSelector: '.lsf-pagination__btn_arrow-right:not(.lsf-pagination__btn_arrow-right-double)',
-
+  _paginationPrevBtnSelector:
+    ".lsf-pagination__btn_arrow-left:not(.lsf-pagination__btn_arrow-left-double)",
+  _paginationNextBtnSelector:
+    ".lsf-pagination__btn_arrow-right:not(.lsf-pagination__btn_arrow-right-double)",
 
   locateRoot() {
     return locate(this._rootSelector);
@@ -34,11 +35,11 @@ module.exports = {
   },
 
   percToX(xPerc) {
-    return this._stageBBox.width * xPerc / 100;
+    return (this._stageBBox.width * xPerc) / 100;
   },
 
   percToY(yPerc) {
-    return this._stageBBox.height * yPerc / 100;
+    return (this._stageBBox.height * yPerc) / 100;
   },
 
   async grabStageBBox() {
@@ -54,29 +55,31 @@ module.exports = {
   },
 
   stageBBox() {
-    if (!this._stageBBox) console.log('Stage bbox wasn\'t grabbed');
-    return this._stageBBox ?? {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-    };
+    if (!this._stageBBox) console.log("Stage bbox wasn't grabbed");
+    return (
+      this._stageBBox ?? {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      }
+    );
   },
 
   stageX() {
-    if (!this._stageBBox) console.log('Stage bbox wasn\'t grabbed');
+    if (!this._stageBBox) console.log("Stage bbox wasn't grabbed");
     return this._stageBBox?.x ?? 0;
   },
 
   stageY() {
-    if (!this._stageBBox) console.log('Stage bbox wasn\'t grabbed');
+    if (!this._stageBBox) console.log("Stage bbox wasn't grabbed");
     return this._stageBBox?.y ?? 0;
   },
 
   async waitForImage() {
-    I.say('Waiting for image to be loaded');
+    I.say("Waiting for image to be loaded");
     await I.executeScript(Helpers.waitForImage);
-    I.waitForVisible('canvas', 5);
+    I.waitForVisible("canvas", 5);
   },
 
   async getCanvasSize() {
@@ -144,7 +147,10 @@ module.exports = {
    * @param {number} tolerance
    */
   async hasPixelColor(x, y, rgbArray, tolerance = 3) {
-    const colorPixels = await I.executeScript(Helpers.getKonvaPixelColorFromPoint, [x, y]);
+    const colorPixels = await I.executeScript(
+      Helpers.getKonvaPixelColorFromPoint,
+      [x, y],
+    );
     const hasPixel = Helpers.areEqualRGB(rgbArray, colorPixels, tolerance);
 
     return hasPixel;
@@ -152,7 +158,10 @@ module.exports = {
 
   // Only for debugging
   async whereIsPixel(rgbArray, tolerance = 3) {
-    const points = await I.executeScript(Helpers.whereIsPixel, [rgbArray, tolerance]);
+    const points = await I.executeScript(Helpers.whereIsPixel, [
+      rgbArray,
+      tolerance,
+    ]);
 
     return points;
   },
@@ -164,7 +173,9 @@ module.exports = {
   },
 
   async isTransformerExist() {
-    const isTransformerExist = await I.executeScript(Helpers.isTransformerExist);
+    const isTransformerExist = await I.executeScript(
+      Helpers.isTransformerExist,
+    );
 
     return isTransformerExist;
   },
@@ -190,18 +201,22 @@ module.exports = {
       return [region.shapeRef._id, region.bboxCoords];
     }, regionId);
 
-    const position = coords ? {
-      x: coords.left + ((coords.right - coords.left) / 2),
-      y: coords.top + ((coords.bottom - coords.top) / 2),
-      width: coords.right - coords.left,
-      height: coords.bottom - coords.top,
-    } : await I.executeScript(Helpers.getRegionAbsoultePosition, shapeId);
+    const position = coords
+      ? {
+          x: coords.left + (coords.right - coords.left) / 2,
+          y: coords.top + (coords.bottom - coords.top) / 2,
+          width: coords.right - coords.left,
+          height: coords.bottom - coords.top,
+        }
+      : await I.executeScript(Helpers.getRegionAbsoultePosition, shapeId);
 
-    return includeStage ? {
-      ...position,
-      x: position.x + this.stageX(),
-      y: position.y + this.stageY(),
-    } : position;
+    return includeStage
+      ? {
+          ...position,
+          x: position.x + this.stageX(),
+          y: position.y + this.stageY(),
+        }
+      : position;
   },
 
   /**
@@ -218,7 +233,11 @@ module.exports = {
     I.scrollPageToTop();
     I.moveMouse(this.stageBBox().x + x, this.stageBBox().y + y);
     I.pressMouseDown();
-    I.moveMouse(this.stageBBox().x + x + shiftX, this.stageBBox().y + y + shiftY, 3);
+    I.moveMouse(
+      this.stageBBox().x + x + shiftX,
+      this.stageBBox().y + y + shiftY,
+      3,
+    );
     I.pressMouseUp();
   },
   /**
@@ -241,7 +260,10 @@ module.exports = {
       I.wait(0.5); // wait before last click to fix polygons creation
     }
 
-    I.clickAt(this.stageBBox().x + lastPoint[0], this.stageBBox().y + lastPoint[1]);
+    I.clickAt(
+      this.stageBBox().x + lastPoint[0],
+      this.stageBBox().y + lastPoint[1],
+    );
   },
   /**
    * Mousedown - mousemove - mouseup drawing through the list of points on the ImageView. Works in couple of lookForStage.
@@ -252,21 +274,29 @@ module.exports = {
    * @param {"steps"|"rate"} mode - mode of firing mousemove event
    * @param {number} parameter - parameter for mode
    */
-  drawThroughPoints(points, mode = 'steps', parameter = 1) {
+  drawThroughPoints(points, mode = "steps", parameter = 1) {
     I.scrollPageToTop();
     const calcSteps = {
       steps: () => parameter,
-      rate: (p1, p2) => Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2)) / parameter,
+      rate: (p1, p2) =>
+        Math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) / parameter,
     }[mode];
     const startPoint = points[0];
 
-    I.moveMouse(this.stageBBox().x + startPoint[0], this.stageBBox().y + startPoint[1]);
+    I.moveMouse(
+      this.stageBBox().x + startPoint[0],
+      this.stageBBox().y + startPoint[1],
+    );
     I.pressMouseDown();
     for (let i = 1; i < points.length; i++) {
       const prevPoint = points[i - 1];
       const curPoint = points[i];
 
-      I.moveMouse(this.stageBBox().x + curPoint[0], this.stageBBox().y + curPoint[1], calcSteps(prevPoint, curPoint));
+      I.moveMouse(
+        this.stageBBox().x + curPoint[0],
+        this.stageBBox().y + curPoint[1],
+        calcSteps(prevPoint, curPoint),
+      );
     }
     I.pressMouseUp();
   },
@@ -290,11 +320,11 @@ module.exports = {
       return regions[regionIndex]?.cleanId ?? undefined;
     }, regionIndex);
 
-    assert.notEqual(regionId, undefined, 'Region not found');
+    assert.notEqual(regionId, undefined, "Region not found");
 
     const position = await this.getRegionAbsoultePosition(regionId, false);
 
-    I.say('Clicking on a region at', position.x + ' ' + position.y);
+    I.say("Clicking on a region at", `${position.x} ${position.y}`);
 
     this.clickAt(position.x, position.y);
   },
@@ -302,11 +332,11 @@ module.exports = {
   async dragRegion(regions, findIndex, shiftX = 50, shiftY = 50) {
     const region = regions.find(findIndex);
 
-    assert.notEqual(region, undefined, 'Region not found');
+    assert.notEqual(region, undefined, "Region not found");
 
     const position = await this.getRegionAbsoultePosition(region.id);
 
-    I.say('Drag region by ' + shiftX + ' ' + shiftY);
+    I.say(`Drag region by ${shiftX} ${shiftY}`);
     await I.dragAndDropMouse(position, {
       x: position.x + shiftX,
       y: position.y + shiftY,
@@ -314,25 +344,25 @@ module.exports = {
   },
 
   selectPanTool() {
-    I.say('Select pan tool');
-    I.pressKey('H');
+    I.say("Select pan tool");
+    I.pressKey("H");
   },
 
   selectMoveTool() {
-    I.say('Select move tool');
-    I.pressKey('V');
+    I.say("Select move tool");
+    I.pressKey("V");
   },
 
   async multiImageGoForwardWithHotkey() {
-    I.say('Attempting to go to the next image');
-    I.pressKey('Ctrl+d');
+    I.say("Attempting to go to the next image");
+    I.pressKey("Ctrl+d");
 
     await this.waitForImage();
   },
 
   async multiImageGoBackwardWithHotkey() {
-    I.say('Attempting to go to the next image');
-    I.pressKey('Ctrl+a');
+    I.say("Attempting to go to the next image");
+    I.pressKey("Ctrl+a");
 
     await this.waitForImage();
   },

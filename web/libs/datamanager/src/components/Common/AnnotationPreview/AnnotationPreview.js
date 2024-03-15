@@ -8,16 +8,16 @@ import "./AnnotationPreview.styl";
 
 const imgDefaultProps = {};
 
-if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = 'anonymous';
+if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = "anonymous";
 
 const wait = (timeout) =>
   new Promise((resolve) => setTimeout(resolve, timeout));
 
 class PreviewGenerator {
   static getInstance(labelingConfig) {
-    if (this._instance) return this._instance;
+    if (PreviewGenerator._instance) return PreviewGenerator._instance;
 
-    return (this._instance = new PreviewGenerator(labelingConfig));
+    return (PreviewGenerator._instance = new PreviewGenerator(labelingConfig));
   }
 
   constructor(labelingConfig) {

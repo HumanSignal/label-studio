@@ -1,4 +1,13 @@
-import React, { cloneElement, forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  cloneElement,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ReactDOM from "react-dom";
 import { Block, cn } from "../../utils/bem";
 import { alignElements } from "../../utils/dom";
@@ -22,14 +31,16 @@ export const Dropdown = forwardRef(
     const [renderable, setRenderable] = useState(visible);
     const [currentVisible, setVisible] = useState(visible);
     const [offset, setOffset] = useState({});
-    const [visibility, setVisibility] = useState(
-      visible ? "visible" : null,
-    );
+    const [visibility, setVisibility] = useState(visible ? "visible" : null);
 
     const calculatePosition = useCallback(() => {
       const dropdownEl = dropdown.current;
       const parent = triggerRef?.current ?? dropdownEl.parentNode;
-      const { left, top } = alignElements(parent, dropdownEl, `bottom-${props.align ?? 'left'}`);
+      const { left, top } = alignElements(
+        parent,
+        dropdownEl,
+        `bottom-${props.align ?? "left"}`,
+      );
 
       setOffset({ left, top });
     }, [triggerRef]);
@@ -38,38 +49,44 @@ export const Dropdown = forwardRef(
       return lastIndex++;
     }, []);
 
-    const performAnimation = useCallback(async (visible = false) => {
-      if (props.enabled === false && visible === true) return;
+    const performAnimation = useCallback(
+      async (visible = false) => {
+        if (props.enabled === false && visible === true) return;
 
-      return new Promise((resolve) => {
-        const menu = dropdown.current;
+        return new Promise((resolve) => {
+          const menu = dropdown.current;
 
-        if (animated !== false) {
-          aroundTransition(menu, {
-            transition: () => {
-              setVisibility(visible ? "appear" : "disappear");
-            },
-            beforeTransition: () => {
-              setVisibility(visible ? "before-appear" : "before-disappear");
-            },
-            afterTransition: () => {
-              setVisibility(visible ? "visible" : null);
-              resolve();
-            },
-          });
-        } else {
-          setVisibility(visible ? "visible" : null);
-          resolve();
-        }
-      });
-    }, [animated]);
+          if (animated !== false) {
+            aroundTransition(menu, {
+              transition: () => {
+                setVisibility(visible ? "appear" : "disappear");
+              },
+              beforeTransition: () => {
+                setVisibility(visible ? "before-appear" : "before-disappear");
+              },
+              afterTransition: () => {
+                setVisibility(visible ? "visible" : null);
+                resolve();
+              },
+            });
+          } else {
+            setVisibility(visible ? "visible" : null);
+            resolve();
+          }
+        });
+      },
+      [animated],
+    );
 
-    const changeVisibility = useCallback(async (visibility) => {
-      props.onToggle?.(visibility);
-      await performAnimation(visibility);
-      setVisible(visibility);
-      props.onVisibilityChanged?.(visibility);
-    }, [props, performAnimation]);
+    const changeVisibility = useCallback(
+      async (visibility) => {
+        props.onToggle?.(visibility);
+        await performAnimation(visibility);
+        setVisible(visibility);
+        props.onVisibilityChanged?.(visibility);
+      },
+      [props, performAnimation],
+    );
 
     const close = useCallback(async () => {
       if (currentVisible === false || renderable === false) return;
@@ -127,9 +144,9 @@ export const Dropdown = forwardRef(
     const content =
       children.props && children.props.type === "Menu"
         ? cloneElement(children, {
-          ...children.props,
-          className: rootName.elem("menu").mix(children.props.className),
-        })
+            ...children.props,
+            className: rootName.elem("menu").mix(children.props.className),
+          })
         : children;
 
     const visibilityClasses = useMemo(() => {
@@ -167,11 +184,11 @@ export const Dropdown = forwardRef(
       </Block>
     );
 
-    return renderable ? (
-      props.inline === true
+    return renderable
+      ? props.inline === true
         ? result
         : ReactDOM.createPortal(result, document.body)
-    ) : null;
+      : null;
   },
 );
 

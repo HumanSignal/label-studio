@@ -21,10 +21,10 @@ export const getProperty = (object, path) => {
 };
 
 const resolveStyle = (col, decoration, cellView) => {
-  let result = {};
+  const result = {};
 
   [cellView, decoration].forEach((item) => {
-    const cellStyle = (item ?? {}).style;
+    const cellStyle = item?.style;
 
     if (cellStyle instanceof Function) {
       Object.assign(result, cellStyle(col) ?? {});

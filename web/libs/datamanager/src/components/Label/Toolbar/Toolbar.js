@@ -10,7 +10,7 @@ import {
   FaInfoCircle,
   FaRedo,
   FaTrashAlt,
-  FaUndo
+  FaUndo,
 } from "react-icons/fa";
 import { useShortcut } from "../../../sdk/hotkeys";
 import { Block, Elem } from "../../../utils/bem";
@@ -22,66 +22,68 @@ import "./Toolbar.styl";
 
 const TOOLTIP_DELAY = 0.8;
 
-export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruction }) => {
-  const annotation = lsf?.annotationStore?.selected;
+export const Toolbar = observer(
+  ({ view, history, lsf, isLabelStream, hasInstruction }) => {
+    const annotation = lsf?.annotationStore?.selected;
 
-  const task = view.dataStore.selected;
+    const task = view.dataStore.selected;
 
-  const { viewingAll: viewAll } = lsf?.annotationStore ?? {};
+    const { viewingAll: viewAll } = lsf?.annotationStore ?? {};
 
-  return lsf?.noTask === false && task ? (
-    <Block name="label-toolbar" mod={{ labelStream: isLabelStream }}>
-      <Elem name="task">
-        <Space size="large">
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <History history={history}>
-              <div style={{ margin: history ? "0 10px" : 0 }}>
-                Task #{task.id}
-              </div>
-            </History>
-          </div>
+    return lsf?.noTask === false && task ? (
+      <Block name="label-toolbar" mod={{ labelStream: isLabelStream }}>
+        <Elem name="task">
+          <Space size="large">
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <History history={history}>
+                <div style={{ margin: history ? "0 10px" : 0 }}>
+                  Task #{task.id}
+                </div>
+              </History>
+            </div>
 
-          {!viewAll && <LSFOperations history={annotation?.history} />}
-        </Space>
-      </Elem>
+            {!viewAll && <LSFOperations history={annotation?.history} />}
+          </Space>
+        </Elem>
 
-      {!!lsf && !!annotation && annotation.type === "annotation" && (
-        <Elem name="actions">
-          {!viewAll && (
-            <SubmissionButtons
-              lsf={lsf}
-              annotation={annotation}
-              isLabelStream={isLabelStream}
-              disabled={lsf.isLoading}
-            />
-          )}
+        {!!lsf && !!annotation && annotation.type === "annotation" && (
+          <Elem name="actions">
+            {!viewAll && (
+              <SubmissionButtons
+                lsf={lsf}
+                annotation={annotation}
+                isLabelStream={isLabelStream}
+                disabled={lsf.isLoading}
+              />
+            )}
 
-          <Elem name="tools">
-            <Space>
-              {hasInstruction && (
-                <Tooltip title="Labeling Instructions">
+            <Elem name="tools">
+              <Space>
+                {hasInstruction && (
+                  <Tooltip title="Labeling Instructions">
+                    <Button
+                      look={lsf.showingDescription ? "primary" : "dashed"}
+                      icon={<Icon icon={FaInfoCircle} />}
+                      onClick={() => lsf.toggleDescription()}
+                    />
+                  </Tooltip>
+                )}
+
+                <Tooltip title="Settings">
                   <Button
-                    look={lsf.showingDescription ? "primary" : "dashed"}
-                    icon={<Icon icon={FaInfoCircle} />}
-                    onClick={() => lsf.toggleDescription()}
+                    look="dashed"
+                    icon={<Icon icon={FaCog} />}
+                    onClick={() => lsf.toggleSettings()}
                   />
                 </Tooltip>
-              )}
-
-              <Tooltip title="Settings">
-                <Button
-                  look="dashed"
-                  icon={<Icon icon={FaCog} />}
-                  onClick={() => lsf.toggleSettings()}
-                />
-              </Tooltip>
-            </Space>
+              </Space>
+            </Elem>
           </Elem>
-        </Elem>
-      )}
-    </Block>
-  ) : null;
-});
+        )}
+      </Block>
+    ) : null;
+  },
+);
 
 const LSFOperations = observer(({ history }) => {
   useShortcut("lsf.undo", () => history?.undo(), {}, [history]);
@@ -127,8 +129,18 @@ const SubmissionButtons = observer(
 
     const buttons = [];
 
-    const submitShortcut = useShortcut('lsf.save-annotation', saveAnnotation, { showShortcut: true }, [disabled]);
-    const rejectShortcut = useShortcut('lsf.reject-task', skipTask, { showShortcut: true }, [disabled]);
+    const submitShortcut = useShortcut(
+      "lsf.save-annotation",
+      saveAnnotation,
+      { showShortcut: true },
+      [disabled],
+    );
+    const rejectShortcut = useShortcut(
+      "lsf.reject-task",
+      skipTask,
+      { showShortcut: true },
+      [disabled],
+    );
 
     buttons.push(
       <Tooltip

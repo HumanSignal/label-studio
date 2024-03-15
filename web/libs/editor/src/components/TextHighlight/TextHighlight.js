@@ -1,13 +1,13 @@
-import emojiRegex from 'emoji-regex';
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import emojiRegex from "emoji-regex";
+import { observer } from "mobx-react";
+import React, { Component } from "react";
 
-import Utils from '../../utils';
-import Range from './Range';
-import { HtxTextNode } from './Node';
-import UrlNode from './UrlNode';
-import EmojiNode from './EmojiNode';
-import styles from './TextHighlight.module.scss';
+import Utils from "../../utils";
+import EmojiNode from "./EmojiNode";
+import { HtxTextNode } from "./Node";
+import Range from "./Range";
+import styles from "./TextHighlight.module.scss";
+import UrlNode from "./UrlNode";
 
 class TextHighlight extends Component {
   constructor() {
@@ -20,8 +20,10 @@ class TextHighlight extends Component {
    * Return first ok element
    */
   getRange(charIndex) {
-    if (this.props.ranges && this.props.ranges.length) {
-      return this.props.ranges.find(range => charIndex >= range.start && charIndex <= range.end);
+    if (this.props.ranges?.length) {
+      return this.props.ranges.find(
+        (range) => charIndex >= range.start && charIndex <= range.end,
+      );
     }
   }
 
@@ -45,14 +47,14 @@ class TextHighlight extends Component {
     /**
      * Line break
      */
-    if (char && char.charCodeAt()) {
+    if (char?.charCodeAt()) {
       nl = char.charCodeAt(0) === 10;
     }
 
     let arrOverlap = [];
 
     if (this.props.ranges) {
-      this.props.ranges.map(range => {
+      this.props.ranges.map((range) => {
         if (charIndex >= range.start && charIndex <= range.end) {
           return (arrOverlap = [...arrOverlap, range.id]);
         }
@@ -80,7 +82,7 @@ class TextHighlight extends Component {
     let arrOverlap = [];
 
     if (this.props.ranges) {
-      this.props.ranges.map(range => {
+      this.props.ranges.map((range) => {
         if (charIndex >= range.start && charIndex <= range.end) {
           return (arrOverlap = [...arrOverlap, range.id]);
         }
@@ -106,7 +108,7 @@ class TextHighlight extends Component {
     let arrOverlap = [];
 
     if (this.props.ranges) {
-      this.props.ranges.map(range => {
+      this.props.ranges.map((range) => {
         if (charIndex >= range.start && charIndex <= range.end) {
           return (arrOverlap = [...arrOverlap, range.id]);
         }
@@ -133,7 +135,7 @@ class TextHighlight extends Component {
       return false;
     }
 
-    let text = '';
+    let text = "";
 
     if (window.getSelection) {
       /**
@@ -142,15 +144,12 @@ class TextHighlight extends Component {
        */
       // text = window.getSelection().toString();
 
-      if (window.getSelection().type === 'None') return;
+      if (window.getSelection().type === "None") return;
 
       /**
        * Create clone range
        */
-      const cloneCont = window
-        .getSelection()
-        .getRangeAt(0)
-        .cloneRange();
+      const cloneCont = window.getSelection().getRangeAt(0).cloneRange();
 
       /**
        * The Range.cloneContents() returns a DocumentFragment copying the objects of type Node included in the Range.
@@ -159,21 +158,21 @@ class TextHighlight extends Component {
       /**
        * Create virtual div with text
        */
-      const virtualDiv = document.createElement('div');
+      const virtualDiv = document.createElement("div");
 
       virtualDiv.appendChild(selectionContents);
 
-      const elementsWithSup = virtualDiv.getElementsByTagName('sup');
+      const elementsWithSup = virtualDiv.getElementsByTagName("sup");
 
       if (elementsWithSup.length > 0) {
         for (let i = 0; i < elementsWithSup.length; i++) {
-          elementsWithSup[i].innerText = '';
+          elementsWithSup[i].innerText = "";
         }
         text = virtualDiv.innerText;
       } else {
         text = virtualDiv.innerText;
       }
-    } else if (document.selection && document.selection.type !== 'Control') {
+    } else if (document.selection && document.selection.type !== "Control") {
       text = document.selection.createRange().text;
     }
 
@@ -184,31 +183,49 @@ class TextHighlight extends Component {
     /**
      * Check for hint
      */
-    if (range.startContainer.parentNode.dataset.hint || range.endContainer.parentNode.dataset.hint) return;
+    if (
+      range.startContainer.parentNode.dataset.hint ||
+      range.endContainer.parentNode.dataset.hint
+    )
+      return;
 
     /**
      * Start position of selected item
      */
-    let startContainerPosition = parseInt(range.startContainer.parentNode.dataset.position);
+    let startContainerPosition = Number.parseInt(
+      range.startContainer.parentNode.dataset.position,
+    );
     /**
      * End position of selected item
      */
-    let endContainerPosition = parseInt(range.endContainer.parentNode.dataset.position);
+    let endContainerPosition = Number.parseInt(
+      range.endContainer.parentNode.dataset.position,
+    );
 
     if (!range.startContainer.parentNode.dataset.position) {
       if (!range.startContainer.dataset) return;
 
-      startContainerPosition = parseInt(range.startContainer.dataset.position);
+      startContainerPosition = Number.parseInt(
+        range.startContainer.dataset.position,
+      );
     }
 
     if (!range.endContainer.parentNode.dataset.position) {
       if (!range.endContainer.dataset) return;
 
-      endContainerPosition = parseInt(range.endContainer.dataset.position);
+      endContainerPosition = Number.parseInt(
+        range.endContainer.dataset.position,
+      );
     }
 
-    const startHL = startContainerPosition < endContainerPosition ? startContainerPosition : endContainerPosition;
-    const endHL = startContainerPosition < endContainerPosition ? endContainerPosition : startContainerPosition;
+    const startHL =
+      startContainerPosition < endContainerPosition
+        ? startContainerPosition
+        : endContainerPosition;
+    const endHL =
+      startContainerPosition < endContainerPosition
+        ? endContainerPosition
+        : startContainerPosition;
 
     const rangeObj = new Range(startHL, endHL, text, {
       ...this.props,
@@ -253,7 +270,12 @@ class TextHighlight extends Component {
    */
   rangeRenderer(letterGroup, range, textCharIndex, onMouseOverHighlightedWord) {
     if (this.props.rangeRenderer) {
-      return this.props.rangeRenderer(letterGroup, range, textCharIndex, onMouseOverHighlightedWord);
+      return this.props.rangeRenderer(
+        letterGroup,
+        range,
+        textCharIndex,
+        onMouseOverHighlightedWord,
+      );
     }
 
     return letterGroup;
@@ -262,7 +284,8 @@ class TextHighlight extends Component {
   getNode(i, range, text, url, isEmoji) {
     if (url.length) {
       return this.getUrlNode(i, range, url);
-    } else if (isEmoji) {
+    }
+    if (isEmoji) {
       return this.getEmojiNode(i, range);
     }
 
@@ -280,7 +303,11 @@ class TextHighlight extends Component {
     /**
      * For all the characters on the text
      */
-    for (let textCharIndex = 0; textCharIndex < this.props.text.length; textCharIndex++) {
+    for (
+      let textCharIndex = 0;
+      textCharIndex < this.props.text.length;
+      textCharIndex++
+    ) {
       /**
        * Get range text
        */
@@ -294,12 +321,20 @@ class TextHighlight extends Component {
       /**
        * Check characters for emoji
        */
-      const isEmoji = emojiRegex().test(this.props.text[textCharIndex] + this.props.text[textCharIndex + 1]);
+      const isEmoji = emojiRegex().test(
+        this.props.text[textCharIndex] + this.props.text[textCharIndex + 1],
+      );
 
       /**
        * Get the current character node
        */
-      const node = this.getNode(textCharIndex, range, this.props.text, url, isEmoji);
+      const node = this.getNode(
+        textCharIndex,
+        range,
+        this.props.text,
+        url,
+        isEmoji,
+      );
 
       /**
        * If the next node is an url one, we fast forward to the end of it
@@ -340,11 +375,19 @@ class TextHighlight extends Component {
       // }
       // console.log(textCharIndex, range.start, range.end)
 
-      for (; rangeCharIndex < parseInt(range.end) + 1; rangeCharIndex++) {
+      for (
+        ;
+        rangeCharIndex < Number.parseInt(range.end) + 1;
+        rangeCharIndex++
+      ) {
         /**
          * Emoji handler
          */
-        const isEmoji = emojiRegex().test(`${this.props.text[rangeCharIndex]}${this.props.text[rangeCharIndex + 1]}`);
+        const isEmoji = emojiRegex().test(
+          `${this.props.text[rangeCharIndex]}${
+            this.props.text[rangeCharIndex + 1]
+          }`,
+        );
 
         if (isEmoji) {
           letterGroup.push(this.getEmojiNode(rangeCharIndex, range));
@@ -357,7 +400,14 @@ class TextHighlight extends Component {
         textCharIndex = rangeCharIndex;
       }
 
-      newText.push(this.rangeRenderer(letterGroup, range, textCharIndex, this.onMouseOverHighlightedWord.bind(this)));
+      newText.push(
+        this.rangeRenderer(
+          letterGroup,
+          range,
+          textCharIndex,
+          this.onMouseOverHighlightedWord.bind(this),
+        ),
+      );
     }
 
     if (lastRange) {

@@ -1,5 +1,5 @@
-import React from 'react';
-import { SentryRoute as Route } from '../config/Sentry';
+import React from "react";
+import { SentryRoute as Route } from "../config/Sentry";
 import { RouteWithStaticFallback } from "../routes/RouteWithStaticFallback";
 
 export const RouteContext = React.createContext();
@@ -43,9 +43,15 @@ export const pageSetToRoutes = (pages, config) => {
     }
 
     if (page.pages) {
-      route.routes = pageSetToRoutes(resolveWithConfig(page.pages, config), config);
+      route.routes = pageSetToRoutes(
+        resolveWithConfig(page.pages, config),
+        config,
+      );
     } else if (page.routes) {
-      route.routes = pageSetToRoutes(resolveWithConfig(page.routes, config), config);
+      route.routes = pageSetToRoutes(
+        resolveWithConfig(page.routes, config),
+        config,
+      );
     }
 
     if (route.component?.context) route.context = route.component.context;
@@ -56,9 +62,8 @@ export const pageSetToRoutes = (pages, config) => {
   try {
     if (Array.isArray(pages)) {
       return pages.map((page) => pageProcessor([null, page]));
-    } else {
-      return Object.entries(pages).map(pageProcessor);
     }
+    return Object.entries(pages).map(pageProcessor);
   } catch (err) {
     console.log(err);
     return [];
@@ -73,7 +78,14 @@ export const pageSetToRoutes = (pages, config) => {
  */
 export const resolveRoutes = (routes, props) => {
   const resolver = (route, parentPath) => {
-    const { component: Component, layout: Layout, path, modal, routes: _routes, ...rest } = route;
+    const {
+      component: Component,
+      layout: Layout,
+      path,
+      modal,
+      routes: _routes,
+      ...rest
+    } = route;
 
     const fullPath = parentPath ? `${parentPath}${path}` : path;
 
@@ -86,11 +98,19 @@ export const resolveRoutes = (routes, props) => {
         // If a component provided for the set of routes/pages,
         // we render one level higher to preserve nesting
         if (Component) {
-          children.push(processRoutes([{
-            path,
-            modal, ...rest,
-            component: Component,
-          }], parentPath));
+          children.push(
+            processRoutes(
+              [
+                {
+                  path,
+                  modal,
+                  ...rest,
+                  component: Component,
+                },
+              ],
+              parentPath,
+            ),
+          );
         }
 
         children.push(...resolvedNestedRoutes);
@@ -99,17 +119,27 @@ export const resolveRoutes = (routes, props) => {
       };
 
       return (
-        <RouteWithStaticFallback key={fullPath} path={fullPath} render={RouteComponent}/>
-      );
-    } else {
-      const routeProps = { key: fullPath, path: fullPath, modal: !!Component.modal };
-
-      return (
-        <Route {...routeProps} exact render={() => (
-          <Component {...(props ?? {})}/>
-        )} {...rest}/>
+        <RouteWithStaticFallback
+          key={fullPath}
+          path={fullPath}
+          render={RouteComponent}
+        />
       );
     }
+    const routeProps = {
+      key: fullPath,
+      path: fullPath,
+      modal: !!Component.modal,
+    };
+
+    return (
+      <Route
+        {...routeProps}
+        exact
+        render={() => <Component {...(props ?? {})} />}
+        {...rest}
+      />
+    );
   };
 
   const processRoutes = (routes, fullPath) => {

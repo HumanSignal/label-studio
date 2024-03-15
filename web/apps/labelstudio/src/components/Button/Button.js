@@ -1,7 +1,7 @@
-import React from 'react';
-import { Block, Elem } from '../../utils/bem';
-import { isDefined } from '../../utils/helpers';
-import { FormSubmissionContext } from '../Form/FormContext';
+import React from "react";
+import { Block, Elem } from "../../utils/bem";
+import { isDefined } from "../../utils/helpers";
+import { FormSubmissionContext } from "../Form/FormContext";
 import "./Button.styl";
 
 export const Button = React.forwardRef(
@@ -34,7 +34,7 @@ export const Button = React.forwardRef(
     const formSubmitting = React.useContext(FormSubmissionContext);
 
     if (formSubmitting === true) {
-      if (mods.look?.includes?.("primary") && type === 'submit') {
+      if (mods.look?.includes?.("primary") && type === "submit") {
         mods.waiting = true;
       } else {
         rest.disabled = true;
@@ -42,8 +42,8 @@ export const Button = React.forwardRef(
     }
 
     if (rest.primary) {
-      mods.look = 'primary';
-      delete rest.primary;
+      mods.look = "primary";
+      rest.primary = undefined;
     }
 
     const iconElem = React.useMemo(() => {
@@ -52,9 +52,19 @@ export const Button = React.forwardRef(
 
       switch (size) {
         case "small":
-          return React.cloneElement(icon, { ...icon.props, size: 12, width: 12, height: 12 });
+          return React.cloneElement(icon, {
+            ...icon.props,
+            size: 12,
+            width: 12,
+            height: 12,
+          });
         case "compact":
-          return React.cloneElement(icon, { ...icon.props, size: 14, width: 14, height: 14 });
+          return React.cloneElement(icon, {
+            ...icon.props,
+            size: 14,
+            width: 14,
+            height: 14,
+          });
         default:
           return icon;
       }

@@ -1,6 +1,6 @@
 const { I } = inject();
 
-const Helpers = require('../tests/helpers');
+const Helpers = require("../tests/helpers");
 
 /**
  * @typedef BoundingClientRect
@@ -11,14 +11,17 @@ const Helpers = require('../tests/helpers');
  */
 
 module.exports = {
-  _rootSelector: '.lsf-video-segmentation',
-  _videoRootSelector: '.lsf-video__main',
-  _trackSelector: '.lsf-seeker__track',
-  _indicatorSelector: '.lsf-seeker__indicator',
-  _positionSelector: '.lsf-seeker__position',
-  _seekStepForwardSelector: '.lsf-timeline-controls__main-controls > div:nth-child(2) > button:nth-child(4)',
-  _seekStepBackwardSelector: '.lsf-timeline-controls__main-controls > div:nth-child(2) > button:nth-child(2)',
-  _playButtonSelector: '.lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(2)',
+  _rootSelector: ".lsf-video-segmentation",
+  _videoRootSelector: ".lsf-video__main",
+  _trackSelector: ".lsf-seeker__track",
+  _indicatorSelector: ".lsf-seeker__indicator",
+  _positionSelector: ".lsf-seeker__position",
+  _seekStepForwardSelector:
+    ".lsf-timeline-controls__main-controls > div:nth-child(2) > button:nth-child(4)",
+  _seekStepBackwardSelector:
+    ".lsf-timeline-controls__main-controls > div:nth-child(2) > button:nth-child(2)",
+  _playButtonSelector:
+    ".lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(2)",
 
   locateRootSelector() {
     return locate(this._rootSelector);
@@ -29,15 +32,21 @@ module.exports = {
   },
 
   videoLocate(locator) {
-    return locator ? locate(locator).inside(this.locateVideoContainer()) : this.locateVideoContainer();
+    return locator
+      ? locate(locator).inside(this.locateVideoContainer())
+      : this.locateVideoContainer();
   },
 
   seekStepForwardSelector() {
-    return locate(this._seekStepForwardSelector).inside(this.locateRootSelector());
+    return locate(this._seekStepForwardSelector).inside(
+      this.locateRootSelector(),
+    );
   },
 
   seekStepBackwardSelector() {
-    return locate(this._seekStepBackwardSelector).inside(this.locateRootSelector());
+    return locate(this._seekStepBackwardSelector).inside(
+      this.locateRootSelector(),
+    );
   },
 
   playButtonSelector() {
@@ -45,7 +54,7 @@ module.exports = {
   },
 
   getCurrentVideo() {
-    return I.executeScript(Helpers.getCurrentMedia, 'video');
+    return I.executeScript(Helpers.getCurrentMedia, "video");
   },
 
   /**
@@ -80,7 +89,10 @@ module.exports = {
    * @returns {Promise<void>}
    */
   async drag(bbox, x, y) {
-    const from = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+    const from = {
+      x: bbox.x + bbox.width / 2,
+      y: bbox.y + bbox.height / 2,
+    };
     const to = { x, y: y || from.y };
 
     return I.dragAndDropMouse(from, to);

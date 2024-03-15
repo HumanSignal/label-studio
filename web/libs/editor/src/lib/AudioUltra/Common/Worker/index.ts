@@ -1,11 +1,15 @@
 type MessengerResponder = (result: Record<string, any>) => void;
 
-type MessengerCallback = (data: any, storage: Record<string, any>, respond: MessengerResponder) => void;
+type MessengerCallback = (
+  data: any,
+  storage: Record<string, any>,
+  respond: MessengerResponder,
+) => void;
 
 type MessengerInput = {
-  compute: MessengerCallback,
-  precompute?: MessengerCallback,
-}
+  compute: MessengerCallback;
+  precompute?: MessengerCallback;
+};
 
 export class ComputeWorker {
   private worker: Worker;
@@ -45,16 +49,24 @@ export class ComputeWorker {
         });
       };
 
-      self.addEventListener('message', (e) => {
+      self.addEventListener("message", (e) => {
         if (!e.data) return;
 
         const { data, type, eventId } = e.data;
 
         switch (type) {
-          case 'compute': compute(data, eventId); break;
-          case 'precompute': precompute(data); break;
-          case 'store': storeData(e); break;
-          case 'getStorage': getStorage(eventId); break;
+          case "compute":
+            compute(data, eventId);
+            break;
+          case "precompute":
+            precompute(data);
+            break;
+          case "store":
+            storeData(e);
+            break;
+          case "getStorage":
+            getStorage(eventId);
+            break;
         }
       });
     },
@@ -65,10 +77,14 @@ export class ComputeWorker {
   }
 
   async compute(data: Record<string, any>) {
-    const result = await this.sendMessage(this.worker, {
-      data,
-      type: 'compute',
-    }, true);
+    const result = await this.sendMessage(
+      this.worker,
+      {
+        data,
+        type: "compute",
+      },
+      true,
+    );
 
     return result?.data?.result?.data;
   }
@@ -76,21 +92,25 @@ export class ComputeWorker {
   async precompute(data: Record<string, any>) {
     await this.sendMessage(this.worker, {
       data,
-      type: 'precompute',
+      type: "precompute",
     });
   }
 
   async store(data: Record<string, any>) {
     await this.sendMessage(this.worker, {
       data,
-      type: 'store',
+      type: "store",
     });
   }
 
   async getStorage() {
-    const response = await this.sendMessage(this.worker, {
-      type: 'getStorage',
-    }, true);
+    const response = await this.sendMessage(
+      this.worker,
+      {
+        type: "getStorage",
+      },
+      true,
+    );
 
     return response?.data?.result;
   }
@@ -99,19 +119,23 @@ export class ComputeWorker {
     this.worker.terminate();
   }
 
-  private sendMessage(worker: Worker, data: Record<string, any>, waitResponse = false) {
+  private sendMessage(
+    worker: Worker,
+    data: Record<string, any>,
+    waitResponse = false,
+  ) {
     return new Promise<MessageEvent | undefined>((resolve) => {
       const eventId = Math.random().toString();
 
       if (waitResponse) {
         const resolver = (e: MessageEvent) => {
           if (eventId === e.data.eventId) {
-            worker.removeEventListener('message', resolver);
+            worker.removeEventListener("message", resolver);
             resolve(e);
           }
         };
 
-        worker.addEventListener('message', resolver);
+        worker.addEventListener("message", resolver);
       }
 
       worker.postMessage({ ...data, eventId });

@@ -1,4 +1,14 @@
-import React, { Children, cloneElement, forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  Children,
+  cloneElement,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Dropdown } from "./DropdownComponent";
 import { DropdownContext } from "./DropdownContext";
 
@@ -23,37 +33,45 @@ export const DropdownTrigger = forwardRef(
     const triggerRef = triggerEL.props.ref ?? useRef();
     const parentDropdown = useContext(DropdownContext);
 
-    const targetIsInsideDropdown = useCallback((target) => {
-      const triggerClicked = triggerRef.current?.contains?.(target);
-      const dropdownClicked = dropdownRef.current?.dropdown?.contains?.(
-        target,
-      );
-      const childDropdownClicked = Array.from(childset).reduce(
-        (res, child) => {
-          return res || child.hasTarget(target);
-        },
-        false,
-      );
+    const targetIsInsideDropdown = useCallback(
+      (target) => {
+        const triggerClicked = triggerRef.current?.contains?.(target);
+        const dropdownClicked =
+          dropdownRef.current?.dropdown?.contains?.(target);
+        const childDropdownClicked = Array.from(childset).reduce(
+          (res, child) => {
+            return res || child.hasTarget(target);
+          },
+          false,
+        );
 
-      return triggerClicked || dropdownClicked || childDropdownClicked;
-    }, [triggerRef, dropdownRef]);
+        return triggerClicked || dropdownClicked || childDropdownClicked;
+      },
+      [triggerRef, dropdownRef],
+    );
 
-    const handleClick = useCallback((e) => {
-      if (!closeOnClickOutside) return;
-      if (targetIsInsideDropdown(e.target)) return;
+    const handleClick = useCallback(
+      (e) => {
+        if (!closeOnClickOutside) return;
+        if (targetIsInsideDropdown(e.target)) return;
 
-      dropdownRef.current?.close?.();
-    }, [closeOnClickOutside, targetIsInsideDropdown]);
+        dropdownRef.current?.close?.();
+      },
+      [closeOnClickOutside, targetIsInsideDropdown],
+    );
 
-    const handleToggle = useCallback((e) => {
-      const inDropdown = dropdownRef.current?.dropdown?.contains?.(e.target);
+    const handleToggle = useCallback(
+      (e) => {
+        const inDropdown = dropdownRef.current?.dropdown?.contains?.(e.target);
 
-      if (inDropdown) return e.stopPropagation();
+        if (inDropdown) return e.stopPropagation();
 
-      if (toggle === false) return dropdownRef?.current?.open();
+        if (toggle === false) return dropdownRef?.current?.open();
 
-      dropdownRef?.current?.toggle();
-    }, [dropdownRef]);
+        dropdownRef?.current?.toggle();
+      },
+      [dropdownRef],
+    );
 
     const triggerClone = cloneElement(triggerEL, {
       ...triggerEL.props,
@@ -72,18 +90,23 @@ export const DropdownTrigger = forwardRef(
     useEffect(() => {
       document.addEventListener("click", handleClick, { capture: true });
       return () =>
-        document.removeEventListener("click", handleClick, { capture: true });
+        document.removeEventListener("click", handleClick, {
+          capture: true,
+        });
     }, [handleClick]);
 
-    const contextValue = useMemo(() => ({
-      triggerRef,
-      dropdown: dropdownRef,
-      hasTarget: targetIsInsideDropdown,
-      addChild: (child) => childset.add(child),
-      removeChild: (child) => childset.delete(child),
-      open: () => dropdownRef?.current?.open?.(),
-      close: () => dropdownRef?.current?.close?.(),
-    }), [triggerRef, dropdownRef]);
+    const contextValue = useMemo(
+      () => ({
+        triggerRef,
+        dropdown: dropdownRef,
+        hasTarget: targetIsInsideDropdown,
+        addChild: (child) => childset.add(child),
+        removeChild: (child) => childset.delete(child),
+        open: () => dropdownRef?.current?.open?.(),
+        close: () => dropdownRef?.current?.close?.(),
+      }),
+      [triggerRef, dropdownRef],
+    );
 
     useEffect(() => {
       if (!parentDropdown) return;

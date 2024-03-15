@@ -6,20 +6,33 @@ import { MenuContext } from "./MenuContext";
 import { MenuItem } from "./MenuItem";
 
 export const Menu = React.forwardRef(
-  ({ children, className, style, size, selectedKeys, closeDropdownOnItemClick }, ref) => {
+  (
+    {
+      children,
+      className,
+      style,
+      size,
+      selectedKeys,
+      closeDropdownOnItemClick,
+    },
+    ref,
+  ) => {
     const dropdown = useDropdown();
 
     const selected = useMemo(() => {
       return new Set(selectedKeys ?? []);
     }, [selectedKeys]);
 
-    const clickHandler = useCallback((e) => {
-      const elem = cn('menu').elem('item').closest(e.target);
+    const clickHandler = useCallback(
+      (e) => {
+        const elem = cn("menu").elem("item").closest(e.target);
 
-      if (dropdown && elem && closeDropdownOnItemClick !== false) {
-        dropdown.close();
-      }
-    }, [dropdown]);
+        if (dropdown && elem && closeDropdownOnItemClick !== false) {
+          dropdown.close();
+        }
+      },
+      [dropdown],
+    );
 
     const collapsed = useMemo(() => {
       return !!dropdown;
@@ -27,7 +40,15 @@ export const Menu = React.forwardRef(
 
     return (
       <MenuContext.Provider value={{ selected }}>
-        <Block ref={ref} tag="ul" name="menu" mod={{ size, collapsed }} mix={className} style={style} onClick={clickHandler}>
+        <Block
+          ref={ref}
+          tag="ul"
+          name="menu"
+          mod={{ size, collapsed }}
+          mix={className}
+          style={style}
+          onClick={clickHandler}
+        >
           {children}
         </Block>
       </MenuContext.Provider>
@@ -36,8 +57,8 @@ export const Menu = React.forwardRef(
 );
 
 Menu.Item = MenuItem;
-Menu.Spacer = () => <li className={cn("menu", { elem: "spacer" })}></li>;
-Menu.Divider = () => <li className={cn("menu", { elem: "divider" })}></li>;
+Menu.Spacer = () => <li className={cn("menu", { elem: "spacer" })} />;
+Menu.Divider = () => <li className={cn("menu", { elem: "divider" })} />;
 Menu.Builder = (url, menuItems) => {
   return (menuItems ?? []).map((item, index) => {
     if (item === "SPACER") return <Menu.Spacer key={index} />;

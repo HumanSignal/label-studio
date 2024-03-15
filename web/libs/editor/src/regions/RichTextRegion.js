@@ -1,32 +1,34 @@
-import { tryReference, types } from 'mobx-state-tree';
-import * as xpath from 'xpath-range';
-import Registry from '../core/Registry';
-import { AreaMixin } from '../mixins/AreaMixin';
-import { HighlightMixin } from '../mixins/HighlightMixin';
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
-import { RichTextModel } from '../tags/object/RichText/model';
-import { findRangeNative, rangeToGlobalOffset } from '../utils/selection-tools';
-import { isDefined } from '../utils/utilities';
-import { FF_LSDV_4620_3, isFF } from '../utils/feature-flags';
+import { tryReference, types } from "mobx-state-tree";
+import * as xpath from "xpath-range";
+import Registry from "../core/Registry";
+import { AreaMixin } from "../mixins/AreaMixin";
+import { HighlightMixin } from "../mixins/HighlightMixin";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import { RichTextModel } from "../tags/object/RichText/model";
+import { FF_LSDV_4620_3, isFF } from "../utils/feature-flags";
+import { findRangeNative, rangeToGlobalOffset } from "../utils/selection-tools";
+import { isDefined } from "../utils/utilities";
 
-const GlobalOffsets = types.model('GlobalOffset', {
-  start: types.number,
-  end: types.number,
-  // distinguish loaded globalOffsets from user's annotation and internally calculated one;
-  // we should rely only on calculated offsets to find ranges, see initRangeAndOffsets();
-  // it should be in the model to avoid reinit on undo/redo.
-  calculated: false,
-}).views(self => ({
-  get serialized() {
-    // should never get to serialized result
-    return { start: self.start, end: self.end };
-  },
-}));
+const GlobalOffsets = types
+  .model("GlobalOffset", {
+    start: types.number,
+    end: types.number,
+    // distinguish loaded globalOffsets from user's annotation and internally calculated one;
+    // we should rely only on calculated offsets to find ranges, see initRangeAndOffsets();
+    // it should be in the model to avoid reinit on undo/redo.
+    calculated: false,
+  })
+  .views((self) => ({
+    get serialized() {
+      // should never get to serialized result
+      return { start: self.start, end: self.end };
+    },
+  }));
 
 const Model = types
-  .model('RichTextRegionModel', {
-    type: 'richtextregion',
+  .model("RichTextRegionModel", {
+    type: "richtextregion",
     object: types.late(() => types.reference(RichTextModel)),
 
     startOffset: types.integer,
@@ -41,7 +43,7 @@ const Model = types
     hideable: true,
     cachedRange: null,
   }))
-  .views(self => ({
+  .views((self) => ({
     get parent() {
       return tryReference(() => self.object);
     },
@@ -52,7 +54,7 @@ const Model = types
       return self.text;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     beforeDestroy() {
       try {
         self.removeHighlight();
@@ -74,7 +76,9 @@ const Model = types
       } else {
         try {
           if (isFF(FF_LSDV_4620_3)) {
-            const xpathRange = self.parent.globalOffsetsToRelativeOffsets(self.globalOffsets);
+            const xpathRange = self.parent.globalOffsetsToRelativeOffsets(
+              self.globalOffsets,
+            );
 
             Object.assign(res.value, {
               ...xpathRange,
@@ -89,7 +93,7 @@ const Model = types
               root,
             );
 
-            if (!range) throw new Error;
+            if (!range) throw new Error();
 
             const xpathRange = xpath.fromRange(range, root);
 
@@ -103,7 +107,12 @@ const Model = types
           // or they can't be applied on current html, so just keep them untouched
           const { start, end, startOffset, endOffset } = self;
 
-          Object.assign(res.value, { start, end, startOffset, endOffset });
+          Object.assign(res.value, {
+            start,
+            end,
+            startOffset,
+            endOffset,
+          });
 
           if (self.globalOffsets) {
             Object.assign(res.value, {
@@ -113,8 +122,8 @@ const Model = types
         }
       }
 
-      if (self.object.savetextresult === 'yes' && isDefined(self.text)) {
-        res.value['text'] = self.text;
+      if (self.object.savetextresult === "yes" && isDefined(self.text)) {
+        res.value.text = self.text;
       }
 
       return res;
@@ -138,10 +147,11 @@ const Model = types
 
       if (!root || !self.globalOffsets) return undefined;
 
-      const rangeIsMissing = !self.cachedRange
-        || self.cachedRange.collapsed
+      const rangeIsMissing =
+        !self.cachedRange ||
+        self.cachedRange.collapsed ||
         // if this range is in detached iframe it'll look like a good one, check this
-        || !self.cachedRange.startContainer?.ownerDocument?.defaultView;
+        !self.cachedRange.startContainer?.ownerDocument?.defaultView;
 
       if (rangeIsMissing) {
         const { start, end } = self.globalOffsets;
@@ -153,7 +163,9 @@ const Model = types
     },
 
     updateXPathsFromGlobalOffsets() {
-      const xPathRange = self.parent.globalOffsetsToRelativeOffsets(self.globalOffsets);
+      const xPathRange = self.parent.globalOffsetsToRelativeOffsets(
+        self.globalOffsets,
+      );
 
       if (xPathRange) {
         self._setXPaths(xPathRange);
@@ -185,10 +197,14 @@ const Model = types
       }
 
       if (isFF(FF_LSDV_4620_3)) {
-
         // 1. first try to find range by xpath in the original layout
-        
-        const offsets = self.parent.relativeOffsetsToGlobalOffsets(self.start, self.startOffset, self.end, self.endOffset);
+
+        const offsets = self.parent.relativeOffsetsToGlobalOffsets(
+          self.start,
+          self.startOffset,
+          self.end,
+          self.endOffset,
+        );
 
         if (offsets) {
           const [start, end] = offsets;
@@ -207,12 +223,11 @@ const Model = types
           return;
         }
       } else {
-
         // 1. first try to find range by xpath in original document
         range = self._getRange({ useOriginalContent: true });
 
         if (range) {
-        // we need this range in the visible document, so find it by global offsets
+          // we need this range in the visible document, so find it by global offsets
           const originalRoot = self._getRootNode(true);
           const [start, end] = rangeToGlobalOffset(range, originalRoot);
 
@@ -276,8 +291,12 @@ const Model = types
 
     _getRange({ useOriginalContent = false, useCache = true } = {}) {
       const rootNode = self._getRootNode(useOriginalContent);
-      const hasCache = isDefined(self._cachedRange) && !useOriginalContent && useCache;
-      const rootNodeExists = hasCache && (rootNode && !rootNode.contains(self._cachedRange.commonAncestorContainer));
+      const hasCache =
+        isDefined(self._cachedRange) && !useOriginalContent && useCache;
+      const rootNodeExists =
+        hasCache &&
+        rootNode &&
+        !rootNode.contains(self._cachedRange.commonAncestorContainer);
 
       if (hasCache === false || rootNodeExists) {
         const foundRange = self._createNativeRange(useOriginalContent);
@@ -316,7 +335,7 @@ const Model = types
         return xpath.toRange(start, startOffset, end, endOffset, rootNode);
       } catch (err) {
         // actually this happens when regions cannot be located by xpath for some reason
-        console.warn('can\'t locate xpath', { start, end }, err);
+        console.warn("can't locate xpath", { start, end }, err);
       }
 
       return undefined;
@@ -324,7 +343,7 @@ const Model = types
   }));
 
 const RichTextRegionModel = types.compose(
-  'RichTextRegionModel',
+  "RichTextRegionModel",
   RegionsMixin,
   AreaMixin,
   NormalizationMixin,
@@ -332,8 +351,8 @@ const RichTextRegionModel = types.compose(
   HighlightMixin,
 );
 
-Registry.addRegionType(RichTextRegionModel, 'text');
-Registry.addRegionType(RichTextRegionModel, 'hypertext');
-Registry.addRegionType(RichTextRegionModel, 'richtext');
+Registry.addRegionType(RichTextRegionModel, "text");
+Registry.addRegionType(RichTextRegionModel, "hypertext");
+Registry.addRegionType(RichTextRegionModel, "richtext");
 
 export { RichTextRegionModel };

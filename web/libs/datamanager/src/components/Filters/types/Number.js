@@ -5,13 +5,13 @@ import { FilterInput } from "../FilterInput";
 
 const valueFilter = (value) => {
   if (isDefined(value)) {
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
       return value;
-    } else if (typeof value === 'string') {
-      return value.replace(/([^\d.,]+)/, '');
-    } else {
-      return value || null;
     }
+    if (typeof value === "string") {
+      return value.replace(/([^\d.,]+)/, "");
+    }
+    return value || null;
   }
 
   return null;

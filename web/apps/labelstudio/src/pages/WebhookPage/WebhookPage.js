@@ -1,38 +1,34 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useAPI } from '../../providers/ApiProvider';
+import { useAPI } from "../../providers/ApiProvider";
 import "./WebhookPage.styl";
 
-
-import WebhookList from './WebhookList';
-import WebhookDetail from './WebhookDetail';
-import { useProject } from '../../providers/ProjectProvider';
-import { Button, Spinner } from '../../components';
-import { Block, Elem } from '../../utils/bem';
-import { IconInfo } from '../../assets/icons';
-import { useHistory } from 'react-router';
+import { useHistory } from "react-router";
+import { IconInfo } from "../../assets/icons";
+import { Button, Spinner } from "../../components";
+import { useProject } from "../../providers/ProjectProvider";
+import { Block, Elem } from "../../utils/bem";
+import WebhookDetail from "./WebhookDetail";
+import WebhookList from "./WebhookList";
 
 const Webhook = () => {
   const [activeWebhook, setActiveWebhook] = useState(null);
   const [webhooks, setWebhooks] = useState(null);
   const [webhooksInfo, setWebhooksInfo] = useState(null);
 
-
   const history = useHistory();
 
   const api = useAPI();
   const { project } = useProject();
 
-  const projectId = useMemo(()=>{
-    if (history.location.pathname.startsWith('/projects')){
+  const projectId = useMemo(() => {
+    if (history.location.pathname.startsWith("/projects")) {
       if (Object.keys(project).length === 0) {
         return null;
-      }else{
-        return project.id;
       }
-    }else{
-      return undefined;
+      return project.id;
     }
+    return undefined;
   }, [project, history]);
 
   console.log(projectId, history.location.pathname);
@@ -41,14 +37,14 @@ const Webhook = () => {
       setWebhooks(null);
       return;
     }
-    let params = {};
+    const params = {};
 
-    if (projectId !== undefined){
-      params['project'] = projectId;
+    if (projectId !== undefined) {
+      params.project = projectId;
     } else {
-      params['project'] = null;
+      params.project = null;
     }
-    const webhooks = await api.callApi('webhooks', {
+    const webhooks = await api.callApi("webhooks", {
       params,
     });
 
@@ -60,17 +56,15 @@ const Webhook = () => {
       setWebhooksInfo(null);
       return;
     }
-    let params = {};
+    const params = {};
 
-    if (projectId !== undefined){
-      params['organization-only'] = false;
+    if (projectId !== undefined) {
+      params["organization-only"] = false;
     }
 
-    const info = await api.callApi('webhooksInfo',
-      {
-        params,
-      },
-    );
+    const info = await api.callApi("webhooksInfo", {
+      params,
+    });
 
     if (info) setWebhooksInfo(info);
   }, [projectId]);
@@ -85,20 +79,23 @@ const Webhook = () => {
   }
   let content = null;
 
-  if (activeWebhook==='new') {
+  if (activeWebhook === "new") {
     content = (
       <WebhookDetail
         onSelectActive={setActiveWebhook}
         onBack={() => setActiveWebhook(null)}
         webhook={null}
         fetchWebhooks={fetchWebhooks}
-        webhooksInfo={webhooksInfo} />
+        webhooksInfo={webhooksInfo}
+      />
     );
   } else if (activeWebhook === null) {
     content = (
       <WebhookList
         onSelectActive={setActiveWebhook}
-        onAddWebhook={()=>{setActiveWebhook('new');}}
+        onAddWebhook={() => {
+          setActiveWebhook("new");
+        }}
         fetchWebhooks={fetchWebhooks}
         webhooks={webhooks}
       />
@@ -110,23 +107,28 @@ const Webhook = () => {
         onBack={() => setActiveWebhook(null)}
         webhook={webhooks[webhooks.findIndex((x) => x.id === activeWebhook)]}
         fetchWebhooks={fetchWebhooks}
-        webhooksInfo={webhooksInfo} />
+        webhooksInfo={webhooksInfo}
+      />
     );
   }
   return (
-    <Block name='webhook-wrap'>
+    <Block name="webhook-wrap">
       {content}
       <Elem name="footer">
-        <Elem name='footer-icon'>
-          <IconInfo width='28' height='28'/>
+        <Elem name="footer-icon">
+          <IconInfo width="28" height="28" />
         </Elem>
-        <Elem name='footer-text'>
+        <Elem name="footer-text">
           <p>
-        Webhooks allow external services to be notified when certain events happen.
-        When the specified events occur, a POST request is sent to each of the URLs you provide.
+            Webhooks allow external services to be notified when certain events
+            happen. When the specified events occur, a POST request is sent to
+            each of the URLs you provide.
           </p>
           <p>
-            <a href="https://labelstud.io/guide/webhooks.html">Read more in the documentation</a>.
+            <a href="https://labelstud.io/guide/webhooks.html">
+              Read more in the documentation
+            </a>
+            .
           </p>
         </Elem>
       </Elem>

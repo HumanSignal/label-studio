@@ -14,7 +14,7 @@ const standaloneModal = (props) => {
   document.body.appendChild(rootDiv);
 
   const renderModal = (props, animate) => {
-    render((
+    render(
       <Modal
         ref={modalRef}
         {...props}
@@ -23,8 +23,9 @@ const standaloneModal = (props) => {
           rootDiv.remove();
         }}
         animateAppearance={animate}
-      />
-    ), rootDiv);
+      />,
+      rootDiv,
+    );
   };
 
   renderModal(props, true);
@@ -39,7 +40,14 @@ const standaloneModal = (props) => {
   };
 };
 
-export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...props }) => {
+export const confirm = ({
+  okText,
+  onOk,
+  cancelText,
+  onCancel,
+  buttonLook,
+  ...props
+}) => {
   const modal = standaloneModal({
     ...props,
     allowClose: false,
@@ -62,7 +70,7 @@ export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...pro
             modal.close();
           }}
           size="compact"
-          look={buttonLook ?? 'primary'}
+          look={buttonLook ?? "primary"}
         >
           {okText ?? "OK"}
         </Button>

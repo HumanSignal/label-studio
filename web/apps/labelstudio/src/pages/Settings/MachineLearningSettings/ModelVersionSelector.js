@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useAPI } from '../../../providers/ApiProvider';
-import { Select } from '../../../components/Form';
-import { Block, Elem } from '../../../utils/bem';
+import { useCallback, useEffect, useState } from "react";
+import { Select } from "../../../components/Form";
+import { useAPI } from "../../../providers/ApiProvider";
+import { Block, Elem } from "../../../utils/bem";
 
-import './ModelVersionSelector.styl';
+import "./ModelVersionSelector.styl";
 
 export const ModelVersionSelector = ({
   name = "model_version",
@@ -20,8 +20,10 @@ export const ModelVersionSelector = ({
   const [version, setVersion] = useState(null);
 
   useEffect(() => {
-    if (versions.length && object?.[valueName] ) {
-      const selectedVersion = versions.find(version => version.value === parseInt(object?.[valueName]));
+    if (versions.length && object?.[valueName]) {
+      const selectedVersion = versions.find(
+        (version) => version.value === Number.parseInt(object?.[valueName]),
+      );
 
       setVersion(selectedVersion);
     }
@@ -44,10 +46,12 @@ export const ModelVersionSelector = ({
     }
 
     if (modelVersions?.versions?.length) {
-      setVersions(modelVersions.versions.map(version => ({
-        value: version,
-        label: version,
-      })));
+      setVersions(
+        modelVersions.versions.map((version) => ({
+          value: version,
+          label: version,
+        })),
+      );
     }
 
     setLoading(false);
@@ -61,16 +65,12 @@ export const ModelVersionSelector = ({
         name={name}
         disabled={!versions.length}
         value={version}
-        onChange={e => setVersion(e.target.value)}
+        onChange={(e) => setVersion(e.target.value)}
         options={versions}
         placeholder={loading ? "Loading ..." : placeholder}
         {...props}
       />
-      {error && (
-        <Elem name="message">
-          {error}
-        </Elem>
-      )}
+      {error && <Elem name="message">{error}</Elem>}
     </Block>
   );
 };

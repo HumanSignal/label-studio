@@ -1,8 +1,10 @@
-import TriggerOptions = Cypress.TriggerOptions
-import ObjectLike = Cypress.ObjectLike
-import ClickOptions = Cypress.ClickOptions
+import TriggerOptions = Cypress.TriggerOptions;
+import ObjectLike = Cypress.ObjectLike;
+import ClickOptions = Cypress.ClickOptions;
 
-type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>
+type MouseInteractionOptions = Partial<
+  TriggerOptions & ObjectLike & MouseEvent
+>;
 
 // The width of the frame item on the timeline
 const FRAME_WIDTH = 16;
@@ -11,31 +13,24 @@ const FRAME_RESERVED_HEIGHT = 24;
 
 export const VideoView = {
   get root() {
-    cy.log('Get VideoView\'s root');
-    return cy
-      .get('.lsf-video-segmentation');
+    cy.log("Get VideoView's root");
+    return cy.get(".lsf-video-segmentation");
   },
   get drawingArea() {
-    cy.log('Get VideoView\'s drawing area');
-    return this
-      .root
-      .get('.konvajs-content');
+    cy.log("Get VideoView's drawing area");
+    return this.root.get(".konvajs-content");
   },
   get timelineContainer() {
-    return this.root
-      .get('.lsf-video-segmentation__timeline');
+    return this.root.get(".lsf-video-segmentation__timeline");
   },
   get timelineToolbar() {
-    return this.root
-      .get('.lsf-timeline__topbar');
+    return this.root.get(".lsf-timeline__topbar");
   },
   get timeLineLabels() {
-    return this.root
-      .get('.lsf-timeline-frames__labels-bg');
+    return this.root.get(".lsf-timeline-frames__labels-bg");
   },
   get timeframesArea() {
-    return this.root
-      .get('.lsf-timeline-frames__scroll');
+    return this.root.get(".lsf-timeline-frames__scroll");
   },
   /**
    * Clicks at the coordinates on the drawing area
@@ -44,9 +39,7 @@ export const VideoView = {
    */
   clickAt(x: number, y: number, options?: Partial<ClickOptions>) {
     cy.log(`Click at the image view at (${x}, ${y})`);
-    this.drawingArea
-      .scrollIntoView()
-      .click(x, y, options);
+    this.drawingArea.scrollIntoView().click(x, y, options);
   },
   /**
    * Clicks at the relative coordinates on the drawing area
@@ -54,7 +47,7 @@ export const VideoView = {
    * @param {number} y
    */
   clickAtRelative(x: number, y: number, options?: Partial<ClickOptions>) {
-    this.drawingArea.then(el => {
+    this.drawingArea.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
       const realY = y * bbox.height;
@@ -70,13 +63,31 @@ export const VideoView = {
    * @param {number} width
    * @param {number} height
    */
-  drawRect(x: number, y: number, width: number, height: number, options: MouseInteractionOptions = {}) {
+  drawRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    options: MouseInteractionOptions = {},
+  ) {
     cy.log(`Draw rectangle at (${x}, ${y}) of size ${width}x${height}`);
     this.drawingArea
       .scrollIntoView()
-      .trigger('mousedown', x, y, { eventConstructor: 'MouseEvent', buttons: 1, ...options })
-      .trigger('mousemove', x + width, y + height, { eventConstructor: 'MouseEvent', buttons: 1, ...options })
-      .trigger('mouseup', x + width, y + height, { eventConstructor: 'MouseEvent', buttons: 1, ...options })
+      .trigger("mousedown", x, y, {
+        eventConstructor: "MouseEvent",
+        buttons: 1,
+        ...options,
+      })
+      .trigger("mousemove", x + width, y + height, {
+        eventConstructor: "MouseEvent",
+        buttons: 1,
+        ...options,
+      })
+      .trigger("mouseup", x + width, y + height, {
+        eventConstructor: "MouseEvent",
+        buttons: 1,
+        ...options,
+      })
       // We need this while the Video tag creates new regions in useEffect hook (it means not immediately)
       // This problem could be solved in VideoRegions component of lsf
       // Without this wait we get absence of a region on screenshots
@@ -90,8 +101,14 @@ export const VideoView = {
    * @param {number} width
    * @param {number} height
    */
-  drawRectRelative(x: number, y: number, width: number, height: number, options: MouseInteractionOptions = {}) {
-    this.drawingArea.then(el => {
+  drawRectRelative(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    options: MouseInteractionOptions = {},
+  ) {
+    this.drawingArea.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
       const realY = y * bbox.height;
@@ -107,14 +124,14 @@ export const VideoView = {
   clickAtFrame(idx, options?: Partial<ClickOptions>) {
     cy.log(`Click at ${idx} on the timeline`);
 
-    this.timeLineLabels.then(el => {
+    this.timeLineLabels.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const pointX = bbox.width + (idx - 0.5) * FRAME_WIDTH;
       const pointY = FRAME_RESERVED_HEIGHT / 2;
 
       this.timeframesArea
         .scrollIntoView()
-        .trigger('mouseover', pointX, pointY)
+        .trigger("mouseover", pointX, pointY)
         .click(pointX, pointY, options);
     });
   },
@@ -124,7 +141,9 @@ export const VideoView = {
    * @param {string} name name of the screenshot
    */
   captureCanvas(name: string) {
-    return this.drawingArea.captureScreenshot(name, { withHidden: ['.lsf-video-canvas'] });
+    return this.drawingArea.captureScreenshot(name, {
+      withHidden: [".lsf-video-canvas"],
+    });
   },
 
   /**
@@ -134,7 +153,10 @@ export const VideoView = {
    * @param treshold to compare image. It's a relation between original number of pixels vs changed number of pixels
    */
   canvasShouldChange(name: string, treshold = 0.1) {
-    return this.drawingArea.compareScreenshot(name, 'shouldChange', { withHidden: ['.lsf-video-canvas'], treshold });
+    return this.drawingArea.compareScreenshot(name, "shouldChange", {
+      withHidden: [".lsf-video-canvas"],
+      treshold,
+    });
   },
 
   /**
@@ -144,6 +166,9 @@ export const VideoView = {
    * @param treshold to compare image. It's a relation between original number of pixels vs changed number of pixels
    */
   canvasShouldNotChange(name: string, treshold = 0.1) {
-    return this.drawingArea.compareScreenshot(name, 'shouldNotChange', { withHidden: ['.lsf-video-canvas'], treshold });
+    return this.drawingArea.compareScreenshot(name, "shouldNotChange", {
+      withHidden: [".lsf-video-canvas"],
+      treshold,
+    });
   },
 };

@@ -1,23 +1,23 @@
-import { getRoot, types } from 'mobx-state-tree';
-import { AudioModel } from '../../tags/object/AudioNext';
-import Utils from '../../utils';
-import Constants from '../../core/Constants';
+import { getRoot, types } from "mobx-state-tree";
+import Constants from "../../core/Constants";
+import { AudioModel } from "../../tags/object/AudioNext";
+import Utils from "../../utils";
 
 export const AudioRegionModel = types
-  .model('AudioRegionModel', {
-    type: 'audioregion',
+  .model("AudioRegionModel", {
+    type: "audioregion",
     object: types.late(() => types.reference(AudioModel)),
 
     start: types.number,
     end: types.number,
     channel: types.optional(types.number, 0),
 
-    selectedregionbg: types.optional(types.string, 'rgba(0, 0, 0, 0.5)'),
+    selectedregionbg: types.optional(types.string, "rgba(0, 0, 0, 0.5)"),
   })
   .volatile(() => ({
     hideable: true,
   }))
-  .views(self => ({
+  .views((self) => ({
     getRegionElement() {
       return self.wsRegionElement(self._ws_region);
     },
@@ -37,7 +37,7 @@ export const AudioRegionModel = types
         start: self.start,
         end: self.end,
         channel: self.channel,
-        color: 'orange',
+        color: "orange",
       };
 
       if (self.readonly) {
@@ -47,7 +47,7 @@ export const AudioRegionModel = types
       return reg;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     /**
      * @returns {AudioRegionResult}
      */
@@ -94,18 +94,20 @@ export const AudioRegionModel = types
 
       if (!el) return;
 
-      const lastClassList = el.className.split(' ');
+      const lastClassList = el.className.split(" ");
 
       for (const obj in lastClassList) {
-        if (lastClassList[obj].indexOf('htx-label') >= 0) {
+        if (lastClassList[obj].indexOf("htx-label") >= 0) {
           lastClassList.splice(obj, 1);
         }
       }
 
-      const classes = [...new Set([...lastClassList, 'htx-highlight', 'htx-highlight-last'])];
+      const classes = [
+        ...new Set([...lastClassList, "htx-highlight", "htx-highlight-last"]),
+      ];
 
       if (!self.parent.showlabels && !settings.showLabels) {
-        classes.push('htx-no-label');
+        classes.push("htx-no-label");
       } else {
         const cssCls = Utils.HTML.labelWithCSS(el, {
           labels: self.labeling?.mainValue,
@@ -115,7 +117,7 @@ export const AudioRegionModel = types
         classes.push(cssCls);
       }
 
-      el.className = classes.filter(Boolean).join(' ');
+      el.className = classes.filter(Boolean).join(" ");
     },
 
     /**
@@ -132,7 +134,9 @@ export const AudioRegionModel = types
         const top = container.scrollTop;
         const left = container.scrollLeft;
 
-        el.scrollIntoViewIfNeeded ? el.scrollIntoViewIfNeeded() : el.scrollIntoView();
+        el.scrollIntoViewIfNeeded
+          ? el.scrollIntoViewIfNeeded()
+          : el.scrollIntoView();
         window.document.scrollingElement.scrollTo(left, top);
       }
     },
@@ -154,7 +158,7 @@ export const AudioRegionModel = types
         self._ws_region.element.style.border = Constants.HIGHLIGHTED_CSS_BORDER;
       } else {
         self.updateColor(0.3);
-        self._ws_region.element.style.border = 'none';
+        self._ws_region.element.style.border = "none";
       }
     },
 
@@ -183,7 +187,9 @@ export const AudioRegionModel = types
         //   // r.update({ color: self.selectedregionbg });
         // });
 
-        self._ws_region.update({ color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8) });
+        self._ws_region.update({
+          color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8),
+        });
       }
 
       self.onClickRegion(ev);
@@ -213,7 +219,7 @@ export const AudioRegionModel = types
 
     toggleHidden(e) {
       self.hidden = !self.hidden;
-      self._ws_region.element.style.display = self.hidden ? 'none' : 'block';
+      self._ws_region.element.style.display = self.hidden ? "none" : "block";
       e?.stopPropagation();
     },
   }));

@@ -1,28 +1,28 @@
-import * as d3 from 'd3';
-import React, { useState } from 'react';
-import { inject, observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
+import * as d3 from "d3";
+import { inject, observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React, { useState } from "react";
 
-import InfoModal from '../../components/Infomodal/Infomodal';
-import { guidGenerator } from '../../core/Helpers';
-import Registry from '../../core/Registry';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import PerRegionMixin from '../../mixins/PerRegion';
-import RequiredMixin from '../../mixins/Required';
-import { isDefined } from '../../utils/utilities';
-import ControlBase from './Base';
-import { ReadOnlyControlMixin } from '../../mixins/ReadOnlyMixin';
-import ClassificationBase from './ClassificationBase';
-import PerItemMixin from '../../mixins/PerItem';
-import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
+import InfoModal from "../../components/Infomodal/Infomodal";
+import { guidGenerator } from "../../core/Helpers";
+import Registry from "../../core/Registry";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import PerItemMixin from "../../mixins/PerItem";
+import PerRegionMixin from "../../mixins/PerRegion";
+import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
+import RequiredMixin from "../../mixins/Required";
+import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
+import { isDefined } from "../../utils/utilities";
+import ControlBase from "./Base";
+import ClassificationBase from "./ClassificationBase";
 
-const FORMAT_FULL = '%Y-%m-%dT%H:%M';
-const FORMAT_DATE = '%Y-%m-%d';
-const FORMAT_TIME = '%H:%M';
+const FORMAT_FULL = "%Y-%m-%dT%H:%M";
+const FORMAT_DATE = "%Y-%m-%d";
+const FORMAT_TIME = "%H:%M";
 
-const ISO_DATE_SEPARATOR = 'T';
+const ISO_DATE_SEPARATOR = "T";
 
-const zero = n => (n < 10 ? '0' : '') + n;
+const zero = (n) => (n < 10 ? "0" : "") + n;
 
 /**
  * The DateTime tag adds date and time selection to the labeling interface. Use this tag to add a date, timestamp, month, or year to an annotation.
@@ -69,9 +69,9 @@ const TagAttrs = types.model({
 const Model = types
   .model({
     pid: types.optional(types.string, guidGenerator),
-    type: 'datetime',
+    type: "datetime",
   })
-  .views(self => ({
+  .views((self) => ({
     selectedValues() {
       return self.datetime;
     },
@@ -82,23 +82,23 @@ const Model = types
     },
 
     get showDate() {
-      return !self.only || self.only.includes('date');
+      return !self.only || self.only.includes("date");
     },
 
     get showTime() {
-      return !self.only || self.only.includes('time');
+      return !self.only || self.only.includes("time");
     },
 
     get onlyTime() {
-      return self.only === 'time';
+      return self.only === "time";
     },
 
     get showMonth() {
-      return self.only?.includes('month') && !self.only?.includes('date');
+      return self.only?.includes("month") && !self.only?.includes("date");
     },
 
     get showYear() {
-      return self.only?.includes('year');
+      return self.only?.includes("year");
     },
 
     /**
@@ -114,23 +114,27 @@ const Model = types
       const date = self.parseDateTime(value);
 
       // we can't use toISOString() because it may shift timezone and return different day
-      return [date.getFullYear(), zero(date.getMonth() + 1), zero(date.getDate())].join('-');
+      return [
+        date.getFullYear(),
+        zero(date.getMonth() + 1),
+        zero(date.getDate()),
+      ].join("-");
     },
 
     /**
      * @returns {string} current year or date in ISO format
      */
     get date() {
-      if (self.only?.includes('year')) return self.year;
+      if (self.only?.includes("year")) return self.year;
       if (!self.month || !self.year) return undefined;
-      return [self.year, zero(self.month), zero(self.day)].join('-');
+      return [self.year, zero(self.month), zero(self.day)].join("-");
     },
 
     /**
      * @returns {string} main value stored in result, already formatted
      */
     get datetime() {
-      const timeStr = self.time || '00:00';
+      const timeStr = self.time || "00:00";
 
       if (self.onlyTime) return timeStr;
       if (!self.date) {
@@ -156,7 +160,7 @@ const Model = types
     year: undefined,
     time: undefined,
   }))
-  .volatile(self => {
+  .volatile((self) => {
     let format;
 
     if (self.onlyTime) format = String;
@@ -171,18 +175,18 @@ const Model = types
       parseDateTime: d3.timeParse(format),
     };
   })
-  .volatile(self => {
+  .volatile((self) => {
     const years = [];
     const months = [];
-    const monthName = d3.timeFormat('%B');
+    const monthName = d3.timeFormat("%B");
     const date = new Date();
-    const getYear = minmax => {
-      if (minmax === 'current') return date.getFullYear();
+    const getYear = (minmax) => {
+      if (minmax === "current") return date.getFullYear();
       if (minmax.length === 4) return minmax;
       return self.parseDateTime(minmax)?.getFullYear();
     };
-    const minYear = getYear(self.min ?? '2000');
-    const maxYear = getYear(self.max ?? 'current');
+    const minYear = getYear(self.min ?? "2000");
+    const maxYear = getYear(self.max ?? "current");
 
     for (let y = maxYear; y >= minYear; y--) {
       years.push(y);
@@ -198,7 +202,7 @@ const Model = types
 
     return { months, years };
   })
-  .actions(self => ({
+  .actions((self) => ({
     setNeedsUpdate(value) {
       self.updateValue = value;
     },
@@ -226,9 +230,11 @@ const Model = types
     },
 
     validDateFormat(dateString) {
-      const dateNumberArray = dateString.split('-').map(dateString => parseInt(dateString, 10));
+      const dateNumberArray = dateString
+        .split("-")
+        .map((dateString) => Number.parseInt(dateString, 10));
       const year = dateNumberArray[0];
-      const isADate = !isNaN(new Date(dateString));
+      const isADate = !Number.isNaN(new Date(dateString));
       const fourPositiveIntegersYear = year <= 9999 && year >= 1000;
 
       if (isADate && fourPositiveIntegersYear) return dateNumberArray;
@@ -289,10 +295,12 @@ const Model = types
     },
 
     requiredModal() {
-      InfoModal.warning(self.requiredmessage || `DateTime "${self.name}" is required.`);
+      InfoModal.warning(
+        self.requiredmessage || `DateTime "${self.name}" is required.`,
+      );
     },
   }))
-  .actions(self => {
+  .actions((self) => {
     const Super = { validateValue: self.validateValue };
 
     return {
@@ -305,7 +313,7 @@ const Model = types
 
         let date = self.getISODate(value);
 
-        if (self.only?.includes('year')) date = date.slice(0, 4);
+        if (self.only?.includes("year")) date = date.slice(0, 4);
 
         const { min, max } = self;
 
@@ -313,7 +321,9 @@ const Model = types
         if (max && date > max) errors.push(`max date is ${max}`);
 
         if (errors.length) {
-          InfoModal.warning(`Date "${date}" is not valid: ${errors.join(', ')}.`);
+          InfoModal.warning(
+            `Date "${date}" is not valid: ${errors.join(", ")}.`,
+          );
           return false;
         }
         return true;
@@ -322,7 +332,7 @@ const Model = types
   });
 
 const DateTimeModel = types.compose(
-  'DateTimeModel',
+  "DateTimeModel",
   ControlBase,
   ClassificationBase,
   RequiredMixin,
@@ -334,18 +344,26 @@ const DateTimeModel = types.compose(
   Model,
 );
 
-const HtxDateTime = inject('store')(
+const HtxDateTime = inject("store")(
   observer(({ item }) => {
     const disabled = item.isReadOnly();
-    const visibleStyle = item.perRegionVisible() ? { margin: '0 0 1em' } : { display: 'none' };
+    const visibleStyle = item.perRegionVisible()
+      ? { margin: "0 0 1em" }
+      : { display: "none" };
     const visual = {
-      style: { width: 'auto', marginRight: '4px', borderColor: item.isValid ? undefined : 'red' },
-      className: 'ant-input',
+      style: {
+        width: "auto",
+        marginRight: "4px",
+        borderColor: item.isValid ? undefined : "red",
+      },
+      className: "ant-input",
     };
-    const [minTime, maxTime] = [item.min, item.max].map(s => s?.match(/\d?\d:\d\d/)?.[0]);
-    const [dateInputValue, setDateInputValue] = useState('');
+    const [minTime, maxTime] = [item.min, item.max].map(
+      (s) => s?.match(/\d?\d:\d\d/)?.[0],
+    );
+    const [dateInputValue, setDateInputValue] = useState("");
 
-    const handleDateInputValueChange = event => {
+    const handleDateInputValueChange = (event) => {
       const value = event.target.value;
       const validDateArray = item.validDateFormat(value);
 
@@ -354,8 +372,11 @@ const HtxDateTime = inject('store')(
     };
 
     if (item.updateValue) {
-      if (item.showDate && (item.date === undefined || item.date !== dateInputValue)) {
-        setDateInputValue(item.date || '');
+      if (
+        item.showDate &&
+        (item.date === undefined || item.date !== dateInputValue)
+      ) {
+        setDateInputValue(item.date || "");
       }
       item.setNeedsUpdate(false);
     }
@@ -363,7 +384,7 @@ const HtxDateTime = inject('store')(
     const handleDateOnBlur = () => {
       const dateWasNotSaved = dateInputValue !== item.date;
 
-      if (dateWasNotSaved) setDateInputValue(item.date || '');
+      if (dateWasNotSaved) setDateInputValue(item.date || "");
     };
 
     return (
@@ -371,7 +392,7 @@ const HtxDateTime = inject('store')(
         {item.showMonth && (
           <select
             {...visual}
-            name={item.name + '-date'}
+            name={`${item.name}-date`}
             disabled={disabled}
             value={item.month}
             onChange={disabled ? undefined : item.onMonthChange}
@@ -387,13 +408,13 @@ const HtxDateTime = inject('store')(
         {item.showYear && (
           <select
             {...visual}
-            name={item.name + '-year'}
+            name={`${item.name}-year`}
             disabled={disabled}
-            value={item.year || ''}
+            value={item.year || ""}
             onChange={disabled ? undefined : item.onYearChange}
           >
             <option value="">Year...</option>
-            {item.years.map(year => (
+            {item.years.map((year) => (
               <option key={year} value={year}>
                 {year}
               </option>
@@ -405,7 +426,7 @@ const HtxDateTime = inject('store')(
             {...visual}
             type="date"
             readOnly={disabled}
-            name={item.name + '-date'}
+            name={`${item.name}-date`}
             value={dateInputValue}
             min={item.min}
             max={item.max}
@@ -418,8 +439,8 @@ const HtxDateTime = inject('store')(
             {...visual}
             type="time"
             readOnly={disabled}
-            name={item.name + '-time'}
-            value={item.time ?? ''}
+            name={`${item.name}-time`}
+            value={item.time ?? ""}
             min={minTime}
             max={maxTime}
             onChange={disabled ? undefined : item.onTimeChange}
@@ -430,6 +451,6 @@ const HtxDateTime = inject('store')(
   }),
 );
 
-Registry.addTag('datetime', DateTimeModel, HtxDateTime);
+Registry.addTag("datetime", DateTimeModel, HtxDateTime);
 
 export { HtxDateTime, DateTimeModel };

@@ -56,7 +56,11 @@ export const DatePicker = ({
 
     dateSetter?.(date);
 
-    if (isDefined(date) && isMatch(date, finalFormat) && date.length === finalFormat.length) {
+    if (
+      isDefined(date) &&
+      isMatch(date, finalFormat) &&
+      date.length === finalFormat.length
+    ) {
       const realDate = new Date(date || null);
 
       if (isValid(realDate)) realDateSetter?.(realDate);
@@ -67,9 +71,9 @@ export const DatePicker = ({
     () =>
       selectRange
         ? {
-          startDate: realStartDate,
-          endDate: realEndDate,
-        }
+            startDate: realStartDate,
+            endDate: realEndDate,
+          }
         : {},
     [selectRange, realStartDate, realEndDate],
   );
@@ -109,7 +113,7 @@ export const DatePicker = ({
       <Dropdown.Trigger
         ref={dropdownRef}
         toggle={false}
-        content={(
+        content={
           <DP
             {...dateRange}
             ref={datepickerRef}
@@ -121,7 +125,7 @@ export const DatePicker = ({
             showTimeSelect={showTime}
             inline
           />
-        )}
+        }
       >
         <Elem name="output" mod={{ range: selectRange }}>
           <Input

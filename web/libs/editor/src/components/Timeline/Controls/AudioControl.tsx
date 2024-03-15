@@ -1,10 +1,14 @@
-import React, { FC, MouseEvent, useEffect, useState } from 'react';
-import { Block, Elem } from '../../../utils/bem';
+import type React from "react";
+import { type FC, type MouseEvent, useEffect, useState } from "react";
+import { Block, Elem } from "../../../utils/bem";
 
-import './AudioControl.styl';
-import { IconSoundConfig, IconSoundMutedConfig } from '../../../assets/icons/timeline';
-import { ControlButton } from '../Controls';
-import { Slider } from './Slider';
+import {
+  IconSoundConfig,
+  IconSoundMutedConfig,
+} from "../../../assets/icons/timeline";
+import { ControlButton } from "../Controls";
+import "./AudioControl.styl";
+import { Slider } from "./Slider";
 
 const MAX_VOL = 100;
 
@@ -32,7 +36,7 @@ export const AudioControl: FC<AudioControlProps> = ({
   }, [volume]);
 
   const handleSetVolume = (e: React.FormEvent<HTMLInputElement>) => {
-    const _volumeValue = parseInt(e.currentTarget.value);
+    const _volumeValue = Number.parseInt(e.currentTarget.value);
 
     if (!_volumeValue) {
       onVolumeChange?.(0);
@@ -41,7 +45,8 @@ export const AudioControl: FC<AudioControlProps> = ({
     if (_volumeValue > MAX_VOL) {
       onVolumeChange?.(MAX_VOL / 100);
       return;
-    } else if (_volumeValue < 0) {
+    }
+    if (_volumeValue < 0) {
       onVolumeChange?.(0);
       return;
     }
@@ -62,8 +67,8 @@ export const AudioControl: FC<AudioControlProps> = ({
           max={MAX_VOL}
           value={Math.round(volume * MAX_VOL)}
           onChange={handleSetVolume}
-          description={'Volume'}
-          info={'Increase or decrease the volume of the audio'}
+          description={"Volume"}
+          info={"Increase or decrease the volume of the audio"}
         />
         {renderMuteButton()}
       </Elem>
@@ -72,24 +77,24 @@ export const AudioControl: FC<AudioControlProps> = ({
 
   const renderMuteButton = () => {
     return (
-      <Elem name={'mute'}>
-        <Elem
-          name="mute-button"
-          onClick={handleSetMute}
-        >
-          { isMuted ? 'Unmute' : 'Mute' }
+      <Elem name={"mute"}>
+        <Elem name="mute-button" onClick={handleSetMute}>
+          {isMuted ? "Unmute" : "Mute"}
         </Elem>
       </Elem>
     );
   };
 
   return (
-    <Block name="audio-control" onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}>
+    <Block
+      name="audio-control"
+      onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
+    >
       <ControlButton
-        look={audioModal ? 'active' : undefined}
+        look={audioModal ? "active" : undefined}
         onClick={onSetModal}
       >
-        {isMuted ? <IconSoundMutedConfig/> : <IconSoundConfig/>}
+        {isMuted ? <IconSoundMutedConfig /> : <IconSoundConfig />}
       </ControlButton>
       {audioModal && renderModal()}
     </Block>

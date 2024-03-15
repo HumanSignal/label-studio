@@ -1,8 +1,8 @@
-import { getEnv, getSnapshot, getType, types } from 'mobx-state-tree';
-import { observer } from 'mobx-react';
-import React from 'react';
-import { Tool } from '../components/Toolbar/Tool';
-import { toKebabCase } from 'strman';
+import { observer } from "mobx-react";
+import { getEnv, getSnapshot, getType, types } from "mobx-state-tree";
+import React from "react";
+import { toKebabCase } from "strman";
+import { Tool } from "../components/Toolbar/Tool";
 
 const ToolView = observer(({ item }) => {
   return (
@@ -22,7 +22,7 @@ const ToolView = observer(({ item }) => {
 });
 
 const BaseTool = types
-  .model('BaseTool', {
+  .model("BaseTool", {
     smart: false,
     unselectRegionOnToolChange: false,
     removeDuplicatesNamed: types.maybeNull(types.string),
@@ -32,7 +32,7 @@ const BaseTool = types
     index: 1,
     canInteractWithRegions: true,
   }))
-  .views(self => {
+  .views((self) => {
     return {
       get toolName() {
         return getType(self).name;
@@ -41,7 +41,7 @@ const BaseTool = types
         return self.control.isSeparated;
       },
       get viewClass() {
-        return () => self.shouldRenderView ? <ToolView item={self} /> : null;
+        return () => (self.shouldRenderView ? <ToolView item={self} /> : null);
       },
       get viewTooltip() {
         return null;
@@ -87,7 +87,11 @@ const BaseTool = types
 
           smartCopy.makeDynamic();
 
-          getEnv(self).manager.addTool(`${toolType.name}-smart`, smartCopy, self.control.removeDuplicatesNamed);
+          getEnv(self).manager.addTool(
+            `${toolType.name}-smart`,
+            smartCopy,
+            self.control.removeDuplicatesNamed,
+          );
         }
       },
 
@@ -96,7 +100,6 @@ const BaseTool = types
       },
     };
   });
-
 
 export const MIN_SIZE = { X: 3, Y: 3 };
 

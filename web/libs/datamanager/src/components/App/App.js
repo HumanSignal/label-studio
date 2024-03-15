@@ -1,4 +1,4 @@
-import { observer, Provider } from "mobx-react";
+import { Provider, observer } from "mobx-react";
 import React from "react";
 import { SDKProvider } from "../../providers/SDKProvider";
 import { Block, Elem } from "../../utils/bem";

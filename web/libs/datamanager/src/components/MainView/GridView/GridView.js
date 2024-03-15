@@ -4,13 +4,13 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeGrid } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import { Block, Elem } from "../../../utils/bem";
+import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { Checkbox } from "../../Common/Checkbox/Checkbox";
+import { SkeletonLoader } from "../../Common/SkeletonLoader";
 import { Space } from "../../Common/Space/Space";
 import { getProperty, prepareColumns } from "../../Common/Table/utils";
 import * as DataGroups from "../../DataGroups";
 import "./GridView.styl";
-import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
-import { SkeletonLoader } from "../../Common/SkeletonLoader";
 
 const GridHeader = observer(({ row, selected }) => {
   return (
@@ -45,12 +45,12 @@ const GridBody = observer(({ row, fields }) => {
 const GridDataGroup = observer(({ type, value, field, row }) => {
   const DataTypeComponent = DataGroups[type];
 
-  return (isFF(FF_LOPS_E_3) && row.loading === field.alias) ? <SkeletonLoader /> : (
-    DataTypeComponent ? (
-      <DataTypeComponent value={value} field={field} original={row} />
-    ) : (
-      <DataGroups.TextDataGroup value={value} field={field} original={row} />
-    )
+  return isFF(FF_LOPS_E_3) && row.loading === field.alias ? (
+    <SkeletonLoader />
+  ) : DataTypeComponent ? (
+    <DataTypeComponent value={value} field={field} original={row} />
+  ) : (
+    <DataGroups.TextDataGroup value={value} field={field} original={row} />
   );
 });
 
@@ -132,19 +132,21 @@ export const GridView = observer(
       ],
     );
 
-    const onItemsRenderedWrap = (cb) => ({
-      visibleRowStartIndex,
-      visibleRowStopIndex,
-      overscanRowStopIndex,
-      overscanRowStartIndex,
-    }) => {
-      cb({
-        overscanStartIndex: overscanRowStartIndex,
-        overscanStopIndex: overscanRowStopIndex,
-        visibleStartIndex: visibleRowStartIndex,
-        visibleStopIndex: visibleRowStopIndex,
-      });
-    };
+    const onItemsRenderedWrap =
+      (cb) =>
+      ({
+        visibleRowStartIndex,
+        visibleRowStopIndex,
+        overscanRowStopIndex,
+        overscanRowStartIndex,
+      }) => {
+        cb({
+          overscanStartIndex: overscanRowStartIndex,
+          overscanStopIndex: overscanRowStopIndex,
+          visibleStartIndex: visibleRowStartIndex,
+          visibleStopIndex: visibleRowStopIndex,
+        });
+      };
 
     const itemCount = Math.ceil(data.length / columnCount);
 

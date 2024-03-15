@@ -1,36 +1,38 @@
-import { observer } from 'mobx-react';
-import { FC, useState } from 'react';
-import { Tooltip } from 'antd';
-import { IconCheck, IconEllipsis } from '../../assets/icons';
-import { Space } from '../../common/Space/Space';
-import { Userpic } from '../../common/Userpic/Userpic';
-import { Dropdown } from '../../common/Dropdown/Dropdown';
-import { Menu } from '../../common/Menu/Menu';
-import { Block, Elem } from '../../utils/bem';
-import { humanDateDiff, userDisplayName } from '../../utils/utilities';
-import { CommentFormBase } from './CommentFormBase';
+import { Tooltip } from "antd";
+import { observer } from "mobx-react";
+import { type FC, useState } from "react";
+import { IconCheck, IconEllipsis } from "../../assets/icons";
+import { Dropdown } from "../../common/Dropdown/Dropdown";
+import { Menu } from "../../common/Menu/Menu";
+import { Space } from "../../common/Space/Space";
+import { Userpic } from "../../common/Userpic/Userpic";
+import { Block, Elem } from "../../utils/bem";
+import { humanDateDiff, userDisplayName } from "../../utils/utilities";
+import { CommentFormBase } from "./CommentFormBase";
 
-import './CommentItem.styl';
-import { Button } from '../../common/Button/Button';
+import { Button } from "../../common/Button/Button";
+import "./CommentItem.styl";
 
 interface Comment {
   comment: {
-    isEditMode: boolean,
-    isConfirmDelete: boolean,
-    createdAt: string,
-    updatedAt: string,
-    isPersisted: boolean,
-    isDeleted: boolean,
-    createdBy: any,
-    text: string,
-    isResolved: boolean,
-    updateComment: (comment: string) => void,
-    deleteComment: () => void,
-    setConfirmMode: (confirmMode: boolean) => void,
-    setEditMode: (isGoingIntoEditMode: boolean) => void,
-    toggleResolve: () => void,
+    isEditMode: boolean;
+    isConfirmDelete: boolean;
+    createdAt: string;
+    updatedAt: string;
+    isPersisted: boolean;
+    isDeleted: boolean;
+    createdBy: any;
+    text: string;
+    isResolved: boolean;
+    updateComment: (comment: string) => void;
+    deleteComment: () => void;
+    setConfirmMode: (confirmMode: boolean) => void;
+    setEditMode: (isGoingIntoEditMode: boolean) => void;
+    toggleResolve: () => void;
   };
-  listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
+  listComments: ({
+    suppressClearComments,
+  }: { suppressClearComments: boolean }) => void;
 }
 
 export const CommentItem: FC<any> = observer(
@@ -71,8 +73,11 @@ export const CommentItem: FC<any> = observer(
       if (isPersisted && time)
         return (
           <Elem name="date">
-            <Tooltip placement="topRight" title={new Date(time).toLocaleString()}>
-              {`${isEdited ? 'updated' : ''} ${humanDateDiff(time)}`}
+            <Tooltip
+              placement="topRight"
+              title={new Date(time).toLocaleString()}
+            >
+              {`${isEdited ? "updated" : ""} ${humanDateDiff(time)}`}
             </Tooltip>
           </Elem>
         );
@@ -83,7 +88,13 @@ export const CommentItem: FC<any> = observer(
       <Block name="comment-item" mod={{ resolved }}>
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy}></Elem>
+            <Elem
+              tag={Userpic}
+              user={createdBy}
+              name="userpic"
+              showUsername
+              username={createdBy}
+            />
             <Elem name="name" tag="span">
               {userDisplayName(createdBy)}
             </Elem>
@@ -103,17 +114,24 @@ export const CommentItem: FC<any> = observer(
             {isEditMode ? (
               <CommentFormBase
                 value={currentComment}
-                onSubmit={async value => {
+                onSubmit={async (value) => {
                   await updateComment(value);
                   setCurrentComment(value);
-                  await listComments({ suppressClearComments: true });
+                  await listComments({
+                    suppressClearComments: true,
+                  });
                 }}
               />
             ) : isConfirmDelete ? (
               <Elem name="confirmForm">
                 <Elem name="question">Are you sure?</Elem>
                 <Elem name="controls">
-                  <Button onClick={() => deleteComment()} size="compact" look="danger" autoFocus>
+                  <Button
+                    onClick={() => deleteComment()}
+                    size="compact"
+                    look="danger"
+                    autoFocus
+                  >
                     Yes
                   </Button>
                   <Button onClick={() => setConfirmMode(false)} size="compact">
@@ -135,9 +153,11 @@ export const CommentItem: FC<any> = observer(
           >
             {isPersisted && (
               <Dropdown.Trigger
-                content={(
+                content={
                   <Menu size="auto">
-                    <Menu.Item onClick={toggleResolve}>{resolved ? 'Unresolve' : 'Resolve'}</Menu.Item>
+                    <Menu.Item onClick={toggleResolve}>
+                      {resolved ? "Unresolve" : "Resolve"}
+                    </Menu.Item>
                     {currentUser?.id === createdBy.id && (
                       <>
                         <Menu.Item
@@ -150,7 +170,7 @@ export const CommentItem: FC<any> = observer(
                             }
                           }}
                         >
-                          {isEditMode ? 'Cancel edit' : 'Edit'}
+                          {isEditMode ? "Cancel edit" : "Edit"}
                         </Menu.Item>
                         {!isConfirmDelete && (
                           <Menu.Item
@@ -164,7 +184,7 @@ export const CommentItem: FC<any> = observer(
                       </>
                     )}
                   </Menu>
-                )}
+                }
               >
                 <Button size="small" type="text" icon={<IconEllipsis />} />
               </Dropdown.Trigger>

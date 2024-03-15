@@ -1,32 +1,31 @@
-import { Block, Elem } from '../../utils/bem';
-import { Fragment, useEffect, useState } from 'react';
-import { Hotkey } from '../../core/Hotkey';
+import { Fragment, useEffect, useState } from "react";
+import { Hotkey } from "../../core/Hotkey";
+import { Block, Elem } from "../../utils/bem";
 
-const hotkeys = Hotkey(
-  'SegmentationToolbar',
-  'Segmentation Tools',
-);
+const hotkeys = Hotkey("SegmentationToolbar", "Segmentation Tools");
 
 const keysDictionary = {
-  plus: '+',
-  minus: '-',
+  plus: "+",
+  minus: "-",
 };
 
 const shortcutView = (shortcut) => {
   if (!shortcut) return null;
 
-  const combos = shortcut.split(',').map(s => s.trim());
+  const combos = shortcut.split(",").map((s) => s.trim());
 
   return (
     <Elem name="shortcut">
       {combos.map((combo, index) => {
-        const keys = combo.split('+');
+        const keys = combo.split("+");
 
         return (
-          <Fragment key={`${keys.join('-')}-${index}`}>
-            {keys.map(key => {
+          <Fragment key={`${keys.join("-")}-${index}`}>
+            {keys.map((key) => {
               return (
-                <Elem name="key" tag="kbd" key={key}>{keysDictionary[key] ?? key}</Elem>
+                <Elem name="key" tag="kbd" key={key}>
+                  {keysDictionary[key] ?? key}
+                </Elem>
               );
             })}
           </Fragment>
@@ -36,15 +35,12 @@ const shortcutView = (shortcut) => {
   );
 };
 
-export const FlyoutMenu = ({
-  items,
-  icon,
-}) => {
+export const FlyoutMenu = ({ items, icon }) => {
   const [isClicked, setClicked] = useState(false);
 
   useEffect(() => {
     const removeShortcuts = () => {
-      items.forEach(menuItem => {
+      items.forEach((menuItem) => {
         const currentShortcut = menuItem.shortcut;
 
         if (currentShortcut && hotkeys.hasKey(currentShortcut)) {
@@ -53,14 +49,18 @@ export const FlyoutMenu = ({
       });
     };
     const addShortcuts = () => {
-      items.forEach(menuItem => {
+      items.forEach((menuItem) => {
         const currentShortcut = menuItem.shortcut;
 
         if (currentShortcut && !hotkeys.hasKey(currentShortcut)) {
-          hotkeys.addKey(currentShortcut, () => {
-            menuItem?.onClick?.();
-            setClicked(false);
-          }, menuItem.label);
+          hotkeys.addKey(
+            currentShortcut,
+            () => {
+              menuItem?.onClick?.();
+              setClicked(false);
+            },
+            menuItem.label,
+          );
         }
       });
     };
@@ -80,27 +80,33 @@ export const FlyoutMenu = ({
       }
     };
 
-    window.addEventListener('click', windowClickHandler);
+    window.addEventListener("click", windowClickHandler);
     return () => {
-      window.removeEventListener('click', windowClickHandler);
+      window.removeEventListener("click", windowClickHandler);
     };
   });
 
   return (
-    <Block name="flyoutmenu" tag="div"
-      className={`${isClicked ? 'hovered' : ''}`}
+    <Block
+      name="flyoutmenu"
+      tag="div"
+      className={`${isClicked ? "hovered" : ""}`}
       onClick={(e) => {
         e.stopPropagation();
         setClicked(!isClicked);
       }}
     >
-      <Elem name="icon" className={`${isClicked ? 'isClicked' : ''}`} title="Zoom presets (click to see options)">
+      <Elem
+        name="icon"
+        className={`${isClicked ? "isClicked" : ""}`}
+        title="Zoom presets (click to see options)"
+      >
         {icon}
       </Elem>
-      <Block name="tooltips" 
-        tag="div">
+      <Block name="tooltips" tag="div">
         {items.map((childItem, index) => (
-          <Elem name="tooltip" 
+          <Elem
+            name="tooltip"
             key={index}
             onClick={(e) => {
               e.stopPropagation();
@@ -113,7 +119,7 @@ export const FlyoutMenu = ({
               {shortcutView(childItem.shortcut)}
             </Elem>
           </Elem>
-        ))}  
+        ))}
       </Block>
     </Block>
   );

@@ -6,32 +6,34 @@ import { Space } from "./Space/Space";
 const Duration = ({ value, format }) => {
   const formatted = new Date(value * 1000).toISOString().substr(11, 8);
 
-  const parsed = formatted.split(':');
+  const parsed = formatted.split(":");
 
-  const result = format.map(unit => {
+  const result = format.map((unit) => {
     switch (unit) {
-      case "hours": return parsed[0];
-      case "minutes": return parsed[1];
-      case "seconds": return parsed[2];
+      case "hours":
+        return parsed[0];
+      case "minutes":
+        return parsed[1];
+      case "seconds":
+        return parsed[2];
     }
   });
 
-  return result.join(':');
+  return result.join(":");
 };
 
 const PlaybackControl = ({ current, duration, onChange }) => {
   const format = React.useMemo(() => {
     if (duration >= 3600) {
       return ["hours", "minutes", "seconds"];
-    } else {
-      return ["minutes", "seconds"];
     }
+    return ["minutes", "seconds"];
   }, [duration]);
 
   return (
     <>
       <Space spread>
-        <Duration value={current} format={format}/>
+        <Duration value={current} format={format} />
         <input
           type="range"
           min={0}
@@ -41,7 +43,7 @@ const PlaybackControl = ({ current, duration, onChange }) => {
           style={{ flex: 1 }}
           onChange={(e) => onChange?.(e.target.value)}
         />
-        <Duration value={duration} format={format}/>
+        <Duration value={duration} format={format} />
       </Space>
     </>
   );
@@ -72,7 +74,7 @@ export class SharedAudio extends Component {
     return (
       <Space
         size="small"
-        style={{ width: "100%", alignItems: 'center' }}
+        style={{ width: "100%", alignItems: "center" }}
         onClick={(e) => e.stopPropagation()}
       >
         <Button onClick={paused ? this.play : this.pause}>
@@ -82,11 +84,17 @@ export class SharedAudio extends Component {
         {this.state.error ? (
           <div>Unable to play</div>
         ) : this.audio ? (
-          <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              flex: 1,
+              alignItems: "center",
+            }}
+          >
             <PlaybackControl
               current={this.state.current}
               duration={this.state.duration}
-              onChange={time => {
+              onChange={(time) => {
                 this.audio.currentTime = time;
                 if (paused) this.audio.pause();
               }}
@@ -126,14 +134,11 @@ export class SharedAudio extends Component {
 
     audio.onplay = () => this.setState({ paused: false });
 
-    audio.ontimeupdate = () =>
-      this.setState({ current: audio.currentTime });
+    audio.ontimeupdate = () => this.setState({ current: audio.currentTime });
 
-    audio.ondurationchange = () =>
-      this.setState({ duration: audio.duration });
+    audio.ondurationchange = () => this.setState({ duration: audio.duration });
 
     audio.oncanplay = () => {
-
       this.setState(
         {
           audio,

@@ -1,4 +1,4 @@
-import { TimelineRegionKeyframe } from '../../Types';
+import type { TimelineRegionKeyframe } from "../../Types";
 
 export interface Lifespan {
   offset: number;
@@ -9,7 +9,10 @@ export interface Lifespan {
   points: TimelineRegionKeyframe[];
 }
 
-export const visualizeLifespans = (keyframes: TimelineRegionKeyframe[], step: number) => {
+export const visualizeLifespans = (
+  keyframes: TimelineRegionKeyframe[],
+  step: number,
+) => {
   if (keyframes.length === 0) return [];
 
   const lifespans: Lifespan[] = [];
@@ -41,8 +44,16 @@ export const visualizeLifespans = (keyframes: TimelineRegionKeyframe[], step: nu
   return lifespans;
 };
 
-export const findClosestKeypoint = (frames: number[], position: number, direction: -1 | 1) => {
-  const targetFrames = frames.filter(f => direction === -1 ? f < position : f > position);
+export const findClosestKeypoint = (
+  frames: number[],
+  position: number,
+  direction: -1 | 1,
+) => {
+  const targetFrames = frames.filter((f) =>
+    direction === -1 ? f < position : f > position,
+  );
 
-  return targetFrames[direction === -1 ? targetFrames.length - 1 : 0] ?? position;
+  return (
+    targetFrames[direction === -1 ? targetFrames.length - 1 : 0] ?? position
+  );
 };

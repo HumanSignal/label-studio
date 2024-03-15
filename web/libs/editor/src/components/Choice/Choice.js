@@ -1,8 +1,8 @@
-import React from 'react';
-import { PropTypes } from 'prop-types';
-import { Radio } from 'antd';
+import { Radio } from "antd";
+import { PropTypes } from "prop-types";
+import React from "react";
 
-import Hint from '../Hint/Hint';
+import Hint from "../Hint/Hint";
 
 /**
  * Choice Component
@@ -30,7 +30,8 @@ export default class ChoiceComponent extends React.Component {
 }
 
 ChoiceComponent.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element])
+    .isRequired,
   value: PropTypes.string.isRequired,
   checked: PropTypes.bool,
   defaultChecked: PropTypes.bool,

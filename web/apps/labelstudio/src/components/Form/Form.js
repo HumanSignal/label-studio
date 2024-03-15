@@ -1,38 +1,52 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { shallowEqualObjects } from 'shallow-equal';
-import { ApiProvider } from '../../providers/ApiProvider';
-import { MultiProvider } from '../../providers/MultiProvider';
-import { Block, cn, Elem } from '../../utils/bem';
-import { debounce } from '../../utils/debounce';
-import { isDefined, objectClean } from '../../utils/helpers';
-import { Button } from '../Button/Button';
-import { Oneof } from '../Oneof/Oneof';
-import { Space } from '../Space/Space';
-import { Counter, Input, Select, Toggle } from './Elements';
-import './Form.styl';
-import { FormContext, FormResponseContext, FormStateContext, FormSubmissionContext, FormValidationContext } from './FormContext';
-import * as Validators from './Validation/Validators';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { shallowEqualObjects } from "shallow-equal";
+import { ApiProvider } from "../../providers/ApiProvider";
+import { MultiProvider } from "../../providers/MultiProvider";
+import { Block, Elem, cn } from "../../utils/bem";
+import { debounce } from "../../utils/debounce";
+import { isDefined, objectClean } from "../../utils/helpers";
+import { Button } from "../Button/Button";
+import { Oneof } from "../Oneof/Oneof";
+import { Space } from "../Space/Space";
+import { Counter, Input, Select, Toggle } from "./Elements";
+import "./Form.styl";
+import {
+  FormContext,
+  FormResponseContext,
+  FormStateContext,
+  FormSubmissionContext,
+  FormValidationContext,
+} from "./FormContext";
+import * as Validators from "./Validation/Validators";
 
-const PASSWORD_PROTECTED_VALUE = 'got ya, suspicious hacker!';
+const PASSWORD_PROTECTED_VALUE = "got ya, suspicious hacker!";
 
 export default class Form extends React.Component {
   state = {
     validation: null,
     showValidation: true,
     submitting: false,
-  }
+  };
 
   /**@type {import('react').RefObject<HTMLFormElement>} */
-  formElement = React.createRef()
+  formElement = React.createRef();
 
-  apiRef = React.createRef()
+  apiRef = React.createRef();
 
   /**@type {Set<HTMLInputElement|HTMLSelectElement>} */
-  fields = new Set()
+  fields = new Set();
 
-  validation = new Map()
+  validation = new Map();
 
-  get api() { return this.apiRef.current; }
+  get api() {
+    return this.apiRef.current;
+  }
 
   componentDidMount() {
     if (this.props.formData) {
@@ -43,7 +57,10 @@ export default class Form extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const equal = shallowEqualObjects(prevProps.formData ?? {}, this.props.formData ?? {});
+    const equal = shallowEqualObjects(
+      prevProps.formData ?? {},
+      this.props.formData ?? {},
+    );
 
     if (!equal) {
       this.fillFormData();
@@ -53,10 +70,22 @@ export default class Form extends React.Component {
   render() {
     const providers = [
       <FormContext.Provider key="form-ctx" value={this} />,
-      <FormValidationContext.Provider key="form-validation-ctx" value={this.state.validation} />,
-      <FormSubmissionContext.Provider key="form-submission-ctx" value={this.state.submitting} />,
-      <FormStateContext.Provider key="form-state-ctx" value={this.state.state} />,
-      <FormResponseContext.Provider key="form-response" value={this.state.lastResponse} />,
+      <FormValidationContext.Provider
+        key="form-validation-ctx"
+        value={this.state.validation}
+      />,
+      <FormSubmissionContext.Provider
+        key="form-submission-ctx"
+        value={this.state.submitting}
+      />,
+      <FormStateContext.Provider
+        key="form-state-ctx"
+        value={this.state.state}
+      />,
+      <FormResponseContext.Provider
+        key="form-response"
+        value={this.state.lastResponse}
+      />,
       <ApiProvider key="form-api" ref={this.apiRef} />,
     ];
 
@@ -64,7 +93,7 @@ export default class Form extends React.Component {
       <MultiProvider providers={providers}>
         <form
           ref={this.formElement}
-          className={cn('form')}
+          className={cn("form")}
           action={this.props.action}
           onSubmit={this.onFormSubmitted}
           onChange={this.onFormChanged}
@@ -107,7 +136,7 @@ export default class Form extends React.Component {
   }
 
   getFieldContext(name) {
-    return Array.from(this.fields).find(f => f.name === name);
+    return Array.from(this.fields).find((f) => f.name === name);
   }
 
   disableValidationMessage() {
@@ -129,7 +158,7 @@ export default class Form extends React.Component {
     } else {
       this.setState({ step: "invalid" });
     }
-  }
+  };
 
   _onAutoSubmit = () => {
     this.validateFields();
@@ -137,9 +166,11 @@ export default class Form extends React.Component {
     if (!this.validation.size) {
       this.submit();
     }
-  }
+  };
 
-  onAutoSubmit = this.props.debounce ? debounce(this._onAutoSubmit, this.props.debounce) : this._onAutoSubmit
+  onAutoSubmit = this.props.debounce
+    ? debounce(this._onAutoSubmit, this.props.debounce)
+    : this._onAutoSubmit;
 
   onFormChanged = async (e) => {
     e.stopPropagation();
@@ -147,7 +178,7 @@ export default class Form extends React.Component {
     this.props.onChange?.(e);
 
     this.autosubmit();
-  }
+  };
 
   autosubmit() {
     if (this.props.autosubmit) {
@@ -169,40 +200,51 @@ export default class Form extends React.Component {
       fields = fields.filter(fieldsFilter);
     }
 
+    const requestBody = fields.reduce(
+      (res, { name, field, skip, allowEmpty, isProtected }) => {
+        const skipProtected =
+          isProtected && field.value === PASSWORD_PROTECTED_VALUE;
+        const skipField =
+          skip ||
+          skipProtected ||
+          ((this.props.skipEmpty || allowEmpty === false) && !field.value);
 
-    const requestBody = fields.reduce((res, { name, field, skip, allowEmpty, isProtected }) => {
-      const skipProtected = isProtected && field.value === PASSWORD_PROTECTED_VALUE;
-      const skipField = skip || skipProtected || ((this.props.skipEmpty || allowEmpty === false) && !field.value);
+        if (full === true || !skipField) {
+          const value = (() => {
+            const inputValue = field.value;
 
-      if (full === true || !skipField) {
-        const value = (() => {
-          const inputValue = field.value;
+            if (["checkbox", "radio"].includes(field.type)) {
+              if (
+                isDefined(inputValue) &&
+                !["", "on", "off", "true", "false"].includes(inputValue)
+              ) {
+                return field.checked ? inputValue : null;
+              }
 
-          if (['checkbox', 'radio'].includes(field.type)) {
-            if (isDefined(inputValue) && !['', 'on', 'off', 'true', 'false'].includes(inputValue)) {
-              return field.checked ? inputValue : null;
+              return booleansAsNumbers ? Number(field.checked) : field.checked;
             }
 
-            return booleansAsNumbers ? Number(field.checked) : field.checked;
-          }
+            return inputValue;
+          })();
 
-          return inputValue;
-        })();
+          if (value !== null) res.push([name, value]);
+        }
 
-        if (value !== null) res.push([name, value]);
-      }
-
-      return res;
-    }, []);
+        return res;
+      },
+      [],
+    );
 
     if (asJSON) {
-      return requestBody.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
-    } else {
-      const formData = new FormData();
-
-      requestBody.forEach(([key, value]) => formData.append(key, value));
-      return formData;
+      return requestBody.reduce(
+        (res, [key, value]) => ({ ...res, [key]: value }),
+        {},
+      );
     }
+    const formData = new FormData();
+
+    requestBody.forEach(([key, value]) => formData.append(key, value));
+    return formData;
   }
 
   async submit({ fieldsFilter } = {}) {
@@ -220,14 +262,17 @@ export default class Form extends React.Component {
       success = await this.submitWithFetch(body);
     }
 
-    this.setState({
-      submitting: false,
-      state: success ? "success" : "fail",
-    }, () => {
-      setTimeout(() => {
-        this.setState({ state: null });
-      }, 1500);
-    });
+    this.setState(
+      {
+        submitting: false,
+        state: success ? "success" : "fail",
+      },
+      () => {
+        setTimeout(() => {
+          this.setState({ state: null });
+        }, 1500);
+      },
+    );
   }
 
   async submitWithAPI(action, body) {
@@ -242,15 +287,14 @@ export default class Form extends React.Component {
     if (response === null) {
       this.props.onError?.();
       return false;
-    } else {
-      this.props.onSubmit?.(response);
-      return true;
     }
+    this.props.onSubmit?.(response);
+    return true;
   }
 
   async submitWithFetch(body) {
     const action = this.formElement.current.action;
-    const method = (this.props.method ?? 'POST').toUpperCase();
+    const method = (this.props.method ?? "POST").toUpperCase();
     const response = await fetch(action, { method, body });
 
     try {
@@ -275,9 +319,8 @@ export default class Form extends React.Component {
       if (response.ok) {
         this.props.onSubmit?.(result);
         return true;
-      } else {
-        this.props.onError?.(result);
       }
+      this.props.onError?.(result);
     } catch (err) {
       console.log(err);
       this.props.onError?.(err);
@@ -337,28 +380,36 @@ export default class Form extends React.Component {
   }
 
   fillWithFormData(field) {
-    const value = (this.props.formData ?? {})[field.name];
+    const value = this.props.formData?.[field.name];
 
     if (field.isProtected && this.props.formData) {
       field.setValue(PASSWORD_PROTECTED_VALUE);
-    } else if (isDefined(value) && field.value !== value && !field.skipAutofill) {
+    } else if (
+      isDefined(value) &&
+      field.value !== value &&
+      !field.skipAutofill
+    ) {
       field.setValue(value);
     }
   }
 }
 
 const ValidationRenderer = ({ validation }) => {
-  const rootClass = cn('form-validation');
+  const rootClass = cn("form-validation");
 
   return (
     <div className={rootClass}>
       {Array.from(validation).map(([name, result]) => (
-        <div key={name} className={rootClass.elem('group')} onClick={() => result.field.focus()}>
-          <div className={rootClass.elem('field')}>{result.label}</div>
+        <div
+          key={name}
+          className={rootClass.elem("group")}
+          onClick={() => result.field.focus()}
+        >
+          <div className={rootClass.elem("field")}>{result.label}</div>
 
-          <div className={rootClass.elem('messages')}>
+          <div className={rootClass.elem("messages")}>
             {result.messages.map((message, i) => (
-              <div key={`${name}-${i}`} className={rootClass.elem('message')}>
+              <div key={`${name}-${i}`} className={rootClass.elem("message")}>
                 {message}
               </div>
             ))}
@@ -374,171 +425,191 @@ Form.Validator = Validators;
 Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   const styles = {};
 
-  if (columnCount) styles['--column-count'] = columnCount;
-  if (rowGap) styles['--row-gap'] = rowGap;
+  if (columnCount) styles["--column-count"] = columnCount;
+  if (rowGap) styles["--row-gap"] = rowGap;
 
   return (
-    <div className={cn('form').elem('row').mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
+    <div
+      className={cn("form").elem("row").mod({ spread })}
+      style={{ ...(style ?? {}), ...styles }}
+    >
       {children}
     </div>
   );
 };
 
-Form.Builder = React.forwardRef(({
-  fields: defaultFields,
-  formData: defaultFormData,
-  fetchFields,
-  fetchFormData,
-  children,
-  formRowStyle,
-  onSubmit,
-  withActions,
-  ...props
-}, ref) => {
-  const formRef = ref ?? useRef();
-  const [fields, setFields] = useState(defaultFields ?? []);
-  const [formData, setFormData] = useState(defaultFormData ?? {});
+Form.Builder = React.forwardRef(
+  (
+    {
+      fields: defaultFields,
+      formData: defaultFormData,
+      fetchFields,
+      fetchFormData,
+      children,
+      formRowStyle,
+      onSubmit,
+      withActions,
+      ...props
+    },
+    ref,
+  ) => {
+    const formRef = ref ?? useRef();
+    const [fields, setFields] = useState(defaultFields ?? []);
+    const [formData, setFormData] = useState(defaultFormData ?? {});
 
-  const renderFields = (fields) => {
-    return fields.map((field, index) => {
-      if (!field) return <div key={`spacer-${index}`} />;
+    const renderFields = (fields) => {
+      return fields.map((field, index) => {
+        if (!field) return <div key={`spacer-${index}`} />;
 
-      const currentValue = formData?.[field.name] ?? undefined;
-      const triggerUpdate = props.autosubmit !== true && field.trigger_form_update === true;
-      const getValue = () => {
-        const isProtected = field.skipAutofill && (!field.allowEmpty || field.protectedValue) && field.type === 'password';
+        const currentValue = formData?.[field.name] ?? undefined;
+        const triggerUpdate =
+          props.autosubmit !== true && field.trigger_form_update === true;
+        const getValue = () => {
+          const isProtected =
+            field.skipAutofill &&
+            (!field.allowEmpty || field.protectedValue) &&
+            field.type === "password";
 
-        if (isProtected) {
-          return PASSWORD_PROTECTED_VALUE;
-        }
+          if (isProtected) {
+            return PASSWORD_PROTECTED_VALUE;
+          }
 
-        if (field.skipAutofill) {
-          return null;
-        }
+          if (field.skipAutofill) {
+            return null;
+          }
 
-        return currentValue ?? field.value;
-      };
-
-      const commonProps = {};
-
-      if (triggerUpdate) {
-        commonProps.onChange = async () => {
-          await formRef.current.submit({
-            fieldsFilter: (f) => f.name === field.name,
-          });
-          await updateFields();
-          await updateFormData();
+          return currentValue ?? field.value;
         };
-      }
 
-      const InputComponent = (() => {
-        switch(field.type) {
-          case "select": return Select;
-          case "counter": return Counter;
-          case "toggle": return Toggle;
-          default: return Input;
+        const commonProps = {};
+
+        if (triggerUpdate) {
+          commonProps.onChange = async () => {
+            await formRef.current.submit({
+              fieldsFilter: (f) => f.name === field.name,
+            });
+            await updateFields();
+            await updateFormData();
+          };
         }
-      })();
 
-      if (['checkbox', 'radio', 'toggle'].includes(field.type)) {
-        commonProps.checked = getValue();
-      } else if (field.type === 'counter') {
-        commonProps.value = getValue();
-      } else {
-        commonProps.defaultValue = getValue();
+        const InputComponent = (() => {
+          switch (field.type) {
+            case "select":
+              return Select;
+            case "counter":
+              return Counter;
+            case "toggle":
+              return Toggle;
+            default:
+              return Input;
+          }
+        })();
+
+        if (["checkbox", "radio", "toggle"].includes(field.type)) {
+          commonProps.checked = getValue();
+        } else if (field.type === "counter") {
+          commonProps.value = getValue();
+        } else {
+          commonProps.defaultValue = getValue();
+        }
+
+        return (
+          <InputComponent
+            key={field.name ?? index}
+            {...field}
+            {...commonProps}
+          />
+        );
+      });
+    };
+
+    const renderColumns = (columns) => {
+      return columns.map((col, index) => (
+        <div
+          className={cn("form").elem("column")}
+          key={index}
+          style={{ width: col.width }}
+        >
+          {renderFields(col.fields)}
+        </div>
+      ));
+    };
+
+    const updateFields = useCallback(async () => {
+      if (fetchFields) {
+        const newFields = await fetchFields();
+
+        if (JSON.stringify(fields) !== JSON.stringify(newFields)) {
+          setFields(newFields);
+        }
       }
+    }, [fetchFields]);
 
-      return (
-        <InputComponent
-          key={field.name ?? index}
-          {...field}
-          {...commonProps}
-        />
-      );
-    });
-  };
+    const updateFormData = useCallback(async () => {
+      if (fetchFormData) {
+        const newFormData = await fetchFormData();
 
-  const renderColumns = (columns) => {
-    return columns.map((col, index) => (
-      <div className={cn('form').elem('column')} key={index} style={{ width: col.width }}>
-        {renderFields(col.fields)}
-      </div>
-    ));
-  };
-
-  const updateFields = useCallback(async () => {
-    if (fetchFields) {
-      const newFields = await fetchFields();
-
-      if (JSON.stringify(fields) !== JSON.stringify(newFields)) {
-        setFields(newFields);
+        if (shallowEqualObjects(formData, newFormData) === false) {
+          setFormData(newFormData);
+        }
       }
-    }
-  }, [fetchFields]);
+    }, [fetchFormData]);
 
-  const updateFormData = useCallback(async () => {
-    if (fetchFormData) {
-      const newFormData = await fetchFormData();
+    const handleOnSubmit = useCallback(
+      async (...args) => {
+        onSubmit?.(...args);
+        await updateFields();
+        await updateFormData();
+      },
+      [onSubmit, fetchFormData],
+    );
 
-      if (shallowEqualObjects(formData, newFormData) === false) {
-        setFormData(newFormData);
-      }
-    }
-  }, [fetchFormData]);
+    useEffect(() => {
+      updateFields();
+    }, [updateFields]);
 
-  const handleOnSubmit = useCallback(async (...args) => {
-    onSubmit?.(...args);
-    await updateFields();
-    await updateFormData();
-  }, [onSubmit, fetchFormData]);
+    useEffect(() => {
+      updateFormData();
+    }, [updateFormData]);
 
-  useEffect(() => {
-    updateFields();
-  }, [updateFields]);
+    useEffect(() => {
+      setFields(defaultFields);
+    }, [defaultFields]);
 
-  useEffect(() => {
-    updateFormData();
-  }, [updateFormData]);
-
-  useEffect(() => {
-    setFields(defaultFields);
-  }, [defaultFields]);
-
-  return (
-    <Form {...props} onSubmit={handleOnSubmit} ref={formRef}>
-      {(fields ?? []).map(({ columnCount, fields, columns }, index) => (
-        <Form.Row key={index} columnCount={columnCount} style={formRowStyle} spread>
-          {columns ? renderColumns(columns) : renderFields(fields)}
-        </Form.Row>
-      ))}
-      {children}
-      {(props.autosubmit !== true && withActions === true) && (
-        <Form.Actions>
-          <Button
-            type="submit"
-            look="primary"
-            style={{ width: 120 }}
+    return (
+      <Form {...props} onSubmit={handleOnSubmit} ref={formRef}>
+        {(fields ?? []).map(({ columnCount, fields, columns }, index) => (
+          <Form.Row
+            key={index}
+            columnCount={columnCount}
+            style={formRowStyle}
+            spread
           >
-            Save
-          </Button>
-        </Form.Actions>
-      )}
-    </Form>
-  );
-});
+            {columns ? renderColumns(columns) : renderFields(fields)}
+          </Form.Row>
+        ))}
+        {children}
+        {props.autosubmit !== true && withActions === true && (
+          <Form.Actions>
+            <Button type="submit" look="primary" style={{ width: 120 }}>
+              Save
+            </Button>
+          </Form.Actions>
+        )}
+      </Form>
+    );
+  },
+);
 
 Form.Actions = ({ children, valid, extra, size }) => {
-  const rootClass = cn('form');
+  const rootClass = cn("form");
 
   return (
-    <div className={rootClass.elem('submit').mod({ size })}>
-      <div className={rootClass.elem('info').mod({ valid })}>
-        {extra}
-      </div>
+    <div className={rootClass.elem("submit").mod({ size })}>
+      <div className={rootClass.elem("info").mod({ valid })}>{extra}</div>
 
-      <Space>
-        {children}
-      </Space>
+      <Space>{children}</Space>
     </div>
   );
 };
@@ -549,7 +620,9 @@ Form.Indicator = () => {
   return (
     <Block name="form-indicator">
       <Oneof value={state}>
-        <Elem tag="span" mod={{ type: state }} name="item" case="success">Saved!</Elem>
+        <Elem tag="span" mod={{ type: state }} name="item" case="success">
+          Saved!
+        </Elem>
       </Oneof>
     </Block>
   );

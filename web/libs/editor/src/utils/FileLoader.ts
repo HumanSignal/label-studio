@@ -1,4 +1,8 @@
-type OnProgressCallback = (total: number, loaded: number, progress: number) => void;
+type OnProgressCallback = (
+  total: number,
+  loaded: number,
+  progress: number,
+) => void;
 
 /**
  * @class FileLoader
@@ -14,7 +18,7 @@ export class FileLoader {
    * @description Progress event available to track download progress
    */
   download(url: string, onProgress?: OnProgressCallback) {
-    if (!url) throw new Error('No URL provided for download');
+    if (!url) throw new Error("No URL provided for download");
 
     return new Promise((resolve, reject) => {
       if (this.fileCache.has(url)) {
@@ -28,9 +32,9 @@ export class FileLoader {
 
       const xhr = new XMLHttpRequest();
 
-      xhr.responseType = 'blob';
+      xhr.responseType = "blob";
 
-      xhr.addEventListener('load', async () => {
+      xhr.addEventListener("load", async () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
           const localURL = this.createDataURL(xhr.response);
 
@@ -38,7 +42,7 @@ export class FileLoader {
 
           // in case we're dealing with an image, let's cache it using default browser mechanisms
           // this will allow instant rendering in the future
-          if (xhr.getResponseHeader('content-type')?.match(/image/)) {
+          if (xhr.getResponseHeader("content-type")?.match(/image/)) {
             try {
               await this.cacheImage(localURL);
             } catch (err) {
@@ -51,22 +55,22 @@ export class FileLoader {
         }
       });
 
-      xhr.addEventListener('progress', (e) => {
+      xhr.addEventListener("progress", (e) => {
         const { total, loaded } = e;
         const progress = loaded / total;
 
         onProgress?.(total, loaded, progress);
       });
 
-      xhr.addEventListener('error', () => {
-        const error = new Error('Network error');
+      xhr.addEventListener("error", () => {
+        const error = new Error("Network error");
 
         reject(error);
 
         this.errorCache.set(url, error);
       });
 
-      xhr.open('GET', url);
+      xhr.open("GET", url);
       xhr.send();
     });
   }

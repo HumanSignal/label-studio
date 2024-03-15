@@ -1,11 +1,18 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-const libraryQueue = new Map;
+const libraryQueue = new Map();
 
-const libRequest = new Map;
+const libRequest = new Map();
 
 const requestLabelStudio = (libraries) => async (library) => {
-  const {scriptSrc, cssSrc, checkAvailability} = libraries[library];
+  const { scriptSrc, cssSrc, checkAvailability } = libraries[library];
   const availableLibrary = checkAvailability();
 
   const queueSet = libraryQueue.get(library) ?? new Set();
@@ -22,40 +29,47 @@ const requestLabelStudio = (libraries) => async (library) => {
   });
 
   if (!libRequest.has(library)) {
-    libRequest.set(library, (async () => {
-      const assets = [];
+    libRequest.set(
+      library,
+      (async () => {
+        const assets = [];
 
-      if (scriptSrc) {
-        assets.push(new Promise((resolve) => {
-          const script = document.createElement('script');
-          script.type = 'text/javascript';
-          script.onload = () => {
-            resolve();
-          };
-          script.src = scriptSrc;
-          script.dataset.replaced = true;
-          document.head.appendChild(script);
-        }));
-      }
+        if (scriptSrc) {
+          assets.push(
+            new Promise((resolve) => {
+              const script = document.createElement("script");
+              script.type = "text/javascript";
+              script.onload = () => {
+                resolve();
+              };
+              script.src = scriptSrc;
+              script.dataset.replaced = true;
+              document.head.appendChild(script);
+            }),
+          );
+        }
 
-      if (cssSrc) {
-        assets.push(new Promise((resolve) => {
-          const link = document.createElement('link');
-          link.rel = "stylesheet";
-          link.type = "text/css";
-          link.onload = () => {
-            resolve();
-          };
-          link.href = cssSrc;
-          link.dataset.replaced = true;
-          document.head.appendChild(link);
-        }));
-      }
+        if (cssSrc) {
+          assets.push(
+            new Promise((resolve) => {
+              const link = document.createElement("link");
+              link.rel = "stylesheet";
+              link.type = "text/css";
+              link.onload = () => {
+                resolve();
+              };
+              link.href = cssSrc;
+              link.dataset.replaced = true;
+              document.head.appendChild(link);
+            }),
+          );
+        }
 
-      await Promise.all(assets);
+        await Promise.all(assets);
 
-      queueSet.forEach(resolver => resolver());
-    })());
+        queueSet.forEach((resolver) => resolver());
+      })(),
+    );
   }
 
   return requestResolver;
@@ -63,7 +77,7 @@ const requestLabelStudio = (libraries) => async (library) => {
 
 export const LibraryContext = createContext({});
 
-export const LibraryProvider = ({libraries, children}) => {
+export const LibraryProvider = ({ libraries, children }) => {
   const requestLibrary = useMemo(() => {
     return requestLabelStudio(libraries);
   }, [libraries]);

@@ -1,8 +1,8 @@
-import React from 'react';
-import { PropTypes } from 'prop-types';
-import { Tag } from 'antd';
+import { Tag } from "antd";
+import { PropTypes } from "prop-types";
+import React from "react";
 
-import styles from './Dialog.module.scss';
+import styles from "./Dialog.module.scss";
 
 export default class DialogView extends React.Component {
   render() {
@@ -41,7 +41,14 @@ export default class DialogView extends React.Component {
     }
 
     return (
-      <div className={selectedStyle} style={{ background: bgColor, width: 'max-content', maxWidth: '100%' }}>
+      <div
+        className={selectedStyle}
+        style={{
+          background: bgColor,
+          width: "max-content",
+          maxWidth: "100%",
+        }}
+      >
         <span className={styles.name}>{this.props.name}:&nbsp;</span>
         <p className={styles.text}>{this.props.text}</p>
         {date}

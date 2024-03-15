@@ -1,12 +1,19 @@
-import { observer, useLocalStore } from "mobx-react";
 import { toJS } from "mobx";
+import { observer, useLocalStore } from "mobx-react";
+import { getRoot } from "mobx-state-tree";
 import React, { forwardRef, useCallback, useEffect, useRef } from "react";
 import {
   ViewColumnType,
   ViewColumnTypeName,
-  ViewColumnTypeShort
+  ViewColumnTypeShort,
 } from "../../../../stores/Tabs/tab_column";
 import { BemWithSpecifiContext } from "../../../../utils/bem";
+import {
+  FF_DEV_2984,
+  FF_DEV_3873,
+  FF_LOPS_E_10,
+  isFF,
+} from "../../../../utils/feature-flags";
 import { Button } from "../../Button/Button";
 import { Dropdown } from "../../Dropdown/Dropdown";
 import { Menu } from "../../Menu/Menu";
@@ -17,8 +24,6 @@ import { TableCell, TableCellContent } from "../TableCell/TableCell";
 import { TableContext, TableElem } from "../TableContext";
 import { getStyle } from "../utils";
 import "./TableHead.styl";
-import { FF_DEV_2984, FF_DEV_3873, FF_LOPS_E_10, isFF } from "../../../../utils/feature-flags";
-import { getRoot } from "mobx-state-tree";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -34,7 +39,7 @@ const DropdownWrapper = observer(
         const selectable = cellView?.userSelectable !== false;
         const displayType = cellView?.displayType !== false;
 
-        return cellView && (selectable && displayType);
+        return cellView && selectable && displayType;
       });
 
     const styles = {
@@ -45,18 +50,18 @@ const DropdownWrapper = observer(
       background: "none",
       fontSize: 14,
     };
-    
-    if ( isFF( FF_LOPS_E_10 ) ) {
+
+    if (isFF(FF_LOPS_E_10)) {
       styles.border = "0 none";
-      styles.fontWeight =  500;
-      styles.fontSize =  16;
-      styles.lineHeight =  24;
-      styles.letterSpacing =  0.15;
+      styles.fontWeight = 500;
+      styles.fontSize = 16;
+      styles.lineHeight = 24;
+      styles.letterSpacing = 0.15;
     }
 
     return (
       <Dropdown.Trigger
-        content={(
+        content={
           <Menu
             title="Display as"
             size="compact"
@@ -83,13 +88,9 @@ const DropdownWrapper = observer(
               );
             })}
           </Menu>
-        )}
+        }
       >
-        <Button
-          type="text"
-          size="small"
-          style={styles}
-        >
+        <Button type="text" size="small" style={styles}>
           {children}
         </Button>
       </Dropdown.Trigger>
@@ -125,9 +126,8 @@ const ColumnRenderer = observer(
     const isDE = root.SDK.type === "DE";
     const canOrder = sortingEnabled && column.original?.canOrder;
     const Decoration = decoration?.get?.(column);
-    const extra = !isDE && columnHeaderExtra
-      ? columnHeaderExtra(column, Decoration)
-      : null;
+    const extra =
+      !isDE && columnHeaderExtra ? columnHeaderExtra(column, Decoration) : null;
     const content = Decoration?.content
       ? Decoration.content(column)
       : column.title;
@@ -195,9 +195,8 @@ export const TableHead = observer(
       },
       ref,
     ) => {
-      const { columns, headerRenderers, cellViews } = React.useContext(
-        TableContext,
-      );
+      const { columns, headerRenderers, cellViews } =
+        React.useContext(TableContext);
 
       if (is2984FF) {
         const states = useLocalStore(() => ({
@@ -230,23 +229,26 @@ export const TableHead = observer(
             return toJS(states.draggedCol);
           },
         }));
-        let colRefs = useRef({});
-        const getUpdatedColOrder = useCallback((cols) => {
-          const orderedColumns = {};
-  
-          (cols ?? columns).forEach((col, colIndex) => {
-            orderedColumns[col.id] = colIndex;
-          });
-          return orderedColumns;
-        }, [columns]);
+        const colRefs = useRef({});
+        const getUpdatedColOrder = useCallback(
+          (cols) => {
+            const orderedColumns = {};
+
+            (cols ?? columns).forEach((col, colIndex) => {
+              orderedColumns[col.id] = colIndex;
+            });
+            return orderedColumns;
+          },
+          [columns],
+        );
 
         useEffect(() => {
           ref.current?.addEventListener("mousedown", (event) => {
-            if (event.target.className.includes("handle")) event.preventDefault();
+            if (event.target.className.includes("handle"))
+              event.preventDefault();
           });
-        }, [],
-        );
-  
+        }, []);
+
         return (
           <Block
             name="table-head"
@@ -257,21 +259,27 @@ export const TableHead = observer(
             }}
             mod={{ droppable: true }}
             mix="horizontal-shadow"
-            onDragOver={useCallback((e) => {
-              const draggedCol = states.getDraggedCol();
-  
-              colRefs.current[draggedCol].style.setProperty("--scale", "0");
-              e.stopPropagation();
-            }, [states])}
+            onDragOver={useCallback(
+              (e) => {
+                const draggedCol = states.getDraggedCol();
+
+                colRefs.current[draggedCol].style.setProperty("--scale", "0");
+                e.stopPropagation();
+              },
+              [states],
+            )}
           >
             {columns.map((col) => {
-              
               return (
-                <Elem name="draggable" draggable={true} ref={(ele) => colRefs.current[col.id] = ele} key={col.id}
-                  onDragStart={(e) => {  
+                <Elem
+                  name="draggable"
+                  draggable={true}
+                  ref={(ele) => (colRefs.current[col.id] = ele)}
+                  key={col.id}
+                  onDragStart={(e) => {
                     e.dataTransfer.effectAllowed = "none";
                     const ele = colRefs.current[col.id];
-  
+
                     states.setInitialDragPos({
                       x: ele.offsetLeft,
                       y: ele.offsetTop,
@@ -281,23 +289,33 @@ export const TableHead = observer(
                   onDragEnd={(e) => {
                     e.stopPropagation();
                     const draggedCol = states.getDraggedCol();
-                    const curColumns = columns.filter(curCol => curCol.id !== draggedCol);
+                    const curColumns = columns.filter(
+                      (curCol) => curCol.id !== draggedCol,
+                    );
                     const newIndex = curColumns.findIndex((curCol) => {
                       const colRefrence = colRefs.current[curCol.id];
-                      const mousePos = e.clientX + (ref?.current?.parentElement.scrollLeft ?? 0);
-                      let isGreaterThanPos = mousePos < (colRefrence.offsetLeft + (colRefrence.clientWidth / 2));
-        
+                      const mousePos =
+                        e.clientX +
+                        (ref?.current?.parentElement.scrollLeft ?? 0);
+                      const isGreaterThanPos =
+                        mousePos <
+                        colRefrence.offsetLeft + colRefrence.clientWidth / 2;
+
                       return isGreaterThanPos;
                     });
-        
-                    colRefs.current[draggedCol].style.setProperty("--scale", "");
-        
+
+                    colRefs.current[draggedCol].style.setProperty(
+                      "--scale",
+                      "",
+                    );
+
                     states.setDraggedCol(null);
                     curColumns.splice(newIndex, 0, col);
                     const updatedColOrder = getUpdatedColOrder(curColumns);
-        
+
                     onDragEnd?.(updatedColOrder);
-                  }}>
+                  }}
+                >
                   <ColumnRenderer
                     column={col}
                     mod={{ draggable: true }}
@@ -317,35 +335,34 @@ export const TableHead = observer(
             <Elem name="extra">{extra}</Elem>
           </Block>
         );
-      } else {
-        return (
-          <Block
-            name="table-head"
-            ref={ref}
-            style={style}
-            mix="horizontal-shadow"
-          >
-            {columns.map((col) => {
-              return (
-                <ColumnRenderer
-                  key={col.id}
-                  column={col}
-                  headerRenderers={headerRenderers}
-                  cellViews={cellViews}
-                  columnHeaderExtra={columnHeaderExtra}
-                  sortingEnabled={sortingEnabled}
-                  stopInteractions={stopInteractions}
-                  decoration={decoration}
-                  onTypeChange={onTypeChange}
-                  onResize={onResize}
-                  onReset={onReset}
-                />
-              );
-            })}
-            <Elem name="extra">{extra}</Elem>
-          </Block>
-        );
       }
+      return (
+        <Block
+          name="table-head"
+          ref={ref}
+          style={style}
+          mix="horizontal-shadow"
+        >
+          {columns.map((col) => {
+            return (
+              <ColumnRenderer
+                key={col.id}
+                column={col}
+                headerRenderers={headerRenderers}
+                cellViews={cellViews}
+                columnHeaderExtra={columnHeaderExtra}
+                sortingEnabled={sortingEnabled}
+                stopInteractions={stopInteractions}
+                decoration={decoration}
+                onTypeChange={onTypeChange}
+                onResize={onResize}
+                onReset={onReset}
+              />
+            );
+          })}
+          <Elem name="extra">{extra}</Elem>
+        </Block>
+      );
     },
   ),
 );

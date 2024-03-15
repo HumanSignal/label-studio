@@ -1,13 +1,18 @@
-import React from 'react';
-import { cn } from '../../../../utils/bem';
-import { FormField } from '../../FormField';
-import { default as Label } from '../Label/Label';
+import React from "react";
+import { cn } from "../../../../utils/bem";
+import { FormField } from "../../FormField";
+import { default as Label } from "../Label/Label";
 
-const TextArea = ({label, className, validate, required, skip, labelProps, ...props}) => {
-  const classList = [
-    cn('textarea'),
-    className
-  ].join(" ").trim();
+const TextArea = ({
+  label,
+  className,
+  validate,
+  required,
+  skip,
+  labelProps,
+  ...props
+}) => {
+  const classList = [cn("textarea"), className].join(" ").trim();
 
   const input = (
     <FormField
@@ -18,13 +23,17 @@ const TextArea = ({label, className, validate, required, skip, labelProps, ...pr
       skip={skip}
       {...props}
     >
-      {ref => (
-        <textarea {...props} ref={ref} className={classList}/>
-      )}
+      {(ref) => <textarea {...props} ref={ref} className={classList} />}
     </FormField>
   );
 
-  return label ? <Label {...(labelProps ?? {})} text={label} required={required}>{input}</Label> : input;
+  return label ? (
+    <Label {...(labelProps ?? {})} text={label} required={required}>
+      {input}
+    </Label>
+  ) : (
+    input
+  );
 };
 
 export default TextArea;

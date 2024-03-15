@@ -68,7 +68,11 @@ declare type APIProject = {
 
   /** Total predictions number in project including skipped_annotations_number and ground_truth_number. */
   total_predictions_number?: string;
-  sampling?: "Sequential sampling" | "Uniform sampling" | "Uncertainty sampling" | null;
+  sampling?:
+    | "Sequential sampling"
+    | "Uniform sampling"
+    | "Uncertainty sampling"
+    | null;
   show_ground_truth_first?: boolean;
   show_overlap_first?: boolean;
   overlap_cohort_percentage?: number;
@@ -84,4 +88,4 @@ declare type APIProject = {
 
   /** JSON-formatted labeling configuration */
   parsed_label_config?: string;
-}
+};

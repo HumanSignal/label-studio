@@ -25,7 +25,9 @@ class Taxonomy {
   }
 
   locate(locator) {
-    return locator ? locate(locator).inside(this.locateTaxonomy()) : this.locateTaxonomy();
+    return locator
+      ? locate(locator).inside(this.locateTaxonomy())
+      : this.locateTaxonomy();
   }
 
   locateInput() {
@@ -33,16 +35,20 @@ class Taxonomy {
   }
 
   locateItemByText(itemText) {
-    return this.locate(this.item).withDescendant(`.//label[text()='${itemText}']`);
+    return this.locate(this.item).withDescendant(
+      `.//label[text()='${itemText}']`,
+    );
   }
 
   locateSelectedByText(itemText) {
-    return this.locate(this.selectedList).find('./div').withDescendant(`.//*[text()='${itemText}']`);
+    return this.locate(this.selectedList)
+      .find("./div")
+      .withDescendant(`.//*[text()='${itemText}']`);
   }
 
   locateActions(itemLocator) {
     let actionsLocator = this.locate(this.itemActions);
-    
+
     if (itemLocator) {
       actionsLocator = actionsLocator.inside(itemLocator);
     }
@@ -78,11 +84,15 @@ class Taxonomy {
   }
 
   seeCheckedItemByText(itemText) {
-    I.seeElement(this.locateItemByText(itemText).withDescendant('.//input[@checked]'));
+    I.seeElement(
+      this.locateItemByText(itemText).withDescendant(".//input[@checked]"),
+    );
   }
 
   dontSeeCheckedItemByText(itemText) {
-    I.dontSeeElement(this.locateItemByText(itemText).withDescendant('.//input[@checked]'));
+    I.dontSeeElement(
+      this.locateItemByText(itemText).withDescendant(".//input[@checked]"),
+    );
   }
 
   seeSelectedValues(selectedValues) {
@@ -112,12 +122,12 @@ class Taxonomy {
   }
 
   clickAdd() {
-    I.click(this.locate('button').withText('Add'));
+    I.click(this.locate("button").withText("Add"));
   }
 
   fillNewItem(value) {
     I.fillField(this.locate(this.newItemField), value);
-    I.pressKey('Enter');
+    I.pressKey("Enter");
   }
 
   addNewItem(value) {
@@ -144,11 +154,11 @@ class Taxonomy {
   }
 
   clickAddInside() {
-    I.click(locate('.ant-dropdown-menu-item').withText('Add Inside'));
+    I.click(locate(".ant-dropdown-menu-item").withText("Add Inside"));
   }
 
   clickDelete() {
-    I.click(locate('.ant-dropdown-menu-item').withText('Delete'));
+    I.click(locate(".ant-dropdown-menu-item").withText("Delete"));
   }
 }
 

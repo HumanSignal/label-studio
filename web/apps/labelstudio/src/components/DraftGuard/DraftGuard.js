@@ -1,7 +1,7 @@
-import { useContext, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import { ToastContext } from '../Toast/Toast';
-import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
+import { useContext, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
+import { ToastContext } from "../Toast/Toast";
 
 export const DRAFT_GUARD_KEY = "DRAFT_GUARD";
 
@@ -26,7 +26,7 @@ export const DraftGuard = () => {
        * when there are unsaved changes. The draftGuardCallback allows the unblock callback to be captured from the
        * history callback `getUserConfirmation` that is triggered by returning a string message from history.block, allowing the user to
        * confirm they want to leave the page. Here we send through a constant message
-       * to signify that we aren't looking for user confirmation but to utilize this to enable navigation blocking based on 
+       * to signify that we aren't looking for user confirmation but to utilize this to enable navigation blocking based on
        * unsuccessful draft saves.
        */
       const unsubscribe = history.block(() => {
@@ -39,10 +39,16 @@ export const DraftGuard = () => {
             const status = res?.$meta?.status;
 
             if (status === 200 || status === 201) {
-              toast.show({ message: "Draft saved successfully",  type: "info" });
+              toast.show({
+                message: "Draft saved successfully",
+                type: "info",
+              });
               unblock();
             } else if (status !== undefined) {
-              toast.show({ message: "There was an error saving your draft", type: "error" });
+              toast.show({
+                message: "There was an error saving your draft",
+                type: "error",
+              });
             } else {
               unblock();
             }

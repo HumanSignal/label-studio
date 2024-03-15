@@ -1,20 +1,20 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { FaMinus, FaPlus } from 'react-icons/fa';
-import { Block, Elem } from '../../../../../utils/bem';
-import { isDefined } from '../../../../../utils/utils';
-import { Oneof } from '../../../Oneof/Oneof';
-import { FormField } from '../../FormField';
-import { useValueTracker } from '../../Utils';
-import { default as Label } from '../Label/Label';
-import './Counter.styl';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { FaMinus, FaPlus } from "react-icons/fa";
+import { Block, Elem } from "../../../../../utils/bem";
+import { isDefined } from "../../../../../utils/utils";
+import { Oneof } from "../../../Oneof/Oneof";
+import { FormField } from "../../FormField";
+import { useValueTracker } from "../../Utils";
+import { default as Label } from "../Label/Label";
+import "./Counter.styl";
 
-const allowedKeys = [
-  'ArrowUp',
-  'ArrowDown',
-  'Backspace',
-  'Delete',
-  /[0-9]/,
-];
+const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", /[0-9]/];
 
 const CounterContext = createContext(null);
 
@@ -31,11 +31,13 @@ const Counter = ({
   defaultValue,
   ...props
 }) => {
-
-  const [min, max] = [props.min ?? -Infinity, props.max ?? Infinity];
+  const [min, max] = [
+    props.min ?? Number.NEGATIVE_INFINITY,
+    props.max ?? Number.POSITIVE_INFINITY,
+  ];
 
   const normalizeValue = (value) => {
-    const val = Number(String(value).replace(` ${postfix}`, ''));
+    const val = Number(String(value).replace(` ${postfix}`, ""));
 
     return Math.max(min, Math.min(max, val));
   };
@@ -63,23 +65,24 @@ const Counter = ({
 
   /**@type {(e: import('react').SyntheticEvent<HTMLInputElement, KeyboardEvent>)} */
   const onInputHandler = (e) => {
-    const allowedKey = allowedKeys.find(k => (k instanceof RegExp) ? k.test(e.key) : k === e.key );
+    const allowedKey = allowedKeys.find((k) =>
+      k instanceof RegExp ? k.test(e.key) : k === e.key,
+    );
 
     if (!allowedKey && !e.metaKey) e.preventDefault();
 
-    if (allowedKey === 'ArrowUp') {
+    if (allowedKey === "ArrowUp") {
       increase();
       e.preventDefault();
-    } else if (allowedKey === 'ArrowDown') {
+    } else if (allowedKey === "ArrowDown") {
       decrease();
       e.preventDefault();
     }
   };
 
-
   /**@type {(e: import('react').SyntheticEvent<HTMLInputElement, ClipboardEvent>)} */
   const onPasteHandler = (e) => {
-    const content = e.nativeEvent.clipboardData.getData('text');
+    const content = e.nativeEvent.clipboardData.getData("text");
     const isNumerical = /([0-9]+)/.test(content);
 
     if (!isNumerical) e.preventDefault();
@@ -113,7 +116,8 @@ const Counter = ({
     input.current.focus();
     getSelection().removeAllRanges();
 
-    const value = (type === 'increase') ? increase() : (type === 'decrease') ? decrease() : 0;
+    const value =
+      type === "increase" ? increase() : type === "decrease" ? decrease() : 0;
 
     if (isDefined(input.current)) {
       input.current.value = value;
@@ -139,11 +143,14 @@ const Counter = ({
       setValue={setNewValue}
       skip={skip}
       onDependencyChanged={(f) => {
-        if (f.type === 'checkbox') setDisabled(!f.checked);
+        if (f.type === "checkbox") setDisabled(!f.checked);
       }}
       {...props}
-    >{({ ref, dependency }) => {
-        const depDisabled = (dependency?.type === 'checkbox' && dependency?.checked === false) || false;
+    >
+      {({ ref, dependency }) => {
+        const depDisabled =
+          (dependency?.type === "checkbox" && dependency?.checked === false) ||
+          false;
         const fieldDisabled = disabled ?? depDisabled;
         const contextValue = {
           currentValue,
@@ -159,8 +166,13 @@ const Counter = ({
 
         return (
           <CounterContext.Provider value={contextValue}>
-            <Block name="counter" mod={{ focused, disabled: fieldDisabled }} mix={className} style={style}>
-              <CounterButton type="decrease"/>
+            <Block
+              name="counter"
+              mod={{ focused, disabled: fieldDisabled }}
+              mix={className}
+              style={style}
+            >
+              <CounterButton type="decrease" />
 
               <Elem
                 ref={ref}
@@ -179,34 +191,42 @@ const Counter = ({
               />
 
               {postfix && (
-                <Elem name="input" mod={{ under: true, withPostfix: !!postfix }}>
+                <Elem
+                  name="input"
+                  mod={{
+                    under: true,
+                    withPostfix: !!postfix,
+                  }}
+                >
                   {displayValue.join(" ")}
                 </Elem>
               )}
 
-              <CounterButton type="increase"/>
+              <CounterButton type="increase" />
             </Block>
           </CounterContext.Provider>
         );
-      }}</FormField>
+      }}
+    </FormField>
   );
 
-  return (label ? (
+  return label ? (
     <Label
       {...(labelProps ?? {})}
       text={label}
       required={required}
       children={field}
     />
-  ) : field);
+  ) : (
+    field
+  );
 };
 
-
-
 const CounterButton = ({ type }) => {
-  const { currentValue, min, max, disabled, ref, onClickHandler } = useContext(CounterContext);
+  const { currentValue, min, max, disabled, ref, onClickHandler } =
+    useContext(CounterContext);
 
-  const compareLimit = type === 'increase' ? max : min;
+  const compareLimit = type === "increase" ? max : min;
 
   return (
     <Elem
@@ -218,11 +238,11 @@ const CounterButton = ({ type }) => {
         disabled: currentValue === compareLimit || disabled,
       }}
       onClick={onClickHandler(type, ref)}
-      onMouseDownCapture={e => e.preventDefault()}
+      onMouseDownCapture={(e) => e.preventDefault()}
     >
       <Oneof value={type}>
-        <FaMinus case="decrease"/>
-        <FaPlus case="increase"/>
+        <FaMinus case="decrease" />
+        <FaPlus case="increase" />
       </Oneof>
     </Elem>
   );

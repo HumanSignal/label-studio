@@ -1,27 +1,27 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import BaseTool from './Base';
-import ToolMixin from '../mixins/Tool';
-import { NodeViews } from '../components/Node/Node';
-import { DrawingTool } from '../mixins/DrawingTool';
-import { FF_DEV_3666, FF_DEV_3793, isFF } from '../utils/feature-flags';
+import { NodeViews } from "../components/Node/Node";
+import { DrawingTool } from "../mixins/DrawingTool";
+import ToolMixin from "../mixins/Tool";
+import { FF_DEV_3666, FF_DEV_3793, isFF } from "../utils/feature-flags";
+import BaseTool from "./Base";
 
 const _Tool = types
-  .model('KeyPointTool', {
+  .model("KeyPointTool", {
     default: types.optional(types.boolean, true),
-    group: 'segmentation',
-    shortcut: 'K',
+    group: "segmentation",
+    shortcut: "K",
     smart: true,
   })
   .views(() => ({
     get tagTypes() {
       return {
-        stateTypes: 'keypointlabels',
-        controlTagTypes: ['keypointlabels', 'keypoint'],
+        stateTypes: "keypointlabels",
+        controlTagTypes: ["keypointlabels", "keypoint"],
       };
     },
     get viewTooltip() {
-      return 'Key Point';
+      return "Key Point";
     },
     get iconComponent() {
       return self.dynamic
@@ -29,13 +29,13 @@ const _Tool = types
         : NodeViews.KeyPointRegionModel.icon;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     clickEv(ev, [x, y]) {
       if (isFF(FF_DEV_3666) && !self.canStartDrawing()) return;
 
       const c = self.control;
 
-      if (c.type === 'keypointlabels' && !c.isSelected) return;
+      if (c.type === "keypointlabels" && !c.isSelected) return;
       if (self.annotation.isReadOnly()) return;
 
       const keyPoint = self.createRegion({
@@ -45,14 +45,13 @@ const _Tool = types
         }),
         ...(isFF(FF_DEV_3793)
           ? {
-            // strokeWidth is visual only, so it's in screen dimensions in config
-            width: self.obj.canvasToInternalX(Number(c.strokewidth)),
-          }
+              // strokeWidth is visual only, so it's in screen dimensions in config
+              width: self.obj.canvasToInternalX(Number(c.strokewidth)),
+            }
           : {
-            width: Number(c.strokewidth),
-            coordstype: 'px',
-          }
-        ),
+              width: Number(c.strokewidth),
+              coordstype: "px",
+            }),
         dynamic: self.dynamic,
         negative: self.dynamic && ev.altKey,
       });
@@ -62,6 +61,12 @@ const _Tool = types
     },
   }));
 
-const KeyPoint = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, _Tool);
+const KeyPoint = types.compose(
+  _Tool.name,
+  ToolMixin,
+  BaseTool,
+  DrawingTool,
+  _Tool,
+);
 
 export { KeyPoint };

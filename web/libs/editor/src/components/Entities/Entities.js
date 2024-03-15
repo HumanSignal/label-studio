@@ -1,28 +1,26 @@
-import React from 'react';
-import { Dropdown } from 'antd';
-import { observer } from 'mobx-react';
+import { Dropdown } from "antd";
+import { observer } from "mobx-react";
+import React from "react";
 
-import './Entities.scss';
-import { RegionTree } from './RegionTree';
-import { LabelList } from './LabelList';
-import { SortMenu, SortMenuIcon } from './SortMenu';
-import { Oneof } from '../../common/Oneof/Oneof';
-import { Space } from '../../common/Space/Space';
-import { Block, Elem } from '../../utils/bem';
-import { RadioGroup } from '../../common/RadioGroup/RadioGroup';
-import './Entities.styl';
-import { Button } from '../../common/Button/Button';
-import { LsInvisible, LsTrash, LsVisible } from '../../assets/icons';
-import { confirm } from '../../common/Modal/Modal';
-import { Tooltip } from '../../common/Tooltip/Tooltip';
+import { LsInvisible, LsTrash, LsVisible } from "../../assets/icons";
+import { Button } from "../../common/Button/Button";
+import { confirm } from "../../common/Modal/Modal";
+import { Oneof } from "../../common/Oneof/Oneof";
+import { RadioGroup } from "../../common/RadioGroup/RadioGroup";
+import { Space } from "../../common/Space/Space";
+import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { Block, Elem } from "../../utils/bem";
+import "./Entities.scss";
+import "./Entities.styl";
+import { LabelList } from "./LabelList";
+import { RegionTree } from "./RegionTree";
+import { SortMenu, SortMenuIcon } from "./SortMenu";
 
-export default observer(({
-  regionStore,
-  annotation,
-}) => {
+export default observer(({ regionStore, annotation }) => {
   const { classifications, regions, view } = regionStore;
-  const count = regions.length + (view === 'regions' ? classifications.length : 0);
-  const toggleVisibility = e => {
+  const count =
+    regions.length + (view === "regions" ? classifications.length : 0);
+  const toggleVisibility = (e) => {
     e.preventDefault();
     e.stopPropagation();
     regionStore.toggleVisibility();
@@ -36,11 +34,14 @@ export default observer(({
             size="small"
             value={view}
             style={{ width: 240 }}
-            onChange={e => {
+            onChange={(e) => {
               regionStore.setView(e.target.value);
             }}
           >
-            <RadioGroup.Button value="regions">Regions{count ? <Elem name="counter">&nbsp;{count}</Elem> : null}</RadioGroup.Button>
+            <RadioGroup.Button value="regions">
+              Regions
+              {count ? <Elem name="counter">&nbsp;{count}</Elem> : null}
+            </RadioGroup.Button>
             <RadioGroup.Button value="labels">Labels</RadioGroup.Button>
           </RadioGroup>
 
@@ -58,12 +59,13 @@ export default observer(({
                 }}
                 onClick={() => {
                   confirm({
-                    title: 'Removing all regions',
-                    body: 'Do you want to delete all annotated regions?',
-                    buttonLook: 'destructive',
+                    title: "Removing all regions",
+                    body: "Do you want to delete all annotated regions?",
+                    buttonLook: "destructive",
                     onOk: () => annotation.deleteAllRegions(),
                   });
-                }} />
+                }}
+              />
             </Tooltip>
           )}
         </Space>
@@ -71,11 +73,19 @@ export default observer(({
 
       {count ? (
         <Elem name="header">
-          <Space spread align={view === 'regions' ? null : 'end'}>
-            {view === 'regions' && (
-              <Dropdown overlay={<SortMenu regionStore={regionStore} />} placement="bottomLeft">
-                <Elem name="sort" onClick={e => e.preventDefault()}>
-                  <Elem name="sort-icon"><SortMenuIcon sortKey={regionStore.sort} /></Elem> {`Sorted by ${regionStore.sort[0].toUpperCase()}${regionStore.sort.slice(1)}`}
+          <Space spread align={view === "regions" ? null : "end"}>
+            {view === "regions" && (
+              <Dropdown
+                overlay={<SortMenu regionStore={regionStore} />}
+                placement="bottomLeft"
+              >
+                <Elem name="sort" onClick={(e) => e.preventDefault()}>
+                  <Elem name="sort-icon">
+                    <SortMenuIcon sortKey={regionStore.sort} />
+                  </Elem>{" "}
+                  {`Sorted by ${regionStore.sort[0].toUpperCase()}${regionStore.sort.slice(
+                    1,
+                  )}`}
                 </Elem>
               </Dropdown>
             )}
@@ -90,22 +100,29 @@ export default observer(({
                   style={{ padding: 0 }}
                   onClick={toggleVisibility}
                   mod={{ hidden: regionStore.isAllHidden }}
-                >{regionStore.isAllHidden ? <LsInvisible /> : <LsVisible />}</Elem>
+                >
+                  {regionStore.isAllHidden ? <LsInvisible /> : <LsVisible />}
+                </Elem>
               ) : null}
-
-
             </Space>
           </Space>
         </Elem>
-      )
-        : null}
+      ) : null}
 
       <Oneof value={view}>
         <Elem name="regions" case="regions">
-          {count ? <RegionTree regionStore={regionStore} /> : <Elem name="empty">No Regions created yet</Elem>}
+          {count ? (
+            <RegionTree regionStore={regionStore} />
+          ) : (
+            <Elem name="empty">No Regions created yet</Elem>
+          )}
         </Elem>
         <Elem name="labels" case="labels">
-          {count ? <LabelList regionStore={regionStore} /> : <Elem name="empty">No Labeled Regions created yet</Elem>}
+          {count ? (
+            <LabelList regionStore={regionStore} />
+          ) : (
+            <Elem name="empty">No Labeled Regions created yet</Elem>
+          )}
         </Elem>
       </Oneof>
     </Block>

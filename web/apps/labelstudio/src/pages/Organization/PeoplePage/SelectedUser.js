@@ -5,11 +5,17 @@ import { Button, Userpic } from "../../../components";
 import { Block, Elem } from "../../../utils/bem";
 import "./SelectedUser.styl";
 
-const UserProjectsLinks = ({projects}) => {
+const UserProjectsLinks = ({ projects }) => {
   return (
     <Elem name="links-list">
       {projects.map((project) => (
-        <Elem tag={NavLink} name="project-link" key={`project-${project.id}`} to={`/projects/${project.id}`} data-external>
+        <Elem
+          tag={NavLink}
+          name="project-link"
+          key={`project-${project.id}`}
+          to={`/projects/${project.id}`}
+          data-external
+        >
           {project.title}
         </Elem>
       ))}
@@ -18,23 +24,25 @@ const UserProjectsLinks = ({projects}) => {
 };
 
 export const SelectedUser = ({ user, onClose }) => {
-  const fullName = [user.first_name, user.last_name].filter(n => !!n).join(" ").trim();
+  const fullName = [user.first_name, user.last_name]
+    .filter((n) => !!n)
+    .join(" ")
+    .trim();
 
   return (
     <Block name="user-info">
-      <Elem name="close" tag={Button} type="link" onClick={onClose}><LsCross/></Elem>
+      <Elem name="close" tag={Button} type="link" onClick={onClose}>
+        <LsCross />
+      </Elem>
 
       <Elem name="header">
-        <Userpic
-          user={user}
-          style={{width: 64, height: 64, fontSize: 28}}
-        />
+        <Userpic user={user} style={{ width: 64, height: 64, fontSize: 28 }} />
 
-        {fullName && (
-          <Elem name="full-name">{fullName}</Elem>
-        )}
+        {fullName && <Elem name="full-name">{fullName}</Elem>}
 
-        <Elem tag="p" name="email">{user.email}</Elem>
+        <Elem tag="p" name="email">
+          {user.email}
+        </Elem>
       </Elem>
 
       {user.phone && (
@@ -47,7 +55,7 @@ export const SelectedUser = ({ user, onClose }) => {
         <Elem name="section">
           <Elem name="section-title">Created Projects</Elem>
 
-          <UserProjectsLinks projects={user.created_projects}/>
+          <UserProjectsLinks projects={user.created_projects} />
         </Elem>
       )}
 
@@ -55,12 +63,13 @@ export const SelectedUser = ({ user, onClose }) => {
         <Elem name="section">
           <Elem name="section-title">Contributed to</Elem>
 
-          <UserProjectsLinks projects={user.contributed_to_projects}/>
+          <UserProjectsLinks projects={user.contributed_to_projects} />
         </Elem>
       )}
 
       <Elem tag="p" name="last-active">
-        Last activity on: {format(new Date(user.last_activity), 'dd MMM yyyy, KK:mm a')}
+        Last activity on:{" "}
+        {format(new Date(user.last_activity), "dd MMM yyyy, KK:mm a")}
       </Elem>
     </Block>
   );

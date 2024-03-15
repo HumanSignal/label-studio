@@ -1,11 +1,19 @@
-import { clamp } from 'lodash';
-import { FC, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useMemoizedHandlers } from '../../../../hooks/useMemoizedHandlers';
-import { Block, Elem } from '../../../../utils/bem';
-import { isDefined } from '../../../../utils/utilities';
-import { TimelineViewProps } from '../../Types';
-import './Frames.styl';
-import { Keypoints } from './Keypoints';
+import { clamp } from "lodash";
+import {
+  type FC,
+  type MouseEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useMemoizedHandlers } from "../../../../hooks/useMemoizedHandlers";
+import { Block, Elem } from "../../../../utils/bem";
+import { isDefined } from "../../../../utils/utilities";
+import type { TimelineViewProps } from "../../Types";
+import "./Frames.styl";
+import { Keypoints } from "./Keypoints";
 
 const toSteps = (num: number, step: number) => {
   return Math.floor(num / step);
@@ -14,7 +22,7 @@ const toSteps = (num: number, step: number) => {
 const roundToStep = (num: number, step: number) => {
   const steps = toSteps(num, step);
 
-  return (steps * step);
+  return steps * step;
 };
 
 export const Frames: FC<TimelineViewProps> = ({
@@ -50,9 +58,17 @@ export const Frames: FC<TimelineViewProps> = ({
     return length * step;
   }, [length, step]);
 
-  const framesInView = useMemo(() => toSteps(roundToStep((scrollable.current?.clientWidth ?? 0) - timelineStartOffset, step), step), [
-    scrollable.current, step, timelineStartOffset,
-  ]);
+  const framesInView = useMemo(
+    () =>
+      toSteps(
+        roundToStep(
+          (scrollable.current?.clientWidth ?? 0) - timelineStartOffset,
+          step,
+        ),
+        step,
+      ),
+    [scrollable.current, step, timelineStartOffset],
+  );
 
   const handlers = useMemoizedHandlers({
     onPositionChange,
@@ -60,53 +76,73 @@ export const Frames: FC<TimelineViewProps> = ({
 
   const background = useMemo(() => {
     const bg = [
-      `repeating-linear-gradient(90deg, #fff 1px, #fff ${step - 1}px, rgba(255,255,255,0) ${step - 1}px, rgba(255,255,255,0) ${step + 1}px)`,
-      'linear-gradient(0deg, #FAFAFA, rgba(255,255,255,0) 50%)',
+      `repeating-linear-gradient(90deg, #fff 1px, #fff ${
+        step - 1
+      }px, rgba(255,255,255,0) ${step - 1}px, rgba(255,255,255,0) ${
+        step + 1
+      }px)`,
+      "linear-gradient(0deg, #FAFAFA, rgba(255,255,255,0) 50%)",
     ];
 
-    return bg.join(', ');
+    return bg.join(", ");
   }, [step]);
 
-  const setScroll = useCallback(({ left, top }) => {
-    if (!length) return;
+  const setScroll = useCallback(
+    ({ left, top }) => {
+      if (!length) return;
 
-    setHoverOffset(null);
+      setHoverOffset(null);
 
-    if (isDefined(top) && offsetY !== top) {
-      setOffsetY(top);
-    }
+      if (isDefined(top) && offsetY !== top) {
+        setOffsetY(top);
+      }
 
-    if (isDefined(left) && offsetX !== left) {
-      setOffsetX(left);
+      if (isDefined(left) && offsetX !== left) {
+        setOffsetX(left);
 
-      const frame = toSteps(roundToStep(left, step), step);
+        const frame = toSteps(roundToStep(left, step), step);
 
-      onScroll?.(clamp(frame, 1, length));
-    }
-  }, [offsetX, offsetY, step, length]);
+        onScroll?.(clamp(frame, 1, length));
+      }
+    },
+    [offsetX, offsetY, step, length],
+  );
 
-  const setIndicatorOffset = useCallback((value) => {
-    const frame = toSteps(roundToStep(value, step), step);
+  const setIndicatorOffset = useCallback(
+    (value) => {
+      const frame = toSteps(roundToStep(value, step), step);
 
-    handlers.onPositionChange?.(clamp(frame + 1, 1, length));
-  }, [step, length, position]);
+      handlers.onPositionChange?.(clamp(frame + 1, 1, length));
+    },
+    [step, length, position],
+  );
 
-  const scrollHandler = useCallback((e) => {
-    const scroll = scrollable.current!;
+  const scrollHandler = useCallback(
+    (e) => {
+      const scroll = scrollable.current!;
 
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      const limit = scroll.scrollWidth - scroll.clientWidth;
-      const newOffsetX = clamp(offsetX + (e.deltaX * scrollMultiplier), 0, limit);
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        const limit = scroll.scrollWidth - scroll.clientWidth;
+        const newOffsetX = clamp(
+          offsetX + e.deltaX * scrollMultiplier,
+          0,
+          limit,
+        );
 
-      setScroll({ left: newOffsetX });
-    } else {
-      const limit = scroll.scrollHeight - scroll.clientHeight;
-      const newOffsetY = clamp(offsetY + (e.deltaY * scrollMultiplier), 0, limit);
+        setScroll({ left: newOffsetX });
+      } else {
+        const limit = scroll.scrollHeight - scroll.clientHeight;
+        const newOffsetY = clamp(
+          offsetY + e.deltaY * scrollMultiplier,
+          0,
+          limit,
+        );
 
-      setScroll({ top: newOffsetY });
-    }
-
-  }, [scrollable, offsetX, offsetY, setScroll]);
+        setScroll({ top: newOffsetY });
+      }
+    },
+    [scrollable, offsetX, offsetY, setScroll],
+  );
 
   const currentOffsetX = useMemo(() => {
     const value = roundToStep(offsetX, step);
@@ -118,47 +154,56 @@ export const Frames: FC<TimelineViewProps> = ({
     return offsetY;
   }, [offsetY]);
 
-  const handleMovement = useCallback((e) => {
-    setHoverEnabled(false);
+  const handleMovement = useCallback(
+    (e) => {
+      setHoverEnabled(false);
 
-    const indicator = e.target;
-    const startOffset = indicator.offsetLeft + currentOffsetX;
-    const startMouse = e.pageX;
-    const limit = scrollable.current!.scrollWidth - indicator.clientWidth;
+      const indicator = e.target;
+      const startOffset = indicator.offsetLeft + currentOffsetX;
+      const startMouse = e.pageX;
+      const limit = scrollable.current?.scrollWidth - indicator.clientWidth;
 
-    let lastOffset = 0;
+      let lastOffset = 0;
 
-    const onMouseMove = (e: globalThis.MouseEvent) => {
-      const targetOffset = roundToStep(e.pageX - startMouse, step);
-      const finalOffset = clamp(startOffset + targetOffset, 0, limit);
+      const onMouseMove = (e: globalThis.MouseEvent) => {
+        const targetOffset = roundToStep(e.pageX - startMouse, step);
+        const finalOffset = clamp(startOffset + targetOffset, 0, limit);
 
-      if (finalOffset !== lastOffset) {
-        lastOffset = finalOffset;
-        setIndicatorOffset(finalOffset);
+        if (finalOffset !== lastOffset) {
+          lastOffset = finalOffset;
+          setIndicatorOffset(finalOffset);
+        }
+      };
+
+      const onMouseUp = () => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        setHoverEnabled(true);
+      };
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [currentOffsetX, setIndicatorOffset, step],
+  );
+
+  const hoverHandler = useCallback(
+    (e) => {
+      if (scrollable.current) {
+        const currentOffset =
+          e.pageX -
+          scrollable.current.getBoundingClientRect().left -
+          timelineStartOffset;
+
+        if (currentOffset > 0) {
+          setHoverOffset(currentOffset);
+        } else {
+          setHoverOffset(null);
+        }
       }
-    };
-
-    const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-      setHoverEnabled(true);
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  }, [currentOffsetX, setIndicatorOffset, step]);
-
-  const hoverHandler = useCallback((e) => {
-    if (scrollable.current) {
-      const currentOffset = e.pageX - scrollable.current.getBoundingClientRect().left - timelineStartOffset;
-
-      if (currentOffset > 0) {
-        setHoverOffset(currentOffset);
-      } else {
-        setHoverOffset(null);
-      }
-    }
-  }, [currentOffsetX, step]);
+    },
+    [currentOffsetX, step],
+  );
 
   const scrollClickHandler = useCallback(() => {
     if (hoverOffset) {
@@ -174,41 +219,44 @@ export const Frames: FC<TimelineViewProps> = ({
     return value + timelineStartOffset;
   }, [position, currentOffsetX, step, length]);
 
-  const onFrameScrub = useCallback((e: MouseEvent) => {
-    const dimensions = scrollable.current!.getBoundingClientRect();
-    const offsetLeft = dimensions.left;
-    const rightLimit = dimensions.width - timelineStartOffset;
+  const onFrameScrub = useCallback(
+    (e: MouseEvent) => {
+      const dimensions = scrollable.current?.getBoundingClientRect();
+      const offsetLeft = dimensions.left;
+      const rightLimit = dimensions.width - timelineStartOffset;
 
-    const getMouseToFrame = (e: MouseEvent | globalThis.MouseEvent) => {
-      const mouseOffset = e.pageX - offsetLeft - timelineStartOffset;
+      const getMouseToFrame = (e: MouseEvent | globalThis.MouseEvent) => {
+        const mouseOffset = e.pageX - offsetLeft - timelineStartOffset;
 
-      return mouseOffset + currentOffsetX;
-    };
+        return mouseOffset + currentOffsetX;
+      };
 
-    const offset = getMouseToFrame(e);
-
-    setIndicatorOffset(offset);
-
-    const onMouseMove = (e: globalThis.MouseEvent) => {
       const offset = getMouseToFrame(e);
 
-      if (offset >= 0 && offset <= rightLimit) {
-        setHoverEnabled(false);
-        setRegionSelectionDisabled(true);
-        setIndicatorOffset(offset);
-      }
-    };
+      setIndicatorOffset(offset);
 
-    const onMouseUp = () => {
-      setHoverEnabled(true);
-      setRegionSelectionDisabled(false);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
+      const onMouseMove = (e: globalThis.MouseEvent) => {
+        const offset = getMouseToFrame(e);
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  }, [currentOffsetX, setIndicatorOffset]);
+        if (offset >= 0 && offset <= rightLimit) {
+          setHoverEnabled(false);
+          setRegionSelectionDisabled(true);
+          setIndicatorOffset(offset);
+        }
+      };
+
+      const onMouseUp = () => {
+        setHoverEnabled(true);
+        setRegionSelectionDisabled(false);
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      };
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [currentOffsetX, setIndicatorOffset],
+  );
 
   useEffect(() => {
     if (scrollable.current) {
@@ -228,25 +276,32 @@ export const Frames: FC<TimelineViewProps> = ({
 
       const { deltaY: delta } = e;
 
-      const allowScroll = !horizontalScroll && ((currentScroll === 0 && delta < 0) || (currentScroll === maxScroll && delta > 0));
+      const allowScroll =
+        !horizontalScroll &&
+        ((currentScroll === 0 && delta < 0) ||
+          (currentScroll === maxScroll && delta > 0));
 
       if (!allowScroll) e.preventDefault();
     };
 
-    target.addEventListener('wheel', handler);
+    target.addEventListener("wheel", handler);
 
-    return () => target.removeEventListener('wheel', handler);
+    return () => target.removeEventListener("wheel", handler);
   }, []);
 
   useEffect(() => {
-    onResize?.(toSteps(scrollable.current!.clientWidth, step));
+    onResize?.(toSteps(scrollable.current?.clientWidth, step));
   }, [viewWidth, step]);
 
   useEffect(() => {
     const scroll = scrollable.current;
 
     if (isDefined(scroll)) {
-      const nextScrollOffset = clamp(offset * step, 0, scroll.scrollWidth - scroll.clientWidth);
+      const nextScrollOffset = clamp(
+        offset * step,
+        0,
+        scroll.scrollWidth - scroll.clientWidth,
+      );
 
       lastScrollPosition.current = roundToStep(nextScrollOffset, step);
 
@@ -272,21 +327,32 @@ export const Frames: FC<TimelineViewProps> = ({
     // this ensures the calculation of offset is kept correct.
     // This is needed because the position is not always a multiple of the step
     // and the offset used to calculate the position is always a multiple of the step.
-    if (positionDelta === 1 && (position >= firstFrame && position <= lastFrame)) {
-
+    if (
+      positionDelta === 1 &&
+      position >= firstFrame &&
+      position <= lastFrame
+    ) {
       // set to previous frame scroll
       // if position is 0, then it will be set to 0
       if (position <= firstFrame) {
-        const prevLeft = clamp((firstFrame - 1 - framesInView) * step, 0, scroll.scrollWidth - scroll.clientWidth);
+        const prevLeft = clamp(
+          (firstFrame - 1 - framesInView) * step,
+          0,
+          scroll.scrollWidth - scroll.clientWidth,
+        );
 
         lastScrollPosition.current = roundToStep(prevLeft, step);
 
         setScroll({ left: prevLeft });
 
-      // set to next frame scroll
-      // if position is last frame, then it will be set to last frame scroll
+        // set to next frame scroll
+        // if position is last frame, then it will be set to last frame scroll
       } else if (position > lastFrame) {
-        const nextLeft = clamp(lastFrame * step, 0, scroll.scrollWidth - scroll.clientWidth);
+        const nextLeft = clamp(
+          lastFrame * step,
+          0,
+          scroll.scrollWidth - scroll.clientWidth,
+        );
 
         lastScrollPosition.current = roundToStep(nextLeft, step);
 
@@ -308,9 +374,9 @@ export const Frames: FC<TimelineViewProps> = ({
   }, [position, framesInView, step]);
 
   const styles = {
-    '--frame-size': `${step}px`,
-    '--view-size': `${viewWidth}px`,
-    '--offset': `${timelineStartOffset}px`,
+    "--frame-size": `${step}px`,
+    "--view-size": `${viewWidth}px`,
+    "--offset": `${timelineStartOffset}px`,
   };
 
   return (
@@ -319,19 +385,28 @@ export const Frames: FC<TimelineViewProps> = ({
         <Elem
           name="indicator"
           onMouseDown={handleMovement}
-          style={{ left: clamp(seekerOffset - step, timelineStartOffset - step, viewWidth) }}
+          style={{
+            left: clamp(
+              seekerOffset - step,
+              timelineStartOffset - step,
+              viewWidth,
+            ),
+          }}
         />
 
         {isDefined(hoverOffset) && hoverEnabled && (
           <Elem
             name="hover"
-            style={{ left: roundToStep(hoverOffset, step), marginLeft: timelineStartOffset }}
+            style={{
+              left: roundToStep(hoverOffset, step),
+              marginLeft: timelineStartOffset,
+            }}
             data-frame={toSteps(currentOffsetX + hoverOffset, step) + 1}
           />
         )}
       </Elem>
 
-      <Elem name="labels-bg" style={{ width: timelineStartOffset }}/>
+      <Elem name="labels-bg" style={{ width: timelineStartOffset }} />
 
       <Elem
         name="scroll"
@@ -353,7 +428,7 @@ export const Frames: FC<TimelineViewProps> = ({
         </Elem>
       </Elem>
 
-      <Elem name="background" style={{ backgroundImage: background }}/>
+      <Elem name="background" style={{ backgroundImage: background }} />
     </Block>
   );
 };
@@ -363,7 +438,7 @@ interface KeypointsVirtualProps {
   startOffset: number;
   scrollTop: number;
   disabled?: boolean;
-  onSelectRegion: TimelineViewProps['onSelectRegion'];
+  onSelectRegion: TimelineViewProps["onSelectRegion"];
 }
 
 const KeypointsVirtual: FC<KeypointsVirtualProps> = ({

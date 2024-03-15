@@ -1,11 +1,22 @@
-import React, { createElement } from 'react';
-import { cn } from '../../../../utils/bem';
-import './Label.styl';
+import React, { createElement } from "react";
+import { cn } from "../../../../utils/bem";
+import "./Label.styl";
 
-const Label = ({ text, children, required, placement, description, size, large, style, simple, flat }) => {
-  const rootClass = cn('label');
+const Label = ({
+  text,
+  children,
+  required,
+  placement,
+  description,
+  size,
+  large,
+  style,
+  simple,
+  flat,
+}) => {
+  const rootClass = cn("label");
   const classList = [rootClass];
-  const tagName = simple ? 'div' : 'label';
+  const tagName = simple ? "div" : "label";
   const mods = {
     size,
     large,
@@ -17,23 +28,25 @@ const Label = ({ text, children, required, placement, description, size, large, 
 
   classList.push(rootClass.mod(mods));
 
-  return createElement(tagName, {
-    'className': classList.join(" "),
-    'data-required': required,
-    'style': style,
-  }, (
+  return createElement(
+    tagName,
+    {
+      className: classList.join(" "),
+      "data-required": required,
+      style: style,
+    },
     <>
-      <div className={rootClass.elem('text')}>
-        <div className={rootClass.elem('content')}>
-          <div className={rootClass.elem('label')}>
-            {text}
-          </div>
-          {description && <div className={rootClass.elem("description")}>{description}</div>}
+      <div className={rootClass.elem("text")}>
+        <div className={rootClass.elem("content")}>
+          <div className={rootClass.elem("label")}>{text}</div>
+          {description && (
+            <div className={rootClass.elem("description")}>{description}</div>
+          )}
         </div>
       </div>
-      <div className={rootClass.elem('field')}>{children}</div>
-    </>
-  ));
+      <div className={rootClass.elem("field")}>{children}</div>
+    </>,
+  );
 };
 
 export default Label;

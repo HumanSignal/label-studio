@@ -17,29 +17,47 @@ const buttonInjector = inject(({ store }) => {
   };
 });
 
-export const FiltersButton = buttonInjector(observer(
-  React.forwardRef(({ activeFiltersNumber, size, sidebarEnabled, viewsStore, ...rest }, ref) => {
-    const hasFilters = activeFiltersNumber > 0;
+export const FiltersButton = buttonInjector(
+  observer(
+    React.forwardRef(
+      (
+        { activeFiltersNumber, size, sidebarEnabled, viewsStore, ...rest },
+        ref,
+      ) => {
+        const hasFilters = activeFiltersNumber > 0;
 
-    return (
-      <Button
-        ref={ref}
-        size={size}
-        onClick={() => sidebarEnabled && viewsStore.toggleSidebar()}
-        {...rest}
-      >
-        Filters {hasFilters && (
-          <Badge size="small" style={{ marginLeft: 5 }}>{activeFiltersNumber}</Badge>
-        )}
-        {isFF(FF_LOPS_E_10) ? (
-          <FaChevronDown size="12" style={{ marginLeft: 8, marginRight: -7 }} color="#1F1F1F" />
-        ) : (
-          <FaAngleDown size="16" style={{ marginLeft: 4 }} color="#0077FF" />
-        )}
-      </Button>
-    );
-  }),
-));
+        return (
+          <Button
+            ref={ref}
+            size={size}
+            onClick={() => sidebarEnabled && viewsStore.toggleSidebar()}
+            {...rest}
+          >
+            Filters{" "}
+            {hasFilters && (
+              <Badge size="small" style={{ marginLeft: 5 }}>
+                {activeFiltersNumber}
+              </Badge>
+            )}
+            {isFF(FF_LOPS_E_10) ? (
+              <FaChevronDown
+                size="12"
+                style={{ marginLeft: 8, marginRight: -7 }}
+                color="#1F1F1F"
+              />
+            ) : (
+              <FaAngleDown
+                size="16"
+                style={{ marginLeft: 4 }}
+                color="#0077FF"
+              />
+            )}
+          </Button>
+        );
+      },
+    ),
+  ),
+);
 
 const injector = inject(({ store }) => {
   return {
@@ -61,9 +79,9 @@ export const FiltersPane = injector(
       <Dropdown.Trigger
         ref={dropdown}
         disabled={sidebarEnabled}
-        content={<Filters/>}
+        content={<Filters />}
       >
-        <FiltersButton {...rest} size={size}/>
+        <FiltersButton {...rest} size={size} />
       </Dropdown.Trigger>
     );
   }),

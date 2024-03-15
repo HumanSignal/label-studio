@@ -1,22 +1,22 @@
-import React from 'react';
-import { observer } from 'mobx-react';
-import { getParentOfType, types } from 'mobx-state-tree';
+import { observer } from "mobx-react";
+import { getParentOfType, types } from "mobx-state-tree";
+import React from "react";
 
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
-import Registry from '../core/Registry';
-import { TextAreaModel } from '../tags/control/TextArea/TextArea';
-import { guidGenerator } from '../core/Helpers';
+import { guidGenerator } from "../core/Helpers";
+import Registry from "../core/Registry";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import { TextAreaModel } from "../tags/control/TextArea/TextArea";
 
-import styles from './TextAreaRegion/TextAreaRegion.module.scss';
-import { HtxTextBox } from '../components/HtxTextBox/HtxTextBox';
-import { FF_DEV_1566, FF_LSDV_4712, isFF } from '../utils/feature-flags';
+import { HtxTextBox } from "../components/HtxTextBox/HtxTextBox";
+import { FF_DEV_1566, FF_LSDV_4712, isFF } from "../utils/feature-flags";
+import styles from "./TextAreaRegion/TextAreaRegion.module.scss";
 
 const Model = types
-  .model('TextAreaRegionModel', {
+  .model("TextAreaRegionModel", {
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
-    type: 'textarearegion',
+    type: "textarearegion",
 
     _value: types.string,
     // states: types.array(types.union(ChoicesModel)),
@@ -27,7 +27,7 @@ const Model = types
     results: [],
     selected: false,
   }))
-  .views(self => ({
+  .views((self) => ({
     get parent() {
       return getParentOfType(self, TextAreaModel);
     },
@@ -38,9 +38,13 @@ const Model = types
       return null;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     setValue(val) {
-      if (isFF(FF_LSDV_4712) && (self._value === val || !self.parent.validateText(val))) return;
+      if (
+        isFF(FF_LSDV_4712) &&
+        (self._value === val || !self.parent.validateText(val))
+      )
+        return;
 
       self._value = val;
       self.parent.onChange();
@@ -60,7 +64,7 @@ const Model = types
   }));
 
 const TextAreaRegionModel = types.compose(
-  'TextAreaRegionModel',
+  "TextAreaRegionModel",
   RegionsMixin,
   NormalizationMixin,
   Model,
@@ -68,7 +72,7 @@ const TextAreaRegionModel = types.compose(
 
 const HtxTextAreaRegionView = ({ item, onFocus }) => {
   const classes = [styles.mark];
-  const params = { onFocus: e => onFocus(e, item) };
+  const params = { onFocus: (e) => onFocus(e, item) };
   const { parent } = item;
   const { relationMode } = item.annotation;
   const editable = parent.isEditable && !item.isReadOnly();
@@ -85,7 +89,7 @@ const HtxTextAreaRegionView = ({ item, onFocus }) => {
   }
 
   if (editable || parent.transcription) {
-    params.onChange = str => {
+    params.onChange = (str) => {
       item.setValue(str);
       item.parent.updateLeadTime();
     };
@@ -114,7 +118,7 @@ const HtxTextAreaRegionView = ({ item, onFocus }) => {
     };
   }
 
-  const name = `${parent?.name ?? ''}:${item.id}`;
+  const name = `${parent?.name ?? ""}:${item.id}`;
 
   return (
     <div {...divAttrs} className={styles.row} data-testid="textarea-region">
@@ -124,7 +128,7 @@ const HtxTextAreaRegionView = ({ item, onFocus }) => {
         onlyEdit={parent.transcription}
         id={`TextAreaRegion-${item.id}`}
         name={name}
-        className={classes.join(' ')}
+        className={classes.join(" ")}
         rows={parent.rows}
         text={item._value}
         {...params}
@@ -136,6 +140,6 @@ const HtxTextAreaRegionView = ({ item, onFocus }) => {
 
 const HtxTextAreaRegion = observer(HtxTextAreaRegionView);
 
-Registry.addTag('textarearegion', TextAreaRegionModel, HtxTextAreaRegion);
+Registry.addTag("textarearegion", TextAreaRegionModel, HtxTextAreaRegion);
 
 export { TextAreaRegionModel, HtxTextAreaRegion };

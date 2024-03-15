@@ -1,5 +1,5 @@
-import { observe } from 'mobx';
-import { debounce } from '../../../utils/debounce';
+import { observe } from "mobx";
+import { debounce } from "../../../utils/debounce";
 
 export class EllipseWatcher {
   constructor(root, element, callback) {
@@ -11,9 +11,11 @@ export class EllipseWatcher {
   }
 
   handleUpdate() {
-    this.disposers = ['x', 'y', 'radiusX', 'radiusY', 'rotation'].map(property => {
-      return observe(this.element, property, this.onUpdate, true);
-    });
+    this.disposers = ["x", "y", "radiusX", "radiusY", "rotation"].map(
+      (property) => {
+        return observe(this.element, property, this.onUpdate, true);
+      },
+    );
   }
 
   onUpdate = debounce(() => {
@@ -21,6 +23,6 @@ export class EllipseWatcher {
   }, 10);
 
   destroy() {
-    this.disposers.forEach(dispose => dispose());
+    this.disposers.forEach((dispose) => dispose());
   }
 }

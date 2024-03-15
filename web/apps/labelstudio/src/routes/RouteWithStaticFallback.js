@@ -1,9 +1,9 @@
-import React, { Children } from 'react';
+import React, { Children } from "react";
 import { Switch } from "react-router";
-import { StaticContent } from '../app/StaticContent/StaticContent';
-import { MenubarContext } from '../components/Menubar/Menubar';
+import { StaticContent } from "../app/StaticContent/StaticContent";
+import { MenubarContext } from "../components/Menubar/Menubar";
 
-import { SentryRoute as Route } from '../config/Sentry';
+import { SentryRoute as Route } from "../config/Sentry";
 
 const extractModalRoutes = (children) => {
   const modalRoutes = [];
@@ -25,16 +25,27 @@ const extractModalRoutes = (children) => {
 /**
  * Router wrapper that handles 404 pages
  */
-export const RouteWithStaticFallback = ({ children, render, route, component, staticComponent, ...props }) => {
+export const RouteWithStaticFallback = ({
+  children,
+  render,
+  route,
+  component,
+  staticComponent,
+  ...props
+}) => {
   const menubar = React.useContext(MenubarContext);
 
   const notFoundRenderer = (children) => {
     let modalRoutes = [];
     let regularRoutes = [];
 
-    if (children.props && children.props.children) {
-      [modalRoutes, regularRoutes] = extractModalRoutes(children.props.children);
-      children = React.cloneElement(children, { children: regularRoutes });
+    if (children.props?.children) {
+      [modalRoutes, regularRoutes] = extractModalRoutes(
+        children.props.children,
+      );
+      children = React.cloneElement(children, {
+        children: regularRoutes,
+      });
     } else if (Array.isArray(children)) {
       [modalRoutes, regularRoutes] = extractModalRoutes(children);
       children = regularRoutes;
@@ -42,20 +53,23 @@ export const RouteWithStaticFallback = ({ children, render, route, component, st
 
     const Static = () => {
       if (menubar?.contextIsSet(null) === false) menubar?.setContext(null);
-      return staticComponent ?? <StaticContent id="main-content"/>;
+      return staticComponent ?? <StaticContent id="main-content" />;
     };
 
-    const exactRoutes = modalRoutes.reduce((res, route) => {
-      if (route.props.exact) {
-        res.exact.push(route);
-      } else {
-        res.modal.push(route);
-      }
-      return res;
-    }, {
-      exact: [],
-      modal: [],
-    });
+    const exactRoutes = modalRoutes.reduce(
+      (res, route) => {
+        if (route.props.exact) {
+          res.exact.push(route);
+        } else {
+          res.modal.push(route);
+        }
+        return res;
+      },
+      {
+        exact: [],
+        modal: [],
+      },
+    );
 
     return (
       <>
@@ -64,7 +78,9 @@ export const RouteWithStaticFallback = ({ children, render, route, component, st
           {exactRoutes.exact}
           {children}
 
-          <Route exact><Static/></Route>
+          <Route exact>
+            <Static />
+          </Route>
         </Switch>
       </>
     );
@@ -83,9 +99,8 @@ export const RouteWithStaticFallback = ({ children, render, route, component, st
   }
 
   return route !== false ? (
-    <Route {...props} {...routeProps}/>
+    <Route {...props} {...routeProps} />
   ) : (
     notFoundRenderer(children)
   );
 };
-

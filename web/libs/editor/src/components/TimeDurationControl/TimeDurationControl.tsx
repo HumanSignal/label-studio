@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
-import { Block } from '../../utils/bem';
+import React, { type FC } from "react";
+import { Block } from "../../utils/bem";
 
-import './TimeDurationControl.styl';
-import { TimeBox } from './TimeBox';
+import { TimeBox } from "./TimeBox";
+import "./TimeDurationControl.styl";
 
 export interface TimerProps {
   isSidepanel: boolean | undefined;
@@ -32,11 +32,13 @@ export const TimeDurationControl: FC<TimerProps> = ({
   const _currentTime = !currentTime ? startTime : currentTime;
 
   const handleChangeCurrentTime = (value: number) => {
-    if (value >= minTime && value <= maxTime && value <= endTime) onChangeStartTime?.(value);
+    if (value >= minTime && value <= maxTime && value <= endTime)
+      onChangeStartTime?.(value);
   };
 
   const handleChangeEndTime = (value: number) => {
-    if (value >= minTime && value <= maxTime && value >= _currentTime) onChangeEndTime?.(value);
+    if (value >= minTime && value <= maxTime && value >= _currentTime)
+      onChangeEndTime?.(value);
   };
 
   return (

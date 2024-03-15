@@ -4,7 +4,7 @@ import { AnnotationPreview } from "../Common/AnnotationPreview/AnnotationPreview
 
 const imgDefaultProps = {};
 
-if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = 'anonymous';
+if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = "anonymous";
 
 export const ImageCell = (column) => {
   const {
@@ -14,7 +14,8 @@ export const ImageCell = (column) => {
   } = column;
   const root = getRoot(original);
 
-  const renderImagePreview = original.total_annotations === 0 || !root.showPreviews;
+  const renderImagePreview =
+    original.total_annotations === 0 || !root.showPreviews;
   const imgSrc = Array.isArray(value) ? value[0] : value;
 
   if (!imgSrc) return null;

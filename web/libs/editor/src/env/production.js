@@ -1,8 +1,8 @@
-import External from '../core/External';
-import Messages from '../utils/messages';
+import External from "../core/External";
+import Messages from "../utils/messages";
 
 function getData(task) {
-  if (task && task.data) {
+  if (task?.data) {
     return {
       ...task,
       data: JSON.stringify(task.data),
@@ -26,13 +26,13 @@ function getState(task) {
 function rootElement(element) {
   let root;
 
-  if (typeof element === 'string') {
+  if (typeof element === "string") {
     root = document.getElementById(element);
   } else {
     root = element;
   }
 
-  root.innerHTML = '';
+  root.innerHTML = "";
 
   return root;
 }
@@ -59,11 +59,19 @@ function configureApplication(params) {
     messages: { ...Messages, ...params.messages },
 
     // callbacks and event handlers
-    onSubmitAnnotation: params.onSubmitAnnotation ? osCB : External.onSubmitAnnotation,
-    onUpdateAnnotation: params.onUpdateAnnotation ? ouCB : External.onUpdateAnnotation,
-    onDeleteAnnotation: params.onDeleteAnnotation ? odCB : External.onDeleteAnnotation,
+    onSubmitAnnotation: params.onSubmitAnnotation
+      ? osCB
+      : External.onSubmitAnnotation,
+    onUpdateAnnotation: params.onUpdateAnnotation
+      ? ouCB
+      : External.onUpdateAnnotation,
+    onDeleteAnnotation: params.onDeleteAnnotation
+      ? odCB
+      : External.onDeleteAnnotation,
     onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
-    onUnskipTask: params.onUnskipTask ? params.onUnskipTask : External.onUnskipTask,
+    onUnskipTask: params.onUnskipTask
+      ? params.onUnskipTask
+      : External.onUnskipTask,
     onSubmitDraft: params.onSubmitDraft,
     onPresignUrlForProject: params.onPresignUrlForProject,
     onTaskLoad: params.onTaskLoad || External.onTaskLoad,
@@ -71,10 +79,14 @@ function configureApplication(params) {
     onEntityCreate: params.onEntityCreate || External.onEntityCreate,
     onEntityDelete: params.onEntityDelete || External.onEntityDelete,
     onGroundTruth: params.onGroundTruth || External.onGroundTruth,
-    onSelectAnnotation: params.onSelectAnnotation || External.onSelectAnnotation,
-    onAcceptAnnotation: params.onAcceptAnnotation || External.onAcceptAnnotation,
-    onRejectAnnotation: params.onRejectAnnotation || External.onRejectAnnotation,
-    onStorageInitialized: params.onStorageInitialized || External.onStorageInitialized,
+    onSelectAnnotation:
+      params.onSelectAnnotation || External.onSelectAnnotation,
+    onAcceptAnnotation:
+      params.onAcceptAnnotation || External.onAcceptAnnotation,
+    onRejectAnnotation:
+      params.onRejectAnnotation || External.onRejectAnnotation,
+    onStorageInitialized:
+      params.onStorageInitialized || External.onStorageInitialized,
     onNextTask: params.onNextTask || External.onNextTask,
     onPrevTask: params.onPrevTask || External.onPrevTask,
 

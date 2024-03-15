@@ -1,22 +1,23 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
-import Registry from '../core/Registry';
-import { AreaMixin } from '../mixins/AreaMixin';
-import { onlyProps, VideoRegion } from './VideoRegion';
-import { interpolateProp } from '../utils/props';
+import Registry from "../core/Registry";
+import { AreaMixin } from "../mixins/AreaMixin";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import { interpolateProp } from "../utils/props";
+import { VideoRegion, onlyProps } from "./VideoRegion";
 
 const Model = types
-  .model('VideoRectangleRegionModel', {
-    type: 'videorectangleregion',
+  .model("VideoRectangleRegionModel", {
+    type: "videorectangleregion",
   })
   .volatile(() => ({
-    props: ['x', 'y', 'width', 'height', 'rotation'],
+    props: ["x", "y", "width", "height", "rotation"],
   }))
-  .views(self => ({
+  .views((self) => ({
     getShape(frame) {
-      let prev, next;
+      let prev;
+      let next;
 
       for (const item of self.sequence) {
         if (item.frame === frame) {
@@ -33,17 +34,19 @@ const Model = types
       if (!prev) return null;
       if (!next) return onlyProps(self.props, prev);
 
-      return Object.fromEntries(self.props.map(prop => [
-        prop,
-        interpolateProp(prev, next, frame, prop),
-      ]));
+      return Object.fromEntries(
+        self.props.map((prop) => [
+          prop,
+          interpolateProp(prev, next, frame, prop),
+        ]),
+      );
     },
 
     getVisibility() {
       return true;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     updateShape(data, frame) {
       const newItem = {
         ...data,
@@ -52,7 +55,7 @@ const Model = types
       };
 
       const kp = self.closestKeypoint(frame);
-      const index = self.sequence.findIndex(item => item.frame >= frame);
+      const index = self.sequence.findIndex((item) => item.frame >= frame);
 
       if (index < 0) {
         self.sequence = [...self.sequence, newItem];
@@ -67,14 +70,16 @@ const Model = types
         self.sequence = [
           ...self.sequence.slice(0, index),
           keypoint,
-          ...self.sequence.slice(index + (self.sequence[index].frame === frame)),
+          ...self.sequence.slice(
+            index + (self.sequence[index].frame === frame),
+          ),
         ];
       }
     },
   }));
 
 const VideoRectangleRegionModel = types.compose(
-  'VideoRectangleRegionModel',
+  "VideoRectangleRegionModel",
   RegionsMixin,
   VideoRegion,
   AreaMixin,
@@ -82,6 +87,6 @@ const VideoRectangleRegionModel = types.compose(
   Model,
 );
 
-Registry.addRegionType(VideoRectangleRegionModel, 'video');
+Registry.addRegionType(VideoRectangleRegionModel, "video");
 
 export { VideoRectangleRegionModel };

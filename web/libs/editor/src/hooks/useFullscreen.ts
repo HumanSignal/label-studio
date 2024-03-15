@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 const enterFullscreen = (el: HTMLElement) => {
-  if ('webkitRequestFullscreen' in el) {
+  if ("webkitRequestFullscreen" in el) {
     (el as any).webkitRequestFullscreen();
   } else {
     el.requestFullscreen();
@@ -9,7 +9,7 @@ const enterFullscreen = (el: HTMLElement) => {
 };
 
 const exitFullscreen = () => {
-  if ('webkitCancelFullScreen' in document) {
+  if ("webkitCancelFullScreen" in document) {
     (document as any).webkitCancelFullScreen();
   } else {
     document.exitFullscreen();
@@ -17,7 +17,10 @@ const exitFullscreen = () => {
 };
 
 const getElement = (): HTMLElement => {
-  return (document as any).webkitCurrentFullScreenElement ?? document.fullscreenElement;
+  return (
+    (document as any).webkitCurrentFullScreenElement ??
+    document.fullscreenElement
+  );
 };
 
 export interface FullscreenProps {
@@ -33,7 +36,7 @@ export interface FullscreenHook {
 }
 
 export const useFullscreen = (
-  options: FullscreenProps = {},
+  options: FullscreenProps,
   deps: any[],
 ): FullscreenHook => {
   const handlers = useRef(options);
@@ -53,9 +56,10 @@ export const useFullscreen = (
       }
     };
 
-    const evt = 'onwebkitfullscreenchange' in document
-      ? 'webkitfullscreenchange'
-      : 'fullscreenchange';
+    const evt =
+      "onwebkitfullscreenchange" in document
+        ? "webkitfullscreenchange"
+        : "fullscreenchange";
 
     document.addEventListener(evt, onChangeFullscreen);
 

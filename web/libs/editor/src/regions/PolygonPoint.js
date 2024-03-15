@@ -1,31 +1,37 @@
-import React, { useState } from 'react';
-import { Circle, Rect } from 'react-konva';
-import { observer } from 'mobx-react';
-import { getParent, getRoot, hasParent, types } from 'mobx-state-tree';
+import { observer } from "mobx-react";
+import { getParent, getRoot, hasParent, types } from "mobx-state-tree";
+import React, { useState } from "react";
+import { Circle, Rect } from "react-konva";
 
-import { guidGenerator } from '../core/Helpers';
-import { useRegionStyles } from '../hooks/useRegionColor';
-import { FF_DEV_2431, FF_DEV_3793, isFF } from '../utils/feature-flags';
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from '../components/ImageView/Image';
+import {
+  RELATIVE_STAGE_HEIGHT,
+  RELATIVE_STAGE_WIDTH,
+} from "../components/ImageView/Image";
+import { guidGenerator } from "../core/Helpers";
+import { useRegionStyles } from "../hooks/useRegionColor";
+import { FF_DEV_2431, FF_DEV_3793, isFF } from "../utils/feature-flags";
 
-const PolygonPointAbsoluteCoordsDEV3793 = types.model()
+const PolygonPointAbsoluteCoordsDEV3793 = types
+  .model()
   .volatile(() => ({
     relativeX: 0,
     relativeY: 0,
     initX: 0,
     initY: 0,
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterCreate() {
       self.initX = self.x;
       self.initY = self.y;
 
-      if (self.parent.coordstype === 'perc') {
+      if (self.parent.coordstype === "perc") {
         self.relativeX = self.x;
         self.relativeY = self.y;
       } else {
-        self.relativeX = (self.x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
-        self.relativeY = (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
+        self.relativeX =
+          (self.x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
+        self.relativeY =
+          (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
       }
     },
     movePoint(offsetX, offsetY) {
@@ -35,7 +41,8 @@ const PolygonPointAbsoluteCoordsDEV3793 = types.model()
       self.y = self.y + offsetY;
 
       self.relativeX = (self.x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeY = (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
+      self.relativeY =
+        (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
     },
     _setPos(x, y) {
       self.initX = x;
@@ -58,7 +65,7 @@ const PolygonPointAbsoluteCoordsDEV3793 = types.model()
   }));
 
 const PolygonPointRelativeCoords = types
-  .model('PolygonPoint', {
+  .model("PolygonPoint", {
     id: types.optional(types.identifier, guidGenerator),
 
     x: types.number,
@@ -66,13 +73,13 @@ const PolygonPointRelativeCoords = types
 
     index: types.number,
 
-    style: 'circle',
-    size: 'small',
+    style: "circle",
+    size: "small",
   })
   .volatile(() => ({
     selected: false,
   }))
-  .views(self => ({
+  .views((self) => ({
     get parent() {
       if (!hasParent(self, 2)) return null;
       return getParent(self, 2);
@@ -92,7 +99,7 @@ const PolygonPointRelativeCoords = types
       return isFF(FF_DEV_3793) ? self.stage?.internalToCanvasY(self.y) : self.y;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     /**
      * External function for Polygon Parent
      * @param {number} x
@@ -139,7 +146,7 @@ const PolygonPointRelativeCoords = types
       const stage = self.stage?.stageRef;
 
       if (!stage) return;
-      stage.container().style.cursor = 'crosshair';
+      stage.container().style.cursor = "crosshair";
 
       /**
        * Check if polygon > 2 points and closed point
@@ -148,7 +155,7 @@ const PolygonPointRelativeCoords = types
 
       const startPoint = ev.target;
 
-      if (self.style === 'rectangle') {
+      if (self.style === "rectangle") {
         startPoint.setX(startPoint.x() - startPoint.width() / 2);
         startPoint.setY(startPoint.y() - startPoint.height() / 2);
       }
@@ -175,9 +182,9 @@ const PolygonPointRelativeCoords = types
       const stage = self.stage?.stageRef;
 
       if (!stage) return;
-      stage.container().style.cursor = 'default';
+      stage.container().style.cursor = "default";
 
-      if (self.style === 'rectangle') {
+      if (self.style === "rectangle") {
         t.setX(t.x() + t.width() / 2);
         t.setY(t.y() + t.height() / 2);
       }
@@ -197,7 +204,11 @@ const PolygonPointRelativeCoords = types
 
 const PolygonPoint = isFF(FF_DEV_3793)
   ? PolygonPointRelativeCoords
-  : types.compose('PolygonPoint', PolygonPointRelativeCoords, PolygonPointAbsoluteCoordsDEV3793);
+  : types.compose(
+      "PolygonPoint",
+      PolygonPointRelativeCoords,
+      PolygonPointAbsoluteCoordsDEV3793,
+    );
 
 const PolygonPointView = observer(({ item, name }) => {
   if (!item.parent) return;
@@ -221,15 +232,15 @@ const PolygonPointView = observer(({ item, name }) => {
   const startPointAttr =
     item.index === 0
       ? {
-        hitStrokeWidth: 12,
-        fill: regionStyles.strokeColor || item.primary,
-        onMouseOver: item.handleMouseOverStartPoint,
-        onMouseOut: item.handleMouseOutStartPoint,
-      }
+          hitStrokeWidth: 12,
+          fill: regionStyles.strokeColor || item.primary,
+          onMouseOver: item.handleMouseOverStartPoint,
+          onMouseOut: item.handleMouseOutStartPoint,
+        }
       : null;
 
   const dragOpts = {
-    onDragMove: e => {
+    onDragMove: (e) => {
       if (item.getSkipInteractions()) return false;
       if (e.target !== e.currentTarget) return;
       const shape = e.target;
@@ -241,8 +252,8 @@ const PolygonPointView = observer(({ item, name }) => {
       if (y > item.stage.stageHeight) y = item.stage.stageHeight;
 
       item._movePoint(x, y);
-      shape.setAttr('x', item.canvasX);
-      shape.setAttr('y', item.canvasY);
+      shape.setAttr("x", item.canvasX);
+      shape.setAttr("y", item.canvasY);
     },
 
     onDragStart: () => {
@@ -253,41 +264,41 @@ const PolygonPointView = observer(({ item, name }) => {
       item.annotation.history.freeze();
     },
 
-    onDragEnd: e => {
+    onDragEnd: (e) => {
       setDraggable(true);
       item.annotation.history.unfreeze();
       e.cancelBubble = true;
     },
 
-    onMouseOver: e => {
+    onMouseOver: (e) => {
       e.cancelBubble = true;
       const stage = item.stage?.stageRef;
 
       if (!stage) return;
-      stage.container().style.cursor = 'crosshair';
+      stage.container().style.cursor = "crosshair";
     },
 
     onMouseOut: () => {
       const stage = item.stage?.stageRef;
 
       if (!stage) return;
-      stage.container().style.cursor = 'default';
+      stage.container().style.cursor = "default";
     },
 
     onTransformEnd(e) {
       if (e.target !== e.currentTarget) return;
       const t = e.target;
 
-      t.setAttr('x', 0);
-      t.setAttr('y', 0);
-      t.setAttr('scaleX', 1);
-      t.setAttr('scaleY', 1);
+      t.setAttr("x", 0);
+      t.setAttr("y", 0);
+      t.setAttr("scaleX", 1);
+      t.setAttr("scaleY", 1);
     },
   };
 
-  const fill = item.selected ? 'green' : 'white';
+  const fill = item.selected ? "green" : "white";
 
-  if (item.style === 'circle') {
+  if (item.style === "circle") {
     return (
       <Circle
         key={name}
@@ -307,8 +318,9 @@ const PolygonPointView = observer(({ item, name }) => {
         onDblClick={() => {
           item.parent.deletePoint(item);
         }}
-        onClick={ev => {
-          if (isFF(FF_DEV_2431) && ev.evt.altKey) return item.parent.deletePoint(item);
+        onClick={(ev) => {
+          if (isFF(FF_DEV_2431) && ev.evt.altKey)
+            return item.parent.deletePoint(item);
           if (item.parent.isDrawing && item.parent.points.length === 1) return;
           // don't unselect polygon on point click
           ev.evt.preventDefault();
@@ -325,28 +337,27 @@ const PolygonPointView = observer(({ item, name }) => {
         draggable={!item.parent.isReadOnly() && draggable}
       />
     );
-  } else {
-    return (
-      <Rect
-        name={name}
-        key={name}
-        x={item.x - w / 2}
-        y={item.y - w / 2}
-        width={w}
-        height={w}
-        fill={fill}
-        stroke="black"
-        strokeWidth={stroke[item.size]}
-        strokeScaleEnabled={false}
-        perfectDrawEnabled={false}
-        shadowForStrokeEnabled={false}
-        dragOnTop={false}
-        {...dragOpts}
-        {...startPointAttr}
-        draggable={!item.parent.isReadOnly()}
-      />
-    );
   }
+  return (
+    <Rect
+      name={name}
+      key={name}
+      x={item.x - w / 2}
+      y={item.y - w / 2}
+      width={w}
+      height={w}
+      fill={fill}
+      stroke="black"
+      strokeWidth={stroke[item.size]}
+      strokeScaleEnabled={false}
+      perfectDrawEnabled={false}
+      shadowForStrokeEnabled={false}
+      dragOnTop={false}
+      {...dragOpts}
+      {...startPointAttr}
+      draggable={!item.parent.isReadOnly()}
+    />
+  );
 });
 
 export { PolygonPoint, PolygonPointView };

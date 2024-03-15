@@ -1,4 +1,4 @@
-Feature('Audio Controls');
+Feature("Audio Controls");
 
 const config = `
 <View>
@@ -21,103 +21,110 @@ const config = `
 `;
 
 const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3",
 };
 
 const annotations = [
   {
-    from_name: 'choice',
-    id: 'hIj6zg57SY',
-    to_name: 'audio',
-    type: 'choices',
-    origin: 'manual',
+    from_name: "choice",
+    id: "hIj6zg57SY",
+    to_name: "audio",
+    type: "choices",
+    origin: "manual",
     value: {
-      choices: ['Lo-Fi'],
+      choices: ["Lo-Fi"],
     },
   },
   {
-    from_name: 'label',
-    id: 'JhxupEJWlW',
-    to_name: 'audio',
+    from_name: "label",
+    id: "JhxupEJWlW",
+    to_name: "audio",
     original_length: 98.719925,
-    type: 'labels',
-    origin: 'manual',
+    type: "labels",
+    origin: "manual",
     value: {
       channel: 1,
       end: 59.39854733358493,
-      labels: ['Other'],
+      labels: ["Other"],
       start: 55.747572792986325,
     },
   },
 ];
 
-const params = { annotations: [{ id: 'test', result: annotations }], config, data };
+const params = {
+  annotations: [{ id: "test", result: annotations }],
+  config,
+  data,
+};
 
-Scenario('Check the audio controls work', async function({ I, LabelStudio, AtAudioView, AtSidebar }) {
-  async function doNotSeeErrors() {
-    await I.wait(2);
-    // The potential errors should be caught by `errorsCollector` plugin
-  }
+Scenario(
+  "Check the audio controls work",
+  async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+    async function doNotSeeErrors() {
+      await I.wait(2);
+      // The potential errors should be caught by `errorsCollector` plugin
+    }
 
-  LabelStudio.setFeatureFlags({
-    ff_front_dev_2715_audio_3_280722_short: true,
-  });
-  I.amOnPage('/');
+    LabelStudio.setFeatureFlags({
+      ff_front_dev_2715_audio_3_280722_short: true,
+    });
+    I.amOnPage("/");
 
-  LabelStudio.init(params);
+    LabelStudio.init(params);
 
-  await AtAudioView.waitForAudio();
-  await AtAudioView.lookForStage();
+    await AtAudioView.waitForAudio();
+    await AtAudioView.lookForStage();
 
-  AtSidebar.seeRegions(1);
+    AtSidebar.seeRegions(1);
 
-  I.say('Check the volume updates');
+    I.say("Check the volume updates");
 
-  await AtAudioView.seeVolume(100);
+    await AtAudioView.seeVolume(100);
 
-  AtAudioView.setVolumeInput(50);
+    AtAudioView.setVolumeInput(50);
 
-  await AtAudioView.seeVolume(50);
+    await AtAudioView.seeVolume(50);
 
-  I.say('Check can be muted');
+    I.say("Check can be muted");
 
-  AtAudioView.clickMuteButton();
+    AtAudioView.clickMuteButton();
 
-  await AtAudioView.seeVolume(0);
+    await AtAudioView.seeVolume(0);
 
-  I.say('Check the playback speed updates');
+    I.say("Check the playback speed updates");
 
-  await AtAudioView.seePlaybackSpeed(1);
+    await AtAudioView.seePlaybackSpeed(1);
 
-  AtAudioView.setPlaybackSpeedInput(2);
- 
-  await AtAudioView.seePlaybackSpeed(2);
+    AtAudioView.setPlaybackSpeedInput(2);
 
-  I.say('Check the amplitude updates');
+    await AtAudioView.seePlaybackSpeed(2);
 
-  await AtAudioView.seeAmplitude(1);
+    I.say("Check the amplitude updates");
 
-  AtAudioView.setAmplitudeInput(2);
+    await AtAudioView.seeAmplitude(1);
 
-  await AtAudioView.seeAmplitude(2);
+    AtAudioView.setAmplitudeInput(2);
 
-  I.say('Check can be played');
+    await AtAudioView.seeAmplitude(2);
 
-  await AtAudioView.seeIsPlaying(false);
+    I.say("Check can be played");
 
-  AtAudioView.clickPlayButton();
+    await AtAudioView.seeIsPlaying(false);
 
-  await AtAudioView.seeIsPlaying(true);
+    AtAudioView.clickPlayButton();
 
-  I.say('Check can be paused');
+    await AtAudioView.seeIsPlaying(true);
 
-  AtAudioView.clickPauseButton();
+    I.say("Check can be paused");
 
-  await AtAudioView.seeIsPlaying(false);
+    AtAudioView.clickPauseButton();
 
-  I.say('Check the waveform can be zoomed without error');
+    await AtAudioView.seeIsPlaying(false);
 
-  await AtAudioView.zoomToPoint(-120);
+    I.say("Check the waveform can be zoomed without error");
 
-  await doNotSeeErrors();
-});
+    await AtAudioView.zoomToPoint(-120);
+
+    await doNotSeeErrors();
+  },
+);

@@ -1,11 +1,11 @@
 import { inject, observer } from "mobx-react";
 import React from "react";
+import { Elem } from "../../utils/bem";
 import { Button } from "./Button/Button";
 import { Checkbox } from "./Checkbox/Checkbox";
 import { Dropdown } from "./Dropdown/Dropdown";
 import { Menu } from "./Menu/Menu";
 import { Tooltip } from "./Tooltip/Tooltip";
-import { Elem } from "../../utils/bem";
 
 const injector = inject(({ store }) => {
   return {
@@ -28,7 +28,11 @@ const FieldsMenu = observer(
     };
 
     return (
-      <Menu size="small" selectedKeys={selected ? [selected] : ["none"]} closeDropdownOnItemClick={false}>
+      <Menu
+        size="small"
+        selectedKeys={selected ? [selected] : ["none"]}
+        closeDropdownOnItemClick={false}
+      >
         {onReset &&
           MenuItem(
             {
@@ -46,7 +50,8 @@ const FieldsMenu = observer(
                 {col.children.map((col) => MenuItem(col, () => onClick?.(col)))}
               </Menu.Group>
             );
-          } else if (!col.parent) {
+          }
+          if (!col.parent) {
             return MenuItem(col, () => onClick?.(col));
           }
 
@@ -98,7 +103,7 @@ export const FieldsButton = injector(
 
     return (
       <Dropdown.Trigger
-        content={(
+        content={
           <FieldsMenu
             columns={filter ? columns.filter(filter) : columns}
             WrapperComponent={wrapper}
@@ -107,16 +112,14 @@ export const FieldsButton = injector(
             selected={selected}
             resetTitle={resetTitle}
           />
-        )}
+        }
         style={{
           maxHeight: 280,
-          overflow: 'auto',
+          overflow: "auto",
         }}
       >
         {tooltip ? (
-          <Elem name={'field-button'}
-            style={{ zIndex: 1000 }}
-          >
+          <Elem name={"field-button"} style={{ zIndex: 1000 }}>
             <Tooltip title={tooltip} theme={tooltipTheme}>
               {renderButton()}
             </Tooltip>

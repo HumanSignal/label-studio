@@ -64,8 +64,12 @@ export const Button = forwardRef(
             </Elem>
           )}
           {isDefined(iconElem) && isDefined(children) ? (
-            <Elem tag="span" name="content">{children}</Elem>
-          ) : (children ?? null)}
+            <Elem tag="span" name="content">
+              {children}
+            </Elem>
+          ) : (
+            children ?? null
+          )}
           {isDefined(extra) ? <Elem name="extra">{extra}</Elem> : null}
         </>
       </Block>

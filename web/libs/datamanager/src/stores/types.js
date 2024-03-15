@@ -23,7 +23,10 @@ export const CustomJSON = types.custom({
 
 export const StringOrNumber = types.union(types.string, types.number);
 
-export const StringOrNumberID = types.union(types.identifier, types.identifierNumber);
+export const StringOrNumberID = types.union(
+  types.identifier,
+  types.identifierNumber,
+);
 
 export const CustomCalback = types.custom({
   name: "callback",

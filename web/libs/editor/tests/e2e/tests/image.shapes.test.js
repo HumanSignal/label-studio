@@ -7,20 +7,20 @@ const {
   polygonKonva,
   dragKonva,
   serialize,
-} = require('./helpers');
+} = require("./helpers");
 
-const assert = require('assert');
+const assert = require("node:assert");
 
-Feature('Test Image object');
+Feature("Test Image object");
 
-const getConfigWithShape = (shape, props = '') => `
+const getConfigWithShape = (shape, props = "") => `
   <View>
     <Image name="img" value="$image" />
     <${shape} ${props} name="tag" toName="img" />
   </View>`;
 
 const IMAGE =
-  'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
+  "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
 
 // precalculated image size on the screen; may change because of different reasons
 const WIDTH = 706;
@@ -28,13 +28,13 @@ const HEIGHT = 882;
 const convertToImageSize = getSizeConvertor(WIDTH, HEIGHT);
 
 const annotationEmpty = {
-  id: '1000',
+  id: "1000",
   result: [],
 };
 
 const shapes = [
   {
-    shape: 'KeyPoint',
+    shape: "KeyPoint",
     props: 'strokeWidth="5"',
     action: clickKonva,
     regions: [
@@ -49,7 +49,7 @@ const shapes = [
     ],
   },
   {
-    shape: 'Polygon',
+    shape: "Polygon",
     action: polygonKonva,
     regions: [
       {
@@ -91,7 +91,7 @@ const shapes = [
     ],
   },
   {
-    shape: 'Rectangle',
+    shape: "Rectangle",
     action: dragKonva,
     regions: [
       {
@@ -105,12 +105,18 @@ const shapes = [
     ],
   },
   {
-    shape: 'Ellipse',
+    shape: "Ellipse",
     action: dragKonva,
     regions: [
       {
         params: [300, 300, 50, 50],
-        result: { radiusX: 50, radiusY: 50, rotation: 0, x: 300, y: 300 },
+        result: {
+          radiusX: 50,
+          radiusY: 50,
+          rotation: 0,
+          x: 300,
+          y: 300,
+        },
       },
       {
         // @todo Ellipse behave differently depending on direction of drawing
@@ -118,14 +124,20 @@ const shapes = [
         // and it moves center after the cursor on left-up movement
         // @todo looks like a bug
         params: [230, 300, -50, -30],
-        result: { radiusX: 50, radiusY: 30, rotation: 0, x: 180, y: 270 },
+        result: {
+          radiusX: 50,
+          radiusY: 30,
+          rotation: 0,
+          x: 180,
+          y: 270,
+        },
       },
     ],
   },
 ];
 
 // eslint-disable-next-line no-undef,codeceptjs/no-skipped-tests
-xScenario('Simple shapes on Image', async function({ I, AtImageView, AtSidebar }) {
+xScenario("Simple shapes on Image", async ({ I, AtImageView, AtSidebar }) => {
   for (const shape of shapes) {
     const params = {
       config: getConfigWithShape(shape.shape, shape.props),
@@ -133,7 +145,7 @@ xScenario('Simple shapes on Image', async function({ I, AtImageView, AtSidebar }
       annotations: [annotationEmpty],
     };
 
-    I.amOnPage('/');
+    I.amOnPage("/");
     await I.executeScript(initLabelStudio, params);
     // canvas won't be initialized fully before the image loads
     await I.executeScript(waitForImage);
@@ -151,7 +163,10 @@ xScenario('Simple shapes on Image', async function({ I, AtImageView, AtSidebar }
 
     for (let i = 0; i < shape.regions.length; i++) {
       assert.equal(result[i].type, shape.shape.toLowerCase());
-      assert.deepEqual(convertToFixed(result[i].value), convertToImageSize(shape.regions[i].result));
+      assert.deepEqual(
+        convertToFixed(result[i].value),
+        convertToImageSize(shape.regions[i].result),
+      );
     }
   }
 });

@@ -32,7 +32,7 @@ export const Checkbox = ({
       />
       <span
         className={rootClass.elem("check").mod({ checked, indeterminate })}
-      ></span>
+      />
     </span>
   );
 

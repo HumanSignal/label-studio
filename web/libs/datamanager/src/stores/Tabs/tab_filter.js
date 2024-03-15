@@ -1,14 +1,14 @@
 import { flow, getParent, getRoot, types } from "mobx-state-tree";
 import { toStudlyCaps } from "strman";
-import * as Filters from "../../components/Filters/types";
 import * as CellViews from "../../components/CellViews";
+import * as Filters from "../../components/Filters/types";
 import { allowedFilterOperations } from "../../components/Filters/types/Utility";
 import { debounce } from "../../utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
 import {
   FilterValueRange,
   FilterValueType,
-  TabFilterType
+  TabFilterType,
 } from "./tab_filter_type";
 
 const operatorNames = Array.from(
@@ -77,7 +77,8 @@ export const TabFilter = types
 
       if (!isDefined(value) || isBlank(value)) {
         return false;
-      } else if (FilterValueRange.is(value)) {
+      }
+      if (FilterValueRange.is(value)) {
         return isDefined(value.min) && isDefined(value.max);
       }
 
@@ -168,7 +169,7 @@ export const TabFilter = types
       self.view.deleteFilter(self);
     },
 
-    save: flow(function * (force = false) {
+    save: flow(function* (force = false) {
       const isValid = self.isValidFilter;
 
       if (force !== true) {
@@ -210,6 +211,7 @@ export const TabFilter = types
     saveDelayed: debounce(() => {
       self.save();
     }, 300),
-  })).preProcessSnapshot((sn) => {
+  }))
+  .preProcessSnapshot((sn) => {
     return { ...sn, value: sn.value ?? null };
   });

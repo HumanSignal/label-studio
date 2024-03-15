@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React, { type FC } from "react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import Input from '../../common/Input/Input';
+import Input from "../../common/Input/Input";
 
 interface FilterInputInterface {
   value: string | number | undefined;
@@ -29,12 +29,12 @@ export const FilterInput: FC<FilterInputInterface> = ({
 
   return (
     <Input
-      size='small'
+      size="small"
       type={type}
-      value={value ?? ''}
+      value={value ?? ""}
       ref={inputRef}
       placeholder={placeholder}
-      data-testid={'filter-input'}
+      data-testid={"filter-input"}
       onChange={onChangeHandler}
       style={style}
       {...(schema ?? {})}

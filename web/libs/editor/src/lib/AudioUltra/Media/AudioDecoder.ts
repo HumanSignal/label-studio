@@ -1,10 +1,13 @@
-import { AudioDecoderWorker, getAudioDecoderWorker } from '@martel/audio-file-decoder';
+import {
+  type AudioDecoderWorker,
+  getAudioDecoderWorker,
+} from "@martel/audio-file-decoder";
 // eslint-disable-next-line
 // @ts-ignore
-import DecodeAudioWasm from '@martel/audio-file-decoder/decode-audio.wasm';
-import { BaseAudioDecoder } from './BaseAudioDecoder';
-import { clamp, info } from '../Common/Utils';
-import { SplitChannel } from './SplitChannel';
+import DecodeAudioWasm from "@martel/audio-file-decoder/decode-audio.wasm";
+import { clamp, info } from "../Common/Utils";
+import { BaseAudioDecoder } from "./BaseAudioDecoder";
+import { SplitChannel } from "./SplitChannel";
 
 const DURATION_CHUNK_SIZE = 60 * 30; // 30 minutes
 
@@ -23,7 +26,9 @@ export class AudioDecoder extends BaseAudioDecoder {
    * 1hour 44.1kHz 1ch = 1 * 60 * 60 * 44100 * 1 = 79380000 samples -> 2 chunks (39690000 samples/chunk)
    */
   getTotalChunks() {
-    return Math.ceil((this._duration * this._channelCount) / DURATION_CHUNK_SIZE);
+    return Math.ceil(
+      (this._duration * this._channelCount) / DURATION_CHUNK_SIZE,
+    );
   }
 
   /**
@@ -43,7 +48,7 @@ export class AudioDecoder extends BaseAudioDecoder {
     if (this.worker) return;
     this.worker = await getAudioDecoderWorker(DecodeAudioWasm, arraybuffer);
 
-    info('decode:worker:ready', this.src);
+    info("decode:worker:ready", this.src);
   }
 
   /**
@@ -52,25 +57,32 @@ export class AudioDecoder extends BaseAudioDecoder {
   async decode(options?: { multiChannel?: boolean }): Promise<void> {
     // If the worker has cached data we can skip the decode step
     if (this.sourceDecoded) {
-      info('decode:cached', this.src);
+      info("decode:cached", this.src);
       return;
     }
     if (this.sourceDecodeCancelled) {
-      throw new Error('AudioDecoder: Worker decode cancelled and contains no data, did you call decoder.renew()?');
+      throw new Error(
+        "AudioDecoder: Worker decode cancelled and contains no data, did you call decoder.renew()?",
+      );
     }
     // The decoding process is already in progress, so wait for it to finish
     if (this.decodingPromise) {
-      info('decode:inprogress', this.src);
+      info("decode:inprogress", this.src);
       return this.decodingPromise;
     }
-    if (!this.worker) throw new Error('AudioDecoder: Worker not initialized, did you call decoder.init()?');
+    if (!this.worker)
+      throw new Error(
+        "AudioDecoder: Worker not initialized, did you call decoder.init()?",
+      );
 
-    info('decode:start', this.src);
+    info("decode:start", this.src);
 
     // Generate a unique id for this decode operation
     this.decodeId = Date.now();
     // This is a shared promise which will be observed by all instances of the same source
-    this.decodingPromise = new Promise(resolve => (this.decodingResolve = resolve as any));
+    this.decodingPromise = new Promise(
+      (resolve) => (this.decodingResolve = resolve as any),
+    );
 
     let splitChannels: SplitChannel | undefined = undefined;
 
@@ -84,15 +96,18 @@ export class AudioDecoder extends BaseAudioDecoder {
       const totalChunks = this.getTotalChunks();
       const chunkIterator = this.chunkDecoder(options);
 
-      splitChannels = this._channelCount > 1 ? new SplitChannel(this._channelCount) : undefined;
+      splitChannels =
+        this._channelCount > 1
+          ? new SplitChannel(this._channelCount)
+          : undefined;
 
       const chunks = Array.from({ length: this._channelCount }).map(
         () => Array.from({ length: totalChunks }) as Float32Array[],
       );
 
-      info('decode:chunk:start', this.src, chunkIndex, totalChunks);
+      info("decode:chunk:start", this.src, chunkIndex, totalChunks);
 
-      this.invoke('progress', [0, totalChunks]);
+      this.invoke("progress", [0, totalChunks]);
 
       // Work through the chunks of the file in a generator until done.
       // Allow this to be interrupted at any time safely.
@@ -111,7 +126,8 @@ export class AudioDecoder extends BaseAudioDecoder {
             if (this._channelCount === 1) {
               chunks[0][chunkIndex] = value;
             } else {
-              if (!splitChannels) throw new Error('AudioDecoder: splitChannels not initialized');
+              if (!splitChannels)
+                throw new Error("AudioDecoder: splitChannels not initialized");
 
               // Multiple channels, split the data into separate channels within a web worker
               // This is done to avoid blocking the UI thread
@@ -125,9 +141,9 @@ export class AudioDecoder extends BaseAudioDecoder {
             }
           }
 
-          this.invoke('progress', [chunkIndex + 1, totalChunks]);
+          this.invoke("progress", [chunkIndex + 1, totalChunks]);
 
-          info('decode:chunk:process', this.src, chunkIndex, totalChunks);
+          info("decode:chunk:process", this.src, chunkIndex, totalChunks);
 
           chunkIndex++;
         }
@@ -139,7 +155,7 @@ export class AudioDecoder extends BaseAudioDecoder {
 
       this.chunks = chunks;
 
-      info('decode:complete', this.src);
+      info("decode:complete", this.src);
     } finally {
       splitChannels?.destroy();
       this.dispose();
@@ -153,7 +169,7 @@ export class AudioDecoder extends BaseAudioDecoder {
     if (this.worker) {
       this.worker.dispose();
       this.worker = undefined;
-      info('decode:worker:disposed', this.src);
+      info("decode:worker:disposed", this.src);
     }
 
     this.cleanupResolvers();
@@ -164,7 +180,9 @@ export class AudioDecoder extends BaseAudioDecoder {
    * Do the work withing Web Worker to avoid blocking the UI.
    * Allow the work to be interrupted so that the worker can be disposed at any time safely.
    */
-  private *chunkDecoder(options?: { multiChannel?: boolean }): Generator<Promise<Float32Array | null> | null> {
+  private *chunkDecoder(options?: {
+    multiChannel?: boolean;
+  }): Generator<Promise<Float32Array | null> | null> {
     if (!this.worker || this.sourceDecodeCancelled) return null;
 
     const totalDuration = this.worker.duration;
@@ -180,7 +198,11 @@ export class AudioDecoder extends BaseAudioDecoder {
       yield new Promise((resolve, reject) => {
         if (!this.worker || this.sourceDecodeCancelled) return resolve(null);
 
-        const nextChunkDuration = clamp(totalDuration - durationOffset, 0, this.getChunkDuration());
+        const nextChunkDuration = clamp(
+          totalDuration - durationOffset,
+          0,
+          this.getChunkDuration(),
+        );
         const currentOffset = durationOffset;
 
         durationOffset += nextChunkDuration;

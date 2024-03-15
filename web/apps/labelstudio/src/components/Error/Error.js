@@ -1,15 +1,25 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
-import sanitizeHtml from 'sanitize-html';
-import { LsSlack } from '../../assets/icons';
-import { Block, Elem } from '../../utils/bem';
-import { absoluteURL, copyText } from '../../utils/helpers';
-import { Button } from '../Button/Button';
-import { Space } from '../Space/Space';
+import React, { Fragment, useCallback, useMemo, useState } from "react";
+import sanitizeHtml from "sanitize-html";
+import { LsSlack } from "../../assets/icons";
+import { Block, Elem } from "../../utils/bem";
+import { absoluteURL, copyText } from "../../utils/helpers";
+import { Button } from "../Button/Button";
+import { Space } from "../Space/Space";
 import "./Error.styl";
 
 const SLACK_INVITE_URL = "https://slack.labelstud.io/?source=product-error-msg";
 
-export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, version, onGoBack, onReload, possum = false}) => {
+export const ErrorWrapper = ({
+  title,
+  message,
+  errorId,
+  stacktrace,
+  validation,
+  version,
+  onGoBack,
+  onReload,
+  possum = false,
+}) => {
   const preparedStackTrace = useMemo(() => {
     return (stacktrace ?? "").trim();
   }, [stacktrace]);
@@ -34,24 +44,27 @@ export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, v
         />
       )}
 
-      {title && (
-        <Elem name="title">{title}</Elem>
-      )}
+      {title && <Elem name="title">{title}</Elem>}
 
       {message && (
-        <Elem name="detail" dangerouslySetInnerHTML={{
-          __html: sanitizeHtml(String(message)),
-        }}/>
+        <Elem
+          name="detail"
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(String(message)),
+          }}
+        />
       )}
 
       {preparedStackTrace && (
-        <Elem name="stracktrace" dangerouslySetInnerHTML={{
-          __html: sanitizeHtml(preparedStackTrace.replace(/(\n)/g, '<br>')),
-        }}/>
+        <Elem
+          name="stracktrace"
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(preparedStackTrace.replace(/(\n)/g, "<br>")),
+          }}
+        />
       )}
 
-
-      {(validation?.length > 0) && (
+      {validation?.length > 0 && (
         <Elem tag="ul" name="validation">
           {validation.map(([field, errors]) => (
             <Fragment key={field}>
@@ -60,7 +73,9 @@ export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, v
                   tag="li"
                   key={i}
                   name="message"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }}
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(err),
+                  }}
                 />
               ))}
             </Fragment>
@@ -79,23 +94,31 @@ export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, v
 
       <Elem name="actions">
         <Space spread>
-          <Elem tag={Button} name="action-slack" target="_blank" icon={<LsSlack/>} href={SLACK_INVITE_URL}>
+          <Elem
+            tag={Button}
+            name="action-slack"
+            target="_blank"
+            icon={<LsSlack />}
+            href={SLACK_INVITE_URL}
+          >
             Ask on Slack
           </Elem>
 
           <Space size="small">
-            {preparedStackTrace && <Button disabled={copied} onClick={copyStacktrace} style={{width: 180}}>
-              {copied ? "Copied" : "Copy Stacktrace"}
-            </Button>}
+            {preparedStackTrace && (
+              <Button
+                disabled={copied}
+                onClick={copyStacktrace}
+                style={{ width: 180 }}
+              >
+                {copied ? "Copied" : "Copy Stacktrace"}
+              </Button>
+            )}
             {onGoBack && <Button onClick={onGoBack}>Go Back</Button>}
             {onReload && <Button onClick={onReload}>Reload</Button>}
           </Space>
         </Space>
       </Elem>
-
     </Block>
   );
 };
-
-
-

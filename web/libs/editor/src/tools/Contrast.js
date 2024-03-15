@@ -1,14 +1,14 @@
-import React from 'react';
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import BaseTool from './Base';
-import Constants from '../core/Constants';
-import ToolMixin from '../mixins/Tool';
+import Constants from "../core/Constants";
+import ToolMixin from "../mixins/Tool";
+import BaseTool from "./Base";
 
-import { Tool } from '../components/Toolbar/Tool';
-import { Range } from '../common/Range/Range';
-import { IconContrastTool } from '../assets/icons';
+import { IconContrastTool } from "../assets/icons";
+import { Range } from "../common/Range/Range";
+import { Tool } from "../components/Toolbar/Tool";
 
 const ToolView = observer(({ item }) => {
   return (
@@ -23,11 +23,15 @@ const ToolView = observer(({ item }) => {
           align="vertical"
           reverse
           continuous
-          minIcon={<IconContrastTool style={{ width: 22, height: 22, opacity: 0.2 }}/>}
-          maxIcon={<IconContrastTool style={{ width: 22, height: 22, opacity: 0.8 }}/>}
+          minIcon={
+            <IconContrastTool style={{ width: 22, height: 22, opacity: 0.2 }} />
+          }
+          maxIcon={
+            <IconContrastTool style={{ width: 22, height: 22, opacity: 0.8 }} />
+          }
           value={item.contrast}
           max={Constants.CONTRAST_MAX}
-          onChange={val => {
+          onChange={(val) => {
             item.setStroke(val);
           }}
         />,
@@ -38,15 +42,15 @@ const ToolView = observer(({ item }) => {
 });
 
 const _Tool = types
-  .model('ContrastTool', {
+  .model("ContrastTool", {
     contrast: types.optional(types.number, Constants.CONTRAST_VALUE),
   })
-  .views(self => ({
+  .views((self) => ({
     get viewClass() {
       return () => <ToolView item={self} />;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     setStroke(val) {
       self.contrast = val;
       self.obj.setContrastGrade(val);

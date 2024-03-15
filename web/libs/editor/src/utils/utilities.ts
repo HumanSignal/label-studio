@@ -1,6 +1,6 @@
-import { formatDistanceToNow } from 'date-fns';
-import { destroy, detach } from 'mobx-state-tree';
-import { toCamelCase } from 'strman';
+import { formatDistanceToNow } from "date-fns";
+import { destroy, detach } from "mobx-state-tree";
+import { toCamelCase } from "strman";
 
 /**
  * Internal helper to check if parameter is a string
@@ -8,7 +8,7 @@ import { toCamelCase } from 'strman';
  * @returns {boolean}
  */
 export const isString = (value: any): value is string => {
-  return typeof value === 'string' || value instanceof String;
+  return typeof value === "string" || value instanceof String;
 };
 
 /**
@@ -50,10 +50,11 @@ export const isStringJSON = (value: string) => {
  */
 export function getUrl(i: number, text: string) {
   const stringToTest = text.slice(i);
-  const myRegexp = /^(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/g; // eslint-disable-line no-useless-escape
+  const myRegexp =
+    /^(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/g; // eslint-disable-line no-useless-escape
   const match = myRegexp.exec(stringToTest);
 
-  return match && match.length ? match[1] : '';
+  return match?.length ? match[1] : "";
 }
 
 /**
@@ -62,8 +63,8 @@ export function getUrl(i: number, text: string) {
  * @param {boolean} [relative=true] - Whether relative urls are good or nood
  */
 export function isValidObjectURL(str: string, relative = false) {
-  if (typeof str !== 'string') return false;
-  if (relative && str.startsWith('/')) return true;
+  if (typeof str !== "string") return false;
+  if (relative && str.startsWith("/")) return true;
   return /^https?:\/\//.test(str);
 }
 
@@ -74,22 +75,24 @@ export function isValidObjectURL(str: string, relative = false) {
  * @returns {string}
  */
 export function toTimeString(ms: number) {
-  if (typeof ms === 'number') {
+  if (typeof ms === "number") {
     return new Date(ms).toUTCString().match(/(\d\d:\d\d:\d\d)/)?.[0];
   }
 }
 
 export function flatten(arr: any[]): any[] {
-  return arr.reduce<any>(function(flat, toFlatten) {
-    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
-  }, []);
+  return arr.reduce<any>(
+    (flat, toFlatten) =>
+      flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten),
+    [],
+  );
 }
 
 export function hashCode(str: string) {
   let hash = 0;
 
   if (str.length === 0) {
-    return hash + '';
+    return `${hash}`;
   }
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -97,18 +100,16 @@ export function hashCode(str: string) {
     hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
-  return hash + '';
+  return `${hash}`;
 }
 
 export function atobUnicode(str: string) {
   // Going backwards: from bytestream, to percent-encoding, to original string.
   return decodeURIComponent(
     atob(str)
-      .split('')
-      .map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join(''),
+      .split("")
+      .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+      .join(""),
   );
 }
 
@@ -117,12 +118,12 @@ export function atobUnicode(str: string) {
  * @param {string} unsafe
  */
 export function escapeHtml(unsafe: string) {
-  return (unsafe ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return (unsafe ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 /**
@@ -132,7 +133,10 @@ export function escapeHtml(unsafe: string) {
  * @param {T[]} arr2 array 2
  */
 export function isArraysEqual(arr1: any[], arr2: any[]) {
-  return arr1.length === arr2.length && arr1.every((value, index) => arr2[index] === value);
+  return (
+    arr1.length === arr2.length &&
+    arr1.every((value, index) => arr2[index] === value)
+  );
 }
 
 /**
@@ -146,7 +150,7 @@ export function wrapArray(value: any[]) {
 }
 
 export function delay(ms = 0) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export const isDefined = <T>(value: T | null | undefined): value is T => {
@@ -173,12 +177,16 @@ export function clamp(x: number, min: number, max: number) {
   return Math.min(max, Math.max(min, x));
 }
 
-export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => {
+export const chunks = <T extends any[]>(
+  source: T,
+  chunkSize: number,
+): T[][] => {
   const result = [];
-  let i,j;
+  let i;
+  let j;
 
-  for (i = 0,j = source.length; i < j; i += chunkSize) {
-    result.push(source.slice(i,i + chunkSize));
+  for (i = 0, j = source.length; i < j; i += chunkSize) {
+    result.push(source.slice(i, i + chunkSize));
   }
 
   return result;
@@ -187,9 +195,12 @@ export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => 
 export const userDisplayName = (user: Record<string, string> = {}) => {
   const { firstName, lastName } = user;
 
-  return (firstName || lastName)
-    ? [firstName, lastName].filter(n => !!n).join(' ').trim()
-    : (user.username || user.email);
+  return firstName || lastName
+    ? [firstName, lastName]
+        .filter((n) => !!n)
+        .join(" ")
+        .trim()
+    : user.username || user.email;
 };
 
 /**
@@ -203,13 +214,14 @@ export const emailFromCreatedBy = (createdBy: string) => {
 };
 
 export const camelizeKeys = (object: any): Record<string, unknown> => {
-  return Object.fromEntries(Object.entries(object).map(([key, value]) => {
-    if (Object.prototype.toString.call(value) === '[object Object]') {
-      return [toCamelCase(key), camelizeKeys(value)];
-    } else {
+  return Object.fromEntries(
+    Object.entries(object).map(([key, value]) => {
+      if (Object.prototype.toString.call(value) === "[object Object]") {
+        return [toCamelCase(key), camelizeKeys(value)];
+      }
       return [toCamelCase(key), value];
-    }
-  }));
+    }),
+  );
 };
 
 export function minMax(items: number[]) {
@@ -222,20 +234,20 @@ export function minMax(items: number[]) {
 
 // Detects if current OS is macOS
 export function isMacOS() {
-  return navigator.platform.indexOf('Mac') > -1;
+  return navigator.platform.indexOf("Mac") > -1;
 }
 
 export const triggerResizeEvent = () => {
-  const event = new Event('resize');
+  const event = new Event("resize");
 
-  event.initEvent('resize', false, false);
+  event.initEvent("resize", false, false);
   window.dispatchEvent(event);
 };
 
 export const humanDateDiff = (date: string | number): string => {
   const fnsDate = formatDistanceToNow(new Date(date), { addSuffix: true });
 
-  if (fnsDate === 'less than a minute ago') return 'just now';
+  if (fnsDate === "less than a minute ago") return "just now";
   return fnsDate;
 };
 
@@ -257,5 +269,8 @@ export const fixMobxObserve = (..._toObserve: any[]) => {};
  * @returns {object[]} sorted list of annotations
  */
 export const sortAnnotations = (annotations: any[]) => {
-  return annotations.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+  return annotations.sort(
+    (a, b) =>
+      new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime(),
+  );
 };

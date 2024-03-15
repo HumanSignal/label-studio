@@ -51,7 +51,7 @@ class _Registry {
   getViewByModel(modelName: string) {
     const view = this.views_models[modelName];
 
-    if (!view) throw new Error('No view for model: ' + modelName);
+    if (!view) throw new Error(`No view for model: ${modelName}`);
 
     return view;
   }
@@ -66,7 +66,7 @@ class _Registry {
     if (!available) return [];
     if (value) {
       for (const model of available) {
-        if (model.detectByValue && model.detectByValue(value)) return [model];
+        if (model.detectByValue?.(value)) return [model];
       }
     }
     return available.filter((a: { detectByValue: any }) => !a.detectByValue);
@@ -78,7 +78,11 @@ class _Registry {
     if (!model) {
       const models = Object.keys(this.tools);
 
-      throw new Error('No model registered for tool: ' + name + '\nAvailable models:\n\t' + models.join('\n\t'));
+      throw new Error(
+        `No model registered for tool: ${name}\nAvailable models:\n\t${models.join(
+          "\n\t",
+        )}`,
+      );
     }
 
     return model;
@@ -95,7 +99,11 @@ class _Registry {
     if (!model) {
       const models = Object.keys(this.models);
 
-      throw new Error('No model registered for tag: ' + tag + '\nAvailable models:\n\t' + models.join('\n\t'));
+      throw new Error(
+        `No model registered for tag: ${tag}\nAvailable models:\n\t${models.join(
+          "\n\t",
+        )}`,
+      );
     }
 
     return model;

@@ -42,7 +42,10 @@ const switchInjector = inject(({ store }) => {
 
 const ProjectSummary = summaryInjector((props) => {
   return (
-    <Space size="large" style={{ paddingRight: "1em", color: "rgba(0,0,0,0.3)" }}>
+    <Space
+      size="large"
+      style={{ paddingRight: "1em", color: "rgba(0,0,0,0.3)" }}
+    >
       {props.cloudSync && (
         <Space
           size="small"
@@ -65,39 +68,41 @@ const ProjectSummary = summaryInjector((props) => {
   );
 });
 
-const TabsSwitch = switchInjector(observer(({ sdk, views, tabs, selectedKey }) => {
-  const editable = sdk.tabControls;
+const TabsSwitch = switchInjector(
+  observer(({ sdk, views, tabs, selectedKey }) => {
+    const editable = sdk.tabControls;
 
-  return (
-    <Tabs
-      activeTab={selectedKey}
-      onAdd={() => views.addView({ reload: false })}
-      onChange={(key) => views.setSelected(key)}
-      tabBarExtraContent={<ProjectSummary />}
-      addIcon={<LSPlus />}
-      allowedActions={editable}
-    >
-      {tabs.map((tab) => (
-        <TabsItem
-          key={tab.key}
-          tab={tab.key}
-          title={tab.title}
-          onFinishEditing={(title) => {
-            tab.setTitle(title);
-            tab.save();
-          }}
-          onDuplicate={() => tab.parent.duplicateView(tab)}
-          onClose={() => tab.parent.deleteView(tab)}
-          onSave={()=> tab.virtual && tab.saveVirtual()}
-          active={tab.key === selectedKey}
-          editable={tab.editable}
-          deletable={tab.deletable}
-          virtual={tab.virtual}
-        />
-      ))}
-    </Tabs>
-  );
-}));
+    return (
+      <Tabs
+        activeTab={selectedKey}
+        onAdd={() => views.addView({ reload: false })}
+        onChange={(key) => views.setSelected(key)}
+        tabBarExtraContent={<ProjectSummary />}
+        addIcon={<LSPlus />}
+        allowedActions={editable}
+      >
+        {tabs.map((tab) => (
+          <TabsItem
+            key={tab.key}
+            tab={tab.key}
+            title={tab.title}
+            onFinishEditing={(title) => {
+              tab.setTitle(title);
+              tab.save();
+            }}
+            onDuplicate={() => tab.parent.duplicateView(tab)}
+            onClose={() => tab.parent.deleteView(tab)}
+            onSave={() => tab.virtual && tab.saveVirtual()}
+            active={tab.key === selectedKey}
+            editable={tab.editable}
+            deletable={tab.deletable}
+            virtual={tab.virtual}
+          />
+        ))}
+      </Tabs>
+    );
+  }),
+);
 
 export const DataManager = injector(({ shrinkWidth }) => {
   return (

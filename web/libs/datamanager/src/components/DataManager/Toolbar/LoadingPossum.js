@@ -10,5 +10,5 @@ const injector = inject(({ store }) => {
 });
 
 export const LoadingPossum = injector(({ loading }) => {
-  return <Spinner size="small" visible={loading}/>;
+  return <Spinner size="small" visible={loading} />;
 });

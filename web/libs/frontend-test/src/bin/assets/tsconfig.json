@@ -11,11 +11,6 @@
       "./node_modules/@types"
     ]
   },
-  "exclude": [
-    "./node_modules"
-  ],
-  "include": [
-    "**/*.ts",
-    "./node_modules/@heartexlabs/ls-test/**/*.ts"
-  ]
+  "exclude": ["./node_modules"],
+  "include": ["**/*.ts", "./node_modules/@heartexlabs/ls-test/**/*.ts"]
 }

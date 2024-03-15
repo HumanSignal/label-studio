@@ -5,8 +5,8 @@ import { Elem } from "../../../utils/bem";
 import { debounce } from "../../../utils/debounce";
 import { FilterDropdown } from "../FilterDropdown";
 import * as FilterInputs from "../types";
-import { allowedFilterOperations } from "../types/Utility";
 import { Common } from "../types/Common";
+import { allowedFilterOperations } from "../types/Utility";
 
 /** @typedef {{
  * type: keyof typeof FilterInputs,
@@ -20,7 +20,10 @@ import { Common } from "../types/Common";
 export const FilterOperation = observer(
   ({ filter, field, operator, value }) => {
     const cellView = filter.cellView;
-    const types = cellView?.customOperators ?? [...(FilterInputs[filter.filter.currentType] ?? FilterInputs.String), ...Common];
+    const types = cellView?.customOperators ?? [
+      ...(FilterInputs[filter.filter.currentType] ?? FilterInputs.String),
+      ...Common,
+    ];
 
     const selected = useMemo(() => {
       let result;
@@ -37,9 +40,12 @@ export const FilterOperation = observer(
       return result;
     }, [operator, types, filter]);
 
-    const saveFilter = useCallback(debounce(() => {
-      filter.save(true);
-    }, 300), [filter]);
+    const saveFilter = useCallback(
+      debounce(() => {
+        filter.save(true);
+      }, 300),
+      [filter],
+    );
 
     const onChange = (newValue) => {
       filter.setValue(newValue);
@@ -51,8 +57,14 @@ export const FilterOperation = observer(
     };
     const availableOperators = filter.cellView?.filterOperators;
     const Input = selected?.input;
-    const operatorList = allowedFilterOperations(types, getRoot(filter)?.SDK?.type);
-    const operators = operatorList.map(({ key, label }) => ({ value: key, label }));
+    const operatorList = allowedFilterOperations(
+      types,
+      getRoot(filter)?.SDK?.type,
+    );
+    const operators = operatorList.map(({ key, label }) => ({
+      value: key,
+      label,
+    }));
 
     return Input ? (
       <>
@@ -61,11 +73,13 @@ export const FilterOperation = observer(
             placeholder="Condition"
             value={filter.operator}
             disabled={types.length === 1}
-            items={(
+            items={
               availableOperators
-                ? operators.filter(op => availableOperators.includes(op.value))
+                ? operators.filter((op) =>
+                    availableOperators.includes(op.value),
+                  )
                 : operators
-            )}
+            }
             onChange={onOperatorSelected}
           />
         </Elem>

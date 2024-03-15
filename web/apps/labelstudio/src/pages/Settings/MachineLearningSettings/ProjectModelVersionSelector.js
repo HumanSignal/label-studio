@@ -1,8 +1,8 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { useAPI } from '../../../providers/ApiProvider';
-import { Button } from '../../../components';
-import { Form, Label, Select } from '../../../components/Form';
-import { ProjectContext } from '../../../providers/ProjectProvider';
+import { useCallback, useContext, useEffect, useState } from "react";
+import { Button } from "../../../components";
+import { Form, Label, Select } from "../../../components/Form";
+import { useAPI } from "../../../providers/ApiProvider";
+import { ProjectContext } from "../../../providers/ProjectProvider";
 
 export const ProjectModelVersionSelector = ({
   name = "model_version",
@@ -21,14 +21,17 @@ export const ProjectModelVersionSelector = ({
     setVersion(project?.[valueName] || null);
   }, [project?.[valueName], versions]);
 
-  const resetMLVersion = useCallback(async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const resetMLVersion = useCallback(
+    async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    await updateProject({
-      model_version: null,
-    });
-  }, [updateProject]);
+      await updateProject({
+        model_version: null,
+      });
+    },
+    [updateProject],
+  );
 
   const fetchMLVersions = useCallback(async () => {
     const pk = project?.id;
@@ -42,10 +45,18 @@ export const ProjectModelVersionSelector = ({
     });
 
     if (modelVersions) {
-      setVersions(Object.entries(modelVersions).reduce((v, [key, value]) => [...v, {
-        value: key,
-        label: `${key} (${value} predictions)`,
-      }], []));
+      setVersions(
+        Object.entries(modelVersions).reduce(
+          (v, [key, value]) => [
+            ...v,
+            {
+              value: key,
+              label: `${key} (${value} predictions)`,
+            },
+          ],
+          [],
+        ),
+      );
     }
 
     setLoading(false);
@@ -57,9 +68,10 @@ export const ProjectModelVersionSelector = ({
     <Form.Row columnCount={1}>
       <Label
         text="Model Version"
-        description={(
+        description={
           <>
-            Model version allows you to specify which prediction will be shown to the annotators.
+            Model version allows you to specify which prediction will be shown
+            to the annotators.
             {version && (
               <>
                 <br />
@@ -67,29 +79,33 @@ export const ProjectModelVersionSelector = ({
               </>
             )}
           </>
-        )}
+        }
         style={{ marginTop: 16 }}
         large
       />
 
-      <div style={{ display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          width: 400,
+          paddingLeft: 16,
+        }}
+      >
         <div style={{ flex: 1, paddingRight: 16 }}>
           <Select
             name={name}
             disabled={!versions.length}
             value={version}
-            onChange={e => setVersion(e.target.value)}
+            onChange={(e) => setVersion(e.target.value)}
             options={versions}
             placeholder={loading ? "Loading ..." : placeholder}
             {...props}
           />
         </div>
 
-        <Button onClick={resetMLVersion}>
-          Reset
-        </Button>
+        <Button onClick={resetMLVersion}>Reset</Button>
       </div>
     </Form.Row>
   );
 };
-

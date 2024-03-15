@@ -9,14 +9,17 @@ interface TransitionOptions {
 /**
  * Performs a transition on an element
  */
-export const aroundTransition = (element: HTMLElement, {
-  init,
-  transition,
-  onStart,
-  beforeTransition,
-  afterTransition,
-}: TransitionOptions = {}) => {
-  return new Promise<true>(async resolve => {
+export const aroundTransition = (
+  element: HTMLElement,
+  {
+    init,
+    transition,
+    onStart,
+    beforeTransition,
+    afterTransition,
+  }: TransitionOptions = {},
+) => {
+  return new Promise<true>(async (resolve) => {
     init?.(element);
 
     const onTransitionStarted = () => {
@@ -26,13 +29,13 @@ export const aroundTransition = (element: HTMLElement, {
     const onTransitionEnded = async () => {
       await afterTransition?.(element);
 
-      element.removeEventListener('transitionstart', onTransitionStarted);
-      element.removeEventListener('transitionend', onTransitionEnded);
+      element.removeEventListener("transitionstart", onTransitionStarted);
+      element.removeEventListener("transitionend", onTransitionEnded);
       resolve(true);
     };
 
-    element.addEventListener('transitionstart', onTransitionStarted);
-    element.addEventListener('transitionend', onTransitionEnded);
+    element.addEventListener("transitionstart", onTransitionStarted);
+    element.addEventListener("transitionend", onTransitionEnded);
 
     await beforeTransition?.(element);
 

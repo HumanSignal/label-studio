@@ -1,4 +1,13 @@
-import { Children, cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Children,
+  cloneElement,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { Block, Elem } from "../../utils/bem";
 import { alignElements } from "../../utils/dom";
@@ -19,19 +28,18 @@ export const Tooltip = forwardRef(
       defaultVisible ? "visible" : null,
     );
     const [injected, setInjected] = useState(false);
-    const [align, setAlign] = useState(alignment ?? 'top-center');
+    const [align, setAlign] = useState(alignment ?? "top-center");
 
     const calculatePosition = useCallback(() => {
       const parent = triggerElement.current;
       const target = tooltipElement.current;
 
       if (isDefined(parent) && isDefined(target)) {
-        const { left, top, align: resultAlign } = alignElements(
-          parent,
-          target,
-          align,
-          10,
-        );
+        const {
+          left,
+          top,
+          align: resultAlign,
+        } = alignElements(parent, target, align, 10);
 
         setOffset({ left, top });
         setAlign(resultAlign);
@@ -82,7 +90,7 @@ export const Tooltip = forwardRef(
           <Block
             ref={tooltipElement}
             name="tooltip"
-            mod={{align}}
+            mod={{ align }}
             mix={visibilityClasses}
             style={{ ...offset, ...(style ?? {}) }}
           >

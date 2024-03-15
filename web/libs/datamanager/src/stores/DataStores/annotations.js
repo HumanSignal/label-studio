@@ -20,7 +20,9 @@ export const create = (columns) => {
       const rootStore = getRoot(self);
 
       if (annotationID !== undefined) {
-        remoteTask = yield rootStore.apiCall("task", { taskID: annotationID });
+        remoteTask = yield rootStore.apiCall("task", {
+          taskID: annotationID,
+        });
       } else {
         remoteTask = yield rootStore.apiCall("nextTask", {
           projectID: getRoot(self).project.id,

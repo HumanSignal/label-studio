@@ -1,9 +1,9 @@
-import {
+import type {
   APIAnnotation,
   APIPrediction,
   APITask,
   LSFAnnotation,
-  LSFTaskData
+  LSFTaskData,
 } from "../types/Task";
 import { FF_LSDV_5035, isFF } from "../utils/feature-flags";
 

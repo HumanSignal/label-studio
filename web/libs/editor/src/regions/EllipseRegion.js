@@ -1,29 +1,32 @@
-import React, { Fragment, useContext } from 'react';
-import { Ellipse } from 'react-konva';
-import { getRoot, types } from 'mobx-state-tree';
+import { getRoot, types } from "mobx-state-tree";
+import React, { Fragment, useContext } from "react";
+import { Ellipse } from "react-konva";
 
-import Constants from '../core/Constants';
-import Registry from '../core/Registry';
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
+import Constants from "../core/Constants";
+import Registry from "../core/Registry";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
 
-import { ImageViewContext } from '../components/ImageView/ImageViewContext';
-import { LabelOnEllipse } from '../components/ImageView/LabelOnRegion';
-import { guidGenerator } from '../core/Helpers';
-import { useRegionStyles } from '../hooks/useRegionColor';
-import { AreaMixin } from '../mixins/AreaMixin';
-import { KonvaRegionMixin } from '../mixins/KonvaRegion';
-import { ImageModel } from '../tags/object/Image';
-import { rotateBboxCoords } from '../utils/bboxCoords';
-import { FF_DEV_3793, isFF } from '../utils/feature-flags';
-import { createDragBoundFunc } from '../utils/image';
-import { AliveRegion } from './AliveRegion';
-import { EditableRegion } from './EditableRegion';
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from '../components/ImageView/Image';
+import {
+  RELATIVE_STAGE_HEIGHT,
+  RELATIVE_STAGE_WIDTH,
+} from "../components/ImageView/Image";
+import { ImageViewContext } from "../components/ImageView/ImageViewContext";
+import { LabelOnEllipse } from "../components/ImageView/LabelOnRegion";
+import { guidGenerator } from "../core/Helpers";
+import { useRegionStyles } from "../hooks/useRegionColor";
+import { AreaMixin } from "../mixins/AreaMixin";
+import { KonvaRegionMixin } from "../mixins/KonvaRegion";
+import { ImageModel } from "../tags/object/Image";
+import { rotateBboxCoords } from "../utils/bboxCoords";
+import { FF_DEV_3793, isFF } from "../utils/feature-flags";
+import { createDragBoundFunc } from "../utils/image";
+import { AliveRegion } from "./AliveRegion";
+import { EditableRegion } from "./EditableRegion";
 
 const EllipseRegionAbsoluteCoordsDEV3793 = types
   .model({
-    coordstype: types.optional(types.enumeration(['px', 'perc']), 'perc'),
+    coordstype: types.optional(types.enumeration(["px", "perc"]), "perc"),
   })
   .volatile(() => ({
     relativeX: 0,
@@ -33,13 +36,13 @@ const EllipseRegionAbsoluteCoordsDEV3793 = types
     relativeRadiusX: 0,
     relativeRadiusY: 0,
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterCreate() {
       self.startX = self.x;
       self.startY = self.y;
 
       switch (self.coordstype) {
-        case 'perc': {
+        case "perc": {
           self.relativeX = self.x;
           self.relativeY = self.y;
           self.relativeRadiusX = self.radiusX;
@@ -48,11 +51,17 @@ const EllipseRegionAbsoluteCoordsDEV3793 = types
           self.relativeHeight = self.height;
           break;
         }
-        case 'px': {
+        case "px": {
           const { stageWidth, stageHeight } = self.parent;
 
           if (stageWidth && stageHeight) {
-            self.setPosition(self.x, self.y, self.radiusX, self.radiusY, self.rotation);
+            self.setPosition(
+              self.x,
+              self.y,
+              self.radiusX,
+              self.radiusY,
+              self.rotation,
+            );
           }
           break;
         }
@@ -69,8 +78,10 @@ const EllipseRegionAbsoluteCoordsDEV3793 = types
       self.relativeX = (x / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
       self.relativeY = (y / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
 
-      self.relativeRadiusX = (radiusX / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeRadiusY = (radiusY / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
+      self.relativeRadiusX =
+        (radiusX / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
+      self.relativeRadiusY =
+        (radiusY / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
 
       self.rotation = (rotation + 360) % 360;
     },
@@ -81,17 +92,17 @@ const EllipseRegionAbsoluteCoordsDEV3793 = types
       self.sw = sw;
       self.sh = sh;
 
-      if (self.coordstype === 'px') {
+      if (self.coordstype === "px") {
         self.x = (sw * self.relativeX) / RELATIVE_STAGE_WIDTH;
         self.y = (sh * self.relativeY) / RELATIVE_STAGE_HEIGHT;
         self.radiusX = (sw * self.relativeRadiusX) / RELATIVE_STAGE_WIDTH;
         self.radiusY = (sh * self.relativeRadiusY) / RELATIVE_STAGE_HEIGHT;
-      } else if (self.coordstype === 'perc') {
+      } else if (self.coordstype === "perc") {
         self.x = (sw * self.x) / RELATIVE_STAGE_WIDTH;
         self.y = (sh * self.y) / RELATIVE_STAGE_HEIGHT;
         self.radiusX = (sw * self.radiusX) / RELATIVE_STAGE_WIDTH;
         self.radiusY = (sh * self.radiusY) / RELATIVE_STAGE_HEIGHT;
-        self.coordstype = 'px';
+        self.coordstype = "px";
       }
     },
   }));
@@ -104,7 +115,7 @@ const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
-    type: 'ellipseregion',
+    type: "ellipseregion",
     object: types.late(() => types.reference(ImageModel)),
 
     x: types.number,
@@ -135,11 +146,11 @@ const Model = types
     hideable: true,
 
     editableFields: [
-      { property: 'x', label: 'X' },
-      { property: 'y', label: 'Y' },
-      { property: 'radiusX', label: 'Rx' },
-      { property: 'radiusY', label: 'Ry' },
-      { property: 'rotation', label: 'icon:angle' },
+      { property: "x", label: "X" },
+      { property: "y", label: "Y" },
+      { property: "radiusX", label: "Rx" },
+      { property: "radiusY", label: "Ry" },
+      { property: "rotation", label: "icon:angle" },
     ],
   }))
   .volatile(() => {
@@ -150,7 +161,7 @@ const Model = types
       supportsScale: true,
     };
   })
-  .views(self => ({
+  .views((self) => ({
     get store() {
       return getRoot(self);
     },
@@ -164,22 +175,35 @@ const Model = types
 
       if (self.rotation === 0) return bboxCoords;
 
-      return rotateBboxCoords(bboxCoords, self.rotation, { x: self.x, y: self.y }, self.parent.whRatio);
+      return rotateBboxCoords(
+        bboxCoords,
+        self.rotation,
+        { x: self.x, y: self.y },
+        self.parent.whRatio,
+      );
     },
     get canvasX() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.x) : self.x;
+      return isFF(FF_DEV_3793)
+        ? self.parent?.internalToCanvasX(self.x)
+        : self.x;
     },
     get canvasY() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.y) : self.y;
+      return isFF(FF_DEV_3793)
+        ? self.parent?.internalToCanvasY(self.y)
+        : self.y;
     },
     get canvasRadiusX() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.radiusX) : self.radiusX;
+      return isFF(FF_DEV_3793)
+        ? self.parent?.internalToCanvasX(self.radiusX)
+        : self.radiusX;
     },
     get canvasRadiusY() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.radiusY) : self.radiusY;
+      return isFF(FF_DEV_3793)
+        ? self.parent?.internalToCanvasY(self.radiusY)
+        : self.radiusY;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterCreate() {
       self.startX = self.x;
       self.startY = self.y;
@@ -200,11 +224,15 @@ const Model = types
       //going to system where our ellipse has angle 0 to X-Axis via rotate matrix
       const theta = self.rotation;
 
-      rel_x = rel_x * Math.cos(Math.unit(theta, 'deg')) - rel_y * Math.sin(Math.unit(theta, 'deg'));
-      rel_y = rel_x * Math.sin(Math.unit(theta, 'deg')) + rel_y * Math.cos(Math.unit(theta, 'deg'));
+      rel_x =
+        rel_x * Math.cos(Math.unit(theta, "deg")) -
+        rel_y * Math.sin(Math.unit(theta, "deg"));
+      rel_y =
+        rel_x * Math.sin(Math.unit(theta, "deg")) +
+        rel_y * Math.cos(Math.unit(theta, "deg"));
 
       if (Math.abs(rel_x) < a) {
-        if (Math.pow(rel_y, 2) < Math.pow(b, 2) * (1 - Math.pow(rel_x, 2) / Math.pow(a, 2))) {
+        if (rel_y ** 2 < b ** 2 * (1 - rel_x ** 2 / a ** 2)) {
           return true;
         }
       } else {
@@ -282,17 +310,21 @@ const Model = types
       const value = {
         x: isFF(FF_DEV_3793) ? self.x : self.convertXToPerc(self.x),
         y: isFF(FF_DEV_3793) ? self.y : self.convertYToPerc(self.y),
-        radiusX: isFF(FF_DEV_3793) ? self.radiusX : self.convertHDimensionToPerc(self.radiusX),
-        radiusY: isFF(FF_DEV_3793) ? self.radiusY : self.convertVDimensionToPerc(self.radiusY),
+        radiusX: isFF(FF_DEV_3793)
+          ? self.radiusX
+          : self.convertHDimensionToPerc(self.radiusX),
+        radiusY: isFF(FF_DEV_3793)
+          ? self.radiusY
+          : self.convertVDimensionToPerc(self.radiusY),
         rotation: self.rotation,
-      }; 
+      };
 
       return self.parent.createSerializedResult(self, value);
     },
   }));
 
 const EllipseRegionModel = types.compose(
-  'EllipseRegionModel',
+  "EllipseRegionModel",
   RegionsMixin,
   AreaMixin,
   NormalizationMixin,
@@ -317,7 +349,7 @@ const HtxEllipseView = ({ item, setShapeRef }) => {
       <Ellipse
         x={item.canvasX}
         y={item.canvasY}
-        ref={el => setShapeRef(el)}
+        ref={(el) => setShapeRef(el)}
         radiusX={item.canvasRadiusX}
         radiusY={item.canvasRadiusY}
         fill={regionStyles.fillColor}
@@ -334,48 +366,50 @@ const HtxEllipseView = ({ item, setShapeRef }) => {
         name={`${item.id} _transformable`}
         onTransform={({ target }) => {
           // resetting the skew makes transformations weird but predictable
-          target.setAttr('skewX', 0);
-          target.setAttr('skewY', 0);
+          target.setAttr("skewX", 0);
+          target.setAttr("skewY", 0);
         }}
-        onTransformEnd={e => {
+        onTransformEnd={(e) => {
           const t = e.target;
 
           item.setPosition(
-            t.getAttr('x'),
-            t.getAttr('y'),
-            t.getAttr('radiusX') * t.getAttr('scaleX'),
-            t.getAttr('radiusY') * t.getAttr('scaleY'),
-            t.getAttr('rotation'),
+            t.getAttr("x"),
+            t.getAttr("y"),
+            t.getAttr("radiusX") * t.getAttr("scaleX"),
+            t.getAttr("radiusY") * t.getAttr("scaleY"),
+            t.getAttr("rotation"),
           );
 
-          t.setAttr('scaleX', 1);
-          t.setAttr('scaleY', 1);
+          t.setAttr("scaleX", 1);
+          t.setAttr("scaleY", 1);
           item.notifyDrawingFinished();
         }}
-        onDragStart={e => {
+        onDragStart={(e) => {
           if (item.parent.getSkipInteractions()) {
             e.currentTarget.stopDrag(e.evt);
             return;
           }
           item.annotation.history.freeze(item.id);
         }}
-        onDragEnd={e => {
+        onDragEnd={(e) => {
           const t = e.target;
 
           item.setPosition(
-            t.getAttr('x'),
-            t.getAttr('y'),
-            t.getAttr('radiusX'),
-            t.getAttr('radiusY'),
-            t.getAttr('rotation'),
+            t.getAttr("x"),
+            t.getAttr("y"),
+            t.getAttr("radiusX"),
+            t.getAttr("radiusY"),
+            t.getAttr("rotation"),
           );
-          item.setScale(t.getAttr('scaleX'), t.getAttr('scaleY'));
+          item.setScale(t.getAttr("scaleX"), t.getAttr("scaleY"));
           item.annotation.history.unfreeze(item.id);
           item.notifyDrawingFinished();
         }}
-        dragBoundFunc={createDragBoundFunc(item, { x: item.x - item.bboxCoords.left, y: item.y - item.bboxCoords.top })}
+        dragBoundFunc={createDragBoundFunc(item, {
+          x: item.x - item.bboxCoords.left,
+          y: item.y - item.bboxCoords.top,
+        })}
         onMouseOver={() => {
-
           if (store.annotationStore.selected.relationMode) {
             item.setHighlight(true);
             stage.container().style.cursor = Constants.RELATION_MODE_CURSOR;
@@ -390,7 +424,7 @@ const HtxEllipseView = ({ item, setShapeRef }) => {
             item.setHighlight(false);
           }
         }}
-        onClick={e => {
+        onClick={(e) => {
           if (item.parent.getSkipInteractions()) return;
 
           if (store.annotationStore.selected.relationMode) {
@@ -403,14 +437,18 @@ const HtxEllipseView = ({ item, setShapeRef }) => {
         draggable={!item.isReadOnly()}
         listening={!suggestion}
       />
-      <LabelOnEllipse item={item} color={regionStyles.strokeColor} strokewidth={regionStyles.strokeWidth}/>
+      <LabelOnEllipse
+        item={item}
+        color={regionStyles.strokeColor}
+        strokewidth={regionStyles.strokeWidth}
+      />
     </Fragment>
   );
 };
 
 const HtxEllipse = AliveRegion(HtxEllipseView);
 
-Registry.addTag('ellipseregion', EllipseRegionModel, HtxEllipse);
-Registry.addRegionType(EllipseRegionModel, 'image');
+Registry.addTag("ellipseregion", EllipseRegionModel, HtxEllipse);
+Registry.addRegionType(EllipseRegionModel, "image");
 
 export { EllipseRegionModel, HtxEllipse };

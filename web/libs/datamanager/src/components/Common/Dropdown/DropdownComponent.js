@@ -28,7 +28,11 @@ export const Dropdown = React.forwardRef(
     const calculatePosition = React.useCallback(() => {
       const dropdownEl = dropdown.current;
       const parent = triggerRef?.current ?? dropdownEl.parentNode;
-      const { left, top } = alignElements(parent, dropdownEl, align ?? "bottom-left");
+      const { left, top } = alignElements(
+        parent,
+        dropdownEl,
+        align ?? "bottom-left",
+      );
 
       setOffset({ left, top });
     }, [triggerRef]);
@@ -121,9 +125,9 @@ export const Dropdown = React.forwardRef(
     const content =
       children.props && children.props.type === "Menu"
         ? React.cloneElement(children, {
-          ...children.props,
-          className: rootName.elem("menu").mix(children.props.className),
-        })
+            ...children.props,
+            className: rootName.elem("menu").mix(children.props.className),
+          })
         : children;
 
     const visibilityClasses = React.useMemo(() => {

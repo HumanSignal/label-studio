@@ -1,17 +1,18 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
-import { Block, Elem } from '../../../utils/bem';
+import type React from "react";
+import { type FC, useEffect, useRef, useState } from "react";
+import { Block, Elem } from "../../../utils/bem";
 
-import './Slider.styl';
-import { Info } from './Info';
+import { Info } from "./Info";
+import "./Slider.styl";
 
 export interface SliderProps {
   description?: string;
   info?: string;
-  max:number;
-  min:number;
-  value:number;
+  max: number;
+  min: number;
+  value: number;
   step?: number;
-  onChange:(e: React.FormEvent<HTMLInputElement>) => void;
+  onChange: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
 export const Slider: FC<SliderProps> = ({
@@ -24,7 +25,7 @@ export const Slider: FC<SliderProps> = ({
   onChange,
 }) => {
   const sliderRef = useRef<HTMLDivElement>();
-  const [valueError, setValueError] = useState<number|string|undefined>();
+  const [valueError, setValueError] = useState<number | string | undefined>();
 
   useEffect(() => {
     changeBackgroundSize();
@@ -32,7 +33,9 @@ export const Slider: FC<SliderProps> = ({
 
   const changeBackgroundSize = () => {
     if (sliderRef.current)
-      sliderRef.current.style.backgroundSize = ((value - min) * 100) / (max - min) + '% 100%';
+      sliderRef.current.style.backgroundSize = `${
+        ((value - min) * 100) / (max - min)
+      }% 100%`;
   };
 
   const handleChangeInputValue = (e: React.FormEvent<HTMLInputElement>) => {
@@ -47,14 +50,17 @@ export const Slider: FC<SliderProps> = ({
     }
 
     const noZero = e.currentTarget.value.match(/^\.[0-9]*$/);
-    const normalizedValue = noZero ? '0' + e.currentTarget.value : e.currentTarget.value;
+    const normalizedValue = noZero
+      ? `0${e.currentTarget.value}`
+      : e.currentTarget.value;
 
-    const newValue = parseFloat(normalizedValue);
+    const newValue = Number.parseFloat(normalizedValue);
 
-    if (isNaN(newValue)) {
+    if (Number.isNaN(newValue)) {
       setValueError(e.currentTarget.value);
       return;
-    } else if (newValue > max || newValue < min) {
+    }
+    if (newValue > max || newValue < min) {
       setValueError(newValue);
     } else {
       onChange(e);
@@ -72,7 +78,12 @@ export const Slider: FC<SliderProps> = ({
           name="input"
           tag="input"
           type="text"
-          mod={(valueError !== undefined && (typeof valueError === 'string' || valueError > max || valueError < min)) && { error: 'control' }}
+          mod={
+            valueError !== undefined &&
+            (typeof valueError === "string" ||
+              valueError > max ||
+              valueError < min) && { error: "control" }
+          }
           min={min}
           max={max}
           value={valueError === undefined ? value : valueError}

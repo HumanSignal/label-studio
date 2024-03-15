@@ -1,5 +1,5 @@
 import { TipsCollection } from "./content";
-import { Tip } from "./types";
+import type { Tip } from "./types";
 
 const STORE_KEY = "heidi_ignored_tips";
 
@@ -7,7 +7,9 @@ function getKey(collection: string) {
   return `${STORE_KEY}:${collection}`;
 }
 
-export function getRandomTip(collection: keyof typeof TipsCollection): Tip | null {
+export function getRandomTip(
+  collection: keyof typeof TipsCollection,
+): Tip | null {
   if (isTipDismissed(collection)) return null;
 
   const tips = TipsCollection[collection];
@@ -31,21 +33,25 @@ export function dismissTip(collection: string) {
   const finalKey = getKey(collection);
   const cookieValue = `${finalKey}=true`;
   const cookieExpiry = `expires=${cookieExpiryDate.toUTCString()}`;
-  const cookiePath = 'path=/';
+  const cookiePath = "path=/";
   const cookieString = [cookieValue, cookieExpiry, cookiePath].join("; ");
 
   document.cookie = cookieString;
 }
 
-
 export function isTipDismissed(collection: string) {
-  const cookies = Object.fromEntries(document.cookie.split(";").map(item => item.trim().split('=')));
+  const cookies = Object.fromEntries(
+    document.cookie.split(";").map((item) => item.trim().split("=")),
+  );
   const finalKey = getKey(collection);
 
-  return cookies[finalKey] === 'true';
+  return cookies[finalKey] === "true";
 }
 
-export function createURL(url: string, params?: Record<string, string>): string {
+export function createURL(
+  url: string,
+  params?: Record<string, string>,
+): string {
   const base = new URL(url);
 
   Object.entries(params ?? {}).forEach(([key, value]) => {
@@ -58,5 +64,5 @@ export function createURL(url: string, params?: Record<string, string>): string 
   if (serverID) base.searchParams.set("server_id", serverID);
   if (userID) base.searchParams.set("user_id", userID);
 
-  return base.toString()
+  return base.toString();
 }

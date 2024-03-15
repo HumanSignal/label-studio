@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 export const useValueTracker = <T>(
   value: T,
@@ -14,9 +20,5 @@ export const useValueTracker = <T>(
     setValue(initialValue);
   }, [initialValue]);
 
-  return [
-    finalValue as T,
-    setValue,
-  ];
+  return [finalValue as T, setValue];
 };
-

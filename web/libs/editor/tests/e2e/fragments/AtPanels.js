@@ -1,4 +1,4 @@
-const { centerOfBbox } = require('../tests/helpers');
+const { centerOfBbox } = require("../tests/helpers");
 const { I } = inject();
 
 /**
@@ -6,20 +6,20 @@ const { I } = inject();
  * They are selected by providing one of PANEL selectors to constructor (see exports).
  */
 class Panel {
-  container = '.lsf-sidepanels';
-  root = '.lsf-panel';
-  detached = '.lsf-panel_detached';
-  aligmentLeft = '.lsf-panel_alignment_left';
-  aligmentRight = '.lsf-panel_alignment_right';
-  header = '.lsf-panel__header';
-  body = '.lsf-panel__body';
-  title = '.lsf-panel__title';
+  container = ".lsf-sidepanels";
+  root = ".lsf-panel";
+  detached = ".lsf-panel_detached";
+  aligmentLeft = ".lsf-panel_alignment_left";
+  aligmentRight = ".lsf-panel_alignment_right";
+  header = ".lsf-panel__header";
+  body = ".lsf-panel__body";
+  title = ".lsf-panel__title";
 
-  leftZone = '.lsf-sidepanels__wrapper_align_left';
-  rightZone = '.lsf-sidepanels__wrapper_align_right';
+  leftZone = ".lsf-sidepanels__wrapper_align_left";
+  rightZone = ".lsf-sidepanels__wrapper_align_right";
 
-  collapsingToggle = '.lsf-panel__toggle';
-  collapsedToggle = '.lsf-panel__toggle_enabled';
+  collapsingToggle = ".lsf-panel__toggle";
+  collapsedToggle = ".lsf-panel__toggle_enabled";
   collapseButton = `${this.collapsingToggle}${this.collapsedToggle}`;
   expandButton = `${this.collapsingToggle}:not(${this.collapsedToggle})`;
 
@@ -35,20 +35,30 @@ class Panel {
   constructor(selector) {
     this.root = selector ? `${this.root}${selector}` : this.root;
   }
-  locatePanel(stateSelector = '') {
+  locatePanel(stateSelector = "") {
     return locate(this.root + stateSelector);
   }
   locate(locator) {
-    return locator ? locate(locator).inside(this.locatePanel()) : this.locatePanel();
+    return locator
+      ? locate(locator).inside(this.locatePanel())
+      : this.locatePanel();
   }
   seePanel() {
     I.seeElement(this.locatePanel());
   }
   seePanelAttachedLeft() {
-    I.seeElement(this.locatePanel(`${this.aligmentLeft}:not(${this.detached})`).inside(this.leftZone));
+    I.seeElement(
+      this.locatePanel(`${this.aligmentLeft}:not(${this.detached})`).inside(
+        this.leftZone,
+      ),
+    );
   }
   seePanelAttachedRight() {
-    I.seeElement(this.locatePanel(`${this.aligmentRight}:not(${this.detached})`).inside(this.rightZone));
+    I.seeElement(
+      this.locatePanel(`${this.aligmentRight}:not(${this.detached})`).inside(
+        this.rightZone,
+      ),
+    );
   }
   seePanelDetached() {
     I.seeElement(this.locatePanel(this.detached));
@@ -94,12 +104,7 @@ class Panel {
       y: fromPoint.y + shiftY,
     };
 
-    return await I.dragAndDropMouse(
-      fromPoint,
-      toPoint,
-      'left',
-      steps,
-    );
+    return await I.dragAndDropMouse(fromPoint, toPoint, "left", steps);
   }
   async dragPanelTo(x, y, steps = 1) {
     const fromBbox = await this.grabHeaderBbox();
@@ -109,12 +114,7 @@ class Panel {
       y,
     };
 
-    return await I.dragAndDropMouse(
-      fromPoint,
-      toPoint,
-      'left',
-      steps,
-    );
+    return await I.dragAndDropMouse(fromPoint, toPoint, "left", steps);
   }
   async dragPanelToElement(locator, steps = 1) {
     const fromBbox = await this.grabHeaderBbox();
@@ -122,12 +122,7 @@ class Panel {
     const fromPoint = centerOfBbox(fromBbox);
     const toPoint = centerOfBbox(toBbox);
 
-    return await I.dragAndDropMouse(
-      fromPoint,
-      toPoint,
-      'left',
-      steps,
-    );
+    return await I.dragAndDropMouse(fromPoint, toPoint, "left", steps);
   }
   async dragPanelToLeftSocket(steps = 1) {
     return await this.dragPanelToElement(this.leftZone, steps);
@@ -137,26 +132,23 @@ class Panel {
   }
 
   async dragResizerBy(shiftX, shiftY, resizerSelector, steps = 1) {
-    const fromBbox = await I.grabElementBoundingRect(this.locate(resizerSelector));
+    const fromBbox = await I.grabElementBoundingRect(
+      this.locate(resizerSelector),
+    );
     const fromPoint = centerOfBbox(fromBbox);
     const toPoint = {
       x: fromPoint.x + shiftX,
       y: fromPoint.y + shiftY,
     };
 
-    return await I.dragAndDropMouse(
-      fromPoint,
-      toPoint,
-      'left',
-      steps,
-    );
+    return await I.dragAndDropMouse(fromPoint, toPoint, "left", steps);
   }
 }
 
 module.exports = new Panel();
 module.exports.PANEL = {
-  OUTLINER: '.lsf-outliner',
-  DETAILS: '.lsf-details',
+  OUTLINER: ".lsf-outliner",
+  DETAILS: ".lsf-details",
 };
 module.exports.usePanel = (panel) => {
   return new Panel(panel);

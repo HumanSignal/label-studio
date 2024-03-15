@@ -1,13 +1,13 @@
-import React from 'react';
-import { inject, observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import { Divider, Empty } from 'antd';
+import { Divider, Empty } from "antd";
+import { inject, observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import { guidGenerator } from '../../utils/unique';
-import Registry from '../../core/Registry';
-import DialogView from '../../components/Dialog/Dialog';
-import { convertToRGBA, stringToColor } from '../../utils/colors';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
+import DialogView from "../../components/Dialog/Dialog";
+import Registry from "../../core/Registry";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import { convertToRGBA, stringToColor } from "../../utils/colors";
+import { guidGenerator } from "../../utils/unique";
 
 /**
  * The Dialog tag renders a dialog box on a task with instructions or other content that you define.
@@ -23,8 +23,8 @@ const Replica = types.model({
   name: types.string,
   text: types.string,
   selected: types.optional(types.boolean, false),
-  date: types.optional(types.string, ''),
-  hint: types.optional(types.string, ''),
+  date: types.optional(types.string, ""),
+  hint: types.optional(types.string, ""),
 });
 
 const TagAttrs = types.model({
@@ -32,16 +32,20 @@ const TagAttrs = types.model({
   name: types.maybeNull(types.string),
 });
 
-const Model = types
-  .model({
-    id: types.optional(types.identifier, guidGenerator),
-    type: 'Dialog',
-    data: types.map(Replica),
-  });
+const Model = types.model({
+  id: types.optional(types.identifier, guidGenerator),
+  type: "Dialog",
+  data: types.map(Replica),
+});
 
-const DialogModel = types.compose('DialogModel', TagAttrs, Model, AnnotationMixin);
+const DialogModel = types.compose(
+  "DialogModel",
+  TagAttrs,
+  Model,
+  AnnotationMixin,
+);
 
-const HtxDialogView = inject('store')(
+const HtxDialogView = inject("store")(
   observer(({ store, item }) => {
     if (!store.task || !store.task.dataObj) {
       return <Empty />;
@@ -50,7 +54,7 @@ const HtxDialogView = inject('store')(
     const result = [];
     let name = item.value;
 
-    if (name.charAt(0) === '$') {
+    if (name.charAt(0) === "$") {
       name = name.substr(1);
     }
 
@@ -79,12 +83,12 @@ const HtxDialogView = inject('store')(
       <div>
         <div
           style={{
-            display: 'flex',
-            flexFlow: 'column',
-            maxHeight: '500px',
-            overflowY: 'scroll',
-            paddingRight: '10px',
-            marginTop: '10px',
+            display: "flex",
+            flexFlow: "column",
+            maxHeight: "500px",
+            overflowY: "scroll",
+            paddingRight: "10px",
+            marginTop: "10px",
           }}
         >
           {result}
@@ -95,6 +99,6 @@ const HtxDialogView = inject('store')(
   }),
 );
 
-Registry.addTag('dialog', DialogModel, HtxDialogView);
+Registry.addTag("dialog", DialogModel, HtxDialogView);
 
 export { DialogModel, HtxDialogView };

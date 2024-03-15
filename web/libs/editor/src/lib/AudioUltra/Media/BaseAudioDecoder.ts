@@ -1,5 +1,5 @@
-import { Events } from '../Common/Events';
-import { info } from '../Common/Utils';
+import { Events } from "../Common/Events";
+import { info } from "../Common/Utils";
 
 interface AudioDecoderEvents {
   progress: (chunk: number, total: number) => void;
@@ -46,7 +46,10 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
   get dataLength() {
     if (this.chunks && !this._dataLength) {
       this._dataLength =
-        (this.chunks?.reduce((a, b) => a + b.reduce((_a, _b) => _a + _b.length, 0), 0) ?? 0) / this._channelCount;
+        (this.chunks?.reduce(
+          (a, b) => a + b.reduce((_a, _b) => _a + _b.length, 0),
+          0,
+        ) ?? 0) / this._channelCount;
     }
     return this._dataLength;
   }
@@ -54,7 +57,10 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
   get dataSize() {
     if (this.chunks && !this._dataSize) {
       this._dataSize =
-        (this.chunks?.reduce((a, b) => a + b.reduce((_a, _b) => _a + _b.byteLength, 0), 0) ?? 0) / this._channelCount;
+        (this.chunks?.reduce(
+          (a, b) => a + b.reduce((_a, _b) => _a + _b.byteLength, 0),
+          0,
+        ) ?? 0) / this._channelCount;
     }
     return this._dataSize;
   }
@@ -73,7 +79,7 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
    */
   cancel() {
     if (!this.cancelled) {
-      info('decode:cancelled', this.src);
+      info("decode:cancelled", this.src);
     }
     this.cancelled = true;
     this.decodeId = 0;
@@ -109,9 +115,11 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
     this.decodingResolve?.();
     this.decodingResolve = undefined;
     this.decodingPromise = undefined;
-    info('decode:cleanup', this.src);
+    info("decode:cleanup", this.src);
   }
 
   abstract init(arraybuffer: ArrayBuffer): Promise<void>;
-  abstract decode(options?: { multiChannel?: boolean }): Promise<void | AudioBuffer>;
+  abstract decode(options?: {
+    multiChannel?: boolean;
+  }): Promise<void | AudioBuffer>;
 }

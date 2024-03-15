@@ -1,40 +1,48 @@
-import React, { useMemo } from 'react';
-import { Checkbox, Modal, Table, Tabs } from 'antd';
-import { observer } from 'mobx-react';
+import { Checkbox, Modal, Table, Tabs } from "antd";
+import { observer } from "mobx-react";
+import React, { useMemo } from "react";
 
-import { Hotkey } from '../../core/Hotkey';
+import { Hotkey } from "../../core/Hotkey";
 
-import './Settings.styl';
-import { Block, Elem } from '../../utils/bem';
-import { triggerResizeEvent } from '../../utils/utilities';
+import { Block, Elem } from "../../utils/bem";
+import { triggerResizeEvent } from "../../utils/utilities";
+import "./Settings.styl";
 
-import EditorSettings from '../../core/settings/editorsettings';
-import * as TagSettings from './TagSettings';
-import { LsClose } from '../../assets/icons';
-import Toggle from '../../common/Toggle/Toggle';
-import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
+import { LsClose } from "../../assets/icons";
+import Toggle from "../../common/Toggle/Toggle";
+import EditorSettings from "../../core/settings/editorsettings";
+import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
+import * as TagSettings from "./TagSettings";
 
 const HotkeysDescription = () => {
   const columns = [
-    { title: 'Shortcut', dataIndex: 'combo', key: 'combo' },
-    { title: 'Description', dataIndex: 'descr', key: 'descr' },
+    { title: "Shortcut", dataIndex: "combo", key: "combo" },
+    { title: "Description", dataIndex: "descr", key: "descr" },
   ];
 
   const keyNamespaces = Hotkey.namespaces();
 
-  const getData = (descr) => Object.keys(descr)
-    .filter(k => descr[k])
-    .map(k => ({
-      key: k,
-      combo: k.split(',').map(keyGroup => {
-        return (
-          <Elem name="key-group" key={keyGroup}>
-            {keyGroup.trim().split('+').map((k) => <Elem tag="kbd" name="key" key={k}>{k}</Elem>)}
-          </Elem>
-        );
-      }),
-      descr: descr[k],
-    }));
+  const getData = (descr) =>
+    Object.keys(descr)
+      .filter((k) => descr[k])
+      .map((k) => ({
+        key: k,
+        combo: k.split(",").map((keyGroup) => {
+          return (
+            <Elem name="key-group" key={keyGroup}>
+              {keyGroup
+                .trim()
+                .split("+")
+                .map((k) => (
+                  <Elem tag="kbd" name="key" key={k}>
+                    {k}
+                  </Elem>
+                ))}
+            </Elem>
+          );
+        }),
+        descr: descr[k],
+      }));
 
   return (
     <Block name="keys">
@@ -42,39 +50,44 @@ const HotkeysDescription = () => {
         {Object.entries(keyNamespaces).map(([ns, data]) => {
           if (Object.keys(data.descriptions).length === 0) {
             return null;
-          } else {
-            return (
-              <Tabs.TabPane key={ns} tab={data.description ?? ns}>
-                <Table columns={columns} dataSource={getData(data.descriptions)} size="small" />
-              </Tabs.TabPane>
-            );
           }
+          return (
+            <Tabs.TabPane key={ns} tab={data.description ?? ns}>
+              <Table
+                columns={columns}
+                dataSource={getData(data.descriptions)}
+                size="small"
+              />
+            </Tabs.TabPane>
+          );
         })}
       </Tabs>
     </Block>
   );
 };
 
-
 const newUI = isFF(FF_DEV_3873) ? { newUI: true } : {};
 
 const editorSettingsKeys = Object.keys(EditorSettings);
 
 if (isFF(FF_DEV_3873)) {
-  const enableTooltipsIndex = editorSettingsKeys.findIndex(key => key === 'enableTooltips');
-  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex(key => key === 'enableLabelTooltips');
+  const enableTooltipsIndex = editorSettingsKeys.findIndex(
+    (key) => key === "enableTooltips",
+  );
+  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex(
+    (key) => key === "enableLabelTooltips",
+  );
 
   // swap these in the array
   const tmp = editorSettingsKeys[enableTooltipsIndex];
 
-  editorSettingsKeys[enableTooltipsIndex] = editorSettingsKeys[enableLabelTooltipsIndex];
+  editorSettingsKeys[enableTooltipsIndex] =
+    editorSettingsKeys[enableLabelTooltipsIndex];
   editorSettingsKeys[enableLabelTooltipsIndex] = tmp;
 }
 
 const SettingsTag = ({ children }) => {
-  return (
-    <Block name="settings-tag">{children}</Block>
-  );
+  return <Block name="settings-tag">{children}</Block>;
 };
 
 const GeneralSettings = observer(({ store }) => {
@@ -88,7 +101,9 @@ const GeneralSettings = observer(({ store }) => {
                 <Block name="settings__label">
                   <Elem name="title">
                     {EditorSettings[obj].newUI.title}
-                    {EditorSettings[obj].newUI.tags?.split(',').map((tag) => (<SettingsTag key={tag}>{tag}</SettingsTag>))}
+                    {EditorSettings[obj].newUI.tags?.split(",").map((tag) => (
+                      <SettingsTag key={tag}>{tag}</SettingsTag>
+                    ))}
                   </Elem>
                   <Block name="description">
                     {EditorSettings[obj].newUI.description}
@@ -136,7 +151,10 @@ const LayoutSettings = observer(({ store }) => {
       </Elem>
 
       <Elem name="field">
-        <Checkbox checked={store.settings.displayLabelsByDefault} onChange={store.settings.toggleSidepanelModel}>
+        <Checkbox
+          checked={store.settings.displayLabelsByDefault}
+          onChange={store.settings.toggleSidepanelModel}
+        >
           Display Labels by default in Results panel
         </Checkbox>
       </Elem>
@@ -182,25 +200,27 @@ const LayoutSettings = observer(({ store }) => {
 });
 
 const Settings = {
-  General: { name: 'General', component: GeneralSettings },
-  Hotkeys: { name: 'Hotkeys', component: HotkeysDescription },
+  General: { name: "General", component: GeneralSettings },
+  Hotkeys: { name: "Hotkeys", component: HotkeysDescription },
 };
 
 if (!isFF(FF_DEV_3873)) {
-  Settings.Layout = { name: 'Layout', component: LayoutSettings };
+  Settings.Layout = { name: "Layout", component: LayoutSettings };
 }
 
 const DEFAULT_ACTIVE = Object.keys(Settings)[0];
 
-const DEFAULT_MODAL_SETTINGS = isFF(FF_DEV_3873) ? {
-  name: 'settings-modal',
-  title: 'Labeling Interface Settings',
-  closeIcon: <LsClose />,
-} : {
-  name: 'settings-modal-old',
-  title: 'Settings',
-  bodyStyle: { paddingTop: '0' },
-};
+const DEFAULT_MODAL_SETTINGS = isFF(FF_DEV_3873)
+  ? {
+      name: "settings-modal",
+      title: "Labeling Interface Settings",
+      closeIcon: <LsClose />,
+    }
+  : {
+      name: "settings-modal-old",
+      title: "Settings",
+      bodyStyle: { paddingTop: "0" },
+    };
 
 export default observer(({ store }) => {
   const availableSettings = useMemo(() => {
@@ -209,7 +229,9 @@ export default observer(({ store }) => {
 
     return availableTags.reduce((res, tagName) => {
       const tagType = store.annotationStore.names.get(tagName).type;
-      const settings = settingsScreens.find(({ tagName }) => tagName.toLowerCase() === tagType.toLowerCase());
+      const settings = settingsScreens.find(
+        ({ tagName }) => tagName.toLowerCase() === tagType.toLowerCase(),
+      );
 
       if (settings) res.push(settings);
 

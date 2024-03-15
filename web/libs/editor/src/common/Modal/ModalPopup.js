@@ -1,10 +1,10 @@
-import { Component, createRef } from 'react';
-import { createPortal } from 'react-dom';
-import { LsRemove } from '../../assets/icons';
-import { BemWithSpecifiContext, cn } from '../../utils/bem';
-import { aroundTransition } from '../../utils/transition';
-import { Button } from '../Button/Button';
-import './Modal.styl';
+import { Component, createRef } from "react";
+import { createPortal } from "react-dom";
+import { LsRemove } from "../../assets/icons";
+import { BemWithSpecifiContext, cn } from "../../utils/bem";
+import { aroundTransition } from "../../utils/transition";
+import { Button } from "../Button/Button";
+import "./Modal.styl";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -19,7 +19,7 @@ export class Modal extends Component {
       body: props.body,
       footer: props.footer,
       visible: props.animateAppearance ? false : props.visible ?? false,
-      transition: props.visible ? 'visible' : null,
+      transition: props.visible ? "visible" : null,
     };
   }
 
@@ -34,18 +34,18 @@ export class Modal extends Component {
   }
 
   show(onShow) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this.setState({ visible: true }, async () => {
         onShow?.();
         this.props.onShow?.();
-        await this.transition('appear', resolve);
+        await this.transition("appear", resolve);
       });
     });
   }
 
   async hide(onHidden) {
-    return new Promise(resolve => {
-      this.transition('disappear', () => {
+    return new Promise((resolve) => {
+      this.transition("disappear", () => {
         this.setState({ visible: false }, () => {
           this.props.onHide?.();
           resolve();
@@ -69,21 +69,35 @@ export class Modal extends Component {
     const mixes = [this.transitionClass, this.props.className];
 
     const modalContent = (
-      <Block name="modal" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
+      <Block
+        name="modal"
+        ref={this.modalRef}
+        mod={mods}
+        mix={mixes}
+        onClick={this.onClickOutside}
+      >
         <Elem name="wrapper">
           <Elem name="content" style={this.props.style}>
             {!bare && (
               <Modal.Header>
                 <Elem name="title">{this.state.title}</Elem>
                 {this.props.allowClose !== false && (
-                  <Elem tag={Button} name="close" type="text" style={{ color: '0099FF' }} icon={<LsRemove />} />
+                  <Elem
+                    tag={Button}
+                    name="close"
+                    type="text"
+                    style={{ color: "0099FF" }}
+                    icon={<LsRemove />}
+                  />
                 )}
               </Modal.Header>
             )}
             <Elem name="body" mod={{ bare }}>
               {this.body}
             </Elem>
-            {this.state.footer && <Modal.Footer>{this.state.footer}</Modal.Footer>}
+            {this.state.footer && (
+              <Modal.Footer>{this.state.footer}</Modal.Footer>
+            )}
           </Elem>
         </Elem>
       </Block>
@@ -92,17 +106,16 @@ export class Modal extends Component {
     return createPortal(modalContent, document.body);
   }
 
-  onClickOutside = e => {
+  onClickOutside = (e) => {
     const { closeOnClickOutside } = this.props;
     const isInModal = this.modalRef.current.contains(e.target);
-    const content = cn('modal')
-      .elem('content')
-      .closest(e.target);
-    const close = cn('modal')
-      .elem('close')
-      .closest(e.target);
+    const content = cn("modal").elem("content").closest(e.target);
+    const close = cn("modal").elem("close").closest(e.target);
 
-    if ((isInModal && close) || (content === null && closeOnClickOutside !== false)) {
+    if (
+      (isInModal && close) ||
+      (content === null && closeOnClickOutside !== false)
+    ) {
       this.hide();
     }
   };
@@ -110,39 +123,42 @@ export class Modal extends Component {
   transition(type, onFinish) {
     return aroundTransition(this.modalRef.current, {
       transition: async () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           this.setState({ transition: type }, () => {
             resolve();
           });
         }),
       beforeTransition: async () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           this.setState({ transition: `before-${type}` }, () => {
             resolve();
           });
         }),
       afterTransition: async () =>
-        new Promise(resolve => {
-          this.setState({ transition: type === 'appear' ? 'visible' : null }, () => {
-            onFinish?.();
-            resolve();
-          });
+        new Promise((resolve) => {
+          this.setState(
+            { transition: type === "appear" ? "visible" : null },
+            () => {
+              onFinish?.();
+              resolve();
+            },
+          );
         }),
     });
   }
 
   get transitionClass() {
     switch (this.state.transition) {
-      case 'before-appear':
-        return 'before-appear';
-      case 'appear':
-        return 'appear before-appear';
-      case 'before-disappear':
-        return 'before-disappear';
-      case 'disappear':
-        return 'disappear before-disappear';
-      case 'visible':
-        return 'visible';
+      case "before-appear":
+        return "before-appear";
+      case "appear":
+        return "appear before-appear";
+      case "before-disappear":
+        return "before-disappear";
+      case "disappear":
+        return "disappear before-disappear";
+      case "visible":
+        return "visible";
     }
     return null;
   }
@@ -152,9 +168,8 @@ export class Modal extends Component {
       const Content = this.state.body;
 
       return Content instanceof Function ? <Content /> : Content;
-    } else {
-      return this.props.children;
     }
+    return this.props.children;
   }
 }
 

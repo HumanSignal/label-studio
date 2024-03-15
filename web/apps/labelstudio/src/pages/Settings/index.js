@@ -1,13 +1,16 @@
-import React from 'react';
-import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
-import { WebhookPage } from '../WebhookPage/WebhookPage';
-import { DangerZone } from './DangerZone';
-import { GeneralSettings } from './GeneralSettings';
-import { InstructionsSettings } from './InstructionsSettings';
-import { LabelingSettings } from './LabelingSettings';
-import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
-import { StorageSettings } from './StorageSettings/StorageSettings';
-import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from '../../utils/license-flags';
+import React from "react";
+import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
+import {
+  LF_CLOUD_STORAGE_FOR_MANAGERS,
+  isInLicense,
+} from "../../utils/license-flags";
+import { WebhookPage } from "../WebhookPage/WebhookPage";
+import { DangerZone } from "./DangerZone";
+import { GeneralSettings } from "./GeneralSettings";
+import { InstructionsSettings } from "./InstructionsSettings";
+import { LabelingSettings } from "./LabelingSettings";
+import { MachineLearningSettings } from "./MachineLearningSettings/MachineLearningSettings";
+import { StorageSettings } from "./StorageSettings/StorageSettings";
 
 const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
 

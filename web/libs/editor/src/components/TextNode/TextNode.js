@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { PropTypes } from 'prop-types';
+import { PropTypes } from "prop-types";
+import React, { Component } from "react";
 
 export default class TextNode extends Component {
   render() {
@@ -21,5 +21,6 @@ TextNode.propTypes = {
   overlap: PropTypes.string,
   key: PropTypes.string,
   style: PropTypes.object,
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    .isRequired,
 };

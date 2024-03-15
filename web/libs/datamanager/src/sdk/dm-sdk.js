@@ -54,12 +54,14 @@ import { createApp } from "./app-create";
 import { LSFWrapper } from "./lsf-sdk";
 import { taskToLSFormat } from "./lsf-utils";
 
-const DEFAULT_TOOLBAR = "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button view-toggle";
+const DEFAULT_TOOLBAR =
+  "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button view-toggle";
 
 const prepareInstruments = (instruments) => {
-  const result = Object
-    .entries(instruments)
-    .map(([name, builder]) => [name, builder({ inject, observer })]);
+  const result = Object.entries(instruments).map(([name, builder]) => [
+    name,
+    builder({ inject, observer }),
+  ]);
 
   return objectToMap(Object.fromEntries(result));
 };
@@ -133,7 +135,7 @@ export class DataManager {
     delete: true,
     edit: true,
     duplicate: true,
-  }
+  };
 
   /** @type {"dm" | "labelops"} */
   type = "dm";
@@ -228,10 +230,10 @@ export class DataManager {
     Object.assign(config.endpoints, apiEndpoints ?? {});
     const sharedParams = {};
 
-    if (!isNaN(this.projectId)) {
+    if (!Number.isNaN(this.projectId)) {
       sharedParams.project = this.projectId;
     }
-    if (!isNaN(this.datasetId)) {
+    if (!Number.isNaN(this.datasetId)) {
       sharedParams.dataset = this.datasetId;
     }
     Object.assign(config, {
@@ -254,7 +256,9 @@ export class DataManager {
 
     this.actions.set(id, { action, callback });
 
-    const actions = Array.from(this.actions.values()).map(({ action }) => action);
+    const actions = Array.from(this.actions.values()).map(
+      ({ action }) => action,
+    );
 
     this.store?.setActions(actions);
   }
@@ -290,11 +294,14 @@ export class DataManager {
       return console.warn(`Can't override native instrument ${name}`);
     }
 
-    this.instruments.set(name, initializer({
-      store: this.store,
-      observer,
-      inject,
-    }));
+    this.instruments.set(
+      name,
+      initializer({
+        store: this.store,
+        observer,
+        inject,
+      }),
+    );
 
     this.store.updateInstruments();
   }
@@ -305,8 +312,8 @@ export class DataManager {
    * @param {Function} callback
    */
   on(eventName, callback) {
-    if (this.lsf && eventName.startsWith('lsf:')) {
-      const evt = toCamelCase(eventName.replace(/^lsf:/, ''));
+    if (this.lsf && eventName.startsWith("lsf:")) {
+      const evt = toCamelCase(eventName.replace(/^lsf:/, ""));
 
       this.lsf?.lsfInstance?.on(evt, callback);
     }
@@ -324,8 +331,8 @@ export class DataManager {
    * @param {Function?} callback
    */
   off(eventName, callback) {
-    if (this.lsf && eventName.startsWith('lsf:')) {
-      const evt = toCamelCase(eventName.replace(/^lsf:/, ''));
+    if (this.lsf && eventName.startsWith("lsf:")) {
+      const evt = toCamelCase(eventName.replace(/^lsf:/, ""));
 
       this.lsf?.lsfInstance?.off(evt, callback);
     }
@@ -340,13 +347,15 @@ export class DataManager {
   }
 
   removeAllListeners() {
-    const lsfEvents = Array.from(this.callbacks.keys()).filter(evt => evt.startsWith('lsf:'));
+    const lsfEvents = Array.from(this.callbacks.keys()).filter((evt) =>
+      evt.startsWith("lsf:"),
+    );
 
-    lsfEvents.forEach(evt => {
+    lsfEvents.forEach((evt) => {
       const callbacks = Array.from(this.getEventCallbacks(evt));
-      const eventName = toCamelCase(evt.replace(/^lsf:/, ''));
+      const eventName = toCamelCase(evt.replace(/^lsf:/, ""));
 
-      callbacks.forEach(clb => this.lsf?.lsfInstance?.off(eventName, clb));
+      callbacks.forEach((clb) => this.lsf?.lsfInstance?.off(eventName, clb));
     });
 
     this.callbacks.clear();
@@ -378,7 +387,7 @@ export class DataManager {
     this.mode = mode;
     this.store.setMode(mode);
 
-    if (modeChanged) this.invoke('modeChanged', this.mode);
+    if (modeChanged) this.invoke("modeChanged", this.mode);
   }
 
   /**
@@ -387,7 +396,7 @@ export class DataManager {
    * @param {any[]} args
    */
   async invoke(eventName, ...args) {
-    if (eventName.startsWith('lsf:')) return;
+    if (eventName.startsWith("lsf:")) return;
 
     this.getEventCallbacks(eventName).forEach((callback) =>
       callback.apply(this, args),
@@ -405,7 +414,7 @@ export class DataManager {
   /** @private */
   async initApp() {
     this.store = await createApp(this.root, this);
-    this.invoke('ready', [this]);
+    this.invoke("ready", [this]);
   }
 
   initLSF(element) {
@@ -416,7 +425,7 @@ export class DataManager {
       task: this.store.taskStore.selected,
       preload: this.preload,
       // annotation: this.store.annotationStore.selected,
-      isLabelStream: this.mode === 'labelstream',
+      isLabelStream: this.mode === "labelstream",
     });
   }
 
@@ -429,12 +438,12 @@ export class DataManager {
   async startLabeling() {
     if (!this.lsf) return;
 
-    let [task, annotation] = [
+    const [task, annotation] = [
       this.store.taskStore.selected,
       this.store.annotationStore.selected,
     ];
 
-    const isLabelStream = this.mode === 'labelstream';
+    const isLabelStream = this.mode === "labelstream";
     const taskExists = isDefined(this.lsf.task) && isDefined(task);
     const taskSelected = this.lsf.task?.id === task?.id;
 
@@ -491,15 +500,17 @@ export class DataManager {
   }
 
   get toolbarInstruments() {
-    const sections = this.toolbar.split("|").map(s => s.trim());
+    const sections = this.toolbar.split("|").map((s) => s.trim());
 
-    const instrumentsList = sections.map(section => {
+    const instrumentsList = sections.map((section) => {
       return section.split(" ").filter((instrument) => {
         const nativeInstrument = !!instruments[instrument];
         const customInstrument = !!this.instruments.has(instrument);
 
         if (!nativeInstrument && !customInstrument) {
-          console.warn(`Unknwown instrument detected: ${instrument}. Did you forget to register it?`);
+          console.warn(
+            `Unknwown instrument detected: ${instrument}. Did you forget to register it?`,
+          );
         }
 
         return nativeInstrument || customInstrument;
@@ -509,5 +520,5 @@ export class DataManager {
     return instrumentsList;
   }
   static packJSON = packJSON;
-  static taskToLSFormat = taskToLSFormat
+  static taskToLSFormat = taskToLSFormat;
 }

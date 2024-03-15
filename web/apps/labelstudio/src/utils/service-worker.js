@@ -4,13 +4,13 @@ function registerServiceWorker(serviceWorkerFileName) {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register(serviceWorkerFileName)
-      .then(function(registration) {
+      .then((registration) => {
         console.log(
           "Service Worker registered with scope:",
           registration.scope,
         );
       })
-      .catch(function(error) {
+      .catch((error) => {
         console.log("Service Worker registration failed:", error);
       });
   }

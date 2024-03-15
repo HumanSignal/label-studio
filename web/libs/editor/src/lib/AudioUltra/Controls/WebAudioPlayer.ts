@@ -1,6 +1,6 @@
-import { WaveformAudio } from '../Media/WaveformAudio';
-import { Waveform } from '../Waveform';
-import { Player } from './Player';
+import type { WaveformAudio } from "../Media/WaveformAudio";
+import type { Waveform } from "../Waveform";
+import { Player } from "./Player";
 
 export class WebAudioPlayer extends Player {
   private audioContext?: AudioContext;
@@ -20,7 +20,7 @@ export class WebAudioPlayer extends Player {
 
     if (!this.audioContext) return;
 
-    if (this.audioContext.state === 'suspended') {
+    if (this.audioContext.state === "suspended") {
       await this.audioContext.resume();
     }
   }
@@ -30,7 +30,10 @@ export class WebAudioPlayer extends Player {
    */
   get rate() {
     // restore the correct rate
-    if (this.audioBufferSource?.playbackRate && this._rate !== this.audioBufferSource.playbackRate.value) {
+    if (
+      this.audioBufferSource?.playbackRate &&
+      this._rate !== this.audioBufferSource.playbackRate.value
+    ) {
       this.audioBufferSource.playbackRate.value = this._rate;
     }
     return this._rate;
@@ -48,7 +51,7 @@ export class WebAudioPlayer extends Player {
       if (this.audioBufferSource?.playbackRate) {
         this.audioBufferSource.playbackRate.value = this._rate;
       }
-      this.wf.invoke('rateChanged', [value]);
+      this.wf.invoke("rateChanged", [value]);
     }
   }
 
@@ -63,7 +66,7 @@ export class WebAudioPlayer extends Player {
 
     if (this.audioContext) {
       this.audioContext.close().finally(() => {
-        delete this.audioContext;
+        this.audioContext = undefined;
       });
     }
   }
@@ -79,7 +82,7 @@ export class WebAudioPlayer extends Player {
       }
     } catch (err: any) {
       // InvalidStateError is thrown when the audio is already playing
-      if (err.name !== 'InvalidStateError') throw err;
+      if (err.name !== "InvalidStateError") throw err;
     }
 
     this.timestamp = performance.now();
@@ -87,7 +90,14 @@ export class WebAudioPlayer extends Player {
   }
 
   protected connectSource() {
-    if (this.isDestroyed || !this.audioContext || !this.audio?.buffer || !this.gainNode || this.connected) return;
+    if (
+      this.isDestroyed ||
+      !this.audioContext ||
+      !this.audio?.buffer ||
+      !this.gainNode ||
+      this.connected
+    )
+      return;
     this.connected = true;
     this.audioBufferSource = this.audioContext.createBufferSource();
     this.audioBufferSource.buffer = this.audio.buffer;
@@ -96,14 +106,15 @@ export class WebAudioPlayer extends Player {
   }
 
   protected disconnectSource(): boolean {
-    if (this.isDestroyed || !this.connected || !this.audioBufferSource) return false;
+    if (this.isDestroyed || !this.connected || !this.audioBufferSource)
+      return false;
     this.connected = false;
 
     try {
       this.audioBufferSource.stop();
     } catch (err: any) {
       // InvalidStateError is thrown when the audio is already stopped
-      if (err.name !== 'InvalidStateError') throw err;
+      if (err.name !== "InvalidStateError") throw err;
     }
     this.audioBufferSource.disconnect();
     this.audioBufferSource.onended = null;

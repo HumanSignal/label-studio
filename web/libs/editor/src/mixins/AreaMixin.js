@@ -1,10 +1,14 @@
-import { destroy, isAlive, types } from 'mobx-state-tree';
-import { defaultStyle } from '../core/Constants';
-import { guidGenerator } from '../core/Helpers';
-import Result from '../regions/Result';
-import { PER_REGION_MODES } from './PerRegion';
-import { ReadOnlyRegionMixin } from './ReadOnlyMixin';
-import { FF_LSDV_4930, FF_TAXONOMY_LABELING, isFF } from '../utils/feature-flags';
+import { destroy, isAlive, types } from "mobx-state-tree";
+import { defaultStyle } from "../core/Constants";
+import { guidGenerator } from "../core/Helpers";
+import Result from "../regions/Result";
+import {
+  FF_LSDV_4930,
+  FF_TAXONOMY_LABELING,
+  isFF,
+} from "../utils/feature-flags";
+import { PER_REGION_MODES } from "./PerRegion";
+import { ReadOnlyRegionMixin } from "./ReadOnlyMixin";
 
 let ouid = 1;
 
@@ -15,17 +19,17 @@ export const AreaMixinBase = types
     results: types.array(Result),
     parentID: types.maybeNull(types.string),
   })
-  .views(self => ({
+  .views((self) => ({
     // self id without annotation id added to uniquiness across all the tree
     get cleanId() {
-      return self.id.replace(/#.*/, '');
+      return self.id.replace(/#.*/, "");
     },
 
     /**
      * @return {Result[]} all results with labeling (created by *Labels control)
      */
     get labelings() {
-      return self.results.filter(r => r.from_name.isLabeling);
+      return self.results.filter((r) => r.from_name.isLabeling);
     },
 
     /**
@@ -35,15 +39,19 @@ export const AreaMixinBase = types
       if (!isAlive(self)) {
         return undefined;
       }
-      return self.results.find(r => r.from_name.isLabeling && r.hasValue);
+      return self.results.find((r) => r.from_name.isLabeling && r.hasValue);
     },
 
     get emptyLabel() {
-      return self.results.find(r => r.from_name?.emptyLabel)?.from_name?.emptyLabel;
+      return self.results.find((r) => r.from_name?.emptyLabel)?.from_name
+        ?.emptyLabel;
     },
 
     get texting() {
-      return isAlive(self) && self.results.find(r => r.type === 'textarea' && r.hasValue);
+      return (
+        isAlive(self) &&
+        self.results.find((r) => r.type === "textarea" && r.hasValue)
+      );
     },
 
     get tag() {
@@ -56,29 +64,41 @@ export const AreaMixinBase = types
       if (!labels || !value) return false;
       // label can contain comma, so check for full match first
       if (labels.includes(value)) return true;
-      if (value.includes(',')) {
-        return value.split(',').some(v => labels.includes(v));
+      if (value.includes(",")) {
+        return value.split(",").some((v) => labels.includes(v));
       }
       return false;
     },
 
     get perRegionTags() {
-      return self.annotation.toNames.get(self.object.name)?.filter(tag => tag.perregion) || [];
+      return (
+        self.annotation.toNames
+          .get(self.object.name)
+          ?.filter((tag) => tag.perregion) || []
+      );
     },
 
     // special tags that can be used for labeling (only <Taxonomy isLabeling/> for now)
     get labelingTags() {
       if (!isFF(FF_TAXONOMY_LABELING)) return [];
 
-      return self.annotation.toNames.get(self.object.name)?.filter(tag => tag.classification && tag.isLabeling) || [];
+      return (
+        self.annotation.toNames
+          .get(self.object.name)
+          ?.filter((tag) => tag.classification && tag.isLabeling) || []
+      );
     },
 
     get perRegionDescControls() {
-      return self.perRegionTags.filter(tag => tag.displaymode === PER_REGION_MODES.REGION_LIST);
+      return self.perRegionTags.filter(
+        (tag) => tag.displaymode === PER_REGION_MODES.REGION_LIST,
+      );
     },
 
     get perRegionFocusTarget() {
-      return self.perRegionTags.find(tag => tag.isVisible !== false && tag.focusable);
+      return self.perRegionTags.find(
+        (tag) => tag.isVisible !== false && tag.focusable,
+      );
     },
 
     get labelName() {
@@ -94,13 +114,13 @@ export const AreaMixinBase = types
 
     getLabelText(joinstr) {
       const label = self.labeling;
-      const text = self.texting?.mainValue?.[0]?.replace(/\n\r|\n/, ' ');
+      const text = self.texting?.mainValue?.[0]?.replace(/\n\r|\n/, " ");
       const labelNames = label?.getSelectedString(joinstr);
       const labelText = [];
 
       if (labelNames) labelText.push(labelNames);
       if (text) labelText.push(text);
-      return labelText.join(': ');
+      return labelText.join(": ");
     },
 
     get parent() {
@@ -115,20 +135,22 @@ export const AreaMixinBase = types
         return void 0;
       }
 
-      const styled = self.results.find(r => r.style);
+      const styled = self.results.find((r) => r.style);
 
-      if (styled && styled.style) {
+      if (styled?.style) {
         return styled.style;
       }
-      const emptyStyled = self.results.find(r => r.emptyStyle);
+      const emptyStyled = self.results.find((r) => r.emptyStyle);
 
-      if (emptyStyled && emptyStyled.emptyStyle) {
+      if (emptyStyled?.emptyStyle) {
         return emptyStyled.emptyStyle;
       }
 
-      const controlStyled = self.results.find(r => self.type.startsWith(r.type));
+      const controlStyled = self.results.find((r) =>
+        self.type.startsWith(r.type),
+      );
 
-      return controlStyled && controlStyled.controlStyle;
+      return controlStyled?.controlStyle;
     },
 
     // @todo may be slow, consider to add some code to annotation (un)select* methods
@@ -141,12 +163,16 @@ export const AreaMixinBase = types
     },
 
     get highlighted() {
-      return self.parent?.selectionArea?.isActive ? self.isInSelectionArea : self._highlighted;
+      return self.parent?.selectionArea?.isActive
+        ? self.isInSelectionArea
+        : self._highlighted;
     },
 
     get isInSelectionArea() {
-      return (!isFF(FF_LSDV_4930) || !self.hidden)
-        && self.parent?.selectionArea?.isActive ? self.parent.selectionArea.intersectsBbox(self.bboxCoords) : false;
+      return (!isFF(FF_LSDV_4930) || !self.hidden) &&
+        self.parent?.selectionArea?.isActive
+        ? self.parent.selectionArea.intersectsBbox(self.bboxCoords)
+        : false;
     },
 
     get supportSuggestions() {
@@ -156,9 +182,9 @@ export const AreaMixinBase = types
   .volatile(() => ({
     // selected: false,
   }))
-  .actions(self => ({
+  .actions((self) => ({
     beforeDestroy() {
-      self.results.forEach(r => destroy(r));
+      self.results.forEach((r) => destroy(r));
     },
 
     setSelected(value) {
@@ -190,7 +216,7 @@ export const AreaMixinBase = types
     },
 
     setValue(tag) {
-      const result = self.results.find(r => r.from_name === tag);
+      const result = self.results.find((r) => r.from_name === tag);
       const values = tag.selectedValues();
 
       if (result) {
@@ -207,8 +233,12 @@ export const AreaMixinBase = types
           },
         });
       }
-      self.updateAppearenceFromState && self.updateAppearenceFromState();
+      self.updateAppearenceFromState?.();
     },
   }));
 
-export const AreaMixin = types.compose('AreaMixin', AreaMixinBase, ReadOnlyRegionMixin);
+export const AreaMixin = types.compose(
+  "AreaMixin",
+  AreaMixinBase,
+  ReadOnlyRegionMixin,
+);

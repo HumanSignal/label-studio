@@ -10,7 +10,7 @@ export const DateTimeInput = observer(({ value, range, time, onChange }) => {
 
       if (Array.isArray(selectedDate)) {
         const [min, max] = selectedDate
-          .map((d) => d ? new Date(d) : null)
+          .map((d) => (d ? new Date(d) : null))
           .map((d) => (isValid(d) ? d.toISOString() : null));
 
         value = { min, max };
@@ -31,11 +31,10 @@ export const DateTimeInput = observer(({ value, range, time, onChange }) => {
         .map((d) => (d === null ? undefined : d))
         .map((d) => new Date(d))
         .map((d) => (isValid(d) ? d : undefined));
-    } else {
-      const date = new Date(value === null ? undefined : value);
-
-      return isValid(date) ? date : undefined;
     }
+    const date = new Date(value === null ? undefined : value);
+
+    return isValid(date) ? date : undefined;
   }, [range, value]);
 
   return (

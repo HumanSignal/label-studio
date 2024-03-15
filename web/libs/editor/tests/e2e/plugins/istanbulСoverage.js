@@ -1,17 +1,17 @@
 /* global global */
 
-const fs = require('fs');
-const path = require('path');
-const TestExclude = require('test-exclude');
-const { recorder, event, output } = require('codeceptjs');
-const Container = require('codeceptjs/lib/container');
-const { clearString } = require('codeceptjs/lib/utils');
+const fs = require("node:fs");
+const path = require("node:path");
+const TestExclude = require("test-exclude");
+const { recorder, event, output } = require("codeceptjs");
+const Container = require("codeceptjs/lib/container");
+const { clearString } = require("codeceptjs/lib/utils");
 
 function hashCode(str) {
   let hash = 0;
 
   if (str.length === 0) {
-    return hash + '';
+    return `${hash}`;
   }
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -23,32 +23,32 @@ function hashCode(str) {
 }
 
 const defaultConfig = {
-  coverageDir: 'output/coverage',
+  coverageDir: "output/coverage",
   actionCoverage: false,
   uniqueFileName: true,
 };
 
 const defaultActionCoverageConfig = {
   enabled: true,
-  beginActionName: 'performActionBegin',
-  endActionName: 'performActionEnd',
-  coverageDir: 'output/actionCoverage',
+  beginActionName: "performActionBegin",
+  endActionName: "performActionEnd",
+  coverageDir: "output/actionCoverage",
   include: true,
   exclude: false,
 };
 
-const supportedHelpers = ['Puppeteer', 'Playwright'];
+const supportedHelpers = ["Puppeteer", "Playwright"];
 
 function buildFileName(test, uniqueFileName) {
   let fileName = clearString(test.title);
   const originalName = fileName;
 
   // This prevent data driven to be included in the failed screenshot file name
-  if (fileName.indexOf('{') !== -1) {
-    fileName = fileName.substr(0, fileName.indexOf('{') - 3).trim();
+  if (fileName.indexOf("{") !== -1) {
+    fileName = fileName.substr(0, fileName.indexOf("{") - 3).trim();
   }
 
-  if (test.ctx && test.ctx.test && test.ctx.test.type === 'hook') {
+  if (test.ctx?.test && test.ctx.test.type === "hook") {
     fileName = clearString(`${test.title}_${test.ctx.test.title}`);
   }
 
@@ -64,11 +64,14 @@ function buildFileName(test, uniqueFileName) {
 }
 
 function prepareActionStepConfig(actionCoverageConfig) {
-  const config = typeof actionCoverageConfig === 'boolean' ? {
-    enabled: actionCoverageConfig,
-  } : actionCoverageConfig;
+  const config =
+    typeof actionCoverageConfig === "boolean"
+      ? {
+          enabled: actionCoverageConfig,
+        }
+      : actionCoverageConfig;
 
-  return Object.assign({}, defaultActionCoverageConfig, config );
+  return Object.assign({}, defaultActionCoverageConfig, config);
 }
 
 /**
@@ -91,7 +94,7 @@ function prepareActionStepConfig(actionCoverageConfig) {
  * * `coverageDir`: directory to dump coverage files
  * * `uniqueFileName`: generate a unique filename by adding uuid
  */
-module.exports = function(config) {
+module.exports = (config) => {
   const helpers = Container.helpers();
   let helper;
 
@@ -102,7 +105,7 @@ module.exports = function(config) {
   }
 
   if (!helper) {
-    console.error('Coverage is only supported in Puppeteer, Playwright');
+    console.error("Coverage is only supported in Puppeteer, Playwright");
     return;
   }
 
@@ -112,7 +115,7 @@ module.exports = function(config) {
 
   const excludeTester = new TestExclude({
     ...options.actionCoverage,
-    cwd: path.resolve('../'),
+    cwd: path.resolve("../"),
   });
 
   let lastCoverages = {};
@@ -134,7 +137,9 @@ module.exports = function(config) {
     global[options.actionCoverage.beginActionName] = performActionBegin;
     global[options.actionCoverage.endActionName] = performActionEnd;
   } else {
-    global[options.actionCoverage.beginActionName] = global[options.actionCoverage.endActionName] = ()=>{};
+    global[options.actionCoverage.beginActionName] = global[
+      options.actionCoverage.endActionName
+    ] = () => {};
   }
 
   const getCoverage = async () => {
@@ -148,11 +153,18 @@ module.exports = function(config) {
   };
 
   function hasActionChanges() {
-    return actionsStack.length !== prevActionsStack.length || actionsStack.some((val, key) => val !== prevActionsStack[key]);
+    return (
+      actionsStack.length !== prevActionsStack.length ||
+      actionsStack.some((val, key) => val !== prevActionsStack[key])
+    );
   }
 
   function filterActionCoverage(actionCoverage) {
-    return Object.fromEntries(Object.entries(actionCoverage).filter(([path]) => excludeTester.shouldInstrument(path)));
+    return Object.fromEntries(
+      Object.entries(actionCoverage).filter(([path]) =>
+        excludeTester.shouldInstrument(path),
+      ),
+    );
   }
   async function collectLastCoverage(actionKeys, endOfTest = false) {
     const coverageInfo = await getCoverage();
@@ -160,7 +172,7 @@ module.exports = function(config) {
     if (!coverageInfo) return {};
     const actionCoverageInfo = filterActionCoverage(coverageInfo);
 
-    actionKeys.forEach(actionKey => {
+    actionKeys.forEach((actionKey) => {
       if (!lastCoverages[actionKey]) {
         lastCoverages[actionKey] = actionCoverageInfo;
       }
@@ -168,12 +180,18 @@ module.exports = function(config) {
 
     for (const lastActionKey of lastActionKeys) {
       if (endOfTest || actionKeys.indexOf(lastActionKey) === -1) {
-        const additionalCoverage = subCoverage(actionCoverageInfo, lastCoverages[lastActionKey]);
+        const additionalCoverage = subCoverage(
+          actionCoverageInfo,
+          lastCoverages[lastActionKey],
+        );
 
         if (!actionCoverages[lastActionKey]) {
           actionCoverages[lastActionKey] = additionalCoverage;
         } else {
-          actionCoverages[lastActionKey] = addCoverage(actionCoverages[lastActionKey], additionalCoverage);
+          actionCoverages[lastActionKey] = addCoverage(
+            actionCoverages[lastActionKey],
+            additionalCoverage,
+          );
         }
 
         lastCoverages[lastActionKey] = undefined;
@@ -191,7 +209,12 @@ module.exports = function(config) {
 
     for (const [filePath, aFileCoverage] of Object.entries(aCoverage)) {
       const bFileCoverage = bCoverage[filePath];
-      const resultFileCoverage = { ...aFileCoverage, s: {}, f: {}, b: {} };
+      const resultFileCoverage = {
+        ...aFileCoverage,
+        s: {},
+        f: {},
+        b: {},
+      };
 
       for (const [key, value] of Object.entries(aFileCoverage.s)) {
         resultFileCoverage.s[key] = op(value, bFileCoverage.s[key]);
@@ -200,7 +223,9 @@ module.exports = function(config) {
         resultFileCoverage.f[key] = op(value, bFileCoverage.f[key]);
       }
       for (const [key, values] of Object.entries(aFileCoverage.b)) {
-        resultFileCoverage.b[key] = values.map((val, idx)=> op(val, bFileCoverage.b[key][idx]));
+        resultFileCoverage.b[key] = values.map((val, idx) =>
+          op(val, bFileCoverage.b[key][idx]),
+        );
       }
       resultCoverage[filePath] = resultFileCoverage;
     }
@@ -208,14 +233,14 @@ module.exports = function(config) {
   }
 
   function subCoverage(aCoverage, bCoverage) {
-    return operateCoverage(aCoverage, bCoverage, (a,b) => a - b);
+    return operateCoverage(aCoverage, bCoverage, (a, b) => a - b);
   }
   function addCoverage(aCoverage, bCoverage) {
-    return operateCoverage(aCoverage, bCoverage, (a,b) => a + b);
+    return operateCoverage(aCoverage, bCoverage, (a, b) => a + b);
   }
 
   event.dispatcher.on(event.all.before, async () => {
-    output.debug('*** Collecting istanbul coverage for tests ****');
+    output.debug("*** Collecting istanbul coverage for tests ****");
     if (!options.actionCoverage.enabled) return;
     actionCoverages = {};
   });
@@ -223,7 +248,7 @@ module.exports = function(config) {
   event.dispatcher.on(event.all.after, async () => {
     if (!options.actionCoverage.enabled) return;
     recorder.add(
-      'saving action coverage',
+      "saving action coverage",
       async () => {
         try {
           const coverageDir = path.resolve(
@@ -235,10 +260,12 @@ module.exports = function(config) {
             fs.mkdirSync(coverageDir, { recursive: true });
           }
 
-          for (const [actionName, coverage] of Object.entries(actionCoverages)) {
+          for (const [actionName, coverage] of Object.entries(
+            actionCoverages,
+          )) {
             const coveragePath = path.resolve(
               coverageDir,
-              actionName+'.coverage.json',
+              `${actionName}.coverage.json`,
             );
 
             output.print(`writing ${coveragePath}`);
@@ -261,15 +288,12 @@ module.exports = function(config) {
   // Save coverage data after every test run
   event.dispatcher.on(event.test.after, async (test) => {
     recorder.add(
-      'saving coverage',
+      "saving coverage",
       async () => {
         try {
           const coverageInfo = await collectLastCoverage(actionsStack, true);
 
-          const coverageDir = path.resolve(
-            process.cwd(),
-            options.coverageDir,
-          );
+          const coverageDir = path.resolve(process.cwd(), options.coverageDir);
 
           if (!fs.existsSync(coverageDir)) {
             fs.mkdirSync(coverageDir, { recursive: true });
@@ -296,7 +320,7 @@ module.exports = function(config) {
     prevActionsStack = [...actionsStack];
     const stack = [...actionsStack];
 
-    recorder.add('collect last coverage', async () => {
+    recorder.add("collect last coverage", async () => {
       try {
         await collectLastCoverage(stack);
       } catch (err) {

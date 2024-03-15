@@ -32,13 +32,13 @@ export const ErrorBox = injector(({ errors }) => {
           padding: "0 10px",
           fontSize: 12,
         }}
-        icon={(
+        icon={
           <RiErrorWarningFill
             color="#ff5a46"
             size={18}
             style={{ marginRight: 5 }}
           />
-        )}
+        }
       >
         Errors occurred
       </Button>

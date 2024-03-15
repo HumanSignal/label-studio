@@ -17,7 +17,7 @@ export const TableCheckboxCell = ({ checked, indeterminate, onChange }) => {
       type="checkbox"
       checked={checked ?? false}
       indeterminate={indeterminate ?? false}
-      onChange={e => onChange(e.target.checked)}
+      onChange={(e) => onChange(e.target.checked)}
     />
   );
 };

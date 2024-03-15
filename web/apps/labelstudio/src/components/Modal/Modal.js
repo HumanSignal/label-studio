@@ -21,12 +21,19 @@ const standaloneModal = (props) => {
     renderCount++;
 
     // simple modals don't require any parts of the app and can't cause the loop of death
-    render((
-      <MultiProvider key={`modal-${renderCount}`} providers={props.simple ? [] : [
-        <ConfigProvider key="config"/>,
-        <ApiProvider key="api"/>,
-        <CurrentUserProvider key="current-user"/>,
-      ]}>
+    render(
+      <MultiProvider
+        key={`modal-${renderCount}`}
+        providers={
+          props.simple
+            ? []
+            : [
+                <ConfigProvider key="config" />,
+                <ApiProvider key="api" />,
+                <CurrentUserProvider key="current-user" />,
+              ]
+        }
+      >
         <Modal
           ref={modalRef}
           {...props}
@@ -37,15 +44,16 @@ const standaloneModal = (props) => {
           }}
           animateAppearance={animate}
         />
-      </MultiProvider>
-    ), rootDiv);
+      </MultiProvider>,
+      rootDiv,
+    );
   };
 
   renderModal(props, true);
 
   return {
     update(newProps) {
-      renderModal({...props, ...(newProps ?? {}), visible: true}, false);
+      renderModal({ ...props, ...(newProps ?? {}), visible: true }, false);
     },
     close() {
       const result = modalRef.current.hide();
@@ -56,7 +64,14 @@ const standaloneModal = (props) => {
   };
 };
 
-export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...props }) => {
+export const confirm = ({
+  okText,
+  onOk,
+  cancelText,
+  onCancel,
+  buttonLook,
+  ...props
+}) => {
   const modal = standaloneModal({
     ...props,
     allowClose: false,
@@ -79,7 +94,7 @@ export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...pro
             modal.close();
           }}
           size="compact"
-          look={buttonLook ?? 'primary'}
+          look={buttonLook ?? "primary"}
         >
           {okText ?? "OK"}
         </Button>
