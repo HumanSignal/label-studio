@@ -3,8 +3,9 @@ import json
 from label_studio.tests.utils import make_project, register_ml_backend_mock
 
 
-@pytest.fixture(autouse=True)
-def ml_backend_for_test_api(ml_backend):
+@pytest.fixture
+def ml_backend_for_test_api(ml_backend, mocker):
+    mocker.patch('socket.gethostbyname', return_value='321.21.21.21')
     register_ml_backend_mock(
         ml_backend,
         url='https://ml_backend_for_test_api',
@@ -14,7 +15,7 @@ def ml_backend_for_test_api(ml_backend):
 
 
 @pytest.mark.django_db
-def test_model_version_on_save(business_client):
+def test_model_version_on_save(business_client, ml_backend_for_test_api):
     project = make_project(
         config=dict(
             is_published=True,
@@ -64,7 +65,7 @@ def test_model_version_on_save(business_client):
 
 
 @pytest.mark.django_db
-def test_model_version_on_delete(business_client):
+def test_model_version_on_delete(business_client, ml_backend_for_test_api):
     project = make_project(
         config=dict(
             is_published=True,
@@ -109,7 +110,7 @@ def test_model_version_on_delete(business_client):
 
 
 @pytest.mark.django_db
-def test_security_write_only_payload(business_client):
+def test_security_write_only_payload(business_client, ml_backend_for_test_api):
     project = make_project(
         config=dict(
             is_published=True,
