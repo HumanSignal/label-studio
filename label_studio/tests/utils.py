@@ -31,7 +31,7 @@ except ImportError:
 
 @contextmanager
 def ml_backend_mock(**kwargs):
-    with requests_mock.Mocker() as m:
+    with requests_mock.Mocker(real_http=True) as m:
         yield register_ml_backend_mock(m, **kwargs)
 
 
