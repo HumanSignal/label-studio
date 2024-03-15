@@ -689,7 +689,9 @@ class Project(ProjectMixin, models.Model):
                 self.model_version = None
                 self.save(update_fields=['model_version'])
 
-            count, _ = predictions.delete()
+            _, deleted_map = predictions.delete()
+
+        count = deleted_map.get('tasks.Prediction', 0)
         return {'deleted_predictions': count}
 
     def get_updated_weights(self):
