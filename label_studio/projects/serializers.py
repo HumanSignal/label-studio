@@ -176,11 +176,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             # that model_version should either match live ml backend
             # or match version in predictions
 
-            if (
-                # p.ml_backends.filter(title=value).exists()
-                # or p.predictions.filter(project=p, model_version=value).exists()
-                p.ml_backends.filter(title=value).union(p.predictions.filter(project=p, model_version=value)).exists()
-            ):
+            if p.ml_backends.filter(title=value).union(p.predictions.filter(project=p, model_version=value)).exists():
                 return value
             else:
                 raise serializers.ValidationError(
