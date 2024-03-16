@@ -27,8 +27,8 @@ export default observer(({ store }) => {
   const classname = [
     styles.block,
     styles.block__controls,
-    store.annotationStore.viewingAllAnnotations ? styles.hidden : '',
-  ].join(' ');
+    store.annotationStore.viewingAll ? styles.hidden : '',
+  ].filter(Boolean).join(' ');
 
   return (
     <div className={styles.container + ' ls-panel'}>

@@ -182,16 +182,22 @@ python -m pip install label-studio
 If you want to use nightly builds or extend the functionality, consider downloading the source code using Git and running Label Studio locally:
 
 ```bash
-git clone https://github.com/heartexlabs/label-studio.git
+git clone https://github.com/HumanSignal/label-studio.git
+
+# install dependencies
 cd label-studio
-# Install all package dependencies
-pip install -e .
-# Run database migrations
-python label_studio/manage.py migrate
-# Collect static files
-python label_studio/manage.py collectstatic
-# Start the server in development mode at http://localhost:8080
-python label_studio/manage.py runserver
+pip install poetry
+poetry install
+
+# run db migrations
+poetry run python label_studio/manage.py migrate
+
+# collect static files
+poetry run python label_studio/manage.py collectstatic
+
+# start the server in development mode at http://localhost:8080
+poetry run python label_studio/manage.py runserver
+
 ```
 
 ## Install with Anaconda

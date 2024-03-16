@@ -14,7 +14,6 @@ import { TabFilter } from "./tab_filter";
 import { TabHiddenColumns } from "./tab_hidden_columns";
 import { TabSelectedItems } from "./tab_selected_items";
 import { History } from '../../utils/history';
-import { FF_LOPS_12, isFF } from "../../utils/feature-flags";
 import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
 import { clamp } from "../../utils/helpers";
 
@@ -396,8 +395,6 @@ export const Tab = types
       }
       if (self.virtual) {
         yield self.dataStore.reload({ query: self.query, interaction });
-      } else if (isFF(FF_LOPS_12) && self.root.SDK?.type === 'labelops') {
-        yield self.dataStore.reload({ query: self.query, interaction });
       }
 
       getRoot(self).SDK?.invoke?.("tabReloaded", self);
@@ -426,20 +423,6 @@ export const Tab = types
       if (!self.saved || !deepEqual(self.snapshot, serialized)) {
         self.snapshot = serialized;
         if (self.virtual === true) {
-          const snapshot = self.serialize();
-
-          self.key = self.parent.snapshotToUrl(snapshot);
-
-          const projectId = self.root.SDK.projectId;
-
-          // Save the virtual tab of the project to local storage to persist between page navigations
-          if (projectId) {
-            localStorage.setItem(`virtual-tab-${projectId}`, JSON.stringify(snapshot));
-          }
-
-          History.navigate({ tab: self.key }, true);
-          self.reload({ interaction });
-        } else if (isFF(FF_LOPS_12) && self.root.SDK?.type === 'labelops') {
           const snapshot = self.serialize();
 
           self.key = self.parent.snapshotToUrl(snapshot);

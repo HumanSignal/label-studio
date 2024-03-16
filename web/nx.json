@@ -3,7 +3,7 @@
   "tasksRunnerOptions": {
     "default": {
       "options": {
-        "cacheableOperations": ["build-storybook"]
+        "cacheableOperations": ["build-storybook", "version"]
       }
     }
   },
@@ -24,6 +24,15 @@
     },
     "test": {
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
+    },
+    "version": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/tools/version.mjs"
+      ],
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/version.json"]
     },
     "build-storybook": {
       "cache": true,

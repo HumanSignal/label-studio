@@ -1,3 +1,5 @@
+import { isFlagEnabled } from "./helpers";
+
 const FEATURE_FLAGS = window.APP_SETTINGS?.feature_flags || {};
 
 // Fix displaying of created_at in the review mode
@@ -33,12 +35,6 @@ export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
  */
 export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
 
-export function isFF(id) {
-  if (id in FEATURE_FLAGS) {
-    return FEATURE_FLAGS[id] === true;
-  }
-  else {
-    return window.APP_SETTINGS?.feature_flags_default_value === true;
-  }
+export function isFF(id: string) {
+  return isFlagEnabled(id, FEATURE_FLAGS, window.APP_SETTINGS?.feature_flags_default_value === true);
 }
-

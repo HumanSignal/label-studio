@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import App from './components/App/App';
 import { configureStore } from './configureStore';
-import { registerPanels } from './registerPanels';
 
 export class LabelStudio extends Component {
   state = {
@@ -26,10 +25,7 @@ export class LabelStudio extends Component {
 
   render() {
     return this.state.initialized ? (
-      <App
-        store={this.store}
-        panels={registerPanels(this.props.panels) ?? []}
-      />
+      <App store={this.store} />
     ) : null;
   }
 }

@@ -2,6 +2,7 @@
 """
 from core.feature_flags import flag_set
 from core.utils.common import load_func
+from core.utils.db import fast_first
 from django.conf import settings
 from organizations.models import OrganizationMember
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -46,7 +47,11 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             if not org_id:
                 return False
 
-            organization_member_for_user = OrganizationMember.objects.get(user_id=instance.id, organization_id=org_id)
+            organization_member_for_user = fast_first(
+                OrganizationMember.objects.filter(user_id=instance.id, organization_id=org_id)
+            )
+            if not organization_member_for_user:
+                return True
         return bool(organization_member_for_user.deleted_at)
 
     def to_representation(self, instance):

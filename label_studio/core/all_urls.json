@@ -53,12 +53,6 @@
         "name": "",
         "decorators": ""
     },
-  {
-        "url": "/models/",
-        "module": "organizations.views.simple_view",
-        "name": "organizations:models",
-        "decorators": ""
-    },
     {
         "url": "/organization/",
         "module": "organizations.views.simple_view",
@@ -75,6 +69,12 @@
         "url": "/people/",
         "module": "organizations.views.organization_people_list",
         "name": "organizations:organization-index",
+        "decorators": ""
+    },
+    {
+        "url": "/models/",
+        "module": "organizations.views.simple_view",
+        "name": "organizations:models",
         "decorators": ""
     },
     {
@@ -201,6 +201,12 @@
         "url": "/api/projects/<int:pk>/tasks/",
         "module": "projects.api.ProjectTaskListAPI",
         "name": "projects:api:project-tasks-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/ground-truth-tasks/",
+        "module": "projects.api.ProjectGroundTruthTaskListAPI",
+        "name": "projects:api:project-gt-tasks-list",
         "decorators": ""
     },
     {

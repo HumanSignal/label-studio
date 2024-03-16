@@ -91,7 +91,6 @@ class AllExportStorageTypesAPI(APIView):
     ),
 )
 class AllImportStorageListAPI(generics.ListAPIView):
-
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
 

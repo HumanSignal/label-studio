@@ -925,9 +925,8 @@ export default observer(
 
     renderTools() {
       const { item, store } = this.props;
-      const cs = store.annotationStore;
 
-      if (cs.viewingAllAnnotations || cs.viewingAllPredictions) return null;
+      if (store.annotationStore.viewingAll) return null;
 
       const tools = item.getToolsManager().allTools();
 
@@ -1051,7 +1050,7 @@ export default observer(
                     item.setImageRef(ref);
                     this.imageRef.current = ref;
                   }}
-                  loading={(isFF(FF_DEV_3077) && !item.lazyoff) && 'lazy'}
+                  loading={(isFF(FF_DEV_3077) && !item.lazyoff) ? 'lazy' : 'false'}
                   style={item.imageTransform}
                   src={item.currentSrc}
                   onLoad={(e) => {

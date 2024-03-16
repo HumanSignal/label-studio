@@ -118,7 +118,13 @@ Label Studio Enterprise automatically logs all user activities so that you can m
 
 ## Information collected by Label Studio
 
-Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the information we collect. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support.
+Label Studio collects usage statistics including the number of page visits, number of annotations, and data types being used in labeling configurations that you set up. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support.
+
+<div class="opensource-only">
+
+You can disable data collection by setting the environment variable `collect_analytics` to `False`. 
+
+</div>
 
 ## Add self-signed certificate to trusted root store
 
@@ -175,3 +181,22 @@ rqworker:
 ```
   </div>
 </div>
+
+
+### Add self-signed certificate to trusted root store for S3 storage
+
+Boto library is used to connect to cloud storage S3. `AWS_CA_BUNDLE` has to be set as environment variable.
+<div class="code-tabs">
+  <div data-name="Docker Compose">
+
+1. Mount your self-signed certificate as a volume into `app` container: (has to be .pem file type)
+
+```yaml
+volumes:
+  - ./ca.pem:/tmp/ca.pem:ro
+```
+2. Add environment variable with the name `AWS_CA_BUNDLE` to be trusted by boto library.
+
+```yaml
+AWS_CA_BUNDLE=/tmp/ca.pem
+```
