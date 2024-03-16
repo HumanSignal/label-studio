@@ -3,6 +3,7 @@ node_modules
 *.ipynb
 __pycache__
 .local/
+.worktree-*
 
 # docs
 __generated__
