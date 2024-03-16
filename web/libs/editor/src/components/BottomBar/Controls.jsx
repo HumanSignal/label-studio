@@ -5,10 +5,11 @@ import { Block, Elem } from '../../utils/bem';
 import { isDefined } from '../../utils/utilities';
 import { IconBan } from '../../assets/icons';
 import { FF_PROD_E_111, isFF } from '../../utils/feature-flags';
-import './Controls.styl';
 import { useCallback, useMemo, useState } from 'react';
 import { LsChevron } from '../../assets/icons';
 import { Dropdown } from '../../common/Dropdown/DropdownComponent';
+
+import './Controls.styl';
 
 const TOOLTIP_DELAY = 0.8;
 
@@ -42,10 +43,10 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
 
   const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
   const submitDisabled = store.hasInterface('annotations:deny-empty') && results.length === 0;
-  
+
   const buttonHandler = useCallback(async (e, callback, tooltipMessage) => {
     const { addedCommentThisSession, currentComment, commentFormSubmit } = store.commentStore;
-    
+
     if (isInProgress) return;
     setIsInProgress(true);
 
@@ -64,10 +65,10 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
     }
     setIsInProgress(false);
   }, [
-    store.rejectAnnotation, 
-    store.skipTask, 
-    store.commentStore.currentComment, 
-    store.commentStore.commentFormSubmit, 
+    store.rejectAnnotation,
+    store.skipTask,
+    store.commentStore.currentComment,
+    store.commentStore.commentFormSubmit,
     store.commentStore.addedCommentThisSession,
     isInProgress,
   ]);
@@ -160,7 +161,7 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
             look="secondary"
             onClick={async (event) => {
               event.preventDefault();
-              
+
               const selected = store.annotationStore?.selected;
 
               selected?.submissionInProgress();
@@ -198,7 +199,7 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
                 look={look}
                 mod={{ has_icon: useExitOption, disabled: isDisabled }}
                 onClick={async (event) => {
-                  if (event.target.classList.contains('lsf-dropdown__trigger')) return;  
+                  if (event.target.classList.contains('lsf-dropdown__trigger')) return;
                   const selected = store.annotationStore?.selected;
 
                   selected?.submissionInProgress();
@@ -243,7 +244,7 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
               }}
               icon={useExitOption && (
                 <Dropdown.Trigger
-                  alignment="top-right" 
+                  alignment="top-right"
                   content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
                 >
                   <div>
@@ -258,13 +259,13 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
         );
 
         buttons.push(button);
-      }  
+      }
     } else {
       if ((userGenerate) || (store.explore && !userGenerate && store.hasInterface('submit'))) {
         const title = submitDisabled
           ? 'Empty annotations denied in this project'
           : 'Save results: [ Ctrl+Enter ]';
-  
+
         buttons.push(
           <ButtonTooltip key="submit" title={title}>
             <Elem name="tooltip-wrapper">
@@ -281,7 +282,7 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
           </ButtonTooltip>,
         );
       }
-  
+
       if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface('update'))) {
         const isUpdate = sentUserGenerate || versions.result;
         const button = (
@@ -297,11 +298,13 @@ export const Controls = controlsInjector(observer(({ store, history, annotation 
             </Button>
           </ButtonTooltip>
         );
-  
+
         buttons.push(button);
-      }  
+      }
     }
   }
+
+  console.log(buttons)
 
   return (
     <Block name="controls">

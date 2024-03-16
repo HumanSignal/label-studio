@@ -2,8 +2,9 @@ import { observer } from 'mobx-react';
 import { Block, Elem } from '../../utils/bem';
 import { Actions } from './Actions';
 import { Controls } from './Controls';
-import './BottomBar.styl';
 import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
+
+import './BottomBar.styl';
 
 export const BottomBar = observer(({ store }) => {
   const annotationStore = store.annotationStore;

@@ -6,7 +6,7 @@ import libConfig from '../../vite.lib.config';
 import wasm from 'vite-plugin-wasm';
 import topLevelAwait from 'vite-plugin-top-level-await';
 
-const MODE = process.env.MODE ?? 'bluild';
+import {prefix} from '../../tools/postcss-prefix';
 
 export default mergeConfig(libConfig, {
   root: __dirname,
@@ -31,7 +31,16 @@ export default mergeConfig(libConfig, {
           `;
         })()
       }
-    }
+    },
+    postcss: {
+      plugins: [
+        prefix({
+          prefix: "lsf-",
+          ignore: [/^body/, /^html/, /^.antd?-/, /^.anticon/],
+          ignorePaths: [/^node_modules/, /.module/]
+        })
+      ],
+    },
   },
 
   plugins: [

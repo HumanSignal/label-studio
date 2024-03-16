@@ -9,6 +9,7 @@
     "ls:unit": "nx run labelstudio:unit",
     "ls:e2e": "nx run labelstudio-e2e:e2e",
     "lsf:watch": "nx run editor:build:development --watch",
+    "lsf:build": "nx run editor:build:production",
     "lsf:serve": "MODE=standalone nx run editor:serve:development",
     "lsf:e2e": "cd libs/editor/tests/e2e && yarn test",
     "lsf:integration": "nx run editor:integration",

@@ -1,3 +1,9 @@
+:global
+  .hello
+    color red
+
+  .world
+    color blue
 .tooltip
   --animation-duration 100ms
   --animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
@@ -29,7 +35,7 @@
   &.before-disappear
     transition-property opacity, transform
     transition-duration var(--animation-duration)
-    transition-iming-function var(--animation-curve)
+    transition-timing-function var(--animation-curve)
 
   // Animation transition handling
   &.before-appear

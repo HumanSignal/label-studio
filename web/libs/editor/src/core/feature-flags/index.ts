@@ -7,5 +7,8 @@ if (process.env.NODE_ENV !== 'production' && !window.APP_SETTINGS) {
     }
   })();
 
-  window.APP_SETTINGS = { feature_flags };
+  window.APP_SETTINGS = {
+    feature_flags,
+    feature_flags_default_value: true,
+  };
 }

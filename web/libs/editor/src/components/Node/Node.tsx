@@ -154,7 +154,7 @@ const Node: FC<any> = observer(({ className, node }) => {
 const NodeIcon: FC<any> = observer(({ node, ...props }) => {
   const name = useNodeName(node);
 
-  if (!(name in NodeViews)) {
+  if (!name || !(name in NodeViews)) {
     console.error(`No ${name} in NodeView`);
     return null;
   }
