@@ -2,7 +2,7 @@ title: Interactive segmentation
 type: community
 group: Computer Vision
 order: 1
-image: /static/templates/segment-anything.png
+image: /static/templates/segment-anything.jpg
 details: Interactive segmenation compatible with SegmentAnything model.
 config: |
   <View>
@@ -47,6 +47,18 @@ config: |
         background-color: #ddd;
         border-radius: 5px;
       }
+  
+      .text-adv {
+        background-color: white;
+        border: 2px solid #000;  # Add border
+        border-radius: 15px;  # Increase border radius
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 30px;  # Increase padding
+        font-family: 'Arial', sans-serif;  # Change font type
+        line-height: 1.6;
+        font-size: 16px;
+        text-align: center;  # Center align text
+     }
     </Style>
     <View className="main">
       <View className="container">
@@ -77,6 +89,9 @@ config: |
             </RectangleLabels>
           </View>
         </View>
+      </View>
+      <View className="text-adv">
+        <HyperText name="title" value="Use &lt;a href='https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model' target='_blank' rel='noopener noreferrer' &gt;SegmentAnything model &lt;/a&gt; with this template." clickableLinks="true" inline="true"/>
       </View>
       <View className="image-container">
         <Image name="image" value="$image" zoom="true" zoomControl="true" />
