@@ -2,13 +2,31 @@ import * as postcss from 'postcss';
 
 type PrefixerOptions = {
   prefix: string;
+  /**
+   * Ignore specific selectors.
+   */
   ignore?: (string | RegExp)[];
+  /**
+   * Ignore specific paths.
+   */
   ignorePaths?: (string | RegExp)[];
+  /**
+   * Include only specific paths.
+   */
   matchPaths?: (string | RegExp)[];
+  /**
+   * Allows to define multiple rules.
+   * If defined, the other options will be ignored.
+   */
   rules?: Omit<PrefixerOptions, "rules">[]
 }
 
-function prefix(options: PrefixerOptions) {
+/**
+  * PostCSS plugin to prefix CSS classes.
+  * Allows to ignore specific selectors and paths or include only specific paths.
+  * Allows global classes by using the `:global` selector.
+  */
+function prefixCSSClasses(options: PrefixerOptions) {
   return function(root: postcss.Root, result: postcss.Result) {
     if (options.rules && options.rules.length > 0) {
       return matchOverRules(options.rules, root, result);
@@ -95,4 +113,4 @@ function isMatchedPath(path: string | undefined, matchPaths: PrefixerOptions['ma
   });
 }
 
-export { prefix, type PrefixerOptions }
+export { prefixCSSClasses, type PrefixerOptions }

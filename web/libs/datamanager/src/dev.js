@@ -10,6 +10,9 @@ export const initDevApp = async (DataManager) => {
   const gatewayAPI = API_GATEWAY ?? "http://localhost:8081/api/dm";
   const useExternalSource = !!gatewayAPI;
 
+  console.log('gatewayAPI', gatewayAPI);
+  console.log('toke', LS_ACCESS_TOKEN);
+
   const dm = new DataManager({
     root: document.getElementById("app"),
     toolbar: "actions columns filters ordering review-button label-button loading-possum error-box | refresh view-toggle",

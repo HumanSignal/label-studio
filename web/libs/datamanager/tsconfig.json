@@ -1,17 +1,34 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "allowJs": false,
-    "checkJs": false,
-    "jsx": "preserve",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
     "strict": true,
-    "rootDirs": ["./src"],
-    "typeRoots": ["./types", "./node_modules/@types"],
-    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": [
+      "vite/client"
+    ],
+    "noEmit": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "allowJs": false,
+    "esModuleInterop": false,
     "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx"
   },
+  "files": [],
+  "include": [
+    "src/types",
+    "node_modules/@types",
+    "src"
+  ],
   "references": [
     {
       "path": "./tsconfig.lib.json"
@@ -19,10 +36,6 @@
     {
       "path": "./tsconfig.spec.json"
     }
-  ],
-  "exclude": [
-    "./dist",
-    "./lib",
   ],
   "extends": "../../tsconfig.base.json"
 }

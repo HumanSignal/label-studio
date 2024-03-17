@@ -1,4 +1,5 @@
 /// <reference types='vitest' />
+//
 import { mergeConfig } from 'vite';
 import defaultConfig from "./vite.config"
 
@@ -21,5 +22,4 @@ export default mergeConfig(defaultConfig, {
       external: ['react', 'react-dom', 'react/jsx-runtime'],
     },
   },
-
 });

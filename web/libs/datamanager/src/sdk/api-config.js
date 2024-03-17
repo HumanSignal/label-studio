@@ -45,7 +45,7 @@ export const APIConfig = {
     },
 
     /** List of tasks (samples) in the dataset */
-    tasks: "/tasks",
+    tasks: "/../tasks",
 
     /** List of task history */
     taskHistory: "/../projects/:projectId/label-stream-history",
@@ -54,13 +54,13 @@ export const APIConfig = {
     annotations: "/views/:tabID/annotations",
 
     /** Single task (sample) */
-    task: "/tasks/:taskID",
+    task: "/../tasks/:taskID",
 
     /** Next task (labelstream, default sequential) */
-    nextTask: "/tasks/next",
+    nextTask: "/../tasks/next",
 
     /** Single annotation */
-    annotation: "/tasks/:taskID/annotations/:id",
+    annotation: "/../tasks/:taskID/annotations/:id",
 
     /** Presign url */
     presignUrlForTask: "/../../tasks/:taskID/presign",

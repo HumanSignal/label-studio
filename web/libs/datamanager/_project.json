@@ -6,20 +6,15 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
+      "executor": "@nx/webpack:webpack",
       "defaultConfiguration": "production",
       "options": {
+        "compiler": "babel",
+        "webpackConfig": "webpack.config.js",
         "tsConfig": "libs/datamanager/tsconfig.lib.json",
         "main": "libs/datamanager/src/index.js",
         "outputPath": "dist/libs/datamanager",
-        "skipTypeCheck": true,
-        "assets": [
-          {
-            "glob": "public",
-            "input": "libs/datamanager",
-            "output": "public/"
-          }
-        ]
+        "isolatedConfig": true
       },
       "configurations": {
         "development": {

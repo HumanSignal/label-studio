@@ -13,7 +13,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
-    "../../.eslintrc.json"
+    "../../.eslintrc.json",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -62,7 +62,7 @@ module.exports = {
       "vars": "all",
       "args": "after-used",
       "varsIgnorePattern": "^_",
-      "argsIgnorePattern": "^_"
+      "argsIgnorePattern": "^_",
     }],
     "no-async-promise-executor": "off",
     "semi": [2, "always"],
@@ -101,7 +101,7 @@ module.exports = {
     "space-before-function-paren": ["error", {
       "anonymous": "never",
       "named": "never",
-      "asyncArrow": "always"
+      "asyncArrow": "always",
     }],
   },
 };

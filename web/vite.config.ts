@@ -1,10 +1,11 @@
-/// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import svgr from 'vite-plugin-svgr';
 import wasm from 'vite-plugin-wasm';
+import tsconfigPaths from 'vite-tsconfig-paths';
 import topLevelAwait from 'vite-plugin-top-level-await';
+import {jsxInJs} from './tools/jsx-in-js';
 
 export default defineConfig({
   define: {
@@ -14,20 +15,21 @@ export default defineConfig({
   assetsInclude: ['**/*.svg', '**/*.xml'],
 
   optimizeDeps: {
+    esbuildOptions: {
+      loader: {
+        ".js": "jsx",
+      },
+    },
     exclude: [
       "@syntect/wasm"
     ]
   },
 
-  build: {
-    rollupOptions: {
-      external: ["@martel/audio-file-decoder/decode-audio.wasm"],
-    }
-  },
-
   plugins: [
     wasm(),
+    tsconfigPaths(),
     topLevelAwait(),
+    jsxInJs(),
     react(),
     svgr({
       svgrOptions: {
@@ -37,5 +39,4 @@ export default defineConfig({
     }),
     nxViteTsPaths(),
   ],
-
 });
