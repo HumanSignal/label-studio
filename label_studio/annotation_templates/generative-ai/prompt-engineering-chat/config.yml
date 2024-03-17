@@ -12,24 +12,24 @@ config: |
     <Paragraphs name="chat" value="$messages" layout="dialogue" nameKey="role" textKey="content" />
     <Header value="User:" />
     <View className="prompt">
-    <TextArea name="prompt"
-              toName="chat"
-              rows="4"
-              editable="true"
-              maxSubmissions="1"
-              showSubmitButton="false"
-              placeholder="Type user prompt here then Shift+Enter..."
-    />
-    </View>
-    <Header value="Assistant:"/>
-      <TextArea name="response"
+      <TextArea name="prompt"
                 toName="chat"
                 rows="4"
                 editable="true"
                 maxSubmissions="1"
                 showSubmitButton="false"
-                placeholder="Generated response will appear here..."
+                placeholder="Type user prompt here then Shift+Enter..."
       />
+    </View>
+    <Header value="Assistant:"/>
+    <TextArea name="response"
+              toName="chat"
+              rows="4"
+              editable="true"
+              maxSubmissions="1"
+              showSubmitButton="false"
+              placeholder="Generated response will appear here..."
+    />
   
   </View>
   

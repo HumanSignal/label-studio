@@ -21,31 +21,26 @@ config: |
     </Style>
     <Header value="Context:"/>
     <View className="text-container">
-    <Text name="context" value="$text" />
-      </View>
+      <Text name="context" value="$text" />
+    </View>
     <Header value="Prompt:" />
     <View className="prompt">
-    <TextArea name="prompt"
-              toName="context"
-              rows="4"
-              editable="true"
-              maxSubmissions="1"
-              showSubmitButton="false"
-              placeholder="Type your prompt here then Shift+Enter..."
-    />
-    </View>
-    <Header value="Response:"/>
-      <TextArea name="response"
+      <TextArea name="prompt"
                 toName="context"
                 rows="4"
                 editable="true"
                 maxSubmissions="1"
                 showSubmitButton="false"
-                placeholder="Generated response will appear here..."
+                placeholder="Type your prompt here then Shift+Enter..."
       />
-  
+    </View>
+    <Header value="Response:"/>
+    <TextArea name="response"
+              toName="context"
+              rows="4"
+              editable="true"
+              maxSubmissions="1"
+              showSubmitButton="false"
+              placeholder="Generated response will appear here..."
+    />
   </View>
-
-
-
-
