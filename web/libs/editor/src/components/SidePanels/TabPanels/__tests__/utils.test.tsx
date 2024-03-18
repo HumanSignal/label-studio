@@ -32,24 +32,9 @@ const dummyPanels: Record<string, PanelBBox> = {
     alignment: Side.left,
     maxHeight: 800,
     panelViews: [
-      {
-        title: "Tab 1",
-        name: "Tab1",
-        component: () => null,
-        active: true,
-      },
-      {
-        title: "Tab 2",
-        name: "Tab2",
-        component: () => null,
-        active: false,
-      },
-      {
-        title: "Tab 3",
-        name: "Tab3",
-        component: () => null,
-        active: false,
-      },
+      { title: "Tab 1", name: "Tab1", component: () => null, active: true },
+      { title: "Tab 2", name: "Tab2", component: () => null, active: false },
+      { title: "Tab 3", name: "Tab3", component: () => null, active: false },
     ],
   },
   p2: {
@@ -65,14 +50,7 @@ const dummyPanels: Record<string, PanelBBox> = {
     detached: true,
     alignment: Side.right,
     maxHeight: 800,
-    panelViews: [
-      {
-        title: "Tab 4",
-        name: "Tab4",
-        component: () => null,
-        active: true,
-      },
-    ],
+    panelViews: [{ title: "Tab 4", name: "Tab4", component: () => null, active: true }],
   },
 };
 
@@ -128,18 +106,8 @@ describe("stateRemovedTab", () => {
     const tabToRemove = 1;
 
     const expectedPanelViews = [
-      {
-        title: "Tab 1",
-        name: "Tab1",
-        component: () => null,
-        active: true,
-      },
-      {
-        title: "Tab 3",
-        name: "Tab3",
-        component: () => null,
-        active: false,
-      },
+      { title: "Tab 1", name: "Tab1", component: () => null, active: true },
+      { title: "Tab 3", name: "Tab3", component: () => null, active: false },
     ];
 
     const expectedState = {
@@ -215,94 +183,44 @@ describe("setActiveDefaults", () => {
     const state = {
       panel1: {
         panelViews: [
-          {
-            title: "Tab 1",
-            name: "Tab1",
-            component: () => null,
-            active: false,
-          },
-          {
-            title: "Tab 2",
-            name: "Tab2",
-            component: () => null,
-            active: false,
-          },
-          {
-            title: "Tab 3",
-            name: "Tab3",
-            component: () => null,
-            active: false,
-          },
+          { title: "Tab 1", name: "Tab1", component: () => null, active: false },
+          { title: "Tab 2", name: "Tab2", component: () => null, active: false },
+          { title: "Tab 3", name: "Tab3", component: () => null, active: false },
         ],
       },
       panel2: {
         panelViews: [
-          {
-            title: "Tab 4",
-            name: "Tab4",
-            component: () => null,
-            active: false,
-          },
-          {
-            title: "Tab 5",
-            name: "Tab5",
-            component: () => null,
-            active: false,
-          },
+          { title: "Tab 4", name: "Tab4", component: () => null, active: false },
+          { title: "Tab 5", name: "Tab5", component: () => null, active: false },
         ],
       },
     };
     const newState = setActiveDefaults(state);
 
-    expect(newState.panel1.panelViews[0].active).toBe(true);
-    expect(newState.panel2.panelViews[0].active).toBe(true);
+    expect(newState["panel1"].panelViews[0].active).toBe(true);
+    expect(newState["panel2"].panelViews[0].active).toBe(true);
   });
 
   it("does not change active tabs if there are already active tabs", () => {
     const state = {
       panel1: {
         panelViews: [
-          {
-            title: "Tab 1",
-            name: "Tab1",
-            component: () => null,
-            active: false,
-          },
-          {
-            title: "Tab 2",
-            name: "Tab2",
-            component: () => null,
-            active: true,
-          },
-          {
-            title: "Tab 3",
-            name: "Tab3",
-            component: () => null,
-            active: false,
-          },
+          { title: "Tab 1", name: "Tab1", component: () => null, active: false },
+          { title: "Tab 2", name: "Tab2", component: () => null, active: true },
+          { title: "Tab 3", name: "Tab3", component: () => null, active: false },
         ],
       },
       panel2: {
         panelViews: [
-          {
-            title: "Tab 4",
-            name: "Tab4",
-            component: () => null,
-            active: true,
-          },
-          {
-            title: "Tab 5",
-            name: "Tab5",
-            component: () => null,
-            active: false,
-          },
+          { title: "Tab 4", name: "Tab4", component: () => null, active: true },
+          { title: "Tab 5", name: "Tab5", component: () => null, active: false },
         ],
       },
     };
 
     const newState = setActiveDefaults(state);
-    const p1t2Active = newState.panel1.panelViews[1].active;
-    const p2t1Active = newState.panel2.panelViews[0].active;
+    const p1t2Active = newState["panel1"].panelViews[1].active;
+    const p2t1Active = newState["panel2"].panelViews[0].active;
 
     expect(p1t2Active).toBe(true);
     expect(p2t1Active).toBe(true);
@@ -321,35 +239,15 @@ describe("stateAddedTab", () => {
   };
 
   it("adds a new tab to the receiving panel on the right", () => {
-    const movingTabData = {
-      title: "Tab 3",
-      name: "Tab3",
-      component: () => null,
-      active: false,
-    };
+    const movingTabData = { title: "Tab 3", name: "Tab3", component: () => null, active: false };
     const receivingTab = 1;
     const receivingPanel = panelName;
     const dropSide = Side.right;
 
     const expectedPanelViews = [
-      {
-        title: "Tab 1",
-        name: "Tab1",
-        component: () => null,
-        active: false,
-      },
-      {
-        title: "Tab 3",
-        name: "Tab3",
-        component: () => null,
-        active: false,
-      },
-      {
-        title: "Tab 2",
-        name: "Tab2",
-        component: () => null,
-        active: false,
-      },
+      { title: "Tab 1", name: "Tab1", component: () => null, active: false },
+      { title: "Tab 3", name: "Tab3", component: () => null, active: false },
+      { title: "Tab 2", name: "Tab2", component: () => null, active: false },
     ];
 
     const expectedState = {
@@ -365,41 +263,16 @@ describe("stateAddedTab", () => {
   });
 
   it("adds a new tab to the receiving panel on the left", () => {
-    const movingTabData = {
-      title: "Tab 3",
-      name: "Tab3",
-      component: () => null,
-      active: false,
-    };
+    const movingTabData = { title: "Tab 3", name: "Tab3", component: () => null, active: false };
     const receivingTab = 1;
     const receivingPanel = panelName;
     const dropSide = Side.left;
 
     const expectedPanelViews = [
-      {
-        title: "Tab 3",
-        name: "Tab3",
-        component: () => null,
-        active: false,
-      },
-      {
-        title: "Tab 1",
-        name: "Tab1",
-        component: () => null,
-        active: false,
-      },
-      {
-        title: "Tab 3",
-        name: "Tab3",
-        component: () => null,
-        active: false,
-      },
-      {
-        title: "Tab 2",
-        name: "Tab2",
-        component: () => null,
-        active: false,
-      },
+      { title: "Tab 3", name: "Tab3", component: () => null, active: false },
+      { title: "Tab 1", name: "Tab1", component: () => null, active: false },
+      { title: "Tab 3", name: "Tab3", component: () => null, active: false },
+      { title: "Tab 2", name: "Tab2", component: () => null, active: false },
     ];
 
     const expectedState = {
@@ -426,9 +299,7 @@ describe("stateRemovePanelEmptyViews", () => {
 
   it("removes empty panel views from the state", () => {
     const expectedState = {
-      [panelName]: {
-        panelViews: initialPanelViews,
-      } as unknown as PanelBBox,
+      [panelName]: { panelViews: initialPanelViews } as unknown as PanelBBox,
     };
 
     const newState = stateRemovePanelEmptyViews(state);
@@ -526,11 +397,7 @@ describe("splitPanelColumns", () => {
     };
 
     const newState = splitPanelColumns(
-      {
-        panel1: panel1Attributes,
-        panel2: panel2Attributes,
-        panel3: panel3Attributes,
-      },
+      { panel1: panel1Attributes, panel2: panel2Attributes, panel3: panel3Attributes },
       removingKey,
       totalHeight,
     );
@@ -734,38 +601,17 @@ describe("getSnappedHeights", () => {
 
 describe("findZIndices", () => {
   const panel1 = {
-    panelViews: [
-      {
-        title: "Tab 1",
-        name: "Tab1",
-        component: () => null,
-        active: true,
-      },
-    ],
+    panelViews: [{ title: "Tab 1", name: "Tab1", component: () => null, active: true }],
     detached: true,
     zIndex: 5,
   };
   const panel2 = {
-    panelViews: [
-      {
-        title: "Tab 2",
-        name: "Tab2",
-        component: () => null,
-        active: false,
-      },
-    ],
+    panelViews: [{ title: "Tab 2", name: "Tab2", component: () => null, active: false }],
     detached: false,
     zIndex: 8,
   };
   const panel3 = {
-    panelViews: [
-      {
-        title: "Tab 3",
-        name: "Tab3",
-        component: () => null,
-        active: false,
-      },
-    ],
+    panelViews: [{ title: "Tab 3", name: "Tab3", component: () => null, active: false }],
     detached: true,
     zIndex: 7,
   };
@@ -789,14 +635,7 @@ describe("findZIndices", () => {
 
   it("should correctly update z-index for focused detached panel", () => {
     const panel4 = {
-      panelViews: [
-        {
-          title: "Tab 4",
-          name: "Tab4",
-          component: () => null,
-          active: true,
-        },
-      ],
+      panelViews: [{ title: "Tab 4", name: "Tab4", component: () => null, active: true }],
       detached: true,
       zIndex: 6,
     };

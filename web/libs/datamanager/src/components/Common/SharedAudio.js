@@ -26,8 +26,9 @@ const PlaybackControl = ({ current, duration, onChange }) => {
   const format = React.useMemo(() => {
     if (duration >= 3600) {
       return ["hours", "minutes", "seconds"];
+    } else {
+      return ["minutes", "seconds"];
     }
-    return ["minutes", "seconds"];
   }, [duration]);
 
   return (
@@ -78,13 +79,7 @@ export class SharedAudio extends Component {
         {this.state.error ? (
           <div>Unable to play</div>
         ) : this.audio ? (
-          <div
-            style={{
-              display: "flex",
-              flex: 1,
-              alignItems: "center",
-            }}
-          >
+          <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
             <PlaybackControl
               current={this.state.current}
               duration={this.state.duration}

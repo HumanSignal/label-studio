@@ -150,13 +150,13 @@ export const AudioModel = types.compose(
       activeStates() {
         const states = self.states();
 
-        return states?.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
+        return states && states.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
       },
 
       get activeState() {
         const states = self.states();
 
-        return states?.filter((s) => getType(s).name === "LabelsModel" && s.isSelected)[0];
+        return states && states.filter((s) => getType(s).name === "LabelsModel" && s.isSelected)[0];
       },
 
       get activeLabel() {
@@ -277,10 +277,7 @@ export const AudioModel = types.compose(
               const labels = activeState?.selectedValues();
 
               selectedRegions.forEach((r) => {
-                r.update({
-                  color: selectedColor,
-                  labels: labels ?? [],
-                });
+                r.update({ color: selectedColor, labels: labels ?? [] });
 
                 const region = r.isRegion ? self.updateRegion(r) : self.addRegion(r);
 
@@ -372,7 +369,7 @@ export const AudioModel = types.compose(
         },
 
         onHotKey(e) {
-          e?.preventDefault();
+          e && e.preventDefault();
           self._ws.togglePlay();
           return false;
         },
@@ -435,9 +432,7 @@ export const AudioModel = types.compose(
           }
 
           const control = self.activeState;
-          const labels = {
-            [control.valueType]: control.selectedValues(),
-          };
+          const labels = { [control.valueType]: control.selectedValues() };
           const r = self.annotation.createResult(wsRegion, labels, control, self);
           const updatedRegion = wsRegion.convertToRegion(labels.labels);
 

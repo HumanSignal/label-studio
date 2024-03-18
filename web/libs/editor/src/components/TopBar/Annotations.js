@@ -77,8 +77,7 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
   const renderCommentIcon = (ent) => {
     if (ent.unresolved_comment_count > 0) {
       return <LsCommentRed />;
-    }
-    if (ent.comment_count > 0) {
+    } else if (ent.comment_count > 0) {
       return <LsComment />;
     }
 
@@ -141,13 +140,7 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
             }}
             extra={
               entities.length > 0 ? (
-                <Space
-                  size="none"
-                  style={{
-                    marginRight: -8,
-                    marginLeft: 8,
-                  }}
-                >
+                <Space size="none" style={{ marginRight: -8, marginLeft: 8 }}>
                   <Elem name="counter">
                     {entities.indexOf(annotationStore.selected) + 1}/{entities.length}
                   </Elem>

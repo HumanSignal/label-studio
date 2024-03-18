@@ -48,15 +48,16 @@ export const objectClean = <T extends AnyObject>(source: T) => {
 
     if (Object.prototype.toString.call(value) === "[object Object]") {
       return [...res, [key, objectClean(value as AnyObject)]];
+    } else {
+      return [...res, [key, value]];
     }
-    return [...res, [key, value]];
   }, []);
 
   return Object.fromEntries(cleanObject) as T;
 };
 
 export const numberWithPrecision = (n: number, precision = 1, removeTrailinZero = false) => {
-  if (typeof n !== "number" || Number.isNaN(n)) return "";
+  if (typeof n !== "number" || isNaN(n)) return "";
 
   let finalNum = n.toFixed(precision);
 
@@ -70,7 +71,7 @@ export const numberWithPrecision = (n: number, precision = 1, removeTrailinZero 
 export const humanReadableNumber = (n: number) => {
   const abs = Math.abs(n);
 
-  if (Number.isNaN(abs) || n === null) return "—";
+  if (isNaN(abs) || n === null) return "—";
   const normalizeNumber = (n: number) => numberWithPrecision(n, 1, true);
 
   let result;
@@ -91,8 +92,9 @@ export const humanReadableNumber = (n: number) => {
 export const absoluteURL = (path = "") => {
   if (path.match(/^https?/) || path.match(/^\/\//)) {
     return path;
+  } else {
+    return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
   }
-  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
 };
 
 export const removePrefix = (path: string) => {

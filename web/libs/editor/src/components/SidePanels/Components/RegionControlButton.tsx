@@ -9,12 +9,7 @@ export const RegionControlButton: FC<ButtonProps> = ({ children, onClick, ...pro
         e.stopPropagation(), onClick?.(e);
       }}
       type="text"
-      style={{
-        padding: 0,
-        width: 24,
-        height: 24,
-        ...(props.style ?? {}),
-      }}
+      style={{ padding: 0, width: 24, height: 24, ...(props.style ?? {}) }}
     >
       {children}
     </Button>

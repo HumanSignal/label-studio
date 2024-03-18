@@ -78,10 +78,5 @@ export const alignElements = (elem, target, align = "bottom-left", padding = 0) 
     resultAlign[1] = "right";
   }
 
-  return {
-    top: offsetTop,
-    left: offsetLeft,
-    pos,
-    align: resultAlign.join("-"),
-  };
+  return { top: offsetTop, left: offsetLeft, pos, align: resultAlign.join("-") };
 };

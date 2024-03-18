@@ -120,8 +120,9 @@ const Model = types
           choice = choice.parentChoice;
         }
         return value;
+      } else {
+        return self._resultValue;
       }
-      return self._resultValue;
     },
 
     isReadOnly() {
@@ -197,12 +198,7 @@ const HtxNewChoiceView = ({ item, store }) => {
   return (
     <Block
       name="choice"
-      mod={{
-        layout: item.parent.layout,
-        leaf: item.isLeaf,
-        notLeaf: !item.isLeaf,
-        hidden: !item.visible,
-      }}
+      mod={{ layout: item.parent.layout, leaf: item.isLeaf, notLeaf: !item.isLeaf, hidden: !item.visible }}
     >
       <Elem name="item" mod={{ notLeaf: !item.isLeaf }} style={style}>
         <Elem
@@ -215,15 +211,7 @@ const HtxNewChoiceView = ({ item, store }) => {
           onChange={changeHandler}
         >
           <HintTooltip title={item.hint} wrapper="span">
-            {item.html ? (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(item.html),
-                }}
-              />
-            ) : (
-              item._value
-            )}
+            {item.html ? <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.html) }} /> : item._value}
             {showHotkey && <Hint>[{item.hotkey}]</Hint>}
           </HintTooltip>
         </Elem>

@@ -8,7 +8,7 @@ import { FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
 import styles from "./Paragraphs.module.scss";
 
 const formatTime = (seconds) => {
-  if (Number.isNaN(seconds)) return "";
+  if (isNaN(seconds)) return "";
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -77,7 +77,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
         const duration =
           item._value[playingId]?.duration || item._value[playingId]?.end - item._value[playingId]?.start;
 
-        if (!Number.isNaN(duration)) {
+        if (!isNaN(duration)) {
           animateElement(node, 0, duration, item.playing);
         }
 
@@ -159,7 +159,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
         className={`${classNames.join(" ")} ${isFF(FF_LSDV_E_278) && styles.newUI}`}
         style={style?.phrase}
       >
-        {isContentVisible && withAudio && !Number.isNaN(v.start) && (
+        {isContentVisible && withAudio && !isNaN(v.start) && (
           <Button
             type="text"
             className={isFF(FF_LSDV_E_278) ? styles.playNewUi : styles.play}
@@ -199,7 +199,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
         {isFF(FF_LSDV_E_278) ? (
           <span className={styles.wrapperText}>
             {isActive && (
-              <span ref={readingLineRef} className={`${styles.readingLine} reading-line`} data-skip-node="true" />
+              <span ref={readingLineRef} className={`${styles.readingLine} reading-line`} data-skip-node="true"></span>
             )}
             <span className={`${cls?.text}`}>{v[item.textkey]}</span>
           </span>

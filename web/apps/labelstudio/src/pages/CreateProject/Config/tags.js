@@ -93,7 +93,7 @@ const Labels = {
           $container.appendChild($labels);
         }
         $control.setAttribute("showInline", JSON.stringify(inline));
-        $container.setAttribute("style", `display:flex;align-items:start;gap:8px;flex-direction:${direction}`);
+        $container.setAttribute("style", "display:flex;align-items:start;gap:8px;flex-direction:" + direction);
       },
       value: ($control) => {
         let $container = $control.parentNode;
@@ -110,7 +110,7 @@ const Labels = {
           return position & Node.DOCUMENT_POSITION_FOLLOWING ? "top" : "bottom";
         }
         if (direction[1] === "column") return direction[2] ? "top" : "bottom";
-        return direction[2] ? "left" : "right";
+        else return direction[2] ? "left" : "right";
       },
     },
     filter: {

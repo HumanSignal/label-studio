@@ -32,15 +32,11 @@ export class Modal extends React.Component {
 
     // with `allowToInterceptEscape` we can prevent closing modal on escape
     // by handling it inside modal, before event will be bubbled here
-    document.addEventListener("keydown", this.closeOnEscape, {
-      capture: !this.props.allowToInterceptEscape,
-    });
+    document.addEventListener("keydown", this.closeOnEscape, { capture: !this.props.allowToInterceptEscape });
   }
 
   componentWillUnmount() {
-    document.removeEventListener("keydown", this.closeOnEscape, {
-      capture: !this.props.allowToInterceptEscape,
-    });
+    document.removeEventListener("keydown", this.closeOnEscape, { capture: !this.props.allowToInterceptEscape });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -185,8 +181,9 @@ export class Modal extends React.Component {
       const Content = this.state.body;
 
       return Content instanceof Function ? <Content /> : Content;
+    } else {
+      return this.props.children;
     }
-    return this.props.children;
   }
 
   get footer() {

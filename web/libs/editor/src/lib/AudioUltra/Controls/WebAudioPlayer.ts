@@ -63,7 +63,7 @@ export class WebAudioPlayer extends Player {
 
     if (this.audioContext) {
       this.audioContext.close().finally(() => {
-        this.audioContext = undefined;
+        delete this.audioContext;
       });
     }
   }

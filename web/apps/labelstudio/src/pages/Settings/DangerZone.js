@@ -76,12 +76,12 @@ export const DangerZone = () => {
           "Reset Cache may help in cases like if you are unable to modify the labeling configuration due " +
           "to validation errors concerning existing labels, but you are confident that the labels don't exist. You can " +
           "use this action to reset the cache and try again.",
-        label: "Reset Cache",
+        label: `Reset Cache`,
       },
       {
         type: "tabs",
         help: "If the Data Manager is not loading, dropping all Data Manager tabs can help.",
-        label: "Drop All Tabs",
+        label: `Drop All Tabs`,
       },
       {
         type: "project",
@@ -109,25 +109,14 @@ export const DangerZone = () => {
             return (
               btn.disabled !== true && (
                 <div>
-                  {btn.help && (
-                    <Label
-                      description={btn.help}
-                      style={{
-                        width: 600,
-                        display: "block",
-                      }}
-                    />
-                  )}
+                  {btn.help && <Label description={btn.help} style={{ width: 600, display: "block" }} />}
                   <Button
                     key={btn.type}
                     look="danger"
                     disabled={disabled}
                     waiting={waiting}
                     onClick={handleOnClick(btn.type)}
-                    style={{
-                      marginLeft: 16,
-                      marginTop: 10,
-                    }}
+                    style={{ marginLeft: 16, marginTop: 10 }}
                   >
                     {btn.label}
                   </Button>
@@ -137,13 +126,7 @@ export const DangerZone = () => {
           })}
         </Space>
       ) : (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: 32,
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
           <Spinner size={32} />
         </div>
       )}

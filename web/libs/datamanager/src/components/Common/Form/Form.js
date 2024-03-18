@@ -184,11 +184,9 @@ export default class Form extends Component {
 
           if (fieldType === "checkbox") {
             return field.checked;
-          }
-          if (fieldType === "radio") {
+          } else if (fieldType === "radio") {
             return inputValue;
-          }
-          if (["number", "range"].includes(fieldType)) {
+          } else if (["number", "range"].includes(fieldType)) {
             return Number(field.value);
           }
 
@@ -205,11 +203,12 @@ export default class Form extends Component {
 
     if (asJSON) {
       return Object.fromEntries(requestBody);
-    }
-    const formData = new FormData();
+    } else {
+      const formData = new FormData();
 
-    requestBody.forEach(([key, value]) => formData.append(key, value));
-    return formData;
+      requestBody.forEach(([key, value]) => formData.append(key, value));
+      return formData;
+    }
   }
 
   async submit({ fieldsFilter } = {}) {
@@ -252,9 +251,10 @@ export default class Form extends Component {
     if (response === null) {
       this.props.onError?.();
       return false;
+    } else {
+      this.props.onSubmit?.(response);
+      return true;
     }
-    this.props.onSubmit?.(response);
-    return true;
   }
 
   async submitWithFetch(body) {
@@ -284,8 +284,9 @@ export default class Form extends Component {
       if (response.ok) {
         this.props.onSubmit?.(result);
         return true;
+      } else {
+        this.props.onError?.(result);
       }
-      this.props.onError?.(result);
     } catch (err) {
       console.log(err);
       this.props.onError?.(err);
@@ -349,7 +350,7 @@ export default class Form extends Component {
   }
 
   fillWithFormData(field) {
-    const value = this.props.formData?.[field.name];
+    const value = (this.props.formData ?? {})[field.name];
 
     if (field.isProtected && this.props.formData) {
       field.setValue(PASSWORD_PROTECTED_VALUE);

@@ -54,11 +54,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
                     onClick={() =>
                       WebhookDeleteModal({
                         onDelete: async () => {
-                          await api.callApi("deleteWebhook", {
-                            params: {
-                              pk: obj.id,
-                            },
-                          });
+                          await api.callApi("deleteWebhook", { params: { pk: obj.id } });
                           await fetchWebhooks();
                         },
                       })

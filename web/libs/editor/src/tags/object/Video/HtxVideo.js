@@ -27,10 +27,7 @@ import { VideoRegions } from "./VideoRegions";
 const isFFDev2715 = isFF(FF_DEV_2715);
 
 function useZoom(videoDimensions, canvasDimentions, shouldClampPan) {
-  const [zoomState, setZoomState] = useState({
-    zoom: 1,
-    pan: { x: 0, y: 0 },
-  });
+  const [zoomState, setZoomState] = useState({ zoom: 1, pan: { x: 0, y: 0 } });
   const data = useRef({});
 
   data.current.video = videoDimensions;
@@ -129,11 +126,7 @@ const HtxVideoView = ({ item, store }) => {
   const [position, _setPosition] = useState(1);
 
   const [videoSize, setVideoSize] = useState(null);
-  const [videoDimensions, setVideoDimensions] = useState({
-    width: 0,
-    height: 0,
-    ratio: 1,
-  });
+  const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0, ratio: 1 });
   const [{ zoom, pan }, { setZoomAndPan, setZoom, setPan }] = useZoom(
     videoDimensions,
     item.ref.current
@@ -366,13 +359,14 @@ const HtxVideoView = ({ item, store }) => {
         return true;
       }
       // Audio v1,v2
-
-      if (_playing === false) {
-        item.ref.current.play();
-        item.triggerSyncPlay();
-        return true;
+      else {
+        if (_playing === false) {
+          item.ref.current.play();
+          item.triggerSyncPlay();
+          return true;
+        }
+        return _playing;
       }
-      return _playing;
     });
   }, []);
 
@@ -387,13 +381,14 @@ const HtxVideoView = ({ item, store }) => {
         return false;
       }
       // Audio v1,v2
-
-      if (_playing === true) {
-        item.ref.current.pause();
-        item.triggerSyncPause();
-        return false;
+      else {
+        if (_playing === true) {
+          item.ref.current.pause();
+          item.triggerSyncPause();
+          return false;
+        }
+        return _playing;
       }
-      return _playing;
     });
   }, []);
 

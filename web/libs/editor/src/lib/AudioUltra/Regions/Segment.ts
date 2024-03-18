@@ -61,11 +61,7 @@ export class Segment extends Events<SegmentEvents> {
   protected layer!: Layer;
   protected handleWidth: number;
   protected isDragging: boolean;
-  protected draggingStartPosition: null | {
-    grabPosition: number;
-    start: number;
-    end: number;
-  };
+  protected draggingStartPosition: null | { grabPosition: number; start: number; end: number };
   protected isGrabbingEdge: { isRightEdge: boolean; isLeftEdge: boolean };
 
   constructor(options: SegmentOptions, waveform: Waveform, visualizer: Visualizer, controller: Regions) {
@@ -312,10 +308,7 @@ export class Segment extends Events<SegmentEvents> {
   };
 
   private initialize() {
-    this.layer = this.visualizer.createLayer({
-      groupName: "regions",
-      name: this.layerName,
-    });
+    this.layer = this.visualizer.createLayer({ groupName: "regions", name: this.layerName });
     // Handle region resizing
     this.on("mouseOver", this.mouseOver);
     this.on("mouseDown", this.mouseDown);

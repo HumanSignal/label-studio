@@ -74,10 +74,7 @@ const Model = types
       if (!Array.isArray(value)) return;
 
       // ids should be strings
-      self._value = value.map((item) => ({
-        ...item,
-        id: String(item.id),
-      }));
+      self._value = value.map((item) => ({ ...item, id: String(item.id) }));
     },
   }));
 

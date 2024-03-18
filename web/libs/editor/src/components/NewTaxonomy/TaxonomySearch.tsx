@@ -81,13 +81,13 @@ const TaxonomySearch = React.forwardRef<TaxonomySearchRef, TaxonomySearchProps>(
 
     const dig = (list: AntTaxonomyItem[], keepAll = false) => {
       return list.reduce<AntTaxonomyItem[]>((total, dataNode) => {
-        const children = dataNode.children;
+        const children = dataNode["children"];
 
         const match = keepAll || filterTreeNode(searchValue, dataNode);
         const childList = children?.length ? dig(children, match) : undefined;
 
         if (match || childList?.length) {
-          if (!keepAll && dataNode.children?.length) _expandedKeys.push(dataNode.key);
+          if (!keepAll && dataNode["children"]?.length) _expandedKeys.push(dataNode.key);
 
           total.push({
             ...dataNode,

@@ -34,6 +34,7 @@ export const ViewColumnType = types.enumeration([
 export const ViewColumnTypeShort = (type) => {
   switch (type) {
     default:
+    case "String":
       return "str";
     case "Number":
       return "num";
@@ -61,6 +62,7 @@ export const ViewColumnTypeShort = (type) => {
 export const ViewColumnTypeName = (type) => {
   switch (type) {
     default:
+    case "String":
       return "String";
     case "Number":
       return "Number";
@@ -103,8 +105,9 @@ export const TabColumn = types
     get hidden() {
       if (self.children) {
         return all(self.children, (c) => c.hidden);
+      } else {
+        return self.parentView?.hiddenColumns.hasColumn(self) ?? (self.parent.hidden || false);
       }
-      return self.parentView?.hiddenColumns.hasColumn(self) ?? (self.parent.hidden || false);
     },
 
     get parentView() {

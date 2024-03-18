@@ -299,29 +299,30 @@ export const TableHead = observer(
             <Elem name="extra">{extra}</Elem>
           </Block>
         );
+      } else {
+        return (
+          <Block name="table-head" ref={ref} style={style} mix="horizontal-shadow">
+            {columns.map((col) => {
+              return (
+                <ColumnRenderer
+                  key={col.id}
+                  column={col}
+                  headerRenderers={headerRenderers}
+                  cellViews={cellViews}
+                  columnHeaderExtra={columnHeaderExtra}
+                  sortingEnabled={sortingEnabled}
+                  stopInteractions={stopInteractions}
+                  decoration={decoration}
+                  onTypeChange={onTypeChange}
+                  onResize={onResize}
+                  onReset={onReset}
+                />
+              );
+            })}
+            <Elem name="extra">{extra}</Elem>
+          </Block>
+        );
       }
-      return (
-        <Block name="table-head" ref={ref} style={style} mix="horizontal-shadow">
-          {columns.map((col) => {
-            return (
-              <ColumnRenderer
-                key={col.id}
-                column={col}
-                headerRenderers={headerRenderers}
-                cellViews={cellViews}
-                columnHeaderExtra={columnHeaderExtra}
-                sortingEnabled={sortingEnabled}
-                stopInteractions={stopInteractions}
-                decoration={decoration}
-                onTypeChange={onTypeChange}
-                onResize={onResize}
-                onReset={onReset}
-              />
-            );
-          })}
-          <Elem name="extra">{extra}</Elem>
-        </Block>
-      );
     },
   ),
 );

@@ -59,16 +59,17 @@ export const create = (columns) => {
 
             if (existingAnnotation) {
               return existingAnnotation;
+            } else {
+              return {
+                id: c.id,
+                pk: c.pk,
+                draftId: c.draftId,
+                result: c.serializeAnnotation(),
+                leadTime: c.leadTime,
+                userGenerate: !!c.userGenerate,
+                sentUserGenerate: !!c.sentUserGenerate,
+              };
             }
-            return {
-              id: c.id,
-              pk: c.pk,
-              draftId: c.draftId,
-              result: c.serializeAnnotation(),
-              leadTime: c.leadTime,
-              userGenerate: !!c.userGenerate,
-              sentUserGenerate: !!c.sentUserGenerate,
-            };
           });
       },
 
@@ -220,7 +221,7 @@ export const create = (columns) => {
 
         if (total_annotations !== null) self.totalAnnotations = total_annotations;
         if (total_predictions !== null) self.totalPredictions = total_predictions;
-        if (!Number.isNaN(similarity_score_upper_limit))
+        if (!isNaN(similarity_score_upper_limit))
           self.similarityUpperLimit =
             Math.ceil(similarity_score_upper_limit * SIMILARITY_UPPER_LIMIT_PRECISION) /
             SIMILARITY_UPPER_LIMIT_PRECISION;

@@ -29,8 +29,8 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
     backgroundColor: "#fafafa",
     autoCenter: true,
     zoomToCursor: true,
-    height: item.height && !Number.isNaN(Number(item.height)) ? Number(item.height) : 96,
-    waveHeight: item.waveheight && !Number.isNaN(Number(item.waveheight)) ? Number(item.waveheight) : 32,
+    height: item.height && !isNaN(Number(item.height)) ? Number(item.height) : 96,
+    waveHeight: item.waveheight && !isNaN(Number(item.waveheight)) ? Number(item.waveheight) : 32,
     splitChannels: item.splitchannels,
     decoderType: item.decoder,
     playerType: item.player,
@@ -145,7 +145,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       {item.errors?.map((error: any, i: any) => (
         <ErrorMessage key={`err-${i}`} error={error} />
       ))}
-      <div ref={(el) => (rootRef.current = el)} />
+      <div ref={(el) => (rootRef.current = el)}></div>
       <Controls
         position={controls.currentTime}
         playing={controls.playing}

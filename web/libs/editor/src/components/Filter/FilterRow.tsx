@@ -19,10 +19,7 @@ interface FilterRowInterface extends FilterListInterface {
   onDelete: (index: number) => void;
 }
 
-const logicItems = Object.entries(Logic).map(([key, label]) => ({
-  key,
-  label,
-}));
+const logicItems = Object.entries(Logic).map(([key, label]) => ({ key, label }));
 
 export const FilterRow: FC<FilterRowInterface> = ({
   field,
@@ -39,10 +36,7 @@ export const FilterRow: FC<FilterRowInterface> = ({
   const [_inputComponent, setInputComponent] = useState(null);
 
   useEffect(() => {
-    onChange(index, {
-      field: availableFilters[_selectedField].label,
-      path: availableFilters[_selectedField].path,
-    });
+    onChange(index, { field: availableFilters[_selectedField].label, path: availableFilters[_selectedField].path });
   }, [_selectedField]);
 
   useEffect(() => {

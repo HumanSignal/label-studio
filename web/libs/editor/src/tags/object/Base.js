@@ -40,7 +40,7 @@ const ObjectBase = types
     findRegion(params) {
       let obj = null;
 
-      if (self._regionsCache?.length) {
+      if (self._regionsCache && self._regionsCache.length) {
         obj = self._regionsCache.find(({ region }) => isMatch(region, params));
       }
 

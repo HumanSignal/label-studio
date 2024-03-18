@@ -54,7 +54,7 @@ export const StorageForm = forwardRef(({ onSubmit, target, project, rootClass, s
 
     const form = formRef.current;
 
-    if (form?.validateFields()) {
+    if (form && form.validateFields()) {
       const body = form.assembleFormData({ asJSON: true });
       const type = form.getField("storage_type").value;
 

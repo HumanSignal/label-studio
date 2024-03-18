@@ -70,8 +70,9 @@ export class APIProxy {
   call(method, { params, body, headers }) {
     if (this.isValidMethod(method)) {
       return this[method](params ?? {}, { body, headers });
+    } else {
+      console.warn(`Unknown API method "${method}"`);
     }
-    console.warn(`Unknown API method "${method}"`);
   }
 
   /**
@@ -151,8 +152,7 @@ export class APIProxy {
    */
   createApiCallExecutor(methodSettings, parentPath, raw = false) {
     return async (urlParams, { headers, body } = {}) => {
-      let responseResult;
-      let responseMeta;
+      let responseResult, responseMeta;
 
       try {
         const finalParams = {
@@ -317,7 +317,7 @@ export class APIProxy {
    * @param {Dict} data
    * @private
    */
-  createUrl(endpoint, data, parentPath, gateway) {
+  createUrl(endpoint, data = {}, parentPath, gateway) {
     const url = new URL(gateway ? this.resolveGateway(gateway) : this.gateway);
     const usedKeys = [];
 

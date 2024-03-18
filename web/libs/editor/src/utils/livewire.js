@@ -12,10 +12,10 @@ this.mousedown = (event) => {
     clearPaths();
     clearParentPoints();
     // do the training from the first point
-    const p = new dwv.math.FastPoint2D(event._x, event._y);
+    var p = new dwv.math.FastPoint2D(event._x, event._y);
     scissors.doTraining(p);
     // add the initial point to the path
-    const p0 = new dwv.math.Point2D(event._x, event._y);
+    var p0 = new dwv.math.Point2D(event._x, event._y);
     path.addPoint(p0);
     path.addControlPoint(p0);
   } else {
@@ -36,7 +36,7 @@ this.mousedown = (event) => {
     else {
       path = currentPath;
       clearParentPoints();
-      const pn = new dwv.math.FastPoint2D(event._x, event._y);
+      var pn = new dwv.math.FastPoint2D(event._x, event._y);
       scissors.doTraining(pn);
       path.addControlPoint(currentPath.getPoint(0));
     }
@@ -48,11 +48,11 @@ this.mousemove = (event) => {
     return;
   }
   // set the point to find the path to
-  let p = new dwv.math.FastPoint2D(event._x, event._y);
+  var p = new dwv.math.FastPoint2D(event._x, event._y);
   scissors.setPoint(p);
   // do the work
-  let results = 0;
-  let stop = false;
+  var results = 0;
+  var stop = false;
   while (!parentPoints[p.y][p.x] && !stop) {
     results = scissors.doWork();
 
@@ -60,9 +60,9 @@ this.mousemove = (event) => {
       stop = true;
     } else {
       // fill parents
-      for (let i = 0; i < results.length - 1; i += 2) {
-        const _p = results[i];
-        const _q = results[i + 1];
+      for (var i = 0; i < results.length - 1; i += 2) {
+        var _p = results[i];
+        var _q = results[i + 1];
         parentPoints[_p.y][_p.x] = _q;
       }
     }
@@ -90,12 +90,12 @@ this.mousemove = (event) => {
     shapeGroup.destroy();
   }
   // create shape
-  const factory = new dwv.tool.RoiFactory();
+  var factory = new dwv.tool.RoiFactory();
   shapeGroup = factory.create(currentPath.pointArray, self.style);
   shapeGroup.id(dwv.math.guid());
 
   // get the position group
-  const posGroup = app.getDrawController().getCurrentPosGroup();
+  var posGroup = app.getDrawController().getCurrentPosGroup();
   // add shape group to position group
   posGroup.add(shapeGroup);
 

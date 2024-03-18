@@ -37,12 +37,7 @@ export const AliveRegion = (RegionComponent: IReactComponent<RegionComponentProp
     const canRender = options?.renderHidden || !item.hidden;
     const shouldNotUsePortal = !isFF(FF_DBLCLICK_DELAY) || options?.shouldNotUsePortal;
     const Wrapper = (shouldNotUsePortal ? Fragment : Portal) as ExoticComponent<PortalProps>;
-    const wrapperProps = shouldNotUsePortal
-      ? {}
-      : {
-          selector: ".selection-regions-layer",
-          enabled: item.inSelection,
-        };
+    const wrapperProps = shouldNotUsePortal ? {} : { selector: ".selection-regions-layer", enabled: item.inSelection };
     const isInTree = !!item.annotation;
     const setShapeRef = useCallback(
       (ref) => {

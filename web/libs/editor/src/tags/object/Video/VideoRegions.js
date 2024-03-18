@@ -170,11 +170,7 @@ const VideoRegionsPure = ({
     if (Math.abs(newRegion.x - x) < MIN_SIZE && Math.abs(newRegion.y - y) < MIN_SIZE) {
       setNewRegion(null);
     } else {
-      setNewRegion((region) => ({
-        ...region,
-        width: x - region.x,
-        height: y - region.y,
-      }));
+      setNewRegion((region) => ({ ...region, width: x - region.x, height: y - region.y }));
     }
     setDrawingMode(false);
   };
@@ -185,7 +181,7 @@ const VideoRegionsPure = ({
     const stage = tr.getStage();
     // @todo not an obvious way to not render transformer for hidden regions
     // @todo could it be rewritten to usual react way?
-    const shapes = selected.map((shape) => stage.findOne(`#${shape.id}`)).filter(Boolean);
+    const shapes = selected.map((shape) => stage.findOne("#" + shape.id)).filter(Boolean);
 
     tr.nodes(shapes);
     tr.getLayer().batchDraw();
@@ -275,7 +271,7 @@ const Shape = observer(({ reg, frame, stageRef, ...props }) => {
         onClick={(e) => {
           const annotation = getParentOfType(reg, Annotation);
 
-          if (annotation?.relationMode) {
+          if (annotation && annotation.relationMode) {
             stageRef.current.container().style.cursor = Constants.DEFAULT_CURSOR;
           }
 

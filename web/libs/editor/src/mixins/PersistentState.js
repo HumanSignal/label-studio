@@ -22,10 +22,7 @@ const PersistentStateMixin = types
 
     storeValues() {
       const key = self.persistentValuesKey;
-      const obj = {
-        task: getRoot(self).task?.id,
-        values: self.persistentValues,
-      };
+      const obj = { task: getRoot(self).task?.id, values: self.persistentValues };
 
       localStorage.setItem(key, JSON.stringify(obj));
     },

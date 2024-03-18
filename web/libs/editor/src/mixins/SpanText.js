@@ -31,9 +31,7 @@ export default types
 
     createSpans() {
       const labelColor = self.getLabelColor();
-      const spans = highlightRange(self, "htx-highlight", {
-        backgroundColor: labelColor,
-      });
+      const spans = highlightRange(self, "htx-highlight", { backgroundColor: labelColor });
 
       const lastSpan = spans[spans.length - 1];
 
@@ -118,7 +116,7 @@ export default types
         return false;
       };
 
-      spans?.forEach((s) => addEvent(s));
+      spans && spans.forEach((s) => addEvent(s));
     },
 
     selectRegion() {
@@ -130,10 +128,7 @@ export default types
         if (first.scrollIntoViewIfNeeded) {
           first.scrollIntoViewIfNeeded();
         } else {
-          first.scrollIntoView({
-            block: "center",
-            behavior: "smooth",
-          });
+          first.scrollIntoView({ block: "center", behavior: "smooth" });
         }
       }
     },

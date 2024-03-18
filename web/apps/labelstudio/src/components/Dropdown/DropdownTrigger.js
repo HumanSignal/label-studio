@@ -74,10 +74,7 @@ export const DropdownTrigger = forwardRef(
 
     useEffect(() => {
       document.addEventListener("click", handleClick, { capture: true });
-      return () =>
-        document.removeEventListener("click", handleClick, {
-          capture: true,
-        });
+      return () => document.removeEventListener("click", handleClick, { capture: true });
     }, [handleClick]);
 
     const contextValue = useMemo(

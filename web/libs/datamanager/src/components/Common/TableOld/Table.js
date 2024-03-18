@@ -136,7 +136,7 @@ export const Table = observer(
               style={{ width: 32, height: 32, padding: 0 }}
               onClick={() => {
                 modal({
-                  title: `Source for task ${out?.id}`,
+                  title: "Source for task " + out?.id,
                   style: { width: 800 },
                   body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
                 });
@@ -255,8 +255,9 @@ export const Table = observer(
         const scrollOffset = index * h - height / 2 + h / 2; // + headerHeight
 
         return (cachedScrollOffset.current = scrollOffset);
+      } else {
+        return 0;
       }
-      return 0;
     }, []);
 
     const itemKey = useCallback(

@@ -199,11 +199,12 @@ export default class Form extends React.Component {
 
     if (asJSON) {
       return requestBody.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
-    }
-    const formData = new FormData();
+    } else {
+      const formData = new FormData();
 
-    requestBody.forEach(([key, value]) => formData.append(key, value));
-    return formData;
+      requestBody.forEach(([key, value]) => formData.append(key, value));
+      return formData;
+    }
   }
 
   async submit({ fieldsFilter } = {}) {
@@ -246,9 +247,10 @@ export default class Form extends React.Component {
     if (response === null) {
       this.props.onError?.();
       return false;
+    } else {
+      this.props.onSubmit?.(response);
+      return true;
     }
-    this.props.onSubmit?.(response);
-    return true;
   }
 
   async submitWithFetch(body) {
@@ -278,8 +280,9 @@ export default class Form extends React.Component {
       if (response.ok) {
         this.props.onSubmit?.(result);
         return true;
+      } else {
+        this.props.onError?.(result);
       }
-      this.props.onError?.(result);
     } catch (err) {
       console.log(err);
       this.props.onError?.(err);
@@ -339,7 +342,7 @@ export default class Form extends React.Component {
   }
 
   fillWithFormData(field) {
-    const value = this.props.formData?.[field.name];
+    const value = (this.props.formData ?? {})[field.name];
 
     if (field.isProtected && this.props.formData) {
       field.setValue(PASSWORD_PROTECTED_VALUE);

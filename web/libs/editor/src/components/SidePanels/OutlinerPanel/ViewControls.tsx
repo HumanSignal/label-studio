@@ -96,13 +96,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
       );
 
     return (
-      <Block
-        name="view-controls"
-        mod={{
-          collapsed: context.locked,
-          FF_LSDV_4992: isFF(FF_LSDV_4992),
-        }}
-      >
+      <Block name="view-controls" mod={{ collapsed: context.locked, FF_LSDV_4992: isFF(FF_LSDV_4992) }}>
         <Grouping
           value={grouping}
           options={["manual", "type", "label"]}

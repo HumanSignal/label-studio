@@ -73,7 +73,7 @@ describe("parseCSV; csv with header", () => {
     const expected = { ...data };
 
     expected.time = expected.timestamp.map(dateISO);
-    expected.timestamp = undefined;
+    delete expected.timestamp;
     expected.gender = ["M", "F", "F"];
     expect(parseCSV(csv, ",")).toStrictEqual([expected, ["time", "cases", "rate", "gender"]]);
   });
@@ -107,11 +107,7 @@ describe("parseCSV; headless csv", () => {
 
   test("Empty values", () => {
     const csv = ["123,0.01,M", "125,,F", "135,0.04,"].join("\n");
-    const expected = {
-      0: [123, 125, 135],
-      1: [0.01, 0, 0.04],
-      2: ["M", "F", 0],
-    };
+    const expected = { 0: [123, 125, 135], 1: [0.01, 0, 0.04], 2: ["M", "F", 0] };
 
     expect(parseCSV(csv, ",")).toStrictEqual([expected, ["0", "1", "2"]]);
   });

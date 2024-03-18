@@ -527,12 +527,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
     return updatedProps;
   }, [partialEmptyBaseProps, showComments]);
 
-  const emptyBaseProps = {
-    ...getPartialEmptyBaseProps,
-    ...commonProps,
-    breakPointActiveTab,
-    setBreakPointActiveTab,
-  };
+  const emptyBaseProps = { ...getPartialEmptyBaseProps, ...commonProps, breakPointActiveTab, setBreakPointActiveTab };
 
   return (
     <SidePanelsContext.Provider value={contextValue}>
@@ -577,14 +572,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
                     return <Fragment key={panelType}>{content}</Fragment>;
                   }
                   return (
-                    <Elem
-                      key={panelType}
-                      name="wrapper"
-                      mod={{
-                        align: panelType,
-                        snap: snap === panelType,
-                      }}
-                    >
+                    <Elem key={panelType} name="wrapper" mod={{ align: panelType, snap: snap === panelType }}>
                       {content}
                     </Elem>
                   );

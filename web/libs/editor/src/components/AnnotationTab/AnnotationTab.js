@@ -29,15 +29,7 @@ export const AnnotationTab = observer(({ store }) => {
       {selectionSize ? (
         <Entity store={store} annotation={annotation} />
       ) : hasSegmentation ? (
-        <p
-          style={{
-            marginTop: 12,
-            marginBottom: 0,
-            paddingInline: 15,
-          }}
-        >
-          No Region selected
-        </p>
+        <p style={{ marginTop: 12, marginBottom: 0, paddingInline: 15 }}>No Region selected</p>
       ) : null}
 
       {hasSegmentation && <Entities store={store} annotation={annotation} regionStore={annotation.regionStore} />}

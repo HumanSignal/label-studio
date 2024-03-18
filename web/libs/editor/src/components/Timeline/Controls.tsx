@@ -358,10 +358,7 @@ const TimeDisplay: FC<TimeDisplay> = ({ currentTime, position, duration, framera
   const pos = position - 1;
   const formatter = formatPosition ?? positionFromTime;
   const commonOptions = { position: pos, fps: framerate, length };
-  const currentTimeFormatted = formatter({
-    time: currentTime,
-    ...commonOptions,
-  });
+  const currentTimeFormatted = formatter({ time: currentTime, ...commonOptions });
   const totalTimeFormatted = formatter({ time: duration, ...commonOptions });
 
   return (

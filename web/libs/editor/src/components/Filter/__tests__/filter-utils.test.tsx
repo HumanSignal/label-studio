@@ -23,11 +23,7 @@ describe("FilterItems", () => {
   ];
 
   test("should filter items that contain the specified value", () => {
-    const filterItem = {
-      operation: "contains",
-      path: "item.name",
-      value: "Car",
-    };
+    const filterItem = { operation: "contains", path: "item.name", value: "Car" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -47,11 +43,7 @@ describe("FilterItems", () => {
   });
 
   test("should filter items that do not contain the specified value", () => {
-    const filterItem = {
-      operation: "not_contains",
-      path: "item.name",
-      value: "Car",
-    };
+    const filterItem = { operation: "not_contains", path: "item.name", value: "Car" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -65,11 +57,7 @@ describe("FilterItems", () => {
   });
 
   test("should filter items that value is between the specified values", () => {
-    const filterItem = {
-      operation: "in",
-      path: "item.value",
-      value: { min: 26, max: 35 },
-    };
+    const filterItem = { operation: "in", path: "item.value", value: { min: 26, max: 35 } };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -83,11 +71,7 @@ describe("FilterItems", () => {
   });
 
   test("should filter items that value is not between the specified values", () => {
-    const filterItem = {
-      operation: "not_in",
-      path: "item.value",
-      value: { min: 26, max: 35 },
-    };
+    const filterItem = { operation: "not_in", path: "item.value", value: { min: 26, max: 35 } };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -107,11 +91,7 @@ describe("FilterItems", () => {
   });
 
   test("should filter items that value match with regex specified value", () => {
-    const filterItem = {
-      operation: "regex",
-      path: "item.name",
-      value: "[C-O]",
-    };
+    const filterItem = { operation: "regex", path: "item.name", value: "[C-O]" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -175,22 +155,14 @@ describe("FilterItems", () => {
   });
 
   test("should return all items when value is empty", () => {
-    const filterItem = {
-      operation: "contains",
-      path: "item.name",
-      value: "",
-    };
+    const filterItem = { operation: "contains", path: "item.name", value: "" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual(items);
   });
 
   test("should filter items that have a greater value than the specified value ", () => {
-    const filterItem = {
-      operation: "greater",
-      path: "item.value",
-      value: "25",
-    };
+    const filterItem = { operation: "greater", path: "item.value", value: "25" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -210,11 +182,7 @@ describe("FilterItems", () => {
   });
 
   test("should filter items that have a less value than the specified value ", () => {
-    const filterItem = {
-      operation: "less",
-      path: "item.value",
-      value: "40",
-    };
+    const filterItem = { operation: "less", path: "item.value", value: "40" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -234,11 +202,7 @@ describe("FilterItems", () => {
   });
 
   test("should filter items that have a less or equal value than the specified value ", () => {
-    const filterItem = {
-      operation: "less_or_equal",
-      path: "item.value",
-      value: "30",
-    };
+    const filterItem = { operation: "less_or_equal", path: "item.value", value: "30" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -258,11 +222,7 @@ describe("FilterItems", () => {
   });
 
   test("should filter items that have a greater or equal value than the specified value ", () => {
-    const filterItem = {
-      operation: "greater_or_equal",
-      path: "item.value",
-      value: "30",
-    };
+    const filterItem = { operation: "greater_or_equal", path: "item.value", value: "30" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -282,22 +242,14 @@ describe("FilterItems", () => {
   });
 
   test("should return all items when operation is invalid", () => {
-    const filterItem = {
-      operation: "invalid_operation",
-      path: "item.name",
-      value: "Doe",
-    };
+    const filterItem = { operation: "invalid_operation", path: "item.name", value: "Doe" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual(items);
   });
 
   test("should filter items that is equal as the specified value", () => {
-    const filterItem = {
-      operation: "equal",
-      path: "item.value",
-      value: "25",
-    };
+    const filterItem = { operation: "equal", path: "item.value", value: "25" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([
@@ -311,11 +263,7 @@ describe("FilterItems", () => {
   });
 
   test("should filter items that is not equal as the specified value", () => {
-    const filterItem = {
-      operation: "not_equal",
-      path: "item.value",
-      value: "25",
-    };
+    const filterItem = { operation: "not_equal", path: "item.value", value: "25" };
     const filteredItems = FilterItemsByOperation(items, filterItem);
 
     expect(filteredItems).toEqual([

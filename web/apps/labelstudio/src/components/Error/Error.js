@@ -69,14 +69,7 @@ export const ErrorWrapper = ({
           {validation.map(([field, errors]) => (
             <Fragment key={field}>
               {[].concat(errors).map((err, i) => (
-                <Elem
-                  tag="li"
-                  key={i}
-                  name="message"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHtml(err),
-                  }}
-                />
+                <Elem tag="li" key={i} name="message" dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }} />
               ))}
             </Fragment>
           ))}

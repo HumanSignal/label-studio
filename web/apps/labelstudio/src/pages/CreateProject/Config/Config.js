@@ -48,11 +48,7 @@ const Label = ({ label, template, color }) => {
           type="color"
           className={configClass.elem("label-color")}
           value={colorNames[color] || color}
-          onChange={(e) =>
-            template.changeLabel(label, {
-              background: e.target.value,
-            })
-          }
+          onChange={(e) => template.changeLabel(label, { background: e.target.value })}
         />
       </label>
       <span>{value}</span>
@@ -104,7 +100,7 @@ const ConfigureControl = ({ control, template }) => {
       <form className={configClass.elem("add-labels")} action="">
         <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
         <span>Use new line as a separator to add multiple labels</span>
-        <textarea name="labels" id="" cols="30" rows="5" ref={refLabels} onKeyPress={onKeyPress} />
+        <textarea name="labels" id="" cols="30" rows="5" ref={refLabels} onKeyPress={onKeyPress}></textarea>
         <input type="button" value="Add" onClick={onAddLabels} />
       </form>
       <div className={configClass.elem("current-labels")}>
@@ -231,15 +227,15 @@ const ConfigureColumn = ({ template, obj, columns }) => {
   const [isManual, setIsManual] = useState(!!value && !columns?.includes(value));
   // value is stored in state to make input conrollable
   // changes will be sent by Enter and blur
-  const [newValue, setNewValue] = useState(`$${value}`);
+  const [newValue, setNewValue] = useState("$" + value);
 
   // update local state when external value changes
-  useEffect(() => setNewValue(`$${value}`), [value]);
+  useEffect(() => setNewValue("$" + value), [value]);
 
   const updateValue = (value) => {
     const newValue = value.replace(/^\$/, "");
 
-    obj.setAttribute("value", `$${newValue}`);
+    obj.setAttribute("value", "$" + newValue);
     template.render();
   };
 
@@ -249,8 +245,7 @@ const ConfigureColumn = ({ template, obj, columns }) => {
     if (value === "-") {
       setIsManual(true);
       return;
-    }
-    if (isManual) {
+    } else if (isManual) {
       setIsManual(false);
     }
 
@@ -260,7 +255,7 @@ const ConfigureColumn = ({ template, obj, columns }) => {
   const handleChange = (e) => {
     const newValue = e.target.value.replace(/^\$/, "");
 
-    setNewValue(`$${newValue}`);
+    setNewValue("$" + newValue);
   };
 
   const handleBlur = () => {
@@ -357,7 +352,7 @@ const Configurator = ({
 
     setLoading(true);
 
-    const validation = await api.callApi("validateConfig", {
+    const validation = await api.callApi(`validateConfig`, {
       params: { pk: project.id },
       body: { label_config: configToCheck },
       errorFilter: () => true,
@@ -404,7 +399,7 @@ const Configurator = ({
         setTemplate(config);
       } catch (e) {
         setParserError({
-          detail: "Parser error",
+          detail: `Parser error`,
           validation_errors: [e.message],
         });
       }
@@ -468,12 +463,7 @@ const Configurator = ({
         </header>
         <div className={configClass.elem("editor")}>
           {configure === "code" && (
-            <div
-              className={configClass.elem("code")}
-              style={{
-                display: configure === "code" ? undefined : "none",
-              }}
-            >
+            <div className={configClass.elem("code")} style={{ display: configure === "code" ? undefined : "none" }}>
               <CodeMirror
                 name="code"
                 id="edit_code"
@@ -506,9 +496,7 @@ const Configurator = ({
           {visualLoaded && (
             <div
               className={configClass.elem("visual")}
-              style={{
-                display: configure === "visual" ? undefined : "none",
-              }}
+              style={{ display: configure === "visual" ? undefined : "none" }}
             >
               {isEmptyConfig(config) && <EmptyConfigPlaceholder />}
               <ConfigureColumns columns={columns} project={project} template={template} />

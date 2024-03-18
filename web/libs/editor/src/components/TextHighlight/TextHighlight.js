@@ -20,7 +20,7 @@ class TextHighlight extends Component {
    * Return first ok element
    */
   getRange(charIndex) {
-    if (this.props.ranges?.length) {
+    if (this.props.ranges && this.props.ranges.length) {
       return this.props.ranges.find((range) => charIndex >= range.start && charIndex <= range.end);
     }
   }
@@ -45,7 +45,7 @@ class TextHighlight extends Component {
     /**
      * Line break
      */
-    if (char?.charCodeAt()) {
+    if (char && char.charCodeAt()) {
       nl = char.charCodeAt(0) === 10;
     }
 
@@ -259,8 +259,7 @@ class TextHighlight extends Component {
   getNode(i, range, text, url, isEmoji) {
     if (url.length) {
       return this.getUrlNode(i, range, url);
-    }
-    if (isEmoji) {
+    } else if (isEmoji) {
       return this.getEmojiNode(i, range);
     }
 

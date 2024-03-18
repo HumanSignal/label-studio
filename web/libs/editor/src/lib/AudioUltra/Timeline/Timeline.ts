@@ -23,12 +23,7 @@ type LabelMaxWidth = {
   [includeMs: string]: number; // true | false
 };
 
-export type TimelineMark = {
-  x: number;
-  time: number;
-  type: "mark" | "label";
-  includeMs: boolean;
-};
+export type TimelineMark = { x: number; time: number; type: "mark" | "label"; includeMs: boolean };
 
 export class Timeline {
   private waveform: Waveform;
@@ -68,11 +63,7 @@ export class Timeline {
 
     this.visualizer.reserveSpace({ height: this.height });
 
-    this.layer = this.visualizer.createLayer({
-      name: "timeline",
-      offscreen: true,
-      zIndex: 103,
-    });
+    this.layer = this.visualizer.createLayer({ name: "timeline", offscreen: true, zIndex: 103 });
     this.visualizer.on("initialized", () => {
       this.visualizer.on("draw", () => this.render());
     });
@@ -221,7 +212,7 @@ export class Timeline {
     const includeMs = viewableDuration < 60;
     const precision = 10;
 
-    const factor = 10 ** 10;
+    const factor = Math.pow(10, 10);
 
     for (let i = segmentStart; i < segmentEnd; i += interval) {
       const time = toPrecision(i, precision);
@@ -230,12 +221,7 @@ export class Timeline {
 
       const intervalType: TimelineMark["type"] = isLabelInterval === 0 ? "label" : "mark";
 
-      this.renderInterval({
-        x: this.mapToPx(i - exactStart),
-        time,
-        type: intervalType,
-        includeMs,
-      });
+      this.renderInterval({ x: this.mapToPx(i - exactStart), time, type: intervalType, includeMs });
     }
   }
 
@@ -281,18 +267,18 @@ export class Timeline {
 
     const exactInterval = toPrecision(lineSpace, Math.abs(significantDigits));
 
-    const significantDigitValue = Math.ceil(exactInterval / 10 ** significantDigits);
+    const significantDigitValue = Math.ceil(exactInterval / Math.pow(10, significantDigits));
 
-    let interval = 10 ** significantDigits;
+    let interval = Math.pow(10, significantDigits);
 
     if (significantDigitValue > 6) {
-      interval = 10 ** significantDigits * 7.5;
+      interval = Math.pow(10, significantDigits) * 7.5;
     } else if (significantDigitValue > 4) {
-      interval = 10 ** significantDigits * 5;
+      interval = Math.pow(10, significantDigits) * 5;
     } else if (significantDigitValue > 2) {
-      interval = 10 ** significantDigits * 2.5;
+      interval = Math.pow(10, significantDigits) * 2.5;
     } else if (significantDigitValue > 1) {
-      interval = 10 ** significantDigits * 1.25;
+      interval = Math.pow(10, significantDigits) * 1.25;
     }
 
     const includeMs = viewableDuration < 60;
@@ -302,18 +288,18 @@ export class Timeline {
 
     const significantLabelDigits = Math.floor(Math.log10(exactLabelInterval));
 
-    const significantLabelDigitValue = Math.ceil(exactLabelInterval / 10 ** significantLabelDigits);
+    const significantLabelDigitValue = Math.ceil(exactLabelInterval / Math.pow(10, significantLabelDigits));
 
     let labelInterval = toPrecision(10, significantLabelDigits);
 
     if (significantLabelDigitValue > 5) {
-      labelInterval = 10 ** significantLabelDigits * 7.5;
+      labelInterval = Math.pow(10, significantLabelDigits) * 7.5;
     } else if (significantLabelDigitValue > 3) {
-      labelInterval = 10 ** significantLabelDigits * 5;
+      labelInterval = Math.pow(10, significantLabelDigits) * 5;
     } else if (significantLabelDigitValue > 2) {
-      labelInterval = 10 ** significantLabelDigits * 2.5;
+      labelInterval = Math.pow(10, significantLabelDigits) * 2.5;
     } else if (significantLabelDigitValue > 1) {
-      labelInterval = 10 ** significantLabelDigits * 1.25;
+      labelInterval = Math.pow(10, significantLabelDigits) * 1.25;
     }
 
     return [interval, labelInterval];

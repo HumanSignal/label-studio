@@ -489,10 +489,7 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden,
         style={{
           ...padding,
         }}
-        mod={{
-          collapsed: sidepanelsCollapsed,
-          newLabelingUI: isFF(FF_DEV_3873),
-        }}
+        mod={{ collapsed: sidepanelsCollapsed, newLabelingUI: isFF(FF_DEV_3873) }}
       >
         {initialized && (
           <>
@@ -509,14 +506,7 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden,
                   }
 
                   return (
-                    <Elem
-                      key={key}
-                      name="wrapper"
-                      mod={{
-                        align: key,
-                        snap: snap === key,
-                      }}
-                    >
+                    <Elem key={key} name="wrapper" mod={{ align: key, snap: snap === key }}>
                       {content}
                     </Elem>
                   );

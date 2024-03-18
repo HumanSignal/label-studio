@@ -65,7 +65,7 @@ const SelectionMap = types
       },
       select(region) {
         self.selected.put(region);
-        region.selectRegion?.();
+        region.selectRegion && region.selectRegion();
 
         if (self.highlighted) {
           // @todo some backward compatibility, should be rewritten to state handling
@@ -248,14 +248,13 @@ export default types
       getRegionsTree(enrich) {
         if (self.group === null || self.group === "manual") {
           return self.asTree(enrich);
-        }
-        if (self.group === "label") {
+        } else if (self.group === "label") {
           return self.asLabelsTree(enrich);
-        }
-        if (self.group === "type") {
+        } else if (self.group === "type") {
           return self.asTypeTree(enrich);
+        } else {
+          console.error(`Grouping by ${self.group} is not implemented`);
         }
-        console.error(`Grouping by ${self.group} is not implemented`);
       },
 
       asTree(enrich) {
@@ -488,7 +487,7 @@ export default types
       // find regions that have that region as a parent
       const children = self.filterByParentID(region.id);
 
-      children?.forEach((r) => r.setParentID(region.parentID));
+      children && children.forEach((r) => r.setParentID(region.parentID));
 
       getEnv(self).events.invoke("entityDelete", region);
 

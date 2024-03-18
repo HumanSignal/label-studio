@@ -93,14 +93,7 @@ const Model = types
     children: Types.unionArray(["channel", "timeseriesoverview", "view", "hypertext"]),
 
     width: 840,
-    margin: types.frozen({
-      top: 20,
-      right: 20,
-      bottom: 30,
-      left: 50,
-      min: 10,
-      max: 10,
-    }),
+    margin: types.frozen({ top: 20, right: 20, bottom: 30, left: 50, min: 10, max: 10 }),
     brushRange: types.array(types.number),
 
     // _value: types.optional(types.string, ""),
@@ -170,7 +163,7 @@ const Model = types
         data = { ...data, [self.keyColumn]: indices };
 
         // Require a timeformat for non numeric values
-      } else if (!self.timeformat && Number.isNaN(data[self.keyColumn][0])) {
+      } else if (!self.timeformat && isNaN(data[self.keyColumn][0])) {
         const message = [
           `Looks like your <b>timeColumn</b> (${self.timecolumn}) contains non-numbers.`,
           "You have to use <b>timeFormat</b> parameter if your values are datetimes.",
@@ -495,14 +488,7 @@ const Model = types
           let separator = self.sep;
 
           if (separator?.length > 1) {
-            const aliases = {
-              tab: "\t",
-              "\\t": "\t",
-              space: " ",
-              auto: "auto",
-              comma: ",",
-              dot: ".",
-            };
+            const aliases = { tab: "\t", "\\t": "\t", space: " ", auto: "auto", comma: ",", dot: "." };
 
             separator = aliases[separator] || separator[0];
           }
@@ -768,7 +754,7 @@ const Overview = observer(({ item, data, series }) => {
       .attr("viewBox", [0, 0, width + margin.left + margin.right, focusHeight + margin.bottom])
       .style("display", "block")
       .append("g")
-      .attr("transform", `translate(${margin.left},0)`);
+      .attr("transform", "translate(" + margin.left + ",0)");
 
     gAxis.current = focus.current.append("g").attr("transform", `translate(0,${focusHeight})`);
 

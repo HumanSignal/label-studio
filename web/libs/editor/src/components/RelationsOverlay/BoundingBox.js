@@ -63,10 +63,7 @@ const stageRelatedBBox = (region, bbox) => {
   const transformedBBox = Geometry.clampBBox(
     Geometry.modifyBBoxCoords(bbox, region.parent.zoomOriginalCoords),
     { x: 0, y: 0 },
-    {
-      x: region.parent.canvasSize.width,
-      y: region.parent.canvasSize.height,
-    },
+    { x: region.parent.canvasSize.width, y: region.parent.canvasSize.height },
   );
 
   return {

@@ -38,10 +38,10 @@ const setTags = () => {
       const { version, commit } = data ?? {};
 
       if (version) {
-        tags[`version-${packageName}`] = version;
+        tags["version-" + packageName] = version;
       }
       if (commit) {
-        tags[`commit-${packageName}`] = commit;
+        tags["commit-" + packageName] = commit;
       }
     });
   }

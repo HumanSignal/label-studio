@@ -109,7 +109,7 @@ const HtxView = observer(({ item }) => {
   }
 
   if (item.isVisible === false) {
-    style.display = "none";
+    style["display"] = "none";
   }
 
   return (

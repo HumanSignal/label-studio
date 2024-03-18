@@ -12,7 +12,7 @@ interface AudioNextProps {
 const numberify = (val: any, defaults: Record<string, number>) => {
   const numVal = Number(val);
 
-  return Number.isNaN(val)
+  return isNaN(val)
     ? defaults.default
     : numVal < defaults.min
       ? defaults.min

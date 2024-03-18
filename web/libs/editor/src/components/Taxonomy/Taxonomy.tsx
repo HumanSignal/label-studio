@@ -236,15 +236,7 @@ const Item: React.FC<RowProps> = ({ style, item, dimensionCallback, maxWidth, is
   }, []);
 
   return (
-    <div
-      ref={itemContainer}
-      style={{
-        paddingLeft: padding,
-        maxWidth,
-        ...style,
-        width: "fit-content",
-      }}
-    >
+    <div ref={itemContainer} style={{ paddingLeft: padding, maxWidth, ...style, width: "fit-content" }}>
       {!isAddingItem ? (
         <>
           <div
@@ -347,10 +339,7 @@ const filterTreeByPredicate = (flatten: TaxonomyItem[], predicate: (item: Taxono
     const item = flatten[i];
 
     if (item.depth === d) {
-      const adjusted: TaxonomyItem = {
-        ...item,
-        children: childs[d] ?? [],
-      };
+      const adjusted: TaxonomyItem = { ...item, children: childs[d] ?? [] };
 
       childs[d] = [];
       if (d) {
@@ -508,7 +497,7 @@ const Taxonomy = ({
       if (options.canRemoveItems === false && !newSelected.length) return;
 
       setInternalSelected(newSelected);
-      onChange?.(null, newSelected);
+      onChange && onChange(null, newSelected);
     };
 
     return [selected, setSelected];
@@ -544,7 +533,7 @@ const Taxonomy = ({
         dontDoubleScroll(e);
         if (e.shiftKey) {
           setOpen(true);
-          searchInput?.focus();
+          searchInput && searchInput.focus();
         }
         if (index >= 0) shiftFocus(index, 1);
         if (searchInput === focusedElement) shiftFocus(0, 0);
@@ -552,11 +541,11 @@ const Taxonomy = ({
       case "ArrowUp":
         dontDoubleScroll(e);
         if (index > 0) shiftFocus(index, -1);
-        else if (index === 0) searchInput?.focus();
+        else if (index === 0) searchInput && searchInput.focus();
         break;
       case "ArrowRight":
         if (index >= 0) focusedElement.parentNode?.parentNode?.toggle(focusedElement.id);
-        searchInput?.focus();
+        searchInput && searchInput.focus();
         break;
       default:
         break;

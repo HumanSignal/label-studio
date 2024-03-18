@@ -24,14 +24,14 @@ const SelectedModelMixin = types
       // return first selected label color
       const sel = self.tiedChildren.find((c) => c.selected === true);
 
-      return sel?.background;
+      return sel && sel.background;
     },
 
     get selectedColor() {
       // return first selected label color
       const sel = self.tiedChildren.find((c) => c.selected === true);
 
-      return sel?.background;
+      return sel && sel.background;
     },
 
     get isSelected() {
@@ -84,17 +84,18 @@ const SelectedModelMixin = types
     checkMaxUsages() {
       if (isFF(FF_DEV_3666)) {
         return self.tiedChildren.filter((c) => !c.canBeUsed());
-      }
-      const list = self.tiedChildren.filter((c) => !c.canBeUsed());
+      } else {
+        const list = self.tiedChildren.filter((c) => !c.canBeUsed());
 
-      if (list.length) list.forEach((c) => c.setSelected(false));
-      return list;
+        if (list.length) list.forEach((c) => c.setSelected(false));
+        return list;
+      }
     },
 
     selectFirstVisible() {
       const f = self.tiedChildren.find((c) => c.visible);
 
-      f?.toggleSelected();
+      f && f.toggleSelected();
 
       return f;
     },

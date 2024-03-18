@@ -15,13 +15,7 @@ interface RectProps extends RectPropsExtend {
   selected: boolean;
   draggable: boolean;
   listening: boolean;
-  box: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    rotation: number;
-  };
+  box: { x: number; y: number; width: number; height: number; rotation: number };
   workingArea: WorkingArea;
   onDragMove: (e: KonvaEventObject<DragEvent>) => void;
 }

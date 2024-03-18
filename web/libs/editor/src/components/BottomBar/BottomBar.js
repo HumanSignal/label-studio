@@ -13,12 +13,7 @@ export const BottomBar = observer(({ store }) => {
   const isViewAll = annotationStore?.viewingAll === true;
 
   return store && !isViewAll ? (
-    <Block
-      name="bottombar"
-      style={{
-        borderTop: isFF(FF_DEV_3873) && "1px solid rgba(0,0,0,0.1)",
-      }}
-    >
+    <Block name="bottombar" style={{ borderTop: isFF(FF_DEV_3873) && "1px solid rgba(0,0,0,0.1)" }}>
       <Elem name="group">
         <Actions store={store} />
       </Elem>

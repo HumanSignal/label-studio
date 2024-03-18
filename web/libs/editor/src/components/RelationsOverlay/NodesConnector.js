@@ -99,8 +99,8 @@ const shapesIntersect = ({ x1, y1, w1, x2, y2, w2 }) => {
 };
 
 const calculateTopPath = ({ x1, y1, w1, x2, y2, w2, limit }) => {
-  const xw1 = x1 + w1 * 0.5;
-  const xw2 = x2 + w2 * 0.5;
+  const xw1 = x1 + w1 * 0.5,
+    xw2 = x2 + w2 * 0.5;
 
   const top = Math.min(y1, y2) - limit;
   const l1 = Math.min(top, y1 - limit);
@@ -118,12 +118,7 @@ const calculateSidePath = ({ x1, y1, w1, h1, x2, y2, w2, h2, limit }) => {
     renderingSide = "right";
   }
 
-  let xs1;
-  let xs2;
-  let ys1;
-  let ys2;
-  let l1;
-  let l2;
+  let xs1, xs2, ys1, ys2, l1, l2;
 
   if (renderingSide === "left") {
     xs1 = x1;
@@ -154,19 +149,8 @@ const buildPathCommand = ({ x1, y1, x2, y2, l1, l2, toEnd, renderingSide }, orie
   const radius = 5;
   const vertical = orientation === "vertical";
 
-  let px1;
-  let py1;
-  let px2;
-  let py2;
-  let px3;
-  let py3;
-  let px4;
-  let py4;
-  let sweep;
-  let arc1;
-  let arc2;
-  let ex;
-  let ey;
+  let px1, py1, px2, py2, px3, py3, px4, py4, sweep, arc1, arc2;
+  let ex, ey;
 
   if (vertical) {
     px1 = x1;

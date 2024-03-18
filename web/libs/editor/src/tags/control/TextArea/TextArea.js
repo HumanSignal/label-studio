@@ -144,8 +144,9 @@ const Model = types
         const num = Number.parseInt(self.maxsubmissions);
 
         return self.submissionsNum < num;
+      } else {
+        return true;
       }
-      return true;
     },
 
     get serializableValue() {
@@ -229,11 +230,7 @@ const Model = types
       },
 
       createRegion(text, pid, leadTime) {
-        const r = TextAreaRegionModel.create({
-          pid,
-          leadTime,
-          _value: text,
-        });
+        const r = TextAreaRegionModel.create({ pid, leadTime, _value: text });
 
         self.regions.push(r);
         return r;
@@ -296,7 +293,7 @@ const Model = types
       },
 
       beforeSend() {
-        if (self._value?.length) {
+        if (self._value && self._value.length) {
           self.addText(self._value);
           self._value = "";
         }
@@ -422,9 +419,9 @@ const HtxTextArea = observer(({ item }) => {
   const showAddButton = !item.isReadOnly() && (item.showsubmitbutton ?? rows !== 1);
   const itemStyle = {};
 
-  if (showAddButton) itemStyle.marginBottom = 0;
+  if (showAddButton) itemStyle["marginBottom"] = 0;
 
-  visibleStyle.marginTop = "4px";
+  visibleStyle["marginTop"] = "4px";
 
   return item.displaymode === PER_REGION_MODES.TAG ? (
     <div className="lsf-text-area" style={visibleStyle}>

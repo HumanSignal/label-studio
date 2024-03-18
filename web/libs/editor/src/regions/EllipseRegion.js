@@ -204,7 +204,7 @@ const Model = types
       rel_y = rel_x * Math.sin(Math.unit(theta, "deg")) + rel_y * Math.cos(Math.unit(theta, "deg"));
 
       if (Math.abs(rel_x) < a) {
-        if (rel_y ** 2 < b ** 2 * (1 - rel_x ** 2 / a ** 2)) {
+        if (Math.pow(rel_y, 2) < Math.pow(b, 2) * (1 - Math.pow(rel_x, 2) / Math.pow(a, 2))) {
           return true;
         }
       } else {
@@ -373,10 +373,7 @@ const HtxEllipseView = ({ item, setShapeRef }) => {
           item.annotation.history.unfreeze(item.id);
           item.notifyDrawingFinished();
         }}
-        dragBoundFunc={createDragBoundFunc(item, {
-          x: item.x - item.bboxCoords.left,
-          y: item.y - item.bboxCoords.top,
-        })}
+        dragBoundFunc={createDragBoundFunc(item, { x: item.x - item.bboxCoords.left, y: item.y - item.bboxCoords.top })}
         onMouseOver={() => {
           if (store.annotationStore.selected.relationMode) {
             item.setHighlight(true);

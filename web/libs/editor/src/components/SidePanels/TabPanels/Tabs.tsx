@@ -66,7 +66,7 @@ const Tab = ({
       elementRef: tabRef,
       onMouseDown(event) {
         if (locked) {
-          setBreakPointActiveTab?.(location.current.tabIndex);
+          setBreakPointActiveTab && setBreakPointActiveTab(location.current.tabIndex);
           return;
         }
         if (event.buttons === 2) return;
@@ -74,10 +74,10 @@ const Tab = ({
 
         setActiveTab(panelKey, tabIndex);
         rootRef.current?.append(ghostTabRef.current!);
-        ghostTabRef.current?.style.pointerEvents = "all";
+        ghostTabRef.current!.style.pointerEvents = "all";
 
         const tab = tabRef.current!;
-        const page = rootRef.current?.getBoundingClientRect();
+        const page = rootRef.current!.getBoundingClientRect();
         const bbox = tab.getBoundingClientRect();
         const [x, y] = [event.pageX, event.pageY];
         const [oX, oY] = [bbox.left - page.left, bbox.top - page.top];
@@ -96,9 +96,9 @@ const Tab = ({
 
         if (ghostTabRef.current) {
           setShouldShowGhostTab(true);
-          ghostTabRef.current?.style.display = "block";
-          ghostTabRef.current?.style.top = `${newY}px`;
-          ghostTabRef.current?.style.left = `${newX}px`;
+          ghostTabRef.current!.style.display = "block";
+          ghostTabRef.current!.style.top = `${newY}px`;
+          ghostTabRef.current!.style.left = `${newX}px`;
         }
         const dropTargets = document.elementsFromPoint(event.clientX, event.clientY);
         const dropTarget = dropTargets.find((target, index) => target.id.includes("droppable") && index > 0);

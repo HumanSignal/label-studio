@@ -248,6 +248,8 @@ const applyTextGranularity = (selection, granularity) => {
       case "paragraph":
         boundarySelection(selection, "paragraphboundary");
         return;
+      case "charater":
+      case "symbol":
       default:
         return;
     }
@@ -610,14 +612,8 @@ export const charsToCodePoints = ({ node, position }) => {
  * @return {Range} the same range
  */
 export const fixCodePointsInRange = (range) => {
-  const start = charsToCodePoints({
-    node: range.startContainer,
-    position: range.startOffset,
-  });
-  const end = charsToCodePoints({
-    node: range.endContainer,
-    position: range.endOffset,
-  });
+  const start = charsToCodePoints({ node: range.startContainer, position: range.startOffset });
+  const end = charsToCodePoints({ node: range.endContainer, position: range.endOffset });
 
   range.setStart(range.startContainer, start.position);
   range.setEnd(range.endContainer, end.position);
@@ -659,10 +655,7 @@ export const findOnPosition = (root, position, borderSide = "left") => {
         if (borderSide === "right" && length + lastPosition === position && nextNode) {
           finishHere = true;
         } else {
-          return {
-            node: currentNode,
-            position: isBR ? 0 : clamp(position - lastPosition, 0, length),
-          };
+          return { node: currentNode, position: isBR ? 0 : clamp(position - lastPosition, 0, length) };
         }
       }
       lastPosition += length;

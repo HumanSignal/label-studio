@@ -203,10 +203,7 @@ const TaxonomyLabelingResult = types
           title = self.showfullpath && title ? title + self.pathseparator + item.label : item.label;
         }
 
-        const label = {
-          value: title,
-          id: path.join(self.pathseparator),
-        };
+        const label = { value: title, id: path.join(self.pathseparator) };
 
         if (item.color) {
           // to conform the current format of our Result#style (and it requires parent)
@@ -299,12 +296,7 @@ const Model = types
 
         if (current) {
           if (!current.children) current.children = [];
-          current.children.push({
-            label: path[lastIndex],
-            path,
-            depth: lastIndex,
-            origin,
-          });
+          current.children.push({ label: path[lastIndex], path, depth: lastIndex, origin });
         }
       }
 
@@ -443,13 +435,7 @@ const Model = types
         // recursive convertor to internal format
         const convert = (items, path) =>
           items.map(({ alias, children, isLeaf, value, ...rest }) => {
-            const item = {
-              label: value,
-              path: [...path, alias ?? value],
-              depth: path.length,
-              isLeaf,
-              ...rest,
-            };
+            const item = { label: value, path: [...path, alias ?? value], depth: path.length, isLeaf, ...rest };
 
             if (children) item.children = convert(children, item.path);
 
@@ -464,11 +450,7 @@ const Model = types
           self._items = items;
         }
       } catch (err) {
-        const message = messages.ERR_LOADING_HTTP({
-          attr: "apiUrl",
-          error: String(err),
-          url: self.apiurl,
-        });
+        const message = messages.ERR_LOADING_HTTP({ attr: "apiUrl", error: String(err), url: self.apiurl });
 
         self.annotationStore.addErrors([errorBuilder.generalError(message)]);
 
@@ -591,8 +573,8 @@ const Model = types
         ChildrenSnapshots.set(sn.name, children);
       }
 
-      sn._children = undefined;
-      sn.children = undefined;
+      delete sn._children;
+      delete sn.children;
     }
 
     return sn;

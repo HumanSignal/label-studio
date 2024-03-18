@@ -22,7 +22,7 @@ interface ToastProviderWithTypes extends ToastPrimitive.ToastProviderProps {
 export const ToastViewport: FC<ToastViewportProps> = ({ hotkey, label, ...props }) => {
   return (
     <Block name="toast-viewport" tag="div" {...props}>
-      <ToastPrimitive.Viewport hotkey={hotkey} label={label} />
+      <ToastPrimitive.Viewport hotkey={hotkey} label={label}></ToastPrimitive.Viewport>
     </Block>
   );
 };

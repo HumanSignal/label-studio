@@ -56,8 +56,9 @@ export const pageSetToRoutes = (pages, config) => {
   try {
     if (Array.isArray(pages)) {
       return pages.map((page) => pageProcessor([null, page]));
+    } else {
+      return Object.entries(pages).map(pageProcessor);
     }
-    return Object.entries(pages).map(pageProcessor);
   } catch (err) {
     console.log(err);
     return [];
@@ -106,14 +107,11 @@ export const resolveRoutes = (routes, props) => {
       };
 
       return <RouteWithStaticFallback key={fullPath} path={fullPath} render={RouteComponent} />;
-    }
-    const routeProps = {
-      key: fullPath,
-      path: fullPath,
-      modal: !!Component.modal,
-    };
+    } else {
+      const routeProps = { key: fullPath, path: fullPath, modal: !!Component.modal };
 
-    return <Route {...routeProps} exact render={() => <Component {...(props ?? {})} />} {...rest} />;
+      return <Route {...routeProps} exact render={() => <Component {...(props ?? {})} />} {...rest} />;
+    }
   };
 
   const processRoutes = (routes, fullPath) => {

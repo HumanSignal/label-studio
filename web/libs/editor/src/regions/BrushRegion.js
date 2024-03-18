@@ -231,11 +231,11 @@ const Model = types
     };
   })
   .actions((self) => {
-    let pathPoints;
-    let cachedPoints;
-    let lastPointX = -1;
-    let lastPointY = -1;
-    let maskImage;
+    let pathPoints,
+      cachedPoints,
+      lastPointX = -1,
+      lastPointY = -1,
+      maskImage;
 
     return {
       afterCreate() {
@@ -319,12 +319,7 @@ const Model = types
         // don't start to save another regions in the middle of drawing process
         self.object.annotation.pauseAutosave();
 
-        pathPoints = Points.create({
-          id: guidGenerator(),
-          type,
-          strokeWidth,
-          opacity,
-        });
+        pathPoints = Points.create({ id: guidGenerator(), type, strokeWidth, opacity });
         cachedPoints = [];
         return pathPoints;
       },
@@ -529,9 +524,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     let img;
 
     if (item.maskDataURL && isFF(FF_DEV_4081)) {
-      img = await Canvas.maskDataURL2Image(item.maskDataURL, {
-        color: item.strokeColor,
-      });
+      img = await Canvas.maskDataURL2Image(item.maskDataURL, { color: item.strokeColor });
     } else if (item.rle) {
       img = Canvas.RLE2Region(item, { color: item.strokeColor });
     }
@@ -768,7 +761,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
         </Group>
       </Layer>
       <Layer
-        id={`${item.cleanId}_labels`}
+        id={item.cleanId + "_labels"}
         ref={(ref) => {
           if (ref) {
             ref.canvas._canvas.style.opacity = item.opacity;

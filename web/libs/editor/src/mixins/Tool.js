@@ -89,7 +89,7 @@ const ToolMixin = types
     afterUpdateSelected() {},
 
     event(name, ev, args) {
-      const fn = `${name}Ev`;
+      const fn = name + "Ev";
 
       if (typeof self[fn] !== "undefined") self[fn].call(self, ev, args);
     },

@@ -265,7 +265,7 @@ const AnnotationStoreModel = types
           node.toname = objects[0];
         }
 
-        if (node?.toname) {
+        if (node && node.toname) {
           self.upsertToName(node);
         }
 
@@ -295,7 +295,7 @@ const AnnotationStoreModel = types
 
       let pk = options.pk || options.id;
 
-      if (options.type === "annotation" && pk && Number.isNaN(pk)) {
+      if (options.type === "annotation" && pk && isNaN(pk)) {
         /* something happened where our annotation pk was replaced with the id */
         pk = self.annotations?.[self.annotations.length - 1]?.storedValue?.pk;
       }
@@ -314,7 +314,7 @@ const AnnotationStoreModel = types
         root: self.root,
       };
 
-      if (user && !("createdBy" in node)) node.createdBy = user.displayName;
+      if (user && !("createdBy" in node)) node["createdBy"] = user.displayName;
       if (options.user) node.user = options.user;
 
       return node;
@@ -378,7 +378,7 @@ const AnnotationStoreModel = types
       const result = isFF(FF_DEV_1621) ? findNonInteractivePredictionResults() : [];
       const c = self.addAnnotation({ ...options, result });
 
-      if (result?.length) {
+      if (result && result.length) {
         const ids = {};
 
         // Area id is <uniq-id>#<annotation-id> to be uniq across all tree

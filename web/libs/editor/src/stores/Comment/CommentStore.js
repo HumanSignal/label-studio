@@ -28,7 +28,7 @@ export const CommentStore = types
       return getParent(self).annotationStore.selected;
     },
     get annotationId() {
-      return Number.isNaN(self.annotation?.pk) ? undefined : self.annotation.pk;
+      return isNaN(self.annotation?.pk) ? undefined : self.annotation.pk;
     },
     get draftId() {
       if (!self.annotation?.draftId) return null;
@@ -65,29 +65,18 @@ export const CommentStore = types
     },
   }))
   .actions((self) => {
-    function serialize(
-      { commentsFilter, queueComments } = {
-        commentsFilter: "all",
-        queueComments: false,
-      },
-    ) {
+    function serialize({ commentsFilter, queueComments } = { commentsFilter: "all", queueComments: false }) {
       const serializedComments = getSnapshot(commentsFilter === "queued" ? self.queuedComments : self.comments);
 
       return {
         comments: queueComments
-          ? serializedComments.map((comment) => ({
-              id: comment.id > 0 ? comment.id * -1 : comment.id,
-              ...comment,
-            }))
+          ? serializedComments.map((comment) => ({ id: comment.id > 0 ? comment.id * -1 : comment.id, ...comment }))
           : serializedComments,
       };
     }
 
     function setCurrentComment(comment) {
-      self.currentComment = {
-        ...self.currentComment,
-        [self.annotation.id]: comment,
-      };
+      self.currentComment = { ...self.currentComment, [self.annotation.id]: comment };
     }
 
     function setCommentFormSubmit(submitCallback) {
@@ -118,10 +107,7 @@ export const CommentStore = types
       if (index > -1) {
         const snapshot = getSnapshot(comments[index]);
 
-        comments[index] = {
-          ...snapshot,
-          id: newComment.id || snapshot.id,
-        };
+        comments[index] = { ...snapshot, id: newComment.id || snapshot.id };
       }
     }
 

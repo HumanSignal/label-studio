@@ -23,7 +23,7 @@ const getMinIndex = (element?: HTMLElement) => {
     while (parent) {
       const parentIndex = Number.parseInt(getComputedStyle(parent).zIndex);
 
-      if (!Number.isNaN(parentIndex)) {
+      if (!isNaN(parentIndex)) {
         index = Math.max(index, parentIndex);
       }
 
@@ -123,10 +123,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
 
     useEffect(() => {
       document.addEventListener("click", handleClick, { capture: true });
-      return () =>
-        document.removeEventListener("click", handleClick, {
-          capture: true,
-        });
+      return () => document.removeEventListener("click", handleClick, { capture: true });
     }, [handleClick]);
 
     const contextValue = useMemo((): DropdownContextValue => {

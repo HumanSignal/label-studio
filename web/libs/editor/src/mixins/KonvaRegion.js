@@ -28,8 +28,8 @@ export const KonvaRegionMixin = types
           !!self.bboxCoordsCanvas &&
           !!self.object &&
           self.bboxCoordsCanvas.right >= self.object.viewPortBBoxCoords.left &&
-          self.bboxCoordsCanvas.bottom >= self.object.viewPortBBoxCoords.top &&
-          self.bboxCoordsCanvas.left <= self.object.viewPortBBoxCoords.right &&
+            self.bboxCoordsCanvas.bottom >= self.object.viewPortBBoxCoords.top &&
+            self.bboxCoordsCanvas.left <= self.object.viewPortBBoxCoords.right &&
           self.bboxCoordsCanvas.top <= self.object.viewPortBBoxCoords.bottom
         );
       },
@@ -101,19 +101,11 @@ export const KonvaRegionMixin = types
         if (overTop < 0 && -overTop / height > 1 - VISIBLE_AREA) {
           // if image is still visible enough — don't scroll
           if (zoomedIn && (cBBox.bottom - vBBox.top) / viewport.clientHeight > 1 - VISIBLE_AREA) return;
-          viewport.scrollBy({
-            top: isHuge ? -overBottom : overTop,
-            left: 0,
-            behavior: "smooth",
-          });
+          viewport.scrollBy({ top: isHuge ? -overBottom : overTop, left: 0, behavior: "smooth" });
         } else if (overBottom < 0 && -overBottom / height > 1 - VISIBLE_AREA) {
           // if image is still visible enough — don't scroll
           if (zoomedIn && (vBBox.bottom - cBBox.top) / viewport.clientHeight > 1 - VISIBLE_AREA) return;
-          viewport.scrollBy({
-            top: isHuge ? overTop : -overBottom,
-            left: 0,
-            behavior: "smooth",
-          });
+          viewport.scrollBy({ top: isHuge ? overTop : -overBottom, left: 0, behavior: "smooth" });
         }
       },
 

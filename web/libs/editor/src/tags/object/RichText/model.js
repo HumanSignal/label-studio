@@ -157,9 +157,7 @@ const Model = types
     _loadedForAnnotation: null,
   }))
   .actions((self) => {
-    let beforeNeedsUpdateCallback;
-    let afterNeedsUpdateCallback;
-    let domManager;
+    let beforeNeedsUpdateCallback, afterNeedsUpdateCallback, domManager;
 
     return {
       setWorkingMode(mode) {
@@ -204,11 +202,7 @@ const Model = types
 
             self.setRemoteValue(yield response.text());
           } catch (error) {
-            const message = messages.ERR_LOADING_HTTP({
-              attr: self.value,
-              error: String(error),
-              url,
-            });
+            const message = messages.ERR_LOADING_HTTP({ attr: self.value, error: String(error), url });
 
             self.annotationStore.addErrors([errorBuilder.generalError(message)]);
             self.setRemoteValue("");

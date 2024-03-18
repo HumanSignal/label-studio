@@ -370,7 +370,7 @@ export default types
       hotkeys.addNamed("region:relation", () => {
         const c = self.annotationStore.selected;
 
-        if (c?.highlightedNode && !c.relationMode) {
+        if (c && c.highlightedNode && !c.relationMode) {
           c.startRelationMode(c.highlightedNode);
         }
       });
@@ -380,7 +380,7 @@ export default types
         e.preventDefault();
         const c = self.annotationStore.selected;
 
-        if (c?.highlightedNode && !c.relationMode) {
+        if (c && c.highlightedNode && !c.relationMode) {
           c.highlightedNode.requestPerRegionFocus();
         }
       });
@@ -421,7 +421,7 @@ export default types
       hotkeys.addNamed("region:exit", () => {
         const c = self.annotationStore.selected;
 
-        if (c?.relationMode) {
+        if (c && c.relationMode) {
           c.stopRelationMode();
         } else if (!c.isDrawing) {
           c.unselectAll();
@@ -439,7 +439,7 @@ export default types
       hotkeys.addNamed("region:cycle", () => {
         const c = self.annotationStore.selected;
 
-        c?.regionStore.selectNext();
+        c && c.regionStore.selectNext();
       });
 
       // duplicate selected regions
@@ -503,7 +503,7 @@ export default types
         if (!events.hasEvent("submitDraft")) return resolve();
         const res = events.invokeFirst("submitDraft", self, c, params);
 
-        if (res?.then) res.then(resolve);
+        if (res && res.then) res.then(resolve);
         else resolve(res);
       });
     }
@@ -593,10 +593,7 @@ export default types
         const isDirty = entity.history.canUndo;
 
         entity.dropDraft();
-        await getEnv(self).events.invoke("acceptAnnotation", self, {
-          isDirty,
-          entity,
-        });
+        await getEnv(self).events.invoke("acceptAnnotation", self, { isDirty, entity });
         self.incrementQueuePosition();
       }, "Error during accept, try again");
     }
@@ -613,11 +610,7 @@ export default types
         const isDirty = entity.history.canUndo;
 
         entity.dropDraft();
-        await getEnv(self).events.invoke("rejectAnnotation", self, {
-          isDirty,
-          entity,
-          comment,
-        });
+        await getEnv(self).events.invoke("rejectAnnotation", self, { isDirty, entity, comment });
         self.incrementQueuePosition(-1);
       }, "Error during reject, try again");
     }
@@ -697,10 +690,7 @@ export default types
         // correct annotation will be selected at the end and everything will be called inside.
         predictions.forEach((p) => {
           const obj = as.addPrediction(p);
-          const results = p.result.map((r) => ({
-            ...r,
-            origin: "prediction",
-          }));
+          const results = p.result.map((r) => ({ ...r, origin: "prediction" }));
 
           obj.deserializeResults(results, { hidden: true });
         });
@@ -708,9 +698,7 @@ export default types
         [...completions, ...annotations].forEach((c) => {
           const obj = as.addAnnotation(c);
 
-          obj.deserializeResults(c.draft || c.result, {
-            hidden: true,
-          });
+          obj.deserializeResults(c.draft || c.result, { hidden: true });
         });
 
         window.STORE_INIT_OK = true;

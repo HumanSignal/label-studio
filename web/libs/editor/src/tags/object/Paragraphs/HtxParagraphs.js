@@ -72,7 +72,7 @@ class HtxParagraphsView extends Component {
     }
     // if the selection is made to the very beginning of the next phrase, we need to
     // move the offset to the end of the previous phrase
-    if (!isStart && fullOffset === 0) {
+    else if (!isStart && fullOffset === 0) {
       phraseNode = this.phraseElements[phraseIndex - 1];
       return [phraseNode.textContent.length, phraseNode, phraseIndex - 1, phraseIndex];
     }
@@ -156,8 +156,7 @@ class HtxParagraphsView extends Component {
               const isLastVisibleIndex = k === visibleIndexes.length - 1;
 
               if (isLastVisibleIndex || visibleIndexes[k + 1] !== curIdx + 1) {
-                let anchorOffset;
-                let focusOffset;
+                let anchorOffset, focusOffset;
 
                 const _range = r.cloneRange();
 

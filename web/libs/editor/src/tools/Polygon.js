@@ -24,7 +24,7 @@ const _Tool = types
         const poly = self.currentArea;
 
         if (isFF(FF_DEV_2432) && poly && !isAlive(poly)) return null;
-        if (poly?.closed) return null;
+        if (poly && poly.closed) return null;
         if (poly === undefined) return null;
         if (poly && poly.type !== "polygonregion") return null;
 

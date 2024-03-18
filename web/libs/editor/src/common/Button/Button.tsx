@@ -90,19 +90,9 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
 
       switch (size) {
         case "small":
-          return cloneElement(icon, {
-            ...icon.props,
-            size: 12,
-            width: 12,
-            height: 12,
-          });
+          return cloneElement(icon, { ...icon.props, size: 12, width: 12, height: 12 });
         case "compact":
-          return cloneElement(icon, {
-            ...icon.props,
-            size: 14,
-            width: 14,
-            height: 14,
-          });
+          return cloneElement(icon, { ...icon.props, size: 14, width: 14, height: 14 });
         default:
           return icon;
       }

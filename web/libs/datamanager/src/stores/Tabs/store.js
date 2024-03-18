@@ -123,7 +123,7 @@ export const TabStore = types
         selected = yield self.getViewByKey(view);
       } else if (typeof view === "number") {
         selected = self.views.find((v) => v.id === view);
-      } else if (view?.id) {
+      } else if (view && view.id) {
         selected = self.views.find((v) => v.id === view.id);
       }
       if (!selected) {
@@ -179,7 +179,7 @@ export const TabStore = types
       const tabStorageKey = isVirtual && viewSnapshot.projectId ? `virtual-tab-${viewSnapshot.projectId}` : null;
       const existingTabStorage = isVirtual && localStorage.getItem(tabStorageKey);
       const existingTabStorageParsed = existingTabStorage ? JSON.parse(existingTabStorage) : null;
-      const urlTabIsVirtualCandidate = !!(viewSnapshot?.tab && Number.isNaN(viewSnapshot.tab));
+      const urlTabIsVirtualCandidate = !!(viewSnapshot?.tab && isNaN(viewSnapshot.tab));
       const existingTabUrlParsed =
         isVirtual && urlTabIsVirtualCandidate ? self.snapshotFromUrl(viewSnapshot.tab) : null;
       const urlTabNotEmpty = !isEmpty(existingTabUrlParsed);
@@ -211,7 +211,7 @@ export const TabStore = types
       };
     },
 
-    addView: flow(function* (viewSnapshot, options) {
+    addView: flow(function* (viewSnapshot = {}, options) {
       const { autoselect = true, autosave = true, reload = true } = options ?? {};
 
       const newSnapshot = self.createSnapshot(viewSnapshot);
@@ -299,9 +299,7 @@ export const TabStore = types
       const root = getRoot(self);
       const apiMethod = !view.saved && root.apiVersion === 2 ? "createTab" : "updateTab";
 
-      const result = yield root.apiCall(apiMethod, params, body, {
-        allowToCancel: root.SDK.type === "DE",
-      });
+      const result = yield root.apiCall(apiMethod, params, body, { allowToCancel: root.SDK.type === "DE" });
 
       if (result.isCanceled) {
         return view;
@@ -324,15 +322,16 @@ export const TabStore = types
         destroy(view);
 
         return newView;
-      }
-      applySnapshot(view, newViewSnapshot);
+      } else {
+        applySnapshot(view, newViewSnapshot);
 
-      if (reload !== false) {
-        view.reload({ interaction });
-      }
+        if (reload !== false) {
+          view.reload({ interaction });
+        }
 
-      view.unlock();
-      return view;
+        view.unlock();
+        return view;
+      }
     }),
 
     duplicateView: flow(function* (view) {
@@ -380,7 +379,7 @@ export const TabStore = types
       const createColumnPath = (columns, column) => {
         const result = [];
 
-        if (column?.parent) {
+        if (column && column.parent) {
           const parentColums = columns.find((c) => {
             return !c.parent && c.id === column.parent && c.target === column.target;
           });
@@ -493,10 +492,10 @@ export const TabStore = types
     }),
 
     fetchSingleTab: flow(function* (tabKey, selectedItems) {
-      let tab;
-      const tabId = Number.parseInt(tabKey);
+      let tab,
+        tabId = Number.parseInt(tabKey);
 
-      if (!Number.isNaN(tabKey) && !Number.isNaN(tabId)) {
+      if (!isNaN(tabKey) && !isNaN(tabId)) {
         const tabData = yield getRoot(self).apiCall("tab", { tabId });
         const columnIds = (self.columns ?? []).map((c) => c.id);
         const { data, ...tabClean } = dataCleanup(tabData, columnIds);

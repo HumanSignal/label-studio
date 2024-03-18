@@ -257,7 +257,7 @@ DataManagerPage.context = ({ dmRef }) => {
     };
   }, [dmRef, project]);
 
-  return project?.id ? (
+  return project && project.id ? (
     <Space size="small">
       {project.expert_instruction && mode !== "explorer" && (
         <Button
@@ -265,13 +265,7 @@ DataManagerPage.context = ({ dmRef }) => {
           onClick={() => {
             modal({
               title: "Instructions",
-              body: () => (
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: project.expert_instruction,
-                  }}
-                />
-              ),
+              body: () => <div dangerouslySetInnerHTML={{ __html: project.expert_instruction }} />,
             });
           }}
         >

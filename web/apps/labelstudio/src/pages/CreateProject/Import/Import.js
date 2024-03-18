@@ -43,7 +43,7 @@ function traverseFileTree(item, path) {
     } else if (item.isDirectory) {
       // Get folder contents
       const dirReader = item.createReader();
-      const dirPath = `${path + item.name}/`;
+      const dirPath = path + item.name + "/";
 
       dirReader.readEntries((entries) => {
         Promise.all(entries.map((entry) => traverseFileTree(entry, dirPath)))
@@ -159,22 +159,13 @@ export const ImportPage = ({
 
   const processFiles = (state, action) => {
     if (action.sending) {
-      return {
-        ...state,
-        uploading: [...action.sending, ...state.uploading],
-      };
+      return { ...state, uploading: [...action.sending, ...state.uploading] };
     }
     if (action.sent) {
-      return {
-        ...state,
-        uploading: state.uploading.filter((f) => !action.sent.includes(f)),
-      };
+      return { ...state, uploading: state.uploading.filter((f) => !action.sent.includes(f)) };
     }
     if (action.uploaded) {
-      return {
-        ...state,
-        uploaded: unique([...state.uploaded, ...action.uploaded], (a, b) => a.id === b.id),
-      };
+      return { ...state, uploaded: unique([...state.uploaded, ...action.uploaded], (a, b) => a.id === b.id) };
     }
     if (action.ids) {
       const ids = unique([...state.ids, ...action.ids]);
@@ -185,11 +176,7 @@ export const ImportPage = ({
     return state;
   };
 
-  const [files, dispatch] = useReducer(processFiles, {
-    uploaded: [],
-    uploading: [],
-    ids: [],
-  });
+  const [files, dispatch] = useReducer(processFiles, { uploaded: [], uploading: [], ids: [] });
   const showList = Boolean(files.uploaded?.length || files.uploading?.length);
 
   const loadFilesList = useCallback(
@@ -346,7 +333,7 @@ export const ImportPage = ({
       <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }} />
 
       <header>
-        <form className={`${importClass.elem("url-form")} inline`} method="POST" onSubmit={onLoadURL}>
+        <form className={importClass.elem("url-form") + " inline"} method="POST" onSubmit={onLoadURL}>
           <input placeholder="Dataset URL" name="url" ref={urlRef} />
           <button type="submit">Add URL</button>
         </form>
@@ -359,10 +346,7 @@ export const ImportPage = ({
           Upload {files.uploaded.length ? "More " : ""}Files
         </button>
         <div
-          className={importClass.elem("csv-handling").mod({
-            highlighted: highlightCsvHandling,
-            hidden: !csvHandling,
-          })}
+          className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}
         >
           <span>Treat CSV/TSV as</span>
           <label>

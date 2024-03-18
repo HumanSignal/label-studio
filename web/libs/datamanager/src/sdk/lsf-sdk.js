@@ -48,8 +48,7 @@ let LabelStudioDM;
 const resolveLabelStudio = async () => {
   if (LabelStudioDM) {
     return LabelStudioDM;
-  }
-  if (window.LabelStudio) {
+  } else if (window.LabelStudio) {
     return (LabelStudioDM = window.LabelStudio);
   }
 };
@@ -234,7 +233,7 @@ export class LSFWrapper {
     if (params) {
       const task = await api.call("task", { params });
       const noData = !task || (!task.annotations?.length && !task.drafts?.length);
-      const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ""} was not found!`;
+      const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ``} was not found!`;
 
       if (noData) {
         Modal.modal({
@@ -541,10 +540,7 @@ export class LSFWrapper {
     const projectId = this.project.id;
     const fileuri = btoa(url);
 
-    return api.createUrl(api.endpoints.presignUrlForProject, {
-      projectId,
-      fileuri,
-    }).url;
+    return api.createUrl(api.endpoints.presignUrlForProject, { projectId, fileuri }).url;
   };
 
   onStorageInitialized = async (ls) => {
@@ -579,15 +575,9 @@ export class LSFWrapper {
     const status = result?.$meta?.status;
 
     if (status === 200 || status === 201)
-      this.datamanager.invoke("toast", {
-        message: "Annotation saved successfully",
-        type: "info",
-      });
+      this.datamanager.invoke("toast", { message: "Annotation saved successfully", type: "info" });
     else if (status !== undefined)
-      this.datamanager.invoke("toast", {
-        message: "There was an error saving your Annotation",
-        type: "error",
-      });
+      this.datamanager.invoke("toast", { message: "There was an error saving your Annotation", type: "error" });
 
     if (exitStream) return this.exitStream();
   };
@@ -617,15 +607,9 @@ export class LSFWrapper {
     const status = result?.$meta?.status;
 
     if (status === 200 || status === 201)
-      this.datamanager.invoke("toast", {
-        message: "Annotation updated successfully",
-        type: "info",
-      });
+      this.datamanager.invoke("toast", { message: "Annotation updated successfully", type: "info" });
     else if (status !== undefined)
-      this.datamanager.invoke("toast", {
-        message: "There was an error updating your Annotation",
-        type: "error",
-      });
+      this.datamanager.invoke("toast", { message: "There was an error updating your Annotation", type: "error" });
 
     this.datamanager.invoke("updateAnnotation", ls, annotation, result);
 
@@ -685,15 +669,9 @@ export class LSFWrapper {
 
   draftToast = (status) => {
     if (status === 200 || status === 201)
-      this.datamanager.invoke("toast", {
-        message: "Draft saved successfully",
-        type: "info",
-      });
+      this.datamanager.invoke("toast", { message: "Draft saved successfully", type: "info" });
     else if (status !== undefined)
-      this.datamanager.invoke("toast", {
-        message: "There was an error saving your draft",
-        type: "error",
-      });
+      this.datamanager.invoke("toast", { message: "There was an error saving your draft", type: "error" });
   };
 
   needsDraftSave = (annotation) => {
@@ -728,7 +706,7 @@ export class LSFWrapper {
     const showToast = params?.useToast && hasChanges;
     // console.log('onSubmitDraft', params?.useToast, hasChanges);
 
-    if (params?.useToast) params.useToast = undefined;
+    if (params?.useToast) delete params.useToast;
 
     Object.assign(data.body, params);
 
@@ -740,22 +718,23 @@ export class LSFWrapper {
 
       showToast && this.draftToast(res?.$meta?.status);
       return res;
-    }
-    let response;
-
-    if (annotationDoesntExist) {
-      response = await this.datamanager.apiCall("createDraftForTask", { taskID: this.task.id }, data);
     } else {
-      response = await this.datamanager.apiCall(
-        "createDraftForAnnotation",
-        { taskID: this.task.id, annotationID: annotation.pk },
-        data,
-      );
-    }
-    response?.id && annotation.setDraftId(response?.id);
-    showToast && this.draftToast(response?.$meta?.status);
+      let response;
 
-    return response;
+      if (annotationDoesntExist) {
+        response = await this.datamanager.apiCall("createDraftForTask", { taskID: this.task.id }, data);
+      } else {
+        response = await this.datamanager.apiCall(
+          "createDraftForAnnotation",
+          { taskID: this.task.id, annotationID: annotation.pk },
+          data,
+        );
+      }
+      response?.id && annotation.setDraftId(response?.id);
+      showToast && this.draftToast(response?.$meta?.status);
+
+      return response;
+    }
   };
 
   onSkipTask = async (_, { comment } = {}) => {
@@ -771,9 +750,10 @@ export class LSFWrapper {
 
         if (id === undefined) {
           return this.datamanager.apiCall("submitAnnotation", params, options);
+        } else {
+          params.annotationID = id;
+          return this.datamanager.apiCall("updateAnnotation", params, options);
         }
-        params.annotationID = id;
-        return this.datamanager.apiCall("updateAnnotation", params, options);
       },
       true,
       this.shouldLoadNext(),
@@ -807,9 +787,7 @@ export class LSFWrapper {
             },
           );
         } else {
-          const annotationData = {
-            body: this.prepareData(currentAnnotation),
-          };
+          const annotationData = { body: this.prepareData(currentAnnotation) };
 
           await this.datamanager.apiCall(
             "createDraftForTask",
@@ -852,7 +830,7 @@ export class LSFWrapper {
     searchParams.delete(paramName);
     let newRelativePathQuery = window.location.pathname;
 
-    if (searchParams.toString()) newRelativePathQuery += `?${searchParams.toString()}`;
+    if (searchParams.toString()) newRelativePathQuery += "?" + searchParams.toString();
     window.history.pushState(null, "", newRelativePathQuery);
     return !!urlParam;
   };
@@ -881,9 +859,7 @@ export class LSFWrapper {
   async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
     const { taskID, currentAnnotation } = this;
     const unique_id = this.task.unique_lock_id;
-    const serializedAnnotation = this.prepareData(currentAnnotation, {
-      includeId,
-    });
+    const serializedAnnotation = this.prepareData(currentAnnotation, { includeId });
 
     if (unique_id) {
       serializedAnnotation.unique_id = unique_id;

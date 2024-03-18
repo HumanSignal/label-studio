@@ -10,8 +10,9 @@ export const VariantSelect = observer(({ filter, schema, onChange, multiple, val
   const selectedValue = (() => {
     if (!multiple) {
       return Array.isArray(value) ? value[0] : value;
+    } else {
+      return Array.isArray(value) ? value : value ?? [];
     }
-    return Array.isArray(value) ? value : value ?? [];
   })();
 
   const FilterItem = filter.cellView?.FilterItem;

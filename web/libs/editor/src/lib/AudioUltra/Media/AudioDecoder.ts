@@ -164,9 +164,7 @@ export class AudioDecoder extends BaseAudioDecoder {
    * Do the work withing Web Worker to avoid blocking the UI.
    * Allow the work to be interrupted so that the worker can be disposed at any time safely.
    */
-  private *chunkDecoder(options?: {
-    multiChannel?: boolean;
-  }): Generator<Promise<Float32Array | null> | null> {
+  private *chunkDecoder(options?: { multiChannel?: boolean }): Generator<Promise<Float32Array | null> | null> {
     if (!this.worker || this.sourceDecodeCancelled) return null;
 
     const totalDuration = this.worker.duration;

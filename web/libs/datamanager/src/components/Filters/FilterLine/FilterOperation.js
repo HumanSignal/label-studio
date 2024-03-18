@@ -57,10 +57,7 @@ export const FilterOperation = observer(({ filter, field, operator, value }) => 
   const availableOperators = filter.cellView?.filterOperators;
   const Input = selected?.input;
   const operatorList = allowedFilterOperations(types, getRoot(filter)?.SDK?.type);
-  const operators = operatorList.map(({ key, label }) => ({
-    value: key,
-    label,
-  }));
+  const operators = operatorList.map(({ key, label }) => ({ value: key, label }));
 
   return Input ? (
     <>

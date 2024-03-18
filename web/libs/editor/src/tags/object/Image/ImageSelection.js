@@ -104,18 +104,8 @@ export const ImageSelection = types
         if (self.isActive || !self.obj.selectedRegions.length) return null;
 
         const initial = isFF(FF_DEV_3793)
-          ? {
-              left: RELATIVE_STAGE_WIDTH,
-              top: RELATIVE_STAGE_HEIGHT,
-              right: 0,
-              bottom: 0,
-            }
-          : {
-              left: self.obj.stageWidth,
-              top: self.obj.stageHeight,
-              right: 0,
-              bottom: 0,
-            };
+          ? { left: RELATIVE_STAGE_WIDTH, top: RELATIVE_STAGE_HEIGHT, right: 0, bottom: 0 }
+          : { left: self.obj.stageWidth, top: self.obj.stageHeight, right: 0, bottom: 0 };
         const bbox = self.obj.selectedRegions.reduce((borders, region) => {
           return region.bboxCoords
             ? {

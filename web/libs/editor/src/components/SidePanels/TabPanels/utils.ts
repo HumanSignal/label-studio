@@ -131,32 +131,32 @@ const panelViews = [
   {
     name: "regions",
     title: "Regions",
-    component: panelComponents.regions as FC<PanelProps>,
+    component: panelComponents["regions"] as FC<PanelProps>,
     active: true,
   },
   {
     name: "history",
     title: "History",
-    component: panelComponents.history as FC<PanelProps>,
+    component: panelComponents["history"] as FC<PanelProps>,
     active: false,
   },
 
   {
     name: "relations",
     title: "Relations",
-    component: panelComponents.relations as FC<PanelProps>,
+    component: panelComponents["relations"] as FC<PanelProps>,
     active: false,
   },
   {
     name: "info",
     title: "Info",
-    component: panelComponents.info as FC<PanelProps>,
+    component: panelComponents["info"] as FC<PanelProps>,
     active: true,
   },
   {
     name: "comments",
     title: "Comments",
-    component: panelComponents.comments as FC<PanelProps>,
+    component: panelComponents["comments"] as FC<PanelProps>,
     active: false,
   },
 ];
@@ -268,7 +268,7 @@ export const checkCollapsedPanelsHaveData = (collapsedSide: PanelsCollapsed, pan
 export const restorePanel = (showComments: boolean): StoredPanelState => {
   const previousState = window.localStorage.getItem("panelState");
   const parsed: StoredPanelState | null = previousState && JSON.parse(previousState);
-  const panelData = parsed?.panelData;
+  const panelData = parsed && parsed.panelData;
   const defaultCollapsedSide = { [Side.left]: false, [Side.right]: false };
   const collapsedSide = parsed?.collapsedSide ?? defaultCollapsedSide;
   const allTabs = panelData && Object.values(panelData).flatMap((panel) => panel.panelViews);
@@ -287,10 +287,7 @@ export const restorePanel = (showComments: boolean): StoredPanelState => {
   const withActiveDefaults = setActiveDefaults(noEmptyPanels);
   const safeCollapsedSide = checkCollapsedPanelsHaveData(collapsedSide, withActiveDefaults);
 
-  return {
-    panelData: restoreComponentsToState(withActiveDefaults),
-    collapsedSide: safeCollapsedSide,
-  };
+  return { panelData: restoreComponentsToState(withActiveDefaults), collapsedSide: safeCollapsedSide };
 };
 
 export const restoreComponentsToState = (panelData: Record<string, PanelBBox>) => {
@@ -440,10 +437,7 @@ export const splitPanelColumns = (state: Record<string, PanelBBox>, removingKey:
     detached: true,
     height: DEFAULT_PANEL_HEIGHT,
   };
-  const removedState = {
-    ...newState,
-    [removingKey]: { ...newState[removingKey], ...movingTabAttributes },
-  };
+  const removedState = { ...newState, [removingKey]: { ...newState[removingKey], ...movingTabAttributes } };
   const column = getAttachedPerSide(newState, alignment);
 
   column?.forEach((key, index) => {
@@ -532,10 +526,7 @@ export const newPanelInState = (
   const newPanel = newPanelFromTab(state, name, movingPanel, movingTab, left, top, viewportSize);
   const stateWithRemovals = stateRemovedTab(state, movingPanel, movingTab);
   const panelsWithRemovals = stateRemovePanelEmptyViews(stateWithRemovals);
-  const panelWithAdditions = {
-    ...panelsWithRemovals,
-    [`${newPanel.name}`]: newPanel,
-  };
+  const panelWithAdditions = { ...panelsWithRemovals, [`${newPanel.name}`]: newPanel };
   const renamedKeys = renameKeys(panelWithAdditions);
   const activeDefaults = setActiveDefaults(renamedKeys);
   const adjustZIndex = findZIndices(activeDefaults, newPanel.name);
@@ -582,10 +573,6 @@ export const findPanelViewByName = (
   const panelViewIndex = state[panelName]?.panelViews.findIndex((view: { name: string }) => view.name === name);
 
   return panelViewIndex >= 0
-    ? {
-        panelName,
-        tab: state[panelName].panelViews[panelViewIndex],
-        panelViewIndex,
-      }
+    ? { panelName, tab: state[panelName].panelViews[panelViewIndex], panelViewIndex }
     : undefined;
 };

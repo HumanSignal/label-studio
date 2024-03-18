@@ -183,9 +183,7 @@ export const AudioRegionModel = types
         //   // r.update({ color: self.selectedregionbg });
         // });
 
-        self._ws_region.update({
-          color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8),
-        });
+        self._ws_region.update({ color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8) });
       }
 
       self.onClickRegion(ev);

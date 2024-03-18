@@ -83,7 +83,7 @@ export const CommentItem: FC<any> = observer(
       <Block name="comment-item" mod={{ resolved }}>
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy} />
+            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy}></Elem>
             <Elem name="name" tag="span">
               {userDisplayName(createdBy)}
             </Elem>
@@ -106,9 +106,7 @@ export const CommentItem: FC<any> = observer(
                 onSubmit={async (value) => {
                   await updateComment(value);
                   setCurrentComment(value);
-                  await listComments({
-                    suppressClearComments: true,
-                  });
+                  await listComments({ suppressClearComments: true });
                 }}
               />
             ) : isConfirmDelete ? (

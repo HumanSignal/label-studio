@@ -58,12 +58,7 @@ const countChildNodes = (item: RowItem[]) => {
   return counter;
 };
 
-const blankItem = (path: string[], depth: number): RowItem => ({
-  label: "",
-  depth,
-  path,
-  isOpen: true,
-});
+const blankItem = (path: string[], depth: number): RowItem => ({ label: "", depth, path, isOpen: true });
 let heightAccumulator: { [key: string]: number } = {};
 
 const TreeStructure = ({
@@ -213,7 +208,7 @@ const TreeStructure = ({
       const definedDepth = depth || 0;
       const id = `${label}-${definedDepth}`;
       const addInside = addInsideId === id;
-      const isOpen = toggleItem?.[id] || openNodes[id] || addInside || (defaultExpanded ? 1 : 2);
+      const isOpen = (toggleItem && toggleItem[id]) || openNodes[id] || addInside || (defaultExpanded ? 1 : 2);
 
       const transformedData: ExtendedData = transformationCallback({
         node: items[i],
@@ -230,20 +225,10 @@ const TreeStructure = ({
         stack.push({ ...transformedData });
         addInside &&
           stack.push(
-            ...recursiveTreeWalker({
-              items: [blankItem(items[i].path, definedDepth + 1)],
-              depth: definedDepth + 1,
-            }),
+            ...recursiveTreeWalker({ items: [blankItem(items[i].path, definedDepth + 1)], depth: definedDepth + 1 }),
           );
         children &&
-          stack.push(
-            ...recursiveTreeWalker({
-              items: children,
-              depth: definedDepth + 1,
-              toggleItem,
-              addInsideId,
-            }),
-          );
+          stack.push(...recursiveTreeWalker({ items: children, depth: definedDepth + 1, toggleItem, addInsideId }));
       } else stack.push({ ...transformedData });
     }
     return stack;
@@ -265,11 +250,7 @@ const TreeStructure = ({
         itemCount={data?.length || 0}
         itemSize={rowHeightCalc}
         width={width}
-        itemData={(index: number) => ({
-          row: data?.[index],
-          toggle,
-          addInside,
-        })}
+        itemData={(index: number) => ({ row: data && data[index], toggle, addInside })}
       >
         {({ data, index, style }) => <Row data={data} rowStyle={style} index={index} rowComponent={rowComponent} />}
       </VariableSizeList>

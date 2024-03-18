@@ -214,10 +214,7 @@ export const Select: SelectComponent<SelectProps> = ({
       >
         <Dropdown.Trigger
           ref={dropdown}
-          className={cn("select", {
-            elem: "dropdown",
-            mod: { variant },
-          }).toClassName()}
+          className={cn("select", { elem: "dropdown", mod: { variant } }).toClassName()}
           content={<Elem name="list">{children}</Elem>}
           onToggle={(visible: boolean) => {
             if (!visible) setFocused(null);

@@ -123,10 +123,7 @@ const NewTaxonomy = ({
   const [filteredTreeData, setFilteredTreeData] = useState<AntTaxonomyItem[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[] | undefined>([]);
   const separator = options.pathSeparator;
-  const style = {
-    minWidth: options.minWidth ?? 200,
-    maxWidth: options.maxWidth,
-  };
+  const style = { minWidth: options.minWidth ?? 200, maxWidth: options.maxWidth };
   const dropdownWidth = options.dropdownWidth === undefined ? true : +options.dropdownWidth;
   const maxUsagesReached = !!options.maxUsages && selected.length >= options.maxUsages;
   const value = selected.map((path) => path.map((p) => p.value).join(separator));

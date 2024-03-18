@@ -46,8 +46,9 @@ const Model = types
             if (typeof val === "object") val = JSON.stringify(val);
             return { type: k, value: val };
           });
+      } else {
+        return self._value;
       }
-      return self._value;
     },
     get columns() {
       if (self.valuetype === "json" || !self._value[0]) {
@@ -55,11 +56,9 @@ const Model = types
           { title: "Name", dataIndex: "type" },
           { title: "Value", dataIndex: "value" },
         ];
+      } else {
+        return Object.keys(self._value[0]).map((value) => ({ title: value, dataIndex: value }));
       }
-      return Object.keys(self._value[0]).map((value) => ({
-        title: value,
-        dataIndex: value,
-      }));
     },
   }))
   .actions((self) => ({

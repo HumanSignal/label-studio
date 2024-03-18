@@ -159,7 +159,7 @@ export const Table = observer(
               style={{ width: 32, height: 32, padding: 0 }}
               onClick={() => {
                 modal({
-                  title: `Source for task ${out?.id}`,
+                  title: "Source for task " + out?.id,
                   style: { width: 800 },
                   body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
                 });
@@ -195,11 +195,7 @@ export const Table = observer(
       const highlightedIndex = data.indexOf(focusedItem) - 1;
       const highlightedElement = tableWrapper.current?.children[highlightedIndex];
 
-      if (highlightedElement)
-        highlightedElement.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+      if (highlightedElement) highlightedElement.scrollIntoView({ behavior: "smooth", block: "center" });
     }, [tableWrapper.current]);
 
     return (

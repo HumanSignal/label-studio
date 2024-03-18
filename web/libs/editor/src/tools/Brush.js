@@ -108,19 +108,14 @@ const _Tool = types
     },
   }))
   .actions((self) => {
-    let brush;
-    let isFirstBrushStroke;
+    let brush, isFirstBrushStroke;
 
     return {
       commitDrawingRegion() {
         const { currentArea, control, obj } = self;
         const source = currentArea.toJSON();
 
-        const value = {
-          coordstype: "px",
-          touches: source.touches,
-          dynamic: source.dynamic,
-        };
+        const value = { coordstype: "px", touches: source.touches, dynamic: source.dynamic };
         const newArea = self.annotation.createResult(value, currentArea.results[0].value.toJSON(), control, obj);
 
         currentArea.setDrawing(false);

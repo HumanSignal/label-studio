@@ -13,10 +13,7 @@ export const InstructionsModal = ({
   visible: boolean;
   onCancel: () => void;
 }) => {
-  const contentStyle: Record<string, string> = {
-    padding: "0 24px 24px",
-    whiteSpace: "pre-wrap",
-  };
+  const contentStyle: Record<string, string> = { padding: "0 24px 24px", whiteSpace: "pre-wrap" };
 
   return (
     <>
@@ -36,11 +33,7 @@ export const InstructionsModal = ({
           overflow: "hidden",
           padding: "0",
         }}
-        bodyStyle={{
-          overflow: "auto",
-          maxHeight: "calc(100vh - 250px)",
-          padding: "0px",
-        }}
+        bodyStyle={{ overflow: "auto", maxHeight: "calc(100vh - 250px)", padding: "0px" }}
       >
         <h2
           style={{
@@ -56,12 +49,7 @@ export const InstructionsModal = ({
           {title}
         </h2>
         {typeof children === "string" ? (
-          <p
-            style={contentStyle}
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(children),
-            }}
-          />
+          <p style={contentStyle} dangerouslySetInnerHTML={{ __html: sanitizeHtml(children) }} />
         ) : (
           <p style={contentStyle}>{children}</p>
         )}

@@ -89,13 +89,7 @@ export const DataView = injector(
           <Tag
             key="column-type"
             color="blue"
-            style={{
-              fontWeight: "500",
-              fontSize: 14,
-              cursor: "pointer",
-              width: 45,
-              padding: 0,
-            }}
+            style={{ fontWeight: "500", fontSize: 14, cursor: "pointer", width: 45, padding: 0 }}
           >
             {original?.readableType ?? parent.title}
           </Tag>,
@@ -141,8 +135,7 @@ export const DataView = injector(
               <Spinner size="large" />
             </Block>
           );
-        }
-        if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
+        } else if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
           return (
             <Block name="syncInProgress">
               <Elem name="title" tag="h3">
@@ -164,8 +157,7 @@ export const DataView = injector(
               )}
             </Block>
           );
-        }
-        if (
+        } else if (
           store.SDK.type === "DE" &&
           (total === 0 || data.length === 0 || !hasData) &&
           datasetStatusID === "completed"
@@ -178,8 +170,7 @@ export const DataView = injector(
               <Elem name="text">Try adjusting the filter or similarity search parameters</Elem>
             </Block>
           );
-        }
-        if (store.SDK.type === "DE" && (total === 0 || data.length === 0 || !hasData)) {
+        } else if (store.SDK.type === "DE" && (total === 0 || data.length === 0 || !hasData)) {
           return (
             <Block name="syncInProgress">
               <Elem name="title" tag="h3">
@@ -188,10 +179,7 @@ export const DataView = injector(
               <Elem name="text">Press the button below to see any synced records</Elem>
               <Button
                 onClick={async () => {
-                  await store.fetchProject({
-                    force: true,
-                    interaction: "refresh",
-                  });
+                  await store.fetchProject({ force: true, interaction: "refresh" });
                   await store.currentView?.reload();
                 }}
               >
@@ -199,8 +187,7 @@ export const DataView = injector(
               </Button>
             </Block>
           );
-        }
-        if (total === 0 || !hasData) {
+        } else if (total === 0 || !hasData) {
           return (
             <Block name="no-results">
               <Elem name="description">
@@ -243,10 +230,7 @@ export const DataView = injector(
       (alias, size, align = "flex-start", help = false) => ({
         alias,
         content: decorationContent,
-        style: (col) => ({
-          width: col.width ?? size,
-          justifyContent: align,
-        }),
+        style: (col) => ({ width: col.width ?? size, justifyContent: align }),
         help,
       }),
       [],

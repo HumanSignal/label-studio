@@ -29,7 +29,7 @@ export default observer(({ store }) => {
     .join(" ");
 
   return (
-    <div className={`${styles.container} ls-panel`}>
+    <div className={styles.container + " ls-panel"}>
       <div className={classname}>
         <Button
           type="ghost"
@@ -59,7 +59,7 @@ export default observer(({ store }) => {
           disabled={!history?.canUndo}
           icon={<RollbackOutlined />}
           onClick={() => {
-            history?.reset();
+            history && history.reset();
           }}
         >
           Reset

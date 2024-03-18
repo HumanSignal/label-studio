@@ -143,11 +143,7 @@ const Model = types
       handleMouseMove({ e, flattenedPoints }) {
         const { offsetX, offsetY } = e.evt;
         const [cursorX, cursorY] = self.parent.fixZoomedCoords([offsetX, offsetY]);
-        const [x, y] = getAnchorPoint({
-          flattenedPoints,
-          cursorX,
-          cursorY,
-        });
+        const [x, y] = getAnchorPoint({ flattenedPoints, cursorX, cursorY });
 
         const group = e.currentTarget;
         const layer = e.currentTarget.getLayer();
@@ -170,11 +166,7 @@ const Model = types
         const { offsetX, offsetY } = e.evt;
 
         const [cursorX, cursorY] = self.parent.fixZoomedCoords([offsetX, offsetY]);
-        const point = getAnchorPoint({
-          flattenedPoints,
-          cursorX,
-          cursorY,
-        });
+        const point = getAnchorPoint({ flattenedPoints, cursorX, cursorY });
 
         self.insertPoint(insertIdx, point[0], point[1]);
       },
@@ -268,8 +260,9 @@ const Model = types
 
         if (dist_points < r) {
           return true;
+        } else {
+          return false;
         }
-        return false;
       },
 
       destroyRegion() {
@@ -590,10 +583,7 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
 
         item.annotation.history.freeze(item.id);
       },
-      dragBoundFunc: createDragBoundFunc(item, {
-        x: -item.bboxCoords.left,
-        y: -item.bboxCoords.top,
-      }),
+      dragBoundFunc: createDragBoundFunc(item, { x: -item.bboxCoords.left, y: -item.bboxCoords.top }),
       onDragEnd: (e) => {
         if (!isDragging) return;
         const t = e.target;

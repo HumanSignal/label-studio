@@ -90,7 +90,7 @@ const Result = types
     get perRegionStates() {
       const states = self.states;
 
-      return states?.filter((s) => s.perregion === true);
+      return states && states.filter((s) => s.perregion === true);
     },
 
     get store() {
@@ -201,8 +201,7 @@ const Result = types
 
       if (control.visiblewhen === "choice-selected") {
         return isChoiceSelected();
-      }
-      if (control.visiblewhen === "choice-unselected") {
+      } else if (control.visiblewhen === "choice-unselected") {
         return !isChoiceSelected();
       }
 
@@ -225,13 +224,7 @@ const Result = types
       const strokecolor = self.tag.background || self.tag.parent.strokecolor;
       const { strokewidth, fillopacity, opacity } = self.tag.parent;
 
-      return {
-        strokecolor,
-        strokewidth,
-        fillcolor,
-        fillopacity,
-        opacity,
-      };
+      return { strokecolor, strokewidth, fillcolor, fillopacity, opacity };
     },
 
     get emptyStyle() {
@@ -244,13 +237,7 @@ const Result = types
       const strokecolor = emptyLabel.background || emptyLabel.parent.strokecolor;
       const { strokewidth, fillopacity, opacity } = emptyLabel.parent;
 
-      return {
-        strokecolor,
-        strokewidth,
-        fillcolor,
-        fillopacity,
-        opacity,
-      };
+      return { strokecolor, strokewidth, fillcolor, fillopacity, opacity };
     },
 
     get controlStyle() {
@@ -258,13 +245,7 @@ const Result = types
 
       const { fillcolor, strokecolor, strokewidth, fillopacity, opacity } = self.from_name;
 
-      return {
-        strokecolor,
-        strokewidth,
-        fillcolor,
-        fillopacity,
-        opacity,
-      };
+      return { strokecolor, strokewidth, fillcolor, fillopacity, opacity };
     },
   }))
   .volatile(() => ({
@@ -340,13 +321,7 @@ const Result = types
         data.parentID = self.area.parentID.replace(/#.*/, "");
       }
 
-      Object.assign(data, {
-        id,
-        from_name,
-        to_name,
-        type,
-        origin: self.area.origin,
-      });
+      Object.assign(data, { id, from_name, to_name, type, origin: self.area.origin });
 
       if (isDefined(value[valueType])) {
         Object.assign(data.value, { [valueType]: value[valueType] });

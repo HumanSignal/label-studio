@@ -26,11 +26,11 @@ export const MenuItem = ({
 
     if (selected.has(name)) {
       return true;
-    }
-    if (exact) {
+    } else if (exact) {
       return pathname === url;
+    } else {
+      return pathname.includes(url);
     }
-    return pathname.includes(url);
   })();
 
   const linkContent = useMemo(

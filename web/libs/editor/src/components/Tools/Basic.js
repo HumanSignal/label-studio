@@ -16,7 +16,7 @@ export default observer(
             icon={this.props.icon}
             className={styles.button}
             onClick={this.props.onClick}
-          />
+          ></Button>
         </Tooltip>
       );
     }

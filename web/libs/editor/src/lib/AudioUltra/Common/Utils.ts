@@ -31,7 +31,7 @@ export const clamp = (value: number, min: number, max: number) => {
 };
 
 export const toPrecision = (value: number, precision = 2) => {
-  const multiplier = 10 ** precision;
+  const multiplier = Math.pow(10, precision);
 
   return Math.round(value * multiplier) / multiplier;
 };
@@ -94,8 +94,7 @@ export const minmax = (array: ArrayLike<number>) => {
   const arraySize = array.length;
 
   if (arraySize > 0) {
-    let max;
-    let min;
+    let max, min;
     let i = 0;
 
     max = min = array[0];
@@ -110,8 +109,9 @@ export const minmax = (array: ArrayLike<number>) => {
     }
 
     return [min, max];
+  } else {
+    return [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
   }
-  return [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
 };
 
 export const averageMinMax = (data: Float32Array) => {
@@ -131,8 +131,9 @@ export const average = (array: ArrayLike<number>) => {
     }
 
     return sum / arraySize;
+  } else {
+    return 0;
   }
-  return 0;
 };
 
 export const measure = (message: string, callback: () => void) => {

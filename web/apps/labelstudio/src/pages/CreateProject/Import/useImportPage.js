@@ -46,12 +46,5 @@ export const useImportPage = (project) => {
     dontCommitToProject: true,
   };
 
-  return {
-    columns,
-    uploading,
-    uploadDisabled,
-    finishUpload,
-    fileIds,
-    pageProps,
-  };
+  return { columns, uploading, uploadDisabled, finishUpload, fileIds, pageProps };
 };

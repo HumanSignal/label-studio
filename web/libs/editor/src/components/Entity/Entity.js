@@ -39,11 +39,9 @@ const renderLabels = (element) => {
 const renderResult = (result) => {
   if (result.type.endsWith("labels")) {
     return renderLabels(result);
-  }
-  if (result.type === "rating") {
+  } else if (result.type === "rating") {
     return <Paragraph>Rating: {result.mainValue}</Paragraph>;
-  }
-  if (
+  } else if (
     result.type === "textarea" &&
     !(result.from_name.perregion && result.from_name.displaymode === PER_REGION_MODES.REGION_LIST)
   ) {
@@ -55,8 +53,7 @@ const renderResult = (result) => {
         </Text>
       </Paragraph>
     );
-  }
-  if (result.type === "choices") {
+  } else if (result.type === "choices") {
     return <Paragraph>Choices: {result.mainValue.join(", ")}</Paragraph>;
   }
 
@@ -135,7 +132,7 @@ export default observer(({ store, annotation }) => {
         </Elem>
         {!hasEditableNodes && <Badge count={"readonly"} style={{ backgroundColor: "#ccc" }} />}
       </Elem>
-      <div className={`${styles.statesblk} ls-entity-states`}>
+      <div className={styles.statesblk + " ls-entity-states"}>
         {node?.score && (
           <Fragment>
             <Text>
@@ -158,7 +155,7 @@ export default observer(({ store, annotation }) => {
           </Text>
         )}
 
-        {node?.results.map(renderResult)}
+        <Fragment>{node?.results.map(renderResult)}</Fragment>
       </div>
 
       {node?.isDrawing && (
@@ -168,7 +165,7 @@ export default observer(({ store, annotation }) => {
         </Elem>
       )}
 
-      <div className={`${styles.block} ls-entity-buttons`}>
+      <div className={styles.block + " ls-entity-buttons"}>
         <Space spread>
           <Space>{entityButtons}</Space>
 

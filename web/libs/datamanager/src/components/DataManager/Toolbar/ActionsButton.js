@@ -50,9 +50,7 @@ export const ActionsButton = injector(
           body: buildDialogContent(text, form, formRef),
           buttonLook: destructive ? "destructive" : "primary",
           onOk() {
-            const body = formRef.current?.assembleFormData({
-              asJSON: true,
-            });
+            const body = formRef.current?.assembleFormData({ asJSON: true });
 
             store.invokeAction(action.id, { body });
           },

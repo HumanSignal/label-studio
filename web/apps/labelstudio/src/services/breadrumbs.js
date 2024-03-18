@@ -72,7 +72,7 @@ export const useBreadcrumbControls = singletonHook(initialBreadcrumbs, () => {
   deleteAction = useCallback(
     (key) => {
       const crumbs = localCrumbs.map((crumb) => {
-        if (crumb.key === key) crumb.onClick = undefined;
+        if (crumb.key === key) delete crumb.onClick;
 
         return crumb;
       });

@@ -99,8 +99,9 @@ export const objectClean = <T extends AnyObject>(source: T) => {
 
     if (Object.prototype.toString.call(value) === "[object Object]") {
       return [...res, [key, objectClean(value as AnyObject)]];
+    } else {
+      return [...res, [key, value]];
     }
-    return [...res, [key, value]];
   }, []);
 
   return Object.fromEntries(cleanObject) as T;
@@ -113,8 +114,9 @@ export const clamp = (value: number, min: number, max: number) => {
 export const absoluteURL = (path = "") => {
   if (path.match(/^https?/) || path.match(/^\/\//)) {
     return path;
+  } else {
+    return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
   }
-  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
 };
 
 export const isDefined = <T>(value?: T): value is NonNullable<T> => {

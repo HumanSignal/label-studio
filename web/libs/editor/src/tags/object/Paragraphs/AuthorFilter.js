@@ -6,9 +6,7 @@ import Utils from "../../../utils";
 import styles from "./Paragraphs.module.scss";
 
 const AuthorTag = ({ name, selected }) => {
-  const itemStyle = {
-    border: `2px solid ${Utils.Colors.convertToRGBA(ColorScheme.make_color({ seed: name })[0])}`,
-  };
+  const itemStyle = { border: `2px solid ${Utils.Colors.convertToRGBA(ColorScheme.make_color({ seed: name })[0])}` };
 
   return (
     <span

@@ -18,32 +18,33 @@ const loadAsyncPage = async (url) => {
   try {
     if (pageCache.has(url)) {
       return pageCache.get(url);
-    }
-    const response = await fetch(url);
-    const html = await response.text();
+    } else {
+      const response = await fetch(url);
+      const html = await response.text();
 
-    if (response.status === 401) {
-      location.href = absoluteURL("/");
-      return;
-    }
+      if (response.status === 401) {
+        location.href = absoluteURL("/");
+        return;
+      }
 
-    if (!response.ok) {
-      modal({
-        body: () => (
-          <ErrorWrapper
-            title={`Error ${response.status}: ${response.statusText}`}
-            errorId={response.status}
-            stacktrace={`Cannot load url ${url}\n\n${html}`}
-          />
-        ),
-        allowClose: false,
-        style: { width: 680 },
-      });
-      return null;
-    }
+      if (!response.ok) {
+        modal({
+          body: () => (
+            <ErrorWrapper
+              title={`Error ${response.status}: ${response.statusText}`}
+              errorId={response.status}
+              stacktrace={`Cannot load url ${url}\n\n${html}`}
+            />
+          ),
+          allowClose: false,
+          style: { width: 680 },
+        });
+        return null;
+      }
 
-    pageCache.set(url, html);
-    return html;
+      pageCache.set(url, html);
+      return html;
+    }
   } catch (err) {
     modal({
       body: () => (
@@ -99,9 +100,7 @@ const swapContent = async (oldPage, newPage) => {
   if (currentContent && newContent) {
     await swapNodes(currentContent, newContent);
   } else {
-    await swapNodes(oldPage.body.children[0], newContent, {
-      removeOld: false,
-    });
+    await swapNodes(oldPage.body.children[0], newContent, { removeOld: false });
   }
 };
 
@@ -251,9 +250,7 @@ export const AsyncPage = ({ children }) => {
     document.addEventListener("click", onLinkClick, { capture: true });
     window.addEventListener("popstate", onPopState);
     return () => {
-      document.removeEventListener("click", onLinkClick, {
-        capture: true,
-      });
+      document.removeEventListener("click", onLinkClick, { capture: true });
       window.removeEventListener("popstate", onPopState);
     };
   }, []);

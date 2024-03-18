@@ -10,11 +10,7 @@ export const GroupMenu = ({ regionStore }) => {
             ev.preventDefault();
             return false;
           }}
-          style={{
-            width: "135px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
+          style={{ width: "135px", display: "flex", justifyContent: "space-between" }}
         >
           <div>Regions</div>
         </div>
@@ -26,11 +22,7 @@ export const GroupMenu = ({ regionStore }) => {
             ev.preventDefault();
             return false;
           }}
-          style={{
-            width: "135px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
+          style={{ width: "135px", display: "flex", justifyContent: "space-between" }}
         >
           <div>Labels</div>
         </div>

@@ -201,15 +201,7 @@ export default class Grid extends Component {
               </div>
             ))}
           {isRenderingNext && (
-            <div
-              id={"c-tmp"}
-              key={"anno-tmp"}
-              style={{
-                opacity: 0,
-                position: "relative",
-                right: 99999,
-              }}
-            >
+            <div id={"c-tmp"} key={"anno-tmp"} style={{ opacity: 0, position: "relative", right: 99999 }}>
               <EntityTab
                 entity={selected}
                 prediction={selected.type === "prediction"}

@@ -19,10 +19,7 @@ export type CommentFormProps = {
 export const CommentFormBase: FC<CommentFormProps> = observer(
   ({ value = "", inline = true, onChange, onSubmit, onBlur, rows = 1, maxRows = 4 }) => {
     const formRef = useRef<HTMLFormElement>(null);
-    const actionRef = useRef<{
-      update?: (text?: string) => void;
-      el?: RefObject<HTMLTextAreaElement>;
-    }>({});
+    const actionRef = useRef<{ update?: (text?: string) => void; el?: RefObject<HTMLTextAreaElement> }>({});
 
     const submitHandler = useCallback(
       async (e?: any) => {

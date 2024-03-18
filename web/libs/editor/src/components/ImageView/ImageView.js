@@ -254,12 +254,7 @@ const TransformerBack = observer(({ item }) => {
             x -= offset.x;
             y -= offset.y;
 
-            const bbox = {
-              x,
-              y,
-              width: right - left,
-              height: bottom - top,
-            };
+            const bbox = { x, y, width: right - left, height: bottom - top };
 
             const fixed = fixRectToFit(bbox, stageWidth, stageHeight);
 
@@ -781,8 +776,7 @@ export default observer(
        */
       if (e.evt && !e.evt.ctrlKey) {
         return;
-      }
-      if (e.evt?.ctrlKey) {
+      } else if (e.evt && e.evt.ctrlKey) {
         /**
          * Disable scrolling page
          */
@@ -917,18 +911,18 @@ export default observer(
       const paginationEnabled = !!item.isMultiItem;
 
       if (getRoot(item).settings.fullscreen === false) {
-        containerStyle.maxWidth = item.maxwidth;
-        containerStyle.maxHeight = item.maxheight;
-        containerStyle.width = item.width;
-        containerStyle.height = item.height;
+        containerStyle["maxWidth"] = item.maxwidth;
+        containerStyle["maxHeight"] = item.maxheight;
+        containerStyle["width"] = item.width;
+        containerStyle["height"] = item.height;
       }
 
       if (!store.settings.enableSmoothing && item.zoomScale > 1) {
-        containerStyle.imageRendering = "pixelated";
+        containerStyle["imageRendering"] = "pixelated";
       }
 
       const imagePositionClassnames = [
-        styles.image_position,
+        styles["image_position"],
         styles[`image_position__${item.verticalalignment === "center" ? "middle" : item.verticalalignment}`],
         styles[`image_position__${item.horizontalalignment}`],
       ];
@@ -975,10 +969,7 @@ export default observer(
                 this.filler = node;
               }}
               className={styles.filler}
-              style={{
-                width: "100%",
-                marginTop: item.fillerHeight,
-              }}
+              style={{ width: "100%", marginTop: item.fillerHeight }}
             />
 
             {isFF(FF_LSDV_4583_6) ? (
@@ -1100,8 +1091,7 @@ const EntireStage = observer(
     crosshairRef,
   }) => {
     const { store } = item;
-    let size;
-    let position;
+    let size, position;
 
     if (isFF(FF_ZOOM_OPTIM)) {
       size = {

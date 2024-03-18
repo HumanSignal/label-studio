@@ -31,10 +31,11 @@ export const DateTimeInput = observer(({ value, range, time, onChange }) => {
         .map((d) => (d === null ? undefined : d))
         .map((d) => new Date(d))
         .map((d) => (isValid(d) ? d : undefined));
-    }
-    const date = new Date(value === null ? undefined : value);
+    } else {
+      const date = new Date(value === null ? undefined : value);
 
-    return isValid(date) ? date : undefined;
+      return isValid(date) ? date : undefined;
+    }
   }, [range, value]);
 
   return (

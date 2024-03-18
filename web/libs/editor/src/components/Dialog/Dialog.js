@@ -41,14 +41,7 @@ export default class DialogView extends React.Component {
     }
 
     return (
-      <div
-        className={selectedStyle}
-        style={{
-          background: bgColor,
-          width: "max-content",
-          maxWidth: "100%",
-        }}
-      >
+      <div className={selectedStyle} style={{ background: bgColor, width: "max-content", maxWidth: "100%" }}>
         <span className={styles.name}>{this.props.name}:&nbsp;</span>
         <p className={styles.text}>{this.props.text}</p>
         {date}

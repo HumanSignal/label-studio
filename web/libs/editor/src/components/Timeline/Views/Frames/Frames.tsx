@@ -136,7 +136,7 @@ export const Frames: FC<TimelineViewProps> = ({
       const indicator = e.target;
       const startOffset = indicator.offsetLeft + currentOffsetX;
       const startMouse = e.pageX;
-      const limit = scrollable.current?.scrollWidth - indicator.clientWidth;
+      const limit = scrollable.current!.scrollWidth - indicator.clientWidth;
 
       let lastOffset = 0;
 
@@ -193,7 +193,7 @@ export const Frames: FC<TimelineViewProps> = ({
 
   const onFrameScrub = useCallback(
     (e: MouseEvent) => {
-      const dimensions = scrollable.current?.getBoundingClientRect();
+      const dimensions = scrollable.current!.getBoundingClientRect();
       const offsetLeft = dimensions.left;
       const rightLimit = dimensions.width - timelineStartOffset;
 
@@ -260,7 +260,7 @@ export const Frames: FC<TimelineViewProps> = ({
   }, []);
 
   useEffect(() => {
-    onResize?.(toSteps(scrollable.current?.clientWidth, step));
+    onResize?.(toSteps(scrollable.current!.clientWidth, step));
   }, [viewWidth, step]);
 
   useEffect(() => {
@@ -339,18 +339,13 @@ export const Frames: FC<TimelineViewProps> = ({
         <Elem
           name="indicator"
           onMouseDown={handleMovement}
-          style={{
-            left: clamp(seekerOffset - step, timelineStartOffset - step, viewWidth),
-          }}
+          style={{ left: clamp(seekerOffset - step, timelineStartOffset - step, viewWidth) }}
         />
 
         {isDefined(hoverOffset) && hoverEnabled && (
           <Elem
             name="hover"
-            style={{
-              left: roundToStep(hoverOffset, step),
-              marginLeft: timelineStartOffset,
-            }}
+            style={{ left: roundToStep(hoverOffset, step), marginLeft: timelineStartOffset }}
             data-frame={toSteps(currentOffsetX + hoverOffset, step) + 1}
           />
         )}

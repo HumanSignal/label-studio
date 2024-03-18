@@ -97,7 +97,7 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
         <DescriptionList.Item term="Version">
           {backend.model_version && isValid(backend.model_version)
             ? format(
-                new Date(Number.isNaN(backend.model_version) ? backend.model_version : Number(backend.model_version)),
+                new Date(isNaN(backend.model_version) ? backend.model_version : Number(backend.model_version)),
                 "MMMM dd, yyyy ∙ HH:mm:ss",
               )
             : backend.model_version || "unknown"}
@@ -116,7 +116,7 @@ const BackendState = ({ backend }) => {
 
   return (
     <div className={cn("ml").elem("status")}>
-      <span className={cn("ml").elem("indicator").mod({ state })} />
+      <span className={cn("ml").elem("indicator").mod({ state })}></span>
       <Oneof value={state} className={cn("ml").elem("status-label")}>
         <span case="DI">Disconnected</span>
         <span case="CO">Connected</span>

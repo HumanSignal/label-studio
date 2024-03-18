@@ -82,7 +82,7 @@ const Counter = ({ label, className, validate, required, skip, labelProps, ...pr
     input.current.focus();
     getSelection().removeAllRanges();
     if (type === "increase") return increase();
-    if (type === "decrease") return decrease();
+    else if (type === "decrease") return decrease();
   };
 
   const field = (

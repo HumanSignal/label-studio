@@ -136,9 +136,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
       selectedId: types.optional(types.maybeNull(types.number), null),
       highlightedId: types.optional(types.maybeNull(types.number), null),
       ...(associatedItemType
-        ? {
-            associatedList: types.optional(types.maybeNull(types.array(associatedItemType)), []),
-          }
+        ? { associatedList: types.optional(types.maybeNull(types.array(associatedItemType)), []) }
         : {}),
     })
     .views((self) => ({
@@ -176,8 +174,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
       },
 
       fetch: flow(function* ({ id, query, pageNumber = null, reload = false, interaction, pageSize } = {}) {
-        let currentViewId;
-        let currentViewQuery;
+        let currentViewId, currentViewQuery;
         const requestId = (self.requestId = guidGenerator());
         const root = getRoot(self);
 

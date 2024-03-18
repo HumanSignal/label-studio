@@ -135,7 +135,7 @@ const getTypeDescription = (type, withNullType = true) => {
  * @param {object[]} result
  * @returns {object[]}
  */
-const flattenTree = (tree, parent, parentParentTypes, result) => {
+const flattenTree = (tree, parent = null, parentParentTypes = ["view"], result) => {
   if (!tree.children) return [];
 
   const children = tree.type === "pagedview" ? tree.children.slice(0, 1) : tree.children;
@@ -146,11 +146,11 @@ const flattenTree = (tree, parent, parentParentTypes, result) => {
     const parentTypes = [...parentParentTypes, ...(parent?.type ? [parent?.type] : [])];
     const flatChild = { ...child, parent: parent?.id ?? null, parentTypes };
 
-    flatChild.children = undefined;
+    delete flatChild.children;
 
     result.push(flatChild);
 
-    if (Array.isArray(child.children)) {
+    if (child.children instanceof Array) {
       flattenTree(child, child, parentTypes, result);
     }
   }
@@ -197,7 +197,7 @@ const validateToNameTag = (element, model, flatTree) => {
       return errorBuilder.tagNotFound(model.name, "toname", name);
     }
 
-    if (controlledTags?.validate(controlledTag.tagName).length) {
+    if (controlledTags && controlledTags.validate(controlledTag.tagName).length) {
       return errorBuilder.tagUnsupported(model.name, "toname", controlledTag.tagName, controlledTags);
     }
   }

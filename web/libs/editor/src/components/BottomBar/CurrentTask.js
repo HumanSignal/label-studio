@@ -45,10 +45,7 @@ export const CurrentTask = observer(({ store }) => {
               type="link"
               disabled={!historyEnabled || !store.canGoPrevTask}
               onClick={store.prevTask}
-              style={{
-                background: "none",
-                backgroundColor: "none",
-              }}
+              style={{ background: "none", backgroundColor: "none" }}
             />
             <Elem
               tag={Button}
@@ -61,10 +58,7 @@ export const CurrentTask = observer(({ store }) => {
               type="link"
               disabled={!store.canGoNextTask && !canPostpone}
               onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
-              style={{
-                background: "none",
-                backgroundColor: "none",
-              }}
+              style={{ background: "none", backgroundColor: "none" }}
             />
           </Elem>
         )}

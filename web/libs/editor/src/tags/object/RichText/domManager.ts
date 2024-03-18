@@ -127,8 +127,7 @@ class DDBlock {
 
     if (el instanceof DDSpanElement) {
       return el.findTextElement(pos, avoid);
-    }
-    if (el instanceof DDTextElement) {
+    } else if (el instanceof DDTextElement) {
       return el;
     }
   }
@@ -564,7 +563,7 @@ class Path {
   }
 
   toString() {
-    return `/${this.segments.map((seg) => `${seg[0]}[${seg[1]}]`).join("/")}`;
+    return "/" + this.segments.map((seg) => `${seg[0]}[${seg[1]}]`).join("/");
   }
 }
 

@@ -60,12 +60,7 @@ const RelationConnector = ({ id, command, color, direction, highlight }) => {
 const RelationLabel = ({ label, position }) => {
   const [x, y] = position;
   const textRef = useRef();
-  const [background, setBackground] = useState({
-    width: 0,
-    height: 0,
-    x: 0,
-    y: 0,
-  });
+  const [background, setBackground] = useState({ width: 0, height: 0, x: 0, y: 0 });
 
   const groupAttributes = {
     transform: `translate(${x}, ${y})`,

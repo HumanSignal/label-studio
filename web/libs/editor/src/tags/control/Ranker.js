@@ -107,16 +107,9 @@ const Model = types
       if (!self.list) return [];
       if (self.rankOnly) return [{ id: self.name, title: self.list.title }];
 
-      const columns = self.buckets.map((b) => ({
-        id: b.name,
-        title: b.title ?? "",
-      }));
+      const columns = self.buckets.map((b) => ({ id: b.name, title: b.title ?? "" }));
 
-      if (!self.defaultBucket)
-        columns.unshift({
-          id: ORIGINAL_ITEMS_KEY,
-          title: self.list.title,
-        });
+      if (!self.defaultBucket) columns.unshift({ id: ORIGINAL_ITEMS_KEY, title: self.list.title });
 
       return columns;
     },
@@ -135,10 +128,7 @@ const Model = types
 
       if (!data) return [];
       if (!result) {
-        itemIds = {
-          ...columnStubs,
-          [self.defaultBucket ?? ORIGINAL_ITEMS_KEY]: ids,
-        };
+        itemIds = { ...columnStubs, [self.defaultBucket ?? ORIGINAL_ITEMS_KEY]: ids };
       } else {
         itemIds = { ...columnStubs, ...result };
 

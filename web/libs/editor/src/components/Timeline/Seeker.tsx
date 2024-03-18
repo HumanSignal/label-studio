@@ -45,7 +45,7 @@ export const Seeker: FC<SeekerProps> = ({
   const onIndicatorDrag = useCallback(
     (e) => {
       const indicator = viewRef.current!;
-      const dimensions = rootRef.current?.getBoundingClientRect();
+      const dimensions = rootRef.current!.getBoundingClientRect();
       const indicatorWidth = indicator.clientWidth;
 
       const startDrag = e.pageX;
@@ -78,7 +78,7 @@ export const Seeker: FC<SeekerProps> = ({
   const onSeekerDrag = useCallback(
     (e: globalThis.MouseEvent) => {
       const indicator = seekerRef.current!;
-      const dimensions = rootRef.current?.getBoundingClientRect();
+      const dimensions = rootRef.current!.getBoundingClientRect();
       const indicatorWidth = indicator.clientWidth;
 
       const startDrag = e.pageX;

@@ -91,8 +91,7 @@ export const ImageEntity = types
         self.setDownloading(false);
         self.setError(true);
         return true;
-      }
-      if (fileLoader.isPreloaded(self.src)) {
+      } else if (fileLoader.isPreloaded(self.src)) {
         self.setDownloading(false);
         self.setDownloaded(true);
         self.setProgress(1);

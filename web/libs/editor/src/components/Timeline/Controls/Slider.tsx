@@ -24,7 +24,7 @@ export const Slider: FC<SliderProps> = ({ description, info, max, min, value, st
   }, [value]);
 
   const changeBackgroundSize = () => {
-    if (sliderRef.current) sliderRef.current.style.backgroundSize = `${((value - min) * 100) / (max - min)}% 100%`;
+    if (sliderRef.current) sliderRef.current.style.backgroundSize = ((value - min) * 100) / (max - min) + "% 100%";
   };
 
   const handleChangeInputValue = (e: React.FormEvent<HTMLInputElement>) => {
@@ -39,15 +39,14 @@ export const Slider: FC<SliderProps> = ({ description, info, max, min, value, st
     }
 
     const noZero = e.currentTarget.value.match(/^\.[0-9]*$/);
-    const normalizedValue = noZero ? `0${e.currentTarget.value}` : e.currentTarget.value;
+    const normalizedValue = noZero ? "0" + e.currentTarget.value : e.currentTarget.value;
 
     const newValue = Number.parseFloat(normalizedValue);
 
-    if (Number.isNaN(newValue)) {
+    if (isNaN(newValue)) {
       setValueError(e.currentTarget.value);
       return;
-    }
-    if (newValue > max || newValue < min) {
+    } else if (newValue > max || newValue < min) {
       setValueError(newValue);
     } else {
       onChange(e);

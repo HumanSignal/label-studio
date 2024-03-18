@@ -190,7 +190,7 @@ export const Controls = controlsInjector(
                   const searchParams = new URLSearchParams(window.location.search);
 
                   searchParams.set("exitStream", "true");
-                  const newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
+                  const newRelativePathQuery = window.location.pathname + "?" + searchParams.toString();
 
                   window.history.pushState(null, "", newRelativePathQuery);
                 }
@@ -215,10 +215,7 @@ export const Controls = controlsInjector(
                   name="submit"
                   disabled={isDisabled}
                   look={look}
-                  mod={{
-                    has_icon: useExitOption,
-                    disabled: isDisabled,
-                  }}
+                  mod={{ has_icon: useExitOption, disabled: isDisabled }}
                   onClick={async (event) => {
                     if (event.target.classList.contains("lsf-dropdown__trigger")) return;
                     const selected = store.annotationStore?.selected;
@@ -256,10 +253,7 @@ export const Controls = controlsInjector(
                 name="submit"
                 disabled={disabled || submitDisabled}
                 look={look}
-                mod={{
-                  has_icon: useExitOption,
-                  disabled: isDisabled,
-                }}
+                mod={{ has_icon: useExitOption, disabled: isDisabled }}
                 onClick={async (event) => {
                   if (event.target.classList.contains("lsf-dropdown__trigger")) return;
                   const selected = store.annotationStore?.selected;

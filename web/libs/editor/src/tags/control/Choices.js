@@ -128,7 +128,7 @@ const Model = types
     get serializableValue() {
       const choices = self.selectedValues();
 
-      if (choices?.length) return { choices };
+      if (choices && choices.length) return { choices };
 
       return null;
     },
@@ -202,8 +202,9 @@ const Model = types
             if (Array.isArray(value) && Array.isArray(choice.resultValue)) {
               if (value.length !== choice.resultValue.length) return false;
               return value.every?.((val, idx) => val === choice.resultValue?.[idx]);
+            } else {
+              return value === choice.resultValue;
             }
-            return value === choice.resultValue;
           });
         }
 
@@ -289,13 +290,7 @@ const ChoicesSelectLayout = observer(({ item }) => {
 
 const HtxChoices = observer(({ item }) => {
   return (
-    <Block
-      name="choices"
-      mod={{
-        hidden: !item.isVisible || !item.perRegionVisible(),
-        layout: item.layout,
-      }}
-    >
+    <Block name="choices" mod={{ hidden: !item.isVisible || !item.perRegionVisible(), layout: item.layout }}>
       {item.layout === "select" ? <ChoicesSelectLayout item={item} /> : Tree.renderChildren(item, item.annotation)}
     </Block>
   );

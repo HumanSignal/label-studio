@@ -12,12 +12,7 @@ export const InlineError = ({ children, includeValidation, className, style }) =
 
   return context.error ? (
     <Block name="inline-error" mix={className} style={style}>
-      <ErrorWrapper
-        possum={false}
-        {...context.errorFormatter(context.error, {
-          includeValidation,
-        })}
-      />
+      <ErrorWrapper possum={false} {...context.errorFormatter(context.error, { includeValidation })} />
       {children}
     </Block>
   ) : null;

@@ -172,13 +172,7 @@ const Counter = ({
               />
 
               {postfix && (
-                <Elem
-                  name="input"
-                  mod={{
-                    under: true,
-                    withPostfix: !!postfix,
-                  }}
-                >
+                <Elem name="input" mod={{ under: true, withPostfix: !!postfix }}>
                   {displayValue.join(" ")}
                 </Elem>
               )}

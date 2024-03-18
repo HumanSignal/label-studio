@@ -20,10 +20,7 @@ const Model = types
     sequence: types.frozen([]),
   })
   .preProcessSnapshot((snapshot) => {
-    return {
-      ...snapshot,
-      sequence: snapshot.sequence || snapshot.value.sequence,
-    };
+    return { ...snapshot, sequence: snapshot.sequence || snapshot.value.sequence };
   })
   .volatile(() => ({
     hideable: true,

@@ -25,10 +25,12 @@ const Webhook = () => {
     if (history.location.pathname.startsWith("/projects")) {
       if (Object.keys(project).length === 0) {
         return null;
+      } else {
+        return project.id;
       }
-      return project.id;
+    } else {
+      return undefined;
     }
-    return undefined;
   }, [project, history]);
 
   console.log(projectId, history.location.pathname);
@@ -40,9 +42,9 @@ const Webhook = () => {
     const params = {};
 
     if (projectId !== undefined) {
-      params.project = projectId;
+      params["project"] = projectId;
     } else {
-      params.project = null;
+      params["project"] = null;
     }
     const webhooks = await api.callApi("webhooks", {
       params,

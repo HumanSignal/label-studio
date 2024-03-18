@@ -15,7 +15,7 @@ import { type BaseProps, Side } from "./types";
 import { resizers } from "./utils";
 
 const distance = (x1: number, x2: number, y1: number, y2: number) => {
-  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 };
 
 export const PanelTabsBase: FC<BaseProps> = ({
@@ -69,7 +69,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
   const keyRef = useRef(key);
   const collapsed = sidePanelCollapsed[alignment as Side] && !detached;
   const isParentOfCollapsedPanel = attachedKeys && attachedKeys[0] === key;
-  const isChildOfGroup = attachedKeys?.includes(key) && attachedKeys[0] !== key;
+  const isChildOfGroup = attachedKeys && attachedKeys.includes(key) && attachedKeys[0] !== key;
   const collapsedHeader = !(collapsed && !isParentOfCollapsedPanel);
   const tooltipText = visible && !collapsed ? "Collapse" : "Expand";
 
@@ -137,7 +137,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
 
         const allowDrag = true;
         const panel = panelRef.current!;
-        const parentBBox = root.current?.getBoundingClientRect();
+        const parentBBox = root.current!.getBoundingClientRect();
         const bbox = panel.getBoundingClientRect();
         const clickTarget = e.target?.getBoundingClientRect();
         const tx = e.clientX - clickTarget.left;
@@ -209,17 +209,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
         setResizing(type);
         handlers.current.onResizeStart?.();
 
-        return {
-          pos: [e.pageX, e.pageY],
-          type,
-          width,
-          maxWidth,
-          height,
-          top,
-          left,
-          resizeDirections,
-          shift,
-        };
+        return { pos: [e.pageX, e.pageY], type, width, maxWidth, height, top, left, resizeDirections, shift };
       },
       onMouseMove(e, data) {
         if (data) {
@@ -281,10 +271,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
   );
 
   const handleGroupPanelToggle = () => {
-    setSidePanelCollapsed({
-      ...sidePanelCollapsed,
-      [alignment]: !sidePanelCollapsed[alignment as Side],
-    });
+    setSidePanelCollapsed({ ...sidePanelCollapsed, [alignment]: !sidePanelCollapsed[alignment as Side] });
   };
 
   const handlePanelToggle = useCallback(

@@ -83,14 +83,7 @@ export const ProjectModelVersionSelector = ({
         large
       />
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          width: 400,
-          paddingLeft: 16,
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", width: 400, paddingLeft: 16 }}>
         <div style={{ flex: 1, paddingRight: 16 }}>
           <Select
             name={name}

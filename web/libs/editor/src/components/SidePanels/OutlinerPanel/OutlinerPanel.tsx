@@ -133,8 +133,7 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
                 <Block name="filters-info">
                   <IconInfo width={21} height={20} />
                   <Elem name="filters-title">
-                    There {hiddenRegions === 1 ? "is" : "are"} {hiddenRegions} hidden region
-                    {hiddenRegions > 1 && "s"}
+                    There {hiddenRegions === 1 ? "is" : "are"} {hiddenRegions} hidden region{hiddenRegions > 1 && "s"}
                   </Elem>
                   <Elem name="filters-description">Adjust or remove filters to view</Elem>
                 </Block>

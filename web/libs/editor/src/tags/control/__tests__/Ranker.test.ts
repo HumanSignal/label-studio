@@ -47,15 +47,9 @@ const items = [
 ];
 
 describe("List + Ranker (rank mode)", () => {
-  const list = ListModel.create({
-    name: "list",
-    value: "$items",
-    title: "Test List",
-  });
+  const list = ListModel.create({ name: "list", value: "$items", title: "Test List" });
   const ranker = RankerModel.create({ name: "rank", toname: "list" });
-  const store = MockStore.create({
-    annotationStore: { selected: { names: { list, ranker } } },
-  });
+  const store = MockStore.create({ annotationStore: { selected: { names: { list, ranker } } } });
 
   store.task.dataObj = { items };
   list.updateValue(store);
@@ -74,11 +68,7 @@ describe("List + Ranker (rank mode)", () => {
 });
 
 describe("List + Ranker + Buckets (pick mode)", () => {
-  const list = ListModel.create({
-    name: "list",
-    value: "$items",
-    title: "Test List",
-  });
+  const list = ListModel.create({ name: "list", value: "$items", title: "Test List" });
   const ranker = RankerModel.create({
     name: "rank",
     toname: "list",
@@ -87,9 +77,7 @@ describe("List + Ranker + Buckets (pick mode)", () => {
       { id: "B2", type: "bucket", name: "B2", title: "Bucket 2" },
     ],
   });
-  const store = MockStore.create({
-    annotationStore: { selected: { names: { list, ranker } } },
-  });
+  const store = MockStore.create({ annotationStore: { selected: { names: { list, ranker } } } });
 
   store.task.dataObj = { items };
   list.updateValue(store);
@@ -139,28 +127,16 @@ describe("List + Ranker + Buckets (pick mode)", () => {
 });
 
 describe("List + Ranker + Buckets + default (group mode)", () => {
-  const list = ListModel.create({
-    name: "list",
-    value: "$items",
-    title: "Test List",
-  });
+  const list = ListModel.create({ name: "list", value: "$items", title: "Test List" });
   const ranker = RankerModel.create({
     name: "rank",
     toname: "list",
     children: [
       { id: "B1", type: "bucket", name: "B1", title: "Bucket 1" },
-      {
-        id: "B2",
-        type: "bucket",
-        name: "B2",
-        title: "Bucket 2",
-        default: true,
-      },
+      { id: "B2", type: "bucket", name: "B2", title: "Bucket 2", default: true },
     ],
   });
-  const store = MockStore.create({
-    annotationStore: { selected: { names: { list, ranker } } },
-  });
+  const store = MockStore.create({ annotationStore: { selected: { names: { list, ranker } } } });
 
   store.task.dataObj = { items };
   list.updateValue(store);

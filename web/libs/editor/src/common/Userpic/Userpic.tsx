@@ -105,9 +105,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
               ref={imgRef}
               src={finalSrc}
               alt={(displayName ?? "").toUpperCase()}
-              style={{
-                opacity: imgVisible ? (faded ? 0.3 : 1) : 0,
-              }}
+              style={{ opacity: imgVisible ? (faded ? 0.3 : 1) : 0 }}
               onLoad={onImageLoaded}
               onError={() => setFinalSrc(FALLBACK_IMAGE)}
               mod={{ faded }}
@@ -134,11 +132,11 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const userFullName = useMemo(() => {
       if (user?.firstName || user?.lastName) {
         return `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
-      }
-      if (user?.email) {
+      } else if (user?.email) {
         return user.email;
+      } else {
+        return username;
       }
-      return username;
     }, [user, username]);
 
     return showUsername && userFullName ? <Tooltip title={userFullName}>{userpic}</Tooltip> : userpic;

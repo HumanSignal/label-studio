@@ -45,8 +45,7 @@ const isSystemEvent = (e: KeyboardEvent<HTMLInputElement>): boolean => {
   return (
     e.code.match(/arrow/i) !== null ||
     (e.shiftKey && e.code.match(/arrow/i) !== null) ||
-    e.metaKey ||
-    e.ctrlKey ||
+    e.metaKey || e.ctrlKey ||
     e.code === "Backspace"
   );
 };
@@ -198,7 +197,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
         const urlParams = new URLSearchParams(location.search);
         const pageNumberFromURL = Number.parseInt(urlParams.get(props.urlParamName) ?? "");
 
-        if (!Number.isNaN(pageNumberFromURL) && pageNumberFromURL !== currentPage) {
+        if (!isNaN(pageNumberFromURL) && pageNumberFromURL !== currentPage) {
           setCurrentPage(pageNumberFromURL);
         }
       };
@@ -243,6 +242,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
             {inputMode ? (
               <input
                 type="text"
+                autoFocus
                 defaultValue={currentPage}
                 pattern="[0-9]"
                 onKeyDown={(e) => {
@@ -271,7 +271,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
                   onClick={() => {
                     /*  */
                   }}
-                />
+                ></div>
               </Elem>
             )}
           </Elem>
@@ -297,10 +297,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
             <Select
               size={size}
               value={pageSize}
-              options={pageSizeOptions.map((v) => ({
-                label: `${v} per page`,
-                value: v,
-              }))}
+              options={pageSizeOptions.map((v) => ({ label: `${v} per page`, value: v }))}
               onChange={(e: any) => {
                 const newPageSize = Number.parseInt(e.target.value);
 

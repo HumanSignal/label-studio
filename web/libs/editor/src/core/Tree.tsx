@@ -71,10 +71,7 @@ function tagIntoObject(node: Element, taskData: Record<string, any>, replaces?: 
     const views = [];
 
     for (let i = 0; i < repeaterArray.length; i++) {
-      const newReplaces: Record<string, string> = {
-        ...replaces,
-        [indexFlag]: i,
-      };
+      const newReplaces: Record<string, string> = { ...replaces, [indexFlag]: i };
       const view = {
         id: guidGenerator(),
         tagName: "View",
@@ -119,13 +116,10 @@ function tagIntoObject(node: Element, taskData: Record<string, any>, replaces?: 
 function cssConverter(style: string) {
   if (!style) return null;
 
-  const result: Record<string, string> = {};
-  const attributes = style.split(";");
+  const result: Record<string, string> = {},
+    attributes = style.split(";");
 
-  let firstIndexOfColon;
-  let i;
-  let key;
-  let value;
+  let firstIndexOfColon, i, key, value;
 
   for (i = 0; i < attributes.length; i++) {
     firstIndexOfColon = attributes[i].indexOf(":");
@@ -250,12 +244,13 @@ function renderItem(ref: IAnyStateTreeNode, annotation: IAnnotation, includeKey 
  * @param {*} item
  */
 function renderChildren(item: IAnyStateTreeNode, annotation: IAnnotation) {
-  if (item?.children?.length) {
+  if (item && item.children && item.children.length) {
     return item.children.map((el: IAnyStateTreeNode) => {
       return renderItem(el, annotation);
     });
+  } else {
+    return null;
   }
-  return null;
 }
 
 /**
@@ -343,7 +338,7 @@ function extractNames(root: IAnyStateTreeNode) {
       node.toname = objects[0];
     }
 
-    if (node?.toname) {
+    if (node && node.toname) {
       const val = toNames.get(node.toname);
 
       if (val) {

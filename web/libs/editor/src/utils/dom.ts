@@ -116,10 +116,5 @@ export const alignElements = (elem: HTMLElement, target: HTMLElement, align: Ele
     resultAlign[1] = "right";
   }
 
-  return {
-    top: offsetTop,
-    left: offsetLeft,
-    pos,
-    align: resultAlign.join("-") as ElementAlignment,
-  };
+  return { top: offsetTop, left: offsetLeft, pos, align: resultAlign.join("-") as ElementAlignment };
 };

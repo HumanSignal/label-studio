@@ -19,10 +19,7 @@ export type CommentFormProps = {
 export const CommentForm: FC<CommentFormProps> = observer(
   ({ commentStore, annotationStore, inline = true, onChange, rows = 1, maxRows = 4 }) => {
     const formRef = useRef<HTMLFormElement>(null);
-    const actionRef = useRef<{
-      update?: (text?: string) => void;
-      el?: RefObject<HTMLTextAreaElement>;
-    }>({});
+    const actionRef = useRef<{ update?: (text?: string) => void; el?: RefObject<HTMLTextAreaElement> }>({});
     const clearTooltipMessage = () => commentStore.setTooltipMessage("");
     const onSubmit = useCallback(
       async (e?: any) => {
@@ -63,10 +60,7 @@ export const CommentForm: FC<CommentFormProps> = observer(
 
     useEffect(() => {
       if (isFF(FF_DEV_3873)) {
-        commentStore.tooltipMessage &&
-          actionRef.current?.el?.current?.focus({
-            preventScroll: true,
-          });
+        commentStore.tooltipMessage && actionRef.current?.el?.current?.focus({ preventScroll: true });
       }
     }, [commentStore.tooltipMessage]);
 

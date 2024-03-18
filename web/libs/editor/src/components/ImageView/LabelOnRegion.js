@@ -50,8 +50,9 @@ const LabelOnBbox = ({
 
     if (currentTextWidth > textMaxWidth) {
       return textMaxWidth;
+    } else {
+      return null;
     }
-    return null;
   }, [textEl, text, maxWidth, scale]);
 
   const tagSceneFunc = useCallback(
@@ -245,8 +246,8 @@ const LabelOnPolygon = observer(({ item, color }) => {
         isTexting={isTexting}
         text={labelText}
         score={item.score}
-        showLabels={settings?.showLabels}
-        showScore={settings?.showScore}
+        showLabels={settings && settings.showLabels}
+        showScore={settings && settings.showScore}
         zoomScale={item.parent.zoomScale}
         color={color}
         onClickLabel={item.onClickLabel}
@@ -289,7 +290,7 @@ const LabelOnMask = observer(({ item, color }) => {
         text={labelText}
         score={item.score}
         showLabels={getRoot(item).settings.showLabels}
-        showScore={settings?.showScore}
+        showScore={settings && settings.showScore}
         zoomScale={item.parent.zoomScale}
         color={color}
         onClickLabel={item.onClickLabel}

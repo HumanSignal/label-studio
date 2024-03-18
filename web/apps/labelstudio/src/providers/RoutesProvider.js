@@ -78,9 +78,7 @@ export const RoutesProvider = ({ children }) => {
     try {
       const crumbs = routesChain
         .map((route) => {
-          const params = matchPath(location.pathname, {
-            path: route.path,
-          });
+          const params = matchPath(location.pathname, { path: route.path });
           const path = generatePath(route.path, params.params);
           const title = route.title instanceof Function ? route.title() : route.title;
           const key = route.component?.displayName ?? route.key ?? path;

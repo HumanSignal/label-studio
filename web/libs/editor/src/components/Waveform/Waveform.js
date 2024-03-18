@@ -47,7 +47,7 @@ function formatTimeCallback(seconds, pxPerSec) {
 
   if (minutes > 0) {
     if (seconds < 10) {
-      secondsStr = `0${secondsStr}`;
+      secondsStr = "0" + secondsStr;
     }
     return `${minutes}:${secondsStr}`;
   }
@@ -216,7 +216,7 @@ export default class Waveform extends React.Component {
     if (val > 700) val = 700;
 
     this.onChangeZoom(val);
-    ev?.preventDefault();
+    ev && ev.preventDefault();
     return false;
   };
 
@@ -249,15 +249,14 @@ export default class Waveform extends React.Component {
     if (val < MIN_ZOOM_Y) val = MIN_ZOOM_Y;
 
     this.onChangeZoomY(val);
-    ev?.preventDefault();
+    ev && ev.preventDefault();
     return false;
   };
 
   onWheel = (e) => {
     if (e && !e.shiftKey) {
       return;
-    }
-    if (e?.shiftKey) {
+    } else if (e && e.shiftKey) {
       /**
        * Disable scrolling page
        */
@@ -351,21 +350,13 @@ export default class Waveform extends React.Component {
       const url = this.props.src;
 
       // just general error message
-      let body = messages.ERR_LOADING_AUDIO({
-        attr: this.props.dataField,
-        error,
-        url,
-      });
+      let body = messages.ERR_LOADING_AUDIO({ attr: this.props.dataField, error, url });
 
       // "Failed to fetch" or HTTP error
       if (error?.includes("HTTP") || error?.includes("fetch")) {
         this.wavesurfer.hadNetworkError = true;
 
-        body = messages.ERR_LOADING_HTTP({
-          attr: this.props.dataField,
-          error,
-          url,
-        });
+        body = messages.ERR_LOADING_HTTP({ attr: this.props.dataField, error, url });
       } else if (typeof e === "string" && e.includes("media element")) {
         // obviously audio cannot be parsed if it was not loaded successfully
         // but WS can generate such error even after network errors, so skip it
@@ -475,7 +466,7 @@ export default class Waveform extends React.Component {
       this.props.onLoad(this.wavesurfer);
     }
 
-    this.hotkeys.addNamed("audio:back", this.onBack, `${Hotkey.DEFAULT_SCOPE},${Hotkey.INPUT_SCOPE}`);
+    this.hotkeys.addNamed("audio:back", this.onBack, Hotkey.DEFAULT_SCOPE + "," + Hotkey.INPUT_SCOPE);
   }
 
   componentWillUnmount() {
@@ -500,12 +491,7 @@ export default class Waveform extends React.Component {
           <Row gutter={16} style={{ marginTop: "1em" }}>
             <Col flex={8} style={{ textAlign: "right", marginTop: "6px" }}>
               <div style={{ display: "flex" }}>
-                <div
-                  style={{
-                    marginTop: "6px",
-                    marginRight: "5px",
-                  }}
-                >
+                <div style={{ marginTop: "6px", marginRight: "5px" }}>
                   <Tooltip placement="topLeft" title="Horizontal zoom out">
                     <ZoomOutOutlined onClick={this.onZoomMinus} className={globalStyles.link} />
                   </Tooltip>
@@ -521,12 +507,7 @@ export default class Waveform extends React.Component {
                     }}
                   />
                 </div>
-                <div
-                  style={{
-                    marginTop: "6px",
-                    marginLeft: "5px",
-                  }}
-                >
+                <div style={{ marginTop: "6px", marginLeft: "5px" }}>
                   <Tooltip placement="topLeft" title="Horizontal zoom in">
                     <ZoomInOutlined onClick={this.onZoomPlus} className={globalStyles.link} />
                   </Tooltip>
@@ -535,12 +516,7 @@ export default class Waveform extends React.Component {
             </Col>
             <Col flex={4} style={{ textAlign: "right", marginTop: "6px" }}>
               <div style={{ display: "flex" }}>
-                <div
-                  style={{
-                    marginTop: "6px",
-                    marginRight: "5px",
-                  }}
-                >
+                <div style={{ marginTop: "6px", marginRight: "5px" }}>
                   <Tooltip placement="topLeft" title="Vertical zoom out">
                     <ZoomOutOutlined onClick={this.onZoomYMinus} className={globalStyles.link} />
                   </Tooltip>
@@ -556,12 +532,7 @@ export default class Waveform extends React.Component {
                     }}
                   />
                 </div>
-                <div
-                  style={{
-                    marginTop: "6px",
-                    marginLeft: "5px",
-                  }}
-                >
+                <div style={{ marginTop: "6px", marginLeft: "5px" }}>
                   <Tooltip placement="topLeft" title="Vertical zoom in">
                     <ZoomInOutlined onClick={this.onZoomYPlus} className={globalStyles.link} />
                   </Tooltip>
@@ -570,12 +541,7 @@ export default class Waveform extends React.Component {
             </Col>
             <Col flex={3}>
               {this.props.volume && (
-                <div
-                  style={{
-                    display: "flex",
-                    marginTop: "6.5px",
-                  }}
-                >
+                <div style={{ display: "flex", marginTop: "6.5px" }}>
                   <div style={{ width: "100%" }}>
                     <Slider
                       min={0}
@@ -587,12 +553,7 @@ export default class Waveform extends React.Component {
                       }}
                     />
                   </div>
-                  <div
-                    style={{
-                      marginLeft: "10px",
-                      marginTop: "5px",
-                    }}
-                  >
+                  <div style={{ marginLeft: "10px", marginTop: "5px" }}>
                     <SoundOutlined />
                   </div>
                 </div>

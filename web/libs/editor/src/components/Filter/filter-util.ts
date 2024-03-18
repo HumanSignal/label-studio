@@ -61,8 +61,9 @@ const contains = (items: any[], filterItem: FilterListInterface) => {
 
       return item?.toLowerCase().includes(filterItem.value.toLowerCase());
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const notcontains = (items: any[], filterItem: FilterListInterface) => {
@@ -72,8 +73,9 @@ const notcontains = (items: any[], filterItem: FilterListInterface) => {
 
       return !item?.toLowerCase().includes(filterItem.value.toLowerCase());
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const greater = (items: any[], filterItem: FilterListInterface) => {
@@ -83,8 +85,9 @@ const greater = (items: any[], filterItem: FilterListInterface) => {
 
       return item > filterItem.value;
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const greaterOrEqual = (items: any[], filterItem: FilterListInterface) => {
@@ -94,8 +97,9 @@ const greaterOrEqual = (items: any[], filterItem: FilterListInterface) => {
 
       return item >= filterItem.value;
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const less = (items: any[], filterItem: FilterListInterface) => {
@@ -105,8 +109,9 @@ const less = (items: any[], filterItem: FilterListInterface) => {
 
       return item < filterItem.value;
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const lessOrEqual = (items: any[], filterItem: FilterListInterface) => {
@@ -116,8 +121,9 @@ const lessOrEqual = (items: any[], filterItem: FilterListInterface) => {
 
       return item <= filterItem.value;
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const equal = (items: any[], filterItem: FilterListInterface) => {
@@ -127,8 +133,9 @@ const equal = (items: any[], filterItem: FilterListInterface) => {
 
       return item?.toString().toLowerCase() === filterItem.value?.toString().toLowerCase();
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const notequal = (items: any[], filterItem: FilterListInterface) => {
@@ -138,8 +145,9 @@ const notequal = (items: any[], filterItem: FilterListInterface) => {
 
       return item?.toString().toLowerCase() !== filterItem.value?.toLowerCase();
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const between = (items: any[], filterItem: FilterListInterface) => {
@@ -149,8 +157,9 @@ const between = (items: any[], filterItem: FilterListInterface) => {
 
       return filterItem.value.min <= item && item <= filterItem.value.max;
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const notbetween = (items: any[], filterItem: FilterListInterface) => {
@@ -160,8 +169,9 @@ const notbetween = (items: any[], filterItem: FilterListInterface) => {
 
       return item <= filterItem.value.min || filterItem.value.max <= item;
     });
+  } else {
+    return items;
   }
-  return items;
 };
 
 const regex = (items: any[], filterItem: FilterListInterface) => {

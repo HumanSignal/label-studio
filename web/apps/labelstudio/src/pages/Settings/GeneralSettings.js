@@ -21,16 +21,8 @@ export const GeneralSettings = () => {
   const colors = ["#FFFFFF", "#F52B4F", "#FA8C16", "#F6C549", "#9ACA4F", "#51AAFD", "#7F64FF", "#D55C9D"];
 
   const samplings = [
-    {
-      value: "Sequential",
-      label: "Sequential",
-      description: "Tasks are ordered by Data manager ordering",
-    },
-    {
-      value: "Uniform",
-      label: "Random",
-      description: "Tasks are chosen with uniform random",
-    },
+    { value: "Sequential", label: "Sequential", description: "Tasks are ordered by Data manager ordering" },
+    { value: "Uniform", label: "Random", description: "Tasks are chosen with uniform random" },
   ];
 
   return (

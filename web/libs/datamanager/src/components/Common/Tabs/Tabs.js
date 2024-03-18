@@ -170,11 +170,7 @@ export const TabsItem = ({
               <Button
                 type="link"
                 size="small"
-                style={{
-                  padding: "6px",
-                  margin: "auto",
-                  color: "#999",
-                }}
+                style={{ padding: "6px", margin: "auto", color: "#999" }}
                 icon={<Icon icon={FaEllipsisV} />}
               />
             </Elem>

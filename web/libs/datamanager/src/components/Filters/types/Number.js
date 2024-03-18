@@ -7,11 +7,11 @@ const valueFilter = (value) => {
   if (isDefined(value)) {
     if (typeof value === "number") {
       return value;
-    }
-    if (typeof value === "string") {
+    } else if (typeof value === "string") {
       return value.replace(/([^\d.,]+)/, "");
+    } else {
+      return value || null;
     }
-    return value || null;
   }
 
   return null;

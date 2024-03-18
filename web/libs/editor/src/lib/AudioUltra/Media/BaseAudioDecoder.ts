@@ -113,7 +113,5 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
   }
 
   abstract init(arraybuffer: ArrayBuffer): Promise<void>;
-  abstract decode(options?: {
-    multiChannel?: boolean;
-  }): Promise<void | AudioBuffer>;
+  abstract decode(options?: { multiChannel?: boolean }): Promise<void | AudioBuffer>;
 }

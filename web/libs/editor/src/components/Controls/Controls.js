@@ -30,7 +30,7 @@ export default inject("store")(
     let taskInformation;
 
     if (store.task) {
-      taskInformation = <h4 className={`${styles.task} ls-task-info`}>Task ID: {store.task.id}</h4>;
+      taskInformation = <h4 className={styles.task + " ls-task-info"}>Task ID: {store.task.id}</h4>;
     }
 
     /**
@@ -56,7 +56,7 @@ export default inject("store")(
       if (store.hasInterface("skip")) {
         skipButton = (
           <Tooltip title="Cancel (skip) task: [ Ctrl+Space ]" mouseEnterDelay={TOOLTIP_DELAY}>
-            <Button disabled={disabled} look="danger" onClick={store.skipTask} className={`${styles.skip} ls-skip-btn`}>
+            <Button disabled={disabled} look="danger" onClick={store.skipTask} className={styles.skip + " ls-skip-btn"}>
               Skip {buttons.skip}
             </Button>
           </Tooltip>
@@ -71,7 +71,7 @@ export default inject("store")(
               look="primary"
               icon={<CheckOutlined />}
               onClick={store.submitAnnotation}
-              className={`${styles.submit} ls-submit-btn`}
+              className={styles.submit + " ls-submit-btn"}
             >
               Submit {buttons.submit}
             </Button>

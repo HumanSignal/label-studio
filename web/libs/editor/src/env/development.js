@@ -79,7 +79,7 @@ import { TimeSeriesSingle } from "../examples/timeseries_single";
 const data = ClassificationMixed;
 
 function getData(task) {
-  if (task?.data) {
+  if (task && task.data) {
     return {
       ...task,
       data: JSON.stringify(task.data),

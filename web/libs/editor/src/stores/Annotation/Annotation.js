@@ -80,9 +80,7 @@ export const Annotation = types
     // Annotation will use getters to get them at the top level
     // This data is never redefined directly, it's empty at the start
     trackedState: types.optional(TrackedState, {}),
-    history: types.optional(TimeTraveller, {
-      targetPath: "../trackedState",
-    }),
+    history: types.optional(TimeTraveller, { targetPath: "../trackedState" }),
 
     dragMode: types.optional(types.boolean, false),
 
@@ -122,7 +120,7 @@ export const Annotation = types
       const children = item.children?.map(updateIds);
 
       if (children) item = { ...item, children };
-      if (item.id) item = { ...item, id: `${item.name ?? item.id}@${sn.id}` };
+      if (item.id) item = { ...item, id: (item.name ?? item.id) + "@" + sn.id };
       // @todo fallback for tags with name as id:
       // if (item.name) item = { ...item, name: item.name + "@" + sn.id };
       // @todo soon no such tags should left
@@ -283,7 +281,7 @@ export const Annotation = types
   .actions((self) => ({
     reinitHistory(force = true) {
       self.history.reinit(force);
-      self.autosave?.cancel();
+      self.autosave && self.autosave.cancel();
       if (self.type === "annotation") self.setInitialValues();
     },
 
@@ -398,7 +396,7 @@ export const Annotation = types
     },
 
     unselectStates() {
-      self.names.forEach((tag) => tag.unselectAll?.());
+      self.names.forEach((tag) => tag.unselectAll && tag.unselectAll());
     },
 
     /**
@@ -466,12 +464,13 @@ export const Annotation = types
     },
 
     unloadRegionState(region) {
-      region.states?.forEach((s) => {
-        const mainViewTag = self.names.get(s.name);
+      region.states &&
+        region.states.forEach((s) => {
+          const mainViewTag = self.names.get(s.name);
 
-        mainViewTag.unselectAll?.();
-        mainViewTag.perRegionCleanup?.();
-      });
+          mainViewTag.unselectAll && mainViewTag.unselectAll();
+          mainViewTag.perRegionCleanup && mainViewTag.perRegionCleanup();
+        });
     },
 
     addRelation(reg) {
@@ -501,7 +500,7 @@ export const Annotation = types
      */
     beforeSend() {
       self.traverseTree((node) => {
-        if (node?.beforeSend) {
+        if (node && node.beforeSend) {
           node.beforeSend();
         }
       });
@@ -521,7 +520,7 @@ export const Annotation = types
       // move all children into the parent region of the given one
       const children = regions.filter((r) => r.parentID === region.id);
 
-      children?.forEach((r) => r.setParentID(region.parentID));
+      children && children.forEach((r) => r.setParentID(region.parentID));
 
       if (!region.classification) getEnv(self).events.invoke("entityDelete", region);
 
@@ -545,7 +544,7 @@ export const Annotation = types
     undo() {
       const { history, regionStore } = self;
 
-      if (history?.canUndo) {
+      if (history && history.canUndo) {
         let stopDrawingAfterNextUndo = false;
         const selectedIds = regionStore.selectedIds;
         const currentRegion = regionStore.findRegion(
@@ -571,7 +570,7 @@ export const Annotation = types
     redo() {
       const { history, regionStore } = self;
 
-      if (history?.canRedo) {
+      if (history && history.canRedo) {
         const selectedIds = regionStore.selectedIds;
 
         history.redo();
@@ -588,8 +587,8 @@ export const Annotation = types
       // Some async or lazy mode operations (ie. Images lazy load) need to reinitHistory without removing state selections
       if (force) self.unselectAll();
 
-      self.names.forEach((tag) => tag.needsUpdate?.());
-      self.areas.forEach((area) => area.updateAppearenceFromState?.());
+      self.names.forEach((tag) => tag.needsUpdate && tag.needsUpdate());
+      self.areas.forEach((area) => area.updateAppearenceFromState && area.updateAppearenceFromState());
       if (isFF(FF_DEV_2432)) {
         const areas = Array.from(self.areas.values());
         const filtered = areas.filter((area) => area.isDrawing);
@@ -728,7 +727,7 @@ export const Annotation = types
     },
 
     beforeDestroy() {
-      self.autosave?.cancel?.();
+      self.autosave && self.autosave.cancel && self.autosave.cancel();
     },
 
     setDraftId(id) {
@@ -808,7 +807,7 @@ export const Annotation = types
       // [TODO] we need to traverse this two times, fix
       // Hotkeys setup
       self.traverseTree((node) => {
-        if (node?.onHotKey && node.hotkey) {
+        if (node && node.onHotKey && node.hotkey) {
           hotkeys.addKey(node.hotkey, node.onHotKey, undefined, node.hotkeyScope);
         }
       });
@@ -817,11 +816,11 @@ export const Annotation = types
         // add Space hotkey for playbacks of audio, there might be
         // multiple audios on the screen
         if (node && !node.hotkey && (node.type === "audio" || node.type === "audioplus")) {
-          if (audiosNum > 0) comb = `${mod}+${audiosNum + 1}`;
+          if (audiosNum > 0) comb = mod + "+" + (audiosNum + 1);
           else audioNode = node;
 
           node.hotkey = comb;
-          hotkeys.addKey(comb, node.onHotKey, "Play an audio", `${Hotkey.DEFAULT_SCOPE},${Hotkey.INPUT_SCOPE}`);
+          hotkeys.addKey(comb, node.onHotKey, "Play an audio", Hotkey.DEFAULT_SCOPE + "," + Hotkey.INPUT_SCOPE);
 
           audiosNum++;
         }
@@ -831,7 +830,7 @@ export const Annotation = types
         /**
          * Hotkey for controls
          */
-        if (node?.onHotKey && !node.hotkey) {
+        if (node && node.onHotKey && !node.hotkey) {
           const comb = hotkeys.makeComb();
 
           if (!comb) return;
@@ -842,7 +841,7 @@ export const Annotation = types
       });
 
       if (audioNode && audiosNum > 1) {
-        audioNode.hotkey = `${mod}+1`;
+        audioNode.hotkey = mod + "+1";
         hotkeys.addKey(audioNode.hotkey, audioNode.onHotKey);
         hotkeys.removeKey(mod);
       }
@@ -979,7 +978,7 @@ export const Annotation = types
                 const labelsContainer = tagNames.get(obj.from_name) ?? tagNames.get("labels");
                 const value = obj.value[key];
 
-                if (value?.length && labelsContainer.type.endsWith("labels")) {
+                if (value && value.length && labelsContainer.type.endsWith("labels")) {
                   const filteredValue = value.filter((labelName) => !!labelsContainer.findLabel(labelName));
                   const oldKey = key;
 
@@ -1146,7 +1145,7 @@ export const Annotation = types
           self.results.filter((r) => r.area.classification).forEach((r) => r.from_name.updateFromResult?.(r.mainValue));
 
         objAnnotation.forEach((obj) => {
-          if (obj.type === "relation") {
+          if (obj["type"] === "relation") {
             self.relationStore.deserializeRelation(
               `${obj.from_id}#${self.id}`,
               `${obj.to_id}#${self.id}`,
@@ -1179,7 +1178,7 @@ export const Annotation = types
     },
 
     deserializeSingleResult(obj, getArea, createArea) {
-      if (obj.type !== "relation") {
+      if (obj["type"] !== "relation") {
         const { id, value: rawValue, type, ...data } = obj;
         let { from_name, to_name } = data;
 
@@ -1230,14 +1229,7 @@ export const Annotation = types
           }
         }
 
-        area.addResult({
-          ...data,
-          id: resultId,
-          type,
-          value,
-          from_name,
-          to_name,
-        });
+        area.addResult({ ...data, id: resultId, type, value, from_name, to_name });
 
         // if there is merged result with region data and type and also with the labels
         // and object allows such merge — create new result with these labels
@@ -1363,7 +1355,7 @@ export const Annotation = types
     },
 
     resetReady() {
-      self.objects.forEach((object) => object.setReady?.(false));
-      self.areas.forEach((area) => area.setReady?.(false));
+      self.objects.forEach((object) => object.setReady && object.setReady(false));
+      self.areas.forEach((area) => area.setReady && area.setReady(false));
     },
   }));

@@ -24,7 +24,7 @@ const resolveStyle = (col, decoration, cellView) => {
   const result = {};
 
   [cellView, decoration].forEach((item) => {
-    const cellStyle = item?.style;
+    const cellStyle = (item ?? {}).style;
 
     if (cellStyle instanceof Function) {
       Object.assign(result, cellStyle(col) ?? {});

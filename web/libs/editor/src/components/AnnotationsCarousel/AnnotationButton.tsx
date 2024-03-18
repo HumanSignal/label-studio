@@ -36,8 +36,7 @@ interface AnnotationButtonInterface {
 const renderCommentIcon = (ent: any) => {
   if (ent.unresolved_comment_count > 0) {
     return LsCommentUnresolved;
-  }
-  if (ent.comment_count > 0) {
+  } else if (ent.comment_count > 0) {
     return LsCommentResolved;
   }
 
@@ -47,8 +46,7 @@ const renderCommentIcon = (ent: any) => {
 const renderCommentTooltip = (ent: any) => {
   if (ent.unresolved_comment_count > 0) {
     return "Unresolved Comments";
-  }
-  if (ent.comment_count > 0) {
+  } else if (ent.comment_count > 0) {
     return "All Comments Resolved";
   }
 
@@ -154,7 +152,7 @@ export const AnnotationButton = observer(
           )}
           {capabilities.enableAnnotationDelete && !isPrediction && (
             <>
-              <Elem name="seperator" />
+              <Elem name="seperator"></Elem>
               <Elem name="option" mod={{ delete: true }} onClick={deleteAnnotation}>
                 <Elem name="icon">
                   <IconTrashRect width={14} height={18} />
@@ -168,13 +166,7 @@ export const AnnotationButton = observer(
     };
 
     return (
-      <Block
-        name="annotation-button"
-        mod={{
-          selected: entity.selected,
-          contextMenuOpen: isContextMenuOpen,
-        }}
-      >
+      <Block name="annotation-button" mod={{ selected: entity.selected, contextMenuOpen: isContextMenuOpen }}>
         <Elem name="mainSection" onClick={clickHandler}>
           <Elem name="picSection">
             <Elem

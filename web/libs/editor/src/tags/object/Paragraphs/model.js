@@ -134,17 +134,14 @@ const Model = types
                 "--highlight-color": Utils.Colors.convertToRGBA(color, 0.4),
                 "--background-color": "#FAFAFA",
               },
-              name: {
-                color: Utils.Colors.convertToRGBA(color, 0.9),
-              },
+              name: { color: Utils.Colors.convertToRGBA(color, 0.9) },
             },
           };
+        } else {
+          return {
+            phrase: { backgroundColor: Utils.Colors.convertToRGBA(color, 0.25) },
+          };
         }
-        return {
-          phrase: {
-            backgroundColor: Utils.Colors.convertToRGBA(color, 0.25),
-          },
-        };
       }
 
       return {};
@@ -173,7 +170,7 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states?.filter((s) => s.isSelected && s._type === "paragraphlabels");
+      return states && states.filter((s) => s.isSelected && s._type === "paragraphlabels");
     },
 
     isVisibleForAuthorFilter(data) {
@@ -450,11 +447,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
         })
         .then(self.setRemoteValue)
         .catch((e) => {
-          const message = messages.ERR_LOADING_HTTP({
-            attr: self.value,
-            error: String(e),
-            url,
-          });
+          const message = messages.ERR_LOADING_HTTP({ attr: self.value, error: String(e), url });
 
           store.annotationStore.addErrors([errorBuilder.generalError(message)]);
           self.setRemoteValue("");
@@ -547,21 +540,22 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
   addRegion(range) {
     if (isFF(FF_DEV_2918)) {
       return self.addRegions([range])[0];
+    } else {
+      const states = isFF(FF_DEV_3666) ? self.getAvailableStates() : self.activeStates();
+
+      if (states.length === 0) return;
+
+      const control = states[0];
+      const labels = { [control.valueType]: control.selectedValues() };
+      const area = self.annotation.createResult(range, labels, control, self);
+
+      area.setText(range.text);
+
+      area.notifyDrawingFinished();
+
+      area._range = range._range;
+      return area;
     }
-    const states = isFF(FF_DEV_3666) ? self.getAvailableStates() : self.activeStates();
-
-    if (states.length === 0) return;
-
-    const control = states[0];
-    const labels = { [control.valueType]: control.selectedValues() };
-    const area = self.annotation.createResult(range, labels, control, self);
-
-    area.setText(range.text);
-
-    area.notifyDrawingFinished();
-
-    area._range = range._range;
-    return area;
   },
 }));
 

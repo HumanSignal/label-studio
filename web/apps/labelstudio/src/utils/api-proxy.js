@@ -140,8 +140,7 @@ export class APIProxy {
    */
   createApiCallExecutor(methodSettings, parentPath, raw = false) {
     return async (urlParams, { headers, signal, body } = {}) => {
-      let responseResult;
-      let responseMeta;
+      let responseResult, responseMeta;
 
       try {
         const finalParams = {
@@ -300,7 +299,7 @@ export class APIProxy {
    * @param {Dict} data
    * @private
    */
-  createUrl(endpoint, data, parentPath) {
+  createUrl(endpoint, data = {}, parentPath) {
     const url = new URL(this.gateway);
     const usedKeys = [];
     const { path: resolvedPath, method: resolvedMethod } = this.resolveEndpoint(endpoint, data);

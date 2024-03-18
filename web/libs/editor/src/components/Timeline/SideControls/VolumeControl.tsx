@@ -9,7 +9,7 @@ export const AudioVolumeControl: FC<TimelineSideControlProps> = ({ volume = 0.5,
   const style: CSSProperties = { color: "#99A0AE" };
   const icon = useMemo(() => {
     if (volume > 0.5) return <IconVolumeFull style={style} />;
-    if (volume > 0) return <IconVolumeHalf style={style} />;
+    else if (volume > 0) return <IconVolumeHalf style={style} />;
     return <IconVolumeMute style={style} />;
   }, [volume]);
 

@@ -30,10 +30,7 @@ export const GroundTruth = observer(({ entity, disabled = false, size = "md" }) 
             <Elem
               name="indicator"
               tag={isFF(FF_DEV_3873) && !entity.ground_truth ? LsStarOutline : LsStar}
-              mod={{
-                active: entity.ground_truth,
-                dark: isFF(FF_DEV_3873),
-              }}
+              mod={{ active: entity.ground_truth, dark: isFF(FF_DEV_3873) }}
             />
           </Elem>
         </Tooltip>

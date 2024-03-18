@@ -9,10 +9,7 @@ import { isDefined } from "../../utils/utilities";
 
 const getItemPosition = (item) => {
   const { shapeRef: shape, bboxCoordsCanvas: bbox } = item;
-  let width;
-  let height;
-  let x;
-  let y;
+  let width, height, x, y;
 
   if (isDefined(bbox)) {
     [width, height, x, y] = [bbox.right - bbox.left, bbox.bottom - bbox.top, bbox.left, bbox.top];
@@ -95,8 +92,9 @@ export const SuggestionControls = observer(({ item, useLayer }) => {
     ) : (
       content
     );
+  } else {
+    return null;
   }
-  return null;
 });
 
 const ControlButton = ({ x = 0, fill, iconColor, onClick, icon }) => {

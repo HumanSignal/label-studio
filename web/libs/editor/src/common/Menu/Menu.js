@@ -51,8 +51,8 @@ export const Menu = forwardRef(
 );
 
 Menu.Item = MenuItem;
-Menu.Spacer = () => <li className={cn("menu", { elem: "spacer" })} />;
-Menu.Divider = () => <li className={cn("menu", { elem: "divider" })} />;
+Menu.Spacer = () => <li className={cn("menu", { elem: "spacer" })}></li>;
+Menu.Divider = () => <li className={cn("menu", { elem: "divider" })}></li>;
 Menu.Builder = (url, menuItems) => {
   return (menuItems ?? []).map((item, index) => {
     if (item === "SPACER") return <Menu.Spacer key={index} />;

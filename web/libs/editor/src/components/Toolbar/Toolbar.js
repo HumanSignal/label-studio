@@ -21,8 +21,7 @@ export const Toolbar = inject("store")(
 
       if (bbox.left < 200) {
         return "right";
-      }
-      if (windowSize.width - bbox.right < 200) {
+      } else if (windowSize.width - bbox.right < 200) {
         return "left";
       }
 

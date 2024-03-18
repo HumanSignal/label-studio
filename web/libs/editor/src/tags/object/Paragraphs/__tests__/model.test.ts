@@ -50,11 +50,7 @@ ff.set({
 
 describe("Paragraphs phrases", () => {
   // creating models can be a long one, so all tests will share one model
-  const model = ParagraphsModel.create({
-    name: "phrases",
-    value: "$phrases",
-    contextscroll: true,
-  });
+  const model = ParagraphsModel.create({ name: "phrases", value: "$phrases", contextscroll: true });
   const store = MockStore.create({ paragraphs: model });
   const duration = 10;
 

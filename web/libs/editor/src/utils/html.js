@@ -30,7 +30,7 @@ const labelWithCSS = (() => {
     const labelsStr = labels ? labels.join(",") : "";
     const clsName = Checkers.hashCode(labelsStr + score);
 
-    let cssCls = `htx-label-${clsName}`;
+    let cssCls = "htx-label-" + clsName;
 
     cssCls = cssCls.toLowerCase();
 
@@ -55,8 +55,8 @@ function createClass(name, rules) {
 
   style.type = "text/css";
   document.getElementsByTagName("head")[0].appendChild(style);
-  if (!style.sheet?.insertRule) (style.styleSheet || style.sheet).addRule(name, rules);
-  else style.sheet.insertRule(`${name}{${rules}}`, 0);
+  if (!(style.sheet || {}).insertRule) (style.styleSheet || style.sheet).addRule(name, rules);
+  else style.sheet.insertRule(name + "{" + rules + "}", 0);
 }
 
 function documentForward(node) {
@@ -156,9 +156,7 @@ function splitText(node, offset) {
 
 function normalizeBoundaries(range) {
   let { startContainer, startOffset, endContainer, endOffset } = range;
-  let node;
-  let next;
-  let last;
+  let node, next, last;
 
   // Move the start container to the last leaf before any sibling boundary,
   // guaranteeing that any children of the container are within the range.
@@ -344,7 +342,7 @@ const findIdxContainer = (el, globidx) => {
 
     if (node.nodeName === "#text") {
       if (len - node.length <= 0) return node;
-      len = len - node.length;
+      else len = len - node.length;
     } else if (node.nodeName === "BR") {
       len = len - 1;
     } else if (node.childNodes.length > 0) {
@@ -425,7 +423,9 @@ function applyHighlightStylesToDoc(destDoc, rulesByStyleId) {
       for (let k = 0; k < rules.length; k++) {
         style.sheet.insertRule(rules[k]);
       }
-    } catch {}
+    } catch {
+      continue;
+    }
   }
 }
 
@@ -453,7 +453,7 @@ export const findByXpath = (xpath, root = document) => {
 
 export const htmlEscape = (string) => {
   const matchHtmlRegExp = /["'&<>]/;
-  const str = `${string}`;
+  const str = "" + string;
   const match = matchHtmlRegExp.exec(str);
 
   if (!match) {

@@ -152,9 +152,7 @@ export const HighlightMixin = types
       if (self._hasSpans || (isFF(FF_LSDV_4620_3) && self._spans?.length)) {
         const lastSpan = self._spans[self._spans.length - 1];
 
-        Utils.Selection.applySpanStyles(lastSpan, {
-          label: self.getLabels(),
-        });
+        Utils.Selection.applySpanStyles(lastSpan, { label: self.getLabels() });
       }
     },
 
@@ -187,9 +185,7 @@ export const HighlightMixin = types
       } else {
         self._stylesheet.setColor(self.getLabelColor());
       }
-      Utils.Selection.applySpanStyles(lastSpan, {
-        label: self.getLabels(),
-      });
+      Utils.Selection.applySpanStyles(lastSpan, { label: self.getLabels() });
     },
 
     /**

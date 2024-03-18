@@ -125,7 +125,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
             }}
           >
             <Form.Row style={{ marginBottom: "40px" }} columnCount={1}>
-              <Label text="Payload URL" style={{ marginLeft: "-16px" }} large />
+              <Label text="Payload URL" style={{ marginLeft: "-16px" }} large></Label>
               <Space className={rootClass.elem("url-space")}>
                 <Input name="url" className={rootClass.elem("url-input")} placeholder="URL" />
                 <Space align="end" className={rootClass.elem("activator")}>
@@ -175,7 +175,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                             type="button"
                             icon={<LsCross />}
                             onClick={() => onHeaderRemove(index)}
-                          />
+                          ></Button>
                         </div>
                       </Space>
                     );
@@ -226,7 +226,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                                   label={value.name}
                                   onChange={onActionChange}
                                   checked={actions.has(key)}
-                                />
+                                ></Toggle>
                               </div>
                             </Form.Row>
                           );
@@ -246,11 +246,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                   onClick={() =>
                     WebhookDeleteModal({
                       onDelete: async () => {
-                        await api.callApi("deleteWebhook", {
-                          params: {
-                            pk: webhook.id,
-                          },
-                        });
+                        await api.callApi("deleteWebhook", { params: { pk: webhook.id } });
                         onBack();
                         await fetchWebhooks();
                       },

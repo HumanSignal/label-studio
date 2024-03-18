@@ -223,11 +223,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
           )}
 
           <MenubarContext.Provider value={providerValue}>
-            <div
-              className={contentClass.elem("content").mod({
-                withSidebar: sidebarPinned && sidebarOpened,
-              })}
-            >
+            <div className={contentClass.elem("content").mod({ withSidebar: sidebarPinned && sidebarOpened })}>
               {children}
             </div>
           </MenubarContext.Provider>

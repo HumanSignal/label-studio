@@ -199,11 +199,7 @@ export const AppStore = types
 
     setTask: flow(function* ({ taskID, annotationID, pushState }) {
       if (pushState !== false) {
-        History.navigate({
-          task: taskID,
-          annotation: annotationID ?? null,
-          interaction: null,
-        });
+        History.navigate({ task: taskID, annotation: annotationID ?? null, interaction: null });
       }
 
       if (!isDefined(taskID)) return;
@@ -348,8 +344,9 @@ export const AppStore = types
           okText: "Go to setup",
         });
         return false;
+      } else {
+        return true;
       }
-      return true;
     },
 
     closeLabeling(options) {
@@ -418,22 +415,23 @@ export const AppStore = types
       self.projectFetch = options.force === true;
 
       const isTimer = options.interaction === "timer";
-      const params = options?.interaction
-        ? {
-            interaction: options.interaction,
-            ...(isTimer
-              ? {
-                  include: [
-                    "task_count",
-                    "task_number",
-                    "annotation_count",
-                    "num_tasks_with_annotations",
-                    "queue_total",
-                  ].join(","),
-                }
-              : null),
-          }
-        : null;
+      const params =
+        options && options.interaction
+          ? {
+              interaction: options.interaction,
+              ...(isTimer
+                ? {
+                    include: [
+                      "task_count",
+                      "task_number",
+                      "annotation_count",
+                      "num_tasks_with_annotations",
+                      "queue_total",
+                    ].join(","),
+                  }
+                : null),
+            }
+          : null;
 
       try {
         const newProject = yield self.apiCall("project", params);
@@ -629,10 +627,7 @@ export const AppStore = types
       // don't apply filters for "all" on "next_task"
       const actionParams = {
         ordering: view.ordering,
-        selectedItems: selected?.snapshot ?? {
-          all: false,
-          included: [],
-        },
+        selectedItems: selected?.snapshot ?? { all: false, included: [] },
         filters: {
           conjunction: view.conjunction ?? "and",
           items: view.serializedFilters ?? [],
@@ -641,14 +636,14 @@ export const AppStore = types
 
       if (actionId === "next_task") {
         if (labelStreamMode === "all") {
-          actionParams.filters = undefined;
+          delete actionParams.filters;
 
           if (actionParams.selectedItems.all === false && actionParams.selectedItems.included.length === 0) {
-            actionParams.selectedItems = undefined;
-            actionParams.ordering = undefined;
+            delete actionParams.selectedItems;
+            delete actionParams.ordering;
           }
         } else if (labelStreamMode === "filtered") {
-          actionParams.selectedItems = undefined;
+          delete actionParams.selectedItems;
         }
       }
 

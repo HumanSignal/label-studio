@@ -173,10 +173,7 @@ const Model = types
     ),
 
     drawingRegion: types.optional(DrawingRegion, null),
-    selectionArea: types.optional(ImageSelection, {
-      start: null,
-      end: null,
-    }),
+    selectionArea: types.optional(ImageSelection, { start: null, end: null }),
   })
   .volatile(() => ({
     currentImage: undefined,
@@ -297,11 +294,11 @@ const Model = types
 
       if (!isFF(FF_DEV_4081)) {
         return null;
-      }
-      if (!value || value === "none") {
+      } else if (!value || value === "none") {
         return null;
+      } else {
+        return value;
       }
-      return value;
     },
 
     get fillerHeight() {
@@ -392,7 +389,7 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states?.filter((s) => s.isSelected && s.type.includes("labels"));
+      return states && states.filter((s) => s.isSelected && s.type.includes("labels"));
     },
 
     controlButton() {
@@ -510,7 +507,7 @@ const Model = types
       if (self.zoomScale !== 1) {
         const { zoomingPositionX = 0, zoomingPositionY = 0 } = self;
 
-        imgTransform.push(`translate3d(${zoomingPositionX}px,${zoomingPositionY}px, 0)`);
+        imgTransform.push("translate3d(" + zoomingPositionX + "px," + zoomingPositionY + "px, 0)");
       }
 
       if (self.rotation) {
@@ -655,12 +652,13 @@ const Model = types
             const canInteractWithRegions = tool?.canInteractWithRegions;
 
             return !canInteractWithRegions;
+          } else {
+            const manager = self.getToolsManager();
+
+            const isPanning = manager.findSelectedTool()?.toolName === "ZoomPanTool";
+
+            return skipInteractions || isPanning;
           }
-          const manager = self.getToolsManager();
-
-          const isPanning = manager.findSelectedTool()?.toolName === "ZoomPanTool";
-
-          return skipInteractions || isPanning;
         },
       },
       actions: {
@@ -914,13 +912,7 @@ const Model = types
       self.resetZoomPositionToCenter();
     },
 
-    handleZoom(
-      val,
-      mouseRelativePos = {
-        x: self.canvasSize.width / 2,
-        y: self.canvasSize.height / 2,
-      },
-    ) {
+    handleZoom(val, mouseRelativePos = { x: self.canvasSize.width / 2, y: self.canvasSize.height / 2 }) {
       if (val) {
         let zoomScale = self.currentZoom;
 

@@ -13,7 +13,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   static create(params: TimelinePluginParams) {
     return {
       name: "timeline",
-      deferInit: params?.deferInit ? params.deferInit : false,
+      deferInit: params && params.deferInit ? params.deferInit : false,
       params,
       instance: TimelinePlugin,
     } as any;
@@ -201,6 +201,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
               "center",
             );
             break;
+          case "right":
           default:
             this.setFillStyles(primaryColor!);
             this.fillRect(curPixel, 0, 1, height);
@@ -246,6 +247,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
               "center",
             );
             break;
+          case "right":
           default:
             this.setFillStyles(secondaryColor!);
             this.fillRect(curPixel, 0, 1, height);
@@ -275,6 +277,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
           case "top":
             this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
             break;
+          case "right":
           default:
             this.fillRect(curPixel, 0, 1, height);
             break;

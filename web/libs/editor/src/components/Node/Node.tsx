@@ -129,7 +129,7 @@ const NodeDebug: FC<any> = observer(({ className, node }) => {
       {labelName}
       <br />
       {getContent(node)}
-      {fullContent?.(node)}
+      {fullContent && fullContent(node)}
     </Block>
   );
 });

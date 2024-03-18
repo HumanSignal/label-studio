@@ -104,10 +104,7 @@ const RectRegionAbsoluteCoordsDEV3793 = types
           self.y = firstPointY;
           self.rotation = self.rotationAtCreation;
         }
-        self.height = self.getHeightOnPerpendicular(points[0], points[1], {
-          x,
-          y,
-        });
+        self.height = self.getHeightOnPerpendicular(points[0], points[1], { x, y });
       }
 
       self.setPosition(self.x, self.y, self.width, self.height, self.rotation);
@@ -238,7 +235,7 @@ const Model = types
       const distanceX = xA - xB;
       const distanceY = yA - yB;
 
-      return Math.sqrt(distanceX ** 2 + distanceY ** 2);
+      return Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
     },
 
     getHeightOnPerpendicular(pointA, pointB, cursor) {
@@ -279,12 +276,7 @@ const Model = types
         const { y: firstPointY, x: firstPointX } = points[0];
         const { y: secondPointY, x: secondPointX } = points[1];
 
-        if (
-          self.isAboveTheLine(canvasPoints[0], canvasPoints[1], {
-            x: canvasX,
-            y: canvasY,
-          })
-        ) {
+        if (self.isAboveTheLine(canvasPoints[0], canvasPoints[1], { x: canvasX, y: canvasY })) {
           self.x = secondPointX;
           self.y = secondPointY;
           self.rotation = self.rotationAtCreation + 180;

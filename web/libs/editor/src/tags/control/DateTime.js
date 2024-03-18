@@ -228,7 +228,7 @@ const Model = types
     validDateFormat(dateString) {
       const dateNumberArray = dateString.split("-").map((dateString) => Number.parseInt(dateString, 10));
       const year = dateNumberArray[0];
-      const isADate = !Number.isNaN(new Date(dateString));
+      const isADate = !isNaN(new Date(dateString));
       const fourPositiveIntegersYear = year <= 9999 && year >= 1000;
 
       if (isADate && fourPositiveIntegersYear) return dateNumberArray;
@@ -339,11 +339,7 @@ const HtxDateTime = inject("store")(
     const disabled = item.isReadOnly();
     const visibleStyle = item.perRegionVisible() ? { margin: "0 0 1em" } : { display: "none" };
     const visual = {
-      style: {
-        width: "auto",
-        marginRight: "4px",
-        borderColor: item.isValid ? undefined : "red",
-      },
+      style: { width: "auto", marginRight: "4px", borderColor: item.isValid ? undefined : "red" },
       className: "ant-input",
     };
     const [minTime, maxTime] = [item.min, item.max].map((s) => s?.match(/\d?\d:\d\d/)?.[0]);
@@ -375,7 +371,7 @@ const HtxDateTime = inject("store")(
         {item.showMonth && (
           <select
             {...visual}
-            name={`${item.name}-date`}
+            name={item.name + "-date"}
             disabled={disabled}
             value={item.month}
             onChange={disabled ? undefined : item.onMonthChange}
@@ -391,7 +387,7 @@ const HtxDateTime = inject("store")(
         {item.showYear && (
           <select
             {...visual}
-            name={`${item.name}-year`}
+            name={item.name + "-year"}
             disabled={disabled}
             value={item.year || ""}
             onChange={disabled ? undefined : item.onYearChange}
@@ -409,7 +405,7 @@ const HtxDateTime = inject("store")(
             {...visual}
             type="date"
             readOnly={disabled}
-            name={`${item.name}-date`}
+            name={item.name + "-date"}
             value={dateInputValue}
             min={item.min}
             max={item.max}
@@ -422,7 +418,7 @@ const HtxDateTime = inject("store")(
             {...visual}
             type="time"
             readOnly={disabled}
-            name={`${item.name}-time`}
+            name={item.name + "-time"}
             value={item.time ?? ""}
             min={minTime}
             max={maxTime}

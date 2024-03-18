@@ -32,15 +32,7 @@ export const Space: FC<SpaceProps> = ({
   return (
     <Block
       name="space"
-      mod={{
-        direction,
-        size,
-        spread,
-        stretch,
-        align,
-        collapsed,
-        truncated,
-      }}
+      mod={{ direction, size, spread, stretch, align, collapsed, truncated }}
       mix={className}
       style={style}
       {...rest}

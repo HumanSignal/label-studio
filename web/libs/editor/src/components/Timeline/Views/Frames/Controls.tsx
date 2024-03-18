@@ -34,7 +34,7 @@ export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({ onActio
         });
       } else {
         onAction?.(e, "keypoint_remove", {
-          frame: closestKeypoint?.frame,
+          frame: closestKeypoint!.frame,
         });
       }
     },
@@ -45,11 +45,11 @@ export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({ onActio
     (e: MouseEvent) => {
       if (canAddLifespan) {
         onAction?.(e, "lifespan_add", {
-          frame: closestKeypoint?.frame,
+          frame: closestKeypoint!.frame,
         });
       } else {
         onAction?.(e, "lifespan_remove", {
-          frame: closestKeypoint?.frame,
+          frame: closestKeypoint!.frame,
         });
       }
     },

@@ -129,12 +129,7 @@ export const RegionItem = observer(({ item, idx, flat, setDraggable, onClick }) 
       if (!vars) {
         const color = item.getOneColor();
 
-        vars = color
-          ? asVars({
-              labelColor: color,
-              labelBgColor: chroma(color).alpha(0.15),
-            })
-          : null;
+        vars = color ? asVars({ labelColor: color, labelBgColor: chroma(color).alpha(0.15) }) : null;
       }
       return vars;
     };

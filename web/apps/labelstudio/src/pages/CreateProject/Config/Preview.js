@@ -40,10 +40,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
     const fileuri = btoa(url);
 
-    return api.api.createUrl(API_CONFIG.endpoints.presignUrlForProject, {
-      projectId,
-      fileuri,
-    }).url;
+    return api.api.createUrl(API_CONFIG.endpoints.presignUrlForProject, { projectId, fileuri }).url;
   };
 
   const currentConfig = useMemo(() => {
@@ -162,7 +159,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         </div>
       )}
       {!data && loading && <Spinner style={{ width: "100%", height: "50vh" }} />}
-      <div id="label-studio" className={configClass.elem("preview-ui")} ref={rootRef} />
+      <div id="label-studio" className={configClass.elem("preview-ui")} ref={rootRef}></div>
     </div>
   );
 };

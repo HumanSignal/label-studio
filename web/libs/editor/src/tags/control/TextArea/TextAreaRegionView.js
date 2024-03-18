@@ -61,7 +61,7 @@ const HtxTextAreaResultLine = forwardRef(
     );
 
     const inputProps = {
-      className: `ant-input ${styles.input}`,
+      className: "ant-input " + styles.input,
       value: displayValue,
       autoSize: isTextarea ? { minRows: 1 } : null,
       onChange: changeHandler,
@@ -190,9 +190,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
 
   useEffect(() => {
     if (isActive && shouldFocus && lastFocusRequest.current < area.perRegionFocusRequest) {
-      (mainInputRef.current || firstResultInputRef.current)?.focus({
-        cursor: "end",
-      });
+      (mainInputRef.current || firstResultInputRef.current)?.focus({ cursor: "end" });
       lastFocusRequest.current = area.perRegionFocusRequest;
     }
   }, [isActive, shouldFocus]);
@@ -242,12 +240,12 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
     };
   }
 
-  if (item.annotation.isReadOnly()) props.disabled = true;
+  if (item.annotation.isReadOnly()) props["disabled"] = true;
 
   const showAddButton = !item.annotation.isReadOnly() && (item.showsubmitbutton ?? rows !== 1);
   const itemStyle = {};
 
-  if (showAddButton) itemStyle.marginBottom = 0;
+  if (showAddButton) itemStyle["marginBottom"] = 0;
 
   const showSubmit =
     (!result ||

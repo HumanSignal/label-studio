@@ -2,11 +2,11 @@ import Konva from "konva";
 import { FF_DEV_3793, isFF } from "./feature-flags";
 
 export function reverseCoordinates(r1, r2) {
-  let r1X = r1.x;
-  let r1Y = r1.y;
-  let r2X = r2.x;
-  let r2Y = r2.y;
-  let d;
+  let r1X = r1.x,
+    r1Y = r1.y,
+    r2X = r2.x,
+    r2Y = r2.y,
+    d;
 
   if (r1X > r2X) {
     d = Math.abs(r1X - r2X);
@@ -71,10 +71,7 @@ export function getBoundingBoxAfterTransform(rect, transform) {
     { x: rect.x + rect.width, y: rect.y + rect.height },
     { x: rect.x, y: rect.y + rect.height },
   ];
-  let minX;
-  let minY;
-  let maxX;
-  let maxY;
+  let minX, minY, maxX, maxY;
 
   points.forEach((point) => {
     const transformed = transform.point(point);
@@ -155,12 +152,7 @@ export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
       const { top: srTop, left: srLeft, right: srRight, bottom: srBottom } = image?.selectedRegionsBBox || {};
       const bbox = singleRegionDragging
         ? { x, y, width: right - left, height: bottom - top }
-        : {
-            x: srLeft - left + x,
-            y: srTop - top + y,
-            width: srRight - srLeft,
-            height: srBottom - srTop,
-          };
+        : { x: srLeft - left + x, y: srTop - top + y, width: srRight - srLeft, height: srBottom - srTop };
       const fixed = isFF(FF_DEV_3793)
         ? fixRectToFit(bbox, 100, 100)
         : fixRectToFit(bbox, image.stageWidth, image.stageHeight);
@@ -178,10 +170,7 @@ export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
 
       if (!isFF(FF_DEV_3793)) return { x, y };
 
-      return {
-        x: image.internalToCanvasX(x),
-        y: image.internalToCanvasY(y),
-      };
+      return { x: image.internalToCanvasX(x), y: image.internalToCanvasY(y) };
     });
 }
 
@@ -245,8 +234,7 @@ export function getTransformedImageData(
   // If negative zoom is on, the image as displayed in the browser could actually be
   // _smaller_ than the viewport. Get the minimum size between these when creating
   // our ultimate canvas.
-  let canvasWidth;
-  let canvasHeight;
+  let canvasWidth, canvasHeight;
 
   if (negativezoom) {
     canvasWidth = Math.min(viewportWidth, imageDisplayedInBrowserWidth);
@@ -276,8 +264,7 @@ export function getTransformedImageData(
   // shown in the browser; determine that then calculate the percentage dimension
   // of the viewport in natural coordinate space. If we are negative zooming then
   // the calculations are slightly different.
-  let viewportNaturalWidth;
-  let viewportNaturalHeight;
+  let viewportNaturalWidth, viewportNaturalHeight;
 
   if (negativezoom) {
     viewportNaturalWidth = naturalWidth;
@@ -291,15 +278,15 @@ export function getTransformedImageData(
   // use, so we can then efficiently get its pixel data for pixel-level tools.
 
   // Source dimensions.
-  const sx = viewportNaturalX;
-  const sy = viewportNaturalY;
-  const sWidth = viewportNaturalWidth;
-  const sHeight = viewportNaturalHeight;
+  const sx = viewportNaturalX,
+    sy = viewportNaturalY,
+    sWidth = viewportNaturalWidth,
+    sHeight = viewportNaturalHeight;
   // Destination dimensions.
-  const dx = 0;
-  const dy = 0;
-  const dWidth = canvasWidth;
-  const dHeight = canvasHeight;
+  const dx = 0,
+    dy = 0,
+    dWidth = canvasWidth,
+    dHeight = canvasHeight;
 
   ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
 

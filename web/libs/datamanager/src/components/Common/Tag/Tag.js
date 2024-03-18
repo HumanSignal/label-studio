@@ -17,8 +17,9 @@ const prepareColor = (colorString) => {
 const getColor = (colorString) => {
   if (colorString) {
     return colors[colorString] ?? colorString;
+  } else {
+    return colors.blue;
   }
-  return colors.blue;
 };
 
 export const Tag = ({ className, style, size, color, children }) => {

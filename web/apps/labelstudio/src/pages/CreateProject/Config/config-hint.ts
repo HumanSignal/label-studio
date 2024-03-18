@@ -9,7 +9,7 @@ const topTags = ["View"];
 
 function matches(hint: string, typed: string, matchInMiddle?: boolean) {
   if (matchInMiddle) return hint.includes(typed);
-  return hint.startsWith(typed);
+  else return hint.startsWith(typed);
 }
 
 type CMCursor = {
@@ -101,9 +101,9 @@ function richHint(el: Element, self: any, data: CMHintResult) {
 }
 
 function getHints(cm: any, options: CMHintOptions) {
-  const tags = options?.schemaInfo;
-  let quote = options?.quoteChar || '"';
-  const matchInMiddle = options?.matchInMiddle;
+  const tags = options && options.schemaInfo;
+  let quote = (options && options.quoteChar) || '"';
+  const matchInMiddle = options && options.matchInMiddle;
 
   if (!tags) return;
 
@@ -151,33 +151,23 @@ function getHints(cm: any, options: CMHintOptions) {
     inner = context.length && context[context.length - 1];
 
     const curTag = inner && tags[inner];
-    const childList = inner ? curTag?.children : topTags;
+    const childList = inner ? curTag && curTag.children : topTags;
 
     if (childList && tagType !== "close") {
       for (const name of childList)
         if (!prefix || matches(name, prefix, matchInMiddle))
-          result.push({
-            text: `<${name}`,
-            name,
-            description: tags[name].description,
-            render: richHint,
-          });
+          result.push({ text: "<" + name, name, description: tags[name].description, render: richHint });
     } else if (tagType !== "close") {
       for (const name in tags)
         if (name !== "!attrs" && (!prefix || matches(name, prefix, matchInMiddle)))
-          result.push({
-            text: `<${name}`,
-            name,
-            description: tags[name].description,
-            render: richHint,
-          });
+          result.push({ text: "<" + name, name, description: tags[name].description, render: richHint });
     }
     if (inner && (!prefix || (tagType === "close" && matches(inner, prefix, matchInMiddle))))
-      result.push({ text: `</${inner}>`, render: richHint });
+      result.push({ text: "</" + inner + ">", render: richHint });
   } else {
     // Attribute completion
     const curTag: CMSchemaItem = tagInfo && tags[tagInfo.name];
-    const attrs = curTag?.attrs;
+    const attrs = curTag && curTag.attrs;
 
     if (!attrs) return;
     if (token.type === "string" || token.string === "=") {
@@ -217,33 +207,25 @@ function getHints(cm: any, options: CMHintOptions) {
       const returnHintsFromAtValues = (atValues: string[]) => {
         for (const value of atValues)
           if (!prefix || matches(value, prefix, matchInMiddle))
-            result.push({
-              text: quote + value + quote,
-              render: richHint,
-            });
+            result.push({ text: quote + value + quote, render: richHint });
         return returnHints();
       };
 
       return returnHintsFromAtValues(atValues);
-    }
-    // An attribute name completion
-    if (token.type === "attribute") {
-      prefix = token.string;
-      replaceToken = true;
-    }
-    for (const attr in attrs) {
-      if (prefix && !matches(attr, prefix, matchInMiddle)) continue;
+    } else {
+      // An attribute name completion
+      if (token.type === "attribute") {
+        prefix = token.string;
+        replaceToken = true;
+      }
+      for (const attr in attrs) {
+        if (prefix && !matches(attr, prefix, matchInMiddle)) continue;
 
-      const name = attrs[attr].required ? `${attr}*` : attr;
-      const type = attrs[attr].type;
+        const name = attrs[attr].required ? attr + "*" : attr;
+        const type = attrs[attr].type;
 
-      result.push({
-        text: attr,
-        name,
-        type,
-        description: attrs[attr].description,
-        render: richHint,
-      });
+        result.push({ text: attr, name, type, description: attrs[attr].description, render: richHint });
+      }
     }
   }
   function returnHints() {

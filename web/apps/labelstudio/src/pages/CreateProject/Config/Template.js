@@ -80,7 +80,7 @@ export class Template {
     const free = columns.filter((c) => !existing.includes(c));
     for (const obj of this.objects) {
       if (!columns.includes(obj.getAttribute("value").replace(/^\$/, ""))) {
-        obj.setAttribute("value", `$${free.shift() ?? columns[0]}`);
+        obj.setAttribute("value", "$" + (free.shift() ?? columns[0]));
       }
     }
 

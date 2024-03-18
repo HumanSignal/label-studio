@@ -197,7 +197,7 @@ class App extends Component {
   render() {
     const { store } = this.props;
     const as = store.annotationStore;
-    const root = as.selected?.root;
+    const root = as.selected && as.selected.root;
     const { settings } = store;
 
     if (store.isLoading) return this.renderLoader();
@@ -227,10 +227,7 @@ class App extends Component {
     return (
       <Block
         name="editor"
-        mod={{
-          fullscreen: settings.fullscreen,
-          _auto_height: !outlinerEnabled,
-        }}
+        mod={{ fullscreen: settings.fullscreen, _auto_height: !outlinerEnabled }}
         ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
       >
         <Settings store={store} />
@@ -247,11 +244,7 @@ class App extends Component {
             <>
               {store.showingDescription && (
                 <Segment>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeHtml(store.description),
-                    }}
-                  />
+                  <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(store.description) }} />
                 </Segment>
               )}
             </>

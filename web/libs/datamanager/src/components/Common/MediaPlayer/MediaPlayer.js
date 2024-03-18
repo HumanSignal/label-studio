@@ -44,11 +44,7 @@ export const MediaPlayer = ({ src, video = false }) => {
       case "loaded":
         return { ...state, loaded: true };
       case "error":
-        return {
-          ...state,
-          error: true,
-          resetSource: state.loaded ? state.resetSource + 1 : state.resetSource,
-        };
+        return { ...state, error: true, resetSource: state.loaded ? state.resetSource + 1 : state.resetSource };
       case "play":
         return { ...state, playing: true };
       case "pause":
@@ -56,20 +52,16 @@ export const MediaPlayer = ({ src, video = false }) => {
       case "buffer":
         return { ...state, buffer: action.payload };
       case "resetSource":
-        return {
-          ...state,
-          resetSource: 0,
-          loaded: false,
-          error: false,
-        };
+        return { ...state, resetSource: 0, loaded: false, error: false };
     }
   }, initialState);
 
   const format = useMemo(() => {
     if (state.duration >= 3600) {
       return ["hours", "minutes", "seconds"];
+    } else {
+      return ["minutes", "seconds"];
     }
-    return ["minutes", "seconds"];
   }, [state.duration]);
 
   const play = useCallback(() => {
@@ -105,8 +97,7 @@ export const MediaPlayer = ({ src, video = false }) => {
   const waitForPlayer = useCallback(() => {
     if (state?.error) {
       return;
-    }
-    if (state?.loaded) {
+    } else if (state?.loaded) {
       play();
     } else {
       setTimeout(() => waitForPlayer(), 10);
@@ -209,7 +200,7 @@ export const MediaPlayer = ({ src, video = false }) => {
           </Elem>
           <Elem name="track">Click to load</Elem>
         </Space>
-        <Elem tag={Space} size="small" name="time" />
+        <Elem tag={Space} size="small" name="time"></Elem>
       </Elem>
     </Block>
   );

@@ -16,8 +16,7 @@ const Model = types
   }))
   .views((self) => ({
     getShape(frame) {
-      let prev;
-      let next;
+      let prev, next;
 
       for (const item of self.sequence) {
         if (item.frame === frame) {

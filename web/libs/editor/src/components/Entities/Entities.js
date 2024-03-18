@@ -38,8 +38,7 @@ export default observer(({ regionStore, annotation }) => {
             }}
           >
             <RadioGroup.Button value="regions">
-              Regions
-              {count ? <Elem name="counter">&nbsp;{count}</Elem> : null}
+              Regions{count ? <Elem name="counter">&nbsp;{count}</Elem> : null}
             </RadioGroup.Button>
             <RadioGroup.Button value="labels">Labels</RadioGroup.Button>
           </RadioGroup>

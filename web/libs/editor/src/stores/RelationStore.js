@@ -193,7 +193,7 @@ const RelationStore = types
           direction: r.direction,
         };
 
-        if (r.selectedValues) s.labels = r.selectedValues;
+        if (r.selectedValues) s["labels"] = r.selectedValues;
 
         return s;
       });

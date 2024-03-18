@@ -81,18 +81,11 @@ export const CurrentTask = observer(({ store }) => {
             <Elem
               tag={Button}
               name="prevnext"
-              mod={{
-                prev: true,
-                disabled: !store.canGoPrevTask,
-                newui: isFF(FF_DEV_3873),
-              }}
+              mod={{ prev: true, disabled: !store.canGoPrevTask, newui: isFF(FF_DEV_3873) }}
               type="link"
               disabled={!historyEnabled || !store.canGoPrevTask}
               onClick={store.prevTask}
-              style={{
-                background: !isFF(FF_DEV_3873) && "none",
-                backgroundColor: isFF(FF_DEV_3873) && "none",
-              }}
+              style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
             />
             <Elem
               tag={Button}
@@ -106,10 +99,7 @@ export const CurrentTask = observer(({ store }) => {
               type="link"
               disabled={!store.canGoNextTask && !canPostpone}
               onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
-              style={{
-                background: !isFF(FF_DEV_3873) && "none",
-                backgroundColor: isFF(FF_DEV_3873) && "none",
-              }}
+              style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
             />
           </Elem>
         )}

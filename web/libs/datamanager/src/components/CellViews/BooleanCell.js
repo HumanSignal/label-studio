@@ -4,8 +4,9 @@ import { Tag } from "../Common/Tag/Tag";
 const parseBoolean = (value) => {
   if ([true, 1, "true", "1", "yes"].includes(value) || !!value === true) {
     return true;
+  } else {
+    return false;
   }
-  return false;
 };
 
 export const BooleanCell = (column) => {
@@ -13,8 +14,7 @@ export const BooleanCell = (column) => {
 
   if (boolValue === true) {
     return <Tag color="#80c70d">true</Tag>;
-  }
-  if (boolValue === false) {
+  } else if (boolValue === false) {
     return <Tag color="#de3301">false</Tag>;
   }
 

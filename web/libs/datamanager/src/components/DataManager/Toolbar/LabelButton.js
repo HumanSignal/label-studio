@@ -48,14 +48,10 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
   }, []);
 
   useEffect(() => {
-    document.addEventListener("click", handleClickOutside, {
-      capture: true,
-    });
+    document.addEventListener("click", handleClickOutside, { capture: true });
 
     return () => {
-      document.removeEventListener("click", handleClickOutside, {
-        capture: true,
-      });
+      document.removeEventListener("click", handleClickOutside, { capture: true });
     };
   }, []);
 
@@ -105,25 +101,16 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
           <Button
             size={size}
             disabled={disabled}
-            mod={{
-              size: size ?? "medium",
-              look: "primary",
-              disabled,
-            }}
+            mod={{ size: size ?? "medium", look: "primary", disabled }}
             style={primaryStyle}
             onClick={onLabelAll}
           >
-            Label {selectedCount ? selectedCount : "All"} Task
-            {!selectedCount || selectedCount > 1 ? "s" : ""}
+            Label {selectedCount ? selectedCount : "All"} Task{!selectedCount || selectedCount > 1 ? "s" : ""}
           </Button>
           <Button
             ref={triggerRef}
             size={size}
-            mod={{
-              size: size ?? "medium",
-              look: "primary",
-              disabled,
-            }}
+            mod={{ size: size ?? "medium", look: "primary", disabled }}
             style={triggerStyle}
             onClick={toggleOpen}
           >

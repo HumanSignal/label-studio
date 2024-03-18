@@ -45,15 +45,14 @@ export const Menu = forwardRef(({ children, className, style, size, selectedKeys
 });
 
 Menu.Item = MenuItem;
-Menu.Spacer = () => <Elem block="main-menu" tag="li" name="spacer" />;
-Menu.Divider = () => <Elem block="main-menu" tag="li" name="divider" />;
+Menu.Spacer = () => <Elem block="main-menu" tag="li" name="spacer"></Elem>;
+Menu.Divider = () => <Elem block="main-menu" tag="li" name="divider"></Elem>;
 Menu.Builder = (url, menuItems) => {
   return (menuItems ?? []).map((item, index) => {
     if (item === "SPACER") return <Menu.Spacer key={index} />;
     if (item === "DIVIDER") return <Menu.Divider key={index} />;
 
-    let pageLabel;
-    let pagePath;
+    let pageLabel, pagePath;
 
     if (Array.isArray(item)) {
       [pagePath, pageLabel] = item;

@@ -39,27 +39,27 @@ const MagicWand = (() => {
    * @return {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
    */
   lib.floodFill = (image, px, py, colorThreshold, mask) => {
-    let c;
-    let x;
-    let newY;
-    let el;
-    let xr;
-    let xl;
-    let dy;
-    let dyl;
-    let dyr;
-    let checkY;
-    const data = image.data;
-    const w = image.width;
-    const h = image.height;
-    const bytes = image.bytes; // number of bytes in the color
-    let maxX = -1;
-    let minX = w + 1;
-    let maxY = -1;
-    let minY = h + 1;
-    let i = py * w + px; // start point index in the mask data
-    const result = new Uint8Array(w * h); // result mask
-    const visited = new Uint8Array(mask ? mask : w * h); // mask of visited points
+    let c,
+      x,
+      newY,
+      el,
+      xr,
+      xl,
+      dy,
+      dyl,
+      dyr,
+      checkY,
+      data = image.data,
+      w = image.width,
+      h = image.height,
+      bytes = image.bytes, // number of bytes in the color
+      maxX = -1,
+      minX = w + 1,
+      maxY = -1,
+      minY = h + 1,
+      i = py * w + px, // start point index in the mask data
+      result = new Uint8Array(w * h), // result mask
+      visited = new Uint8Array(mask ? mask : w * h); // mask of visited points
 
     if (visited[i] === 1) return null;
 
@@ -136,31 +136,13 @@ const MagicWand = (() => {
         newY = el.y - el.dir;
         if (newY >= 0 && newY < h) {
           // add two scanning lines in the opposite direction (y - dir) if necessary
-          if (xl < el.left)
-            stack.push({
-              y: newY,
-              left: xl,
-              right: el.left,
-              dir: -el.dir,
-            }); // from "new left" to "current left"
-          if (el.right < xr)
-            stack.push({
-              y: newY,
-              left: el.right,
-              right: xr,
-              dir: -el.dir,
-            }); // from "current right" to "new right"
+          if (xl < el.left) stack.push({ y: newY, left: xl, right: el.left, dir: -el.dir }); // from "new left" to "current left"
+          if (el.right < xr) stack.push({ y: newY, left: el.right, right: xr, dir: -el.dir }); // from "current right" to "new right"
         }
         newY = el.y + el.dir;
         if (newY >= 0 && newY < h) {
           // add the scanning line in the direction (y + dir) if necessary
-          if (xl < xr)
-            stack.push({
-              y: newY,
-              left: xl,
-              right: xr,
-              dir: el.dir,
-            }); // from "new left" to "new right"
+          if (xl < xr) stack.push({ y: newY, left: xl, right: xr, dir: el.dir }); // from "new left" to "new right"
         }
       }
       // check minmax for Y if necessary
@@ -192,25 +174,25 @@ const MagicWand = (() => {
    * @return {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
    */
   lib.gaussBlur = (mask, radius) => {
-    let i;
-    let k;
-    let k1;
-    let x;
-    let y;
-    let val;
-    let start;
-    let end;
-    const n = radius * 2 + 1; // size of the pattern for radius-neighbors (from -r to +r with the center point)
-    const s2 = radius * radius;
-    const wg = new Float32Array(n); // weights
-    let total = 0; // sum of weights(used for normalization)
-    const w = mask.width;
-    const h = mask.height;
-    const data = mask.data;
-    const minX = mask.bounds.minX;
-    const maxX = mask.bounds.maxX;
-    const minY = mask.bounds.minY;
-    const maxY = mask.bounds.maxY;
+    let i,
+      k,
+      k1,
+      x,
+      y,
+      val,
+      start,
+      end,
+      n = radius * 2 + 1, // size of the pattern for radius-neighbors (from -r to +r with the center point)
+      s2 = radius * radius,
+      wg = new Float32Array(n), // weights
+      total = 0, // sum of weights(used for normalization)
+      w = mask.width,
+      h = mask.height,
+      data = mask.data,
+      minX = mask.bounds.minX,
+      maxX = mask.bounds.maxX,
+      minY = mask.bounds.minY,
+      maxY = mask.bounds.maxY;
 
     // calc gauss weights
     for (i = 0; i < radius; i++) {
@@ -225,9 +207,9 @@ const MagicWand = (() => {
       wg[i] /= total;
     }
 
-    const result = new Uint8Array(w * h); // result mask
-    const endX = radius + w;
-    const endY = radius + h;
+    const result = new Uint8Array(w * h), // result mask
+      endX = radius + w,
+      endY = radius + h;
 
     //walk through all source points for blur
     for (y = minY; y < maxY + 1; y++)
@@ -271,28 +253,28 @@ const MagicWand = (() => {
    * @return {Array} border index array of boundary points with radius-neighbors (only points need for blur)
    */
   function createBorderForBlur(mask, radius, visited) {
-    let x;
-    let i;
-    let j;
-    let y;
-    let k;
-    let k1;
-    let k2;
-    const w = mask.width;
-    const h = mask.height;
-    const data = mask.data;
-    const visitedData = new Uint8Array(data);
-    const minX = mask.bounds.minX;
-    const maxX = mask.bounds.maxX;
-    const minY = mask.bounds.minY;
-    const maxY = mask.bounds.maxY;
-    let len = w * h;
-    const temp = new Uint8Array(len); // auxiliary array to check uniqueness
-    const border = []; // only border points
-    const x0 = Math.max(minX, 1);
-    const x1 = Math.min(maxX, w - 2);
-    const y0 = Math.max(minY, 1);
-    const y1 = Math.min(maxY, h - 2);
+    let x,
+      i,
+      j,
+      y,
+      k,
+      k1,
+      k2,
+      w = mask.width,
+      h = mask.height,
+      data = mask.data,
+      visitedData = new Uint8Array(data),
+      minX = mask.bounds.minX,
+      maxX = mask.bounds.maxX,
+      minY = mask.bounds.minY,
+      maxY = mask.bounds.maxY,
+      len = w * h,
+      temp = new Uint8Array(len), // auxiliary array to check uniqueness
+      border = [], // only border points
+      x0 = Math.max(minX, 1),
+      x1 = Math.min(maxX, w - 2),
+      y0 = Math.max(minY, 1),
+      y1 = Math.min(maxY, h - 2);
 
     if (visited && visited.length > 0) {
       // copy visited points (only "black")
@@ -336,12 +318,12 @@ const MagicWand = (() => {
 
     if (maxY === h - 1) for (x = minX; x < maxX + 1; x++) if (data[maxY * w + x] === 1) border.push(maxY * w + x);
 
-    const result = []; // border points with radius-neighbors
-    let start;
-    let end;
-    const endX = radius + w;
-    const endY = radius + h;
-    const n = radius * 2 + 1; // size of the pattern for radius-neighbors (from -r to +r with the center point)
+    let result = [], // border points with radius-neighbors
+      start,
+      end,
+      endX = radius + w,
+      endY = radius + h,
+      n = radius * 2 + 1; // size of the pattern for radius-neighbors (from -r to +r with the center point)
 
     len = border.length;
     // walk through radius-neighbors of border points and add them to the result array
@@ -390,30 +372,30 @@ const MagicWand = (() => {
    * @return {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
    */
   lib.gaussBlurOnlyBorder = (mask, radius, visited) => {
-    const border = createBorderForBlur(mask, radius, visited); // get border points with radius-neighbors
-    let ww;
-    let dsq;
-    let i;
-    let j;
-    let k;
-    let k1;
-    let x;
-    let y;
-    let val;
-    let start;
-    let end;
-    const n = radius * 2 + 1; // size of the pattern for radius-neighbors (from -r to +r with center point)
-    const s2 = 2 * radius * radius;
-    const wg = new Float32Array(n); // weights
-    let total = 0; // sum of weights(used for normalization)
-    const w = mask.width;
-    const h = mask.height;
-    const data = mask.data;
-    let minX = mask.bounds.minX;
-    let maxX = mask.bounds.maxX;
-    let minY = mask.bounds.minY;
-    let maxY = mask.bounds.maxY;
-    const len = border.length;
+    let border = createBorderForBlur(mask, radius, visited), // get border points with radius-neighbors
+      ww,
+      dsq,
+      i,
+      j,
+      k,
+      k1,
+      x,
+      y,
+      val,
+      start,
+      end,
+      n = radius * 2 + 1, // size of the pattern for radius-neighbors (from -r to +r with center point)
+      s2 = 2 * radius * radius,
+      wg = new Float32Array(n), // weights
+      total = 0, // sum of weights(used for normalization)
+      w = mask.width,
+      h = mask.height,
+      data = mask.data,
+      minX = mask.bounds.minX,
+      maxX = mask.bounds.maxX,
+      minY = mask.bounds.minY,
+      maxY = mask.bounds.maxY,
+      len = border.length;
 
     // calc gauss weights
     for (i = 0; i < radius; i++) {
@@ -427,9 +409,9 @@ const MagicWand = (() => {
       wg[i] /= total;
     }
 
-    const result = new Uint8Array(data); // copy the source mask
-    const endX = radius + w;
-    const endY = radius + h;
+    const result = new Uint8Array(data), // copy the source mask
+      endX = radius + w,
+      endY = radius + h;
 
     //walk through all border points for blur
     for (i = 0; i < len; i++) {
@@ -490,25 +472,25 @@ const MagicWand = (() => {
    * @return {Object} border mask: {Uint8Array} data, {int} width, {int} height, {Object} offset
    */
   lib.createBorderMask = (mask) => {
-    let x;
-    let y;
-    let k;
-    let k1;
-    let k2;
-    const w = mask.width;
-    const h = mask.height;
-    const data = mask.data;
-    const minX = mask.bounds.minX;
-    const maxX = mask.bounds.maxX;
-    const minY = mask.bounds.minY;
-    const maxY = mask.bounds.maxY;
-    const rw = maxX - minX + 1; // bounds size
-    const rh = maxY - minY + 1;
-    const result = new Uint8Array(rw * rh); // reduced mask (bounds size)
-    const x0 = Math.max(minX, 1);
-    const x1 = Math.min(maxX, w - 2);
-    const y0 = Math.max(minY, 1);
-    const y1 = Math.min(maxY, h - 2);
+    let x,
+      y,
+      k,
+      k1,
+      k2,
+      w = mask.width,
+      h = mask.height,
+      data = mask.data,
+      minX = mask.bounds.minX,
+      maxX = mask.bounds.maxX,
+      minY = mask.bounds.minY,
+      maxY = mask.bounds.maxY,
+      rw = maxX - minX + 1, // bounds size
+      rh = maxY - minY + 1,
+      result = new Uint8Array(rw * rh), // reduced mask (bounds size)
+      x0 = Math.max(minX, 1),
+      x1 = Math.min(maxX, w - 2),
+      y0 = Math.max(minY, 1),
+      y1 = Math.min(maxY, h - 2);
 
     // walk through inner values except points on the boundary of the image
     for (y = y0; y < y1 + 1; y++)
@@ -560,17 +542,17 @@ const MagicWand = (() => {
    * @return {Array} border index array boundary points of the mask
    */
   lib.getBorderIndices = (mask) => {
-    let x;
-    let y;
-    let k;
-    let k1;
-    let k2;
-    const w = mask.width;
-    const h = mask.height;
-    const data = mask.data;
-    const border = []; // only border points
-    const x1 = w - 1;
-    const y1 = h - 1;
+    let x,
+      y,
+      k,
+      k1,
+      k2,
+      w = mask.width,
+      h = mask.height,
+      data = mask.data,
+      border = [], // only border points
+      x1 = w - 1,
+      y1 = h - 1;
 
     // walk through inner values except points on the boundary of the image
     for (y = 1; y < y1; y++)
@@ -617,17 +599,17 @@ const MagicWand = (() => {
    * @return {Object} border mask: {Uint8Array} data, {int} width, {int} height, {Object} offset
    */
   function prepareMask(mask) {
-    let x;
-    let y;
-    const w = mask.width;
-    const data = mask.data;
-    const minX = mask.bounds.minX;
-    const maxX = mask.bounds.maxX;
-    const minY = mask.bounds.minY;
-    const maxY = mask.bounds.maxY;
-    const rw = maxX - minX + 3; // bounds size +1 px on each side (a "white" border)
-    const rh = maxY - minY + 3;
-    const result = new Uint8Array(rw * rh); // reduced mask (bounds size)
+    let x,
+      y,
+      w = mask.width,
+      data = mask.data,
+      minX = mask.bounds.minX,
+      maxX = mask.bounds.maxX,
+      minY = mask.bounds.minY,
+      maxY = mask.bounds.maxY,
+      rw = maxX - minX + 3, // bounds size +1 px on each side (a "white" border)
+      rh = maxY - minY + 3,
+      result = new Uint8Array(rw * rh); // reduced mask (bounds size)
 
     // walk through inner values and copy only "black" points to the result mask
     for (y = minY; y < maxY + 1; y++)
@@ -649,31 +631,31 @@ const MagicWand = (() => {
    * @return {Array} contours: {Array} points, {bool} inner, {int} label
    */
   lib.traceContours = (mask) => {
-    const m = prepareMask(mask);
-    const contours = [];
-    let label = 0;
-    const w = m.width;
-    const w2 = w * 2;
-    const h = m.height;
-    const src = m.data;
-    const dx = m.offset.x;
-    const dy = m.offset.y;
-    const dest = new Uint8Array(src); // label matrix
-    let i;
-    let j;
-    let x;
-    let y;
-    let k;
-    let k1;
-    let c;
-    let inner;
-    let dir;
-    let first;
-    let second;
-    let current;
-    let previous;
-    let next;
-    let d;
+    let m = prepareMask(mask),
+      contours = [],
+      label = 0,
+      w = m.width,
+      w2 = w * 2,
+      h = m.height,
+      src = m.data,
+      dx = m.offset.x,
+      dy = m.offset.y,
+      dest = new Uint8Array(src), // label matrix
+      i,
+      j,
+      x,
+      y,
+      k,
+      k1,
+      c,
+      inner,
+      dir,
+      first,
+      second,
+      current,
+      previous,
+      next,
+      d;
 
     // all [dx,dy] pairs (array index is the direction)
     // 5 6 7
@@ -714,10 +696,7 @@ const MagicWand = (() => {
 
                   // get the next point by new direction
                   d = directions[dir]; // index as direction
-                  next = {
-                    x: current.x + d[0],
-                    y: current.y + d[1],
-                  };
+                  next = { x: current.x + d[0], y: current.y + d[1] };
 
                   k1 = next.y * w + next.x;
                   if (src[k1] === 1) {
@@ -742,10 +721,7 @@ const MagicWand = (() => {
                 } else {
                   second = next;
                 }
-                c.push({
-                  x: previous.x + dx,
-                  y: previous.y + dy,
-                });
+                c.push({ x: previous.x + dx, y: previous.y + dy });
                 previous = current;
                 dir = (dir + 4) % 8; // next dir (symmetrically to the current direction)
               }
@@ -771,29 +747,29 @@ const MagicWand = (() => {
    * @return {Array} contours: {Array} points, {bool} inner, {int} label, {int} initialCount
    */
   lib.simplifyContours = (contours, simplifyTolerant, simplifyCount) => {
-    const lenContours = contours.length;
-    const result = [];
-    let i;
-    let j;
-    let k;
-    let c;
-    let points;
-    let len;
-    let resPoints;
-    let lst;
-    let stack;
-    let ids;
-    let maxd;
-    let maxi;
-    let dist;
-    let r1;
-    let r2;
-    let r12;
-    let dx;
-    let dy;
-    let pi;
-    let pf;
-    let pl;
+    let lenContours = contours.length,
+      result = [],
+      i,
+      j,
+      k,
+      c,
+      points,
+      len,
+      resPoints,
+      lst,
+      stack,
+      ids,
+      maxd,
+      maxi,
+      dist,
+      r1,
+      r2,
+      r12,
+      dx,
+      dy,
+      pi,
+      pf,
+      pl;
 
     // walk through all contours
     for (j = 0; j < lenContours; j++) {
@@ -807,12 +783,7 @@ const MagicWand = (() => {
         for (k = 0; k < len; k++) {
           resPoints.push({ x: points[k].x, y: points[k].y });
         }
-        result.push({
-          inner: c.inner,
-          label: c.label,
-          points: resPoints,
-          initialCount: len,
-        });
+        result.push({ inner: c.inner, label: c.label, points: resPoints, initialCount: len });
         continue;
       }
 
@@ -871,12 +842,7 @@ const MagicWand = (() => {
       for (k = 0; k < len; k++) {
         resPoints.push({ x: points[lst[k]].x, y: points[lst[k]].y }); // add result points to the correct order
       }
-      result.push({
-        inner: c.inner,
-        label: c.label,
-        points: resPoints,
-        initialCount: c.points.length,
-      });
+      result.push({ inner: c.inner, label: c.label, points: resPoints, initialCount: c.points.length });
     }
 
     return result;
@@ -901,8 +867,7 @@ function paint(ctx, w, h, mask, color, alpha) {
 
   alpha = Math.round(alpha * 255.0);
 
-  let x;
-  let y;
+  let x, y;
   const { data, bounds, width: maskW } = mask;
   const imgData = ctx.createImageData(w, h);
 

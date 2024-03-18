@@ -25,8 +25,7 @@ const isSystemEvent = (e: KeyboardEvent<HTMLInputElement>): boolean => {
   return (
     e.code.match(/arrow/i) !== null ||
     (e.shiftKey && e.code.match(/arrow/i) !== null) ||
-    e.metaKey ||
-    e.ctrlKey ||
+    e.metaKey || e.ctrlKey ||
     e.code === "Backspace"
   );
 };
@@ -85,6 +84,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
             {inputMode ? (
               <input
                 type="text"
+                autoFocus
                 defaultValue={currentPage}
                 pattern="[0-9]"
                 onKeyDown={(e) => {
@@ -125,7 +125,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
                   onClick={() => {
                     /*  */
                   }}
-                />
+                ></div>
               </Elem>
             )}
           </Elem>

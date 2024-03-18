@@ -16,8 +16,9 @@ export const FilterItemType = types.union({
   dispatcher(s) {
     if (isDefined(s.value)) {
       return FilterItemValue;
+    } else {
+      return FilterValue;
     }
-    return FilterValue;
   },
 });
 
@@ -49,11 +50,9 @@ export const FilterValueType = types.union({
 
     if (hasProperties(sn, ["items"])) {
       return FilterValueList;
-    }
-    if (hasProperties(sn, ["min", "max"])) {
+    } else if (hasProperties(sn, ["min", "max"])) {
       return FilterValueRange;
-    }
-    if (Array.isArray(sn)) {
+    } else if (Array.isArray(sn)) {
       return types.array(FilterValueType);
     }
 
@@ -67,8 +66,9 @@ export const FilterSchema = types.union({
 
     if (isDefined(s.items)) {
       return FilterValueList;
+    } else {
+      return FilterValueRange;
     }
-    return FilterValueRange;
   },
 });
 

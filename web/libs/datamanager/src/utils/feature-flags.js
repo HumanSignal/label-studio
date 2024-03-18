@@ -89,6 +89,7 @@ export function isFF(id) {
 
   if (id in featureFlags) {
     return featureFlags[id] === true;
+  } else {
+    return window.APP_SETTINGS?.feature_flags_default_value === true;
   }
-  return window.APP_SETTINGS?.feature_flags_default_value === true;
 }

@@ -126,7 +126,7 @@ class RichTextPieceView extends Component {
     const region = this._determineRegion(event.target);
 
     if (!region) return;
-    region?.onClickRegion(event);
+    region && region.onClickRegion(event);
     event.stopPropagation();
   };
 
@@ -352,7 +352,7 @@ class RichTextPieceView extends Component {
     if (body.scrollHeight) {
       // body dimensions sometimes doesn't count some inner content offsets
       // but html's offsetHeight sometimes is zero, so get the max of both
-      iframe.style.height = `${Math.max(body.scrollHeight, htmlEl.offsetHeight)}px`;
+      iframe.style.height = Math.max(body.scrollHeight, htmlEl.offsetHeight) + "px";
     }
 
     this.markObjectAsLoaded();
@@ -412,52 +412,53 @@ class RichTextPieceView extends Component {
           )}
         </Block>
       );
-    }
-    return (
-      <Block name="richtext" tag={ObjectTag} item={item}>
-        <Elem name="loading" ref={this.loadingRef}>
-          <LoadingOutlined />
-        </Elem>
+    } else {
+      return (
+        <Block name="richtext" tag={ObjectTag} item={item}>
+          <Elem name="loading" ref={this.loadingRef}>
+            <LoadingOutlined />
+          </Elem>
 
-        <Elem
-          key="root"
-          name="iframe"
-          tag="iframe"
-          referrerPolicy="no-referrer"
-          sandbox="allow-same-origin allow-scripts"
-          ref={(el) => {
-            item.setReady(false);
-            item.visibleNodeRef.current = el;
-          }}
-          className="htx-richtext"
-          srcDoc={val}
-          onLoad={this.onIFrameLoad}
-        />
-        {isFF(FF_LSDV_4620_3) ? null : (
-          <>
-            <Elem
-              key="orig"
-              name="orig-iframe"
-              tag="iframe"
-              referrerPolicy="no-referrer"
-              sandbox="allow-same-origin allow-scripts"
-              ref={item.originalContentRef}
-              className="htx-richtext-orig"
-              srcDoc={val}
-            />
-            <Elem
-              key="work"
-              name="work-iframe"
-              tag="iframe"
-              referrerPolicy="no-referrer"
-              sandbox="allow-same-origin allow-scripts"
-              ref={item.workingNodeRef}
-              className="htx-richtext-work"
-            />
-          </>
-        )}
-      </Block>
-    );
+          <Elem
+            key="root"
+            name="iframe"
+            tag="iframe"
+            referrerPolicy="no-referrer"
+            sandbox="allow-same-origin allow-scripts"
+            ref={(el) => {
+              item.setReady(false);
+              item.visibleNodeRef.current = el;
+            }}
+            className="htx-richtext"
+            srcDoc={val}
+            onLoad={this.onIFrameLoad}
+          />
+          {isFF(FF_LSDV_4620_3) ? null : (
+            <>
+              <Elem
+                key="orig"
+                name="orig-iframe"
+                tag="iframe"
+                referrerPolicy="no-referrer"
+                sandbox="allow-same-origin allow-scripts"
+                ref={item.originalContentRef}
+                className="htx-richtext-orig"
+                srcDoc={val}
+              />
+              <Elem
+                key="work"
+                name="work-iframe"
+                tag="iframe"
+                referrerPolicy="no-referrer"
+                sandbox="allow-same-origin allow-scripts"
+                ref={item.workingNodeRef}
+                className="htx-richtext-work"
+              />
+            </>
+          )}
+        </Block>
+      );
+    }
   }
 }
 

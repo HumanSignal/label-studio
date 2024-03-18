@@ -38,11 +38,11 @@ const TaskStore = types
     get dataObj() {
       if (Utilities.Checkers.isStringJSON(self.data)) {
         return JSON.parse(self.data);
-      }
-      if (typeof self.data === "object") {
+      } else if (typeof self.data === "object") {
         return self.data;
+      } else {
+        return null;
       }
-      return null;
     },
   }));
 

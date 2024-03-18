@@ -53,7 +53,7 @@ export function getUrl(i: number, text: string) {
   const myRegexp = /^(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/g; // eslint-disable-line no-useless-escape
   const match = myRegexp.exec(stringToTest);
 
-  return match?.length ? match[1] : "";
+  return match && match.length ? match[1] : "";
 }
 
 /**
@@ -90,7 +90,7 @@ export function hashCode(str: string) {
   let hash = 0;
 
   if (str.length === 0) {
-    return `${hash}`;
+    return hash + "";
   }
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -98,7 +98,7 @@ export function hashCode(str: string) {
     hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
-  return `${hash}`;
+  return hash + "";
 }
 
 export function atobUnicode(str: string) {
@@ -106,7 +106,7 @@ export function atobUnicode(str: string) {
   return decodeURIComponent(
     atob(str)
       .split("")
-      .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+      .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
       .join(""),
   );
 }
@@ -174,8 +174,7 @@ export function clamp(x: number, min: number, max: number) {
 
 export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => {
   const result = [];
-  let i;
-  let j;
+  let i, j;
 
   for (i = 0, j = source.length; i < j; i += chunkSize) {
     result.push(source.slice(i, i + chunkSize));
@@ -210,8 +209,9 @@ export const camelizeKeys = (object: any): Record<string, unknown> => {
     Object.entries(object).map(([key, value]) => {
       if (Object.prototype.toString.call(value) === "[object Object]") {
         return [toCamelCase(key), camelizeKeys(value)];
+      } else {
+        return [toCamelCase(key), value];
       }
-      return [toCamelCase(key), value];
     }),
   );
 };

@@ -101,12 +101,7 @@ const Model = types
           // or they can't be applied on current html, so just keep them untouched
           const { start, end, startOffset, endOffset } = self;
 
-          Object.assign(res.value, {
-            start,
-            end,
-            startOffset,
-            endOffset,
-          });
+          Object.assign(res.value, { start, end, startOffset, endOffset });
 
           if (self.globalOffsets) {
             Object.assign(res.value, {
@@ -117,7 +112,7 @@ const Model = types
       }
 
       if (self.object.savetextresult === "yes" && isDefined(self.text)) {
-        res.value.text = self.text;
+        res.value["text"] = self.text;
       }
 
       return res;

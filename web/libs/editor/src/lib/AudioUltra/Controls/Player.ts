@@ -305,7 +305,7 @@ export abstract class Player extends Destructable {
     if (this.isDestroyed || !this.audio) return;
     this.disconnectSource();
     this.audio.destroy();
-    this.audio = undefined;
+    delete this.audio;
   }
 
   protected watch = () => {

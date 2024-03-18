@@ -203,11 +203,9 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
     const label = (() => {
       if (!type) {
         return "No Label";
-      }
-      if (type.includes("label")) {
+      } else if (type.includes("label")) {
         return item.value;
-      }
-      if (type.includes("region") || type.includes("range")) {
+      } else if (type.includes("region") || type.includes("range")) {
         const labelsInResults = item.labelings.map((result: any) => result.selectedLabels || []);
 
         const labels: any[] = [].concat(...labelsInResults);
@@ -226,8 +224,7 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
             })}
           </Block>
         );
-      }
-      if (type.includes("tool")) {
+      } else if (type.includes("tool")) {
         return item.value;
       }
     })();
@@ -486,8 +483,7 @@ const RegionControls: FC<RegionControlsProps> = observer(
     const hidden = useMemo(() => {
       if (type?.includes("region") || type?.includes("range")) {
         return entity.hidden;
-      }
-      if ((!type || type.includes("label") || type?.includes("tool")) && regions) {
+      } else if ((!type || type.includes("label") || type?.includes("tool")) && regions) {
         return Object.values(regions).every(({ hidden }) => hidden);
       }
       return false;

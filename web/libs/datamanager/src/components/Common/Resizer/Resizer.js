@@ -82,10 +82,7 @@ export const Resizer = ({
         name="handle"
         ref={resizeHandler}
         style={handleStyle}
-        mod={{
-          resizing: showResizerLine !== false && isResizing,
-          quickview: type === "quickview",
-        }}
+        mod={{ resizing: showResizerLine !== false && isResizing, quickview: type === "quickview" }}
         onMouseDown={handleResize}
         onDoubleClick={() => onReset?.()}
       />
