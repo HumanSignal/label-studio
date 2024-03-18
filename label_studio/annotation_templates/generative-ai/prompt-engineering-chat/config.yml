@@ -1,0 +1,64 @@
+title: "Chat with AI Assistant"
+type: community
+group: Generative AI
+order: 3
+image: /static/templates/chat-completion.jpg
+details: Generate model response in chat style. It allows you to prompt your LLM and retrieve the generated text on the fly. It works with ML backend from https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/llm_interactive example.
+config: |
+  <View>
+     <Style>
+      .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
+      .text-adv {
+        background-color: white;
+        border: 2px solid #000;  # Add border
+        border-radius: 15px;  # Increase border radius
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 30px;  # Increase padding
+        font-family: 'Arial', sans-serif;  # Change font type
+        line-height: 1.6;
+        font-size: 16px;
+        text-align: center;  # Center align text
+      }
+    </Style>
+    <View className="text-adv">
+     <HyperText name="title" value="Use &lt;a href='https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/llm_interactive' target='_blank' rel='noopener noreferrer' &gt;Interactive LLM &lt;/a&gt; with this template." clickableLinks="true" inline="true"/>
+    </View>
+    <Paragraphs name="chat" value="$messages" layout="dialogue" nameKey="role" textKey="content" />
+    <Header value="User:" />
+    <View className="prompt">
+      <TextArea name="prompt"
+                toName="chat"
+                rows="4"
+                editable="true"
+                maxSubmissions="1"
+                showSubmitButton="false"
+                placeholder="Type user prompt here then Shift+Enter..."
+      />
+    </View>
+    <Header value="Assistant:"/>
+    <TextArea name="response"
+              toName="chat"
+              rows="4"
+              editable="true"
+              maxSubmissions="1"
+              showSubmitButton="false"
+              placeholder="Generated response will appear here..."
+    />
+  
+  </View>
+  
+  <!-- { "data" : {
+    "messages": [
+      {
+          "role": "user",
+          "content": "What ingredients go well with pineapple?"
+      },
+      {
+          "role": "assistant",
+          "content": "Ham, bacon, or chicken are popular choices."
+      }
+  ]}}
+  -->
+
+
+

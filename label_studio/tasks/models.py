@@ -866,7 +866,13 @@ class Prediction(models.Model):
         null=True,
         help_text='An ML Backend instance that created the prediction.',
     )
-
+    model_run = models.ForeignKey(
+        'ml_models.ModelRun',
+        on_delete=models.CASCADE,
+        related_name='predictions',
+        null=True,
+        help_text='A run of a ModelVersion that created the prediction.',
+    )
     cluster = models.IntegerField(
         _('cluster'),
         default=None,
