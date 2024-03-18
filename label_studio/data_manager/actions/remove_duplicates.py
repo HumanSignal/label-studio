@@ -104,8 +104,7 @@ def move_annotations(duplicates):
                 Task.objects.get(id=task['id']).annotations.update(task_id=first['id'])
                 total_moved_annotations += task['total_annotations']
                 logger.info(
-                    f"Moved {task['total_annotations']} annotations " 
-                    f"from task {task['id']} to task {first['id']}"
+                    f"Moved {task['total_annotations']} annotations from task {task['id']} to task {first['id']}"
                 )
                 task['total_annotations'] = 0
 
