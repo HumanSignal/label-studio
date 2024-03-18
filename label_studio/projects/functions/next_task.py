@@ -153,7 +153,7 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
             and flag_set('fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto')
             and lse_project.agreement_threshold is not None
             and get_tasks_agreement_queryset
-            and user.is_annotator
+            and user.is_project_annotator(project)
         ):
             not_solved_tasks = (
                 get_tasks_agreement_queryset(not_solved_tasks)
