@@ -10,7 +10,7 @@ from projects.models import Project
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from users.models import User
 
-from label_studio.tests.utils import make_project
+from .utils import make_project
 
 _project_for_text_choices_onto_A_B_classes = dict(
     title='Test',
