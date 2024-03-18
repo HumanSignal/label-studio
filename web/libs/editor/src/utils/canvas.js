@@ -366,49 +366,27 @@ function brushSizeCircle(size) {
   return canvas.toDataURL();
 }
 
+/**
+ * Given a string of SVG xml, encode it into a data URL
+ * @param {string} data SVG XML string to encode
+ * @returns {string} Data URL containing inline SVG already enclosed in quotes
+ */
 function encodeSVG(data) {
-  const externalQuotesValue = 'single';
-
-  function getQuotes() {
-    const double = '"';
-    const single = '\'';
-
-    return {
-      level1: externalQuotesValue === 'double' ? double : single,
-      level2: externalQuotesValue === 'double' ? single : double,
-    };
-  }
-
-  const quotes = getQuotes();
-
-  function addNameSpace(data) {
-    if (data.indexOf('http://www.w3.org/2000/svg') < 0) {
-      data = data.replace(/<svg/g, `<svg xmlns=${quotes.level2}http://www.w3.org/2000/svg${quotes.level2}`);
-    }
-
-    return data;
-  }
-
-  data = addNameSpace(data);
-  const symbols = /[\r\n%#()<>?[\\\]^`{|}]/g;
-
-  // Use single quotes instead of double to avoid encoding.
-  if (externalQuotesValue === 'double') {
-    data = data.replace(/"/g, '\'');
-  } else {
-    data = data.replace(/'/g, '"');
-  }
-
-  data = data.replace(/>\s{1,}</g, '><');
   data = data.replace(/\s{2,}/g, ' ');
 
-  // var resultCss = `background-image: url();`;
-
+  const symbols = /[\r\n%#()<>?[\\\]^`{|}]/g;
   const escaped = data.replace(symbols, encodeURIComponent);
 
-  return `${quotes.level1}data:image/svg+xml,${escaped}${quotes.level1}`;
+  return `'data:image/svg+xml,${escaped}'`;
 }
 
+/**
+ * Given a label and optional score, return an SVG data URL to use it in regions.
+ * Has internal caching to avoid recalculating the same SVGs.
+ * @param {string} label Label text
+ * @param {number} [score] Score in [0, 1] range
+ * @returns {string} Data URL containing inline SVG already enclosed in quotes
+ */
 const labelToSVG = (function() {
   const SVG_CACHE = {};
 
@@ -454,7 +432,8 @@ const labelToSVG = (function() {
       width = width + calculateTextWidth(label) + 2;
     }
 
-    const res = `<svg height="16" width="${width}">${items.join('')}</svg>`;
+    const xmlns = 'xmlns="http://www.w3.org/2000/svg"';
+    const res = `<svg ${xmlns} height="16" width="${width}">${items.join('')}</svg>`;
     const enc = encodeSVG(res);
 
     SVG_CACHE[cacheKey] = enc;
