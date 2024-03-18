@@ -1,19 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+
 import logging
 import random
-from collections import defaultdict
 
 import ujson as json
-from core.label_config import replace_task_data_undefined_with_config_field
 from core.permissions import AllPermissions
-from data_manager.actions.basic import delete_tasks
 from data_manager.functions import DataManagerException
 from django.conf import settings
-from io_storages.azure_blob.models import AzureBlobImportStorageLink
-from io_storages.gcs.models import GCSImportStorageLink
-from io_storages.localfiles.models import LocalFilesImportStorage
-from io_storages.s3.models import S3ImportStorageLink
 from tasks.models import Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 
@@ -54,7 +48,10 @@ def propagate_annotations(project, queryset, **kwargs):
     TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
     # Update counters for tasks and is_labeled. It should be a single operation as counters affect bulk is_labeled update
     project.update_tasks_counters_and_is_labeled(tasks_queryset=Task.objects.filter(id__in=tasks))
-    return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
+    return {
+        'response_code': 200,
+        'detail': f'Created {len(db_annotations)} annotations',
+    }
 
 
 def propagate_annotations_form(user, project):
@@ -66,90 +63,6 @@ def propagate_annotations_form(user, project):
         + (f' [first ID: {str(first_annotation.id)}]' if first_annotation else ''),
     }
     return [{'columnCount': 1, 'fields': [field]}]
-
-
-def remove_duplicates(project, queryset, **kwargs):
-    # get io_storage_* links for tasks, we need to copy them
-    storages = []
-    for field in dir(Task):
-        if field.startswith('io_storages_'):
-            storages += [field]
-
-    tasks = list(queryset.values('data', 'id', 'total_annotations', *storages))
-    duplicates = defaultdict(list)
-    for task in list(tasks):
-        replace_task_data_undefined_with_config_field(task['data'], project)
-        task['data'] = json.dumps(task['data'])
-        duplicates[task['data']].append(task)
-
-    ### build storage links for duplicates ###
-    classes = {
-        'io_storages_s3importstoragelink': S3ImportStorageLink,
-        'io_storages_gcsimportstoragelink': GCSImportStorageLink,
-        'io_storages_azureblobimportstoragelink': AzureBlobImportStorageLink,
-        'io_storages_localfilesimportstoragelink': LocalFilesImportStorage,
-        # 'io_storages_redisimportstoragelink',
-        # 'lse_io_storages_lses3importstoragelink'  # not supported yet
-    }
-    for data in list(duplicates):
-        tasks = duplicates[data]
-        source = None
-
-        # find first task with existing storage link
-        for task in tasks:
-            for link in classes:
-                if link in task and task[link] is not None:
-                    # we don't support case when there are many storage links in duplicated tasks
-                    if source is not None:
-                        source = None
-                        break
-                    source = (task, classes[link], task[link])  # last arg is a storage link id
-
-        # add storage links to duplicates
-        if source:
-            _class = source[1]  # get link name
-            for task in tasks:
-                if task['id'] != source[0]['id']:
-                    link_instance = _class.objects.get(id=source[2])
-                    _class.create(
-                        task=Task.objects.get(id=task['id']), key=link_instance.key, storage=link_instance.storage
-                    )
-
-    ### remove duplicates ###
-    removing = []
-
-    # prepare main tasks which won't be deleted
-    for data in duplicates:
-        root = duplicates[data]
-        if len(root) == 1:
-            continue
-
-        one_task_saved = False
-        new_root = []
-        for task in root:
-            # keep all tasks with annotations in safety
-            if task['total_annotations'] > 0:
-                one_task_saved = True
-            else:
-                new_root.append(task)
-
-        for task in new_root:
-            # keep the first task in safety
-            if not one_task_saved:
-                one_task_saved = True
-            # remove all other tasks
-            else:
-                removing.append(task['id'])
-
-    # remove tasks
-    queryset = queryset.filter(id__in=removing, annotations__isnull=True)
-    assert queryset.count() == len(removing), (
-        f'Remove duplicates failed, operation is not finished: '
-        f'queryset count {queryset.count()} != removing {len(removing)}'
-    )
-
-    delete_tasks(project, queryset)
-    return {'response_code': 200, 'detail': f'Removed {len(removing)} tasks'}
 
 
 def rename_labels(project, queryset, **kwargs):
@@ -202,7 +115,10 @@ def rename_labels(project, queryset, **kwargs):
     annotations = Annotation.objects.filter(project=project)
     project.summary.update_created_annotations_and_labels(annotations)
 
-    return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}
+    return {
+        'response_code': 200,
+        'detail': f'Updated {label_count} labels in {annotation_count}',
+    }
 
 
 def rename_labels_form(user, project):
@@ -399,18 +315,6 @@ actions = [
             'audios with the same durations.',
             'type': 'confirm',
             'form': propagate_annotations_form,
-        },
-    },
-    {
-        'entry_point': remove_duplicates,
-        'permission': all_permissions.projects_change,
-        'title': 'Remove Duplicated Tasks',
-        'order': 1,
-        'experimental': True,
-        'dialog': {
-            'text': 'Confirm that you want to remove duplicated tasks with the same data fields.'
-            'Only tasks without annotations will be deleted.',
-            'type': 'confirm',
         },
     },
     {
