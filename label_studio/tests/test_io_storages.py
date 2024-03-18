@@ -1,7 +1,6 @@
 import json
 
 import pytest
-
 from tests.utils import make_project
 
 
