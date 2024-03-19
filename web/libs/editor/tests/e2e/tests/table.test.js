@@ -1,4 +1,4 @@
-Feature('Table');
+Feature("Table");
 
 const config = `
 <View>
@@ -20,12 +20,12 @@ const data = {
   },
 };
 
-const params = { annotations: [{ id: 'test', result: [] }], config, data };
+const params = { annotations: [{ id: "test", result: [] }], config, data };
 
-Scenario('Check if the table is sorted', async function({ I, LabelStudio, AtTableView }) {
-  const _sortedArr = ['aaTest', 'ATest', 'bbbTest', 'cTest'];
+Scenario("Check if the table is sorted", async ({ I, LabelStudio, AtTableView }) => {
+  const _sortedArr = ["aaTest", "ATest", "bbbTest", "cTest"];
 
-  I.amOnPage('/');
+  I.amOnPage("/");
 
   LabelStudio.init(params);
 

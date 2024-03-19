@@ -100,6 +100,7 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.13.0",
     "@babel/runtime": "^7.12.13",
+    "@biomejs/biome": "1.6.1",
     "@cypress/code-coverage": "^3.12.9",
     "@cypress/webpack-preprocessor": "^5.17.0",
     "@nx/cypress": "17.0.3",
@@ -224,9 +225,7 @@
         "@babel/preset-env",
         {
           "targets": {
-            "browsers": [
-              "last 2 Chrome versions"
-            ]
+            "browsers": ["last 2 Chrome versions"]
           }
         }
       ]

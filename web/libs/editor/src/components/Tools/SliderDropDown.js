@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from 'react';
-import { Button, Dropdown, Menu, Slider } from 'antd';
-import { observer } from 'mobx-react';
-import { ReloadOutlined } from '@ant-design/icons';
+import { ReloadOutlined } from "@ant-design/icons";
+import { Button, Dropdown, Menu, Slider } from "antd";
+import { observer } from "mobx-react";
+import React, { Component, Fragment } from "react";
 
-import styles from './Styles.module.scss';
+import styles from "./Styles.module.scss";
 
 export default observer(
   class SliderDropDownTool extends Component {
@@ -23,7 +23,7 @@ export default observer(
             />
             <Button
               shape="circle"
-              type={this.props.selected ? 'primary' : 'default'}
+              type={this.props.selected ? "primary" : "default"}
               className={styles.button}
               onClick={this.props.onResetClick}
             >

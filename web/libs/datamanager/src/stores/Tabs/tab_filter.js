@@ -1,21 +1,13 @@
 import { flow, getParent, getRoot, types } from "mobx-state-tree";
 import { toStudlyCaps } from "strman";
-import * as Filters from "../../components/Filters/types";
 import * as CellViews from "../../components/CellViews";
+import * as Filters from "../../components/Filters/types";
 import { allowedFilterOperations } from "../../components/Filters/types/Utility";
 import { debounce } from "../../utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
-import {
-  FilterValueRange,
-  FilterValueType,
-  TabFilterType
-} from "./tab_filter_type";
+import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
 
-const operatorNames = Array.from(
-  new Set(
-    [].concat(...Object.values(Filters).map((f) => f.map((op) => op.key))),
-  ),
-);
+const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
 
 const Operators = types.enumeration(operatorNames);
 
@@ -60,8 +52,7 @@ export const TabFilter = types
     },
 
     get componentValueType() {
-      return self.component?.find(({ key }) => key === self.operator)
-        ?.valueType;
+      return self.component?.find(({ key }) => key === self.operator)?.valueType;
     },
 
     get target() {
@@ -168,7 +159,7 @@ export const TabFilter = types
       self.view.deleteFilter(self);
     },
 
-    save: flow(function * (force = false) {
+    save: flow(function* (force = false) {
       const isValid = self.isValidFilter;
 
       if (force !== true) {
@@ -189,9 +180,7 @@ export const TabFilter = types
     }),
 
     setDefaultValue() {
-      self.setValue(
-        getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue,
-      );
+      self.setValue(getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue);
     },
 
     setValueDelayed(value) {
@@ -210,6 +199,7 @@ export const TabFilter = types
     saveDelayed: debounce(() => {
       self.save();
     }, 300),
-  })).preProcessSnapshot((sn) => {
+  }))
+  .preProcessSnapshot((sn) => {
     return { ...sn, value: sn.value ?? null };
   });

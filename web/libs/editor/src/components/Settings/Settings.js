@@ -1,40 +1,48 @@
-import React, { useMemo } from 'react';
-import { Checkbox, Modal, Table, Tabs } from 'antd';
-import { observer } from 'mobx-react';
+import { Checkbox, Modal, Table, Tabs } from "antd";
+import { observer } from "mobx-react";
+import React, { useMemo } from "react";
 
-import { Hotkey } from '../../core/Hotkey';
+import { Hotkey } from "../../core/Hotkey";
 
-import './Settings.styl';
-import { Block, Elem } from '../../utils/bem';
-import { triggerResizeEvent } from '../../utils/utilities';
+import { Block, Elem } from "../../utils/bem";
+import { triggerResizeEvent } from "../../utils/utilities";
+import "./Settings.styl";
 
-import EditorSettings from '../../core/settings/editorsettings';
-import * as TagSettings from './TagSettings';
-import { LsClose } from '../../assets/icons';
-import Toggle from '../../common/Toggle/Toggle';
-import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
+import { LsClose } from "../../assets/icons";
+import Toggle from "../../common/Toggle/Toggle";
+import EditorSettings from "../../core/settings/editorsettings";
+import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
+import * as TagSettings from "./TagSettings";
 
 const HotkeysDescription = () => {
   const columns = [
-    { title: 'Shortcut', dataIndex: 'combo', key: 'combo' },
-    { title: 'Description', dataIndex: 'descr', key: 'descr' },
+    { title: "Shortcut", dataIndex: "combo", key: "combo" },
+    { title: "Description", dataIndex: "descr", key: "descr" },
   ];
 
   const keyNamespaces = Hotkey.namespaces();
 
-  const getData = (descr) => Object.keys(descr)
-    .filter(k => descr[k])
-    .map(k => ({
-      key: k,
-      combo: k.split(',').map(keyGroup => {
-        return (
-          <Elem name="key-group" key={keyGroup}>
-            {keyGroup.trim().split('+').map((k) => <Elem tag="kbd" name="key" key={k}>{k}</Elem>)}
-          </Elem>
-        );
-      }),
-      descr: descr[k],
-    }));
+  const getData = (descr) =>
+    Object.keys(descr)
+      .filter((k) => descr[k])
+      .map((k) => ({
+        key: k,
+        combo: k.split(",").map((keyGroup) => {
+          return (
+            <Elem name="key-group" key={keyGroup}>
+              {keyGroup
+                .trim()
+                .split("+")
+                .map((k) => (
+                  <Elem tag="kbd" name="key" key={k}>
+                    {k}
+                  </Elem>
+                ))}
+            </Elem>
+          );
+        }),
+        descr: descr[k],
+      }));
 
   return (
     <Block name="keys">
@@ -55,14 +63,13 @@ const HotkeysDescription = () => {
   );
 };
 
-
 const newUI = isFF(FF_DEV_3873) ? { newUI: true } : {};
 
 const editorSettingsKeys = Object.keys(EditorSettings);
 
 if (isFF(FF_DEV_3873)) {
-  const enableTooltipsIndex = editorSettingsKeys.findIndex(key => key === 'enableTooltips');
-  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex(key => key === 'enableLabelTooltips');
+  const enableTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableTooltips");
+  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableLabelTooltips");
 
   // swap these in the array
   const tmp = editorSettingsKeys[enableTooltipsIndex];
@@ -72,9 +79,7 @@ if (isFF(FF_DEV_3873)) {
 }
 
 const SettingsTag = ({ children }) => {
-  return (
-    <Block name="settings-tag">{children}</Block>
-  );
+  return <Block name="settings-tag">{children}</Block>;
 };
 
 const GeneralSettings = observer(({ store }) => {
@@ -88,11 +93,11 @@ const GeneralSettings = observer(({ store }) => {
                 <Block name="settings__label">
                   <Elem name="title">
                     {EditorSettings[obj].newUI.title}
-                    {EditorSettings[obj].newUI.tags?.split(',').map((tag) => (<SettingsTag key={tag}>{tag}</SettingsTag>))}
+                    {EditorSettings[obj].newUI.tags?.split(",").map((tag) => (
+                      <SettingsTag key={tag}>{tag}</SettingsTag>
+                    ))}
                   </Elem>
-                  <Block name="description">
-                    {EditorSettings[obj].newUI.description}
-                  </Block>
+                  <Block name="description">{EditorSettings[obj].newUI.description}</Block>
                 </Block>
                 <Toggle
                   key={index}
@@ -182,25 +187,27 @@ const LayoutSettings = observer(({ store }) => {
 });
 
 const Settings = {
-  General: { name: 'General', component: GeneralSettings },
-  Hotkeys: { name: 'Hotkeys', component: HotkeysDescription },
+  General: { name: "General", component: GeneralSettings },
+  Hotkeys: { name: "Hotkeys", component: HotkeysDescription },
 };
 
 if (!isFF(FF_DEV_3873)) {
-  Settings.Layout = { name: 'Layout', component: LayoutSettings };
+  Settings.Layout = { name: "Layout", component: LayoutSettings };
 }
 
 const DEFAULT_ACTIVE = Object.keys(Settings)[0];
 
-const DEFAULT_MODAL_SETTINGS = isFF(FF_DEV_3873) ? {
-  name: 'settings-modal',
-  title: 'Labeling Interface Settings',
-  closeIcon: <LsClose />,
-} : {
-  name: 'settings-modal-old',
-  title: 'Settings',
-  bodyStyle: { paddingTop: '0' },
-};
+const DEFAULT_MODAL_SETTINGS = isFF(FF_DEV_3873)
+  ? {
+      name: "settings-modal",
+      title: "Labeling Interface Settings",
+      closeIcon: <LsClose />,
+    }
+  : {
+      name: "settings-modal-old",
+      title: "Settings",
+      bodyStyle: { paddingTop: "0" },
+    };
 
 export default observer(({ store }) => {
   const availableSettings = useMemo(() => {

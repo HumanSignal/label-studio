@@ -1,12 +1,12 @@
-import React from 'react';
-import { useAPI } from '../../../providers/ApiProvider';
+import React from "react";
+import { useAPI } from "../../../providers/ApiProvider";
 
 export const useDraftProject = () => {
   const api = useAPI();
   const [project, setProject] = React.useState();
 
   const fetchDraftProject = React.useCallback(async () => {
-    const response = await api.callApi('projects');
+    const response = await api.callApi("projects");
 
     // always create the new one
     const projects = response?.results ?? [];
@@ -15,12 +15,12 @@ export const useDraftProject = () => {
     let projectName = `New Project #${projectNumber}`;
 
     // dirty hack to get proper non-duplicate name
-    while(projects.find(({ title }) => title === projectName)) {
+    while (projects.find(({ title }) => title === projectName)) {
       projectNumber++;
       projectName = `New Project #${projectNumber}`;
     }
 
-    const draft = await api.callApi('createProject', {
+    const draft = await api.callApi("createProject", {
       body: {
         title: projectName,
       },

@@ -1,5 +1,4 @@
-
-import { Layer, RendererOptions } from './Layer';
+import { Layer, type RendererOptions } from "./Layer";
 
 export class LayerGroup extends Layer {
   layers: Layer[];
@@ -12,7 +11,7 @@ export class LayerGroup extends Layer {
   get isGroup() {
     return true;
   }
-  
+
   get length() {
     return this.layers.length;
   }
@@ -31,11 +30,11 @@ export class LayerGroup extends Layer {
   }
 
   removeLayer(layer: Layer) {
-    this.layers = this.layers.filter(l => l !== layer);
+    this.layers = this.layers.filter((l) => l !== layer);
   }
 
   remove() {
-    this.layers.forEach(layer => {
+    this.layers.forEach((layer) => {
       layer.remove();
     });
     this.layers = [];
@@ -43,14 +42,14 @@ export class LayerGroup extends Layer {
   }
 
   clear(): void {
-    this.layers.forEach(layer => {
+    this.layers.forEach((layer) => {
       layer.clear();
     });
     super.clear();
   }
 
   setSize(width: number, height: number) {
-    this.layers.forEach(layer => {
+    this.layers.forEach((layer) => {
       layer.setSize(width, height);
     });
 
@@ -58,8 +57,6 @@ export class LayerGroup extends Layer {
   }
 
   sortLayers() {
-    this.layers.sort((a, b) =>
-      a.index - b.index,
-    );
+    this.layers.sort((a, b) => a.index - b.index);
   }
 }

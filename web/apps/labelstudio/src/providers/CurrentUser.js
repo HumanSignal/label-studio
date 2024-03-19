@@ -8,7 +8,7 @@ export const CurrentUserProvider = ({ children }) => {
   const [user, setUser] = useState();
 
   const fetch = useCallback(() => {
-    api.callApi('me').then(user => {
+    api.callApi("me").then((user) => {
       setUser(user);
     });
   }, []);
@@ -17,11 +17,7 @@ export const CurrentUserProvider = ({ children }) => {
     fetch();
   }, [fetch]);
 
-  return (
-    <CurrentUserContext.Provider value={{ user, fetch }}>
-      {children}
-    </CurrentUserContext.Provider>
-  );
+  return <CurrentUserContext.Provider value={{ user, fetch }}>{children}</CurrentUserContext.Provider>;
 };
 
 export const useCurrentUser = () => useContext(CurrentUserContext) ?? {};

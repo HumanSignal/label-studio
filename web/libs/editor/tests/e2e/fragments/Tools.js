@@ -6,12 +6,14 @@ module.exports = {
       const elem = document.querySelector(selector);
       const pos = elem?.getBoundingClientRect();
 
-      return pos ? {
-        x: pos.x,
-        y: pos.y,
-        width: pos.width,
-        height: pos.height,
-      } : null;
+      return pos
+        ? {
+            x: pos.x,
+            y: pos.y,
+            width: pos.width,
+            height: pos.height,
+          }
+        : null;
     }, elementSelector);
 
     return pos;

@@ -1,21 +1,17 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 type ValueFromString<T> = (value: string) => T;
 
 type ValueToString = (value: any) => string;
 
 type Options<T> = {
-  fromString?: ValueFromString<T>,
-  toString?: ValueToString,
-}
+  fromString?: ValueFromString<T>;
+  toString?: ValueToString;
+};
 
 type StateResult<T> = [T, (value: T) => void];
 
-export const useLocalStorageState = <T>(
-  keyName: string,
-  defaultValue: T,
-  options: Options<T> = {},
-): StateResult<T> => {
+export const useLocalStorageState = <T>(keyName: string, defaultValue: T, options: Options<T> = {}): StateResult<T> => {
   const localStorageState = localStorage.getItem(keyName);
   const defaultState = localStorageState
     ? options.fromString?.(localStorageState) ?? (localStorageState as unknown as T)

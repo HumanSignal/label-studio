@@ -1,6 +1,6 @@
-import './core/feature-flags';
-import './assets/styles/global.scss';
-import { LabelStudio } from './LabelStudio';
+import { LabelStudio } from "./LabelStudio";
+import "./assets/styles/global.scss";
+import "./core/feature-flags";
 
 window.LabelStudio = LabelStudio;
 

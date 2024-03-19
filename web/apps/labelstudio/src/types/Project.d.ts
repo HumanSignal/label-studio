@@ -84,4 +84,4 @@ declare type APIProject = {
 
   /** JSON-formatted labeling configuration */
   parsed_label_config?: string;
-}
+};

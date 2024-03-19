@@ -1,4 +1,4 @@
-import { Instance, types } from 'mobx-state-tree';
+import { type Instance, types } from "mobx-state-tree";
 
 /**
  * Supress all additional events during this window in ms.
@@ -6,7 +6,7 @@ import { Instance, types } from 'mobx-state-tree';
  */
 export const SYNC_WINDOW = 100;
 
-export type SyncEvent = 'play' | 'pause' | 'seek' | 'speed';
+export type SyncEvent = "play" | "pause" | "seek" | "speed";
 
 /**
  * Currently only for reference, MST mixins don't allow to apply this interface
@@ -38,12 +38,12 @@ export class SyncManager {
 
   register(syncTarget: Instance<typeof SyncableMixin>) {
     this.syncTargets.set(syncTarget.name, syncTarget);
-    if (syncTarget.type === 'audio') this.audioTags += 1;
+    if (syncTarget.type === "audio") this.audioTags += 1;
   }
 
   unregister(syncTarget: Instance<typeof SyncableMixin>) {
     this.syncTargets.delete(syncTarget.name);
-    if (syncTarget.type === 'audio') this.audioTags -= 1;
+    if (syncTarget.type === "audio") this.audioTags -= 1;
     // @todo remove manager on empty set
   }
 
@@ -58,13 +58,13 @@ export class SyncManager {
    */
   sync(data: SyncData, event: SyncEvent, origin: string) {
     // @todo remove
-    if (!this.locked || this.locked === origin) console.log('SYNC', { event, locked: this.locked, data, origin });
+    if (!this.locked || this.locked === origin) console.log("SYNC", { event, locked: this.locked, data, origin });
 
     ///// locking mechanism
     // also send events came from original tag even when sync window is locked,
     // this allows to correct state in case of coupled events like play + seek.
     if (this.locked && this.locked !== origin) return false;
-    if (!this.locked) setTimeout(() => this.locked = null, SYNC_WINDOW);
+    if (!this.locked) setTimeout(() => (this.locked = null), SYNC_WINDOW);
     this.locked = origin;
 
     for (const target of this.syncTargets.values()) {
@@ -102,7 +102,7 @@ export const SyncManagerFactory = {
   },
 };
 
-export type SyncHandler = (data: SyncData, event: string) => void
+export type SyncHandler = (data: SyncData, event: string) => void;
 
 interface SyncableProps {
   syncHandlers: Map<string, SyncHandler>;
@@ -115,10 +115,10 @@ interface SyncableProps {
  * Should be used before ObjectBase to not break FF_DEV_3391.
  */
 const SyncableMixin = types
-  .model('SyncableMixin', {
+  .model("SyncableMixin", {
     name: types.string,
     type: types.string,
-    sync: types.optional(types.string, ''),
+    sync: types.optional(types.string, ""),
   })
   /* eslint-disable @typescript-eslint/indent */
   .volatile<SyncableProps>(() => ({
@@ -132,7 +132,7 @@ const SyncableMixin = types
     },
   }))
   /* eslint-enable @typescript-eslint/indent */
-  .actions(self => ({
+  .actions((self) => ({
     afterCreate() {
       if (!self.sync) return;
 
@@ -142,29 +142,29 @@ const SyncableMixin = types
     },
 
     /**
-    * Tag can add handlers to `syncHandlers` here
-    */
+     * Tag can add handlers to `syncHandlers` here
+     */
     registerSyncHandlers() {},
 
     syncSend(data: SyncData, event: SyncEvent) {
       if (!self.sync) return;
       const notSuppressed = self.syncManager!.sync(data, event, self.name);
 
-      if (notSuppressed && event === 'play') {
+      if (notSuppressed && event === "play") {
         // Only Audio has volume controls, so Audio should not be muted,
         // while other synced tags should be muted, otherwise volume can't be controlled.
         // But if there are no Audio tags in group, the tag triggered sync
         // should be the main tag with volume active, and others should be muted.
-        self.syncMuted(self.type !== 'audio' && self.syncManager!.audioTags > 0);
+        self.syncMuted(self.type !== "audio" && self.syncManager!.audioTags > 0);
       }
     },
 
     syncReceive(data: SyncData, event: SyncEvent) {
       const handler = self.syncHandlers.get(event);
 
-      if (event === 'play') {
+      if (event === "play") {
         // audio is the only tag with volume control, so don't mute it, but mute others.
-        self.syncMuted(self.type !== 'audio');
+        self.syncMuted(self.type !== "audio");
       }
 
       if (handler) {

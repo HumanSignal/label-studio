@@ -32,4 +32,3 @@ export const normalizeFilterValue = (type: string, op: string, value: any) => {
 
   return formatter ? formatter(op, value) : value;
 };
-

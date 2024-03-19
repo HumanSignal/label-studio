@@ -1,4 +1,4 @@
-import { Block, Elem } from '../../../utils/bem';
+import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import "./Agreement.styl";
 

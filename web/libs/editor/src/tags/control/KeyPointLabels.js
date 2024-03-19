@@ -1,14 +1,14 @@
-import React from 'react';
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import LabelMixin from '../../mixins/LabelMixin';
-import Registry from '../../core/Registry';
-import SelectedModelMixin from '../../mixins/SelectedModel';
-import Types from '../../core/Types';
-import { HtxLabels, LabelsModel } from './Labels/Labels';
-import { KeyPointModel } from './KeyPoint';
-import ControlBase from './Base';
+import Registry from "../../core/Registry";
+import Types from "../../core/Types";
+import LabelMixin from "../../mixins/LabelMixin";
+import SelectedModelMixin from "../../mixins/SelectedModel";
+import ControlBase from "./Base";
+import { KeyPointModel } from "./KeyPoint";
+import { HtxLabels, LabelsModel } from "./Labels/Labels";
 
 /**
  * The `KeyPointLabels` tag creates labeled keypoints. Use to apply labels to identified key points, such as identifying facial features for a facial recognition labeling project.
@@ -39,15 +39,15 @@ import ControlBase from './Base';
  */
 
 const Validation = types.model({
-  controlledTags: Types.unionTag(['Image']),
+  controlledTags: Types.unionTag(["Image"]),
 });
 
 const ModelAttrs = types
-  .model('KeyPointLabelsModel', {
-    type: 'keypointlabels',
-    children: Types.unionArray(['label', 'header', 'view', 'hypertext']),
+  .model("KeyPointLabelsModel", {
+    type: "keypointlabels",
+    children: Types.unionArray(["label", "header", "view", "hypertext"]),
   })
-  .views(self => ({
+  .views((self) => ({
     get hasStates() {
       const states = self.states();
 
@@ -62,15 +62,15 @@ const Composition = types.compose(
   KeyPointModel,
   Validation,
   LabelMixin,
-  SelectedModelMixin.props({ _child: 'LabelModel' }),
+  SelectedModelMixin.props({ _child: "LabelModel" }),
 );
 
-const KeyPointLabelsModel = types.compose('KeyPointLabelsModel', Composition);
+const KeyPointLabelsModel = types.compose("KeyPointLabelsModel", Composition);
 
 const HtxKeyPointLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
 });
 
-Registry.addTag('keypointlabels', KeyPointLabelsModel, HtxKeyPointLabels);
+Registry.addTag("keypointlabels", KeyPointLabelsModel, HtxKeyPointLabels);
 
 export { HtxKeyPointLabels, KeyPointLabelsModel };

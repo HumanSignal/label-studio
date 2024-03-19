@@ -12,7 +12,8 @@ export const initDevApp = async (DataManager) => {
 
   const dm = new DataManager({
     root: document.getElementById("app"),
-    toolbar: "actions columns filters ordering review-button label-button loading-possum error-box | refresh view-toggle",
+    toolbar:
+      "actions columns filters ordering review-button label-button loading-possum error-box | refresh view-toggle",
     apiGateway: gatewayAPI,
     apiVersion: 2,
     apiMockDisabled: useExternalSource,
@@ -45,18 +46,18 @@ export const initDevApp = async (DataManager) => {
       },
     },
     instruments: {
-      'review-button': () => {
+      "review-button": () => {
         return () => <Button style={{ width: 105 }}>Review</Button>;
       },
     },
-    type: 'dm',
+    type: "dm",
   });
 
   dm.on("lsf:groundTruth", () => {
-    console.log('lsf ground truth set');
+    console.log("lsf ground truth set");
   });
 
   dm.on("taskSelected", () => {
-    console.log('task selected');
+    console.log("task selected");
   });
 };

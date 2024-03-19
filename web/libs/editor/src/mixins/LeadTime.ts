@@ -1,10 +1,10 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
 // both approaches are valid, so code is ready for both,
 // but currently we use instant logic hardcoded
 enum LEAD_TIME_LOGIC_OPTIONS {
-  'inertial', // every action counted, minus overlaps
-  'instant', // close events are recorded from first to last with no extra time
+  inertial = 0, // every action counted, minus overlaps
+  instant = 1, // close events are recorded from first to last with no extra time
 }
 
 // stored length of interactions in ms, also works as a debounce time
@@ -37,7 +37,7 @@ const LeadTimeMixin = types
     // time of the end of the current debounce frame
     debouncedTime: 0,
   }))
-  .actions(self => ({
+  .actions((self) => ({
     _countTimeInertial() {
       const now = Date.now();
 
@@ -73,7 +73,7 @@ const LeadTimeMixin = types
       self.debouncedTime = now + LEAD_TIME_INTERACTION;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     /**
      * Calculate leadTime; call it on every interaction.
      */

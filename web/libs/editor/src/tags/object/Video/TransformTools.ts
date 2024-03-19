@@ -1,6 +1,6 @@
-import { KonvaEventObject } from 'konva/lib/Node';
-import { Box, Transformer } from 'konva/lib/shapes/Transformer';
-import { WorkingArea } from './types';
+import type { KonvaEventObject } from "konva/lib/Node";
+import type { Box, Transformer } from "konva/lib/shapes/Transformer";
+import type { WorkingArea } from "./types";
 
 // define several math function
 export const getCorner = (pivotX: number, pivotY: number, diffX: number, diffY: number, angle: number) => {
@@ -38,16 +38,18 @@ export const getClientRect = (rotatedBox: Box) => {
   };
 };
 
-export const getCommonBBox = (boxes: {
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-}[]) => {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
+export const getCommonBBox = (
+  boxes: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }[],
+) => {
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
 
   boxes.forEach((box) => {
     minX = Math.min(minX, box.x);
@@ -64,55 +66,58 @@ export const getCommonBBox = (boxes: {
   };
 };
 
-export const createBoundingBoxGetter = (workingArea: WorkingArea, enabled = true) => (oldBox: Box, newBox: Box) => {
-  if (!enabled) return newBox;
+export const createBoundingBoxGetter =
+  (workingArea: WorkingArea, enabled = true) =>
+  (oldBox: Box, newBox: Box) => {
+    if (!enabled) return newBox;
 
-  const box = getClientRect(newBox);
-  const result = { ...newBox };
+    const box = getClientRect(newBox);
+    const result = { ...newBox };
 
-  const edgeReached = [
-    box.x <= workingArea.x, // x0
-    box.y <= workingArea.y, // y0
-    box.x + box.width >= workingArea.x + workingArea.width, // x1
-    box.y + box.height >= workingArea.y + workingArea.height, // y1
-  ];
+    const edgeReached = [
+      box.x <= workingArea.x, // x0
+      box.y <= workingArea.y, // y0
+      box.x + box.width >= workingArea.x + workingArea.width, // x1
+      box.y + box.height >= workingArea.y + workingArea.height, // y1
+    ];
 
-  // If any edge is caught, stop the movement
-  if (edgeReached.some(Boolean)) {
-    return oldBox;
-  }
-
-  return result;
-};
-
-export const createOnDragMoveHandler = (workingArea: WorkingArea, enabled = true) => function(this: Transformer, e: KonvaEventObject<DragEvent>) {
-  if (!enabled) return;
-
-  const nodes = this?.nodes ? this.nodes() : [e.target];
-  const boxes = nodes.map((node) => node.getClientRect());
-  const box = getCommonBBox(boxes);
-
-  nodes.forEach((shape) => {
-    const absPos = shape.getAbsolutePosition();
-    // where are shapes inside bounding box of all shapes?
-    const offsetX = box.x - workingArea.x - absPos.x;
-    const offsetY = box.y - workingArea.y - absPos.y;
-
-    // we total box goes outside of viewport, we need to move absolute position of shape
-    const newAbsPos = { ...absPos };
-
-    if (box.x - workingArea.x < 0) {
-      newAbsPos.x = -offsetX;
+    // If any edge is caught, stop the movement
+    if (edgeReached.some(Boolean)) {
+      return oldBox;
     }
-    if (box.y - workingArea.y < 0) {
-      newAbsPos.y = -offsetY;
-    }
-    if (box.x - workingArea.x + box.width > workingArea.width) {
-      newAbsPos.x = workingArea.width - box.width - offsetX;
-    }
-    if (box.y - workingArea.y + box.height > workingArea.height) {
-      newAbsPos.y = workingArea.height - box.height - offsetY;
-    }
-    shape.setAbsolutePosition(newAbsPos);
-  });
-};
+
+    return result;
+  };
+
+export const createOnDragMoveHandler = (workingArea: WorkingArea, enabled = true) =>
+  function (this: Transformer, e: KonvaEventObject<DragEvent>) {
+    if (!enabled) return;
+
+    const nodes = this?.nodes ? this.nodes() : [e.target];
+    const boxes = nodes.map((node) => node.getClientRect());
+    const box = getCommonBBox(boxes);
+
+    nodes.forEach((shape) => {
+      const absPos = shape.getAbsolutePosition();
+      // where are shapes inside bounding box of all shapes?
+      const offsetX = box.x - workingArea.x - absPos.x;
+      const offsetY = box.y - workingArea.y - absPos.y;
+
+      // we total box goes outside of viewport, we need to move absolute position of shape
+      const newAbsPos = { ...absPos };
+
+      if (box.x - workingArea.x < 0) {
+        newAbsPos.x = -offsetX;
+      }
+      if (box.y - workingArea.y < 0) {
+        newAbsPos.y = -offsetY;
+      }
+      if (box.x - workingArea.x + box.width > workingArea.width) {
+        newAbsPos.x = workingArea.width - box.width - offsetX;
+      }
+      if (box.y - workingArea.y + box.height > workingArea.height) {
+        newAbsPos.y = workingArea.height - box.height - offsetY;
+      }
+      shape.setAbsolutePosition(newAbsPos);
+    });
+  };

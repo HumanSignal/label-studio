@@ -5,7 +5,7 @@ export function cutFibers(object) {
   while ((obj = objects.pop())) {
     const keys = Object.keys(obj);
     const descriptors = Object.getOwnPropertyDescriptors(obj);
-    const isSvg = obj.elementType === 'svg';
+    const isSvg = obj.elementType === "svg";
 
     // preventing processing svgs due to the problem with props,
     // props sometimes come from the global variables, so it's tricky to clean them without breaking icons itself
@@ -16,10 +16,10 @@ export function cutFibers(object) {
       const isWritable = descriptors[key].writable;
 
       if (prop && isWritable) {
-        if (key !== '_debugOwner' && typeof prop === 'object' && {}.hasOwnProperty.call(prop, 'stateNode')) {
+        if (key !== "_debugOwner" && typeof prop === "object" && {}.hasOwnProperty.call(prop, "stateNode")) {
           objects.push(obj[key]);
         }
-        if (typeof prop === 'object' || typeof prop === 'function') {
+        if (typeof prop === "object" || typeof prop === "function") {
           obj[key] = null;
         }
       }
@@ -37,7 +37,7 @@ export function findReactKey(node) {
       return match[1];
     }
   }
-  return '';
+  return "";
 }
 
 export function cleanDomAfterReact(nodes, reactKey) {
@@ -45,8 +45,12 @@ export function cleanDomAfterReact(nodes, reactKey) {
     if (node.isConnected) return;
     // preventing processing svgs due to the problem with props,
     // props sometimes come from the global variables, so it's tricky to clean them without breaking icons itself
-    if (node.tagName === 'svg') return;
-    const reactPropKeys = (Object.keys(node)).filter(key => key.startsWith('__react') && (!RegExp(/^(?:__reactProps|__reactFiber)/).exec(key) || RegExp(new RegExp(`\\${reactKey}$`)).exec(key)));
+    if (node.tagName === "svg") return;
+    const reactPropKeys = Object.keys(node).filter(
+      (key) =>
+        key.startsWith("__react") &&
+        (!RegExp(/^(?:__reactProps|__reactFiber)/).exec(key) || RegExp(new RegExp(`\\${reactKey}$`)).exec(key)),
+    );
 
     if (reactPropKeys.length) {
       for (const key of reactPropKeys) {
@@ -82,7 +86,7 @@ function createCleaner() {
   };
 }
 
-export function reactCleaner(object, key = 'default') {
+export function reactCleaner(object, key = "default") {
   if (!globalCache.has(object)) {
     globalCache.set(object, new Map());
   }

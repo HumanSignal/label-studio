@@ -1,8 +1,8 @@
 const { I } = inject();
-const Helpers = require('../tests/helpers');
+const Helpers = require("../tests/helpers");
 
 module.exports = {
-  _rootSelector: '.lsf-htx-richtext',
+  _rootSelector: ".lsf-htx-richtext",
   selectTextByGlobalOffset(startOffset, endOffset) {
     I.executeScript(Helpers.selectText, {
       selector: this._rootSelector,
@@ -28,6 +28,6 @@ module.exports = {
     return locate(this._rootSelector);
   },
   locateText(locator) {
-    return locate(this.locate(locator).toXPath() + '//text()');
+    return locate(`${this.locate(locator).toXPath()}//text()`);
   },
 };

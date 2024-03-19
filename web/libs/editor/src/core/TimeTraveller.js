@@ -1,13 +1,13 @@
-import { applySnapshot, getEnv, getSnapshot, onSnapshot, resolvePath, types } from 'mobx-state-tree';
-import { FF_DEV_1284, isFF } from '../utils/feature-flags';
+import { applySnapshot, getEnv, getSnapshot, onSnapshot, resolvePath, types } from "mobx-state-tree";
+import { FF_DEV_1284, isFF } from "../utils/feature-flags";
 
 /**
  * Time Traveller
  */
 const TimeTraveller = types
-  .model('TimeTraveller', {
+  .model("TimeTraveller", {
     undoIdx: 0,
-    targetPath: '',
+    targetPath: "",
     skipNextUndoState: types.optional(types.boolean, false),
     lastAdditionTime: types.optional(types.Date, new Date()),
     createdIdx: 0,
@@ -16,7 +16,7 @@ const TimeTraveller = types
     history: [],
     isFrozen: false,
   }))
-  .views(self => ({
+  .views((self) => ({
     get canUndo() {
       return self.undoIdx > 0;
     },
@@ -27,7 +27,7 @@ const TimeTraveller = types
       return self.history.length > 1;
     },
   }))
-  .actions(self => {
+  .actions((self) => {
     let targetStore;
     let snapshotDisposer;
     const updateHandlers = new Set();
@@ -37,7 +37,7 @@ const TimeTraveller = types
     let replaceNextUndoState = false;
 
     function triggerHandlers(force = true) {
-      updateHandlers.forEach(handler => handler(force));
+      updateHandlers.forEach((handler) => handler(force));
     }
 
     return {
@@ -117,10 +117,10 @@ const TimeTraveller = types
 
         if (!targetStore)
           throw new Error(
-            'Failed to find target store for TimeTraveller. Please provide `targetPath` property, or a `targetStore` in the environment',
+            "Failed to find target store for TimeTraveller. Please provide `targetPath` property, or a `targetStore` in the environment",
           );
         // start listening to changes
-        snapshotDisposer = onSnapshot(targetStore, snapshot => this.addUndoState(snapshot));
+        snapshotDisposer = onSnapshot(targetStore, (snapshot) => this.addUndoState(snapshot));
         // record an initial state if no known
         if (self.history.length === 0) {
           self.recordNow();

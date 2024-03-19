@@ -1,15 +1,14 @@
 import { observer } from "mobx-react";
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaCode } from "react-icons/fa";
 import { RiCodeLine } from "react-icons/ri";
+import { LsGear, LsGearNewUI } from "../../../assets/icons";
 import { useSDK } from "../../../providers/SDKProvider";
+import { Block, Elem } from "../../../utils/bem";
+import { FF_DEV_3873, FF_LOPS_E_3, FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
 import { isDefined } from "../../../utils/utils";
 import { Button } from "../Button/Button";
+import { FieldsButton } from "../FieldsButton";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
 import { Tooltip } from "../Tooltip/Tooltip";
@@ -19,10 +18,6 @@ import { TableBlock, TableContext, TableElem } from "./TableContext";
 import { TableHead } from "./TableHead/TableHead";
 import { TableRow } from "./TableRow/TableRow";
 import { prepareColumns } from "./utils";
-import { Block, Elem } from "../../../utils/bem";
-import { FieldsButton } from "../FieldsButton";
-import { LsGear, LsGearNewUI } from "../../../assets/icons";
-import { FF_DEV_3873, FF_LOPS_E_10, FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 
 const Decorator = (decoration) => {
   return {
@@ -42,15 +37,7 @@ const Decorator = (decoration) => {
   };
 };
 
-const RowRenderer = observer(({
-  row,
-  index,
-  stopInteractions,
-  rowHeight,
-  fitContent,
-  onRowClick,
-  decoration,
-}) => {
+const RowRenderer = observer(({ row, index, stopInteractions, rowHeight, fitContent, onRowClick, decoration }) => {
   const isEven = index % 2 === 0;
   const mods = {
     even: isEven,
@@ -61,12 +48,7 @@ const RowRenderer = observer(({
   };
 
   return (
-    <TableElem
-      key={`${row.id}-${index}`}
-      name="row-wrapper"
-      mod={mods}
-      onClick={(e) => onRowClick?.(row, e)}
-    >
+    <TableElem key={`${row.id}-${index}`} name="row-wrapper" mod={mods} onClick={(e) => onRowClick?.(row, e)}>
       <TableRow
         key={row.id}
         data={row}
@@ -106,7 +88,7 @@ export const Table = observer(
     headerExtra,
     ...props
   }) => {
-    const colOrderKey = 'dm:columnorder';
+    const colOrderKey = "dm:columnorder";
     const tableHead = useRef();
     const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const columns = prepareColumns(props.columns, props.hiddenColumns);
@@ -129,21 +111,11 @@ export const Table = observer(
         },
         onClick: (e) => e.stopPropagation(),
         Header: () => {
-          return (
-            <SelectionObserver
-              selection={selectedItems}
-              onSelect={props.onSelectAll}
-              className="select-all"
-            />
-          );
+          return <SelectionObserver selection={selectedItems} onSelect={props.onSelectAll} className="select-all" />;
         },
         Cell: ({ data }) => {
           return (
-            <SelectionObserver
-              id={data.id}
-              selection={selectedItems}
-              onSelect={() => props.onSelectRow(data.id)}
-            />
+            <SelectionObserver id={data.id} selection={selectedItems} onSelect={() => props.onSelectRow(data.id)} />
           );
         },
       });
@@ -173,7 +145,7 @@ export const Table = observer(
 
         const onTaskLoad = async () => {
           if (isFF(FF_LOPS_E_3) && type === "DE") {
-            return new Promise(resolve => resolve(out));
+            return new Promise((resolve) => resolve(out));
           }
           const response = await api.task({ taskID: out.id });
 
@@ -192,7 +164,13 @@ export const Table = observer(
                   body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
                 });
               }}
-              icon={isFF(FF_LOPS_E_10) ? <Icon icon={RiCodeLine} style={{ width: 24, height: 24 }}/> : <Icon icon={FaCode}/>}
+              icon={
+                isFF(FF_LOPS_E_10) ? (
+                  <Icon icon={RiCodeLine} style={{ width: 24, height: 24 }} />
+                ) : (
+                  <Icon icon={FaCode} />
+                )
+              }
             />
           </Tooltip>
         );
@@ -200,7 +178,7 @@ export const Table = observer(
     });
 
     if (Object.keys(colOrder).length > 0) {
-      columns.sort( (a, b) => {
+      columns.sort((a, b) => {
         return colOrder[a.id] < colOrder[b.id] ? -1 : 1;
       });
     }
@@ -213,11 +191,11 @@ export const Table = observer(
 
     const tableWrapper = useRef();
 
-    useEffect(() => {    
+    useEffect(() => {
       const highlightedIndex = data.indexOf(focusedItem) - 1;
       const highlightedElement = tableWrapper.current?.children[highlightedIndex];
 
-      if (highlightedElement) highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (highlightedElement) highlightedElement.scrollIntoView({ behavior: "smooth", block: "center" });
     }, [tableWrapper.current]);
 
     return (
@@ -228,13 +206,13 @@ export const Table = observer(
               <Elem
                 name="button-new"
                 tag={FieldsButton}
-                className={'newUi'}
+                className={"newUi"}
                 icon={<LsGearNewUI />}
-                tooltip={'Customize Columns'}
+                tooltip={"Customize Columns"}
                 style={{ padding: 0 }}
                 wrapper={FieldsButton.Checkbox}
               />
-            ):(
+            ) : (
               <Elem
                 name="button"
                 tag={FieldsButton}
@@ -245,11 +223,7 @@ export const Table = observer(
             )}
           </Block>
         )}
-        <TableBlock
-          ref={tableWrapper}
-          name="table"
-          mod={{ fit: props.fitToContent }}
-        >
+        <TableBlock ref={tableWrapper} name="table" mod={{ fit: props.fitToContent }}>
           <TableContext.Provider value={contextValue}>
             <TableHead
               ref={tableHead}
@@ -268,7 +242,8 @@ export const Table = observer(
             {data.map((row, index) => {
               return (
                 <RowRenderer
-                  key={`${row.id}-${index}`}l
+                  key={`${row.id}-${index}`}
+                  l
                   row={row}
                   index={index}
                   onRowClick={props.onRowClick}
@@ -297,14 +272,12 @@ const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
       };
 
       if (sdkType !== "DE") {
-        formatted.annotations =  response.annotations ?? [];
-        formatted.predictions =  response.predictions ?? [];
+        formatted.annotations = response.annotations ?? [];
+        formatted.predictions = response.predictions ?? [];
       }
       setSource(formatted);
     });
   }, []);
 
-  return (
-    <pre>{source ? JSON.stringify(source, null, "  ") : null}</pre>
-  );
+  return <pre>{source ? JSON.stringify(source, null, "  ") : null}</pre>;
 };

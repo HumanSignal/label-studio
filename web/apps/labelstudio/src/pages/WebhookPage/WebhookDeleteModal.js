@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import { Button } from "../../components";
 import { Elem } from "../../components/Menu/MenuContext";
@@ -8,41 +8,45 @@ import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
 import { Block, cn } from "../../utils/bem";
 
-
-
-export const WebhookDeleteModal = ({onDelete}) => {
+export const WebhookDeleteModal = ({ onDelete }) => {
   return modal({
     title: "Delete",
-    body: ()=>{
+    body: () => {
       const ctrl = useModalControls();
-      const rootClass = cn('webhook-delete-modal');
-      return (<div className={rootClass}>
-        <div className={rootClass.elem('modal-text')}>
-              Are you sure you want to delete the webhook? This action
-              cannot be undone.  
+      const rootClass = cn("webhook-delete-modal");
+      return (
+        <div className={rootClass}>
+          <div className={rootClass.elem("modal-text")}>
+            Are you sure you want to delete the webhook? This action cannot be undone.
+          </div>
         </div>
-
-      </div>);},
-    footer: ()=>{
+      );
+    },
+    footer: () => {
       const ctrl = useModalControls();
-      const rootClass = cn('webhook-delete-modal');
-      return <Space align="end">
-        <Button 
-          className={rootClass.elem('width-button')} 
-          onClick={()=>{ctrl.hide();}}>
-                Cancel
-        </Button>
-        <Button 
-          look="destructive"
-          className={rootClass.elem('width-button')}
-          onClick={
-            async ()=>{
+      const rootClass = cn("webhook-delete-modal");
+      return (
+        <Space align="end">
+          <Button
+            className={rootClass.elem("width-button")}
+            onClick={() => {
+              ctrl.hide();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            look="destructive"
+            className={rootClass.elem("width-button")}
+            onClick={async () => {
               await onDelete();
               ctrl.hide();
-            }
-          }
-        >Delete</Button>
-      </Space>;
+            }}
+          >
+            Delete
+          </Button>
+        </Space>
+      );
     },
     style: { width: 512 },
   });

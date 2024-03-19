@@ -21,7 +21,7 @@ export const getProperty = (object, path) => {
 };
 
 const resolveStyle = (col, decoration, cellView) => {
-  let result = {};
+  const result = {};
 
   [cellView, decoration].forEach((item) => {
     const cellStyle = (item ?? {}).style;

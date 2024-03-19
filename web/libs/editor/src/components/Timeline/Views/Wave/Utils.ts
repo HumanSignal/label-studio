@@ -14,8 +14,8 @@
  */
 export const formatTimeCallback = (seconds: number, pxPerSec: number) => {
   const timeDate = new Date(seconds * 1000).toISOString();
-  const startIndex = (pxPerSec >= 25 * 10) ? 14 : (seconds >= 3600 ? 11 : 14);
-  const endIndex = (pxPerSec >= 25 * 10) ? 23 : 19;
+  const startIndex = pxPerSec >= 25 * 10 ? 14 : seconds >= 3600 ? 11 : 14;
+  const endIndex = pxPerSec >= 25 * 10 ? 23 : 19;
   const formatted = timeDate.substring(startIndex, endIndex);
 
   return formatted;

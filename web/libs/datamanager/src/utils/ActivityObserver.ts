@@ -15,5 +15,5 @@ export class ActivityObserver {
 
   private handler = () => {
     this.active = window.navigator.onLine && !document.hidden;
-  }
+  };
 }

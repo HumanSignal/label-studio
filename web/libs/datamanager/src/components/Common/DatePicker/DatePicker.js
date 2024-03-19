@@ -41,9 +41,7 @@ export const DatePicker = ({
     return "";
   };
 
-  const [initialStartDate, initialEndDate] = selectRange
-    ? value
-    : [].concat(value);
+  const [initialStartDate, initialEndDate] = selectRange ? value : [].concat(value);
 
   const [realStartDate, setRealStartDate] = useState(initialStartDate ?? null);
   const [realEndDate, setRealEndDate] = useState(initialEndDate ?? null);
@@ -67,9 +65,9 @@ export const DatePicker = ({
     () =>
       selectRange
         ? {
-          startDate: realStartDate,
-          endDate: realEndDate,
-        }
+            startDate: realStartDate,
+            endDate: realEndDate,
+          }
         : {},
     [selectRange, realStartDate, realEndDate],
   );
@@ -109,7 +107,7 @@ export const DatePicker = ({
       <Dropdown.Trigger
         ref={dropdownRef}
         toggle={false}
-        content={(
+        content={
           <DP
             {...dateRange}
             ref={datepickerRef}
@@ -121,15 +119,13 @@ export const DatePicker = ({
             showTimeSelect={showTime}
             inline
           />
-        )}
+        }
       >
         <Elem name="output" mod={{ range: selectRange }}>
           <Input
             size={size}
             value={startDate || ""}
-            onChange={(e) =>
-              updateDate(e.target.value, setStartDate, setRealStartDate)
-            }
+            onChange={(e) => updateDate(e.target.value, setStartDate, setRealStartDate)}
           />
           {selectRange && (
             <>
@@ -139,9 +135,7 @@ export const DatePicker = ({
               <Input
                 size={size}
                 value={endDate || ""}
-                onChange={(e) =>
-                  updateDate(e.target.value, setEndDate, setRealEndDate)
-                }
+                onChange={(e) => updateDate(e.target.value, setEndDate, setRealEndDate)}
               />
             </>
           )}

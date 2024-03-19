@@ -1,7 +1,6 @@
-type Callback = (...args: any[]) => any
+type Callback = (...args: any[]) => any;
 
 export class EventInvoker {
-
   events = new Map<string, Set<Callback>>();
 
   on(eventName: string, callback: Callback) {
@@ -30,7 +29,7 @@ export class EventInvoker {
     const eventMap = this.getEventMap(eventName);
 
     if (eventMap.size > 0) {
-      return Promise.all([...eventMap].map(fn => fn(...args)));
+      return Promise.all([...eventMap].map((fn) => fn(...args)));
     }
   }
 

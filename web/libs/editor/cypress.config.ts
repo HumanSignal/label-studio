@@ -1,4 +1,3 @@
-import configure from '@humansignal/frontend-test/configure';
-
+import configure from "@humansignal/frontend-test/configure";
 
 export default configure();

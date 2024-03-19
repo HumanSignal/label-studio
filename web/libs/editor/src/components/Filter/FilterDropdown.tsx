@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Select } from '../../common/Select/Select';
+import React, { type FC } from "react";
+import { Select } from "../../common/Select/Select";
 
 interface FilterDropdownInterface {
   items: any[];
@@ -7,22 +7,17 @@ interface FilterDropdownInterface {
   value?: string | string[] | undefined;
   placeholder?: string;
   defaultValue?: string | string[] | undefined;
-  optionRender?:any;
+  optionRender?: any;
   dataTestid?: string;
-  style?:any;
+  style?: any;
 }
 
-const renderOptions = (item: any, index:number) => {
+const renderOptions = (item: any, index: number) => {
   const value = item.key ?? item.label;
   const key = index;
 
   return (
-    <Select.Option
-      key={`${key}`}
-      value={value}
-      style={{ fontSize: 12 }}
-      title={value}
-    >
+    <Select.Option key={`${key}`} value={value} style={{ fontSize: 12 }} title={value}>
       {item.label}
     </Select.Option>
   );
@@ -35,8 +30,8 @@ export const FilterDropdown: FC<FilterDropdownInterface> = ({
   style,
   dataTestid,
   value,
-  onChange }) => {
-
+  onChange,
+}) => {
   return (
     <Select
       placeholder={placeholder}
@@ -45,12 +40,12 @@ export const FilterDropdown: FC<FilterDropdownInterface> = ({
       value={value}
       style={{
         fontSize: 12,
-        width: '100%',
-        backgroundColor: '#fafafa',
+        width: "100%",
+        backgroundColor: "#fafafa",
         ...(style ?? {}),
       }}
       onChange={(value) => onChange(value)}
-      size='small'
+      size="small"
     >
       {items.map(renderOptions)}
     </Select>

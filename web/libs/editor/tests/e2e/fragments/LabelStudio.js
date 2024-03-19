@@ -1,5 +1,5 @@
 const { I } = inject();
-const Helpers = require('../tests/helpers');
+const Helpers = require("../tests/helpers");
 
 module.exports = {
   init({ events = {}, ...params }) {
@@ -38,22 +38,24 @@ module.exports = {
   },
 
   async resultsNotChanged(result, fractionDigits = 2) {
-    const serialized = (await this.serialize());
+    const serialized = await this.serialize();
 
-    I.assertDeepEqualWithTolerance(result, serialized, fractionDigits, 'Results must be equal');
+    I.assertDeepEqualWithTolerance(result, serialized, fractionDigits, "Results must be equal");
   },
 
   async resultsChanged(result, fractionDigits = 2) {
-    const serialized = (await this.serialize());
+    const serialized = await this.serialize();
 
-    I.assertNotDeepEqualWithTolerance(result, serialized, fractionDigits, 'Results must be different');
+    I.assertNotDeepEqualWithTolerance(result, serialized, fractionDigits, "Results must be different");
   },
 
   async grabUserLabels() {
     const userLabels = await I.executeScript(() => {
-      return Object.fromEntries(Object.entries(window.Htx.userLabels?.controls).map(([control, labels]) => {
-        return [control, labels.map(label => label.path)];
-      }));
+      return Object.fromEntries(
+        Object.entries(window.Htx.userLabels?.controls).map(([control, labels]) => {
+          return [control, labels.map((label) => label.path)];
+        }),
+      );
     });
 
     return userLabels;
@@ -66,24 +68,24 @@ module.exports = {
   },
 
   enableSetting(settingName) {
-    I.say('Attempting to open settings menu'); 
-    I.click('[aria-label=Settings]');
-    I.see('Settings');
-    I.say('Attempt to enable setting');
+    I.say("Attempting to open settings menu");
+    I.click("[aria-label=Settings]");
+    I.see("Settings");
+    I.say("Attempt to enable setting");
     I.click(settingName);
     I.seeCheckboxIsChecked(settingName);
-    I.click('[aria-label=Close]');
-    I.dontSee('Settings');
+    I.click("[aria-label=Close]");
+    I.dontSee("Settings");
   },
 
   disableSetting(settingName) {
-    I.say('Attempting to open settings menu'); 
-    I.click('[aria-label=Settings]');
-    I.see('Settings');
-    I.say('Attempt to disable setting');
+    I.say("Attempting to open settings menu");
+    I.click("[aria-label=Settings]");
+    I.see("Settings");
+    I.say("Attempt to disable setting");
     I.click(settingName);
     I.seeCheckboxIsChecked(settingName);
-    I.click('[aria-label=Close]');
-    I.dontSee('Settings');
+    I.click("[aria-label=Close]");
+    I.dontSee("Settings");
   },
 };

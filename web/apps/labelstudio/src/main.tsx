@@ -1,2 +1,2 @@
-import './app/App';
-import './utils/service-worker';
+import "./app/App";
+import "./utils/service-worker";

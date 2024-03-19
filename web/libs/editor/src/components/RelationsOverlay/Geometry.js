@@ -14,7 +14,7 @@
  * y3: number,
  * y4: number}} RectCoordinates Represents 4 corners coordinates of rectangle
  */
-import { clamp } from '../../utils/utilities';
+import { clamp } from "../../utils/utilities";
 
 export class Geometry {
   /**
@@ -100,7 +100,7 @@ export class Geometry {
       .reduce((res, rect1) => {
         const bbox1 = this.toRectCoordinates(rect1);
 
-        rectsList2.forEach(rect2 => {
+        rectsList2.forEach((rect2) => {
           const bbox2 = this.toRectCoordinates(rect2);
 
           const avgDistance =
@@ -140,7 +140,7 @@ export class Geometry {
     };
   }
 
-  static modifyBBoxCoords(bbox, modifier = x => x) {
+  static modifyBBoxCoords(bbox, modifier = (x) => x) {
     const p1 = modifier([bbox.x, bbox.y]);
     const p2 = modifier([bbox.width + bbox.x, bbox.height + bbox.y]);
 
@@ -189,7 +189,7 @@ export class Geometry {
       const t = Math.atan(((-minor / 2) * Math.tan(angleRad)) / (major / 2));
 
       return [t, t + Math.PI]
-        .map(t => {
+        .map((t) => {
           return x + (major / 2) * Math.cos(t) * Math.cos(angleRad) - (minor / 2) * Math.sin(t) * Math.sin(angleRad);
         })
         .sort((a, b) => b - a);
@@ -199,7 +199,7 @@ export class Geometry {
       const t = Math.atan(((minor / 2) * 1.0) / Math.tan(angleRad) / (major / 2));
 
       return [t, t + Math.PI]
-        .map(t => {
+        .map((t) => {
           return y + (minor / 2) * Math.sin(t) * Math.cos(angleRad) + (major / 2) * Math.cos(t) * Math.sin(angleRad);
         })
         .sort((a, b) => b - a);
@@ -288,7 +288,9 @@ export class Geometry {
         }
       }
     }
-    return min.x <= max.x && min.y <= max.y ? { x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y } : null;
+    return min.x <= max.x && min.y <= max.y
+      ? { x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y }
+      : null;
   }
   /**
    * Combine two or more BBoxes into one
@@ -336,7 +338,7 @@ export class Geometry {
 
     if (bboxes.length === 0) return null;
 
-    const convertDOMRect = domRect => ({
+    const convertDOMRect = (domRect) => ({
       x: domRect.x,
       y: domRect.y,
       width: domRect.width,

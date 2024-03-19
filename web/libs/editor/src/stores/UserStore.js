@@ -1,8 +1,8 @@
-import { types } from 'mobx-state-tree';
-import { camelizeKeys } from '../utils/utilities';
+import { types } from "mobx-state-tree";
+import { camelizeKeys } from "../utils/utilities";
 
 export const UserExtended = types
-  .model('UserExtended', {
+  .model("UserExtended", {
     id: types.identifierNumber,
     firstName: types.maybeNull(types.string),
     lastName: types.maybeNull(types.string),
@@ -17,12 +17,11 @@ export const UserExtended = types
     return camelizeKeys(sn ?? {});
   });
 
-
 /**
  * User store of Label Studio
  */
 const UserStore = types
-  .model('UserStore', {
+  .model("UserStore", {
     /**
      * Personal key of user
      */
@@ -40,11 +39,11 @@ const UserStore = types
      */
     lastName: types.maybeNull(types.string),
   })
-  .views(self => ({
+  .views((self) => ({
     get displayName() {
       if (self.firstName || self.lastName) return `${self.firstName} ${self.lastName}`;
 
-      return '';
+      return "";
     },
   }));
 

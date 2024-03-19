@@ -1,13 +1,12 @@
-import { FC } from 'react';
-import { Button, ButtonProps } from '../../../common/Button/Button';
+import type { FC } from "react";
+import { Button, type ButtonProps } from "../../../common/Button/Button";
 
 export const RegionControlButton: FC<ButtonProps> = ({ children, onClick, ...props }) => {
   return (
     <Button
       {...props}
       onClick={(e) => {
-        e.stopPropagation(),
-        onClick?.(e);
+        e.stopPropagation(), onClick?.(e);
       }}
       type="text"
       style={{ padding: 0, width: 24, height: 24, ...(props.style ?? {}) }}

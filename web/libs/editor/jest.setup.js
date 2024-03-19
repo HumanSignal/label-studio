@@ -1,38 +1,32 @@
-require('jest-fetch-mock').enableMocks();
+require("jest-fetch-mock").enableMocks();
 
 // Mock HTMLMediaElement data and methods not implemented by jsdom.
 window.HTMLMediaElement.prototype._mock = {
   paused: true,
-  duration: NaN,
+  duration: Number.NaN,
   _loaded: false,
   // Emulates the media file loading
   _load: function mediaInit(media) {
-    media.dispatchEvent(new Event('loadedmetadata'));
-    media.dispatchEvent(new Event('loadeddata'));
-    media.dispatchEvent(new Event('canplaythrough'));
+    media.dispatchEvent(new Event("loadedmetadata"));
+    media.dispatchEvent(new Event("loadeddata"));
+    media.dispatchEvent(new Event("canplaythrough"));
   },
   // Reset to the initial state
   _resetMock: function resetMock(media) {
-    media._mock = Object.assign(
-      {},
-      window.HTMLMediaElement.prototype._mock,
-    );
+    media._mock = Object.assign({}, window.HTMLMediaElement.prototype._mock);
   },
-  _supportsTypes: [
-    'video/mp4', 'video/webm', 'video/ogg',
-    'audio/mp3', 'audio/webm', 'audio/ogg', 'audio/wav',
-  ],
+  _supportsTypes: ["video/mp4", "video/webm", "video/ogg", "audio/mp3", "audio/webm", "audio/ogg", "audio/wav"],
 };
 
 // Get "paused" value, it is automatically set to true / false when we play / pause the media.
-Object.defineProperty(window.HTMLMediaElement.prototype, 'paused', {
+Object.defineProperty(window.HTMLMediaElement.prototype, "paused", {
   get() {
     return this._mock.paused;
   },
 });
 
 // Get and set media duration
-Object.defineProperty(window.HTMLMediaElement.prototype, 'duration', {
+Object.defineProperty(window.HTMLMediaElement.prototype, "duration", {
   get() {
     return this._mock.duration;
   },
@@ -49,7 +43,7 @@ window.HTMLMediaElement.prototype.load = function loadMock() {
     // emulate the media file load and metadata initialization
     this._mock._load(this);
   }
-  this.dispatchEvent(new Event('load'));
+  this.dispatchEvent(new Event("load"));
 };
 
 // Start the playback.
@@ -59,16 +53,16 @@ window.HTMLMediaElement.prototype.play = function playMock() {
     this._mock._load(this);
   }
   this._mock.paused = false;
-  this.dispatchEvent(new Event('play'));
+  this.dispatchEvent(new Event("play"));
 };
 
 // Pause the playback
 window.HTMLMediaElement.prototype.pause = function pauseMock() {
   this._mock.paused = true;
-  this.dispatchEvent(new Event('pause'));
+  this.dispatchEvent(new Event("pause"));
 };
 
 // Can play the media file
 window.HTMLMediaElement.prototype.canPlayType = function canPlayTypeMock(type) {
-  return this._mock._supportsTypes.includes(type) ? 'maybe' : '';
+  return this._mock._supportsTypes.includes(type) ? "maybe" : "";
 };

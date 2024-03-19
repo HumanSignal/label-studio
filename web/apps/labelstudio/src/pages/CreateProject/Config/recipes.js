@@ -13,7 +13,7 @@ export const recipes = [
     <Label value="Airplane" background="green"/>
     <Label value="Car" background="blue"/>
   </RectangleLabels>
-</View>`
+</View>`,
   },
   {
     title: "Polygon labeling",
@@ -54,6 +54,6 @@ export const recipes = [
   </Labels>
 
   <Text name="text" value="$text"/>
-</View>`
-  }
+</View>`,
+  },
 ];

@@ -1,20 +1,12 @@
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Block, Elem } from '../../utils/bem';
-import { Tooltip } from '../Tooltip/Tooltip';
-import './Userpic.styl';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Block, Elem } from "../../utils/bem";
+import { Tooltip } from "../Tooltip/Tooltip";
+import "./Userpic.styl";
 
-const FALLBACK_IMAGE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+const FALLBACK_IMAGE =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-export const Userpic = forwardRef(({
-  username,
-  size,
-  src,
-  user,
-  className,
-  showUsername,
-  style,
-  ...rest
-}, ref) => {
+export const Userpic = forwardRef(({ username, size, src, user, className, showUsername, style, ...rest }, ref) => {
   const imgRef = useRef();
   const [finalUsername, setFinalUsername] = useState(username);
   const [finalSrc, setFinalSrc] = useState(user?.avatar ?? src);
@@ -27,7 +19,7 @@ export const Userpic = forwardRef(({
 
   useEffect(() => {
     if (user) {
-      const {first_name, last_name, email, initials, username} = user;
+      const { first_name, last_name, email, initials, username } = user;
 
       if (initials) {
         setFinalUsername(initials);
@@ -59,9 +51,9 @@ export const Userpic = forwardRef(({
         ref={imgRef}
         src={finalSrc}
         alt={(finalUsername ?? "").toUpperCase()}
-        style={{opacity: imgVisible ? 1 : 0}}
+        style={{ opacity: imgVisible ? 1 : 0 }}
         onLoad={onImageLoaded}
-        onError={() => setFinalSrc(FALLBACK_IMAGE) }
+        onError={() => setFinalSrc(FALLBACK_IMAGE)}
       />
       {nameVisible && (
         <Elem tag="span" name="username">
@@ -73,7 +65,7 @@ export const Userpic = forwardRef(({
 
   const userFullName = useMemo(() => {
     if (user?.first_name || user?.last_name) {
-      return `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim();
+      return `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
     } else if (user?.email) {
       return user.email;
     } else {
@@ -81,10 +73,6 @@ export const Userpic = forwardRef(({
     }
   }, [user, username]);
 
-  return (showUsername && userFullName) ? (
-    <Tooltip title={userFullName}>
-      {userpic}
-    </Tooltip>
-  ) : userpic;
+  return showUsername && userFullName ? <Tooltip title={userFullName}>{userpic}</Tooltip> : userpic;
 });
-Userpic.displayName = 'Userpic';
+Userpic.displayName = "Userpic";

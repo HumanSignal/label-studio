@@ -1,17 +1,14 @@
-import type { StorybookConfig } from '@storybook/react-vite';
+import type { StorybookConfig } from "@storybook/react-vite";
 
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
-import { mergeConfig } from 'vite';
-import svgr from 'vite-plugin-svgr';
+import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
+import { mergeConfig } from "vite";
+import svgr from "vite-plugin-svgr";
 
 const config: StorybookConfig = {
-  stories: [
-    '../src/lib/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-    '../src/stories/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-  ],
-  addons: ['@storybook/addon-essentials', '@storybook/addon-interactions'],
+  stories: ["../src/lib/**/*.stories.@(js|jsx|ts|tsx|mdx)", "../src/stories/**/*.stories.@(js|jsx|ts|tsx|mdx)"],
+  addons: ["@storybook/addon-essentials", "@storybook/addon-interactions"],
   framework: {
-    name: '@storybook/react-vite',
+    name: "@storybook/react-vite",
     options: {},
   },
 
@@ -21,7 +18,7 @@ const config: StorybookConfig = {
         nxViteTsPaths(),
         svgr({
           esbuildOptions: {},
-          svgrOptions: { plugins: ['@svgr/plugin-jsx'], ref: true },
+          svgrOptions: { plugins: ["@svgr/plugin-jsx"], ref: true },
         }),
       ],
     }),

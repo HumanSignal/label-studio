@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
 /**
  * @todo rework this into MetaMixin for all the meta data
@@ -19,7 +19,7 @@ const NormalizationMixin = types
       normInput: sn.meta?.text?.[0] ?? null,
     };
   })
-  .actions(self => ({
+  .actions((self) => ({
     setMetaValue(key: string, value: any) {
       self.meta = { ...self.meta, [key]: value };
     },
@@ -43,12 +43,12 @@ const NormalizationMixin = types
       self.normInput = val;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     /**
      * Delete meta text
      */
     deleteMetaText() {
-      self.setMetaText('');
+      self.setMetaText("");
     },
   }));
 

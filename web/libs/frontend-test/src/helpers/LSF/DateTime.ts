@@ -1,11 +1,9 @@
-
-
 class DateTimeHelper {
   private get _baseRootSelector() {
-    return '.htx-datetime';
+    return ".htx-datetime";
   }
 
-  private _rootSelector: string
+  private _rootSelector: string;
 
   constructor(rootSelector) {
     this._rootSelector = rootSelector.replace(/^\&/, this._baseRootSelector);
@@ -16,13 +14,11 @@ class DateTimeHelper {
   }
 
   get dateInput() {
-    return this.root
-      .find('[type="date"]');
+    return this.root.find('[type="date"]');
   }
 
   get timeInput() {
-    return this.root
-      .find('[type="time"]');
+    return this.root.find('[type="time"]');
   }
 
   private _dateRegExp = /^\d{4}-\d{2}-\d{2}$/;
@@ -34,13 +30,9 @@ class DateTimeHelper {
   type(datetime: string) {
     const parts = datetime
       .split(/[^\d\-:]/)
-      .filter(value =>
-        value.match(this._dateRegExp) ||
-        value.match(this._timeRegExp),
-      );
+      .filter((value) => value.match(this._dateRegExp) || value.match(this._timeRegExp));
 
-    cy.wrap(parts)
-      .should('have.lengthOf.at.least', 1);
+    cy.wrap(parts).should("have.lengthOf.at.least", 1);
 
     for (const value of parts) {
       if (value.match(this._dateRegExp)) {
@@ -58,31 +50,24 @@ class DateTimeHelper {
   hasValue(datetime: string) {
     const parts = datetime
       .split(/[^\d\-:]/)
-      .filter(value =>
-        value.match(this._dateRegExp) ||
-         value.match(this._timeRegExp),
-      );
+      .filter((value) => value.match(this._dateRegExp) || value.match(this._timeRegExp));
 
-    cy.wrap(parts)
-      .should('have.lengthOf.at.least', 1);
+    cy.wrap(parts).should("have.lengthOf.at.least", 1);
 
     for (const value of parts) {
       if (value.match(this._dateRegExp)) {
-        this.dateInput.should('have.value', value);
+        this.dateInput.should("have.value", value);
       }
       if (value.match(this._timeRegExp)) {
-        this.timeInput.should('have.value', value);
+        this.timeInput.should("have.value", value);
       }
     }
   }
 }
 
-const DateTime = new DateTimeHelper('&:eq(0)');
+const DateTime = new DateTimeHelper("&:eq(0)");
 const useDateTime = (rootSelector: string) => {
   return new DateTimeHelper(rootSelector);
 };
 
-export {
-  DateTime,
-  useDateTime
-};
+export { DateTime, useDateTime };

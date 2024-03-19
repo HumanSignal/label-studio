@@ -1,5 +1,5 @@
-import { isAlive, types } from 'mobx-state-tree';
-import { ImageEntity } from './ImageEntity';
+import { isAlive, types } from "mobx-state-tree";
+import { ImageEntity } from "./ImageEntity";
 
 export const ImageEntityMixin = types
   .model({
@@ -7,14 +7,14 @@ export const ImageEntityMixin = types
 
     imageEntities: types.optional(types.array(ImageEntity), []),
   })
-  .actions(self => {
+  .actions((self) => {
     return {
       beforeDestroy() {
         self.currentImageEntity = null;
       },
     };
   })
-  .views(self => ({
+  .views((self) => ({
     get maxItemIndex() {
       return self.imageEntities.length - 1;
     },
@@ -22,12 +22,7 @@ export const ImageEntityMixin = types
     get imageIsLoaded() {
       const imageEntity = self.currentImageEntity;
 
-      return (
-        !imageEntity.downloading &&
-        !imageEntity.error &&
-        imageEntity.downloaded &&
-        imageEntity.imageLoaded
-      );
+      return !imageEntity.downloading && !imageEntity.error && imageEntity.downloaded && imageEntity.imageLoaded;
     },
     get rotation() {
       if (!isAlive(self)) {
@@ -162,6 +157,6 @@ export const ImageEntityMixin = types
 
     findImageEntity(index) {
       index = index ?? 0;
-      return self.imageEntities.find(entity => entity.index === index);
+      return self.imageEntities.find((entity) => entity.index === index);
     },
   }));
