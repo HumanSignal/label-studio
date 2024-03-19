@@ -1,12 +1,10 @@
 import json
 
 import pytest
+from projects.models import Task
+from rest_framework import status
 
 from label_studio.tests.utils import make_project, register_ml_backend_mock
-from rest_framework.test import APIClient
-from rest_framework import status
-from ml.models import MLBackend
-from projects.models import Project, Task
 
 
 @pytest.fixture
@@ -144,21 +142,40 @@ def test_security_write_only_payload(business_client, ml_backend_for_test_api, m
         user=business_client.user,
     )
 
-    # create ML backend
+    # create ML backend - fails without password
     response = business_client.post(
         '/api/ml/',
         data={
             'project': project.id,
             'title': 'test_ml_backend_creation_ML_backend',
             'url': 'https://ml_backend_for_test_api',
+            'auth_method': 'BASIC_AUTH',
+            # 'basic_auth_user': 'user',
+            # 'basic_auth_pass': '<SECRET>',
+        },
+    )
+    assert response.status_code == 400
+    r = response.json()
+    assert (
+        r['validation_errors']['non_field_errors'][0]
+        == 'Authentication username and password is required for Basic Authentication.'
+    )
+
+    # create ML backend with username and password
+    response = business_client.post(
+        '/api/ml/',
+        data={
+            'project': project.id,
+            'title': 'test_ml_backend_creation_ML_backend',
+            'url': 'https://ml_backend_for_test_api',
+            'auth_method': 'BASIC_AUTH',
             'basic_auth_user': 'user',
             'basic_auth_pass': '<SECRET>',
         },
     )
     assert response.status_code == 201
     r = response.json()
-
-    # check that password is not returned in POST response
+    # security check that password is not returned in POST response
     assert 'basic_auth_pass' not in r
     ml_backend_id = r['id']
     response = business_client.get(f'/api/ml/{ml_backend_id}')
@@ -166,6 +183,23 @@ def test_security_write_only_payload(business_client, ml_backend_for_test_api, m
     # check that password is not returned in GET response
     assert 'basic_auth_pass' not in response.json()
 
+    # patch ML backend without password - must pass since it uses write_only field for previous password
+    response = business_client.patch(
+        f'/api/ml/{ml_backend_id}',
+        data=json.dumps(
+            {
+                'project': project.id,
+                'title': 'new_title_1',
+                'url': 'https://ml_backend_for_test_api',
+            }
+        ),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    # check that password is not returned in PATCH response
+    assert 'basic_auth_pass' not in response.json()
+
+    # patch ML backend with password
     response = business_client.patch(
         f'/api/ml/{ml_backend_id}',
         data=json.dumps(
@@ -197,7 +231,7 @@ def test_ml_backend_predict_test_api_post_random_true(business_client):
             title='test_ml_backend_creation',
         ),
         user=business_client.user,
-        use_ml_backend=True
+        use_ml_backend=True,
     )
     Task.objects.create(project=project, data={'image': 'http://example.com/image.jpg'})
 

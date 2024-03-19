@@ -42,7 +42,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
 
             if any(field not in attrs for field in required_fields):
                 raise serializers.ValidationError(
-                    'When you select Basic Auth you need to provide' 'Username and Password parameters'
+                    'Authentication username and password is required for Basic Authentication.'
                 )
 
     def _validate_healthcheck(self, attrs):
