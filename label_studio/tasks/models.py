@@ -809,6 +809,13 @@ class Prediction(models.Model):
     result = JSONField('result', null=True, default=dict, help_text='Prediction result')
     score = models.FloatField(_('score'), default=None, help_text='Prediction score', null=True)
     model_version = models.TextField(_('model version'), default='', blank=True, null=True)
+    model_run = models.ForeignKey(
+        'ml_models.ModelRun',
+        on_delete=models.CASCADE,
+        related_name='predictions',
+        null=True,
+        help_text='A run of a ModelVersion that created the prediction.',
+    )
     cluster = models.IntegerField(
         _('cluster'),
         default=None,

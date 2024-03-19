@@ -1,0 +1,105 @@
+title: Interactive segmentation
+type: community
+group: Computer Vision
+order: 1
+image: /static/templates/segment-anything.jpg
+details: Interactive segmenation compatible with SegmentAnything model.
+config: |
+  <View>
+    <Style>
+      .main {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      .column {
+        flex: 1;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .column .title {
+        margin: 0;
+        color: #333;
+      }
+
+      .column .label {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 3px;
+      }
+
+      .image-container {
+        width: 100%;
+        height: 300px;
+        background-color: #ddd;
+        border-radius: 5px;
+      }
+  
+      .text-adv {
+        background-color: white;
+        border: 2px solid #000;  # Add border
+        border-radius: 15px;  # Increase border radius
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 30px;  # Increase padding
+        font-family: 'Arial', sans-serif;  # Change font type
+        line-height: 1.6;
+        font-size: 16px;
+        text-align: center;  # Center align text
+     }
+    </Style>
+    <View className="main">
+      <View className="container">
+        <View className="column">
+          <View className="title">Choose Label</View>
+          <View className="label">
+            <BrushLabels name="tag" toName="image">
+              <Label value="Foreground" background="#FF0000" />
+              <Label value="Background" background="#0d14d3" />
+            </BrushLabels>
+          </View>
+        </View>
+        <View className="column">
+          <View className="title">Use Keypoint</View>
+          <View className="label">
+            <KeyPointLabels name="tag2" toName="image" smart="true">
+              <Label value="Foreground" smart="true" background="#000000" showInline="true" />
+              <Label value="Background" smart="true" background="#000000" showInline="true" />
+            </KeyPointLabels>
+          </View>
+        </View>
+        <View className="column">
+          <View className="title">Use Rectangle</View>
+          <View className="label">
+            <RectangleLabels name="tag3" toName="image" smart="true">
+              <Label value="Foreground" background="#000000" showInline="true" />
+              <Label value="Background" background="#000000" showInline="true" />
+            </RectangleLabels>
+          </View>
+        </View>
+      </View>
+      <View className="text-adv">
+        <HyperText name="title" value="Use &lt;a href='https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model' target='_blank' rel='noopener noreferrer' &gt;SegmentAnything model &lt;/a&gt; with this template." clickableLinks="true" inline="true"/>
+      </View>
+      <View className="image-container">
+        <Image name="image" value="$image" zoom="true" zoomControl="true" />
+      </View>
+    </View>
+  </View>
+  
+  <!-- { "data": {
+    "image": "/static/templates/segment-anything.png"
+  } }
+  -->

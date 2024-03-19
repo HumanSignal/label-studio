@@ -54,7 +54,9 @@ class ModelVersion(models.Model):
 
     parent_model = models.ForeignKey(ModelInterface, related_name='model_versions', on_delete=models.CASCADE)
 
-    # TODO add field containing model run IDs
+    @property
+    def full_title(self):
+        return f'{self.parent_model.title}__{self.title}'
 
     prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
 
