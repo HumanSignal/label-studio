@@ -3744,4 +3744,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4"
-content-hash = "1f4fb1fbc4dcf88bc739282b556c9623727add9b4a4ec44762911ddc29ae9451"
+content-hash = "62cb5d75fc747863194f47fa681d8af0c2ec63df923bda064e9cc7f6f55320f6"
