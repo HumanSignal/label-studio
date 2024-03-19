@@ -197,6 +197,7 @@ launchdarkly-server-sdk = "8.2.1"
 python-json-logger = "2.0.4"
 label-studio-converter = "0.0.58"
 google-cloud-storage = "^2.13.0"
+google-cloud-logging = "^3.10.0"
 mysqlclient = {version = "*", optional = true}
 django-csp = "3.7"
 openai = "^1.10.0"
