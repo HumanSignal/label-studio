@@ -8,10 +8,9 @@ from django.conf import settings
 from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, QuerySet, Value, When
 from django.db.models.fields import DecimalField
 from projects.functions.stream_history import add_stream_history
+from projects.models import Project
 from tasks.models import Annotation, Task
-
-from label_studio.projects.models import Project
-from label_studio.users.models import User
+from users.models import User
 
 logger = logging.getLogger(__name__)
 
