@@ -3,6 +3,10 @@ import json
 import pytest
 
 from label_studio.tests.utils import make_project, register_ml_backend_mock
+from rest_framework.test import APIClient
+from rest_framework import status
+from ml.models import MLBackend
+from projects.models import Project, Task
 
 
 @pytest.fixture
@@ -22,7 +26,6 @@ def mock_gethostbyname(mocker):
 
 @pytest.mark.django_db
 def test_model_version_on_save(business_client, ml_backend_for_test_api, mock_gethostbyname):
-
     project = make_project(
         config=dict(
             is_published=True,
@@ -182,3 +185,29 @@ def test_security_write_only_payload(business_client, ml_backend_for_test_api, m
 
     ml_backend = MLBackend.objects.get(id=ml_backend_id)
     assert ml_backend.basic_auth_pass == '<ANOTHER_SECRET>'
+
+
+@pytest.mark.django_db
+def test_ml_backend_predict_test_api_post_random_true(business_client):
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config="""<View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>""",
+            title='test_ml_backend_creation',
+        ),
+        user=business_client.user,
+        use_ml_backend=True
+    )
+    Task.objects.create(project=project, data={'image': 'http://example.com/image.jpg'})
+
+    # get ML backend id from project
+    project.refresh_from_db()
+    ml_backend = project.get_ml_backends().first()
+
+    response = business_client.post(f'/api/ml/{ml_backend.id}/predict/test?random=true')
+
+    assert response.status_code == status.HTTP_200_OK
+    r = response.json()
+    assert r['url'] == 'http://localhost:8999/predict'
+    assert r['status'] == 200
