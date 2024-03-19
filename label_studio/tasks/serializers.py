@@ -314,11 +314,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         ff_user = self.project.organization.created_by
 
         # get members from project, we need them to restore annotation.completed_by etc
-        organization = (
-            user.active_organization
-            if not self.project.created_by.active_organization
-            else self.project.created_by.active_organization
-        )
+        organization = self.project.organization
         members_email_to_id = dict(organization.members.values_list('user__email', 'user__id'))
         members_ids = set(members_email_to_id.values())
         logger.debug(f'{len(members_email_to_id)} members found in organization {organization}')
