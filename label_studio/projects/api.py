@@ -22,6 +22,7 @@ from django.utils.decorators import method_decorator
 from django_filters import CharFilter, FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
+from ml.serializers import MLBackendSerializer
 from projects.functions.next_task import get_next_task
 from projects.functions.stream_history import get_label_stream_history
 from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
@@ -30,6 +31,7 @@ from projects.serializers import (
     GetFieldsSerializer,
     ProjectImportSerializer,
     ProjectLabelConfigSerializer,
+    ProjectModelVersionExtendedSerializer,
     ProjectReimportSerializer,
     ProjectSerializer,
     ProjectSummarySerializer,
@@ -123,7 +125,7 @@ class ProjectFilterSet(FilterSet):
         operation_summary='Create new project',
         operation_description="""
     Create a project and set up the labeling interface in Label Studio using the API.
-    
+
     ```bash
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
     --data '{{"label_config": "<View>[...]</View>"}}'
@@ -640,5 +642,33 @@ class ProjectModelVersions(generics.RetrieveAPIView):
     queryset = Project.objects.all()
 
     def get(self, request, *args, **kwargs):
+        # TODO make sure "extended" is the right word and is
+        # consistent with other APIs we've got
+        extended = self.request.query_params.get('extended', False)
+        include_live_models = self.request.query_params.get('include_live_models', False)
         project = self.get_object()
-        return Response(data=project.get_model_versions(with_counters=True))
+        data = project.get_model_versions(with_counters=True, extended=extended)
+
+        if extended:
+            serializer_models = None
+            serializer = ProjectModelVersionExtendedSerializer(data, many=True)
+
+            if include_live_models:
+                ml_models = project.get_ml_backends()
+                serializer_models = MLBackendSerializer(ml_models, many=True)
+
+            # serializer.is_valid(raise_exception=True)
+            return Response({'static': serializer.data, 'live': serializer_models and serializer_models.data})
+        else:
+            return Response(data=data)
+
+    def delete(self, request, *args, **kwargs):
+        project = self.get_object()
+        model_version = request.data.get('model_version', None)
+
+        if not model_version:
+            raise RestValidationError('model_version param is required')
+
+        count = project.delete_predictions(model_version=model_version)
+
+        return Response(data=count)
