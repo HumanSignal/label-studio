@@ -58,7 +58,7 @@ class BaseHTTPAPI(object):
         self._headers = headers or {}
         self._auth_method = auth_method
 
-        # TODO add kwarg check in here
+        # TODO basic auth parameters must be required for auth_method == 'basic'
         self._basic_auth = (kwargs.get('basic_auth_user'), kwargs.get('basic_auth_pass'))
 
         self._max_retries = max_retries or self.MAX_RETRIES
