@@ -201,7 +201,9 @@ class ExportAPI(generics.RetrieveAPIView):
             project, tasks, export_type, download_resources, request.GET
         )
 
-        return FileResponse(export_file, content_type=content_type, filename=filename)
+        r = FileResponse(export_file, as_attachment=True, content_type=content_type, filename=filename)
+        r['filename'] = filename
+        return r
 
 
 @method_decorator(
