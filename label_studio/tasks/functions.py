@@ -119,14 +119,14 @@ def export_project(project_id, export_format, path, serializer_context=None):
         tasks += ExportDataSerializer(_task_ids, many=True, **serializer_options).data
 
     # convert to output format
-    export_stream, _, filename = DataExport.generate_export_file(
+    export_file, _, filename = DataExport.generate_export_file(
         project, tasks, export_format, settings.CONVERTER_DOWNLOAD_RESOURCES, {}
     )
 
     # write to file
     filepath = os.path.join(path, filename) if os.path.isdir(path) else path
     with open(filepath, 'wb') as file:
-        file.write(export_stream.read())
+        file.write(export_file.read())
 
     logger.debug(f'End exporting project <{project.title}> ({project.id}) in {export_format} format.')
 

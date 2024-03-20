@@ -140,9 +140,12 @@ def read_yaml(filepath):
     return data
 
 
-def read_bytes_stream(filepath):
-    with open(filepath, mode='rb') as f:
-        return io.BytesIO(f.read())
+def path_to_open_binary_file(filepath) -> io.BufferedReader:
+    """
+    The result of this call should generally be passed to a FileResponse or similar.
+    Unusually, this call deliberately doesn't close the file; FileResponse is responsible for this.
+    """
+    return open(filepath, mode='rb')
 
 
 def get_all_dirs_from_dir(d):

@@ -14,7 +14,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -100,7 +100,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                 type=openapi.TYPE_BOOLEAN,
                 in_=openapi.IN_QUERY,
                 description="""
-                          If true, download all resource files such as images, audio, and others relevant to the tasks. 
+                          If true, download all resource files such as images, audio, and others relevant to the tasks.
                           """,
             ),
             openapi.Parameter(
@@ -122,9 +122,9 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         tags=['Export'],
         operation_summary='Easy export of tasks and annotations',
         operation_description="""
-        <i>Note: if you have a large project it's recommended to use 
+        <i>Note: if you have a large project it's recommended to use
         export snapshots, this easy export endpoint might have timeouts.</i><br/><br>
-        Export annotated tasks as a file in a specific format. 
+        Export annotated tasks as a file in a specific format.
         For example, to export JSON annotations for a project to a file called `annotations.json`,
         run the following from the command line:
         ```bash
@@ -197,14 +197,11 @@ class ExportAPI(generics.RetrieveAPIView):
             ).data
         logger.debug('Prepare export files')
 
-        export_stream, content_type, filename = DataExport.generate_export_file(
+        export_file, content_type, filename = DataExport.generate_export_file(
             project, tasks, export_type, download_resources, request.GET
         )
 
-        response = HttpResponse(File(export_stream), content_type=content_type)
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-        response['filename'] = filename
-        return response
+        return FileResponse(export_file, content_type=content_type, filename=filename)
 
 
 @method_decorator(
@@ -445,10 +442,10 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
         tags=['Export'],
         operation_summary='Download export snapshot as file in specified format',
         operation_description="""
-        Download an export file in the specified format for a specific project. Specify the project ID with the `id` 
-        parameter in the path and the ID of the export file you want to download using the `export_pk` parameter 
-        in the path. 
-        
+        Download an export file in the specified format for a specific project. Specify the project ID with the `id`
+        parameter in the path and the ID of the export file you want to download using the `export_pk` parameter
+        in the path.
+
         Get the `export_pk` from the response of the request to [Create new export](/api#operation/api_projects_exports_create)
         or after [listing export files](/api#operation/api_projects_exports_list).
         """,
