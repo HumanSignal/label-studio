@@ -8,7 +8,7 @@ import os
 import shutil
 import socket
 from contextlib import contextmanager
-from tempfile import mkdtemp, mkstemp
+from tempfile import NamedTemporaryFile, mkdtemp, mkstemp
 
 import pkg_resources
 import requests
@@ -145,7 +145,9 @@ def path_to_open_binary_file(filepath) -> io.BufferedReader:
     The result of this call should generally be passed to a FileResponse or similar.
     Unusually, this call deliberately doesn't close the file; FileResponse is responsible for this.
     """
-    return open(filepath, mode='rb')
+    tmp = NamedTemporaryFile(delete=True)
+    shutil.copy2(filepath, tmp.name)
+    return tmp
 
 
 def get_all_dirs_from_dir(d):
