@@ -21,7 +21,7 @@ import {
 } from './TimeSeries/helpers';
 import { AnnotationMixin } from '../../mixins/AnnotationMixin';
 import PersistentStateMixin from '../../mixins/PersistentState';
-import { parseCSV, tryToParseJSON } from '../../utils/data';
+import { parseCSV, parseValue, tryToParseJSON } from '../../utils/data';
 import { fixMobxObserve } from '../../utils/utilities';
 
 import './TimeSeries/Channel';
@@ -414,7 +414,7 @@ const Model = types
 
       if (self.valuetype !== 'url') {
         if (self.value) {
-          self.setData(dataObj[idFromValue(self.value)]);
+          self.setData(parseValue(self.value, dataObj));
         } else {
           self.setData(dataObj);
         }
@@ -427,7 +427,7 @@ const Model = types
         store.annotationStore.addErrors([errorBuilder.generalError(message)]);
         return;
       }
-      const url = dataObj[idFromValue(self.value)];
+      const url = parseValue(self.value, dataObj);
 
       if (!url || typeof url !== 'string') {
         const message = `Cannot find url in <b>${idFromValue(self.value)}</b> field of your task`;
