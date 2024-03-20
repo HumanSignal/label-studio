@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
 
-def get_next_task_logging_level(user: User):
+def get_next_task_logging_level(user: User) -> int:
     level = logging.DEBUG
     if flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long', user=user):
         level = logging.INFO
@@ -143,7 +143,7 @@ def _try_uncertainty_sampling(
 
 def get_not_solved_tasks_qs(
     user: User, project: Project, prepared_tasks: QuerySet[Task], assigned_flag: Union[bool, None], queue_info: str
-) -> Tuple[QuerySet, list, str, bool]:
+) -> Tuple[QuerySet[Task], List[int], str, bool]:
     user_solved_tasks_array = user.annotations.filter(project=project, task__isnull=False)
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
@@ -281,7 +281,7 @@ def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
 
 
 def get_task_from_qs_with_sampling(
-    not_solved_tasks: QuerySet,
+    not_solved_tasks: QuerySet[Task],
     user_solved_tasks_array: List[int],
     prepared_tasks: QuerySet,
     user: User,
