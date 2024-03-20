@@ -52,7 +52,7 @@ export const VersionNotifier = ({ showNewVersion, showCurrentVersion }) => {
 
   return (newVersion && showNewVersion) ? (
     <Block tag="li" name="version-notifier">
-      <a href={url} target="_blank">
+      <a href={url} target="_blank" rel="noopener">
         <Elem name="icon">
           <IconBell/>
         </Elem>

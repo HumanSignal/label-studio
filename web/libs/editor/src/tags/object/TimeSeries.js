@@ -192,7 +192,7 @@ const Model = types
             throw new Error([
               `<b>timeColumn</b> (${self.timecolumn}) must be incremental and sequentially ordered.`,
               `First wrong values: ${nonSeqValues.join(', ')}`,
-              `<br/><a href="${getEnv(self).messages.URL_TAGS_DOCS}/timeseries.html" target="_blank">Read Documentation</a> for details.`,
+              `<br/><a href="${getEnv(self).messages.URL_TAGS_DOCS}/timeseries.html" target="_blank" rel="noopener">Read Documentation</a> for details.`,
             ].join('<br/>'));
           }
 
@@ -211,7 +211,7 @@ const Model = types
             message.push('You have to use <b>timeFormat</b> parameter if your values are datetimes.');
           }
           message.push(
-            `<br/><a href="${getEnv(self).messages.URL_TAGS_DOCS}/timeseries.html#Parameters" target="_blank">Read Documentation</a> for details.`,
+            `<br/><a href="${getEnv(self).messages.URL_TAGS_DOCS}/timeseries.html#Parameters" target="_blank" rel="noopener">Read Documentation</a> for details.`,
           );
           throw new Error(message.join('<br/>'));
         }

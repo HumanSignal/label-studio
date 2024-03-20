@@ -64,10 +64,15 @@ export const GeneralSettings = () => {
                 </Elem>
                 <Select placeholder="Select an option" disabled options={[]} />
                 <Caption>
-                  Simplify project management by organizing projects into workspaces. <a target="_blank" href={createURL("https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects", {
-                  experiment: 'project_settings_tip',
-                  treatment: 'simplify_project_management',
-                })}>Learn more</a>
+                  Simplify project management by organizing projects into workspaces.
+                  {" "}
+                  <a target="_blank" rel="noopener" href={createURL(
+                    "https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects",
+                    {
+                      experiment: 'project_settings_tip',
+                      treatment: 'simplify_project_management',
+                    },
+                  )}>Learn more</a>
                 </Caption>
               </Block>
             )}
@@ -96,10 +101,15 @@ export const GeneralSettings = () => {
                   disabled
                   description={(
                     <>
-                      Tasks are chosen according to model uncertainty score (active learning mode). <a target="_blank" href={createURL("https://docs.humansignal.com/guide/active_learning", {
-                      experiment: 'project_settings_workspace',
-                      treatment: 'workspaces',
-                    })}>Learn more</a>
+                      Tasks are chosen according to model uncertainty score (active learning mode).
+                      {" "}
+                      <a target="_blank" rel="noopener" href={createURL(
+                        "https://docs.humansignal.com/guide/active_learning",
+                        {
+                          experiment: 'project_settings_workspace',
+                          treatment: 'workspaces',
+                        },
+                      )}>Learn more</a>
                     </>
                   )}
                 />

@@ -42,11 +42,21 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
             navigator.clipboard.writeText(msg);
           }}>Copy</Button>
           {(target === 'export' ? (
-            <a style={{ float: "right" }} target="_blank" href="https://labelstud.io/guide/storage.html#Target-storage-permissions">
+            <a
+              style={{ float: "right" }}
+              target="_blank"
+              href="https://labelstud.io/guide/storage.html#Target-storage-permissions"
+              rel="noopener"
+            >
               Check Target Storage documentation
             </a>
           ) : (
-            <a style={{ float: "right" }} target="_blank" href="https://labelstud.io/guide/storage.html#Source-storage-permissions">
+            <a
+              style={{ float: "right" }}
+              target="_blank"
+              href="https://labelstud.io/guide/storage.html#Source-storage-permissions"
+              rel="noopener"
+            >
               Check Source Storage documentation
             </a>
           ))}

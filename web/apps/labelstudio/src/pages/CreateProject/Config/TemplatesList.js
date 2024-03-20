@@ -79,7 +79,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
       </main>
       <footer>
         <IconInfo className={listClass.elem("info-icon")} width="20" height="20" />
-        See the documentation to <a href="https://labelstud.io/guide" target="_blank">contribute a template</a>.
+        See the documentation to <a href="https://labelstud.io/guide" target="_blank" rel="noopener">contribute a template</a>.
       </footer>
     </div>
   );

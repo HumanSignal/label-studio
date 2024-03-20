@@ -227,18 +227,21 @@ export const Menubar = ({
                   href="https://labelstud.io/guide"
                   icon={<IconBook/>}
                   target="_blank"
+                  rel="noopener"
                 />
                 <Menu.Item
                   label="GitHub"
                   href="https://github.com/heartexlabs/label-studio"
                   icon={<LsGitHub/>}
                   target="_blank"
+                  rel="noopener"
                 />
                 <Menu.Item
                   label="Slack Community"
                   href="https://slack.labelstud.io/?source=product-menu"
                   icon={<LsSlack/>}
                   target="_blank"
+                  rel="noopener"
                 />
 
                 <VersionNotifier showCurrentVersion/>

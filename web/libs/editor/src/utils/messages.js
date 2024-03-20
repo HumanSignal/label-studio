@@ -71,7 +71,7 @@ export default {
         The request parameters are invalid.
         If you are using S3, make sure you’ve specified the right bucket region name.
       </p>
-      <p>URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code></p>
+      <p>URL: <code><a href="${encodeURI(url)}" target="_blank" rel="noopener">${htmlEscape(url)}</a></code></p>
     </div>`;
   },
 
@@ -81,7 +81,7 @@ export default {
       <p>
         There was an issue loading URL from <code>${attr}</code> value.
         Most likely that's because static server has wide-open CORS.
-        <a href="${this.URL_CORS_DOCS}" target="_blank">Read more on that here.</a>
+        <a href="${this.URL_CORS_DOCS}" target="_blank" rel="noopener">Read more on that here.</a>
       </p>
       <p>
         Also check that:
@@ -90,7 +90,7 @@ export default {
           <li>Network is reachable</li>
         </ul>
       </p>
-      <p>URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code></p>
+      <p>URL: <code><a href="${encodeURI(url)}" target="_blank" rel="noopener">${htmlEscape(url)}</a></code></p>
     </div>`;
   },
 
@@ -107,14 +107,14 @@ export default {
           <li>URL scheme matches the service scheme, i.e. https and https</li>
           <li>
             The static server has wide-open CORS,
-            <a href=${this.URL_CORS_DOCS} target="_blank">more on that here</a>
+            <a href=${this.URL_CORS_DOCS} target="_blank" rel="noopener">more on that here</a>
           </li>
         </ul>
       </p>
       <p>
         Technical description: <code>${error}</code>
         <br />
-        URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code>
+        URL: <code><a href="${encodeURI(url)}" target="_blank" rel="noopener">${htmlEscape(url)}</a></code>
       </p>
     </div>`;
   },
