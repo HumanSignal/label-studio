@@ -53,6 +53,9 @@ const _Tool = types
     group: 'segmentation',
     shortcut: 'B',
     smart: true,
+
+    // Support the existing unselect behavior until the Magic Wand feature flag is on by default.
+    // @todo change to false once the Magic Wand is on by default.
     unselectRegionOnToolChange: isFF(FF_DEV_4081) ? false : true,
   })
   .volatile(() => ({
