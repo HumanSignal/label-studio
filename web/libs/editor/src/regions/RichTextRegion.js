@@ -112,7 +112,7 @@ const Model = types
       }
 
       if (self.object.savetextresult === "yes" && isDefined(self.text)) {
-        res.value["text"] = self.text;
+        res.value.text = self.text;
       }
 
       return res;

@@ -197,8 +197,8 @@ describe("setActiveDefaults", () => {
     };
     const newState = setActiveDefaults(state);
 
-    expect(newState["panel1"].panelViews[0].active).toBe(true);
-    expect(newState["panel2"].panelViews[0].active).toBe(true);
+    expect(newState.panel1.panelViews[0].active).toBe(true);
+    expect(newState.panel2.panelViews[0].active).toBe(true);
   });
 
   it("does not change active tabs if there are already active tabs", () => {
@@ -219,8 +219,8 @@ describe("setActiveDefaults", () => {
     };
 
     const newState = setActiveDefaults(state);
-    const p1t2Active = newState["panel1"].panelViews[1].active;
-    const p2t1Active = newState["panel2"].panelViews[0].active;
+    const p1t2Active = newState.panel1.panelViews[1].active;
+    const p2t1Active = newState.panel2.panelViews[0].active;
 
     expect(p1t2Active).toBe(true);
     expect(p2t1Active).toBe(true);

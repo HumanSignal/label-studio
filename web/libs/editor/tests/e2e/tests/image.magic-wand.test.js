@@ -139,13 +139,13 @@ Scenario(
     const result = await I.executeScript(serialize);
     const entry = result[1];
 
-    assert.equal(entry["from_name"], "labels_1");
-    assert.equal(entry["type"], "labels");
-    const labels = entry["value"]["labels"];
+    assert.equal(entry.from_name, "labels_1");
+    assert.equal(entry.type, "labels");
+    const labels = entry.value.labels;
 
     assert.equal(labels.length, 1);
     assert.equal(labels[0], "Cloud");
-    assert.equal(entry["value"]["rle"].length > 0, true);
+    assert.equal(entry.value.rle.length > 0, true);
 
     // Undo the bottom left area we just added, make sure its gone but our region list is still
     // 1, then redo it and ensure its back and our region list is still 1 again.

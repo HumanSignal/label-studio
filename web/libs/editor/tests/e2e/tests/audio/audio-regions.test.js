@@ -108,7 +108,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
   });
 
   // Don't need to test this for both scenarios of flags, as it is the same code and is verified in the above test
-  if (!flags["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"]) {
+  if (!flags.fflag_feat_front_lsdv_e_278_contextual_scrolling_short) {
     FFlagScenario(
       "Check if multiple regions are working changing labels",
       async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
