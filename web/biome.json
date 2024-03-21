@@ -44,7 +44,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "useConsistentArrayType": "off",
         "useDefaultParameterLast": "off",
         "useExponentiationOperator": "off",
         "useFragmentSyntax": "off",
