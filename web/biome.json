@@ -20,7 +20,6 @@
       "suspicious": {
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
-        "noDebugger": "off",
         "noDoubleEquals": "off",
         "noDuplicateObjectKeys": "off",
         "noGlobalIsFinite": "off",
