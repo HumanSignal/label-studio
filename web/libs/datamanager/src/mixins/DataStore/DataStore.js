@@ -174,7 +174,8 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
       },
 
       fetch: flow(function* ({ id, query, pageNumber = null, reload = false, interaction, pageSize } = {}) {
-        let currentViewId, currentViewQuery;
+        let currentViewId;
+        let currentViewQuery;
         const requestId = (self.requestId = guidGenerator());
         const root = getRoot(self);
 

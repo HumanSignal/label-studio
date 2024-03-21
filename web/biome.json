@@ -44,7 +44,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "useSingleVarDeclarator": "off",
         "useTemplate": "off"
       },
       "nursery": {

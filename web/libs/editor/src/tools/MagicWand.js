@@ -315,10 +315,10 @@ const _Tool = types
       // it relative to the entire screen coordinates, as this results in a better user
       // experience.
 
-      const imgX = ev.offsetX,
-        imgY = ev.offsetY,
-        screenX = ev.screenX,
-        screenY = ev.screenY;
+      const imgX = ev.offsetX;
+      const imgY = ev.offsetY;
+      const screenX = ev.screenX;
+      const screenY = ev.screenY;
 
       return [imgX, imgY, screenX, screenY];
     },
@@ -446,11 +446,11 @@ const _Tool = types
     threshold(newScreenX, newScreenY) {
       if (newScreenX !== self.anchorScreenX || newScreenY !== self.anchorScreenY) {
         // Get the offset of where we've dragged the mouse to update the threshold.
-        const dx = Math.abs(newScreenX - self.anchorScreenX),
-          dy = Math.abs(newScreenY - self.anchorScreenY),
-          len = Math.sqrt(dx * dx + dy * dy),
-          adx = Math.abs(dx),
-          ady = Math.abs(dy);
+        const dx = Math.abs(newScreenX - self.anchorScreenX);
+        const dy = Math.abs(newScreenY - self.anchorScreenY);
+        const len = Math.sqrt(dx * dx + dy * dy);
+        const adx = Math.abs(dx);
+        const ady = Math.abs(dy);
         let sign = adx > ady ? dx / adx : dy / ady;
 
         sign = sign < 0 ? sign / 5 : sign / 3;
@@ -483,7 +483,8 @@ const _Tool = types
     setupFinalMask: flow(function* setupFinalMask() {
       // The mask is a single channel; convert it to be RGBA multi-channel data as a data URL.
       const singleChannelMask = self.mask;
-      let canvasWidth, canvasHeight;
+      let canvasWidth;
+      let canvasHeight;
 
       if (self.negativezoom) {
         canvasWidth = Math.min(self.viewportWidth, self.imageDisplayedInBrowserWidth);
@@ -541,15 +542,15 @@ const _Tool = types
 
       // Now efficiently draw this mask over onto the full, naturally sized image.
       // Source dimensions.
-      const sx = 0,
-        sy = 0,
-        sWidth = self.transformedCanvas.width,
-        sHeight = self.transformedCanvas.height;
+      const sx = 0;
+      const sy = 0;
+      const sWidth = self.transformedCanvas.width;
+      const sHeight = self.transformedCanvas.height;
       // Destination dimensions.
-      const dx = viewportNaturalX,
-        dy = viewportNaturalY,
-        dWidth = viewportNaturalWidth,
-        dHeight = viewportNaturalHeight;
+      const dx = viewportNaturalX;
+      const dy = viewportNaturalY;
+      const dWidth = viewportNaturalWidth;
+      const dHeight = viewportNaturalHeight;
 
       naturalCtx.drawImage(blitImg, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
 

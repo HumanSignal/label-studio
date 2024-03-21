@@ -116,10 +116,13 @@ function tagIntoObject(node: Element, taskData: Record<string, any>, replaces?: 
 function cssConverter(style: string) {
   if (!style) return null;
 
-  const result: Record<string, string> = {},
-    attributes = style.split(";");
+  const result: Record<string, string> = {};
+  const attributes = style.split(";");
 
-  let firstIndexOfColon, i, key, value;
+  let firstIndexOfColon;
+  let i;
+  let key;
+  let value;
 
   for (i = 0; i < attributes.length; i++) {
     firstIndexOfColon = attributes[i].indexOf(":");

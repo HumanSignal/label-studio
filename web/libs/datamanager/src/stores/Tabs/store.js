@@ -491,8 +491,8 @@ export const TabStore = types
     }),
 
     fetchSingleTab: flow(function* (tabKey, selectedItems) {
-      let tab,
-        tabId = Number.parseInt(tabKey);
+      let tab;
+      const tabId = Number.parseInt(tabKey);
 
       if (!isNaN(tabKey) && !isNaN(tabId)) {
         const tabData = yield getRoot(self).apiCall("tab", { tabId });

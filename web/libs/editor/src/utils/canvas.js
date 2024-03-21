@@ -45,8 +45,8 @@ function maskDataURL2Image(maskDataURL, { color = Constants.FILL_COLOR } = {}) {
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      const nw = img.width,
-        nh = img.height;
+      const nw = img.width;
+      const nh = img.height;
 
       canvas.width = nw;
       canvas.height = nh;
@@ -108,7 +108,8 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
     finalColor = (alpha << 24) | (blue << 16) | (green << 8) | red;
   }
 
-  let x, y;
+  let x;
+  let y;
   const sourceNumChannels = numChannels; // Could be 1-channel mask or RGBA mask.
 
   for (y = 0; y <= nh; y++) {
@@ -139,8 +140,8 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
  */
 function RLE2Region(item, { color = Constants.FILL_COLOR } = {}) {
   const { rle } = item;
-  const nw = item.currentImageEntity.naturalWidth,
-    nh = item.currentImageEntity.naturalHeight;
+  const nw = item.currentImageEntity.naturalWidth;
+  const nh = item.currentImageEntity.naturalHeight;
 
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -272,8 +273,8 @@ function Region2RLE(region) {
   if (isFF(FF_LSDV_4583)) return exportRLE(region);
 
   // Legacy encoder
-  const nw = region.currentImageEntity.naturalWidth,
-    nh = region.currentImageEntity.naturalHeight;
+  const nw = region.currentImageEntity.naturalWidth;
+  const nh = region.currentImageEntity.naturalHeight;
   const stage = region.object?.stageRef;
   const parent = region.parent;
 
@@ -294,15 +295,15 @@ function Region2RLE(region) {
   // hide labels on regions and show them later
   layer.findOne(".highlight").hide();
 
-  const width = stage.getWidth(),
-    height = stage.getHeight(),
-    scaleX = stage.getScaleX(),
-    scaleY = stage.getScaleY(),
-    x = stage.getX(),
-    y = stage.getY(),
-    offsetX = stage.getOffsetX(),
-    offsetY = stage.getOffsetY(),
-    rotation = stage.getRotation();
+  const width = stage.getWidth();
+  const height = stage.getHeight();
+  const scaleX = stage.getScaleX();
+  const scaleY = stage.getScaleY();
+  const x = stage.getX();
+  const y = stage.getY();
+  const offsetX = stage.getOffsetX();
+  const offsetY = stage.getOffsetY();
+  const rotation = stage.getRotation();
 
   stage
     .setWidth(parent.stageWidth)
@@ -473,9 +474,9 @@ const labelToSVG = (() => {
  * }}
  */
 const trim = (canvas) => {
-  let copy,
-    width = canvas.width,
-    height = canvas.height;
+  let copy;
+  let width = canvas.width;
+  let height = canvas.height;
   const ctx = canvas.getContext("2d");
   const bbox = {
     top: null,
@@ -488,7 +489,9 @@ const trim = (canvas) => {
     copy = document.createElement("canvas").getContext("2d");
     const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const l = pixels.data.length;
-    let i, x, y;
+    let i;
+    let x;
+    let y;
 
     for (i = 0; i < l; i += 4) {
       if (pixels.data[i + 3] !== 0) {

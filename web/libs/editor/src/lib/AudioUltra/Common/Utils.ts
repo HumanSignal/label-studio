@@ -94,7 +94,8 @@ export const minmax = (array: ArrayLike<number>) => {
   const arraySize = array.length;
 
   if (arraySize > 0) {
-    let max, min;
+    let max;
+    let min;
     let i = 0;
 
     max = min = array[0];

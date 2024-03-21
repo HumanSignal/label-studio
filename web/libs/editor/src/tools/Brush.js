@@ -108,7 +108,8 @@ const _Tool = types
     },
   }))
   .actions((self) => {
-    let brush, isFirstBrushStroke;
+    let brush;
+    let isFirstBrushStroke;
 
     return {
       commitDrawingRegion() {

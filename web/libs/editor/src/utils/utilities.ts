@@ -174,7 +174,8 @@ export function clamp(x: number, min: number, max: number) {
 
 export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => {
   const result = [];
-  let i, j;
+  let i;
+  let j;
 
   for (i = 0, j = source.length; i < j; i += chunkSize) {
     result.push(source.slice(i, i + chunkSize));

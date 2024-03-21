@@ -1092,7 +1092,8 @@ const EntireStage = observer(
     crosshairRef,
   }) => {
     const { store } = item;
-    let size, position;
+    let size;
+    let position;
 
     if (isFF(FF_ZOOM_OPTIM)) {
       size = {
