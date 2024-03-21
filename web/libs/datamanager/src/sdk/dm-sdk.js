@@ -221,10 +221,10 @@ export class DataManager {
     Object.assign(config.endpoints, apiEndpoints ?? {});
     const sharedParams = {};
 
-    if (!isNaN(this.projectId)) {
+    if (!Number.isNaN(this.projectId)) {
       sharedParams.project = this.projectId;
     }
-    if (!isNaN(this.datasetId)) {
+    if (!Number.isNaN(this.datasetId)) {
       sharedParams.dataset = this.datasetId;
     }
     Object.assign(config, {

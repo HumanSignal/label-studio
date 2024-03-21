@@ -28,7 +28,7 @@ export const CommentStore = types
       return getParent(self).annotationStore.selected;
     },
     get annotationId() {
-      return isNaN(self.annotation?.pk) ? undefined : self.annotation.pk;
+      return Number.isNaN(self.annotation?.pk) ? undefined : self.annotation.pk;
     },
     get draftId() {
       if (!self.annotation?.draftId) return null;

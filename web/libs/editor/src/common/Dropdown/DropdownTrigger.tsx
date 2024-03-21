@@ -23,7 +23,7 @@ const getMinIndex = (element?: HTMLElement) => {
     while (parent) {
       const parentIndex = Number.parseInt(getComputedStyle(parent).zIndex);
 
-      if (!isNaN(parentIndex)) {
+      if (!Number.isNaN(parentIndex)) {
         index = Math.max(index, parentIndex);
       }
 

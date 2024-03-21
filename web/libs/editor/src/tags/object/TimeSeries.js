@@ -163,7 +163,7 @@ const Model = types
         data = { ...data, [self.keyColumn]: indices };
 
         // Require a timeformat for non numeric values
-      } else if (!self.timeformat && isNaN(data[self.keyColumn][0])) {
+      } else if (!self.timeformat && Number.isNaN(data[self.keyColumn][0])) {
         const message = [
           `Looks like your <b>timeColumn</b> (${self.timecolumn}) contains non-numbers.`,
           "You have to use <b>timeFormat</b> parameter if your values are datetimes.",

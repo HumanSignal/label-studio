@@ -301,13 +301,13 @@ export const Tab = types
       }
       /* if we have a min and max we need to make sure we save that too.
       this prevents firing 2 view save requests to accomplish the same thing */
-      return !isNaN(min) && !isNaN(max) ? self.setSemanticSearchThreshold(min, max) : self.save();
+      return !Number.isNaN(min) && !Number.isNaN(max) ? self.setSemanticSearchThreshold(min, max) : self.save();
     },
 
     setSemanticSearchThreshold(_min, max) {
       const min = clamp(_min ?? THRESHOLD_MIN, THRESHOLD_MIN, max - THRESHOLD_MIN_DIFF);
 
-      if (self.semantic_search?.length && !isNaN(min) && !isNaN(max)) {
+      if (self.semantic_search?.length && !Number.isNaN(min) && !Number.isNaN(max)) {
         self.threshold = { min, max };
         return self.save();
       }

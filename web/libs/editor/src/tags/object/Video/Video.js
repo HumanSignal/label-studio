@@ -104,7 +104,7 @@ const Model = types
       // normalize framerate — should be string with number of frames per second
       const framerate = Number(parseValue(self.framerate, self.store.task?.dataObj));
 
-      if (!framerate || isNaN(framerate)) self.framerate = "24";
+      if (!framerate || Number.isNaN(framerate)) self.framerate = "24";
       else if (framerate < 1) self.framerate = String(1 / framerate);
       else self.framerate = String(framerate);
     },

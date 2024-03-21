@@ -8,7 +8,7 @@ import { FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
 import styles from "./Paragraphs.module.scss";
 
 const formatTime = (seconds) => {
-  if (isNaN(seconds)) return "";
+  if (Number.isNaN(seconds)) return "";
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -77,7 +77,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
         const duration =
           item._value[playingId]?.duration || item._value[playingId]?.end - item._value[playingId]?.start;
 
-        if (!isNaN(duration)) {
+        if (!Number.isNaN(duration)) {
           animateElement(node, 0, duration, item.playing);
         }
 
@@ -159,7 +159,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
         className={`${classNames.join(" ")} ${isFF(FF_LSDV_E_278) && styles.newUI}`}
         style={style?.phrase}
       >
-        {isContentVisible && withAudio && !isNaN(v.start) && (
+        {isContentVisible && withAudio && !Number.isNaN(v.start) && (
           <Button
             type="text"
             className={isFF(FF_LSDV_E_278) ? styles.playNewUi : styles.play}

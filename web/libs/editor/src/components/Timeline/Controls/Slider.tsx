@@ -43,7 +43,7 @@ export const Slider: FC<SliderProps> = ({ description, info, max, min, value, st
 
     const newValue = Number.parseFloat(normalizedValue);
 
-    if (isNaN(newValue)) {
+    if (Number.isNaN(newValue)) {
       setValueError(e.currentTarget.value);
       return;
     }

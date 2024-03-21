@@ -228,7 +228,7 @@ const Model = types
     validDateFormat(dateString) {
       const dateNumberArray = dateString.split("-").map((dateString) => Number.parseInt(dateString, 10));
       const year = dateNumberArray[0];
-      const isADate = !isNaN(new Date(dateString));
+      const isADate = !Number.isNaN(new Date(dateString));
       const fourPositiveIntegersYear = year <= 9999 && year >= 1000;
 
       if (isADate && fourPositiveIntegersYear) return dateNumberArray;

@@ -171,7 +171,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
         const urlParams = new URLSearchParams(location.search);
         const pageNumberFromURL = Number.parseInt(urlParams.get(props.urlParamName) ?? "");
 
-        if (!isNaN(pageNumberFromURL) && pageNumberFromURL !== currentPage) {
+        if (!Number.isNaN(pageNumberFromURL) && pageNumberFromURL !== currentPage) {
           setCurrentPage(pageNumberFromURL);
         }
       };

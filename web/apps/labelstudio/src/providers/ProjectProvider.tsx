@@ -30,7 +30,7 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
     async (id, force = false) => {
       const finalProjectId = +(id ?? params.id);
 
-      if (isNaN(finalProjectId)) return;
+      if (Number.isNaN(finalProjectId)) return;
 
       if (!force && projectCache.has(finalProjectId) && projectCache.get(finalProjectId) !== undefined) {
         setProjectData({ ...projectCache.get(finalProjectId)! });

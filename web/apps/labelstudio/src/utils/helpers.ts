@@ -56,7 +56,7 @@ export const objectClean = <T extends AnyObject>(source: T) => {
 };
 
 export const numberWithPrecision = (n: number, precision = 1, removeTrailinZero = false) => {
-  if (typeof n !== "number" || isNaN(n)) return "";
+  if (typeof n !== "number" || Number.isNaN(n)) return "";
 
   let finalNum = n.toFixed(precision);
 
@@ -70,7 +70,7 @@ export const numberWithPrecision = (n: number, precision = 1, removeTrailinZero 
 export const humanReadableNumber = (n: number) => {
   const abs = Math.abs(n);
 
-  if (isNaN(abs) || n === null) return "—";
+  if (Number.isNaN(abs) || n === null) return "—";
   const normalizeNumber = (n: number) => numberWithPrecision(n, 1, true);
 
   let result;

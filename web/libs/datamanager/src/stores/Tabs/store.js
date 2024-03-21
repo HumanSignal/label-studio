@@ -179,7 +179,7 @@ export const TabStore = types
       const tabStorageKey = isVirtual && viewSnapshot.projectId ? `virtual-tab-${viewSnapshot.projectId}` : null;
       const existingTabStorage = isVirtual && localStorage.getItem(tabStorageKey);
       const existingTabStorageParsed = existingTabStorage ? JSON.parse(existingTabStorage) : null;
-      const urlTabIsVirtualCandidate = !!(viewSnapshot?.tab && isNaN(viewSnapshot.tab));
+      const urlTabIsVirtualCandidate = !!(viewSnapshot?.tab && Number.isNaN(viewSnapshot.tab));
       const existingTabUrlParsed =
         isVirtual && urlTabIsVirtualCandidate ? self.snapshotFromUrl(viewSnapshot.tab) : null;
       const urlTabNotEmpty = !isEmpty(existingTabUrlParsed);
@@ -494,7 +494,7 @@ export const TabStore = types
       let tab;
       const tabId = Number.parseInt(tabKey);
 
-      if (!isNaN(tabKey) && !isNaN(tabId)) {
+      if (!Number.isNaN(tabKey) && !Number.isNaN(tabId)) {
         const tabData = yield getRoot(self).apiCall("tab", { tabId });
         const columnIds = (self.columns ?? []).map((c) => c.id);
         const { data, ...tabClean } = dataCleanup(tabData, columnIds);

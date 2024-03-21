@@ -210,7 +210,7 @@ export const Wave: FC<TimelineViewProps> = ({
 
       if (!wsi) return;
       if (wsi.isPlaying()) return;
-      if (!duration || isNaN(duration)) return;
+      if (!duration || Number.isNaN(duration)) return;
       if (pos === currentTime) return;
 
       wsi.setCurrentTime(pos);
@@ -463,7 +463,7 @@ const useWaveSurfer = ({
     wsi.setCurrentTime = (time: number) => {
       const duration = wsi.getDuration();
 
-      if (!isNaN(duration) && time !== wsi.getCurrentTime()) {
+      if (!Number.isNaN(duration) && time !== wsi.getCurrentTime()) {
         time = clamp(time, 0, duration);
         wsi.seekTo(time / wsi.getDuration());
       }

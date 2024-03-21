@@ -149,7 +149,7 @@ const Model = types
       onChange(e) {
         const value = +e.target.value;
 
-        if (!isNaN(value)) {
+        if (!Number.isNaN(value)) {
           self.setNumber(value);
           // without this line we can have `7` in model field while it's displayed as `007`.
           // at least it is bad for testing cases

@@ -295,7 +295,7 @@ const AnnotationStoreModel = types
 
       let pk = options.pk || options.id;
 
-      if (options.type === "annotation" && pk && isNaN(pk)) {
+      if (options.type === "annotation" && pk && Number.isNaN(pk)) {
         /* something happened where our annotation pk was replaced with the id */
         pk = self.annotations?.[self.annotations.length - 1]?.storedValue?.pk;
       }

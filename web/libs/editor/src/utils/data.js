@@ -88,7 +88,7 @@ export const parseCSV = (text, separator = "auto") => {
   // and name of this column is not number :)
   // so we have different types for values in first and second rows
 
-  if (!names.every((n, i) => isNaN(n) === isNaN(secondLine[i]))) {
+  if (!names.every((n, i) => Number.isNaN(n) === Number.isNaN(secondLine[i]))) {
     lines.shift();
     names = names.map((n) => n.toLowerCase());
   } else {
@@ -120,7 +120,7 @@ export const parseCSV = (text, separator = "auto") => {
     for (i = 0; i < row.length; i++) {
       const val = +row[i];
 
-      result[names[i]].push(isNaN(val) ? row[i] : val);
+      result[names[i]].push(Number.isNaN(val) ? row[i] : val);
     }
   }
 
