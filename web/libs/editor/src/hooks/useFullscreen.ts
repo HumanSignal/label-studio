@@ -32,7 +32,7 @@ export interface FullscreenHook {
   setHandlers: (options?: FullscreenProps) => void;
 }
 
-export const useFullscreen = (options: FullscreenProps = {}, deps: any[]): FullscreenHook => {
+export const useFullscreen = (options: FullscreenProps, deps: any[]): FullscreenHook => {
   const handlers = useRef(options);
 
   useEffect(() => {

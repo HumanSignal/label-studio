@@ -211,7 +211,7 @@ export const TabStore = types
       };
     },
 
-    addView: flow(function* (viewSnapshot = {}, options) {
+    addView: flow(function* (viewSnapshot, options) {
       const { autoselect = true, autosave = true, reload = true } = options ?? {};
 
       const newSnapshot = self.createSnapshot(viewSnapshot);

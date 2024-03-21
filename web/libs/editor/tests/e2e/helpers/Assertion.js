@@ -6,14 +6,14 @@ const Helper = require("@codeceptjs/helper");
 const TIME_DIFF_THRESHOLD = 0.3;
 
 class AssertionHelper extends Helper {
-  assertDeepEqualWithTolerance(actual, expected, fractionDigits = 2, message) {
+  assertDeepEqualWithTolerance(actual, expected, fractionDigits, message) {
     assert.deepStrictEqual(
       Helpers.convertToFixed(actual, fractionDigits),
       Helpers.convertToFixed(expected, fractionDigits),
       message,
     );
   }
-  assertNotDeepEqualWithTolerance(actual, expected, fractionDigits = 2, message) {
+  assertNotDeepEqualWithTolerance(actual, expected, fractionDigits, message) {
     assert.notDeepStrictEqual(
       Helpers.convertToFixed(actual, fractionDigits),
       Helpers.convertToFixed(expected, fractionDigits),

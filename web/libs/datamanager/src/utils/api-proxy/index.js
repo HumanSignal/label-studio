@@ -316,7 +316,7 @@ export class APIProxy {
    * @param {Dict} data
    * @private
    */
-  createUrl(endpoint, data = {}, parentPath, gateway) {
+  createUrl(endpoint, data, parentPath, gateway) {
     const url = new URL(gateway ? this.resolveGateway(gateway) : this.gateway);
     const usedKeys = [];
 

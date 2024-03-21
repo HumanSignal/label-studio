@@ -135,7 +135,7 @@ const getTypeDescription = (type, withNullType = true) => {
  * @param {object[]} result
  * @returns {object[]}
  */
-const flattenTree = (tree, parent = null, parentParentTypes = ["view"], result) => {
+const flattenTree = (tree, parent, parentParentTypes, result) => {
   if (!tree.children) return [];
 
   const children = tree.type === "pagedview" ? tree.children.slice(0, 1) : tree.children;

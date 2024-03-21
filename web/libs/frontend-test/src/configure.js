@@ -36,7 +36,7 @@ export default function (configModifier, setupNodeEvents) {
       viewportHeight: 900,
       // output config
       setupNodeEvents(on, config) {
-        on("before:browser:launch", (browser = null, launchOptions) => {
+        on("before:browser:launch", (browser, launchOptions) => {
           if (browser.name === "chrome") {
             // Force sRGB color profile to prevent color mismatch in CI vs local runs
             launchOptions.args.push("--force-color-profile=srgb");
