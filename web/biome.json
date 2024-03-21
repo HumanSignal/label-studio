@@ -32,7 +32,6 @@
       },
       "style": {},
       "nursery": {
-        "noFocusedTests": "off",
         "noSkippedTests": "off",
         "noUselessTernary": "off",
         "useSortedClasses": "off"
