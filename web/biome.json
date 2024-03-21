@@ -20,7 +20,6 @@
       "suspicious": {
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
-        "noGlobalIsFinite": "off",
         "noGlobalIsNan": "off",
         "noMisrefactoredShorthandAssign": "off",
         "noSparseArray": "off",
