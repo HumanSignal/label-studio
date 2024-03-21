@@ -12,6 +12,10 @@ ENV BUILD_NO_SERVER=true \
 
 WORKDIR /label-studio/web
 
+# Fix Docker Arm64 Build
+RUN yarn config set registry https://registry.npmjs.org/
+RUN yarn config set network-timeout 1200000 # HTTP timeout used when downloading packages, set to 20 minutes
+
 COPY web/package.json .
 COPY web/yarn.lock .
 COPY web/tools tools
