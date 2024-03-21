@@ -38,8 +38,7 @@
         "noForEach": "off"
       },
       "correctness": {
-        "useExhaustiveDependencies": "off",
-        "useIsNan": "off"
+        "useExhaustiveDependencies": "off"
       },
       "performance": {
         "noAccumulatingSpread": "off",
