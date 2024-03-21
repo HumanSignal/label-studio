@@ -1,6 +1,6 @@
 {
-  "message": "Add to fe build",
-  "commit": "ab1e46a4378c0d9df7f7e895b22962573e7d7cd5",
-  "date": "2024-03-21T13:37:36.000Z",
+  "message": "Add fe build to release pypi",
+  "commit": "4b084968bb42ca88dded57353e36cb19ce50b08c",
+  "date": "2024-03-21T15:37:55.000Z",
   "branch": "PLT-213"
 }
