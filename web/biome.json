@@ -17,7 +17,6 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "noAriaHiddenOnFocusable": "off",
         "noAriaUnsupportedElements": "off",
         "noAutofocus": "off",
         "noDistractingElements": "off",
