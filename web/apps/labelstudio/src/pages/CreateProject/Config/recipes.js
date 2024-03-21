@@ -20,7 +20,7 @@ export const recipes = [
     type: "community",
     group: "Computer Vision",
     image: "polygon.png",
-    details: ``,
+    details: "",
     config: `<View>
   <Header value="Select label and click on image to start"/>
   <Image name="image" value="$image"/>

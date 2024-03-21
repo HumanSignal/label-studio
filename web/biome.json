@@ -44,7 +44,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "noUnusedTemplateLiteral": "off",
         "noUselessElse": "off",
         "noVar": "off",
         "useBlockStatements": "off",

@@ -39,7 +39,7 @@ export const MachineLearningSettings = () => {
   const startTrainingModal = useCallback(
     (backend) => {
       const modalProps = {
-        title: `Start Model Training`,
+        title: "Start Model Training",
         style: { width: 760 },
         closeOnClickOutside: true,
         body: <StartModelTraining backend={backend} />,
@@ -53,7 +53,7 @@ export const MachineLearningSettings = () => {
   const showRequestModal = useCallback(
     (backend) => {
       const modalProps = {
-        title: `Test Request`,
+        title: "Test Request",
         style: { width: 760 },
         closeOnClickOutside: true,
         body: <TestRequest backend={backend} />,

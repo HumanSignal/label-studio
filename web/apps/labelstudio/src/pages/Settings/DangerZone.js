@@ -76,12 +76,12 @@ export const DangerZone = () => {
           "Reset Cache may help in cases like if you are unable to modify the labeling configuration due " +
           "to validation errors concerning existing labels, but you are confident that the labels don't exist. You can " +
           "use this action to reset the cache and try again.",
-        label: `Reset Cache`,
+        label: "Reset Cache",
       },
       {
         type: "tabs",
         help: "If the Data Manager is not loading, dropping all Data Manager tabs can help.",
-        label: `Drop All Tabs`,
+        label: "Drop All Tabs",
       },
       {
         type: "project",
