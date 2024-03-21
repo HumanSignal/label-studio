@@ -44,7 +44,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "noVar": "off",
         "useBlockStatements": "off",
         "useConsistentArrayType": "off",
         "useDefaultParameterLast": "off",
