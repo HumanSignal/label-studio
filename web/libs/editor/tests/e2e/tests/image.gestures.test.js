@@ -1,6 +1,6 @@
 const { initLabelStudio, serialize, convertToFixed, getSizeConvertor } = require("./helpers");
 
-const assert = require("assert");
+const assert = require("node:assert");
 
 const DEFAULT_DIMENSIONS = {
   rect: { width: 30, height: 30 },

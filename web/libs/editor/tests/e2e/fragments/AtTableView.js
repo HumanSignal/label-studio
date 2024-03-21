@@ -1,5 +1,5 @@
 const { I } = inject();
-const assert = require("assert");
+const assert = require("node:assert");
 
 module.exports = {
   _tableRowSelectors: [

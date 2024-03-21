@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 const toml = require("toml");
 
 const pyproject = path.resolve(__dirname, "../", "pyproject.toml");

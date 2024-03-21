@@ -1,6 +1,6 @@
 const { serialize } = require("./helpers");
 
-const assert = require("assert");
+const assert = require("node:assert");
 
 Feature("Zooming and rotating");
 

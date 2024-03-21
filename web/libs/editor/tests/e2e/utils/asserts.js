@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const Helpers = require("../tests/helpers");
 
 function deepEqualWithTolerance(actual, expected, fractionDigits, message) {

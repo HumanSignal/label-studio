@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const { createRandomIntWithSeed } = require("../helpers");
 
 Feature("Richtext perfomance");

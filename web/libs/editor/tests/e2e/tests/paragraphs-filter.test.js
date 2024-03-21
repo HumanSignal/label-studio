@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const { omitBy } = require("./helpers");
 
 Feature("Paragraphs filter");

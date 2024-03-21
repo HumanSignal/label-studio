@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const Helpers = require("../helpers");
 
 Feature("Image zoom position").tag("@regress");

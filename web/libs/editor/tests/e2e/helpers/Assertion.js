@@ -1,5 +1,5 @@
 const Helpers = require("../tests/helpers");
-const assert = require("assert");
+const assert = require("node:assert");
 const Helper = require("@codeceptjs/helper");
 
 // used in Audio/Video/Paragraphs sync

@@ -1,7 +1,7 @@
 const { recorder, event } = require("codeceptjs");
 const Container = require("codeceptjs/lib/container");
 const { assert } = require("chai");
-const format = require("util").format;
+const format = require("node:util").format;
 
 const supportedHelpers = ["Playwright"];
 

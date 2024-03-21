@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const { FFlagMatrix, FFlagScenario } = require("../../utils/feature-flags");
 
 Feature("Sync: Audio Paragraphs");

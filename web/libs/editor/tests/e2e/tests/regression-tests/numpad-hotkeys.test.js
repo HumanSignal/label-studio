@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const { emulateKeypress } = require("../helpers");
 
 Feature("Numpad hotkeys").tag("@regress");

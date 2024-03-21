@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const { toKebabCase } = require("strman");
 
 Feature("Images' labels type matching");

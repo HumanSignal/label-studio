@@ -14,7 +14,7 @@ const examples = [
   require("../examples/timeseries-url-indexed"),
 ];
 
-const assert = require("assert");
+const assert = require("node:assert");
 
 function roundFloats(struct) {
   return JSON.parse(

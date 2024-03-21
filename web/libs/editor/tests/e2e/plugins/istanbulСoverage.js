@@ -1,7 +1,7 @@
 /* global global */
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 const TestExclude = require("test-exclude");
 const { recorder, event, output } = require("codeceptjs");
 const Container = require("codeceptjs/lib/container");

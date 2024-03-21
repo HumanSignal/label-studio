@@ -3,7 +3,7 @@
 const headless = process.env.HEADLESS;
 const port = process.env.LSF_PORT ?? 3000;
 const enableCoverage = process.env.COVERAGE === "true";
-const fs = require("fs");
+const fs = require("node:fs");
 const FRAGMENTS_PATH = "./fragments/";
 
 module.exports.config = {

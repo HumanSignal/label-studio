@@ -1,6 +1,6 @@
 const Helpers = require("./helpers");
 const Asserts = require("../utils/asserts");
-const assert = require("assert");
+const assert = require("node:assert");
 
 Feature("Empty labels");
 

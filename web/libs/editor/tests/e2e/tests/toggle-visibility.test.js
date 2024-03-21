@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const { initLabelStudio, countKonvaShapes, switchRegionTreeView } = require("./helpers");
 
 const ALL_VISIBLE_SELECTOR = ".lsf-entities__visibility:not(.lsf-entities__visibility_hidden)";

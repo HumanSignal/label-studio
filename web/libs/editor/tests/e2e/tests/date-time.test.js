@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const { formatDateValue } = require("../helpers/DateTime");
 const { serialize, selectText } = require("./helpers");
 

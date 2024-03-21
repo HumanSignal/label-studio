@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 
 Feature("Video timeline seek indicator").tag("@regress");
 

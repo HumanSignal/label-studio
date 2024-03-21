@@ -1,6 +1,6 @@
 /* global Feature, Scenario */
 
-const assert = require("assert");
+const assert = require("node:assert");
 const { serialize } = require("./helpers");
 
 Feature("Text Area");

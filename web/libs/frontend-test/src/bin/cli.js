@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import cp from "child_process";
-import fs from "fs";
-import path from "path";
-import { stdout } from "process";
+import cp from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { stdout } from "node:process";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 

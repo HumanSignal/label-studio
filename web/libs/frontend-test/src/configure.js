@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { nxE2EPreset } from "@nx/cypress/plugins/cypress-preset";
 import { defineConfig } from "cypress";
 import { addMatchImageSnapshotPlugin } from "cypress-image-snapshot/plugin";

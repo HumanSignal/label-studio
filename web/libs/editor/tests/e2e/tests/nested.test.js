@@ -1,6 +1,6 @@
 const { initLabelStudio, serialize, selectText } = require("./helpers");
 
-const assert = require("assert");
+const assert = require("node:assert");
 
 Feature("Nested Choices");
 

@@ -1,6 +1,6 @@
 const jsdoc2md = require("jsdoc-to-markdown");
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const groups = [
   { dir: "object", title: "Objects", order: 301, nested: true },

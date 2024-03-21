@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const { initLabelStudio } = require("./helpers");
 
 const config = `

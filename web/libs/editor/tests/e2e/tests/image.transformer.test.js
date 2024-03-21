@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require("node:assert");
 const Asserts = require("../utils/asserts");
 const Helpers = require("./helpers");
 

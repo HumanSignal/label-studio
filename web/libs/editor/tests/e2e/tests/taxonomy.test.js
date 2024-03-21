@@ -1,5 +1,5 @@
 /* global Before */
-const assert = require("assert");
+const assert = require("node:assert");
 
 Feature("Taxonomy");
 

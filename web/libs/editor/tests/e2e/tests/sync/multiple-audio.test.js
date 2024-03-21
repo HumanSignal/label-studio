@@ -1,6 +1,6 @@
 /* global Feature, Scenario */
 
-const assert = require("assert");
+const assert = require("node:assert");
 
 Feature("Sync: Multiple Audio");
 

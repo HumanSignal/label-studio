@@ -1,5 +1,5 @@
 const { saveDraftLocally, getLocallySavedDraft } = require("./helpers");
-const assert = require("assert");
+const assert = require("node:assert");
 
 Feature("Unfinished polygons");
 

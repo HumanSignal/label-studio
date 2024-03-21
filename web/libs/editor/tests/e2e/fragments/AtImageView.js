@@ -1,6 +1,6 @@
 const { I } = inject();
 
-const assert = require("assert");
+const assert = require("node:assert");
 const Helpers = require("../tests/helpers");
 
 module.exports = {

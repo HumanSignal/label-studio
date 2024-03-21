@@ -1,5 +1,5 @@
-const fs = require("fs/promises");
-const path = require("path");
+const fs = require("node:fs/promises");
+const path = require("node:path");
 
 const v8toIstanbul = require("v8-to-istanbul");
 const covDir = "./output/coverage";

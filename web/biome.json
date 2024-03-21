@@ -44,7 +44,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "useNodejsImportProtocol": "off",
         "useNumberNamespace": "off",
         "useNumericLiterals": "off",
         "useSelfClosingElements": "off",

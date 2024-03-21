@@ -1,5 +1,5 @@
 const { initLabelStudio, dragKonva, waitForImage, serialize } = require("../helpers");
-const assert = require("assert");
+const assert = require("node:assert");
 
 const config = `
   <View>
