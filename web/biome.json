@@ -16,9 +16,7 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "a11y": {
-        "useValidAriaRole": "off"
-      },
+      "a11y": {},
       "suspicious": {
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
