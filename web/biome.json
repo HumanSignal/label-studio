@@ -39,7 +39,6 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
-        "noStringCaseMismatch": "off",
         "noSwitchDeclarations": "off",
         "noUnnecessaryContinue": "off",
         "noUnusedLabels": "off",
