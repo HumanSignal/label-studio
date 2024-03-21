@@ -97,7 +97,7 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
           return m?.toClassName?.();
         }
       })
-      .reduce((res, cls) => [...res, ...cls!.split(/\s+/)], [] as string[]);
+      .reduce((res, cls) => [...res, ...cls?.split(/\s+/)], [] as string[]);
 
     finalClass.push(...mixMap);
   }
@@ -200,8 +200,8 @@ export const BemWithSpecifiContext = (context: Context<CN | null>) => {
     const finalMix = ([] as [CNMix?]).concat(mix).filter((cnm) => !!cnm);
     const finalTag = rest.tag ?? "div";
 
-    const className = (block ? cn(block) : blockCtx)!
-      .elem(name)
+    const className = (block ? cn(block) : blockCtx)
+      ?.elem(name)
       .mod(mod)
       .mix(...(finalMix as CNMix[]), rest.className)
       .toClassName();

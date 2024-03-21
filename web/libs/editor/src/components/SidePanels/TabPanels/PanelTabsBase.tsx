@@ -137,7 +137,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
 
         const allowDrag = true;
         const panel = panelRef.current!;
-        const parentBBox = root.current!.getBoundingClientRect();
+        const parentBBox = root.current?.getBoundingClientRect();
         const bbox = panel.getBoundingClientRect();
         const clickTarget = e.target?.getBoundingClientRect();
         const tx = e.clientX - clickTarget.left;

@@ -197,7 +197,7 @@ export const PanelBase: FC<PanelBaseProps> = ({
 
         const allowDrag = detached;
         const panel = panelRef.current!;
-        const parentBBox = root.current!.getBoundingClientRect();
+        const parentBBox = root.current?.getBoundingClientRect();
         const bbox = panel.getBoundingClientRect();
         const [x, y] = [e.pageX, e.pageY];
         const [oX, oY] = [bbox.left - parentBBox.left, bbox.top - parentBBox.top];

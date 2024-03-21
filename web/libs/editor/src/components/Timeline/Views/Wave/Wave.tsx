@@ -176,7 +176,7 @@ export const Wave: FC<TimelineViewProps> = ({
 
   // Handle timeline navigation clicks
   const onTimelineClick = useCallback((e: RMouseEvent<HTMLDivElement>) => {
-    const surfer = waveRef.current!.querySelector("wave")!;
+    const surfer = waveRef.current?.querySelector("wave")!;
     const offset = surfer.getBoundingClientRect().left;
     const duration = ws.current?.getDuration();
     const relativeOffset = (surfer.scrollLeft + (e.clientX - offset)) / surfer.scrollWidth;
