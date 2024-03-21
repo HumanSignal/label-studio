@@ -35,8 +35,7 @@
         "useValidTypeof": "off"
       },
       "complexity": {
-        "noForEach": "off",
-        "useSimplifiedLogicExpression": "off"
+        "noForEach": "off"
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
