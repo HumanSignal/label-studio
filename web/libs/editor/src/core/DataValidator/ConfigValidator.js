@@ -146,7 +146,7 @@ const flattenTree = (tree, parent = null, parentParentTypes = ["view"], result) 
     const parentTypes = [...parentParentTypes, ...(parent?.type ? [parent?.type] : [])];
     const flatChild = { ...child, parent: parent?.id ?? null, parentTypes };
 
-    delete flatChild.children;
+    flatChild.children = undefined;
 
     result.push(flatChild);
 

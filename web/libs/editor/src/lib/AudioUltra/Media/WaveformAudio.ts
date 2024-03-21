@@ -80,17 +80,17 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
     super.destroy();
     this.disconnect();
 
-    delete this.mediaResolve;
-    delete this.mediaReject;
-    delete this.mediaPromise;
-    delete this.decoderPromise;
+    this.mediaResolve = undefined;
+    this.mediaReject = undefined;
+    this.mediaPromise = undefined;
+    this.decoderPromise = undefined;
     this.decoder?.destroy();
-    delete this.decoder;
+    this.decoder = undefined;
     this.el?.removeEventListener("error", this.mediaReady);
     this.el?.removeEventListener("canplaythrough", this.mediaReady);
     this.el?.remove();
-    delete this.el;
-    delete this.buffer;
+    this.el = undefined;
+    this.buffer = undefined;
   }
 
   get chunks(): Float32Array[][] | undefined {

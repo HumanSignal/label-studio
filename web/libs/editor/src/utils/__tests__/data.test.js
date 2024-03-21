@@ -73,7 +73,7 @@ describe("parseCSV; csv with header", () => {
     const expected = { ...data };
 
     expected.time = expected.timestamp.map(dateISO);
-    delete expected.timestamp;
+    expected.timestamp = undefined;
     expected.gender = ["M", "F", "F"];
     expect(parseCSV(csv, ",")).toStrictEqual([expected, ["time", "cases", "rate", "gender"]]);
   });

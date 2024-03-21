@@ -457,7 +457,7 @@ export const Tab = types
       sn.filters = filters;
     }
 
-    delete sn.selectedItems;
+    sn.selectedItems = undefined;
 
     return sn;
   });

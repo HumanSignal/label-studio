@@ -29,7 +29,7 @@ export const Button = React.forwardRef(
 
     if (rest.primary) {
       mods.look = "primary";
-      delete rest.primary;
+      rest.primary = undefined;
     }
 
     const iconElem = React.useMemo(() => {

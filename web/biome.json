@@ -41,8 +41,7 @@
         "useExhaustiveDependencies": "off"
       },
       "performance": {
-        "noAccumulatingSpread": "off",
-        "noDelete": "off"
+        "noAccumulatingSpread": "off"
       },
       "style": {
         "noNonNullAssertion": "off",

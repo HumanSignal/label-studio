@@ -706,7 +706,7 @@ export class LSFWrapper {
     const showToast = params?.useToast && hasChanges;
     // console.log('onSubmitDraft', params?.useToast, hasChanges);
 
-    if (params?.useToast) delete params.useToast;
+    if (params?.useToast) params.useToast = undefined;
 
     Object.assign(data.body, params);
 

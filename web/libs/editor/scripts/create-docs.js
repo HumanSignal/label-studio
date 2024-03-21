@@ -83,7 +83,7 @@ fetch(currentTagsUrl)
       }
 
       // remove all other @params we don't know how to use
-      delete t.customTags;
+      t.customTags = undefined;
 
       let str = jsdoc2md
         .renderSync({ data: [t], "example-lang": "html" })

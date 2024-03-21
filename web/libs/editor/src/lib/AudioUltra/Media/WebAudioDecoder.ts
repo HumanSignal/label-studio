@@ -89,8 +89,8 @@ export class WebAudioDecoder extends BaseAudioDecoder {
    * Dispose and free up resources.
    */
   protected dispose() {
-    delete this.arraybuffer;
-    delete this.context;
+    this.arraybuffer = undefined;
+    this.context = undefined;
 
     this.cleanupResolvers();
   }

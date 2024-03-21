@@ -635,14 +635,14 @@ export const AppStore = types
 
       if (actionId === "next_task") {
         if (labelStreamMode === "all") {
-          delete actionParams.filters;
+          actionParams.filters = undefined;
 
           if (actionParams.selectedItems.all === false && actionParams.selectedItems.included.length === 0) {
-            delete actionParams.selectedItems;
-            delete actionParams.ordering;
+            actionParams.selectedItems = undefined;
+            actionParams.ordering = undefined;
           }
         } else if (labelStreamMode === "filtered") {
-          delete actionParams.selectedItems;
+          actionParams.selectedItems = undefined;
         }
       }
 

@@ -137,7 +137,7 @@ export const AudioView = {
     let name;
     if (options?.name) {
       name = options.name;
-      delete options.name;
+      options.name = undefined;
     }
     if (name) {
       el.wait(0).matchImageSnapshot(name, options);

@@ -573,8 +573,8 @@ const Model = types
         ChildrenSnapshots.set(sn.name, children);
       }
 
-      delete sn._children;
-      delete sn.children;
+      sn._children = undefined;
+      sn.children = undefined;
     }
 
     return sn;

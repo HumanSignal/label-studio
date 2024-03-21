@@ -34,7 +34,7 @@ const NormalizationMixin = types
       } else {
         const adjusted = { ...self.meta };
 
-        delete adjusted.text;
+        adjusted.text = undefined;
         self.meta = adjusted;
       }
     },
