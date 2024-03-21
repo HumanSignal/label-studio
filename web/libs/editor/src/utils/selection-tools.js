@@ -248,8 +248,6 @@ const applyTextGranularity = (selection, granularity) => {
       case "paragraph":
         boundarySelection(selection, "paragraphboundary");
         return;
-      case "charater":
-      case "symbol":
       default:
         return;
     }

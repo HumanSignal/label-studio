@@ -34,7 +34,6 @@ export const ViewColumnType = types.enumeration([
 export const ViewColumnTypeShort = (type) => {
   switch (type) {
     default:
-    case "String":
       return "str";
     case "Number":
       return "num";
@@ -62,7 +61,6 @@ export const ViewColumnTypeShort = (type) => {
 export const ViewColumnTypeName = (type) => {
   switch (type) {
     default:
-    case "String":
       return "String";
     case "Number":
       return "Number";
