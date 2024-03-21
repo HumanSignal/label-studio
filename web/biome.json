@@ -17,7 +17,6 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "noAccessKey": "off",
         "noAriaHiddenOnFocusable": "off",
         "noAriaUnsupportedElements": "off",
         "noAutofocus": "off",
@@ -103,7 +102,6 @@
         "useSingleVarDeclarator": "off",
         "useTemplate": "off"
       },
-
       "nursery": {
         "noConsole": "off",
         "noFocusedTests": "off",
