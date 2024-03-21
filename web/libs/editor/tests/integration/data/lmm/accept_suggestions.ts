@@ -1,4 +1,4 @@
-import { LabelStudio } from '@humansignal/frontend-test/helpers/LSF';
+import { LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 
 export const llmTextareaConfig = `<View>
   <Style>
@@ -10,63 +10,54 @@ export const llmTextareaConfig = `<View>
   <Text name="text" value="$text"/>
   <TextArea name="answer" toName="text"/>
 </View>`;
-export const llmTextareaData = { text: 'Some simple text' };
+export const llmTextareaData = { text: "Some simple text" };
 
 export const LLM_WHAT_DO_YOU_SEE = {
-  prompt: 'What do you see?',
-  answer: 'I see your question!',
+  prompt: "What do you see?",
+  answer: "I see your question!",
 };
 export const LLM_WHAT_ELSE_DO_YOU_SEE = {
-  prompt: 'What else do you see?',
-  answer: 'Oh! I see some simple text!',
+  prompt: "What else do you see?",
+  answer: "Oh! I see some simple text!",
 };
 export const llmTextareaSuggestions = {
-  [LLM_WHAT_DO_YOU_SEE.prompt]:
-        [
-          {
-            'from_name': 'prompt',
-            'id': 'ID_FROM_ML_PROMPT_1',
-            'to_name': 'text',
-            'type': 'textarea',
-            'value': {
-              'text': [
-                LLM_WHAT_DO_YOU_SEE.prompt,
-              ],
-            },
-          },
-          {
-            'from_name': 'answer',
-            'id': 'ID_FROM_ML_ANSWER_1',
-            'to_name': 'text',
-            'type': 'textarea',
-            'value': {
-              'text': [
-                LLM_WHAT_DO_YOU_SEE.answer,
-              ],
-            },
-          },
-        ],
-  [LLM_WHAT_ELSE_DO_YOU_SEE.prompt]: [
+  [LLM_WHAT_DO_YOU_SEE.prompt]: [
     {
-      'from_name': 'prompt',
-      'id': 'ID_FROM_ML_PROMPT_2',
-      'to_name': 'text',
-      'type': 'textarea',
-      'value': {
-        'text': [
-          LLM_WHAT_ELSE_DO_YOU_SEE.prompt,
-        ],
+      from_name: "prompt",
+      id: "ID_FROM_ML_PROMPT_1",
+      to_name: "text",
+      type: "textarea",
+      value: {
+        text: [LLM_WHAT_DO_YOU_SEE.prompt],
       },
     },
     {
-      'from_name': 'answer',
-      'id': 'ID_FROM_ML_ANSWER_2',
-      'to_name': 'text',
-      'type': 'textarea',
-      'value': {
-        'text': [
-          LLM_WHAT_ELSE_DO_YOU_SEE.answer,
-        ],
+      from_name: "answer",
+      id: "ID_FROM_ML_ANSWER_1",
+      to_name: "text",
+      type: "textarea",
+      value: {
+        text: [LLM_WHAT_DO_YOU_SEE.answer],
+      },
+    },
+  ],
+  [LLM_WHAT_ELSE_DO_YOU_SEE.prompt]: [
+    {
+      from_name: "prompt",
+      id: "ID_FROM_ML_PROMPT_2",
+      to_name: "text",
+      type: "textarea",
+      value: {
+        text: [LLM_WHAT_ELSE_DO_YOU_SEE.prompt],
+      },
+    },
+    {
+      from_name: "answer",
+      id: "ID_FROM_ML_ANSWER_2",
+      to_name: "text",
+      type: "textarea",
+      value: {
+        text: [LLM_WHAT_ELSE_DO_YOU_SEE.answer],
       },
     },
   ],

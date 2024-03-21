@@ -10,7 +10,7 @@
     "typeRoots": ["./types", "./node_modules/@types"],
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true
   },
   "references": [
     {
@@ -20,9 +20,6 @@
       "path": "./tsconfig.spec.json"
     }
   ],
-  "exclude": [
-    "./dist",
-    "./lib",
-  ],
+  "exclude": ["./dist", "./lib"],
   "extends": "../../tsconfig.base.json"
 }

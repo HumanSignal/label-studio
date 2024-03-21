@@ -1,5 +1,5 @@
-import React from 'react';
+import React from "react";
 
-export const Divider = ({height}) => {
-  return <div style={{height: height}}/>;
+export const Divider = ({ height }) => {
+  return <div style={{ height: height }} />;
 };

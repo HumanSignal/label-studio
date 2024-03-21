@@ -37,11 +37,11 @@ const createDynamicModels = (columns) => {
  * @returns {Promise<AppStore>}
  */
 export const createApp = async (rootNode, datamanager) => {
-  const isLabelStream = datamanager.mode === 'labelstream';
+  const isLabelStream = datamanager.mode === "labelstream";
 
   const response = await datamanager.api.columns();
 
-  if ((!response || response.error)) {
+  if (!response || response.error) {
     const message = `
       ${response?.error ?? ""}
       LS API not available; check \`API_GATEWAY\` and \`LS_ACCESS_TOKEN\` env vars;

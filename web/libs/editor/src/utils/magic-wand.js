@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 
-import chroma from 'chroma-js';
+import chroma from "chroma-js";
 
 // Magic Wand (Fuzzy Selection Tool) for Javascript
 //
@@ -26,7 +26,7 @@ import chroma from 'chroma-js';
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-const MagicWand = (function() {
+const MagicWand = (() => {
   const lib = {};
 
   /** Create a binary mask on the image by color threshold
@@ -38,7 +38,7 @@ const MagicWand = (function() {
    * @param {Uint8Array} mask of visited points (optional)
    * @return {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
    */
-  lib.floodFill = function(image, px, py, colorThreshold, mask) {
+  lib.floodFill = (image, px, py, colorThreshold, mask) => {
     let c,
       x,
       newY,
@@ -173,7 +173,7 @@ const MagicWand = (function() {
    * @param {int} blur radius
    * @return {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
    */
-  lib.gaussBlur = function(mask, radius) {
+  lib.gaussBlur = (mask, radius) => {
     let i,
       k,
       k1,
@@ -371,7 +371,7 @@ const MagicWand = (function() {
    * @param {Uint8Array} visited: mask of visited points (optional)
    * @return {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
    */
-  lib.gaussBlurOnlyBorder = function(mask, radius, visited) {
+  lib.gaussBlurOnlyBorder = (mask, radius, visited) => {
     let border = createBorderForBlur(mask, radius, visited), // get border points with radius-neighbors
       ww,
       dsq,
@@ -471,7 +471,7 @@ const MagicWand = (function() {
    * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
    * @return {Object} border mask: {Uint8Array} data, {int} width, {int} height, {Object} offset
    */
-  lib.createBorderMask = function(mask) {
+  lib.createBorderMask = (mask) => {
     let x,
       y,
       k,
@@ -541,7 +541,7 @@ const MagicWand = (function() {
    * @param {Object} mask: {Uint8Array} data, {int} width, {int} height
    * @return {Array} border index array boundary points of the mask
    */
-  lib.getBorderIndices = function(mask) {
+  lib.getBorderIndices = (mask) => {
     let x,
       y,
       k,
@@ -630,7 +630,7 @@ const MagicWand = (function() {
    * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
    * @return {Array} contours: {Array} points, {bool} inner, {int} label
    */
-  lib.traceContours = function(mask) {
+  lib.traceContours = (mask) => {
     let m = prepareMask(mask),
       contours = [],
       label = 0,
@@ -746,7 +746,7 @@ const MagicWand = (function() {
    * @param {int} simplify count: min number of points when the contour is simplified
    * @return {Array} contours: {Array} points, {bool} inner, {int} label, {int} initialCount
    */
-  lib.simplifyContours = function(contours, simplifyTolerant, simplifyCount) {
+  lib.simplifyContours = (contours, simplifyTolerant, simplifyCount) => {
     let lenContours = contours.length,
       result = [],
       i,
@@ -838,9 +838,7 @@ const MagicWand = (function() {
 
       resPoints = [];
       len = lst.length;
-      lst.sort(function(a, b) {
-        return a - b;
-      }); // restore index order
+      lst.sort((a, b) => a - b); // restore index order
       for (k = 0; k < len; k++) {
         resPoints.push({ x: points[lst[k]].x, y: points[lst[k]].y }); // add result points to the correct order
       }
@@ -861,10 +859,10 @@ const MagicWand = (function() {
  * @param h When creating an image from the mask, the height of that image.
  * @param color Chroma.js compatible RGB color to use when drawing the mask.
  * @param alpha Float 0 to 1 value of how much opacity to use for thresholded, filled pixels.
- */ 
+ */
 function paint(ctx, w, h, mask, color, alpha) {
   if (!mask) return;
-  
+
   const [r, g, b] = chroma(color).rgb();
 
   alpha = Math.round(alpha * 255.0);
@@ -876,7 +874,7 @@ function paint(ctx, w, h, mask, color, alpha) {
   for (y = bounds.minY; y <= bounds.maxY; y++) {
     for (x = bounds.minX; x <= bounds.maxX; x++) {
       if (data[y * maskW + x] === 0) continue;
-      let k = (y * w + x) * 4;
+      const k = (y * w + x) * 4;
 
       imgData.data[k] = r;
       imgData.data[k + 1] = g;
@@ -884,7 +882,7 @@ function paint(ctx, w, h, mask, color, alpha) {
       imgData.data[k + 3] = alpha;
     }
   }
-  
+
   ctx.putImageData(imgData, 0, 0);
 }
 

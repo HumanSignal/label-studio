@@ -10,7 +10,6 @@ const formatNumber = (num) => {
   }
 };
 
-export const NumberCell = (column) =>
-  isDefined(column.value) ? formatNumber(column.value) : "";
+export const NumberCell = (column) => (isDefined(column.value) ? formatNumber(column.value) : "");
 
 // NumberCell.userSelectable = false;

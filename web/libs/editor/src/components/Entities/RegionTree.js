@@ -1,11 +1,11 @@
-import { Spin, Tree } from 'antd';
-import { observer } from 'mobx-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import styles from './Entities.module.scss';
-import Utils from '../../utils';
+import { Spin, Tree } from "antd";
+import { observer } from "mobx-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Utils from "../../utils";
+import styles from "./Entities.module.scss";
 
-import { LsChevron } from '../../assets/icons';
-import { RegionItem } from './RegionItem';
+import { LsChevron } from "../../assets/icons";
+import { RegionItem } from "./RegionItem";
 
 export const RegionTree = observer(({ regionStore }) => {
   // @todo improve list render
@@ -24,20 +24,20 @@ export const RegionTree = observer(({ regionStore }) => {
 
   if (deferred)
     return (
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: "center" }}>
         <Spin />
       </div>
     );
 
-  const isFlat = !regionStore.sortedRegions.some(r => r.parentID);
+  const isFlat = !regionStore.sortedRegions.some((r) => r.parentID);
   const regions = regionStore.asTree((item, idx, onClick) => {
     return {
       key: item.id,
-      title: <RegionItem item={item} idx={idx} flat={isFlat} setDraggable={setDraggable} onClick={onClick}/>,
+      title: <RegionItem item={item} idx={idx} flat={isFlat} setDraggable={setDraggable} onClick={onClick} />,
     };
   });
 
-  const classifications = regionStore.classifications.map(item => ({
+  const classifications = regionStore.classifications.map((item) => ({
     classification: true,
     key: item.id,
     title: <RegionItem item={item} flat setDraggable={setDraggable} />,
@@ -54,7 +54,7 @@ export const RegionTree = observer(({ regionStore }) => {
       blockNode={true}
       defaultExpandAll={true}
       autoExpandParent={true}
-      switcherIcon={<LsChevron opacity="0.25"/>}
+      switcherIcon={<LsChevron opacity="0.25" />}
       onDragStart={({ event, node }) => {
         if (node.classification || !canDrag.current) {
           event.preventDefault();
@@ -66,9 +66,9 @@ export const RegionTree = observer(({ regionStore }) => {
         if (node.classification) return false;
         const dropKey = node.props.eventKey;
         const dragKey = dragNode.props.eventKey;
-        const dropPos = node.props.pos.split('-');
+        const dropPos = node.props.pos.split("-");
 
-        dropPosition = dropPosition - parseInt(dropPos[dropPos.length - 1]);
+        dropPosition = dropPosition - Number.parseInt(dropPos[dropPos.length - 1]);
         const treeDepth = dropPos.length;
 
         const dropReg = regionStore.findRegionID(dropKey);
@@ -77,19 +77,19 @@ export const RegionTree = observer(({ regionStore }) => {
         regionStore.unhighlightAll();
 
         if (treeDepth === 2 && dropToGap && dropPosition === -1) {
-          dragReg.setParentID('');
+          dragReg.setParentID("");
         } else if (dropPosition !== -1) {
           // check if the dragReg can be a child of dropReg
           const selDrop = dropReg.labeling?.selectedLabels || [];
-          const labelWithConstraint = selDrop.filter(l => l.groupcancontain);
+          const labelWithConstraint = selDrop.filter((l) => l.groupcancontain);
 
           if (labelWithConstraint.length) {
             const selDrag = dragReg.labeling.selectedLabels;
 
-            const set1 = Utils.Checkers.flatten(labelWithConstraint.map(l => l.groupcancontain.split(',')));
-            const set2 = Utils.Checkers.flatten(selDrag.map(l => (l.alias ? [l.alias, l.value] : [l.value])));
+            const set1 = Utils.Checkers.flatten(labelWithConstraint.map((l) => l.groupcancontain.split(",")));
+            const set2 = Utils.Checkers.flatten(selDrag.map((l) => (l.alias ? [l.alias, l.value] : [l.value])));
 
-            if (set1.filter(value => -1 !== set2.indexOf(value)).length === 0) return;
+            if (set1.filter((value) => -1 !== set2.indexOf(value)).length === 0) return;
           }
 
           // check drop regions tree depth
@@ -100,11 +100,11 @@ export const RegionTree = observer(({ regionStore }) => {
             // example if we have a tree of A -> B -> C -> D and
             // we're moving B -> C part somewhere then it'd have a
             // height of 1
-            const treeHeight = function(node) {
+            const treeHeight = (node) => {
               if (!node) return 0;
 
               // TODO this can blow up if we have lots of stuff there
-              const childrenHeight = regionStore.filterByParentID(node.pid).map(c => treeHeight(c));
+              const childrenHeight = regionStore.filterByParentID(node.pid).map((c) => treeHeight(c));
 
               if (!childrenHeight.length) return 0;
 

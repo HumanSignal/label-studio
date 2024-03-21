@@ -1,39 +1,47 @@
-import { Component, createRef, forwardRef, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { shallowEqualObjects } from 'shallow-equal';
-import { Block, cn, Elem } from '../../../utils/bem';
-import { objectClean } from '../../../utils/helpers';
-import { Button } from '../Button/Button';
-import { Oneof } from '../Oneof/Oneof';
-import { Space } from '../Space/Space';
-import { Counter, Input, Select, Toggle } from './Elements';
-import './Form.styl';
-import { FormContext, FormResponseContext, FormStateContext, FormSubmissionContext, FormValidationContext } from './FormContext';
-import * as Validators from './Validation/Validators';
-import { SDKContext } from '../../../providers/SDKProvider';
-import { isDefined } from '../../../utils/utils';
-import { MultiProvider } from '../../../providers/MultiProvider';
+import { Component, createRef, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { shallowEqualObjects } from "shallow-equal";
+import { MultiProvider } from "../../../providers/MultiProvider";
+import { SDKContext } from "../../../providers/SDKProvider";
+import { Block, Elem, cn } from "../../../utils/bem";
+import { objectClean } from "../../../utils/helpers";
+import { isDefined } from "../../../utils/utils";
+import { Button } from "../Button/Button";
+import { Oneof } from "../Oneof/Oneof";
+import { Space } from "../Space/Space";
+import { Counter, Input, Select, Toggle } from "./Elements";
+import "./Form.styl";
+import {
+  FormContext,
+  FormResponseContext,
+  FormStateContext,
+  FormSubmissionContext,
+  FormValidationContext,
+} from "./FormContext";
+import * as Validators from "./Validation/Validators";
 
-const PASSWORD_PROTECTED_VALUE = 'got ya, suspicious hacker!';
+const PASSWORD_PROTECTED_VALUE = "got ya, suspicious hacker!";
 
 export default class Form extends Component {
   state = {
     validation: null,
     showValidation: true,
     submitting: false,
-  }
+  };
 
   /**@type {import('react').RefObject<HTMLFormElement>} */
-  formElement = createRef()
+  formElement = createRef();
 
-  apiRef = createRef()
+  apiRef = createRef();
 
   /**@type {Set<HTMLInputElement|HTMLSelectElement>} */
-  fields = new Set()
+  fields = new Set();
 
-  validation = new Map()
+  validation = new Map();
 
   /**@type {import("../../../utils/api-proxy").APIProxy;} */
-  get api() { return this.context.api; }
+  get api() {
+    return this.context.api;
+  }
 
   componentDidMount() {
     if (this.props.formData) {
@@ -51,18 +59,18 @@ export default class Form extends Component {
 
   render() {
     const providers = [
-      <FormContext.Provider key="form-ctx" value={this}/>,
-      <FormValidationContext.Provider key="form-validation-ctx" value={this.state.validation}/>,
-      <FormSubmissionContext.Provider key="form-submission-ctx" value={this.state.submitting}/>,
-      <FormStateContext.Provider key="form-state-ctx" value={this.state.state}/>,
-      <FormResponseContext.Provider key="form-response" value={this.state.lastResponse}/>,
+      <FormContext.Provider key="form-ctx" value={this} />,
+      <FormValidationContext.Provider key="form-validation-ctx" value={this.state.validation} />,
+      <FormSubmissionContext.Provider key="form-submission-ctx" value={this.state.submitting} />,
+      <FormStateContext.Provider key="form-state-ctx" value={this.state.state} />,
+      <FormResponseContext.Provider key="form-response" value={this.state.lastResponse} />,
     ];
 
     return (
       <MultiProvider providers={providers}>
         <form
           ref={this.formElement}
-          className={cn('form')}
+          className={cn("form")}
           action={this.props.action}
           onSubmit={this.onFormSubmitted}
           onChange={this.onFormChanged}
@@ -73,7 +81,7 @@ export default class Form extends Component {
           {this.props.children}
 
           {this.state.validation && this.state.showValidation && (
-            <ValidationRenderer validation={this.state.validation}/>
+            <ValidationRenderer validation={this.state.validation} />
           )}
         </form>
       </MultiProvider>
@@ -107,7 +115,7 @@ export default class Form extends Component {
   }
 
   getFieldContext(name) {
-    return Array.from(this.fields).find(f => f.name === name);
+    return Array.from(this.fields).find((f) => f.name === name);
   }
 
   disableValidationMessage() {
@@ -129,7 +137,7 @@ export default class Form extends Component {
     } else {
       this.setState({ step: "invalid" });
     }
-  }
+  };
 
   onAutoSubmit() {
     this.validateFields();
@@ -145,7 +153,7 @@ export default class Form extends Component {
     this.props.onChange?.(e, this);
 
     this.autosubmit();
-  }
+  };
 
   autosubmit() {
     clearTimeout(this.submittibg);
@@ -157,11 +165,7 @@ export default class Form extends Component {
     }, this.props.debounce);
   }
 
-  assembleFormData({
-    asJSON = false,
-    full = false,
-    fieldsFilter,
-  } = {}) {
+  assembleFormData({ asJSON = false, full = false, fieldsFilter } = {}) {
     let fields = Array.from(this.fields);
 
     if (fieldsFilter instanceof Function) {
@@ -178,11 +182,11 @@ export default class Form extends Component {
         const value = (() => {
           const inputValue = field.value;
 
-          if (fieldType === 'checkbox') {
+          if (fieldType === "checkbox") {
             return field.checked;
-          } else if (fieldType === 'radio') {
+          } else if (fieldType === "radio") {
             return inputValue;
-          } else if (['number', 'range'].includes(fieldType)) {
+          } else if (["number", "range"].includes(fieldType)) {
             return Number(field.value);
           }
 
@@ -222,14 +226,17 @@ export default class Form extends Component {
       success = await this.submitWithFetch(body);
     }
 
-    this.setState({
-      submitting: false,
-      state: success ? "success" : "fail",
-    }, () => {
-      setTimeout(() => {
-        this.setState({ state: null });
-      }, 1500);
-    });
+    this.setState(
+      {
+        submitting: false,
+        state: success ? "success" : "fail",
+      },
+      () => {
+        setTimeout(() => {
+          this.setState({ state: null });
+        }, 1500);
+      },
+    );
   }
 
   async submitWithAPI(action, body) {
@@ -252,7 +259,7 @@ export default class Form extends Component {
 
   async submitWithFetch(body) {
     const action = this.formElement.current.action;
-    const method = (this.props.method ?? 'POST').toUpperCase();
+    const method = (this.props.method ?? "POST").toUpperCase();
     const response = await fetch(action, { method, body });
 
     try {
@@ -294,7 +301,7 @@ export default class Form extends Component {
   validateFields() {
     this.resetValidation();
 
-    for(const field of this.fields) {
+    for (const field of this.fields) {
       const result = this.validateField(field);
 
       if (result.length) {
@@ -354,17 +361,17 @@ export default class Form extends Component {
 }
 
 const ValidationRenderer = ({ validation }) => {
-  const rootClass = cn('form-validation');
+  const rootClass = cn("form-validation");
 
   return (
     <div className={rootClass}>
       {Array.from(validation).map(([name, result]) => (
-        <div key={name} className={rootClass.elem('group')} onClick={() => result.field.focus()}>
-          <div className={rootClass.elem('field')}>{result.label}</div>
+        <div key={name} className={rootClass.elem("group")} onClick={() => result.field.focus()}>
+          <div className={rootClass.elem("field")}>{result.label}</div>
 
-          <div className={rootClass.elem('messages')}>
+          <div className={rootClass.elem("messages")}>
             {result.messages.map((message, i) => (
-              <div key={`${name}-${i}`} className={rootClass.elem('message')}>
+              <div key={`${name}-${i}`} className={rootClass.elem("message")}>
                 {message}
               </div>
             ))}
@@ -380,178 +387,176 @@ Form.Validator = Validators;
 Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   const styles = {};
 
-  if (columnCount) styles['--column-count'] = columnCount;
-  if (rowGap) styles['--row-gap'] = rowGap;
+  if (columnCount) styles["--column-count"] = columnCount;
+  if (rowGap) styles["--row-gap"] = rowGap;
 
   return (
-    <div className={cn('form').elem('row').mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
+    <div className={cn("form").elem("row").mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
 };
 
-Form.Builder = forwardRef(({
-  fields: defaultFields,
-  formData: defaultFormData,
-  fetchFields,
-  fetchFormData,
-  children,
-  formRowStyle,
-  onSubmit,
-  withActions,
-  triggerAction,
-  ...props
-}, ref) => {
-  const formRef = ref ?? useRef();
-  const [fields, setFields] = useState(defaultFields ?? []);
-  const [formData, setFormData] = useState(defaultFormData ?? {});
+Form.Builder = forwardRef(
+  (
+    {
+      fields: defaultFields,
+      formData: defaultFormData,
+      fetchFields,
+      fetchFormData,
+      children,
+      formRowStyle,
+      onSubmit,
+      withActions,
+      triggerAction,
+      ...props
+    },
+    ref,
+  ) => {
+    const formRef = ref ?? useRef();
+    const [fields, setFields] = useState(defaultFields ?? []);
+    const [formData, setFormData] = useState(defaultFormData ?? {});
 
-  const renderFields = (fields) => {
-    return fields.map((field, index) => {
-      if (!field) return <div key={`spacer-${index}`}/>;
-      const { trigger_form_update, ...restProps } = field;
+    const renderFields = (fields) => {
+      return fields.map((field, index) => {
+        if (!field) return <div key={`spacer-${index}`} />;
+        const { trigger_form_update, ...restProps } = field;
 
-      const currentValue = formData?.[field.name] ?? undefined;
-      const triggerUpdate = props.autosubmit !== true && trigger_form_update === true;
-      const getValue = () => {
-        const isProtected = field.skipAutofill && !field.allowEmpty && field.type === 'password';
+        const currentValue = formData?.[field.name] ?? undefined;
+        const triggerUpdate = props.autosubmit !== true && trigger_form_update === true;
+        const getValue = () => {
+          const isProtected = field.skipAutofill && !field.allowEmpty && field.type === "password";
 
-        if (isProtected) {
-          return PASSWORD_PROTECTED_VALUE;
-        }
-
-        if (field.skipAutofill) {
-          return null;
-        }
-
-        return currentValue ?? field.value;
-      };
-
-      const commonProps = {};
-
-      if (triggerUpdate) {
-        commonProps.onChange = async () => {
-          if (triggerAction instanceof Function) {
-            triggerAction(field);
+          if (isProtected) {
+            return PASSWORD_PROTECTED_VALUE;
           }
 
-          await updateFields();
-          await updateFormData();
+          if (field.skipAutofill) {
+            return null;
+          }
+
+          return currentValue ?? field.value;
         };
-      }
 
-      const InputComponent = (() => {
-        switch(field.type) {
-          case "select": return Select;
-          case "counter": return Counter;
-          case "toggle": return Toggle;
-          default: return Input;
+        const commonProps = {};
+
+        if (triggerUpdate) {
+          commonProps.onChange = async () => {
+            if (triggerAction instanceof Function) {
+              triggerAction(field);
+            }
+
+            await updateFields();
+            await updateFormData();
+          };
         }
-      })();
 
-      if (['checkbox', 'radio', 'toggle'].includes(field.type)) {
-        commonProps.checked = getValue();
-      } else {
-        commonProps.defaultValue = getValue();
+        const InputComponent = (() => {
+          switch (field.type) {
+            case "select":
+              return Select;
+            case "counter":
+              return Counter;
+            case "toggle":
+              return Toggle;
+            default:
+              return Input;
+          }
+        })();
+
+        if (["checkbox", "radio", "toggle"].includes(field.type)) {
+          commonProps.checked = getValue();
+        } else {
+          commonProps.defaultValue = getValue();
+        }
+
+        return <InputComponent key={field.name ?? index} {...restProps} {...commonProps} />;
+      });
+    };
+
+    const renderColumns = (columns) => {
+      return columns.map((col, index) => (
+        <div className={cn("form").elem("column")} key={index} style={{ width: col.width }}>
+          {renderFields(col.fields)}
+        </div>
+      ));
+    };
+
+    const updateFields = useCallback(async () => {
+      if (fetchFields) {
+        const newFields = await fetchFields();
+
+        if (JSON.stringify(fields) !== JSON.stringify(newFields)) {
+          setFields(newFields);
+        }
       }
+    }, [fetchFields]);
 
-      return (
-        <InputComponent
-          key={field.name ?? index}
-          {...restProps}
-          {...commonProps}
-        />
-      );
-    });
-  };
+    const updateFormData = useCallback(async () => {
+      if (fetchFormData) {
+        const newFormData = await fetchFormData();
 
-  const renderColumns = (columns) => {
-    return columns.map((col, index) => (
-      <div className={cn('form').elem('column')} key={index} style={{ width: col.width }}>
-        {renderFields(col.fields)}
-      </div>
-    ));
-  };
-
-  const updateFields = useCallback(async () => {
-    if (fetchFields) {
-      const newFields = await fetchFields();
-
-      if (JSON.stringify(fields) !== JSON.stringify(newFields)) {
-        setFields(newFields);
+        if (shallowEqualObjects(formData, newFormData) === false) {
+          setFormData(newFormData);
+        }
       }
-    }
-  }, [fetchFields]);
+    }, [fetchFormData]);
 
-  const updateFormData = useCallback(async () => {
-    if (fetchFormData) {
-      const newFormData = await fetchFormData();
+    const handleOnSubmit = useCallback(
+      async (...args) => {
+        onSubmit?.(...args);
+        await updateFields();
+        await updateFormData();
+      },
+      [onSubmit, fetchFormData],
+    );
 
-      if (shallowEqualObjects(formData, newFormData) === false) {
-        setFormData(newFormData);
-      }
-    }
-  }, [fetchFormData]);
+    useEffect(() => {
+      updateFields();
+    }, [updateFields]);
 
-  const handleOnSubmit = useCallback(async (...args) => {
-    onSubmit?.(...args);
-    await updateFields();
-    await updateFormData();
-  }, [onSubmit, fetchFormData]);
+    useEffect(() => {
+      updateFormData();
+    }, [updateFormData]);
 
-  useEffect(() => {
-    updateFields();
-  }, [updateFields]);
+    useEffect(() => {
+      setFields(defaultFields);
+    }, [defaultFields]);
 
-  useEffect(() => {
-    updateFormData();
-  }, [updateFormData]);
+    useEffect(() => {
+      setFormData(defaultFormData);
+    }, [defaultFormData]);
 
-  useEffect(() => {
-    setFields(defaultFields);
-  }, [defaultFields]);
-
-  useEffect(() => {
-    setFormData(defaultFormData);
-  }, [defaultFormData]);
-
-  return (
-    <Form {...props} onSubmit={handleOnSubmit} ref={formRef}>
-      {(fields ?? []).map(({ columnCount, fields, columns }, index) => (
-        <Form.Row key={index} columnCount={columnCount} style={formRowStyle} spread>
-          {columns ? renderColumns(columns) : renderFields(fields)}
-        </Form.Row>
-      ))}
-      {children}
-      {(props.autosubmit !== true && withActions === true) && (
-        <Form.Actions>
-          <Button
-            type="submit"
-            look="primary"
-            style={{ width: 120 }}
-          >
-            Save
-          </Button>
-        </Form.Actions>
-      )}
-    </Form>
-  );
-});
+    return (
+      <Form {...props} onSubmit={handleOnSubmit} ref={formRef}>
+        {(fields ?? []).map(({ columnCount, fields, columns }, index) => (
+          <Form.Row key={index} columnCount={columnCount} style={formRowStyle} spread>
+            {columns ? renderColumns(columns) : renderFields(fields)}
+          </Form.Row>
+        ))}
+        {children}
+        {props.autosubmit !== true && withActions === true && (
+          <Form.Actions>
+            <Button type="submit" look="primary" style={{ width: 120 }}>
+              Save
+            </Button>
+          </Form.Actions>
+        )}
+      </Form>
+    );
+  },
+);
 
 Form.contextType = SDKContext;
 
 Form.Actions = ({ children, valid, extra, size }) => {
-  const rootClass = cn('form');
+  const rootClass = cn("form");
 
   return (
-    <div className={rootClass.elem('submit').mod({ size })}>
-      <div className={rootClass.elem('info').mod({ valid })}>
-        {extra}
-      </div>
+    <div className={rootClass.elem("submit").mod({ size })}>
+      <div className={rootClass.elem("info").mod({ valid })}>{extra}</div>
 
-      <Space>
-        {children}
-      </Space>
+      <Space>{children}</Space>
     </div>
   );
 };
@@ -562,7 +567,9 @@ Form.Indicator = () => {
   return (
     <Block name="form-indicator">
       <Oneof value={state}>
-        <Elem tag="span" mod={{ type: state }} name="item" case="success">Saved!</Elem>
+        <Elem tag="span" mod={{ type: state }} name="item" case="success">
+          Saved!
+        </Elem>
       </Oneof>
     </Block>
   );

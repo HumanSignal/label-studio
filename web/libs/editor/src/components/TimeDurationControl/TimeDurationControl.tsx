@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
-import { Block } from '../../utils/bem';
+import React, { type FC } from "react";
+import { Block } from "../../utils/bem";
 
-import './TimeDurationControl.styl';
-import { TimeBox } from './TimeBox';
+import { TimeBox } from "./TimeBox";
+import "./TimeDurationControl.styl";
 
 export interface TimerProps {
   isSidepanel: boolean | undefined;

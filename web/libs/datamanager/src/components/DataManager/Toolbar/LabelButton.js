@@ -1,11 +1,19 @@
 import { inject } from "mobx-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../Common/Button/Button";
 import { Interface } from "../../Common/Interface";
-import { useCallback, useEffect, useRef, useState } from "react";
 
 const Arrow = ({ rotate }) => (
-  <svg fill="currentColor" strokeWidth="0" viewBox="0 0 320 512" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style={{ transform: rotate ? "rotate(180deg)" : undefined }}>
-    <path d="M143 352.3L7 216.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.2 9.4-24.4 9.4-33.8 0z"/>
+  <svg
+    fill="currentColor"
+    strokeWidth="0"
+    viewBox="0 0 320 512"
+    height="16"
+    width="16"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ transform: rotate ? "rotate(180deg)" : undefined }}
+  >
+    <path d="M143 352.3L7 216.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.2 9.4-24.4 9.4-33.8 0z" />
   </svg>
 );
 
@@ -29,9 +37,9 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
   const triggerRef = useRef();
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleOpen = useCallback(() => setIsOpen(isOpen => !isOpen), []);
+  const toggleOpen = useCallback(() => setIsOpen((isOpen) => !isOpen), []);
 
-  const handleClickOutside = useCallback(e => {
+  const handleClickOutside = useCallback((e) => {
     const el = triggerRef.current;
 
     if (el && !el.contains(e.target)) {
@@ -97,7 +105,7 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
             style={primaryStyle}
             onClick={onLabelAll}
           >
-            Label {selectedCount ? selectedCount : "All"} Task{!selectedCount || selectedCount > 1 ? "s" : ''}
+            Label {selectedCount ? selectedCount : "All"} Task{!selectedCount || selectedCount > 1 ? "s" : ""}
           </Button>
           <Button
             ref={triggerRef}
@@ -109,12 +117,7 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
             <Arrow rotate={isOpen} />
           </Button>
         </div>
-        <Button
-          size={size}
-          style={secondStyle}
-          mod={{ size: size ?? "medium", disabled }}
-          onClick={onLabelVisible}
-        >
+        <Button size={size} style={secondStyle} mod={{ size: size ?? "medium", disabled }} onClick={onLabelVisible}>
           Label Tasks As Displayed
         </Button>
       </div>

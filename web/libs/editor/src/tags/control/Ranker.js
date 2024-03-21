@@ -1,18 +1,18 @@
-import React from 'react';
-import { inject, observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
+import { inject, observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import Ranker from '../../components/Ranker/Ranker';
-import Registry from '../../core/Registry';
-import Tree from '../../core/Tree';
-import Types from '../../core/Types';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import { ReadOnlyControlMixin } from '../../mixins/ReadOnlyMixin';
-import { guidGenerator } from '../../utils/unique';
-import Base from './Base';
+import Ranker from "../../components/Ranker/Ranker";
+import Registry from "../../core/Registry";
+import Tree from "../../core/Tree";
+import Types from "../../core/Types";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
+import { guidGenerator } from "../../utils/unique";
+import Base from "./Base";
 
 // column to display items from original List, when there are no default Bucket
-const ORIGINAL_ITEMS_KEY = '_';
+const ORIGINAL_ITEMS_KEY = "_";
 
 /**
  * The `Ranker` tag is used to rank items in a `List` tag or pick relevant items from a `List`, depending on using nested `Bucket` tags.
@@ -74,21 +74,21 @@ const ORIGINAL_ITEMS_KEY = '_';
  */
 const Model = types
   .model({
-    type: 'ranker',
+    type: "ranker",
     toname: types.maybeNull(types.string),
     collapsible: types.optional(types.boolean, true),
 
     // @todo allow Views inside: ['bucket', 'view']
-    children: Types.unionArray(['bucket']),
+    children: Types.unionArray(["bucket"]),
   })
-  .views(self => ({
+  .views((self) => ({
     get list() {
       const list = self.annotation.names.get(self.toname);
 
-      return list.type === 'list' ? list : null;
+      return list.type === "list" ? list : null;
     },
     get buckets() {
-      return Tree.filterChildrenOfType(self, 'BucketModel');
+      return Tree.filterChildrenOfType(self, "BucketModel");
     },
     /**
      * rank mode: tag's name
@@ -97,9 +97,7 @@ const Model = types
      * @returns {string | undefined}
      */
     get defaultBucket() {
-      return self.buckets.length > 0
-        ? self.buckets.find(b => b.default)?.name
-        : self.name;
+      return self.buckets.length > 0 ? self.buckets.find((b) => b.default)?.name : self.name;
     },
     get rankOnly() {
       return !self.buckets.length;
@@ -109,21 +107,21 @@ const Model = types
       if (!self.list) return [];
       if (self.rankOnly) return [{ id: self.name, title: self.list.title }];
 
-      const columns = self.buckets.map(b => ({ id: b.name, title: b.title ?? '' }));
+      const columns = self.buckets.map((b) => ({ id: b.name, title: b.title ?? "" }));
 
       if (!self.defaultBucket) columns.unshift({ id: ORIGINAL_ITEMS_KEY, title: self.list.title });
 
       return columns;
     },
   }))
-  .views(self => ({
+  .views((self) => ({
     get dataSource() {
       const data = self.list?._value;
       const items = self.list?.items;
       const ids = Object.keys(items);
       const columns = self.columns;
       /** @type {Record<string, string[]>} */
-      const columnStubs = Object.fromEntries(self.columns.map(c => [c.id, []]));
+      const columnStubs = Object.fromEntries(self.columns.map((c) => [c.id, []]));
       /** @type {Record<string, string[]>} */
       const result = self.result?.value.ranker;
       let itemIds = {};
@@ -138,14 +136,13 @@ const Model = types
         // so create it from results not groupped into buckets;
         // also if there are unknown columns in result they'll go there too.
         if (!self.defaultBucket) {
-          const columnNames = self.columns.map(c => c.id);
+          const columnNames = self.columns.map((c) => c.id);
           // all items in known columns, including original list (_)
           const selected = Object.entries(result)
             .filter(([key]) => columnNames.includes(key))
-            .map(([_, values]) => values)
-            .flat();
+            .flatMap(([_, values]) => values);
           // all undistributed items or items from unknown columns
-          const left = ids.filter(id => !selected.includes(id));
+          const left = ids.filter((id) => !selected.includes(id));
 
           if (left.length) {
             // there are might be already some items in result
@@ -157,10 +154,10 @@ const Model = types
       return { items, columns, itemIds };
     },
     get result() {
-      return self.annotation?.results.find(r => r.from_name === self);
+      return self.annotation?.results.find((r) => r.from_name === self);
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     createResult(data) {
       self.annotation.createResult({}, { ranker: data }, self, self.list);
     },
@@ -183,7 +180,7 @@ const Model = types
 
       const ids = Object.keys(self.list?.items);
       // empty array for every column
-      const data = Object.fromEntries(self.columns.map(c => [c.id, []]));
+      const data = Object.fromEntries(self.columns.map((c) => [c.id, []]));
 
       // List items should also be stored at the beginning for consistency, we add them to result
       data[self.defaultBucket ?? ORIGINAL_ITEMS_KEY] = ids;
@@ -192,9 +189,9 @@ const Model = types
     },
   }));
 
-const RankerModel = types.compose('RankerModel', Base, AnnotationMixin, Model, ReadOnlyControlMixin);
+const RankerModel = types.compose("RankerModel", Base, AnnotationMixin, Model, ReadOnlyControlMixin);
 
-const HtxRanker = inject('store')(
+const HtxRanker = inject("store")(
   observer(({ item }) => {
     const data = item.dataSource;
 
@@ -219,20 +216,22 @@ const HtxRanker = inject('store')(
  * @param {string} title       Title of the column
  * @param {boolean} [default]  This Bucket will be used to display results from `List` by default; see `Ranker` tag for more details
  */
-const BucketModel = types.model('BucketModel', {
+const BucketModel = types.model("BucketModel", {
   id: types.optional(types.identifier, guidGenerator),
-  type: 'bucket',
+  type: "bucket",
   name: types.string,
   title: types.maybeNull(types.string),
   default: types.optional(types.boolean, false),
 });
 
-const HtxBucket = inject('store')(observer(({ item }) => {
-  return <h1>{item.name}</h1>;
-}));
+const HtxBucket = inject("store")(
+  observer(({ item }) => {
+    return <h1>{item.name}</h1>;
+  }),
+);
 
-Registry.addTag('ranker', RankerModel, HtxRanker);
-Registry.addTag('bucket', BucketModel, HtxBucket);
+Registry.addTag("ranker", RankerModel, HtxRanker);
+Registry.addTag("bucket", BucketModel, HtxBucket);
 Registry.addObjectType(RankerModel);
 
 export { BucketModel, HtxRanker, RankerModel };
