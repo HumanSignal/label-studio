@@ -423,9 +423,7 @@ function applyHighlightStylesToDoc(destDoc, rulesByStyleId) {
       for (let k = 0; k < rules.length; k++) {
         style.sheet.insertRule(rules[k]);
       }
-    } catch {
-      continue;
-    }
+    } catch {}
   }
 }
 
