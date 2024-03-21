@@ -17,7 +17,6 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "noHeaderScope": "off",
         "noInteractiveElementToNoninteractiveRole": "off",
         "noNoninteractiveElementToInteractiveRole": "off",
         "noNoninteractiveTabindex": "off",
