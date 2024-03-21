@@ -68,7 +68,8 @@ export const TabFilter = types
 
       if (!isDefined(value) || isBlank(value)) {
         return false;
-      } else if (FilterValueRange.is(value)) {
+      }
+      if (FilterValueRange.is(value)) {
         return isDefined(value.min) && isDefined(value.max);
       }
 

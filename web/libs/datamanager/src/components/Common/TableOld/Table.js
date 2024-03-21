@@ -255,9 +255,8 @@ export const Table = observer(
         const scrollOffset = index * h - height / 2 + h / 2; // + headerHeight
 
         return (cachedScrollOffset.current = scrollOffset);
-      } else {
-        return 0;
       }
+      return 0;
     }, []);
 
     const itemKey = useCallback(

@@ -59,17 +59,16 @@ export const create = (columns) => {
 
             if (existingAnnotation) {
               return existingAnnotation;
-            } else {
-              return {
-                id: c.id,
-                pk: c.pk,
-                draftId: c.draftId,
-                result: c.serializeAnnotation(),
-                leadTime: c.leadTime,
-                userGenerate: !!c.userGenerate,
-                sentUserGenerate: !!c.sentUserGenerate,
-              };
             }
+            return {
+              id: c.id,
+              pk: c.pk,
+              draftId: c.draftId,
+              result: c.serializeAnnotation(),
+              leadTime: c.leadTime,
+              userGenerate: !!c.userGenerate,
+              sentUserGenerate: !!c.sentUserGenerate,
+            };
           });
       },
 

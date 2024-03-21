@@ -4,7 +4,8 @@ export const Oneof = ({ value, children, className }) => {
   const selectedChild = useMemo(() => {
     if (Array.isArray(children)) {
       return children.find((c) => c.props.case === value) || null;
-    } else if (children.props.case === value) {
+    }
+    if (children.props.case === value) {
       return children;
     }
   }, [children, value]);

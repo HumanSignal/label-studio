@@ -248,13 +248,14 @@ export default types
       getRegionsTree(enrich) {
         if (self.group === null || self.group === "manual") {
           return self.asTree(enrich);
-        } else if (self.group === "label") {
-          return self.asLabelsTree(enrich);
-        } else if (self.group === "type") {
-          return self.asTypeTree(enrich);
-        } else {
-          console.error(`Grouping by ${self.group} is not implemented`);
         }
+        if (self.group === "label") {
+          return self.asLabelsTree(enrich);
+        }
+        if (self.group === "type") {
+          return self.asTypeTree(enrich);
+        }
+        console.error(`Grouping by ${self.group} is not implemented`);
       },
 
       asTree(enrich) {

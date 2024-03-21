@@ -95,9 +95,8 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
       .map((m) => {
         if (typeof m === "string") {
           return m;
-        } else {
-          return m?.toClassName?.();
         }
+        return m?.toClassName?.();
       })
       .reduce((res, cls) => [...res, ...cls?.split(/\s+/)], [] as string[]);
 

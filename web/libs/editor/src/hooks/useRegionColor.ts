@@ -59,11 +59,11 @@ export const getRegionStyles = ({
   const strokeWidth = (() => {
     if (suggestion) {
       return defaultSuggestionWidth;
-    } else if (selected && !sameStrokeWidthForSelected) {
-      return defaultStrokeWidthHighlighted;
-    } else {
-      return +(style?.strokewidth ?? defaultStrokeWidth);
     }
+    if (selected && !sameStrokeWidthForSelected) {
+      return defaultStrokeWidthHighlighted;
+    }
+    return +(style?.strokewidth ?? defaultStrokeWidth);
   })();
 
   return {

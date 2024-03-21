@@ -132,11 +132,11 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const userFullName = useMemo(() => {
       if (user?.firstName || user?.lastName) {
         return `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
-      } else if (user?.email) {
-        return user.email;
-      } else {
-        return username;
       }
+      if (user?.email) {
+        return user.email;
+      }
+      return username;
     }, [user, username]);
 
     return showUsername && userFullName ? <Tooltip title={userFullName}>{userpic}</Tooltip> : userpic;

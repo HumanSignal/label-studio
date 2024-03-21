@@ -109,9 +109,8 @@ export const minmax = (array: ArrayLike<number>) => {
     }
 
     return [min, max];
-  } else {
-    return [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
   }
+  return [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
 };
 
 export const averageMinMax = (data: Float32Array) => {
@@ -131,9 +130,8 @@ export const average = (array: ArrayLike<number>) => {
     }
 
     return sum / arraySize;
-  } else {
-    return 0;
   }
+  return 0;
 };
 
 export const measure = (message: string, callback: () => void) => {

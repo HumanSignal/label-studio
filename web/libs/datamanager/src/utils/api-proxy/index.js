@@ -70,9 +70,8 @@ export class APIProxy {
   call(method, { params, body, headers }) {
     if (this.isValidMethod(method)) {
       return this[method](params ?? {}, { body, headers });
-    } else {
-      console.warn(`Unknown API method "${method}"`);
     }
+    console.warn(`Unknown API method "${method}"`);
   }
 
   /**

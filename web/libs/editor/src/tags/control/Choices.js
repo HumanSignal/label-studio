@@ -202,9 +202,8 @@ const Model = types
             if (Array.isArray(value) && Array.isArray(choice.resultValue)) {
               if (value.length !== choice.resultValue.length) return false;
               return value.every?.((val, idx) => val === choice.resultValue?.[idx]);
-            } else {
-              return value === choice.resultValue;
             }
+            return value === choice.resultValue;
           });
         }
 

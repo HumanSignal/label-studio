@@ -344,9 +344,8 @@ export const AppStore = types
           okText: "Go to setup",
         });
         return false;
-      } else {
-        return true;
       }
+      return true;
     },
 
     closeLabeling(options) {

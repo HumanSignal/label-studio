@@ -195,9 +195,8 @@ const _Tool = types
     get existingRegion() {
       if (self.getSelectedShape?.type && self.getSelectedShape.maskDataURL) {
         return self.getSelectedShape;
-      } else {
-        return null;
       }
+      return null;
     },
 
     /**

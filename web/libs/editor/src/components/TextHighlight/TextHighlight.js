@@ -259,7 +259,8 @@ class TextHighlight extends Component {
   getNode(i, range, text, url, isEmoji) {
     if (url.length) {
       return this.getUrlNode(i, range, url);
-    } else if (isEmoji) {
+    }
+    if (isEmoji) {
       return this.getEmojiNode(i, range);
     }
 

@@ -103,9 +103,8 @@ export const TabColumn = types
     get hidden() {
       if (self.children) {
         return all(self.children, (c) => c.hidden);
-      } else {
-        return self.parentView?.hiddenColumns.hasColumn(self) ?? (self.parent.hidden || false);
       }
+      return self.parentView?.hiddenColumns.hasColumn(self) ?? (self.parent.hidden || false);
     },
 
     get parentView() {

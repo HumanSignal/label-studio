@@ -120,9 +120,8 @@ const Model = types
           choice = choice.parentChoice;
         }
         return value;
-      } else {
-        return self._resultValue;
       }
+      return self._resultValue;
     },
 
     isReadOnly() {

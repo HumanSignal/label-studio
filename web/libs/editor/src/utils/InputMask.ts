@@ -48,9 +48,8 @@ export class MaskUtil {
       .map((char: any) => {
         if (char.validator) {
           return this.proxyChar;
-        } else {
-          return char.char;
         }
+        return char.char;
       })
       .join("");
 
@@ -64,13 +63,11 @@ export class MaskUtil {
 
         if (validator) {
           return validator === this.numValidate ? "\\d" : "[a-zA-Z]";
-        } else {
-          if (escape.includes(char)) {
-            return `\\${char}`;
-          } else {
-            return char;
-          }
         }
+        if (escape.includes(char)) {
+          return `\\${char}`;
+        }
+        return char;
       })
       .join("");
 
@@ -102,9 +99,8 @@ export class MaskUtil {
         .reduce((accumulator: any, currentValue: any) => {
           if (currentValue === false) {
             return false;
-          } else {
-            return accumulator;
           }
+          return accumulator;
         });
 
       if (!isValid) {
@@ -117,9 +113,8 @@ export class MaskUtil {
           if (maskObj.validator) {
             pointer += 1;
             return filteredData[pointer];
-          } else {
-            return maskObj.char;
           }
+          return maskObj.char;
         })
         .join("");
     }
@@ -156,9 +151,8 @@ export class MaskUtil {
           if (maskObj.validator) {
             pointer += 1;
             return filteredData[pointer] || this.proxyChar;
-          } else {
-            return maskObj.char || this.proxyChar;
           }
+          return maskObj.char || this.proxyChar;
         })
         .join("") || this.placeholder
     );

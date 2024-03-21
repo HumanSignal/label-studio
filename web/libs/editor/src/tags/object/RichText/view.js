@@ -412,53 +412,52 @@ class RichTextPieceView extends Component {
           )}
         </Block>
       );
-    } else {
-      return (
-        <Block name="richtext" tag={ObjectTag} item={item}>
-          <Elem name="loading" ref={this.loadingRef}>
-            <LoadingOutlined />
-          </Elem>
-
-          <Elem
-            key="root"
-            name="iframe"
-            tag="iframe"
-            referrerPolicy="no-referrer"
-            sandbox="allow-same-origin allow-scripts"
-            ref={(el) => {
-              item.setReady(false);
-              item.visibleNodeRef.current = el;
-            }}
-            className="htx-richtext"
-            srcDoc={val}
-            onLoad={this.onIFrameLoad}
-          />
-          {isFF(FF_LSDV_4620_3) ? null : (
-            <>
-              <Elem
-                key="orig"
-                name="orig-iframe"
-                tag="iframe"
-                referrerPolicy="no-referrer"
-                sandbox="allow-same-origin allow-scripts"
-                ref={item.originalContentRef}
-                className="htx-richtext-orig"
-                srcDoc={val}
-              />
-              <Elem
-                key="work"
-                name="work-iframe"
-                tag="iframe"
-                referrerPolicy="no-referrer"
-                sandbox="allow-same-origin allow-scripts"
-                ref={item.workingNodeRef}
-                className="htx-richtext-work"
-              />
-            </>
-          )}
-        </Block>
-      );
     }
+    return (
+      <Block name="richtext" tag={ObjectTag} item={item}>
+        <Elem name="loading" ref={this.loadingRef}>
+          <LoadingOutlined />
+        </Elem>
+
+        <Elem
+          key="root"
+          name="iframe"
+          tag="iframe"
+          referrerPolicy="no-referrer"
+          sandbox="allow-same-origin allow-scripts"
+          ref={(el) => {
+            item.setReady(false);
+            item.visibleNodeRef.current = el;
+          }}
+          className="htx-richtext"
+          srcDoc={val}
+          onLoad={this.onIFrameLoad}
+        />
+        {isFF(FF_LSDV_4620_3) ? null : (
+          <>
+            <Elem
+              key="orig"
+              name="orig-iframe"
+              tag="iframe"
+              referrerPolicy="no-referrer"
+              sandbox="allow-same-origin allow-scripts"
+              ref={item.originalContentRef}
+              className="htx-richtext-orig"
+              srcDoc={val}
+            />
+            <Elem
+              key="work"
+              name="work-iframe"
+              tag="iframe"
+              referrerPolicy="no-referrer"
+              sandbox="allow-same-origin allow-scripts"
+              ref={item.workingNodeRef}
+              className="htx-richtext-work"
+            />
+          </>
+        )}
+      </Block>
+    );
   }
 }
 

@@ -256,7 +256,8 @@ export default class Waveform extends React.Component {
   onWheel = (e) => {
     if (e && !e.shiftKey) {
       return;
-    } else if (e?.shiftKey) {
+    }
+    if (e?.shiftKey) {
       /**
        * Disable scrolling page
        */

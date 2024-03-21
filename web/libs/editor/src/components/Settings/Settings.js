@@ -50,13 +50,12 @@ const HotkeysDescription = () => {
         {Object.entries(keyNamespaces).map(([ns, data]) => {
           if (Object.keys(data.descriptions).length === 0) {
             return null;
-          } else {
-            return (
-              <Tabs.TabPane key={ns} tab={data.description ?? ns}>
-                <Table columns={columns} dataSource={getData(data.descriptions)} size="small" />
-              </Tabs.TabPane>
-            );
           }
+          return (
+            <Tabs.TabPane key={ns} tab={data.description ?? ns}>
+              <Table columns={columns} dataSource={getData(data.descriptions)} size="small" />
+            </Tabs.TabPane>
+          );
         })}
       </Tabs>
     </Block>

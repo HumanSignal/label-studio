@@ -322,16 +322,15 @@ export const TabStore = types
         destroy(view);
 
         return newView;
-      } else {
-        applySnapshot(view, newViewSnapshot);
-
-        if (reload !== false) {
-          view.reload({ interaction });
-        }
-
-        view.unlock();
-        return view;
       }
+      applySnapshot(view, newViewSnapshot);
+
+      if (reload !== false) {
+        view.reload({ interaction });
+      }
+
+      view.unlock();
+      return view;
     }),
 
     duplicateView: flow(function* (view) {

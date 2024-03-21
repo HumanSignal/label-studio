@@ -9,7 +9,7 @@ const topTags = ["View"];
 
 function matches(hint: string, typed: string, matchInMiddle?: boolean) {
   if (matchInMiddle) return hint.includes(typed);
-  else return hint.startsWith(typed);
+  return hint.startsWith(typed);
 }
 
 type CMCursor = {
@@ -212,20 +212,19 @@ function getHints(cm: any, options: CMHintOptions) {
       };
 
       return returnHintsFromAtValues(atValues);
-    } else {
-      // An attribute name completion
-      if (token.type === "attribute") {
-        prefix = token.string;
-        replaceToken = true;
-      }
-      for (const attr in attrs) {
-        if (prefix && !matches(attr, prefix, matchInMiddle)) continue;
+    }
+    // An attribute name completion
+    if (token.type === "attribute") {
+      prefix = token.string;
+      replaceToken = true;
+    }
+    for (const attr in attrs) {
+      if (prefix && !matches(attr, prefix, matchInMiddle)) continue;
 
-        const name = attrs[attr].required ? attr + "*" : attr;
-        const type = attrs[attr].type;
+      const name = attrs[attr].required ? attr + "*" : attr;
+      const type = attrs[attr].type;
 
-        result.push({ text: attr, name, type, description: attrs[attr].description, render: richHint });
-      }
+      result.push({ text: attr, name, type, description: attrs[attr].description, render: richHint });
     }
   }
   function returnHints() {
