@@ -44,7 +44,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "useExponentiationOperator": "off",
         "useFragmentSyntax": "off",
         "useNodejsImportProtocol": "off",
         "useNumberNamespace": "off",

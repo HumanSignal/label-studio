@@ -261,7 +261,7 @@ module.exports = {
     I.scrollPageToTop();
     const calcSteps = {
       steps: () => parameter,
-      rate: (p1, p2) => Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2)) / parameter,
+      rate: (p1, p2) => Math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) / parameter,
     }[mode];
     const startPoint = points[0];
 

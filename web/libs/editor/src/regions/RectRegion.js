@@ -235,7 +235,7 @@ const Model = types
       const distanceX = xA - xB;
       const distanceY = yA - yB;
 
-      return Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+      return Math.sqrt(distanceX ** 2 + distanceY ** 2);
     },
 
     getHeightOnPerpendicular(pointA, pointB, cursor) {
