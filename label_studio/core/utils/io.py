@@ -142,8 +142,8 @@ def read_yaml(filepath):
 
 def path_to_open_binary_file(filepath) -> io.BufferedReader:
     """
-    The result of this call should generally be passed to a FileResponse or similar.
-    Unusually, this call deliberately doesn't close the file; FileResponse is responsible for this.
+    Copy the file at filepath to a named temporary file and return that file object.
+    Unusually, this function deliberately doesn't close the file; the caller is responsible for this.
     """
     tmp = NamedTemporaryFile(delete=True)
     shutil.copy2(filepath, tmp.name)
