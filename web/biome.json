@@ -17,7 +17,6 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "noAutofocus": "off",
         "noDistractingElements": "off",
         "noHeaderScope": "off",
         "noInteractiveElementToNoninteractiveRole": "off",

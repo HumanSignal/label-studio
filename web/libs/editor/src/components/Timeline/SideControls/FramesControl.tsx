@@ -53,7 +53,6 @@ const FrameInput: FC<FrameInputProps> = ({ length, position, onChange, onFinishE
       type="text"
       ref={input}
       defaultValue={position + 1}
-      autoFocus
       onFocus={() => input.current?.select()}
       onKeyDown={(e) => {
         const allowedKey = allowedKeys.find((k) => (k instanceof RegExp ? k.test(e.key) : k === e.key));

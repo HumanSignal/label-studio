@@ -208,7 +208,6 @@ export const Pagination: FC<PaginationProps> = forwardRef(
             {inputMode ? (
               <input
                 type="text"
-                autoFocus
                 defaultValue={currentPage}
                 pattern="[0-9]"
                 onKeyDown={(e) => {
