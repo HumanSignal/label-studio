@@ -1,22 +1,32 @@
-# syntax=docker/dockerfile:1.3
-FROM --platform=${BUILDPLATFORM} node:18 AS frontend-builder
+# syntax=docker/dockerfile:1
+ARG NODE_VERSION=18
 
-ENV NPM_CACHE_LOCATION=$HOME/.cache/yarn/v6 \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    NX_REJECT_UNKNOWN_LOCAL_CACHE=0
+################################ Stage: frontend-builder (build frontend assets)
+FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION} AS frontend-builder
+ENV BUILD_NO_SERVER=true \
+    BUILD_NO_HASH=true \
+    BUILD_NO_CHUNKS=true \
+    BUILD_MODULE=true \
+    YARN_CACHE_FOLDER=/root/web/.yarn \
+    NODE_ENV=production
 
 WORKDIR /label-studio/web
-
-COPY --chown=1001:0 web .
-COPY --chown=1001:0 pyproject.toml /label-studio
 
 # Fix Docker Arm64 Build
 RUN yarn config set registry https://registry.npmjs.org/
 RUN yarn config set network-timeout 1200000 # HTTP timeout used when downloading packages, set to 20 minutes
 
-RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
-    yarn install --frozen-lockfile \
-    && yarn run build
+COPY web/package.json .
+COPY web/yarn.lock .
+COPY web/tools tools
+RUN --mount=type=cache,target=${YARN_CACHE_FOLDER},sharing=locked \
+    yarn install --prefer-offline --no-progress --pure-lockfile --frozen-lockfile --ignore-engines --non-interactive --production=false
+
+COPY web .
+COPY pyproject.toml ../pyproject.toml
+RUN --mount=type=cache,target=${YARN_CACHE_FOLDER},sharing=locked \
+    --mount=type=bind,source=.git,target=../.git \
+    yarn run build && yarn version:libs
 
 FROM ubuntu:22.04
 
