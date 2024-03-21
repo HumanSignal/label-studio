@@ -20,7 +20,6 @@
       "suspicious": {
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
-        "noApproximativeNumericConstant": "off",
         "noCommentText": "off",
         "noConsoleLog": "off",
         "noDebugger": "off",
