@@ -389,7 +389,7 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states && states.filter((s) => s.isSelected && s.type.includes("labels"));
+      return states?.filter((s) => s.isSelected && s.type.includes("labels"));
     },
 
     controlButton() {

@@ -24,7 +24,7 @@ const _BaseNPointTool = types
       get getActivePolygon() {
         const poly = self.currentArea;
 
-        if (poly && poly.closed) return null;
+        if (poly?.closed) return null;
         if (poly === undefined) return null;
         if (poly && poly.type !== "rectangleregion") return null;
 

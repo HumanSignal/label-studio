@@ -65,7 +65,7 @@ const SelectionMap = types
       },
       select(region) {
         self.selected.put(region);
-        region.selectRegion && region.selectRegion();
+        region.selectRegion?.();
 
         if (self.highlighted) {
           // @todo some backward compatibility, should be rewritten to state handling
@@ -487,7 +487,7 @@ export default types
       // find regions that have that region as a parent
       const children = self.filterByParentID(region.id);
 
-      children && children.forEach((r) => r.setParentID(region.parentID));
+      children?.forEach((r) => r.setParentID(region.parentID));
 
       getEnv(self).events.invoke("entityDelete", region);
 

@@ -32,7 +32,7 @@ export const RouteWithStaticFallback = ({ children, render, route, component, st
     let modalRoutes = [];
     let regularRoutes = [];
 
-    if (children.props && children.props.children) {
+    if (children.props?.children) {
       [modalRoutes, regularRoutes] = extractModalRoutes(children.props.children);
       children = React.cloneElement(children, { children: regularRoutes });
     } else if (Array.isArray(children)) {

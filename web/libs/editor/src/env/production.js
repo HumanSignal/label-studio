@@ -2,7 +2,7 @@ import External from "../core/External";
 import Messages from "../utils/messages";
 
 function getData(task) {
-  if (task && task.data) {
+  if (task?.data) {
     return {
       ...task,
       data: JSON.stringify(task.data),

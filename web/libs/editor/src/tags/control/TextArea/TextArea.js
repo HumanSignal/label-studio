@@ -293,7 +293,7 @@ const Model = types
       },
 
       beforeSend() {
-        if (self._value && self._value.length) {
+        if (self._value?.length) {
           self.addText(self._value);
           self._value = "";
         }

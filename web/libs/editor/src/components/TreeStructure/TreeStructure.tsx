@@ -208,7 +208,7 @@ const TreeStructure = ({
       const definedDepth = depth || 0;
       const id = `${label}-${definedDepth}`;
       const addInside = addInsideId === id;
-      const isOpen = (toggleItem && toggleItem[id]) || openNodes[id] || addInside || (defaultExpanded ? 1 : 2);
+      const isOpen = toggleItem?.[id] || openNodes[id] || addInside || (defaultExpanded ? 1 : 2);
 
       const transformedData: ExtendedData = transformationCallback({
         node: items[i],
@@ -250,7 +250,7 @@ const TreeStructure = ({
         itemCount={data?.length || 0}
         itemSize={rowHeightCalc}
         width={width}
-        itemData={(index: number) => ({ row: data && data[index], toggle, addInside })}
+        itemData={(index: number) => ({ row: data?.[index], toggle, addInside })}
       >
         {({ data, index, style }) => <Row data={data} rowStyle={style} index={index} rowComponent={rowComponent} />}
       </VariableSizeList>

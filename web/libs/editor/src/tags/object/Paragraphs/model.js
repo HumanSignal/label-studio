@@ -170,7 +170,7 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states && states.filter((s) => s.isSelected && s._type === "paragraphlabels");
+      return states?.filter((s) => s.isSelected && s._type === "paragraphlabels");
     },
 
     isVisibleForAuthorFilter(data) {

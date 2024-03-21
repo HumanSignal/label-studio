@@ -135,7 +135,7 @@ export const AudioView = {
   toMatchImageSnapshot(el?: Cypress.Chainable<JQuery<HTMLElement>>, options?: { name?: string; threshold?: number }) {
     el = el || this.root;
     let name;
-    if (options && options.name) {
+    if (options?.name) {
       name = options.name;
       delete options.name;
     }

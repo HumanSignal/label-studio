@@ -30,13 +30,12 @@ export const ProjectCell = (cell) => {
         lineHeight: "16px",
       }}
     >
-      {projectList &&
-        projectList.map((projectRef, index) => (
-          <Fragment key={projectRef.project_id}>
-            {index > 0 && ", "}
-            <ProjectLink project={projectRef} />
-          </Fragment>
-        ))}
+      {projectList?.map((projectRef, index) => (
+        <Fragment key={projectRef.project_id}>
+          {index > 0 && ", "}
+          <ProjectLink project={projectRef} />
+        </Fragment>
+      ))}
     </div>
   );
 };

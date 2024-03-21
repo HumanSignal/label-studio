@@ -188,7 +188,7 @@ class ChannelD3 extends React.Component {
     } = this.props;
 
     const activeStates = parent?.activeStates();
-    const statesSelected = activeStates && activeStates.length;
+    const statesSelected = activeStates?.length;
     const readonly = parent?.annotation?.isReadOnly();
 
     // skip if event fired by .move() - prevent recursion and bugs

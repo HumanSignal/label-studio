@@ -48,7 +48,7 @@ function buildFileName(test, uniqueFileName) {
     fileName = fileName.substr(0, fileName.indexOf("{") - 3).trim();
   }
 
-  if (test.ctx && test.ctx.test && test.ctx.test.type === "hook") {
+  if (test.ctx?.test && test.ctx.test.type === "hook") {
     fileName = clearString(`${test.title}_${test.ctx.test.title}`);
   }
 

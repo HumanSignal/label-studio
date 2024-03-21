@@ -13,7 +13,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   static create(params: TimelinePluginParams) {
     return {
       name: "timeline",
-      deferInit: params && params.deferInit ? params.deferInit : false,
+      deferInit: params?.deferInit ? params.deferInit : false,
       params,
       instance: TimelinePlugin,
     } as any;

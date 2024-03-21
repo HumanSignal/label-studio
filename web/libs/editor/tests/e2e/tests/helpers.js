@@ -15,7 +15,7 @@ async function initLabelStudio({
   additionalInterfaces = [],
   params = {},
 }) {
-  if (window.Konva && window.Konva.stages.length) window.Konva.stages.forEach((stage) => stage.destroy());
+  if (window.Konva?.stages.length) window.Konva.stages.forEach((stage) => stage.destroy());
 
   const interfaces = [
     "panel",

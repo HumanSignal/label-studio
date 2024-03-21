@@ -197,7 +197,7 @@ const validateToNameTag = (element, model, flatTree) => {
       return errorBuilder.tagNotFound(model.name, "toname", name);
     }
 
-    if (controlledTags && controlledTags.validate(controlledTag.tagName).length) {
+    if (controlledTags?.validate(controlledTag.tagName).length) {
       return errorBuilder.tagUnsupported(model.name, "toname", controlledTag.tagName, controlledTags);
     }
   }

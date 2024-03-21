@@ -93,7 +93,7 @@ export const useWaveform = (
   useEffect(() => {
     const wf = waveform.current;
 
-    if (wf && wf.loaded) {
+    if (wf?.loaded) {
       wf.zoom = zoom;
     }
   }, [zoom]);
@@ -101,7 +101,7 @@ export const useWaveform = (
   useEffect(() => {
     const wf = waveform.current;
 
-    if (wf && wf.loaded) {
+    if (wf?.loaded) {
       wf.volume = volume;
     }
   }, [volume]);
@@ -109,7 +109,7 @@ export const useWaveform = (
   useEffect(() => {
     const wf = waveform.current;
 
-    if (wf && wf.loaded) {
+    if (wf?.loaded) {
       wf.rate = rate;
     }
   }, [rate]);
@@ -117,7 +117,7 @@ export const useWaveform = (
   useEffect(() => {
     const wf = waveform.current;
 
-    if (wf && wf.loaded) {
+    if (wf?.loaded) {
       wf.amp = amp;
     }
   }, [amp]);

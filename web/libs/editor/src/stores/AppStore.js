@@ -370,7 +370,7 @@ export default types
       hotkeys.addNamed("region:relation", () => {
         const c = self.annotationStore.selected;
 
-        if (c && c.highlightedNode && !c.relationMode) {
+        if (c?.highlightedNode && !c.relationMode) {
           c.startRelationMode(c.highlightedNode);
         }
       });
@@ -380,7 +380,7 @@ export default types
         e.preventDefault();
         const c = self.annotationStore.selected;
 
-        if (c && c.highlightedNode && !c.relationMode) {
+        if (c?.highlightedNode && !c.relationMode) {
           c.highlightedNode.requestPerRegionFocus();
         }
       });
@@ -421,7 +421,7 @@ export default types
       hotkeys.addNamed("region:exit", () => {
         const c = self.annotationStore.selected;
 
-        if (c && c.relationMode) {
+        if (c?.relationMode) {
           c.stopRelationMode();
         } else if (!c.isDrawing) {
           c.unselectAll();
@@ -439,7 +439,7 @@ export default types
       hotkeys.addNamed("region:cycle", () => {
         const c = self.annotationStore.selected;
 
-        c && c.regionStore.selectNext();
+        c?.regionStore.selectNext();
       });
 
       // duplicate selected regions
@@ -503,7 +503,7 @@ export default types
         if (!events.hasEvent("submitDraft")) return resolve();
         const res = events.invokeFirst("submitDraft", self, c, params);
 
-        if (res && res.then) res.then(resolve);
+        if (res?.then) res.then(resolve);
         else resolve(res);
       });
     }

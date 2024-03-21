@@ -137,9 +137,9 @@ module.exports = composePlugins(
       if (isScss) {
         rule.oneOf.forEach((loader) => {
           if (loader.use) {
-            const cssLoader = loader.use.find((use) => use.loader && use.loader.includes("css-loader"));
+            const cssLoader = loader.use.find((use) => use.loader?.includes("css-loader"));
 
-            if (cssLoader && cssLoader.options) {
+            if (cssLoader?.options) {
               cssLoader.options.modules = {
                 mode: "local",
                 auto: true,
@@ -163,15 +163,15 @@ module.exports = composePlugins(
           if (testString.match(/module/)) return false;
 
           // we only target pre-processors that has 'css-loader included'
-          return testString.match(/scss|sass|styl/) && r.use.some((u) => u.loader && u.loader.includes("css-loader"));
+          return testString.match(/scss|sass|styl/) && r.use.some((u) => u.loader?.includes("css-loader"));
         });
 
         r.forEach((_r) => {
-          const cssLoader = _r.use.find((use) => use.loader && use.loader.includes("css-loader"));
+          const cssLoader = _r.use.find((use) => use.loader?.includes("css-loader"));
 
           if (!cssLoader) return;
 
-          const isSASS = _r.use.some((use) => use.loader && use.loader.match(/sass|scss/));
+          const isSASS = _r.use.some((use) => use.loader?.match(/sass|scss/));
 
           if (isSASS) _r.exclude = /node_modules/;
 
@@ -187,10 +187,10 @@ module.exports = composePlugins(
       }
 
       if (rule.test.toString().includes("styl")) {
-        const r = rule.oneOf.filter((r) => r.use && r.use.find((u) => u.loader && u.loader.includes("stylus-loader")));
+        const r = rule.oneOf.filter((r) => r.use?.find((u) => u.loader?.includes("stylus-loader")));
 
         r.forEach((_r) => {
-          const l = _r.use.filter((u) => u.loader && u.loader.includes("stylus-loader"));
+          const l = _r.use.filter((u) => u.loader?.includes("stylus-loader"));
 
           l.forEach((_l) => {
             _l.options = {

@@ -216,7 +216,7 @@ export default class Waveform extends React.Component {
     if (val > 700) val = 700;
 
     this.onChangeZoom(val);
-    ev && ev.preventDefault();
+    ev?.preventDefault();
     return false;
   };
 
@@ -249,14 +249,14 @@ export default class Waveform extends React.Component {
     if (val < MIN_ZOOM_Y) val = MIN_ZOOM_Y;
 
     this.onChangeZoomY(val);
-    ev && ev.preventDefault();
+    ev?.preventDefault();
     return false;
   };
 
   onWheel = (e) => {
     if (e && !e.shiftKey) {
       return;
-    } else if (e && e.shiftKey) {
+    } else if (e?.shiftKey) {
       /**
        * Disable scrolling page
        */

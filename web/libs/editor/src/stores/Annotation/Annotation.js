@@ -281,7 +281,7 @@ export const Annotation = types
   .actions((self) => ({
     reinitHistory(force = true) {
       self.history.reinit(force);
-      self.autosave && self.autosave.cancel();
+      self.autosave?.cancel();
       if (self.type === "annotation") self.setInitialValues();
     },
 
@@ -396,7 +396,7 @@ export const Annotation = types
     },
 
     unselectStates() {
-      self.names.forEach((tag) => tag.unselectAll && tag.unselectAll());
+      self.names.forEach((tag) => tag.unselectAll?.());
     },
 
     /**
@@ -464,13 +464,12 @@ export const Annotation = types
     },
 
     unloadRegionState(region) {
-      region.states &&
-        region.states.forEach((s) => {
-          const mainViewTag = self.names.get(s.name);
+      region.states?.forEach((s) => {
+        const mainViewTag = self.names.get(s.name);
 
-          mainViewTag.unselectAll && mainViewTag.unselectAll();
-          mainViewTag.perRegionCleanup && mainViewTag.perRegionCleanup();
-        });
+        mainViewTag.unselectAll?.();
+        mainViewTag.perRegionCleanup?.();
+      });
     },
 
     addRelation(reg) {
@@ -500,7 +499,7 @@ export const Annotation = types
      */
     beforeSend() {
       self.traverseTree((node) => {
-        if (node && node.beforeSend) {
+        if (node?.beforeSend) {
           node.beforeSend();
         }
       });
@@ -520,7 +519,7 @@ export const Annotation = types
       // move all children into the parent region of the given one
       const children = regions.filter((r) => r.parentID === region.id);
 
-      children && children.forEach((r) => r.setParentID(region.parentID));
+      children?.forEach((r) => r.setParentID(region.parentID));
 
       if (!region.classification) getEnv(self).events.invoke("entityDelete", region);
 
@@ -544,7 +543,7 @@ export const Annotation = types
     undo() {
       const { history, regionStore } = self;
 
-      if (history && history.canUndo) {
+      if (history?.canUndo) {
         let stopDrawingAfterNextUndo = false;
         const selectedIds = regionStore.selectedIds;
         const currentRegion = regionStore.findRegion(
@@ -570,7 +569,7 @@ export const Annotation = types
     redo() {
       const { history, regionStore } = self;
 
-      if (history && history.canRedo) {
+      if (history?.canRedo) {
         const selectedIds = regionStore.selectedIds;
 
         history.redo();
@@ -587,8 +586,8 @@ export const Annotation = types
       // Some async or lazy mode operations (ie. Images lazy load) need to reinitHistory without removing state selections
       if (force) self.unselectAll();
 
-      self.names.forEach((tag) => tag.needsUpdate && tag.needsUpdate());
-      self.areas.forEach((area) => area.updateAppearenceFromState && area.updateAppearenceFromState());
+      self.names.forEach((tag) => tag.needsUpdate?.());
+      self.areas.forEach((area) => area.updateAppearenceFromState?.());
       if (isFF(FF_DEV_2432)) {
         const areas = Array.from(self.areas.values());
         const filtered = areas.filter((area) => area.isDrawing);
@@ -727,7 +726,7 @@ export const Annotation = types
     },
 
     beforeDestroy() {
-      self.autosave && self.autosave.cancel && self.autosave.cancel();
+      self.autosave?.cancel?.();
     },
 
     setDraftId(id) {
@@ -807,7 +806,7 @@ export const Annotation = types
       // [TODO] we need to traverse this two times, fix
       // Hotkeys setup
       self.traverseTree((node) => {
-        if (node && node.onHotKey && node.hotkey) {
+        if (node?.onHotKey && node.hotkey) {
           hotkeys.addKey(node.hotkey, node.onHotKey, undefined, node.hotkeyScope);
         }
       });
@@ -830,7 +829,7 @@ export const Annotation = types
         /**
          * Hotkey for controls
          */
-        if (node && node.onHotKey && !node.hotkey) {
+        if (node?.onHotKey && !node.hotkey) {
           const comb = hotkeys.makeComb();
 
           if (!comb) return;
@@ -978,7 +977,7 @@ export const Annotation = types
                 const labelsContainer = tagNames.get(obj.from_name) ?? tagNames.get("labels");
                 const value = obj.value[key];
 
-                if (value && value.length && labelsContainer.type.endsWith("labels")) {
+                if (value?.length && labelsContainer.type.endsWith("labels")) {
                   const filteredValue = value.filter((labelName) => !!labelsContainer.findLabel(labelName));
                   const oldKey = key;
 
@@ -1355,7 +1354,7 @@ export const Annotation = types
     },
 
     resetReady() {
-      self.objects.forEach((object) => object.setReady && object.setReady(false));
-      self.areas.forEach((area) => area.setReady && area.setReady(false));
+      self.objects.forEach((object) => object.setReady?.(false));
+      self.areas.forEach((area) => area.setReady?.(false));
     },
   }));

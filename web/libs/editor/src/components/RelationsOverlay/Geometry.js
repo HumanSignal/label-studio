@@ -300,7 +300,7 @@ export class Geometry {
   static combineBBoxes(...bboxes) {
     const [x1, y1, x2, y2] = Geometry.getPointsBBox(
       bboxes.reduce((points, bbox) => {
-        if (bbox && bbox.x && bbox.y) {
+        if (bbox?.x && bbox.y) {
           points.push(bbox.x);
           points.push(bbox.y);
           points.push(bbox.x + bbox.width);

@@ -16,7 +16,7 @@ const HtxTextNodeView = ({ store, range, id, highlightStyle, style, charIndex, c
     </span>
   );
 
-  if (overlap && overlap.length) {
+  if (overlap?.length) {
     let bg;
 
     if (range.states) {

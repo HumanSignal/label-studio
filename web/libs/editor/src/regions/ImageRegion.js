@@ -22,7 +22,7 @@ const RegionMixin = types
     get perRegionStates() {
       const states = self.states;
 
-      return states && states.filter((s) => s.perregion === true);
+      return states?.filter((s) => s.perregion === true);
     },
 
     get store() {

@@ -123,7 +123,7 @@ export const TabStore = types
         selected = yield self.getViewByKey(view);
       } else if (typeof view === "number") {
         selected = self.views.find((v) => v.id === view);
-      } else if (view && view.id) {
+      } else if (view?.id) {
         selected = self.views.find((v) => v.id === view.id);
       }
       if (!selected) {
@@ -379,7 +379,7 @@ export const TabStore = types
       const createColumnPath = (columns, column) => {
         const result = [];
 
-        if (column && column.parent) {
+        if (column?.parent) {
           const parentColums = columns.find((c) => {
             return !c.parent && c.id === column.parent && c.target === column.target;
           });

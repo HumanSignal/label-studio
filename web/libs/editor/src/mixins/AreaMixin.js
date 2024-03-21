@@ -117,18 +117,18 @@ export const AreaMixinBase = types
 
       const styled = self.results.find((r) => r.style);
 
-      if (styled && styled.style) {
+      if (styled?.style) {
         return styled.style;
       }
       const emptyStyled = self.results.find((r) => r.emptyStyle);
 
-      if (emptyStyled && emptyStyled.emptyStyle) {
+      if (emptyStyled?.emptyStyle) {
         return emptyStyled.emptyStyle;
       }
 
       const controlStyled = self.results.find((r) => self.type.startsWith(r.type));
 
-      return controlStyled && controlStyled.controlStyle;
+      return controlStyled?.controlStyle;
     },
 
     // @todo may be slow, consider to add some code to annotation (un)select* methods
@@ -208,7 +208,7 @@ export const AreaMixinBase = types
           },
         });
       }
-      self.updateAppearenceFromState && self.updateAppearenceFromState();
+      self.updateAppearenceFromState?.();
     },
   }));
 

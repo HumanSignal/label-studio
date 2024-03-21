@@ -268,7 +268,7 @@ export const checkCollapsedPanelsHaveData = (collapsedSide: PanelsCollapsed, pan
 export const restorePanel = (showComments: boolean): StoredPanelState => {
   const previousState = window.localStorage.getItem("panelState");
   const parsed: StoredPanelState | null = previousState && JSON.parse(previousState);
-  const panelData = parsed && parsed.panelData;
+  const panelData = parsed?.panelData;
   const defaultCollapsedSide = { [Side.left]: false, [Side.right]: false };
   const collapsedSide = parsed?.collapsedSide ?? defaultCollapsedSide;
   const allTabs = panelData && Object.values(panelData).flatMap((panel) => panel.panelViews);

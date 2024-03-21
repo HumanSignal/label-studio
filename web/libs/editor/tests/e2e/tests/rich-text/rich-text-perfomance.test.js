@@ -100,7 +100,7 @@ Scenario("Rich text initialization in hightload conditions", async ({ I, LabelSt
     }).then(() => {
       new Promise((resolve) => {
         const watchObjectsReady = () => {
-          const isReady = window.Htx && window.Htx.annotationStore.selected.objects.every((object) => object.isReady);
+          const isReady = window.Htx?.annotationStore.selected.objects.every((object) => object.isReady);
 
           if (isReady) {
             window._loadedTime = Date.now();

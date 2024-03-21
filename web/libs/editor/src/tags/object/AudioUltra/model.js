@@ -150,13 +150,13 @@ export const AudioModel = types.compose(
       activeStates() {
         const states = self.states();
 
-        return states && states.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
+        return states?.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
       },
 
       get activeState() {
         const states = self.states();
 
-        return states && states.filter((s) => getType(s).name === "LabelsModel" && s.isSelected)[0];
+        return states?.filter((s) => getType(s).name === "LabelsModel" && s.isSelected)[0];
       },
 
       get activeLabel() {
@@ -369,7 +369,7 @@ export const AudioModel = types.compose(
         },
 
         onHotKey(e) {
-          e && e.preventDefault();
+          e?.preventDefault();
           self._ws.togglePlay();
           return false;
         },

@@ -126,7 +126,7 @@ class RichTextPieceView extends Component {
     const region = this._determineRegion(event.target);
 
     if (!region) return;
-    region && region.onClickRegion(event);
+    region?.onClickRegion(event);
     event.stopPropagation();
   };
 

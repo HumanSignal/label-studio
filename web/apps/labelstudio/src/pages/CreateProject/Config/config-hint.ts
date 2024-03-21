@@ -101,9 +101,9 @@ function richHint(el: Element, self: any, data: CMHintResult) {
 }
 
 function getHints(cm: any, options: CMHintOptions) {
-  const tags = options && options.schemaInfo;
-  let quote = (options && options.quoteChar) || '"';
-  const matchInMiddle = options && options.matchInMiddle;
+  const tags = options?.schemaInfo;
+  let quote = options?.quoteChar || '"';
+  const matchInMiddle = options?.matchInMiddle;
 
   if (!tags) return;
 
@@ -151,7 +151,7 @@ function getHints(cm: any, options: CMHintOptions) {
     inner = context.length && context[context.length - 1];
 
     const curTag = inner && tags[inner];
-    const childList = inner ? curTag && curTag.children : topTags;
+    const childList = inner ? curTag?.children : topTags;
 
     if (childList && tagType !== "close") {
       for (const name of childList)
@@ -167,7 +167,7 @@ function getHints(cm: any, options: CMHintOptions) {
   } else {
     // Attribute completion
     const curTag: CMSchemaItem = tagInfo && tags[tagInfo.name];
-    const attrs = curTag && curTag.attrs;
+    const attrs = curTag?.attrs;
 
     if (!attrs) return;
     if (token.type === "string" || token.string === "=") {

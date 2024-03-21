@@ -265,7 +265,7 @@ const AnnotationStoreModel = types
           node.toname = objects[0];
         }
 
-        if (node && node.toname) {
+        if (node?.toname) {
           self.upsertToName(node);
         }
 
@@ -378,7 +378,7 @@ const AnnotationStoreModel = types
       const result = isFF(FF_DEV_1621) ? findNonInteractivePredictionResults() : [];
       const c = self.addAnnotation({ ...options, result });
 
-      if (result && result.length) {
+      if (result?.length) {
         const ids = {};
 
         // Area id is <uniq-id>#<annotation-id> to be uniq across all tree

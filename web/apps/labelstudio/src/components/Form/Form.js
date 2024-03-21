@@ -341,7 +341,7 @@ export default class Form extends React.Component {
   }
 
   fillWithFormData(field) {
-    const value = (this.props.formData ?? {})[field.name];
+    const value = this.props.formData?.[field.name];
 
     if (field.isProtected && this.props.formData) {
       field.setValue(PASSWORD_PROTECTED_VALUE);

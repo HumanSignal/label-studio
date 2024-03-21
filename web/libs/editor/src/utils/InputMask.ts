@@ -247,7 +247,7 @@ export class MaskUtil {
       }
 
       /** If we have a validator for the key */
-      if (mask && mask.validator) {
+      if (mask?.validator) {
         const match = !!key.match(mask.validator);
         /** Don't allow non-matches */
 

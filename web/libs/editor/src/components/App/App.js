@@ -197,7 +197,7 @@ class App extends Component {
   render() {
     const { store } = this.props;
     const as = store.annotationStore;
-    const root = as.selected && as.selected.root;
+    const root = as.selected?.root;
     const { settings } = store;
 
     if (store.isLoading) return this.renderLoader();

@@ -69,7 +69,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
   const keyRef = useRef(key);
   const collapsed = sidePanelCollapsed[alignment as Side] && !detached;
   const isParentOfCollapsedPanel = attachedKeys && attachedKeys[0] === key;
-  const isChildOfGroup = attachedKeys && attachedKeys.includes(key) && attachedKeys[0] !== key;
+  const isChildOfGroup = attachedKeys?.includes(key) && attachedKeys[0] !== key;
   const collapsedHeader = !(collapsed && !isParentOfCollapsedPanel);
   const tooltipText = visible && !collapsed ? "Collapse" : "Expand";
 

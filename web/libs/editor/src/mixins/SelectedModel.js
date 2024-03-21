@@ -24,14 +24,14 @@ const SelectedModelMixin = types
       // return first selected label color
       const sel = self.tiedChildren.find((c) => c.selected === true);
 
-      return sel && sel.background;
+      return sel?.background;
     },
 
     get selectedColor() {
       // return first selected label color
       const sel = self.tiedChildren.find((c) => c.selected === true);
 
-      return sel && sel.background;
+      return sel?.background;
     },
 
     get isSelected() {
@@ -95,7 +95,7 @@ const SelectedModelMixin = types
     selectFirstVisible() {
       const f = self.tiedChildren.find((c) => c.visible);
 
-      f && f.toggleSelected();
+      f?.toggleSelected();
 
       return f;
     },

@@ -244,7 +244,7 @@ function renderItem(ref: IAnyStateTreeNode, annotation: IAnnotation, includeKey 
  * @param {*} item
  */
 function renderChildren(item: IAnyStateTreeNode, annotation: IAnnotation) {
-  if (item && item.children && item.children.length) {
+  if (item?.children?.length) {
     return item.children.map((el: IAnyStateTreeNode) => {
       return renderItem(el, annotation);
     });
@@ -338,7 +338,7 @@ function extractNames(root: IAnyStateTreeNode) {
       node.toname = objects[0];
     }
 
-    if (node && node.toname) {
+    if (node?.toname) {
       const val = toNames.get(node.toname);
 
       if (val) {

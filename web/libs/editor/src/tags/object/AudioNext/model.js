@@ -100,7 +100,7 @@ export const AudioModel = types.compose(
       activeStates() {
         const states = self.states();
 
-        return states && states.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
+        return states?.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
       },
     }))
     ////// Sync actions
@@ -182,7 +182,7 @@ export const AudioModel = types.compose(
       },
 
       onHotKey(e) {
-        e && e.preventDefault();
+        e?.preventDefault();
         self._ws.playPause();
         return false;
       },
@@ -226,7 +226,7 @@ export const AudioModel = types.compose(
       selectRange(ev, ws_region) {
         const selectedRegions = self.regs.filter((r) => r.start >= ws_region.start && r.end <= ws_region.end);
 
-        ws_region.remove && ws_region.remove();
+        ws_region.remove?.();
         if (!selectedRegions.length) return;
         // @todo: needs preventing drawing with ctrl pressed
         // if (ev.ctrlKey || ev.metaKey) {

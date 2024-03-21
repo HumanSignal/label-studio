@@ -194,7 +194,7 @@ const Model = types
 
         self.annotation.toNames
           .get(labels.toname)
-          .filter((tag) => tag.type && tag.type.endsWith("labels") && tag.name !== labels.name);
+          .filter((tag) => tag.type?.endsWith("labels") && tag.name !== labels.name);
 
         // unselect other tools if they exist and selected
         const manager = ToolsManager.getInstance({ name: self.parent.toname });

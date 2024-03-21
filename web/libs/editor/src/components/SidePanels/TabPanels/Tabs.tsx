@@ -66,7 +66,7 @@ const Tab = ({
       elementRef: tabRef,
       onMouseDown(event) {
         if (locked) {
-          setBreakPointActiveTab && setBreakPointActiveTab(location.current.tabIndex);
+          setBreakPointActiveTab?.(location.current.tabIndex);
           return;
         }
         if (event.buttons === 2) return;

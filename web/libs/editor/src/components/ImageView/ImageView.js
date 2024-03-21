@@ -776,7 +776,7 @@ export default observer(
        */
       if (e.evt && !e.evt.ctrlKey) {
         return;
-      } else if (e.evt && e.evt.ctrlKey) {
+      } else if (e.evt?.ctrlKey) {
         /**
          * Disable scrolling page
          */

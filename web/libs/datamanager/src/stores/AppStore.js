@@ -415,23 +415,22 @@ export const AppStore = types
       self.projectFetch = options.force === true;
 
       const isTimer = options.interaction === "timer";
-      const params =
-        options && options.interaction
-          ? {
-              interaction: options.interaction,
-              ...(isTimer
-                ? {
-                    include: [
-                      "task_count",
-                      "task_number",
-                      "annotation_count",
-                      "num_tasks_with_annotations",
-                      "queue_total",
-                    ].join(","),
-                  }
-                : null),
-            }
-          : null;
+      const params = options?.interaction
+        ? {
+            interaction: options.interaction,
+            ...(isTimer
+              ? {
+                  include: [
+                    "task_count",
+                    "task_number",
+                    "annotation_count",
+                    "num_tasks_with_annotations",
+                    "queue_total",
+                  ].join(","),
+                }
+              : null),
+          }
+        : null;
 
       try {
         const newProject = yield self.apiCall("project", params);

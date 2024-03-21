@@ -39,7 +39,7 @@ const RegionsMixin = types
     get perRegionStates() {
       const states = self.states;
 
-      return states && states.filter((s) => s.perregion === true);
+      return states?.filter((s) => s.perregion === true);
     },
 
     get store() {
@@ -273,13 +273,13 @@ const RegionsMixin = types
       toggleFiltered(e) {
         self.filtered = !self.filtered;
         self.toggleHidden(e, true);
-        e && e.stopPropagation();
+        e?.stopPropagation();
       },
 
       toggleHidden(e, isFiltered = false) {
         if (!isFiltered) self.filtered = false;
         self.hidden = !self.hidden;
-        e && e.stopPropagation();
+        e?.stopPropagation();
       },
 
       notifyDrawingFinished({ destroy = false } = {}) {

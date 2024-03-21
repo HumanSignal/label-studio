@@ -128,7 +128,7 @@ const Model = types
     get serializableValue() {
       const choices = self.selectedValues();
 
-      if (choices && choices.length) return { choices };
+      if (choices?.length) return { choices };
 
       return null;
     },

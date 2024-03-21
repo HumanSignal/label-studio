@@ -12,7 +12,7 @@ const DynamicChildrenMixin = types
   }))
   .actions((self) => {
     const prepareDynamicChildrenData = (data, store, parent) => {
-      if (data && data.length) {
+      if (data?.length) {
         for (const obj of data) {
           parent.children.push({
             type: self.defaultChildType,

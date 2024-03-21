@@ -59,7 +59,7 @@ export default observer(({ store }) => {
           disabled={!history?.canUndo}
           icon={<RollbackOutlined />}
           onClick={() => {
-            history && history.reset();
+            history?.reset();
           }}
         >
           Reset

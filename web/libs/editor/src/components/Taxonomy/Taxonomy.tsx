@@ -497,7 +497,7 @@ const Taxonomy = ({
       if (options.canRemoveItems === false && !newSelected.length) return;
 
       setInternalSelected(newSelected);
-      onChange && onChange(null, newSelected);
+      onChange?.(null, newSelected);
     };
 
     return [selected, setSelected];
@@ -533,7 +533,7 @@ const Taxonomy = ({
         dontDoubleScroll(e);
         if (e.shiftKey) {
           setOpen(true);
-          searchInput && searchInput.focus();
+          searchInput?.focus();
         }
         if (index >= 0) shiftFocus(index, 1);
         if (searchInput === focusedElement) shiftFocus(0, 0);
@@ -541,11 +541,11 @@ const Taxonomy = ({
       case "ArrowUp":
         dontDoubleScroll(e);
         if (index > 0) shiftFocus(index, -1);
-        else if (index === 0) searchInput && searchInput.focus();
+        else if (index === 0) searchInput?.focus();
         break;
       case "ArrowRight":
         if (index >= 0) focusedElement.parentNode?.parentNode?.toggle(focusedElement.id);
-        searchInput && searchInput.focus();
+        searchInput?.focus();
         break;
       default:
         break;

@@ -116,7 +116,7 @@ export default types
         return false;
       };
 
-      spans && spans.forEach((s) => addEvent(s));
+      spans?.forEach((s) => addEvent(s));
     },
 
     selectRegion() {

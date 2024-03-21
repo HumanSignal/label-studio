@@ -257,7 +257,7 @@ DataManagerPage.context = ({ dmRef }) => {
     };
   }, [dmRef, project]);
 
-  return project && project.id ? (
+  return project?.id ? (
     <Space size="small">
       {project.expert_instruction && mode !== "explorer" && (
         <Button

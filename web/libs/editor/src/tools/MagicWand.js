@@ -193,7 +193,7 @@ const _Tool = types
      *  mask, or null otherwise.
      */
     get existingRegion() {
-      if (self.getSelectedShape && self.getSelectedShape.type && self.getSelectedShape.maskDataURL) {
+      if (self.getSelectedShape?.type && self.getSelectedShape.maskDataURL) {
         return self.getSelectedShape;
       } else {
         return null;

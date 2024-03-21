@@ -64,9 +64,7 @@ Scenario("Basic scenario", async ({ I, LabelStudio, AtImageView, AtSettings, AtL
   }
   I.pressKey("Enter");
   const results = await LabelStudio.serialize();
-  const hasText = results.find(
-    (result) => result && result.value && result.value.text && result.value.text[0] === Text,
-  );
+  const hasText = results.find((result) => result?.value?.text && result.value.text[0] === Text);
 
   assert(hasText, true);
 });
@@ -204,9 +202,7 @@ Scenario(
 
     for (const region of regions) {
       if (region.text) {
-        const hasText = results.find(
-          (result) => result && result.value && result.value.text && result.value.text[0] === region.text,
-        );
+        const hasText = results.find((result) => result?.value?.text && result.value.text[0] === region.text);
 
         assert(hasText, true);
       }

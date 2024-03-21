@@ -37,7 +37,7 @@ fs.mkdirSync(outputDir, { recursive: true });
 // get list of already exsting tags if possible to set `is_new` flag
 fetch(currentTagsUrl)
   .then((res) => (res.ok ? res.json() : null))
-  .then((list) => list && list.map((file) => file.name.replace(/.md$/, "")))
+  .then((list) => list?.map((file) => file.name.replace(/.md$/, "")))
   .catch(() => null)
   .then((tags) => {
     function processTemplate(t, dir, supertag) {
@@ -58,7 +58,7 @@ fetch(currentTagsUrl)
       const header = supertag ? `## ${t.name}\n\n` : infoHeader(t.name, dir, isNew, meta);
 
       // we can use comma-separated list of @regions used by tag
-      const regions = t.customTags && t.customTags.find((desc) => desc.tag === "regions");
+      const regions = t.customTags?.find((desc) => desc.tag === "regions");
       // sample regions result and description
       let results = "";
 
