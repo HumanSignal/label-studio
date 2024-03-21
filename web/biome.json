@@ -17,7 +17,6 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "noRedundantRoles": "off",
         "useAnchorContent": "off",
         "useAriaActivedescendantWithTabindex": "off",
         "useValidAriaProps": "off",
