@@ -2,6 +2,8 @@ import { flatten, isDefined } from '../../../utils/utilities';
 
 // line feed
 const LF = '\n';
+// carriage return
+const CF = '\r';
 
 type DDExtraText = string;
 
@@ -366,7 +368,8 @@ class DomData {
     let fromIdx = this.displayedTextPos;
     const contentParts = [];
 
-    while (displayedText[fromIdx] === LF) {
+    // it should be just LF but in some OS / browsers it's LF and CR
+    while (displayedText[fromIdx] === LF || displayedText[fromIdx] === CF) {
       fromIdx++;
     }
     let toIdx = fromIdx;
