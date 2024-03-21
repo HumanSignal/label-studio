@@ -93,8 +93,7 @@ jobs:
           poetry install --with build
 
       - name: Collect static
-        run: |
-          poetry run python label_studio/manage.py collectstatic
+        run: poetry run python label_studio/manage.py collectstatic
 
       - name: Download feature flags
         env:
