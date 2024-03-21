@@ -31,9 +31,7 @@
         "noAccumulatingSpread": "off"
       },
       "style": {},
-      "nursery": {
-        "useSortedClasses": "off"
-      }
+      "nursery": {}
     }
   }
 }
