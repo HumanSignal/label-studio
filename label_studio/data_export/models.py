@@ -143,6 +143,11 @@ class DataExport(object):
 
     @staticmethod
     def generate_export_file(project, tasks, output_format, download_resources, get_args):
+        """Generate export file and return it as an open file object.
+
+        Be sure to close the file after using it, to avoid wasting disk space.
+        """
+
         # prepare for saving
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)

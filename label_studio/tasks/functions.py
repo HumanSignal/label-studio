@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import shutil
 import sys
 
 from core.bulk_update_utils import bulk_update
@@ -125,8 +126,9 @@ def export_project(project_id, export_format, path, serializer_context=None):
 
     # write to file
     filepath = os.path.join(path, filename) if os.path.isdir(path) else path
-    with open(filepath, 'wb') as file:
-        file.write(export_file.read())
+    with open(filepath, 'wb'):
+        shutil.copy2(export_file.name, filepath)
+    export_file.close()
 
     logger.debug(f'End exporting project <{project.title}> ({project.id}) in {export_format} format.')
 

@@ -319,6 +319,7 @@ class ExportMixin:
                 output_file = pathlib.Path(tmp_dir) / (str(out_dir.stem) + '.zip')
                 filename = pathlib.Path(input_name).stem + '.zip'
 
+            # TODO(jo): can we avoid the `f.read()` here?
             with open(output_file, mode='rb') as f:
                 return File(
                     io.BytesIO(f.read()),
