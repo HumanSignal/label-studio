@@ -93,7 +93,7 @@ const Labels = {
           $container.appendChild($labels);
         }
         $control.setAttribute("showInline", JSON.stringify(inline));
-        $container.setAttribute("style", "display:flex;align-items:start;gap:8px;flex-direction:" + direction);
+        $container.setAttribute("style", `display:flex;align-items:start;gap:8px;flex-direction:${direction}`);
       },
       value: ($control) => {
         let $container = $control.parentNode;

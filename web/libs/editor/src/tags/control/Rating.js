@@ -79,7 +79,7 @@ const Model = types
   }))
   .actions((self) => ({
     getSelectedString() {
-      return self.rating + " star";
+      return `${self.rating} star`;
     },
 
     needsUpdate() {

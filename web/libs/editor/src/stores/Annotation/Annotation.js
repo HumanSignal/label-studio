@@ -120,7 +120,7 @@ export const Annotation = types
       const children = item.children?.map(updateIds);
 
       if (children) item = { ...item, children };
-      if (item.id) item = { ...item, id: (item.name ?? item.id) + "@" + sn.id };
+      if (item.id) item = { ...item, id: `${item.name ?? item.id}@${sn.id}` };
       // @todo fallback for tags with name as id:
       // if (item.name) item = { ...item, name: item.name + "@" + sn.id };
       // @todo soon no such tags should left
@@ -815,11 +815,11 @@ export const Annotation = types
         // add Space hotkey for playbacks of audio, there might be
         // multiple audios on the screen
         if (node && !node.hotkey && (node.type === "audio" || node.type === "audioplus")) {
-          if (audiosNum > 0) comb = mod + "+" + (audiosNum + 1);
+          if (audiosNum > 0) comb = `${mod}+${audiosNum + 1}`;
           else audioNode = node;
 
           node.hotkey = comb;
-          hotkeys.addKey(comb, node.onHotKey, "Play an audio", Hotkey.DEFAULT_SCOPE + "," + Hotkey.INPUT_SCOPE);
+          hotkeys.addKey(comb, node.onHotKey, "Play an audio", `${Hotkey.DEFAULT_SCOPE},${Hotkey.INPUT_SCOPE}`);
 
           audiosNum++;
         }
@@ -840,7 +840,7 @@ export const Annotation = types
       });
 
       if (audioNode && audiosNum > 1) {
-        audioNode.hotkey = mod + "+1";
+        audioNode.hotkey = `${mod}+1`;
         hotkeys.addKey(audioNode.hotkey, audioNode.onHotKey);
         hotkeys.removeKey(mod);
       }

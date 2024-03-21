@@ -155,11 +155,11 @@ export class MediaLoader extends Destructable {
       xhr.responseType = "arraybuffer";
 
       const errorHandler = () => {
-        const error = new Error("HTTP error status: " + xhr.status);
+        const error = new Error(`HTTP error status: ${xhr.status}`);
 
         error.name = "HTTPError";
 
-        this.wf.setError("HTTP error status: " + xhr.status, error);
+        this.wf.setError(`HTTP error status: ${xhr.status}`, error);
         reject(xhr);
       };
 

@@ -11,7 +11,7 @@ function hashCode(str) {
   let hash = 0;
 
   if (str.length === 0) {
-    return hash + "";
+    return `${hash}`;
   }
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -238,7 +238,7 @@ module.exports = (config) => {
           }
 
           for (const [actionName, coverage] of Object.entries(actionCoverages)) {
-            const coveragePath = path.resolve(coverageDir, actionName + ".coverage.json");
+            const coveragePath = path.resolve(coverageDir, `${actionName}.coverage.json`);
 
             output.print(`writing ${coveragePath}`);
             fs.writeFileSync(coveragePath, JSON.stringify(coverage));

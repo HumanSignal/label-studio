@@ -61,7 +61,7 @@ const HtxTextAreaResultLine = forwardRef(
     );
 
     const inputProps = {
-      className: "ant-input " + styles.input,
+      className: `ant-input ${styles.input}`,
       value: displayValue,
       autoSize: isTextarea ? { minRows: 1 } : null,
       onChange: changeHandler,

@@ -564,7 +564,7 @@ class Path {
   }
 
   toString() {
-    return "/" + this.segments.map((seg) => `${seg[0]}[${seg[1]}]`).join("/");
+    return `/${this.segments.map((seg) => `${seg[0]}[${seg[1]}]`).join("/")}`;
   }
 }
 

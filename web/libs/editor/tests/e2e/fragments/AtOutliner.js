@@ -25,7 +25,7 @@ module.exports = {
   },
   locateRegionIndex(idx) {
     return this.locateRegionItemList().withDescendant(
-      locate(this._regionListItemIndex).toXPath() + `[text()='${idx}']`,
+      `${locate(this._regionListItemIndex).toXPath()}[text()='${idx}']`,
     );
   },
   locateSelectedItem(locator) {

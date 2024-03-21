@@ -507,7 +507,7 @@ const Model = types
       if (self.zoomScale !== 1) {
         const { zoomingPositionX = 0, zoomingPositionY = 0 } = self;
 
-        imgTransform.push("translate3d(" + zoomingPositionX + "px," + zoomingPositionY + "px, 0)");
+        imgTransform.push(`translate3d(${zoomingPositionX}px,${zoomingPositionY}px, 0)`);
       }
 
       if (self.rotation) {

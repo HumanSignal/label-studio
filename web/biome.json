@@ -43,9 +43,7 @@
       "performance": {
         "noAccumulatingSpread": "off"
       },
-      "style": {
-        "useTemplate": "off"
-      },
+      "style": {},
       "nursery": {
         "noConsole": "off",
         "noFocusedTests": "off",

@@ -174,7 +174,7 @@ Scenario(
             break;
           // year is formatted in config to be an ISO date
           case "year":
-            expected.datetime = input.year + "-01-01";
+            expected.datetime = `${input.year}-01-01`;
             break;
         }
 

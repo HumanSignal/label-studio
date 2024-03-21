@@ -386,7 +386,7 @@ class ChannelD3 extends React.Component {
     this.trackerTime.text(
       `${this.formatTime(dataX)}${brushWidth === 0 ? "" : ` [${this.formatDuration(brushWidth)}]`}`,
     );
-    this.trackerValue.text(this.formatValue(dataY) + " " + this.props.item.units);
+    this.trackerValue.text(`${this.formatValue(dataY)} ${this.props.item.units}`);
     this.trackerPoint.attr("cy", this.y(dataY));
     this.tracker.attr("text-anchor", screenX > width - 100 ? "end" : "start");
   };
@@ -638,7 +638,7 @@ class ChannelD3 extends React.Component {
       .attr("viewBox", [0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom])
       .style("display", "block")
       .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const marker = main
       .append("defs")

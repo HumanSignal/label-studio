@@ -80,7 +80,7 @@ const DrawingTool = types
       event(name, ev, [x, y, canvasX, canvasY]) {
         // filter right clicks and middle clicks and shift pressed
         if (ev.button > 0 || ev.shiftKey) return;
-        let fn = name + "Ev";
+        let fn = `${name}Ev`;
 
         if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
 
@@ -89,7 +89,7 @@ const DrawingTool = types
           const ts = ev.timeStamp;
 
           if (ts - lastClick.ts < 300 && self.comparePointsWithThreshold(lastClick, { x, y })) {
-            fn = "dbl" + fn;
+            fn = `dbl${fn}`;
             if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
           }
           lastClick = { ts, x, y };

@@ -30,7 +30,7 @@ const infoHeader = (name, group, isNew = false, meta = {}) =>
     "",
   ].join("\n");
 
-const outputDir = path.resolve(__dirname + "/../docs");
+const outputDir = path.resolve(`${__dirname}/../docs`);
 
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -64,11 +64,11 @@ fetch(currentTagsUrl)
 
       if (regions) {
         for (const region of regions.value.split(/,\s*/)) {
-          const files = path.resolve(__dirname + "/../src/regions/" + region + ".js");
+          const files = path.resolve(`${__dirname}/../src/regions/${region}.js`);
           const regionsData = jsdoc2md.getTemplateDataSync({ files });
           // region descriptions named after region and defined as separate type:
           // @typedef {Object} AudioRegionResult
-          const serializeData = regionsData.find((reg) => reg.name === region + "Result");
+          const serializeData = regionsData.find((reg) => reg.name === `${region}Result`);
 
           if (serializeData) {
             results = jsdoc2md
@@ -92,7 +92,7 @@ fetch(currentTagsUrl)
         .replace(/^(.*?\n){3}/, header)
         // remove useless Kind: member
         .replace(/\*\*Kind\*\*.*?\n/, "### Parameters\n")
-        .replace(/(\*\*Example\*\*\s*\n)/, results + "$1")
+        .replace(/(\*\*Example\*\*\s*\n)/, `${results}$1`)
         .replace(/\*\*Example\*\*\s*\n/g, "### Example\n")
         // move comments from examples to description
         .replace(/```html[\n\s]*<!--[\n\s]*([\w\W]*?)[\n\s]*-->[\n\s]*/g, "\n$1\n\n```html\n")
@@ -134,8 +134,8 @@ fetch(currentTagsUrl)
     }
 
     for (const { dir, title, nested } of groups) {
-      console.log("## " + title);
-      const prefix = __dirname + "/../src/tags/" + dir;
+      console.log(`## ${title}`);
+      const prefix = `${__dirname}/../src/tags/${dir}`;
       const getTemplateDataByGlob = (glob) => jsdoc2md.getTemplateDataSync({ files: path.resolve(prefix + glob) });
       let templateData = getTemplateDataByGlob("/*.js");
 

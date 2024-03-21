@@ -177,7 +177,7 @@ module.exports = composePlugins(
 
           if (cssLoader.options) {
             cssLoader.options.modules = {
-              localIdentName: css_prefix + "[local]", // Customize this format
+              localIdentName: `${css_prefix}[local]`, // Customize this format
               getLocalIdent(_ctx, _ident, className) {
                 if (className.includes("ant")) return className;
               },

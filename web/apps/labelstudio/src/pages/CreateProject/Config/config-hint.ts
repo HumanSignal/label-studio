@@ -156,14 +156,14 @@ function getHints(cm: any, options: CMHintOptions) {
     if (childList && tagType !== "close") {
       for (const name of childList)
         if (!prefix || matches(name, prefix, matchInMiddle))
-          result.push({ text: "<" + name, name, description: tags[name].description, render: richHint });
+          result.push({ text: `<${name}`, name, description: tags[name].description, render: richHint });
     } else if (tagType !== "close") {
       for (const name in tags)
         if (name !== "!attrs" && (!prefix || matches(name, prefix, matchInMiddle)))
-          result.push({ text: "<" + name, name, description: tags[name].description, render: richHint });
+          result.push({ text: `<${name}`, name, description: tags[name].description, render: richHint });
     }
     if (inner && (!prefix || (tagType === "close" && matches(inner, prefix, matchInMiddle))))
-      result.push({ text: "</" + inner + ">", render: richHint });
+      result.push({ text: `</${inner}>`, render: richHint });
   } else {
     // Attribute completion
     const curTag: CMSchemaItem = tagInfo && tags[tagInfo.name];
@@ -221,7 +221,7 @@ function getHints(cm: any, options: CMHintOptions) {
     for (const attr in attrs) {
       if (prefix && !matches(attr, prefix, matchInMiddle)) continue;
 
-      const name = attrs[attr].required ? attr + "*" : attr;
+      const name = attrs[attr].required ? `${attr}*` : attr;
       const type = attrs[attr].type;
 
       result.push({ text: attr, name, type, description: attrs[attr].description, render: richHint });

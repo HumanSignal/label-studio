@@ -190,17 +190,17 @@ function hexToRGBArray(hex) {
    */
 
   if (hex && hex.length === 4) {
-    rgb[0] = "0x" + hex[1] + hex[1];
-    rgb[1] = "0x" + hex[2] + hex[2];
-    rgb[2] = "0x" + hex[3] + hex[3];
+    rgb[0] = `0x${hex[1]}${hex[1]}`;
+    rgb[1] = `0x${hex[2]}${hex[2]}`;
+    rgb[2] = `0x${hex[3]}${hex[3]}`;
 
     /**
      * If HEX = 6
      */
   } else if (hex && hex.length === 7) {
-    rgb[0] = "0x" + hex[1] + hex[2];
-    rgb[1] = "0x" + hex[3] + hex[4];
-    rgb[2] = "0x" + hex[5] + hex[6];
+    rgb[0] = `0x${hex[1]}${hex[2]}`;
+    rgb[1] = `0x${hex[3]}${hex[4]}`;
+    rgb[2] = `0x${hex[5]}${hex[6]}`;
   }
   return rgb.map((x) => +x);
 }
@@ -263,7 +263,7 @@ export function stringToColor(str) {
   for (let i = 0; i < 3; i++) {
     const value = (hash >> (i * 8)) & 0xff;
 
-    color += ("00" + value.toString(16)).substr(-2);
+    color += `00${value.toString(16)}`.substr(-2);
   }
 
   return color;
