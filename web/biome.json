@@ -32,7 +32,6 @@
       },
       "style": {},
       "nursery": {
-        "noUselessTernary": "off",
         "useSortedClasses": "off"
       }
     }
