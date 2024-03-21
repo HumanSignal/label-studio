@@ -44,7 +44,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "useSelfClosingElements": "off",
         "useShorthandArrayType": "off",
         "useShorthandAssign": "off",
         "useSingleCaseStatement": "off",

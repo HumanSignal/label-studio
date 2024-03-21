@@ -89,7 +89,7 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
       </div>
       <div className={rootClass.elem("meta")}>
         <div className={rootClass.elem("group")}>{truncate(backend.url, 20, 10, "...")}</div>
-        <div className={rootClass.elem("group")}></div>
+        <div className={rootClass.elem("group")} />
         <div className={rootClass.elem("group")}>
           Created &nbsp;
           {formatDistanceToNow(parseISO(backend.created_at), {
@@ -106,7 +106,7 @@ const BackendState = ({ backend }) => {
 
   return (
     <div className={cn("ml").elem("status")}>
-      <span className={cn("ml").elem("indicator").mod({ state })}></span>
+      <span className={cn("ml").elem("indicator").mod({ state })} />
       <Oneof value={state} className={cn("ml").elem("status-label")}>
         <span case="DI">Disconnected</span>
         <span case="CO">Connected</span>

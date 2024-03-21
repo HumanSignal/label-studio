@@ -200,7 +200,7 @@ export const MediaPlayer = ({ src, video = false }) => {
           </Elem>
           <Elem name="track">Click to load</Elem>
         </Space>
-        <Elem tag={Space} size="small" name="time"></Elem>
+        <Elem tag={Space} size="small" name="time" />
       </Elem>
     </Block>
   );

@@ -145,7 +145,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       {item.errors?.map((error: any, i: any) => (
         <ErrorMessage key={`err-${i}`} error={error} />
       ))}
-      <div ref={(el) => (rootRef.current = el)}></div>
+      <div ref={(el) => (rootRef.current = el)} />
       <Controls
         position={controls.currentTime}
         playing={controls.playing}

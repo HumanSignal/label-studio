@@ -236,7 +236,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
                   onClick={() => {
                     /*  */
                   }}
-                ></div>
+                />
               </Elem>
             )}
           </Elem>
