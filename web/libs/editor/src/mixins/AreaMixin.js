@@ -180,6 +180,11 @@ export const AreaMixinBase = types
       self.results.push(r);
     },
 
+    // This method should be overridden if we need to get some additional data from result on deserialize
+    applyAdditionalDataFromResult(_result) {
+      // do nothing
+    },
+
     removeResult(r) {
       const index = self.results.indexOf(r);
 

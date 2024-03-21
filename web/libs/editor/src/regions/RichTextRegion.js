@@ -61,6 +61,15 @@ const Model = types
       }
     },
 
+    applyAdditionalDataFromResult(result) {
+      const isMainResult = result?.type?.endsWith('labels');
+      const hasText = isDefined(result?.value?.text);
+
+      if (isMainResult && hasText) {
+       self.text = result.value.text;
+      }
+   },
+
     serialize() {
       const res = {
         value: {},
@@ -187,7 +196,7 @@ const Model = types
       if (isFF(FF_LSDV_4620_3)) {
 
         // 1. first try to find range by xpath in the original layout
-        
+
         const offsets = self.parent.relativeOffsetsToGlobalOffsets(self.start, self.startOffset, self.end, self.endOffset);
 
         if (offsets) {

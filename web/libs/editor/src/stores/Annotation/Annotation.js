@@ -1033,8 +1033,8 @@ export const Annotation = types
         if (tagNames.has(obj.from_name) && tagNames.has(obj.to_name)) {
           res.push(obj);
         }
-        
-        // Insert image dimensions from result 
+
+        // Insert image dimensions from result
         (() => {
           if (!isDefined(obj.original_width)) return;
           if (!tagNames.has(obj.to_name)) return;
@@ -1043,7 +1043,7 @@ export const Annotation = types
 
           if (tag.type !== 'image') return;
 
-          const imageEntity = tag.findImageEntity(obj.item_index ?? 0); 
+          const imageEntity = tag.findImageEntity(obj.item_index ?? 0);
 
           if (!imageEntity) return;
 
@@ -1214,6 +1214,7 @@ export const Annotation = types
             object: to_name,
             ...data,
             // We need to omit value properties due to there may be conflicting property types, for example a text.
+            // if we don't it can create a classification instead of proper area
             ...omitValueFields(value),
             value,
           };
@@ -1231,7 +1232,10 @@ export const Annotation = types
           }
         }
 
-        area.addResult({ ...data, id: resultId, type, value, from_name, to_name });
+        const newResult = { ...data, id: resultId, type, value, from_name, to_name };
+
+        area.addResult(newResult);
+        area.applyAdditionalDataFromResult?.(newResult);
 
         // if there is merged result with region data and type and also with the labels
         // and object allows such merge — create new result with these labels
@@ -1349,7 +1353,7 @@ export const Annotation = types
         area.setValue(state);
       });
       self.suggestions.delete(id);
-      
+
     },
 
     rejectSuggestion(id) {
