@@ -44,7 +44,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "useShorthandAssign": "off",
         "useSingleCaseStatement": "off",
         "useSingleVarDeclarator": "off",
         "useTemplate": "off"
