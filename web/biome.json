@@ -19,8 +19,7 @@
       "a11y": {},
       "suspicious": {
         "noExplicitAny": "off",
-        "noAssignInExpressions": "off",
-        "useValidTypeof": "off"
+        "noAssignInExpressions": "off"
       },
       "complexity": {
         "noForEach": "off"
