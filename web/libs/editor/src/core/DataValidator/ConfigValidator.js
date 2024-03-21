@@ -150,7 +150,7 @@ const flattenTree = (tree, parent, parentParentTypes, result) => {
 
     result.push(flatChild);
 
-    if (child.children instanceof Array) {
+    if (Array.isArray(child.children)) {
       flattenTree(child, child, parentTypes, result);
     }
   }
