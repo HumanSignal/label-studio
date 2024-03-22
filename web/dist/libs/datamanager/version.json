@@ -1,6 +1,6 @@
 {
-  "message": "return workaround",
-  "commit": "2577060e87a20b066d38a575c94d9887a03955a0",
-  "date": "2024-03-21T17:36:42.000Z",
-  "branch": "PLT-213"
+  "message": "Merge branch 'develop' into 'fb-leap-388/svg-xmlns'",
+  "commit": "04b954592843e5d39c7333b7397262f7d6b0e794",
+  "date": "2024-03-22T10:54:48.000Z",
+  "branch": "fb-leap-388/svg-xmlns"
 }
