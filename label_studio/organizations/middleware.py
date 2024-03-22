@@ -12,11 +12,16 @@ class DummyGetSessionMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        org = Organization.objects.first()
         user = request.user
-        if user and user.is_authenticated and user.active_organization is None:
-            user.active_organization = org
-            user.save(update_fields=['active_organization'])
+        if user and user.is_authenticated:
+            if user.active_organization is None:
+                org = Organization.objects.first()
+                user.active_organization = org
+                user.save(update_fields=['active_organization'])
+            else:
+                org = user.active_organization
+        else:
+            org = Organization.objects.first()
         if org is not None:
             request.session['organization_pk'] = org.id
         response = self.get_response(request)
