@@ -80,7 +80,7 @@ def predictions_to_annotations_form(user, project):
                 {
                     'type': 'select',
                     'name': 'model_version',
-                    'label': 'Choose a model',
+                    'label': 'Choose predictions',
                     'options': versions,
                 }
             ],
@@ -95,8 +95,10 @@ actions = [
         'title': 'Create Annotations From Predictions',
         'order': 91,
         'dialog': {
-            'text': 'This action will create new annotations from predictions with the selected model version '
-            'for each selected task.',
+            'title': 'Create Annotations From Predictions',
+            'text': 'Create annotations from predictions using selected predictions set '
+            'for each selected task.'
+            'Your account will be assigned as an owner to those annotations. ',
             'type': 'confirm',
             'form': predictions_to_annotations_form,
         },

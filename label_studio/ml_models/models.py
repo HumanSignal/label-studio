@@ -141,7 +141,9 @@ class ModelRun(models.Model):
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
-    triggered_at = models.DateTimeField(_('triggered at'))
+    triggered_at = models.DateTimeField(_('triggered at'), null=True, default=None)
+
+    predictions_updated_at = models.DateTimeField(_('predictions updated at'), null=True, default=None)
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
 

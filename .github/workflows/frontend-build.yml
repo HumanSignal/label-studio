@@ -45,11 +45,16 @@ jobs:
           node-version: "${{ env.NODE }}"
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
-      - name: "Monorepo: Build"
+      - name: "Build"
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
         run: yarn build
 
-      - name: Commit and Push
+      - name: "Generate version files"
+        continue-on-error: true
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn version:libs
+
+      - name: "Commit and Push"
         run: |
           git add "${{ env.FRONTEND_MONOREPO_DIR }}" || true
           git status -s

@@ -257,6 +257,10 @@ class TaskListAPI(generics.ListCreateAPIView):
 
             # retrieve ML predictions if tasks don't have them
             if not review and project.evaluate_predictions_automatically:
+                # TODO MM TODO this needs a discussion, because I'd expect
+                # people to retrieve manually instead on DM load, plus it
+                # will slow down initial DM load
+                # if project.retrieve_predictions_automatically is deprecated now and no longer used
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
                 [tasks_by_ids[_id].refresh_from_db() for _id in ids]

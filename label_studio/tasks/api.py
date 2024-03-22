@@ -223,21 +223,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         else:
             return TaskSimpleSerializer
 
-    def retrieve(self, request, *args, **kwargs):
-        task = self.get_object()
-        project = task.project
-
-        # call machine learning api and format response
-        if project.evaluate_predictions_automatically:
-            for ml_backend in task.project.ml_backends.all():
-                ml_backend.predict_tasks([task])
-
-        result = self.get_serializer(task).data
-
-        # use proxy inlining to task data (for credential access)
-        result['data'] = task.resolve_uri(result['data'], project)
-        return Response(result)
-
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 

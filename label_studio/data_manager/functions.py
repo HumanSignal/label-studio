@@ -315,15 +315,20 @@ def get_prepared_queryset(request, project):
 
 
 def evaluate_predictions(tasks):
-    """Call ML backend for prediction evaluation of the task queryset"""
+    """
+    Call the given ML backend to retrieve predictions with the task queryset as an input.
+    If backend is not specified, we'll assume the tasks' project only has one associated
+    ML backend, and use that backend.
+    """
     if not tasks:
         return
 
     project = tasks[0].project
 
-    for ml_backend in project.ml_backends.all():
-        # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
-        ml_backend.predict_tasks(tasks)
+    backend = project.ml_backend
+
+    if backend:
+        return backend.predict_tasks(tasks=tasks)
 
 
 def filters_ordering_selected_items_exist(data):

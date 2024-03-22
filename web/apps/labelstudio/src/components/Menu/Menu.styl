@@ -75,6 +75,33 @@
     &__item
       border-radius 0
 
+  &_contextual
+    box-shadow 0px 1px 2px rgba(38, 38, 38, 0.3), 0px 1px 3px 1px rgba(38, 38, 38, 0.15)
+    border-radius 4px
+
+  &_contextual &__item
+    height 32px
+    padding 16px 8px
+    margin 4px 8px
+    display flex
+    align-items center
+    justify-content space-between
+    border-radius 4px
+    cursor pointer
+    &:hover
+      background-color rgba(65, 60, 74, 0.08)
+    &_dangerous
+      color #CF1322
+      &:hover
+        color #CF1322
+        background-color rgba(207, 19, 34, 0.08)
+
+  &:first-child
+    padding-top 4px
+
+  &:last-child
+    padding-bottom 4px
+
 .menu-group
   &__title
     padding 4px 10px

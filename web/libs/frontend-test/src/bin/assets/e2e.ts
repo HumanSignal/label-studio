@@ -1,5 +1,5 @@
 import { CURRENT_FLAGS } from '../../feature-flags';
-import '@heartex/ls-test/cypress/support/e2e;
+import '@heartex/ls-test/cypress/support/e2e';
 
 before(() => {
   cy.window().then(win => {
