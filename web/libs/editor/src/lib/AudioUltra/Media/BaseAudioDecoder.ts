@@ -1,5 +1,5 @@
-import { Events } from '../Common/Events';
-import { info } from '../Common/Utils';
+import { Events } from "../Common/Events";
+import { info } from "../Common/Utils";
 
 interface AudioDecoderEvents {
   progress: (chunk: number, total: number) => void;
@@ -73,7 +73,7 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
    */
   cancel() {
     if (!this.cancelled) {
-      info('decode:cancelled', this.src);
+      info("decode:cancelled", this.src);
     }
     this.cancelled = true;
     this.decodeId = 0;
@@ -109,7 +109,7 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
     this.decodingResolve?.();
     this.decodingResolve = undefined;
     this.decodingPromise = undefined;
-    info('decode:cleanup', this.src);
+    info("decode:cleanup", this.src);
   }
 
   abstract init(arraybuffer: ArrayBuffer): Promise<void>;

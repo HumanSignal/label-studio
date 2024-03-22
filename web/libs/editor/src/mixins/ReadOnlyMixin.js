@@ -1,18 +1,16 @@
-import { isAlive, types } from 'mobx-state-tree';
+import { isAlive, types } from "mobx-state-tree";
 
-export const ReadOnlyControlMixin = types
-  .model('ReadOnlyControlMixin', {})
-  .views(self => ({
-    isReadOnly() {
-      return self.result?.isReadOnly() || self.annotation?.isReadOnly();
-    },
-  }));
+export const ReadOnlyControlMixin = types.model("ReadOnlyControlMixin", {}).views((self) => ({
+  isReadOnly() {
+    return self.result?.isReadOnly() || self.annotation?.isReadOnly();
+  },
+}));
 
 export const ReadOnlyRegionMixin = types
-  .model('ReadOnlyRegionMixin', {
+  .model("ReadOnlyRegionMixin", {
     readonly: types.optional(types.boolean, false),
   })
-  .views(self => ({
+  .views((self) => ({
     isReadOnly() {
       if (!isAlive(self)) {
         return false;

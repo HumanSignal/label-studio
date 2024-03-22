@@ -1,4 +1,4 @@
-import { observer, Provider } from "mobx-react";
+import { Provider, observer } from "mobx-react";
 import React from "react";
 import { SDKProvider } from "../../providers/SDKProvider";
 import { Block, Elem } from "../../utils/bem";
@@ -17,11 +17,7 @@ class ErrorBoundary extends React.Component {
   }
 
   render() {
-    return this.state.error ? (
-      <div className="error">{this.state.error}</div>
-    ) : (
-      this.props.children
-    );
+    return this.state.error ? <div className="error">{this.state.error}</div> : this.props.children;
   }
 }
 
@@ -38,9 +34,7 @@ const AppComponent = ({ app }) => {
             {app.crashed ? (
               <Block name="crash">
                 <Elem name="header">Oops...</Elem>
-                <Elem name="description">
-                  Project has been deleted or not yet created.
-                </Elem>
+                <Elem name="description">Project has been deleted or not yet created.</Elem>
               </Block>
             ) : app.loading ? (
               <Block name="app-loader">

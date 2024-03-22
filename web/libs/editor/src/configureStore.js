@@ -1,13 +1,13 @@
-import AppStore from './stores/AppStore';
+import AppStore from "./stores/AppStore";
 
 // Get environment settings
 const getEnvironment = async () => {
   /* istanbul ignore next */
-  if (process.env.NODE_ENV === 'development' && !process.env.BUILD_NO_SERVER) {
-    return (await import('./env/development')).default;
+  if (process.env.NODE_ENV === "development" && !process.env.BUILD_NO_SERVER) {
+    return (await import("./env/development")).default;
   }
 
-  return (await import('./env/production')).default;
+  return (await import("./env/production")).default;
 };
 
 // Configure default store

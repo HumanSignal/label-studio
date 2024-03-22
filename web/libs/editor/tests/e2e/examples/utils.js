@@ -1,5 +1,5 @@
-const xml2js = require('xml2js');
-const builder = require('xmlbuilder');
+const xml2js = require("xml2js");
+const builder = require("xmlbuilder");
 const OPTIONS = {
   headless: true,
   explicitChildren: true,
@@ -11,7 +11,7 @@ function parseXml(doc) {
   let document;
   const parser = new xml2js.Parser(OPTIONS);
 
-  parser.parseString(doc, function(err, result) {
+  parser.parseString(doc, (err, result) => {
     document = result;
   });
   return document;
@@ -19,11 +19,11 @@ function parseXml(doc) {
 function renderXml(doc) {
   const rootName = Object.keys(doc)[0];
   const xml = builder.create(rootName, null, null, { headless: true });
-  const renderChildren = function(nodes, xml) {
-    nodes.forEach(node => {
-      const elem = xml.ele(node['#name']);
+  const renderChildren = (nodes, xml) => {
+    nodes.forEach((node) => {
+      const elem = xml.ele(node["#name"]);
 
-      if (node.$) Object.keys(node.$).forEach(key => elem.att(key, node.$[key]));
+      if (node.$) Object.keys(node.$).forEach((key) => elem.att(key, node.$[key]));
       if (node.$$) renderChildren(node.$$, elem);
     });
   };
@@ -49,7 +49,7 @@ function xmlForEachNode(tree, cb) {
   function forEachNode(node) {
     cb(node);
     if (node.$$) {
-      node.$$.forEach(childNode => forEachNode(childNode));
+      node.$$.forEach((childNode) => forEachNode(childNode));
     }
   }
   forEachNode(Object.values(tree)[0]);
@@ -59,7 +59,7 @@ function xmlFilterNodes(tree, cb) {
   function filterChildren(node) {
     cb(node);
     if (node.$$) {
-      node.$$ = node.$$.filter(childNode => {
+      node.$$ = node.$$.filter((childNode) => {
         if (!cb(childNode)) return false;
         filterChildren(childNode);
         return true;
@@ -75,13 +75,13 @@ function xmlFilterNodes(tree, cb) {
 }
 
 function xmlTreeHasTag(tree, tagName) {
-  return xmlFindBy(tree, node => node['#name'] === tagName);
+  return xmlFindBy(tree, (node) => node["#name"] === tagName);
 }
 
 function xmlFindBy(tree, cb) {
   function findBy(node) {
     if (cb(node)) return node;
-    return !!node.$$ && node.$$.find(childNode => findBy(childNode));
+    return !!node.$$ && node.$$.find((childNode) => findBy(childNode));
   }
   const rootNode = Object.values(tree)[0];
 

@@ -1,14 +1,7 @@
 import React from "react";
 import Input from "../Common/Input/Input";
 
-export const FilterInput = ({
-  value,
-  type,
-  onChange,
-  placeholder,
-  schema,
-  style,
-}) => {
+export const FilterInput = ({ value, type, onChange, placeholder, schema, style }) => {
   const inputRef = React.useRef();
   const onChangeHandler = () => {
     const value = inputRef.current?.value ?? inputRef.current?.input?.value;

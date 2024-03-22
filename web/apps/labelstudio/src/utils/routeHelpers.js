@@ -1,5 +1,5 @@
-import React from 'react';
-import { SentryRoute as Route } from '../config/Sentry';
+import React from "react";
+import { SentryRoute as Route } from "../config/Sentry";
 import { RouteWithStaticFallback } from "../routes/RouteWithStaticFallback";
 
 export const RouteContext = React.createContext();
@@ -56,9 +56,8 @@ export const pageSetToRoutes = (pages, config) => {
   try {
     if (Array.isArray(pages)) {
       return pages.map((page) => pageProcessor([null, page]));
-    } else {
-      return Object.entries(pages).map(pageProcessor);
     }
+    return Object.entries(pages).map(pageProcessor);
   } catch (err) {
     console.log(err);
     return [];
@@ -86,11 +85,19 @@ export const resolveRoutes = (routes, props) => {
         // If a component provided for the set of routes/pages,
         // we render one level higher to preserve nesting
         if (Component) {
-          children.push(processRoutes([{
-            path,
-            modal, ...rest,
-            component: Component,
-          }], parentPath));
+          children.push(
+            processRoutes(
+              [
+                {
+                  path,
+                  modal,
+                  ...rest,
+                  component: Component,
+                },
+              ],
+              parentPath,
+            ),
+          );
         }
 
         children.push(...resolvedNestedRoutes);
@@ -98,18 +105,11 @@ export const resolveRoutes = (routes, props) => {
         return Layout ? <Layout {...routeProps}>{children}</Layout> : children;
       };
 
-      return (
-        <RouteWithStaticFallback key={fullPath} path={fullPath} render={RouteComponent}/>
-      );
-    } else {
-      const routeProps = { key: fullPath, path: fullPath, modal: !!Component.modal };
-
-      return (
-        <Route {...routeProps} exact render={() => (
-          <Component {...(props ?? {})}/>
-        )} {...rest}/>
-      );
+      return <RouteWithStaticFallback key={fullPath} path={fullPath} render={RouteComponent} />;
     }
+    const routeProps = { key: fullPath, path: fullPath, modal: !!Component.modal };
+
+    return <Route {...routeProps} exact render={() => <Component {...(props ?? {})} />} {...rest} />;
   };
 
   const processRoutes = (routes, fullPath) => {

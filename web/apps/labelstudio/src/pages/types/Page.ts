@@ -1,7 +1,7 @@
-import { FC } from 'react';
+import type { FC } from "react";
 
 export type PageProps = {
-  children: React.ReactNode
+  children: React.ReactNode;
 };
 
 export type PageComponent = FC<PageProps>;
@@ -14,16 +14,19 @@ export type PageSettings = {
   titleRaw?: string;
   exact?: boolean;
   context?: PageContext;
-} & ({
-  component?: PageComponent;
-  pages?: Page[];
-} | {
-  layout?: PageLayout;
-  routes?: any[],
-});
+} & (
+  | {
+      component?: PageComponent;
+      pages?: Page[];
+    }
+  | {
+      layout?: PageLayout;
+      routes?: any[];
+    }
+);
 
-export type PageLayoutSettingt = Omit<PageSettings, "path">
+export type PageLayoutSettingt = Omit<PageSettings, "path">;
 
-export type PageLayout = PageLayoutSettingt | (PageComponent & PageLayoutSettingt)
+export type PageLayout = PageLayoutSettingt | (PageComponent & PageLayoutSettingt);
 
 export type Page = PageSettings | (PageComponent & PageSettings);

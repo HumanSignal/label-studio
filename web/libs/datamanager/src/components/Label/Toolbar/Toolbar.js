@@ -10,7 +10,7 @@ import {
   FaInfoCircle,
   FaRedo,
   FaTrashAlt,
-  FaUndo
+  FaUndo,
 } from "react-icons/fa";
 import { useShortcut } from "../../../sdk/hotkeys";
 import { Block, Elem } from "../../../utils/bem";
@@ -35,9 +35,7 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
         <Space size="large">
           <div style={{ display: "flex", alignItems: "center" }}>
             <History history={history}>
-              <div style={{ margin: history ? "0 10px" : 0 }}>
-                Task #{task.id}
-              </div>
+              <div style={{ margin: history ? "0 10px" : 0 }}>Task #{task.id}</div>
             </History>
           </div>
 
@@ -69,11 +67,7 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
               )}
 
               <Tooltip title="Settings">
-                <Button
-                  look="dashed"
-                  icon={<Icon icon={FaCog} />}
-                  onClick={() => lsf.toggleSettings()}
-                />
+                <Button look="dashed" icon={<Icon icon={FaCog} />} onClick={() => lsf.toggleSettings()} />
               </Tooltip>
             </Space>
           </Elem>
@@ -89,84 +83,57 @@ const LSFOperations = observer(({ history }) => {
 
   return history ? (
     <Button.Group>
-      <Button
-        icon={<Icon icon={FaUndo} />}
-        disabled={!history.canUndo}
-        onClick={() => history.undo()}
-      />
-      <Button
-        icon={<Icon icon={FaRedo} />}
-        disabled={!history.canRedo}
-        onClick={() => history.redo()}
-      />
-      <Button
-        icon={<Icon icon={FaTrashAlt} />}
-        disabled={!history.canUndo}
-        onClick={() => history.reset()}
-      />
+      <Button icon={<Icon icon={FaUndo} />} disabled={!history.canUndo} onClick={() => history.undo()} />
+      <Button icon={<Icon icon={FaRedo} />} disabled={!history.canRedo} onClick={() => history.redo()} />
+      <Button icon={<Icon icon={FaTrashAlt} />} disabled={!history.canUndo} onClick={() => history.reset()} />
     </Button.Group>
   ) : null;
 });
 
-const SubmissionButtons = observer(
-  ({ lsf, annotation, isLabelStream, disabled }) => {
-    const { userGenerate, sentUserGenerate } = annotation;
-    const isNewTask = userGenerate && !sentUserGenerate;
+const SubmissionButtons = observer(({ lsf, annotation, isLabelStream, disabled }) => {
+  const { userGenerate, sentUserGenerate } = annotation;
+  const isNewTask = userGenerate && !sentUserGenerate;
 
-    const saveAnnotation = React.useCallback(() => {
-      if (!disabled) {
-        isNewTask ? lsf.submitAnnotation() : lsf.updateAnnotation();
-      }
-    }, [disabled, isNewTask, lsf]);
+  const saveAnnotation = React.useCallback(() => {
+    if (!disabled) {
+      isNewTask ? lsf.submitAnnotation() : lsf.updateAnnotation();
+    }
+  }, [disabled, isNewTask, lsf]);
 
-    const skipTask = React.useCallback(() => {
-      if (!disabled) {
-        lsf.skipTask();
-      }
-    }, [disabled, lsf]);
+  const skipTask = React.useCallback(() => {
+    if (!disabled) {
+      lsf.skipTask();
+    }
+  }, [disabled, lsf]);
 
-    const buttons = [];
+  const buttons = [];
 
-    const submitShortcut = useShortcut('lsf.save-annotation', saveAnnotation, { showShortcut: true }, [disabled]);
-    const rejectShortcut = useShortcut('lsf.reject-task', skipTask, { showShortcut: true }, [disabled]);
+  const submitShortcut = useShortcut("lsf.save-annotation", saveAnnotation, { showShortcut: true }, [disabled]);
+  const rejectShortcut = useShortcut("lsf.reject-task", skipTask, { showShortcut: true }, [disabled]);
 
-    buttons.push(
-      <Tooltip
-        key="skip"
-        title={rejectShortcut}
-        mouseEnterDelay={TOOLTIP_DELAY}
+  buttons.push(
+    <Tooltip key="skip" title={rejectShortcut} mouseEnterDelay={TOOLTIP_DELAY}>
+      <Button look="danger" onClick={skipTask} disabled={disabled} icon={<Icon icon={FaBan} />}>
+        Skip
+      </Button>
+    </Tooltip>,
+  );
+
+  buttons.push(
+    <Tooltip key="submit" title={submitShortcut} mouseEnterDelay={TOOLTIP_DELAY}>
+      <Button
+        look="primary"
+        disabled={disabled}
+        icon={<Icon icon={isNewTask ? FaCheck : FaCheckCircle} />}
+        onClick={saveAnnotation}
       >
-        <Button
-          look="danger"
-          onClick={skipTask}
-          disabled={disabled}
-          icon={<Icon icon={FaBan} />}
-        >
-          Skip
-        </Button>
-      </Tooltip>,
-    );
+        {isNewTask || isLabelStream ? "Submit" : "Update"}
+      </Button>
+    </Tooltip>,
+  );
 
-    buttons.push(
-      <Tooltip
-        key="submit"
-        title={submitShortcut}
-        mouseEnterDelay={TOOLTIP_DELAY}
-      >
-        <Button
-          look="primary"
-          disabled={disabled}
-          icon={<Icon icon={isNewTask ? FaCheck : FaCheckCircle} />}
-          onClick={saveAnnotation}
-        >
-          {isNewTask || isLabelStream ? "Submit" : "Update"}
-        </Button>
-      </Tooltip>,
-    );
-
-    return <Space>{buttons}</Space>;
-  },
-);
+  return <Space>{buttons}</Space>;
+});
 
 const HistoryButton = ({ children, ...rest }) => (
   <Button {...rest} shape="circle">
@@ -195,17 +162,9 @@ const History = observer(({ history, children }) => {
 
   return renderable ? (
     <React.Fragment>
-      <HistoryButton
-        disabled={!canGoBack}
-        onClick={() => history.goBackward()}
-        icon={<Icon icon={FaArrowLeft} />}
-      />
+      <HistoryButton disabled={!canGoBack} onClick={() => history.goBackward()} icon={<Icon icon={FaArrowLeft} />} />
       {children}
-      <HistoryButton
-        disabled={!canGoForward}
-        onClick={() => history.goForward()}
-        icon={<Icon icon={FaArrowRight} />}
-      />
+      <HistoryButton disabled={!canGoForward} onClick={() => history.goForward()} icon={<Icon icon={FaArrowRight} />} />
     </React.Fragment>
   ) : (
     children

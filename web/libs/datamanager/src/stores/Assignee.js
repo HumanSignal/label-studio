@@ -11,19 +11,35 @@ export const Assignee = types
     annotated: types.maybeNull(types.boolean),
   })
   .views((self) => ({
-    get firstName() { return self.user.firstName; },
-    get lastName() { return self.user.lastName; },
-    get username() { return self.user.username; },
-    get email() { return self.user.email; },
-    get lastActivity() { return self.user.lastActivity; },
-    get avatar() { return self.user.avatar; },
-    get initials() { return self.user.initials; },
-    get fullName() { return self.user.fullName; },
+    get firstName() {
+      return self.user.firstName;
+    },
+    get lastName() {
+      return self.user.lastName;
+    },
+    get username() {
+      return self.user.username;
+    },
+    get email() {
+      return self.user.email;
+    },
+    get lastActivity() {
+      return self.user.lastActivity;
+    },
+    get avatar() {
+      return self.user.avatar;
+    },
+    get initials() {
+      return self.user.initials;
+    },
+    get fullName() {
+      return self.user.fullName;
+    },
   }))
   .preProcessSnapshot((sn) => {
     let result = sn;
 
-    if (typeof sn === 'number') {
+    if (typeof sn === "number") {
       result = {
         id: sn,
         user: sn,

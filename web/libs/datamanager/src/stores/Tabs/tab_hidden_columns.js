@@ -1,9 +1,7 @@
 import { getRoot, types } from "mobx-state-tree";
 import { TabColumn } from "./tab_column";
 
-const ColumnsList = types.maybeNull(
-  types.array(types.late(() => types.reference(TabColumn))),
-);
+const ColumnsList = types.maybeNull(types.array(types.late(() => types.reference(TabColumn))));
 
 export const TabHiddenColumns = types
   .model("TabHiddenColumns", {

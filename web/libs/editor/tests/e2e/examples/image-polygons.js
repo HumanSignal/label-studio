@@ -9,16 +9,16 @@ const config = `
 `;
 
 const data = {
-  image: 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg',
+  image: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg",
 };
 
 const result = [
   {
-    id: 'XSMXwwsaTa',
-    from_name: 'tag',
-    to_name: 'img',
-    type: 'polygonlabels',
-    origin: 'manual',
+    id: "XSMXwwsaTa",
+    from_name: "tag",
+    to_name: "img",
+    type: "polygonlabels",
+    origin: "manual",
     original_width: 10109,
     original_height: 4542,
     image_rotation: 0,
@@ -29,17 +29,15 @@ const result = [
         [48.13333333333333, 62.61127596439169],
         [48.13333333333333, 32.93768545994065],
       ],
-      polygonlabels: [
-        'Hello',
-      ],
+      polygonlabels: ["Hello"],
     },
   },
   {
-    id: 'DSm8iGlaA8',
-    from_name: 'tag',
-    to_name: 'img',
-    type: 'polygonlabels',
-    origin: 'manual',
+    id: "DSm8iGlaA8",
+    from_name: "tag",
+    to_name: "img",
+    type: "polygonlabels",
+    origin: "manual",
     original_width: 10109,
     original_height: 4542,
     image_rotation: 0,
@@ -50,13 +48,11 @@ const result = [
         [88.69294605809128, 60.508083140877595],
         [87.75933609958506, 87.06697459584295],
       ],
-      polygonlabels: [
-        'World',
-      ],
+      polygonlabels: ["World"],
     },
   },
 ];
 
-const title = 'Polygons on Image';
+const title = "Polygons on Image";
 
 module.exports = { config, data, result, title };

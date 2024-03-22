@@ -1,15 +1,15 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { Description } from '../../../components/Description/Description';
-import { Divider } from '../../../components/Divider/Divider';
-import { EmptyState } from '../../../components/EmptyState/EmptyState';
-import { Caption } from '../../../components/Caption/Caption';
-import { IconEmptyPredictions } from '../../../assets/icons';
-import { useAPI } from '../../../providers/ApiProvider';
-import { ProjectContext } from '../../../providers/ProjectProvider';
-import { Spinner } from '../../../components/Spinner/Spinner';
-import { PredictionsList } from './PredictionsList';
-import { Block, Elem } from '../../../utils/bem';
-import './PredictionsSettings.styl';
+import { useCallback, useContext, useEffect, useState } from "react";
+import { IconEmptyPredictions } from "../../../assets/icons";
+import { Caption } from "../../../components/Caption/Caption";
+import { Description } from "../../../components/Description/Description";
+import { Divider } from "../../../components/Divider/Divider";
+import { EmptyState } from "../../../components/EmptyState/EmptyState";
+import { Spinner } from "../../../components/Spinner/Spinner";
+import { useAPI } from "../../../providers/ApiProvider";
+import { ProjectContext } from "../../../providers/ProjectProvider";
+import { Block, Elem } from "../../../utils/bem";
+import { PredictionsList } from "./PredictionsList";
+import "./PredictionsSettings.styl";
 
 export const PredictionsSettings = () => {
   const api = useAPI();
@@ -20,7 +20,7 @@ export const PredictionsSettings = () => {
 
   const fetchVersions = useCallback(async () => {
     setLoading(true);
-    const versions = await api.callApi('projectModelVersions', {
+    const versions = await api.callApi("projectModelVersions", {
       params: {
         pk: project.id,
         extended: true,
@@ -40,17 +40,13 @@ export const PredictionsSettings = () => {
 
   return (
     <Block name="prediction-settings">
-      <Elem name={'wrapper'}>
+      <Elem name={"wrapper"}>
         {loading && <Spinner size={32} />}
 
         {loaded && versions.length > 0 && (
           <Description style={{ marginTop: 0, maxWidth: 680 }}>
-            List of predictions available in the project. To learn about how to
-            import predictions,{' '}
-            <a
-              href="https://labelstud.io/guide/predictions.html"
-              target="_blank"
-            >
+            List of predictions available in the project. To learn about how to import predictions,{" "}
+            <a href="https://labelstud.io/guide/predictions.html" target="_blank" rel="noreferrer">
               see the documentation
             </a>
             .
@@ -58,11 +54,9 @@ export const PredictionsSettings = () => {
         )}
 
         {loaded && versions.length > 0 && (
-          <Elem name={'title-block'}>
-            <Elem name={'title'}>Predictions List</Elem>
-            <Caption>
-              Each card is associated with separate model version.
-            </Caption>
+          <Elem name={"title-block"}>
+            <Elem name={"title"}>Predictions List</Elem>
+            <Caption>Each card is associated with separate model version.</Caption>
           </Elem>
         )}
 
@@ -71,26 +65,19 @@ export const PredictionsSettings = () => {
             icon={<IconEmptyPredictions />}
             title="No predictions yet uploaded"
             description="Predictions could be used to prelabel the data, or validate the model. You can upload and select predictions from multiple model versions. You can also connect live models in the Model tab."
-            footer={(
+            footer={
               <div>
                 Need help?
                 <br />
-                <a
-                  href="https://labelstud.io/guide/predictions"
-                  target="_blank"
-                >
+                <a href="https://labelstud.io/guide/predictions" target="_blank" rel="noreferrer">
                   Learn more on how to upload predictions in our docs
                 </a>
               </div>
-            )}
+            }
           />
         )}
 
-        <PredictionsList
-          project={project}
-          versions={versions}
-          fetchVersions={fetchVersions}
-        />
+        <PredictionsList project={project} versions={versions} fetchVersions={fetchVersions} />
 
         <Divider height={32} />
       </Elem>
@@ -98,5 +85,5 @@ export const PredictionsSettings = () => {
   );
 };
 
-PredictionsSettings.title = 'Predictions';
-PredictionsSettings.path = '/predictions';
+PredictionsSettings.title = "Predictions";
+PredictionsSettings.path = "/predictions";

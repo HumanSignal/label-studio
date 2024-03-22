@@ -10,9 +10,8 @@ export const VariantSelect = observer(({ filter, schema, onChange, multiple, val
   const selectedValue = (() => {
     if (!multiple) {
       return Array.isArray(value) ? value[0] : value;
-    } else {
-      return Array.isArray(value) ? value : value ?? [];
     }
+    return Array.isArray(value) ? value : value ?? [];
   })();
 
   const FilterItem = filter.cellView?.FilterItem;
@@ -23,9 +22,13 @@ export const VariantSelect = observer(({ filter, schema, onChange, multiple, val
       value={selectedValue}
       multiple={multiple}
       optionRender={FilterItem}
-      outputFormat={multiple ? (value) => {
-        return value ? [].concat(value) : [];
-      } : undefined}
+      outputFormat={
+        multiple
+          ? (value) => {
+              return value ? [].concat(value) : [];
+            }
+          : undefined
+      }
       onChange={(value) => onChange(value)}
     />
   );
@@ -36,13 +39,13 @@ export const ListFilter = [
     key: "contains",
     label: "contains",
     valueType: "single",
-    input: (props) => <VariantSelect {...props} multiple/>,
+    input: (props) => <VariantSelect {...props} multiple />,
   },
   {
     key: "not_contains",
     label: "not contains",
     valueType: "single",
-    input: (props) => <VariantSelect {...props} multiple/>,
+    input: (props) => <VariantSelect {...props} multiple />,
   },
   // ... Common,
 ];

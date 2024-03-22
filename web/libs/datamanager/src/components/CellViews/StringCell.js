@@ -11,7 +11,7 @@ export const valueToString = (value) => {
     /* JSON.stringify will handle JSON and non-strings, non-null, non-undefined */
     return JSON.stringify(value);
   } catch {
-    return 'Error: Invalid JSON';
+    return "Error: Invalid JSON";
   }
 };
 
@@ -23,9 +23,5 @@ export const StringCell = ({ value }) => {
     lineHeight: "16px",
   };
 
-  return (
-    <div style={style}>
-      {valueToString(value)}
-    </div>
-  );
+  return <div style={style}>{valueToString(value)}</div>;
 };

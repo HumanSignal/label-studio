@@ -1,15 +1,21 @@
 {
   "presets": [
-    ["@babel/preset-react", {
-      "runtime": "automatic"
-    }],
-    "@babel/preset-typescript",
-    ["@babel/preset-env", {
-      "targets": {
-        "browsers": ["last 2 Chrome versions"],
-        "node": "current"
+    [
+      "@babel/preset-react",
+      {
+        "runtime": "automatic"
       }
-    }]
+    ],
+    "@babel/preset-typescript",
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "browsers": ["last 2 Chrome versions"],
+          "node": "current"
+        }
+      }
+    ]
   ],
   "plugins": [
     ["babel-plugin-import", { "libraryName": "antd" }],

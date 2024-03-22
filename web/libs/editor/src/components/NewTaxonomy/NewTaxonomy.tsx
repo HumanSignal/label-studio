@@ -1,65 +1,66 @@
-import { TreeSelect } from 'antd';
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { TreeSelect } from "antd";
+import type React from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
-import { Tooltip } from '../../common/Tooltip/Tooltip';
+import { Tooltip } from "../../common/Tooltip/Tooltip";
 
-import './NewTaxonomy.styl';
-import { TaxonomySearch, TaxonomySearchRef } from './TaxonomySearch';
+import "./NewTaxonomy.styl";
+import { TaxonomySearch, type TaxonomySearchRef } from "./TaxonomySearch";
 
 type TaxonomyPath = string[];
 type onAddLabelCallback = (path: string[]) => any;
 type onDeleteLabelCallback = (path: string[]) => any;
 
 type TaxonomyItem = {
-  label: string,
-  path: TaxonomyPath,
-  depth: number,
-  isLeaf?: boolean, // only in new async taxonomy
-  children?: TaxonomyItem[],
-  origin?: 'config' | 'user' | 'session',
-  hint?: string,
-  color?: string,
+  label: string;
+  path: TaxonomyPath;
+  depth: number;
+  isLeaf?: boolean; // only in new async taxonomy
+  children?: TaxonomyItem[];
+  origin?: "config" | "user" | "session";
+  hint?: string;
+  color?: string;
 };
 
 export type AntTaxonomyItem = {
-  title: string | JSX.Element,
-  value: string,
-  key: string,
-  isLeaf?: boolean,
-  children?: AntTaxonomyItem[],
-  disableCheckbox?: boolean,
+  title: string | JSX.Element;
+  value: string;
+  key: string;
+  isLeaf?: boolean;
+  children?: AntTaxonomyItem[];
+  disableCheckbox?: boolean;
 };
 
 type TaxonomyOptions = {
-  leafsOnly?: boolean,
-  showFullPath?: boolean,
-  pathSeparator: string,
-  maxUsages?: number,
-  maxWidth?: number,
-  minWidth?: number,
-  dropdownWidth?: number,
-  placeholder?: string,
+  leafsOnly?: boolean;
+  showFullPath?: boolean;
+  pathSeparator: string;
+  maxUsages?: number;
+  maxWidth?: number;
+  minWidth?: number;
+  dropdownWidth?: number;
+  placeholder?: string;
 };
 
 type SelectedItem = {
-  label: string,
-  value: string,
+  label: string;
+  value: string;
 }[];
 
 type TaxonomyProps = {
-  items: TaxonomyItem[],
-  selected: SelectedItem[],
-  onChange: (node: any, selected: TaxonomyPath[]) => any,
-  onLoadData?: (item: TaxonomyPath) => any,
-  onAddLabel?: onAddLabelCallback,
-  onDeleteLabel?: onDeleteLabelCallback,
-  options: TaxonomyOptions,
-  isEditable?: boolean,
-  defaultSearch?: boolean,
+  items: TaxonomyItem[];
+  selected: SelectedItem[];
+  onChange: (node: any, selected: TaxonomyPath[]) => any;
+  onLoadData?: (item: TaxonomyPath) => any;
+  onAddLabel?: onAddLabelCallback;
+  onDeleteLabel?: onDeleteLabelCallback;
+  options: TaxonomyOptions;
+  isEditable?: boolean;
+  defaultSearch?: boolean;
 };
 
 type TaxonomyExtendedOptions = TaxonomyOptions & {
-  maxUsagesReached?: boolean,
+  maxUsagesReached?: boolean;
 };
 
 const convert = (
@@ -125,10 +126,10 @@ const NewTaxonomy = ({
   const style = { minWidth: options.minWidth ?? 200, maxWidth: options.maxWidth };
   const dropdownWidth = options.dropdownWidth === undefined ? true : +options.dropdownWidth;
   const maxUsagesReached = !!options.maxUsages && selected.length >= options.maxUsages;
-  const value = selected.map(path => path.map(p => p.value).join(separator));
-  const displayed = selected.map(path => ({
-    value: path.map(p => p.value).join(separator),
-    label: options.showFullPath ? path.map(p => p.label).join(separator) : path.at(-1).label,
+  const value = selected.map((path) => path.map((p) => p.value).join(separator));
+  const displayed = selected.map((path) => ({
+    value: path.map((p) => p.value).join(separator),
+    label: options.showFullPath ? path.map((p) => p.label).join(separator) : path.at(-1).label,
   }));
 
   useEffect(() => {
@@ -143,42 +144,46 @@ const NewTaxonomy = ({
     setFilteredTreeData(list);
     if (expandedKeys?.length) setExpandedKeys(expandedKeys);
     else setExpandedKeys(undefined);
-
   }, []);
 
-  const renderDropdown = useCallback((origin: ReactNode) => {
-    return (
-      <>
-        {!defaultSearch && (
-          <TaxonomySearch
-            ref={refInput}
-            treeData={treeData}
-            onChange={handleSearch}
-          />
-        )}
-        {origin}
-      </>
-    );
-  }, [treeData]);
+  const renderDropdown = useCallback(
+    (origin: ReactNode) => {
+      return (
+        <>
+          {!defaultSearch && <TaxonomySearch ref={refInput} treeData={treeData} onChange={handleSearch} />}
+          {origin}
+        </>
+      );
+    },
+    [treeData],
+  );
 
-  const handleDropdownChange = useCallback((open: boolean) => {
-    if (open) {
-      // handleDropdownChange is being called before the dropdown is rendered,
-      // 200ms is the time that we have to wait to dropdown be rendered and animated
-      setTimeout(() => {
-        refInput.current?.focus();
-      }, 200);
-    } else {
-      refInput.current?.resetValue();
-    }
-  }, [refInput]);
+  const handleDropdownChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        // handleDropdownChange is being called before the dropdown is rendered,
+        // 200ms is the time that we have to wait to dropdown be rendered and animated
+        setTimeout(() => {
+          refInput.current?.focus();
+        }, 200);
+      } else {
+        refInput.current?.resetValue();
+      }
+    },
+    [refInput],
+  );
 
   return (
     <TreeSelect
       treeData={defaultSearch ? treeData : filteredTreeData}
       value={displayed}
       labelInValue={true}
-      onChange={items => onChange(null, items.map(item => item.value.split(separator)))}
+      onChange={(items) =>
+        onChange(
+          null,
+          items.map((item) => item.value.split(separator)),
+        )
+      }
       loadData={loadData}
       treeCheckable
       showSearch={defaultSearch}
@@ -193,7 +198,7 @@ const NewTaxonomy = ({
       showCheckedStrategy={TreeSelect.SHOW_ALL}
       treeExpandAction={false}
       dropdownMatchSelectWidth={dropdownWidth}
-      placeholder={options.placeholder || 'Click to add...'}
+      placeholder={options.placeholder || "Click to add..."}
       style={style}
       className="htx-taxonomy"
     />

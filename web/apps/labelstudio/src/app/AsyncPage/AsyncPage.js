@@ -1,16 +1,16 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
-import { ErrorWrapper } from '../../components/Error/Error';
-import { modal } from '../../components/Modal/Modal';
-import { ConfigContext } from '../../providers/ConfigProvider';
-import { absoluteURL, removePrefix } from '../../utils/helpers';
-import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from '../../utils/scripts';
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router";
+import { ErrorWrapper } from "../../components/Error/Error";
+import { modal } from "../../components/Modal/Modal";
+import { ConfigContext } from "../../providers/ConfigProvider";
+import { absoluteURL, removePrefix } from "../../utils/helpers";
+import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from "../../utils/scripts";
 
 const pageCache = new Map();
 
 const pageFromHTML = (html) => {
   const parser = new DOMParser();
-  const document = parser.parseFromString(html, 'text/html');
+  const document = parser.parseFromString(html, "text/html");
   return document;
 };
 
@@ -18,33 +18,32 @@ const loadAsyncPage = async (url) => {
   try {
     if (pageCache.has(url)) {
       return pageCache.get(url);
-    } else {
-      const response = await fetch(url);
-      const html = await response.text();
-
-      if (response.status === 401) {
-        location.href = absoluteURL("/");
-        return;
-      }
-
-      if (!response.ok) {
-        modal({
-          body: () => (
-            <ErrorWrapper
-              title={`Error ${response.status}: ${response.statusText}`}
-              errorId={response.status}
-              stacktrace={`Cannot load url ${url}\n\n${html}`}
-            />
-          ),
-          allowClose: false,
-          style: { width: 680 },
-        });
-        return null;
-      }
-
-      pageCache.set(url, html);
-      return html;
     }
+    const response = await fetch(url);
+    const html = await response.text();
+
+    if (response.status === 401) {
+      location.href = absoluteURL("/");
+      return;
+    }
+
+    if (!response.ok) {
+      modal({
+        body: () => (
+          <ErrorWrapper
+            title={`Error ${response.status}: ${response.statusText}`}
+            errorId={response.status}
+            stacktrace={`Cannot load url ${url}\n\n${html}`}
+          />
+        ),
+        allowClose: false,
+        style: { width: 680 },
+      });
+      return null;
+    }
+
+    pageCache.set(url, html);
+    return html;
   } catch (err) {
     modal({
       body: () => (
@@ -78,8 +77,8 @@ const swapNodes = async (oldNode, newNode) => {
  * @param {Document} newPage
  */
 const swapAppSettings = async (oldPage, newPage) => {
-  const oldSettings = oldPage.querySelector('script#app-settings');
-  const newSettings = newPage.querySelector('script#app-settings');
+  const oldSettings = oldPage.querySelector("script#app-settings");
+  const newSettings = newPage.querySelector("script#app-settings");
 
   if (oldSettings && newSettings) {
     await replaceScript(oldSettings, {
@@ -94,38 +93,37 @@ const swapAppSettings = async (oldPage, newPage) => {
  * @param {Document} newPage
  */
 const swapContent = async (oldPage, newPage) => {
-  const currentContent = oldPage.querySelector('#dynamic-content');
-  const newContent = newPage.querySelector('#dynamic-content');
+  const currentContent = oldPage.querySelector("#dynamic-content");
+  const newContent = newPage.querySelector("#dynamic-content");
 
   if (currentContent && newContent) {
     await swapNodes(currentContent, newContent);
   } else {
-    await swapNodes(oldPage.body.children[0], newContent, {removeOld: false});
+    await swapNodes(oldPage.body.children[0], newContent, { removeOld: false });
   }
 };
 
 /** @param {HTMLElement} nodes */
 const nodesToSignatures = (nodes) => {
-  return new Set(Array.from(nodes).map(n => n.outerHTML));
+  return new Set(Array.from(nodes).map((n) => n.outerHTML));
 };
-
 
 /**
  * @param {HTMLHeadElement} oldHead
  * @param {HTMLHeadElement} newHead
  */
 const swapHeadScripts = async (oldHead, newHead) => {
-  swapNodes(oldHead.querySelector('title'), newHead.querySelector('title'));
+  swapNodes(oldHead.querySelector("title"), newHead.querySelector("title"));
 
   const fragment = document.createDocumentFragment();
 
-  Array.from(newHead.querySelectorAll('script'))
-    .filter(script => isScriptValid(script))
-    .forEach(script => fragment.appendChild(script));
+  Array.from(newHead.querySelectorAll("script"))
+    .filter((script) => isScriptValid(script))
+    .forEach((script) => fragment.appendChild(script));
 
-  Array.from(oldHead.querySelectorAll('script'))
-    .filter(script => isScriptValid(script))
-    .forEach(script => script.remove());
+  Array.from(oldHead.querySelectorAll("script"))
+    .filter((script) => isScriptValid(script))
+    .forEach((script) => script.remove());
 
   oldHead.appendChild(fragment);
   await reInsertScripts(oldHead);
@@ -136,23 +134,22 @@ const swapHeadScripts = async (oldHead, newHead) => {
  * @param {Document} newPage
  */
 const swapStylesheets = async (oldPage, newPage) => {
-  const linkSelector = [
-    'style:not([data-replaced])',
-    'link[rel=stylesheet]:not([data-replaced])',
-  ].join(', ');
+  const linkSelector = ["style:not([data-replaced])", "link[rel=stylesheet]:not([data-replaced])"].join(", ");
   const oldStyles = Array.from(oldPage.querySelectorAll(linkSelector));
   const newStyles = Array.from(newPage.querySelectorAll(linkSelector));
 
   const existingSignatures = nodesToSignatures(oldStyles);
-  const stylesToReplace = newStyles.filter(style => !existingSignatures.has(style.outerHTML));
+  const stylesToReplace = newStyles.filter((style) => !existingSignatures.has(style.outerHTML));
 
   await Promise.all(
-    stylesToReplace.map(style => new Promise((resolve) => {
-      style.onload = () => resolve(style.outerHTML);
-      document.head.append(style);
-    })),
+    stylesToReplace.map(
+      (style) =>
+        new Promise((resolve) => {
+          style.onload = () => resolve(style.outerHTML);
+          document.head.append(style);
+        }),
+    ),
   );
-
 };
 
 /** @param {Document} newPage */
@@ -169,15 +166,15 @@ const swapPageParts = async (newPage, onReady) => {
 const isVisitable = (target) => {
   if (!target) return false;
   if (target.dataset.external) return false;
-  if (target.getAttribute('href').match(/#/)) return false;
+  if (target.getAttribute("href").match(/#/)) return false;
   if (target.origin !== location.origin) return false;
 
   return true;
 };
 
 const locationWithoutHash = () => {
-  const {href} = location;
-  return href.replace(/#(.*)/g, '');
+  const { href } = location;
+  return href.replace(/#(.*)/g, "");
 };
 
 const fetchPage = async (locationUrl) => {
@@ -191,7 +188,6 @@ const useStaticContent = (initialContent, onContentLoad) => {
   const [staticContent, setStaticContent] = useState(initialContent);
 
   const fetchCallback = useCallback(async (locationUrl) => {
-
     currentLocation = locationUrl;
     clearScriptsCache();
     const result = await fetchPage(locationUrl);
@@ -204,17 +200,14 @@ const useStaticContent = (initialContent, onContentLoad) => {
     return false;
   }, []);
 
-  return [
-    staticContent,
-    fetchCallback,
-  ];
+  return [staticContent, fetchCallback];
 };
 
 export const AsyncPageContext = createContext(null);
 
 export const AsyncPageConsumer = AsyncPageContext.Consumer;
 
-export const AsyncPage = ({children}) => {
+export const AsyncPage = ({ children }) => {
   const initialContent = document;
 
   const history = useHistory();
@@ -226,10 +219,10 @@ export const AsyncPage = ({children}) => {
 
   const onLinkClick = useCallback(async (e) => {
     /**@type {HTMLAnchorElement} */
-    const target = e.target.closest('a[href]:not([target]):not([download])');
+    const target = e.target.closest("a[href]:not([target]):not([download])");
 
     if (!isVisitable(target)) return;
-    if (target.matches('[data-external]')) return;
+    if (target.matches("[data-external]")) return;
     if (e.metaKey || e.ctrlKey) return;
 
     e.preventDefault();
@@ -253,17 +246,13 @@ export const AsyncPage = ({children}) => {
   // useEffect(onPopState, [location]);
 
   useEffect(() => {
-    document.addEventListener('click', onLinkClick, {capture: true});
-    window.addEventListener('popstate', onPopState);
+    document.addEventListener("click", onLinkClick, { capture: true });
+    window.addEventListener("popstate", onPopState);
     return () => {
-      document.removeEventListener('click', onLinkClick, {capture: true});
-      window.removeEventListener('popstate', onPopState);
+      document.removeEventListener("click", onLinkClick, { capture: true });
+      window.removeEventListener("popstate", onPopState);
     };
   }, []);
 
-  return (
-    <AsyncPageContext.Provider value={staticContent}>
-      {children}
-    </AsyncPageContext.Provider>
-  );
+  return <AsyncPageContext.Provider value={staticContent}>{children}</AsyncPageContext.Provider>;
 };

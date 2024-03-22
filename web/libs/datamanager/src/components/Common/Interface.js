@@ -6,6 +6,8 @@ const injector = inject(({ store }) => {
   };
 });
 
-export const Interface = injector(observer(({ name, interfaces, children }) => {
-  return interfaces.get(name) === true ? children : null;
-}));
+export const Interface = injector(
+  observer(({ name, interfaces, children }) => {
+    return interfaces.get(name) === true ? children : null;
+  }),
+);

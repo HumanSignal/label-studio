@@ -1,7 +1,7 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { cn } from '../../utils/bem';
-import { absoluteURL } from '../../utils/helpers';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { cn } from "../../utils/bem";
+import { absoluteURL } from "../../utils/helpers";
 
 export const MenuItem = ({
   children,
@@ -20,31 +20,30 @@ export const MenuItem = ({
   const rootClass = cn("main-menu", { elem: "item" });
   const classList = [rootClass.toClassName()];
   const isActive = (() => {
-    const pathname = location.pathname.replace(/\/$/, '');
+    const pathname = location.pathname.replace(/\/$/, "");
     const url = to ?? href;
 
     if (exact) {
       return pathname === url;
-    } else {
-      return pathname.includes(url);
     }
+    return pathname.includes(url);
   })();
 
   if (isActive || active) classList.push(rootClass.mod({ active: true }));
 
   if (isDangerous) classList.push(rootClass.mod({ dangerous: true }));
-  
+
   if (className) classList.push(className);
 
   const linkContent = (
     <>
-      {icon && <span className={rootClass.elem('item-icon')}>{icon}</span>}
+      {icon && <span className={rootClass.elem("item-icon")}>{icon}</span>}
       {children ?? label}
     </>
   );
 
   const linkAttributes = {
-    className: classList.join(' '),
+    className: classList.join(" "),
     onClick,
     ...rest,
   };
@@ -53,28 +52,21 @@ export const MenuItem = ({
   const finalHref = to ?? href;
 
   if (forceReload) {
-    linkAttributes.onClick = () => location.href = to ?? href;
+    linkAttributes.onClick = () => (location.href = to ?? href);
   }
 
   return (
     <li>
       {to ? (
-        <NavLink to={finalHref}
-          {...linkAttributes}
-          exact={exact}
-          activeClassName={activeClassName}
-          data-external
-        >
+        <NavLink to={finalHref} {...linkAttributes} exact={exact} activeClassName={activeClassName} data-external>
           {linkContent}
         </NavLink>
-      ) : finalHref ?  (
+      ) : finalHref ? (
         <a href={absoluteURL(finalHref)} {...linkAttributes}>
           {linkContent}
         </a>
       ) : (
-        <span {...linkAttributes}>
-          {linkContent}
-        </span>
+        <span {...linkAttributes}>{linkContent}</span>
       )}
     </li>
   );

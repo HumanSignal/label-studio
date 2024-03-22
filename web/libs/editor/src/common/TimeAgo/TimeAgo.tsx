@@ -1,5 +1,6 @@
-import { format, formatDistanceToNow } from 'date-fns';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { format, formatDistanceToNow } from "date-fns";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const SECS = 1000;
 const MINS = 60 * SECS;
@@ -25,14 +26,14 @@ function getNextTick(passedTime = 0) {
   return Math.ceil((passedTime - baseLimit + 1) / baseStep) * baseStep + baseLimit;
 }
 
-type TimeAgoProps = React.ComponentPropsWithoutRef<'time'> & {
-  date: number | string | Date,
-}
+type TimeAgoProps = React.ComponentPropsWithoutRef<"time"> & {
+  date: number | string | Date;
+};
 
 export const TimeAgo = ({ date, ...rest }: TimeAgoProps) => {
   const [timestamp, forceUpdate] = useState(Date.now());
   const fromTS = useMemo(() => {
-    return (new Date(date)).valueOf();
+    return new Date(date).valueOf();
   }, [date]);
   const timeoutId = useRef<number>();
   const scheduleNext = useCallback(() => {
@@ -53,15 +54,13 @@ export const TimeAgo = ({ date, ...rest }: TimeAgoProps) => {
 
   // Replace the longer english text when less than a minute in time. This is done this way due to a limiting API
   // with the date-fns function. If we require an entire overhaul to the messaging for the en-US locale, revisit this and replace with an entire locale override option.
-  const text = formatDistanceToNow(fromTS, { addSuffix: true }) === 'less than a minute ago' ? 'seconds ago' : formatDistanceToNow(fromTS, { addSuffix: true });
-
+  const text =
+    formatDistanceToNow(fromTS, { addSuffix: true }) === "less than a minute ago"
+      ? "seconds ago"
+      : formatDistanceToNow(fromTS, { addSuffix: true });
 
   return (
-    <time
-      dateTime={format(fromTS, 'yyyy-MM-dd\'T\'HH:mm:ss.SSSxxx')}
-      title={format(fromTS, 'PPpp')}
-      {...rest}
-    >
+    <time dateTime={format(fromTS, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")} title={format(fromTS, "PPpp")} {...rest}>
       {text}
     </time>
   );

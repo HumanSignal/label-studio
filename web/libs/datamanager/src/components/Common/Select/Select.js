@@ -1,5 +1,15 @@
-import React, { Children, cloneElement, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { shallowEqualArrays } from 'shallow-equal';
+import React, {
+  Children,
+  cloneElement,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { shallowEqualArrays } from "shallow-equal";
 import { BemWithSpecifiContext } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { Dropdown } from "../Dropdown/Dropdown";
@@ -26,16 +36,7 @@ const findSelectedChild = (children, value) => {
   }, null);
 };
 
-export const Select = ({
-  value,
-  defaultValue,
-  size,
-  children,
-  onChange,
-  style,
-  multiple,
-  tabIndex=0,
-}) => {
+export const Select = ({ value, defaultValue, size, children, onChange, style, multiple, tabIndex = 0 }) => {
   const dropdown = useRef();
   const rootRef = useRef();
   const [currentValue, setCurrentValue] = useState(multiple ? [].concat(value ?? []).flat(10) : value);
@@ -48,7 +49,7 @@ export const Select = ({
 
     if (multiple) {
       if (currentValue.includes(newValue)) {
-        updatedValue = currentValue.filter(v => v !== newValue);
+        updatedValue = currentValue.filter((v) => v !== newValue);
       } else {
         updatedValue = [...currentValue, newValue].flat(10);
       }
@@ -78,10 +79,7 @@ export const Select = ({
       return <>Multiple values selected</>;
     }
 
-    const foundChild = findSelectedChild(
-      children,
-      defaultValue ?? currentValue,
-    );
+    const foundChild = findSelectedChild(children, defaultValue ?? currentValue);
 
     const result = foundChild?.props?.children;
 
@@ -92,32 +90,35 @@ export const Select = ({
     setFocused(options[i ?? 0].props.value);
   };
 
-  const focusNext = useCallback((direction) => {
-    const selectedIndex = options.findIndex(c => c.props.value === focused);
-    let nextIndex = selectedIndex === -1 ? 0 : selectedIndex + direction;
+  const focusNext = useCallback(
+    (direction) => {
+      const selectedIndex = options.findIndex((c) => c.props.value === focused);
+      let nextIndex = selectedIndex === -1 ? 0 : selectedIndex + direction;
 
-    if (nextIndex >= options.length) {
-      nextIndex = 0;
-    } else if (nextIndex < 0) {
-      nextIndex = options.length - 1;
-    }
+      if (nextIndex >= options.length) {
+        nextIndex = 0;
+      } else if (nextIndex < 0) {
+        nextIndex = options.length - 1;
+      }
 
-    focusItem(nextIndex);
-  }, [focused]);
+      focusItem(nextIndex);
+    },
+    [focused],
+  );
 
   const handleKeyboard = (e) => {
     if (document.activeElement !== rootRef.current) {
       return;
     }
 
-    if (['ArrowDown', 'ArrowUp'].includes(e.key)) {
+    if (["ArrowDown", "ArrowUp"].includes(e.key)) {
       if (dropdown?.current.visible) {
-        focusNext(e.key === 'ArrowDown' ? 1 : -1);
+        focusNext(e.key === "ArrowDown" ? 1 : -1);
       } else {
         dropdown.current?.open();
         focusItem();
       }
-    } else if ((e.code === 'Space' || e.code === 'Enter') && isDefined(focused)) {
+    } else if ((e.code === "Space" || e.code === "Enter") && isDefined(focused)) {
       context.setCurrentValue(focused);
     }
   };
@@ -137,7 +138,7 @@ export const Select = ({
       <Block ref={rootRef} name="select" mod={{ size }} style={style} tabIndex={tabIndex} onKeyDown={handleKeyboard}>
         <Dropdown.Trigger
           ref={dropdown}
-          style={{ maxHeight: 280, overflow: 'auto' }}
+          style={{ maxHeight: 280, overflow: "auto" }}
           content={<Elem name="list">{children}</Elem>}
           onToggle={(visible) => {
             if (!visible) setFocused(null);
@@ -161,7 +162,7 @@ Select.Option = ({ value, children, style }) => {
     const option = String(value);
 
     if (multiple) {
-      return currentValue.map(v => String(v)).includes(option);
+      return currentValue.map((v) => String(v)).includes(option);
     } else {
       return option === String(currentValue);
     }

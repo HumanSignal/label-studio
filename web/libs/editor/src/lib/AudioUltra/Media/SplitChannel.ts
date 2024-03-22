@@ -1,5 +1,5 @@
-import { Destructable } from '../Common/Destructable';
-import { ComputeWorker } from '../Common/Worker';
+import { Destructable } from "../Common/Destructable";
+import { ComputeWorker } from "../Common/Worker";
 
 export class SplitChannel extends Destructable {
   static usage = 0;
@@ -12,7 +12,7 @@ export class SplitChannel extends Destructable {
     if (!SplitChannel.worker) {
       // eslint-disable-next-line
       // @ts-ignore
-      SplitChannel.worker = new ComputeWorker(new Worker(new URL('./SplitChannelWorker.ts', import.meta.url)));
+      SplitChannel.worker = new ComputeWorker(new Worker(new URL("./SplitChannelWorker.ts", import.meta.url)));
     }
     this.channelCount = channelCount;
   }
@@ -27,7 +27,7 @@ export class SplitChannel extends Destructable {
   }
 
   async split(value: Float32Array): Promise<Float32Array[]> {
-    if (!SplitChannel.worker) throw new Error('AudioDecoder: worker not initialized');
+    if (!SplitChannel.worker) throw new Error("AudioDecoder: worker not initialized");
 
     return SplitChannel.worker.compute({
       value,
@@ -35,4 +35,3 @@ export class SplitChannel extends Destructable {
     });
   }
 }
-	

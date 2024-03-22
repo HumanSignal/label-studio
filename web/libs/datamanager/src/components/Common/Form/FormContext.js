@@ -1,16 +1,16 @@
-import { createContext } from 'react';
+import { createContext } from "react";
 
 export const FormContext = createContext();
-FormContext.displayName = 'FormContext';
+FormContext.displayName = "FormContext";
 
 export const FormValidationContext = createContext();
-FormValidationContext.displayName = 'FormValidationContext';
+FormValidationContext.displayName = "FormValidationContext";
 
 export const FormSubmissionContext = createContext();
-FormSubmissionContext.displayName = 'FormSubmissionContext';
+FormSubmissionContext.displayName = "FormSubmissionContext";
 
 export const FormStateContext = createContext();
-FormStateContext.displayName = 'FormStateContext';
+FormStateContext.displayName = "FormStateContext";
 
 export const FormResponseContext = createContext();
-FormResponseContext.displayName = 'FormResponseContext';
+FormResponseContext.displayName = "FormResponseContext";

@@ -30,14 +30,7 @@ const GroupWrapper = ({ children, wrap = false }) => {
   return wrap ? <Elem name="group">{children}</Elem> : children;
 };
 
-export const FilterLine = observer(({
-  filter,
-  availableFilters,
-  index,
-  view,
-  sidebar,
-  dropdownClassName,
-}) => {
+export const FilterLine = observer(({ filter, availableFilters, index, view, sidebar, dropdownClassName }) => {
   return (
     <Block name="filter-line" tag={Fragment}>
       <GroupWrapper wrap={sidebar}>
@@ -61,12 +54,7 @@ export const FilterLine = observer(({
               <Elem name="selector">
                 {filter.field.title}
                 {filter.field.parent && (
-                  <Tag
-                    size="small"
-                    className="filters-data-tag"
-                    color="#1d91e4"
-                    style={{ marginLeft: 7 }}
-                  >
+                  <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
                     {filter.field.parent.title}
                   </Tag>
                 )}
@@ -76,12 +64,7 @@ export const FilterLine = observer(({
         </Elem>
       </GroupWrapper>
       <GroupWrapper wrap={sidebar}>
-        <FilterOperation
-          filter={filter}
-          value={filter.currentValue}
-          operator={filter.operator}
-          field={filter.field}
-        />
+        <FilterOperation filter={filter} value={filter.currentValue} operator={filter.operator} field={filter.field} />
       </GroupWrapper>
       <Elem name="remove">
         <Button
@@ -95,5 +78,4 @@ export const FilterLine = observer(({
       </Elem>
     </Block>
   );
-},
-);
+});

@@ -1,7 +1,7 @@
-const { event } = require('codeceptjs');
+const { event } = require("codeceptjs");
 
-const REPLACE_ARGS_RULE = 'replaceArgs';
-const HIDE_FUNCTION_RULE = 'hideFunction';
+const REPLACE_ARGS_RULE = "replaceArgs";
+const HIDE_FUNCTION_RULE = "hideFunction";
 
 const RULES = {
   REPLACE_ARGS_RULE,
@@ -29,11 +29,13 @@ const RULES = {
  * @type {stepLogsModifierConfig}
  */
 const defaultConfig = {
-  modifyStepLogs: [{
-    stepNameMatcher: true,
-    rule: REPLACE_ARGS_RULE,
-    params: ['[args]'],
-  }],
+  modifyStepLogs: [
+    {
+      stepNameMatcher: true,
+      rule: REPLACE_ARGS_RULE,
+      params: ["[args]"],
+    },
+  ],
 };
 
 /**
@@ -41,7 +43,7 @@ const defaultConfig = {
  * The main goal is making step logs more compact.
  * @param {stepLogsModifierConfig} config
  */
-module.exports = function(config) {
+module.exports = (config) => {
   const options = Object.assign({}, defaultConfig, config);
 
   const RULES = {
@@ -50,7 +52,7 @@ module.exports = function(config) {
       step.toCode = replaceArgsStepToCode.bind(step, replacer);
     },
     [HIDE_FUNCTION_RULE](step) {
-      const functionName = step.args?.[0]?.name || '<anonymous>';
+      const functionName = step.args?.[0]?.name || "<anonymous>";
 
       step.toString = replaceArgsStepToString.bind(step, functionName);
       step.toCode = replaceArgsStepToCode.bind(step, functionName);
@@ -65,10 +67,10 @@ module.exports = function(config) {
   }
 
   function testStep(matcher, stepName) {
-    if (typeof matcher === 'boolean') return matcher;
-    if (typeof matcher === 'string') return matcher === stepName;
+    if (typeof matcher === "boolean") return matcher;
+    if (typeof matcher === "string") return matcher === stepName;
     if (matcher instanceof RegExp) return matcher.test(stepName);
-    if (Array.isArray(matcher)) return matcher.some(f => testStep(f, stepName));
+    if (Array.isArray(matcher)) return matcher.some((f) => testStep(f, stepName));
     return false;
   }
 
@@ -78,13 +80,13 @@ module.exports = function(config) {
     }
     for (const modifierParams of options.modifyStepLogs) {
       if (testStep(modifierParams.stepNameMatcher, step.name)) {
-        if (typeof modifierParams.rule === 'function') {
+        if (typeof modifierParams.rule === "function") {
           modifierParams.rule(step);
         } else {
           if (RULES[modifierParams.rule]) {
-            RULES[modifierParams.rule](step, ...(modifierParams.params||[]));
+            RULES[modifierParams.rule](step, ...(modifierParams.params || []));
           } else {
-            console.error('There is no step modifier rule called `', modifierParams.rule,'`');
+            console.error("There is no step modifier rule called `", modifierParams.rule, "`");
           }
         }
       }

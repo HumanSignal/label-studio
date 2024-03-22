@@ -1,5 +1,5 @@
 export const simpleData = {
-  text: 'This text exists for no reason',
+  text: "This text exists for no reason",
 };
 
 export const textareaConfigSimple = `<View>
@@ -22,15 +22,15 @@ export const textareaConfigPerRegion = `<View>
 
 export const textareaResultsPerRegion = [
   {
-    'id': 'reg1',
-    'type': 'labels',
-    'from_name': 'lbl',
-    'to_name': 'text',
-    'value': {
-      'start': 5,
-      'end': 9,
-      'labels': ['Word'],
-      'text': 'text',
+    id: "reg1",
+    type: "labels",
+    from_name: "lbl",
+    to_name: "text",
+    value: {
+      start: 5,
+      end: 9,
+      labels: ["Word"],
+      text: "text",
     },
   },
 ];

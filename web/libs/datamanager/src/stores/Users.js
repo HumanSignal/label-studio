@@ -3,7 +3,7 @@ import { camelizeKeys } from "../utils/helpers";
 import { StringOrNumberID } from "./types";
 
 export const User = types
-  .model('User', {
+  .model("User", {
     id: StringOrNumberID,
     firstName: types.string,
     lastName: types.string,
@@ -15,11 +15,14 @@ export const User = types
   })
   .views((self) => ({
     get fullName() {
-      return [self.firstName, self.lastName].filter(n => !!n).join(" ").trim();
+      return [self.firstName, self.lastName]
+        .filter((n) => !!n)
+        .join(" ")
+        .trim();
     },
 
     get displayName() {
-      return self.fullName || ((self.username) ? self.username : self.email);
+      return self.fullName || (self.username ? self.username : self.email);
     },
   }))
   .preProcessSnapshot((sn) => {

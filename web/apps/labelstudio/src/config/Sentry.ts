@@ -1,8 +1,8 @@
 import * as Sentry from "@sentry/browser";
-import * as ReactSentry from '@sentry/react';
-import { RouterHistory } from "@sentry/react/dist/reactrouter";
+import * as ReactSentry from "@sentry/react";
+import type { RouterHistory } from "@sentry/react/dist/reactrouter";
 import { Integrations } from "@sentry/tracing";
-import { Route } from 'react-router-dom';
+import { Route } from "react-router-dom";
 
 export const initSentry = (history: RouterHistory) => {
   setTags();
@@ -38,10 +38,10 @@ const setTags = () => {
       const { version, commit } = data ?? {};
 
       if (version) {
-        tags['version-' + packageName] = version;
+        tags[`version-${packageName}`] = version;
       }
       if (commit) {
-        tags['commit-' + packageName] = commit;
+        tags[`commit-${packageName}`] = commit;
       }
     });
   }

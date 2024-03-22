@@ -17,23 +17,21 @@ const sidebarInjector = inject(({ store }) => {
   };
 });
 
-export const FiltersSidebar = sidebarInjector(
-  ({ viewsStore, sidebarEnabled, sidebarVisible }) => {
-    return sidebarEnabled && sidebarVisible ? (
-      <Block name="sidebar">
-        <Elem name="header">
-          <Elem name="extra">
-            <Button
-              type="link"
-              icon={<Icon icon={FaCaretSquareLeft} size="24" />}
-              onClick={() => viewsStore.collapseFilters()}
-            />
-          </Elem>
-          <Elem name="title">Filters</Elem>
+export const FiltersSidebar = sidebarInjector(({ viewsStore, sidebarEnabled, sidebarVisible }) => {
+  return sidebarEnabled && sidebarVisible ? (
+    <Block name="sidebar">
+      <Elem name="header">
+        <Elem name="extra">
+          <Button
+            type="link"
+            icon={<Icon icon={FaCaretSquareLeft} size="24" />}
+            onClick={() => viewsStore.collapseFilters()}
+          />
         </Elem>
-        <Filters sidebar={true} />
-      </Block>
-    ) : null;
-  },
-);
+        <Elem name="title">Filters</Elem>
+      </Elem>
+      <Filters sidebar={true} />
+    </Block>
+  ) : null;
+});
 FiltersSidebar.displayName = "FiltersSidebar";

@@ -1,8 +1,8 @@
 /* global  performActionBegin performActionEnd */
 // in this file you can append custom step methods to 'I' object
 
-module.exports = function() {
-  return actor({
+module.exports = () =>
+  actor({
     // Define custom steps here, use 'this' to access default methods of I.
     // It is recommended to place a general 'login' function here.
     _performActionBegin(name) {
@@ -23,4 +23,3 @@ module.exports = function() {
       this._performActionEnd(name);
     },
   });
-};

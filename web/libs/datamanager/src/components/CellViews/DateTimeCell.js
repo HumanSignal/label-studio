@@ -5,9 +5,7 @@ export const DateTimeCell = (column) => {
   const date = new Date(column.value);
 
   return column.value ? (
-    <div style={{ whiteSpace: "nowrap" }}>
-      {isValid(date) ? format(date, dateTimeFormat) : ""}
-    </div>
+    <div style={{ whiteSpace: "nowrap" }}>{isValid(date) ? format(date, dateTimeFormat) : ""}</div>
   ) : (
     ""
   );

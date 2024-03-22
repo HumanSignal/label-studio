@@ -1,6 +1,6 @@
 const { I } = inject();
 
-const Helpers = require('../tests/helpers');
+const Helpers = require("../tests/helpers");
 
 /**
  * @typedef BoundingClientRect
@@ -11,14 +11,15 @@ const Helpers = require('../tests/helpers');
  */
 
 module.exports = {
-  _rootSelector: '.lsf-video-segmentation',
-  _videoRootSelector: '.lsf-video__main',
-  _trackSelector: '.lsf-seeker__track',
-  _indicatorSelector: '.lsf-seeker__indicator',
-  _positionSelector: '.lsf-seeker__position',
-  _seekStepForwardSelector: '.lsf-timeline-controls__main-controls > div:nth-child(2) > button:nth-child(4)',
-  _seekStepBackwardSelector: '.lsf-timeline-controls__main-controls > div:nth-child(2) > button:nth-child(2)',
-  _playButtonSelector: '.lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(2)',
+  _rootSelector: ".lsf-video-segmentation",
+  _videoRootSelector: ".lsf-video__main",
+  _trackSelector: ".lsf-seeker__track",
+  _indicatorSelector: ".lsf-seeker__indicator",
+  _positionSelector: ".lsf-seeker__position",
+  _seekStepForwardSelector: ".lsf-timeline-controls__main-controls > div:nth-child(2) > button:nth-child(4)",
+  _seekStepBackwardSelector: ".lsf-timeline-controls__main-controls > div:nth-child(2) > button:nth-child(2)",
+  _playButtonSelector:
+    ".lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(2)",
 
   locateRootSelector() {
     return locate(this._rootSelector);
@@ -45,7 +46,7 @@ module.exports = {
   },
 
   getCurrentVideo() {
-    return I.executeScript(Helpers.getCurrentMedia, 'video');
+    return I.executeScript(Helpers.getCurrentMedia, "video");
   },
 
   /**

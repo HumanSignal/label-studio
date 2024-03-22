@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
-import { Layer, Rect } from 'react-konva';
+import { observer } from "mobx-react";
+import React, { Component } from "react";
+import { Layer, Rect } from "react-konva";
 
 /**
  * Create grid for Image Canvas
@@ -16,7 +16,7 @@ const createGrid = (width, height, nodeSize) => {
         row,
         x: col * nodeSize,
         y: row * nodeSize,
-        fill: '#fff',
+        fill: "#fff",
       })),
     )
     .reduce((p, c) => [...p, ...c]);

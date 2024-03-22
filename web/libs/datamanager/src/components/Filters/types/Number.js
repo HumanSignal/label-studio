@@ -5,26 +5,20 @@ import { FilterInput } from "../FilterInput";
 
 const valueFilter = (value) => {
   if (isDefined(value)) {
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
       return value;
-    } else if (typeof value === 'string') {
-      return value.replace(/([^\d.,]+)/, '');
-    } else {
-      return value || null;
     }
+    if (typeof value === "string") {
+      return value.replace(/([^\d.,]+)/, "");
+    }
+    return value || null;
   }
 
   return null;
 };
 
 const NumberInput = observer(({ onChange, ...rest }) => {
-  return (
-    <FilterInput
-      {...rest}
-      type="number"
-      onChange={(value) => onChange(valueFilter(value))}
-    />
-  );
+  return <FilterInput {...rest} type="number" onChange={(value) => onChange(valueFilter(value))} />;
 });
 
 const RangeInput = observer(({ schema, value, onChange }) => {
@@ -46,21 +40,9 @@ const RangeInput = observer(({ schema, value, onChange }) => {
 
   return (
     <>
-      <NumberInput
-        placeholder="Min"
-        value={min}
-        onChange={onChangeMin}
-        schema={schema}
-        style={{ flex: 1 }}
-      />
+      <NumberInput placeholder="Min" value={min} onChange={onChangeMin} schema={schema} style={{ flex: 1 }} />
       <span style={{ padding: "0 10px" }}>and</span>
-      <NumberInput
-        placeholder="Max"
-        value={max}
-        onChange={onChangeMax}
-        schema={schema}
-        style={{ flex: 1 }}
-      />
+      <NumberInput placeholder="Max" value={max} onChange={onChangeMax} schema={schema} style={{ flex: 1 }} />
     </>
   );
 });

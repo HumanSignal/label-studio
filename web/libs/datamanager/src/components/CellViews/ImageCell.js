@@ -4,7 +4,7 @@ import { AnnotationPreview } from "../Common/AnnotationPreview/AnnotationPreview
 
 const imgDefaultProps = {};
 
-if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = 'anonymous';
+if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = "anonymous";
 
 export const ImageCell = (column) => {
   const {

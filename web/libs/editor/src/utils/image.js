@@ -1,12 +1,12 @@
-import Konva from 'konva';
-import { FF_DEV_3793, isFF } from './feature-flags';
+import Konva from "konva";
+import { FF_DEV_3793, isFF } from "./feature-flags";
 
 export function reverseCoordinates(r1, r2) {
-  let r1X = r1.x,
-    r1Y = r1.y,
-    r2X = r2.x,
-    r2Y = r2.y,
-    d;
+  let r1X = r1.x;
+  let r1Y = r1.y;
+  let r2X = r2.x;
+  let r2Y = r2.y;
+  let d;
 
   if (r1X > r2X) {
     d = Math.abs(r1X - r2X);
@@ -31,7 +31,7 @@ export function reverseCoordinates(r1, r2) {
  * @param {object} shape
  */
 export function canvasToBinaryMatrix(canvas, shape) {
-  const currentLayer = canvas.stageRef.getLayers().filter(layer => layer.attrs.id === shape.id);
+  const currentLayer = canvas.stageRef.getLayers().filter((layer) => layer.attrs.id === shape.id);
 
   const canv = currentLayer[0].canvas.context;
 
@@ -71,9 +71,12 @@ export function getBoundingBoxAfterTransform(rect, transform) {
     { x: rect.x + rect.width, y: rect.y + rect.height },
     { x: rect.x, y: rect.y + rect.height },
   ];
-  let minX, minY, maxX, maxY;
+  let minX;
+  let minY;
+  let maxX;
+  let maxY;
 
-  points.forEach(point => {
+  points.forEach((point) => {
     const transformed = transform.point(point);
 
     if (minX === undefined) {
@@ -133,12 +136,11 @@ export function fixRectToFit(rect, stageWidth, stageHeight) {
   return { ...rect, x, y, width, height };
 }
 
-
 export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
   const { parent: image } = item;
 
-  return function(pos) {
-    return image.fixForZoomWrapper(pos, (pos) => {
+  return (pos) =>
+    image.fixForZoomWrapper(pos, (pos) => {
       let { x, y } = pos;
 
       if (isFF(FF_DEV_3793)) {
@@ -173,7 +175,6 @@ export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
 
       return { x: image.internalToCanvasX(x), y: image.internalToCanvasY(y) };
     });
-  };
 }
 
 /**
@@ -220,19 +221,24 @@ export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
  * @returns {[ImageData, Canvas]} Returns an array with the actual RGBA imagedata of the transformed
  *  image, as well as a Canvas with the transformed image drawn on it.
  */
-export function getTransformedImageData(img,
-  naturalWidth, naturalHeight,
-  imageDisplayedInBrowserWidth, imageDisplayedInBrowserHeight,
-  viewportWidth, viewportHeight,
+export function getTransformedImageData(
+  img,
+  naturalWidth,
+  naturalHeight,
+  imageDisplayedInBrowserWidth,
+  imageDisplayedInBrowserHeight,
+  viewportWidth,
+  viewportHeight,
   zoomScale,
   zoomingPositionX,
   zoomingPositionY,
-  negativezoom) {
-
+  negativezoom,
+) {
   // If negative zoom is on, the image as displayed in the browser could actually be
   // _smaller_ than the viewport. Get the minimum size between these when creating
   // our ultimate canvas.
-  let canvasWidth, canvasHeight;
+  let canvasWidth;
+  let canvasHeight;
 
   if (negativezoom) {
     canvasWidth = Math.min(viewportWidth, imageDisplayedInBrowserWidth);
@@ -242,24 +248,28 @@ export function getTransformedImageData(img,
     canvasHeight = viewportHeight;
   }
 
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
 
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   const [viewportNaturalX, viewportNaturalY] = getActualZoomingPosition(
-    naturalWidth, naturalHeight,
-    imageDisplayedInBrowserWidth, imageDisplayedInBrowserHeight,
+    naturalWidth,
+    naturalHeight,
+    imageDisplayedInBrowserWidth,
+    imageDisplayedInBrowserHeight,
     zoomingPositionX,
-    zoomingPositionY);
+    zoomingPositionY,
+  );
 
   // The viewport dimensions are some percentage of the actual size of the image
   // shown in the browser; determine that then calculate the percentage dimension
   // of the viewport in natural coordinate space. If we are negative zooming then
   // the calculations are slightly different.
-  let viewportNaturalWidth, viewportNaturalHeight;
+  let viewportNaturalWidth;
+  let viewportNaturalHeight;
 
   if (negativezoom) {
     viewportNaturalWidth = naturalWidth;
@@ -273,15 +283,15 @@ export function getTransformedImageData(img,
   // use, so we can then efficiently get its pixel data for pixel-level tools.
 
   // Source dimensions.
-  const sx = viewportNaturalX,
-    sy = viewportNaturalY,
-    sWidth = viewportNaturalWidth,
-    sHeight = viewportNaturalHeight;
+  const sx = viewportNaturalX;
+  const sy = viewportNaturalY;
+  const sWidth = viewportNaturalWidth;
+  const sHeight = viewportNaturalHeight;
   // Destination dimensions.
-  const dx = 0,
-    dy = 0,
-    dWidth = canvasWidth,
-    dHeight = canvasHeight;
+  const dx = 0;
+  const dy = 0;
+  const dWidth = canvasWidth;
+  const dHeight = canvasHeight;
 
   ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
 
@@ -293,11 +303,11 @@ export function getTransformedImageData(img,
   try {
     transformedData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   } catch (err) {
-    const msg = 'Please configure CORS cross-domain headers correctly for getting image labeling data';
+    const msg = "Please configure CORS cross-domain headers correctly for getting image labeling data";
 
     alert(msg);
     console.error(msg);
-    throw (msg);
+    throw msg;
   }
 
   return [transformedData, canvas];
@@ -321,11 +331,14 @@ export function getTransformedImageData(img,
  * @returns {[int, int]} X and Y upper left position of where the zoom is relative to the actual,
  *  natural size of the image.
  */
-export function getActualZoomingPosition(naturalWidth, naturalHeight,
-  imageDisplayedInBrowserWidth, imageDisplayedInBrowserHeight,
+export function getActualZoomingPosition(
+  naturalWidth,
+  naturalHeight,
+  imageDisplayedInBrowserWidth,
+  imageDisplayedInBrowserHeight,
   zoomingPositionX,
-  zoomingPositionY) {
-
+  zoomingPositionY,
+) {
   // The zoomingPosition is actually relative to whatever size the image is
   // actually being displayed in the browser (which could be scaled down or up),
   // so turn it into a percentage then re-apply it to the full natural size to get the

@@ -1,13 +1,13 @@
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 /* global test, expect, jest */
 import Enzyme, { render } from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import { HtxHeader } from "../Header";
 
 Enzyme.configure({ adapter: new Adapter() });
 
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useLayoutEffect: jest.requireActual('react').useEffect,
+jest.mock("react", () => ({
+  ...jest.requireActual("react"),
+  useLayoutEffect: jest.requireActual("react").useEffect,
 }));
 
 test("Header basic test", () => {

@@ -18,7 +18,7 @@ export const RadioGroup = ({ size, value, onChange, children, ...rest }) => {
       }}
     >
       <Block name="radio-group" mod={{ size, newUI: isFF(FF_LOPS_E_10) }} {...rest}>
-        <Elem name='buttons'>{children}</Elem>
+        <Elem name="buttons">{children}</Elem>
       </Block>
     </RadioContext.Provider>
   );
@@ -29,10 +29,11 @@ const RadioButton = ({ value, disabled, children }) => {
   const checked = value === currentValue;
 
   return (
-    <Elem tag='label' name='button' mod={{ checked, disabled }}>
-      <Elem name='input' 
-        tag='input' 
-        type="radio" 
+    <Elem tag="label" name="button" mod={{ checked, disabled }}>
+      <Elem
+        name="input"
+        tag="input"
+        type="radio"
         value={value}
         checked={value === currentValue}
         onChange={onChange}

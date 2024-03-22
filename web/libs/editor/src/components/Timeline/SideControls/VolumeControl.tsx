@@ -1,19 +1,16 @@
-import { CSSProperties, FC, useMemo, useRef } from 'react';
-import { IconVolumeFull, IconVolumeHalf, IconVolumeMute } from '../../../assets/icons';
-import { Range } from '../../../common/Range/Range';
-import { WS_VOLUME } from '../../../tags/object/AudioNext/constants';
-import { TimelineSideControlProps } from '../Types';
+import { type CSSProperties, type FC, useMemo, useRef } from "react";
+import { IconVolumeFull, IconVolumeHalf, IconVolumeMute } from "../../../assets/icons";
+import { Range } from "../../../common/Range/Range";
+import { WS_VOLUME } from "../../../tags/object/AudioNext/constants";
+import type { TimelineSideControlProps } from "../Types";
 
-export const AudioVolumeControl: FC<TimelineSideControlProps> = ({
-  volume = 0.5,
-  onVolumeChange,
-}) => {
+export const AudioVolumeControl: FC<TimelineSideControlProps> = ({ volume = 0.5, onVolumeChange }) => {
   const storedVolume = useRef(volume);
-  const style: CSSProperties = { color: '#99A0AE' };
+  const style: CSSProperties = { color: "#99A0AE" };
   const icon = useMemo(() => {
-    if (volume > 0.5) return <IconVolumeFull style={style}/>;
-    else if (volume > 0) return <IconVolumeHalf style={style}/>;
-    return <IconVolumeMute style={style}/>;
+    if (volume > 0.5) return <IconVolumeFull style={style} />;
+    if (volume > 0) return <IconVolumeHalf style={style} />;
+    return <IconVolumeMute style={style} />;
   }, [volume]);
 
   return (
@@ -24,7 +21,7 @@ export const AudioVolumeControl: FC<TimelineSideControlProps> = ({
       step={WS_VOLUME.step}
       value={volume}
       minIcon={icon}
-      onChange={volume => onVolumeChange?.(Number(volume))}
+      onChange={(volume) => onVolumeChange?.(Number(volume))}
       onMinIconClick={() => {
         if (volume === 0) {
           onVolumeChange?.(storedVolume.current);

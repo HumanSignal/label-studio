@@ -11,17 +11,17 @@ export const valueToString = (value) => {
     /* JSON.stringify will handle JSON and non-strings, non-null, non-undefined */
     return JSON.stringify(value);
   } catch {
-    return 'Error: Invalid JSON';
+    return "Error: Invalid JSON";
   }
 };
 
 export const TextDataGroup = ({ value }) => {
   const output = valueToString(value);
-  const style = { 
-    padding: 5, 
-    height: TextDataGroup.height, 
-    overflow: "hidden", 
-    whiteSpace: "nowrap", 
+  const style = {
+    padding: 5,
+    height: TextDataGroup.height,
+    overflow: "hidden",
+    whiteSpace: "nowrap",
     textOverflow: "ellipsis",
   };
 
