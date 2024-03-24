@@ -92,6 +92,12 @@ Administrators and Managers also have the following options:
 
 </div>
 
+## Label a region
+
+Click on a label and then click on the text/image/video/other data to begin labeling. They type of tools available to you depend on the labeling configuration. 
+
+For more information, see [Label regions](label_regions). 
+
 
 ## Reset an annotation
 

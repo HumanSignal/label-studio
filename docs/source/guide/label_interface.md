@@ -58,7 +58,7 @@ The quick view is where you manually select each task from the Data Manager. The
 <div class="enterprise-only">
 
 !!! note
-    * If you have the Annotator role, you cannot access the Data Manager unless a manager or administrator has enabled Annotator access in the project settings. 
+    * If you have the Annotator role, you cannot access the Data Manager unless a Manager or Administrator has enabled Annotator access in the project settings. 
     * If you have the Annotator role and auto assignment is enabled, you can only view tasks that you have already labeled. Therefore, the Data Manager might initially appear empty. 
 
 ![Screenshot of Quick View](/images/label/quick_view_lse.png)
@@ -69,7 +69,7 @@ The quick view is where you manually select each task from the Data Manager. The
 
 ## Label stream
 
-In the label stream, as you finish each task, you automatically move onto the next one. 
+In the label stream, as you finish each task, you automatically move on to the next one. 
 
 !!! note
 
