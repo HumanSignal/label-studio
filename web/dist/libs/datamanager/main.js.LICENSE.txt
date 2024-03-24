@@ -15,7 +15,7 @@ object-assign
  * A simple micro-library for defining and dispatching keyboard shortcuts. It has no dependencies.
  * 
  * Copyright (c) 2020 kenny wong <wowohoo@qq.com>
- * http://jaywcjlove.github.io/hotkeys
+ * https://wangchujiang.com/hotkeys-js/
  * 
  * Licensed under the MIT license.
  */

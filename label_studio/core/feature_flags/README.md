@@ -26,7 +26,7 @@
    
     Naming convention is presented [here](#feature-flags-namings)
     
-    [Read more](https://docs.launchdarkly.com/sdk/features/flags_from_files#creating_a_flag_data_file) about extended format
+    [Read more](https://docs.launchdarkly.com/sdk/features/flags-from-files/?q=creating+a+flag+data+file#creating-a-flag-data-file) about extended format
     
 2. Set variables:
 
