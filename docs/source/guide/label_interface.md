@@ -1,21 +1,133 @@
 ---
-title: Using the panels within the labeling interface
-short: Panels
+title: Using the labeling interface
+short: Labeling interface
 tier: all
 type: guide
 order: 213
 order_enterprise: 113
-meta_title: Labeling interface
-meta_description: How to use the labeling editor in Label Studio
+meta_title: Using the labeling interface
+meta_description: How to use the labeling interface panels in Label Studio
 section: "Labeling"
 parent: "labeling"
 parent_enterprise: "labeling"
 date: 2024-02-29 14:41:32
 ---
 
-The labeling interface has several panels that provide information about the task and allow you to fine-tune your annotation. 
+The labeling interface is what you see when you open a task in Label Studio. 
 
-## Info panel
+The labeling interface is highly customizable, so the options that available to you depend on several factors:
+
+<div class="opensource-only">
+
+* How the labeling interface has been [configured](setup) and what kind of data you are labeling. This is the primary customization point and determines which tools are available and what you need to do to complete the task. 
+* How you have configured your [labeling settings](hotkeys#Configure-your-labeling-settings). 
+* Whether you are using an [ML backend to assist](label_advanced#Perform-ML-assisted-labeling-with-interactive-preannotations). 
+* Whether you are using Label Studio Enterprise (the Enterprise version has additional customization options and the ability to leave comments). 
+* Whether you are labeling in [quick view or the label stream](#Label-stream-vs-quick-view). 
+
+!!! error Enterprise
+    The screenshots and videos below include a Comments panel. This is only available in Label Studio Enterprise. 
+
+</div>
+
+<div class="enterprise-only">
+
+* How the labeling interface has been [configured](setup) and what kind of data you are labeling. This is the primary customization point and determines which tools are available and what you need to do to complete the task.  
+* How you have configured your [labeling settings](hotkeys#Configure-your-labeling-settings). 
+* Whether you are using an [ML backend to assist](label_advanced#Perform-ML-assisted-labeling-with-interactive-preannotations). 
+* Whether you are labeling in [quick view or the label stream](#Label-stream-vs-quick-view). 
+* Your role. For example, Annotators do not see certain actions, such as the one to delete a submitted annotation. 
+* Various [project settings](project_settings_lse), which can determine whether:
+    * You can see the **Skip** option. 
+    * You are required to leave a comment when skipping a task. 
+    * You are allowed to submit an empty annotation. 
+
+</div>
+
+## Quick view
+
+The quick view is where you manually select each task from the Data Manager. There are fewer navigation controls from quick view, because if you want to skip or leave a task, you can simply click away to return to the Data Manager. 
+
+
+<div class="opensource-only">
+
+![Screenshot of Quick View](/images/label/quick_view.png)
+
+</div>
+
+<div class="enterprise-only">
+
+!!! note
+    * If you have the Annotator role, you cannot access the Data Manager unless a manager or administrator has enabled Annotator access in the project settings. 
+    * If you have the Annotator role and auto assignment is enabled, you can only view tasks that you have already labeled. Therefore, the Data Manager might initially appear empty. 
+
+![Screenshot of Quick View](/images/label/quick_view_lse.png)
+
+</div>
+
+
+
+## Label stream
+
+In the label stream, as you finish each task, you automatically move onto the next one. 
+
+!!! note
+
+    When labeling tasks, you should not open the label stream simultaneously in two tabs. This could result in you receiving the same task twice, which can circumvent project settings that address annotator overlap.
+
+<div class="opensource-only">
+
+![Screenshot of Label Stream](/images/label/label_stream.png)
+
+</div>
+
+<div class="enterprise-only">
+
+![Screenshot of Label Stream](/images/label/label_stream_lse.png)
+
+</div>
+
+### Navigating the label stream
+
+You can use the arrows at the top to move through tasks. 
+
+![Screenshot of arrows](/images/label/label_postpone.png)
+
+| Action   | Description   |
+|--|-----|
+| Blue forward arrow  | Postpone the task. It is moved to the back of your labeling queue. |
+| Black forward arrow  | This appears above tasks you have already viewed or postponed.  |
+| Black reverse arrow | Move back through tasks you have already viewed. |
+
+
+### Skipping a task
+
+The **Skip** action is only available from the labeling stream. Otherwise, you can "skip" a task by simply selecting another in the Data Manager.
+
+
+<div class="enterprise-only">
+
+When you skip a task, whether you will see the task again depends on the [project settings](project_settings_lse#Annotation). 
+
+</div>
+
+<div class="opensource-only">
+
+When annotators skip a task, the task no longer appears in the labeling queue for that annotator. Other annotators still see the task in their labeling queue. 
+
+</div>
+
+### Exiting the labeling stream
+
+If you are not finished but would like to exit the labeling stream (for example, to pause the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation), you can click the drop-down menu next to **Submit** and then select **Submit and Exit** (or **Update and Exit**). This will submit the current annotation and allow you to exit the labeling stream. 
+
+If you are not done with your annotation, you can simply check to make sure your draft was saved in the history panel and then navigate to the Projects page to stop the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation from running. 
+
+<img src="../images/submit-and-exit.png" class="gif-border">
+
+## Label interface panels
+
+### Info panel
 
 This shows information about the selected regions. 
 
@@ -106,7 +218,7 @@ If you accidentally delete a region, press `ctrl` + `z` or click **Undo** in the
 </tr>
 </table>
 
-### Use the Info panel to refine a region
+#### Use the Info panel to refine a region
 
 For some region types, you can finely tune a region by editing its values. 
 
@@ -116,7 +228,7 @@ For example, if you are adding a rectangle, you can modify its coordinates and r
 
 <div class="enterprise-only">
 
-## Comments panel
+### Comments panel
 
 Use this section to leave comments. Reviewers and administrators get notifications about comments. 
 
@@ -124,11 +236,11 @@ For more information, see [Comments and notifications](comments_notifications).
 
 </div>
 
-## History panel
+### History panel
 
 This panel displays the annotation history as it progresses through the creation and review process. 
 
-## Regions panel
+### Regions panel
 
 A region is an area within the data that you as identify as an annotator. For example, this can be a box that you draw on an image, a section of highlighted text, highlighted video segments, and so on. 
 
@@ -169,9 +281,9 @@ If you are using the **Group Manually** option, you can order regions as follows
 !!! note
     The order and grouping that you apply does not affect the underlying data and does not change how the annotations are exported. It is simply for your convenience when working in the labeling interface. 
 
-## Relations panel
+### Relations panel
 
-This panel lists any relations you have added between regions. For information on adding a relation, see [Add relations between annotations](labeling#Add-relations-between-regions). 
+This panel lists any relations you have added between regions. For information on adding a relation, see [Add relations between annotations](label_regions#Add-relations-between-regions). 
 
 A relation indicates a connection between two regions, such as a hierarchy or order. These are often added in NLP tasks. 
 
@@ -182,13 +294,15 @@ You can use the **Relations** panel to delete relations and hide relations. Clic
 ![Relations panel gif](/images/label/relations_panel.gif)
 
 
-## Customize your panel layout
+## Customize your layout
 
-You can customize your panel layout:
+As an annotator, there are several things you can do to customize your layout:
 
-* Click the arrows to collapse/expand panel groups or the entire side pane. 
-* Drag and drop the panel tab title to reorder panels within the side pane. 
-* Use drag and drop for a panel group to undock them from the side and move them around your screen. 
+* Use the [settings](hotkeys) to determine whether the available hotkeys are displayed. 
+* Customize your panel layout:
+  * Click the arrows to collapse/expand panel groups or the entire side pane. 
+  * Drag and drop the panel tab title to reorder panels within the side pane. 
+  * Use drag and drop for a panel group to undock them from the side and move them around your screen. 
 
 <video src="../images/label/panel_arrange.mp4" controls="controls" style="max-width: 800px;" class="gif-border" />
 

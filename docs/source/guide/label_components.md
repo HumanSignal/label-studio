@@ -51,6 +51,8 @@ Your labeling configuration must include at least one object tag to specify the 
 
 Each object tag must have a unique name attribute and a value attribute that so that you can “point” to it from elsewhere within the labeling configuration. You can read more about this in [Parameters](#Parameters) below. 
 
+For more information, see [Retrieve imported data into the labeling configuration](label_object). 
+
 </dd>
 
 <dt>Control tags</dt>
@@ -145,7 +147,7 @@ Returning to the example from above, we can begin to add parameters:
 
 ## Variables
 
-Variables are used within tag parameters to dynamically insert data from the task into the labeling configuration. 
+Variables are prefixed with a dollar sign `$variable` and used within tag parameters to dynamically insert data from the task into the labeling configuration. 
 
 While variables are commonly used in the `value` parameter to bind the data to the object tags, they can also be used in other parameters where dynamic content is needed.
 
@@ -214,3 +216,26 @@ Inline styles defined using the `style` parameter will only affect the tag they 
 The `<Style>` tag is used to define CSS styles that can be applied globally across the entire labeling interface. It's similar to the `<style>` element in HTML, where you can write CSS rules that affect multiple elements within the interface.
 
 You can use the `<Style>` tag to create CSS classes and then apply these classes to various elements within your labeling configuration. For more information, see the [Style tag reference](/tags/style). 
+
+### HTML styling
+
+You can use the <HyperText> object tag to display text with inline HTML elements like `<b>` or `<strong>`. This allows you to apply formatting to specific parts of a string. 
+
+For example: 
+
+```xml
+
+<View>
+  <HyperText name="formatted_text" value="$htmlContent" />
+</View>
+```
+
+And your task data would include the HTML content with the desired formatting:
+
+```json
+{
+  "data": {
+    "htmlContent": "This is <b>bold</b> and this is <strong>strong</strong> text."
+  }
+}
+```
