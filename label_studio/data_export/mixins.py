@@ -1,4 +1,5 @@
 import hashlib
+import io
 import json
 import logging
 import pathlib
@@ -14,7 +15,6 @@ from core.utils.io import (
     get_all_dirs_from_dir,
     get_all_files_from_dir,
     get_temp_dir,
-    read_bytes_stream,
 )
 from data_manager.models import View
 from django.conf import settings
@@ -319,11 +319,12 @@ class ExportMixin:
                 output_file = pathlib.Path(tmp_dir) / (str(out_dir.stem) + '.zip')
                 filename = pathlib.Path(input_name).stem + '.zip'
 
-            out = read_bytes_stream(output_file)
-            return File(
-                out,
-                name=filename,
-            )
+            # TODO(jo): can we avoid the `f.read()` here?
+            with open(output_file, mode='rb') as f:
+                return File(
+                    io.BytesIO(f.read()),
+                    name=filename,
+                )
 
 
 def export_background(

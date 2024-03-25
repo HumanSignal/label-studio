@@ -8,7 +8,7 @@ import os
 import shutil
 import socket
 from contextlib import contextmanager
-from tempfile import mkdtemp, mkstemp
+from tempfile import NamedTemporaryFile, mkdtemp, mkstemp
 
 import pkg_resources
 import requests
@@ -140,9 +140,14 @@ def read_yaml(filepath):
     return data
 
 
-def read_bytes_stream(filepath):
-    with open(filepath, mode='rb') as f:
-        return io.BytesIO(f.read())
+def path_to_open_binary_file(filepath) -> io.BufferedReader:
+    """
+    Copy the file at filepath to a named temporary file and return that file object.
+    Unusually, this function deliberately doesn't close the file; the caller is responsible for this.
+    """
+    tmp = NamedTemporaryFile(delete=True)
+    shutil.copy2(filepath, tmp.name)
+    return tmp
 
 
 def get_all_dirs_from_dir(d):
