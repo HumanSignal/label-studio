@@ -54,6 +54,11 @@ jobs:
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
         run: yarn version:libs
 
+      - name: "Generate docs tags files"
+        continue-on-error: true
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn docs
+
       - name: "Commit and Push"
         run: |
           git add "${{ env.FRONTEND_MONOREPO_DIR }}" || true
