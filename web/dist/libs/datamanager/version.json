@@ -1,6 +1,6 @@
 {
-  "message": "ci: PLT-287: Add docs tags generation",
-  "commit": "f69f1ff23bca7d0e07503bc61bb4854ff7c09507",
-  "date": "2024-03-25T17:04:37.000Z",
+  "message": "fix",
+  "commit": "22a8229641ae9097804a9cd679ed4c23384bce5f",
+  "date": "2024-03-25T17:12:44.000Z",
   "branch": "PLT-287"
 }
