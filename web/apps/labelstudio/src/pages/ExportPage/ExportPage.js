@@ -235,7 +235,13 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
       <Elem name="feedback">
         Can't find an export format?
         <br/>
-        Please let us know in <a className="no-go" href="https://slack.labelstud.io/?source=product-export">Slack</a> or submit an issue to the <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">Repository</a>
+        Please let us know in
+        {" "}
+        <a className="no-go" href="https://slack.labelstud.io/?source=product-export" target="_blank">Slack</a>
+        {" "}
+        or submit an issue to the
+        {" "}
+        <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues" target="_blank" rel="noreferrer">Repository</a>
       </Elem>
     </Block>
   );
