@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'docs-video-rectangle-params'",
-  "commit": "75851c3af15180c7716f8cc3de6a161d7241abf6",
-  "date": "2024-03-26T13:16:17.000Z",
+  "message": "Fix the names of @regions",
+  "commit": "93af47440cec9dc1d40954efde6f93bf15f872e7",
+  "date": "2024-03-26T13:25:18.000Z",
   "branch": "docs-video-rectangle-params"
 }
