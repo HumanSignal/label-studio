@@ -1,43 +1,14 @@
-import { observer } from 'mobx-react';
-import React, { createContext, useState } from 'react';
-import { Children } from 'react';
+import React from 'react';
 import { Block, Elem } from '../../utils/bem';
 import './SidebarTabs.styl';
 
-const SidebarContext = createContext();
-
-export const SidebarTabs = observer(({ active, children }) => {
-  const [selected, setSelected] = useState(active);
-  const tabs = Children.toArray(children);
-
+// @todo there was an idea of switchable tabs, but they were not used,
+// @todo so implementation was removed and the whole part of interface
+// @todo is waiting to be removed in favor of new UI (see FF_DEV_3873)
+export const SidebarTabs = ({ children }) => {
   return (
-    <SidebarContext.Provider value={{ selected }}>
-      <Block name="sidebar-tabs">
-        {tabs.length > 1 && (
-          <Elem name="toggle">
-            {tabs.map(tab => (
-              <Elem
-                name="tab"
-                key={tab.props.name}
-                mod={{ active: tab.props.name === selected }}
-                onClick={() => setSelected(tab.props.name)}
-              >
-                {tab.props.title}
-              </Elem>
-            ))}
-          </Elem>
-        )}
-
-        <Elem name="content">{tabs.find(tab => tab.props.name === selected)}</Elem>
-      </Block>
-    </SidebarContext.Provider>
+    <Block name="sidebar-tabs">
+      <Elem name="content">{children}</Elem>
+    </Block>
   );
-});
-
-export const SidebarPage = ({ children }) => {
-  return children;
-};
-
-export const SidebarContent = ({ children }) => {
-  return <Block name="sidebar-content">{children}</Block>;
 };

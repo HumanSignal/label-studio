@@ -6,7 +6,7 @@ import { Block, Elem, MenuContext } from './MenuContext';
 import { MenuItem } from './MenuItem';
 
 export const Menu = forwardRef(
-  ({ children, className, style, size, selectedKeys, closeDropdownOnItemClick }, ref) => {
+  ({ children, className, style, size, selectedKeys, closeDropdownOnItemClick, contextual }, ref) => {
     const dropdown = useDropdown();
 
     const selected = useMemo(() => {
@@ -27,7 +27,7 @@ export const Menu = forwardRef(
 
     return (
       <MenuContext.Provider value={{ selected }}>
-        <Block ref={ref} tag="ul" name="main-menu" mod={{size, collapsed}} mix={className} style={style} onClick={clickHandler}>
+        <Block ref={ref} tag="ul" name="main-menu" mod={{size, collapsed, contextual}} mix={className} style={style} onClick={clickHandler}>
           {children}
         </Block>
       </MenuContext.Provider>

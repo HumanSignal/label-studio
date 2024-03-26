@@ -29,6 +29,12 @@ _api_urlpatterns = [
     path('<int:pk>/validate/', api.ProjectLabelConfigValidateAPI.as_view(), name='project-label-config-validate'),
     # Project summary
     path('<int:pk>/summary/', api.ProjectSummaryAPI.as_view(), name='project-summary'),
+    # Project summary
+    path(
+        '<int:pk>/summary/reset/',
+        api.ProjectSummaryResetAPI.as_view(),
+        name='project-summary-reset',
+    ),
     # Project import
     path('<int:pk>/imports/<int:import_pk>/', api.ProjectImportAPI.as_view(), name='project-imports'),
     # Project reimport

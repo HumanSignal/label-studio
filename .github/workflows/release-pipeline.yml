@@ -136,7 +136,7 @@ jobs:
       - update-homebrew-tap
       - update-helm-chart
     runs-on: ubuntu-latest
-    if: ${{ failure() }}
+    if: failure()
     steps:
       - name: Send Notification to Slack
         id: slack_notify_ops_release

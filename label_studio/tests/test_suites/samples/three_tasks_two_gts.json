@@ -1,0 +1,281 @@
+[
+    {
+        "data":
+        {
+            "image": "https://data.heartex.net/open-images/train_0/mini/0007efdd465a14b8.jpg",
+            "text": "Calif. wildfires signal the arrival of a planetary fire age https://t.co/Vvo9noqQfA",
+            "audio": "https://data.heartex.net/librispeech/dev-clean/3536/8226/3536-8226-0024.flac.wav"
+        },
+        "annotations":
+        [
+            {
+                "result":
+                [
+                    {
+                        "id": "oid0",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 80.62,
+                            "y": 24.26,
+                            "width": 3.12,
+                            "height": 3.6,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        }
+                    }
+                ],
+                "ground_truth": true
+            }
+        ],
+        "predictions":
+        [
+            {
+                "result":
+                [
+                    {
+                        "id": "oid3",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 80.88,
+                            "y": 24.03,
+                            "width": 2.13,
+                            "height": 2.86,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        },
+                        "score": 0.23053804129850775
+                    }
+                ],
+                "ground_truth": false,
+                "model_version": "model 0",
+                "score": 0.7212843313260696
+            }
+        ]
+    },
+    {
+        "data":
+        {
+            "image": "https://data.heartex.net/open-images/train_0/mini/001a4c5a994c1425.jpg",
+            "text": "The Supreme Court won’t hear a challenge from gun maker Remington to a lawsuit brought by families of victims kille… https://t.co/k8ocrhV7Qj",
+            "audio": "https://data.heartex.net/librispeech/dev-clean/3536/8226/3536-8226-0024.flac.wav"
+        },
+        "annotations":
+        [
+            {
+                "result":
+                [
+                    {
+                        "id": "oid4",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 74.59,
+                            "y": 81.49,
+                            "width": 22.73,
+                            "height": 13.69,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        }
+                    }
+                ],
+                "ground_truth": true
+            }
+        ],
+        "predictions":
+        [
+            {
+                "result":
+                [
+                    {
+                        "id": "oid7",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 75.89,
+                            "y": 83.89,
+                            "width": 21.91,
+                            "height": 12.96,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        },
+                        "score": 0.2962464632651445
+                    }
+                ],
+                "ground_truth": false,
+                "model_version": "model 0",
+                "score": 0.36088106914938645
+            }
+        ]
+    },
+    {
+        "data":
+        {
+            "image": "https://data.heartex.net/open-images/train_0/mini/007dd9372c1d4088.jpg",
+            "text": "HAPPENING NOW: Coverage of Southern California wildfires from Los Angeles ABC station KABC. https://t.co/R1TsTK1qRG https://t.co/tYO1icafiq",
+            "audio": "https://data.heartex.net/librispeech/dev-clean/3536/8226/3536-8226-0009.flac.wav"
+        },
+        "annotations":
+        [
+            {
+                "result":
+                [
+                    {
+                        "id": "oid8",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 3.0,
+                            "y": 0.0,
+                            "width": 30.5,
+                            "height": 28.17,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        }
+                    },
+                    {
+                        "id": "oid9",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 28.12,
+                            "y": 3.0,
+                            "width": 44.19,
+                            "height": 23.23,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        }
+                    },
+                    {
+                        "id": "oid10",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 65.94,
+                            "y": 0.0,
+                            "width": 34.0,
+                            "height": 61.76,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        }
+                    }
+                ],
+                "ground_truth": false
+            }
+        ],
+        "predictions":
+        [
+            {
+                "result":
+                [
+                    {
+                        "id": "oid17",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 5.25,
+                            "y": 0,
+                            "width": 26.18,
+                            "height": 28.46,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        },
+                        "score": 0.41617402141032844
+                    },
+                    {
+                        "id": "oid18",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 28.61,
+                            "y": 4.38,
+                            "width": 44.3,
+                            "height": 21.26,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        },
+                        "score": 0.9085043776238039
+                    },
+                    {
+                        "id": "oid19",
+                        "from_name": "label",
+                        "to_name": "image",
+                        "source": "$image",
+                        "type": "rectanglelabels",
+                        "value":
+                        {
+                            "x": 64.92,
+                            "y": 0,
+                            "width": 35.46,
+                            "height": 62.11,
+                            "rotation": 0,
+                            "rectanglelabels":
+                            [
+                                "Car"
+                            ]
+                        },
+                        "score": 0.060230304372540844
+                    }
+                ],
+                "ground_truth": false,
+                "model_version": "model 0",
+                "score": 0.9601087774342991
+            }
+        ]
+    }
+]

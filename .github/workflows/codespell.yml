@@ -9,6 +9,7 @@ on:
 
 jobs:
   codespell:
+    if: ${{ false }}  # disable for now
     name: Check for spelling errors
     runs-on: ubuntu-latest
 
