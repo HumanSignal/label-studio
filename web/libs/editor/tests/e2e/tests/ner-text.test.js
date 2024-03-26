@@ -259,3 +259,26 @@ Scenario('NER Text with SECURE MODE', async function({ I, LabelStudio }) {
     window.LS_SECURE_MODE = window.OLD_LS_SECURE_MODE;
   });
 });
+
+Scenario('NER Text regions in Outliner', async function({ I, LabelStudio }) {
+  const params = {
+    annotations: [{ id: 'TestCmpl', result: resultsFromUrl }],
+    config: configUrl,
+    data: { url },
+  };
+
+  I.amOnPage('/');
+  // enabling both flags for New UI, but will work with Otliner one only as well
+  LabelStudio.setFeatureFlags({
+    ff_front_1170_outliner_030222_short: true,
+    fflag_feat_front_dev_3873_labeling_ui_improvements_short: true,
+  });
+  LabelStudio.init(params);
+
+  I.waitForElement('.lsf-richtext__line', 60);
+
+  I.see('American political leader');
+
+  I.seeElement(locate('.lsf-outliner-item').withText(resultsFromUrl[0].value.text));
+  I.seeElement(locate('.lsf-outliner-item').withText(resultsFromUrl[1].value.text));
+});

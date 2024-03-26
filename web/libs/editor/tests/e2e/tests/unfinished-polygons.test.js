@@ -56,7 +56,7 @@ Scenario('Drafts for unfinished polygons', async function({ I, LabelStudio, AtLa
   AtImageView.drawByClickingPoints([[50,50], [100, 50], [100, 80]]);
 
   I.say('wait until autosave');
-  I.waitForFunction(()=>!!window.LSDraft, .5);
+  I.waitForFunction(() => !!window.LSDraft, .5);
   I.say('check result');
   const draft = await I.executeScript(getLocallySavedDraft);
 
@@ -83,7 +83,7 @@ Scenario('Saving polygon drawing steps to history', async function({ I, LabelStu
   AtImageView.drawByClick(50, 50);
 
   I.say('check current history size');
-  let historyStepsCount = await I.executeScript(()=>window.Htx.annotationStore.selected.history.history.length);
+  let historyStepsCount = await I.executeScript(() => window.Htx.annotationStore.selected.history.history.length);
 
   assert.strictEqual(historyStepsCount, 2);
 
@@ -93,7 +93,7 @@ Scenario('Saving polygon drawing steps to history', async function({ I, LabelStu
   AtImageView.drawByClick(50, 50);
 
   I.say('check current history size and result');
-  historyStepsCount = await I.executeScript(()=>window.Htx.annotationStore.selected.history.history.length);
+  historyStepsCount = await I.executeScript(() => window.Htx.annotationStore.selected.history.history.length);
   assert.strictEqual(historyStepsCount, 5);
   let result = await LabelStudio.serialize();
 
@@ -105,7 +105,7 @@ Scenario('Saving polygon drawing steps to history', async function({ I, LabelStu
   I.click('button[aria-label=Undo]');
   I.click('button[aria-label=Undo]');
   I.say('check current history index and result');
-  historyStepsCount = await I.executeScript(()=>window.Htx.annotationStore.selected.history.undoIdx);
+  historyStepsCount = await I.executeScript(() => window.Htx.annotationStore.selected.history.undoIdx);
   assert.strictEqual(historyStepsCount, 1);
   result = await LabelStudio.serialize();
   assert.strictEqual(result[0].value.points.length, 1);
@@ -263,7 +263,7 @@ Scenario('Init an annotation with result of new format of polygon results', asyn
   await AtImageView.lookForStage();
   const canvasSize = await AtImageView.getCanvasSize();
 
-  AtImageView.drawByClick(canvasSize.width * .10, canvasSize.height * .40 );
+  AtImageView.drawByClick(canvasSize.width * .10, canvasSize.height * .40);
   result = await LabelStudio.serialize();
   assert.strictEqual(result[1].value.points.length, 4);
   assert.strictEqual(result[1].value.closed, false);
@@ -425,7 +425,7 @@ Scenario('Change label on unfinished polygons', async function({ I, LabelStudio,
   AtLabels.clickLabel('World');
 
   I.say('wait until autosave');
-  I.waitForFunction(()=>!!window.LSDraft, .5);
+  I.waitForFunction(() => !!window.LSDraft, .5);
   I.say('check result');
   const draft = await I.executeScript(getLocallySavedDraft);
 
