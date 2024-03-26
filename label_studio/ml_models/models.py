@@ -54,7 +54,9 @@ class ModelVersion(models.Model):
 
     parent_model = models.ForeignKey(ModelInterface, related_name='model_versions', on_delete=models.CASCADE)
 
-    # TODO add field containing model run IDs
+    @property
+    def full_title(self):
+        return f'{self.parent_model.title}__{self.title}'
 
     prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
 
@@ -126,19 +128,38 @@ class ModelRun(models.Model):
     )
 
     project_subset = models.CharField(max_length=255, choices=ProjectSubset.choices, default=ProjectSubset.HASGT)
+
     status = models.CharField(max_length=255, choices=ModelRunStatus.choices, default=ModelRunStatus.PENDING)
+
+    job_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,
+        help_text='Job ID for inference job for a ModelRun e.g. Adala job ID',
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
-    triggered_at = models.DateTimeField(_('triggered at'))
+    triggered_at = models.DateTimeField(_('triggered at'), null=True, default=None)
+
+    predictions_updated_at = models.DateTimeField(_('predictions updated at'), null=True, default=None)
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
 
     # todo may need to clean up in future
     @property
     def input_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input_tasks.csv'
+        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input.csv'
 
     @property
     def output_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output_tasks.csv'
+        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output.csv'
+
+    @property
+    def error_file_name(self):
+        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
+
+    @property
+    def base_file_path(self):
+        return 's3://sandbox2-datasets-for-prompter-workflow/adala/hakan_test'   # TODO decide on path to use for LSE

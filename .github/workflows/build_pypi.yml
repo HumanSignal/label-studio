@@ -48,6 +48,7 @@ on:
 
 env:
   PYTHON_VERSION_FILE: "pyproject.toml"
+  FRONTEND_MONOREPO_DIR: "web"
 
 jobs:
   pypi:
@@ -80,6 +81,21 @@ jobs:
           ./toml set '${{ env.PYTHON_VERSION_FILE }}' tool.poetry.version "$version" > pyproject.toml.new
           mv -f pyproject.toml.new pyproject.toml
 
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: "Build"
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn build
+
+      - name: "Generate version files"
+        continue-on-error: true
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn version:libs
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -89,12 +105,10 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
-        run: |
-          poetry install --with build
+        run: poetry install --with build
 
       - name: Collect static
-        run: |
-          poetry run python label_studio/manage.py collectstatic
+        run: poetry run python label_studio/manage.py collectstatic
 
       - name: Download feature flags
         env:

@@ -40,8 +40,11 @@ class ModelProviderConnection(models.Model):
 
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
+    # Check if user is Admin or Owner
+    # This will need to be updated if we ever use this model in LSO as `is_owner` and
+    # `is_administrator` only exist in LSE
     def has_permission(self, user):
-        return user.active_organization == self.organization
+        return (user.is_administrator or user.is_owner) and user.active_organization_id == self.organization_id
 
     def validate_api_key(self):
         """
