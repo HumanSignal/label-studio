@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'docs/193'",
-  "commit": "9742997963cf3e6946dade6d78892352ef1549ff",
-  "date": "2024-03-25T17:41:47.000Z",
-  "branch": "docs/193"
+  "message": "ci: test",
+  "commit": "9db47ef0e19275e1cfaaaa1eecff615af5783843",
+  "date": "2024-03-26T11:46:43.000Z",
+  "branch": "ci-test"
 }

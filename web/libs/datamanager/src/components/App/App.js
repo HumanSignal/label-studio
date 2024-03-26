@@ -39,7 +39,7 @@ const AppComponent = ({ app }) => {
               <Block name="crash">
                 <Elem name="header">Oops...</Elem>
                 <Elem name="description">
-                  Project has been deleted or not yet created.
+                  Project has been deleted or not yet created.!
                 </Elem>
               </Block>
             ) : app.loading ? (
