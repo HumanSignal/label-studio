@@ -375,8 +375,8 @@ const Model = types
      * @property {number} original_height height of the original image (px)
      * @property {number} image_rotation rotation degree of the image (deg)
      * @property {Object} value
-     * @property {number} value.x x coordinate of the top left corner before rotation (0-100)
-     * @property {number} value.y y coordinate of the top left corner before rotation (0-100)
+     * @property {number} value.x x coordinate of the top left corner (0-100)
+     * @property {number} value.y y coordinate of the top left corner (0-100)
      * @property {number} value.width width of the bounding box (0-100)
      * @property {number} value.height height of the bounding box (0-100)
      * @property {number} value.rotation rotation degree of the bounding box (deg)
