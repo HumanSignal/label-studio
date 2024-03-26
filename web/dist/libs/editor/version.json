@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'docs/193'",
-  "commit": "9742997963cf3e6946dade6d78892352ef1549ff",
-  "date": "2024-03-25T17:41:47.000Z",
-  "branch": "docs/193"
+  "message": "Fix newlines in all LSF E2E from CRLF to LF",
+  "commit": "4dba4cffc09690acbd982ab5e7710c767fbdca61",
+  "date": "2024-03-26T00:53:20.000Z",
+  "branch": "fb-leap-219/update-lsf-e2e"
 }
