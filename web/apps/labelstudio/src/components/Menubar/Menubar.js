@@ -233,12 +233,14 @@ export const Menubar = ({
                   href="https://github.com/heartexlabs/label-studio"
                   icon={<LsGitHub/>}
                   target="_blank"
+                  rel="noreferrer"
                 />
                 <Menu.Item
                   label="Slack Community"
                   href="https://slack.labelstud.io/?source=product-menu"
                   icon={<LsSlack/>}
                   target="_blank"
+                  rel="noreferrer"
                 />
 
                 <VersionNotifier showCurrentVersion/>
