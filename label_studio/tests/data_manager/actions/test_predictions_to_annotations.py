@@ -1,7 +1,7 @@
 import mock
 from data_manager.actions.predictions_to_annotations import predictions_to_annotations_form
-from users.models import User
 from projects.models import Project
+from users.models import User
 
 
 def test_predictions_to_annotations_form():
