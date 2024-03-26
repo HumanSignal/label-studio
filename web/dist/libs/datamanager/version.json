@@ -1,6 +1,6 @@
 {
-  "message": "Fix newlines in all LSF E2E from CRLF to LF",
-  "commit": "4dba4cffc09690acbd982ab5e7710c767fbdca61",
-  "date": "2024-03-26T00:53:20.000Z",
+  "message": "Update web/libs/editor/tests/e2e/tests/ner-text.test.js",
+  "commit": "26b1ad9ba78d4b70552b8e10687485303667a5bf",
+  "date": "2024-03-26T01:55:06.000Z",
   "branch": "fb-leap-219/update-lsf-e2e"
 }
