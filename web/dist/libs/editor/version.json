@@ -1,6 +1,6 @@
 {
-  "message": "Fix the names of @regions",
-  "commit": "93af47440cec9dc1d40954efde6f93bf15f872e7",
-  "date": "2024-03-26T13:25:18.000Z",
+  "message": "Also remove incorrect rotation reference for Rect x,y",
+  "commit": "eed74160e49a7cf1b1f2bd90ff70ef9b8ffa1594",
+  "date": "2024-03-26T15:23:08.000Z",
   "branch": "docs-video-rectangle-params"
 }
