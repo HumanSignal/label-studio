@@ -268,7 +268,7 @@ Scenario('NER Text regions in Outliner', async function({ I, LabelStudio }) {
   };
 
   I.amOnPage('/');
-  // enabling both flags for New UI, but will work with Otliner one only as well
+  // enabling both flags for New UI, but will work with Outliner one only as well
   LabelStudio.setFeatureFlags({
     ff_front_1170_outliner_030222_short: true,
     fflag_feat_front_dev_3873_labeling_ui_improvements_short: true,
