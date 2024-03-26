@@ -61,6 +61,17 @@ const Model = types
       }
     },
 
+    /**
+     * Applies additional data from the given result.
+     * In the results we have almost all data meaningful stored in value but in regions we have two places for it:
+     * - region itself (fields in model)
+     * - related results (in results array)
+     * so for some fields we should control more if we want to apply fields that could be in both places into the region.
+     * This method also helps to avoid region type detection at the deserialization stage.
+     *
+     * @param {Object} result - The result object containing additional data.
+     * @returns {void}
+     */
     applyAdditionalDataFromResult(result) {
       const isMainResult = result?.type?.endsWith('labels');
       const hasText = isDefined(result?.value?.text);
