@@ -7,6 +7,62 @@ import { AreaMixin } from '../mixins/AreaMixin';
 import { onlyProps, VideoRegion } from './VideoRegion';
 import { interpolateProp } from '../utils/props';
 
+/**
+ * @example
+ * 
+ * 
+ * 
+ * {
+ *   "value": {
+ *     "framesCount": 1051,
+ *     "duration": 42.008633,
+ *     "sequence": [
+ *       {
+ *         "frame": 1,
+ *         "enabled": true,
+ *         "rotation": 0,
+ *         "x": 16,
+ *         "y": 51,
+ *         "width": 30,
+ *         "height": 28,
+ *         "time": 0.04
+ *       }, {
+ *         "x": 44.7,
+ *         "y": 51.5,
+ *         "width": 30.1,
+ *         "height": 28.8,
+ *         "rotation": 0,
+ *         "frame": 18,
+ *         "enabled": true,
+ *         "time": 0.72
+ *       }, {
+ *         "x": 44.7,
+ *         "y": 51.5,
+ *         "width": 30.1,
+ *         "height": 28.8,
+ *         "rotation": 0,
+ *         "enabled": false, // this region won't appear on next frames
+ *         "frame": 25,
+ *         "time": 1
+ *       }
+ *     ]
+ *   }
+ * }
+ * @typedef {Object} VideoRectangleRegionResult
+ * @property {Object} value
+ * @property {number} value.framesCount total number of frames in the video
+ * @property {number} value.duration duration of the video in seconds
+ * @property {number} value.sequence array of keypoint objects
+ * @property {number} value.sequence[].x x coordinate of the top left corner (0-100)
+ * @property {number} value.sequence[].y y coordinate of the top left corner (0-100)
+ * @property {number} value.sequence[].width width of the bounding box (0-100)
+ * @property {number} value.sequence[].height height of the bounding box (0-100)
+ * @property {number} value.sequence[].rotation rotation degree of the bounding box (deg)
+ * @property {number} value.sequence[].enabled whether the region is visible on this and next frames
+ * @property {number} value.sequence[].frame frame number
+ * @property {number} value.sequence[].time time in seconds
+ */
+
 const Model = types
   .model('VideoRectangleRegionModel', {
     type: 'videorectangleregion',

@@ -22,6 +22,7 @@ import ControlBase from './Base';
  *   </Labels>
  * </View>
  * @name VideoRectangle
+ * @regions VideoRectangleRegionResult
  * @meta_title Video Tag for Video Labeling
  * @meta_description Customize Label Studio with the Video tag for basic video annotation tasks for machine learning and data science projects.
  * @param {string} name Name of the element
