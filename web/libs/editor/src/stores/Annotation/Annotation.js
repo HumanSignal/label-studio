@@ -1,12 +1,11 @@
-import { destroy, detach, flow, getEnv, getParent, getRoot, isAlive, onSnapshot, types } from 'mobx-state-tree';
-
 import throttle from 'lodash.throttle';
+import {destroy, detach, flow, getEnv, getParent, getRoot, isAlive, onSnapshot, types} from 'mobx-state-tree';
 import Constants from '../../core/Constants';
-import { errorBuilder } from '../../core/DataValidator/ConfigValidator';
-import { guidGenerator } from '../../core/Helpers';
-import { Hotkey } from '../../core/Hotkey';
+import {errorBuilder} from '../../core/DataValidator/ConfigValidator';
+import {guidGenerator} from '../../core/Helpers';
+import {Hotkey} from '../../core/Hotkey';
 import TimeTraveller from '../../core/TimeTraveller';
-import Tree, { TRAVERSE_STOP } from '../../core/Tree';
+import Tree, {TRAVERSE_STOP} from '../../core/Tree';
 import Types from '../../core/Types';
 import Area from '../../regions/Area';
 import Result from '../../regions/Result';
@@ -16,20 +15,83 @@ import {
   FF_DEV_1598,
   FF_DEV_2100,
   FF_DEV_2432,
-  FF_DEV_3391, FF_LLM_EPIC,
+  FF_DEV_3391,
+  FF_LLM_EPIC,
   FF_LSDV_3009,
   FF_LSDV_4583,
   FF_LSDV_4832,
   FF_LSDV_4988,
   isFF
 } from '../../utils/feature-flags';
-import { delay, isDefined } from '../../utils/utilities';
-import { CommentStore } from '../Comment/CommentStore';
+import {delay, isDefined} from '../../utils/utilities';
+import {CommentStore} from '../Comment/CommentStore';
 import RegionStore from '../RegionStore';
 import RelationStore from '../RelationStore';
-import { UserExtended } from '../UserStore';
+import {UserExtended} from '../UserStore';
 
 const hotkeys = Hotkey('Annotations', 'Annotations');
+
+/**
+ * Omit value fields from the object.
+ *
+ * This should fix a problem with wrong region type detection caused by overlapping fields from a result and from an area.
+ * The current problem is related to the text field of richtext region that could appear in the result for the textarea as well.
+ * As these fields have the same name and different types it could make the region to be detected as a classification region instead of richtext,
+ * and we may miss its displaying.
+ *
+ * For now, it is mostly related to the rich text region with per region textareas.
+ * The problem may appear when we get wrong order of results for deserialization.
+ * The other reason may be the omitted main result (We declare that all the data that we need to restore the main region is also contained in the per-region results).
+ * @example Wrong order:
+ * [{
+ *   "id": "id_1",
+ *   "from_name": "comment",
+ *   "to_name": "text",
+ *   "type": "textarea",
+ *   "value": {
+ *     "start": 0,
+ *     "end": 11,
+ *     "text": ["A comment for the region],
+ *    },
+ *  },
+ *  {
+ *    "id": "id_1",
+ *    "from_name": "labels",
+ *    "to_name": "text",
+ *    "type": "labels",
+ *    "value": {
+ *      "start": 0,
+ *      "end": 11,
+ *      "labels": ["Label 1"],
+ *      "text": "Just a text",
+ *    },
+ * }]
+ *
+ * @example Omitted main result:
+ * [{
+ *    "id": "only_per_region_textarea",
+ *    "from_name": "comment",
+ *    "to_name": "text",
+ *    "type": "textarea",
+ *    "value": {
+ *      "start": 0,
+ *      "end": 11,
+ *      "labels": ["Label 1"],
+ *      "text": ["A comment for the region"],
+ *    },
+ * }]
+ *
+ * @param value {Object} object to fix
+ * @returns {Object} new object without value fields
+ */
+function omitValueFields(value) {
+  const newValue = {...value};
+
+  Result.properties.value.propertyNames.forEach(propName => {
+    delete newValue[propName];
+  });
+  return newValue;
+}
 
 const TrackedState = types
   .model('TrackedState', {
@@ -1033,8 +1095,8 @@ export const Annotation = types
         if (tagNames.has(obj.from_name) && tagNames.has(obj.to_name)) {
           res.push(obj);
         }
-        
-        // Insert image dimensions from result 
+
+        // Insert image dimensions from result
         (() => {
           if (!isDefined(obj.original_width)) return;
           if (!tagNames.has(obj.to_name)) return;
@@ -1043,7 +1105,7 @@ export const Annotation = types
 
           if (tag.type !== 'image') return;
 
-          const imageEntity = tag.findImageEntity(obj.item_index ?? 0); 
+          const imageEntity = tag.findImageEntity(obj.item_index ?? 0);
 
           if (!imageEntity) return;
 
@@ -1191,15 +1253,6 @@ export const Annotation = types
         const areaId = `${id || guidGenerator()}#${self.id}`;
         const resultId = `${data.from_name}@${areaId}`;
         const value = self.prepareValue(rawValue, tagType);
-        // This should fix a problem when the order of results is broken
-        const omitValueFields = (value) => {
-          const newValue = { ...value };
-
-          Result.properties.value.propertyNames.forEach(propName => {
-            delete newValue[propName];
-          });
-          return newValue;
-        };
 
         if (isFF(FF_DEV_3391)) {
           to_name = `${to_name}@${self.id}`;
@@ -1214,6 +1267,8 @@ export const Annotation = types
             object: to_name,
             ...data,
             // We need to omit value properties due to there may be conflicting property types, for example a text.
+            // if we don't it can create a classification instead of proper area
+            /** @see `omitValueFields` */
             ...omitValueFields(value),
             value,
           };
@@ -1231,7 +1286,11 @@ export const Annotation = types
           }
         }
 
-        area.addResult({ ...data, id: resultId, type, value, from_name, to_name });
+        const newResult = { ...data, id: resultId, type, value, from_name, to_name };
+
+        area.addResult(newResult);
+        // apply additional data, that were skipped in favour of region type detection
+        area.applyAdditionalDataFromResult?.(newResult);
 
         // if there is merged result with region data and type and also with the labels
         // and object allows such merge — create new result with these labels
@@ -1349,7 +1408,7 @@ export const Annotation = types
         area.setValue(state);
       });
       self.suggestions.delete(id);
-      
+
     },
 
     rejectSuggestion(id) {
