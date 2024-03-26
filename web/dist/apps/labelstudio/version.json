@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'docs/193'",
-  "commit": "9742997963cf3e6946dade6d78892352ef1549ff",
-  "date": "2024-03-25T17:41:47.000Z",
-  "branch": "docs/193"
+  "message": "introducing lefthook",
+  "commit": "e193af3e7d4562d53d48b459f68632bdea5dc342",
+  "date": "2024-03-26T20:36:26.000Z",
+  "branch": "init-biomejs"
 }
