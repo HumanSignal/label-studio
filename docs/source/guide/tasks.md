@@ -42,6 +42,10 @@ You can import many types of data, including text, timeseries, audio, and image 
 
 If you don't see a supported data or file type that you want to import, please let us know by submitting an issue to the <a className="no-go" href="https://github.com/humansignal/label-studio/issues">Label Studio Repository</a>.
 
+## Retrieve data using object tags
+
+Importing data does not automatically mean it is displayed in your tasks. For that, you need to ensure you are properly using the object tag in your labeling configuration. For more information, see [Retrieve imported data into the labeling configuration](label_object). 
+
 
 ### How to import your data
 
@@ -114,133 +118,6 @@ http://example.com/text.txt
 
 {% enddetails %}
 
-
-## How to retrieve data
-
-There are several steps to retrieve the data to display in the `Object` tag. The data retrieval is also used in [dynamic choices](/templates/serp_ranking.html) and [labels](/templates/inventory_tracking.html). Use the following parameters in the `Object` tag.
-
-### `value` (required)
-
-The `value` parameter represents the source of the data. It can be plain text or a step of complex data retrieval system. It can be denoted using the following forms:
-`value` (required)
-
-#### Variables 
-
-In most cases, the `Object` tag has the value with one variable (prefixed with a $) in it.
-
-For example, `<Audio value="$audio" ... />` seeks the "audio" field in the imported JSON object:
-```json
-{
-  "data": {
-    "audio": "https://host.name/myaudio.wav"
-  }
-}
-```
-
-#### Plain text
-
-The value parameter can be a string. It is useful for `Header` and `Text`. 
-
-Also, you can use the content of the tag as value. It is useful for descriptive text tags and is applied for `Label` and `Choice`.
-
-For example:
-
-```xml
-<Header>Label audio:</Header>
-<Header value="Label only fully visible cars" />
-<Text name="instruction" value="Label only fully visible cars" />
-<Label>cat</Label>
-
-<Choice>other</Choice>
-```
-
-#### Other cases
-
-1. The `value` parameter can be a text containing variables prefixed by $.
-
-    For example:
-    ```xml
-    <Header value="url: $image"/>
-    ```
-
-2. The `value` parameter can also refer to nested data in arrays and dicts (`$texts[2]` and `$audio.url`). 
-
-    For example: 
-    ```xml
-    <Image name="image" value="$images[0]"/>
-    ```
-
-3. The `value` parameter can include [`Repeater`](/tags/repeater.html) tag substitution, by default `{{idx}}`.
-
-    For example:
-    ```xml
-    <Repeater on="$audios">
-      <Audio name="audio_{{idx}}" value="$audios[{{idx}}].url"/>
-    </Repeater>
-    ```
-
-
-### `valueType` (optional)
-
-The `valueType` parameter defines how to treat the data retrieved from the previous steps.
-There are two options such as the  "url" and raw data. Currently the raw data input can be  "text” or "json”. The  “text” is used for `HyperText` and `Text` tags and "json" is used for `TimeSeries` tag. 
-
-For example:
-
-- Using “url”: `<Text name="text1" value="$text" valueType="url"/>` displays the text loaded by the URL.
-
-- Using “text”: `<Text name="text" value="$text" valueType="text"/>` displays the URL without loading the text.
-
-### `resolver` (optional)
-    
-Use this parameter to retrieve data from multi-column csv on [S3 or other cloud storage](/guide/storage.html). Label Studio can retrieve it only in run-time, so it's secure.
-
-If you import a file with a list of tasks, and every task in this list is a link to another file in the storage. In this case, you can use the `resolver` parameter to retrieve the content of these files from a storage. 
-
-**Use case**
-
-There is a list of tasks, where the "remote" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
-
-Tasks:
-```json
-[
-    { "remote": "s3://bucket/text1.csv" },
-    { "remote": "s3://bucket/text2.csv" }
-]
-```
-
-CSV file:
-```csv
-id;text
-12;The most flexible data annotation tool. Quickly installable. Build custom UIs or use pre-built labeling templates.
-```
-
-**Solution**
-
-To retrieve the file, use the following parameters:
-
-1. `value="$remote"`: The URL to CSV on S3 is in "remote" field of task data. If you use the `resolver` parameter the `value` is always treated as URL, so you don't need to set `valueType`.
-
-2. `resolver="csv|separator=;|column=text"`: Load this file in run-time, parse it as CSV, and get the “text” column from the first row. 
-
-3. Display the result.
-
-**Syntax**
-
-The syntax for the `resolver` parameter consists of a list of options separated by a `|` symbol.
-
-The first option is the type of file.
-
-!!! note
-    Currently, only CSV files are supported.
-
-The remaining options are parameters of the specified file type with optional values. The parameters for CSV files are:
-
-- `headless`: A CSV file does not have headers (this parameter is boolean and can't have a value).
-- `separator=;`: CSV separator, usually can be detected automatically.
-- `column=1`: In `headless` mode use zero-based index, otherwise use column name.
-
-For example, `resolver="csv|headless|separator=;|column=1"`
 
 
 ## How to format your data to import it
