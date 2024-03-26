@@ -27,6 +27,8 @@ After you [start Label Studio](start) and [create an account](signup), create a 
    
 </div>
 
+</div>
+
 <div class="enterprise-only">
 
 1. [Create a project](#Create-a-project)

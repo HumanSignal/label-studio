@@ -76,12 +76,15 @@ meta_description: Label Studio interactive demo and playground for data labeling
 
   .editor-row {
       display: flex;
-      margin-bottom: 1em;
+      margin: 0 auto 1em;
       width: 100% !important;
+      max-width: 1300px;
   }
 
    .data-row {
       display: flex;
+      max-width: 1300px;
+      margin: 0 auto;
    }
 
   .preview-col {
@@ -99,6 +102,18 @@ meta_description: Label Studio interactive demo and playground for data labeling
       width: 40%;
   }
 
+  .config-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .config-wrapper h4{
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
   .input-col {
       width: 49%;
       padding-right: 2%;
@@ -112,7 +127,8 @@ meta_description: Label Studio interactive demo and playground for data labeling
   }
 
   h4 {
-    margin-bottom: 1rem!important;
+    margin-bottom: 1rem;
+    margin-top: 0 !important;
   }
 
   /* hide title "basic template configs" */
@@ -129,7 +145,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
 
   .message, .accordion {
     width: 90%;
-    max-width: 1150px;
+    max-width: 1300px;
     margin: 1em auto 1.75em auto;
   }
   .grid {
@@ -146,6 +162,16 @@ meta_description: Label Studio interactive demo and playground for data labeling
         -ms-flex-align: stretch;
             align-items: stretch;
     padding: 0;
+  }
+
+  .loading{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .loading img{
+    border: none;
   }
 
   .column {
@@ -233,12 +259,12 @@ meta_description: Label Studio interactive demo and playground for data labeling
 
   .share-buttons {
     float:right;
-    margin: 1.2em 1em 1em 1em;
+    margin: 0 0 0 1em;
   }
   .share-buttons i {
     cursor: pointer;
-    opacity: 0.5 !important;
-    color: #f58a48;
+
+    color: var(--color-orange-400);
     transition: 0.25s;
   }
   .share-buttons i:hover {
@@ -276,6 +302,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
 
     .editor-row {
         flex-direction: column;
+        max-width: 1300px;
     }
     .data-row {
         flex-direction: column;
@@ -347,7 +374,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
 <div>
   <div class="editor-row">
     <div class="config-col">
-      <div>
+      <div class="config-wrapper">
         <h4 style="display: inline-block">2. Edit Labeling config</h4>
         <span class="share-buttons">
           <i class="icon copy outline" style="cursor: pointer" title="Copy labeling config"></i>

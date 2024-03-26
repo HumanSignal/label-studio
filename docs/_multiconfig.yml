@@ -1,10 +1,10 @@
 theme_config:
-  tier: enterprise
-  root_domain: heartex.com
+  tier: opensource
+  root_domain: labelstud.io
 deploy:
   type: aws-s3
   region: us-east-1
-  bucket: docs.heartex.com
+  bucket: labelstud.io
 title: Label Studio
 subtitle: Data labeling, annotation and exploration tool
 description: >-
@@ -54,7 +54,7 @@ markdown:
   pedantic: false
   sanitize: false
   tables: true
-  breaks: true
+  breaks: false
   smartLists: true
   smartypants: true
 index_generator:

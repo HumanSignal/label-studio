@@ -97,7 +97,6 @@ To configure Label Studio to use TLS for end-client connections with PostgreSQL,
 
 1. Enable TLS for your PostgreSQL instance and save Root TLS certificate, client certificate and its key for the next steps.
 2. Create a Kubernetes secret with your certificates, replacing `<PATH_TO_CA>`, `<PATH_TO_CLIENT_CRT>` and `<PATH_TO_CLIENT_KEY>` with paths to your certificates:
-
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA> --from-file=client.crt=<PATH_TO_CLIENT_CRT> --from-file=client.key=<PATH_TO_CLIENT_KEY>
 ```
@@ -144,13 +143,11 @@ kubectl get pods
 Restart your Helm release by doing the following from the command line:
 
 1. Identify the &lt;RELEASE_NAME&gt; of the latest Label Studio release:
-
 ```shell
 helm list
 ```
 
-2Restart the Label Studio app:
-
+2. Restart the Label Studio app:
 ```shell
 kubectl rollout restart deployment/<RELEASE_NAME>-ls-app
 ```
