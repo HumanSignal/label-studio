@@ -18,13 +18,13 @@ import { interpolateProp } from '../utils/props';
  *     "duration": 42.008633,
  *     "sequence": [
  *       {
- *         "frame": 1,
- *         "enabled": true,
- *         "rotation": 0,
  *         "x": 16,
  *         "y": 51,
  *         "width": 30,
  *         "height": 28,
+ *         "rotation": 0,
+ *         "enabled": true,
+ *         "frame": 1,
  *         "time": 0.04
  *       }, {
  *         "x": 44.7,
@@ -32,8 +32,8 @@ import { interpolateProp } from '../utils/props';
  *         "width": 30.1,
  *         "height": 28.8,
  *         "rotation": 0,
- *         "frame": 18,
  *         "enabled": true,
+ *         "frame": 18,
  *         "time": 0.72
  *       }, {
  *         "x": 44.7,
