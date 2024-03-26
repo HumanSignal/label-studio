@@ -1,0 +1,6 @@
+pre-push:
+  commands:
+    check:
+      root: "web/"
+      glob: "**/*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
+      run: yarn biome check --no-errors-on-unmatched --files-ignore-unknown=true --config-path=. {push_files}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.6.1/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "files": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      "**/tsconfig*",
+      "libs/editor/examples/**/*.json",
+      "libs/editor/src/examples/**/annotations/1.json"
+    ],
+    "maxSize": 3670016
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "develop"
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  }
+}
