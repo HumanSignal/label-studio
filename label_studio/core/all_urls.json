@@ -943,7 +943,7 @@
     },
     {
         "url": "/api/ml/<int:pk>/predict/test",
-        "module": "ml.api.MLBackendPredictTestAPI",
+        "module": "ml.api.MLBackendPredictAPI",
         "name": "ml:api:ml-predict-test",
         "decorators": ""
     },
