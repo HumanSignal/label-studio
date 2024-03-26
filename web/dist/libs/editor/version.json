@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'docs/193'",
-  "commit": "9742997963cf3e6946dade6d78892352ef1549ff",
-  "date": "2024-03-25T17:41:47.000Z",
-  "branch": "docs/193"
+  "message": "docs: Add example of VideoRectangle results",
+  "commit": "de7bb7bf0a2f8624dd697dc422ea3d4bf6bd4124",
+  "date": "2024-03-26T13:07:37.000Z",
+  "branch": "docs-video-rectangle-params"
 }
