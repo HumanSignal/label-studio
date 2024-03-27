@@ -65,8 +65,9 @@ def predictions_to_annotations_form(user, project):
     versions = project.get_model_versions()
 
     # put the current model version on the top of the list
+    # if it exists
     first = project.model_version
-    if first is not None:
+    if first:
         try:
             versions.remove(first)
         except ValueError:

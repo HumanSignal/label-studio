@@ -89,7 +89,7 @@ import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
  * @param {string} [placeholder=]         - What to display as prompt on the input
  * @param {boolean} [perRegion]           - Use this tag to classify specific regions instead of the whole object
  * @param {boolean} [perItem]             - Use this tag to classify specific items inside the object instead of the whole object[^FF_LSDV_4583]
- * @param {boolean} [legacy]              - Use this tag to enable the legacy version of the Taxonomy tag. When true, the `apiUrl` parameter is not usable. 
+ * @param {boolean} [legacy]              - Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable.  
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
