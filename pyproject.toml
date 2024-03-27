@@ -219,9 +219,23 @@ pre-commit = "3.3.3"
 s3transfer = "0.7.0"
 mock = ">=5.1.0"
 moto = ">=4.2.6"
+pyright = "^1.1.356"
+django-stubs = "^4.2.7"
+lxml-stubs = "^0.5.1"
+types-psutil = "^5.9.5.20240316"
+types-mock = "^5.1.0.20240311"
+types-bleach = "^6.1.0.20240311"
+types-redis = "^4.6.0.20240311"
+types-google-cloud-ndb = "^2.3.0.20240311"
+types-colorama = "^0.4.15.20240311"
+types-ujson = "^5.9.0.0"
+types-jsonschema = "^4.21.0.20240311"
+appdirs-stubs = "^0.1.0"
+djangorestframework-stubs = "^3.14.5"
 label-studio-sdk = { url = "https://github.com/HumanSignal/label-studio-sdk/archive/e94b252a6039cfdac71d61fcab910c7b9554953d.zip" }
 [tool.poetry.group.build.dependencies]
 twine = ">=4.0.2"
+
 
 [tool.poetry.extras]
 mysql = ["mysqlclient"]
