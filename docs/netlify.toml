@@ -11,7 +11,7 @@
   force = true
 
 [[redirects]]
-  from = "https://docs.humansignal.com/guide/starter_cloud"
+  from = "/guide/starter_cloud"
   to = "https://humansignal.com/platform/starter-cloud/manage"
   status = 301
   force = true
