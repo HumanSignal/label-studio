@@ -1,6 +1,6 @@
 {
-  "message": "Add one more `@example` tag",
-  "commit": "f4b43e51fcdedc4f9f79d7b1a567d63454b44c6e",
-  "date": "2024-03-27T10:34:10.000Z",
-  "branch": "fix-misspells-frontend-docs"
+  "message": "Merge branch 'develop' into 'fb-leap-598'",
+  "commit": "850f6275c9010ad01c6cb8a275874b16f343e868",
+  "date": "2024-03-27T12:19:01.000Z",
+  "branch": "fb-leap-598"
 }
