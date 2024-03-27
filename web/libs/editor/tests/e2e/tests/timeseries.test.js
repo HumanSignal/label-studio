@@ -285,7 +285,7 @@ Scenario('TimeSeries with optimized data', async ({ I, LabelStudio, AtTimeSeries
       I.say(`I see ${timestamp}`);
     
       assert(timestamp === lastTimestamp || timestamp - lastTimestamp === 1,
-        `Timestamps should not be skipped. Got ${lastTimestamp} and ${timestamp} but ${timestamp -  1} is missed`);
+        `Timestamps should not be skipped. Got ${lastTimestamp} and ${timestamp} but ${timestamp - 1} is missed`);
     }
     lastTimestamp = timestamp;
   }

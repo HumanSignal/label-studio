@@ -931,7 +931,7 @@ class Project(ProjectMixin, models.Model):
             output = {r['model_version']: r['count'] for r in model_versions}
 
             # Ensure that self.model_version exists in output
-            if self.model_version is not None and self.model_version not in output:
+            if self.model_version and self.model_version not in output:
                 output[self.model_version] = 0
 
             # Return as per requirement

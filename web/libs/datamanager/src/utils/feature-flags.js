@@ -77,6 +77,12 @@ export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
  */
 export const FF_LOPS_86 = "fflag_feat_front_lops_86_datasets_storage_edit_short";
 
+/**
+ * Self Serve
+ * @link https://app.launchdarkly.com/default/test/features/fflag_feat_front_leap_482_self_serve_short/
+ */
+export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
+
 // Customize flags
 const flags = {};
 
