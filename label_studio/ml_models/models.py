@@ -159,7 +159,3 @@ class ModelRun(models.Model):
     @property
     def error_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
-
-    @property
-    def base_file_path(self):
-        return 's3://sandbox2-datasets-for-prompter-workflow/adala/hakan_test'   # TODO decide on path to use for LSE
