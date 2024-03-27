@@ -40,6 +40,7 @@ const ORIGINAL_ITEMS_KEY = '_';
  *     { "id": "wiki", "title": "Arrow (computer science)", "body": "In computer science, arrows or bolts are a type class..." }
  *   ]
  * }
+ * @example
  * <!-- Example result for Ranker tag -->
  * {
  *   "from_name": "rank",
