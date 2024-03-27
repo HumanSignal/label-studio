@@ -154,7 +154,7 @@ Scenario('Drawing multiple blank regions and then attaching labels', async ({ I,
     'ff_front_1170_outliner_030222_short': true,
   });
   I.amOnPage('/');
-  LabelStudio.init({ config: createConfig( ), data });
+  LabelStudio.init({ config: createConfig(), data });
   AtImageView.waitForImage();
   AtSettings.open();
   AtSettings.setGeneralSettings({
@@ -192,12 +192,12 @@ Scenario('Drawing multiple blank regions and then attaching labels', async ({ I,
   }
   session('Deserialization', () => {
     I.amOnPage('/');
-    LabelStudio.init({ config: createConfig( ), data, annotations: [{ id: 'test', result: results }] });
+    LabelStudio.init({ config: createConfig(), data, annotations: [{ id: 'test', result: results }] });
     AtImageView.waitForImage();
     AtOutliner.seeRegions(regions.length);
     for (const [idx, region] of Object.entries(regions)) {
       if (region.text) {
-        I.seeInField(AtOutliner.locateRegionIndex((+idx)+1).find('.lsf-textarea-tag__input'), region.text);
+        I.seeInField(AtOutliner.locateRegionIndex((+idx) + 1).find('.lsf-textarea-tag__input'), region.text);
       }
     }
   });

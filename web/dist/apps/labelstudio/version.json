@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-598'",
-  "commit": "850f6275c9010ad01c6cb8a275874b16f343e868",
-  "date": "2024-03-27T12:19:01.000Z",
-  "branch": "fb-leap-598"
+  "message": "Update web/libs/editor/tests/e2e/tests/ner-text.test.js",
+  "commit": "26b1ad9ba78d4b70552b8e10687485303667a5bf",
+  "date": "2024-03-26T01:55:06.000Z",
+  "branch": "fb-leap-219/update-lsf-e2e"
 }

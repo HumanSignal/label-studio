@@ -1,6 +1,3 @@
-
-/* global Feature, Scenario */
-
 const assert = require('assert');
 const { serialize } = require('./helpers');
 

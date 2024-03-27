@@ -2,7 +2,7 @@ const assert = require('assert');
 
 Feature('Dynamic choices').tag('@regress');
 
-Scenario('Hotkeys for dynamic choices', async ({ I, LabelStudio })=>{
+Scenario('Hotkeys for dynamic choices', async ({ I, LabelStudio }) => {
   const params = {
     config: `
 <View>
