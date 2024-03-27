@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fix-misspells-frontend-docs'",
-  "commit": "656b4f88f3a26dff6df1830b97b2a690dd0927bc",
-  "date": "2024-03-27T10:27:24.000Z",
+  "message": "Add one more `@example` tag",
+  "commit": "f4b43e51fcdedc4f9f79d7b1a567d63454b44c6e",
+  "date": "2024-03-27T10:34:10.000Z",
   "branch": "fix-misspells-frontend-docs"
 }

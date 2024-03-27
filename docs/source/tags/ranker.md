@@ -46,7 +46,12 @@ Example task data for Ranker tag
     { "id": "wiki", "title": "Arrow (computer science)", "body": "In computer science, arrows or bolts are a type class..." }
   ]
 }
-<!-- Example result for Ranker tag -->
+```
+### Example
+
+Example result for Ranker tag
+
+```json
 {
   "from_name": "rank",
   "to_name": "results",
