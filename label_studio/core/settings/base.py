@@ -54,6 +54,7 @@ LOGGING = {
         'rules': {'level': 'WARNING'},
         'django': {
             'handlers': ['console'],
+            'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
             # 'propagate': True,
         },
         'django_auth_ldap': {'level': os.environ.get('LOG_LEVEL', 'DEBUG')},
@@ -183,7 +184,7 @@ if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
         client.setup_logging()
 
         LOGGING['handlers']['google_cloud_logging'] = {
-            'level': get_env('LOG_LEVEL', 'WARNING'),
+            'level': get_env('GOOGLE_CLOUD_LOG_LEVEL', get_env('LOG_LEVEL', 'WARNING')),
             'class': 'google.cloud.logging.handlers.CloudLoggingHandler',
             'client': client,
         }
