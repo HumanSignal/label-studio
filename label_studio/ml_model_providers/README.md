@@ -2,6 +2,13 @@
 
 Currently supporting a feature in [Label Studio Enterprise](https://github.com/HumanSignal/label-studio-enterprise).
 
+## ModelProviderConnection
+
+Holds the API keys for an LLM provider. These can belong to a user or an organization.
+
+
+# Diagram
+
 ```mermaid
 ---
 Django ER Diagram
