@@ -139,7 +139,7 @@ To see more detailed logs, start the ML backend server with the `--debug` option
     The terms "predictions" and pre-annotations" are used interchangeably. 
 
 
-## Get predictions from a model
+### Get predictions from a model
 
 After you connect a model to Label Studio as a machine learning backend, you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes [training](#Model-training). 
 
@@ -160,7 +160,7 @@ If you want to retrieve predictions manually for a list of tasks **using only an
 }
 ```
 
-## Interactive pre-annotations
+### Interactive pre-annotations
 
 ML-assisted labeling with interactive pre-annotations works with image segmentation and object detection tasks using rectangles, ellipses, polygons, brush masks, and keypoints, as well as with HTML and text named entity recognition tasks. Your ML backend must support the type of labeling that you're performing, recognize the input that you create, and be able to respond with the relevant output for a prediction.
 
