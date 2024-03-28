@@ -10,7 +10,8 @@ meta_description: Machine learning frameworks for integrating your model develop
 section: "Machine learning"
 ---
 
-Integrate your model development pipeline with your data labeling workflow by adding a machine learning (ML) backend to Label Studio. You can set up your favorite machine learning frameworks to do the following:
+You can use an ML backend to integrate your model development pipeline with your data labeling workflow and do the following:
+
 - **Pre-labeling** by letting models predict labels and then have annotators perform further manual refinements. 
 - **Auto-labeling** by letting models create automatic annotations. 
 - **Online Learning** by simultaneously updating your model while new annotations are created, letting you retrain your model on-the-fly. 
@@ -18,64 +19,100 @@ Integrate your model development pipeline with your data labeling workflow by ad
 
 For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify. 
 
-!!! note
-    Use [Label Studio Enterprise to build an automated active learning loop](https://docs.humansignal.com/guide/active_learning.html) with a machine learning model backend. If you use the open source Community Edition of Label Studio, you can manually sort tasks and retrieve predictions to mimic an active learning process.
+If you just need to load static pre-annotated data into Label Studio, running an ML backend might be overkill for you. Instead, you can [import preannotated data](predictions).
 
+!!! info Tip
+    You can use [Label Studio Enterprise to build an automated active learning loop](https://docs.humansignal.com/guide/active_learning.html) with a machine learning model backend. If you use the open source Community Edition of Label Studio, you can manually sort tasks and retrieve predictions to mimic an active learning process.
 
-At a high level, you'll need to do the following: 
+## Set up one of Label Studio's ML backend examples
 
-1. Set up an ML backend. You can either:
-   - [Start an example ML backend](#Quickstart-with-an-example-ML-backend) or 
-   - [Create your own machine learning backend](ml_create)
-2. [Connect Label Studio to the ML backend](#Add-an-ML-backend-to-Label-Studio).
+The Label Studio ML backend is an SDK that wraps your machine learning code and turns it into a web server. The web server can be connected to a running Label Studio instance to automate labeling tasks. We have provided a [library of example models](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#models) that you can use in your own workflow, or extend and customize as needed. 
 
-## Quickstart with an example ML backend
+Ir you want to write your own model instead, see [Write your own ML backend](ml_create).
 
-Label Studio includes several example machine learning backends with popular machine learning models. See the [machine learning tutorials](ml_tutorials.html). Each example ML backend uses Docker Compose to start running the example ML backend server.
+### Prerequisites
 
-To start an example machine learning backend with Docker Compose, complete the following steps:
+<div class="opensource-only">
 
-1. Make sure port 9090 is available. For information changing ports, see [Modify the port](ml_create#Modify-the-port).
-2. Clone the Label Studio Machine Learning Backend git repository:  
-  ```bash
-   git clone https://github.com/HumanSignal/label-studio-ml-backend.git 
-   ```
-1. Change to the directory with the Docker Compose configuration file:
-   ```bash
-   cd label-studio-ml-backend/label_studio_ml/examples/the_simplest_ml_backend
-   ```
-2. Start Docker Compose:
+* [Label Studio](install)
+* [Docker Compose](https://docs.docker.com/compose/install/)
+
+</div>
+
+<div class="enterprise-only">
+
+* [Label Studio](install_enterprise)
+* [Docker Compose](https://docs.docker.com/compose/install/)
+
+</div>
+
+### Start the model
+
+1. First, decide which [model](#Example-models) you want to use and check for required parameters (click the link for each model to see a full parameter list). 
+
+    Use [`label_studio_ml/default_configs/docker-compose.yml`](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/default_configs/docker-compose.yml) for general configuration, and `docker-compose.yml` within the model directory for model-specific parameters. 
+
+2. Then replace `{MODEL_NAME}` in the below command with the appropriate directory:
+
     ```bash
-    docker-compose up
-    ```
+git clone https://github.com/HumanSignal/label-studio-ml-backend.git
+cd label-studio-ml-backend/label_studio_ml/examples/{MODEL_NAME}
+docker-compose up
+```
 
-You can access the machine learning backend server at `http://localhost:9090`. You can also use this URL to add the machine learning backend to Label Studio (see below).
+The model should begin running at `http://localhost:9090`. 
+
+You can check this with the following command:
+
+```bash
+curl http://localhost:9090/health
+```
 
 !!! note
-    `localhost` is a special domain name that loops back directly to your local environment. In the instance of Docker-hosted containers, this loops back to the container itself, and not the computer the container is hosted on. Docker provides a special domain as a workaround for this, docker.host.internal. If you're hosting Label Studio and your ML Backend inside of Docker, try using that domain instead of localhost. (`http://host.docker.internal:9090`)
-
-For information on creating a custom ML backend, see [Write your own ML backend](ml_create). 
-
-
-
-## Add an ML backend to Label Studio 
-
-After you start the machine learning backend server, add it to your Label Studio project:
-
-1. From Label Studio, open the project that you want to use with your ML backend.
-2. Select **Settings > Machine Learning**.
-3. Click **Add Model**. 
-4. Enter a title for the model and provide the URL for the ML backend. For example, `http://localhost:9090`. 
-5. (Optional) Enter a description.
-6. (Optional) Select **Allow version auto-update**. See [Version auto-update](#Enable-auto-update-for-a-model) for more.
-7. (Optional) Select **Use for interactive preannotation**. See [Get interactive pre-annotations](#Get-interactive-preannotations) for more.
-8. Click **Validate and Save**. 
+    `localhost` is a special domain name that loops back directly to your local environment. In the instance of Docker-hosted containers, this loops back to the container itself, and not the machine the container is hosted on. Docker provides a special domain as a workaround for this, docker.host.internal. If you're hosting Label Studio and your ML Backend inside of Docker, try using that domain instead of localhost. (`http://host.docker.internal:9090`)
 
 If you see any errors, see [Troubleshooting ML Backends & Predictions](https://support.humansignal.com/hc/en-us/sections/23627938255117-ML-Backend-Predictions) in the HumanSignal support center. 
 
-!!! note
+### Connect the model to Label Studio
+
+After you [create a project](setup_project), open the project settings and select **Model**. 
+
+Click **Connect Model** and complete the following fields:
+
+| Field | Description                                                                            |
+| -------- | -------------------------------------------------------------------------------------- |
+| **Name**   | Enter a name for the model.                        |
+| **Backend URL**  | Enter a URL for the model. <br /><br />If you are following the steps above, this would be `http://localhost:9090`.  |
+| **Select authentication method**   | If a username and password is required to access the model, you can select **Basic Authentication** and enter them here.                                     |
+| **Extra params**  | Enter any additional parameters you want to pass to the model.                                      |
+| **Interactive preannotations**  | Enable this option to allow the model to assist with the labeling process by providing real-time predictions or suggestions as annotators work on tasks.  <br /><br />In other words, as you interact with data (for example, by drawing a region on an image, highlighting text, or asking an LLM a question), the ML backend receives this input and returns predictions based on it.  |
+
+!!! info Tip
     You can also [add an ML backend using the API](/api/#operation/api_ml_create). You will need the project ID and the machine learning backend URL. 
-   
+
+## Example models
+
+The following models are available in the [Label Studio ML backend repository](https://github.com/HumanSignal/label-studio-ml-backend/). 
+
+Some of them work without any additional configuration. If the model has required parameters, you can set those parameters in `docker-compose.yml` within the model directory. 
+
+| MODEL_NAME                                                                 | Description                                                                                                                | Required parameters |
+|----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|---------------------|
+| [segment_anything_model](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model) | General-purpose interactive image segmentation [from Meta](https://segment-anything.com/)                                  | None                |
+| [llm_interactive](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/llm_interactive)               | Prompt engineering, data collection and model evaluation workflows for LLM ([OpenAI](https://platform.openai.com/), Azure) | OPENAI_API_KEY      |
+| [grounding_dino](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/grounding_dino)                 | Object detection with text prompts ([details](https://github.com/IDEA-Research/GroundingDINO))                             | None                |
+| [tesseract](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/tesseract)                           | Optical Character Recognition (OCR) by drawing bounding boxes ([details](https://github.com/tesseract-ocr/tesseract))      | None                |
+| [easyocr](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/easyocr)                               | Another OCR tool from [EasyOCR](https://github.com/JaidedAI/EasyOCR)                                                       | None                |
+| [spacy](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/spacy)                                   | Named entity recognition model from [SpaCy](https://spacy.io/)                                                             | None                |
+| [flair](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/flair)                                   | NLP models by [flair](https://flairnlp.github.io/)                                                                         | None                |
+| [huggingface](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/huggingface)                       | NLP models by [Hugging Face](https://huggingface.co/)                                                                      | HF_TOKEN            |
+| [nemo](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/nemo)                                     | Speech transcription models by [NVIDIA NeMo](https://github.com/NVIDIA/NeMo)                                               | None                |
+| [mmetection](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/mmetection)                         | Object detection models by [OpenMMLab](https://github.com/open-mmlab/mmdetection)                                          | None                |
+| [simple_text_classifier](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/simple_text_classifier) | Simple trainable text classification model powered by [scikit-learn](https://scikit-learn.org/stable/)                     | None                |
+| [substring_matching](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching)         | Select keyword to highlight all occurrences of the keyword in the text                                                     | None                |
+
+
+
 ## Train a model
 
 After you connect a model to Label Studio as a machine learning backend and annotate at least one task, you can start training the model. 
@@ -97,7 +134,7 @@ After you connect a model to Label Studio as a machine learning backend, you can
 If the model has not been trained yet, do the following to get predictions to appear:
 1. Start labeling data in Label Studio. 
 2. Return to the **Machine Learning** settings for your project and click **Start Training** to start training the model.
-3. In the data manager for your project, select the tasks that you want to get predictions for and select **Retrieve predictions** using the drop-down actions menu. Label Studio sends the selected tasks to your ML backend. 
+3. In the Data Manager for your project, select the tasks that you want to get predictions for and select **Retrieve predictions** using the drop-down actions menu. Label Studio sends the selected tasks to your ML backend. 
 4. After retrieving the predictions, they appear in the task preview and Label stream modes for the selected tasks.  
 
 You can also retrieve predictions automatically by loading tasks. To do this, enable `Retrieve predictions when loading a task automatically` on the **Machine Learning** settings for your project. When you scroll through tasks in the data manager for a project, the predictions for those tasks are automatically retrieved from the ML backend. Predictions also appear when labeling tasks in the Label stream workflow.
@@ -114,26 +151,17 @@ If you want to retrieve predictions manually for a list of tasks **using only an
   ]
 }
 ```
-### Enable auto-update for a model
-Enabling model auto-update allows automatic retraining of your model every time a new annotation is submitted. To enable auto-update, do the following:
 
-Either enable the **Allow version auto-update** option when adding a model, or:
-1. In the Label Studio UI, open the project that you want to use with your ML backend.
-2. Select **Settings > Machine Learning**.
-3. For the connected model you wish to enable, click **Edit** in the overflow menu.
-4. Enable **Allow version auto-update**.
-5. Click **Validate and Save**.
-
-### Get interactive pre-annotations
+## Interactive pre-annotations
 
 ML-assisted labeling with interactive pre-annotations works with image segmentation and object detection tasks using rectangles, ellipses, polygons, brush masks, and keypoints, as well as with HTML and text named entity recognition tasks. Your ML backend must support the type of labeling that you're performing, recognize the input that you create, and be able to respond with the relevant output for a prediction.
 
-Either enable the **Use for interactive preannotation** option when adding a model, or:
+Either enable the **Interactive preannotation** option when adding a model, or:
 
 1. In the Label Studio UI, open the project that you want to use with your ML backend.
 2. Select **Settings > Machine Learning**.
 3. For the connected model you wish to enable, click **Edit** in the overflow menu.
-4. Enable **Use for interactive preannotation**.
+4. Enable **Interactive preannotation**.
 5. Click **Validate and Save**.
 
 For image labeling, you can update your labeling configuration to include `smart="true"` option for the type of labeling you're performing. Smart tools appear by default if auto-annotation is enabled. If you only want the smart option to appear and don't want to perform manual labeling at all, use `smartOnly="true"`. 
