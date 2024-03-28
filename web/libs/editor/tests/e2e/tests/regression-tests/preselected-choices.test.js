@@ -2,7 +2,7 @@ const assert = require('assert');
 
 Feature('Preselected choices');
 
-Scenario('Make a duplicate of annotation with preselected choices', async ({ I, LabelStudio, AtTopbar })=>{
+Scenario('Make a duplicate of annotation with preselected choices', async ({ I, LabelStudio, AtTopbar }) => {
   const params = {
     config: `
 <View>
@@ -52,7 +52,7 @@ Scenario('Make a duplicate of annotation with preselected choices', async ({ I, 
   assert.deepStrictEqual(annotationWithPresetValues[0].value.choices, ['Option 1']);
 });
 
-Scenario('Make a duplicate of empty annotation with preselected choices', async ({ I, LabelStudio, AtTopbar })=>{
+Scenario('Make a duplicate of empty annotation with preselected choices', async ({ I, LabelStudio, AtTopbar }) => {
   const params = {
     config: `
 <View>

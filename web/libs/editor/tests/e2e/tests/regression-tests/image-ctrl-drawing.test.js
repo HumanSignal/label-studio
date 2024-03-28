@@ -206,6 +206,9 @@ Scenario('How it works without ctrl', async function({ I, LabelStudio, AtSidebar
   for (const regionPair of regionPairs) {
     const [outerRegion, innerRegion] = regionPair;
 
+    // Brush is not relevant in this case anymore (it will not interact with other regions)
+    if (innerRegion.shape === 'Brush') continue;
+
     LabelStudio.init(params);
     AtImageView.waitForImage();
     AtSidebar.seeRegions(0);

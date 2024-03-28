@@ -6,6 +6,7 @@ import drf_yasg.openapi as openapi
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from django.conf import settings
+from django.http import Http404
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
@@ -76,10 +77,11 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
+
         self.check_object_permissions(self.request, project)
-        ml_backends = MLBackend.objects.filter(project_id=project.id)
-        for mlb in ml_backends:
-            mlb.update_state()
+
+        ml_backends = project.update_ml_backends_state()
+
         return ml_backends
 
     def perform_create(self, serializer):
@@ -206,6 +208,60 @@ class MLBackendTrainAPI(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        operation_summary='Predict',
+        operation_description="""
+        After you add an ML backend, call this API with the ML backend ID to run a test prediction on specific task data               
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this ML backend.',
+            ),
+        ],
+        responses={
+            200: openapi.Response(title='Predicting OK', description='Predicting has successfully started.'),
+            500: openapi.Response(
+                description='Predicting error',
+                schema=openapi.Schema(
+                    title='Error message',
+                    description='Error message',
+                    type=openapi.TYPE_STRING,
+                    example='Server responded with an error.',
+                ),
+            ),
+        },
+    ),
+)
+class MLBackendPredictTestAPI(APIView):
+    serializer_class = MLBackendSerializer
+    permission_required = all_permissions.projects_change
+
+    def post(self, request, *args, **kwargs):
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, ml_backend)
+
+        random = request.query_params.get('random', False)
+        if random:
+            task = Task.get_random(project=ml_backend.project)
+            if not task:
+                raise Http404
+
+            kwargs = ml_backend._predict(task)
+            return Response(**kwargs)
+
+        else:
+            return Response(
+                status=status.HTTP_501_NOT_IMPLEMENTED,
+                data={'error': 'Not implemented - you must provide random=true query parameter'},
+            )
+
+
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Machine Learning'],
         operation_summary='Request Interactive Annotation',
         operation_description="""
         Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
@@ -227,22 +283,40 @@ class MLBackendTrainAPI(APIView):
     ),
 )
 class MLBackendInteractiveAnnotating(APIView):
+    """
+    Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+    predicted region based on annotator input.
+    """
 
     permission_required = all_permissions.tasks_view
 
+    def _error_response(self, message, log_function=logger.info):
+        log_function(message)
+        return Response({'errors': [message]}, status=status.HTTP_200_OK)
+
+    def _get_task(self, ml_backend, validated_data):
+        return generics.get_object_or_404(Task, pk=validated_data['task'], project=ml_backend.project)
+
+    def _get_credentials(self, request, context, project):
+        if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
+            context.update(
+                project_credentials_login=project.task_data_login,
+                project_credentials_password=project.task_data_password,
+            )
+        return context
+
     def post(self, request, *args, **kwargs):
+        """
+        Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+        predicted region based on annotator input.
+        """
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
         serializer = MLInteractiveAnnotatingRequest(data=request.data)
         serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
 
-        task = generics.get_object_or_404(Task, pk=validated_data['task'], project=ml_backend.project)
-        context = validated_data.get('context')
-
-        if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
-            context['project_credentials_login'] = task.project.task_data_login
-            context['project_credentials_password'] = task.project.task_data_password
+        task = self._get_task(ml_backend, serializer.validated_data)
+        context = self._get_credentials(request, serializer.validated_data.get('context', {}), task.project)
 
         result = ml_backend.interactive_annotating(task, context, user=request.user)
 

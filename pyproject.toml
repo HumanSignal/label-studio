@@ -104,7 +104,7 @@ target-version = ['py38']
 [tool.poetry]
 
 name = "label-studio"
-version = "1.11.1.dev0"
+version = "1.12.1.dev0"
 description = "Label Studio annotation tool"
 authors = [
     "Heartex <hello@heartex.ai>",
@@ -197,6 +197,7 @@ launchdarkly-server-sdk = "8.2.1"
 python-json-logger = "2.0.4"
 label-studio-converter = "0.0.58"
 google-cloud-storage = "^2.13.0"
+google-cloud-logging = "^3.10.0"
 mysqlclient = {version = "*", optional = true}
 django-csp = "3.7"
 openai = "^1.10.0"
@@ -218,7 +219,7 @@ pre-commit = "3.3.3"
 s3transfer = "0.7.0"
 mock = ">=5.1.0"
 moto = ">=4.2.6"
-label-studio-sdk = { url = "https://github.com/HumanSignal/label-studio-sdk/archive/b74e2d693f203bfb16c8919fd9670ec8e2c5f8ea.zip" }
+label-studio-sdk = { url = "https://github.com/HumanSignal/label-studio-sdk/archive/e94b252a6039cfdac71d61fcab910c7b9554953d.zip" }
 [tool.poetry.group.build.dependencies]
 twine = ">=4.0.2"
 

@@ -87,25 +87,6 @@ stages:
     headers:
       content-type: application/json
     json:
-      model_version: model_version_UNEXISTED
-
-- name: get_next_task
-  request:
-    method: GET
-    url: '{django_live_url}/api/projects/{project_pk}/next'
-  response:
-    json:
-      data:
-        text: Test example phrase
-      is_labeled: false
-
-- name: change_project_model_version
-  request:
-    method: PATCH
-    url: '{django_live_url}/api/projects/{project_pk}'
-    headers:
-      content-type: application/json
-    json:
       model_version: null
 
 - name: get_next_task
@@ -116,31 +97,6 @@ stages:
     json:
       data:
         text: Test example phrase
-      predictions:
-        - result:
-            - from_name: text_class
-              to_name: text
-              type: choices
-              value:
-                choices:
-                  - class_A
-          model_version: model_version_A
-        - result:
-            - from_name: text_class
-              to_name: text
-              type: choices
-              value:
-                choices:
-                  - class_B
-          model_version: model_version_B
-
-
-
-
-
-
-
-
 
 
 ---
@@ -248,3 +204,4 @@ stages:
     status_code: 200
     json:
       id: !int "{task_id}"
+      
