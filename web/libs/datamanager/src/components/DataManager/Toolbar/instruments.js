@@ -21,37 +21,46 @@ const style = {
   justifyContent: 'space-between',
 };
 
-// Check if user is on trial
-const isTrialExpired = window.APP_SETTINGS.billing.checks.is_license_expired;
-// Check the subscription period end date
-const subscriptionPeriodEnd = window.APP_SETTINGS.subscription.current_period_end;
-// Check if user is self-serve
-const isSelfServe = isFF(FF_SELF_SERVE) && window.APP_SETTINGS.billing.enterprise;
-// Check if user is self-serve and has expired trial
-const isSelfServeExpiredTrial = isSelfServe && isTrialExpired && !subscriptionPeriodEnd;
-// Check if user is self-serve and has expired subscription
-const isSelfServeExpiredSubscription = isSelfServe && subscriptionPeriodEnd && new Date(subscriptionPeriodEnd) < new Date();
-// Check if user is self-serve and has expired trial or subscription
-const isSelfServeExpired = isSelfServeExpiredTrial || isSelfServeExpiredSubscription;
+/**
+ * Checks for Starter Cloud trial expiration.
+ * If expired it renders disabled Import button with a tooltip.
+ */
+const ImportButtonWithChecks = ({ size }) => {
+  const simpleButton = <ImportButton size={size}>Import</ImportButton>;
+  const isOpenSource = !window.APP_SETTINGS.billing;
+  // Check if user is self-serve; Enterprise flag === false is the main condition
+  const isSelfServe = isFF(FF_SELF_SERVE) && window.APP_SETTINGS.billing?.enterprise === false;
 
-const WithDisabledTooltip = ({ children, ...props }) => {
-  if (!props.disabled) {
-    return children;
-  }
+  if (isOpenSource || !isSelfServe) return simpleButton;
 
+  // Check if user is on trial
+  const isTrialExpired = window.APP_SETTINGS.billing.checks?.is_license_expired;
+  // Check the subscription period end date
+  const subscriptionPeriodEnd = window.APP_SETTINGS.subscription?.current_period_end;
+  // Check if user is self-serve and has expired trial
+  const isSelfServeExpiredTrial = isSelfServe && isTrialExpired && !subscriptionPeriodEnd;
+  // Check if user is self-serve and has expired subscription
+  const isSelfServeExpiredSubscription = isSelfServe
+    && subscriptionPeriodEnd
+    && new Date(subscriptionPeriodEnd) < new Date();
+  // Check if user is self-serve and has expired trial or subscription
+  const isSelfServeExpired = isSelfServeExpiredTrial || isSelfServeExpiredSubscription;
+
+  if (!isSelfServeExpired) return simpleButton;
+
+  // Disabled buttons ignore hover, so we use wrapper to properly handle a tooltip
   return (
     <Tooltip
-      title={props.title}
+      title="You must upgrade your plan to import data"
       style={{
-        maxWidth:200,
+        maxWidth: 200,
         textAlign: "center",
       }}>
       <Block name="button-wrapper">
-        {children}
+        <ImportButton disabled size={size}>Import</ImportButton>
       </Block>
     </Tooltip>
   );
-
 };
 
 export const instruments = {
@@ -106,11 +115,7 @@ export const instruments = {
   'import-button': ({ size }) => {
     return (
       <Interface name="import">
-        <WithDisabledTooltip
-          title="You must upgrade your plan to import data"
-          disabled={isSelfServeExpired}>
-          <ImportButton disabled={isSelfServeExpired} size={size}>Import</ImportButton>
-        </WithDisabledTooltip>
+        <ImportButtonWithChecks size={size} />
       </Interface>
     );
   },
