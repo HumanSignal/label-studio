@@ -60,9 +60,7 @@ cd label-studio-ml-backend/label_studio_ml/examples/{MODEL_NAME}
 docker-compose up
 ```
 
-The model should begin running at `http://localhost:9090`. 
-
-You can check this with the following command:
+The model should begin running at `http://localhost:9090`. You can verify this with the following command:
 
 ```bash
 curl http://localhost:9090/health
@@ -73,7 +71,7 @@ curl http://localhost:9090/health
 
 If you see any errors, see [Troubleshooting ML Backends & Predictions](https://support.humansignal.com/hc/en-us/sections/23627938255117-ML-Backend-Predictions) in the HumanSignal support center. 
 
-### Connect the model to Label Studio
+### Connect a model to Label Studio
 
 After you [create a project](setup_project), open the project settings and select **Model**. 
 
@@ -111,33 +109,43 @@ Some of them work without any additional configuration. If the model has require
 | [simple_text_classifier](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/simple_text_classifier) | Simple trainable text classification model powered by [scikit-learn](https://scikit-learn.org/stable/)                     | None                |
 | [substring_matching](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching)         | Select keyword to highlight all occurrences of the keyword in the text                                                     | None                |
 
+## Model training
 
+Training a model allows it learn from submitted annotations and potentially improve its predictions for subsequent tasks. 
 
-## Train a model
+After you connect a model to Label Studio as a machine learning backend and annotate at least one task, you can start training the model. You can use automated or manual training. 
 
-After you connect a model to Label Studio as a machine learning backend and annotate at least one task, you can start training the model. 
+From the **Model** page under project settings, select one of the following:
 
-You can prompt your model to train in several ways: 
-- Manually using the Label Studio UI. Click **Start Training** on the **Machine Learning** settings for your project.
-- Manually using the API. Specify the ID of the machine learning backend and run the following command: 
+* **Start model training on annotation submission**--Enable this option for automated training. When enabled, training is automatically initiated every time an annotation is submitted or updated. 
+* **Start Training** (Available from the overflow menu next to the connected model)--Manually initiate training. Use this action if you want to control when the model training occurs, such as after a specific number of annotations have been collected or at certain intervals.
+
+You can also initiate training programmatically using the following:
+
+* From the API, specify the ID of the machine learning backend and run the following command: 
    ```
    curl -X POST http://localhost:8080/api/ml/{id}/train
    ```
   See [the Train API documentation](/api/#operation/api_ml_train_create) for more.
-- [Trigger training with webhooks](ml_create.html#Trigger-training-with-webhooks).
+- [Trigger training with webhooks](ml_create#Trigger-training-with-webhooks).
 
-In development mode, training logs appear in the web browser console. In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
+In development mode, training logs appear in the web browser console. In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. 
+
+To see more detailed logs, start the ML backend server with the `--debug` option. 
+
+## Pre-annotations/predictions
+
+!!! note
+    The terms "predictions" and pre-annotations" are used interchangeably. 
+
 
 ## Get predictions from a model
-After you connect a model to Label Studio as a machine learning backend, you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes training. 
 
-If the model has not been trained yet, do the following to get predictions to appear:
-1. Start labeling data in Label Studio. 
-2. Return to the **Machine Learning** settings for your project and click **Start Training** to start training the model.
-3. In the Data Manager for your project, select the tasks that you want to get predictions for and select **Retrieve predictions** using the drop-down actions menu. Label Studio sends the selected tasks to your ML backend. 
-4. After retrieving the predictions, they appear in the task preview and Label stream modes for the selected tasks.  
+After you connect a model to Label Studio as a machine learning backend, you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes [training](#Model-training). 
 
-You can also retrieve predictions automatically by loading tasks. To do this, enable `Retrieve predictions when loading a task automatically` on the **Machine Learning** settings for your project. When you scroll through tasks in the data manager for a project, the predictions for those tasks are automatically retrieved from the ML backend. Predictions also appear when labeling tasks in the Label stream workflow.
+* To manually add predictions, go to the Data Manager, select the tasks you want to get predictions for, and then select **Actions > Retrieve predictions**.
+* To automatically pre-label data with predictions, go to the project settings and enable **Annotation > Use predictions to prelabel data**. 
+
 
 !!! note
     For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset from connected machine learning backends, make a [POST call to the predictions endpoint of the Label Studio API](/api/#operation/api_predictions_create) for each task to prompt the machine learning backend to create predictions for the tasks. 
@@ -159,7 +167,7 @@ ML-assisted labeling with interactive pre-annotations works with image segmentat
 Either enable the **Interactive preannotation** option when adding a model, or:
 
 1. In the Label Studio UI, open the project that you want to use with your ML backend.
-2. Select **Settings > Machine Learning**.
+2. Select **Settings > Model**.
 3. For the connected model you wish to enable, click **Edit** in the overflow menu.
 4. Enable **Interactive preannotation**.
 5. Click **Validate and Save**.
@@ -193,13 +201,19 @@ curl -H 'Authorization: Token <user-token-from-account-page>' -X POST \
 
 ### Choose which predictions to display to annotators
 
-You can choose which model predictions to display to annotators by default. 
+<div class="opensource-only">
 
-1. For a specific project, open the **Settings** and select **Machine Learning**.
-2. Under **Model Version**, select the version of the model that you want to use to display predictions to annotators by default. Your changes save automatically. 
+You can choose which model or prediction set to display to annotators by default. This is available under the **Annotation > Pre-labeing** in the project settings. 
 
-The model version can be specified in [imported pre-annotations](predictions.html), multiple versions of one connected ML backend, or multiple connected ML backends. 
+</div>
 
-When annotators start labeling, they'll see the predictions from that model version for each task, which they can then modify as needed. If there are no predictions for a task from the model version selected, no predictions display to the annotator even if another model version has predictions for the task. 
+<div class="enterprise-only">
+
+You can choose which model or prediction set to display to annotators by default. This is available under the **Annotation > Predictions** in the project settings. 
+
+</div>
+
+Use the drop-down menu to select which model or predictions to use in your labeling workflow. 
+
 
 
