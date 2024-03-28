@@ -60,47 +60,19 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
-        run: |
-          poetry install --with test
-
-      - name: Setup node
-        id: setup_node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "${{ env.NODE }}"
-
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v4
-        name: Configure npm cache
-        id: npm-cache
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-npm-ls-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json', 'label_studio/frontend/package-lock.json') }}
+        run: poetry install --with test
 
       - name: Install LSF & set version.py
-        run: poetry run ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        run: poetry run ./deploy/prebuild_wo_frontend.sh
 
       - name: Do migrations
         run: poetry run python label_studio/manage.py migrate
 
       - name: Run functional tests
-        run: |
-          cd label_studio/
-          poetry run pytest --cov=. --cov-report=xml -vv -n auto
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.1.0
-        with:
-          fail_ci_if_error: true
-          files: ./label_studio/coverage.xml
-          verbose: true
-          name: codecov-python-${{ matrix.python-version }}
-          token: ${{ secrets.CODECOV_TOKEN }}
+        working-directory: label_studio
+        run: poetry run pytest -vv -n auto
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -124,39 +96,29 @@ jobs:
       JSON_LOG: 0
       # SENTRY_DSN:
 
-    # Service containers to run with `container-job`
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
         image: postgres:13.8
-        # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
-        # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          # Maps tcp port 5432 on service container to the host
           - 5432:5432
 
-      # Label used to access the service container
       redis:
-        # Docker Hub image
         image: redis
-        # Set health checks to wait until redis has started
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          # Maps port 6379 on service container to the host
           - 6379:6379
 
     steps:
@@ -182,47 +144,29 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
-        run: |
-          poetry install --with test
-
-      - name: Setup node
-        id: setup_node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "${{ env.NODE }}"
-
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v4
-        name: Configure npm cache
-        id: npm-cache
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-npm-ls-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json', 'label_studio/frontend/package-lock.json') }}
+        run: poetry install --with test
 
       - name: Install LSF & set version.py
-        run: poetry run ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        run: poetry run ./deploy/prebuild_wo_frontend.sh
 
       - name: Do migrations
         run: poetry run python label_studio/manage.py migrate
 
       - name: Run functional tests
-        run: |
-          cd label_studio/
-          poetry run pytest --cov=. --cov-report=xml -vv -n auto
+        working-directory: label_studio
+        run: poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.1.0
         with:
-          fail_ci_if_error: true
+          name: codecov-python-${{ matrix.python-version }}
+          flags: pytests
           files: ./label_studio/coverage.xml
-          verbose: true
-          name: codecov-python-${{ matrix.python-version }}-postgresql
           token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
+          fail_ci_if_error: true
 
   windows_label_studio:
     name: LS SQLite Windows
@@ -271,8 +215,7 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Install Python dependencies
-        run: |
-          poetry install --with test
+        run: poetry install --with test
 
       - name: Fix sqlite.dll for python < 3.9
         if: ${{ contains(matrix.python-version, '3.8') }}
@@ -293,6 +236,5 @@ jobs:
       - name: Test with pytest
         env:
           collect_analytics: 0
-        run: |
-          cd label_studio/
-          poetry run python -m pytest -vv -n auto
+        working-directory: label_studio
+        run: poetry run pytest -vv -n auto
