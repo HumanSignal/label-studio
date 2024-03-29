@@ -3,9 +3,9 @@ title: Create and configure projects
 short: Create project
 type: guide
 tier: all
-order: 155
-order_enterprise: 56
-section: "Project Management"
+order: 104
+order_enterprise: 104
+section: "Create & Manage Projects"
 meta_title: Set up your labeling project
 meta_description: Set up data labeling and annotation projects in Label Studio to produce high-quality data for your machine learning and data science projects.
 ---

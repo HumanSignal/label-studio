@@ -1,13 +1,13 @@
 ---
 title: Manage projects in Label Studio Enterprise
 short: Manage projects
-tier: enterprise
+tier: all
 type: guide
-order: 0
-order_enterprise: 62
+order: 116
+order_enterprise: 116
 meta_title: Manage projects in Label Studio Enterprise
 meta_description: A description of various project management actions available.
-section: "Project Management"
+section: "Create & Manage Projects"
 ---
 
 For more project actions, see:

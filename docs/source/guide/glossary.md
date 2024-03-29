@@ -3,11 +3,13 @@ title: Label Studio terminology
 short: Terminology
 tier: all
 type: guide
-order: 15
-order_enterprise: 35
+order: 16 
+order_enterprise: 16
 meta_title: Label Studio terminology
 meta_description: A glossary of common terms seen throughout Label Studio. 
-section: "Get started"
+section: "Discover & Learn"
+parent: "get_started"
+parent_enterprise: "get_started"
 date: 2023-10-27 11:38:25
 ---
 

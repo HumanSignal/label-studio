@@ -4,10 +4,10 @@ short: User management
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 359
+order_enterprise: 366
 meta_title: User management overview
 meta_description: User management options available in Label Studio Enterprise
-section: "Administration"
+section: "Manage Your Organization"
 ---
 
 User management can be a crucial component in your data annotation workflow. 

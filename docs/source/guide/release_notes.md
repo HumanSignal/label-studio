@@ -6,8 +6,8 @@ short: On-Prem Release Notes
 type: guide
 tier: enterprise
 order: 0
-order_enterprise: 999
-section: "Reference"
+order_enterprise: 451
+section: "What's New"
 meta_title: On-premises release notes for Label Studio Enterprise
 meta_description: Review new features, enhancements, and bug fixes for on-premises Label Studio Enterprise installations. 
 ---
@@ -17,6 +17,173 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
 
 !!! note 
     Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
+
+
+<a name="2101post1md"></a>
+
+*Mar 13, 2024*
+
+## Label Studio Enterprise 2.10.1.post1
+Helm Chart version: 1.4.0
+
+### Security
+
+- Upgrade vulnerable versions of Pillow and Cryptography
+- Remove unused `requirements.*.txt` files that referred to old packages with CVEs
+
+
+
+<a name="2101md"></a>
+
+## Label Studio Enterprise 2.10.1
+
+<div class="onprem-highlight">
+  
+Release summary:
+    
+- Enhancements:
+    - Added a new **Reset Cache** action for projects. 
+- Security:
+    - Fixed an issue with activity logs. 
+- Various bug fixes
+
+For more details, see the full release notes below. 
+  
+</div>
+
+*Mar 12, 2024*
+
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.4.0
+
+### Enhancements
+
+There is a new **Reset Cache** action available from project settings under the **Danger Zone** section. You can use this action to reset and recalculate the labeling cache. 
+
+This action is particularly useful for situations in which you are attempting to modify the labeling configuration and you receive a validation error pointing to non-existent labels or drafts. 
+
+![Screenshot of the Reset Cache action](/images/releases/2-10-1-reset-cache.png)
+
+### Security
+
+Fixed an issue where sensitive information was available in activity logs. 
+
+### Bug fixes
+
+- Fixed an issue where users could not submit annotations if the labeling configuration included the `TextArea` tag with the `required` and `skipDuplicates` parameters.
+
+- Fixed an issue where the Projects page was displaying the wrong number when indicating how many projects are displayed on the page.
+
+- Fixed an issue where when calling `GET api/tasks?projects={id}&fields=all`, reviews were not returned.
+
+- Fixed an issue where an empty draft was created every time a user clicked **View all annotations**.
+
+- Fixed an issue where the URL in email invites was missing the `http` protocol.
+
+- Fixed an issue where sometimes the **Refresh** action on the project dashboard would be stuck in a loading state.
+
+
+
+<a name="2100md"></a>
+
+## Label Studio Enterprise 2.10.0
+
+<div class="onprem-highlight">
+    
+Release summary:
+    
+- Enhancements:
+    - More granular API-level controls, including datetime filtering for annotation history.
+    - UI updates for better performance and user experience, such as improved text formatting in the grid view and a confirmation message after deleting a user.
+- Security:
+    - Implemented comprehensive HTML sanitization for a secure user experience.
+    - Increased SSRF protection with banning IPs within reserved blocks and improved error messages.
+- Bug fixes:
+    - Various fixes for issues related to tags, video annotation, comments, refresh action, label stream, hotkeys, data manager, relations, screen resizing, dropdowns, region selection, member management, and more.
+
+For more details, see the full release notes below. 
+</div>
+
+*Feb 13, 2024*
+
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:**  1.4.0
+
+### Enhancements
+
+- More granular API-level controls: 
+
+    - Implemented datetime filtering to the per-project annotation history API to support analytics queries and reporting.  Now you can filter [`/api/projects/{id}/annotation-history`](https://app.heartex.com/docs/api/#tag/Annotation-History/operation/api_projects_annotation-history_list) by `created_at_from` and `created_at_to`.
+
+- Made several updates to the UI to improve performance and user experience, including:
+
+    - Better formatting for longer text strings when using the grid view in the Data Manager.
+
+    - The Projects page is now limited to 12 projects per page, improving load time performance..
+
+    - Added a confirmation message after deleting a user.
+
+
+### Security
+
+- Implemented comprehensive HTML sanitization to safeguard against vulnerabilities and ensure a secure user experience.
+
+- This release includes several measures to increase SSRF protection, which address [`CVE-2023-47116`](https://github.com/HumanSignal/label-studio/security/advisories/GHSA-p59w-9gqw-wj8r):
+    - When `SSRF_PROTECTION_ENABLED` is set to `true` (note that it defaults to `false`), our new default is to ban [all IPs within reserved blocks](https://en.wikipedia.org/wiki/Reserved_IP_addresses), for both IPv4 and IPv6.
+    - We are introducing two new environment variables, to be used in conjunction with `SSRF_PROTECTION_ENABLED=true`:
+        - `USER_ADDITIONAL_BANNED_SUBNETS` — Use this to specify additional IP addresses or CIDR blocks to ban from server-side requests (e.g. the URL-based file uploader).
+        - `USE_DEFAULT_BANNED_SUBNETS` — This is set to `True` by default. If you would like to have full control over banned subnets, you can set this to `False` and use `USER_ADDITIONAL_BANNED_SUBNETS` to specify all the IP addresses/CIDR blocks you’d like to disallow instead.
+    - We have also improved our error messages to make it clearer when an action is being blocked due to SSRF protections.
+
+
+### Bug fixes
+
+- Fixed an issue with the Number tag in which the `max`  constraint was not working.
+
+- Fixed an issue with the Number tag where `toName`  was not validated.
+
+- Fixed an issue in which users were seeing an error when switching from task details to settings while working with a video annotation.
+
+- Fixed an issue where comments that were entered but not submitted were preserved even when navigating between annotations. This could lead to users accidentally submitting comments they did not want to save.
+
+- Fixed several issues where the refresh action was disabled depending on the selections that users would make when filtering for date and time ranges in the project dashboard.
+
+- Fixed an issue where users were not shown a confirmation message after clicking **Submit and exit** in the label stream.
+
+- Fixed an issue where Label Studio crashed when configuring multiple hotkeys using the `hotkey=","` format.
+
+- Fixed an issue where annotation drafts were not saving when switching to view all mode.
+
+- Fixed an issue where users would encounter an error when using the **Storage filename** filter in the Data Manager.
+
+- Fixed an issue where relations were not displayed if they were added by a user while reviewing a task.
+
+- Fixed an issue where the **Comments** tab was disappearing when users resized their screen.
+
+- Fixed an issue where drop-downs were occasionally displaying offset from their triggering element.
+
+- Fixed an issue where, if a user attempted to de-select a region by clicking outside of it, they would create a new region instead.
+
+- Fixed a small styling issue in the **Delete Member** modal title.
+
+- Fixed an issue where users could not use the Magic Wand tool with image preloading enabled.
+
+- Fixed an issue with duplicate default hotkeys when working with multi-image segmentation.
+
+- Fixed an issue where the Organization page roles filter would briefly display an incorrect number.
+
+- Fixed an issue where deactivated users were not listed in Members pages.
+
+- Fixed an issue where the **Review** button counter was not displaying the correct count in certain scenarios.
+
+- Fixed an issue where the Data Manager was not displaying `false`  or `0`  values as expected.
+
+- Fixed an issue where, when assigning tasks in bulk, 1 out of ~150 tasks would be left unassigned.
+
+- Fixed an issue where, if a user was a member of multiple organizations, they would not see a confirmation message after saving an annotation draft.
+
+- Fixed a regression issue in which regions text was not displayed properly in regions list.
+
+- Fixed an issue where invite signup links were missing `http` validation.
+
 
 
 <a name="290-2md"></a>

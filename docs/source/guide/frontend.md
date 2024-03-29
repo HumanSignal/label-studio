@@ -7,7 +7,7 @@ order_enterprise: 0
 hide_menu: true
 meta_title: Customize User Interface
 meta_description: Label Studio documentation for integrating the Label Studio frontend interface into your own machine learning or data labeling application workflow.
-section: "Integration and Development"
+section: "Integrate & Extend"
 
 ---
 

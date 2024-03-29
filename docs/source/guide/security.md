@@ -2,11 +2,11 @@
 title: Secure Label Studio
 type: guide
 tier: all
-order: 143
-order_enterprise: 405
+order: 99
+order_enterprise: 99
 meta_title: Secure Label Studio
 meta_description: About the security and hardening processes used by various Label Studio editions, and how you can configure a more secure data labeling project.
-section: "Security and Privacy"
+section: "Install & Setup"
 ---
 
 Label Studio provides many ways to secure access to your data and your deployment architecture.

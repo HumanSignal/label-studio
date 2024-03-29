@@ -1,13 +1,13 @@
 ---
 title: Data Discovery overview - Beta 🧪
-short: Overview
+short: Data Discovery overview
 tier: enterprise
 type: guide
 order: 0
 order_enterprise: 201
 meta_title: Data Discovery overview and features
 meta_description: An overview of Label Studio's Data Discovery functionality, including features and limitations. 
-section: "Data Discovery"
+section: "Curate Datasets"
 date: 2023-11-10 15:23:18
 ---
 

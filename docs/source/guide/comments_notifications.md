@@ -3,9 +3,9 @@ title: Comments and notifications
 short: Comments and notifications
 type: guide
 tier: enterprise
-section: "Labeling"
+section: "Create & Manage Projects"
 order: 0
-order_enterprise: 115
+order_enterprise: 146
 meta_title: Comment and notification systems in Label Studio
 meta_description: The Comments and Notifications feature defines how annotators, reviewers and administrators communicate and receive updates on projects and tasks.
 ---

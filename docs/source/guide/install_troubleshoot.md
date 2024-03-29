@@ -3,11 +3,12 @@ title: Troubleshoot installation issues
 short: Troubleshooting
 tier: opensource
 type: guide
-order: 90
+order: 81
 order_enterprise: 0
 meta_title: Troubleshoot Label Studio installation issues
 meta_description: Tips for troubleshooting Label Studio installation issues
-section: "Install"
+section: "Install & Setup"
+parent: "install"
 date: 2023-12-06 10:38:02
 ---
 

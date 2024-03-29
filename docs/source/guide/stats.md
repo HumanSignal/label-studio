@@ -1,13 +1,13 @@
 ---
 title: Annotation agreement and how it is calculated
-short: Annotation agreement
+short: Annotation agreement matrix
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 260
+order_enterprise: 307
 meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
-section: "Quality control"
+section: "Review & Measure Quality"
 ---
 
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
