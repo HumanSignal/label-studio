@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-908: Fix condition for Starter Cloud to fix DM",
-  "commit": "a50d7d89452d6a05b489629b34c667f5d68f565b",
-  "date": "2024-03-28T13:12:51.000Z",
-  "branch": "fb-leap-908/broken-dm"
+  "message": "deprecation comment in packjson",
+  "commit": "cbb6c5a433603a4773ad77118a102c31ed2ec0ba",
+  "date": "2024-03-29T18:49:44.000Z",
+  "branch": "fb-LEAP-846/virtual-date-filter"
 }
