@@ -1,3 +1,5 @@
+// DEPRECATED; don't use this. use utils/urlJSON instead.
+
 const CODES = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.';
 // Not used symbols _!~*'()
 const NUM_CODES = '0123456789.e+-';
