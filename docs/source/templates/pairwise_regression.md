@@ -26,7 +26,7 @@ If you need a dataset to train a pairwise regression model, use this template to
     <Image name="image2" value="$image2" />
   </View>
   <View style="margin-left: auto; margin-right: auto; width: 16em">
-    <Rating name="rating" toName="image1,image2"/>
+    <Rating name="rating" toName="image1"/>
   </View>
 </View>
 ```
@@ -58,9 +58,9 @@ Add a new [View](/tags/view.html) tag with styling to control how the rating opt
 <View style="margin-left: auto; margin-right: auto; width: 16em">
 ```
 
-Use the [Rating](/tags/rating.html) control tag to display star ratings to apply to both images:
+Use the [Rating](/tags/rating.html) control tag to display star ratings, it will be linked with the first image name:
 ```xml
-<Rating name="rating" toName="image1,image2"/>
+<Rating name="rating" toName="image1"/>
 ```
 Close the [View](/tags/view.html) tag after the Rating tag.
 
