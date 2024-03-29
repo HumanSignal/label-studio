@@ -3390,33 +3390,6 @@
       "version": 2,
       "deleted": false
     },
-    "fflag_fix_back_leap_217_show_tasks_with_comments_30112023_short": {
-      "key": "fflag_fix_back_leap_217_show_tasks_with_comments_30112023_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "f9c5bc70f76545c9aac866bc3de30020",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_fix_back_leap_24_tasks_api_optimization_05092023_short": {
       "key": "fflag_fix_back_leap_24_tasks_api_optimization_05092023_short",
       "on": false,

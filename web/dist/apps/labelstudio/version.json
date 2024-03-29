@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-388/svg-xmlns'",
-  "commit": "04b954592843e5d39c7333b7397262f7d6b0e794",
-  "date": "2024-03-22T10:54:48.000Z",
-  "branch": "fb-leap-388/svg-xmlns"
+  "message": "fix: LEAP-908: Fix condition for Starter Cloud to fix DM",
+  "commit": "a50d7d89452d6a05b489629b34c667f5d68f565b",
+  "date": "2024-03-28T13:12:51.000Z",
+  "branch": "fb-leap-908/broken-dm"
 }
