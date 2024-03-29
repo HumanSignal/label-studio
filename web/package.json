@@ -61,7 +61,7 @@
     "mobx-react": "^6",
     "mobx-state-tree": "^3.16.0",
     "nanoid": "^3.3.0",
-    "pako": "2.1.0",
+    "pako": "^2.1.0",
     "papaparse": "^5.4.1",
     "pleasejs": "^0.4.2",
     "pngjs": "^7.0.0",
