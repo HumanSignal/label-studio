@@ -6,7 +6,7 @@ import { gzip, ungzip } from 'pako'
 import { fromUint8Array, toUint8Array } from 'js-base64'
 import { packJSON } from './packJSON';
 
-export const deserializeJsonFromUrl = (s: string): object => {
+export const deserializeJsonFromUrl = (s: string): unknown => {
   // Fall back to packJSON if deserialization fails; this probably means
   // we are deserializing an old virtual view. TODO(jo): deprecate packJSON entirely
   try {
