@@ -1,5 +1,6 @@
-/** Library that serializes and deserializes JSON data to/from URL-safe strings
- *  using gzip to minimize the size of the serialized data.
+/**
+ * Library that serializes and deserializes JSON data to/from URL-safe strings
+ * using gzip to minimize the size of the serialized data.
  */
 
 import { gzip, ungzip } from 'pako'
