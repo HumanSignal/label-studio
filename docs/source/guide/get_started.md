@@ -112,7 +112,7 @@ The component parts of Label Studio are available as modular extensible packages
 | [Machine Learning Backends](https://github.com/HumanSignal/label-studio-ml-backend) | Python   | Predict data labels at various parts of the labeling process. |
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png"/></div>
 
 
 

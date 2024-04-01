@@ -25,12 +25,12 @@ The following two workflows are flexible and can be combined. For example, in Fi
 
 <center>
 <br>
-<img src="/images/comments-notifications/workflow-notifications.png" class="gif-border"/>
+<img src="/images/workflow-notifications.png"/>
 <br><i>Figure 1A. The workflow based on notifications</i><br>
 
 <br>
 
-<img src="/images/comments-notifications/workflow-data-manager.png" style="margin: 0 auto" class="gif-border"/>
+<img src="/images/workflow-data-manager.png" style="max-width: 17rem;"/>
 <br><i>Figure 2B. The workflow based on the Data Manager</i><br>
 </center>
 

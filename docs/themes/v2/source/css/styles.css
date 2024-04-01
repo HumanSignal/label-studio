@@ -5,6 +5,7 @@
 html {
   --color-orange-400: #FF7557;
   --color-orange-100: #FFD6CD;
+  --color-orange-0: #FFF1EE;
 
   --color-yellow-400: #FFA663;
   --color-yellow-100: #FFE4D0;
@@ -820,7 +821,7 @@ h6 {
 .content-markdown h4 {
   --min-size: 1.25rem;
   /* 20px */
-  --max-size: 1.45rem;
+  --max-size: 1.5rem;
   /* 28px */
   --line-height: 1.07;
   font-weight: 600;
@@ -832,7 +833,7 @@ h6 {
 .collapse summary {
   --min-size: 1rem;
   /* 16px */
-  --max-size: 1.5rem;
+  --max-size: 1.25rem;
   /* 24px */
   --line-height: 100%;
   font-weight: 600;
@@ -843,7 +844,7 @@ h6 {
 .page-header-content-switcher {
   --min-size: 0.875rem;
   /* 14px */
-  --max-size: 1.125rem;
+  --max-size: 1rem;
   /* 18px */
   --breakpoint: 3vw;
   --line-height: 100%;
@@ -1081,7 +1082,7 @@ ul {
 }
 
 @media (max-width: 800px) {
-  .notion-grid .content-markdown {
+  .notion-grid .content-markdown { 
     max-width: 100%;
     width: 100%;
   }
@@ -1092,7 +1093,7 @@ ul {
 }
 
 .make-intense-zoom {
-  cursor: url("/images/plus_cursor.png") 25 25, auto;
+  cursor: url("/images/plus_cursor.svg") 25 25, auto;
 }
 
 .toc {
@@ -1300,10 +1301,6 @@ ul {
   height: auto;
   margin: 1em 0;
   display: block;
-}
-
-.content-markdown img {
-  border: 1px var(--color-gray-100) solid;
 }
 
 .content-markdown hr {
@@ -1981,10 +1978,10 @@ Footer
   --color: var(--color-main-accent);
   --color-hover: var(--color-white);
   --background-hover: var(--color-orange-400);
-  --background: var(--color-orange-100);
+  --background: var(--color-orange-0);
 
   appearance: none;
-  background-color: var(--color-orange-100);
+  background-color: var(--color-orange-0);
   border: 1px var(--color) solid;
   color: var(--color);
   font-size: 0.875rem;
