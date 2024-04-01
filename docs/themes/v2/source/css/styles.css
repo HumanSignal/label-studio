@@ -684,6 +684,13 @@ dl {
   padding-bottom: 2rem;
 }
 
+.large-changelog-item{
+  border: 1px solid var(--color-gray-400);
+  padding: 1.5rem;
+  border-radius: .75rem;
+  margin-top: 2rem;
+}
+
 .content-footer {
   border-top: 1px var(--color-gray-300) solid;
   padding-top: 2em;
