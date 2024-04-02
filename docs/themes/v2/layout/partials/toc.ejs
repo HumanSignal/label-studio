@@ -53,7 +53,7 @@
           <% if(locals.component === "nav") { %>
             <button>
               <%- p.page.section || tocHeaderFileName %>
-              <% if(p.page.section === "Data Discovery" || tocHeaderFileName === "Data Discovery") {%>
+              <% if(p.page.section === "Curate Datasets" || tocHeaderFileName === "Curate Datasets") {%>
                 <svg width="41" height="16" viewBox="0 0 41 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_47_53391)">
                   <path d="M37 0H4C1.79086 0 0 1.79086 0 4V12C0 14.2091 1.79086 16 4 16H37C39.2091 16 41 14.2091 41 12V4C41 1.79086 39.2091 0 37 0Z" fill="url(#paint0_linear_47_53391)"/>
@@ -79,7 +79,7 @@
           <% } else { %>
             <div class="toc-section-heading">
               <%- partial("component/text", {text: p.page.section || tocHeaderFileName, size: "Eyebrow", tag: "h3"}) %>
-              <% if(p.page.section === "Data Discovery" || tocHeaderFileName === "Data Discovery") {%>
+              <% if(p.page.section === "Curate Datasets" || tocHeaderFileName === "Curate Datasets") {%>
                 <svg width="41" height="16" viewBox="0 0 41 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_47_5339)">
                   <path d="M37 0H4C1.79086 0 0 1.79086 0 4V12C0 14.2091 1.79086 16 4 16H37C39.2091 16 41 14.2091 41 12V4C41 1.79086 39.2091 0 37 0Z" fill="url(#paint0_linear_47_5339)"/>
@@ -126,7 +126,16 @@
         <% } %>
       </li>
       <% } %>
+      
     <% }) %>
+    <li>
+      <a href="https://support.humansignal.com" target="_blank">Hugues
+        <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+          <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+        </svg>
+      </a>
+    </li>
+    
 </ul>
 
 <% if(locals.component === "nav") { %>
