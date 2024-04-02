@@ -395,6 +395,7 @@ main {
   position: relative;
   padding: 3rem clamp(25px, 4vw, 50px);
   width: 100%;
+  background: var(--color-white);
 }
 
 .content-decoration {
@@ -593,6 +594,8 @@ dl {
   background-size: 100% .5rem;
   background-repeat: no-repeat;
   box-shadow: 0 0 12px rgba(23, 20, 13, .16);
+  display: flex;
+  flex-direction: column;
 }
 
 .card-link {
@@ -607,14 +610,22 @@ dl {
 
 .card-text {
   padding: 2rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-items: flex-end;
+  height: 100%;
 }
 
 .card-image .card-text {
   padding: 1rem 1.5rem 1.5rem;
 }
 
+.card-text p{
+  margin-bottom: 1rem;
+}
+
 .card-text .Link {
-  margin-top: 1rem;
+  margin-top: auto;
 }
 
 .card>img {
@@ -1289,6 +1300,7 @@ ul {
   border-top: 1px var(--color-gray-300) solid;
   padding: 0.6em;
   line-height: 1.4;
+  vertical-align: top;
 }
 
 /* @media (min-width: 60rem) {
@@ -1676,7 +1688,7 @@ Footer
   padding: 5em 0 2em 0;
   width: 100%;
   display: grid;
-  color: #fff;
+  color: var(--color-white);
   place-items: center;
   position: relative;
   z-index: 3;
@@ -2143,7 +2155,7 @@ code.hljs {
   right: 0;
   appearance: none;
   background-color: #fff3;
-  color: #fff;
+  color: var(--color-white);
   opacity: .5;
   border: 0;
   border-bottom-left-radius: 0.5em;
@@ -2187,7 +2199,7 @@ code.hljs {
 
 #render-editor-loader {
   max-width: 1200px;
-  background: #fff;
+  background: var(--color-white);
   padding: 3%;
   width: 500px;
   height: 500px;
@@ -2202,7 +2214,7 @@ code.hljs {
 #render-editor {
   max-width: 1200px;
   border: none;
-  background: #fff;
+  background: var(--color-white);
   padding: 3%;
   width: 500px;
   height: 500px;
@@ -2433,10 +2445,12 @@ code.hljs {
 
 .page-tier-enterprise {
   --color-main-accent: var(--color-orange-400);
+  background: var(--color-white);
 }
 
 .page-tier-enterprise .page-header {
   background-color: var(--color-gray-900);
+  border-bottom: none;
 }
 
 .page-header-main-nav>li>a:not(.Button) {
@@ -2562,6 +2576,15 @@ code.hljs {
 }
 
 @media (max-width: 500px) {
+
+  .page-header-top-level{
+    flex-wrap: wrap;
+  }
+  .AlgoliaSearch{
+    margin-left: 1rem;
+    margin-right: -1rem;
+    margin-top: 1rem;
+  }
   .page-tier-enterprise .HeaderLogo {
     flex-basis: 12em;
     flex-grow: 1;
