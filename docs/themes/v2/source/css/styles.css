@@ -32,8 +32,8 @@ html {
   --color-gray-100: #F9F8F6;
   --color-white: #FDFDFC;
 
-  --font-family-primary: "Hellix-Regular", sans-serif;
-  --font-family-secondary: "Hellix-Regular", sans-serif;
+  --font-family-primary: "Hellix", sans-serif;
+  --font-family-secondary: "Hellix", sans-serif;
   --font-family-monospace: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 
   color: var(--color-gray-900);
@@ -620,7 +620,7 @@ dl {
   padding: 1rem 1.5rem 1.5rem;
 }
 
-.card-text p{
+.card-text p {
   margin-bottom: 1rem;
 }
 
@@ -2577,14 +2577,16 @@ code.hljs {
 
 @media (max-width: 500px) {
 
-  .page-header-top-level{
+  .page-header-top-level {
     flex-wrap: wrap;
   }
-  .AlgoliaSearch{
+
+  .AlgoliaSearch {
     margin-left: 1rem;
     margin-right: -1rem;
     margin-top: 1rem;
   }
+
   .page-tier-enterprise .HeaderLogo {
     flex-basis: 12em;
     flex-grow: 1;
