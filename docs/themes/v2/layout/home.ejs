@@ -14,12 +14,12 @@ meta_description: Get started with Label Studio by creating projects to label an
     <%- partial("component/heading", {text: "Label Studio Documentation", size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
     <div class="opensource-only">
       <p class="Text Large">Discover our Quick Start installation guide, instructions on building custom UIs, pre-built labeling templates to get you labeling more quickly, and much more.</p>
-      <%- partial("component/button", { url: "", label: "Quick Start Guide", customClass: "Button" }) %>
+      <%- partial("component/button", { url: "/guide/", label: "Quick Start Guide", customClass: "Button" }) %>
     </div>
     
     <div class="enterprise-only">
       <p class="Text Large">Discover how to build custom UIs or take advantage of pre-built labeling templates, manage team member permissions and workflows, and much more.</p>
-      <%- partial("component/button", { url: "", label: "Quick Start Guide", customClass: "Button" }) %>
+      <%- partial("component/button", { url: "/guide/install_enterprise.html", label: "Installation Guide", customClass: "Button" }) %>
     </div>
   </div>
 </div>
@@ -42,7 +42,7 @@ meta_description: Get started with Label Studio by creating projects to label an
           <div class="Link">Learn more<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
         </div>
       </a>
-      <a href="https://labelstud.io/templates/" target="_blank" class="card card-link card-image">
+      <a href="/templates/" class="card card-link card-image">
         <img src="../images/design/templates.png" alt=""/>
         <div class="card-text">
           <%- partial("component/heading", {text: "Use templates", tag: "h2", customClass: "card-title" }) %>
@@ -53,7 +53,7 @@ meta_description: Get started with Label Studio by creating projects to label an
     </div>
   </div>
   <div class="column-wrapper">
-    <h2 class="Heading Large">Popular articles</h3>
+    <h2 class="Heading Large">Popular articles</h2>
     <div class="columns">
       <ol class="structured-list">
         <li><a href="/" class="Link">Link to a popular page goes here</a></li>
@@ -73,9 +73,9 @@ meta_description: Get started with Label Studio by creating projects to label an
     </div>
   </div>
   <div class="column-wrapper">
-    <h2 class="Heading Large">Get help</h3>
+    <h2 class="Heading Large">Get help</h2>
     <div class="columns">
-      <a href="https://community.labelstud.io/" target="_blank" class="card card-link">
+      <a href="https://slack.labelstud.io" target="_blank" class="card card-link">
         <div class="card-text">
           <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="card-icon">
             <circle cx="15" cy="15" r="15" fill="#F0F0F0"/>
@@ -89,7 +89,7 @@ meta_description: Get started with Label Studio by creating projects to label an
             </linearGradient>
             </defs>
             </svg>            
-          <%- partial("component/heading", {text: "Visit our forums", tag: "h2", customClass: "card-title" }) %>
+          <%- partial("component/heading", {text: "Join Slack", tag: "h2", customClass: "card-title" }) %>
           <p class="Text">Lorem ipsum dolor sit amet consectitur dolor sit amet. Lorem ipsum dolor sit amet consectitur dolor sit amet.</p>
           <div class="Link">Get started<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
         </div>
@@ -154,7 +154,7 @@ meta_description: Get started with Label Studio by creating projects to label an
             <div class="Link">Learn more<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
           </div>
         </a>
-        <a href="https://labelstud.io/templates/" target="_blank" class="card card-link card-image">
+        <a href="/templates/" class="card card-link card-image">
           <img src="../images/design/templates.png" alt=""/>
           <div class="card-text">
             <%- partial("component/heading", {text: "Use templates", tag: "h2", customClass: "card-title" }) %>
@@ -165,7 +165,7 @@ meta_description: Get started with Label Studio by creating projects to label an
       </div>
     </div>
     <div class="column-wrapper">
-      <h2 class="Heading Large">Popular articles</h3>
+      <h2 class="Heading Large">Popular articles</h2>
       <div class="columns">
         <ol class="structured-list">
           <li><a href="/" class="Link">Link to a popular page goes here</a></li>
@@ -185,9 +185,9 @@ meta_description: Get started with Label Studio by creating projects to label an
       </div>
     </div>
     <div class="column-wrapper">
-      <h2 class="Heading Large">Get help</h3>
+      <h2 class="Heading Large">Get help</h2>
       <div class="columns">
-        <a href="https://community.labelstud.io/" target="_blank" class="card card-link">
+        <a href="https://slack.labelstud.io" target="_blank" class="card card-link">
           <div class="card-text">
             <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="card-icon">
               <circle cx="15" cy="15" r="15" fill="#F0F0F0"/>
@@ -201,9 +201,9 @@ meta_description: Get started with Label Studio by creating projects to label an
               </linearGradient>
               </defs>
               </svg>            
-            <%- partial("component/heading", {text: "Visit our forums", tag: "h2", customClass: "card-title" }) %>
+            <%- partial("component/heading", {text: "Join Slack", tag: "h2", customClass: "card-title" }) %>
             <p class="Text">Lorem ipsum dolor sit amet consectitur dolor sit amet. Lorem ipsum dolor sit amet consectitur dolor sit amet.</p>
-            <div class="Link">Get started<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+            <div class="Link">Join our community<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
           </div>
         </a>
         <a href="https://support.humansignal.com/hc/en-us" target="_blank" class="card card-link">
@@ -222,7 +222,7 @@ meta_description: Get started with Label Studio by creating projects to label an
               </svg>            
             <%- partial("component/heading", {text: "Support portal", tag: "h2", customClass: "card-title" }) %>
             <p class="Text">Lorem ipsum dolor sit amet consectitur dolor sit amet. Lorem ipsum dolor sit amet consectitur dolor sit amet.</p>
-            <div class="Link">Get started<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+            <div class="Link">Get help<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
           </div>
         </a>
         <a href="https://www.youtube.com/channel/UCbloiVAlCYzBatZXk-b5rFQ" target="_blank" class="card card-link">
@@ -241,13 +241,13 @@ meta_description: Get started with Label Studio by creating projects to label an
               </svg>            
             <%- partial("component/heading", {text: "Video tutorials", tag: "h2", customClass: "card-title" }) %>
             <p class="Text">Lorem ipsum dolor sit amet consectitur dolor sit amet. Lorem ipsum dolor sit amet consectitur dolor sit amet.</p>
-            <div class="Link">Get started<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+            <div class="Link">Watch videos<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
           </div>
         </a>
       </div>
     </div>
     <div class="column-wrapper">
-      <h2 class="Heading Large">Latest Updates</h3>
+      <h2 class="Heading Large">Latest Updates</h2>
       <ul class="changelog">
         <li class="changelog-item">
           <span class="Text Eyebrow">Label Studio Enterprise 2.9.1</span>
@@ -262,8 +262,7 @@ meta_description: Get started with Label Studio by creating projects to label an
           <a href="" class="Link block-link">Improved member list filtering from the Organization page, collapsible Ranker items, various UI improvements</a>
         </li>
       </ul>
-      <a href=""class="Link">View all release notes<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></a>
+      <a href="/guide/release_notes.html" class="Link">View all release notes<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></a>
     </div>
   </div>
 </div>
-      

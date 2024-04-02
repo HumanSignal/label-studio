@@ -594,6 +594,8 @@ dl {
   background-size: 100% .5rem;
   background-repeat: no-repeat;
   box-shadow: 0 0 12px rgba(23, 20, 13, .16);
+  display: flex;
+  flex-direction: column;
 }
 
 .card-link {
@@ -608,14 +610,22 @@ dl {
 
 .card-text {
   padding: 2rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-items: flex-end;
+  height: 100%;
 }
 
 .card-image .card-text {
   padding: 1rem 1.5rem 1.5rem;
 }
 
+.card-text p{
+  margin-bottom: 1rem;
+}
+
 .card-text .Link {
-  margin-top: 1rem;
+  margin-top: auto;
 }
 
 .card>img {
