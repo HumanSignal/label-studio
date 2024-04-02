@@ -395,6 +395,7 @@ main {
   position: relative;
   padding: 3rem clamp(25px, 4vw, 50px);
   width: 100%;
+  background: var(--color-white);
 }
 
 .content-decoration {
