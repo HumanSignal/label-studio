@@ -2440,6 +2440,7 @@ code.hljs {
 
 .page-tier-enterprise .page-header {
   background-color: var(--color-gray-900);
+  border-bottom: none;
 }
 
 .page-header-main-nav>li>a:not(.Button) {
