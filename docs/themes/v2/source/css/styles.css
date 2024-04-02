@@ -529,20 +529,20 @@ main {
 }
 
 dt {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 dd .admonition:first-child {
-    margin-top: 1em;
+  margin-top: 1em;
 }
 
 dd .admonition:last-child {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 dl {
-    margin-bottom: 1em;
-    margin-top: 1em;
+  margin-bottom: 1em;
+  margin-top: 1em;
 }
 
 @media (max-width: 800px) {
@@ -684,7 +684,7 @@ dl {
   padding-bottom: 2rem;
 }
 
-.large-changelog-item{
+.large-changelog-item {
   border: 1px solid var(--color-gray-400);
   padding: 1.5rem;
   border-radius: .75rem;
@@ -1089,7 +1089,7 @@ ul {
 }
 
 @media (max-width: 800px) {
-  .notion-grid .content-markdown { 
+  .notion-grid .content-markdown {
     max-width: 100%;
     width: 100%;
   }
@@ -1633,7 +1633,7 @@ details+details {
 .templates-card p {
   color: var(--color-gray-500);
   margin-bottom: 0;
-  margin-top:.5rem;
+  margin-top: .5rem;
   text-transform: capitalize;
 }
 
@@ -2219,6 +2219,10 @@ code.hljs {
 
 .page-type-playground #basic-templates a:hover {
   /* border-bottom: 1px dashed currentColor; */
+}
+
+.page-type-playground .page-rightsidebar {
+  display: none;
 }
 
 .playground-buttons {
