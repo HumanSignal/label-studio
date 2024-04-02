@@ -412,6 +412,7 @@ You can use a service account key that you create, or if you already have a Kube
 
 #### Create a new service account key
 1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
+
 2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `ls-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 ```yaml
@@ -433,6 +434,7 @@ global:
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-file=key_json=<PATH_TO_JSON>
 ```
+
 2. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
 ```yaml
 global:
@@ -447,9 +449,8 @@ global:
             bucket: "<YOUR_BUCKET_NAME>"
 ```
 
-  </div>
-
-  <div data-name="Docker Compose">
+</div>
+<div data-name="Docker Compose">
 
 1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
 2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `env.list` file.
@@ -463,11 +464,13 @@ GOOGLE_APPLICATION_CREDENTIALS="/opt/heartex/secrets/key.json"
 ```
 
 3. Place the downloaded JSON file from step 1 in the same directory as your `env.list` file.
+
 4. Append the following entry in `docker-compose.yml` file as the path for `app.volumes`:
 ```yaml
 - ./service-account-file.json:/opt/heartex/secrets/key.json:ro
 ```
-  </div>
+
+</div>
 </div>
 
 
