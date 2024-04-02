@@ -68,7 +68,7 @@ const ProjectCard = ({ project }) => {
               e.preventDefault();
             }}>
               <Dropdown.Trigger content={(
-                <Menu>
+                <Menu contextual>
                   <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
                   <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
                 </Menu>

@@ -5,6 +5,7 @@ import datetime
 import logging
 import numbers
 import os
+import random
 import uuid
 from typing import Any, Mapping, Optional, cast
 from urllib.parse import urljoin
@@ -179,6 +180,18 @@ class Task(TaskMixin, models.Model):
         return os.path.basename(self.file_upload.file.name)
 
     @classmethod
+    def get_random(cls, project):
+        """Get random task from a project, this should not be used lightly as its expensive method to run"""
+
+        ids = cls.objects.filter(project=project).values_list('id', flat=True)
+        if len(ids) == 0:
+            return None
+
+        random_id = random.choice(ids)
+
+        return cls.objects.get(id=random_id)
+
+    @classmethod
     def get_locked_by(cls, user, project=None, tasks=None):
         """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
         lock = None
@@ -193,6 +206,36 @@ class Task(TaskMixin, models.Model):
 
         if lock:
             return lock.task
+
+    def get_predictions_for_prelabeling(self):
+        """This is called to return either new predictions from the
+        model or grab static predictions if they were set, depending
+        on the projects configuration.
+
+        """
+        from data_manager.functions import evaluate_predictions
+
+        project = self.project
+        predictions = self.predictions
+
+        # TODO if we use live_model on project then we will need to check for it here
+        if project.show_collab_predictions and project.model_version is not None:
+            if project.ml_backend_in_model_version:
+                new_predictions = evaluate_predictions([self])
+                # TODO this is not as clean as I'd want it to
+                # be. Effectively retrieve_predictions will work only for
+                # tasks where there is no predictions matching current
+                # model version. In case it will return a model_version
+                # and we can grab predictions explicitly
+                if isinstance(new_predictions, str):
+                    model_version = new_predictions
+                    return predictions.filter(model_version=model_version)
+                else:
+                    return new_predictions
+            else:
+                return predictions.filter(model_version=project.model_version)
+        else:
+            return []
 
     def has_lock(self, user=None):
         """
@@ -220,7 +263,8 @@ class Task(TaskMixin, models.Model):
         num_locks = self.num_locks_user(user=user)
         num_annotations = self.annotations.exclude(q | Q(ground_truth=True)).count()
         num = num_locks + num_annotations
-        if num > self.overlap:
+
+        if num > self.overlap_with_agreement_threshold(num, num_locks):
             logger.error(
                 f'Num takes={num} > overlap={self.overlap} for task={self.id}, '
                 f"skipped mode {self.project.skip_queue} - it's a bug",
@@ -235,7 +279,8 @@ class Task(TaskMixin, models.Model):
                 self.update_is_labeled()
                 if self.is_labeled is True:
                     self.save(update_fields=['is_labeled'])
-        result = bool(num >= self.overlap)
+
+        result = bool(num >= self.overlap_with_agreement_threshold(num, num_locks))
         logger.log(
             get_next_task_logging_level(user),
             f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations} '
@@ -246,6 +291,29 @@ class Task(TaskMixin, models.Model):
     @property
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
+
+    def overlap_with_agreement_threshold(self, num, num_locks):
+        # Limit to one extra annotator at a time when the task is under the threshold and meets the overlap criteria,
+        # regardless of the max_additional_annotators_assignable setting. This ensures recalculating agreement after
+        # each annotation and prevents concurrent annotations from dropping the agreement below the threshold.
+        if (
+            hasattr(self.project, 'lse_project')
+            and self.project.lse_project
+            and self.project.lse_project.agreement_threshold is not None
+        ):
+            try:
+                from stats.models import get_task_agreement
+            except (ModuleNotFoundError, ImportError):
+                return
+
+            agreement = get_task_agreement(self)
+            if agreement is not None and agreement < self.project.lse_project.agreement_threshold:
+                return (
+                    min(self.overlap + self.project.lse_project.max_additional_annotators_assignable, num + 1)
+                    if num_locks == 0
+                    else num
+                )
+        return self.overlap
 
     def num_locks_user(self, user):
         return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
@@ -783,7 +851,28 @@ class Prediction(models.Model):
 
     result = JSONField('result', null=True, default=dict, help_text='Prediction result')
     score = models.FloatField(_('score'), default=None, help_text='Prediction score', null=True)
-    model_version = models.TextField(_('model version'), default='', blank=True, null=True)
+    model_version = models.TextField(
+        _('model version'),
+        default='',
+        blank=True,
+        null=True,
+        help_text='A string value that for model version that produced the prediction. Used in both live models and when uploading offline predictions.',
+    )
+
+    model = models.ForeignKey(
+        'ml.MLBackend',
+        on_delete=models.CASCADE,
+        related_name='predictions',
+        null=True,
+        help_text='An ML Backend instance that created the prediction.',
+    )
+    model_run = models.ForeignKey(
+        'ml_models.ModelRun',
+        on_delete=models.CASCADE,
+        related_name='predictions',
+        null=True,
+        help_text='A run of a ModelVersion that created the prediction.',
+    )
     cluster = models.IntegerField(
         _('cluster'),
         default=None,

@@ -207,7 +207,7 @@ examples.forEach(example => {
   examplesTable.add([title, config, data, result]);
 });
 
-Data(examplesTable).Scenario('Check visibility switcher through all examples', ({ I, AtSidebar, current })=> {
+Data(examplesTable).Scenario('Check visibility switcher through all examples', ({ I, AtSidebar, current }) => {
   const { config, data, result } = current;
   const params = { annotations: [{ id: 'test', result }], config, data };
 

@@ -43,6 +43,9 @@ style.textContent = `
   font-weight: 600;
   margin: 1em 0 0 0;
 }
+.onprem-highlight *, .onprem-highlight p {
+  font-weight: bold;
+}
 `;
 
 document.head.appendChild(style);

@@ -9,7 +9,7 @@ import Types from '../../core/Types';
 import { StoreExtender } from '../../mixins/SharedChoiceStore/extender';
 import { ViewModel } from '../../tags/visual';
 import Utils from '../../utils';
-import { FF_DEV_1621, FF_DEV_3034, FF_DEV_3391, FF_DEV_3617, isFF } from '../../utils/feature-flags';
+import { FF_DEV_1621, FF_DEV_3034, FF_DEV_3391, FF_DEV_3617, FF_SIMPLE_INIT, isFF } from '../../utils/feature-flags';
 import { emailFromCreatedBy } from '../../utils/utilities';
 import { Annotation } from './Annotation';
 import { HistoryItem } from './HistoryItem';
@@ -30,7 +30,6 @@ const AnnotationStoreModel = types
     history: types.array(HistoryItem),
 
     viewingAllAnnotations: types.optional(types.boolean, false),
-    viewingAllPredictions: types.optional(types.boolean, false),
 
     validation: types.maybeNull(types.array(ValidationError)),
   })
@@ -43,13 +42,28 @@ const AnnotationStoreModel = types
     },
 
     get viewingAll() {
-      return self.viewingAllAnnotations || self.viewingAllPredictions;
+      return self.viewingAllAnnotations;
     },
   }))
   .actions(self => {
     function toggleViewingAll() {
-      if (self.viewingAllAnnotations || self.viewingAllPredictions) {
+      self.viewingAllAnnotations = !self.viewingAllAnnotations;
+
+      if (self.viewingAllAnnotations) {
         if (self.selected) {
+          // const comments = self.store.commentStore;
+
+          // @todo `currentComment` is an object and saving them was not a part of original fix
+          // @todo so I leave it for next fix coming soon
+          // if (comments.currentComment) {
+          //   // comment will save draft automatically
+          //   comments.commentFormSubmit();
+          // } else
+          if (self.selected.type === 'annotation') {
+            // save draft if there are changes waiting to be saved — it's handled inside
+            self.selected.saveDraftImmediately();
+          }
+
           self.selected.unselectAll();
           self.selected.selected = false;
         }
@@ -58,29 +72,17 @@ const AnnotationStoreModel = types
           c.editable = false;
         });
       } else {
-        selectAnnotation(self.annotations[0].id, { fromViewAll: true });
+        selectAnnotation(self.annotations.at(isFF(FF_SIMPLE_INIT) ? -1 : 0).id, { fromViewAll: true });
       }
     }
 
-    function toggleViewingAllPredictions() {
-      self.viewingAllPredictions = !self.viewingAllPredictions;
-
-      if (self.viewingAllPredictions) self.viewingAllAnnotations = false;
-
-      toggleViewingAll();
-    }
-
+    // @todo that's just an alias, rewrite it everywhere
     function toggleViewingAllAnnotations() {
-      self.viewingAllAnnotations = !self.viewingAllAnnotations;
-
-      if (self.viewingAllAnnotations) self.viewingAllPredictions = false;
-
       toggleViewingAll();
     }
 
     function unselectViewingAll() {
       self.viewingAllAnnotations = false;
-      self.viewingAllPredictions = false;
     }
 
     function _unselectAll() {
@@ -123,9 +125,9 @@ const AnnotationStoreModel = types
     }
 
     /**
-   * Select annotation
-   * @param {*} id
-   */
+     * Select annotation
+     * @param {*} id
+     */
     function selectAnnotation(id, options = {}) {
       if (!self.annotations.length) return null;
 
@@ -159,8 +161,8 @@ const AnnotationStoreModel = types
       getEnv(self).events.invoke('deleteAnnotation', self.store, annotation);
 
       /**
-     * MST destroy annotation
-     */
+       * MST destroy annotation
+       */
       destroy(annotation);
       
       /**
@@ -170,8 +172,8 @@ const AnnotationStoreModel = types
 
       self.selected = null;
       /**
-     * Select other annotation
-     */
+       * Select other annotation
+       */
       if (self.annotations.length > 0) {
         self.selectAnnotation(self.annotations[0].id);
       }
@@ -257,8 +259,8 @@ const AnnotationStoreModel = types
         }
 
         const isControlTag = node.name && !objectTypes.includes(node.type);
-        // auto-infer missed toName if there is only one object tag in the config
 
+        // auto-infer missed toName if there is only one object tag in the config
         if (isControlTag && !node.toname && objects.length === 1) {
           node.toname = objects[0];
         }
@@ -322,6 +324,12 @@ const AnnotationStoreModel = types
 
       const item = createItem(options);
 
+      if (isFF(FF_SIMPLE_INIT)) {
+        self.predictions.push(item);
+
+        return self.predictions.at(-1);
+      }
+
       self.predictions.unshift(item);
 
       const record = self.predictions[0];
@@ -348,9 +356,13 @@ const AnnotationStoreModel = types
         item.completed_by = actual_user ?? getRoot(self).user?.id ?? undefined;
       }
 
-      self.annotations.unshift(item);
+      if (isFF(FF_SIMPLE_INIT)) {
+        self.annotations.push(item);
+      } else {
+        self.annotations.unshift(item);
+      }
 
-      const record = self.annotations[0];
+      const record = self.annotations.at(isFF(FF_SIMPLE_INIT) ? -1 : 0);
 
       record.addVersions({
         result: options.result,
@@ -520,7 +532,6 @@ const AnnotationStoreModel = types
       beforeDestroy,
 
       toggleViewingAllAnnotations,
-      toggleViewingAllPredictions,
 
       initRoot,
       addToName,

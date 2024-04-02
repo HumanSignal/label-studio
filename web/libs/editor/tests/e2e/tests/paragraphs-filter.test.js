@@ -9,16 +9,16 @@ const ANNOTATIONS = [
   {
     'result': [
       {
-        'id':'ryzr4QdL93',
-        'from_name':'ner',
-        'to_name':'text',
-        'source':'$dialogue',
-        'type':'paragraphlabels',
-        'value':{
-          'start':'2',
-          'end':'4',
-          'startOffset':0,
-          'endOffset':134,
+        'id': 'ryzr4QdL93',
+        'from_name': 'ner',
+        'to_name': 'text',
+        'source': '$dialogue',
+        'type': 'paragraphlabels',
+        'value': {
+          'start': '2',
+          'end': '4',
+          'startOffset': 0,
+          'endOffset': 134,
           'paragraphlabels': ['Important Stuff'],
           'text': 'Uncomfortable silences. Why do we feel its necessary to yak about nonsense in order to be comfortable?I dont know. Thats a good question.Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.',
         },
@@ -147,11 +147,11 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
     1,// 8
     3,// 9
     1,// 10
-  ].map((authorId, idx)=>({
-    start: idx+1,
-    end: idx+2,
+  ].map((authorId, idx) => ({
+    start: idx + 1,
+    end: idx + 2,
     author: `Author ${authorId}`,
-    text: `Message ${idx+1}`,
+    text: `Message ${idx + 1}`,
   }));
   const params = {
     config: CONFIG,
@@ -186,7 +186,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
 
     assert.strictEqual(result.length, 4);
 
-    assert.deepStrictEqual(omitBy(result[0].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[0].value, (v, key) => key === 'paragraphlabels'), {
       'start': '0',
       'end': '0',
       'startOffset': 0,
@@ -194,7 +194,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
       'text': 'Message 1',
     });
 
-    assert.deepStrictEqual(omitBy(result[1].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[1].value, (v, key) => key === 'paragraphlabels'), {
       'start': '2',
       'end': '3',
       'startOffset': 0,
@@ -202,7 +202,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
       'text': 'Message 3\n\nMessage 4',
     });
 
-    assert.deepStrictEqual(omitBy(result[2].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[2].value, (v, key) => key === 'paragraphlabels'), {
       'start': '5',
       'end': '7',
       'startOffset': 0,
@@ -210,7 +210,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
       'text': 'Message 6\n\nMessage 7\n\nMessage 8',
     });
 
-    assert.deepStrictEqual(omitBy(result[3].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[3].value, (v, key) => key === 'paragraphlabels'), {
       'start': '9',
       'end': '9',
       'startOffset': 0,
@@ -232,7 +232,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
   {
     const result = await LabelStudio.serialize();
 
-    assert.deepStrictEqual(omitBy(result[4].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[4].value, (v, key) => key === 'paragraphlabels'), {
       'start': '2',
       'end': '3',
       'startOffset': 4,
@@ -240,7 +240,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
       'text': 'age 3\n\nMessage 4',
     });
 
-    assert.deepStrictEqual(omitBy(result[5].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[5].value, (v, key) => key === 'paragraphlabels'), {
       'start': '5',
       'end': '7',
       'startOffset': 0,
@@ -263,7 +263,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
   {
     const result = await LabelStudio.serialize();
 
-    assert.deepStrictEqual(omitBy(result[6].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[6].value, (v, key) => key === 'paragraphlabels'), {
       'start': '2',
       'end': '2',
       'startOffset': 8,
@@ -271,7 +271,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
       'text': '3',
     });
 
-    assert.deepStrictEqual(omitBy(result[7].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[7].value, (v, key) => key === 'paragraphlabels'), {
       'start': '4',
       'end': '5',
       'startOffset': 0,
@@ -279,7 +279,7 @@ Scenario('Check different cases ', async ({ I, LabelStudio, AtSidebar, AtParagra
       'text': 'Message 5\n\nMessage 6',
     });
 
-    assert.deepStrictEqual(omitBy(result[8].value, (v, key)=> key === 'paragraphlabels'), {
+    assert.deepStrictEqual(omitBy(result[8].value, (v, key) => key === 'paragraphlabels'), {
       'start': '7',
       'end': '7',
       'startOffset': 0,
@@ -585,7 +585,7 @@ Scenario('Initializing a paragraph region range should not include author names 
   I.amOnPage('/');
   LabelStudio.setFeatureFlags(FEATURE_FLAGS);
 
-  const [{ result : [region] }] = ANNOTATIONS;
+  const [{ result: [region] }] = ANNOTATIONS;
   const { paragraphlabels: _paragraphlabels, ...value } = region.value;
 
   LabelStudio.init(params);

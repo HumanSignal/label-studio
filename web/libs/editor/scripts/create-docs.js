@@ -30,7 +30,9 @@ const infoHeader = (name, group, isNew = false, meta = {}) =>
     '',
   ].join('\n');
 
-const outputDir = path.resolve(__dirname + '/../docs');
+const args = process.argv.slice(2);
+const outputDirArg = args[0] || __dirname + '/../docs';
+const outputDir = path.resolve(outputDirArg);
 
 fs.mkdirSync(outputDir, { recursive: true });
 

@@ -9,6 +9,7 @@ from core.filters import ListFilter
 from core.label_config import config_essential_data_has_changed
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
+from core.redis import start_job_async_or_sync
 from core.utils.common import paginator, paginator_help, temporary_disconnect_all_signals
 from core.utils.exceptions import LabelStudioDatabaseException, ProjectExistException
 from core.utils.io import find_dir, find_file, read_yaml
@@ -21,13 +22,16 @@ from django.utils.decorators import method_decorator
 from django_filters import CharFilter, FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
+from ml.serializers import MLBackendSerializer
 from projects.functions.next_task import get_next_task
 from projects.functions.stream_history import get_label_stream_history
+from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
 from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
 from projects.serializers import (
     GetFieldsSerializer,
     ProjectImportSerializer,
     ProjectLabelConfigSerializer,
+    ProjectModelVersionExtendedSerializer,
     ProjectReimportSerializer,
     ProjectSerializer,
     ProjectSummarySerializer,
@@ -121,7 +125,7 @@ class ProjectFilterSet(FilterSet):
         operation_summary='Create new project',
         operation_description="""
     Create a project and set up the labeling interface in Label Studio using the API.
-    
+
     ```bash
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
     --data '{{"label_config": "<View>[...]</View>"}}'
@@ -397,6 +401,32 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
+class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
+    """This API is useful when we need to reset project.summary.created_labels and created_labels_drafts
+    and recalculate them from scratch. It's hard to correctly follow all changes in annotation region
+    labels and these fields aren't calculated properly after some time. Label config changes are not allowed
+    when these changes touch any labels from these created_labels* dictionaries.
+    """
+
+    parser_classes = (JSONParser,)
+    parent_queryset = Project.objects.all()
+    permission_required = ViewClassPermission(
+        POST=all_permissions.projects_change,
+    )
+
+    @swagger_auto_schema(auto_schema=None)
+    def post(self, *args, **kwargs):
+        project = self.get_parent_object()
+        summary = project.summary
+        start_job_async_or_sync(
+            recalculate_created_annotations_and_labels_from_scratch,
+            project,
+            summary,
+            organization_id=self.request.user.active_organization.id,
+        )
+        return Response(status=status.HTTP_200_OK)
+
+
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
@@ -591,5 +621,33 @@ class ProjectModelVersions(generics.RetrieveAPIView):
     queryset = Project.objects.all()
 
     def get(self, request, *args, **kwargs):
+        # TODO make sure "extended" is the right word and is
+        # consistent with other APIs we've got
+        extended = self.request.query_params.get('extended', False)
+        include_live_models = self.request.query_params.get('include_live_models', False)
         project = self.get_object()
-        return Response(data=project.get_model_versions(with_counters=True))
+        data = project.get_model_versions(with_counters=True, extended=extended)
+
+        if extended:
+            serializer_models = None
+            serializer = ProjectModelVersionExtendedSerializer(data, many=True)
+
+            if include_live_models:
+                ml_models = project.get_ml_backends()
+                serializer_models = MLBackendSerializer(ml_models, many=True)
+
+            # serializer.is_valid(raise_exception=True)
+            return Response({'static': serializer.data, 'live': serializer_models and serializer_models.data})
+        else:
+            return Response(data=data)
+
+    def delete(self, request, *args, **kwargs):
+        project = self.get_object()
+        model_version = request.data.get('model_version', None)
+
+        if not model_version:
+            raise RestValidationError('model_version param is required')
+
+        count = project.delete_predictions(model_version=model_version)
+
+        return Response(data=count)

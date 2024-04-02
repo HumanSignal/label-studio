@@ -166,6 +166,31 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             self.instance.validate_config(value)
         return value
 
+    def validate_model_version(self, value):
+        """Custom model_version validation"""
+        p = self.instance
+
+        # Only run the validation if model_version is about to change
+        # and it contains a string
+        if p is not None and p.model_version != value and value != '':
+            # that model_version should either match live ml backend
+            # or match version in predictions
+
+            if p.ml_backends.filter(title=value).union(p.predictions.filter(project=p, model_version=value)).exists():
+                return value
+            else:
+                raise serializers.ValidationError(
+                    "Model version doesn't exist either as live model or as static predictions."
+                )
+
+        return value
+
+    def update(self, instance, validated_data):
+        if not validated_data.get('show_collab_predictions'):
+            instance.model_version = ''
+
+        return super().update(instance, validated_data)
+
     def get_queue_total(self, project):
         remain = project.tasks.filter(
             Q(is_labeled=False) & ~Q(annotations__completed_by_id=self.user_id)
@@ -218,6 +243,12 @@ class ProjectReimportSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectReimport
         fields = '__all__'
+
+
+class ProjectModelVersionExtendedSerializer(serializers.Serializer):
+    model_version = serializers.CharField()
+    count = serializers.IntegerField()
+    latest = serializers.DateTimeField()
 
 
 class GetFieldsSerializer(serializers.Serializer):

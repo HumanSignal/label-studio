@@ -1,9 +1,6 @@
 // Outliner + Details
 export const FF_DEV_1170 = "ff_front_1170_outliner_030222_short";
 
-// Switch to page navigation
-export const FF_DEV_1470 = "ff_front_dev_1470_dm_pagination_010422_short";
-
 /**
  * Support for notification links in the Label Steam and the Review Stream.
  * @link https://app.launchdarkly.com/default/branch/features/feat_front_dev_1752_notification_links_in_label_and_review_streams
@@ -44,12 +41,6 @@ export const FF_DEV_3734 = 'fflag_fix_front_dev_3734_hide_task_counter_131222_sh
 export const FF_DEV_4008 = "feat_front_dev_4008_quick_task_open_short";
 
 /**
- * Support for LabelOps functionality.
- * @link https://app.launchdarkly.com/default/branch/features/fflag_feat_front_lops_12_label_ops_ui_short
- */
-export const FF_LOPS_12 = "fflag_feat_front_lops_12_label_ops_ui_short";
-
-/**
  * Support for Datasets functionality.
  */
 export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
@@ -85,6 +76,12 @@ export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
  * Adding the ability to toggle dataset storage editability.
  */
 export const FF_LOPS_86 = "fflag_feat_front_lops_86_datasets_storage_edit_short";
+
+/**
+ * Self Serve
+ * @link https://app.launchdarkly.com/default/test/features/fflag_feat_front_leap_482_self_serve_short/
+ */
+export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
 
 // Customize flags
 const flags = {};

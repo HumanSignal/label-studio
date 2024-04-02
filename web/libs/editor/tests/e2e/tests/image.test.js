@@ -148,10 +148,10 @@ Scenario('Image with perRegion tags', async function({ I, AtImageView, AtSidebar
   assert.deepStrictEqual(result[0].value.rectanglelabels, ['Moonwalker']);
 });
 
-const outOfBoundsFFs = new DataTable(['FF_DEV_3793'])
+const outOfBoundsFFs = new DataTable(['FF_DEV_3793']);
 
 outOfBoundsFFs.add([true]);
-outOfBoundsFFs.add([false])
+outOfBoundsFFs.add([false]);
 
 Data(outOfBoundsFFs)
   .Scenario('Can\'t create rectangles outside of canvas', async ({

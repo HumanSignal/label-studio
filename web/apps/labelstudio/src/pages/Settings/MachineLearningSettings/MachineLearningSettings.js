@@ -1,195 +1,186 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button } from '../../../components';
+import { Button, Spinner } from '../../../components';
 import { Description } from '../../../components/Description/Description';
 import { Divider } from '../../../components/Divider/Divider';
-import { ErrorWrapper } from '../../../components/Error/Error';
-import { InlineError } from '../../../components/Error/InlineError';
-import { Form, Input, Label, TextArea, Toggle } from '../../../components/Form';
+import { Form, Label, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
+import { EmptyState } from '../../../components/EmptyState/EmptyState';
+import { IconEmptyPredictions } from '../../../assets/icons';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
-import { ProjectModelVersionSelector } from './ProjectModelVersionSelector';
-import { ModelVersionSelector } from './ModelVersionSelector';
-import { FF_DEV_1682, isFF } from '../../../utils/feature-flags';
+import { CustomBackendForm } from './Forms';
+import { TestRequest } from './TestRequest';
+import { StartModelTraining } from './StartModelTraining';
+import { Block, Elem } from '../../../utils/bem';
 import './MachineLearningSettings.styl';
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
   const { project, fetchProject } = useContext(ProjectContext);
-  const [mlError, setMLError] = useState();
   const [backends, setBackends] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const fetchBackends = useCallback(async () => {
+    setLoading(true);
     const models = await api.callApi('mlBackends', {
       params: {
         project: project.id,
+        include_static: true,
       },
     });
 
     if (models) setBackends(models);
+    setLoading(false);
+    setLoaded(true);
   }, [project, setBackends]);
 
-  const showMLFormModal = useCallback((backend) => {
-    const action = backend ? "updateMLBackend" : "addMLBackend";
+  const startTrainingModal = useCallback(
+    (backend) => {
+      const modalProps = {
+        title: `Start Model Training`,
+        style: { width: 760 },
+        closeOnClickOutside: true,
+        body: <StartModelTraining backend={backend} />,
+      };
 
-    const modalProps = {
-      title: `${backend ? 'Edit' : 'Add'} model`,
-      style: { width: 760 },
-      closeOnClickOutside: false,
-      body: (
-        <Form
-          action={action}
-          formData={{ ...(backend ?? {}) }}
-          params={{ pk: backend?.id }}
-          onSubmit={async (response) => {
-            if (!response.error_message) {
-              await fetchBackends();
+      modal(modalProps);
+    },
+    [project],
+  );
+
+  const showRequestModal = useCallback(
+    (backend) => {
+      const modalProps = {
+        title: `Test Request`,
+        style: { width: 760 },
+        closeOnClickOutside: true,
+        body: <TestRequest backend={backend} />,
+      };
+
+      modal(modalProps);
+    },
+    [project],
+  );
+
+  const showMLFormModal = useCallback(
+    (backend) => {
+      const action = backend ? 'updateMLBackend' : 'addMLBackend';
+      const modalProps = {
+        title: `${backend ? 'Edit' : 'Connect'} Model`,
+        style: { width: 760 },
+        closeOnClickOutside: false,
+        body: (
+          <CustomBackendForm
+            action={action}
+            backend={backend}
+            project={project}
+            onSubmit={() => {
+              fetchBackends();
               modalRef.close();
-            }
-          }}
-        >
-          <Input type="hidden" name="project" value={project.id}/>
+            }}
+          />
+        ),
+      };
 
-          <Form.Row columnCount={2}>
-            <Input name="title" label="Title" placeholder="ML Model"/>
-            <Input name="url" label="URL" required/>
-          </Form.Row>
-
-          <Form.Row columnCount={1}>
-            <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
-          </Form.Row>
-
-          {isFF(FF_DEV_1682) && !!backend && (
-            <Form.Row columnCount={2}>
-              <ModelVersionSelector
-                object={backend}
-                apiName="modelVersions"
-                label="Version"
-              />
-            </Form.Row>
-          )}
-
-          {isFF(FF_DEV_1682) && (
-            <Form.Row columnCount={1}>
-              <div>
-                <Toggle
-                  name="auto_update"
-                  label="Allow version auto-update"
-                />
-              </div>
-            </Form.Row>
-          )}
-
-          <Form.Row columnCount={1}>
-            <div>
-              <Toggle
-                name="is_interactive"
-                label="Use for interactive preannotations"
-              />
-            </div>
-          </Form.Row>
-
-          <Form.Actions>
-            <Button type="submit" look="primary" onClick={() => setMLError(null)}>
-              Validate and Save
-            </Button>
-          </Form.Actions>
-
-          <Form.ResponseParser>{response => (
-            <>
-              {response.error_message && (
-                <ErrorWrapper error={{
-                  response: {
-                    detail: `Failed to ${backend ? 'save' : 'add new'} ML backend.`,
-                    exc_info: response.error_message,
-                  },
-                }}/>
-              )}
-            </>
-          )}</Form.ResponseParser>
-
-          <InlineError/>
-        </Form>
-      ),
-    };
-
-    const modalRef = modal(modalProps);
-  }, [project, fetchBackends, mlError]);
+      const modalRef = modal(modalProps);
+    },
+    [project, fetchBackends],
+  );
 
   useEffect(() => {
     if (project.id) {
       fetchBackends();
     }
-  }, [project]);
+  }, [project.id]);
 
   return (
-    <>
-      <Description style={{ marginTop: 0, maxWidth: 680 }}>
-        Add one or more machine learning models to predict labels for your data.
-        To import predictions without connecting a model,
-        {" "}
-        <a href="https://labelstud.io/guide/predictions.html" target="_blank">
-          see the documentation
-        </a>.
-      </Description>
-      <Button onClick={() => showMLFormModal()}>
-        Add Model
-      </Button>
+    <Block name="ml-settings">
+      <Elem name={'wrapper'}>
+        {loading && <Spinner size={32} />}
+        {loaded && backends.length === 0 && (
+          <EmptyState
+            icon={<IconEmptyPredictions />}
+            title="Let’s connect your first model"
+            description="Connect a machine learning model to generate predictions. These predictions can be compared side by side, used for efficient pre‒labeling and, to aid in active learning, directing users to the most impactful labeling tasks."
+            action={(
+              <Button primary onClick={() => showMLFormModal()}>
+                Connect Model
+              </Button>
+            )}
+            footer={(
+              <div>
+                Need help?
+                <br />
+                <a>Learn more about connecting models in our docs</a>
+              </div>
+            )}
+          />
+        )}
+        <MachineLearningList
+          onEdit={(backend) => showMLFormModal(backend)}
+          onTestRequest={(backend) => showRequestModal(backend)}
+          onStartTraining={(backend) => startTrainingModal(backend)}
+          fetchBackends={fetchBackends}
+          backends={backends}
+        />
 
-      <Divider height={32}/>
+        <Divider height={32} />
 
-      <Form action="updateProject"
-        formData={{ ...project }}
-        params={{ pk: project.id }}
-        onSubmit={() => fetchProject()}
-        autosubmit
-      >
-        <Form.Row columnCount={1}>
-          <Label text="ML-Assisted Labeling" large/>
-
-          <div style={{ paddingLeft: 16 }}>
-            <Toggle
-              label="Start model training after any annotations are submitted or updated"
-              name="start_training_on_annotation_update"
-            />
-          </div>
-
-          <div style={{ paddingLeft: 16 }}>
-            <Toggle
-              label="Retrieve predictions when loading a task automatically"
-              name="evaluate_predictions_automatically"
-            />
-          </div>
-
-          <div style={{ paddingLeft: 16 }}>
-            <Toggle
-              label="Show predictions to annotators in the Label Stream and Quick View"
-              name="show_collab_predictions"
-            />
-          </div>
-        </Form.Row>
-
-        {(!isFF(FF_DEV_1682) || !backends.length ) && (
-          <ProjectModelVersionSelector />
+        {backends.length > 0 && (
+          <Description style={{ marginTop: 0, maxWidth: 680 }}>
+            A connected model has been detected! If you wish to fetch
+            predictions from this model, please follow these steps:
+            <br />
+            <br />
+            1. Navigate to the <i>Data Manager</i>.<br />
+            2. Select the desired tasks.
+            <br />
+            3. Click on <i>Retrieve model predictions</i> from the{' '}
+            <i>Actions</i> menu.
+            <br />
+            <br />
+            Additionally, you can configure the system to use this model for
+            fetching live predictions in the <i>Annotation</i> tab.
+          </Description>
         )}
 
-        <Form.Actions>
-          <Form.Indicator>
-            <span case="success">Saved!</span>
-          </Form.Indicator>
-          <Button type="submit" look="primary" style={{ width: 120 }}>Save</Button>
-        </Form.Actions>
-      </Form>
+        <Form
+          action="updateProject"
+          formData={{ ...project }}
+          params={{ pk: project.id }}
+          onSubmit={() => fetchProject()}
+        >
+          {backends.length > 0 && (
+            <Form.Row columnCount={1}>
+              <Label text="Configuration" large />
 
-      <MachineLearningList
-        onEdit={(backend) => showMLFormModal(backend)}
-        fetchBackends={fetchBackends}
-        backends={backends}
-      />
-    </>
+              <div style={{ paddingLeft: 16 }}>
+                <Toggle
+                  label="Start model training on annotation submission"
+                  description="This option will send a request to /train with information about annotations. You can use this to enable an Active Learning loop. You can also manually start training through model menu in its card."
+                  name="start_training_on_annotation_update"
+                />
+              </div>
+            </Form.Row>
+          )}
+
+          {backends.length > 0 && (
+            <Form.Actions>
+              <Form.Indicator>
+                <span case="success">Saved!</span>
+              </Form.Indicator>
+              <Button type="submit" look="primary" style={{ width: 120 }}>
+                Save
+              </Button>
+            </Form.Actions>
+          )}
+        </Form>
+      </Elem>
+    </Block>
   );
 };
 
-MachineLearningSettings.title = "Machine Learning";
-MachineLearningSettings.path = "/ml";
+MachineLearningSettings.title = 'Model';
+MachineLearningSettings.path = '/ml';

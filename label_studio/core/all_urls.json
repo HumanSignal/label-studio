@@ -53,12 +53,6 @@
         "name": "",
         "decorators": ""
     },
-  {
-        "url": "/models/",
-        "module": "organizations.views.simple_view",
-        "name": "organizations:models",
-        "decorators": ""
-    },
     {
         "url": "/organization/",
         "module": "organizations.views.simple_view",
@@ -75,6 +69,12 @@
         "url": "/people/",
         "module": "organizations.views.organization_people_list",
         "name": "organizations:organization-index",
+        "decorators": ""
+    },
+    {
+        "url": "/models/",
+        "module": "organizations.views.simple_view",
+        "name": "organizations:models",
         "decorators": ""
     },
     {
@@ -177,6 +177,12 @@
         "url": "/api/projects/<int:pk>/summary/",
         "module": "projects.api.ProjectSummaryAPI",
         "name": "projects:api:project-summary",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/summary/reset/",
+        "module": "projects.api.ProjectSummaryResetAPI",
+        "name": "projects:api:project-summary-reset",
         "decorators": ""
     },
     {
@@ -933,6 +939,12 @@
         "url": "/api/ml/<int:pk>/train",
         "module": "ml.api.MLBackendTrainAPI",
         "name": "ml:api:ml-train",
+        "decorators": ""
+    },
+    {
+        "url": "/api/ml/<int:pk>/predict/test",
+        "module": "ml.api.MLBackendPredictAPI",
+        "name": "ml:api:ml-predict-test",
         "decorators": ""
     },
     {
