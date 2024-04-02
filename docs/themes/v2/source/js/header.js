@@ -8,9 +8,11 @@
     const button = e.currentTarget;
     const menu = button.nextElementSibling;
     const menuStyles = getComputedStyle(menu);
+    const arrow = button.querySelector("svg");
+    const arrowStyles = getComputedStyle(arrow);
 
-    menu.style.setProperty('display', menuStyles.display=== "flex" ? "none" : "flex");
-    button.classList.toggle("active");
+    arrow.style.setProperty('transform', arrowStyles.transform === "none" ? "matrix(-1, 0, 0, -1, 0, 0)" : "none");
+    menu.style.setProperty('display', menuStyles.display === "flex" ? "none" : "flex");
   }
 
   navToggleButtons && navToggleButtons.forEach(button => button.addEventListener("click", toggleMenu));

@@ -479,6 +479,10 @@ main {
   display: flex;
 }
 
+.page-sidebar .page-sidebar-list li:has([aria-current="page"]) .page-sidebar-children-list {
+  display: flex;
+}
+
 .page-sidebar .page-sidebar-grandchildren-list {
   margin: 0.5rem 0 0.5rem 1rem;
   width: 100%;
@@ -531,10 +535,6 @@ main {
 .page-sidebar .page-sidebar-toggle-children-list svg {
   width: 10px;
   height: auto;
-}
-
-.page-sidebar-toggle-children-list.active svg {
-  transform: rotate(180deg);
 }
 
 .icon-external-link {

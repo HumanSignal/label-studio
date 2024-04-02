@@ -1,6 +1,6 @@
 <% const isEnterpriseTheme = theme.tier === "enterprise" %>
   <ul class="page-sidebar-list">
-    <% const pages = site.pages.filter(page => !page.hide_menu && page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
+    <% const pages = site.pages.filter(page => !page.hide_menu && page.path !== "guide/index.html" && page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
     <% if(isEnterpriseTheme) pages.forEach(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
     <% const orderedPages = pages.sort('order') %>
     <% const parentPages = orderedPages.filter(page => isEnterpriseTheme ? page.parent_enterprise === undefined : page.parent === undefined) %>
@@ -8,12 +8,10 @@
 
     <% const pagesArray = parentPages.map(page => {
       var fileName = page.path.replace(/^.+?\/([\w-]+)\.html/, '$1')
-      let childPages = childrenPages.filter(child => child.parent_enterprise === fileName || child.parent === fileName);
 
       return {
         page: page,
         fileName: fileName,
-        childPages: childPages
       }
     }) %>
 
