@@ -104,49 +104,46 @@
       <% }
       tocHeader = p.page.section;
       %>
-      <% if(p.page.short || p.page.title) { %>
-        <% const pageTitle = p.page.short || p.page.title %>
-        <li>
+      <% const pageTitle = p.page.short || p.page.title %>
+      <li>
         <a href="<%- url_for(p.page.path) %>" class="<%- p.page.is_new ? ' new' : '' %>" <%- page.title === p.page.title ? 'aria-current="page"' : '' %>>
-        <%- pageTitle %></a>
-        <% if(p.childPages.length > 0) {%>
-          <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
-          <button class="page-sidebar-toggle-children-list<%- activeChildPage.length > 0 ? ' active' : ''%>">
-            <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
-            </svg>
-          </button>
-          <ul class="page-sidebar-children-list<%- activeChildPage.length > 0 ? ' page-sidebar-children-list-active' : ''%>">
-          <% p.childPages.forEach(child => { %>
-            <li>
-              <a href="<%- url_for(child.path) %>" class="<%- child.is_new ? ' new' : '' %>" <%- page.title === child.title ? 'aria-current="page"' : '' %>>
-              <%- child.short ? child.short: child.title %></a>
-            </li>
-          <% }) %>
+          <%- pageTitle %>
+        </a>
+        <% const childrenPages = orderedPages.filter(page => page.parent_enterprise === p.fileName || page.parent === p.fileName ) %>
+        <% if(childrenPages.length > 0) {%>
+            <button class="page-sidebar-toggle-children-list">
+              <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+              </svg>
+            </button>
+            <ul class="page-sidebar-children-list">
+            <% childrenPages.forEach(function (p, index) { %>
+            <% const pageTitle = p.short || p.title %>
+            <% const fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
+              <li>
+                <a href="<%- url_for(p.path) %>" class="page-sidebar-children-link<%- p.is_new ? ' new' : '' %>" <%- page.title === p.title ? 'aria-current="page"' : '' %>>
+                  <%- pageTitle %>
+                </a>
+                <% const grandChildrenPages = orderedPages.filter(page => page.parent_enterprise === fileName || page.parent === fileName ) %>
+                <% if(grandChildrenPages.length > 0) {%>
+                    <ul class="page-sidebar-grandchildren-list">
+                      <% grandChildrenPages.forEach(function (p, index) { %>
+                    <li>
+                      <% const pageTitle = p.short || p.title %>
+                      <a href="<%- url_for(p.path) %>" class="page-sidebar-children-link<%- p.is_new ? ' new' : '' %>" <%- page.title === p.title ? 'aria-current="page"' : '' %>>
+                        <%- pageTitle %>
+                      </a>
+                    </li>
+                  
+                  <% }) %>
+                </ul>
+                <% } %>
+              </li>
+            
+            <% }) %>
           </ul>
         <% } %>
       </li>
-      <% if(pageTitle == "Frontend") { %>
-        <% if(!isEnterpriseTheme) {%>
-          <li>
-          <a href="https://github.com/HumanSignal/label-studio/blob/develop/CONTRIBUTING.md" target="_blank">Contribution guide
-            <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
-              <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
-            </svg>
-          </a>
-        </li>
-        <% } %>
-        <li>
-          <a href="https://labelstud.io/integrations/" target="_blank">Integrations directory
-            <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
-              <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
-            </svg>
-          </a>
-        </li>
-        <% } %>
-
-      <% } %>
-      
     <% }) %>
     
 </ul>

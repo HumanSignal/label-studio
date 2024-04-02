@@ -475,6 +475,16 @@ main {
   display: none;
 }
 
+.page-sidebar .page-sidebar-children-list:has([aria-current="page"]) {
+  display: flex;
+}
+
+.page-sidebar .page-sidebar-grandchildren-list {
+  margin: 0.5rem 0 0.5rem 1rem;
+  width: 100%;
+  flex-direction: column;
+}
+
 .page-sidebar .page-sidebar-children-list-active {
   display: flex;
 }
@@ -512,6 +522,10 @@ main {
   border: 0;
   padding: 0;
   cursor: pointer;
+}
+
+.page-sidebar-list li:has(.page-sidebar-children-link[aria-current="page"]) .page-sidebar-toggle-children-list svg {
+  transform: rotate(180deg);
 }
 
 .page-sidebar .page-sidebar-toggle-children-list svg {
