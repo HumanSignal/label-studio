@@ -1,0 +1,30 @@
+{
+    "editor": {
+	"title": "Editor",
+	"description": "Editor is used for labeling",
+	"categories": {
+	    "annotation": {
+		"title": "Annotion Interface",
+		"description": "Navigate how annotaions are created and saved",
+		"items": {
+		    "undo": { "key": "ctrl+b", "title": "Undo Action", "description": "Undo any annotation that was created" }
+		}
+	    }
+	}
+    },
+
+  "dm": {
+    "title": "Project's Data Manager",
+    "description": "",
+    "categories": {
+      "move": {
+	"title": "Move around",
+	
+	"items": {
+	  "up":  { "key": "shift+up", "title": "Go one item up" }
+	}
+      }
+    }
+  }
+  
+}

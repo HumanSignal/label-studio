@@ -23,8 +23,9 @@
   <link href="{{settings.HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
 
   <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
+  <script src="{{settings.HOSTNAME}}{% static 'js/hotkeys.js' %}"></script>
   <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
-
+  
   {% block app-scripts %}
     <script nonce="{{request.csp_nonce}}">
       EDITOR_JS = `{{settings.HOSTNAME}}/label-studio-frontend/main.js?v={{ versions.lsf.commit }}`;
@@ -104,6 +105,7 @@
     sentry_dsn: {% if settings.FRONTEND_SENTRY_DSN %}"{{ settings.FRONTEND_SENTRY_DSN }}"{% else %}null{% endif %},
     sentry_rate: "{{ settings.FRONTEND_SENTRY_RATE }}",
     sentry_environment: "{{ settings.FRONTEND_SENTRY_ENVIRONMENT }}",
+    custom_keymap: {{ user.hotkeys|safe }},
     editor_keymap: JSON.parse({{ settings.EDITOR_KEYMAP|safe }}),
     feature_flags: {{ feature_flags|json_dumps_ensure_ascii|safe }},
     feature_flags_default_value: {{ settings.FEATURE_FLAGS_DEFAULT_VALUE|json_dumps_ensure_ascii|safe }},

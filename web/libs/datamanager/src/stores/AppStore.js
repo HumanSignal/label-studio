@@ -63,7 +63,7 @@ export const AppStore = types
   })
   .views((self) => ({
     /** @returns {import("../sdk/dm-sdk").DataManager} */
-    get SDK() {
+      get SDK() {
       return self._sdk;
     },
 

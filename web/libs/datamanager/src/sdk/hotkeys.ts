@@ -18,8 +18,9 @@ export const useShortcut = (
   callback: () => void,
   options = { showShortcut: true },
   dependencies = undefined,
+  customKeymap = {}
 ) => {
-  const action = keymap[actionName] as Hotkey;
+  const action = (customKeymap[actionName] || keymap[actionName]) as Hotkey;
   const isMacos = /mac/i.test(navigator.platform);
   const shortcut = action.shortcut ?? (isMacos ? action.macos : action.other) as string;
 
@@ -30,7 +31,7 @@ export const useShortcut = (
     element: document.body,
   } as any, dependencies);
 
-  const title = action.title + (options.showShortcut ? `: [ ${readableShortcut(shortcut)} ]` : '');
+  const title = action.title + (options && options.showShortcut ? `: [ ${readableShortcut(shortcut)} ]` : '');
 
   return title;
 };

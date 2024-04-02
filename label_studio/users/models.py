@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import copy
+import json
 import datetime
 from typing import Optional
 
@@ -26,6 +28,19 @@ for r in range(YEAR_START, (datetime.datetime.now().year + 1)):
 year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
 
 
+def flatten_hotkeys(data):
+    result = {}
+    for cKey, category in data.items():
+        for sKey, subcategory in category['categories'].items():
+            for hKey, hotkey in subcategory['items'].items():
+                result[f"{cKey}:{sKey}:{hKey}"] = hotkey['key']
+    return result
+
+with open(settings.DEFAULT_HOTKEYS_FILE) as f:
+    DEFAULT_HOTKEYS_FULL = json.load(f)
+    DEFAULT_HOTKEYS_MERGED = flatten_hotkeys(DEFAULT_HOTKEYS_FULL)
+
+    
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -91,6 +106,8 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     phone = models.CharField(_('phone'), max_length=256, blank=True)
     avatar = models.ImageField(upload_to=hash_upload, blank=True)
 
+    custom_hotkeys = models.JSONField(_('hotkeys'), default=dict, null=True, help_text='Custom hotkeys')
+    
     is_staff = models.BooleanField(
         _('staff status'), default=False, help_text=_('Designates whether the user can log into this admin site.')
     )
@@ -100,7 +117,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         default=True,
         help_text=_('Designates whether to treat this user as active. Unselect this instead of deleting accounts.'),
     )
-
+    
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     activity_at = models.DateTimeField(_('last annotation activity'), auto_now=True)
@@ -139,6 +156,25 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
             else:
                 return settings.HOSTNAME + self.avatar.url
 
+    @property
+    def hotkeys(self):
+        """ Returns a dict with default hotkeys merged with custom hotkeys """
+        return { **DEFAULT_HOTKEYS_MERGED, **(self.custom_hotkeys or {}) }
+
+    @property
+    def hotkeys_full(self):
+        """ Return hotkeys with extended descriptions in a format that view expects """
+        full = copy.deepcopy(DEFAULT_HOTKEYS_FULL)
+        
+        for cKey, category in full.items():
+            for sKey, subcategory in category['categories'].items():
+                for hKey, hotkey in subcategory['items'].items():
+                    path = f"{cKey}:{sKey}:{hKey}"
+                    if path in self.custom_hotkeys:
+                        hotkey["key"] = self.custom_hotkeys[path]
+                        
+        return full
+    
     def is_organization_admin(self, org_pk):
         return True
 

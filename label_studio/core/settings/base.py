@@ -579,6 +579,7 @@ WEBHOOK_SERIALIZERS = {
     'label_link': 'labels_manager.serializers.LabelLinkSerializer',
 }
 
+DEFAULT_HOTKEYS_FILE = get_env('DEFAULT_HOTKEYS_FILE', 'default_hotkeys.json')
 EDITOR_KEYMAP = json.dumps(get_env('EDITOR_KEYMAP'))
 
 # fix a problem with Windows mimetypes for JS and PNG
@@ -732,3 +733,4 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
 
 CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE', 10000)
 CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT', 60)
+

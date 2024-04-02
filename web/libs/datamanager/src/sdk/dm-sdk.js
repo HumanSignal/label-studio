@@ -81,6 +81,9 @@ export class DataManager {
   /** @type {import("../stores/AppStore").AppStore} */
   store = null;
 
+  /** custom keymap for the datamanger */
+  customKeymap = {};
+  
   /** @type {Dict<any>} */
   labelStudioOptions = {};
 
@@ -150,6 +153,7 @@ export class DataManager {
     this.dataset = config.dataset;
     this.datasetId = config.datasetId;
     this.settings = config.settings;
+    this.customKeymap = config.customKeymap;
     this.labelStudioOptions = config.labelStudio;
     this.env = config.env ?? process.env.NODE_ENV ?? this.env;
     this.mode = config.mode ?? this.mode;

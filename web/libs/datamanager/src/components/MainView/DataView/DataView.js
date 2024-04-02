@@ -313,22 +313,22 @@ export const DataView = injector(
 
       const task = dataStore.focusPrev();
 
-      if (isFF(FF_DEV_4008)) getRoot(view).startLabeling(task);
-    });
+      // if (isFF(FF_DEV_4008)) getRoot(view).startLabeling(task);
+    }, null, null, store._sdk.customKeymap);
 
     useShortcut("dm.focus-next", () => {
       if (document.activeElement !== document.body) return;
 
       const task = dataStore.focusNext();
 
-      if (isFF(FF_DEV_4008)) getRoot(view).startLabeling(task);
-    });
+      // if (isFF(FF_DEV_4008)) getRoot(view).startLabeling(task);
+    }, null, null, store._sdk.customKeymap);
 
     useShortcut("dm.close-labeling", () => {
       if (document.activeElement !== document.body) return;
 
       if (dataStore.selected) store.closeLabeling();
-    });
+    }, null, null, store._sdk.customKeymap);
 
     useShortcut("dm.open-labeling", () => {
       if (document.activeElement !== document.body) return;
@@ -337,7 +337,7 @@ export const DataView = injector(
       // don't close QuickView by Enter
 
       if (highlighted && !highlighted.isSelected) store.startLabeling(highlighted);
-    });
+    }, null, null, store._sdk.customKeymap);
 
     useEffect(() => {
       const updateDatasetStatus = (dataset) => (

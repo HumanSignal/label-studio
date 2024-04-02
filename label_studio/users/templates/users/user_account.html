@@ -24,6 +24,33 @@
 
 <div class="full_content">
   <div class="account-page">
+
+    <form action="{% url 'user-detail' pk=user.pk %}" method="patch" class="user__hotkeys">
+      <header>Customize Hotkeys</header>
+
+      {% for cKey, category in hotkeys.items %}
+        <h4>{{ category.title }}</h4>
+        <span>{{ category.description }}</span>
+	<ul>
+	  {% for sKey, subcategory in category.categories.items %}
+	    <h5>{{ subcategory.title }}</h5>
+	    <span>{{ subcategory.description }}</span>
+	    {% for hKey, hotkey in subcategory.items.items %}
+              <li class="field">
+                <label for="">{{ hotkey.title }}</label>
+                <input type="text" name="{{ cKey }}:{{ sKey }}:{{ hKey }}" class="ls-input" value="{{ hotkey.key }}" onfocus="capture_hotkey(event)" />
+	        <p>{{ hotkey.description }}</p>
+              </li>
+	    {% endfor %}
+	  {% endfor %}
+	</ul>
+      {% endfor %}
+      
+      <footer>
+        <button class="ls-button ls-button_look_primary" onclick="submit_hotkeys()">Save</button>
+      </footer>
+    </form>
+        
     <form action="{% url 'user-detail' pk=user.pk %}" method="patch" class="user__info">
       <input type="hidden" name="_method" value="patch"/>
 

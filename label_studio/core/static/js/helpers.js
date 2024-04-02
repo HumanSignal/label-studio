@@ -180,6 +180,126 @@ function submit_files(url, method, onSuccess) {
   });
 }
 
+function capture_hotkey(ev, map) {
+    map = window.APP_SETTINGS.hotkeys;
+    
+    console.log(map);
+    let flipped = {}
+    for(let key in map) {
+	flipped[map[key]] = key;
+    }
+
+    var div = document.createElement('div');
+    div.className = "ls-modal";
+    div.innerHTML = `
+    <div class="ls-modal__wrapper">
+        <div class="ls-modal__content">
+            <div class="ls-modal__header">Change hotkey</div>
+            <div class="ls-modal__body">                            
+              <span class="hk-preview-container"></span>
+              <span class="hk-used" style="color: red"></span>
+              <button class="hk-reset-btn">Reset</button>
+              <button class="hk-clear-btn">Clear</button>
+              <button class="hk-capture-btn">Capture</button>
+            </div>
+        </div>
+    </div>`;
+
+    function pkeys(keys, key) {
+	if (keys.indexOf(key) === -1) keys.push(key);
+	return keys;
+    }
+
+    function pkeysStr(keysStr, key) {
+	if (keysStr.indexOf(key) === -1) keysStr.push(key);
+	return keysStr;
+    }
+    
+    hotkeys("*", function (evn) {
+	evn.preventDefault();
+	const keys = [];
+	const kstr = [];
+	
+	if (hotkeys.shift) {
+	    pkeys(keys, 16);
+	    pkeysStr(kstr, "Shift")
+	}
+	
+	kstr.push(String.fromCharCode(evn.keyCode));
+	if (keys.indexOf(evn.keyCode) === -1) keys.push(evn.keyCode);
+
+	const k = kstr.join("+");
+	div.querySelector('.hk-preview-container').innerText = k;
+
+	console.log(flipped);
+	
+	if (k in flipped) {	    
+	    div.querySelector('.hk-used').innerText = "Hotkey used in " + flipped[k];
+	} else {
+	    div.querySelector('.hk-used').innerText = "";
+	}
+    })
+    
+    div.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('hk-capture-btn')) {
+	    ev.target.value = this.querySelector('.hk-preview-container').innerText;
+            this.parentNode.removeChild(this);
+        }
+    });
+    
+    document.body.appendChild(div);
+}
+
+function submit_hotkeys() {
+    var f = $(event.target).closest('form');
+    var data = $(f).serializeArray();
+    var dataJSON = data.reduce(function(m,o) { m[o.name] = o.value; return m; }, {});
+    
+    console.log($(f).attr('method'));
+    console.log(dataJSON);
+    
+    var params = {
+	url: $(f).attr('action'),
+	type: $(f).attr('method'),
+	data: { "custom_hotkeys": JSON.stringify(dataJSON) },
+
+	error: function (result, textStatus, errorThrown) {
+	    console.log('smart_submit ajax error', result);
+
+	    // call done function if it's defined and ignore all the rest
+	    if (typeof done === "function") {
+		done(result)
+	    }
+	    // default error handle
+	    else {
+		if (typeof result.responseText !== 'undefined') {
+		    alert("Error: " + message_from_response(result));
+		} else {
+		    alert("Request error: " + errorThrown);
+		}
+		window.location.reload();
+	    }
+	},
+
+	success: function (data, textStatus, result) {
+	    // call done function if it's defined and ignore all the rest
+	    if (typeof done === "function") {
+		done(result)
+	    }
+	    // default success handle
+	    else {
+		window.location.reload();
+	    }
+	}
+    };
+
+    console.log('smart_submit ajax params', params);
+    $.ajax(params);
+    event.preventDefault();
+    return false;
+
+}
+
 // Take closest form (or form by id) and submit it,
 // optional: prevent page refresh if done passed as function
 function smart_submit(done, form_id) {

@@ -21,20 +21,32 @@ if (!isFF(FF_MULTI_OBJECT_HOTKEYS)) {
   }
 }
 
+export type Hotkey = {
+    key?: string,
+    title?: string,
+    description?: string,
+    
+    mac?: string,
+    modifier?: string,
+    modifierDescription?: string,
+    
+    other?: string
+}
+
 // Validate keymap integrity
-const allowedKeympaKeys = ['key', 'mac', 'description', 'modifier', 'modifierDescription'];
+// const allowedKeymapKeys = ['key', 'mac', 'description', 'modifier', 'modifierDescription'];
 
-const validateKeymap = (keymap: Keymap) => {
-  Object.entries(keymap).forEach(([name, settings]) => {
-    Object.keys(settings).forEach(key => {
-      if (!allowedKeympaKeys.includes(key)) {
-        throw new Error(`Unknown keymap property ${key} for key ${name}`);
-      }
-    });
-  });
-};
+// const validateKeymap = (keymap: Keymap) => {
+//   Object.entries(keymap).forEach(([name, settings]) => {
+//     Object.keys(settings).forEach(key => {
+//       if (!allowedKeymapKeys.includes(key)) {
+//         throw new Error(`Unknown keymap property ${key} for key ${name}`);
+//       }
+//     });
+//   });
+// };
 
-validateKeymap(defaultKeymap);
+// validateKeymap(defaultKeymap);
 
 type HotkeyMap = {
   [key: string]: keymaster.KeyHandler,
@@ -399,8 +411,9 @@ Hotkey.INPUT_SCOPE = INPUT_SCOPE;
 Hotkey.keymap = { ...defaultKeymap } as Keymap;
 
 Hotkey.setKeymap = (newKeymap: Keymap) => {
-  validateKeymap(newKeymap);
-
+  // validateKeymap(newKeymap);
+    console.log(newKeymap);
+    
   Object.assign(Hotkey.keymap, newKeymap);
 };
 

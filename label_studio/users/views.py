@@ -142,10 +142,11 @@ def user_account(request):
         form = forms.UserProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect(reverse('user-account'))
-
+            return redirect(reverse('user-account'))    
+        
     return render(
         request,
         'users/user_account.html',
-        {'settings': settings, 'user': user, 'user_profile_form': form, 'token': token},
+        {'settings': settings, 'user': user, 'user_profile_form': form, 'token': token, 'hotkeys': user.hotkeys_full },
     )
+

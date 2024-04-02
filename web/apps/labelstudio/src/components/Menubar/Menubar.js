@@ -9,6 +9,7 @@ import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Hamburger } from "../Hamburger/Hamburger";
 import { Menu } from '../Menu/Menu';
+import { Modal, confirm } from '../../components/Modal/Modal';
 import { Userpic } from '../Userpic/Userpic';
 import { VersionNotifier, VersionProvider } from '../VersionNotifier/VersionNotifier';
 import './Menubar.styl';
@@ -38,6 +39,22 @@ const RightContextMenu = ({className, ...props}) => {
     />
   );
 };
+
+const KeymapModal = ({}) => {
+    const handleOnClick = (type) => () => {
+        confirm({
+            title: "Current Hotkeys",
+            body: <div><b>Hello World 2</b></div>,
+            okText: "Okay",
+            // buttonLook: "destructive",
+            onOk: async () => {
+                
+            },
+        });
+    };
+    
+    return <></>;
+}; 
 
 export const Menubar = ({
   enabled,
@@ -113,6 +130,18 @@ export const Menubar = ({
     useMenuRef?.current?.close();
   }, [location]);
 
+    const handleOnClick = (type) => () => {
+        confirm({
+            title: "Current Hotkeys",
+            body: <div><b>Hello World 2</b></div>,
+            okText: "Okay",
+            // buttonLook: "destructive",
+            onOk: async () => {
+                
+            },
+        });
+    };
+
   return (
     <div className={contentClass}>
       {enabled && (
@@ -133,6 +162,10 @@ export const Menubar = ({
             <RightContextMenu className={contextItem.mod({right: true})}/>
           </div>
 
+          <div style={{ "display": "flex", "alignItems": "center" }}>
+            <img src={absoluteURL("/static/icons/keymap.png")} alt="Keymap" height="16" onClick={handleOnClick()} />
+          </div>
+          
           <Dropdown.Trigger ref={useMenuRef} align="right" content={(
             <Menu>
               <Menu.Item
