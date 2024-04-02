@@ -29,8 +29,8 @@ short: On-Prem Release Notes
 type: guide
 tier: enterprise
 order: 0
-order_enterprise: 999
-section: "Reference"
+order_enterprise: 451
+section: "What's New"
 meta_title: On-premises release notes for Label Studio Enterprise
 meta_description: Review new features, enhancements, and bug fixes for on-premises Label Studio Enterprise installations. 
 ---

@@ -4,10 +4,12 @@ short: Dashboard
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 68
+order_enterprise: 125
 meta_title: Project Dashboard
 meta_description: Use the project Dashboard to monitor performance and progress.
-section: "Project Management"
+section: "Create & Manage Projects"
+parent: "manage_projects"
+parent_enterprise: "manage_projects"
 ---
 
 > Review project progress, status, and data distribution in Project Performance Dashboards

@@ -1,13 +1,13 @@
 ---
 title: Set up webhooks in Label Studio
-short: Webhook setup
+short: Webhooks
 type: guide
 tier: all
-order: 415
-order_enterprise: 515
+order: 407
+order_enterprise: 407
 meta_title: Configure Webhooks in Label Studio
 meta_description: Label Studio documentation for setting up and configuring webhooks to integrate Label Studio with your machine learning pipeline.
-section: "Integration and Development"
+section: "Integrate & Extend"
 
 ---
 

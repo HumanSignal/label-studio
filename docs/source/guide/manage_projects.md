@@ -1,13 +1,13 @@
 ---
 title: Manage projects in Label Studio Enterprise
 short: Manage projects
-tier: enterprise
+tier: all
 type: guide
-order: 0
-order_enterprise: 62
+order: 116
+order_enterprise: 116
 meta_title: Manage projects in Label Studio Enterprise
 meta_description: A description of various project management actions available.
-section: "Project Management"
+section: "Create & Manage Projects"
 ---
 
 For more project actions, see:
@@ -19,11 +19,14 @@ For more project actions, see:
 
 You can use the **All Projects** page to view projects across all workspaces. 
 
-<<<<<<< HEAD
+
 ## Use the organization page
 =======
 ![Screenshot of the All Projects page](/images/project/projects_page.png)
->>>>>>> develop
+
+=======
+![Screenshot of the All Projects page](/images/project/projects_page.png)
+
 
 
 ## Search projects
@@ -40,12 +43,12 @@ The project search allows partial and case-insensitive matches.
 
 A project template includes the following:
 
-<<<<<<< HEAD
+
+
 ## Workspaces
 =======
 * Labeling configuration
 * Most project settings
->>>>>>> develop
 
 It does not include:
 

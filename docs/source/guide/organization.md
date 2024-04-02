@@ -1,13 +1,13 @@
 ---
 title: Organization management
-short: Organization
+short: Overview
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 352
+order_enterprise: 351
 meta_title: Organization management
 meta_description: Brief overview of organization structures in Label Studio Enterprise. 
-section: "Administration"
+section: "Manage Your Organization"
 date: 2024-02-16 15:44:07
 ---
 

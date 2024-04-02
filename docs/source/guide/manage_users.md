@@ -4,10 +4,10 @@ short: User management
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 359
+order_enterprise: 366
 meta_title: User management overview
 meta_description: User management options available in Label Studio Enterprise
-section: "Administration"
+section: "Manage Your Organization"
 ---
 
 User management can be a crucial component in your data annotation workflow. 
@@ -43,11 +43,11 @@ Label Studio Enterprise user management options include:
 Use a combination of roles, to control what actions users can take, and project workspaces, to control what data and projects users have access to.
 
 For example, a project annotator using Label Studio sees only the projects they have access to:
-<img src="/images/LSE/LSE-annotator-view.jpg" width=400 height=275 alt="Diagram showing that only Label Studio projects that they have been added to are visible to an annotator."/>
+<img src="/images/LSE-annotator-view.png" alt="Diagram showing that only Label Studio projects that they have been added to are visible to an annotator."/>
 <i>Figure 1: Only Label Studio projects are added and visible to an annotator.</i>
 
 A Label Studio administrator sees all projects and workspaces that exist in the Label Studio instance:
-<img src="/images/LSE/LSE-admin-view.jpg" width=600 height=400 alt="Diagram showing that an administrator can view all projects and workspaces in a Label Studio instance."/>
+<img src="/images/LSE-admin-view.png" alt="Diagram showing that an administrator can view all projects and workspaces in a Label Studio instance."/>
 <i>Figure 2: An administrator can view all projects and workspaces in a Label Studio instance.</i>
 
 ## Permissions in Label Studio Enterprise

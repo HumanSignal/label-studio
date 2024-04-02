@@ -1,13 +1,14 @@
 ---
-title: Project settings
-short: Project settings
+title: Project Settings
+short: Project Settings
 tier: opensource
 type: guide
-order: 165
+order: 119
 order_enterprise: 0
-meta_title: Project settings
+meta_title: Project Settings
 meta_description: Brief descriptions of all the options available when configuring the project settings
-section: "Project Management"
+section: "Create & Manage Projects"
+parent: "manage_projects"
 date: 2024-02-06 22:28:27
 ---
 

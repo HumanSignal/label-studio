@@ -3,11 +3,13 @@ title: Import pre-annotated data into Label Studio
 short: Import pre-annotations
 type: guide
 tier: all
-order: 260
-order_enterprise: 160
+order: 163
+order_enterprise: 163
 meta_title: Import pre-annotated data into Label Studio
 meta_description: Import predicted labels, predictions, pre-annotations, or pre-labels into Label Studio for your data labeling, machine learning, and data science projects.
-section: "Import and Export"
+section: "Import & Export"
+parent: "tasks"
+parent_enterprise: "tasks"
 ---
 
 If you have predictions generated for your dataset from a model, either as pre-annotated tasks or pre-labeled tasks, you can import the predictions with your dataset into Label Studio for review and correction. Label Studio automatically displays the pre-annotations that you import on the Labeling page for each task. 
