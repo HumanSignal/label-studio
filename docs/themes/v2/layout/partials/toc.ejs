@@ -105,9 +105,10 @@
       tocHeader = p.page.section;
       %>
       <% if(p.page.short || p.page.title) { %>
+        <% const pageTitle = p.page.short || p.page.title %>
         <li>
         <a href="<%- url_for(p.page.path) %>" class="<%- p.page.is_new ? ' new' : '' %>" <%- page.title === p.page.title ? 'aria-current="page"' : '' %>>
-        <%- p.page.short ? p.page.short : p.page.title %></a>
+        <%- pageTitle %></a>
         <% if(p.childPages.length > 0) {%>
           <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
           <button class="page-sidebar-toggle-children-list<%- activeChildPage.length > 0 ? ' active' : ''%>">
@@ -125,16 +126,28 @@
           </ul>
         <% } %>
       </li>
+      <% if(pageTitle == "Frontend") { %>
+        <% if(!isEnterpriseTheme) {%>
+          <li>
+          <a href="https://github.com/HumanSignal/label-studio/blob/develop/CONTRIBUTING.md" target="_blank">Contribution guide
+            <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+              <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+            </svg>
+          </a>
+        </li>
+        <% } %>
+        <li>
+          <a href="https://labelstud.io/integrations/" target="_blank">Integrations directory
+            <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+              <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+            </svg>
+          </a>
+        </li>
+        <% } %>
+
       <% } %>
       
     <% }) %>
-    <li>
-      <a href="https://support.humansignal.com" target="_blank">Hugues
-        <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
-          <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
-        </svg>
-      </a>
-    </li>
     
 </ul>
 
@@ -164,21 +177,24 @@
     </a>
   </li>
   <li>
-    <a href="https://support.humansignal.com/hc/en-us/requests/new" target="_blank">Submit A Ticket
-      <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
-        <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
-      </svg>
-    </a>
-  </li>
-  <li>
     <a href="https://humansignal.com/contact-sales/" target="_blank">Contact Sales
       <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
         <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
       </svg>
     </a>
   </li>
+  <% if(isEnterpriseTheme) {%>
+    <li>
+      <a href="https://support.humansignal.com/hc/en-us/requests/new" target="_blank">Submit A Ticket
+        <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+          <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+        </svg>
+      </a>
+    </li>
+  <% } %>
 </ul>
 
+<% if(!isEnterpriseTheme) {%>
 <% if(locals.component === "nav") { %>
   <button>
     what's new
@@ -189,12 +205,13 @@
 <% } else { %>
   <div class="toc-section-heading"><%- partial("component/text", {text: "What's New", size: "Eyebrow", tag: "h3"}) %></div>
 <% } %>
-<ul class="page-sidebar-list">
-  <li>
-    <a href="https://github.com/HumanSignal/label-studio/releases" target="_blank">Release Notes
-      <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
-        <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
-      </svg>
-    </a>
-  </li>
+<ul class="page-sidebar-list">  
+    <li>
+      <a href="https://github.com/HumanSignal/label-studio/releases" target="_blank">LSO release notes
+        <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+          <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+        </svg>
+      </a>
+    </li>
 </ul>
+<% } %>
