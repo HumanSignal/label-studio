@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-908: Fix condition for Starter Cloud to fix DM",
-  "commit": "a50d7d89452d6a05b489629b34c667f5d68f565b",
-  "date": "2024-03-28T13:12:51.000Z",
-  "branch": "fb-leap-908/broken-dm"
+  "message": "fix: LEAP-878: Fix shrinking textarea on edit",
+  "commit": "16a3e960c63343f20b34f9b8ac7b84b1708027fe",
+  "date": "2024-04-03T14:50:08.000Z",
+  "branch": "fb-leap-878/textarea-height"
 }
