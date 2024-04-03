@@ -19,13 +19,6 @@
           "devServerTarget": "labelstudio:serve-static"
         }
       }
-    },
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/labelstudio-e2e/**/*.{js,ts}"]
-      }
     }
   },
   "tags": [],
