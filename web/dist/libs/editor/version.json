@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-591: Remove eslint and prettier from project to make room for Biome",
-  "commit": "b5e1b2a0b2a7cf51c633916225e790ebb45900ca",
-  "date": "2024-04-03T16:17:35.000Z",
+  "message": "Merge branch 'fb-optic-591' of github.com:heartexlabs/label-studio into fb-optic-591",
+  "commit": "a1ae9a415041668b441ea736c5cbdc8d782ec940",
+  "date": "2024-04-03T16:35:48.000Z",
   "branch": "fb-optic-591"
 }
