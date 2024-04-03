@@ -45,8 +45,8 @@ export const PredictionsSettings = () => {
         {loading && <Spinner size={32} />}
 
         {loaded && versions.length > 0 && (
-          <Elem name={'title-block'}>
-            <Elem name={'title'}>Predictions List</Elem>
+          <Elem name="title-block">
+            <Elem name="title">Predictions List</Elem>
             <Description  style={{ marginTop: 14 }}>
               List of predictions available in the project.
               Each card is associated with a separate model version.
