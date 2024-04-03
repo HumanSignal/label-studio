@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-765: LEAP-898: Fix security vulnerabilities in dependencies",
-  "commit": "a25ea445dd6a5c3a27006247b0ca608ec6134e07",
-  "date": "2024-04-03T15:09:28.000Z",
-  "branch": "fb-leap-765"
+  "message": "Merge remote-tracking branch 'origin/develop' into fb-optic-591",
+  "commit": "1dcdd169df8071f971df1be05d557c1f18f83804",
+  "date": "2024-04-03T21:07:25.000Z",
+  "branch": "fb-optic-591"
 }
