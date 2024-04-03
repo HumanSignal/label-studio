@@ -25,10 +25,6 @@ export const FF_DEV_3617 = 'fflag_fix_front_dev_3617_taxonomy_memory_leaks_fix';
 export const FF_LSDV_4711 = "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short";
 // Enables "Enterprise Awareness" features
 export const FF_LSDV_E_297 = "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short";
-/**
- * Improve load time performance of Dashboard Members page
- */
-export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
 
 /**
  * Prompter workflow

@@ -17,7 +17,6 @@ import './App.styl';
 import { AsyncPage } from './AsyncPage/AsyncPage';
 import ErrorBoundary from './ErrorBoundary';
 import { RootPage } from './RootPage';
-import { FF_OPTIC_2, isFF } from '../utils/feature-flags';
 import { ToastProvider, ToastViewport } from '../components/Toast/Toast';
 
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
@@ -25,7 +24,7 @@ const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
 const browserHistory = createBrowserHistory({
   basename: baseURL.pathname || "/",
   getUserConfirmation: (message, callback) => {
-    if (isFF(FF_OPTIC_2) && message === DRAFT_GUARD_KEY) {
+    if (message === DRAFT_GUARD_KEY) {
       draftGuardCallback.current = callback;
     } else {
       callback(window.confirm(message));

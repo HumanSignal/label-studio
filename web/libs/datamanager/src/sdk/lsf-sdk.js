@@ -19,7 +19,6 @@ import {
   FF_DEV_3034,
   FF_DEV_3734,
   FF_LSDV_4620_3_ML,
-  FF_OPTIC_2,
   isFF
 } from "../utils/feature-flags";
 import { isDefined } from "../utils/utils";
@@ -329,7 +328,7 @@ export class LSFWrapper {
 
   setLSFTask(task, annotationID, fromHistory) {
     if (!this.lsf) return;
-    
+
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
     this.setLoading(true, hasChangedTasks);
@@ -693,7 +692,7 @@ export class LSFWrapper {
 
       this.draftToast(status);
     }
-  };  
+  };
 
   onSubmitDraft = async (studio, annotation, params = {}) => {
     const annotationDoesntExist = !annotation.pk;
@@ -703,7 +702,7 @@ export class LSFWrapper {
     // console.log('onSubmitDraft', params?.useToast, hasChanges);
 
     if (params?.useToast) delete params.useToast;
-    
+
     Object.assign(data.body, params);
 
     await this.saveUserLabels();
@@ -711,7 +710,7 @@ export class LSFWrapper {
     if (annotation.draftId > 0) {
       // draft has been already created
       const res = await this.datamanager.apiCall("updateDraft", { draftID: annotation.draftId }, data);
-      
+
       showToast && this.draftToast(res?.$meta?.status);
       return res;
 
@@ -829,7 +828,7 @@ export class LSFWrapper {
   onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);
   onEntityDelete = (...args) => this.datamanager.invoke("onEntityDelete", ...args);
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
-    if (isFF(FF_OPTIC_2) && !!nextAnnotation?.history?.undoIdx) {
+    if (!!nextAnnotation?.history?.undoIdx) {
       this.saveDraft(nextAnnotation).then(() => {
         this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
       });
@@ -839,11 +838,11 @@ export class LSFWrapper {
   }
 
   onNextTask = async (nextTaskId, nextAnnotationId) => {
-    if (isFF(FF_OPTIC_2)) this.saveDraft();
+    this.saveDraft();
     this.loadTask(nextTaskId, nextAnnotationId, true);
   }
   onPrevTask = async (prevTaskId, prevAnnotationId) => {
-    if (isFF(FF_OPTIC_2)) this.saveDraft();
+    this.saveDraft();
     this.loadTask(prevTaskId, prevAnnotationId, true);
   }
   async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {

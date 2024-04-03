@@ -68,11 +68,6 @@ export const FF_LSDV_5035 = 'fflag_feat_back_lsdv_5035_use_created_at_from_draft
 export const FF_LOPS_E_10 = "fflag_feat_front_lops_e_10_updated_ux_short";
 
 /**
- * Save draft on leave annotation editor
- */
-export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
-
-/**
  * Adding the ability to toggle dataset storage editability.
  */
 export const FF_LOPS_86 = "fflag_feat_front_lops_86_datasets_storage_edit_short";
