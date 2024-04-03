@@ -123,7 +123,17 @@ Training a model allows it to learn from submitted annotations and potentially i
 
 After you connect a model to Label Studio as a machine learning backend and annotate at least one task, you can start training the model. You can use automated or manual training. 
 
-From the **Model** page under project settings, select one of the following:
+<div class="enterprise-only">
+
+From the [**Model** page](project_settings_lse#Model) under project settings, select one of the following: 
+
+</div>
+
+<div class="opensource-only">
+
+From the [**Model** page](project_settings#Model) under project settings, select one of the following: 
+
+</div>
 
 * **Start model training on annotation submission**--Enable this option for automated training. When enabled, training is automatically initiated every time an annotation is submitted or updated. 
 * **Start Training** (Available from the overflow menu next to the connected model)--Manually initiate training. Use this action if you want to control when the model training occurs, such as after a specific number of annotations have been collected or at certain intervals.
