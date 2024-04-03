@@ -1,32 +1,22 @@
 /* global LSF_VERSION */
 
-import {
-  destroy,
-  detach,
-  flow,
-  getEnv, getParent,
-  getSnapshot,
-  isRoot,
-  types,
-  walk
-} from 'mobx-state-tree';
-
 import uniqBy from 'lodash/uniqBy';
+import {destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, walk} from 'mobx-state-tree';
 import InfoModal from '../components/Infomodal/Infomodal';
-import { Hotkey } from '../core/Hotkey';
+import {Hotkey} from '../core/Hotkey';
+import {destroy as destroySharedStore} from '../mixins/SharedChoiceStore/mixin';
 import ToolsManager from '../tools/Manager';
 import Utils from '../utils';
-import { guidGenerator } from '../utils/unique';
-import { clamp, delay, isDefined } from '../utils/utilities';
+import {FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF} from '../utils/feature-flags';
+import {guidGenerator} from '../utils/unique';
+import {clamp, delay, isDefined} from '../utils/utilities';
 import AnnotationStore from './Annotation/store';
+import {CommentStore} from './Comment/CommentStore';
 import Project from './ProjectStore';
 import Settings from './SettingsStore';
 import Task from './TaskStore';
-import { UserExtended } from './UserStore';
-import { UserLabels } from './UserLabels';
-import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from '../utils/feature-flags';
-import { CommentStore } from './Comment/CommentStore';
-import { destroy as destroySharedStore } from '../mixins/SharedChoiceStore/mixin';
+import {UserLabels} from './UserLabels';
+import {UserExtended} from './UserStore';
 
 const hotkeys = Hotkey('AppStore', 'Global Hotkeys');
 
@@ -327,10 +317,12 @@ export default types
       if (self.hasInterface('submit', 'update', 'review')) {
         hotkeys.addNamed('annotation:submit', () => {
           const annotationStore = self.annotationStore;
-
-          if (annotationStore.viewingAll) return;
-
+          const shouldDenyEmptyAnnotation = self.hasInterface('annotations:deny-empty');
           const entity = annotationStore.selected;
+          const areResultsEmpty = entity.results.length === 0;
+
+          if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
+          if (annotationStore.viewingAll) return;
 
           entity?.submissionInProgress();
 
