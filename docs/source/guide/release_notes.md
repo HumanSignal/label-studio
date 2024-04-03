@@ -19,6 +19,19 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
     Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
 
 
+<a name="2101post2md"></a>
+
+*Apr 02, 2024*
+
+## Label Studio Enterprise 2.10.1.post2
+Helm Chart version: 1.4.0
+
+### Bug fixes
+
+- Fixed an issue that prevented the docker-compose instance from start, due to a misconfiguration in the internal discovery settings.
+
+
+
 <a name="2101post1md"></a>
 
 *Mar 13, 2024*

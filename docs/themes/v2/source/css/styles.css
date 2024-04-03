@@ -199,6 +199,12 @@ body {
   }
 }
 
+@media (max-width: 700px) {
+  .HeaderSquares{
+    display: none;
+  }
+}
+
 .page-header-content-switcher {
   list-style: none;
   margin: .5rem 0 0 0;
