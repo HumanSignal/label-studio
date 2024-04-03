@@ -19,7 +19,7 @@ const SCENARIO_PARAMS = {
     data: { question: 'Is it a question?' },
     config: `<View>
   <Text name="question" value="$question"/>
-  <TextArea name="answer" toName="question" skipDuplicates="true"/>
+  <TextArea name="answer" toName="question" skipDuplicates="true" required="true"/>
 </View>`,
     fieldSelector: '[name="answer"]',
     text: 'Isn\'t it?',
@@ -135,11 +135,17 @@ Data(scenarioDataTable).Scenario('Skip duplicate values on entering', async ({ I
   I.pressKey('Enter');
 
   Modals.seeWarning(SKIP_DUPLICATES_ERROR);
+  Modals.closeWarning();
 
   I.fillField(fieldSelector, text);
   I.pressKey('Enter');
 
   Modals.seeWarning(SKIP_DUPLICATES_ERROR);
+  Modals.closeWarning();
+
+  // check that there are no warnings and errors
+  I.updateAnnotation();
+  Modals.dontSeeWarning(SKIP_DUPLICATES_ERROR);
 });
 
 Scenario('Independent skip duplicate values', async ({ I, LabelStudio, AtSidebar, Modals }) => {

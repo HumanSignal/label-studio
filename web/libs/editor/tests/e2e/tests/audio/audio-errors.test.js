@@ -49,7 +49,7 @@ Scenario('Check if audio decoder error handler is showing', async function({ I, 
     annotations: [{ id: 'test', result: annotations }],
     config,
     data: {
-      url: '/public/files/video.mp4', // mp4 is not supported by audio decoder
+      url: '/files/video.mp4', // mp4 is not supported by audio decoder
     },
   });
 

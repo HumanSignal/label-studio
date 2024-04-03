@@ -1,6 +1,6 @@
 Feature('Brush relations').tag('@regress');
 
-const IMAGE = 'https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg';
+const IMAGE = 'https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg';
 
 const config = `<View>
     <Image name="img" value="$image"></Image>
@@ -44,13 +44,13 @@ Scenario('Brush relations shouldn\'t crash everything', async ({ I, LabelStudio,
     const x = canvasSize.width / 4 * ((i % 2) * 2 + 1);
     const y = canvasSize.height / 4 * ((Math.floor(i / 2) % 2) * 2 + 1);
     // generate points in a spiral
-    const points = generateSpiralPoints(x, y, Math.min(canvasSize.width / 6, canvasSize.height / 6), .4,  Math.PI / 18);
+    const points = generateSpiralPoints(x, y, Math.min(canvasSize.width / 6, canvasSize.height / 6), .4, Math.PI / 18);
 
     // select the brush label
     I.pressKey('1');
     // draw a brush region
     AtImageView.drawThroughPoints(points);
-    AtSidebar.seeRegions(i+1);
+    AtSidebar.seeRegions(i + 1);
     // unselect the region
     I.pressKey('u');
     // save the central point

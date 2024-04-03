@@ -1,3 +1,5 @@
+const assert = require('assert');
+
 /**
  * Load custom example
  * @param {object} params
@@ -157,7 +159,7 @@ const createAddEventListenerScript = (eventName, callback) => {
  * Wait for the main Image object to be loaded
  */
 const waitForImage = () => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = document.querySelector('[alt=LS]');
 
     if (!img || img.complete) return resolve();
@@ -165,6 +167,8 @@ const waitForImage = () => {
     img.onload = () => {
       setTimeout(resolve, 100);
     };
+    // if image is not loaded in 10 seconds, reject
+    setTimeout(reject, 10000);
   });
 };
 
@@ -232,7 +236,7 @@ const convertToFixed = (data, fractionDigits = 2) => {
   if (['string', 'number'].includes(typeof data)) {
     const n = Number(data);
 
-    return Number.isNaN(n) ? data : Number.isInteger(n) ? n : +Number(n).toFixed(fractionDigits);
+    return Number.isNaN(n) ? data : Number.isInteger(n) ? n : +n.toFixed(fractionDigits);
   }
   if (Array.isArray(data)) {
     return data.map(n => convertToFixed(n, fractionDigits));
@@ -531,6 +535,14 @@ async function generateImageUrl({ width, height }) {
   return canvas.toDataURL();
 }
 
+const getNaturalSize = () => {
+  const imageObject = window.Htx.annotationStore.selected.objects.find(o => o.type === 'image');
+
+  return {
+    width: imageObject.naturalWidth,
+    height: imageObject.naturalHeight,
+  };
+};
 const getCanvasSize = () => {
   const imageObject = window.Htx.annotationStore.selected.objects.find(o => o.type === 'image');
 
@@ -813,6 +825,16 @@ function hasSelectedRegion() {
   return !!Htx.annotationStore.selected.highlightedNode;
 }
 
+async function doDrawingAction(I, { msg, fromX, fromY, toX, toY }) {
+  I.usePlaywrightTo(msg, async ({ browser, browserContext, page }) => {
+    await page.mouse.move(fromX, fromY);
+    await page.mouse.down();
+    await page.mouse.move(toX, toY);
+    await page.mouse.up();
+  });
+  I.wait(1); // Ensure that the tool is fully finished being created.
+}
+
 // `mulberry32` (simple generator with a 32-bit state)
 function createRandomWithSeed(seed) {
   return function() {
@@ -823,6 +845,7 @@ function createRandomWithSeed(seed) {
     return ((t ^ t >>> 14) >>> 0) / 4294967296;
   };
 }
+
 function createRandomIntWithSeed(seed) {
   const random = createRandomWithSeed(seed);
 
@@ -857,6 +880,7 @@ module.exports = {
   areEqualRGB,
   hasKonvaPixelColorAtPoint,
   getKonvaPixelColorFromPoint,
+  getNaturalSize,
   getCanvasSize,
   getImageSize,
   getImageFrameSize,
@@ -883,6 +907,7 @@ module.exports = {
   omitBy,
   dumpJSON,
 
+  doDrawingAction,
   createRandomWithSeed,
   createRandomIntWithSeed,
 };

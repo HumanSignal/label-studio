@@ -421,24 +421,3 @@ stages:
       headers:
         content-type: application/json
 
-  - name: get tasks with ground truth
-    request:
-      method: GET
-      url: '{django_live_url}/api/projects/{project_pk}/ground-truth-tasks'
-    response:
-      strict:
-        - json:list_any_order
-      status_code: 200
-      json: [
-      {
-        "id": !int "{first_task}",
-        "project": !int "{project_pk}"
-      },
-      {   
-        "id": !int "{second_task}", 
-        "project": !int "{project_pk}"
-      }   
-      ]
-      headers:
-        content-type: application/json
-

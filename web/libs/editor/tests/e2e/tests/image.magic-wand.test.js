@@ -1,9 +1,9 @@
 const {
   initLabelStudio,
+  doDrawingAction,
   hasKonvaPixelColorAtPoint,
   setKonvaLayersOpacity,
   serialize,
-  waitForImage,
 } = require('./helpers');
 const assert = require('assert');
 
@@ -42,8 +42,6 @@ const annotationEmpty = {
   result: [],
 };
 
-// TODO: Change these URLs to heartex URLs, and ensure the heartex bucket allows CORS access
-// for these to work.
 const data = {
   'image': [
     'http://htx-pub.s3.amazonaws.com/samples/magicwand/magic_wand_scale_1_20200902_015806_26_2235_1B_AnalyticMS_00750_00750.jpg',
@@ -53,16 +51,6 @@ const data = {
   ],
   'thumb': 'http://htx-pub.s3.amazonaws.com/samples/magicwand/magic_wand_thumbnail_20200902_015806_26_2235_1B_AnalyticMS_00750_00750.jpg',
 };
-
-async function magicWand(I, { msg, fromX, fromY, toX, toY }) {
-  I.usePlaywrightTo(msg, async ({ page }) => {
-    await page.mouse.move(fromX, fromY);
-    await page.mouse.down();
-    await page.mouse.move(toX, toY);
-    await page.mouse.up();
-  });
-  I.wait(1); // Ensure that the magic wand brush region is fully finished being created.
-}
 
 async function assertMagicWandPixel(I, x, y, assertValue, rgbArray, msg) {
   const hasPixel = await I.executeScript(hasKonvaPixelColorAtPoint, [x, y, rgbArray, 1]);
@@ -101,8 +89,8 @@ Scenario('Make sure the magic wand works in a variety of scenarios', async funct
   AtSidebar.seeRegions(0);
 
   I.say('Magic wanding clouds with cloud class in upper left of image');
-  await magicWand(I, { msg: 'Fill in clouds upper left', fromX: 258, fromY: 214, toX: 650, toY: 650 });
-  await magicWand(I, { msg: 'Fill in clouds lower left', fromX: 337, fromY: 777, toX: 650, toY: 650 });
+  await doDrawingAction(I, { msg: 'Fill in clouds upper left', fromX: 258, fromY: 214, toX: 650, toY: 650 });
+  await doDrawingAction(I, { msg: 'Fill in clouds lower left', fromX: 337, fromY: 777, toX: 650, toY: 650 });
 
   I.say('Ensuring repeated magic wands back to back with same class collapsed into single region');
   AtSidebar.seeRegions(1);
@@ -173,7 +161,7 @@ Scenario('Make sure the magic wand works in a variety of scenarios', async funct
   I.pressKey('2');
 
   I.say('Magic wanding cloud shadows with cloud shadow class in center of zoomed image');
-  await magicWand(I, { msg: 'Cloud shadow in middle of image', fromX: 390, fromY: 500, toX: 500, toY: 500 });
+  await doDrawingAction(I, { msg: 'Cloud shadow in middle of image', fromX: 390, fromY: 500, toX: 500, toY: 500 });
 
   I.say('Ensuring new cloud shadow magic wand region gets added to sidebar');
   AtSidebar.seeRegions(2);
