@@ -15,7 +15,7 @@ import { Tab } from "./tab";
 import { TabColumn } from "./tab_column";
 import { TabFilterType } from "./tab_filter_type";
 import { TabHiddenColumns } from "./tab_hidden_columns";
-import { packJSON } from '../../utils/packJSON';
+import { serializeJsonForUrl, deserializeJsonFromUrl } from '../../utils/urlJSON';
 import { isEmpty } from "../../utils/helpers";
 
 const storeValue = (name, value) => {
@@ -131,7 +131,7 @@ export const TabStore = types
         selected = self.views.find((v) => v.id === view);
       }  else if (view && view.id) {
         selected = self.views.find((v) => v.id === view.id);
-      } 
+      }
       if(!selected) {
         selected = self.views[0];
       }
@@ -274,7 +274,7 @@ export const TabStore = types
 
     snapshotFromUrl(viewQueryParam) {
       try {
-        const viewSnapshot = packJSON.parse(viewQueryParam);
+        const viewSnapshot = deserializeJsonFromUrl(viewQueryParam);
 
         viewSnapshot.key = viewQueryParam;
         viewSnapshot.virtual = true;
@@ -285,7 +285,7 @@ export const TabStore = types
     },
 
     snapshotToUrl(snapshot) {
-      return packJSON.stringify(snapshot);
+      return serializeJsonForUrl(snapshot);
     },
 
     saveView: flow(function* (view, { reload, interaction } = {}) {
