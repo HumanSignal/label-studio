@@ -58,7 +58,7 @@ Ir you want to write your own model instead, see [Write your own ML backend](ml_
 git clone https://github.com/HumanSignal/label-studio-ml-backend.git
 cd label-studio-ml-backend/label_studio_ml/examples/{MODEL_NAME}
 docker-compose up
-```
+    ```
 
 The model should begin running at `http://localhost:9090`. You can verify this by clicking **Send Test Request** from the overflow menu next to the model or by using the following command: 
 
@@ -71,7 +71,17 @@ If you see any errors, see [Troubleshooting ML Backends & Predictions](https://s
 
 ### Connect the model to Label Studio
 
-After you [create a project](setup_project), open the project settings and select **Model**. 
+<div class="enterprise-only">
+
+After you [create a project](setup_project), open the project settings and select [**Model**](project_settings_lse#Model). 
+
+</div>
+
+<div class="opensource-only">
+
+After you [create a project](setup_project), open the project settings and select [**Model**](project_settings#Model). 
+
+</div>
 
 Click **Connect Model** and complete the following fields:
 
