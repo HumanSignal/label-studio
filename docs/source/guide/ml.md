@@ -10,12 +10,12 @@ meta_description: Machine learning frameworks for integrating your model develop
 section: "Machine learning"
 ---
 
-You can use an ML backend to integrate your model development pipeline with your data labeling workflow and do the following:
+You can use an ML backend to integrate your model development pipeline with your data labeling workflow. There are several use cases, including: 
 
-- **Pre-labeling** by letting models predict labels and then have annotators perform further manual refinements. 
-- **Auto-labeling** by letting models create automatic annotations. 
-- **Online Learning** by simultaneously updating your model while new annotations are created, letting you retrain your model on-the-fly. 
-- **Active Learning** by selecting example tasks that the model is uncertain how to label for your annotators to label manually.
+- Pre-annotate data with a model
+- Use active learning to select the most relevant data for labeling
+- Interactive (AI-assisted) labeling
+- Model fine-tuning based on recently annotated data
 
 For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify. 
 
