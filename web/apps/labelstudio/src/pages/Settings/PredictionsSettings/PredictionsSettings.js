@@ -9,6 +9,7 @@ import { ProjectContext } from '../../../providers/ProjectProvider';
 import { Spinner } from '../../../components/Spinner/Spinner';
 import { PredictionsList } from './PredictionsList';
 import { Block, Elem } from '../../../utils/bem';
+import { Label } from "../../../components/Form";
 import './PredictionsSettings.styl';
 
 export const PredictionsSettings = () => {
@@ -44,25 +45,18 @@ export const PredictionsSettings = () => {
         {loading && <Spinner size={32} />}
 
         {loaded && versions.length > 0 && (
-          <Description style={{ marginTop: 0, maxWidth: 680 }}>
-            List of predictions available in the project. To learn about how to
-            import predictions,{' '}
-            <a
-              href="https://labelstud.io/guide/predictions.html"
-              target="_blank"
-            >
-              see the documentation
-            </a>
-            .
-          </Description>
-        )}
-
-        {loaded && versions.length > 0 && (
           <Elem name={'title-block'}>
             <Elem name={'title'}>Predictions List</Elem>
-            <Caption>
-              Each card is associated with separate model version.
-            </Caption>
+            <Description  style={{ marginTop: 14 }}>
+              List of predictions available in the project.
+              Each card is associated with a separate model version.
+              To learn about how to import predictions,{' '}
+                <a
+                  href="https://labelstud.io/guide/predictions.html"
+                  target="_blank"
+                  rel="noreferrer"
+                >see&nbsp;the&nbsp;documentation</a>.
+            </Description>
           </Elem>
         )}
 

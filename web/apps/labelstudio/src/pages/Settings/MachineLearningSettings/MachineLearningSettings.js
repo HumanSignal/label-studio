@@ -129,20 +129,19 @@ export const MachineLearningSettings = () => {
         <Divider height={32} />
 
         {backends.length > 0 && (
-          <Description style={{ marginTop: 0, maxWidth: 680 }}>
+          <Description style={{ marginTop: 0, maxWidth: 680, lineHeight:'1.5em' }}>
             A connected model has been detected! If you wish to fetch
             predictions from this model, please follow these steps:
             <br />
             <br />
             1. Navigate to the <i>Data Manager</i>.<br />
-            2. Select the desired tasks.
-            <br />
-            3. Click on <i>Retrieve model predictions</i> from the{' '}
+            2. Select the desired tasks.<br />
+            3. Click on <i>Batch predictions</i> from the{' '}
             <i>Actions</i> menu.
             <br />
             <br />
             Additionally, you can configure the system to use this model for
-            fetching live predictions in the <i>Annotation</i> tab.
+            fetching live predictions in the Labeling Stream and Quickview on the <i>Annotation</i> tab.
           </Description>
         )}
 

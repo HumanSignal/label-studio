@@ -57,10 +57,10 @@ export const AnnotationSettings = () => {
 
           <Form.Row columnCount={1} style={{ borderTop: '1px solid #f1f1f1' }}>
             <br />
-            <Elem name={'header'}>Pre-labeling</Elem>
+            <Elem name={'header'}>Live Predictions</Elem>
             <div>
               <Toggle
-                label="Use predictions to pre-label data"
+                label="Use predictions to pre-label data in the Labeling Stream and Quickview"
                 description="Enable and select which set of predictions to use for prelabeling."
                 name="show_collab_predictions"
                 onChange={(e) => {
