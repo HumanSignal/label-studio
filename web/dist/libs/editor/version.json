@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-828/empty-text-fields'",
-  "commit": "81b2c70d08f7840f69f9df998d79edc122453c67",
-  "date": "2024-04-03T12:01:19.000Z",
-  "branch": "fb-leap-828/empty-text-fields"
+  "message": "fix: LEAP-765: LEAP-898: Fix security vulnerabilities in dependencies",
+  "commit": "a25ea445dd6a5c3a27006247b0ca608ec6134e07",
+  "date": "2024-04-03T15:09:28.000Z",
+  "branch": "fb-leap-765"
 }
