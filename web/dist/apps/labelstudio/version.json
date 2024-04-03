@@ -1,6 +1,6 @@
 {
-  "message": "Update web/libs/datamanager/src/utils/urlJSON.ts",
-  "commit": "6fb43b0a8f7e717062e6d19221f359d945088729",
-  "date": "2024-04-01T21:27:15.000Z",
-  "branch": "fb-LEAP-846/virtual-date-filter"
+  "message": "Merge branch 'develop' into 'fb-leap-828/empty-text-fields'",
+  "commit": "81b2c70d08f7840f69f9df998d79edc122453c67",
+  "date": "2024-04-03T12:01:19.000Z",
+  "branch": "fb-leap-828/empty-text-fields"
 }
