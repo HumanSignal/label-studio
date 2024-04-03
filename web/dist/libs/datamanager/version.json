@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-908: Fix condition for Starter Cloud to fix DM",
-  "commit": "a50d7d89452d6a05b489629b34c667f5d68f565b",
-  "date": "2024-03-28T13:12:51.000Z",
-  "branch": "fb-leap-908/broken-dm"
+  "message": "Merge branch 'develop' into 'fb-leap-828/empty-text-fields'",
+  "commit": "81b2c70d08f7840f69f9df998d79edc122453c67",
+  "date": "2024-04-03T12:01:19.000Z",
+  "branch": "fb-leap-828/empty-text-fields"
 }
