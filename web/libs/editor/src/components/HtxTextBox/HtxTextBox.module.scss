@@ -15,7 +15,8 @@
 
 .delete {
   color: #1890ff;
-  padding-top: 0.5em;
+  // Typography.Paragraph has margin-bottom: 1em, so we have to compensate it to have icon in the middle
+  margin-top: -1em;
   padding-left: 1em;
   line-height: 1.8em;
 }
