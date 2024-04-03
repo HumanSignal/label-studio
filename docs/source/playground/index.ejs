@@ -76,30 +76,57 @@ meta_description: Label Studio interactive demo and playground for data labeling
 
   .editor-row {
       display: flex;
-      margin: 0 auto 1em;
+      margin: 0 auto 1.5em;
       width: 100% !important;
       max-width: 1300px;
+  }
+
+  .intro-wrapper{
+    background: white;
+    border: 1px solid var(--color-gray-300);
+    border-radius: .75rem;
+    padding: 1.5rem;
+    max-width: 1300px;
+    margin: 0 auto 1.5rem;
   }
 
    .data-row {
       display: flex;
       max-width: 1300px;
       margin: 0 auto;
+      background: white;
+      border: 1px solid var(--color-gray-300);
+      border-radius: .75rem;
+      padding: 1.5rem;
    }
 
   .preview-col {
       width: 60%;
       flex: 1;
+      background: white;
+      border: 1px solid var(--color-gray-300);
+      border-radius: .75rem;
+      padding: 1.5rem;
    }
 
   .editor-area {
       border: 1px solid rgba(34,36,38,.15);
-      border-radius: 0.28571429rem;
+      border-radius: .5rem;
+      overflow: hidden;
+  }
+
+  .config-col p{
+    margin: .75rem 0 0 0;
+    color: var(--color-gray-600);
   }
 
   .config-col {
-      margin-right: 2em;
+      margin-right: 1.5em;
       width: 40%;
+      background: white;
+      border: 1px solid var(--color-gray-300);
+      border-radius: .75rem;
+      padding: 1.5rem;
   }
 
   .config-wrapper{
@@ -144,9 +171,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
   }
 
   .message, .accordion {
-    width: 90%;
-    max-width: 1300px;
-    margin: 1em auto 1.75em auto;
+    margin-top: .5rem;
   }
   .grid {
     display: -webkit-box;
@@ -179,9 +204,8 @@ meta_description: Label Studio interactive demo and playground for data labeling
   }
   .use-template {
     font-weight: normal!important;
-  }
-  .use-template:hover {
-    border-bottom: 1px dashed currentColor;
+    margin-bottom: .5rem;
+    display: block;
   }
 
   @font-face {
@@ -197,7 +221,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
   i.icon {
     opacity: 0.75;
     display: inline-block;
-    margin: 0 0.25rem 0 0;
+    margin: 0 0 0 0;
     width: 1.18em;
     height: 1em;
     font-family: 'Icons';
@@ -211,6 +235,11 @@ meta_description: Label Studio interactive demo and playground for data labeling
     -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
   }
+
+  i.icon + .ui{
+    margin-top: .75rem;
+  }
+
   i.icon:before {
     background: none !important;
   }
@@ -273,9 +302,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
   }
 
   .intro {
-    max-width: 700px;
-    margin: 0 auto;
-    margin-top: 1.5em;
+    text-align: left;
   }
 
 @media screen and (max-width: 900px) {
@@ -360,19 +387,19 @@ meta_description: Label Studio interactive demo and playground for data labeling
 </style>
 
 <!-- html -->
+<div class="intro-wrapper">
+  <div class="intro">
+    <h4>1. Choose annotation template</h4>
+  </div>
 
-<div class="intro">
-    <h4 style="text-align: center">1. Choose annotation template</h4>
+  <%- include('template_titles') %>
 </div>
-
-
-<%- include('template_titles') %>
 
 <div>
   <div class="editor-row">
     <div class="config-col">
       <div class="config-wrapper">
-        <h4 style="display: inline-block">2. Edit Labeling config</h4>
+        <h4 style="display: inline-block">2. Edit labeling config</h4>
         <span class="share-buttons">
           <i class="icon copy outline" style="cursor: pointer" title="Copy labeling config"></i>
           <i class="icon share" style="cursor: pointer" title="Copy link to this playground"></i>
@@ -384,15 +411,15 @@ meta_description: Label Studio interactive demo and playground for data labeling
                 id="id_label_config"></textarea>
       </div>
 
-      <div style="margin-top: 1em">
+      <p>
         Start typing in the config, and you can quickly preview the labeling interface.
         At the bottom of the page, you have live serialization updates
         of what Label Studio expects as an input and what it gives you as a result of your labeling work.
-      </div>
+      </p>
     </div>
 
     <div class="preview-col">
-      <h4>3. Inspect Interface preview</h4>
+      <h4>3. Inspect interface preview</h4>
       <div class="validation"></div>
       <div id="editor-wrap">
       </div>

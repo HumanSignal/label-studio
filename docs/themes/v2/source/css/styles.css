@@ -1650,7 +1650,6 @@ details+details {
 
 .templates-card img {
   width: calc(var(--padding) * 2 + 100%);
-  min-height: 14em;
   height: auto;
   margin: calc(-1 * var(--padding)) calc(-1 * var(--padding)) 0.75em calc(-1 * var(--padding));
   transition: border-radius 200ms;
@@ -2235,16 +2234,6 @@ code.hljs {
 
 .page-type-playground .content-markdown a {
   text-decoration: none;
-}
-
-.page-type-playground #basic-templates a {
-  margin-bottom: 0.25rem;
-  display: inline-block;
-  border-bottom: 1px solid transparent;
-}
-
-.page-type-playground #basic-templates a:hover {
-  /* border-bottom: 1px dashed currentColor; */
 }
 
 .page-type-playground .page-rightsidebar {
