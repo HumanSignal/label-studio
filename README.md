@@ -28,6 +28,7 @@ Install Label Studio locally, or deploy it in a cloud instance. [Or, sign up for
 - [Install locally with Docker](#install-locally-with-docker)
 - [Run with Docker Compose (Label Studio + Nginx + PostgreSQL)](#run-with-docker-compose)
 - [Install locally with pip](#install-locally-with-pip)
+- [Install locally with poetry](#install-locally-with-poetry)
 - [Install locally with Anaconda](#install-locally-with-anaconda)
 - [Install for local development](#install-for-local-development)
 - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
@@ -80,9 +81,19 @@ browser can access the MinIO server. For more detailed instructions, please refe
 
 ### Install locally with pip
 
+Label Studio can't be install with pip directly. You should install it with poetry. 
+
+
+### Install locally with poetry
+
+```bash
+
+### Install locally with poetry
+pip install poetry
+
 ```bash
 # Requires Python >=3.8
-pip install label-studio
+poetry install label-studio
 
 # Start the server at http://localhost:8080
 label-studio
@@ -94,16 +105,18 @@ label-studio
 conda create --name label-studio
 conda activate label-studio
 conda install psycopg2
-pip install label-studio
+pip install poetry
+poetry install label-studio
 ```
 
 ### Install for local development
 
-You can run the latest Label Studio version locally without installing the package with pip. 
+You can run the latest Label Studio version locally without installing the package from pypi. 
 
 ```bash
 # Install all package dependencies
-pip install -e .
+pip install poetry
+poetry install .
 # Run database migrations
 python label_studio/manage.py migrate
 python label_studio/manage.py collectstatic
@@ -124,12 +137,6 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 
 For information about updating the frontend, see [label-studio/web/README.md](https://github.com/HumanSignal/label-studio/blob/develop/web/README.md#usage-instructions).
 
-### Troubleshoot installation
-If you see any errors during installation, try to rerun the installation
-
-```bash
-pip install --ignore-installed label-studio
-```
 
 #### Install dependencies on Windows 
 To run Label Studio on Windows, download and install the following wheel packages from [Gohlke builds](https://www.lfd.uci.edu/~gohlke/pythonlibs) to ensure you're using the correct version of Python:
@@ -143,14 +150,15 @@ pip install -U pip
 pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 
 # Install label studio
-pip install label-studio
+pip install poetry
+poetry install label-studio
 ```
 
 ### Run test suite
 To add the tests' dependencies to your local install:
 
 ```bash
-pip install -r deploy/requirements-test.txt
+poetry install --with test
 ```
 
 Alternatively, it is possible to run the unit tests from a Docker container in which the test dependencies are installed:
