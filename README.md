@@ -81,7 +81,7 @@ browser can access the MinIO server. For more detailed instructions, please refe
 
 ### Install locally with pip
 
-Label Studio can't be install with pip directly. You should install it with poetry. 
+Label Studio can't be installed with pip directly. You should install it with poetry. 
 
 
 ### Install locally with poetry
