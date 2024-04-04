@@ -549,18 +549,15 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
 
     project_id = queryset.project.id if project_exists else None
 
-    if project_id is None:
+    if project_id is None or not is_lse_project or not has_custom_agreement_queryset:
         return base_annotate_completed_at(queryset)
 
-    lse_project = (
-        fast_first(
-            LseProject.objects.filter(project_id=project_id).values(
-                'agreement_threshold', 'max_additional_annotators_assignable'
-            )
+    lse_project = fast_first(
+        LseProject.objects.filter(project_id=project_id).values(
+            'agreement_threshold', 'max_additional_annotators_assignable'
         )
-        if is_lse_project
-        else None
     )
+
     agreement_threshold = lse_project['agreement_threshold'] if lse_project else None
     if not lse_project or not agreement_threshold:
         # This project doesn't use task_agreement so don't consider it when determining completed_at
