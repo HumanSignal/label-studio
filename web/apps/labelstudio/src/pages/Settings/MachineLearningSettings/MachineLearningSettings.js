@@ -112,8 +112,14 @@ export const MachineLearningSettings = () => {
             footer={(
               <div>
                 Need help?
-                <br />
-                <a>Learn more about connecting models in our docs</a>
+                <br/>
+                <a
+                  href="https://labelstud.io/guide/ml"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more about connecting models in our docs
+                </a>
               </div>
             )}
           />
@@ -141,7 +147,17 @@ export const MachineLearningSettings = () => {
             <br />
             <br />
             Additionally, you can configure the system to use this model for
-            fetching live predictions in the Labeling Stream and Quickview on the <i>Annotation</i> tab.
+            fetching live predictions in {' '}
+            <a
+              style={{color: 'unset', textDecoration: 'underline'}}
+              target="_blank" href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
+            ><i>Label&nbsp;All&nbsp;Tasks</i></a>{' '}
+            and{' '}
+            <a
+              style={{ color: 'unset', textDecoration: 'underline' }}
+              target="_blank" href="https://labelstud.io/guide/get_started#Interface"
+            ><i>Quick view</i></a>{' '}
+            on the <i>Annotation</i> tab.
           </Description>
         )}
 

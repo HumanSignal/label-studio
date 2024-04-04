@@ -78,7 +78,7 @@ const BackendCard = ({
         <div>
           <BackendState backend={backend} />
           <div className={rootClass.elem('title')}>
-            <b>{backend.title}</b>
+            {backend.title}
           </div>
         </div>
 

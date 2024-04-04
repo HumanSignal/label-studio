@@ -47,7 +47,7 @@ export const PredictionsSettings = () => {
         {loaded && versions.length > 0 && (
           <div>
             <Elem name={'title'}>Predictions List</Elem>
-            <Description class="desc">
+            <Description style={{ marginTop: '1em' }}>
               List of predictions available in the project.
               Each card is associated with a separate model version.
               To learn about how to import predictions,{' '}
