@@ -327,10 +327,12 @@ export default types
       if (self.hasInterface('submit', 'update', 'review')) {
         hotkeys.addNamed('annotation:submit', () => {
           const annotationStore = self.annotationStore;
-
-          if (annotationStore.viewingAll) return;
-
+          const shouldDenyEmptyAnnotation = self.hasInterface('annotations:deny-empty');
           const entity = annotationStore.selected;
+          const areResultsEmpty = entity.results.length === 0;
+
+          if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
+          if (annotationStore.viewingAll) return;
 
           entity?.submissionInProgress();
 
