@@ -91,7 +91,6 @@ Label Studio can't be install with pip directly. You should install it with poet
 ### Install locally with poetry
 pip install poetry
 
-```bash
 # Requires Python >=3.8
 poetry install label-studio
 
