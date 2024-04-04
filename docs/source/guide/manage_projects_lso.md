@@ -1,6 +1,6 @@
 ---
 title: Manage projects in Label Studio
-short: Manage projects in Label Studio
+short: Manage projects
 tier: opensource
 type: guide
 order: 116
