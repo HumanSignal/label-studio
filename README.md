@@ -81,13 +81,18 @@ browser can access the MinIO server. For more detailed instructions, please refe
 
 ### Install locally with pip
 
-Label Studio can't be installed with pip directly. You should install it with poetry. 
+Label Studio can be installed with pip, however it's recommended to use poetry to avoid dependency conflicts. 
 
+```bash
+pip install label-studio
+
+# Start the server at http://localhost:8080
+label-studio
+```
 
 ### Install locally with poetry
 
 ```bash
-
 ### Install locally with poetry
 pip install poetry
 
@@ -104,8 +109,7 @@ label-studio
 conda create --name label-studio
 conda activate label-studio
 conda install psycopg2
-pip install poetry
-poetry install label-studio
+pip install label-studio
 ```
 
 ### Install for local development
@@ -115,7 +119,7 @@ You can run the latest Label Studio version locally without installing the packa
 ```bash
 # Install all package dependencies
 pip install poetry
-poetry install .
+poetry install
 # Run database migrations
 python label_studio/manage.py migrate
 python label_studio/manage.py collectstatic
@@ -149,8 +153,7 @@ pip install -U pip
 pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 
 # Install label studio
-pip install poetry
-poetry install label-studio
+pip install label-studio
 ```
 
 ### Run test suite
