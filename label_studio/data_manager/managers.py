@@ -6,6 +6,7 @@ from datetime import datetime
 
 import ujson as json
 from core.feature_flags import flag_set
+from core.utils.db import fast_first
 from data_manager.prepare_params import ConjunctionEnum
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -538,9 +539,17 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-    project_id = queryset[0].project_id
+    project_id = queryset.project.id if hasattr(queryset, 'project') and queryset.project is not None else None
 
-    lse_project = LseProject.objects.filter(project_id=project_id).first() if LseProject and project_id else None
+    lse_project = (
+        fast_first(
+            LseProject.objects.filter(project_id=project_id).values(
+                'agreement_threshold', 'max_additional_annotators_assignable'
+            )
+        )
+        if LseProject and project_id
+        else None
+    )
     agreement_threshold = lse_project.agreement_threshold if lse_project else None
     if not lse_project or not agreement_threshold:
         # This project doesn't use task_agreement so don't consider it when determining completed_at
