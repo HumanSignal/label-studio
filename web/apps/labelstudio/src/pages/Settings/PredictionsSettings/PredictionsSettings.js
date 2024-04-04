@@ -45,9 +45,9 @@ export const PredictionsSettings = () => {
         {loading && <Spinner size={32} />}
 
         {loaded && versions.length > 0 && (
-          <div>
-            <Elem name={'title'}>Predictions List</Elem>
-            <Description style={{ marginTop: '1em' }}>
+          <Elem name="title-block">
+            <Elem name="title">Predictions List</Elem>
+            <Description  style={{ marginTop: '1em' }}>
               List of predictions available in the project.
               Each card is associated with a separate model version.
               To learn about how to import predictions,{' '}
@@ -57,7 +57,7 @@ export const PredictionsSettings = () => {
                   rel="noreferrer"
                 >see&nbsp;the&nbsp;documentation</a>.
             </Description>
-          </div>
+          </Elem>
         )}
 
         {loaded && versions.length === 0 && (

@@ -60,13 +60,6 @@
         }
       }
     },
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/labelstudio/**/*.{ts,tsx,js,jsx}"]
-      }
-    },
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
