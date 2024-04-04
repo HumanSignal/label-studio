@@ -135,7 +135,7 @@ export const MachineLearningSettings = () => {
         <Divider height={32} />
 
         {backends.length > 0 && (
-          <Description style={{ marginTop: 0, maxWidth: 680, lineHeight:'1.5em' }}>
+          <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: "1.5em" }}>
             A connected model has been detected! If you wish to fetch
             predictions from this model, please follow these steps:
             <br />

@@ -6,7 +6,7 @@ import truncate from 'truncate-middle';
 import { Button, Dropdown, Menu } from '../../../components';
 import { confirm } from '../../../components/Modal/Modal';
 import { Oneof } from '../../../components/Oneof/Oneof';
-import {Tooltip} from "../../../components/Tooltip/Tooltip";
+import { Tooltip } from "../../../components/Tooltip/Tooltip";
 import { ApiContext } from '../../../providers/ApiProvider';
 import { Block, cn } from '../../../utils/bem';
 
