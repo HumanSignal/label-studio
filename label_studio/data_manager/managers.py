@@ -510,25 +510,25 @@ class GroupConcat(Aggregate):
         super().__init__(expression, distinct='DISTINCT ' if distinct else '', output_field=output_field, **extra)
 
 
-def newest_annotation_subquery():
+def newest_annotation_subquery() -> Subquery:
     from tasks.models import Annotation
 
-    return Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
+    newest_annotations = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
+    return Subquery(newest_annotations.values('created_at'))
 
 
-def base_annotate_completed_at(queryset):
-    newest = newest_annotation_subquery()
-    return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
+def base_annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
+    return queryset.annotate(completed_at=Case(When(is_labeled=True, then=newest_annotation_subquery())))
 
 
-def annotate_completed_at(queryset):
+def annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-    if (
-        get_tasks_agreement_queryset
-        and LseProject
-        and flag_set('fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto')
+    is_lse_project = LseProject and get_tasks_agreement_queryset
+
+    if is_lse_project and flag_set(
+        'fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto'
     ):
         return annotated_completed_at_considering_agreement_threshold(queryset)
 
@@ -539,7 +539,13 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-    project_id = queryset.project.id if hasattr(queryset, 'project') and queryset.project is not None else None
+    is_lse_project = LseProject and get_tasks_agreement_queryset
+    project_exists = is_lse_project and hasattr(queryset, 'project') and queryset.project is not None
+
+    project_id = queryset.project.id if project_exists else None
+
+    if project_id is None:
+        return base_annotate_completed_at(queryset)
 
     lse_project = (
         fast_first(
@@ -555,7 +561,6 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
         # This project doesn't use task_agreement so don't consider it when determining completed_at
         return base_annotate_completed_at(queryset)
 
-    newest_annotation = newest_annotation_subquery()
     queryset = get_tasks_agreement_queryset(queryset) if get_tasks_agreement_queryset else queryset
     max_additional_annotators_assignable = lse_project['max_additional_annotators_assignable']
 
@@ -567,7 +572,7 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
                 Q(_agreement__gte=agreement_threshold)
                 | Q(annotation_count__gte=(F('overlap') + max_additional_annotators_assignable))
             ),
-            then=Subquery(newest_annotation.values('created_at')),
+            then=newest_annotation_subquery(),
         ),
         default=Value(None),
         output_field=DateTimeField(),
