@@ -147,16 +147,16 @@ export const MachineLearningSettings = () => {
             <br />
             <br />
             Additionally, you can configure the system to use this model for
-            fetching live predictions in {' '}
+            fetching live predictions in {" "}
             <a
-              style={{color: 'unset', textDecoration: 'underline'}}
+              style={{ color: "unset", textDecoration: "underline" }}
               target="_blank" href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
-            ><i>Label&nbsp;All&nbsp;Tasks</i></a>{' '}
-            and{' '}
+            ><i>Label&nbsp;All&nbsp;Tasks</i></a>{" "}
+            and{" "}
             <a
-              style={{ color: 'unset', textDecoration: 'underline' }}
+              style={{ color: "unset", textDecoration: "underline" }}
               target="_blank" href="https://labelstud.io/guide/get_started#Interface"
-            ><i>Quick view</i></a>{' '}
+            ><i>Quick View</i></a>{" "}
             on the <i>Annotation</i> tab.
           </Description>
         )}
