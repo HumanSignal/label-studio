@@ -151,7 +151,7 @@ After you start labeling, enable **Auto-Annotation** to see and use the smart op
    
 For image labeling, after you enable auto-annotation you can choose whether to **Auto accept annotation suggestions**. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once.
 
-<br/><img src="/images/release-130/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
+<br/><img src="/images/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
    
 ### Delete predictions 
 
