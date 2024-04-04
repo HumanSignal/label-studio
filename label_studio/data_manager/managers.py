@@ -525,7 +525,7 @@ def annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-    is_lse_project = LseProject and get_tasks_agreement_queryset
+    is_lse_project = bool(LseProject and get_tasks_agreement_queryset)
 
     if is_lse_project and flag_set(
         'fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto'
@@ -539,7 +539,7 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-    is_lse_project = LseProject and get_tasks_agreement_queryset
+    is_lse_project = bool(LseProject and get_tasks_agreement_queryset)
     project_exists = is_lse_project and hasattr(queryset, 'project') and queryset.project is not None
 
     project_id = queryset.project.id if project_exists else None
