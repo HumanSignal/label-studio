@@ -8,7 +8,7 @@ order_enterprise: 122
 meta_title: Use the Data Manager in projects
 meta_description: Manage, filter, and sort project data for your labeling project.
 section: "Create & Manage Projects"
-parent: "manage_projects"
+parent: "manage_projects_lso"
 parent_enterprise: "manage_projects" 
 
 ---
