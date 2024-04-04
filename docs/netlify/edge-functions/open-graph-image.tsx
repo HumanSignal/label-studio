@@ -13,10 +13,11 @@ const enterpriseBackground = `url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA
 export default async function handler(req: Request) {
   const { searchParams } = new URL(req.url);
   const title = searchParams.get("title") || "";
+  const themeParam = searchParams.get("theme") || undefined;
   let category = searchParams.get("category") || "Docs";
   category = category === "guide" ? "docs" : category;
 
-  const theme = req.url.includes("humansignal.com") ? "enterprise" : "opensource";
+  const theme = themeParam || req.url.includes("humansignal.com") ? "enterprise" : "opensource";
   
   const fontData = await font;
 
@@ -73,5 +74,4 @@ export default async function handler(req: Request) {
 export const config = {
   path: "/open-graph-image",
   onError: "/images/og-default-ls.png",
-  cache: "manual",
 };
