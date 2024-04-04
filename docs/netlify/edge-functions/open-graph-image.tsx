@@ -74,5 +74,4 @@ export default async function handler(req: Request) {
 export const config = {
   path: "/open-graph-image",
   onError: "/images/og-default-ls.png",
-  cache: "manual",
 };
