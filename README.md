@@ -81,8 +81,6 @@ browser can access the MinIO server. For more detailed instructions, please refe
 
 ### Install locally with pip
 
-Label Studio can be installed with pip, however it's recommended to use poetry to avoid dependency conflicts. 
-
 ```bash
 pip install label-studio
 
@@ -93,11 +91,15 @@ label-studio
 ### Install locally with poetry
 
 ```bash
-### Install locally with poetry
+# activate virtual environment and install poetry
+python3 -m venv .venv
+source .venv/bin/activate
 pip install poetry
 
-# Requires Python >=3.8
-poetry install label-studio
+### set poetry environment
+poetry new my-label-studio
+cd my-label-studio
+poetry add label-studio
 
 # Start the server at http://localhost:8080
 label-studio
