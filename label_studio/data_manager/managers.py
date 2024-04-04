@@ -517,7 +517,7 @@ def newest_annotation_subquery():
 
 def base_annotate_completed_at(queryset):
     newest = newest_annotation_subquery()
-    return queryset.annotate(completed_at=Subquery(newest.values('created_at')))
+    return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
 
 
 def annotate_completed_at(queryset):
@@ -538,9 +538,7 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     LseProject = load_func(settings.LSE_PROJECT)
     get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
 
-    project_id = None
-    if queryset.project is not None:
-        project_id = queryset.project.id
+    project_id = queryset[0].project_id
 
     lse_project = LseProject.objects.filter(project_id=project_id).first() if LseProject and project_id else None
     agreement_threshold = lse_project.agreement_threshold if lse_project else None
