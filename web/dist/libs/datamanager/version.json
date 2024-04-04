@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-828/empty-text-fields'",
-  "commit": "81b2c70d08f7840f69f9df998d79edc122453c67",
-  "date": "2024-04-03T12:01:19.000Z",
-  "branch": "fb-leap-828/empty-text-fields"
+  "message": "Merge branch 'fb-leap-856/deny-empty' of ssh://github.com/heartexlabs/label-studio into fb-leap-856/deny-empty",
+  "commit": "f101a29d79597af4df007cac70f34d7ed36f90be",
+  "date": "2024-04-03T12:41:08.000Z",
+  "branch": "fb-leap-856/deny-empty"
 }
