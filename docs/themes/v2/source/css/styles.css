@@ -410,6 +410,15 @@ main {
   left: -1px;
 }
 
+@media (max-width: 700px) {
+  .content {
+    padding-top: 1rem;
+  }
+  .content-decoration {
+    display: none;
+  }
+}
+
 .page-sidebar {
   --color-accent: var(--color-blue-400);
 
