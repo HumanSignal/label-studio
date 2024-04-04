@@ -1,6 +1,6 @@
 {
-  "message": "Merge remote-tracking branch 'origin/develop' into fb-optic-591",
-  "commit": "1dcdd169df8071f971df1be05d557c1f18f83804",
-  "date": "2024-04-03T21:07:25.000Z",
-  "branch": "fb-optic-591"
+  "message": "Merge branch 'fb-leap-856/deny-empty' of ssh://github.com/heartexlabs/label-studio into fb-leap-856/deny-empty",
+  "commit": "f101a29d79597af4df007cac70f34d7ed36f90be",
+  "date": "2024-04-03T12:41:08.000Z",
+  "branch": "fb-leap-856/deny-empty"
 }
