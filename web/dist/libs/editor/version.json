@@ -1,6 +1,6 @@
 {
-  "message": "refactor: OPTIC-482: Archive feature flag fflag_feat_optic_2_ensure_draft_saved_short",
-  "commit": "c929309d2bd70fa7bba97e4d46ea2202bf3a2dd5",
-  "date": "2024-04-03T23:16:21.000Z",
+  "message": "Merge branch 'develop' into 'fb-optic-482/archive-feature-flag-fflag_feat_optic_2_ensure_draft_saved_short'",
+  "commit": "6e638bbb8e1b31067a624eae7ed2630bc00c2703",
+  "date": "2024-04-04T16:23:36.000Z",
   "branch": "fb-optic-482/archive-feature-flag-fflag_feat_optic_2_ensure_draft_saved_short"
 }
