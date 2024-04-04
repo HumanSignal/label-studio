@@ -57,11 +57,25 @@ export const AnnotationSettings = () => {
 
           <Form.Row columnCount={1} style={{ borderTop: '1px solid #f1f1f1' }}>
             <br />
-            <Elem name={'header'}>Pre-labeling</Elem>
+            <Elem name={'header'}>Live Predictions</Elem>
             <div>
               <Toggle
-                label="Use predictions to pre-label data"
-                description="Enable and select which set of predictions to use for prelabeling."
+                label="Use predictions to pre-label tasks"
+                description={
+                  <span>
+                    Enable and select which set of predictions to use for prelabeling.
+                    Predictions will be pre-loaded in {" "}
+                    <a
+                      style={{ color: "rgb(105 129 185)" }}
+                      target="_blank" href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
+                    >Label&nbsp;All&nbsp;Tasks</a>{" "}
+                    and {" "}
+                    <a
+                      style={{ color: "rgb(105 129 185)" }}
+                      target="_blank" href="https://labelstud.io/guide/get_started#Interface"
+                    >Quick View</a>.
+                  </span>
+                }
                 name="show_collab_predictions"
                 onChange={(e) => {
                   setCollab(e.target.checked);

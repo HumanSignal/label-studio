@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'fb-leap-856/deny-empty' of ssh://github.com/heartexlabs/label-studio into fb-leap-856/deny-empty",
-  "commit": "f101a29d79597af4df007cac70f34d7ed36f90be",
-  "date": "2024-04-03T12:41:08.000Z",
-  "branch": "fb-leap-856/deny-empty"
+  "message": "Merge branch 'develop' into 'fb-HUMSIG-37-visuals'",
+  "commit": "309851f803a1995c36b11f416f80cff709b6be2f",
+  "date": "2024-04-04T16:34:09.000Z",
+  "branch": "fb-HUMSIG-37-visuals"
 }

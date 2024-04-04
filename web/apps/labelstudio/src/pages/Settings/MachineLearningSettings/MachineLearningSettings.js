@@ -112,8 +112,14 @@ export const MachineLearningSettings = () => {
             footer={(
               <div>
                 Need help?
-                <br />
-                <a>Learn more about connecting models in our docs</a>
+                <br/>
+                <a
+                  href="https://labelstud.io/guide/ml"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more about connecting models in our docs
+                </a>
               </div>
             )}
           />
@@ -129,20 +135,29 @@ export const MachineLearningSettings = () => {
         <Divider height={32} />
 
         {backends.length > 0 && (
-          <Description style={{ marginTop: 0, maxWidth: 680 }}>
+          <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: "1.5em" }}>
             A connected model has been detected! If you wish to fetch
             predictions from this model, please follow these steps:
             <br />
             <br />
             1. Navigate to the <i>Data Manager</i>.<br />
-            2. Select the desired tasks.
-            <br />
-            3. Click on <i>Retrieve model predictions</i> from the{' '}
+            2. Select the desired tasks.<br />
+            3. Click on <i>Batch predictions</i> from the{' '}
             <i>Actions</i> menu.
             <br />
             <br />
             Additionally, you can configure the system to use this model for
-            fetching live predictions in the <i>Annotation</i> tab.
+            fetching live predictions in {" "}
+            <a
+              style={{ color: "unset", textDecoration: "underline" }}
+              target="_blank" href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
+            ><i>Label&nbsp;All&nbsp;Tasks</i></a>{" "}
+            and{" "}
+            <a
+              style={{ color: "unset", textDecoration: "underline" }}
+              target="_blank" href="https://labelstud.io/guide/get_started#Interface"
+            ><i>Quick View</i></a>{" "}
+            on the <i>Annotation</i> tab.
           </Description>
         )}
 
