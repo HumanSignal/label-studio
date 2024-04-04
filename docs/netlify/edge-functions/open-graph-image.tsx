@@ -16,7 +16,7 @@ export default async function handler(req: Request) {
   let category = searchParams.get("category") || "Docs";
   category = category === "guide" ? "docs" : category;
 
-  const theme = req.url.includes("humansignal.com") ? "enterprise" : "opensource"
+  const theme = req.url.includes("humansignal.com") ? "enterprise" : "opensource";
   
   const fontData = await font;
 
@@ -39,7 +39,7 @@ export default async function handler(req: Request) {
           textTransform: "uppercase",
           letterSpacing: "0.1em",
           borderRadius: "6px",
-          background: theme === "enterprise" ? "#262522" : "none",
+          backgroundColor: theme === "enterprise" ? "#262522" : "none",
           border: theme === "enterprise" ? "none" : "1.5px #E37BD3 solid",
           padding: "6px 12px"
         }}>{category}</p>
