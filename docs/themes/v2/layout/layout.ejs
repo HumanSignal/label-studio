@@ -5,7 +5,7 @@
 
 <% var defaultSeo = {
   description: "Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.",
-  ogImage: isEnterpriseTheme ? "enterprise-OG-default.png" : "docs-OG-default.png"
+  ogImage: isEnterpriseTheme ? "og-default-enterprise.png" : "og-default-ls.png"
 } %>
 
 <!DOCTYPE html>
@@ -64,14 +64,12 @@
   <% } %>
   <meta name="twitter:description" content="<%- page.meta_description ? page.meta_description : defaultSeo.description %>">
 
-  <% if (page.image) { %>
-    <meta property="og:image" content="https://<%- config.theme_config.root_domain %><%- page.image %>" />
-    <meta name="thumbnail" content="https://<%- config.theme_config.root_domain %><%- page.image %>"/>
-    <meta name="twitter:image" content="https://<%- config.theme_config.root_domain %><%- page.image %>"/>
+  <% if (page.title) { %>
+    <meta name="twitter:image" content="http://<%- config.theme_config.root_domain %>/open-graph-image?title=<%- encodeURIComponent(page.title) %>&category=<%- path.split('/')[0] %>"/>
+    <meta property="og:image" content="http://<%- config.theme_config.root_domain %>/open-graph-image?title=<%- encodeURIComponent(page.title) %>&category=<%- path.split('/')[0] %>"/>
   <% } else { %>
-    <meta name="twitter:image" content="https://<%- config.theme_config.root_domain %>/images/<%- defaultSeo.ogImage %>"/>
-    <meta name="thumbnail" content="https://<%- config.theme_config.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
     <meta property="og:image" content="https://<%- config.theme_config.root_domain %>/images/<%- defaultSeo.ogImage %>" />
+    <meta name="twitter:image" content="https://<%- config.theme_config.root_domain %>/images/<%- defaultSeo.ogImage %>"/>
   <% } %>
 
   <meta name="msapplication-TileColor" content="#4fc08d">
