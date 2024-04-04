@@ -28,6 +28,7 @@ export default async function handler(req: Request) {
           height: '630px',
           display: 'flex',
           flexDirection: "column",
+          alignItems: "flex-start",
           paddingTop: '55px',
           paddingLeft: '70px',
           background: theme === "enterprise" ? enterpriseBackground : openSourceBackground
