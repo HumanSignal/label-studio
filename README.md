@@ -82,6 +82,7 @@ browser can access the MinIO server. For more detailed instructions, please refe
 ### Install locally with pip
 
 ```bash
+# Requires Python >=3.8
 pip install label-studio
 
 # Start the server at http://localhost:8080
