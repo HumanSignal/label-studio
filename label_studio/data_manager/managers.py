@@ -550,14 +550,14 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
         if LseProject and project_id
         else None
     )
-    agreement_threshold = lse_project.agreement_threshold if lse_project else None
+    agreement_threshold = lse_project['agreement_threshold'] if lse_project else None
     if not lse_project or not agreement_threshold:
         # This project doesn't use task_agreement so don't consider it when determining completed_at
         return base_annotate_completed_at(queryset)
 
     newest_annotation = newest_annotation_subquery()
     queryset = get_tasks_agreement_queryset(queryset) if get_tasks_agreement_queryset else queryset
-    max_additional_annotators_assignable = lse_project.max_additional_annotators_assignable
+    max_additional_annotators_assignable = lse_project['max_additional_annotators_assignable']
 
     completed_at_case = Case(
         When(
