@@ -1131,7 +1131,7 @@ ul {
 }
 
 .make-intense-zoom {
-  cursor: url("/images/plus_cursor.svg") 25 25, auto;
+  cursor: url("/images/design/plus_cursor.svg") 25 25, auto;
 }
 
 .toc {
@@ -1204,7 +1204,7 @@ ul {
   margin-top: 2em;
   padding: 1.5em 2em;
   color: var(--color-gray-900);
-  background: url("/images/gradient.svg");
+  background: url("/images/design/gradient.svg");
   background-size: cover;
   width: var(--toc-size);
   display: flex;
