@@ -70,7 +70,7 @@ def predict(self, tasks, context, **kwargs):
 The `predict` method is used to make predictions for the tasks. It uses the following:
 
 - `tasks`: [Label Studio tasks in JSON format](task_format)
-- `context`: [Label Studio context in JSON format](https://labelstud.io/guide/ml.html#Passing-data-to-ML-backend) - for an interactive labeling scenario
+- `context`: [Label Studio context in JSON format](#Support-interactive-pre-annotations-in-your-ML-backend) - for an interactive labeling scenario
 - `predictions`: [Predictions array in JSON format](export#Raw-JSON-format-of-completed-tasks)
 
 Once you implement the `predict` method, you can see predictions from the connected ML backend in Label Studio.
