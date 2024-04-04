@@ -38,13 +38,21 @@ For information on setting up the labeling interface, see [Labeling configuratio
 
 Use these settings to configure what options annotators will see and how their labeling tasks are assigned. 
 
-### Instructions
+<dl>
+
+<dt>Instructions</dt>
+
+<dd>
 
 Specify instructions to show the annotators. This field accepts HTML formatting. 
 
 Enable **Show before labeling** to display a pop-up message to annotators when they enter the label stream. If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface. 
 
-### Distribute Labeling Tasks
+</dd>
+
+<dt id="distribute-tasks">Distribute Labeling Tasks</dt>
+
+<dd>
 
 Select how you want to distribute tasks to annotators for labeling. 
 
@@ -53,7 +61,11 @@ Select how you want to distribute tasks to annotators for labeling.
 | **Auto**         | Annotators are automatically assigned to tasks, and the option to manually assign annotators is disabled. Automatic assignments are distributed to all users with the Annotator role who are project [members](#Members) <br /><br />You can further define the automatic assignment workflow in the [**Quality** settings](#Quality).  |
 | **Manual** | You must [manually assign](manage_data#Assign-annotators-to-tasks) annotators to tasks. Annotators are not be able to view any labeling tasks until they have those tasks manually assigned to them. |
 
-### Skip Queue
+</dd>
+
+<dt>Skip Queue</dt>
+
+<dd>
 
 Select how you want to handle skipped tasks. To disallow skipped tasks, you can hide the **Skip** action under the **Annotating Options** section (see below).
 
@@ -123,7 +135,11 @@ Unlike the other skip queue options, in this case skipped tasks are marked as Co
 </tr>
 </table>
 
-### Annotating Options
+</dd>
+
+<dt id="annotating-options">Annotating Options</dt>
+
+<dd>
 
 Configure additional settings for annotators. 
 
@@ -135,7 +151,11 @@ Configure additional settings for annotators.
 | **Reveal pre-annotations interactively** | When enabled, pre-annotations are not automatically displayed to an annotator. Instead, annotators can choose when to reveal these pre-annotations as they work on the task, providing them with the opportunity to first assess the image or text without the influence of the model's predictions. |
 | **Annotators must leave a comment on skip** | When enabled, annotators are required to leave a comment when skipping a task. |
 
-### Task Sampling
+</dd>
+
+<dt id="task-sampling">Task Sampling</dt>
+
+<dd>
 
 Configure the order in which tasks are presented to annotators.  
 
@@ -145,18 +165,30 @@ Configure the order in which tasks are presented to annotators.
 | **Sequential Sampling** | Tasks are shown to annotators in the same order that they appear on the Data Manager. |
 | **Uniform Sampling** | Tasks are shown in random order.  |
 
+</dd>
+
+</dl>
+
 
 ## Review
 
 Use these settings to configure what options reviewers will see. 
 
-### Instructions
+<dl>
+
+<dt>Instructions</dt>
+
+<dd>
 
 Specify instructions to show the reviewers. This field accepts HTML formatting. 
 
 Enable **Show before reviewing** to display a pop-up message to reviewers when they enter the label stream. If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface.  
 
-### Reviewing Options
+</dd>
+
+<dt id="reviewing-options">Reviewing Options</dt>
+
+<dd>
 
 Configure additional settings for reviewers.
 
@@ -268,7 +300,13 @@ If reviewers can view the Data Manager, this setting controls whether they can a
 
 ## Quality
 
-### Overlap of Annotations
+Use these settings to determine task completeness and agreement metrics. 
+
+<dl>
+
+<dt id="overlap">Overlap of Annotations</dt>
+
+<dd>
 
 !!! note
     Overlap settings only apply when the project is using Auto distribution mode. If you are using Manual distribution mode, all tasks must be manually assigned - meaning that you are also manually determining overlap.  
@@ -292,17 +330,93 @@ The following options supersede what you specified under [**Annotations > Task S
 | **Show tasks with overlap first**         | If your overlap enforcement is less than 100% (meaning that only some tasks require multiple annotators), then the tasks that *do* require multiple annotations are shown first. <br /><br />If your overlap is 100%, then this setting has no effect.   |
 | **Show tasks with ground truth labels first** | Prioritize tasks that already have a ground truth label. |
 
-### Annotation Agreement
+</dd>
 
-Annotation statistics such as annotator consensus are calculated using an agreement metric. If you want the agreement metric to calculate annotation or prediction agreement by requiring exact matching choices, choose that option in the annotation settings. 
+<dt id="task-agreement">Task Agreement</dt>
 
-For more information, see [Annotation agreement and how it is calculated](stats). 
+<dd>
 
-### Custom weights
+When multiple annotators are labeling a task, the task agreement reflects how much agreement there is between annotators. 
 
-Set custom weights for tags and labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
+For example, if 10 annotators review a task and only 2 select the same choice, then that task would have a low agreement score.  
+
+You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Task agreement and how it is calculated](stats). 
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+**Agreement metric**
+</td>
+<td>
+
+Select the [metric](stats#Available-agreement-metrics) that should determine task agreement.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Low agreement strategy**
+</td>
+<td>
+
+You can set a low agreement strategy to ensure that a task is not marked complete until it meets 1) the required [overlap](#overlap) and 2) a minimum agreement level.  
+
+* **Do nothing** - Tasks with a low agreement can be marked complete; no additional actions are taken. 
+* **Assign additional annotator** - Automatically assign an additional annotator to tasks with low agreement. 
+
+    Note that your project must be set up to [automatically distribute tasks](#distribute-tasks).
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Desired agreement threshold**
+</td>
+<td>
+
+Enter the agreement threshold as a percentage (1-100) that a task must have before it can be considered complete.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Maximum additional annotators**
+</td>
+<td>
+
+Enter a maximum number of annotators that can be automatically assigned to the task. If left blank, there is no limit to additional annotators.
+
+Annotators are assigned one at a time until the agreement threshold is achieved. 
+
+</td>
+</tr>
+</table>
+
+!!! note
+    When configuring **Maximum additional annotators**, be mindful of the number of annotators available in your project. If you have fewer annotators available than the sum of [**Annotations per task minimum**](#overlap) + **Maximum additional annotators**, you might encounter a scenario in which a task with a low agreement score cannot be marked complete.
+
+</dd>
+
+<dt>Custom weights</dt>
+
+<dd>
+
+Set custom weights for labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
 
 Weights set to zero are ignored from calculation.
+
+</dd>
+</dl>
 
 ## Members
 
@@ -316,7 +430,7 @@ Some users cannot be added or removed from the Members page at the project level
 
 * If you have [Manual distribution](#distribute-tasks) enabled, you need to add users with the Annotator role as project members before you can assign them to tasks. And if you have [**Review only manually assigned tasks**](#reviewing-options) enabled, the users with the Reviewer role must also be project members before they can be assigned to tasks. 
 
-### Project-level roles
+#### Project-level roles
 
 Project-level roles are Annotator and Reviewer. 
 
@@ -335,7 +449,11 @@ To assign a project-level role, first add the person to your project. Once added
 
 Click **Add Model** to connect an machine learning (ML) backend to your project. For more information about using ML backends, see [Machine learning integration](ml).
 
-### ML-Assisted Labeling
+<dl>
+
+<dt>ML-Assisted Labeling</dt>
+
+<dd>
 
 | Field          | Description    |
 | ------------- | ------------ |
@@ -343,20 +461,24 @@ Click **Add Model** to connect an machine learning (ML) backend to your project.
 | **Retrieve predictions when loading a task automatically** | When enabled, Label Studio automatically fetches predictions from the connected ML backend for each task as it is loaded by an annotator. This means that when an annotator navigates to a new task, Label Studio sends a request to the ML backend to retrieve any available predictions for that task, which are then displayed to the annotator. <br /><br />When disabled, someone must manually retrieve predictions. This can be done in using the **Actions** menu in the Data Manager.  |
 | **Show predictions to annotators in the Label Stream and Quick View** | When enabled, predictions are shown to annotators during the labeling process. This is enabled by default.<br /><br />Disable this option to hide predictions from annotators. For example, you might want to hide predictions to prevent bias. |
 
-### Model Version
+</dd>
+
+<dt>Model Version</dt>
+
+<dd>
 
 If you have multiple versions, you can select which version is used to generate predictions. 
+
+</dd>
+
+</dl>
 
 ## Cloud storage
 
 This is where you connect Label Studio to a cloud storage provider:
 
-### Source Cloud Storage
-
-This is where the source data for your project is saved. When you sync your source storage, Label Studio retrieves data to be annotated. 
-
-### Target Cloud Storage
-This is where your annotations are saved. When you sync your target storage, annotations are sent from Label Studio to the target storage location. 
+* **Source Cloud Storage**--This is where the source data for your project is saved. When you sync your source storage, Label Studio retrieves data to be annotated. 
+* **Target Cloud Storage**--This is where your annotations are saved. When you sync your target storage, annotations are sent from Label Studio to the target storage location. 
 
 For more information, see [Sync data from external storage](storage). 
 
@@ -369,14 +491,13 @@ You can use webhooks to integration third-party applications. For more informati
 
 From here, you can access actions that result in data loss, and should be used with caution. 
 
-### Reset Cache
+* **Reset Cache** 
 
-Reset the labeling cache. This can help in situations where you are seeing validation errors concerning certain labels -- but you know that those labels do not exist. 
+    Reset the labeling cache. This can help in situations where you are seeing validation errors concerning certain labels -- but you know that those labels do not exist. 
+* **Drop All Tabs**
 
-### Drop All Tabs
+    If the Data Manager is not loading, dropping all Data Manager tabs can help.
+* **Delete Project**
 
-If the Data Manager is not loading, dropping all Data Manager tabs can help.
+    Deleting a project permanently removes all tasks, annotations, and project data from Label Studio.
 
-### Delete Project
-
-Deleting a project permanently removes all tasks, annotations, and project data from Label Studio.
