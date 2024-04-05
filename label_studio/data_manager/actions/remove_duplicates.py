@@ -69,7 +69,7 @@ def remove_duplicated_tasks(duplicates, project, queryset):
         new_root = []
         for task in root:
             # keep all tasks with annotations in safety
-            if task['total_annotations'] > 0:
+            if task['total_annotations'] + task['cancelled_annotations'] > 0:
                 one_task_saved = True
             else:
                 new_root.append(task)
@@ -112,7 +112,7 @@ def move_annotations(duplicates):
         i, first = 0, root[0]
         for i, task in enumerate(root):
             first = task
-            if task['total_annotations'] > 0:
+            if task['total_annotations'] + task['cancelled_annotations'] > 0:
                 break
 
         # move annotations to the first task
@@ -124,6 +124,7 @@ def move_annotations(duplicates):
                     f"Moved {task['total_annotations']} annotations from task {task['id']} to task {first['id']}"
                 )
                 task['total_annotations'] = 0
+                task['cancelled_annotations'] = 0
 
 
 def restore_storage_links_for_duplicated_tasks(duplicates) -> None:
