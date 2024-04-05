@@ -92,9 +92,7 @@ label-studio
 ### Install locally with poetry
 
 ```bash
-# activate virtual environment and install poetry
-python3 -m venv .venv
-source .venv/bin/activate
+### install poetry
 pip install poetry
 
 ### set poetry environment
@@ -102,7 +100,10 @@ poetry new my-label-studio
 cd my-label-studio
 poetry add label-studio
 
-# Start the server at http://localhost:8080
+### activate poetry environment
+poetry shell
+
+### Start the server at http://localhost:8080
 label-studio
 ```
 
