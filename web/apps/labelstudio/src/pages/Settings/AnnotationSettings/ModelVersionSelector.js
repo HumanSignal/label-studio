@@ -72,13 +72,10 @@ export const ModelVersionSelector = ({
   useEffect(fetchMLVersions, [fetchMLVersions]);
 
   return (
-    <>
-      <Label
-        description={
-          <>Select which predictions or which model you want to use:</>
-        }
-      />
-
+    <div>
+      <p>
+        Select which predictions or which model you want to use:
+      </p>
       <div style={{ display: 'flex', alignItems: 'center', width: 400 }}>
         <div style={{ flex: 1, paddingRight: 16 }}>
           <Select
@@ -98,6 +95,6 @@ export const ModelVersionSelector = ({
           />
         </div>
       </div>
-    </>
+    </div>
   );
 };

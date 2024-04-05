@@ -298,6 +298,8 @@ If reviewers can view the Data Manager, this setting controls whether they can a
 
 ## Quality
 
+Use these settings to determine task completeness and agreement metrics. 
+
 <dl>
 
 <dt id="overlap">Overlap of Annotations</dt>
@@ -328,13 +330,78 @@ The following options supersede what you specified under [**Annotations > Task S
 
 </dd>
 
-<dt>Annotation Agreement</dt>
+<dt id="task-agreement">Task Agreement</dt>
 
 <dd>
 
-Annotation statistics such as annotator consensus are calculated using an agreement metric. If you want the agreement metric to calculate annotation or prediction agreement by requiring exact matching choices, choose that option in the annotation settings. 
+When multiple annotators are labeling a task, the task agreement reflects how much agreement there is between annotators. 
 
-For more information, see [Annotation agreement and how it is calculated](stats). 
+For example, if 10 annotators review a task and only 2 select the same choice, then that task would have a low agreement score.  
+
+You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Task agreement and how it is calculated](stats). 
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+**Agreement metric**
+</td>
+<td>
+
+Select the [metric](stats#Available-agreement-metrics) that should determine task agreement.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Low agreement strategy**
+</td>
+<td>
+
+You can set a low agreement strategy to ensure that a task is not marked complete until it meets 1) the required [overlap](#overlap) and 2) a minimum agreement level.  
+
+* **Do nothing** - Tasks with a low agreement can be marked complete; no additional actions are taken. 
+* **Assign additional annotator** - Automatically assign an additional annotator to tasks with low agreement. 
+
+    Note that your project must be set up to [automatically distribute tasks](#distribute-tasks).
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Desired agreement threshold**
+</td>
+<td>
+
+Enter the agreement threshold as a percentage (1-100) that a task must have before it can be considered complete.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Maximum additional annotators**
+</td>
+<td>
+
+Enter a maximum number of annotators that can be automatically assigned to the task. If left blank, there is no limit to additional annotators.
+
+Annotators are assigned one at a time until the agreement threshold is achieved. 
+
+</td>
+</tr>
+</table>
+
+!!! note
+    When configuring **Maximum additional annotators**, be mindful of the number of annotators available in your project. If you have fewer annotators available than the sum of [**Annotations per task minimum**](#overlap) + **Maximum additional annotators**, you might encounter a scenario in which a task with a low agreement score cannot be marked complete.
 
 </dd>
 
@@ -342,7 +409,7 @@ For more information, see [Annotation agreement and how it is calculated](stats)
 
 <dd>
 
-Set custom weights for tags and labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
+Set custom weights for labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
 
 Weights set to zero are ignored from calculation.
 
