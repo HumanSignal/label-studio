@@ -24,7 +24,7 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 * Avoid frequent imports because each new import requires lengthy background operations. One import per 30 seconds will work without overloads.
 
 !!! warning
-    For large projects or business critical projects, do not [upload media files through the Label Studio interface](#Import-data-from-the-Label-Studio-UI). This is especially true for files such as images, audio, video, etc.  
+    For large projects or business critical projects, do not [upload media files through the Label Studio interface](#Import-data-from-the-Label-Studio-UI). This is especially true for files such as images, audio, video, timeseries, etc.  
     
     Uploading data through the Label Studio UI works fine for proof of concept projects, but it is not recommended for larger projects. You will also face challenges when you want export your data or move it to another Label Studio instance or even just redeploy Label Studio. Finally, Label Studio is not designed as a hosting service at scale and does not have backups for imported media resources. 
     
