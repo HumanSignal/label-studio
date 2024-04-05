@@ -1,4 +1,4 @@
-import { formatDistanceToNow, parseISO } from 'date-fns';
+import { formatDistanceToNow, format, parseISO } from 'date-fns';
 import { useCallback, useContext } from 'react';
 import { LsEllipsis } from '../../../assets/icons';
 
@@ -6,6 +6,7 @@ import truncate from 'truncate-middle';
 import { Button, Dropdown, Menu } from '../../../components';
 import { confirm } from '../../../components/Modal/Modal';
 import { Oneof } from '../../../components/Oneof/Oneof';
+import { Tooltip } from "../../../components/Tooltip/Tooltip";
 import { ApiContext } from '../../../providers/ApiProvider';
 import { Block, cn } from '../../../utils/bem';
 
@@ -77,46 +78,31 @@ const BackendCard = ({
         <div>
           <BackendState backend={backend} />
           <div className={rootClass.elem('title')}>
-            <b>{backend.title}</b>
+            {backend.title}
           </div>
         </div>
-        <div className={rootClass.elem('menu')}>
-          <Dropdown.Trigger
-            align="right"
-            content={(
-              <Menu size="medium" contextual>
-                <Menu.Item onClick={() => onTestRequest(backend)}>
-                  Send Test Request
-                </Menu.Item>
-                <Menu.Item onClick={() => onStartTrain(backend)}>
-                  Start Training
-                </Menu.Item>
 
-                <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
-                <Menu.Item onClick={() => confirmDelete(backend)} isDangerous>
-                  Delete
-                </Menu.Item>
-              </Menu>
-            )}
-          >
-            <Button
-              type="link"
-              icon={<LsEllipsis />}
-              style={{ padding: '15px' }}
-            />
+        <div className={rootClass.elem("menu")}>
+          <Dropdown.Trigger align="right" content={(
+            <Menu size="medium" contextual>
+              <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
+              <Menu.Item onClick={() => confirmDelete(backend)} isDangerous>Delete</Menu.Item>
+              <Menu.Divider />
+              <Menu.Item onClick={() => onTestRequest(backend)}>Send Test Request</Menu.Item>
+              <Menu.Item onClick={() => onStartTrain(backend)}>Start Training</Menu.Item>
+            </Menu>
+          )}>
+            <Button type="link" icon={<LsEllipsis />} style={{ padding: "15px" }} />
           </Dropdown.Trigger>
         </div>
       </div>
-      <div className={rootClass.elem('meta')}>
-        <div className={rootClass.elem('group')}>
-          {truncate(backend.url, 20, 10, '...')}
-        </div>
-        <div className={rootClass.elem('group')}></div>
-        <div className={rootClass.elem('group')}>
-          Created &nbsp;
-          {formatDistanceToNow(parseISO(backend.created_at), {
-            addSuffix: true,
-          })}
+
+      <div className={rootClass.elem("meta")}>
+        <div className={rootClass.elem("group")}>{truncate(backend.url, 20, 10, '...')}</div>
+        <div className={rootClass.elem("group")}>
+          <Tooltip title={format(parseISO(backend.created_at), 'yyyy-MM-dd HH:mm:ss')}>
+            <span>Created&nbsp;{formatDistanceToNow(parseISO(backend.created_at), { addSuffix: true })}</span>
+          </Tooltip>
         </div>
       </div>
     </Block>
