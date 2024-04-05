@@ -219,21 +219,24 @@ class Task(TaskMixin, models.Model):
         predictions = self.predictions
 
         # TODO if we use live_model on project then we will need to check for it here
-        if project.show_collab_predictions and project.model_version is not None:
-            if project.ml_backend_in_model_version:
-                new_predictions = evaluate_predictions([self])
-                # TODO this is not as clean as I'd want it to
-                # be. Effectively retrieve_predictions will work only for
-                # tasks where there is no predictions matching current
-                # model version. In case it will return a model_version
-                # and we can grab predictions explicitly
-                if isinstance(new_predictions, str):
-                    model_version = new_predictions
-                    return predictions.filter(model_version=model_version)
+        if project.show_collab_predictions:
+            if project.model_version:
+                if project.ml_backend_in_model_version:
+                    new_predictions = evaluate_predictions([self])
+                    # TODO this is not as clean as I'd want it to
+                    # be. Effectively retrieve_predictions will work only for
+                    # tasks where there is no predictions matching current
+                    # model version. In case it will return a model_version
+                    # and we can grab predictions explicitly
+                    if isinstance(new_predictions, str):
+                        model_version = new_predictions
+                        return predictions.filter(model_version=model_version)
+                    else:
+                        return new_predictions
                 else:
-                    return new_predictions
+                    return predictions.filter(model_version=project.model_version)
             else:
-                return predictions.filter(model_version=project.model_version)
+                return predictions
         else:
             return []
 
