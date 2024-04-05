@@ -20,9 +20,15 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 
 ## General guidelines for importing data
 
-* For larger projects, do not upload data through the Label Studio interface. This works fine for proof of concept projects, but it is not recommended for larger projects. We recommend that you configure external storage instead. 
 * It’s best to keep about 100k tasks / 100k annotations per project for optimal performance.
 * Avoid frequent imports because each new import requires lengthy background operations. One import per 30 seconds will work without overloads.
+
+!!! warning
+    For large projects or business critical projects, do not [upload media files through the Label Studio interface](#Import-data-from-the-Label-Studio-UI). This is especially true for files such as images, audio, video, etc.  
+    
+    Uploading data through the Label Studio UI works fine for proof of concept projects, but it is not recommended for larger projects. You will also face challenges when you want export your data or move it to another Label Studio instance or even just redeploy Label Studio. Finally, Label Studio is not designed as a hosting service at scale and does not have backups for imported media resources. 
+    
+    We strongly recommend that you configure external storage instead.
 
 ## Types of data you can import into Label Studio
 
@@ -489,6 +495,13 @@ If you're running Label Studio on Docker and want to add local file storage, you
 
 
 ## Import data from the Label Studio UI
+
+!!! warning
+    For large projects or business critical projects, do not upload media files through the Label Studio interface. This is especially true for files such as images, audio, video, etc.  
+    
+    Uploading data through the Label Studio UI works fine for proof of concept projects, but it is not recommended for larger projects. You will also face challenges when you want export your data or move it to another Label Studio instance or even just redeploy Label Studio. Finally, Label Studio is not designed as a hosting service at scale and does not have backups for imported media resources. 
+    
+    We strongly recommend that you configure external storage instead.
 
 To import data from the Label Studio UI, do the following:
 1. On the Label Studio UI, open the Data Manager page for a specific project.
