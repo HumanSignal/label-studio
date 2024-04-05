@@ -139,7 +139,7 @@ def test_action_remove_duplicates(business_client, project_id):
 
 @pytest.mark.django_db
 def test_action_remove_duplicates_with_annotations(business_client, project_id):
-    """ This test checks that the "remove_duplicates" action works correctly
+    """This test checks that the "remove_duplicates" action works correctly
     when there are annotations distributed among multiple duplicated tasks.
     Remove duplicates should keep the task with the first task with annotations,
     link other annotations to the first task and remove the excess tasks.
