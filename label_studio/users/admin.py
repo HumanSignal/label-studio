@@ -4,12 +4,11 @@ from core.models import AsyncMigrationStatus
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
+from ml.models import MLBackend, MLBackendTrainJob
 from organizations.models import Organization, OrganizationMember
 from projects.models import Project
 from tasks.models import Annotation, Prediction, Task
 from users.models import User
-
-from ml.models import MLBackend, MLBackendTrainJob
 
 
 class UserAdminShort(UserAdmin):
