@@ -32,7 +32,10 @@ from django.utils._os import safe_join
 from drf_yasg.utils import swagger_auto_schema
 from io_storages.localfiles.models import LocalFilesImportStorage
 from ranged_fileresponse import RangedFileResponse
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+
 
 logger = logging.getLogger(__name__)
 
@@ -167,6 +170,8 @@ def samples_paragraphs(request):
     return HttpResponse(json.dumps(result), content_type='application/json')
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def localfiles_data(request):
     """Serving files for LocalFilesImportStorage"""
     user = request.user
