@@ -1,8 +1,17 @@
 import { getRoot, getSnapshot, types } from "mobx-state-tree";
 import React from "react";
-import { toStudlyCaps } from "strman";
-import { CommentCheck, CommentRed, LsAnnotation, LsBanSquare, LsSparkSquare, LsStarSquare, LsThumbsDown, LsThumbsUp } from "../../assets/icons";
+import {
+  CommentCheck,
+  CommentRed,
+  LsAnnotation,
+  LsBanSquare,
+  LsSparkSquare,
+  LsStarSquare,
+  LsThumbsDown,
+  LsThumbsUp
+} from "../../assets/icons";
 import * as CellViews from "../../components/CellViews";
+import { normalizeCellAlias } from "../../components/CellViews";
 import { all } from "../../utils/utils";
 import { StringOrNumberID } from "../types";
 
@@ -214,7 +223,7 @@ export const TabColumn = types
     },
 
     get filterable() {
-      return ((CellViews[self.type] ?? CellViews[toStudlyCaps(self.alias)])?.filterable) !== false;
+      return ((CellViews[self.type] ?? CellViews[normalizeCellAlias(self.alias)])?.filterable) !== false;
     },
   }))
   .actions((self) => ({
