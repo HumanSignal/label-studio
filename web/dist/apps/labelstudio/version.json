@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-HUMSIG-37-visuals'",
-  "commit": "309851f803a1995c36b11f416f80cff709b6be2f",
-  "date": "2024-04-04T16:34:09.000Z",
-  "branch": "fb-HUMSIG-37-visuals"
+  "message": "fix: LEAP-859: Fix data manager breaking on displaying specific data",
+  "commit": "0585e0651dbece8896d51078bfced6a39e8336f1",
+  "date": "2024-04-08T12:48:22.000Z",
+  "branch": "fb-leap-859/colimn-special-characters"
 }
