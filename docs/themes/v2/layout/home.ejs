@@ -248,21 +248,19 @@ meta_description: Get started with Label Studio by creating projects to label an
       </div>
     </div>
     <div class="column-wrapper">
+
+      <% let recentReleaseNotes = getRecentReleaseNotes(); %>
       <h2 class="Heading Large">Latest Updates</h2>
       <ul class="changelog">
-        <li class="changelog-item">
-          <span class="Text Eyebrow">Label Studio Enterprise 2.9.1</span>
-          <a href="" class="Link block-link">Bug fixes</a>
-        </li>
-        <li class="changelog-item">
-          <span class="Text Eyebrow">Label Studio Enterprise 2.9.0</span>
-          <a href="" class="Link block-link">Improved member list filtering from the Organization page, collapsible Ranker items, various UI improvements</a>
-        </li>
-        <li class="changelog-item">
-          <span class="Text Eyebrow">Label Studio Enterprise 2.8.0</span>
-          <a href="" class="Link block-link">Improved member list filtering from the Organization page, collapsible Ranker items, various UI improvements</a>
-        </li>
-      </ul>
+        <% for (const note of recentReleaseNotes) { %>
+          <li class="changelog-item">
+            <a href="/guide/release_notes/#<%= note.id %>" class="Link block-link">
+              <%= note.title %>
+              </a>
+            </li>
+        <% } %>
+        </ul>
+      
       <a href="/guide/release_notes.html" class="Link">View all release notes<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></a>
     </div>
   </div>
