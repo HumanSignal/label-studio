@@ -3,6 +3,7 @@
   const pageSidebar = document.querySelector(".page-sidebar");
   const navToggleButtons = pageHeader.querySelectorAll("button");
   const sideBarToggleButtons = pageSidebar && pageSidebar.querySelectorAll("button");
+  const hamburgerButton = pageHeader.querySelector(".hamburger-button");
 
   const toggleMenu = (e) => {
     const button = e.currentTarget;
@@ -65,6 +66,16 @@
       window.addEventListener("keydown", handleFocusSearch);
     }
   });
+
+  hamburgerButton.addEventListener("click", () => {
+    const nav = hamburgerButton.nextElementSibling;
+    const navStyle = getComputedStyle(nav);
+
+    hamburgerButton.classList.toggle("active");
+
+    nav.style.setProperty('display', navStyle.display=== "flex" ? "none" : "flex");
+
+  })
 
   if (window.matchMedia( "(hover: none)" ).matches) {
     const toggleQuickNav = (e) => {

@@ -296,7 +296,7 @@ body {
     width: 100%;
     background-color: var(--color-white);
     position: absolute;
-    top: 75px;
+    top: 98px;
     left: 0;
     padding: 0 1em 1em 1em;
     border-bottom: 1px var(--color-gray-900) solid;
@@ -341,7 +341,13 @@ body {
   }
 
   .page-header nav {
-    top: 64px;
+    top: 146px;
+  }
+}
+
+@media (max-width: 500px) {
+  .page-header nav {
+    top: 183px;
   }
 }
 
