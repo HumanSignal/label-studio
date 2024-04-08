@@ -52,7 +52,9 @@ Ir you want to write your own model instead, see [Write your own ML backend](ml_
 
     Use [`label_studio_ml/default_configs/docker-compose.yml`](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/default_configs/docker-compose.yml) for general configuration, and `docker-compose.yml` within the model directory for model-specific parameters. 
 
-2. Then replace `{MODEL_NAME}` in the below command with the appropriate directory:
+2. Then replace `{MODEL_NAME}` in the below command with the appropriate directory. 
+
+    For example, if you are using the SAM backend, the model name would be `segment_anything_model`, which matches the [directory name in the repo](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model):
 
     ```bash
 git clone https://github.com/HumanSignal/label-studio-ml-backend.git
@@ -98,24 +100,10 @@ Click **Connect Model** and complete the following fields:
 
 ## Example models
 
-The following models are available in the [Label Studio ML backend repository](https://github.com/HumanSignal/label-studio-ml-backend/). 
+For a list of the available example models, see the [Models table in GitHub](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#models). 
 
 Some of them work without any additional configuration. If the model has required parameters, you can set those parameters in `docker-compose.yml` within the model directory. 
 
-| MODEL_NAME                                                                 | Description                                                                                                                | Required parameters |
-|----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|---------------------|
-| [segment_anything_model](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model) | General-purpose interactive image segmentation [from Meta](https://segment-anything.com/)                                  | None                |
-| [llm_interactive](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/llm_interactive)               | Prompt engineering, data collection and model evaluation workflows for LLM ([OpenAI](https://platform.openai.com/), Azure) | OPENAI_API_KEY      |
-| [grounding_dino](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/grounding_dino)                 | Object detection with text prompts ([details](https://github.com/IDEA-Research/GroundingDINO))                             | None                |
-| [tesseract](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/tesseract)                           | Optical Character Recognition (OCR) by drawing bounding boxes ([details](https://github.com/tesseract-ocr/tesseract))      | None                |
-| [easyocr](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/easyocr)                               | Another OCR tool from [EasyOCR](https://github.com/JaidedAI/EasyOCR)                                                       | None                |
-| [spacy](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/spacy)                                   | Named entity recognition model from [SpaCy](https://spacy.io/)                                                             | None                |
-| [flair](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/flair)                                   | NLP models by [flair](https://flairnlp.github.io/)                                                                         | None                |
-| [huggingface](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/huggingface)                       | NLP models by [Hugging Face](https://huggingface.co/)                                                                      | HF_TOKEN            |
-| [nemo](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/nemo)                                     | Speech transcription models by [NVIDIA NeMo](https://github.com/NVIDIA/NeMo)                                               | None                |
-| [mmdetection](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/mmdetection-3)                         | Object detection models by [OpenMMLab](https://github.com/open-mmlab/mmdetection)                                          | None                |
-| [simple_text_classifier](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/simple_text_classifier) | Simple trainable text classification model powered by [scikit-learn](https://scikit-learn.org/stable/)                     | None                |
-| [substring_matching](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching)         | Select keyword to highlight all occurrences of the keyword in the text                                                     | None                |
 
 ## Model training
 
