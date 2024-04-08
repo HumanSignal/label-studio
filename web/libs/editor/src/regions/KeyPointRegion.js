@@ -1,36 +1,36 @@
-import React, { Fragment, useContext } from 'react';
-import { Circle } from 'react-konva';
-import { getRoot, types } from 'mobx-state-tree';
+import { getRoot, types } from "mobx-state-tree";
+import React, { Fragment, useContext } from "react";
+import { Circle } from "react-konva";
 
-import Registry from '../core/Registry';
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
+import Registry from "../core/Registry";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
 
-import { ImageViewContext } from '../components/ImageView/ImageViewContext';
-import { LabelOnKP } from '../components/ImageView/LabelOnRegion';
-import { guidGenerator } from '../core/Helpers';
-import { useRegionStyles } from '../hooks/useRegionColor';
-import { AreaMixin } from '../mixins/AreaMixin';
-import { KonvaRegionMixin } from '../mixins/KonvaRegion';
-import { ImageModel } from '../tags/object/Image';
-import { FF_DEV_3793, isFF } from '../utils/feature-flags';
-import { createDragBoundFunc } from '../utils/image';
-import { AliveRegion } from './AliveRegion';
-import { EditableRegion } from './EditableRegion';
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from '../components/ImageView/Image';
-import Constants from '../core/Constants';
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
+import { ImageViewContext } from "../components/ImageView/ImageViewContext";
+import { LabelOnKP } from "../components/ImageView/LabelOnRegion";
+import Constants from "../core/Constants";
+import { guidGenerator } from "../core/Helpers";
+import { useRegionStyles } from "../hooks/useRegionColor";
+import { AreaMixin } from "../mixins/AreaMixin";
+import { KonvaRegionMixin } from "../mixins/KonvaRegion";
+import { ImageModel } from "../tags/object/Image";
+import { FF_DEV_3793, isFF } from "../utils/feature-flags";
+import { createDragBoundFunc } from "../utils/image";
+import { AliveRegion } from "./AliveRegion";
+import { EditableRegion } from "./EditableRegion";
 
 const KeyPointRegionAbsoluteCoordsDEV3793 = types
   .model({
-    coordstype: types.optional(types.enumeration(['px', 'perc']), 'perc'),
+    coordstype: types.optional(types.enumeration(["px", "perc"]), "perc"),
   })
   .volatile(() => ({
     relativeX: 0,
     relativeY: 0,
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterCreate() {
-      if (self.coordstype === 'perc') {
+      if (self.coordstype === "perc") {
         // deserialization
         self.relativeX = self.x;
         self.relativeY = self.y;
@@ -60,16 +60,16 @@ const KeyPointRegionAbsoluteCoordsDEV3793 = types
     },
 
     updateImageSize(wp, hp, sw, sh) {
-      if (self.coordstype === 'px') {
+      if (self.coordstype === "px") {
         self.x = (sw * self.relativeX) / RELATIVE_STAGE_WIDTH;
         self.y = (sh * self.relativeY) / RELATIVE_STAGE_HEIGHT;
       }
 
-      if (self.coordstype === 'perc') {
+      if (self.coordstype === "perc") {
         self.x = (sw * self.x) / RELATIVE_STAGE_WIDTH;
         self.y = (sh * self.y) / RELATIVE_STAGE_HEIGHT;
         self.width = (sw * self.width) / RELATIVE_STAGE_WIDTH;
-        self.coordstype = 'px';
+        self.coordstype = "px";
       }
     },
   }));
@@ -78,7 +78,7 @@ const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
-    type: 'keypointregion',
+    type: "keypointregion",
     object: types.late(() => types.reference(ImageModel)),
 
     x: types.number,
@@ -94,11 +94,11 @@ const Model = types
     supportsRotate: false,
     supportsScale: false,
     editableFields: [
-      { property: 'x', label: 'X' },
-      { property: 'y', label: 'Y' },
+      { property: "x", label: "X" },
+      { property: "y", label: "Y" },
     ],
   }))
-  .views(self => ({
+  .views((self) => ({
     get store() {
       return getRoot(self);
     },
@@ -120,7 +120,7 @@ const Model = types
       return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.width) : self.width;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     setPosition(x, y) {
       const point = self.control?.getSnappedPoint({
         x: self.parent.canvasToInternalX(x),
@@ -178,7 +178,7 @@ const Model = types
   }));
 
 const KeyPointRegionModel = types.compose(
-  'KeyPointRegionModel',
+  "KeyPointRegionModel",
   RegionsMixin,
   AreaMixin,
   NormalizationMixin,
@@ -194,9 +194,9 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
 
   const regionStyles = useRegionStyles(item, {
     includeFill: true,
-    defaultFillColor: '#000',
-    defaultStrokeColor: '#fff',
-    defaultOpacity: (item.style ?? item.tag) ? 0.6 : 1,
+    defaultFillColor: "#000",
+    defaultStrokeColor: "#fff",
+    defaultOpacity: item.style ?? item.tag ? 0.6 : 1,
     // avoid size glitching when user select/unselect region
     sameStrokeWidthForSelected: true,
   });
@@ -220,7 +220,7 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
       <Circle
         x={item.canvasX}
         y={item.canvasY}
-        ref={el => setShapeRef(el)}
+        ref={(el) => setShapeRef(el)}
         // keypoint should always be the same visual size
         radius={Math.max(item.canvasWidth, 2) / item.parent?.zoomScale}
         // fixes performance, but opactity+borders might look not so good
@@ -229,51 +229,48 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
         // scaleX={1 / item.parent.zoomScale}
         // scaleY={1 / item.parent.zoomScale}
         name={`${item.id} _transformable`}
-        onDragStart={e => {
+        onDragStart={(e) => {
           if (item.parent.getSkipInteractions()) {
             e.currentTarget.stopDrag(e.evt);
             return;
           }
           item.annotation.history.freeze(item.id);
         }}
-        onDragEnd={e => {
+        onDragEnd={(e) => {
           const t = e.target;
 
-          item.setPosition(t.getAttr('x'), t.getAttr('y'));
-          t.setAttr('x', item.canvasX);
-          t.setAttr('y', item.canvasY);
+          item.setPosition(t.getAttr("x"), t.getAttr("y"));
+          t.setAttr("x", item.canvasX);
+          t.setAttr("y", item.canvasY);
           item.annotation.history.unfreeze(item.id);
           item.notifyDrawingFinished();
         }}
         dragBoundFunc={createDragBoundFunc(item)}
         transformsEnabled="position"
-        onTransformEnd={e => {
+        onTransformEnd={(e) => {
           const t = e.target;
 
-          item.setPosition(
-            t.getAttr('x'),
-            t.getAttr('y'),
-          );
+          item.setPosition(t.getAttr("x"), t.getAttr("y"));
 
-          t.setAttr('scaleX', 1);
-          t.setAttr('scaleY', 1);
+          t.setAttr("scaleX", 1);
+          t.setAttr("scaleY", 1);
         }}
         onMouseOver={() => {
           if (store.annotationStore.selected.relationMode) {
             item.setHighlight(true);
-            stage.container().style.cursor = 'crosshair';
+            stage.container().style.cursor = "crosshair";
           } else {
-            stage.container().style.cursor = 'pointer';
+            stage.container().style.cursor = "pointer";
           }
         }}
         onMouseOut={() => {
-          stage.container().style.cursor = 'default';
+          stage.container().style.cursor = "default";
 
           if (store.annotationStore.selected.relationMode) {
             item.setHighlight(false);
           }
         }}
-        onClick={e => {
+        onClick={(e) => {
           if (item.parent.getSkipInteractions()) return;
 
           if (store.annotationStore.selected.relationMode) {
@@ -287,18 +284,18 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
         draggable={!item.isReadOnly()}
         listening={!suggestion}
       />
-      <LabelOnKP item={item} color={regionStyles.strokeColor}/>
+      <LabelOnKP item={item} color={regionStyles.strokeColor} />
     </Fragment>
   );
 };
 
 const HtxKeyPoint = AliveRegion(HtxKeyPointView);
 
-Registry.addTag('keypointregion', KeyPointRegionModel, HtxKeyPoint);
+Registry.addTag("keypointregion", KeyPointRegionModel, HtxKeyPoint);
 Registry.addRegionType(
   KeyPointRegionModel,
-  'image',
-  value => 'x' in value && 'y' in value && 'width' in value && !('height' in value),
+  "image",
+  (value) => "x" in value && "y" in value && "width" in value && !("height" in value),
 );
 
 export { KeyPointRegionModel, HtxKeyPoint };

@@ -6,17 +6,20 @@ import { Space } from "./Space/Space";
 const Duration = ({ value, format }) => {
   const formatted = new Date(value * 1000).toISOString().substr(11, 8);
 
-  const parsed = formatted.split(':');
+  const parsed = formatted.split(":");
 
-  const result = format.map(unit => {
+  const result = format.map((unit) => {
     switch (unit) {
-      case "hours": return parsed[0];
-      case "minutes": return parsed[1];
-      case "seconds": return parsed[2];
+      case "hours":
+        return parsed[0];
+      case "minutes":
+        return parsed[1];
+      case "seconds":
+        return parsed[2];
     }
   });
 
-  return result.join(':');
+  return result.join(":");
 };
 
 const PlaybackControl = ({ current, duration, onChange }) => {
@@ -31,7 +34,7 @@ const PlaybackControl = ({ current, duration, onChange }) => {
   return (
     <>
       <Space spread>
-        <Duration value={current} format={format}/>
+        <Duration value={current} format={format} />
         <input
           type="range"
           min={0}
@@ -41,7 +44,7 @@ const PlaybackControl = ({ current, duration, onChange }) => {
           style={{ flex: 1 }}
           onChange={(e) => onChange?.(e.target.value)}
         />
-        <Duration value={duration} format={format}/>
+        <Duration value={duration} format={format} />
       </Space>
     </>
   );
@@ -70,14 +73,8 @@ export class SharedAudio extends Component {
     const paused = this.state.paused || this.state.audio === null;
 
     return (
-      <Space
-        size="small"
-        style={{ width: "100%", alignItems: 'center' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Button onClick={paused ? this.play : this.pause}>
-          {paused ? <FaPlay /> : <FaPause />}
-        </Button>
+      <Space size="small" style={{ width: "100%", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+        <Button onClick={paused ? this.play : this.pause}>{paused ? <FaPlay /> : <FaPause />}</Button>
 
         {this.state.error ? (
           <div>Unable to play</div>
@@ -86,7 +83,7 @@ export class SharedAudio extends Component {
             <PlaybackControl
               current={this.state.current}
               duration={this.state.duration}
-              onChange={time => {
+              onChange={(time) => {
                 this.audio.currentTime = time;
                 if (paused) this.audio.pause();
               }}
@@ -126,14 +123,11 @@ export class SharedAudio extends Component {
 
     audio.onplay = () => this.setState({ paused: false });
 
-    audio.ontimeupdate = () =>
-      this.setState({ current: audio.currentTime });
+    audio.ontimeupdate = () => this.setState({ current: audio.currentTime });
 
-    audio.ondurationchange = () =>
-      this.setState({ duration: audio.duration });
+    audio.ondurationchange = () => this.setState({ duration: audio.duration });
 
     audio.oncanplay = () => {
-
       this.setState(
         {
           audio,

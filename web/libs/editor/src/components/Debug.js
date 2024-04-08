@@ -1,7 +1,7 @@
-import React, { useCallback, useRef } from 'react';
-import { Button, Form } from 'antd';
+import { Button, Form } from "antd";
+import React, { useCallback, useRef } from "react";
 
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react";
 
 const toJSON = (annotation) => {
   const id = annotation.pk || annotation.id;
@@ -53,7 +53,7 @@ const DebugComponent = ({ store }) => {
   }, []);
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: "100%" }}>
       <br />
       <h2>Debug</h2>
       <div>
@@ -63,11 +63,11 @@ const DebugComponent = ({ store }) => {
       </div>
 
       <Form>
-        <div style={{ display: 'flex' }}>
-          <div style={{ flexBasis: '50%' }}>
+        <div style={{ display: "flex" }}>
+          <div style={{ flexBasis: "50%" }}>
             <p>Data</p>
             <textarea
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               ref={refData}
               rows={4}
               defaultValue={store.task.data}
@@ -75,17 +75,17 @@ const DebugComponent = ({ store }) => {
             />
             <p>Config</p>
             <textarea
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               ref={refConfig}
               rows={16}
               defaultValue={store.config}
               className="is-search"
             />
           </div>
-          <div style={{ flexBasis: '50%' }}>
+          <div style={{ flexBasis: "50%" }}>
             <p>Annotations</p>
             <textarea
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               ref={refAnnotations}
               rows={22}
               // defaultValue={}

@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { ErrorWrapper } from '../components/Error/Error';
-import { Modal } from '../components/Modal/ModalPopup';
+import React, { Component } from "react";
+import { ErrorWrapper } from "../components/Error/Error";
+import { Modal } from "../components/Modal/ModalPopup";
 
 export const ErrorContext = React.createContext();
 
@@ -15,7 +15,7 @@ export default class ErrorBoundary extends Component {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, {componentStack}) {
+  componentDidCatch(error, { componentStack }) {
     // You can also log the error to an error reporting service
     this.setState({
       error,
@@ -26,7 +26,7 @@ export default class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
-      const {error, errorInfo} = this.state;
+      const { error, errorInfo } = this.state;
 
       const goBack = () => {
         // usually this will trigger React Router in the broken app, which is not helpful
@@ -37,11 +37,11 @@ export default class ErrorBoundary extends Component {
 
       return (
         <Modal onHide={() => location.reload()} style={{ width: "60vw" }} visible bare>
-          <div style={{padding: 40}}>
+          <div style={{ padding: 40 }}>
             <ErrorWrapper
               title="Runtime error"
               message={error}
-              stacktrace={`${errorInfo ? `Component Stack: ${errorInfo}` : ''}\n\n${this.state.error?.stack ?? ''}`}
+              stacktrace={`${errorInfo ? `Component Stack: ${errorInfo}` : ""}\n\n${this.state.error?.stack ?? ""}`}
               onGoBack={goBack}
               onReload={() => location.reload()}
             />
@@ -51,13 +51,15 @@ export default class ErrorBoundary extends Component {
     }
 
     return (
-      <ErrorContext.Provider value={{
-        hasError: this.state.hasError,
-        error: this.state.error,
-        errorInfo: this.state.errorInfo,
-        silence: this.silence,
-        unsilence: this.unsilence,
-      }}>
+      <ErrorContext.Provider
+        value={{
+          hasError: this.state.hasError,
+          error: this.state.error,
+          errorInfo: this.state.errorInfo,
+          silence: this.silence,
+          unsilence: this.unsilence,
+        }}
+      >
         {this.props.children}
       </ErrorContext.Provider>
     );
@@ -67,9 +69,5 @@ export default class ErrorBoundary extends Component {
 export const ErrorUI = () => {
   const context = React.useContext(ErrorContext);
 
-  return context.hasError && (
-    <div className="error">
-      Error occurred
-    </div>
-  );
+  return context.hasError && <div className="error">Error occurred</div>;
 };

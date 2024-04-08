@@ -1,7 +1,6 @@
-import React from 'react';
-import { FilterDropdown } from '../FilterDropdown';
-import { observer } from 'mobx-react';
-
+import { observer } from "mobx-react";
+import React from "react";
+import { FilterDropdown } from "../FilterDropdown";
 
 const BaseInput = observer((props) => (
   <FilterDropdown
@@ -9,17 +8,17 @@ const BaseInput = observer((props) => (
       props.onChange(!value);
     }}
     items={[
-      { label: 'true', key: true },
-      { label: 'false', key: false },
+      { label: "true", key: true },
+      { label: "false", key: false },
     ]}
   />
 ));
 
 export const BooleanFilter = [
   {
-    key: 'equal',
-    label: 'is',
-    valueType: 'single',
+    key: "equal",
+    label: "is",
+    valueType: "single",
     input: BaseInput,
   },
 ];

@@ -1,14 +1,10 @@
 import { getRoot, types } from "mobx-state-tree";
 import { hasProperties } from "../../utils/helpers";
 import { isDefined } from "../../utils/utils";
-import { TabColumn, ViewColumnType } from "./tab_column";
 import { StringOrNumberID } from "../types";
+import { TabColumn, ViewColumnType } from "./tab_column";
 
-export const FilterValue = types.union(
-  types.string,
-  types.number,
-  types.boolean,
-);
+export const FilterValue = types.union(types.string, types.number, types.boolean);
 
 export const FilterItemValue = types.model("FilterItemValue", {
   value: FilterValue,
@@ -18,7 +14,6 @@ export const FilterItemValue = types.model("FilterItemValue", {
 
 export const FilterItemType = types.union({
   dispatcher(s) {
-
     if (isDefined(s.value)) {
       return FilterItemValue;
     } else {
@@ -53,9 +48,9 @@ export const FilterValueType = types.union({
     if (!isDefined(sn)) return FilterValue;
     if (sn.$treenode) return sn.$treenode.type;
 
-    if (hasProperties(sn, ['items'])) {
+    if (hasProperties(sn, ["items"])) {
       return FilterValueList;
-    } else if (hasProperties(sn, ['min', 'max'])) {
+    } else if (hasProperties(sn, ["min", "max"])) {
       return FilterValueRange;
     } else if (Array.isArray(sn)) {
       return types.array(FilterValueType);

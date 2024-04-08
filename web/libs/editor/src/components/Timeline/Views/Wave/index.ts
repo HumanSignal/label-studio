@@ -1,12 +1,12 @@
-import { TimelineView } from '../../Types';
-import { Wave } from './Wave';
+import type { TimelineView } from "../../Types";
+import { Wave } from "./Wave";
 
 const View: TimelineView = {
   View: Wave,
   settings: {
-    playpauseHotkey: 'media:playpause',
-    stepBackHotkey: 'media:step-backward',
-    stepForwardHotkey: 'media:step-forward',
+    playpauseHotkey: "media:playpause",
+    stepBackHotkey: "media:step-backward",
+    stepForwardHotkey: "media:step-forward",
   },
 };
 

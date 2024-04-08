@@ -1,21 +1,21 @@
-import React from 'react';
-import { observer } from 'mobx-react';
-import { cast, types } from 'mobx-state-tree';
+import { observer } from "mobx-react";
+import { cast, types } from "mobx-state-tree";
+import React from "react";
 
-import { defaultStyle } from '../../../core/Constants';
-import { customTypes } from '../../../core/CustomTypes';
-import { guidGenerator } from '../../../core/Helpers';
-import Registry from '../../../core/Registry';
-import Tree from '../../../core/Tree';
-import Types from '../../../core/Types';
-import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
-import DynamicChildrenMixin from '../../../mixins/DynamicChildrenMixin';
-import LabelMixin from '../../../mixins/LabelMixin';
-import SelectedModelMixin from '../../../mixins/SelectedModel';
-import { Block } from '../../../utils/bem';
-import ControlBase from '../Base';
-import '../Label';
-import './Labels.styl';
+import { defaultStyle } from "../../../core/Constants";
+import { customTypes } from "../../../core/CustomTypes";
+import { guidGenerator } from "../../../core/Helpers";
+import Registry from "../../../core/Registry";
+import Tree from "../../../core/Tree";
+import Types from "../../../core/Types";
+import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
+import DynamicChildrenMixin from "../../../mixins/DynamicChildrenMixin";
+import LabelMixin from "../../../mixins/LabelMixin";
+import SelectedModelMixin from "../../../mixins/SelectedModel";
+import { Block } from "../../../utils/bem";
+import ControlBase from "../Base";
+import "../Label";
+import "./Labels.styl";
 
 /**
  * The `Labels` tag provides a set of labels for labeling regions in tasks for machine learning and data science projects. Use the `Labels` tag to create a set of labels that can be assigned to identified region and specify the values of labels to assign to regions.
@@ -69,22 +69,22 @@ import './Labels.styl';
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 
-  choice: types.optional(types.enumeration(['single', 'multiple']), 'single'),
+  choice: types.optional(types.enumeration(["single", "multiple"]), "single"),
   maxusages: types.maybeNull(types.string),
   showinline: types.optional(types.boolean, true),
 
   // TODO this will move away from here
   groupdepth: types.maybeNull(types.string),
 
-  opacity: types.optional(customTypes.range(), '0.2'),
-  fillcolor: types.optional(customTypes.color, '#f48a42'),
+  opacity: types.optional(customTypes.range(), "0.2"),
+  fillcolor: types.optional(customTypes.color, "#f48a42"),
 
-  strokewidth: types.optional(types.string, '1'),
-  strokecolor: types.optional(customTypes.color, '#f48a42'),
+  strokewidth: types.optional(types.string, "1"),
+  strokecolor: types.optional(customTypes.color, "#f48a42"),
   fillopacity: types.maybeNull(customTypes.range()),
   allowempty: types.optional(types.boolean, false),
 
-  value: types.optional(types.string, ''),
+  value: types.optional(types.string, ""),
 });
 
 /**
@@ -94,23 +94,23 @@ const TagAttrs = types.model({
  */
 const ModelAttrs = types.model({
   pid: types.optional(types.string, guidGenerator),
-  type: 'labels',
-  children: Types.unionArray(['label', 'header', 'view', 'text', 'hypertext', 'richtext']),
+  type: "labels",
+  children: Types.unionArray(["label", "header", "view", "text", "hypertext", "richtext"]),
 
   visible: types.optional(types.boolean, true),
 });
 
-const Model = LabelMixin.views(self => ({
+const Model = LabelMixin.views((self) => ({
   get shouldBeUnselected() {
-    return self.choice === 'single';
+    return self.choice === "single";
   },
   get defaultChildType() {
-    return 'label';
+    return "label";
   },
   get isLabeling() {
     return true;
   },
-})).actions(self => ({
+})).actions((self) => ({
   afterCreate() {
     if (self.allowempty) {
       let empty = self.findLabel(null);
@@ -118,7 +118,7 @@ const Model = LabelMixin.views(self => ({
       if (!empty) {
         const emptyParams = {
           value: null,
-          type: 'label',
+          type: "label",
           background: defaultStyle.fillcolor,
         };
 
@@ -135,14 +135,14 @@ const Model = LabelMixin.views(self => ({
 }));
 
 const LabelsModel = types.compose(
-  'LabelsModel',
+  "LabelsModel",
   ControlBase,
   ModelAttrs,
   TagAttrs,
   AnnotationMixin,
   DynamicChildrenMixin,
   Model,
-  SelectedModelMixin.props({ _child: 'LabelModel' }),
+  SelectedModelMixin.props({ _child: "LabelModel" }),
 );
 
 const HtxLabels = observer(({ item }) => {
@@ -153,6 +153,6 @@ const HtxLabels = observer(({ item }) => {
   );
 });
 
-Registry.addTag('labels', LabelsModel, HtxLabels);
+Registry.addTag("labels", LabelsModel, HtxLabels);
 
 export { HtxLabels, LabelsModel };

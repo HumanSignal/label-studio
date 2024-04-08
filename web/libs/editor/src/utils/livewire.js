@@ -2,7 +2,7 @@
 
 export function Livewire() {}
 
-this.mousedown = function(event) {
+this.mousedown = (event) => {
   // first time
   if (!self.started) {
     self.started = true;
@@ -43,7 +43,7 @@ this.mousedown = function(event) {
   }
 };
 
-this.mousemove = function(event) {
+this.mousemove = (event) => {
   if (!self.started) {
     return;
   }
@@ -105,7 +105,7 @@ this.mousemove = function(event) {
   command.execute();
 };
 
-this.dblclick = function(/*event*/) {
+this.dblclick = (/*event*/) => {
   // save command in undo stack
   app.addToUndoStack(command);
   // set flag

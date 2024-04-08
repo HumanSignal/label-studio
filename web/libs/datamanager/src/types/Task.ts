@@ -39,11 +39,11 @@ export interface APIPrediction {
 }
 
 export interface APIResult {
-  id: string,
-  from_name: string,
-  to_name: string,
-  type: string, // @todo enum
-  value: Record<string, any>,
+  id: string;
+  from_name: string;
+  to_name: string;
+  type: string; // @todo enum
+  value: Record<string, any>;
 }
 
 export interface APITask {

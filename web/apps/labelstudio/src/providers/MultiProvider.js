@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export const MultiProvider = (props) => {
   let content = props.children || null;
