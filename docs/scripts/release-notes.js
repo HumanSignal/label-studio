@@ -18,8 +18,10 @@ hexo.extend.filter.register("after_init", async function () {
     };
 
     const markdownFiles = await concatMd.default(
-        "source/guide/release_notes/onprem", {sorter: compareVersions}
+        "source/guide/release_notes/onprem", {sorter: compareVersions, joinString: "\n\n\n\n\n\n-----newfile-----"}
     );
+
+    const wrappedPages = markdownFiles.split('\n-----newfile-----').map(page => `<div class="release-note">${page}</div>`).join('');
 
     const frontmatter = `---
 NOTE: Don't change release_notes.md manually, it's automatically built from onprem/*.md files on hexo server run!   
@@ -43,7 +45,7 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
 
 `;
 
-    const finalString = frontmatter + markdownFiles;
+    const finalString = frontmatter + wrappedPages;
 
     //writing to file
     fs.writeFile("source/guide/release_notes.md", finalString, (err) => {

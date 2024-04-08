@@ -11,20 +11,6 @@ style.textContent = `
   cursor: pointer;
   position: relative;
 }
-.collapsible-header::before {
-  content: "${is_collapsed ? "▶" : "▼"}";
-  font-size: 70%;
-  position: absolute;
-  left: -1.25em;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.collapsible-header:hover::before {
-  opacity: 1;
-}
-.collapsible-header.expanded::before {
-  content: "▼";
-}
 .toc button {
   margin-top: 1.5em;
   border-radius: 5px;
@@ -40,11 +26,9 @@ style.textContent = `
 }
 .onprem-highlight {
   display: block!important;
-  font-weight: 600;
+  font-weight: 400;
   margin: 1em 0 0 0;
-}
-.onprem-highlight *, .onprem-highlight p {
-  font-weight: bold;
+  font-size: 1rem;
 }
 `;
 
