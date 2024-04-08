@@ -45,7 +45,8 @@ const isSystemEvent = (e: KeyboardEvent<HTMLInputElement>): boolean => {
   return (
     e.code.match(/arrow/i) !== null ||
     (e.shiftKey && e.code.match(/arrow/i) !== null) ||
-    e.metaKey || e.ctrlKey ||
+    e.metaKey ||
+    e.ctrlKey ||
     e.code === "Backspace"
   );
 };
