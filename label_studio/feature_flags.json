@@ -597,7 +597,7 @@
     },
     "ff_click_new_project_action_short": {
       "key": "ff_click_new_project_action_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -620,7 +620,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "ff_dev_2007_dev_2008_dynamic_tag_children_250322_short": {
