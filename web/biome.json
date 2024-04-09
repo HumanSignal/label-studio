@@ -70,7 +70,6 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
-        "noUnusedLabels": "off",
         "noUnusedPrivateClassMembers": "off",
         "noUnusedVariables": "off",
         "noVoidElementsWithChildren": "off",
