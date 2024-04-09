@@ -18,10 +18,8 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
 !!! note 
     Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
 
-
+<div class="release-note">
 <a name="2101post2md"></a>
-
-*Apr 02, 2024*
 
 ## Label Studio Enterprise 2.10.1.post2
 Helm Chart version: 1.4.0
@@ -32,9 +30,10 @@ Helm Chart version: 1.4.0
 
 
 
-<a name="2101post1md"></a>
 
-*Mar 13, 2024*
+
+</div><div class="release-note">
+<a name="2101post1md"></a>
 
 ## Label Studio Enterprise 2.10.1.post1
 Helm Chart version: 1.4.0
@@ -46,6 +45,9 @@ Helm Chart version: 1.4.0
 
 
 
+
+
+</div><div class="release-note">
 <a name="2101md"></a>
 
 ## Label Studio Enterprise 2.10.1
@@ -96,6 +98,10 @@ Fixed an issue where sensitive information was available in activity logs.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="2100md"></a>
 
 ## Label Studio Enterprise 2.10.0
@@ -199,6 +205,10 @@ For more details, see the full release notes below.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="290-2md"></a>
 
 ## Label Studio Enterprise 2.9.0-2
@@ -214,6 +224,10 @@ For more details, see the full release notes below.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="290-1md"></a>
 
 ## Label Studio Enterprise 2.9.0-1
@@ -229,6 +243,10 @@ For more details, see the full release notes below.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="290md"></a>
 
 ## Label Studio Enterprise 2.9.0
@@ -265,6 +283,10 @@ For more details, see the full release notes below.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="280md"></a>
 
 ## Label Studio Enterprise 2.8.0
@@ -336,6 +358,10 @@ For more details, see the full release notes below.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="270-1md"></a>
 
 ## Label Studio Enterprise 2.7.0-1
@@ -348,6 +374,10 @@ For more details, see the full release notes below.
 - Fix UWSGI config to support IPv4 only host networks.
 
 
+
+
+
+</div><div class="release-note">
 <a name="270md"></a>
 
 ## Label Studio Enterprise 2.7.0
@@ -426,6 +456,10 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="260-2md"></a>
 
 ## Label Studio Enterprise 2.6.0-2
@@ -439,6 +473,10 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="260-1md"></a>
 
 ## Label Studio Enterprise 2.6.0-1
@@ -452,6 +490,10 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 - Fixed an issue where `PATCH api/tasks/<id>` was returning errors. 
 
 
+
+
+
+</div><div class="release-note">
 <a name="260md"></a>
 
 ## Label Studio Enterprise 2.6.0
@@ -489,6 +531,10 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="250-1md"></a>
 
 ## Label Studio Enterprise 2.5.0-1
@@ -501,6 +547,10 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 - Security fix for Data Manager
 
 
+
+
+
+</div><div class="release-note">
 <a name="250md"></a>
 
 ## Label Studio Enterprise 2.5.0
@@ -536,6 +586,10 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 - Fixed an issue with login page indexing that was preventing users from being added to projects. 
 - Fixed an issue where the predictions counter was not correct when using project-level role mapping. 
 
+
+
+
+</div><div class="release-note">
 <a name="2410md"></a>
 
 ## Label Studio Enterprise 2.4.10
@@ -628,6 +682,10 @@ This release addresses a vulnerability regarding how SECRET_KEY is set.
 - Fixed an issue causing deadlocks on task import when running parallel jobs. 
 
 
+
+
+
+</div><div class="release-note">
 <a name="249-7md"></a>
 
 ## Label Studio Enterprise 2.4.9-7
@@ -644,6 +702,10 @@ This release addresses a vulnerability regarding how SECRET_KEY is set.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="249-6md"></a>
 
 ## Label Studio Enterprise 2.4.9-6
@@ -658,6 +720,10 @@ This release addresses a vulnerability regarding how SECRET_KEY is set.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="249-5md"></a>
 
 ## Label Studio Enterprise 2.4.9-5
@@ -671,6 +737,10 @@ This release addresses a vulnerability regarding how SECRET_KEY is set.
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="249-4md"></a>
 
 ## Label Studio Enterprise 2.4.9-4
@@ -691,6 +761,10 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="249-2md"></a>
 
 ## Label Studio Enterprise 2.4.9-2
@@ -730,6 +804,10 @@ Add Draft Column to the Data Manager
 - Tooltip is missing when expanding / collapsing "Archived Workspaces" section
 
 
+
+
+
+</div><div class="release-note">
 <a name="248-1md"></a>
 
 ## Label Studio Enterprise 2.4.8-1
@@ -743,6 +821,10 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="248md"></a>
 
 ## Label Studio Enterprise 2.4.8
@@ -850,6 +932,10 @@ Add Draft Column to the Data Manager
 - Shorten ordered by title in outliner to allow for filters
 
 
+
+
+
+</div><div class="release-note">
 <a name="247md"></a>
 
 ## Label Studio Enterprise 2.4.7
@@ -873,6 +959,10 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="246-1md"></a>
 
 ## Label Studio Enterprise 2.4.6-1
@@ -886,6 +976,10 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="246md"></a>
 
 ## Label Studio Enterprise 2.4.6
@@ -908,6 +1002,10 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="245md"></a>
 
 ## Label Studio Enterprise 2.4.5
@@ -935,6 +1033,10 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note">
 <a name="244md"></a>
 
 ## Label Studio Enterprise 2.4.4
@@ -962,6 +1064,10 @@ Add Draft Column to the Data Manager
 - Audio playback and playhead remain in sync.
 
 
+
+
+
+</div><div class="release-note">
 <a name="243md"></a>
 
 ## Label Studio Enterprise 2.4.3
@@ -994,6 +1100,10 @@ Add Draft Column to the Data Manager
 - The first Audio V3 region created is not added to the undo stack
 
 
+
+
+
+</div><div class="release-note">
 <a name="242md"></a>
 
 ## Label Studio Enterprise 2.4.2
@@ -1037,6 +1147,10 @@ Add Draft Column to the Data Manager
 - Saving model version on Machine Learning settings doesn't work
 
 
+
+
+
+</div><div class="release-note">
 <a name="241md"></a>
 
 ## Label Studio Enterprise 2.4.1
@@ -1072,6 +1186,10 @@ Add Draft Column to the Data Manager
 - Prevent annotation duplicates when 'Re-queue skipped tasks back to the annotator' parameter is selected
 - Add Google project ID to Source/Target GCS form
 
+
+
+
+</div><div class="release-note">
 <a name="240md"></a>
 
 ## Label Studio Enterprise 2.4.0
@@ -1155,6 +1273,10 @@ This section highlights the new features and enhancements, and bug fixes in Labe
 - Filtering failed to work for Annotation results.
 - Returned `400` bad requests on incorrect XML.
 
+
+
+
+</div><div class="release-note">
 <a name="231md"></a>
 
 ## Label Studio Enterprise 2.3.1
@@ -1419,6 +1541,10 @@ Label Studio 2.3.1 includes the following bug fixes:
 - Updated swagger docs for `AllStorage` APIs.
 - Added example output for `HyperTextLabels` in the Label Studio documentation suite.
 
+
+
+
+</div><div class="release-note">
 <a name="2210md"></a>
 
 ## Label Studio Enterprise 2.2.10
@@ -1439,6 +1565,10 @@ Label Studio 2.2.10 includes the following bug fixes:
 - Fixed an issue when the Safari browser stopped working.
 - Fixed scrollable area in **Review** mode.
 
+
+
+
+</div><div class="release-note">
 <a name="229md"></a>
 
 ## Label Studio Enterprise 2.2.9
@@ -1514,6 +1644,10 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Fixed synchronization speed between video and audio.
 - Fixed an issue with prop `whenChoiceValue`.
 
+
+
+
+</div><div class="release-note">
 <a name="228md"></a>
 
 ## Label Studio Enterprise 2.2.8
@@ -1590,6 +1724,10 @@ Label Studio 2.2.8 includes the following bug fixes:
 - Fixed 404 on skip.
 
 
+
+
+
+</div><div class="release-note">
 <a name="220md"></a>
 
 ## Label Studio Enterprise 2.2.0
@@ -1645,3 +1783,4 @@ Label Studio Enterprise 2.2.0 introduces the following new features and enhancem
     <br>
     <div style="margin:auto; text-align:center;"><img src="/images/lead-time.png" style="opacity: 0.8"/></div>
     <i>Figure 5: Lead Time column in Data Manager. </i>
+</div>

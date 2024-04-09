@@ -442,7 +442,7 @@ main {
 }
 
 .page-sidebar .page-sidebar-list [aria-current="page"] {
-  color: var(--color-accent);
+  color: var(--color-gray-900);
   font-weight: 600;
   background: var(--color-white);
   border: 1px solid var(--color-gray-300);
@@ -479,7 +479,7 @@ main {
 }
 
 .page-sidebar ul a {
-  font-size: 0.875rem;
+  font-size: 0.925rem;
   text-decoration: none;
   color: var(--color-gray-900);
   padding: .325rem .5rem;
@@ -535,8 +535,8 @@ main {
 }
 
 .page-sidebar .page-sidebar-children-list [aria-current="page"] {
-  color: var(--color-blue-400);
-  font-weight: 400;
+  color: var(--color-gray-900);
+  font-weight: 600;
   border: none;
   border-radius: 0;
   background: none;
