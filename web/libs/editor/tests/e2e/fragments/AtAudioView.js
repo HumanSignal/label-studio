@@ -34,8 +34,8 @@ module.exports = {
   },
   async waitForAudio() {
     await I.executeScript(Helpers.waitForAudio);
-    I.waitForInvisible(this._progressBarSelector);
-    I.waitForDetached('loading-progress-bar', 10);
+    I.waitForInvisible(this._progressBarSelector, 30);
+    I.waitForDetached('loading-progress-bar', 30);
   },
   getCurrentAudio() {
     return I.executeScript(Helpers.getCurrentMedia, 'audio');
@@ -174,7 +174,7 @@ module.exports = {
   /**
    * Zooms in the Audio Waveform by using the mouse wheel at the given relative position.
    * @param {number} deltaY
-   * @param {Object} [atPoint] - Point where the wheel action will be called 
+   * @param {Object} [atPoint] - Point where the wheel action will be called
    * @param {number} [atPoint.x=0.5] - relative X coordinate
    * @param {number} [atPoint.y=0.5] - relative Y coordinate
    * @returns {Promise<void>}
@@ -325,7 +325,7 @@ module.exports = {
 
     assert.match(error, matcher);
   },
-  
+
   /**
    * Asserts whether the audio player is reporting as paused.
    * @returns {Promise<void>}

@@ -10,7 +10,7 @@ const config = `
   </View>
 `;
 
-const image = 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
+const image = 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
 
 describe('Basic Image scenario', () => {
   it('Should be able to draw a simple rectangle', () => {

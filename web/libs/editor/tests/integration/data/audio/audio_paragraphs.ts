@@ -18,7 +18,7 @@ export const config = `
 `;
 
 export const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3',
   text: [
     {
       'text': 'Dont you hate that?',

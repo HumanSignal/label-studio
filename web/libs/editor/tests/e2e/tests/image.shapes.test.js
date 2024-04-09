@@ -20,7 +20,7 @@ const getConfigWithShape = (shape, props = '') => `
   </View>`;
 
 const IMAGE =
-  'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
+  'https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
 
 // precalculated image size on the screen; may change because of different reasons
 const WIDTH = 706;

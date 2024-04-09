@@ -143,7 +143,7 @@ List of items where only `"from_name", "to_name"` values from the [raw JSON form
 For example: 
 ```json
 {
-  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
+  "image": "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
   "tag": [{
     "height": 10.458911419423693,
     "rectanglelabels": [
