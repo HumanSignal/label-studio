@@ -82,7 +82,6 @@
       "style": {
         "noNonNullAssertion": "off",
         "useDefaultParameterLast": "off",
-        "useExponentiationOperator": "off",
         "useFragmentSyntax": "off",
         "useNodejsImportProtocol": "off",
         "useNumberNamespace": "off",
