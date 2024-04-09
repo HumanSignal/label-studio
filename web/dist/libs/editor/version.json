@@ -1,6 +1,6 @@
 {
-  "message": "fixing structure",
-  "commit": "54faef5f70ba1019dc9804f556494c15d4209cd0",
-  "date": "2024-04-09T03:42:09.000Z",
+  "message": "Update web/apps/labelstudio/src/components/Description/Description.styl",
+  "commit": "bc87eb8ce82e617a59351c8e8954ea185e55143c",
+  "date": "2024-04-09T16:55:03.000Z",
   "branch": "dev/copy-changes"
 }
