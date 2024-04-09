@@ -306,168 +306,162 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
 
     assert.strictEqual(panel1HeaderBbox.x, panel2HeaderBbox.x);
   }
-
+  I.say("Drag panel somewhere to the center of the screen");
   {
-    I.say("Drag panel somewhere to the center of the screen");
+    let panelBbox = await AtOutlinerPanel.grabPanelBbox();
+    const panelsContainerBbox = await AtPanels.grabPanelsContainerBbox();
+    const panelsContainerCenter = centerOfBbox(panelsContainerBbox);
+
+    await AtOutlinerPanel.dragPanelTo(panelsContainerCenter.x, panelsContainerCenter.y - panelBbox.height / 2);
+
+    I.say("Try to resize panel in all directions");
+    panelBbox = await AtOutlinerPanel.grabPanelBbox();
     {
-      let panelBbox = await AtOutlinerPanel.grabPanelBbox();
-      const panelsContainerBbox = await AtPanels.grabPanelsContainerBbox();
-      const panelsContainerCenter = centerOfBbox(panelsContainerBbox);
+      I.say("drag TopLeft corner");
+      await AtOutlinerPanel.dragResizerBy(-1, -2, AtOutlinerPanel.resizeTopLeft);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
-      await AtOutlinerPanel.dragPanelTo(panelsContainerCenter.x, panelsContainerCenter.y - panelBbox.height / 2);
-
-      I.say("Try to resize panel in all directions");
-      panelBbox = await AtOutlinerPanel.grabPanelBbox();
-      {
-        I.say("drag TopLeft corner");
-        await AtOutlinerPanel.dragResizerBy(-1, -2, AtOutlinerPanel.resizeTopLeft);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert.strictEqual(newPanelBbox.x - panelBbox.x, -1);
-        assert.strictEqual(newPanelBbox.y - panelBbox.y, -2);
-        assert.strictEqual(newPanelBbox.width - panelBbox.width, 1);
-        assert.strictEqual(newPanelBbox.height - panelBbox.height, 2);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("drag TopRight corner");
-        await AtOutlinerPanel.dragResizerBy(-1, -2, AtOutlinerPanel.resizeTopRight);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
-        assert.strictEqual(newPanelBbox.y - panelBbox.y, -2);
-        assert.strictEqual(newPanelBbox.width - panelBbox.width, -1);
-        assert.strictEqual(newPanelBbox.height - panelBbox.height, 2);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("drag BottomRight corner");
-        await AtOutlinerPanel.dragResizerBy(3, 5, AtOutlinerPanel.resizeBottomRight);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
-        assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
-        assert.strictEqual(newPanelBbox.width - panelBbox.width, 3);
-        assert.strictEqual(newPanelBbox.height - panelBbox.height, 5);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("drag BottomLeft corner");
-        await AtOutlinerPanel.dragResizerBy(3, -5, AtOutlinerPanel.resizeBottomLeft);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert.strictEqual(newPanelBbox.x - panelBbox.x, 3);
-        assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
-        assert.strictEqual(newPanelBbox.width - panelBbox.width, -3);
-        assert.strictEqual(newPanelBbox.height - panelBbox.height, -5);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("drag Top border");
-        await AtOutlinerPanel.dragResizerBy(10, -10, AtOutlinerPanel.resizeTop, 2);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
-        assert.strictEqual(newPanelBbox.y - panelBbox.y, -10);
-        assert.strictEqual(newPanelBbox.width - panelBbox.width, 0);
-        assert.strictEqual(newPanelBbox.height - panelBbox.height, 10);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("drag Right border");
-        await AtOutlinerPanel.dragResizerBy(100, -7, AtOutlinerPanel.resizeRight, 2);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
-        assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
-        assert.strictEqual(newPanelBbox.width - panelBbox.width, 100);
-        assert.strictEqual(newPanelBbox.height - panelBbox.height, 0);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("drag Bottom border");
-        await AtOutlinerPanel.dragResizerBy(11, 11, AtOutlinerPanel.resizeBottom);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
-        assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
-        assert.strictEqual(newPanelBbox.width - panelBbox.width, 0);
-        assert.strictEqual(newPanelBbox.height - panelBbox.height, 11);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("drag Left border");
-        await AtOutlinerPanel.dragResizerBy(7, -7, AtOutlinerPanel.resizeLeft);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert.strictEqual(newPanelBbox.x - panelBbox.x, 7);
-        assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
-        assert.strictEqual(newPanelBbox.width - panelBbox.width, -7);
-        assert.strictEqual(newPanelBbox.height - panelBbox.height, 0);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("Check maximal size restriction");
-        await AtOutlinerPanel.dragResizerBy(-1000, -1000, AtOutlinerPanel.resizeTopLeft);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert(newPanelBbox.x - panelBbox.x < 500);
-        assert(newPanelBbox.y - panelBbox.y < 500);
-        assert(newPanelBbox.width - panelBbox.width > -500);
-        assert(newPanelBbox.height - panelBbox.height > -500);
-        panelBbox = newPanelBbox;
-      }
-      {
-        I.say("Check minimal size restriction");
-        await AtOutlinerPanel.dragResizerBy(panelBbox.width, panelBbox.height + 50, AtOutlinerPanel.resizeTopLeft);
-        const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
-
-        assert(newPanelBbox.width > 100);
-        assert(newPanelBbox.height > 100);
-        assert(newPanelBbox.x < panelBbox.x + panelBbox.width - 100);
-        assert(newPanelBbox.y < panelBbox.y + panelBbox.height - 100);
-        panelBbox = newPanelBbox;
-      }
+      assert.strictEqual(newPanelBbox.x - panelBbox.x, -1);
+      assert.strictEqual(newPanelBbox.y - panelBbox.y, -2);
+      assert.strictEqual(newPanelBbox.width - panelBbox.width, 1);
+      assert.strictEqual(newPanelBbox.height - panelBbox.height, 2);
+      panelBbox = newPanelBbox;
     }
-
-    I.say("Move details to the left socket");
-    await AtDetailsPanel.dragPanelToLeftSocket();
-    AtDetailsPanel.seePanelAttachedLeft();
-
     {
-      I.say("Move outliner to the right socket by moving to the left (check that there is some gap)");
-      const panelBbox = await AtOutlinerPanel.grabPanelBbox();
-      const panelContainerWidth = await AtOutlinerPanel.grabPanelsContainerBbox("width");
-      const shiftX = 50;
+      I.say("drag TopRight corner");
+      await AtOutlinerPanel.dragResizerBy(-1, -2, AtOutlinerPanel.resizeTopRight);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
-      await AtOutlinerPanel.dragPanelTo(panelContainerWidth - panelBbox.width / 2 - shiftX, panelBbox.y);
-      AtOutlinerPanel.seePanelDetached();
-      await AtOutlinerPanel.dragResizerBy(shiftX, 0, AtOutlinerPanel.resizeRight);
-      AtOutlinerPanel.seePanelDetached();
-      await AtOutlinerPanel.dragPanelBy(-5, 0);
-      AtOutlinerPanel.seePanelAttachedRight();
+      assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
+      assert.strictEqual(newPanelBbox.y - panelBbox.y, -2);
+      assert.strictEqual(newPanelBbox.width - panelBbox.width, -1);
+      assert.strictEqual(newPanelBbox.height - panelBbox.height, 2);
+      panelBbox = newPanelBbox;
+    }
+    {
+      I.say("drag BottomRight corner");
+      await AtOutlinerPanel.dragResizerBy(3, 5, AtOutlinerPanel.resizeBottomRight);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+
+      assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
+      assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
+      assert.strictEqual(newPanelBbox.width - panelBbox.width, 3);
+      assert.strictEqual(newPanelBbox.height - panelBbox.height, 5);
+      panelBbox = newPanelBbox;
+    }
+    {
+      I.say("drag BottomLeft corner");
+      await AtOutlinerPanel.dragResizerBy(3, -5, AtOutlinerPanel.resizeBottomLeft);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+
+      assert.strictEqual(newPanelBbox.x - panelBbox.x, 3);
+      assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
+      assert.strictEqual(newPanelBbox.width - panelBbox.width, -3);
+      assert.strictEqual(newPanelBbox.height - panelBbox.height, -5);
+      panelBbox = newPanelBbox;
+    }
+    {
+      I.say("drag Top border");
+      await AtOutlinerPanel.dragResizerBy(10, -10, AtOutlinerPanel.resizeTop, 2);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+
+      assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
+      assert.strictEqual(newPanelBbox.y - panelBbox.y, -10);
+      assert.strictEqual(newPanelBbox.width - panelBbox.width, 0);
+      assert.strictEqual(newPanelBbox.height - panelBbox.height, 10);
+      panelBbox = newPanelBbox;
+    }
+    {
+      I.say("drag Right border");
+      await AtOutlinerPanel.dragResizerBy(100, -7, AtOutlinerPanel.resizeRight, 2);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+
+      assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
+      assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
+      assert.strictEqual(newPanelBbox.width - panelBbox.width, 100);
+      assert.strictEqual(newPanelBbox.height - panelBbox.height, 0);
+      panelBbox = newPanelBbox;
+    }
+    {
+      I.say("drag Bottom border");
+      await AtOutlinerPanel.dragResizerBy(11, 11, AtOutlinerPanel.resizeBottom);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+
+      assert.strictEqual(newPanelBbox.x - panelBbox.x, 0);
+      assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
+      assert.strictEqual(newPanelBbox.width - panelBbox.width, 0);
+      assert.strictEqual(newPanelBbox.height - panelBbox.height, 11);
+      panelBbox = newPanelBbox;
+    }
+    {
+      I.say("drag Left border");
+      await AtOutlinerPanel.dragResizerBy(7, -7, AtOutlinerPanel.resizeLeft);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+
+      assert.strictEqual(newPanelBbox.x - panelBbox.x, 7);
+      assert.strictEqual(newPanelBbox.y - panelBbox.y, 0);
+      assert.strictEqual(newPanelBbox.width - panelBbox.width, -7);
+      assert.strictEqual(newPanelBbox.height - panelBbox.height, 0);
+      panelBbox = newPanelBbox;
+    }
+    {
+      I.say("Check maximal size restriction");
+      await AtOutlinerPanel.dragResizerBy(-1000, -1000, AtOutlinerPanel.resizeTopLeft);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+
+      assert(newPanelBbox.x - panelBbox.x < 500);
+      assert(newPanelBbox.y - panelBbox.y < 500);
+      assert(newPanelBbox.width - panelBbox.width > -500);
+      assert(newPanelBbox.height - panelBbox.height > -500);
+      panelBbox = newPanelBbox;
+    }
+    {
+      I.say("Check minimal size restriction");
+      await AtOutlinerPanel.dragResizerBy(panelBbox.width, panelBbox.height + 50, AtOutlinerPanel.resizeTopLeft);
+      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+
+      assert(newPanelBbox.width > 100);
+      assert(newPanelBbox.height > 100);
+      assert(newPanelBbox.x < panelBbox.x + panelBbox.width - 100);
+      assert(newPanelBbox.y < panelBbox.y + panelBbox.height - 100);
+      panelBbox = newPanelBbox;
     }
   }
 
+  I.say("Move details to the left socket");
+  await AtDetailsPanel.dragPanelToLeftSocket();
+  AtDetailsPanel.seePanelAttachedLeft();
+
   {
-    I.say("Attached panels should be resizable");
+    I.say("Move outliner to the right socket by moving to the left (check that there is some gap)");
+    const panelBbox = await AtOutlinerPanel.grabPanelBbox();
+    const panelContainerWidth = await AtOutlinerPanel.grabPanelsContainerBbox("width");
+    const shiftX = 50;
 
-    {
-      const panelBbox = await AtOutlinerPanel.grabPanelBbox();
+    await AtOutlinerPanel.dragPanelTo(panelContainerWidth - panelBbox.width / 2 - shiftX, panelBbox.y);
+    AtOutlinerPanel.seePanelDetached();
+    await AtOutlinerPanel.dragResizerBy(shiftX, 0, AtOutlinerPanel.resizeRight);
+    AtOutlinerPanel.seePanelDetached();
+    await AtOutlinerPanel.dragPanelBy(-5, 0);
+    AtOutlinerPanel.seePanelAttachedRight();
+  }
+  I.say("Attached panels should be resizable");
 
-      await AtOutlinerPanel.dragResizerBy(-10, 0, AtOutlinerPanel.resizeLeft);
-      const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
+  {
+    const panelBbox = await AtOutlinerPanel.grabPanelBbox();
 
-      assert(newPanelBbox.width - panelBbox.width, 10);
-    }
-    {
-      const panelBbox = await AtDetailsPanel.grabPanelBbox();
+    await AtOutlinerPanel.dragResizerBy(-10, 0, AtOutlinerPanel.resizeLeft);
+    const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
-      await AtDetailsPanel.dragResizerBy(10, 0, AtOutlinerPanel.resizeRight);
-      const newPanelBbox = await AtDetailsPanel.grabPanelBbox();
+    assert(newPanelBbox.width - panelBbox.width, 10);
+  }
+  {
+    const panelBbox = await AtDetailsPanel.grabPanelBbox();
 
-      assert(newPanelBbox.width - panelBbox.width, 10);
-    }
+    await AtDetailsPanel.dragResizerBy(10, 0, AtOutlinerPanel.resizeRight);
+    const newPanelBbox = await AtDetailsPanel.grabPanelBbox();
+
+    assert(newPanelBbox.width - panelBbox.width, 10);
   }
 
   I.say("Collapse is still working");
@@ -475,31 +469,28 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   AtOutlinerPanel.dontSeePanelBody();
   AtOutlinerPanel.dontSeeСollapseButton();
   AtOutlinerPanel.seeExpandButton();
-
+  I.say("Drag panel somewhere to the center of the screen");
   {
-    I.say("Drag panel somewhere to the center of the screen");
-    {
-      const panelBbox = await AtDetailsPanel.grabPanelBbox();
-      const panelsContainerBbox = await AtPanels.grabPanelsContainerBbox();
-      const panelsContainerCenter = centerOfBbox(panelsContainerBbox);
+    const panelBbox = await AtDetailsPanel.grabPanelBbox();
+    const panelsContainerBbox = await AtPanels.grabPanelsContainerBbox();
+    const panelsContainerCenter = centerOfBbox(panelsContainerBbox);
 
-      await AtDetailsPanel.dragPanelTo(panelsContainerCenter.x, panelsContainerCenter.y - panelBbox.height / 2);
-      AtDetailsPanel.seePanelDetached();
-    }
-    I.say("Collapse detached panel");
-    AtDetailsPanel.collapsePanel();
-    AtDetailsPanel.dontSeePanelBody();
-    AtDetailsPanel.dontSeeСollapseButton();
-    AtDetailsPanel.seeExpandButton();
-
-    I.say("Make sure that it is still movable");
-    await AtDetailsPanel.dragPanelToLeftSocket();
-    I.say("and attachable");
-    AtDetailsPanel.seePanelAttachedLeft();
-    I.say("and expandable");
-    AtDetailsPanel.expandPanel();
-    AtDetailsPanel.seePanelBody();
-    AtDetailsPanel.seeСollapseButton();
-    AtDetailsPanel.dontSeeExpandButton();
+    await AtDetailsPanel.dragPanelTo(panelsContainerCenter.x, panelsContainerCenter.y - panelBbox.height / 2);
+    AtDetailsPanel.seePanelDetached();
   }
+  I.say("Collapse detached panel");
+  AtDetailsPanel.collapsePanel();
+  AtDetailsPanel.dontSeePanelBody();
+  AtDetailsPanel.dontSeeСollapseButton();
+  AtDetailsPanel.seeExpandButton();
+
+  I.say("Make sure that it is still movable");
+  await AtDetailsPanel.dragPanelToLeftSocket();
+  I.say("and attachable");
+  AtDetailsPanel.seePanelAttachedLeft();
+  I.say("and expandable");
+  AtDetailsPanel.expandPanel();
+  AtDetailsPanel.seePanelBody();
+  AtDetailsPanel.seeСollapseButton();
+  AtDetailsPanel.dontSeeExpandButton();
 });
