@@ -70,7 +70,7 @@ const Model = types.model({
 const StyleModel = types.compose("StyleModel", Model);
 
 const HtxStyle = observer(({ item }) => {
-  return <style dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.value) }}></style>;
+  return <style dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.value) }} />;
 });
 
 Registry.addTag("style", StyleModel, HtxStyle);

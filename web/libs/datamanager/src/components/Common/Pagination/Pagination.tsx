@@ -272,7 +272,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
                   onClick={() => {
                     /*  */
                   }}
-                ></div>
+                />
               </Elem>
             )}
           </Elem>
