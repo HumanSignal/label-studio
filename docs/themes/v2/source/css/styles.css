@@ -702,6 +702,8 @@ dl {
   list-style: none;
   padding-left: 0;
   margin-left: .5rem;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
 }
 
 .changelog-item {
@@ -726,13 +728,12 @@ dl {
   background: var(--color-gray-200);
   background: linear-gradient(109.47deg, #FFA663 0%, #FF7557 51.56%, #E37BD3 100%), var(--color-white);
   position: absolute;
-  top: 0;
+  top: 10px;
   left: -.375rem;
 }
 
 .changelog-item:last-child {
-  border-left: 1px solid transparent;
-  padding-bottom: 2rem;
+  padding-bottom: 0;
 }
 
 .large-changelog-item {
@@ -1067,7 +1068,7 @@ ul {
 .block-link {
   display: block;
   font-size: 1.75rem;
-  margin-top: .5rem;
+  margin-top: 0;
   color: var(--color-gray-900);
   transition: all 200ms;
 }
