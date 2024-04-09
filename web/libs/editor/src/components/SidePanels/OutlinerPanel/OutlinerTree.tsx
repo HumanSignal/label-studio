@@ -336,7 +336,7 @@ const useEventHandlers = () => {
     const dropPos = node.props.pos.split("-");
     const regions = node.item.annotation.regionStore;
 
-    dropPosition = dropPosition - parseInt(dropPos[dropPos.length - 1]);
+    dropPosition = dropPosition - Number.parseInt(dropPos[dropPos.length - 1]);
     const treeDepth = dropPos.length;
 
     const dragReg = regions.findRegionID(dragKey);

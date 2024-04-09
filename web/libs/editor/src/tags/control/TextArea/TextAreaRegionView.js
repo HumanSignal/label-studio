@@ -19,7 +19,7 @@ const { TextArea } = Input;
 
 const HtxTextAreaResultLine = forwardRef(
   ({ idx, value, readOnly, onChange, onDelete, onFocus, validate, control, collapsed }, ref) => {
-    const rows = parseInt(control.rows);
+    const rows = Number.parseInt(control.rows);
     const isTextarea = rows > 1;
     const [stateValue, setStateValue] = useState(value ?? "");
 
@@ -150,7 +150,7 @@ const HtxTextAreaResult = observer(({ item, control, firstResultInputRef, onFocu
 });
 
 const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, outliner, color }) => {
-  const rows = parseInt(item.rows);
+  const rows = Number.parseInt(item.rows);
   const isTextArea = rows > 1;
   const isActive = item.perRegionArea === area;
   const shouldFocus = area.isCompleted && area.perRegionFocusTarget === item && area.perRegionFocusRequest;
@@ -250,7 +250,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
   const showSubmit =
     (!result ||
       !result?.mainValue?.length ||
-      (item.maxsubmissions && result.mainValue.length < parseInt(item.maxsubmissions))) &&
+      (item.maxsubmissions && result.mainValue.length < Number.parseInt(item.maxsubmissions))) &&
     !area.isReadOnly();
 
   if (!isAlive(item) || !isAlive(area)) return null;

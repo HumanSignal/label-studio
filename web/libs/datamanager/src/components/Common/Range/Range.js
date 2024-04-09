@@ -93,7 +93,9 @@ export const Range = forwardRef(
           value={currentValue}
           data-type="number"
           onChange={(e) => {
-            const value = multi ? e.target.value.split(",").map((v) => parseInt(v)) : parseInt(e.target.value);
+            const value = multi
+              ? e.target.value.split(",").map((v) => Number.parseInt(v))
+              : Number.parseInt(e.target.value);
 
             updateValue(value);
           }}

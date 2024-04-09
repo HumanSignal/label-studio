@@ -49,7 +49,7 @@ const getStoredPageSize = (name?: string): number | undefined => {
   const value = localStorage.getItem(`pages:${name}`);
 
   if (isDefined(value)) {
-    return parseInt(value);
+    return Number.parseInt(value);
   }
 
   return undefined;
@@ -137,7 +137,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
     const applyPageNumberFromEvent = (
       e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>,
     ) => {
-      const result = parseInt((e.target as HTMLInputElement).value);
+      const result = Number.parseInt((e.target as HTMLInputElement).value);
 
       setPageClamped(result);
       setInputMode(false);
@@ -169,7 +169,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
         if (!props.urlParamName) return;
 
         const urlParams = new URLSearchParams(location.search);
-        const pageNumberFromURL = parseInt(urlParams.get(props.urlParamName) ?? "");
+        const pageNumberFromURL = Number.parseInt(urlParams.get(props.urlParamName) ?? "");
 
         if (!isNaN(pageNumberFromURL) && pageNumberFromURL !== currentPage) {
           setCurrentPage(pageNumberFromURL);
@@ -264,7 +264,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
               value={pageSize}
               options={pageSizeOptions.map((v) => ({ label: `${v} per page`, value: v }))}
               onChange={(e: any) => {
-                const newPageSize = parseInt(e.target.value);
+                const newPageSize = Number.parseInt(e.target.value);
 
                 setPageSize(newPageSize);
 
@@ -296,7 +296,7 @@ export const usePage = (paramName: string, initialValue = 1) => {
   const params = new URLSearchParams(location.search);
   const urlValue = params.get(paramName);
 
-  const [page, setPage] = useState(urlValue ? parseInt(urlValue) : initialValue);
+  const [page, setPage] = useState(urlValue ? Number.parseInt(urlValue) : initialValue);
 
   return [page, setPage];
 };
@@ -305,7 +305,7 @@ export const usePageSize = (paramName: string, initialValue = 1) => {
   const params = new URLSearchParams(location.search);
   const urlValue = params.get(paramName);
 
-  const [pageSize, setPageSize] = useState(urlValue ? parseInt(urlValue) : initialValue);
+  const [pageSize, setPageSize] = useState(urlValue ? Number.parseInt(urlValue) : initialValue);
 
   return [pageSize, setPageSize];
 };

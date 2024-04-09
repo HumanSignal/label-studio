@@ -18,7 +18,7 @@ import { EmptyProjectsList, ProjectsList } from "./ProjectsList";
 const getCurrentPage = () => {
   const pageNumberFromURL = new URLSearchParams(location.search).get("page");
 
-  return pageNumberFromURL ? parseInt(pageNumberFromURL) : 1;
+  return pageNumberFromURL ? Number.parseInt(pageNumberFromURL) : 1;
 };
 
 export const ProjectsPage = () => {
@@ -29,7 +29,7 @@ export const ProjectsPage = () => {
   const [currentPage, setCurrentPage] = useState(getCurrentPage());
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
-  const defaultPageSize = parseInt(localStorage.getItem("pages:projects-list") ?? 30);
+  const defaultPageSize = Number.parseInt(localStorage.getItem("pages:projects-list") ?? 30);
 
   const [modal, setModal] = React.useState(false);
   const openModal = setModal.bind(null, true);

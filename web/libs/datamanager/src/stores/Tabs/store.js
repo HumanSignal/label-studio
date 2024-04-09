@@ -453,7 +453,7 @@ export const TabStore = types
     },
 
     fetchTabs: flow(function* (tab, taskID, labeling) {
-      const tabId = parseInt(tab);
+      const tabId = Number.parseInt(tab);
       const response = yield getRoot(self).apiCall("tabs");
       const tabs = response.tabs ?? response ?? [];
       const columnIds = self.columns.map((c) => c.id);
@@ -482,7 +482,7 @@ export const TabStore = types
           pushState: false,
         });
       } else if (isDefined(taskID)) {
-        const task = { id: parseInt(taskID) };
+        const task = { id: Number.parseInt(taskID) };
 
         getRoot(self).startLabeling(task, {
           pushState: false,
@@ -492,7 +492,7 @@ export const TabStore = types
 
     fetchSingleTab: flow(function* (tabKey, selectedItems) {
       let tab,
-        tabId = parseInt(tabKey);
+        tabId = Number.parseInt(tabKey);
 
       if (!isNaN(tabKey) && !isNaN(tabId)) {
         const tabData = yield getRoot(self).apiCall("tab", { tabId });

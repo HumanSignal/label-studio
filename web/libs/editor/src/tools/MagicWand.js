@@ -150,11 +150,11 @@ const _Tool = types
     },
 
     get defaultthreshold() {
-      return parseInt(self.control.defaultthreshold, 10);
+      return Number.parseInt(self.control.defaultthreshold, 10);
     },
 
     get opacity() {
-      return parseFloat(self.control.opacity);
+      return Number.parseFloat(self.control.opacity);
     },
 
     get fillcolor() {
@@ -182,7 +182,7 @@ const _Tool = types
     },
 
     get blurradius() {
-      return parseInt(self.control.blurradius, 10);
+      return Number.parseInt(self.control.blurradius, 10);
     },
 
     /**

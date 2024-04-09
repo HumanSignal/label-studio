@@ -46,7 +46,7 @@ export const TextArea: FC<TextAreaProps> = ({
     rows,
     maxRows: Math.max(maxRows - 1, 1),
     lineHeight: 24,
-    maxHeight: Infinity,
+    maxHeight: Number.POSITIVE_INFINITY,
   });
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -57,7 +57,7 @@ export const TextArea: FC<TextAreaProps> = ({
 
         if (!textarea || !autoGrowRef.current || !textAreaRef.current) return;
 
-        if (autoGrowRef.current.maxHeight === Infinity) {
+        if (autoGrowRef.current.maxHeight === Number.POSITIVE_INFINITY) {
           textarea.style.height = "auto";
           const currentValue = textAreaRef.current.value;
 

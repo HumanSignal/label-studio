@@ -376,7 +376,7 @@ export const AppStore = types
       const { tab, task, annotation, labeling } = state ?? {};
 
       if (tab) {
-        const tabId = parseInt(tab);
+        const tabId = Number.parseInt(tab);
 
         self.viewsStore.setSelected(Number.isNaN(tabId) ? tab : tabId, {
           pushState: false,
@@ -388,10 +388,10 @@ export const AppStore = types
         const params = {};
 
         if (annotation) {
-          params.task_id = parseInt(task);
-          params.id = parseInt(annotation);
+          params.task_id = Number.parseInt(task);
+          params.id = Number.parseInt(annotation);
         } else {
-          params.id = parseInt(task);
+          params.id = Number.parseInt(task);
         }
 
         self.startLabeling(params, { pushState: false });

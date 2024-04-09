@@ -127,8 +127,8 @@ export const VideoCanvas = memo(
         const resultWidth = width * zoom;
         const resultHeight = height * zoom;
 
-        const xMinMax = clamp((resultWidth - canvasWidth) / 2, 0, Infinity);
-        const yMinMax = clamp((resultHeight - canvasHeight) / 2, 0, Infinity);
+        const xMinMax = clamp((resultWidth - canvasWidth) / 2, 0, Number.POSITIVE_INFINITY);
+        const yMinMax = clamp((resultHeight - canvasHeight) / 2, 0, Number.POSITIVE_INFINITY);
 
         const panX = props.allowPanOffscreen ? pan.x : clamp(pan.x, -xMinMax, xMinMax);
         const panY = props.allowPanOffscreen ? pan.y : clamp(pan.y, -yMinMax, yMinMax);

@@ -10,13 +10,13 @@ const Range = (min = 0, max = 1) =>
   types.custom<any, number>({
     name: `Range(${min}..${max})`,
     fromSnapshot(snapshot) {
-      return parseFloat(snapshot);
+      return Number.parseFloat(snapshot);
     },
     toSnapshot(value) {
       return value.toString();
     },
     isTargetType(value) {
-      const floatValue = parseFloat(value);
+      const floatValue = Number.parseFloat(value);
 
       return min <= floatValue && floatValue <= max;
     },

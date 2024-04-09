@@ -38,8 +38,16 @@ function useZoom(videoDimensions, canvasDimentions, shouldClampPan) {
     if (!shouldClampPan) {
       return pan;
     }
-    const xMinMax = clamp((data.current.video.width * zoom - data.current.canvas.width) / 2, 0, Infinity);
-    const yMinMax = clamp((data.current.video.height * zoom - data.current.canvas.height) / 2, 0, Infinity);
+    const xMinMax = clamp(
+      (data.current.video.width * zoom - data.current.canvas.width) / 2,
+      0,
+      Number.POSITIVE_INFINITY,
+    );
+    const yMinMax = clamp(
+      (data.current.video.height * zoom - data.current.canvas.height) / 2,
+      0,
+      Number.POSITIVE_INFINITY,
+    );
 
     return {
       x: clamp(pan.x, -xMinMax, xMinMax),

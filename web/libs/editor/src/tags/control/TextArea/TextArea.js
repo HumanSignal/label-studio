@@ -141,7 +141,7 @@ const Model = types
 
     get showSubmit() {
       if (self.maxsubmissions) {
-        const num = parseInt(self.maxsubmissions);
+        const num = Number.parseInt(self.maxsubmissions);
 
         return self.submissionsNum < num;
       }
@@ -364,7 +364,7 @@ const TextAreaModel = types.compose(
 );
 
 const HtxTextArea = observer(({ item }) => {
-  const rows = parseInt(item.rows);
+  const rows = Number.parseInt(item.rows);
   const onFocus = useCallback(
     (ev, model) => {
       if (isFF(FF_DEV_1564_DEV_1565)) {

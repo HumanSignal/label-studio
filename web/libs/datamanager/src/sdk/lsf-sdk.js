@@ -921,7 +921,7 @@ export class LSFWrapper {
     };
 
     if (includeId && userGenerate) {
-      result.id = parseInt(annotation.pk);
+      result.id = Number.parseInt(annotation.pk);
     }
 
     return result;

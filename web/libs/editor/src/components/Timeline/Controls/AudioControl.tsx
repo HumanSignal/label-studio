@@ -28,7 +28,7 @@ export const AudioControl: FC<AudioControlProps> = ({ volume, onVolumeChange, on
   }, [volume]);
 
   const handleSetVolume = (e: React.FormEvent<HTMLInputElement>) => {
-    const _volumeValue = parseInt(e.currentTarget.value);
+    const _volumeValue = Number.parseInt(e.currentTarget.value);
 
     if (!_volumeValue) {
       onVolumeChange?.(0);

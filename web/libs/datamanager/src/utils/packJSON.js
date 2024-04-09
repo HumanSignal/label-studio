@@ -260,7 +260,7 @@ PackJSON.prototype.encodeNumber = function (value) {
       .toString(32)
       .split("")
       .forEach((b32, idx) => {
-        const val = parseInt(b32, 32);
+        const val = Number.parseInt(b32, 32);
 
         this.buffer.pushChunk(idx ? 5 : val.toString(2).length, val);
       });
@@ -292,7 +292,7 @@ PackJSON.prototype.decodeNumber = function () {
         .map((v, idx) => this.buffer.readChunk(idx ? 5 : size % 5 || 5).toString(32))
         .join("");
 
-      return (sign ? -1 : 1) * parseInt(b32, 32);
+      return (sign ? -1 : 1) * Number.parseInt(b32, 32);
     }
     case NUMBER_STRING_TYPE: {
       const length = this.buffer.readChunk((64 / NUM_CODES_SIZE - 1).toString(2).length);
@@ -378,7 +378,7 @@ PackJSON.prototype.encodeStringLen = function (value) {
   const stringLengthParts = value.length.toString(1 << STRING_LEN_BLOCK_SIZE).split("");
 
   stringLengthParts.forEach((lenBlock, idx) => {
-    this.buffer.pushChunk(STRING_LEN_BLOCK_SIZE, parseInt(lenBlock, 1 << STRING_LEN_BLOCK_SIZE));
+    this.buffer.pushChunk(STRING_LEN_BLOCK_SIZE, Number.parseInt(lenBlock, 1 << STRING_LEN_BLOCK_SIZE));
     this.buffer.pushChunk(1, idx === stringLengthParts.length - 1); // stop chain marker
   });
 };
@@ -440,7 +440,7 @@ PackJSON.prototype.decodeStringLen = function () {
     stringLengthParts.push(this.buffer.readChunk(STRING_LEN_BLOCK_SIZE).toString(1 << STRING_LEN_BLOCK_SIZE));
     shouldStop = this.buffer.readChunk(1);
   } while (!shouldStop);
-  return parseInt(stringLengthParts.join(""), 1 << STRING_LEN_BLOCK_SIZE);
+  return Number.parseInt(stringLengthParts.join(""), 1 << STRING_LEN_BLOCK_SIZE);
 };
 
 PackJSON.prototype.packInConstants = function (value) {

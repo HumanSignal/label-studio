@@ -268,7 +268,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   }
 
   setAmp(amp: number) {
-    this.amp = clamp(amp, 1, Infinity);
+    this.amp = clamp(amp, 1, Number.POSITIVE_INFINITY);
     this.draw();
   }
 

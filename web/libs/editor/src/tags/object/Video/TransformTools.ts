@@ -46,10 +46,10 @@ export const getCommonBBox = (
     height: number;
   }[],
 ) => {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
 
   boxes.forEach((box) => {
     minX = Math.min(minX, box.x);
