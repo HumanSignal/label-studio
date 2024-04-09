@@ -135,23 +135,22 @@ export const MachineLearningSettings = () => {
         <Divider height={32} />
 
         {backends.length > 0 && (
-          <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: "1.5em" }}>
-            A connected model has been detected! If you wish to fetch
-            predictions from this model, please follow these steps:
-            <br />
-            <br />
-            1. Navigate to the <i>Data Manager</i>.<br />
-            2. Select the desired tasks.<br />
-            3. Click on <i>Retrieve predictions</i> from the{' '}
-            <i>Actions</i> menu.
-            <br />
-            <br />
-
-            <Description style={{ marginTop: 0, opacity: 1, display: "flex", gap: "5px" }} className="description_alert_warning">
-              <IconInfo width="20" height="20" />
-              If you want to use the model predictions for pre-labeling, please configure this in the Annotation settings.
+          <>
+            <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: "1.5em" }}>
+              A connected model has been detected! If you wish to fetch
+              predictions from this model, please follow these steps:
+              <br />
+              <br />
+              1. Navigate to the <i>Data Manager</i>.<br />
+              2. Select the desired tasks.<br />
+              3. Click on <i>Retrieve predictions</i> from the{' '}
+              <i>Actions</i> menu.
             </Description>
-          </Description>
+            <Description style={{ marginTop: 0, display: "flex", gap: "5px" }} className="description_alert_warning">
+              <IconInfo width="20" height="20" />
+              If you want to use the model predictions for prelabeling, please configure this in the Annotation settings.
+            </Description>
+          </>
         )}
 
         <Form
