@@ -40,7 +40,6 @@
       "suspicious": {
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
-        "noDuplicateObjectKeys": "off",
         "noGlobalIsFinite": "off",
         "noGlobalIsNan": "off",
         "noMisrefactoredShorthandAssign": "off",
