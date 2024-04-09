@@ -25,10 +25,10 @@ The script does the following:
 
 import os
 import re
-import yaml
 from pathlib import Path
 from typing import List
 
+import yaml
 
 ML_REPO_PATH = os.getenv('ML_REPO_PATH', 'label-studio-ml-backend/')
 
@@ -45,10 +45,7 @@ def parse_readme_file(file_path: str) -> dict:
     header = re.findall(r'---\n(.*?)\n---', content, re.DOTALL)
     body = re.sub(r'---\n(.*?)\n---', '', content, flags=re.DOTALL)
 
-    return {
-        'header': header[0].strip() if header else '',
-        'body': body.strip()
-    }
+    return {'header': header[0].strip() if header else '', 'body': body.strip()}
 
 
 def create_tutorial_files():
@@ -68,10 +65,9 @@ def create_tutorial_files():
                 f.write(parsed_content['header'])
                 f.write('\n---\n\n')
             f.write(parsed_content['body'])
-        files_and_headers.append({
-            'model_name': model_name,
-            'header': yaml.load(parsed_content['header'], Loader=yaml.FullLoader)
-        })
+        files_and_headers.append(
+            {'model_name': model_name, 'header': yaml.load(parsed_content['header'], Loader=yaml.FullLoader)}
+        )
 
     update_ml_tutorials_index(files_and_headers)
 
@@ -91,10 +87,7 @@ def update_ml_tutorials_index(files_and_headers: List):
     for f in files_and_headers:
         print('Processing', f['model_name'])
         h = f['header'] or {}
-        card = {
-            'title': h.get('title') or f['model_name'],
-            'url': f'/tutorials/{f["model_name"]}.html'
-        }
+        card = {'title': h.get('title') or f['model_name'], 'url': f'/tutorials/{f["model_name"]}.html'}
         card.update(f['header'] or {})
         data['cards'].append(card)
 
