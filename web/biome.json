@@ -81,7 +81,6 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noVar": "off",
         "useBlockStatements": "off",
         "useConsistentArrayType": "off",
         "useDefaultParameterLast": "off",
