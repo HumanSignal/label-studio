@@ -1,6 +1,6 @@
 import React, { useCallback, useContext } from 'react';
 
-import { formatDistanceToNow, parseISO } from 'date-fns';
+import { format, formatDistanceToNow, parseISO } from 'date-fns';
 import {
   IconInfoOutline,
   IconPredictions,
@@ -62,7 +62,7 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
     <Block name="prediction-card">
       <div>
         <div className={rootClass.elem('title')}>
-          <b>{version.model_version}</b>
+          {version.model_version}
           {version.model_version === 'undefined' && (
             <Tooltip title="Model version is undefined. Likely means that model_version field was missing when predictions were imported.">
               <IconInfoOutline
@@ -73,13 +73,15 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
             </Tooltip>
           )}
         </div>
-        <div className={rootClass.elem('meta')}>
-          <div className={rootClass.elem('group')}>
-            <IconPredictions /> {version.count}
+        <div className={rootClass.elem("meta")}>
+          <div className={rootClass.elem("group")}>
+            <IconPredictions/>&nbsp;{version.count}
           </div>
-          <div className={rootClass.elem('group')}>
-            Last prediction created:{' '}
-            {formatDistanceToNow(parseISO(version.latest), { addSuffix: true })}
+          <div className={rootClass.elem("group")}>
+            Last prediction created&nbsp;
+            <Tooltip title={format(parseISO(version.latest), 'yyyy-MM-dd HH:mm:ss')}>
+              <span>{formatDistanceToNow(parseISO(version.latest), { addSuffix: true })}</span>
+            </Tooltip>
           </div>
         </div>
       </div>

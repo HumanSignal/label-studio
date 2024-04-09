@@ -1,6 +1,6 @@
 ---
-title: Annotation agreement and how it is calculated
-short: Annotation agreement matrix
+title: Task agreement and how it is calculated
+short: Task agreement matrix
 tier: enterprise
 type: guide
 order: 0
@@ -24,6 +24,19 @@ Task agreement shows the consensus between multiple annotators when labeling the
 You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.
 
 For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance).
+
+
+### Configure task agreement settings for a project
+
+To configure task agreement settings for a project, go to the project **Settings** page and select **Quality**. From here you can configure several the following:
+
+* Select which agreement metric to use. The default metric is the [basic matching function](#Basic-matching-function). 
+* Set a low agreement threshold. 
+
+    A low agreement threshold  ensures that a task cannot be marked complete until it meets a minimum agreement threshold. 
+* Customize the weight of different labels when calculating agreement. 
+
+For more information, see [Project settings - Task agreement](project_settings_lse#task-agreement). 
 
 ## Agreement method
 
