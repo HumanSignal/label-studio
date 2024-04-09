@@ -31,7 +31,6 @@
       "recommended": true,
       "a11y": {
         "noAutofocus": "off",
-        "noPositiveTabindex": "off",
         "noRedundantRoles": "off",
         "useAnchorContent": "off",
         "useAriaActivedescendantWithTabindex": "off",
