@@ -98,22 +98,22 @@ export class Geometry {
   static closestRects(rectsList1, rectsList2) {
     const result = rectsList1
       .reduce((res, rect1) => {
-        const bbox1 = this.toRectCoordinates(rect1);
+        const bbox1 = Geometry.toRectCoordinates(rect1);
 
         rectsList2.forEach((rect2) => {
-          const bbox2 = this.toRectCoordinates(rect2);
+          const bbox2 = Geometry.toRectCoordinates(rect2);
 
           const avgDistance =
             [
-              this.distance([bbox1.x1, bbox1.y1], [bbox2.x1, bbox1.y1]),
-              this.distance([bbox1.x2, bbox1.y2], [bbox2.x2, bbox1.y2]),
-              this.distance([bbox1.x3, bbox1.y3], [bbox2.x3, bbox1.y3]),
-              this.distance([bbox1.x4, bbox1.y4], [bbox2.x4, bbox2.y4]),
+              Geometry.distance([bbox1.x1, bbox1.y1], [bbox2.x1, bbox1.y1]),
+              Geometry.distance([bbox1.x2, bbox1.y2], [bbox2.x2, bbox1.y2]),
+              Geometry.distance([bbox1.x3, bbox1.y3], [bbox2.x3, bbox1.y3]),
+              Geometry.distance([bbox1.x4, bbox1.y4], [bbox2.x4, bbox2.y4]),
             ].reduce((d1, d2) => d1 + d2) / 4;
 
           res.push({
             distance: avgDistance,
-            bbox: [this.convertToRectBBox(bbox1), this.convertToRectBBox(bbox2)],
+            bbox: [Geometry.convertToRectBBox(bbox1), Geometry.convertToRectBBox(bbox2)],
           });
         });
 
@@ -181,7 +181,7 @@ export class Geometry {
    * @returns {BBox[]} Dimensions of bounding box
    */
   static getEllipseBBox(x, y, rx, ry, angle) {
-    const angleRad = this.normalizeAngle(angle);
+    const angleRad = Geometry.normalizeAngle(angle);
     const major = Math.max(rx, ry) * 2;
     const minor = Math.min(rx, ry) * 2;
 
@@ -223,14 +223,14 @@ export class Geometry {
    * @returns {BBox[]} Dimensions of bounding box
    */
   static getRectBBox(x, y, width, height, angle) {
-    const angleRad = this.normalizeAngle(angle);
+    const angleRad = Geometry.normalizeAngle(angle);
 
     const rotate = (x1, y1) => [
       (x1 - x) * Math.cos(angleRad) - (y1 - y) * Math.sin(angleRad) + x,
       (x1 - x) * Math.sin(angleRad) + (y1 - y) * Math.cos(angleRad) + y,
     ];
 
-    const [rx1, ry1, rx2, ry2] = this.getPointsBBox([
+    const [rx1, ry1, rx2, ry2] = Geometry.getPointsBBox([
       x,
       y,
       ...rotate(x + width, y),
@@ -248,7 +248,7 @@ export class Geometry {
    */
   static getPolygonBBox(points) {
     const coords = points.reduce((res, point) => [...res, point.x, point.y], []);
-    const [x1, y1, x2, y2] = this.getPointsBBox(coords);
+    const [x1, y1, x2, y2] = Geometry.getPointsBBox(coords);
 
     return { x: x1, y: y1, width: x2 - x1, height: y2 - y1 };
   }
@@ -259,7 +259,7 @@ export class Geometry {
    * @return {BBox[]}
    */
   static getBrushBBox(points) {
-    const [x1, y1, x2, y2] = this.getPointsBBox(points);
+    const [x1, y1, x2, y2] = Geometry.getPointsBBox(points);
 
     return { x: x1, y: y1, width: x2 - x1, height: y2 - y1 };
   }
@@ -298,7 +298,7 @@ export class Geometry {
    * @return {BBox}
    */
   static combineBBoxes(...bboxes) {
-    const [x1, y1, x2, y2] = this.getPointsBBox(
+    const [x1, y1, x2, y2] = Geometry.getPointsBBox(
       bboxes.reduce((points, bbox) => {
         if (bbox && bbox.x && bbox.y) {
           points.push(bbox.x);
