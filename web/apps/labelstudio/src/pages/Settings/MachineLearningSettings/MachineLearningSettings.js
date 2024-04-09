@@ -5,7 +5,7 @@ import { Divider } from '../../../components/Divider/Divider';
 import { Form, Label, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
-import { IconEmptyPredictions } from '../../../assets/icons';
+import { IconEmptyPredictions, IconInfo } from '../../../assets/icons';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
@@ -142,22 +142,15 @@ export const MachineLearningSettings = () => {
             <br />
             1. Navigate to the <i>Data Manager</i>.<br />
             2. Select the desired tasks.<br />
-            3. Click on <i>Batch predictions</i> from the{' '}
+            3. Click on <i>Retrieve predictions</i> from the{' '}
             <i>Actions</i> menu.
             <br />
             <br />
-            Additionally, you can configure the system to use this model for
-            fetching live predictions in {" "}
-            <a
-              style={{ color: "unset", textDecoration: "underline" }}
-              target="_blank" href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
-            ><i>Label&nbsp;All&nbsp;Tasks</i></a>{" "}
-            and{" "}
-            <a
-              style={{ color: "unset", textDecoration: "underline" }}
-              target="_blank" href="https://labelstud.io/guide/get_started#Interface"
-            ><i>Quick View</i></a>{" "}
-            on the <i>Annotation</i> tab.
+
+            <Description style={{ marginTop: 0, opacity: 1, display: "flex", gap: "5px" }} className="description_alert_warning">
+              <IconInfo width="20" height="20" />
+              If you want to use the model predictions for pre-labeling, please configure this in the Annotation settings.
+            </Description>
           </Description>
         )}
 
