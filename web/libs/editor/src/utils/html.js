@@ -30,7 +30,7 @@ const labelWithCSS = (() => {
     const labelsStr = labels ? labels.join(",") : "";
     const clsName = Checkers.hashCode(labelsStr + score);
 
-    let cssCls = "htx-label-" + clsName;
+    let cssCls = `htx-label-${clsName}`;
 
     cssCls = cssCls.toLowerCase();
 
@@ -56,7 +56,7 @@ function createClass(name, rules) {
   style.type = "text/css";
   document.getElementsByTagName("head")[0].appendChild(style);
   if (!(style.sheet || {}).insertRule) (style.styleSheet || style.sheet).addRule(name, rules);
-  else style.sheet.insertRule(name + "{" + rules + "}", 0);
+  else style.sheet.insertRule(`${name}{${rules}}`, 0);
 }
 
 function documentForward(node) {
@@ -453,7 +453,7 @@ export const findByXpath = (xpath, root = document) => {
 
 export const htmlEscape = (string) => {
   const matchHtmlRegExp = /["'&<>]/;
-  const str = "" + string;
+  const str = `${string}`;
   const match = matchHtmlRegExp.exec(str);
 
   if (!match) {

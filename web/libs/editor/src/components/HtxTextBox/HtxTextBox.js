@@ -114,7 +114,7 @@ export class HtxTextBox extends React.Component {
 
     const inputProps = {
       name,
-      className: "ant-input " + styles.input,
+      className: `ant-input ${styles.input}`,
       style: height ? { height } : null,
       autoFocus: true,
       ref: this.inputRef,
@@ -150,11 +150,11 @@ export class HtxTextBox extends React.Component {
     this.updateHeight();
 
     return (
-      <Paragraph {...props} className={className + " ant-typography-edit-content " + styles.editing}>
+      <Paragraph {...props} className={`${className} ant-typography-edit-content ${styles.editing}`}>
         {rows > 1 ? <textarea {...inputProps} /> : <input {...inputProps} />}
         {!onlyEdit && (
           <Tooltip title="Save: [shift+enter]">
-            <EnterOutlined className={"ant-typography-edit-content-confirm " + styles.enter} onClick={this.save} />
+            <EnterOutlined className={`ant-typography-edit-content-confirm ${styles.enter}`} onClick={this.save} />
           </Tooltip>
         )}
       </Paragraph>

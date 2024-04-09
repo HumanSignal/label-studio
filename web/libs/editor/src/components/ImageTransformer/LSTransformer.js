@@ -95,7 +95,7 @@ class LSTransformer extends Konva.Transformer {
       });
 
       rotateButton.on("dragstart", (e) => {
-        const anchorNode = this.findOne("." + this._movingAnchorName);
+        const anchorNode = this.findOne(`.${this._movingAnchorName}`);
 
         anchorNode.stopDrag();
         e.cancelBubble = true;
@@ -232,7 +232,7 @@ class LSTransformer extends Konva.Transformer {
   }
 
   detach() {
-    this._outerBack?.off("." + EVENTS_NAME);
+    this._outerBack?.off(`.${EVENTS_NAME}`);
 
     super.detach();
   }

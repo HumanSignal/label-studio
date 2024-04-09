@@ -143,7 +143,7 @@ DataStore.Scenario(
         I.click(AtLabels.locateLabel("blank").at(+shapeIdx + 1));
       },
       (shapeName) => {
-        AtLabels.clickLabel(shapeName + "Create");
+        AtLabels.clickLabel(`${shapeName}Create`);
       },
     ];
 
@@ -184,7 +184,7 @@ DataStore.Scenario(
       I.click(toolSelector);
       I.say(`${shape}: Labeling.`);
 
-      const currentLabelName = shape + "Append";
+      const currentLabelName = `${shape}Append`;
 
       regions.forEach((region, idx) => {
         AtSidebar.clickRegion(+idx + 1);
