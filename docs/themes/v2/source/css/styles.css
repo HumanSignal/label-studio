@@ -543,6 +543,10 @@ main {
   border-left: 3px solid var(--color-blue-400);
 }
 
+.page-sidebar .page-sidebar-children-list [aria-current="page"]:hover {
+  border-left: 3px solid var(--color-blue-400);
+}
+
 .page-sidebar-toggle-children-list {
   appearance: none;
   background-color: transparent;
