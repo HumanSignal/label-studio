@@ -30,7 +30,6 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "noAccessKey": "off",
         "noAriaHiddenOnFocusable": "off",
         "noAriaUnsupportedElements": "off",
         "noAutofocus": "off",
