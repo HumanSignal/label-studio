@@ -1,4 +1,4 @@
-import {toStudlyCaps} from "strman";
+import { toStudlyCaps } from "strman";
 
 export { Agreement } from './Agreement/Agreement';
 export {
@@ -18,7 +18,8 @@ export { VideoCell as Video } from "./VideoCell";
 export { ProjectCell as Project } from './ProjectCell';
 
 export function normalizeCellAlias(alias) {
-  const safeAlias = alias
+  // remove trailing separators to make `toStudlyCaps` safe
+  const safeAlias = alias.replace(/[-_\s]+$/g, '');
     // remove trailing separators to make `toStudlyCaps` safe
     .replace(/[-_\s]+$/g, '');
   return toStudlyCaps(safeAlias);
