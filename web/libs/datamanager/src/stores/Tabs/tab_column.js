@@ -223,7 +223,9 @@ export const TabColumn = types
     },
 
     get filterable() {
-      return ((CellViews[self.type] ?? CellViews[normalizeCellAlias(self.alias)])?.filterable) !== false;
+      const cellView = CellViews[self.type] ?? CellViews[normalizeCellAlias(self.alias)];
+      
+      return cellView?.filterable !== false;
     },
   }))
   .actions((self) => ({
