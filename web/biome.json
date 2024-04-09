@@ -44,7 +44,12 @@
         "useAnchorContent": "off",
         "useAriaActivedescendantWithTabindex": "off",
         "useValidAriaProps": "off",
-        "useValidAriaRole": "off"
+        "useValidAriaRole": "off",
+        "noRedundantAlt": "off",
+        "noSvgWithoutTitle": "off",
+        "useAltText": "off",
+        "useButtonType": "off",
+        "useKeyWithClickEvents": "off"
       },
       "suspicious": {
         "noExplicitAny": "off",
@@ -61,7 +66,14 @@
         "noSparseArray": "off",
         "noUnsafeNegation": "off",
         "useIsArray": "off",
-        "useValidTypeof": "off"
+        "useValidTypeof": "off",
+        "noArrayIndexKey": "off",
+        "noAsyncPromiseExecutor": "off",
+        "noConfusingVoidType": "off",
+        "noImplicitAnyLet": "off",
+        "noShadowRestrictedNames": "off",
+        "useDefaultSwitchClauseLast": "off",
+        "useGetterReturn": "off"
       },
       "complexity": {
         "noForEach": "off",
@@ -74,7 +86,9 @@
         "useLiteralKeys": "off",
         "useOptionalChain": "off",
         "useRegexLiterals": "off",
-        "useSimplifiedLogicExpression": "off"
+        "useSimplifiedLogicExpression": "off",
+        "noBannedTypes": "off",
+        "noStaticOnlyClass": "off"
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
@@ -89,7 +103,11 @@
         "noUnusedPrivateClassMembers": "off",
         "noUnusedVariables": "off",
         "noVoidElementsWithChildren": "off",
-        "useIsNan": "off"
+        "useIsNan": "off",
+        "noChildrenProp": "off",
+        "noConstantCondition": "off",
+        "noInnerDeclarations": "off",
+        "noInvalidUseBeforeDeclaration": "off"
       },
       "performance": {
         "noAccumulatingSpread": "off",
@@ -114,15 +132,20 @@
         "useShorthandAssign": "off",
         "useSingleCaseStatement": "off",
         "useSingleVarDeclarator": "off",
-        "useTemplate": "off"
+        "useTemplate": "off",
+        "noArguments": "off",
+        "noCommaOperator": "off",
+        "noParameterAssign": "off"
       },
-
       "nursery": {
         "noConsole": "off",
         "noFocusedTests": "off",
         "noSkippedTests": "off",
         "noUselessTernary": "off",
         "useSortedClasses": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
       }
     }
   }
