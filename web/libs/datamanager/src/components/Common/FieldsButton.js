@@ -45,7 +45,8 @@ const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, sele
               {col.children.map((col) => MenuItem(col, () => onClick?.(col)))}
             </Menu.Group>
           );
-        } else if (!col.parent) {
+        }
+        if (!col.parent) {
           return MenuItem(col, () => onClick?.(col));
         }
 

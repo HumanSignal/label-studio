@@ -46,7 +46,8 @@ export const Slider: FC<SliderProps> = ({ description, info, max, min, value, st
     if (isNaN(newValue)) {
       setValueError(e.currentTarget.value);
       return;
-    } else if (newValue > max || newValue < min) {
+    }
+    if (newValue > max || newValue < min) {
       setValueError(newValue);
     } else {
       onChange(e);

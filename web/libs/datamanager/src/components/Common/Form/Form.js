@@ -184,9 +184,11 @@ export default class Form extends Component {
 
           if (fieldType === "checkbox") {
             return field.checked;
-          } else if (fieldType === "radio") {
+          }
+          if (fieldType === "radio") {
             return inputValue;
-          } else if (["number", "range"].includes(fieldType)) {
+          }
+          if (["number", "range"].includes(fieldType)) {
             return Number(field.value);
           }
 
@@ -203,12 +205,11 @@ export default class Form extends Component {
 
     if (asJSON) {
       return Object.fromEntries(requestBody);
-    } else {
-      const formData = new FormData();
-
-      requestBody.forEach(([key, value]) => formData.append(key, value));
-      return formData;
     }
+    const formData = new FormData();
+
+    requestBody.forEach(([key, value]) => formData.append(key, value));
+    return formData;
   }
 
   async submit({ fieldsFilter } = {}) {
@@ -251,10 +252,9 @@ export default class Form extends Component {
     if (response === null) {
       this.props.onError?.();
       return false;
-    } else {
-      this.props.onSubmit?.(response);
-      return true;
     }
+    this.props.onSubmit?.(response);
+    return true;
   }
 
   async submitWithFetch(body) {
@@ -284,9 +284,8 @@ export default class Form extends Component {
       if (response.ok) {
         this.props.onSubmit?.(result);
         return true;
-      } else {
-        this.props.onError?.(result);
       }
+      this.props.onError?.(result);
     } catch (err) {
       console.log(err);
       this.props.onError?.(err);

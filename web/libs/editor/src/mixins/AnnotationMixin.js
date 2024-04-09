@@ -17,7 +17,8 @@ export const AnnotationMixin = types.model("AnnotationMixin", {}).views((self) =
       if (root === self) {
         if (self.control) {
           return self.control.annotation;
-        } else if (self.obj) {
+        }
+        if (self.obj) {
           return self.obj.annotation;
         }
         return null;
@@ -43,7 +44,8 @@ export const AnnotationMixin = types.model("AnnotationMixin", {}).views((self) =
     if (root === self) {
       if (self.control) {
         return getRoot(self.control).annotationStore;
-      } else if (self.obj) {
+      }
+      if (self.obj) {
         return getRoot(self.obj).annotationStore;
       }
       return null;

@@ -5,9 +5,8 @@ const formatNumber = (num) => {
 
   if (num % 1 === 0) {
     return number;
-  } else {
-    return number.toFixed(3);
   }
+  return number.toFixed(3);
 };
 
 export const NumberCell = (column) => (isDefined(column.value) ? formatNumber(column.value) : "");
