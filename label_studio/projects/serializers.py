@@ -102,7 +102,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             data['expert_instruction'] = bleach.clean(
                 initial_data['expert_instruction'], tags=SAFE_HTML_TAGS, attributes=SAFE_HTML_ATTRIBUTES
             )
-            
+
         return data
 
     class Meta:
@@ -187,8 +187,8 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         return value
 
     def update(self, instance, validated_data):
-        if validated_data.get("show_collab_predictions") is False:
-            instance.model_version = ""
+        if validated_data.get('show_collab_predictions') is False:
+            instance.model_version = ''
 
         return super().update(instance, validated_data)
 

@@ -90,11 +90,10 @@ class MLBackendListAPI(generics.ListCreateAPIView):
 
         project = ml_backend.project
 
-        # In case we are adding the model, let's set it as the default 
-        # to obtain predictions. This approach is consistent with uploading 
+        # In case we are adding the model, let's set it as the default
+        # to obtain predictions. This approach is consistent with uploading
         # offline predictions, which would be set automatically.
-        if project.show_collab_predictions and \
-           (project.model_version is None or project.model_version == ""):
+        if project.show_collab_predictions and (project.model_version is None or project.model_version == ''):
             project.model_version = ml_backend.title
             project.save(update_fields=['model_version'])
 

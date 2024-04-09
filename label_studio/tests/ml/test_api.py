@@ -6,9 +6,10 @@ from rest_framework import status
 
 from label_studio.tests.utils import make_project, register_ml_backend_mock
 
-ORIG_MODEL_NAME="basic_ml_backend"
-PROJECT_CONFIG="""<View><Image name="image" value="$image_url"/><Choices name="label"
+ORIG_MODEL_NAME = 'basic_ml_backend'
+PROJECT_CONFIG = """<View><Image name="image" value="$image_url"/><Choices name="label"
           toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>"""
+
 
 @pytest.fixture
 def ml_backend_for_test_api(ml_backend):
@@ -48,7 +49,7 @@ def test_ml_backend_set_for_prelabeling(business_client, ml_backend_for_test_api
         },
     )
     assert response.status_code == 201
-    
+
     project.refresh_from_db()
     assert project.model_version == 'ml_backend_title'
 
@@ -69,7 +70,7 @@ def test_ml_backend_not_set_for_prelabeling(business_client, ml_backend_for_test
 
     project.model_version = ORIG_MODEL_NAME
     project.save()
-    
+
     # create ML backend
     response = business_client.post(
         '/api/ml/',
@@ -80,10 +81,10 @@ def test_ml_backend_not_set_for_prelabeling(business_client, ml_backend_for_test
         },
     )
     assert response.status_code == 201
-    
+
     project.refresh_from_db()
     assert project.model_version == ORIG_MODEL_NAME
-    
+
 
 @pytest.mark.django_db
 def test_model_version_on_save(business_client, ml_backend_for_test_api, mock_gethostbyname):
@@ -304,5 +305,3 @@ def test_ml_backend_predict_test_api_post_random_true(business_client):
     r = response.json()
     assert r['url'] == 'http://localhost:8999/predict'
     assert r['status'] == 200
-
-
