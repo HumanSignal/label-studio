@@ -193,7 +193,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
     },
   );
 
-  if (flags["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"]) {
+  if (flags.fflag_feat_front_lsdv_e_278_contextual_scrolling_short) {
     FFlagScenario(
       "Playback button states continually change over time according to the paragraph segment which is being played",
       async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {

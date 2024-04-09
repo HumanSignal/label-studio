@@ -1206,7 +1206,7 @@ export const Annotation = types
           self.results.filter((r) => r.area.classification).forEach((r) => r.from_name.updateFromResult?.(r.mainValue));
 
         objAnnotation.forEach((obj) => {
-          if (obj["type"] === "relation") {
+          if (obj.type === "relation") {
             self.relationStore.deserializeRelation(
               `${obj.from_id}#${self.id}`,
               `${obj.to_id}#${self.id}`,
@@ -1239,7 +1239,7 @@ export const Annotation = types
     },
 
     deserializeSingleResult(obj, getArea, createArea) {
-      if (obj["type"] !== "relation") {
+      if (obj.type !== "relation") {
         const { id, value: rawValue, type, ...data } = obj;
         let { from_name, to_name } = data;
 

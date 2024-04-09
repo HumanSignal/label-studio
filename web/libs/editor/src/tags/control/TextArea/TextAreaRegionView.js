@@ -240,12 +240,12 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
     };
   }
 
-  if (item.annotation.isReadOnly()) props["disabled"] = true;
+  if (item.annotation.isReadOnly()) props.disabled = true;
 
   const showAddButton = !item.annotation.isReadOnly() && (item.showsubmitbutton ?? rows !== 1);
   const itemStyle = {};
 
-  if (showAddButton) itemStyle["marginBottom"] = 0;
+  if (showAddButton) itemStyle.marginBottom = 0;
 
   const showSubmit =
     (!result ||

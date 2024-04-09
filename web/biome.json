@@ -64,7 +64,6 @@
       "complexity": {
         "noForEach": "off",
         "noUselessSwitchCase": "off",
-        "useLiteralKeys": "off",
         "useOptionalChain": "off",
         "useRegexLiterals": "off",
         "useSimplifiedLogicExpression": "off",
