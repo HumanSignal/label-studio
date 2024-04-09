@@ -9,7 +9,10 @@ import { isDefined } from "../../utils/utilities";
 
 const getItemPosition = (item) => {
   const { shapeRef: shape, bboxCoordsCanvas: bbox } = item;
-  let width, height, x, y;
+  let width;
+  let height;
+  let x;
+  let y;
 
   if (isDefined(bbox)) {
     [width, height, x, y] = [bbox.right - bbox.left, bbox.bottom - bbox.top, bbox.left, bbox.top];

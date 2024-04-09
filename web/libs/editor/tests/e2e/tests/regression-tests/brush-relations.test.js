@@ -14,9 +14,9 @@ function getPointAtSpiral(t, v, w) {
 }
 
 function generateSpiralPoints(x0, y0, R, v, w) {
-  let t = 1,
-    x,
-    y;
+  let t = 1;
+  let x;
+  let y;
   const points = [];
 
   do {
