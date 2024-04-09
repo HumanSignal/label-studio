@@ -76,7 +76,6 @@
         "noParameterAssign": "off"
       },
       "nursery": {
-        "noUselessTernary": "off",
         "useSortedClasses": "off"
       },
       "security": {
