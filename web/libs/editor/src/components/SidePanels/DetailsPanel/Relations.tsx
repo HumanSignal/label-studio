@@ -10,9 +10,13 @@ import { Select } from 'antd';
 import './Relations.styl';
 
 const RealtionsComponent: FC<any> = ({ relationStore }) => {
+  const relations = useCallback(() => {
+    return relationStore.orderedRelations;
+  }, [relationStore])();
+
   return (
     <Block name="relations">
-      <RelationsList relations={relationStore.relations}/>
+      <RelationsList relations={relations} />
     </Block>
   );
 };
@@ -33,7 +37,7 @@ const RelationsList: FC<RelationsListProps> = observer(({ relations }) => {
   );
 });
 
-const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
+const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
   const [hovered, setHovered] = useState(false);
 
   const onMouseEnter = useCallback(() => {
@@ -56,9 +60,9 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
     const { direction } = relation;
 
     switch (direction) {
-      case 'left': return <IconRelationLeft data-direction={relation.direction}/>;
-      case 'right': return <IconRelationRight data-direction={relation.direction}/>;
-      case 'bi': return <IconRelationBi data-direction={relation.direction}/>;
+      case 'left': return <IconRelationLeft data-direction={relation.direction} />;
+      case 'right': return <IconRelationRight data-direction={relation.direction} />;
+      case 'bi': return <IconRelationBi data-direction={relation.direction} />;
       default: return null;
     }
   }, [relation.direction]);
@@ -97,14 +101,14 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
                 onClick={relation.toggleMeta}
                 style={{ padding: 0 }}
               >
-                <IconMenu/>
+                <IconMenu />
               </Button>
             )}
           </Elem>
           <Elem name="action">
             {(hovered || !relation.visible) && (
               <Button type="text" onClick={relation.toggleVisibility} aria-label={`${relation.visible ? 'Hide' : 'Show'} Relation`}>
-                {relation.visible ? <IconEyeOpened/> : <IconEyeClosed />}
+                {relation.visible ? <IconEyeOpened /> : <IconEyeClosed />}
               </Button>
             )}
           </Elem>
@@ -115,14 +119,14 @@ const RelationItem: FC<{relation: any}> = observer(({ relation }) => {
                 relation.node2.setHighlight(false);
                 relation.parent.deleteRelation(relation);
               }}>
-                <IconTrash/>
+                <IconTrash />
               </Button>
             )}
           </Elem>
         </Elem>
       </Elem>
       {relation.showMeta && (
-        <RelationMeta relation={relation}/>
+        <RelationMeta relation={relation} />
       )}
     </Elem>
   );
