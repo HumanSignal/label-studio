@@ -1,6 +1,6 @@
 Feature('Video meta').tag('@regress');
 
-const VIDEO = '/files/opossum_intro.webm';
+const VIDEO = './public/files/opossum_intro.webm';
 
 Scenario('Filling meta in video regions', async ({ I, LabelStudio, AtVideoView, AtOutliner, AtDetails }) => {
   I.amOnPage('/');
