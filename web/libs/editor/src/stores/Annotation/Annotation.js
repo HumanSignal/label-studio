@@ -11,7 +11,6 @@ import Area from '../../regions/Area';
 import Result from '../../regions/Result';
 import Utils from '../../utils';
 import {
-  FF_DEV_1284,
   FF_DEV_1598,
   FF_DEV_2100,
   FF_DEV_2432,
@@ -1129,9 +1128,7 @@ export const Annotation = types
 
       self.isSuggestionsAccepting = true;
       if (getRoot(self).autoAcceptSuggestions) {
-        if (isFF(FF_DEV_1284)) {
-          self.history.setReplaceNextUndoState(true);
-        }
+        self.history.setReplaceNextUndoState(true);
         self.acceptAllSuggestions();
       } else {
         self.suggestions.forEach((suggestion) => {
@@ -1141,23 +1138,14 @@ export const Annotation = types
           // If we cannot display suggestions on object/control then just accept them
           if (!supportSuggestions) {
             self.acceptSuggestion(suggestion.id);
-            if (isFF(FF_DEV_1284)) {
-              // This is necessary to prevent the occurrence of new steps in the history after updating objects at the end of current method
-              history.setReplaceNextUndoState(true);
-            }
+            // This is necessary to prevent the occurrence of new steps in the history after updating objects at the end of current method
+            history.setReplaceNextUndoState(true);            
           }
         });
       }
       self.isSuggestionsAccepting = false;
-
-      if (!isFF(FF_DEV_1284)) {
-        history.freeze('richtext:suggestions');
-      }
-      self.names.forEach(tag => tag.needsUpdate?.({ suggestions: true }));
-      if (!isFF(FF_DEV_1284)) {
-        history.setReplaceNextUndoState(true);
-        history.unfreeze('richtext:suggestions');
-      }
+      
+      self.names.forEach(tag => tag.needsUpdate?.({ suggestions: true }));      
     },
 
     cleanClassificationAreas() {
@@ -1338,14 +1326,14 @@ export const Annotation = types
       Array.from(self.suggestions.keys()).forEach((id) => {
         self.acceptSuggestion(id);
       });
-      self.deleteAllDynamicregions(isFF(FF_DEV_1284));
+      self.deleteAllDynamicregions(true);
     },
 
     rejectAllSuggestions() {
-      Array.from(self.suggestions.keys).forEach((id) => {
+      Array.from(self.suggestions.keys()).forEach((id) => {
         self.suggestions.delete(id);
       });
-      self.deleteAllDynamicregions(isFF(FF_DEV_1284));
+      self.deleteAllDynamicregions(true);
     },
 
     deleteAllDynamicregions(silent = false) {
