@@ -5,7 +5,7 @@ import { Description } from '../../../components/Description/Description';
 import { Form, Label, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
-import { IconEmptyPredictions, IconInfo } from '../../../assets/icons';
+import { IconEmptyPredictions } from '../../../assets/icons';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
@@ -143,15 +143,12 @@ export const MachineLearningSettings = () => {
               2. Select the desired tasks.<br />
               3. Click on <i>Retrieve predictions</i> from the <i>Actions</i> menu.
             </Description>
-            <Elem name="callout">
-              <IconInfo width="24" height="24" />
-              <span>
-                If you want to use the model predictions for prelabeling, please configure this in the
-                {" "}
-                <NavLink to="annotation">Annotation settings</NavLink>
-                .
-              </span>
-            </Elem>
+            <Description>
+              If you want to use the model predictions for prelabeling, please configure this in the
+              {" "}
+              <NavLink to="annotation">Annotation settings</NavLink>
+              .
+            </Description>
           </>
         )}
 
