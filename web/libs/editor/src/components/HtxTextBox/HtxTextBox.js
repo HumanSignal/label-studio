@@ -6,6 +6,8 @@ import throttle from 'lodash.throttle';
 import { FF_DEV_1566, isFF } from '../../utils/feature-flags';
 
 const { Paragraph } = Typography;
+// used for correct auto-height calculation
+const BORDER_WIDTH = 1;
 
 export class HtxTextBox extends React.Component {
   state = {
@@ -85,9 +87,12 @@ export class HtxTextBox extends React.Component {
   };
 
   updateHeight = throttle(() => {
-    const height = this.inputRef.current?.scrollHeight || 0;
+    // very important to add borders to the height, otherwise input will be shrinking on every recalc
+    const scrollHeight = this.inputRef.current?.scrollHeight ?? 0;
+    const height = scrollHeight + BORDER_WIDTH * 2;
 
-    if (height && height !== this.state.height) {
+    // initially scrollHeight can be 0, so we won't change height
+    if (scrollHeight && height !== this.state.height) {
       this.setState({ height });
     }
   }, 100);
@@ -114,7 +119,7 @@ export class HtxTextBox extends React.Component {
     const inputProps = {
       name,
       className: 'ant-input ' + styles.input,
-      style: height ? { height } : null,
+      style: height ? { height, borderWidth: BORDER_WIDTH } : null,
       autoFocus: true,
       ref: this.inputRef,
       value,

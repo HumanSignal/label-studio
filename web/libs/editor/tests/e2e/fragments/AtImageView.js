@@ -79,6 +79,12 @@ module.exports = {
     I.waitForVisible('canvas', 5);
   },
 
+  async getNaturalSize() {
+    const sizes = await I.executeScript(Helpers.getNaturalSize);
+
+    return sizes;
+  },
+
   async getCanvasSize() {
     const sizes = await I.executeScript(Helpers.getCanvasSize);
 

@@ -6,7 +6,7 @@ import { aroundTransition } from "../../../utils/transition";
 import "./Tooltip.styl";
 
 export const Tooltip = forwardRef(
-  ({ title, children, defaultVisible, style }, ref) => {
+  ({ title, children, defaultVisible, disabled, style }, ref) => {
     const child = Children.only(children);
     const triggerElement = ref ?? useRef();
     const tooltipElement = useRef();
@@ -83,14 +83,20 @@ export const Tooltip = forwardRef(
       [injected, offset, title, visibilityClasses, tooltipElement],
     );
 
+    useEffect(() => {
+      if (disabled === true && visibility === "visible") performAnimation(false);
+    }, [disabled]);
+
     const clone = cloneElement(child, {
       ...child.props,
       ref: triggerElement,
       onMouseEnter(e) {
+        if (disabled === true) return;
         setInjected(true);
         child.props.onMouseEnter?.(e);
       },
       onMouseLeave(e) {
+        if (disabled === true) return;
         performAnimation(false);
         child.props.onMouseLeave?.(e);
       },

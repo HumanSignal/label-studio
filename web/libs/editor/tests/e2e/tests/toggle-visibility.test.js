@@ -18,7 +18,7 @@ const config = `
 
 const data = {
   image:
-    'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg',
+    'https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg',
 };
 
 const createRegion = (from_name, type, values) => ({
@@ -207,7 +207,7 @@ examples.forEach(example => {
   examplesTable.add([title, config, data, result]);
 });
 
-Data(examplesTable).Scenario('Check visibility switcher through all examples', ({ I, AtSidebar, current })=> {
+Data(examplesTable).Scenario('Check visibility switcher through all examples', ({ I, AtSidebar, current }) => {
   const { config, data, result } = current;
   const params = { annotations: [{ id: 'test', result }], config, data };
 
