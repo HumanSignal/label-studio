@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-849: LEAP-933: Security vulnerability fixes",
-  "commit": "f0086f25c287f6efc5e27acd87bb0587f0316a3f",
-  "date": "2024-04-09T17:49:03.000Z",
-  "branch": "fb-leap-849"
+  "message": "Merge branch 'develop' into 'fb-leap-878/textarea-height'",
+  "commit": "b658f627980cf5816a20682b1a529c7273a1ee86",
+  "date": "2024-04-09T19:14:55.000Z",
+  "branch": "fb-leap-878/textarea-height"
 }
