@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-508: Add noreferrer to external links",
-  "commit": "5026bd5e803bf8841b9680b90798eddfdba767d6",
-  "date": "2024-03-26T15:30:54.000Z",
+  "message": "Merge branch 'develop' into 'fb-leap-508/external-links'",
+  "commit": "2d4133a7bd725a89858b54013d0367ecab38ce10",
+  "date": "2024-04-10T15:02:04.000Z",
   "branch": "fb-leap-508/external-links"
 }
