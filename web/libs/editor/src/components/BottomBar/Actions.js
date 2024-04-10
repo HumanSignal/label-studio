@@ -3,6 +3,7 @@ import { Button } from '../../common/Button/Button';
 import { Elem } from '../../utils/bem';
 import { EditingHistory } from './HistoryActions';
 import { DynamicPreannotationsToggle } from '../AnnotationTab/DynamicPreannotationsToggle';
+import { AutoAcceptToggle } from '../AnnotationTab/AutoAcceptToggle';
 import { GroundTruth } from '../CurrentEntity/GroundTruth';
 import { Tooltip } from '../../common/Tooltip/Tooltip';
 
@@ -49,9 +50,9 @@ export const Actions = ({ store }) => {
       {store.hasInterface('ground-truth') && <GroundTruth entity={entity}/>}
 
       {!isViewAll && (
-
         <Elem name="section">
           <DynamicPreannotationsToggle />
+	  <AutoAcceptToggle />
         </Elem>
       )}
     </Elem>
