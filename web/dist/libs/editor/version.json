@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-849: LEAP-933: Security vulnerability fixes",
-  "commit": "f0086f25c287f6efc5e27acd87bb0587f0316a3f",
-  "date": "2024-04-09T17:49:03.000Z",
-  "branch": "fb-leap-849"
+  "message": "fixes for LEAP-872, LEAP-935, LEAP-942, including moving the",
+  "commit": "aee7114e2aa471825bc343e35d7001dc6db3e79b",
+  "date": "2024-04-10T04:07:25.000Z",
+  "branch": "dev/move-auto-accept"
 }
