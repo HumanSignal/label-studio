@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Button, Spinner } from '../../../components';
 import { Description } from '../../../components/Description/Description';
-import { Divider } from '../../../components/Divider/Divider';
 import { Form, Label, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
@@ -132,24 +132,26 @@ export const MachineLearningSettings = () => {
           backends={backends}
         />
 
-        <Divider height={32} />
-
         {backends.length > 0 && (
           <>
-            <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: "1.5em" }}>
+            <Description>
               A connected model has been detected! If you wish to fetch
               predictions from this model, please follow these steps:
               <br />
               <br />
               1. Navigate to the <i>Data Manager</i>.<br />
               2. Select the desired tasks.<br />
-              3. Click on <i>Retrieve predictions</i> from the{' '}
-              <i>Actions</i> menu.
+              3. Click on <i>Retrieve predictions</i> from the <i>Actions</i> menu.
             </Description>
-            <Description style={{ marginTop: 0, display: "flex", gap: "5px" }} className="description_alert_warning">
-              <IconInfo width="20" height="20" />
-              If you want to use the model predictions for prelabeling, please configure this in the Annotation settings.
-            </Description>
+            <Elem name="callout">
+              <IconInfo width="24" height="24" />
+              <span>
+                If you want to use the model predictions for prelabeling, please configure this in the
+                {" "}
+                <NavLink to="annotation">Annotation settings</NavLink>
+                .
+              </span>
+            </Elem>
           </>
         )}
 
