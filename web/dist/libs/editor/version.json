@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-864: Fix Unit, Integration and E2E tests on LSO",
-  "commit": "dc43f07c28793ad609ee188bd3595ba7452e19d6",
-  "date": "2024-04-09T14:39:10.000Z",
+  "message": "Merge branch 'develop' into 'fb-leap-864'",
+  "commit": "1e75dadafb0544e19fcf5e2620f6880ee3afb668",
+  "date": "2024-04-10T13:19:35.000Z",
   "branch": "fb-leap-864"
 }
