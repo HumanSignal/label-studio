@@ -3,7 +3,7 @@ const { omitBy } = require('./helpers');
 
 Feature('Paragraphs filter');
 
-const AUDIO = 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3';
+const AUDIO = 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3';
 
 const ANNOTATIONS = [
   {
@@ -527,7 +527,7 @@ Scenario('Selecting the end character on a paragraph phrase to the very start of
   const params = {
     data: {
       ...DATA,
-      dialogue: DATA.dialogue.map(d => [d, { ...d, text: `${d.text}2` }]).flat(), 
+      dialogue: DATA.dialogue.map(d => [d, { ...d, text: `${d.text}2` }]).flat(),
     },
     config: CONFIG,
   };

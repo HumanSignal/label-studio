@@ -37,12 +37,12 @@ const configSpeech = `
         <Choice value="Positive"/>
         <Choice value="Neutral"/>
         <Choice value="Negative"/>
-    </Choices>                               
+    </Choices>
   </View>
 `;
 
 const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3',
 };
 
 const annotations = [

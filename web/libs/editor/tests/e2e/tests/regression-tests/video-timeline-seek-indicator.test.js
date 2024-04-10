@@ -17,7 +17,7 @@ Scenario('Seek view should be in sync with indicator position', async ({ I, Labe
     <Label value="Possum" background="#FA8C16"/>
   </Labels>
 </View>`,
-    data: { video: '/files/opossum_intro.webm' },
+    data: { video: './public/files/opossum_intro.webm' },
   });
 
   I.say('waitForObjectsReady');
@@ -82,7 +82,7 @@ Scenario('Seek view should be in sync with indicator position', async ({ I, Labe
     assert.ok(indicatorBbox.x <= positionBbox.x, 'Video position indicator not within the seek indicator when dragged back to the midway point');
     assert.ok(indicatorBbox.x + indicatorBbox.width >= positionBbox.x + positionBbox.width, 'Video position indicator not within the seek indicator when dragged back to the midway point');
   }
-  
+
   {
     I.say('Drag the video position indicator to the start');
     AtVideoView.drag(positionBbox, 0, 0);

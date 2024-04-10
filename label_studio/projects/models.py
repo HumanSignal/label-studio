@@ -59,9 +59,6 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectManager(models.Manager):
-    def for_user(self, user):
-        return self.filter(organization=user.active_organization)
-
     COUNTER_FIELDS = [
         'task_number',
         'finished_task_number',
@@ -73,21 +70,26 @@ class ProjectManager(models.Manager):
         'skipped_annotations_number',
     ]
 
+    ANNOTATED_FIELDS = {
+        'task_number': annotate_task_number,
+        'finished_task_number': annotate_finished_task_number,
+        'total_predictions_number': annotate_total_predictions_number,
+        'total_annotations_number': annotate_total_annotations_number,
+        'num_tasks_with_annotations': annotate_num_tasks_with_annotations,
+        'useful_annotation_number': annotate_useful_annotation_number,
+        'ground_truth_number': annotate_ground_truth_number,
+        'skipped_annotations_number': annotate_skipped_annotations_number,
+    }
+
+    def for_user(self, user):
+        return self.filter(organization=user.active_organization)
+
     def with_counts(self, fields=None):
         return self.with_counts_annotate(self, fields=fields)
 
     @staticmethod
     def with_counts_annotate(queryset, fields=None):
-        available_fields = {
-            'task_number': annotate_task_number,
-            'finished_task_number': annotate_finished_task_number,
-            'total_predictions_number': annotate_total_predictions_number,
-            'total_annotations_number': annotate_total_annotations_number,
-            'num_tasks_with_annotations': annotate_num_tasks_with_annotations,
-            'useful_annotation_number': annotate_useful_annotation_number,
-            'ground_truth_number': annotate_ground_truth_number,
-            'skipped_annotations_number': annotate_skipped_annotations_number,
-        }
+        available_fields = ProjectManager.ANNOTATED_FIELDS
         if fields is None:
             to_annotate = available_fields
         else:

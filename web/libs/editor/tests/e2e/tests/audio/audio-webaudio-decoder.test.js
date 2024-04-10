@@ -35,12 +35,12 @@ const configSpeech = `
         <Choice value="Positive"/>
         <Choice value="Neutral"/>
         <Choice value="Negative"/>
-    </Choices>                               
+    </Choices>
   </View>
 `;
 
 const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3',
 };
 
 const annotations = [
@@ -83,7 +83,7 @@ Scenario('Check if regions are selected', async function({ I, LabelStudio, AtAud
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached('loading-progress-bar', 30);
 
   await AtAudioView.lookForStage();
 
@@ -116,7 +116,7 @@ Scenario('Check if multiple regions are working changing labels', async function
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached('loading-progress-bar', 30);
 
   await AtAudioView.lookForStage();
 
@@ -156,7 +156,7 @@ Scenario('Can select a region below a hidden region', async function({ I, LabelS
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached('loading-progress-bar', 30);
 
   await AtAudioView.lookForStage();
 
@@ -196,7 +196,7 @@ Scenario('Delete region by pressing delete hotkey', async function({ I, LabelStu
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached('loading-progress-bar', 30);
 
   await AtAudioView.lookForStage();
 
@@ -222,7 +222,7 @@ Scenario('Check if there are ghost regions', async function({ I, LabelStudio, At
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached('loading-progress-bar', 30);
 
   await AtAudioView.lookForStage();
 
