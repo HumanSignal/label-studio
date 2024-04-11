@@ -8,6 +8,8 @@ export class LabelStudio extends Component {
   };
 
   componentDidMount() {
+    if (this.store) return;
+
     configureStore(this.props).then(({ store }) => {
       this.store = store;
       window.Htx = this.store;
