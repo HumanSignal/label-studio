@@ -3,10 +3,13 @@
 
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
+from tasks.models import Prediction
 
 
 def validate_string_list(value):
@@ -59,6 +62,16 @@ class ModelVersion(models.Model):
         return f'{self.parent_model.title}__{self.title}'
 
     prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+
+    def delete_predictions(self):
+        """
+        Deletes any predictions that have originated from a ModelVersion
+
+        Currently assumes that we are setting the `model_version` field of Prediction
+        to ModelVersion.full_title
+        """
+
+        predictions = Prediction.objects.filter(model_version=self.full_title).delete()
 
 
 class ThirdPartyModelVersion(ModelVersion):
@@ -159,3 +172,27 @@ class ModelRun(models.Model):
     @property
     def error_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
+
+
+@receiver(pre_delete, sender=ModelVersion)
+def delete_predictions_model_version(sender, instance, **kwargs):
+    """
+    Deletes all Prediction objects associated with a ModelVersion when
+    deleting that ModelVersion
+    """
+
+    instance.delete_predictions()
+
+
+@receiver(pre_delete, sender=ModelVersion)
+def delete_predictions_model_run(sender, instance, **kwargs):
+    """
+    Deletes all Prediction objects associated with a ModelVersion when
+    deleting a ModelRun.
+
+    We only allow for a single ModelRun object to exist per-ModelVersion,
+    so when we start a new run, we delete the existing one. We want to delete
+    Predictions in that case so we only have the new ones from new ModelRun
+    """
+
+    instance.model_version.delete_predictions()
