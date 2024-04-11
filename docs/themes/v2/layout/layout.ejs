@@ -113,12 +113,6 @@
       <aside class="page-sidebar">
         <%- partial("partials/toc", { type: page.type, tier: tier }) %>
       </aside>
-
-      <script>
-        let sidebar = document.querySelector(".page-sidebar");
-        let activeSidebarLink = sidebar.querySelector("[aria-current]");
-        if(activeSidebarLink) sidebar.scrollTop = activeSidebarLink.getBoundingClientRect().y - 120;
-      </script>
     <% } %>
     <div class="content">
       <% if(isEnterpriseTheme) { %>
