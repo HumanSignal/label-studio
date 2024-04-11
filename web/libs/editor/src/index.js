@@ -6,4 +6,6 @@ window.LabelStudio = LabelStudio;
 
 export default LabelStudio;
 
+console.log('just to create the PR');
+
 export { LabelStudio };
