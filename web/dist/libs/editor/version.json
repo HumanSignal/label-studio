@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-999: Fix E2E tests on LSO",
-  "commit": "e566ff6a3f5c7ff7ebb45b4d3f64a511e415969d",
-  "date": "2024-04-11T14:01:09.000Z",
+  "message": "Merge branch 'develop' into 'fb-leap-999'",
+  "commit": "67b3769d23685b618e333f217763b5e781b40a4f",
+  "date": "2024-04-11T14:45:23.000Z",
   "branch": "fb-leap-999"
 }
