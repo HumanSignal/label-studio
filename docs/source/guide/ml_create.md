@@ -13,7 +13,7 @@ section: "Machine learning"
 
 Use the Label Studio ML backend to integrate Label Studio with machine learning models. The Label Studio ML backend is an SDK that you can use to wrap your machine learning model code and turn it into a web server. The machine learning server uses [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) and [supervisord](http://supervisord.org/), and handles background training jobs with [RQ](https://python-rq.org/).
 
-Follow the steps below to wrap custom machine learning model code with the Label Studio ML SDK, or see [our library of example ML backends](ml_tutorials.html) to integrate with popular machine learning frameworks such as PyTorch, GPT2, and others. 
+Follow the steps below to wrap custom machine learning model code with the Label Studio ML SDK, or see [our library of example ML backends](ml_tutorials.html) to integrate with popular machine learning frameworks and tools such as [Huggingface's Transformers](https://huggingface.co/docs/transformers/index), [OpenAI](https://openai.com/), [Langchain](https://www.langchain.com/) and others. 
 
 For information on using one of Label Studio's example backends, see [Set up an example ML backend](ml#Set-up-an-example-ML-backend)
 
@@ -39,20 +39,26 @@ This creates the following directory structure, which you can modify to implemen
 ```
 my_ml_backend/
 ├── Dockerfile
+├── .dockerignore
 ├── docker-compose.yml
 ├── model.py
 ├── _wsgi.py
 ├── README.md
-└── requirements.txt
+├── requirements-base.txt
+├── requirements-test.txt
+├── requirements.txt
+└── test_api.py
 ```
 
 Where:
 
-* `Dockerfile` and `docker-compose.yml` are used to run the ML backend with Docker. 
+* `Dockerfile`, `docker-compose.yml` and `.dockerignore` are used to run the ML backend with Docker. 
 * `model.py` is the main file where you can implement your own training and inference logic. 
 * `_wsgi.py` is a helper file that is used to run the ML backend with Docker (you don't need to modify this). 
-* `README.md` has instructions on how to run the ML backend. 
-* `requirements.txt` is a file with Python dependencies.
+* `README.md` must contain instructions on how to run the ML backend. 
+* `requirements.txt` is where you put your Python dependencies.
+* `requirements_base.txt` and `requirements_test.txt` are basic dependencies (you don't need to modify this)
+* `test_api.py` is where you put your model tests
 
 
 ## 3. Implement prediction logic
@@ -140,7 +146,7 @@ See the [annotation webhook event reference](webhook_reference#Annotation-Create
 
 Other methods and parameters are available within the `LabelStudioMLBase` class:
 
-- `self.label_config` - Returns the [Label Studio labeling config](setup) as XML string.
+- `self.label_interface` - Returns the Label Studio Label Interface object that contains all information about the labeling task
 - `self.parsed_label_config` - Returns the [Label Studio labeling config](setup) as JSON.
 - `self.model_version` - Returns the current model version.
 
@@ -168,13 +174,12 @@ pip install -r my_ml_backend
 label-studio-ml start my_ml_backend
 ```
 
-### Modify the port
+### Modify the host and port
 
-To modify the port, use the `-p` parameter:
+To modify the host and port, use the following command line parameters:
 
 ```bash
-label-studio-ml start my_ml_backend -p 9091
-```
+label-studio-ml start my_ml_backend -p 9091 --host 0.0.0.0
 
 ### Test your ML backend
 
