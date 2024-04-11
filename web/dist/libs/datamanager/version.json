@@ -1,6 +1,6 @@
 {
-  "message": "add more time on waitForAction",
-  "commit": "71e9693e551923ed43da50b15009a4c0c436a6a7",
-  "date": "2024-04-11T18:07:26.000Z",
+  "message": "changing the timeout for e2e tests to 30 minutes",
+  "commit": "dd1842789ba0ced9fdb94b33b1f4e3ca4a66532c",
+  "date": "2024-04-11T18:39:32.000Z",
   "branch": "fb-leap-999"
 }
