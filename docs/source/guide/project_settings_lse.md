@@ -389,7 +389,7 @@ To assign a project-level role, first add the person to your project. Once added
 
 ## Model
 
-Click **Add Model** to connect an machine learning (ML) backend to your project. For more information on connecting a model, see [Machine learning integration](ml).
+Click **Connect Model** to connect a machine learning (ML) backend to your project. For more information on connecting a model, see [Machine learning integration](ml).
 
 You have the following configuration options:
 
