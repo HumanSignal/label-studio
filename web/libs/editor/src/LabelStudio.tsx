@@ -104,10 +104,8 @@ export class LabelStudio {
     const { store } = await configureStore(this.options, this.events);
     const rootElement = this.getRootElement(this.root);
 
-     if (!this.store) {
-      this.store = store;
-      window.Htx = this.store;
-     }
+    this.store = store;
+    window.Htx = this.store;
 
     const isRendered = false;
 
@@ -165,8 +163,8 @@ export class LabelStudio {
             ...
             as well as nulling all these this.store
          */
-        // this.store = null;
-        // this.destroy = null;
+        this.store = null;
+        this.destroy = null;
         LabelStudio.instances.delete(this);
       }
     };
