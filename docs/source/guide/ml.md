@@ -54,17 +54,19 @@ Ir you want to write your own model instead, see [Write your own ML backend](ml_
 
 2. Then replace `{MODEL_NAME}` in the below command with the appropriate directory. 
 
-    For example, if you are using the SAM backend, the model name would be `segment_anything_model`, which matches the [directory name in the repo](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model):
+    For example, if you are using the SAM backend with [SegmentAnything model](https://segment-anything.com/), the model name would be `segment_anything_model`, which matches the [directory name in the repo](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model):
 
     ```bash
 git clone https://github.com/HumanSignal/label-studio-ml-backend.git
-cd label-studio-ml-backend/label_studio_ml/examples/{MODEL_NAME}
+cd label-studio-ml-backend/label_studio_ml/examples/segment_anything_model
 docker-compose up
     ```
 
 The model should begin running at `http://localhost:9090`. You can verify this by clicking **Send Test Request** from the overflow menu next to the model or by using the following command: 
 
-`curl http://localhost:9090/health`
+```bash
+> curl http://localhost:9090
+{"model_class":"SamMLBackend","status":"UP"}
 
 !!! note
     `localhost` is a special domain name that loops back directly to your local environment. In the instance of Docker-hosted containers, this loops back to the container itself, and not the machine the container is hosted on. Docker provides a special domain as a workaround for this, docker.host.internal. If you're hosting Label Studio and your ML Backend inside of Docker, try using that domain instead of localhost. (`http://host.docker.internal:9090`)
@@ -124,7 +126,7 @@ From the [**Model** page](project_settings#Model) under project settings, select
 </div>
 
 * **Start model training on annotation submission**--Enable this option for automated training. When enabled, training is automatically initiated every time an annotation is submitted or updated. 
-* **Start Training** (Available from the overflow menu next to the connected model)--Manually initiate training. Use this action if you want to control when the model training occurs, such as after a specific number of annotations have been collected or at certain intervals.
+* **Start Training** (Available from the overflow menu next to the connected model) -- Manually initiate training. Use this action if you want to control when the model training occurs, such as after a specific number of annotations have been collected or at certain intervals.
 
 You can also initiate training programmatically using the following:
 
@@ -205,13 +207,13 @@ curl -H 'Authorization: Token <user-token-from-account-page>' -X POST \
 
 <div class="opensource-only">
 
-You can choose which model or prediction set to display to annotators by default. This is available under the **Annotation > Pre-labeing** in the project settings. 
+You can choose which model or prediction set to display to annotators by default. This is available under the **Annotation > Live Predictions** in the project settings. 
 
 </div>
 
 <div class="enterprise-only">
 
-You can choose which model or prediction set to display to annotators by default. This is available under the **Annotation > Predictions** in the project settings. 
+You can choose which model or prediction set to display to annotators by default. This is available under the **Annotation > Live Predictions** in the project settings. 
 
 </div>
 
