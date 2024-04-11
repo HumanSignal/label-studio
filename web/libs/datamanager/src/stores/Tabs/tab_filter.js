@@ -1,15 +1,11 @@
 import { flow, getParent, getRoot, types } from "mobx-state-tree";
-import { toStudlyCaps } from "strman";
-import * as Filters from "../../components/Filters/types";
 import * as CellViews from "../../components/CellViews";
+import { normalizeCellAlias } from "../../components/CellViews";
+import * as Filters from "../../components/Filters/types";
 import { allowedFilterOperations } from "../../components/Filters/types/Utility";
 import { debounce } from "../../utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
-import {
-  FilterValueRange,
-  FilterValueType,
-  TabFilterType
-} from "./tab_filter_type";
+import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
 
 const operatorNames = Array.from(
   new Set(
@@ -99,7 +95,7 @@ export const TabFilter = types
     get cellView() {
       const col = self.filter.field;
 
-      return CellViews[col.type] ?? CellViews[toStudlyCaps(col.alias)];
+      return CellViews[col.type] ?? CellViews[normalizeCellAlias(col.alias)];
     },
   }))
   .volatile(() => ({
