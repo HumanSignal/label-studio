@@ -3,7 +3,7 @@ Feature('Max usage');
 const IMAGE = 'https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg';
 
 const createImageToolsConfig = ({ maxUsage }) => `
-<View> 
+<View>
   <Image name="img" value="$image" width="50%"/>
   <Rectangle name="Rectangle" toName="img" />
   <Ellipse name="Ellipse" toName="img" />
@@ -214,7 +214,7 @@ Data(maxUsageDataTable).Scenario('Max usages of labels in Audio on region creati
   <Audio name="audio" value="$audio" />
 </View>`,
     data: {
-      audio: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+      audio: 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3',
     },
   });
 
