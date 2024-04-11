@@ -165,8 +165,8 @@ export class LabelStudio {
             ...
             as well as nulling all these this.store
          */
-        this.store = null;
-        this.destroy = null;
+        // this.store = null;
+        // this.destroy = null;
         LabelStudio.instances.delete(this);
       }
     };
