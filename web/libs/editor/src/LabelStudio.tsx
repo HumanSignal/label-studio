@@ -104,8 +104,10 @@ export class LabelStudio {
     const { store } = await configureStore(this.options, this.events);
     const rootElement = this.getRootElement(this.root);
 
-    this.store = store;
-    window.Htx = this.store;
+     if (!this.store) {
+      this.store = store;
+      window.Htx = this.store;
+     }
 
     const isRendered = false;
 
