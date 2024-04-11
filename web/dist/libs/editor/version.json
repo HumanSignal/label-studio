@@ -1,6 +1,6 @@
 {
-  "message": "Update web/libs/datamanager/src/components/CellViews/index.js",
-  "commit": "8553ac21be3cf2f6546938902868db11ecbea92a",
-  "date": "2024-04-09T15:06:54.000Z",
+  "message": "Merge branch 'develop' into 'fb-leap-859/colimn-special-characters'",
+  "commit": "f3fa69b33601204f47e6ccc049aefa899b531986",
+  "date": "2024-04-11T15:28:30.000Z",
   "branch": "fb-leap-859/colimn-special-characters"
 }
