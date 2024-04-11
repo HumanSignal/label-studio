@@ -62,7 +62,7 @@ Use the drop-down menu to select the predictions source. For example, you can se
 
 ## Model
 
-Click **Add Model** to connect an machine learning (ML) backend to your project. For more information on connecting a model, see [Machine learning integration](ml).
+Click **Connect Model** to connect a machine learning (ML) backend to your project. For more information on connecting a model, see [Machine learning integration](ml).
 
 You have the following configuration options:
 
