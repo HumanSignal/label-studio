@@ -22,7 +22,7 @@ module.exports.config = {
       show: !headless,
       restart: 'context',
       timeout: 60000, // Action timeout after 60 seconds
-      waitForAction: headless ? 200 : 1200,
+      waitForAction: headless ? 300 : 1200,
       windowSize: '1200x900',
       waitForNavigation: 'networkidle',
       browser: 'chromium',
