@@ -18,7 +18,7 @@ You can use an ML backend to integrate your model development pipeline with your
 
 For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify. 
 
-Once a model is connect, the way it works is:
+Once a model is connected, the way it works is:
 
 1. A user opens the task. 
 2. Label Studio sends the request to ML backend. 
