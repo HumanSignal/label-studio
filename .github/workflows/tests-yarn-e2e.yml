@@ -65,8 +65,6 @@ jobs:
 
       - name: Run tests
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-        env:
-          HEADLESS: true
         run: |
           yarn test:e2e
 
