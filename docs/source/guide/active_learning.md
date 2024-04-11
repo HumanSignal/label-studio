@@ -41,12 +41,11 @@ As you label tasks, Label Studio sends webhook events to your machine learning b
 
 ## Set up an ML model as an ML backend for active learning
 
-[Set up an example machine learning model as an ML backend](ml.html#Get-started-with-an-example-ML-backend), or [create a custom machine learning model](ml_create.html).
+[Set up an example machine learning model as an ML backend](ml#Set-up-an-example-ML-backend), or [create a custom machine learning model](ml_create).
 
 ## Connect the ML backend to Label Studio for active learning
 
-1. Follow the steps to [Add an ML backend to Label Studio](ml.html#Add-an-ML-backend-to-Label-Studio).
-2. Under **Model**, enable the setting to **Start model training on annotation submission**. 
+Follow the steps to [connect a model to a Label Studio project](ml#Connect-the-model-to-Label-Studio) and ensure the setting **Start model training on annotation submission** is enabled. This sends a training request to the backend after each annotation submission or update. 
 
 ## Configure webhooks to send a training event to the ML backend (optional)
 
@@ -66,7 +65,7 @@ For more details on the webhook event payloads, see the full [payload details fo
 
 ## Set up task sampling with prediction scores
 
-In order to maximize the training efficiency and effectiveness of your machine learning model, you want your annotators to focus on labeling the tasks with the least confident, or most uncertain, prediction scores from your model. To do make sure of that, [set up uncertainty task sampling](setup_project.html#Set-up-task-sampling).
+In order to maximize the training efficiency and effectiveness of your machine learning model, you want your annotators to focus on labeling the tasks with the least confident, or most uncertain, prediction scores from your model. To do make sure of that, [set up uncertainty task sampling](project_settings_lse#task-sampling).
 
 ## Label the tasks 
 
@@ -79,7 +78,7 @@ As your model retrains and a new version is updated in Label Studio, the tasks s
 If you want to change the behavior of the active learning loop, you can make manual changes.
 
 - Customize the prediction score produced by the model by modifying the inference call. See [Make predictions with your ML backend](#Make-predictions-with-your-ML-backend) for details and example code. 
-- To change the version of the model used to show predictions to annotators, update it in the machine learning settings. See [Choose which predictions to show to annotators](ml.html#Choose-which-predictions-to-display-to-annotators).
+- To change the version of the model used to show predictions to annotators, update it in the machine learning settings. See [Choose which predictions to show to annotators](ml#Choose-which-predictions-to-display-to-annotators).
 - If you want to delete all predictions after your model is retrained, see how to [delete predictions](ml.html#Delete-predictions).
 - If you need to retrieve and save predictions for all tasks, see the recommendations for [retrieving predictions from a model](ml.html#Get-predictions-from-a-model).
 

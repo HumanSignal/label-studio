@@ -83,7 +83,7 @@ Once you implement the `predict` method, you can see predictions from the connec
 
 ### Support interactive pre-annotations in your ML backend
 
-If you want to support interactive pre-annotations in your machine learning backend, write an inference call using the `predict()` method. For an example that does this for text labeling projects, see [this code example for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching).
+If you want to support interactive pre-annotations in your machine learning backend, write an inference call using the `predict()` method. For an example that does this for text labeling projects, see [this code example for substring matching](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/interactive_substring_matching).
 
 Complete the following steps:
 
@@ -146,8 +146,7 @@ See the [annotation webhook event reference](webhook_reference#Annotation-Create
 
 Other methods and parameters are available within the `LabelStudioMLBase` class:
 
-- `self.label_interface` - Returns the Label Studio Label Interface object that contains all information about the labeling task
-- `self.parsed_label_config` - Returns the [Label Studio labeling config](setup) as JSON.
+- `self.label_interface` - Returns the Label Studio Label Interface object that contains all information about the labeling task.
 - `self.model_version` - Returns the current model version.
 
 
