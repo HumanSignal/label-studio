@@ -39,7 +39,7 @@ Scenario('Play/pause of multiple synced audio stay in sync', async function({ I,
     assert.equal(audioTime1, audioTime2);
     assert.equal(audioTime1, 0);
   }
-
+  I.wait(1);
   AtAudioView.clickPlayButton();
   I.wait(1);
   {
