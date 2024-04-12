@@ -32,13 +32,14 @@ Scenario('Play/pause of multiple synced audio stay in sync', async function({ I,
 
   await AtAudioView.waitForAudio();
   await AtAudioView.lookForStage();
+
   {
     const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
 
     assert.equal(audioTime1, audioTime2);
     assert.equal(audioTime1, 0);
   }
-  I.wait(1);
+
   AtAudioView.clickPlayButton();
   I.wait(1);
   {
@@ -75,10 +76,10 @@ Scenario('Looping of multiple synced audio stay in sync', async function({ I, La
   LabelStudio.init(params);
 
   await AtAudioView.waitForAudio();
-  await AtAudioView.lookForStage()
+  await AtAudioView.lookForStage();
 
   I.say('Draw an audio segment to start looping');
-  AtAudioView.dragAudioElement(160,80);
+  AtAudioView.dragAudioElement(160, 80);
   {
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
 
@@ -110,10 +111,8 @@ Scenario('Looping of multiple synced audio stay in sync', async function({ I, La
 
 
   I.say('Clicking outside of the audio segment and then clicking play should restart the audio from the beginning of the segment');
-  I.wait(1);
   AtAudioView.clickAt(250);
   AtAudioView.clickPlayButton();
-  I.wait(1);
   {
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
 
