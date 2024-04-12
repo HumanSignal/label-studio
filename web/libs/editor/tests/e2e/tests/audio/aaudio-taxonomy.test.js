@@ -400,9 +400,8 @@ Scenario('Taxonomy per region', async ({ I, LabelStudio, AtTaxonomy, AtOutliner 
   const data = {
     text: 'Some text etc.',
   };
-
-  I.amOnPage('/');
   I.wait(1);
+  I.amOnPage('/');
   LabelStudio.init({
     config,
     data,
@@ -457,7 +456,6 @@ Scenario('Taxonomy per region', async ({ I, LabelStudio, AtTaxonomy, AtOutliner 
       ],
     }],
   });
-  I.wait(1);
   I.say('Should not see perrigion taxonomy without selected region');
   AtTaxonomy.dontSeeTaxonomy();
   I.say('Should not see perrigion taxonomy without selected region that was set in whenLabelValue');
@@ -482,7 +480,9 @@ Scenario('Taxonomy per region', async ({ I, LabelStudio, AtTaxonomy, AtOutliner 
   const result = await LabelStudio.serialize();
 
   await session('Deserialization', async () => {
+    I.wait(1);
     I.amOnPage('/');
+    I.wait(1);
     LabelStudio.init({
       config,
       data,
@@ -558,7 +558,9 @@ Scenario('Aliases in Taxonomy', async ({ I, LabelStudio, AtTaxonomy }) => {
   assert.deepStrictEqual(result[0].value.taxonomy, [['1-3', '3'], ['4-7', '7']]);
 
   await session('Deserialization', async () => {
+    I.wait(1);
     I.amOnPage('/');
+    I.wait(1);
     LabelStudio.init({
       config: createConfig(),
       data: {
@@ -580,7 +582,9 @@ Scenario('Aliases in Taxonomy', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   await session('ShowFullPath', async () => {
     //showFullPath
+    I.wait(1);
     I.amOnPage('/');
+    I.wait(1);
     LabelStudio.init({
       config: createConfig({ showFullPath: true }),
       data: {
@@ -626,7 +630,7 @@ Scenario('Taxonomy dynamic items', async ({ I, LabelStudio, AtTaxonomy }) => {
       ],
     }],
   };
-
+  I.wait(1);
   I.amOnPage('/');
   I.wait(1);
   LabelStudio.init({
@@ -638,7 +642,6 @@ Scenario('Taxonomy dynamic items', async ({ I, LabelStudio, AtTaxonomy }) => {
 `,
     data,
   });
-  I.wait(1);
   I.say('Should see items');
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('Items');
