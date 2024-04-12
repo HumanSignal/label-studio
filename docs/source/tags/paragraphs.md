@@ -1,7 +1,7 @@
 ---
 title: Paragraphs
 type: tags
-order: 305
+order: 304
 meta_title: Paragraph Tags for Paragraphs
 meta_description: Customize Label Studio with the Paragraphs tag to annotate paragraphs for NLP and NER machine learning and data science projects.
 ---
