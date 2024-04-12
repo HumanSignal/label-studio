@@ -79,6 +79,7 @@ Scenario('Looping of multiple synced audio stay in sync', async function({ I, La
   await AtAudioView.lookForStage();
 
   I.say('Draw an audio segment to start looping');
+  I.wait(1);
   AtAudioView.dragAudioElement(160, 80);
   {
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
@@ -96,7 +97,9 @@ Scenario('Looping of multiple synced audio stay in sync', async function({ I, La
   }
 
   I.say('Audio played to the same point in time');
+  I.wait(1);
   AtAudioView.clickPauseButton();
+  I.wait(1);
   {
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
 
@@ -111,8 +114,11 @@ Scenario('Looping of multiple synced audio stay in sync', async function({ I, La
 
 
   I.say('Clicking outside of the audio segment and then clicking play should restart the audio from the beginning of the segment');
+  I.wait(1);
   AtAudioView.clickAt(250);
+  I.wait(1);
   AtAudioView.clickPlayButton();
+  I.wait(1);
   {
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
 
