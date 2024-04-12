@@ -283,6 +283,6 @@ class LSTransformer extends Konva.Transformer {
   }
 }
 
-Konva["LSTransformer"] = LSTransformer;
+Konva.LSTransformer = LSTransformer;
 
 export default "LSTransformer";

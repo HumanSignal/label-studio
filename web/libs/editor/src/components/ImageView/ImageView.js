@@ -911,18 +911,18 @@ export default observer(
       const paginationEnabled = !!item.isMultiItem;
 
       if (getRoot(item).settings.fullscreen === false) {
-        containerStyle["maxWidth"] = item.maxwidth;
-        containerStyle["maxHeight"] = item.maxheight;
-        containerStyle["width"] = item.width;
-        containerStyle["height"] = item.height;
+        containerStyle.maxWidth = item.maxwidth;
+        containerStyle.maxHeight = item.maxheight;
+        containerStyle.width = item.width;
+        containerStyle.height = item.height;
       }
 
       if (!store.settings.enableSmoothing && item.zoomScale > 1) {
-        containerStyle["imageRendering"] = "pixelated";
+        containerStyle.imageRendering = "pixelated";
       }
 
       const imagePositionClassnames = [
-        styles["image_position"],
+        styles.image_position,
         styles[`image_position__${item.verticalalignment === "center" ? "middle" : item.verticalalignment}`],
         styles[`image_position__${item.horizontalalignment}`],
       ];
