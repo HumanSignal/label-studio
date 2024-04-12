@@ -1,6 +1,6 @@
 {
-  "message": "change the timeout for 55 minutes",
-  "commit": "78121ac506b30782e015a01bd3ab029e3ad0674e",
-  "date": "2024-04-11T23:11:44.000Z",
+  "message": "set yarn test e2e timeout to 45",
+  "commit": "c81c68e5f72470e75208aaabd98641cac84a26c3",
+  "date": "2024-04-12T01:23:38.000Z",
   "branch": "fb-leap-999"
 }
