@@ -36,23 +36,26 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
   I.amOnPage('/');
   LabelStudio.init({
     config: `
-<View>
-  <Text name="text" value="$text"/>
-  <Taxonomy name="taxonomy" toName="text">
-    <Choice value="target group 1">
-      <Choice value="london london london london london london london" />
-      <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
-      <Choice value="not so long line"/>
-    </Choice>
-  </Taxonomy>
-</View>`,
+      <View>
+        <Text name="text" value="$text"/>
+        <Taxonomy name="taxonomy" toName="text">
+          <Choice value="target group 1">
+            <Choice value="london london london london london london london" />
+            <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
+            <Choice value="not so long line"/>
+          </Choice>
+        </Taxonomy>
+      </View>`,
     data: {
       text: 'Annotation 1',
     },
   });
 
   AtTaxonomy.clickTaxonomy();
-  AtTaxonomy.toggleGroupWithText('target group 1');
+  AtTaxonomy.fillSearch('long');
+
+  await checkOverlapAndGap('long long long', 'not so long');
+
 
   I.amOnPage('/');
   LabelStudio.init({
@@ -72,8 +75,11 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
     },
   });
 
+  I.wait(1);
   AtTaxonomy.clickTaxonomy();
+  I.wait(1);
   AtTaxonomy.fillSearch('long');
+  await checkOverlapAndGap('long long long', 'not so long');
 
   I.amOnPage('/');
   LabelStudio.init({
@@ -93,8 +99,12 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
     },
   });
 
+  I.wait(1);
   AtTaxonomy.clickTaxonomy();
+  I.wait(1);
   AtTaxonomy.fillSearch('long');
+  await checkOverlapAndGap('super long line', 'enough long line');
+  await checkOverlapAndGap('enough long line', 'not long line');
 });
 
 Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
