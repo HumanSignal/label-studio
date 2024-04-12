@@ -129,6 +129,7 @@ Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
     },
   };
 
+  I.wait(1);
   I.amOnPage('/');
   I.wait(1);
   LabelStudio.init(params);
