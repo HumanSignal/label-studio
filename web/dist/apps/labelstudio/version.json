@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-859/colimn-special-characters'",
-  "commit": "f3fa69b33601204f47e6ccc049aefa899b531986",
-  "date": "2024-04-11T15:28:30.000Z",
-  "branch": "fb-leap-859/colimn-special-characters"
+  "message": "chore: OPTIC-592:  Migrate any JSX files to include the proper extension",
+  "commit": "c3eab282c1b66e44c14e28ec3cf33925e0e5cc52",
+  "date": "2024-04-12T14:41:51.000Z",
+  "branch": "fb-optic-592/js-jsx-conversion"
 }

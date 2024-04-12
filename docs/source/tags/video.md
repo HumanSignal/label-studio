@@ -1,7 +1,7 @@
 ---
 title: Video
 type: tags
-order: 310
+order: 307
 meta_title: Video Tag for Video Labeling
 meta_description: Customize Label Studio with the Video tag for basic video annotation tasks for machine learning and data science projects.
 ---
