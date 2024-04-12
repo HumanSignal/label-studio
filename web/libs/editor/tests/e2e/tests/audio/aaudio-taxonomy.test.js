@@ -39,7 +39,7 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
 <View>
   <Text name="text" value="$text"/>
   <Taxonomy name="taxonomy" toName="text">
-    <Choice value="target group">
+    <Choice value="target group 1">
       <Choice value="london london london london london london london" />
       <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
       <Choice value="not so long line"/>
@@ -51,9 +51,10 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
     },
   });
 
+  I.wait(1);
   AtTaxonomy.clickTaxonomy();
   I.wait(1);
-  AtTaxonomy.toggleGroupWithText('target group');
+  AtTaxonomy.toggleGroupWithText('target group 1');
 
   await checkOverlapAndGap('long long long', 'not so long');
 
@@ -64,7 +65,7 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
 <View>
   <Text name="text" value="$text"/>
   <Taxonomy name="taxonomy" toName="text">
-    <Choice value="target group">
+    <Choice value="target group 2">
       <Choice value="london london london london london london london" />
       <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
       <Choice value="not so long line"/>
@@ -76,6 +77,7 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
     },
   });
 
+  I.wait(1);
   AtTaxonomy.clickTaxonomy();
   I.wait(1);
   AtTaxonomy.fillSearch('long');
@@ -87,7 +89,7 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
 <View>
   <Text name="text" value="$text"/>
   <Taxonomy name="taxonomy" toName="text">
-    <Choice value="target group">
+    <Choice value="target group 3">
       <Choice value="super long line ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ..."/>
       <Choice value="enough long line ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ..."/>
       <Choice value="not long line ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ..."/>
@@ -99,6 +101,7 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
     },
   });
 
+  I.wait(1);
   AtTaxonomy.clickTaxonomy();
   I.wait(1);
   AtTaxonomy.fillSearch('long');
