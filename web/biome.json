@@ -63,7 +63,6 @@
       },
       "complexity": {
         "noForEach": "off",
-        "noUselessFragments": "off",
         "noUselessLoneBlockStatements": "off",
         "noUselessSwitchCase": "off",
         "useLiteralKeys": "off",
