@@ -90,7 +90,7 @@ export function hashCode(str: string) {
   let hash = 0;
 
   if (str.length === 0) {
-    return hash + "";
+    return `${hash}`;
   }
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -98,7 +98,7 @@ export function hashCode(str: string) {
     hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
-  return hash + "";
+  return `${hash}`;
 }
 
 export function atobUnicode(str: string) {
@@ -106,7 +106,7 @@ export function atobUnicode(str: string) {
   return decodeURIComponent(
     atob(str)
       .split("")
-      .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+      .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
       .join(""),
   );
 }

@@ -181,7 +181,7 @@ const VideoRegionsPure = ({
     const stage = tr.getStage();
     // @todo not an obvious way to not render transformer for hidden regions
     // @todo could it be rewritten to usual react way?
-    const shapes = selected.map((shape) => stage.findOne("#" + shape.id)).filter(Boolean);
+    const shapes = selected.map((shape) => stage.findOne(`#${shape.id}`)).filter(Boolean);
 
     tr.nodes(shapes);
     tr.getLayer().batchDraw();

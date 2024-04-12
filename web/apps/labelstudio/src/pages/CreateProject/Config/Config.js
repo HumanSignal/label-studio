@@ -227,15 +227,15 @@ const ConfigureColumn = ({ template, obj, columns }) => {
   const [isManual, setIsManual] = useState(!!value && !columns?.includes(value));
   // value is stored in state to make input conrollable
   // changes will be sent by Enter and blur
-  const [newValue, setNewValue] = useState("$" + value);
+  const [newValue, setNewValue] = useState(`$${value}`);
 
   // update local state when external value changes
-  useEffect(() => setNewValue("$" + value), [value]);
+  useEffect(() => setNewValue(`$${value}`), [value]);
 
   const updateValue = (value) => {
     const newValue = value.replace(/^\$/, "");
 
-    obj.setAttribute("value", "$" + newValue);
+    obj.setAttribute("value", `$${newValue}`);
     template.render();
   };
 
@@ -256,7 +256,7 @@ const ConfigureColumn = ({ template, obj, columns }) => {
   const handleChange = (e) => {
     const newValue = e.target.value.replace(/^\$/, "");
 
-    setNewValue("$" + newValue);
+    setNewValue(`$${newValue}`);
   };
 
   const handleBlur = () => {

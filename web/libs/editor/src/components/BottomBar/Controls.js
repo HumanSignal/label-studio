@@ -190,7 +190,7 @@ export const Controls = controlsInjector(
                   const searchParams = new URLSearchParams(window.location.search);
 
                   searchParams.set("exitStream", "true");
-                  const newRelativePathQuery = window.location.pathname + "?" + searchParams.toString();
+                  const newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
 
                   window.history.pushState(null, "", newRelativePathQuery);
                 }

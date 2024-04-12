@@ -352,7 +352,7 @@ class RichTextPieceView extends Component {
     if (body.scrollHeight) {
       // body dimensions sometimes doesn't count some inner content offsets
       // but html's offsetHeight sometimes is zero, so get the max of both
-      iframe.style.height = Math.max(body.scrollHeight, htmlEl.offsetHeight) + "px";
+      iframe.style.height = `${Math.max(body.scrollHeight, htmlEl.offsetHeight)}px`;
     }
 
     this.markObjectAsLoaded();
