@@ -55,7 +55,8 @@
         "noUselessSwitchCase": "off",
         "useOptionalChain": "off",
         "noBannedTypes": "off",
-        "noStaticOnlyClass": "off"
+        "noStaticOnlyClass": "off",
+        "noUselessFragments": "off"
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
@@ -75,7 +76,8 @@
         "useNodejsImportProtocol": "off",
         "noArguments": "off",
         "noCommaOperator": "off",
-        "noParameterAssign": "off"
+        "noParameterAssign": "off",
+        "noUselessElse": "off"
       },
       "nursery": {},
       "security": {
