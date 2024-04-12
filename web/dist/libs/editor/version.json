@@ -1,6 +1,6 @@
 {
-  "message": "remove validation on test",
-  "commit": "2887de88b923fb971c622b68026849ed9bd647c8",
-  "date": "2024-04-12T17:14:01.000Z",
+  "message": "change from open taxonomy by click to open by search",
+  "commit": "9bc4938a5789eb872bc31a0a5205cb99a32873bb",
+  "date": "2024-04-12T17:23:02.000Z",
   "branch": "fb-leap-999"
 }
