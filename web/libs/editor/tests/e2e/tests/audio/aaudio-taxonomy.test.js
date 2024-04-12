@@ -52,8 +52,6 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
     },
   });
 
-  LabelStudio.waitForObjectsReady();
-
   I.wait(1);
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('target group 1');
@@ -78,8 +76,6 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
     },
   });
 
-  LabelStudio.waitForObjectsReady();
-
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.fillSearch('long');
   await checkOverlapAndGap('long long long', 'not so long');
@@ -101,8 +97,6 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
       text: 'Annotation 3',
     },
   });
-
-  LabelStudio.waitForObjectsReady();
 
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.fillSearch('long');
@@ -136,7 +130,9 @@ Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
   };
 
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init(params);
+  I.wait(1);
 
   I.say('Add item to the root');
   AtTaxonomy.clickTaxonomy();
@@ -233,6 +229,7 @@ Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
 
 Scenario('Non unique values filtering', async ({ I, LabelStudio, AtTaxonomy }) => {
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config: `
 <View>
@@ -250,6 +247,7 @@ Scenario('Non unique values filtering', async ({ I, LabelStudio, AtTaxonomy }) =
       text: 'Text',
     },
   });
+  I.wait(1);
   AtTaxonomy.clickTaxonomy();
   I.seeElement(AtTaxonomy.locateItemByText('a').at(1));
   I.dontSeeElement(AtTaxonomy.locateItemByText('a').at(2));
@@ -289,6 +287,7 @@ Scenario('Taxonomy read only in history', async ({ I, LabelStudio, AtTaxonomy })
     ff_front_1170_outliner_030222_short: false,
   });
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config: `
 <View>
@@ -309,6 +308,7 @@ Scenario('Taxonomy read only in history', async ({ I, LabelStudio, AtTaxonomy })
     },
     annotations: [{ id: 2, result: [] }],
   });
+  I.wait(1);
   I.click('.lsf-history-item');
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.seeSelectedValues(['ab', 'c']);
@@ -328,6 +328,7 @@ Scenario('Taxonomy read only in history', async ({ I, LabelStudio, AtTaxonomy })
 
 Scenario('Taxonomy readonly result', async ({ I, LabelStudio, AtTaxonomy }) => {
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config: `
 <View>
@@ -360,6 +361,7 @@ Scenario('Taxonomy readonly result', async ({ I, LabelStudio, AtTaxonomy }) => {
       ],
     }],
   });
+  I.wait(1);
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.seeSelectedValues(['ab', 'c']);
   AtTaxonomy.toggleGroupWithText('a');
@@ -397,6 +399,7 @@ Scenario('Taxonomy per region', async ({ I, LabelStudio, AtTaxonomy, AtOutliner 
   };
 
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config,
     data,
@@ -451,6 +454,7 @@ Scenario('Taxonomy per region', async ({ I, LabelStudio, AtTaxonomy, AtOutliner 
       ],
     }],
   });
+  I.wait(1);
   I.say('Should not see perrigion taxonomy without selected region');
   AtTaxonomy.dontSeeTaxonomy();
   I.say('Should not see perrigion taxonomy without selected region that was set in whenLabelValue');
@@ -527,12 +531,14 @@ Scenario('Aliases in Taxonomy', async ({ I, LabelStudio, AtTaxonomy }) => {
 `;
 
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config: createConfig(),
     data: {
       text: 'A text',
     },
   });
+  I.wait(1);
   I.say('Should see values of choices and work with them');
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('One to three');
@@ -619,6 +625,7 @@ Scenario('Taxonomy dynamic items', async ({ I, LabelStudio, AtTaxonomy }) => {
   };
 
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config: `
 <View>
@@ -628,6 +635,7 @@ Scenario('Taxonomy dynamic items', async ({ I, LabelStudio, AtTaxonomy }) => {
 `,
     data,
   });
+  I.wait(1);
   I.say('Should see items');
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('Items');
@@ -697,12 +705,14 @@ Scenario('Taxonomy maxUsages', async ({ I, LabelStudio, AtTaxonomy }) => {
 `;
 
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config,
     data: {
       text: 'A text',
     },
   });
+  I.wait(1);
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('1');
   AtTaxonomy.toggleGroupWithText('2');
@@ -757,12 +767,14 @@ Scenario('Taxonomy visibleWhen', async ({ I, LabelStudio, AtTaxonomy }) => {
 `;
 
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config: createConfig(),
     data: {
       text: 'A text',
     },
   });
+  I.wait(1);
   I.say('Should see values of choices and work with them');
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('One to three');
@@ -875,12 +887,14 @@ Scenario('Taxonomy visibleWhen with aliases', async ({ I, LabelStudio, AtTaxonom
 `;
 
   I.amOnPage('/');
+  I.wait(1);
   LabelStudio.init({
     config: createConfig(),
     data: {
       text: 'A text',
     },
   });
+  I.wait(1);
   I.say('Should see values of choices and work with them');
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('One to three');
