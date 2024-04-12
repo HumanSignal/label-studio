@@ -31,7 +31,6 @@
       "recommended": true,
       "a11y": {
         "noAutofocus": "off",
-        "noNoninteractiveElementToInteractiveRole": "off",
         "noNoninteractiveTabindex": "off",
         "noPositiveTabindex": "off",
         "noRedundantRoles": "off",
