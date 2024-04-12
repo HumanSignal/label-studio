@@ -1,6 +1,6 @@
 {
-  "message": "remove all validations",
-  "commit": "a72028f61049e4f1c508c4f4773decd45f53fc63",
-  "date": "2024-04-12T17:51:15.000Z",
+  "message": "add back validations and add wait",
+  "commit": "0dda1f2df649bfaf91cf439eecad896b8b2dd9c9",
+  "date": "2024-04-12T17:59:54.000Z",
   "branch": "fb-leap-999"
 }
