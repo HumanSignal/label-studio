@@ -82,7 +82,6 @@
       "style": {
         "noNonNullAssertion": "off",
         "useDefaultParameterLast": "off",
-        "useFragmentSyntax": "off",
         "useNodejsImportProtocol": "off",
         "useNumberNamespace": "off",
         "useNumericLiterals": "off",
