@@ -1,6 +1,6 @@
 {
-  "message": "add wait object to be ready",
-  "commit": "1c0434d59431e2f86e92e5de1ca669712b1d3544",
-  "date": "2024-04-12T17:36:47.000Z",
+  "message": "remove all validations",
+  "commit": "a72028f61049e4f1c508c4f4773decd45f53fc63",
+  "date": "2024-04-12T17:51:15.000Z",
   "branch": "fb-leap-999"
 }
