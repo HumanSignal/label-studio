@@ -616,13 +616,15 @@ class ExportStorageLink(models.Model):
     @staticmethod
     def get_key(annotation):
         # get user who created the organization explicitly using filter/values_list to avoid prefetching
-        user_id = Annotation.objects.filter(id=annotation.id).values_list(
-            'project__organization__created_by', flat=True
-        ).first()
+        user_id = (
+            Annotation.objects.filter(id=annotation.id)
+            .values_list('project__organization__created_by', flat=True)
+            .first()
+        )
         user = User.objects.filter(id=user_id).first()
         flag = flag_set('fflag_feat_optic_650_target_storage_task_format_long', user=user)
 
-        if settings.FUTURE_SAVE_TASK_TO_STORAGE or flag
+        if settings.FUTURE_SAVE_TASK_TO_STORAGE or flag:
             ext = '.json' if settings.FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT or flag else ''
             return str(annotation.task.id) + ext
         else:
