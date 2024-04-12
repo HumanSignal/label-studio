@@ -7,7 +7,7 @@ import { stdout } from "process";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 
-const packageDir = `./node_modules/@heartexlabs/ls-test`;
+const packageDir = "./node_modules/@heartexlabs/ls-test";
 const assetsDir = path.resolve(packageDir, "bin/assets");
 const workspaceDir = path.resolve();
 const relativePath = (p) => path.resolve(assetsDir, p);

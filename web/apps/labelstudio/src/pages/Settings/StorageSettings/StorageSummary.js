@@ -30,7 +30,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
   const annotations_help = last_sync_count + " annotations successfully saved during the last sync.";
   const total_annotations_help =
     typeof storage.meta?.total_annotations !== "undefined"
-      ? storage.meta.total_annotations + ` total annotations seen in the project at the sync moment.`
+      ? storage.meta.total_annotations + " total annotations seen in the project at the sync moment."
       : "";
 
   const handleButtonClick = () => {

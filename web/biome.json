@@ -81,7 +81,6 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noUnusedTemplateLiteral": "off",
         "noUselessElse": "off",
         "noVar": "off",
         "useBlockStatements": "off",

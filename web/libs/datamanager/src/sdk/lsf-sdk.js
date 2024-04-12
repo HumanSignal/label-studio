@@ -233,7 +233,7 @@ export class LSFWrapper {
     if (params) {
       const task = await api.call("task", { params });
       const noData = !task || (!task.annotations?.length && !task.drafts?.length);
-      const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ``} was not found!`;
+      const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ""} was not found!`;
 
       if (noData) {
         Modal.modal({
