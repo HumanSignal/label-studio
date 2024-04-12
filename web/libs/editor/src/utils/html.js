@@ -156,7 +156,9 @@ function splitText(node, offset) {
 
 function normalizeBoundaries(range) {
   let { startContainer, startOffset, endContainer, endOffset } = range;
-  let node, next, last;
+  let node;
+  let next;
+  let last;
 
   // Move the start container to the last leaf before any sibling boundary,
   // guaranteeing that any children of the container are within the range.

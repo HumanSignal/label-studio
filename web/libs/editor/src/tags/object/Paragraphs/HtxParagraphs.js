@@ -156,7 +156,8 @@ class HtxParagraphsView extends Component {
               const isLastVisibleIndex = k === visibleIndexes.length - 1;
 
               if (isLastVisibleIndex || visibleIndexes[k + 1] !== curIdx + 1) {
-                let anchorOffset, focusOffset;
+                let anchorOffset;
+                let focusOffset;
 
                 const _range = r.cloneRange();
 

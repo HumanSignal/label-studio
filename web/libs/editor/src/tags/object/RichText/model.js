@@ -157,7 +157,9 @@ const Model = types
     _loadedForAnnotation: null,
   }))
   .actions((self) => {
-    let beforeNeedsUpdateCallback, afterNeedsUpdateCallback, domManager;
+    let beforeNeedsUpdateCallback;
+    let afterNeedsUpdateCallback;
+    let domManager;
 
     return {
       setWorkingMode(mode) {
