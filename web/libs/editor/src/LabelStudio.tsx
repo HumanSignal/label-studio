@@ -47,8 +47,8 @@ export class LabelStudio {
   static instances = new Set<LabelStudio>();
 
   static destroyAll() {
-    this.instances.forEach((inst) => inst.destroy?.());
-    this.instances.clear();
+    LabelStudio.instances.forEach((inst) => inst.destroy?.());
+    LabelStudio.instances.clear();
   }
 
   options: Partial<LSFOptions>;
