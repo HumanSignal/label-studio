@@ -1,6 +1,6 @@
 {
-  "message": "set yarn test e2e timeout to 45",
-  "commit": "c81c68e5f72470e75208aaabd98641cac84a26c3",
-  "date": "2024-04-12T01:23:38.000Z",
+  "message": "change the name to make tests easier",
+  "commit": "9fe0d9c1d0fe9f31de315699ad12eda50e1dd785",
+  "date": "2024-04-12T14:03:17.000Z",
   "branch": "fb-leap-999"
 }
