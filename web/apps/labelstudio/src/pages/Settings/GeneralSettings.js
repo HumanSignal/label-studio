@@ -1,15 +1,15 @@
-import React, { useCallback, useContext } from "react";
-import { Button } from "../../components";
-import { EnterpriseBadge } from "../../components/Badges/Enterprise";
-import { Caption } from "../../components/Caption/Caption";
-import { Form, Input, Label, Select, TextArea } from "../../components/Form";
-import { RadioGroup } from "../../components/Form/Elements/RadioGroup/RadioGroup";
-import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
-import { createURL } from "../../components/HeidiTips/utils";
-import { ProjectContext } from "../../providers/ProjectProvider";
-import { Block, Elem, cn } from "../../utils/bem";
-import { FF_LSDV_E_297, isFF } from "../../utils/feature-flags";
-import "./settings.styl";
+import React, { useCallback, useContext } from 'react';
+import { Button } from '../../components';
+import { EnterpriseBadge } from '../../components/Badges/Enterprise';
+import { Caption } from '../../components/Caption/Caption';
+import { Form, Input, Label, Select, TextArea } from '../../components/Form';
+import { RadioGroup } from '../../components/Form/Elements/RadioGroup/RadioGroup';
+import { HeidiTips } from '../../components/HeidiTips/HeidiTips';
+import { createURL } from '../../components/HeidiTips/utils';
+import { ProjectContext } from '../../providers/ProjectProvider';
+import { Block, Elem, cn } from '../../utils/bem';
+import { FF_LSDV_E_297, isFF } from '../../utils/feature-flags';
+import './settings.styl';
 
 export const GeneralSettings = () => {
   const { project, fetchProject } = useContext(ProjectContext);
@@ -18,55 +18,55 @@ export const GeneralSettings = () => {
     if (project.id) fetchProject(project.id, true);
   }, [project]);
 
-  const colors = ["#FFFFFF", "#F52B4F", "#FA8C16", "#F6C549", "#9ACA4F", "#51AAFD", "#7F64FF", "#D55C9D"];
+  const colors = ['#FFFFFF', '#F52B4F', '#FA8C16', '#F6C549', '#9ACA4F', '#51AAFD', '#7F64FF', '#D55C9D'];
 
   const samplings = [
-    { value: "Sequential", label: "Sequential", description: "Tasks are ordered by Data manager ordering" },
-    { value: "Uniform", label: "Random", description: "Tasks are chosen with uniform random" },
+    { value: 'Sequential', label: 'Sequential', description: 'Tasks are ordered by Data manager ordering' },
+    { value: 'Uniform', label: 'Random', description: 'Tasks are chosen with uniform random' },
   ];
 
   return (
-    <Block name="general-settings">
-      <Elem name={"wrapper"}>
-        <Form action="updateProject" formData={{ ...project }} params={{ pk: project.id }} onSubmit={updateProject}>
-          <Form.Row columnCount={1} rowGap="32px">
-            <Input name="title" label="Project Name" labelProps={{ large: true }} />
+    <Block name='general-settings'>
+      <Elem name={'wrapper'}>
+        <Form action='updateProject' formData={{ ...project }} params={{ pk: project.id }} onSubmit={updateProject}>
+          <Form.Row columnCount={1} rowGap='32px'>
+            <Input name='title' label='Project Name' labelProps={{ large: true }} />
 
-            <TextArea name="description" label="Description" labelProps={{ large: true }} style={{ minHeight: 128 }} />
+            <TextArea name='description' label='Description' labelProps={{ large: true }} style={{ minHeight: 128 }} />
             {isFF(FF_LSDV_E_297) && (
-              <Block name="workspace-placeholder">
-                <Elem name="badge-wrapper">
-                  <Elem name="title">Workspace</Elem>
+              <Block name='workspace-placeholder'>
+                <Elem name='badge-wrapper'>
+                  <Elem name='title'>Workspace</Elem>
                   <EnterpriseBadge />
                 </Elem>
-                <Select placeholder="Select an option" disabled options={[]} />
+                <Select placeholder='Select an option' disabled options={[]} />
                 <Caption>
-                  Simplify project management by organizing projects into workspaces.{" "}
+                  Simplify project management by organizing projects into workspaces.{' '}
                   <a
-                    target="_blank"
+                    target='_blank'
                     href={createURL(
-                      "https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects",
+                      'https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects',
                       {
-                        experiment: "project_settings_tip",
-                        treatment: "simplify_project_management",
+                        experiment: 'project_settings_tip',
+                        treatment: 'simplify_project_management',
                       },
                     )}
-                    rel="noreferrer"
+                    rel='noreferrer'
                   >
                     Learn more
                   </a>
                 </Caption>
               </Block>
             )}
-            <RadioGroup name="color" label="Color" size="large" labelProps={{ size: "large" }}>
+            <RadioGroup name='color' label='Color' size='large' labelProps={{ size: 'large' }}>
               {colors.map((color) => (
                 <RadioGroup.Button key={color} value={color}>
-                  <Block name="color" style={{ "--background": color }} />
+                  <Block name='color' style={{ '--background': color }} />
                 </RadioGroup.Button>
               ))}
             </RadioGroup>
 
-            <RadioGroup label="Task Sampling" labelProps={{ size: "large" }} name="sampling" simple>
+            <RadioGroup label='Task Sampling' labelProps={{ size: 'large' }} name='sampling' simple>
               {samplings.map(({ value, label, description }) => (
                 <RadioGroup.Button
                   key={value}
@@ -77,8 +77,8 @@ export const GeneralSettings = () => {
               ))}
               {isFF(FF_LSDV_E_297) && (
                 <RadioGroup.Button
-                  key="uncertainty-sampling"
-                  value=""
+                  key='uncertainty-sampling'
+                  value=''
                   label={
                     <>
                       Uncertainty sampling <EnterpriseBadge />
@@ -87,14 +87,14 @@ export const GeneralSettings = () => {
                   disabled
                   description={
                     <>
-                      Tasks are chosen according to model uncertainty score (active learning mode).{" "}
+                      Tasks are chosen according to model uncertainty score (active learning mode).{' '}
                       <a
-                        target="_blank"
-                        href={createURL("https://docs.humansignal.com/guide/active_learning", {
-                          experiment: "project_settings_workspace",
-                          treatment: "workspaces",
+                        target='_blank'
+                        href={createURL('https://docs.humansignal.com/guide/active_learning', {
+                          experiment: 'project_settings_workspace',
+                          treatment: 'workspaces',
                         })}
-                        rel="noreferrer"
+                        rel='noreferrer'
                       >
                         Learn more
                       </a>
@@ -107,19 +107,19 @@ export const GeneralSettings = () => {
 
           <Form.Actions>
             <Form.Indicator>
-              <span case="success">Saved!</span>
+              <span case='success'>Saved!</span>
             </Form.Indicator>
-            <Button type="submit" look="primary" style={{ width: 120 }}>
+            <Button type='submit' look='primary' style={{ width: 120 }}>
               Save
             </Button>
           </Form.Actions>
         </Form>
       </Elem>
-      {isFF(FF_LSDV_E_297) && <HeidiTips collection="projectSettings" />}
+      {isFF(FF_LSDV_E_297) && <HeidiTips collection='projectSettings' />}
     </Block>
   );
 };
 
-GeneralSettings.menuItem = "General";
-GeneralSettings.path = "/";
+GeneralSettings.menuItem = 'General';
+GeneralSettings.path = '/';
 GeneralSettings.exact = true;

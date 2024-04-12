@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
 const AppStoreContext = React.createContext();
-AppStoreContext.displayName = "AppStoreContext";
+AppStoreContext.displayName = 'AppStoreContext';
 
 export const AppStoreProvider = ({ children }) => {
   const [store, setStore] = React.useState({});

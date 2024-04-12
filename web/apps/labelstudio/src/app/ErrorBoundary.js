@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { ErrorWrapper } from "../components/Error/Error";
-import { Modal } from "../components/Modal/ModalPopup";
+import React, { Component } from 'react';
+import { ErrorWrapper } from '../components/Error/Error';
+import { Modal } from '../components/Modal/ModalPopup';
 
 export const ErrorContext = React.createContext();
 
@@ -36,12 +36,12 @@ export default class ErrorBoundary extends Component {
       };
 
       return (
-        <Modal onHide={() => location.reload()} style={{ width: "60vw" }} visible bare>
+        <Modal onHide={() => location.reload()} style={{ width: '60vw' }} visible bare>
           <div style={{ padding: 40 }}>
             <ErrorWrapper
-              title="Runtime error"
+              title='Runtime error'
               message={error}
-              stacktrace={`${errorInfo ? `Component Stack: ${errorInfo}` : ""}\n\n${this.state.error?.stack ?? ""}`}
+              stacktrace={`${errorInfo ? `Component Stack: ${errorInfo}` : ''}\n\n${this.state.error?.stack ?? ''}`}
               onGoBack={goBack}
               onReload={() => location.reload()}
             />
@@ -69,5 +69,5 @@ export default class ErrorBoundary extends Component {
 export const ErrorUI = () => {
   const context = React.useContext(ErrorContext);
 
-  return context.hasError && <div className="error">Error occurred</div>;
+  return context.hasError && <div className='error'>Error occurred</div>;
 };

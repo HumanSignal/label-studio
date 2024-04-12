@@ -1,5 +1,5 @@
-import { observe } from "mobx";
-import { observer } from "mobx-react";
+import { observe } from 'mobx';
+import { observer } from 'mobx-react';
 import {
   type IAnyType,
   getType,
@@ -8,7 +8,7 @@ import {
   isPrimitiveType,
   isUnionType,
   types,
-} from "mobx-state-tree";
+} from 'mobx-state-tree';
 import React, {
   type ChangeEvent,
   type FC,
@@ -19,12 +19,12 @@ import React, {
   useEffect,
   useMemo,
   useState,
-} from "react";
-import { IconPropertyAngle } from "../../../assets/icons";
-import { Block, Elem, useBEM } from "../../../utils/bem";
-import { FF_DEV_2715, isFF } from "../../../utils/feature-flags";
-import { TimeDurationControl } from "../../TimeDurationControl/TimeDurationControl";
-import "./RegionEditor.styl";
+} from 'react';
+import { IconPropertyAngle } from '../../../assets/icons';
+import { Block, Elem, useBEM } from '../../../utils/bem';
+import { FF_DEV_2715, isFF } from '../../../utils/feature-flags';
+import { TimeDurationControl } from '../../TimeDurationControl/TimeDurationControl';
+import './RegionEditor.styl';
 
 interface RegionEditorProps {
   region: any;
@@ -44,12 +44,12 @@ const getInputType = (type: any) => {
   const primitive = getPrimitiveType(type);
 
   switch (primitive) {
-    case "number":
-      return "number";
-    case "string":
-      return "text";
+    case 'number':
+      return 'number';
+    case 'string':
+      return 'text';
     default:
-      return "text";
+      return 'text';
   }
 };
 
@@ -59,18 +59,18 @@ const IconMapping = {
 
 const RegionEditorComponent: FC<RegionEditorProps> = ({ region }) => {
   const fields: any[] = region.editableFields ?? [];
-  const isAudioModel = getType(region).name === "AudioRegionModel";
+  const isAudioModel = getType(region).name === 'AudioRegionModel';
 
   const changeStartTimeHandler = (value: number) => {
-    region.setProperty("start", value);
+    region.setProperty('start', value);
   };
 
   const changeEndTimeHandler = (value: number) => {
-    region.setProperty("end", value);
+    region.setProperty('end', value);
   };
 
   const renderRegionProperty = () => (
-    <Elem name="wrapper">
+    <Elem name='wrapper'>
       {region.editorEnabled &&
         fields.map((field: any, i) => {
           return (
@@ -87,7 +87,7 @@ const RegionEditorComponent: FC<RegionEditorProps> = ({ region }) => {
 
   const renderAudioTimeControls = () => {
     return (
-      <Elem name="wrapper-time-control">
+      <Elem name='wrapper-time-control'>
         <TimeDurationControl
           startTime={region.start}
           endTime={region.end}
@@ -102,7 +102,7 @@ const RegionEditorComponent: FC<RegionEditorProps> = ({ region }) => {
   };
 
   return (
-    <Block name="region-editor" mod={{ disabled: region.isReadOnly() }}>
+    <Block name='region-editor' mod={{ disabled: region.isReadOnly() }}>
       {isAudioModel && isFF(FF_DEV_2715) ? renderAudioTimeControls() : renderRegionProperty()}
     </Block>
   );
@@ -175,18 +175,18 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
   }, [region]);
 
   return (
-    <Elem name="property" tag="label">
+    <Elem name='property' tag='label'>
       {isBoolean ? (
         <input
-          className={block?.elem("input").toClassName()}
-          type="checkbox"
+          className={block?.elem('input').toClassName()}
+          type='checkbox'
           checked={value}
           onChange={(e) => onChangeHandler(e.target.checked)}
         />
       ) : isPrimitive ? (
         <RegionInput
           type={getInputType(propertyType)}
-          step="0.01"
+          step='0.01'
           value={value}
           onChange={(v) => onChangeHandler(Number(v))}
         />
@@ -194,7 +194,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
         <select
           value={value}
           onChange={(e) => onChangeHandler(e.target.value)}
-          className={block?.elem("select").toClassName()}
+          className={block?.elem('select').toClassName()}
         >
           {options.map((value, i) => (
             <option key={`${value}-${i}`} value={value}>
@@ -232,13 +232,13 @@ const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, valu
       let value: number | string = e.target.value;
       let safeValue = true;
 
-      if (type === "number") {
+      if (type === 'number') {
         if (!value.match(/^([0-9,.]+)$/gi)) {
           safeValue = false;
         }
 
         if (value.match(/(,|\.)$/)) {
-          value = value.replace(/,/, ".");
+          value = value.replace(/,/, '.');
           safeValue = false;
         }
 
@@ -254,15 +254,15 @@ const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, valu
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (type !== "number") return;
+      if (type !== 'number') return;
 
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
 
         const step = e.altKey && e.shiftKey ? 0.01 : e.shiftKey ? 10 : e.altKey ? 0.1 : 1;
         let newValue = Number(currentValue);
 
-        if (e.key === "ArrowUp") {
+        if (e.key === 'ArrowUp') {
           newValue += step;
         } else {
           newValue -= step;
@@ -281,8 +281,8 @@ const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, valu
   return (
     <input
       {...props}
-      className={block?.elem("input").toClassName()}
-      type="text"
+      className={block?.elem('input').toClassName()}
+      type='text'
       step={step}
       onChange={onChangeHandler}
       onKeyDown={onKeyDown}
@@ -293,8 +293,8 @@ const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, valu
 
 const PropertyLabel: FC<{ label: string }> = ({ label }) => {
   const IconComponent = useMemo(() => {
-    if (label.startsWith("icon:")) {
-      const iconName = label.split(":")[1] as keyof typeof IconMapping;
+    if (label.startsWith('icon:')) {
+      const iconName = label.split(':')[1] as keyof typeof IconMapping;
 
       return IconMapping[iconName] ?? null;
     }
@@ -303,7 +303,7 @@ const PropertyLabel: FC<{ label: string }> = ({ label }) => {
   }, [label]);
 
   return (
-    <Elem name="text" tag="span">
+    <Elem name='text' tag='span'>
       {IconComponent ? <IconComponent /> : label}
     </Elem>
   );

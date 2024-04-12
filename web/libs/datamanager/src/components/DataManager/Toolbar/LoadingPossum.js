@@ -1,5 +1,5 @@
-import { inject } from "mobx-react";
-import { Spinner } from "../../Common/Spinner";
+import { inject } from 'mobx-react';
+import { Spinner } from '../../Common/Spinner';
 
 const injector = inject(({ store }) => {
   const { dataStore, currentView } = store;
@@ -10,5 +10,5 @@ const injector = inject(({ store }) => {
 });
 
 export const LoadingPossum = injector(({ loading }) => {
-  return <Spinner size="small" visible={loading} />;
+  return <Spinner size='small' visible={loading} />;
 });

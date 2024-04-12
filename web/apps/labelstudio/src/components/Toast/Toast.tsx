@@ -1,8 +1,8 @@
-import * as ToastPrimitive from "@radix-ui/react-toast";
-import { type FC, type ReactNode, createContext, useContext, useState } from "react";
-import { type BemComponent, Block, Elem } from "../../utils/bem";
-import { MessageToast } from "./MessageToast";
-import "./Toast.styl";
+import * as ToastPrimitive from '@radix-ui/react-toast';
+import { type FC, type ReactNode, createContext, useContext, useState } from 'react';
+import { type BemComponent, Block, Elem } from '../../utils/bem';
+import { MessageToast } from './MessageToast';
+import './Toast.styl';
 
 export type ToastViewportProps = ToastPrimitive.ToastViewportProps & BemComponent;
 export interface ToastProps {
@@ -13,15 +13,15 @@ export interface ToastProps {
 }
 
 export enum ToastType {
-  info = "info",
-  error = "error",
+  info = 'info',
+  error = 'error',
 }
 interface ToastProviderWithTypes extends ToastPrimitive.ToastProviderProps {
   toastType: ToastType;
 }
 export const ToastViewport: FC<ToastViewportProps> = ({ hotkey, label, ...props }) => {
   return (
-    <Block name="toast-viewport" tag="div" {...props}>
+    <Block name='toast-viewport' tag='div' {...props}>
       <ToastPrimitive.Viewport hotkey={hotkey} label={label} />
     </Block>
   );
@@ -30,19 +30,19 @@ export const ToastViewport: FC<ToastViewportProps> = ({ hotkey, label, ...props 
 export const Toast: FC<ToastProps> = ({ title, action, children, closeable = false, ...props }) => {
   return (
     <ToastPrimitive.Root {...props}>
-      <Block name="toast">
+      <Block name='toast'>
         {title && (
           <ToastPrimitive.Title>
-            <Elem name="title">{title}</Elem>
+            <Elem name='title'>{title}</Elem>
           </ToastPrimitive.Title>
         )}
         <ToastPrimitive.Description>
-          <Elem name="content">{children}</Elem>
+          <Elem name='content'>{children}</Elem>
         </ToastPrimitive.Description>
         {action}
         {closeable && (
           <ToastPrimitive.Close asChild>
-            <Elem name="close" aria-label="Close">
+            <Elem name='close' aria-label='Close'>
               <span aria-hidden>×</span>
             </Elem>
           </ToastPrimitive.Close>
@@ -52,13 +52,13 @@ export const Toast: FC<ToastProps> = ({ title, action, children, closeable = fal
   );
 };
 
-type ToastWithoutBem = ToastPrimitive.ToastActionProps & Omit<BemComponent, "name">;
+type ToastWithoutBem = ToastPrimitive.ToastActionProps & Omit<BemComponent, 'name'>;
 export interface ToastActionProps extends ToastWithoutBem {
   closeCallback?: () => void;
 }
 export const ToastAction: FC<ToastActionProps> = ({ children, closeCallback, altText, ...props }) => (
-  <ToastPrimitive.Action altText={altText} asChild style={{ pointerEvents: "none" }}>
-    <Elem name="action" tag="button" onClick={closeCallback} style={{ pointerEvents: "all" }} {...props}>
+  <ToastPrimitive.Action altText={altText} asChild style={{ pointerEvents: 'none' }}>
+    <Elem name='action' tag='button' onClick={closeCallback} style={{ pointerEvents: 'all' }} {...props}>
       {children}
     </Elem>
   </ToastPrimitive.Action>
@@ -74,12 +74,12 @@ export const useToast = () => {
   const context = useContext(ToastContext);
 
   if (!context) {
-    throw new Error("useToast must be used within a ToastProvider");
+    throw new Error('useToast must be used within a ToastProvider');
   }
   return context;
 };
 
-export const ToastProvider: FC<ToastProviderWithTypes> = ({ swipeDirection = "down", children, ...props }) => {
+export const ToastProvider: FC<ToastProviderWithTypes> = ({ swipeDirection = 'down', children, ...props }) => {
   const [toastMessage, setToastMessage] = useState<ToastShowArgs | null>();
   const duration = 2000;
   const show = ({ message, type }: ToastShowArgs) => {

@@ -1,11 +1,11 @@
-import { TreeSelect } from "antd";
-import type React from "react";
-import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { TreeSelect } from 'antd';
+import type React from 'react';
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
-import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { Tooltip } from '../../common/Tooltip/Tooltip';
 
-import "./NewTaxonomy.styl";
-import { TaxonomySearch, type TaxonomySearchRef } from "./TaxonomySearch";
+import './NewTaxonomy.styl';
+import { TaxonomySearch, type TaxonomySearchRef } from './TaxonomySearch';
 
 type TaxonomyPath = string[];
 type onAddLabelCallback = (path: string[]) => any;
@@ -17,7 +17,7 @@ type TaxonomyItem = {
   depth: number;
   isLeaf?: boolean; // only in new async taxonomy
   children?: TaxonomyItem[];
-  origin?: "config" | "user" | "session";
+  origin?: 'config' | 'user' | 'session';
   hint?: string;
   color?: string;
 };
@@ -73,7 +73,7 @@ const convert = (
     const color = (item: TaxonomyItem) => (
       // no BEM here to make it more lightweight
       // global classname to allow to change it in Style tag
-      <span className="htx-taxonomy-item-color" style={{ background: item.color }}>
+      <span className='htx-taxonomy-item-color' style={{ background: item.color }}>
         {item.label}
       </span>
     );
@@ -198,9 +198,9 @@ const NewTaxonomy = ({
       showCheckedStrategy={TreeSelect.SHOW_ALL}
       treeExpandAction={false}
       dropdownMatchSelectWidth={dropdownWidth}
-      placeholder={options.placeholder || "Click to add..."}
+      placeholder={options.placeholder || 'Click to add...'}
       style={style}
-      className="htx-taxonomy"
+      className='htx-taxonomy'
     />
   );
 };

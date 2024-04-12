@@ -1,13 +1,13 @@
-import { observer } from "mobx-react";
-import { types } from "mobx-state-tree";
-import React from "react";
+import { observer } from 'mobx-react';
+import { types } from 'mobx-state-tree';
+import React from 'react';
 
-import Registry from "../../core/Registry";
-import Types from "../../core/Types";
-import LabelMixin from "../../mixins/LabelMixin";
-import SelectedModelMixin from "../../mixins/SelectedModel";
-import ControlBase from "./Base";
-import { HtxLabels, LabelsModel } from "./Labels/Labels";
+import Registry from '../../core/Registry';
+import Types from '../../core/Types';
+import LabelMixin from '../../mixins/LabelMixin';
+import SelectedModelMixin from '../../mixins/SelectedModel';
+import ControlBase from './Base';
+import { HtxLabels, LabelsModel } from './Labels/Labels';
 
 /**
  * The `HyperTextLabels` tag creates labeled hyper text (HTML). Use with the HyperText object tag to annotate HTML text or HTML elements for named entity recognition tasks.
@@ -34,13 +34,13 @@ import { HtxLabels, LabelsModel } from "./Labels/Labels";
  */
 
 const Validation = types.model({
-  controlledTags: Types.unionTag(["HyperText"]),
+  controlledTags: Types.unionTag(['HyperText']),
 });
 
 const ModelAttrs = types
-  .model("HyperTextLabelsModel", {
-    type: "hypertextlabels",
-    children: Types.unionArray(["label", "header", "view", "hypertext"]),
+  .model('HyperTextLabelsModel', {
+    type: 'hypertextlabels',
+    children: Types.unionArray(['label', 'header', 'view', 'hypertext']),
   })
   .views((self) => ({
     get hasStates() {
@@ -58,11 +58,11 @@ const ModelAttrs = types
     },
 
     get resultType() {
-      return "hypertextlabels";
+      return 'hypertextlabels';
     },
 
     get valueType() {
-      return "hypertextlabels";
+      return 'hypertextlabels';
     },
   }));
 
@@ -72,15 +72,15 @@ const Composition = types.compose(
   ModelAttrs,
   Validation,
   LabelMixin,
-  SelectedModelMixin.props({ _child: "LabelModel" }),
+  SelectedModelMixin.props({ _child: 'LabelModel' }),
 );
 
-const HyperTextLabelsModel = types.compose("HyperTextLabelsModel", Composition);
+const HyperTextLabelsModel = types.compose('HyperTextLabelsModel', Composition);
 
 const HtxHyperTextLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
 });
 
-Registry.addTag("hypertextlabels", HyperTextLabelsModel, HtxHyperTextLabels);
+Registry.addTag('hypertextlabels', HyperTextLabelsModel, HtxHyperTextLabels);
 
 export { HtxHyperTextLabels, HyperTextLabelsModel };

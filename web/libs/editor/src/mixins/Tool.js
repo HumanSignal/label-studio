@@ -1,11 +1,11 @@
-import { getEnv, getRoot, types } from "mobx-state-tree";
-import { cloneNode } from "../core/Helpers";
-import { AnnotationMixin } from "./AnnotationMixin";
+import { getEnv, getRoot, types } from 'mobx-state-tree';
+import { cloneNode } from '../core/Helpers';
+import { AnnotationMixin } from './AnnotationMixin';
 
 const ToolMixin = types
   .model({
     selected: types.optional(types.boolean, false),
-    group: types.optional(types.string, "default"),
+    group: types.optional(types.string, 'default'),
     shortcut: types.optional(types.maybeNull(types.string), null),
   })
   .views((self) => ({
@@ -26,7 +26,7 @@ const ToolMixin = types
     },
 
     get fullName() {
-      return self.toolName + (self.dynamic ? "-dynamic" : "");
+      return self.toolName + (self.dynamic ? '-dynamic' : '');
     },
 
     get clonedStates() {
@@ -91,7 +91,7 @@ const ToolMixin = types
     event(name, ev, args) {
       const fn = `${name}Ev`;
 
-      if (typeof self[fn] !== "undefined") self[fn].call(self, ev, args);
+      if (typeof self[fn] !== 'undefined') self[fn].call(self, ev, args);
     },
   }));
 

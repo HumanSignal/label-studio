@@ -1,6 +1,6 @@
-import { isAlive } from "mobx-state-tree";
-import { useLayoutEffect } from "react";
-import Tree from "../../core/Tree";
+import { isAlive } from 'mobx-state-tree';
+import { useLayoutEffect } from 'react';
+import Tree from '../../core/Tree';
 
 export function Annotation({ annotation, root }) {
   useLayoutEffect(() => {

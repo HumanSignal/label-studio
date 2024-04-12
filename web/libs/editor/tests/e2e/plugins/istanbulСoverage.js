@@ -1,11 +1,11 @@
 /* global global */
 
-const fs = require("fs");
-const path = require("path");
-const TestExclude = require("test-exclude");
-const { recorder, event, output } = require("codeceptjs");
-const Container = require("codeceptjs/lib/container");
-const { clearString } = require("codeceptjs/lib/utils");
+const fs = require('fs');
+const path = require('path');
+const TestExclude = require('test-exclude');
+const { recorder, event, output } = require('codeceptjs');
+const Container = require('codeceptjs/lib/container');
+const { clearString } = require('codeceptjs/lib/utils');
 
 function hashCode(str) {
   let hash = 0;
@@ -23,32 +23,32 @@ function hashCode(str) {
 }
 
 const defaultConfig = {
-  coverageDir: "output/coverage",
+  coverageDir: 'output/coverage',
   actionCoverage: false,
   uniqueFileName: true,
 };
 
 const defaultActionCoverageConfig = {
   enabled: true,
-  beginActionName: "performActionBegin",
-  endActionName: "performActionEnd",
-  coverageDir: "output/actionCoverage",
+  beginActionName: 'performActionBegin',
+  endActionName: 'performActionEnd',
+  coverageDir: 'output/actionCoverage',
   include: true,
   exclude: false,
 };
 
-const supportedHelpers = ["Puppeteer", "Playwright"];
+const supportedHelpers = ['Puppeteer', 'Playwright'];
 
 function buildFileName(test, uniqueFileName) {
   let fileName = clearString(test.title);
   const originalName = fileName;
 
   // This prevent data driven to be included in the failed screenshot file name
-  if (fileName.indexOf("{") !== -1) {
-    fileName = fileName.substr(0, fileName.indexOf("{") - 3).trim();
+  if (fileName.indexOf('{') !== -1) {
+    fileName = fileName.substr(0, fileName.indexOf('{') - 3).trim();
   }
 
-  if (test.ctx && test.ctx.test && test.ctx.test.type === "hook") {
+  if (test.ctx && test.ctx.test && test.ctx.test.type === 'hook') {
     fileName = clearString(`${test.title}_${test.ctx.test.title}`);
   }
 
@@ -65,7 +65,7 @@ function buildFileName(test, uniqueFileName) {
 
 function prepareActionStepConfig(actionCoverageConfig) {
   const config =
-    typeof actionCoverageConfig === "boolean"
+    typeof actionCoverageConfig === 'boolean'
       ? {
           enabled: actionCoverageConfig,
         }
@@ -105,7 +105,7 @@ module.exports = (config) => {
   }
 
   if (!helper) {
-    console.error("Coverage is only supported in Puppeteer, Playwright");
+    console.error('Coverage is only supported in Puppeteer, Playwright');
     return;
   }
 
@@ -115,7 +115,7 @@ module.exports = (config) => {
 
   const excludeTester = new TestExclude({
     ...options.actionCoverage,
-    cwd: path.resolve("../"),
+    cwd: path.resolve('../'),
   });
 
   let lastCoverages = {};
@@ -220,7 +220,7 @@ module.exports = (config) => {
   }
 
   event.dispatcher.on(event.all.before, async () => {
-    output.debug("*** Collecting istanbul coverage for tests ****");
+    output.debug('*** Collecting istanbul coverage for tests ****');
     if (!options.actionCoverage.enabled) return;
     actionCoverages = {};
   });
@@ -228,7 +228,7 @@ module.exports = (config) => {
   event.dispatcher.on(event.all.after, async () => {
     if (!options.actionCoverage.enabled) return;
     recorder.add(
-      "saving action coverage",
+      'saving action coverage',
       async () => {
         try {
           const coverageDir = path.resolve(process.cwd(), options.actionCoverage.coverageDir);
@@ -260,7 +260,7 @@ module.exports = (config) => {
   // Save coverage data after every test run
   event.dispatcher.on(event.test.after, async (test) => {
     recorder.add(
-      "saving coverage",
+      'saving coverage',
       async () => {
         try {
           const coverageInfo = await collectLastCoverage(actionsStack, true);
@@ -289,7 +289,7 @@ module.exports = (config) => {
     prevActionsStack = [...actionsStack];
     const stack = [...actionsStack];
 
-    recorder.add("collect last coverage", async () => {
+    recorder.add('collect last coverage', async () => {
       try {
         await collectLastCoverage(stack);
       } catch (err) {

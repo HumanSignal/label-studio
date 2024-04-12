@@ -1,21 +1,21 @@
-import { observer } from "mobx-react";
-import { type FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useMedia } from "../../../hooks/useMedia";
-import { useRegionsCopyPaste } from "../../../hooks/useRegionsCopyPaste";
-import { Block, Elem } from "../../../utils/bem";
-import ResizeObserver from "../../../utils/resize-observer";
-import { clamp } from "../../../utils/utilities";
-import "../SidePanels.styl";
-import { SidePanelsContext } from "../SidePanelsContext";
+import { observer } from 'mobx-react';
+import { type FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMedia } from '../../../hooks/useMedia';
+import { useRegionsCopyPaste } from '../../../hooks/useRegionsCopyPaste';
+import { Block, Elem } from '../../../utils/bem';
+import ResizeObserver from '../../../utils/resize-observer';
+import { clamp } from '../../../utils/utilities';
+import '../SidePanels.styl';
+import { SidePanelsContext } from '../SidePanelsContext';
 import {
   DEFAULT_PANEL_HEIGHT,
   DEFAULT_PANEL_MAX_HEIGHT,
   DEFAULT_PANEL_MAX_WIDTH,
   DEFAULT_PANEL_WIDTH,
   PANEL_HEADER_HEIGHT,
-} from "../constants";
-import { PanelTabsBase } from "./PanelTabsBase";
-import { Tabs } from "./Tabs";
+} from '../constants';
+import { PanelTabsBase } from './PanelTabsBase';
+import { Tabs } from './Tabs';
 import {
   type CommonProps,
   DropSide,
@@ -26,7 +26,7 @@ import {
   Side,
   type SidePanelsProps,
   type ViewportSize,
-} from "./types";
+} from './types';
 import {
   findPanelViewByName,
   findZIndices,
@@ -48,7 +48,7 @@ import {
   stateAddedTab,
   stateRemovePanelEmptyViews,
   stateRemovedTab,
-} from "./utils";
+} from './utils';
 
 const maxWindowWidth = 980;
 const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
@@ -131,11 +131,11 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   const createNewPanel = useCallback(
     (name: string, movingPanel: string, movingTab: number, left: number, top: number) => {
       if (localSnap.current) {
-        const snapSide = localSnap.current.split("-");
+        const snapSide = localSnap.current.split('-');
         const side = snapSide[0] as Side;
 
         if (collapsedSideRef.current?.[side]) return;
-        const joinOrder = snapSide[1] === "top" ? JoinOrder.top : JoinOrder.bottom;
+        const joinOrder = snapSide[1] === 'top' ? JoinOrder.top : JoinOrder.bottom;
         const height = viewportSize.current.height;
 
         setPanelData((state) => {
@@ -327,9 +327,9 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       setPositioning(false);
       setLockPanelContents(() => false);
       if (!localSnap.current) return;
-      const snap = localSnap.current.split("-");
+      const snap = localSnap.current.split('-');
       const side = snap[0] as Side;
-      const joinOrder = snap[1] === "top" ? JoinOrder.top : JoinOrder.bottom;
+      const joinOrder = snap[1] === 'top' ? JoinOrder.top : JoinOrder.bottom;
       const sameSidePanelKeys = getAttachedPerSide(panelData, side)?.filter((panelName) => panelName !== key);
 
       if (sameSidePanelKeys && sameSidePanelKeys.length > 0) {
@@ -443,8 +443,8 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       };
 
       if (detached) result.detached.push(props);
-      else if (alignment === "left") result.left.push(props);
-      else if (alignment === "right") result.right.push(props);
+      else if (alignment === 'left') result.left.push(props);
+      else if (alignment === 'right') result.right.push(props);
     }
     return result;
   }, [
@@ -521,7 +521,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
     const updatedProps = { ...partialEmptyBaseProps };
 
     updatedProps.panelViews = partialEmptyBaseProps.panelViews.filter(
-      (view) => view.name !== "comments" || showComments,
+      (view) => view.name !== 'comments' || showComments,
     );
 
     return updatedProps;
@@ -538,18 +538,18 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
             setViewportSizeMatch(el.clientWidth <= maxWindowWidth);
           }
         }}
-        name="sidepanels"
+        name='sidepanels'
         mod={{ collapsed: panelBreakPoint }}
         style={{ ...padding }}
       >
         {initialized && (
           <>
-            <Elem name="content" mod={{ resizing: lockPanelContents || positioning }}>
+            <Elem name='content' mod={{ resizing: lockPanelContents || positioning }}>
               {children}
             </Elem>
             {panelsHidden !== true && panelBreakPoint ? (
               <>
-                <Elem name="wrapper">
+                <Elem name='wrapper'>
                   <PanelTabsBase {...emptyBaseProps}>
                     <Tabs {...emptyBaseProps} />
                   </PanelTabsBase>
@@ -568,11 +568,11 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
                       );
                     });
 
-                  if (panelType === "detached") {
+                  if (panelType === 'detached') {
                     return <Fragment key={panelType}>{content}</Fragment>;
                   }
                   return (
-                    <Elem key={panelType} name="wrapper" mod={{ align: panelType, snap: snap === panelType }}>
+                    <Elem key={panelType} name='wrapper' mod={{ align: panelType, snap: snap === panelType }}>
                       {content}
                     </Elem>
                   );

@@ -1,5 +1,5 @@
-const xml2js = require("xml2js");
-const builder = require("xmlbuilder");
+const xml2js = require('xml2js');
+const builder = require('xmlbuilder');
 const OPTIONS = {
   headless: true,
   explicitChildren: true,
@@ -21,7 +21,7 @@ function renderXml(doc) {
   const xml = builder.create(rootName, null, null, { headless: true });
   const renderChildren = (nodes, xml) => {
     nodes.forEach((node) => {
-      const elem = xml.ele(node["#name"]);
+      const elem = xml.ele(node['#name']);
 
       if (node.$) Object.keys(node.$).forEach((key) => elem.att(key, node.$[key]));
       if (node.$$) renderChildren(node.$$, elem);
@@ -75,7 +75,7 @@ function xmlFilterNodes(tree, cb) {
 }
 
 function xmlTreeHasTag(tree, tagName) {
-  return xmlFindBy(tree, (node) => node["#name"] === tagName);
+  return xmlFindBy(tree, (node) => node['#name'] === tagName);
 }
 
 function xmlFindBy(tree, cb) {

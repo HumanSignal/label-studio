@@ -1,15 +1,15 @@
-import { useContext, useEffect, useMemo, useState } from "react";
-import { Fragment } from "react";
-import { Hotkey } from "../../core/Hotkey";
-import { Block, Elem } from "../../utils/bem";
-import { isDefined } from "../../utils/utilities";
-import { ToolbarContext } from "./ToolbarContext";
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { Fragment } from 'react';
+import { Hotkey } from '../../core/Hotkey';
+import { Block, Elem } from '../../utils/bem';
+import { isDefined } from '../../utils/utilities';
+import { ToolbarContext } from './ToolbarContext';
 
-const hotkeys = Hotkey("SegmentationToolbar", "Segmentation Tools");
+const hotkeys = Hotkey('SegmentationToolbar', 'Segmentation Tools');
 
 const keysDictionary = {
-  plus: "+",
-  minus: "-",
+  plus: '+',
+  minus: '-',
 };
 
 export const Tool = ({
@@ -35,18 +35,18 @@ export const Tool = ({
   const shortcutView = useMemo(() => {
     if (!isDefined(shortcut)) return null;
 
-    const combos = shortcut.split(",").map((s) => s.trim());
+    const combos = shortcut.split(',').map((s) => s.trim());
 
     return (
-      <Elem name="shortcut">
+      <Elem name='shortcut'>
         {combos.map((combo, index) => {
-          const keys = combo.split("+");
+          const keys = combo.split('+');
 
           return (
-            <Fragment key={`${keys.join("-")}-${index}`}>
+            <Fragment key={`${keys.join('-')}-${index}`}>
               {keys.map((key) => {
                 return (
-                  <Elem name="key" tag="kbd" key={key}>
+                  <Elem name='key' tag='kbd' key={key}>
                     {keysDictionary[key] ?? key}
                   </Elem>
                 );
@@ -108,7 +108,7 @@ export const Tool = ({
   }, [extraShortcuts, active]);
 
   const extraContent = useMemo(() => {
-    return smart && extra ? <Elem name="extra">{extra}</Elem> : null;
+    return smart && extra ? <Elem name='extra'>{extra}</Elem> : null;
   }, [smart, extra]);
 
   const showControls = dynamic === false && controls?.length && (active || (controlsOnHover && hovered));
@@ -117,8 +117,8 @@ export const Tool = ({
 
   return (
     <Block
-      name="tool"
-      tag="button"
+      name='tool'
+      tag='button'
       aria-label={ariaLabel}
       mod={{
         active,
@@ -143,12 +143,12 @@ export const Tool = ({
         setHovered(false);
       }}
     >
-      <Elem name="icon">{icon}</Elem>
+      <Elem name='icon'>{icon}</Elem>
       {dynamic === false &&
         controlsOnHover === false &&
         (expanded ? (
           <>
-            <Elem name="label">
+            <Elem name='label'>
               {extraContent}
               {label}
               {shortcutView}
@@ -157,8 +157,8 @@ export const Tool = ({
         ) : (
           (isDefined(label) || isDefined(shortcutView)) &&
           !showControls && (
-            <Elem name="tooltip" mod={{ controlled: !!(smart && extra) }}>
-              <Elem name="tooltip-body">
+            <Elem name='tooltip' mod={{ controlled: !!(smart && extra) }}>
+              <Elem name='tooltip-body'>
                 {extraContent}
                 {label}
                 {shortcutView}
@@ -167,8 +167,8 @@ export const Tool = ({
           )
         ))}
       {showControls && (
-        <Elem name="controls" onClickCapture={(e) => e.stopPropagation()}>
-          <Elem name="controls-body">{controls}</Elem>
+        <Elem name='controls' onClickCapture={(e) => e.stopPropagation()}>
+          <Elem name='controls-body'>{controls}</Elem>
         </Elem>
       )}
     </Block>

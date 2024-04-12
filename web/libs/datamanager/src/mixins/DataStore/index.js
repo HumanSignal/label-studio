@@ -1,2 +1,2 @@
-export { DataStore } from "./DataStore";
-export { DataStoreItem } from "./DataStoreItem";
+export { DataStore } from './DataStore';
+export { DataStoreItem } from './DataStoreItem';

@@ -1,14 +1,14 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { generatePath, matchPath, useHistory, useLocation } from "react-router";
-import { Pages } from "../pages";
-import { setBreadcrumbs, useBreadcrumbControls } from "../services/breadrumbs";
-import { pageSetToRoutes } from "../utils/routeHelpers";
-import { useAppStore } from "./AppStoreProvider";
-import { useConfig } from "./ConfigProvider";
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { generatePath, matchPath, useHistory, useLocation } from 'react-router';
+import { Pages } from '../pages';
+import { setBreadcrumbs, useBreadcrumbControls } from '../services/breadrumbs';
+import { pageSetToRoutes } from '../utils/routeHelpers';
+import { useAppStore } from './AppStoreProvider';
+import { useConfig } from './ConfigProvider';
 
 export const RoutesContext = createContext();
 
-const findMacthingComponents = (path, routesMap, parentPath = "") => {
+const findMacthingComponents = (path, routesMap, parentPath = '') => {
   const result = [];
 
   const match = routesMap.find((route) => {
@@ -118,16 +118,16 @@ export const useParams = () => {
 
   const match = useMemo(() => {
     const parsedLocation = location.search
-      .replace(/^\?/, "")
-      .split("&")
+      .replace(/^\?/, '')
+      .split('&')
       .map((pair) => {
-        const [key, value] = pair.split("=").map((p) => decodeURIComponent(p));
+        const [key, value] = pair.split('=').map((p) => decodeURIComponent(p));
         return [key, value];
       });
 
     const search = Object.fromEntries(parsedLocation);
 
-    const urlParams = matchPath(location.pathname, currentPath ?? "");
+    const urlParams = matchPath(location.pathname, currentPath ?? '');
 
     return { ...search, ...(urlParams?.params ?? {}) };
   }, [location, currentPath]);

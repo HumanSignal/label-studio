@@ -1,9 +1,9 @@
-import React, { forwardRef, useEffect, useMemo } from "react";
-import { cn } from "../../../../utils/bem";
-import { FormField } from "../../FormField";
-import { useValueTracker } from "../../Utils";
-import { default as Label } from "../Label/Label";
-import "./Toggle.styl";
+import React, { forwardRef, useEffect, useMemo } from 'react';
+import { cn } from '../../../../utils/bem';
+import { FormField } from '../../FormField';
+import { useValueTracker } from '../../Utils';
+import { default as Label } from '../Label/Label';
+import './Toggle.styl';
 
 const Toggle = forwardRef(
   (
@@ -22,7 +22,7 @@ const Toggle = forwardRef(
     },
     ref,
   ) => {
-    const rootClass = cn("toggle");
+    const rootClass = cn('toggle');
     const initialChecked = useMemo(() => defaultChecked ?? checked ?? false, [defaultChecked, checked]);
     const [isChecked, setIsChecked] = useValueTracker(checked, defaultChecked ?? false);
 
@@ -50,19 +50,19 @@ const Toggle = forwardRef(
         {...props}
       >
         {(ref) => (
-          <div className={classList.join(" ")}>
+          <div className={classList.join(' ')}>
             <input
               ref={ref}
               {...props}
-              className={rootClass.elem("input")}
-              type="checkbox"
+              className={rootClass.elem('input')}
+              type='checkbox'
               checked={isChecked}
               onChange={(e) => {
                 setIsChecked(e.target.checked);
                 onChange?.(e);
               }}
             />
-            <span className={rootClass.elem("indicator")} />
+            <span className={rootClass.elem('indicator')} />
           </div>
         )}
       </FormField>
@@ -71,7 +71,7 @@ const Toggle = forwardRef(
     return label ? (
       <Label
         ref={ref}
-        placement="right"
+        placement='right'
         required={required}
         text={label}
         children={formField}

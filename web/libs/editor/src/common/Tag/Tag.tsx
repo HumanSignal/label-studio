@@ -1,8 +1,8 @@
-import color from "chroma-js";
-import type { CSSProperties, FC } from "react";
-import { Block } from "../../utils/bem";
-import { colors } from "../../utils/namedColors";
-import "./Tag.styl";
+import color from 'chroma-js';
+import type { CSSProperties, FC } from 'react';
+import { Block } from '../../utils/bem';
+import { colors } from '../../utils/namedColors';
+import './Tag.styl';
 
 type ColorName = keyof typeof colors;
 
@@ -11,14 +11,14 @@ const prepareColor = (colorString: string, solid: boolean) => {
 
   return solid
     ? {
-        color: color.contrast(baseColor, "#fff") > 4.5 ? "#fff" : "#000",
+        color: color.contrast(baseColor, '#fff') > 4.5 ? '#fff' : '#000',
         background: baseColor,
-        "shadow-color": baseColor.darken(0.22),
+        'shadow-color': baseColor.darken(0.22),
       }
     : {
         color: baseColor,
         background: baseColor.desaturate(2).brighten(2.2),
-        "shadow-color": baseColor.desaturate(1).brighten(1.22),
+        'shadow-color': baseColor.desaturate(1).brighten(1.22),
       };
 };
 
@@ -33,7 +33,7 @@ interface TagProps {
   color: string | ColorName;
   className?: string;
   style?: CSSProperties;
-  size?: "small" | "compact";
+  size?: 'small' | 'compact';
   solid?: boolean;
   children?: React.ReactNode;
 }
@@ -46,7 +46,7 @@ export const Tag: FC<TagProps> = ({ className, style, size, color, solid = false
   const styles = { ...(style ?? {}), ...finalColor };
 
   return (
-    <Block tag="span" name="tag" mod={{ size }} mix={className} style={styles}>
+    <Block tag='span' name='tag' mod={{ size }} mix={className} style={styles}>
       {children}
     </Block>
   );

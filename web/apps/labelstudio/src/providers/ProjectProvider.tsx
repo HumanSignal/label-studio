@@ -1,9 +1,9 @@
-import type React from "react";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { shallowEqualObjects } from "shallow-equal";
-import { type WrappedResponse, useAPI } from "./ApiProvider";
-import { useAppStore } from "./AppStoreProvider";
-import { useParams } from "./RoutesProvider";
+import type React from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { shallowEqualObjects } from 'shallow-equal';
+import { type WrappedResponse, useAPI } from './ApiProvider';
+import { useAppStore } from './AppStoreProvider';
+import { useParams } from './RoutesProvider';
 
 type Empty = Record<string, never>;
 
@@ -15,7 +15,7 @@ type Context = {
 };
 
 export const ProjectContext = createContext<Context>({} as Context);
-ProjectContext.displayName = "ProjectContext";
+ProjectContext.displayName = 'ProjectContext';
 
 const projectCache = new Map<number, APIProject>();
 
@@ -26,7 +26,7 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
   // @todo use null for missed project data
   const [projectData, setProjectData] = useState<APIProject | Empty>(projectCache.get(+params.id) ?? {});
 
-  const fetchProject: Context["fetchProject"] = useCallback(
+  const fetchProject: Context['fetchProject'] = useCallback(
     async (id, force = false) => {
       const finalProjectId = +(id ?? params.id);
 
@@ -36,7 +36,7 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
         setProjectData({ ...projectCache.get(finalProjectId)! });
       }
 
-      const result = await api.callApi<APIProject>("project", {
+      const result = await api.callApi<APIProject>('project', {
         params: { pk: finalProjectId },
         errorFilter: () => false,
       });
@@ -54,9 +54,9 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
     [params],
   );
 
-  const updateProject: Context["updateProject"] = useCallback(
+  const updateProject: Context['updateProject'] = useCallback(
     async (fields: APIProject) => {
-      const result = await api.callApi<APIProject>("updateProject", {
+      const result = await api.callApi<APIProject>('updateProject', {
         params: {
           pk: projectData.id,
         },

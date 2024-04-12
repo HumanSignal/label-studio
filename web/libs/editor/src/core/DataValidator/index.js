@@ -1,5 +1,5 @@
-import { types } from "mobx-state-tree";
-import { ConfigValidator } from "./ConfigValidator";
+import { types } from 'mobx-state-tree';
+import { ConfigValidator } from './ConfigValidator';
 
 /**@typedef {(errors: any[]) => void} ErrorCallback */
 
@@ -30,7 +30,7 @@ export const ValidationError = types
       return [self.modelName, self.field, self.error, self.value]
         .concat(...[self.validType])
         .filter((el) => el !== null)
-        .join("-");
+        .join('-');
     },
   }));
 

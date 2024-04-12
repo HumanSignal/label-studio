@@ -1,7 +1,7 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from 'react';
 
 export const ConfigContext = createContext(window.APP_SETTINGS);
-ConfigContext.displayName = "ConfigContext";
+ConfigContext.displayName = 'ConfigContext';
 
 export const ConfigConsumer = ConfigContext.Consumer;
 

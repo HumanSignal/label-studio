@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
-import { cn } from "../../../utils/bem";
-import { Dropdown } from "./DropdownComponent";
-import { DropdownContext } from "./DropdownContext";
+import React, { useContext } from 'react';
+import { cn } from '../../../utils/bem';
+import { Dropdown } from './DropdownComponent';
+import { DropdownContext } from './DropdownContext';
 
 export const DropdownTrigger = React.forwardRef(
   ({ tag, children, dropdown, content, toggle, closeOnClickOutside = true, disabled = false, ...props }, ref) => {
@@ -55,9 +55,9 @@ export const DropdownTrigger = React.forwardRef(
     const cloneProps = {
       ...triggerEL.props,
       tag,
-      key: "dd-trigger",
+      key: 'dd-trigger',
       ref: triggerRef,
-      className: cn("dropdown").elem("trigger").mix(props.className).mix(triggerEL.props.className),
+      className: cn('dropdown').elem('trigger').mix(props.className).mix(triggerEL.props.className),
       onClickCapture: handleToggle,
     };
 
@@ -70,8 +70,8 @@ export const DropdownTrigger = React.forwardRef(
     ) : null;
 
     React.useEffect(() => {
-      document.addEventListener("click", handleClick, { capture: true });
-      return () => document.removeEventListener("click", handleClick, { capture: true });
+      document.addEventListener('click', handleClick, { capture: true });
+      return () => document.removeEventListener('click', handleClick, { capture: true });
     }, [handleClick]);
 
     const contextValue = React.useMemo(

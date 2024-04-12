@@ -1,18 +1,18 @@
-import { inject, observer } from "mobx-react";
-import { types } from "mobx-state-tree";
-import React from "react";
+import { inject, observer } from 'mobx-react';
+import { types } from 'mobx-state-tree';
+import React from 'react';
 
-import Ranker from "../../components/Ranker/Ranker";
-import Registry from "../../core/Registry";
-import Tree from "../../core/Tree";
-import Types from "../../core/Types";
-import { AnnotationMixin } from "../../mixins/AnnotationMixin";
-import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
-import { guidGenerator } from "../../utils/unique";
-import Base from "./Base";
+import Ranker from '../../components/Ranker/Ranker';
+import Registry from '../../core/Registry';
+import Tree from '../../core/Tree';
+import Types from '../../core/Types';
+import { AnnotationMixin } from '../../mixins/AnnotationMixin';
+import { ReadOnlyControlMixin } from '../../mixins/ReadOnlyMixin';
+import { guidGenerator } from '../../utils/unique';
+import Base from './Base';
 
 // column to display items from original List, when there are no default Bucket
-const ORIGINAL_ITEMS_KEY = "_";
+const ORIGINAL_ITEMS_KEY = '_';
 
 /**
  * The `Ranker` tag is used to rank items in a `List` tag or pick relevant items from a `List`, depending on using nested `Bucket` tags.
@@ -76,21 +76,21 @@ const ORIGINAL_ITEMS_KEY = "_";
  */
 const Model = types
   .model({
-    type: "ranker",
+    type: 'ranker',
     toname: types.maybeNull(types.string),
     collapsible: types.optional(types.boolean, true),
 
     // @todo allow Views inside: ['bucket', 'view']
-    children: Types.unionArray(["bucket"]),
+    children: Types.unionArray(['bucket']),
   })
   .views((self) => ({
     get list() {
       const list = self.annotation.names.get(self.toname);
 
-      return list.type === "list" ? list : null;
+      return list.type === 'list' ? list : null;
     },
     get buckets() {
-      return Tree.filterChildrenOfType(self, "BucketModel");
+      return Tree.filterChildrenOfType(self, 'BucketModel');
     },
     /**
      * rank mode: tag's name
@@ -109,7 +109,7 @@ const Model = types
       if (!self.list) return [];
       if (self.rankOnly) return [{ id: self.name, title: self.list.title }];
 
-      const columns = self.buckets.map((b) => ({ id: b.name, title: b.title ?? "" }));
+      const columns = self.buckets.map((b) => ({ id: b.name, title: b.title ?? '' }));
 
       if (!self.defaultBucket) columns.unshift({ id: ORIGINAL_ITEMS_KEY, title: self.list.title });
 
@@ -191,9 +191,9 @@ const Model = types
     },
   }));
 
-const RankerModel = types.compose("RankerModel", Base, AnnotationMixin, Model, ReadOnlyControlMixin);
+const RankerModel = types.compose('RankerModel', Base, AnnotationMixin, Model, ReadOnlyControlMixin);
 
-const HtxRanker = inject("store")(
+const HtxRanker = inject('store')(
   observer(({ item }) => {
     const data = item.dataSource;
 
@@ -218,22 +218,22 @@ const HtxRanker = inject("store")(
  * @param {string} title       Title of the column
  * @param {boolean} [default]  This Bucket will be used to display results from `List` by default; see `Ranker` tag for more details
  */
-const BucketModel = types.model("BucketModel", {
+const BucketModel = types.model('BucketModel', {
   id: types.optional(types.identifier, guidGenerator),
-  type: "bucket",
+  type: 'bucket',
   name: types.string,
   title: types.maybeNull(types.string),
   default: types.optional(types.boolean, false),
 });
 
-const HtxBucket = inject("store")(
+const HtxBucket = inject('store')(
   observer(({ item }) => {
     return <h1>{item.name}</h1>;
   }),
 );
 
-Registry.addTag("ranker", RankerModel, HtxRanker);
-Registry.addTag("bucket", BucketModel, HtxBucket);
+Registry.addTag('ranker', RankerModel, HtxRanker);
+Registry.addTag('bucket', BucketModel, HtxBucket);
 Registry.addObjectType(RankerModel);
 
 export { BucketModel, HtxRanker, RankerModel };

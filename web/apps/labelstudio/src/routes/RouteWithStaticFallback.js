@@ -1,9 +1,9 @@
-import React, { Children } from "react";
-import { Switch } from "react-router";
-import { StaticContent } from "../app/StaticContent/StaticContent";
-import { MenubarContext } from "../components/Menubar/Menubar";
+import React, { Children } from 'react';
+import { Switch } from 'react-router';
+import { StaticContent } from '../app/StaticContent/StaticContent';
+import { MenubarContext } from '../components/Menubar/Menubar';
 
-import { SentryRoute as Route } from "../config/Sentry";
+import { SentryRoute as Route } from '../config/Sentry';
 
 const extractModalRoutes = (children) => {
   const modalRoutes = [];
@@ -42,7 +42,7 @@ export const RouteWithStaticFallback = ({ children, render, route, component, st
 
     const Static = () => {
       if (menubar?.contextIsSet(null) === false) menubar?.setContext(null);
-      return staticComponent ?? <StaticContent id="main-content" />;
+      return staticComponent ?? <StaticContent id='main-content' />;
     };
 
     const exactRoutes = modalRoutes.reduce(

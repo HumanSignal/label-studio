@@ -1,8 +1,8 @@
-import { type FC, type MutableRefObject, useMemo, useRef, useState } from "react";
-import { Block } from "../../../utils/bem";
-import { clamp } from "../../../utils/utilities";
-import type { TimelineSideControlProps } from "../Types";
-import "./FramesControl.styl";
+import { type FC, type MutableRefObject, useMemo, useRef, useState } from 'react';
+import { Block } from '../../../utils/bem';
+import { clamp } from '../../../utils/utilities';
+import type { TimelineSideControlProps } from '../Types';
+import './FramesControl.styl';
 
 export const FramesControl: FC<TimelineSideControlProps> = ({ position = 0, length = 0, onPositionChange }) => {
   const [inputMode, setInputMode] = useState(false);
@@ -11,7 +11,7 @@ export const FramesControl: FC<TimelineSideControlProps> = ({ position = 0, leng
   }, [length]);
 
   return (
-    <Block name="frames-control" onClick={() => setInputMode(true)}>
+    <Block name='frames-control' onClick={() => setInputMode(true)}>
       {inputMode ? (
         <FrameInput
           length={duration}
@@ -39,7 +39,7 @@ interface FrameInputProps {
   onFinishEditing: () => void;
 }
 
-const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", "Enter", /[0-9]/];
+const allowedKeys = ['ArrowUp', 'ArrowDown', 'Backspace', 'Delete', 'Enter', /[0-9]/];
 
 const FrameInput: FC<FrameInputProps> = ({ length, position, onChange, onFinishEditing }) => {
   const input = useRef<HTMLInputElement>() as MutableRefObject<HTMLInputElement>;
@@ -50,7 +50,7 @@ const FrameInput: FC<FrameInputProps> = ({ length, position, onChange, onFinishE
 
   return (
     <input
-      type="text"
+      type='text'
       ref={input}
       defaultValue={position + 1}
       autoFocus
@@ -63,15 +63,15 @@ const FrameInput: FC<FrameInputProps> = ({ length, position, onChange, onFinishE
         const value = Number.parseInt(input.current!.value);
         const step = e.shiftKey ? 10 : 1;
 
-        if (e.key === "Enter") {
+        if (e.key === 'Enter') {
           notifyChange?.(value);
           onFinishEditing?.();
-        } else if (e.key === "Escape") {
+        } else if (e.key === 'Escape') {
           onFinishEditing?.();
-        } else if (allowedKey === "ArrowUp") {
+        } else if (allowedKey === 'ArrowUp') {
           input.current!.value = clamp(value + step, 1, length).toString();
           e.preventDefault();
-        } else if (allowedKey === "ArrowDown") {
+        } else if (allowedKey === 'ArrowDown') {
           input.current!.value = clamp(value - step, 1, length).toString();
           e.preventDefault();
         }

@@ -1,20 +1,20 @@
-import { observer } from "mobx-react";
-import { type FC, useEffect, useMemo, useRef, useState } from "react";
-import { useLocalStorageState } from "../../hooks/useLocalStorageState";
-import { useMemoizedHandlers } from "../../hooks/useMemoizedHandlers";
-import { Block, Elem } from "../../utils/bem";
-import { clamp, isDefined } from "../../utils/utilities";
-import { TimelineContextProvider } from "./Context";
-import { Controls } from "./Controls";
-import { Seeker } from "./Seeker";
-import "./Timeline.styl";
-import type { TimelineContextValue, TimelineControlsStepHandler, TimelineProps } from "./Types";
-import { default as Views } from "./Views";
+import { observer } from 'mobx-react';
+import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocalStorageState } from '../../hooks/useLocalStorageState';
+import { useMemoizedHandlers } from '../../hooks/useMemoizedHandlers';
+import { Block, Elem } from '../../utils/bem';
+import { clamp, isDefined } from '../../utils/utilities';
+import { TimelineContextProvider } from './Context';
+import { Controls } from './Controls';
+import { Seeker } from './Seeker';
+import './Timeline.styl';
+import type { TimelineContextValue, TimelineControlsStepHandler, TimelineProps } from './Types';
+import { default as Views } from './Views';
 
 const TimelineComponent: FC<TimelineProps> = ({
   regions,
   zoom = 1,
-  mode = "frames",
+  mode = 'frames',
   length = 1024,
   position = 1,
   framerate = 24,
@@ -38,9 +38,9 @@ const TimelineComponent: FC<TimelineProps> = ({
   const [currentPosition, setCurrentPosition] = useState(clamp(position, 1, Number.POSITIVE_INFINITY));
   const [seekOffset, setSeekOffset] = useState(0);
   const [seekVisibleWidth, setSeekVisibleWidth] = useState(0);
-  const [viewCollapsed, setViewCollapsed] = useLocalStorageState("video-timeline", false, {
+  const [viewCollapsed, setViewCollapsed] = useLocalStorageState('video-timeline', false, {
     fromString(value) {
-      return value === "true" ? true : false;
+      return value === 'true' ? true : false;
     },
     toString(value) {
       return String(value);
@@ -118,7 +118,7 @@ const TimelineComponent: FC<TimelineProps> = ({
   }, [position, length]);
 
   const controls = (
-    <Elem name="topbar">
+    <Elem name='topbar'>
       <Controls
         length={length}
         position={currentPosition}
@@ -153,7 +153,7 @@ const TimelineComponent: FC<TimelineProps> = ({
             />
           ) : null
         }
-        mediaType="timeline"
+        mediaType='timeline'
       />
 
       {allowSeek && (
@@ -173,7 +173,7 @@ const TimelineComponent: FC<TimelineProps> = ({
   );
 
   const view = !viewCollapsed && !disableView && (
-    <Elem name="view">
+    <Elem name='view'>
       <View.View
         step={step}
         length={length}
@@ -205,7 +205,7 @@ const TimelineComponent: FC<TimelineProps> = ({
 
   return (
     <TimelineContextProvider value={contextValue}>
-      <Block name="timeline" className={className}>
+      <Block name='timeline' className={className}>
         {controlsOnTop ? (
           <>
             {controls}

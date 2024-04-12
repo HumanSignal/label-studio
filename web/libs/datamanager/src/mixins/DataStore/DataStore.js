@@ -1,8 +1,8 @@
-import { flow, getRoot, types } from "mobx-state-tree";
-import { DEFAULT_PAGE_SIZE, getStoredPageSize } from "../../components/Common/Pagination/Pagination";
-import { FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
-import { guidGenerator } from "../../utils/random";
-import { isDefined } from "../../utils/utils";
+import { flow, getRoot, types } from 'mobx-state-tree';
+import { DEFAULT_PAGE_SIZE, getStoredPageSize } from '../../components/Common/Pagination/Pagination';
+import { FF_LOPS_E_3, isFF } from '../../utils/feature-flags';
+import { guidGenerator } from '../../utils/random';
+import { isDefined } from '../../utils/utils';
 
 const listIncludes = (list, id) => {
   const index = id !== undefined ? Array.from(list).findIndex((item) => item.id === id) : -1;
@@ -11,9 +11,9 @@ const listIncludes = (list, id) => {
 };
 
 const MixinBase = types
-  .model("InfiniteListMixin", {
+  .model('InfiniteListMixin', {
     page: types.optional(types.integer, 0),
-    pageSize: types.optional(types.integer, getStoredPageSize("tasks", DEFAULT_PAGE_SIZE)),
+    pageSize: types.optional(types.integer, getStoredPageSize('tasks', DEFAULT_PAGE_SIZE)),
     total: types.optional(types.integer, 0),
     loading: false,
     loadingItem: false,
@@ -53,7 +53,7 @@ const MixinBase = types
     setSelected(val) {
       let selected;
 
-      if (typeof val === "number") {
+      if (typeof val === 'number') {
         selected = self.list.find((t) => t.id === val);
         if (!selected) {
           selected = getRoot(self).taskStore.loadTask(val);
@@ -66,7 +66,7 @@ const MixinBase = types
         self.selected = selected;
         self.highlighted = selected;
 
-        getRoot(self).SDK.invoke("taskSelected");
+        getRoot(self).SDK.invoke('taskSelected');
       }
     },
 
@@ -193,7 +193,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
 
         self.loading = true;
 
-        if (interaction === "filter" || interaction === "ordering" || reload) {
+        if (interaction === 'filter' || interaction === 'ordering' || reload) {
           self.page = 1;
         } else if (reload || isDefined(pageNumber)) {
           if (self.page === 0) self.page = 1;
@@ -205,7 +205,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
         if (pageSize) {
           self.pageSize = pageSize;
         } else {
-          self.pageSize = getStoredPageSize("tasks", DEFAULT_PAGE_SIZE);
+          self.pageSize = getStoredPageSize('tasks', DEFAULT_PAGE_SIZE);
         }
 
         const params = {
@@ -221,7 +221,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
 
         if (interaction) Object.assign(params, { interaction });
 
-        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === "DE" });
+        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === 'DE' });
 
         // We cancel current request processing if request id
         // changed during the request. It indicates that something
@@ -256,7 +256,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
 
         self.loading = false;
 
-        root.SDK.invoke("dataFetched", self);
+        root.SDK.invoke('dataFetched', self);
       }),
 
       reload: flow(function* ({ id, query, interaction } = {}) {

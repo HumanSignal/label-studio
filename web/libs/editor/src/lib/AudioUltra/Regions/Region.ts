@@ -1,8 +1,8 @@
-import type { Waveform } from "..";
-import { rgba } from "../Common/Color";
-import type { Visualizer } from "../Visual/Visualizer";
-import type { Regions } from "./Regions";
-import { Segment, type SegmentGlobalEvents, type SegmentOptions } from "./Segment";
+import type { Waveform } from '..';
+import { rgba } from '../Common/Color';
+import type { Visualizer } from '../Visual/Visualizer';
+import type { Regions } from './Regions';
+import { Segment, type SegmentGlobalEvents, type SegmentOptions } from './Segment';
 
 export interface RegionGlobalEvents extends SegmentGlobalEvents {
   regionCreated: (region: Region | Segment) => void;
@@ -43,7 +43,7 @@ export class Region extends Segment {
       const layer = this.controller.layerGroup;
       const color = this.color;
       const timelineTop = this.timelinePlacement;
-      const timelineLayer = this.visualizer.getLayer("timeline");
+      const timelineLayer = this.visualizer.getLayer('timeline');
       const timelineHeight = this.timelineHeight;
       const top = (timelineLayer?.isVisible && timelineTop ? timelineHeight : 0) + 4;
       const labelMeasures = this.labels.map((label) => layer.context.measureText(label));
@@ -59,8 +59,8 @@ export class Region extends Segment {
 
       layer.fillStyle = `rgba(${color.r + color.r}, ${color.g + color.g}, ${color.b + color.b})`;
       this.selected && layer.roundRect(start, top, selectedAdjustmentWidth, allVerticalStackedLabelsHeight + 5, 4);
-      layer.fillStyle = this.selected ? "white" : "black";
-      layer.font = "12px Arial";
+      layer.fillStyle = this.selected ? 'white' : 'black';
+      layer.font = '12px Arial';
       this.labels.forEach((label, iterator) => {
         const stackedLabelHeight = (allVerticalStackedLabelsHeight / labelMeasures.length) * (iterator + 1) - 1;
 

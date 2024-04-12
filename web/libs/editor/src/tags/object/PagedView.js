@@ -1,73 +1,73 @@
-import { observer } from "mobx-react";
-import { types } from "mobx-state-tree";
-import React, { useCallback, useEffect, useState } from "react";
+import { observer } from 'mobx-react';
+import { types } from 'mobx-state-tree';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { Pagination } from "../../common/Pagination/Pagination";
-import { Hotkey } from "../../core/Hotkey";
-import Registry from "../../core/Registry";
-import Tree from "../../core/Tree";
-import Types from "../../core/Types";
-import { AnnotationMixin } from "../../mixins/AnnotationMixin";
-import { FF_DEV_1170, isFF } from "../../utils/feature-flags";
+import { Pagination } from '../../common/Pagination/Pagination';
+import { Hotkey } from '../../core/Hotkey';
+import Registry from '../../core/Registry';
+import Tree from '../../core/Tree';
+import Types from '../../core/Types';
+import { AnnotationMixin } from '../../mixins/AnnotationMixin';
+import { FF_DEV_1170, isFF } from '../../utils/feature-flags';
 
 const Model = types.model({
   id: types.identifier,
-  type: "pagedview",
+  type: 'pagedview',
   children: Types.unionArray([
-    "view",
-    "header",
-    "labels",
-    "label",
-    "table",
-    "taxonomy",
-    "choices",
-    "choice",
-    "collapse",
-    "datetime",
-    "number",
-    "rating",
-    "ranker",
-    "rectangle",
-    "ellipse",
-    "polygon",
-    "keypoint",
-    "brush",
-    "magicwand",
-    "rectanglelabels",
-    "ellipselabels",
-    "polygonlabels",
-    "keypointlabels",
-    "brushlabels",
-    "hypertextlabels",
-    "timeserieslabels",
-    "text",
-    "audio",
-    "image",
-    "hypertext",
-    "richtext",
-    "timeseries",
-    "audioplus",
-    "list",
-    "dialog",
-    "textarea",
-    "pairwise",
-    "style",
-    "label",
-    "relations",
-    "filter",
-    "timeseries",
-    "timeserieslabels",
-    "pagedview",
-    "paragraphs",
-    "paragraphlabels",
-    "video",
-    "videorectangle",
+    'view',
+    'header',
+    'labels',
+    'label',
+    'table',
+    'taxonomy',
+    'choices',
+    'choice',
+    'collapse',
+    'datetime',
+    'number',
+    'rating',
+    'ranker',
+    'rectangle',
+    'ellipse',
+    'polygon',
+    'keypoint',
+    'brush',
+    'magicwand',
+    'rectanglelabels',
+    'ellipselabels',
+    'polygonlabels',
+    'keypointlabels',
+    'brushlabels',
+    'hypertextlabels',
+    'timeserieslabels',
+    'text',
+    'audio',
+    'image',
+    'hypertext',
+    'richtext',
+    'timeseries',
+    'audioplus',
+    'list',
+    'dialog',
+    'textarea',
+    'pairwise',
+    'style',
+    'label',
+    'relations',
+    'filter',
+    'timeseries',
+    'timeserieslabels',
+    'pagedview',
+    'paragraphs',
+    'paragraphlabels',
+    'video',
+    'videorectangle',
   ]),
 });
 
-const PagedViewModel = types.compose("PagedViewModel", Model, AnnotationMixin);
-const PAGE_QUERY_PARAM = "view_page";
-const hotkeys = Hotkey("Repeater");
+const PagedViewModel = types.compose('PagedViewModel', Model, AnnotationMixin);
+const PAGE_QUERY_PARAM = 'view_page';
+const hotkeys = Hotkey('Repeater');
 const DEFAULT_PAGE_SIZE = 1;
 const PAGE_SIZE_OPTIONS = [1, 5, 10, 25, 50, 100];
 
@@ -129,14 +129,14 @@ const HtxPagedView = observer(({ item }) => {
   const totalPages = Math.ceil(item.children.length / pageSize);
 
   useEffect(() => {
-    setPageSize(getStoredPageSize("repeater", DEFAULT_PAGE_SIZE));
+    setPageSize(getStoredPageSize('repeater', DEFAULT_PAGE_SIZE));
   }, []);
 
   useEffect(() => {
     const last = item.annotation.lastSelectedRegion;
 
     if (last) {
-      const _pageNumber = Number.parseFloat(last.object.name.split("_")[1]) + 1;
+      const _pageNumber = Number.parseFloat(last.object.name.split('_')[1]) + 1;
 
       setPage(Math.ceil(_pageNumber / pageSize));
     }
@@ -144,19 +144,19 @@ const HtxPagedView = observer(({ item }) => {
 
   useEffect(() => {
     if (isFF(FF_DEV_1170)) {
-      document.querySelector(".lsf-sidepanels__content")?.scrollTo(0, 0);
+      document.querySelector('.lsf-sidepanels__content')?.scrollTo(0, 0);
     } else {
-      document.querySelector("#label-studio-dm")?.scrollTo(0, 0);
+      document.querySelector('#label-studio-dm')?.scrollTo(0, 0);
     }
 
     setTimeout(() => {
-      hotkeys.addNamed("repeater:next-page", () => {
+      hotkeys.addNamed('repeater:next-page', () => {
         if (page < totalPages) {
           setPage(page + 1);
         }
       });
 
-      hotkeys.addNamed("repeater:previous-page", () => {
+      hotkeys.addNamed('repeater:previous-page', () => {
         if (page > 1) {
           setPage(page - 1);
         }
@@ -164,8 +164,8 @@ const HtxPagedView = observer(({ item }) => {
     });
 
     return () => {
-      hotkeys.removeNamed("repeater:next-page");
-      hotkeys.removeNamed("repeater:previous-page");
+      hotkeys.removeNamed('repeater:next-page');
+      hotkeys.removeNamed('repeater:previous-page');
     };
   }, [page]);
 
@@ -195,12 +195,12 @@ const HtxPagedView = observer(({ item }) => {
         pageSize={pageSize}
         pageSizeOptions={PAGE_SIZE_OPTIONS}
         pageSizeSelectable={false}
-        size={"medium"}
+        size={'medium'}
         onChange={(page, maxPerPage = pageSize) => {
           item.annotation.unselectAll();
           setPage(page);
           if (maxPerPage !== pageSize) {
-            setStoredPageSize("repeater", maxPerPage);
+            setStoredPageSize('repeater', maxPerPage);
             setPageSize(maxPerPage);
           }
         }}
@@ -209,6 +209,6 @@ const HtxPagedView = observer(({ item }) => {
   );
 });
 
-Registry.addTag("pagedview", PagedViewModel, HtxPagedView);
+Registry.addTag('pagedview', PagedViewModel, HtxPagedView);
 
 export { HtxPagedView, PagedViewModel };

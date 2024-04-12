@@ -1,20 +1,20 @@
-import { toJS } from "mobx";
-import { observer, useLocalStore } from "mobx-react";
-import { getRoot } from "mobx-state-tree";
-import React, { forwardRef, useCallback, useEffect, useRef } from "react";
-import { ViewColumnType, ViewColumnTypeName, ViewColumnTypeShort } from "../../../../stores/Tabs/tab_column";
-import { BemWithSpecifiContext } from "../../../../utils/bem";
-import { FF_DEV_2984, FF_DEV_3873, isFF } from "../../../../utils/feature-flags";
-import { Button } from "../../Button/Button";
-import { Dropdown } from "../../Dropdown/Dropdown";
-import { Menu } from "../../Menu/Menu";
-import { Resizer } from "../../Resizer/Resizer";
-import { Space } from "../../Space/Space";
-import { Tag } from "../../Tag/Tag";
-import { TableCell, TableCellContent } from "../TableCell/TableCell";
-import { TableContext, TableElem } from "../TableContext";
-import { getStyle } from "../utils";
-import "./TableHead.styl";
+import { toJS } from 'mobx';
+import { observer, useLocalStore } from 'mobx-react';
+import { getRoot } from 'mobx-state-tree';
+import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
+import { ViewColumnType, ViewColumnTypeName, ViewColumnTypeShort } from '../../../../stores/Tabs/tab_column';
+import { BemWithSpecifiContext } from '../../../../utils/bem';
+import { FF_DEV_2984, FF_DEV_3873, isFF } from '../../../../utils/feature-flags';
+import { Button } from '../../Button/Button';
+import { Dropdown } from '../../Dropdown/Dropdown';
+import { Menu } from '../../Menu/Menu';
+import { Resizer } from '../../Resizer/Resizer';
+import { Space } from '../../Space/Space';
+import { Tag } from '../../Tag/Tag';
+import { TableCell, TableCellContent } from '../TableCell/TableCell';
+import { TableContext, TableElem } from '../TableContext';
+import { getStyle } from '../utils';
+import './TableHead.styl';
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -35,17 +35,17 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
   return (
     <Dropdown.Trigger
       content={
-        <Menu title="Display as" size="compact" selectedKeys={[column.currentType]}>
+        <Menu title='Display as' size='compact' selectedKeys={[column.currentType]}>
           {types.map((type) => {
             return (
               <Menu.Item key={type} onClick={() => onChange?.(column, type)}>
                 <Space>
                   <Tag
-                    size="small"
+                    size='small'
                     style={{
                       width: 45,
-                      textAlign: "center",
-                      cursor: "pointer",
+                      textAlign: 'center',
+                      cursor: 'pointer',
                       fontSize: 14,
                     }}
                   >
@@ -60,14 +60,14 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
       }
     >
       <Button
-        type="text"
-        size="small"
+        type='text'
+        size='small'
         style={{
           flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: "none",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'none',
           fontSize: 14,
         }}
       >
@@ -95,14 +95,14 @@ const ColumnRenderer = observer(
       const { cellClassName: _, headerClassName, ...rest } = column;
 
       return (
-        <TableElem {...rest} name="cell" key={id} mix={["th", headerClassName]}>
+        <TableElem {...rest} name='cell' key={id} mix={['th', headerClassName]}>
           <Header />
         </TableElem>
       );
     }
 
     const root = getRoot(column.original);
-    const isDE = root.SDK.type === "DE";
+    const isDE = root.SDK.type === 'DE';
     const canOrder = sortingEnabled && column.original?.canOrder;
     const Decoration = decoration?.get?.(column);
     const extra = !isDE && columnHeaderExtra ? columnHeaderExtra(column, Decoration) : null;
@@ -111,23 +111,23 @@ const ColumnRenderer = observer(
 
     const headContent = (
       <>
-        <TableCellContent mod={{ canOrder, disabled: stopInteractions }} mix="th-content">
+        <TableCellContent mod={{ canOrder, disabled: stopInteractions }} mix='th-content'>
           {content}
         </TableCellContent>
 
-        {extra && <Elem name="column-extra">{extra}</Elem>}
+        {extra && <Elem name='column-extra'>{extra}</Elem>}
       </>
     );
 
     return (
-      <TableCell data-id={id} mix="th">
+      <TableCell data-id={id} mix='th'>
         <Resizer
           style={{
             height: 22,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: style.justifyContent ?? "space-between",
-            overflow: "hidden",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: style.justifyContent ?? 'space-between',
+            overflow: 'hidden',
           }}
           initialWidth={style.width ?? 150}
           minWidth={style.minWidth ?? 30}
@@ -211,26 +211,26 @@ export const TableHead = observer(
         );
 
         useEffect(() => {
-          ref.current?.addEventListener("mousedown", (event) => {
-            if (event.target.className.includes("handle")) event.preventDefault();
+          ref.current?.addEventListener('mousedown', (event) => {
+            if (event.target.className.includes('handle')) event.preventDefault();
           });
         }, []);
 
         return (
           <Block
-            name="table-head"
+            name='table-head'
             ref={ref}
             style={{
               ...style,
               height: isFF(FF_DEV_3873) && 42,
             }}
             mod={{ droppable: true }}
-            mix="horizontal-shadow"
+            mix='horizontal-shadow'
             onDragOver={useCallback(
               (e) => {
                 const draggedCol = states.getDraggedCol();
 
-                colRefs.current[draggedCol].style.setProperty("--scale", "0");
+                colRefs.current[draggedCol].style.setProperty('--scale', '0');
                 e.stopPropagation();
               },
               [states],
@@ -239,12 +239,12 @@ export const TableHead = observer(
             {columns.map((col) => {
               return (
                 <Elem
-                  name="draggable"
+                  name='draggable'
                   draggable={true}
                   ref={(ele) => (colRefs.current[col.id] = ele)}
                   key={col.id}
                   onDragStart={(e) => {
-                    e.dataTransfer.effectAllowed = "none";
+                    e.dataTransfer.effectAllowed = 'none';
                     const ele = colRefs.current[col.id];
 
                     states.setInitialDragPos({
@@ -265,7 +265,7 @@ export const TableHead = observer(
                       return isGreaterThanPos;
                     });
 
-                    colRefs.current[draggedCol].style.setProperty("--scale", "");
+                    colRefs.current[draggedCol].style.setProperty('--scale', '');
 
                     states.setDraggedCol(null);
                     curColumns.splice(newIndex, 0, col);
@@ -290,12 +290,12 @@ export const TableHead = observer(
                 </Elem>
               );
             })}
-            <Elem name="extra">{extra}</Elem>
+            <Elem name='extra'>{extra}</Elem>
           </Block>
         );
       }
       return (
-        <Block name="table-head" ref={ref} style={style} mix="horizontal-shadow">
+        <Block name='table-head' ref={ref} style={style} mix='horizontal-shadow'>
           {columns.map((col) => {
             return (
               <ColumnRenderer
@@ -313,7 +313,7 @@ export const TableHead = observer(
               />
             );
           })}
-          <Elem name="extra">{extra}</Elem>
+          <Elem name='extra'>{extra}</Elem>
         </Block>
       );
     },

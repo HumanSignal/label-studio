@@ -1,4 +1,4 @@
-import { type MutableRefObject, useCallback, useEffect, useRef } from "react";
+import { type MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
 /**
  * Creates a shared AbortController, which can be used to abort requests.

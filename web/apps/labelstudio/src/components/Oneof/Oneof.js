@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react';
 
 export const Oneof = ({ value, children, className }) => {
   const selectedChild = useMemo(() => {
@@ -13,7 +13,7 @@ export const Oneof = ({ value, children, className }) => {
   return selectedChild
     ? React.cloneElement(selectedChild, {
         ...selectedChild.props,
-        className: [className, selectedChild.props.className].join(" "),
+        className: [className, selectedChild.props.className].join(' '),
       })
     : null;
 };

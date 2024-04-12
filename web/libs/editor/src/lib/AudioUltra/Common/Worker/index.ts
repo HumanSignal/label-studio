@@ -42,22 +42,22 @@ export class ComputeWorker {
         });
       };
 
-      self.addEventListener("message", (e) => {
+      self.addEventListener('message', (e) => {
         if (!e.data) return;
 
         const { data, type, eventId } = e.data;
 
         switch (type) {
-          case "compute":
+          case 'compute':
             compute(data, eventId);
             break;
-          case "precompute":
+          case 'precompute':
             precompute(data);
             break;
-          case "store":
+          case 'store':
             storeData(e);
             break;
-          case "getStorage":
+          case 'getStorage':
             getStorage(eventId);
             break;
         }
@@ -74,7 +74,7 @@ export class ComputeWorker {
       this.worker,
       {
         data,
-        type: "compute",
+        type: 'compute',
       },
       true,
     );
@@ -85,14 +85,14 @@ export class ComputeWorker {
   async precompute(data: Record<string, any>) {
     await this.sendMessage(this.worker, {
       data,
-      type: "precompute",
+      type: 'precompute',
     });
   }
 
   async store(data: Record<string, any>) {
     await this.sendMessage(this.worker, {
       data,
-      type: "store",
+      type: 'store',
     });
   }
 
@@ -100,7 +100,7 @@ export class ComputeWorker {
     const response = await this.sendMessage(
       this.worker,
       {
-        type: "getStorage",
+        type: 'getStorage',
       },
       true,
     );
@@ -119,12 +119,12 @@ export class ComputeWorker {
       if (waitResponse) {
         const resolver = (e: MessageEvent) => {
           if (eventId === e.data.eventId) {
-            worker.removeEventListener("message", resolver);
+            worker.removeEventListener('message', resolver);
             resolve(e);
           }
         };
 
-        worker.addEventListener("message", resolver);
+        worker.addEventListener('message', resolver);
       }
 
       worker.postMessage({ ...data, eventId });

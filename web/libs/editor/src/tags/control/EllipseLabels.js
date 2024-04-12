@@ -1,14 +1,14 @@
-import { observer } from "mobx-react";
-import { types } from "mobx-state-tree";
-import React from "react";
+import { observer } from 'mobx-react';
+import { types } from 'mobx-state-tree';
+import React from 'react';
 
-import Registry from "../../core/Registry";
-import Types from "../../core/Types";
-import LabelMixin from "../../mixins/LabelMixin";
-import SelectedModelMixin from "../../mixins/SelectedModel";
-import ControlBase from "./Base";
-import { EllipseModel } from "./Ellipse";
-import { HtxLabels, LabelsModel } from "./Labels/Labels";
+import Registry from '../../core/Registry';
+import Types from '../../core/Types';
+import LabelMixin from '../../mixins/LabelMixin';
+import SelectedModelMixin from '../../mixins/SelectedModel';
+import ControlBase from './Base';
+import { EllipseModel } from './Ellipse';
+import { HtxLabels, LabelsModel } from './Labels/Labels';
 
 /**
  * The `EllipseLabels` tag creates labeled ellipses. Use to apply labels to ellipses for semantic segmentation.
@@ -39,9 +39,9 @@ import { HtxLabels, LabelsModel } from "./Labels/Labels";
  * @param {boolean=} [canRotate=true] - Show or hide rotation option
  */
 
-const ModelAttrs = types.model("EllipseLabelsModel", {
-  type: "ellipselabels",
-  children: Types.unionArray(["label", "header", "view", "hypertext"]),
+const ModelAttrs = types.model('EllipseLabelsModel', {
+  type: 'ellipselabels',
+  children: Types.unionArray(['label', 'header', 'view', 'hypertext']),
 });
 
 const Composition = types.compose(
@@ -50,15 +50,15 @@ const Composition = types.compose(
   ModelAttrs,
   EllipseModel,
   LabelMixin,
-  SelectedModelMixin.props({ _child: "LabelModel" }),
+  SelectedModelMixin.props({ _child: 'LabelModel' }),
 );
 
-const EllipseLabelsModel = types.compose("EllipseLabelsModel", Composition);
+const EllipseLabelsModel = types.compose('EllipseLabelsModel', Composition);
 
 const HtxEllipseLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
 });
 
-Registry.addTag("ellipselabels", EllipseLabelsModel, HtxEllipseLabels);
+Registry.addTag('ellipselabels', EllipseLabelsModel, HtxEllipseLabels);
 
 export { HtxEllipseLabels, EllipseLabelsModel };

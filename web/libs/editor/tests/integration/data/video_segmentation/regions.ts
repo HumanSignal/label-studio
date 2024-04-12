@@ -1,4 +1,4 @@
-export const simpleVideoData = { video: "/public/files/opossum_intro.webm" };
+export const simpleVideoData = { video: '/public/files/opossum_intro.webm' };
 
 export const simpleVideoConfig = `<View>
   <Video name="video" value="$video" />
@@ -36,12 +36,12 @@ export const simpleVideoResult = [
           time: 0.125,
         },
       ],
-      labels: ["Label 1"],
+      labels: ['Label 1'],
     },
-    id: "RRxnu061g3",
-    from_name: "box",
-    to_name: "video",
-    type: "videorectangle",
-    origin: "manual",
+    id: 'RRxnu061g3',
+    from_name: 'box',
+    to_name: 'video',
+    type: 'videorectangle',
+    origin: 'manual',
   },
 ];

@@ -1,16 +1,16 @@
-import { observer } from "mobx-react";
-import ColorScheme from "pleasejs";
-import { useCallback, useMemo } from "react";
-import { Select } from "../../../common/Select/Select";
-import Utils from "../../../utils";
-import styles from "./Paragraphs.module.scss";
+import { observer } from 'mobx-react';
+import ColorScheme from 'pleasejs';
+import { useCallback, useMemo } from 'react';
+import { Select } from '../../../common/Select/Select';
+import Utils from '../../../utils';
+import styles from './Paragraphs.module.scss';
 
 const AuthorTag = ({ name, selected }) => {
   const itemStyle = { border: `2px solid ${Utils.Colors.convertToRGBA(ColorScheme.make_color({ seed: name })[0])}` };
 
   return (
     <span
-      className={[styles.authorFilter__select__item, selected && styles.authorFilter__select__item_selected].join(" ")}
+      className={[styles.authorFilter__select__item, selected && styles.authorFilter__select__item_selected].join(' ')}
       style={itemStyle}
     >
       {name}
@@ -62,21 +62,21 @@ export const AuthorFilter = observer(({ item, onChange }) => {
         options={options}
         onChange={onFilterChange}
         renderMultipleSelected={renderMultipleSelected}
-        size="compact"
-        variant="rounded"
-        surface="emphasis"
+        size='compact'
+        variant='rounded'
+        surface='emphasis'
         multiple
       >
         <div className={styles.authorFilter__search}>
           <input
-            autoComplete="off"
+            autoComplete='off'
             className={styles.authorFilter__search__input}
-            name="search_author"
-            placeholder="Search"
+            name='search_author'
+            placeholder='Search'
             onInput={(e) => item.setAuthorSearch(e.target.value)}
           />
         </div>
-        <Select.Option value={null} key="showAllAuthors" exclude>
+        <Select.Option value={null} key='showAllAuthors' exclude>
           <span className={styles.authorFilter__showall}>Show all authors</span>
         </Select.Option>
         {filteredOptions.map((name) => (

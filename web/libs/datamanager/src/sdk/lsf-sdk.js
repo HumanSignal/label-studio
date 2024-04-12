@@ -12,8 +12,8 @@
  * messages: Dict<string|Function>
  * }} LSFOptions */
 
-import { when } from "mobx";
-import { Modal } from "../components/Common/Modal/Modal";
+import { when } from 'mobx';
+import { Modal } from '../components/Common/Modal/Modal';
 import {
   FF_DEV_1752,
   FF_DEV_2186,
@@ -23,24 +23,24 @@ import {
   FF_LSDV_4620_3_ML,
   FF_OPTIC_2,
   isFF,
-} from "../utils/feature-flags";
-import { isDefined } from "../utils/utils";
-import { CommentsSdk } from "./comments-sdk";
+} from '../utils/feature-flags';
+import { isDefined } from '../utils/utils';
+import { CommentsSdk } from './comments-sdk';
 // import { LSFHistory } from "./lsf-history";
-import { annotationToServer, taskToLSFormat } from "./lsf-utils";
+import { annotationToServer, taskToLSFormat } from './lsf-utils';
 
 const DEFAULT_INTERFACES = [
-  "basic",
-  "controls",
-  "submit",
-  "update",
-  "predictions",
-  "topbar",
-  "predictions:menu", // right menu with prediction items
-  "annotations:menu", // right menu with annotation items
-  "annotations:current",
-  "side-column", // entity
-  "edit-history", // undo/redo
+  'basic',
+  'controls',
+  'submit',
+  'update',
+  'predictions',
+  'topbar',
+  'predictions:menu', // right menu with prediction items
+  'annotations:menu', // right menu with annotation items
+  'annotations:current',
+  'side-column', // entity
+  'edit-history', // undo/redo
 ];
 
 let LabelStudioDM;
@@ -102,53 +102,53 @@ export class LSFWrapper {
     let interfaces = [...DEFAULT_INTERFACES];
 
     if (this.project.enable_empty_annotation === false) {
-      interfaces.push("annotations:deny-empty");
+      interfaces.push('annotations:deny-empty');
     }
 
     if (this.labelStream) {
-      interfaces.push("infobar");
-      interfaces.push("topbar:prevnext");
+      interfaces.push('infobar');
+      interfaces.push('topbar:prevnext');
       if (FF_DEV_2186 && this.project.review_settings?.require_comment_on_reject) {
-        interfaces.push("comments:update");
+        interfaces.push('comments:update');
       }
       if (this.project.show_skip_button) {
-        interfaces.push("skip");
+        interfaces.push('skip');
       }
     } else {
       interfaces.push(
-        "infobar",
-        "annotations:add-new",
-        "annotations:view-all",
-        "annotations:delete",
-        "annotations:tabs",
-        "predictions:tabs",
+        'infobar',
+        'annotations:add-new',
+        'annotations:view-all',
+        'annotations:delete',
+        'annotations:tabs',
+        'predictions:tabs',
       );
     }
 
-    if (this.datamanager.hasInterface("instruction")) {
-      interfaces.push("instruction");
+    if (this.datamanager.hasInterface('instruction')) {
+      interfaces.push('instruction');
     }
 
-    if (!this.labelStream && this.datamanager.hasInterface("groundTruth")) {
-      interfaces.push("ground-truth");
+    if (!this.labelStream && this.datamanager.hasInterface('groundTruth')) {
+      interfaces.push('ground-truth');
     }
 
-    if (this.datamanager.hasInterface("autoAnnotation")) {
-      interfaces.push("auto-annotation");
+    if (this.datamanager.hasInterface('autoAnnotation')) {
+      interfaces.push('auto-annotation');
     }
     if (this.interfacesModifier) {
       interfaces = this.interfacesModifier(interfaces, this.labelStream);
     }
     if (isFF(FF_DEV_2887)) {
-      interfaces.push("annotations:comments");
+      interfaces.push('annotations:comments');
     }
 
-    console.group("Interfaces");
+    console.group('Interfaces');
     console.log([...interfaces]);
 
     if (!this.shouldLoadNext()) {
       interfaces = interfaces.filter((item) => {
-        return !["topbar:prevnext", "skip"].includes(item);
+        return !['topbar:prevnext', 'skip'].includes(item);
       });
     }
 
@@ -202,13 +202,13 @@ export class LSFWrapper {
 
       this.lsfInstance = new LSF(this.root, settings);
 
-      this.lsfInstance.on("presignUrlForProject", this.onPresignUrlForProject);
+      this.lsfInstance.on('presignUrlForProject', this.onPresignUrlForProject);
 
-      const names = Array.from(this.datamanager.callbacks.keys()).filter((k) => k.startsWith("lsf:"));
+      const names = Array.from(this.datamanager.callbacks.keys()).filter((k) => k.startsWith('lsf:'));
 
       names.forEach((name) => {
         this.datamanager.getEventCallbacks(name).forEach((clb) => {
-          this.lsfInstance.on(name.replace(/^lsf:/, ""), clb);
+          this.lsfInstance.on(name.replace(/^lsf:/, ''), clb);
         });
       });
 
@@ -216,7 +216,7 @@ export class LSFWrapper {
         new CommentsSdk(this.lsfInstance, this.datamanager);
       }
     } catch (err) {
-      console.error("Failed to initialize LabelStudio", settings);
+      console.error('Failed to initialize LabelStudio', settings);
       console.error(err);
     }
   }
@@ -232,9 +232,9 @@ export class LSFWrapper {
     }
 
     if (params) {
-      const task = await api.call("task", { params });
+      const task = await api.call('task', { params });
       const noData = !task || (!task.annotations?.length && !task.drafts?.length);
-      const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ""} was not found!`;
+      const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ''} was not found!`;
 
       if (noData) {
         Modal.modal({
@@ -256,7 +256,7 @@ export class LSFWrapper {
   /** @private */
   async loadTask(taskID, annotationID, fromHistory = false) {
     if (!this.lsf) {
-      return console.error("Make sure that LSF was properly initialized");
+      return console.error('Make sure that LSF was properly initialized');
     }
 
     const nextAction = async () => {
@@ -288,12 +288,12 @@ export class LSFWrapper {
 
     if (isFF(FF_DEV_2887) && this.lsf?.commentStore?.hasUnsaved) {
       Modal.confirm({
-        title: "You have unsaved changes",
-        body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
+        title: 'You have unsaved changes',
+        body: 'There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.',
         onOk() {
           nextAction();
         },
-        okText: "Discard and continue",
+        okText: 'Discard and continue',
       });
       return;
     }
@@ -302,7 +302,7 @@ export class LSFWrapper {
   }
 
   exitStream() {
-    this.datamanager.invoke("navigate", "projects");
+    this.datamanager.invoke('navigate', 'projects');
   }
 
   selectTask(task, annotationID, fromHistory = false) {
@@ -361,8 +361,8 @@ export class LSFWrapper {
     // const isManuallyAssigned = distribution === "assigned_only";
 
     // undefined or true for backward compatibility
-    this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
-    this.lsf.toggleInterface("topbar:task-counter", !isFF(FF_DEV_3734));
+    this.lsf.toggleInterface('postpone', this.task.allow_postpone !== false);
+    this.lsf.toggleInterface('topbar:task-counter', !isFF(FF_DEV_3734));
     this.lsf.assignTask(task);
     this.lsf.initializeStore(lsfTask);
     this.setAnnotation(annotationID, fromHistory || isRejectedQueue);
@@ -436,9 +436,9 @@ export class LSFWrapper {
     } else {
       if (this.annotations.length === 0 && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
-      } else if (this.annotations.length > 0 && id && id !== "auto") {
+      } else if (this.annotations.length > 0 && id && id !== 'auto') {
         annotation = this.annotations.find((c) => c.pk === id || c.id === id);
-      } else if (this.annotations.length > 0 && (id === "auto" || hasAutoAnnotations)) {
+      } else if (this.annotations.length > 0 && (id === 'auto' || hasAutoAnnotations)) {
         annotation = first;
       } else {
         annotation = cs.createAnnotation();
@@ -447,7 +447,7 @@ export class LSFWrapper {
 
     if (annotation) {
       cs.selectAnnotation(annotation.id);
-      this.datamanager.invoke("annotationSet", annotation);
+      this.datamanager.invoke('annotationSet', annotation);
     }
   }
 
@@ -461,7 +461,7 @@ export class LSFWrapper {
       for (const label of userLabels[from_name]) {
         body.push({
           value: label.path,
-          title: [from_name, JSON.stringify(label.path)].join(":"),
+          title: [from_name, JSON.stringify(label.path)].join(':'),
           from_name,
           project: this.project.id,
         });
@@ -470,15 +470,15 @@ export class LSFWrapper {
 
     if (!body.length) return;
 
-    await this.datamanager.apiCall("saveUserLabels", {}, { body });
+    await this.datamanager.apiCall('saveUserLabels', {}, { body });
   };
 
   async loadUserLabels() {
     if (!this.lsf?.userLabels) return;
 
-    const userLabels = await this.datamanager.apiCall("userLabelsForProject", {
+    const userLabels = await this.datamanager.apiCall('userLabelsForProject', {
       project: this.project.id,
-      expand: "label",
+      expand: 'label',
     });
 
     if (!userLabels) return;
@@ -499,7 +499,7 @@ export class LSFWrapper {
   }
 
   onLabelStudioLoad = async (ls) => {
-    this.datamanager.invoke("labelStudioLoad", ls);
+    this.datamanager.invoke('labelStudioLoad', ls);
     this.lsf = ls;
 
     if (!this.lsf.task) this.setLoading(true);
@@ -523,7 +523,7 @@ export class LSFWrapper {
 
   /** @private */
   onTaskLoad = async (...args) => {
-    this.datamanager.invoke("onSelectAnnotation", ...args);
+    this.datamanager.invoke('onSelectAnnotation', ...args);
   };
 
   /**
@@ -535,7 +535,7 @@ export class LSFWrapper {
     const parsedUrl = new URL(url);
 
     // return same url if http(s)
-    if (["http:", "https:"].includes(parsedUrl.protocol)) return url;
+    if (['http:', 'https:'].includes(parsedUrl.protocol)) return url;
 
     const api = this.datamanager.api;
     const projectId = this.project.id;
@@ -545,11 +545,11 @@ export class LSFWrapper {
   };
 
   onStorageInitialized = async (ls) => {
-    this.datamanager.invoke("onStorageInitialized", ls);
+    this.datamanager.invoke('onStorageInitialized', ls);
 
     if (this.task && this.labelStream === false) {
       const annotationID =
-        this.initialAnnotation?.pk ?? this.task.lastAnnotation?.pk ?? this.task.lastAnnotation?.id ?? "auto";
+        this.initialAnnotation?.pk ?? this.task.lastAnnotation?.pk ?? this.task.lastAnnotation?.id ?? 'auto';
 
       this.setAnnotation(annotationID);
     }
@@ -560,10 +560,10 @@ export class LSFWrapper {
     const exitStream = this.shouldExitStream();
     const loadNext = exitStream ? false : this.shouldLoadNext();
     const result = await this.submitCurrentAnnotation(
-      "submitAnnotation",
+      'submitAnnotation',
       async (taskID, body) => {
         return await this.datamanager.apiCall(
-          "submitAnnotation",
+          'submitAnnotation',
           { taskID },
           { body },
           // don't react on duplicated annotations error
@@ -576,9 +576,9 @@ export class LSFWrapper {
     const status = result?.$meta?.status;
 
     if (status === 200 || status === 201)
-      this.datamanager.invoke("toast", { message: "Annotation saved successfully", type: "info" });
+      this.datamanager.invoke('toast', { message: 'Annotation saved successfully', type: 'info' });
     else if (status !== undefined)
-      this.datamanager.invoke("toast", { message: "There was an error saving your Annotation", type: "error" });
+      this.datamanager.invoke('toast', { message: 'There was an error saving your Annotation', type: 'error' });
 
     if (exitStream) return this.exitStream();
   };
@@ -595,7 +595,7 @@ export class LSFWrapper {
 
     const result = await this.withinLoadingState(async () => {
       return this.datamanager.apiCall(
-        "updateAnnotation",
+        'updateAnnotation',
         {
           taskID: task.id,
           annotationID: annotation.pk,
@@ -608,11 +608,11 @@ export class LSFWrapper {
     const status = result?.$meta?.status;
 
     if (status === 200 || status === 201)
-      this.datamanager.invoke("toast", { message: "Annotation updated successfully", type: "info" });
+      this.datamanager.invoke('toast', { message: 'Annotation updated successfully', type: 'info' });
     else if (status !== undefined)
-      this.datamanager.invoke("toast", { message: "There was an error updating your Annotation", type: "error" });
+      this.datamanager.invoke('toast', { message: 'There was an error updating your Annotation', type: 'error' });
 
-    this.datamanager.invoke("updateAnnotation", ls, annotation, result);
+    this.datamanager.invoke('updateAnnotation', ls, annotation, result);
 
     if (exitStream) return this.exitStream();
 
@@ -627,7 +627,7 @@ export class LSFWrapper {
   };
 
   deleteDraft = async (id) => {
-    const response = await this.datamanager.apiCall("deleteDraft", {
+    const response = await this.datamanager.apiCall('deleteDraft', {
       draftID: id,
     });
 
@@ -650,14 +650,14 @@ export class LSFWrapper {
       }
     } else {
       response = await this.withinLoadingState(async () => {
-        return this.datamanager.apiCall("deleteAnnotation", {
+        return this.datamanager.apiCall('deleteAnnotation', {
           taskID: task.id,
           annotationID: annotation.pk,
         });
       });
 
       // this.task.deleteAnnotation(annotation);
-      this.datamanager.invoke("deleteAnnotation", ls, annotation);
+      this.datamanager.invoke('deleteAnnotation', ls, annotation);
     }
 
     if (response.ok) {
@@ -670,9 +670,9 @@ export class LSFWrapper {
 
   draftToast = (status) => {
     if (status === 200 || status === 201)
-      this.datamanager.invoke("toast", { message: "Draft saved successfully", type: "info" });
+      this.datamanager.invoke('toast', { message: 'Draft saved successfully', type: 'info' });
     else if (status !== undefined)
-      this.datamanager.invoke("toast", { message: "There was an error saving your draft", type: "error" });
+      this.datamanager.invoke('toast', { message: 'There was an error saving your draft', type: 'error' });
   };
 
   needsDraftSave = (annotation) => {
@@ -715,7 +715,7 @@ export class LSFWrapper {
 
     if (annotation.draftId > 0) {
       // draft has been already created
-      const res = await this.datamanager.apiCall("updateDraft", { draftID: annotation.draftId }, data);
+      const res = await this.datamanager.apiCall('updateDraft', { draftID: annotation.draftId }, data);
 
       showToast && this.draftToast(res?.$meta?.status);
       return res;
@@ -723,10 +723,10 @@ export class LSFWrapper {
     let response;
 
     if (annotationDoesntExist) {
-      response = await this.datamanager.apiCall("createDraftForTask", { taskID: this.task.id }, data);
+      response = await this.datamanager.apiCall('createDraftForTask', { taskID: this.task.id }, data);
     } else {
       response = await this.datamanager.apiCall(
-        "createDraftForAnnotation",
+        'createDraftForAnnotation',
         { taskID: this.task.id, annotationID: annotation.pk },
         data,
       );
@@ -739,7 +739,7 @@ export class LSFWrapper {
 
   onSkipTask = async (_, { comment } = {}) => {
     await this.submitCurrentAnnotation(
-      "skipTask",
+      'skipTask',
       (taskID, body) => {
         const { id, ...annotation } = body;
         const params = { taskID };
@@ -749,10 +749,10 @@ export class LSFWrapper {
         if (comment) options.body.comment = comment;
 
         if (id === undefined) {
-          return this.datamanager.apiCall("submitAnnotation", params, options);
+          return this.datamanager.apiCall('submitAnnotation', params, options);
         }
         params.annotationID = id;
-        return this.datamanager.apiCall("updateAnnotation", params, options);
+        return this.datamanager.apiCall('updateAnnotation', params, options);
       },
       true,
       this.shouldLoadNext(),
@@ -763,7 +763,7 @@ export class LSFWrapper {
     const { task, currentAnnotation } = this;
 
     if (!isDefined(currentAnnotation) && !isDefined(currentAnnotation.pk)) {
-      console.error("Annotation must be on unskip");
+      console.error('Annotation must be on unskip');
       return;
     }
 
@@ -771,13 +771,13 @@ export class LSFWrapper {
       currentAnnotation.pauseAutosave();
 
       if (isFF(FF_DEV_3034)) {
-        await this.datamanager.apiCall("convertToDraft", {
+        await this.datamanager.apiCall('convertToDraft', {
           annotationID: currentAnnotation.pk,
         });
       } else {
         if (currentAnnotation.draftId > 0) {
           await this.datamanager.apiCall(
-            "updateDraft",
+            'updateDraft',
             {
               draftID: currentAnnotation.draftId,
             },
@@ -789,7 +789,7 @@ export class LSFWrapper {
           const annotationData = { body: this.prepareData(currentAnnotation) };
 
           await this.datamanager.apiCall(
-            "createDraftForTask",
+            'createDraftForTask',
             {
               taskID: this.task.id,
             },
@@ -802,27 +802,27 @@ export class LSFWrapper {
           this.lsf.commentStore.toCache(`task.${task.id}`);
         }
 
-        await this.datamanager.apiCall("deleteAnnotation", {
+        await this.datamanager.apiCall('deleteAnnotation', {
           taskID: task.id,
           annotationID: currentAnnotation.pk,
         });
       }
     });
     await this.loadTask(task.id);
-    this.datamanager.invoke("unskipTask");
+    this.datamanager.invoke('unskipTask');
   };
 
   shouldLoadNext = () => {
     if (!this.labelStream) return false;
 
     // validating if URL is from notification, in case of notification it shouldn't load next task
-    const urlParam = new URLSearchParams(location.search).get("interaction");
+    const urlParam = new URLSearchParams(location.search).get('interaction');
 
-    return urlParam !== "notifications";
+    return urlParam !== 'notifications';
   };
 
   shouldExitStream = () => {
-    const paramName = "exitStream";
+    const paramName = 'exitStream';
     const urlParam = new URLSearchParams(location.search).get(paramName);
     const searchParams = new URLSearchParams(window.location.search);
 
@@ -830,20 +830,20 @@ export class LSFWrapper {
     let newRelativePathQuery = window.location.pathname;
 
     if (searchParams.toString()) newRelativePathQuery += `?${searchParams.toString()}`;
-    window.history.pushState(null, "", newRelativePathQuery);
+    window.history.pushState(null, '', newRelativePathQuery);
     return !!urlParam;
   };
 
   // Proxy events that are unused by DM integration
-  onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);
-  onEntityDelete = (...args) => this.datamanager.invoke("onEntityDelete", ...args);
+  onEntityCreate = (...args) => this.datamanager.invoke('onEntityCreate', ...args);
+  onEntityDelete = (...args) => this.datamanager.invoke('onEntityDelete', ...args);
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
     if (isFF(FF_OPTIC_2) && !!nextAnnotation?.history?.undoIdx) {
       this.saveDraft(nextAnnotation).then(() => {
-        this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
+        this.datamanager.invoke('onSelectAnnotation', prevAnnotation, nextAnnotation, options, this);
       });
     } else {
-      this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
+      this.datamanager.invoke('onSelectAnnotation', prevAnnotation, nextAnnotation, options, this);
     }
   };
 
@@ -886,7 +886,7 @@ export class LSFWrapper {
       // Persist any queued comments which are not currently attached to an annotation
       if (
         isFF(FF_DEV_2887) &&
-        ["submitAnnotation", "skipTask"].includes(eventName) &&
+        ['submitAnnotation', 'skipTask'].includes(eventName) &&
         this.lsf?.commentStore?.persistQueuedComments
       ) {
         await this.lsf.commentStore.persistQueuedComments();
@@ -987,7 +987,7 @@ export class LSFWrapper {
 
   /** @returns {string|null} */
   get instruction() {
-    return (this.project.instruction ?? this.project.expert_instruction ?? "").trim() || null;
+    return (this.project.instruction ?? this.project.expert_instruction ?? '').trim() || null;
   }
 
   get canPreloadTask() {

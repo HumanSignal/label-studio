@@ -1,16 +1,16 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { Block, cn } from "../../../utils/bem";
-import { alignElements } from "../../../utils/dom";
-import { aroundTransition } from "../../../utils/transition";
-import "./Dropdown.styl";
-import { DropdownContext } from "./DropdownContext";
-import { DropdownTrigger } from "./DropdownTrigger";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Block, cn } from '../../../utils/bem';
+import { alignElements } from '../../../utils/dom';
+import { aroundTransition } from '../../../utils/transition';
+import './Dropdown.styl';
+import { DropdownContext } from './DropdownContext';
+import { DropdownTrigger } from './DropdownTrigger';
 
 let lastIndex = 1;
 
 export const Dropdown = React.forwardRef(({ animated = true, visible = false, ...props }, ref) => {
-  const rootName = cn("dropdown");
+  const rootName = cn('dropdown');
 
   /**@type {import('react').RefObject<HTMLElement>} */
   const dropdown = React.useRef();
@@ -20,12 +20,12 @@ export const Dropdown = React.forwardRef(({ animated = true, visible = false, ..
   const { children, align } = props;
   const [currentVisible, setVisible] = React.useState(visible);
   const [offset, setOffset] = React.useState({});
-  const [visibility, setVisibility] = React.useState(visible ? "visible" : null);
+  const [visibility, setVisibility] = React.useState(visible ? 'visible' : null);
 
   const calculatePosition = React.useCallback(() => {
     const dropdownEl = dropdown.current;
     const parent = triggerRef?.current ?? dropdownEl.parentNode;
-    const { left, top } = alignElements(parent, dropdownEl, align ?? "bottom-left");
+    const { left, top } = alignElements(parent, dropdownEl, align ?? 'bottom-left');
 
     setOffset({ left, top });
   }, [triggerRef]);
@@ -44,18 +44,18 @@ export const Dropdown = React.forwardRef(({ animated = true, visible = false, ..
         if (animated !== false) {
           aroundTransition(menu, {
             transition: () => {
-              setVisibility(visible ? "appear" : "disappear");
+              setVisibility(visible ? 'appear' : 'disappear');
             },
             beforeTransition: () => {
-              setVisibility(visible ? "before-appear" : "before-disappear");
+              setVisibility(visible ? 'before-appear' : 'before-disappear');
             },
             afterTransition: () => {
-              setVisibility(visible ? "visible" : null);
+              setVisibility(visible ? 'visible' : null);
               resolve();
             },
           });
         } else {
-          setVisibility(visible ? "visible" : null);
+          setVisibility(visible ? 'visible' : null);
           resolve();
         }
       });
@@ -106,7 +106,7 @@ export const Dropdown = React.forwardRef(({ animated = true, visible = false, ..
   }, [visible]);
 
   React.useEffect(() => {
-    if (!isInline && visibility === "before-appear") {
+    if (!isInline && visibility === 'before-appear') {
       calculatePosition();
     }
   }, [visibility, calculatePosition, isInline]);
@@ -116,27 +116,27 @@ export const Dropdown = React.forwardRef(({ animated = true, visible = false, ..
   }, [props.enabled]);
 
   const content =
-    children.props && children.props.type === "Menu"
+    children.props && children.props.type === 'Menu'
       ? React.cloneElement(children, {
           ...children.props,
-          className: rootName.elem("menu").mix(children.props.className),
+          className: rootName.elem('menu').mix(children.props.className),
         })
       : children;
 
   const visibilityClasses = React.useMemo(() => {
     switch (visibility) {
-      case "before-appear":
-        return "before-appear";
-      case "appear":
-        return "appear before-appear";
-      case "before-disappear":
-        return "before-disappear";
-      case "disappear":
-        return "disappear before-disappear";
-      case "visible":
-        return "visible";
+      case 'before-appear':
+        return 'before-appear';
+      case 'appear':
+        return 'appear before-appear';
+      case 'before-disappear':
+        return 'before-disappear';
+      case 'disappear':
+        return 'disappear before-disappear';
+      case 'visible':
+        return 'visible';
       default:
-        return visible ? "visible" : null;
+        return visible ? 'visible' : null;
     }
   }, [visibility, visible]);
 
@@ -149,7 +149,7 @@ export const Dropdown = React.forwardRef(({ animated = true, visible = false, ..
   const result = (
     <Block
       ref={dropdown}
-      name="dropdown"
+      name='dropdown'
       mix={[props.className, visibilityClasses]}
       style={compositeStyles}
       onClick={(e) => e.stopPropagation()}
@@ -161,6 +161,6 @@ export const Dropdown = React.forwardRef(({ animated = true, visible = false, ..
   return props.inline === true ? result : ReactDOM.createPortal(result, document.body);
 });
 
-Dropdown.displayName = "Dropdown";
+Dropdown.displayName = 'Dropdown';
 
 Dropdown.Trigger = DropdownTrigger;

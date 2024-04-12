@@ -1,12 +1,12 @@
-import { getRoot, protect, types, unprotect } from "mobx-state-tree";
-import { parseValue } from "../utils/data";
-import ProcessAttrsMixin from "./ProcessAttrs";
+import { getRoot, protect, types, unprotect } from 'mobx-state-tree';
+import { parseValue } from '../utils/data';
+import ProcessAttrsMixin from './ProcessAttrs';
 
 const DynamicChildrenMixin = types
   .model({})
   .views(() => ({
     get defaultChildType() {
-      console.error("DynamicChildrenMixin needs to implement defaultChildType getter in views");
+      console.error('DynamicChildrenMixin needs to implement defaultChildType getter in views');
       return undefined;
     },
   }))

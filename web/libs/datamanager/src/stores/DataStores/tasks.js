@@ -1,26 +1,26 @@
-import { flow, getRoot, getSnapshot, types } from "mobx-state-tree";
-import { DataStore, DataStoreItem } from "../../mixins/DataStore";
-import { getAnnotationSnapshot } from "../../sdk/lsf-utils";
-import { FF_DEV_2536, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
-import { isDefined } from "../../utils/utils";
-import { Assignee } from "../Assignee";
-import { DynamicModel, registerModel } from "../DynamicModel";
-import { CustomJSON } from "../types";
+import { flow, getRoot, getSnapshot, types } from 'mobx-state-tree';
+import { DataStore, DataStoreItem } from '../../mixins/DataStore';
+import { getAnnotationSnapshot } from '../../sdk/lsf-utils';
+import { FF_DEV_2536, FF_LOPS_E_3, isFF } from '../../utils/feature-flags';
+import { isDefined } from '../../utils/utils';
+import { Assignee } from '../Assignee';
+import { DynamicModel, registerModel } from '../DynamicModel';
+import { CustomJSON } from '../types';
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
 const fileAttributes = types.model({
   certainty: types.optional(types.maybeNull(types.number), 0),
   distance: types.optional(types.maybeNull(types.number), 0),
-  id: types.optional(types.maybeNull(types.string), ""),
+  id: types.optional(types.maybeNull(types.string), ''),
 });
 
 const exportedModel = types.model({
   project_id: types.optional(types.maybeNull(types.number), null),
-  created_at: types.optional(types.maybeNull(types.string), ""),
+  created_at: types.optional(types.maybeNull(types.string), ''),
 });
 
 export const create = (columns) => {
-  const TaskModelBase = DynamicModel("TaskModelBase", columns, {
+  const TaskModelBase = DynamicModel('TaskModelBase', columns, {
     ...(isFF(FF_DEV_2536) ? { comment_authors: types.optional(types.array(Assignee), []) } : {}),
     annotators: types.optional(types.array(Assignee), []),
     reviewers: types.optional(types.array(Assignee), []),
@@ -39,7 +39,7 @@ export const create = (columns) => {
     ...(isFF(FF_LOPS_E_3)
       ? {
           _additional: types.optional(fileAttributes, {}),
-          candidate_task_id: types.optional(types.string, ""),
+          candidate_task_id: types.optional(types.string, ''),
           project: types.union(types.number, types.optional(types.array(exportedModel), [])), //number for Projects, array of exportedModel for Datasets
         }
       : {}),
@@ -100,23 +100,23 @@ export const create = (columns) => {
       },
 
       loadAnnotations: flow(function* () {
-        const annotations = yield Promise.all([getRoot(self).apiCall("annotations", { taskID: self.id })]);
+        const annotations = yield Promise.all([getRoot(self).apiCall('annotations', { taskID: self.id })]);
 
         self.annotations = annotations[0];
       }),
     }));
 
-  const TaskModel = types.compose("TaskModel", TaskModelBase, DataStoreItem);
-  const AssociatedType = types.model("AssociatedModelBase", {
+  const TaskModel = types.compose('TaskModel', TaskModelBase, DataStoreItem);
+  const AssociatedType = types.model('AssociatedModelBase', {
     id: types.identifierNumber,
     title: types.string,
     workspace: types.optional(types.array(types.string), []),
   });
 
-  registerModel("TaskModel", TaskModel);
+  registerModel('TaskModel', TaskModel);
 
-  return DataStore("TasksStore", {
-    apiMethod: "tasks",
+  return DataStore('TasksStore', {
+    apiMethod: 'tasks',
     listItemType: TaskModel,
     associatedItemType: AssociatedType,
     properties: {
@@ -126,7 +126,7 @@ export const create = (columns) => {
   })
     .actions((self) => ({
       loadTaskHistory: flow(function* (props) {
-        let taskHistory = yield self.root.apiCall("taskHistory", props);
+        let taskHistory = yield self.root.apiCall('taskHistory', props);
 
         taskHistory = taskHistory.map((task) => {
           return {
@@ -139,13 +139,13 @@ export const create = (columns) => {
       }),
       loadTask: flow(function* (taskID, { select = true } = {}) {
         if (!isDefined(taskID)) {
-          console.warn("Task ID must be provided");
+          console.warn('Task ID must be provided');
           return;
         }
 
         self.setLoading(taskID);
 
-        const taskData = yield self.root.apiCall("task", { taskID });
+        const taskData = yield self.root.apiCall('task', { taskID });
 
         const task = self.applyTaskSnapshot(taskData, taskID);
 
@@ -157,12 +157,12 @@ export const create = (columns) => {
       }),
 
       loadNextTask: flow(function* ({ select = true } = {}) {
-        const taskData = yield self.root.invokeAction("next_task", {
+        const taskData = yield self.root.invokeAction('next_task', {
           reload: false,
         });
 
         if (taskData?.$meta?.status === 404) {
-          getRoot(self).SDK.invoke("labelStreamFinished");
+          getRoot(self).SDK.invoke('labelStreamFinished');
           return null;
         }
 
@@ -174,7 +174,7 @@ export const create = (columns) => {
         if (select !== false) self.setSelected(task);
 
         if (labelStreamModeChanged) {
-          getRoot(self).SDK.invoke("assignedStreamFinished");
+          getRoot(self).SDK.invoke('assignedStreamFinished');
         }
 
         return task;
@@ -204,7 +204,7 @@ export const create = (columns) => {
 
         if (snapshot.predictions) {
           snapshot.predictions.forEach((p) => {
-            p.created_by = (p.model_version?.trim() ?? "") || p.created_by;
+            p.created_by = (p.model_version?.trim() ?? '') || p.created_by;
           });
         }
 

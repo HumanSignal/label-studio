@@ -1,11 +1,11 @@
-import React from "react";
-import { BemWithSpecifiContext } from "../../../utils/bem";
-import "./Space.styl";
+import React from 'react';
+import { BemWithSpecifiContext } from '../../../utils/bem';
+import './Space.styl';
 
 const { Block } = BemWithSpecifiContext();
 
 export const Space = ({
-  direction = "horizontal",
+  direction = 'horizontal',
   size,
   className,
   style,
@@ -16,7 +16,7 @@ export const Space = ({
   ...rest
 }) => {
   return (
-    <Block name="space" mod={{ direction, size, spread, stretch, align }} mix={className} style={style} {...rest}>
+    <Block name='space' mod={{ direction, size, spread, stretch, align }} mix={className} style={style} {...rest}>
       {children}
     </Block>
   );

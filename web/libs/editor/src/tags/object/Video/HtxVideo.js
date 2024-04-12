@@ -1,28 +1,28 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { IconZoomIn } from "../../../assets/icons";
-import { Button } from "../../../common/Button/Button";
-import { Dropdown } from "../../../common/Dropdown/Dropdown";
-import { Menu } from "../../../common/Menu/Menu";
-import { ErrorMessage } from "../../../components/ErrorMessage/ErrorMessage";
-import ObjectTag from "../../../components/Tags/Object";
-import { Timeline } from "../../../components/Timeline/Timeline";
-import { VideoCanvas, clampZoom } from "../../../components/VideoCanvas/VideoCanvas";
+import { IconZoomIn } from '../../../assets/icons';
+import { Button } from '../../../common/Button/Button';
+import { Dropdown } from '../../../common/Dropdown/Dropdown';
+import { Menu } from '../../../common/Menu/Menu';
+import { ErrorMessage } from '../../../components/ErrorMessage/ErrorMessage';
+import ObjectTag from '../../../components/Tags/Object';
+import { Timeline } from '../../../components/Timeline/Timeline';
+import { VideoCanvas, clampZoom } from '../../../components/VideoCanvas/VideoCanvas';
 import {
   MAX_ZOOM_WHEEL,
   MIN_ZOOM_WHEEL,
   ZOOM_STEP,
   ZOOM_STEP_WHEEL,
-} from "../../../components/VideoCanvas/VideoConstants";
-import { defaultStyle } from "../../../core/Constants";
-import { useFullscreen } from "../../../hooks/useFullscreen";
-import { useToggle } from "../../../hooks/useToggle";
-import { Block, Elem } from "../../../utils/bem";
-import { FF_DEV_2715, isFF } from "../../../utils/feature-flags";
-import ResizeObserver from "../../../utils/resize-observer";
-import { clamp, isDefined } from "../../../utils/utilities";
-import "./Video.styl";
-import { VideoRegions } from "./VideoRegions";
+} from '../../../components/VideoCanvas/VideoConstants';
+import { defaultStyle } from '../../../core/Constants';
+import { useFullscreen } from '../../../hooks/useFullscreen';
+import { useToggle } from '../../../hooks/useToggle';
+import { Block, Elem } from '../../../utils/bem';
+import { FF_DEV_2715, isFF } from '../../../utils/feature-flags';
+import ResizeObserver from '../../../utils/resize-observer';
+import { clamp, isDefined } from '../../../utils/utilities';
+import './Video.styl';
+import { VideoRegions } from './VideoRegions';
 
 const isFFDev2715 = isFF(FF_DEV_2715);
 
@@ -178,9 +178,9 @@ const HtxVideoView = ({ item, store }) => {
       e.preventDefault();
     };
 
-    container.addEventListener("wheel", cancelWheel);
+    container.addEventListener('wheel', cancelWheel);
 
-    return () => container.removeEventListener("wheel", cancelWheel);
+    return () => container.removeEventListener('wheel', cancelWheel);
   }, []);
 
   useEffect(() => {
@@ -193,25 +193,25 @@ const HtxVideoView = ({ item, store }) => {
     };
 
     const onKeyDown = (e) => {
-      if (e.code.startsWith("Shift")) {
+      if (e.code.startsWith('Shift')) {
         e.preventDefault();
 
         if (!panMode) {
           setPanMode(true);
 
           const cancelPan = (e) => {
-            if (e.code.startsWith("Shift")) {
+            if (e.code.startsWith('Shift')) {
               setPanMode(false);
-              document.removeEventListener("keyup", cancelPan);
+              document.removeEventListener('keyup', cancelPan);
             }
           };
 
-          document.addEventListener("keyup", cancelPan);
+          document.addEventListener('keyup', cancelPan);
         }
       }
     };
 
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener('keydown', onKeyDown);
 
     const observer = new ResizeObserver(() => onResize());
     const [vContainer, vBlock] = [videoContainerRef.current, videoBlockRef.current];
@@ -220,7 +220,7 @@ const HtxVideoView = ({ item, store }) => {
     observer.observe(vBlock);
 
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener('keydown', onKeyDown);
       observer.unobserve(vContainer);
       observer.unobserve(vBlock);
       observer.disconnect();
@@ -282,12 +282,12 @@ const HtxVideoView = ({ item, store }) => {
       };
 
       const onMouseUp = () => {
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
       };
 
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
     },
     [panMode, pan],
   );
@@ -408,18 +408,18 @@ const HtxVideoView = ({ item, store }) => {
 
       regions.forEach((region) => {
         switch (action) {
-          case "lifespan_add":
-          case "lifespan_remove":
+          case 'lifespan_add':
+          case 'lifespan_remove':
             region.toggleLifespan(data.frame);
             break;
-          case "keypoint_add":
+          case 'keypoint_add':
             region.addKeypoint(data.frame);
             break;
-          case "keypoint_remove":
+          case 'keypoint_remove':
             region.removeKeypoint(data.frame);
             break;
           default:
-            console.warn("unknown action");
+            console.warn('unknown action');
         }
       });
     },
@@ -445,7 +445,7 @@ const HtxVideoView = ({ item, store }) => {
 
   const regions = item.regs.map((reg) => {
     const color = reg.style?.fillcolor ?? reg.tag?.fillcolor ?? defaultStyle.fillcolor;
-    const label = reg.labels.join(", ") || "Empty";
+    const label = reg.labels.join(', ') || 'Empty';
     const sequence = reg.sequence.map((s) => ({
       frame: s.frame,
       enabled: s.enabled,
@@ -463,14 +463,14 @@ const HtxVideoView = ({ item, store }) => {
 
   return (
     <ObjectTag item={item}>
-      <Block name="video-segmentation" ref={mainContentRef} mod={{ fullscreen: isFullScreen }}>
+      <Block name='video-segmentation' ref={mainContentRef} mod={{ fullscreen: isFullScreen }}>
         {item.errors?.map((error, i) => (
           <ErrorMessage key={`err-${i}`} error={error} />
         ))}
 
-        <Block name="video" mod={{ fullscreen: isFullScreen }} ref={videoBlockRef}>
+        <Block name='video' mod={{ fullscreen: isFullScreen }} ref={videoBlockRef}>
           <Elem
-            name="main"
+            name='main'
             ref={videoContainerRef}
             style={{ height: Number(item.height) }}
             onMouseDown={handlePan}
@@ -520,7 +520,7 @@ const HtxVideoView = ({ item, store }) => {
 
         {loaded && (
           <Elem
-            name="timeline"
+            name='timeline'
             tag={Timeline}
             playing={playing}
             length={videoLength}
@@ -535,14 +535,14 @@ const HtxVideoView = ({ item, store }) => {
             controls={{ FramesControl: true }}
             customControls={[
               {
-                position: "left",
+                position: 'left',
                 component: () => {
                   return (
                     <Dropdown.Trigger
-                      key="dd"
+                      key='dd'
                       inline={isFullScreen}
                       content={
-                        <Menu size="auto" closeDropdownOnItemClick={false}>
+                        <Menu size='auto' closeDropdownOnItemClick={false}>
                           <Menu.Item onClick={zoomIn}>Zoom In</Menu.Item>
                           <Menu.Item onClick={zoomOut}>Zoom Out</Menu.Item>
                           <Menu.Item onClick={zoomToFit}>Zoom To Fit</Menu.Item>
@@ -550,7 +550,7 @@ const HtxVideoView = ({ item, store }) => {
                         </Menu>
                       }
                     >
-                      <Button size="small" nopadding>
+                      <Button size='small' nopadding>
                         <IconZoomIn />
                       </Button>
                     </Dropdown.Trigger>

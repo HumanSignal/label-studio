@@ -18,7 +18,7 @@ const config = `
 `;
 
 const data = {
-  csv: "https://htx-pub.s3.amazonaws.com/datasets/timeseries/time-series-velocity-acceleration.csv",
+  csv: 'https://htx-pub.s3.amazonaws.com/datasets/timeseries/time-series-velocity-acceleration.csv',
 };
 
 const result = [
@@ -27,29 +27,29 @@ const result = [
       start: 4,
       end: 23,
       instant: false,
-      timeserieslabels: ["Run"],
+      timeserieslabels: ['Run'],
     },
-    id: "Oek-tTCZ6_",
-    from_name: "label",
-    to_name: "ts",
-    type: "timeserieslabels",
-    origin: "manual",
+    id: 'Oek-tTCZ6_',
+    from_name: 'label',
+    to_name: 'ts',
+    type: 'timeserieslabels',
+    origin: 'manual',
   },
   {
     value: {
       start: 52,
       end: 69,
       instant: false,
-      timeserieslabels: ["Walk"],
+      timeserieslabels: ['Walk'],
     },
-    id: "U0S2_cORxv",
-    from_name: "label",
-    to_name: "ts",
-    type: "timeserieslabels",
-    origin: "manual",
+    id: 'U0S2_cORxv',
+    from_name: 'label',
+    to_name: 'ts',
+    type: 'timeserieslabels',
+    origin: 'manual',
   },
 ];
 
-const title = "TimeSeries csv loaded by url with index column";
+const title = 'TimeSeries csv loaded by url with index column';
 
 module.exports = { config, data, result, title };

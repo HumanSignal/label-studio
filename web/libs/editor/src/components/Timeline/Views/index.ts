@@ -1,5 +1,5 @@
-import { default as frames } from "./Frames";
-import { default as wave } from "./Wave";
+import { default as frames } from './Frames';
+import { default as wave } from './Wave';
 
 const Views = {
   frames,

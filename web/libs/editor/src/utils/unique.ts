@@ -1,5 +1,5 @@
 // @todo for nanoid@3 there should be default import
-import { nanoid } from "nanoid";
+import { nanoid } from 'nanoid';
 
 /**
  * Unique hash generator

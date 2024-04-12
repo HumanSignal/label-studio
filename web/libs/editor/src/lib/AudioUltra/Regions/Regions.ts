@@ -1,4 +1,4 @@
-import { type RgbaColorArray, rgba } from "../Common/Color";
+import { type RgbaColorArray, rgba } from '../Common/Color';
 import {
   clamp,
   defaults,
@@ -7,13 +7,13 @@ import {
   getCursorPositionY,
   isInRange,
   pixelsToTime,
-} from "../Common/Utils";
-import { CursorSymbol } from "../Cursor/Cursor";
-import type { LayerGroup } from "../Visual/LayerGroup";
-import type { Visualizer } from "../Visual/Visualizer";
-import type { Waveform } from "../Waveform";
-import { Region, type RegionOptions } from "./Region";
-import { Segment } from "./Segment";
+} from '../Common/Utils';
+import { CursorSymbol } from '../Cursor/Cursor';
+import type { LayerGroup } from '../Visual/LayerGroup';
+import type { Visualizer } from '../Visual/Visualizer';
+import type { Waveform } from '../Waveform';
+import { Region, type RegionOptions } from './Region';
+import { Segment } from './Segment';
 
 export interface RegionsGlobalEvents {
   beforeRegionsDraw: (regions: Regions) => void;
@@ -35,8 +35,8 @@ export class Regions {
   private initialRegions: RegionOptions[];
   private locked = false;
   private hoveredRegions = new Set<Region | Segment>();
-  private defaultColor = rgba("#787878");
-  private drawingColor = rgba("#787878");
+  private defaultColor = rgba('#787878');
+  private drawingColor = rgba('#787878');
   private labels: string[] | undefined;
   private createable = true;
   private updateable = true;
@@ -54,26 +54,26 @@ export class Regions {
     this.createable = options?.createable ?? this.createable;
     this.updateable = options?.updateable ?? this.updateable;
     this.deleteable = options?.deleteable ?? this.deleteable;
-    this.layerGroup = this.visualizer.getLayer("regions") as LayerGroup;
+    this.layerGroup = this.visualizer.getLayer('regions') as LayerGroup;
     this.showLabels = this.waveform.params.showLabels ?? false;
     this.init();
   }
 
   init() {
     // Regions general events
-    this.visualizer.on("initialized", this.handleInit);
-    this.waveform.on("regionRemoved", this.handleRegionRemoved);
-    this.waveform.on("regionUpdated", this.handleRegionUpdated);
+    this.visualizer.on('initialized', this.handleInit);
+    this.waveform.on('regionRemoved', this.handleRegionRemoved);
+    this.waveform.on('regionUpdated', this.handleRegionUpdated);
 
-    this.visualizer.container.addEventListener("mousedown", this.handleDrawRegion);
+    this.visualizer.container.addEventListener('mousedown', this.handleDrawRegion);
 
     // Regions specific events
     const { container } = this.visualizer;
 
-    container.addEventListener("mousemove", this.handleMouseMove);
-    container.addEventListener("mousedown", this.handleMouseDown);
-    container.addEventListener("mouseup", this.handleMouseUp);
-    container.addEventListener("click", this.handleClick);
+    container.addEventListener('mousemove', this.handleMouseMove);
+    container.addEventListener('mousedown', this.handleMouseDown);
+    container.addEventListener('mouseup', this.handleMouseUp);
+    container.addEventListener('click', this.handleClick);
   }
 
   handleDraw = () => {
@@ -217,15 +217,15 @@ export class Regions {
   destroy() {
     const { container } = this.visualizer;
 
-    this.visualizer.off("initialized", this.handleInit);
-    this.visualizer.off("draw", this.handleDraw);
-    this.waveform.off("regionRemoved", this.handleRegionRemoved);
-    this.waveform.off("regionUpdated", this.handleRegionUpdated);
+    this.visualizer.off('initialized', this.handleInit);
+    this.visualizer.off('draw', this.handleDraw);
+    this.waveform.off('regionRemoved', this.handleRegionRemoved);
+    this.waveform.off('regionUpdated', this.handleRegionUpdated);
 
-    container.removeEventListener("mousemove", this.handleMouseMove);
-    container.removeEventListener("mousedown", this.handleMouseDown);
-    container.removeEventListener("mouseup", this.handleMouseUp);
-    container.removeEventListener("click", this.handleClick);
+    container.removeEventListener('mousemove', this.handleMouseMove);
+    container.removeEventListener('mousedown', this.handleMouseDown);
+    container.removeEventListener('mouseup', this.handleMouseUp);
+    container.removeEventListener('click', this.handleClick);
 
     this.regions.forEach((region) => region.destroy());
     this.regions = [];
@@ -282,7 +282,7 @@ export class Regions {
     }
 
     // Handle rendering when the visualizer is being drawn
-    this.visualizer.on("draw", this.handleDraw);
+    this.visualizer.on('draw', this.handleDraw);
   };
 
   private handleRegionUpdated = () => {
@@ -303,7 +303,7 @@ export class Regions {
     let region: Region | Segment;
     let startX: number;
 
-    this.waveform.invoke("beforeRegionsDraw", [this]);
+    this.waveform.invoke('beforeRegionsDraw', [this]);
 
     const addRegion = () => {
       const { container, zoomedWidth, fullWidth } = this.visualizer;
@@ -352,14 +352,14 @@ export class Regions {
     const handleMouseUp = () => {
       const { player, autoPlayNewSegments } = this.waveform;
 
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
 
       if (region && region.start === region.end) {
         region.remove();
         this.unlock();
       } else if (region) {
-        this.waveform.invoke("regionCreated", [region]);
+        this.waveform.invoke('regionCreated', [region]);
         if (autoPlayNewSegments && !region.isRegion) {
           if (player.playing) {
             player.pause();
@@ -371,18 +371,18 @@ export class Regions {
         this.unlock();
       }
 
-      this.waveform.invoke("afterRegionsDraw", [this]);
+      this.waveform.invoke('afterRegionsDraw', [this]);
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
   private handleMouseMove = (e: MouseEvent) => {
     const region = this.findRegionUnderCursor(e);
 
     if (region) {
-      region.invoke("mouseOver", [region, e]);
+      region.invoke('mouseOver', [region, e]);
 
       if (!region.hovered) {
         this.hoveredRegions.clear();
@@ -390,7 +390,7 @@ export class Regions {
       }
     } else if (this.hoveredRegions.size) {
       this.hoveredRegions.forEach((region) => {
-        region.invoke("mouseLeave", [region, e]);
+        region.invoke('mouseLeave', [region, e]);
       });
       this.hoveredRegions.clear();
       if (!this.cursorLockedByPlayhead) {
@@ -400,7 +400,7 @@ export class Regions {
   };
 
   private get cursorLockedByPlayhead() {
-    return this.waveform.cursor.hasFocus() && this.waveform.cursor.isFocused("playhead");
+    return this.waveform.cursor.hasFocus() && this.waveform.cursor.isFocused('playhead');
   }
 
   private handleMouseDown = (e: MouseEvent) => {
@@ -410,7 +410,7 @@ export class Regions {
     if (this.layerGroup.isVisible && region?.updateable) {
       e.preventDefault();
       e.stopPropagation();
-      region.invoke("mouseDown", [region, e]);
+      region.invoke('mouseDown', [region, e]);
     }
   };
 
@@ -419,18 +419,18 @@ export class Regions {
     const region = this.findRegionUnderCursor(e);
 
     if (this.layerGroup.isVisible && region?.updateable) {
-      region.invoke("mouseUp", [region, e]);
+      region.invoke('mouseUp', [region, e]);
     }
   };
 
   private handleClick = (e: MouseEvent) => {
-    const mainLayer = this.visualizer.getLayer("main");
+    const mainLayer = this.visualizer.getLayer('main');
 
     if (e.target && mainLayer?.canvas?.contains(e.target)) {
       const region = this.findRegionUnderCursor(e);
 
       if (this.layerGroup.isVisible && region) {
-        region.invoke("click", [region, e]);
+        region.invoke('click', [region, e]);
       }
     }
   };
@@ -452,7 +452,7 @@ export class Regions {
   private cursorInRegion(e: MouseEvent, region: Segment) {
     const { xStart, width } = region;
     const { container, timelinePlacement, timelineHeight = 0, height } = this.visualizer;
-    const timelineLayer = this.visualizer.getLayer("timeline");
+    const timelineLayer = this.visualizer.getLayer('timeline');
     const timelineTop = timelinePlacement === defaults.timelinePlacement;
     const yStart = timelineTop && timelineLayer?.isVisible ? timelineHeight : 0;
     const x = getCursorPositionX(e, container);
@@ -484,7 +484,7 @@ export class Regions {
   hover(region: Region | Segment, e?: MouseEvent) {
     if (e) {
       this.visualizer.lockSeek();
-      region.invoke("mouseEnter", [region, e]);
+      region.invoke('mouseEnter', [region, e]);
     }
 
     this.hoveredRegions.add(region);
@@ -493,7 +493,7 @@ export class Regions {
   unhover(region: Region | Segment, e?: MouseEvent) {
     if (e) {
       this.visualizer.unlockSeek();
-      region.invoke("mouseLeave", [region, e]);
+      region.invoke('mouseLeave', [region, e]);
     }
 
     this.hoveredRegions.delete(region);

@@ -1,9 +1,9 @@
-import type React from "react";
-import { type FC, useEffect, useRef, useState } from "react";
-import { Block, Elem } from "../../../utils/bem";
+import type React from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
+import { Block, Elem } from '../../../utils/bem';
 
-import { Info } from "./Info";
-import "./Slider.styl";
+import { Info } from './Info';
+import './Slider.styl';
 
 export interface SliderProps {
   description?: string;
@@ -56,18 +56,18 @@ export const Slider: FC<SliderProps> = ({ description, info, max, min, value, st
 
   const renderInput = () => {
     return (
-      <Elem name="control">
-        <Elem name="info">
+      <Elem name='control'>
+        <Elem name='info'>
           {description}
           {info && <Info text={info} />}
         </Elem>
         <Elem
-          name="input"
-          tag="input"
-          type="text"
+          name='input'
+          tag='input'
+          type='text'
           mod={
             valueError !== undefined &&
-            (typeof valueError === "string" || valueError > max || valueError < min) && { error: "control" }
+            (typeof valueError === 'string' || valueError > max || valueError < min) && { error: 'control' }
           }
           min={min}
           max={max}
@@ -79,12 +79,12 @@ export const Slider: FC<SliderProps> = ({ description, info, max, min, value, st
   };
 
   return (
-    <Block name="audio-slider">
+    <Block name='audio-slider'>
       <Elem
         ref={sliderRef}
-        name="range"
-        tag="input"
-        type="range"
+        name='range'
+        tag='input'
+        type='range'
         min={min}
         max={max}
         step={step}

@@ -1,9 +1,9 @@
-Feature("Video meta").tag("@regress");
+Feature('Video meta').tag('@regress');
 
-const VIDEO = "/files/opossum_intro.webm";
+const VIDEO = '/files/opossum_intro.webm';
 
-Scenario("Filling meta in video regions", async ({ I, LabelStudio, AtVideoView, AtOutliner, AtDetails }) => {
-  I.amOnPage("/");
+Scenario('Filling meta in video regions', async ({ I, LabelStudio, AtVideoView, AtOutliner, AtDetails }) => {
+  I.amOnPage('/');
   LabelStudio.setFeatureFlags({
     ff_front_1170_outliner_030222_short: true,
   });
@@ -23,7 +23,7 @@ Scenario("Filling meta in video regions", async ({ I, LabelStudio, AtVideoView, 
     },
     annotations: [
       {
-        id: "test",
+        id: 'test',
         result: [
           {
             value: {
@@ -41,11 +41,11 @@ Scenario("Filling meta in video regions", async ({ I, LabelStudio, AtVideoView, 
               ],
               framesCount: 1009,
             },
-            id: "test_1",
-            from_name: "box",
-            to_name: "video",
-            type: "videorectangle",
-            origin: "manual",
+            id: 'test_1',
+            from_name: 'box',
+            to_name: 'video',
+            type: 'videorectangle',
+            origin: 'manual',
           },
           {
             value: {
@@ -63,11 +63,11 @@ Scenario("Filling meta in video regions", async ({ I, LabelStudio, AtVideoView, 
               ],
               framesCount: 1009,
             },
-            id: "test_2",
-            from_name: "box",
-            to_name: "video",
-            type: "videorectangle",
-            origin: "manual",
+            id: 'test_2',
+            from_name: 'box',
+            to_name: 'video',
+            type: 'videorectangle',
+            origin: 'manual',
           },
         ],
       },
@@ -75,27 +75,27 @@ Scenario("Filling meta in video regions", async ({ I, LabelStudio, AtVideoView, 
   });
   LabelStudio.waitForObjectsReady();
 
-  const META_1 = "Some meta";
-  const META_2 = "Some other meta";
+  const META_1 = 'Some meta';
+  const META_2 = 'Some other meta';
 
   AtOutliner.seeRegions(2);
   AtOutliner.clickRegion(2);
 
-  I.say("Fill a meta for the 2nd region");
+  I.say('Fill a meta for the 2nd region');
   AtDetails.clickEditMeta();
   AtDetails.fillMeta(META_1);
-  I.say("Reselect region and check the meta");
+  I.say('Reselect region and check the meta');
   AtOutliner.clickRegion(1);
   AtOutliner.clickRegion(2);
   I.see(META_1);
 
-  I.say("Fill a meta for the 1st region");
+  I.say('Fill a meta for the 1st region');
   AtOutliner.clickRegion(1);
   AtDetails.clickEditMeta();
   AtDetails.fillMeta(META_2);
-  I.say("Reset selection by clicking on the canvas");
+  I.say('Reset selection by clicking on the canvas');
   I.click(AtVideoView.videoLocate());
-  I.say("Check meta for the 1st region");
+  I.say('Check meta for the 1st region');
   AtOutliner.clickRegion(1);
   I.see(META_2);
 });

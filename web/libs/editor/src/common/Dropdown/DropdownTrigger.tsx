@@ -9,10 +9,10 @@ import {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { cn } from "../../utils/bem";
-import { Dropdown, type DropdownProps, type DropdownRef } from "./DropdownComponent";
-import { DropdownContext, type DropdownContextValue } from "./DropdownContext";
+} from 'react';
+import { cn } from '../../utils/bem';
+import { Dropdown, type DropdownProps, type DropdownRef } from './DropdownComponent';
+import { DropdownContext, type DropdownContextValue } from './DropdownContext';
 
 const getMinIndex = (element?: HTMLElement) => {
   let index = 1000;
@@ -98,7 +98,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       return {
         ...(triggerEL as any).props,
         tag,
-        key: "dd-trigger",
+        key: 'dd-trigger',
         ref: (el: HTMLElement) => {
           triggerRef.current = triggerRef.current ?? el;
 
@@ -106,7 +106,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
             setMinIndex(Math.max(minIndex, getMinIndex(triggerRef.current)));
           }
         },
-        className: cn("dropdown").elem("trigger").mix(props.className),
+        className: cn('dropdown').elem('trigger').mix(props.className),
         onClickCapture: handleToggle,
       };
     }, [triggerEL, triggerRef, props.className, handleToggle]);
@@ -122,8 +122,8 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     ) : null;
 
     useEffect(() => {
-      document.addEventListener("click", handleClick, { capture: true });
-      return () => document.removeEventListener("click", handleClick, { capture: true });
+      document.addEventListener('click', handleClick, { capture: true });
+      return () => document.removeEventListener('click', handleClick, { capture: true });
     }, [handleClick]);
 
     const contextValue = useMemo((): DropdownContextValue => {

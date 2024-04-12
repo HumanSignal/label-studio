@@ -1,22 +1,22 @@
-import { inject } from "mobx-react";
-import { getRoot } from "mobx-state-tree";
-import { useCallback, useMemo } from "react";
-import { useState } from "react";
-import { useEffect } from "react";
-import { FaQuestionCircle } from "react-icons/fa";
-import { useShortcut } from "../../../sdk/hotkeys";
-import { Block, Elem } from "../../../utils/bem";
-import { FF_DEV_2536, FF_DEV_4008, FF_LOPS_86, FF_OPTIC_2, isFF } from "../../../utils/feature-flags";
-import * as CellViews from "../../CellViews";
-import { Button } from "../../Common/Button/Button";
-import { Icon } from "../../Common/Icon/Icon";
-import { ImportButton } from "../../Common/SDKButtons";
-import { Spinner } from "../../Common/Spinner";
-import { Table } from "../../Common/TableOld/Table";
-import { Tag } from "../../Common/Tag/Tag";
-import { Tooltip } from "../../Common/Tooltip/Tooltip";
-import { GridView } from "../GridView/GridView";
-import "./Table.styl";
+import { inject } from 'mobx-react';
+import { getRoot } from 'mobx-state-tree';
+import { useCallback, useMemo } from 'react';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { FaQuestionCircle } from 'react-icons/fa';
+import { useShortcut } from '../../../sdk/hotkeys';
+import { Block, Elem } from '../../../utils/bem';
+import { FF_DEV_2536, FF_DEV_4008, FF_LOPS_86, FF_OPTIC_2, isFF } from '../../../utils/feature-flags';
+import * as CellViews from '../../CellViews';
+import { Button } from '../../Common/Button/Button';
+import { Icon } from '../../Common/Icon/Icon';
+import { ImportButton } from '../../Common/SDKButtons';
+import { Spinner } from '../../Common/Spinner';
+import { Table } from '../../Common/TableOld/Table';
+import { Tag } from '../../Common/Tag/Tag';
+import { Tooltip } from '../../Common/Tooltip/Tooltip';
+import { GridView } from '../GridView/GridView';
+import './Table.styl';
 
 const injector = inject(({ store }) => {
   const { dataStore, currentView } = store;
@@ -25,7 +25,7 @@ const injector = inject(({ store }) => {
     dataStore,
     updated: dataStore.updated,
     view: currentView,
-    viewType: currentView?.type ?? "list",
+    viewType: currentView?.type ?? 'list',
     columns: currentView?.fieldsAsColumns ?? [],
     hiddenColumns: currentView?.hiddenColumnsList,
     selectedItems: currentView?.selected,
@@ -67,7 +67,7 @@ export const DataView = injector(
     const loadMore = useCallback(async () => {
       if (!dataStore.hasNextPage || dataStore.loading) return Promise.resolve();
 
-      await dataStore.fetch({ interaction: "scroll" });
+      await dataStore.fetch({ interaction: 'scroll' });
       return Promise.resolve();
     }, [dataStore]);
 
@@ -87,9 +87,9 @@ export const DataView = injector(
       if (parent) {
         children.push(
           <Tag
-            key="column-type"
-            color="blue"
-            style={{ fontWeight: "500", fontSize: 14, cursor: "pointer", width: 45, padding: 0 }}
+            key='column-type'
+            color='blue'
+            style={{ fontWeight: '500', fontSize: 14, cursor: 'pointer', width: 45, padding: 0 }}
           >
             {original?.readableType ?? parent.title}
           </Tag>,
@@ -98,7 +98,7 @@ export const DataView = injector(
 
       if (help && decoration?.help !== false) {
         children.push(
-          <Tooltip key="help-tooltip" title={help}>
+          <Tooltip key='help-tooltip' title={help}>
             <Icon icon={FaQuestionCircle} style={{ opacity: 0.5 }} />
           </Tooltip>,
         );
@@ -115,10 +115,10 @@ export const DataView = injector(
       async (item, e) => {
         const itemID = item.task_id ?? item.id;
 
-        if (store.SDK.type === "DE") {
-          store.SDK.invoke("recordPreview", item, columns, getRoot(view).taskStore.associatedList);
+        if (store.SDK.type === 'DE') {
+          store.SDK.invoke('recordPreview', item, columns, getRoot(view).taskStore.associatedList);
         } else if (e.metaKey || e.ctrlKey) {
-          window.open(`./?task=${itemID}`, "_blank");
+          window.open(`./?task=${itemID}`, '_blank');
         } else {
           if (isFF(FF_OPTIC_2)) store._sdk.lsf?.saveDraft();
           getRoot(view).startLabeling(item);
@@ -131,58 +131,58 @@ export const DataView = injector(
       (content) => {
         if (isLoading && total === 0 && !isLabeling) {
           return (
-            <Block name="fill-container">
-              <Spinner size="large" />
+            <Block name='fill-container'>
+              <Spinner size='large' />
             </Block>
           );
         }
-        if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
+        if (store.SDK.type === 'DE' && ['canceled', 'failed'].includes(datasetStatusID)) {
           return (
-            <Block name="syncInProgress">
-              <Elem name="title" tag="h3">
+            <Block name='syncInProgress'>
+              <Elem name='title' tag='h3'>
                 Failed to sync data
               </Elem>
               {isFF(FF_LOPS_86) ? (
                 <>
-                  <Elem name="text">Check your storage settings and resync to import records</Elem>
+                  <Elem name='text'>Check your storage settings and resync to import records</Elem>
                   <Button
                     onClick={async () => {
-                      window.open("./settings/storage");
+                      window.open('./settings/storage');
                     }}
                   >
                     Manage Storage
                   </Button>
                 </>
               ) : (
-                <Elem name="text">Check your storage settings. You may need to recreate this dataset</Elem>
+                <Elem name='text'>Check your storage settings. You may need to recreate this dataset</Elem>
               )}
             </Block>
           );
         }
         if (
-          store.SDK.type === "DE" &&
+          store.SDK.type === 'DE' &&
           (total === 0 || data.length === 0 || !hasData) &&
-          datasetStatusID === "completed"
+          datasetStatusID === 'completed'
         ) {
           return (
-            <Block name="syncInProgress">
-              <Elem name="title" tag="h3">
+            <Block name='syncInProgress'>
+              <Elem name='title' tag='h3'>
                 Nothing found
               </Elem>
-              <Elem name="text">Try adjusting the filter or similarity search parameters</Elem>
+              <Elem name='text'>Try adjusting the filter or similarity search parameters</Elem>
             </Block>
           );
         }
-        if (store.SDK.type === "DE" && (total === 0 || data.length === 0 || !hasData)) {
+        if (store.SDK.type === 'DE' && (total === 0 || data.length === 0 || !hasData)) {
           return (
-            <Block name="syncInProgress">
-              <Elem name="title" tag="h3">
+            <Block name='syncInProgress'>
+              <Elem name='title' tag='h3'>
                 Hang tight! Records are syncing in the background
               </Elem>
-              <Elem name="text">Press the button below to see any synced records</Elem>
+              <Elem name='text'>Press the button below to see any synced records</Elem>
               <Button
                 onClick={async () => {
-                  await store.fetchProject({ force: true, interaction: "refresh" });
+                  await store.fetchProject({ force: true, interaction: 'refresh' });
                   await store.currentView?.reload();
                 }}
               >
@@ -193,20 +193,20 @@ export const DataView = injector(
         }
         if (total === 0 || !hasData) {
           return (
-            <Block name="no-results">
-              <Elem name="description">
+            <Block name='no-results'>
+              <Elem name='description'>
                 {hasData ? (
                   <>
                     <h3>Nothing found</h3>
                     Try adjusting the filter
                   </>
                 ) : (
-                  "Looks like you have not imported any data yet"
+                  'Looks like you have not imported any data yet'
                 )}
               </Elem>
               {!hasData && (
-                <Elem name="navigation">
-                  <ImportButton look="primary" href="./import">
+                <Elem name='navigation'>
+                  <ImportButton look='primary' href='./import'>
                     Go to import
                   </ImportButton>
                 </Elem>
@@ -231,7 +231,7 @@ export const DataView = injector(
     };
 
     const commonDecoration = useCallback(
-      (alias, size, align = "flex-start", help = false) => ({
+      (alias, size, align = 'flex-start', help = false) => ({
         alias,
         content: decorationContent,
         style: (col) => ({ width: col.width ?? size, justifyContent: align }),
@@ -242,35 +242,35 @@ export const DataView = injector(
 
     const decoration = useMemo(
       () => [
-        commonDecoration("total_annotations", 60, "center"),
-        commonDecoration("cancelled_annotations", 60, "center"),
-        commonDecoration("total_predictions", 60, "center"),
-        commonDecoration("completed_at", 180, "space-between", true),
-        commonDecoration("reviews_accepted", 60, "center"),
-        commonDecoration("reviews_rejected", 60, "center"),
-        commonDecoration("ground_truth", 60, "center"),
-        isFF(FF_DEV_2536) && commonDecoration("comment_count", 60, "center"),
-        isFF(FF_DEV_2536) && commonDecoration("unresolved_comment_count", 60, "center"),
+        commonDecoration('total_annotations', 60, 'center'),
+        commonDecoration('cancelled_annotations', 60, 'center'),
+        commonDecoration('total_predictions', 60, 'center'),
+        commonDecoration('completed_at', 180, 'space-between', true),
+        commonDecoration('reviews_accepted', 60, 'center'),
+        commonDecoration('reviews_rejected', 60, 'center'),
+        commonDecoration('ground_truth', 60, 'center'),
+        isFF(FF_DEV_2536) && commonDecoration('comment_count', 60, 'center'),
+        isFF(FF_DEV_2536) && commonDecoration('unresolved_comment_count', 60, 'center'),
         {
-          resolver: (col) => col.type === "Number",
+          resolver: (col) => col.type === 'Number',
           style(col) {
             return /id/.test(col.id) ? { width: 50 } : { width: 110 };
           },
         },
         {
-          resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type !== "DE",
-          style: { width: 150, justifyContent: "center" },
+          resolver: (col) => col.type === 'Image' && col.original && getRoot(col.original)?.SDK?.type !== 'DE',
+          style: { width: 150, justifyContent: 'center' },
         },
         {
-          resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type === "DE",
+          resolver: (col) => col.type === 'Image' && col.original && getRoot(col.original)?.SDK?.type === 'DE',
           style: { width: 150 },
         },
         {
-          resolver: (col) => ["Date", "Datetime"].includes(col.type),
+          resolver: (col) => ['Date', 'Datetime'].includes(col.type),
           style: { width: 240 },
         },
         {
-          resolver: (col) => ["Audio", "AudioPlus"].includes(col.type),
+          resolver: (col) => ['Audio', 'AudioPlus'].includes(col.type),
           style: { width: 150 },
         },
       ],
@@ -278,7 +278,7 @@ export const DataView = injector(
     );
 
     const content =
-      view.root.isLabeling || viewType === "list" ? (
+      view.root.isLabeling || viewType === 'list' ? (
         <Table
           view={view}
           data={data}
@@ -293,7 +293,7 @@ export const DataView = injector(
           order={view.ordering}
           focusedItem={focusedItem}
           isItemLoaded={isItemLoaded}
-          sortingEnabled={view.type === "list"}
+          sortingEnabled={view.type === 'list'}
           columnHeaderExtra={columnHeaderExtra}
           selectedItems={selectedItems}
           onSelectAll={onSelectAll}
@@ -320,7 +320,7 @@ export const DataView = injector(
         />
       );
 
-    useShortcut("dm.focus-previous", () => {
+    useShortcut('dm.focus-previous', () => {
       if (document.activeElement !== document.body) return;
 
       const task = dataStore.focusPrev();
@@ -328,7 +328,7 @@ export const DataView = injector(
       if (isFF(FF_DEV_4008)) getRoot(view).startLabeling(task);
     });
 
-    useShortcut("dm.focus-next", () => {
+    useShortcut('dm.focus-next', () => {
       if (document.activeElement !== document.body) return;
 
       const task = dataStore.focusNext();
@@ -336,13 +336,13 @@ export const DataView = injector(
       if (isFF(FF_DEV_4008)) getRoot(view).startLabeling(task);
     });
 
-    useShortcut("dm.close-labeling", () => {
+    useShortcut('dm.close-labeling', () => {
       if (document.activeElement !== document.body) return;
 
       if (dataStore.selected) store.closeLabeling();
     });
 
-    useShortcut("dm.open-labeling", () => {
+    useShortcut('dm.open-labeling', () => {
       if (document.activeElement !== document.body) return;
 
       const { highlighted } = dataStore;
@@ -354,13 +354,13 @@ export const DataView = injector(
     useEffect(() => {
       const updateDatasetStatus = (dataset) => dataset?.status?.id && setDatasetStatusID(dataset?.status?.id);
 
-      getRoot(store).SDK.on("datasetUpdated", updateDatasetStatus);
-      return () => getRoot(store).SDK.off("datasetUpdated", updateDatasetStatus);
+      getRoot(store).SDK.on('datasetUpdated', updateDatasetStatus);
+      return () => getRoot(store).SDK.off('datasetUpdated', updateDatasetStatus);
     }, []);
 
     // Render the UI for your table
     return (
-      <Block name="data-view" className="dm-content" style={{ pointerEvents: isLocked ? "none" : "auto" }}>
+      <Block name='data-view' className='dm-content' style={{ pointerEvents: isLocked ? 'none' : 'auto' }}>
         {renderContent(content)}
       </Block>
     );

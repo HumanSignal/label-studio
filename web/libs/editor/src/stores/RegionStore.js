@@ -1,19 +1,19 @@
-import { destroy, detach, getEnv, getParent, onPatch, types } from "mobx-state-tree";
+import { destroy, detach, getEnv, getParent, onPatch, types } from 'mobx-state-tree';
 
-import { Hotkey } from "../core/Hotkey";
-import Tree, { TRAVERSE_STOP } from "../core/Tree";
-import { AllRegionsType } from "../regions";
-import { debounce } from "../utils/debounce";
-import { FF_DEV_2755, isFF } from "../utils/feature-flags";
-import { isDefined } from "../utils/utilities";
+import { Hotkey } from '../core/Hotkey';
+import Tree, { TRAVERSE_STOP } from '../core/Tree';
+import { AllRegionsType } from '../regions';
+import { debounce } from '../utils/debounce';
+import { FF_DEV_2755, isFF } from '../utils/feature-flags';
+import { isDefined } from '../utils/utilities';
 
-const hotkeys = Hotkey("RegionStore");
+const hotkeys = Hotkey('RegionStore');
 
 const localStorageKeys = {
-  sort: "outliner:sort",
-  sortDirection: "outliner:sort-direction",
-  group: "outliner:group",
-  view: "regionstore:view",
+  sort: 'outliner:sort',
+  sortDirection: 'outliner:sort-direction',
+  group: 'outliner:group',
+  view: 'regionstore:view',
 };
 
 const SelectionMap = types
@@ -133,27 +133,27 @@ const SelectionMap = types
   });
 
 export default types
-  .model("RegionStore", {
+  .model('RegionStore', {
     sort: types.optional(
-      types.enumeration(["date", "score"]),
-      window.localStorage.getItem(localStorageKeys.sort) ?? "date",
+      types.enumeration(['date', 'score']),
+      window.localStorage.getItem(localStorageKeys.sort) ?? 'date',
     ),
 
     sortOrder: types.optional(
-      types.enumeration(["asc", "desc"]),
-      window.localStorage.getItem(localStorageKeys.sortDirection) ?? "asc",
+      types.enumeration(['asc', 'desc']),
+      window.localStorage.getItem(localStorageKeys.sortDirection) ?? 'asc',
     ),
 
     group: types.optional(
-      types.enumeration(["type", "label", "manual"]),
-      () => window.localStorage.getItem(localStorageKeys.group) ?? "manual",
+      types.enumeration(['type', 'label', 'manual']),
+      () => window.localStorage.getItem(localStorageKeys.group) ?? 'manual',
     ),
 
     filter: types.maybeNull(types.array(types.safeReference(AllRegionsType)), null),
 
     view: types.optional(
-      types.enumeration(["regions", "labels"]),
-      window.localStorage.getItem(localStorageKeys.view) ?? "regions",
+      types.enumeration(['regions', 'labels']),
+      window.localStorage.getItem(localStorageKeys.view) ?? 'regions',
     ),
     selection: types.optional(SelectionMap, {}),
   })
@@ -210,7 +210,7 @@ export default types
       get classifications() {
         const textAreas = Array.from(self.annotation.names.values())
           .filter((t) => isDefined(t))
-          .filter((t) => t.type === "textarea" && !t.perregion)
+          .filter((t) => t.type === 'textarea' && !t.perregion)
           .map((t) => t.regions);
 
         return [].concat(...textAreas);
@@ -240,19 +240,19 @@ export default types
             [...self.filteredRegions].sort(isDesc ? (a, b) => b.score - a.score : (a, b) => a.score - b.score),
         };
 
-        const sorted = sorts[self.sort](self.sortOrder === "desc");
+        const sorted = sorts[self.sort](self.sortOrder === 'desc');
 
         return sorted;
       },
 
       getRegionsTree(enrich) {
-        if (self.group === null || self.group === "manual") {
+        if (self.group === null || self.group === 'manual') {
           return self.asTree(enrich);
         }
-        if (self.group === "label") {
+        if (self.group === 'label') {
           return self.asLabelsTree(enrich);
         }
-        if (self.group === "type") {
+        if (self.group === 'type') {
           return self.asTypeTree(enrich);
         }
         console.error(`Grouping by ${self.group} is not implemented`);
@@ -284,7 +284,7 @@ export default types
 
         lookup.forEach((el) => {
           const pid = el.item.parentID;
-          const parent = pid ? lookup.get(pid) ?? lookup.get(pid.replace(/#(.+)/i, "")) : null;
+          const parent = pid ? lookup.get(pid) ?? lookup.get(pid.replace(/#(.+)/i, '')) : null;
 
           if (parent) return parent.children.push(el);
 
@@ -322,7 +322,7 @@ export default types
 
           if (isFF(FF_DEV_2755)) {
             group.hotkey = labelHotKey;
-            group.pos = groupId.slice(0, groupId.indexOf("#"));
+            group.pos = groupId.slice(0, groupId.indexOf('#'));
           }
           group.children.push({
             ...enrich(region, index, false, null, onClick, groupId),
@@ -336,7 +336,7 @@ export default types
               addToLabelGroup(`${label.value}#${label.id}`, label, region);
             }
           } else {
-            addToLabelGroup("no-label", undefined, region);
+            addToLabelGroup('no-label', undefined, region);
           }
         };
 
@@ -370,9 +370,9 @@ export default types
           if (group) return group;
 
           const groupingEntity = {
-            type: "tool",
-            value: key.replace("region", ""),
-            background: "#000",
+            type: 'tool',
+            value: key.replace('region', ''),
+            background: '#000',
           };
 
           return (groups[key] = {
@@ -427,12 +427,12 @@ export default types
   .actions((self) => ({
     addRegion(region) {
       self.regions.push(region);
-      getEnv(self).events.invoke("entityCreate", region);
+      getEnv(self).events.invoke('entityCreate', region);
     },
 
     toggleSortOrder() {
-      if (self.sortOrder === "asc") self.sortOrder = "desc";
-      else self.sortOrder = "asc";
+      if (self.sortOrder === 'asc') self.sortOrder = 'desc';
+      else self.sortOrder = 'asc';
     },
 
     setView(view) {
@@ -446,7 +446,7 @@ export default types
       if (self.sort === sort) {
         self.toggleSortOrder();
       } else {
-        self.sortOrder = "asc";
+        self.sortOrder = 'asc';
         self.sort = sort;
       }
 
@@ -490,7 +490,7 @@ export default types
 
       children && children.forEach((r) => r.setParentID(region.parentID));
 
-      getEnv(self).events.invoke("entityDelete", region);
+      getEnv(self).events.invoke('entityDelete', region);
 
       destroy(region);
       self.initHotkeys();
@@ -510,18 +510,18 @@ export default types
 
     afterCreate() {
       onPatch(self, (patch) => {
-        if ((patch.op === "add" || patch.op === "delete") && patch.path.indexOf("/regions/") !== -1) {
+        if ((patch.op === 'add' || patch.op === 'delete') && patch.path.indexOf('/regions/') !== -1) {
           self.initHotkeys();
         }
       });
       self.view =
         window.localStorage.getItem(localStorageKeys.view) ??
-        (self.annotation.store.settings.displayLabelsByDefault ? "labels" : "regions");
+        (self.annotation.store.settings.displayLabelsByDefault ? 'labels' : 'regions');
     },
 
     // init Alt hotkeys for regions selection
     initHotkeys() {
-      const PREFIX = "alt+shift+";
+      const PREFIX = 'alt+shift+';
 
       hotkeys.unbindAll();
 
@@ -534,7 +534,7 @@ export default types
 
       // this is added just for the reference to show up in the
       // settings page
-      hotkeys.addKey("alt+shift+$n", () => {}, "Select a region");
+      hotkeys.addKey('alt+shift+$n', () => {}, 'Select a region');
     },
 
     /**

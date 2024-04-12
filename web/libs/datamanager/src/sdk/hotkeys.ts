@@ -1,6 +1,6 @@
-import { useHotkeys } from "react-hotkeys-hook";
-import { toStudlyCaps } from "strman";
-import { keymap } from "./keymap";
+import { useHotkeys } from 'react-hotkeys-hook';
+import { toStudlyCaps } from 'strman';
+import { keymap } from './keymap';
 
 export type Hotkey = {
   title: string;
@@ -11,9 +11,9 @@ export type Hotkey = {
 
 const readableShortcut = (shortcut: string) => {
   return shortcut
-    .split("+")
+    .split('+')
     .map((str) => toStudlyCaps(str))
-    .join(" + ");
+    .join(' + ');
 };
 
 export const useShortcut = (
@@ -38,7 +38,7 @@ export const useShortcut = (
     dependencies,
   );
 
-  const title = action.title + (options.showShortcut ? `: [ ${readableShortcut(shortcut)} ]` : "");
+  const title = action.title + (options.showShortcut ? `: [ ${readableShortcut(shortcut)} ]` : '');
 
   return title;
 };

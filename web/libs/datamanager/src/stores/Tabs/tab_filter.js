@@ -1,11 +1,11 @@
-import { flow, getParent, getRoot, types } from "mobx-state-tree";
-import { toStudlyCaps } from "strman";
-import * as CellViews from "../../components/CellViews";
-import * as Filters from "../../components/Filters/types";
-import { allowedFilterOperations } from "../../components/Filters/types/Utility";
-import { debounce } from "../../utils/debounce";
-import { isBlank, isDefined } from "../../utils/utils";
-import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
+import { flow, getParent, getRoot, types } from 'mobx-state-tree';
+import { toStudlyCaps } from 'strman';
+import * as CellViews from '../../components/CellViews';
+import * as Filters from '../../components/Filters/types';
+import { allowedFilterOperations } from '../../components/Filters/types/Utility';
+import { debounce } from '../../utils/debounce';
+import { isBlank, isDefined } from '../../utils/utils';
+import { FilterValueRange, FilterValueType, TabFilterType } from './tab_filter_type';
 
 const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
 
@@ -17,7 +17,7 @@ const getOperatorDefaultValue = (operator) => {
       default:
         return null;
 
-      case "empty":
+      case 'empty':
         return false;
     }
   }
@@ -26,7 +26,7 @@ const getOperatorDefaultValue = (operator) => {
 };
 
 export const TabFilter = types
-  .model("TabFilter", {
+  .model('TabFilter', {
     filter: types.reference(TabFilterType),
     operator: types.maybeNull(Operators),
     value: types.maybeNull(FilterValueType),
@@ -176,7 +176,7 @@ export const TabFilter = types
       self.markSaved();
       getRoot(self)?.unsetSelection();
       self.view?.clearSelection();
-      yield self.view?.save({ interaction: "filter" });
+      yield self.view?.save({ interaction: 'filter' });
       self.saving = false;
     }),
 

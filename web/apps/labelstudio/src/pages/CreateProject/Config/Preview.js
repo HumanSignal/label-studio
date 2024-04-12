@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { Spinner } from "../../../components";
-import { API_CONFIG } from "../../../config/ApiConfig";
-import { useAPI } from "../../../providers/ApiProvider";
-import { useLibrary } from "../../../providers/LibraryProvider";
-import { cn } from "../../../utils/bem";
-import { FF_DEV_3617, isFF } from "../../../utils/feature-flags";
-import "./Config.styl";
-import { EMPTY_CONFIG } from "./Template";
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Spinner } from '../../../components';
+import { API_CONFIG } from '../../../config/ApiConfig';
+import { useAPI } from '../../../providers/ApiProvider';
+import { useLibrary } from '../../../providers/LibraryProvider';
+import { cn } from '../../../utils/bem';
+import { FF_DEV_3617, isFF } from '../../../utils/feature-flags';
+import './Config.styl';
+import { EMPTY_CONFIG } from './Template';
 
-const configClass = cn("configure");
+const configClass = cn('configure');
 
 export const Preview = ({ config, data, error, loading, project }) => {
-  const LabelStudio = useLibrary("lsf");
+  const LabelStudio = useLibrary('lsf');
   const lsf = useRef(null);
   const rootRef = useRef();
   const api = useAPI();
@@ -34,7 +34,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
     const parsedUrl = new URL(url);
 
     // return same url if http(s)
-    if (["http:", "https:"].includes(parsedUrl.protocol)) return url;
+    if (['http:', 'https:'].includes(parsedUrl.protocol)) return url;
 
     const projectId = project.id;
 
@@ -53,15 +53,15 @@ export const Preview = ({ config, data, error, loading, project }) => {
       if (!LabelStudio) return;
       if (!task.data) return;
 
-      console.info("Initializing LSF preview", { config, task });
+      console.info('Initializing LSF preview', { config, task });
 
       try {
         const lsf = new window.LabelStudio(rootRef.current, {
           config,
           task,
-          interfaces: ["side-column", "annotations:comments"],
+          interfaces: ['side-column', 'annotations:comments'],
           // with SharedStore we should use more late event
-          [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](LS) {
+          [isFF(FF_DEV_3617) ? 'onStorageInitialized' : 'onLabelStudioLoad'](LS) {
             LS.settings.bottomSidePanel = true;
 
             const initAnnotation = () => {
@@ -80,7 +80,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
           },
         });
 
-        lsf.on("presignUrlForProject", onPresignUrlForProject);
+        lsf.on('presignUrlForProject', onPresignUrlForProject);
 
         return lsf;
       } catch (err) {
@@ -95,7 +95,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
     const opacity = loading || error ? 0.6 : 1;
     // to avoid rerenders and data loss we do it this way
 
-    document.getElementById("label-studio").style.opacity = opacity;
+    document.getElementById('label-studio').style.opacity = opacity;
   }, [loading, error]);
 
   useEffect(() => {
@@ -105,7 +105,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
     return () => {
       if (lsf.current) {
-        console.info("Destroying LSF");
+        console.info('Destroying LSF');
         // there is can be weird error from LSF, but we can just skip it for now
         try {
           lsf.current.destroy();
@@ -118,7 +118,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
   useEffect(() => {
     if (lsf.current?.store) {
       lsf.current.store.assignConfig(currentConfig);
-      console.log("LSF config updated");
+      console.log('LSF config updated');
     }
   }, [currentConfig]);
 
@@ -135,15 +135,15 @@ export const Preview = ({ config, data, error, loading, project }) => {
       });
 
       store.annotationStore.selectAnnotation(c.id);
-      console.log("LSF task updated");
+      console.log('LSF task updated');
     }
   }, [currentTask]);
 
   return (
-    <div className={configClass.elem("preview")}>
+    <div className={configClass.elem('preview')}>
       <h3>UI Preview</h3>
       {error && (
-        <div className={configClass.elem("preview-error")}>
+        <div className={configClass.elem('preview-error')}>
           <h2>
             {error.detail} {error.id}
           </h2>
@@ -158,8 +158,8 @@ export const Preview = ({ config, data, error, loading, project }) => {
           ))}
         </div>
       )}
-      {!data && loading && <Spinner style={{ width: "100%", height: "50vh" }} />}
-      <div id="label-studio" className={configClass.elem("preview-ui")} ref={rootRef} />
+      {!data && loading && <Spinner style={{ width: '100%', height: '50vh' }} />}
+      <div id='label-studio' className={configClass.elem('preview-ui')} ref={rootRef} />
     </div>
   );
 };

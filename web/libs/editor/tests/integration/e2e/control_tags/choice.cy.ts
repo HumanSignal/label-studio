@@ -1,14 +1,14 @@
-import { FF_DEV_2007 } from "@humansignal/frontend-test/feature-flags";
-import { Choices, LabelStudio, Tooltip } from "@humansignal/frontend-test/helpers/LSF";
+import { FF_DEV_2007 } from '@humansignal/frontend-test/feature-flags';
+import { Choices, LabelStudio, Tooltip } from '@humansignal/frontend-test/helpers/LSF';
 import {
   choicesConfig,
   choicesMultipleSelectionConfig,
   choicesSelectLayoutConfig,
   simpleData,
-} from "../../data/control_tags/choice";
+} from '../../data/control_tags/choice';
 
-describe("Control Tags - Choice", () => {
-  describe("Old version", () => {
+describe('Control Tags - Choice', () => {
+  describe('Old version', () => {
     beforeEach(() => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         [FF_DEV_2007]: false,
@@ -18,43 +18,43 @@ describe("Control Tags - Choice", () => {
     it('should show hint for <Choice /> when choice="single"', () => {
       LabelStudio.params().config(choicesConfig).data(simpleData).withResult([]).init();
 
-      Choices.findChoice("Choice 2").trigger("mouseenter");
-      Tooltip.hasText("A hint for Choice 2");
+      Choices.findChoice('Choice 2').trigger('mouseenter');
+      Tooltip.hasText('A hint for Choice 2');
     });
     it('should show hint for <Choice /> when choice="multiple"', () => {
       LabelStudio.params().config(choicesMultipleSelectionConfig).data(simpleData).withResult([]).init();
 
-      Choices.findChoice("Choice 2").trigger("mouseenter");
-      Tooltip.hasText("A hint for Choice 2");
+      Choices.findChoice('Choice 2').trigger('mouseenter');
+      Tooltip.hasText('A hint for Choice 2');
     });
     it('should show hint for <Choice /> when layout="select"', () => {
       LabelStudio.params().config(choicesSelectLayoutConfig).data(simpleData).withResult([]).init();
 
       Choices.toggleSelect();
-      Choices.findOption("Choice 2").trigger("mouseenter");
-      Tooltip.hasText("A hint for Choice 2");
+      Choices.findOption('Choice 2').trigger('mouseenter');
+      Tooltip.hasText('A hint for Choice 2');
     });
   });
 
-  describe("New version", () => {
+  describe('New version', () => {
     beforeEach(() => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         [FF_DEV_2007]: true,
       });
     });
 
-    it("should show hint for <Choise />", () => {
+    it('should show hint for <Choise />', () => {
       LabelStudio.params().config(choicesConfig).data(simpleData).withResult([]).init();
 
-      Choices.findChoice("Choice 2").trigger("mouseenter");
-      Tooltip.hasText("A hint for Choice 2");
+      Choices.findChoice('Choice 2').trigger('mouseenter');
+      Tooltip.hasText('A hint for Choice 2');
     });
 
-    it("should show hint for <Choise />", () => {
+    it('should show hint for <Choise />', () => {
       LabelStudio.params().config(choicesMultipleSelectionConfig).data(simpleData).withResult([]).init();
 
-      Choices.findChoice("Choice 2").trigger("mouseenter");
-      Tooltip.hasText("A hint for Choice 2");
+      Choices.findChoice('Choice 2').trigger('mouseenter');
+      Tooltip.hasText('A hint for Choice 2');
     });
   });
 });

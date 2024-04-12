@@ -1,6 +1,6 @@
-Feature("Brush relations").tag("@regress");
+Feature('Brush relations').tag('@regress');
 
-const IMAGE = "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg";
+const IMAGE = 'https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg';
 
 const config = `<View>
     <Image name="img" value="$image"></Image>
@@ -32,7 +32,7 @@ Scenario("Brush relations shouldn't crash everything", async ({ I, LabelStudio, 
     data: { image: IMAGE },
   };
 
-  I.amOnPage("/");
+  I.amOnPage('/');
   LabelStudio.init(params);
   AtImageView.waitForImage();
   AtSidebar.seeRegions(0);
@@ -49,21 +49,21 @@ Scenario("Brush relations shouldn't crash everything", async ({ I, LabelStudio, 
     const points = generateSpiralPoints(x, y, Math.min(canvasSize.width / 6, canvasSize.height / 6), 0.4, Math.PI / 18);
 
     // select the brush label
-    I.pressKey("1");
+    I.pressKey('1');
     // draw a brush region
     AtImageView.drawThroughPoints(points);
     AtSidebar.seeRegions(i + 1);
     // unselect the region
-    I.pressKey("u");
+    I.pressKey('u');
     // save the central point
     regionsCentralPoints.push({ x, y });
   }
   // switch to the move tool for easy region selecting
-  I.pressKey("v");
+  I.pressKey('v');
   // select the first region
   AtImageView.clickAt(regionsCentralPoints[0].x, regionsCentralPoints[0].y);
   // create relation to the second region
-  I.pressKey(["alt", "r"]);
+  I.pressKey(['alt', 'r']);
   AtImageView.clickAt(regionsCentralPoints[1].x, regionsCentralPoints[1].y);
   // check that the relation has been created
   AtSidebar.seeRelations(1);
@@ -76,18 +76,18 @@ Scenario("Brush relations shouldn't crash everything", async ({ I, LabelStudio, 
     // reload LS with that datalabel studio logo
     LabelStudio.init({
       ...params,
-      annotations: [{ id: "imported", result: annotation }],
+      annotations: [{ id: 'imported', result: annotation }],
     });
 
     AtImageView.waitForImage();
     // Check that relation still exist
     AtSidebar.seeRelations(1);
     // switch to the move tool for easy region selecting
-    I.pressKey("v");
+    I.pressKey('v');
     // select the third region
     AtImageView.clickAt(regionsCentralPoints[2].x, regionsCentralPoints[2].y);
     // create relation to the fourth region
-    I.pressKey(["alt", "r"]);
+    I.pressKey(['alt', 'r']);
     AtImageView.clickAt(regionsCentralPoints[3].x, regionsCentralPoints[3].y);
     // check that the relation has been created
     AtSidebar.seeRelations(2);

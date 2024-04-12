@@ -1,10 +1,10 @@
-import { debounce } from "lodash";
-import { type FC, type FocusEvent, type MutableRefObject, type RefObject, useCallback, useEffect, useRef } from "react";
-import { cn } from "../../utils/bem";
-import { isMacOS } from "../../utils/utilities";
+import { debounce } from 'lodash';
+import { type FC, type FocusEvent, type MutableRefObject, type RefObject, useCallback, useEffect, useRef } from 'react';
+import { cn } from '../../utils/bem';
+import { isMacOS } from '../../utils/utilities';
 
-import mergeRefs from "../Utils/mergeRefs";
-import "./TextArea.styl";
+import mergeRefs from '../Utils/mergeRefs';
+import './TextArea.styl';
 
 export type TextAreaProps = {
   value?: string | null;
@@ -39,8 +39,8 @@ export const TextArea: FC<TextAreaProps> = ({
 }) => {
   const inlineAction = !!onSubmit;
 
-  const rootClass = cn("textarea");
-  const classList = [rootClass.mod({ inline: inlineAction, autosize: autoSize }), className].join(" ").trim();
+  const rootClass = cn('textarea');
+  const classList = [rootClass.mod({ inline: inlineAction, autosize: autoSize }), className].join(' ').trim();
 
   const autoGrowRef = useRef({
     rows,
@@ -58,10 +58,10 @@ export const TextArea: FC<TextAreaProps> = ({
         if (!textarea || !autoGrowRef.current || !textAreaRef.current) return;
 
         if (autoGrowRef.current.maxHeight === Number.POSITIVE_INFINITY) {
-          textarea.style.height = "auto";
+          textarea.style.height = 'auto';
           const currentValue = textAreaRef.current.value;
 
-          textAreaRef.current.value = "";
+          textAreaRef.current.value = '';
           autoGrowRef.current.lineHeight = textAreaRef.current.scrollHeight / autoGrowRef.current.rows;
           autoGrowRef.current.maxHeight = autoGrowRef.current.lineHeight * autoGrowRef.current.maxRows;
 
@@ -71,11 +71,11 @@ export const TextArea: FC<TextAreaProps> = ({
         let newHeight: number;
 
         if (textarea.scrollHeight > autoGrowRef.current.maxHeight) {
-          textarea.style.overflowY = "scroll";
+          textarea.style.overflowY = 'scroll';
           newHeight = autoGrowRef.current.maxHeight;
         } else {
-          textarea.style.overflowY = "hidden";
-          textarea.style.height = "auto";
+          textarea.style.overflowY = 'hidden';
+          textarea.style.height = 'auto';
           newHeight = textarea.scrollHeight;
         }
         const contentLength = textarea.value.length;
@@ -97,7 +97,7 @@ export const TextArea: FC<TextAreaProps> = ({
 
   if (actionRef) {
     actionRef.current = {
-      update: (text = "") => {
+      update: (text = '') => {
         if (!textAreaRef.current) return;
 
         textAreaRef.current.value = text;
@@ -137,7 +137,7 @@ export const TextArea: FC<TextAreaProps> = ({
 
   useEffect(() => {
     if (textAreaRef.current) {
-      textAreaRef.current.value = value || "";
+      textAreaRef.current.value = value || '';
       resizeTextArea();
     }
   }, [value]);
@@ -147,17 +147,17 @@ export const TextArea: FC<TextAreaProps> = ({
 
     const listener = (event: KeyboardEvent) => {
       if (!textAreaRef.current) return;
-      if (event.key === "Enter" && (event.ctrlKey || (isMacOS() && event.metaKey))) {
+      if (event.key === 'Enter' && (event.ctrlKey || (isMacOS() && event.metaKey))) {
         onSubmit(textAreaRef.current.value);
       }
     };
 
     if (textAreaRef.current) {
-      textAreaRef.current.addEventListener("keydown", listener);
+      textAreaRef.current.addEventListener('keydown', listener);
     }
     return () => {
       if (textAreaRef.current) {
-        textAreaRef.current.removeEventListener("keydown", listener);
+        textAreaRef.current.removeEventListener('keydown', listener);
       }
     };
   }, [onSubmit]);

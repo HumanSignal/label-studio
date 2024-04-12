@@ -1,9 +1,9 @@
-import { types } from "mobx-state-tree";
+import { types } from 'mobx-state-tree';
 
-import Constants from "../../core/Constants";
-import { customTypes } from "../../core/CustomTypes";
-import { guidGenerator } from "../../core/Helpers";
-import Registry from "../../core/Registry";
+import Constants from '../../core/Constants';
+import { customTypes } from '../../core/CustomTypes';
+import { guidGenerator } from '../../core/Helpers';
+import Registry from '../../core/Registry';
 
 /**
  * The `Relation` tag represents a single relation label. Use with the `Relations` tag to specify the value of a label to apply to a relation between regions.
@@ -35,16 +35,16 @@ const TagAttrs = types.model({
 const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
-    type: "relation",
+    type: 'relation',
   })
   .actions(() => ({}));
 
-const RelationModel = types.compose("RelationModel", TagAttrs, Model);
+const RelationModel = types.compose('RelationModel', TagAttrs, Model);
 
 const HtxRelationView = () => {
   return null;
 };
 
-Registry.addTag("relation", RelationModel, HtxRelationView);
+Registry.addTag('relation', RelationModel, HtxRelationView);
 
 export { HtxRelationView, RelationModel };

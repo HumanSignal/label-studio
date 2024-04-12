@@ -1,6 +1,6 @@
-import React from "react";
-import { SentryRoute as Route } from "../config/Sentry";
-import { RouteWithStaticFallback } from "../routes/RouteWithStaticFallback";
+import React from 'react';
+import { SentryRoute as Route } from '../config/Sentry';
+import { RouteWithStaticFallback } from '../routes/RouteWithStaticFallback';
 
 export const RouteContext = React.createContext();
 

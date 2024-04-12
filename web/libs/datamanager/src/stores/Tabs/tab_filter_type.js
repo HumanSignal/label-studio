@@ -1,12 +1,12 @@
-import { getRoot, types } from "mobx-state-tree";
-import { hasProperties } from "../../utils/helpers";
-import { isDefined } from "../../utils/utils";
-import { StringOrNumberID } from "../types";
-import { TabColumn, ViewColumnType } from "./tab_column";
+import { getRoot, types } from 'mobx-state-tree';
+import { hasProperties } from '../../utils/helpers';
+import { isDefined } from '../../utils/utils';
+import { StringOrNumberID } from '../types';
+import { TabColumn, ViewColumnType } from './tab_column';
 
 export const FilterValue = types.union(types.string, types.number, types.boolean);
 
-export const FilterItemValue = types.model("FilterItemValue", {
+export const FilterItemValue = types.model('FilterItemValue', {
   value: FilterValue,
   title: FilterValue,
   color: types.maybeNull(types.string),
@@ -22,7 +22,7 @@ export const FilterItemType = types.union({
 });
 
 export const FilterValueList = types
-  .model("FilterValueList", {
+  .model('FilterValueList', {
     items: types.array(FilterItemType),
   })
   .views((self) => ({
@@ -32,7 +32,7 @@ export const FilterValueList = types
   }));
 
 export const FilterValueRange = types
-  .model("FilterValueRange", {
+  .model('FilterValueRange', {
     min: types.maybeNull(FilterValue),
     max: types.maybeNull(FilterValue),
   })
@@ -47,10 +47,10 @@ export const FilterValueType = types.union({
     if (!isDefined(sn)) return FilterValue;
     if (sn.$treenode) return sn.$treenode.type;
 
-    if (hasProperties(sn, ["items"])) {
+    if (hasProperties(sn, ['items'])) {
       return FilterValueList;
     }
-    if (hasProperties(sn, ["min", "max"])) {
+    if (hasProperties(sn, ['min', 'max'])) {
       return FilterValueRange;
     }
     if (Array.isArray(sn)) {
@@ -73,7 +73,7 @@ export const FilterSchema = types.union({
 });
 
 export const TabFilterType = types
-  .model("TabFilterType", {
+  .model('TabFilterType', {
     id: StringOrNumberID,
     field: types.reference(TabColumn),
     type: ViewColumnType,
@@ -82,7 +82,7 @@ export const TabFilterType = types
   .views((self) => ({
     get defaultValue() {
       switch (self.type) {
-        case "Boolean":
+        case 'Boolean':
           return false;
         default:
           return undefined;

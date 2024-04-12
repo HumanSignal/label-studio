@@ -1,18 +1,18 @@
-import chroma from "chroma-js";
-import { observer } from "mobx-react";
-import { flow, types } from "mobx-state-tree";
-import React from "react";
+import chroma from 'chroma-js';
+import { observer } from 'mobx-react';
+import { flow, types } from 'mobx-state-tree';
+import React from 'react';
 
-import { IconMagicWandTool } from "../assets/icons";
-import { Tool } from "../components/Toolbar/Tool";
-import { defaultStyle } from "../core/Constants";
-import { guidGenerator } from "../core/Helpers";
-import { DrawingTool } from "../mixins/DrawingTool";
-import ToolMixin from "../mixins/Tool";
-import Canvas from "../utils/canvas";
-import { getActualZoomingPosition, getTransformedImageData } from "../utils/image";
-import { drawMask } from "../utils/magic-wand";
-import BaseTool from "./Base";
+import { IconMagicWandTool } from '../assets/icons';
+import { Tool } from '../components/Toolbar/Tool';
+import { defaultStyle } from '../core/Constants';
+import { guidGenerator } from '../core/Helpers';
+import { DrawingTool } from '../mixins/DrawingTool';
+import ToolMixin from '../mixins/Tool';
+import Canvas from '../utils/canvas';
+import { getActualZoomingPosition, getTransformedImageData } from '../utils/image';
+import { drawMask } from '../utils/magic-wand';
+import BaseTool from './Base';
 
 /**
  * Technical Overview:
@@ -69,9 +69,9 @@ import BaseTool from "./Base";
 const ToolView = observer(({ item }) => {
   return (
     <Tool
-      label="Magic Wand"
-      ariaLabel="magicwand"
-      shortcut="W"
+      label='Magic Wand'
+      ariaLabel='magicwand'
+      shortcut='W'
       active={item.selected}
       icon={item.iconClass}
       tool={item}
@@ -85,9 +85,9 @@ const ToolView = observer(({ item }) => {
 });
 
 const _Tool = types
-  .model("MagicWandTool", {
-    group: "segmentation",
-    shortcut: "W",
+  .model('MagicWandTool', {
+    group: 'segmentation',
+    shortcut: 'W',
     smart: true,
     unselectRegionOnToolChange: false,
   })
@@ -140,8 +140,8 @@ const _Tool = types
 
     get tagTypes() {
       return {
-        stateTypes: "brushlabels",
-        controlTagTypes: ["brushlabels", "magicwand"],
+        stateTypes: 'brushlabels',
+        controlTagTypes: ['brushlabels', 'magicwand'],
       };
     },
 
@@ -164,7 +164,7 @@ const _Tool = types
 
       if (!states.length) return color;
 
-      const selectedEntry = states.find((entry) => typeof entry.selectedColor !== "undefined");
+      const selectedEntry = states.find((entry) => typeof entry.selectedColor !== 'undefined');
 
       color = selectedEntry ? selectedEntry.selectedColor : defaultColor;
       return chroma(color).hex();
@@ -220,7 +220,7 @@ const _Tool = types
 
       // Start magic wand thresholding.
       self.annotation.history.freeze();
-      self.mode = "drawing";
+      self.mode = 'drawing';
       self.currentThreshold = self.defaultthreshold;
       self.currentRegion = null;
 
@@ -240,15 +240,15 @@ const _Tool = types
       self.rotation = image.rotation;
 
       if (self.rotation || image.crosshair) {
-        self.mode = "viewing";
+        self.mode = 'viewing';
         self.annotation.history.unfreeze();
 
         let msg;
 
         if (self.rotation) {
-          msg = "The Magic Wand is not supported on rotated images";
+          msg = 'The Magic Wand is not supported on rotated images';
         } else {
-          msg = "The Magic Wand is not supported if the crosshair is turned on";
+          msg = 'The Magic Wand is not supported if the crosshair is turned on';
         }
 
         alert(msg);
@@ -258,7 +258,7 @@ const _Tool = types
       // Listen for the escape key to quit the Magic Wand; get the event
       // before others, allowing it to bubble upwards (useCapture: true),
       // as otherwise the escape key gets eaten by other keyboard listeners.
-      window.addEventListener("keydown", self.keydownEv, true /* useCapture */);
+      window.addEventListener('keydown', self.keydownEv, true /* useCapture */);
 
       [self.anchorImgX, self.anchorImgY, self.anchorScreenX, self.anchorScreenY] = self.getEventCoords(ev);
       self.initCache();
@@ -268,7 +268,7 @@ const _Tool = types
 
     mousemoveEv(ev) {
       // If we are in magic wand mode, change the threshold based on the mouse movement.
-      if (self.mode !== "drawing") return;
+      if (self.mode !== 'drawing') return;
 
       const [_newImgX, _newImgY, newScreenX, newScreenY] = self.getEventCoords(ev);
 
@@ -281,11 +281,11 @@ const _Tool = types
       // condition instead of using clickEv.
 
       // Were we cancelled mid-way while using the Magic Wand?
-      if (self.mode === "viewing") return;
+      if (self.mode === 'viewing') return;
 
       // Finish magic wand thresholding.
-      self.mode = "viewing";
-      window.removeEventListener("keydown", self.keydownEv, true /* useCapture */);
+      self.mode = 'viewing';
+      window.removeEventListener('keydown', self.keydownEv, true /* useCapture */);
 
       yield self.setupFinalMask();
     }),
@@ -293,13 +293,13 @@ const _Tool = types
     keydownEv(e) {
       const { key } = e;
 
-      if (key === "Escape") {
+      if (key === 'Escape') {
         // Eat the escape key event.
         e.preventDefault();
         e.stopPropagation();
 
-        self.mode = "viewing";
-        window.removeEventListener("keydown", self.keydownEv, true /* useCapture */);
+        self.mode = 'viewing';
+        window.removeEventListener('keydown', self.keydownEv, true /* useCapture */);
         self.overlayCtx.clearRect(0, 0, self.overlay.width, self.overlay.height);
       }
     },
@@ -332,7 +332,7 @@ const _Tool = types
       self.isFirstWand = self.existingRegion === null || self.existingRegion.id !== self.cachedRegionId;
 
       if (self.isFirstWand) {
-        self.cachedNaturalCanvas = document.createElement("canvas");
+        self.cachedNaturalCanvas = document.createElement('canvas');
         self.cachedNaturalCanvas.width = self.naturalWidth;
         self.cachedNaturalCanvas.height = self.naturalHeight;
         self.cachedLabel = self.selectedLabel;
@@ -354,7 +354,7 @@ const _Tool = types
       // some of the black magic mobx-state-tree uses to version data and things get very slow as
       // alot of state is captured. Instead, just invalidate the cache, which will cause a new region
       // to be created rather than stacking with the earlier, older region.
-      self.cachedNaturalCanvas = document.createElement("canvas");
+      self.cachedNaturalCanvas = document.createElement('canvas');
       self.cachedNaturalCanvas.width = self.naturalWidth;
       self.cachedNaturalCanvas.height = self.naturalHeight;
       self.isFirstWand = true;
@@ -393,10 +393,10 @@ const _Tool = types
       self.overlay = image.overlayRef;
       self.overlayOrigStyle = self.overlay.style;
 
-      self.overlay.style = "";
+      self.overlay.style = '';
       self.overlay.width = self.transformedCanvas.width;
       self.overlay.height = self.transformedCanvas.height;
-      self.overlayCtx = self.overlay.getContext("2d");
+      self.overlayCtx = self.overlay.getContext('2d');
 
       // Now draw an initial Magic Wand with default threshold and anchored at the
       // location given.
@@ -494,11 +494,11 @@ const _Tool = types
         canvasHeight = self.viewportHeight;
       }
 
-      const scaledDataURL = Canvas.mask2DataURL(singleChannelMask.data, canvasWidth, canvasHeight, "#FFFFFF");
+      const scaledDataURL = Canvas.mask2DataURL(singleChannelMask.data, canvasWidth, canvasHeight, '#FFFFFF');
 
       // Get the mask onto a canvas surface we can work with, to blit and upscale/downscale
       // the final results.
-      const blitImg = document.createElement("img");
+      const blitImg = document.createElement('img');
 
       blitImg.src = scaledDataURL;
       yield blitImg.decode();
@@ -519,7 +519,7 @@ const _Tool = types
      *  ready for us to get pixels from.
      */
     copyTransformedMaskToNaturalSize(blitImg) {
-      const naturalCtx = self.cachedNaturalCanvas.getContext("2d");
+      const naturalCtx = self.cachedNaturalCanvas.getContext('2d');
 
       // Get the dimensions of what we are showing in the browser, but transform them into coordinates
       // relative to the full, natural size of the image. Useful so that we can ultimately transform
@@ -593,7 +593,7 @@ const _Tool = types
     commitDrawingRegion(maskDataURL) {
       const value = {
         maskDataURL,
-        coordstype: "px",
+        coordstype: 'px',
         dynamic: false,
       };
       const newRegion = self.annotation.createResult(

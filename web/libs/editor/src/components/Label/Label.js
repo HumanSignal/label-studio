@@ -1,9 +1,9 @@
-import chroma from "chroma-js";
-import React, { useMemo } from "react";
-import { Block, Elem } from "../../utils/bem";
-import { asVars } from "../../utils/styles";
+import chroma from 'chroma-js';
+import React, { useMemo } from 'react';
+import { Block, Elem } from '../../utils/bem';
+import { asVars } from '../../utils/styles';
 
-import "./Label.styl";
+import './Label.styl';
 
 export const Label = React.forwardRef(
   (
@@ -37,20 +37,20 @@ export const Label = React.forwardRef(
 
     return (
       <Block
-        tag="span"
+        tag='span'
         ref={ref}
-        name="label"
+        name='label'
         mod={{ empty, hidden, selected, clickable: !!onClick, margins }}
         mix={className}
         style={styles}
         onClick={onClick}
         {...rest}
       >
-        <Elem tag="span" name="text">
+        <Elem tag='span' name='text'>
           {children}
         </Elem>
         {hotkey ? (
-          <Elem tag="span" name="hotkey">
+          <Elem tag='span' name='hotkey'>
             {hotkey}
           </Elem>
         ) : null}

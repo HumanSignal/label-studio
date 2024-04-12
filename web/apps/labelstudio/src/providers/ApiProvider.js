@@ -1,24 +1,24 @@
-import { createContext, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { ErrorWrapper } from "../components/Error/Error";
-import { modal } from "../components/Modal/Modal";
-import { API_CONFIG } from "../config/ApiConfig";
-import { APIProxy } from "../utils/api-proxy";
-import { absoluteURL } from "../utils/helpers";
+import { createContext, forwardRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { ErrorWrapper } from '../components/Error/Error';
+import { modal } from '../components/Modal/Modal';
+import { API_CONFIG } from '../config/ApiConfig';
+import { APIProxy } from '../utils/api-proxy';
+import { absoluteURL } from '../utils/helpers';
 
 const API = new APIProxy(API_CONFIG);
 
 export const ApiContext = createContext();
-ApiContext.displayName = "ApiContext";
+ApiContext.displayName = 'ApiContext';
 
 let apiLocked = false;
 
 const errorFormatter = (result) => {
   const { response } = result;
-  const isShutdown = String(response?.detail ?? result?.error) === "Failed to fetch";
+  const isShutdown = String(response?.detail ?? result?.error) === 'Failed to fetch';
 
   return {
     isShutdown,
-    title: result.error ? "Runtime error" : "Server error",
+    title: result.error ? 'Runtime error' : 'Server error',
     message: response?.detail ?? result?.error,
     stacktrace: response?.exc_info ?? null,
     version: response?.version,
@@ -34,7 +34,7 @@ const handleError = async (response, showModal = true) => {
   }
 
   if (response.status === 401) {
-    location.href = absoluteURL("/");
+    location.href = absoluteURL('/');
     return;
   }
 
@@ -46,8 +46,8 @@ const handleError = async (response, showModal = true) => {
       body: isShutdown ? (
         <ErrorWrapper
           possum={false}
-          title={"Connection refused"}
-          message={"Server not responding. Is it still running?"}
+          title={'Connection refused'}
+          message={'Server not responding. Is it still running?'}
         />
       ) : (
         <ErrorWrapper {...formattedError} />
@@ -72,7 +72,7 @@ export const ApiProvider = forwardRef(({ children }, ref) => {
 
     if (result.status === 401) {
       apiLocked = true;
-      location.href = absoluteURL("/");
+      location.href = absoluteURL('/');
       return;
     }
 

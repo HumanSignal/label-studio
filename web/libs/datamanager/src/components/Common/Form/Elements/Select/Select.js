@@ -1,8 +1,8 @@
-import { cn } from "../../../../../utils/bem";
-import { FormField } from "../../FormField";
-import { useValueTracker } from "../../Utils";
-import { default as Label } from "../Label/Label";
-import "./Select.styl";
+import { cn } from '../../../../../utils/bem';
+import { FormField } from '../../FormField';
+import { useValueTracker } from '../../Utils';
+import { default as Label } from '../Label/Label';
+import './Select.styl';
 
 const Select = ({
   label,
@@ -13,11 +13,11 @@ const Select = ({
   skip,
   labelProps,
   ghost,
-  size = "medium",
+  size = 'medium',
   defaultValue,
   ...props
 }) => {
-  const rootClass = cn("form-select");
+  const rootClass = cn('form-select');
   const [value, setValue] = useValueTracker(props.value, defaultValue);
 
   const classList = rootClass.mod({ ghost, size }).mix(className);
@@ -44,10 +44,10 @@ const Select = ({
               onChange={(e) => {
                 setValue(e.target.value), props.onChange?.(e);
               }}
-              className={rootClass.elem("list")}
+              className={rootClass.elem('list')}
             >
               {props.placeholder && (!props.defaulValue || !props.value) && (
-                <option value="" disabled hidden>
+                <option value='' disabled hidden>
                   {props.placeholder}
                 </option>
               )}

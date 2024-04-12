@@ -1,22 +1,22 @@
-import { observer } from "mobx-react";
-import { getParentOfType, types } from "mobx-state-tree";
-import React from "react";
+import { observer } from 'mobx-react';
+import { getParentOfType, types } from 'mobx-state-tree';
+import React from 'react';
 
-import { guidGenerator } from "../core/Helpers";
-import Registry from "../core/Registry";
-import NormalizationMixin from "../mixins/Normalization";
-import RegionsMixin from "../mixins/Regions";
-import { TextAreaModel } from "../tags/control/TextArea/TextArea";
+import { guidGenerator } from '../core/Helpers';
+import Registry from '../core/Registry';
+import NormalizationMixin from '../mixins/Normalization';
+import RegionsMixin from '../mixins/Regions';
+import { TextAreaModel } from '../tags/control/TextArea/TextArea';
 
-import { HtxTextBox } from "../components/HtxTextBox/HtxTextBox";
-import { FF_DEV_1566, FF_LSDV_4712, isFF } from "../utils/feature-flags";
-import styles from "./TextAreaRegion/TextAreaRegion.module.scss";
+import { HtxTextBox } from '../components/HtxTextBox/HtxTextBox';
+import { FF_DEV_1566, FF_LSDV_4712, isFF } from '../utils/feature-flags';
+import styles from './TextAreaRegion/TextAreaRegion.module.scss';
 
 const Model = types
-  .model("TextAreaRegionModel", {
+  .model('TextAreaRegionModel', {
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
-    type: "textarearegion",
+    type: 'textarearegion',
 
     _value: types.string,
     // states: types.array(types.union(ChoicesModel)),
@@ -59,7 +59,7 @@ const Model = types
     },
   }));
 
-const TextAreaRegionModel = types.compose("TextAreaRegionModel", RegionsMixin, NormalizationMixin, Model);
+const TextAreaRegionModel = types.compose('TextAreaRegionModel', RegionsMixin, NormalizationMixin, Model);
 
 const HtxTextAreaRegionView = ({ item, onFocus }) => {
   const classes = [styles.mark];
@@ -109,17 +109,17 @@ const HtxTextAreaRegionView = ({ item, onFocus }) => {
     };
   }
 
-  const name = `${parent?.name ?? ""}:${item.id}`;
+  const name = `${parent?.name ?? ''}:${item.id}`;
 
   return (
-    <div {...divAttrs} className={styles.row} data-testid="textarea-region">
+    <div {...divAttrs} className={styles.row} data-testid='textarea-region'>
       <HtxTextBox
         isEditable={editable}
         isDeleteable={deleteable}
         onlyEdit={parent.transcription}
         id={`TextAreaRegion-${item.id}`}
         name={name}
-        className={classes.join(" ")}
+        className={classes.join(' ')}
         rows={parent.rows}
         text={item._value}
         {...params}
@@ -131,6 +131,6 @@ const HtxTextAreaRegionView = ({ item, onFocus }) => {
 
 const HtxTextAreaRegion = observer(HtxTextAreaRegionView);
 
-Registry.addTag("textarearegion", TextAreaRegionModel, HtxTextAreaRegion);
+Registry.addTag('textarearegion', TextAreaRegionModel, HtxTextAreaRegion);
 
 export { TextAreaRegionModel, HtxTextAreaRegion };

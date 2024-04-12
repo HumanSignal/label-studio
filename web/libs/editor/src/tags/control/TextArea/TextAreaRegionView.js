@@ -1,19 +1,19 @@
-import { observer } from "mobx-react";
-import { isAlive } from "mobx-state-tree";
-import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { observer } from 'mobx-react';
+import { isAlive } from 'mobx-state-tree';
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import Button from "antd/lib/button/index";
-import Form from "antd/lib/form/index";
-import Input from "antd/lib/input/index";
+import Button from 'antd/lib/button/index';
+import Form from 'antd/lib/form/index';
+import Input from 'antd/lib/input/index';
 
-import { IconTrash } from "../../../assets/icons";
-import styles from "../../../components/HtxTextBox/HtxTextBox.module.scss";
-import Registry from "../../../core/Registry";
-import { PER_REGION_MODES } from "../../../mixins/PerRegion";
-import { Block, Elem } from "../../../utils/bem";
-import { FF_LSDV_4712, isFF } from "../../../utils/feature-flags";
+import { IconTrash } from '../../../assets/icons';
+import styles from '../../../components/HtxTextBox/HtxTextBox.module.scss';
+import Registry from '../../../core/Registry';
+import { PER_REGION_MODES } from '../../../mixins/PerRegion';
+import { Block, Elem } from '../../../utils/bem';
+import { FF_LSDV_4712, isFF } from '../../../utils/feature-flags';
 
-import "./TextArea.styl";
+import './TextArea.styl';
 
 const { TextArea } = Input;
 
@@ -21,7 +21,7 @@ const HtxTextAreaResultLine = forwardRef(
   ({ idx, value, readOnly, onChange, onDelete, onFocus, validate, control, collapsed }, ref) => {
     const rows = Number.parseInt(control.rows);
     const isTextarea = rows > 1;
-    const [stateValue, setStateValue] = useState(value ?? "");
+    const [stateValue, setStateValue] = useState(value ?? '');
 
     if (isFF(FF_LSDV_4712)) {
       useEffect(() => {
@@ -33,7 +33,7 @@ const HtxTextAreaResultLine = forwardRef(
 
     const displayValue = useMemo(() => {
       if (collapsed) {
-        return (value ?? "").split(/\n/)[0] ?? "";
+        return (value ?? '').split(/\n/)[0] ?? '';
       }
 
       return isFF(FF_LSDV_4712) ? stateValue : value;
@@ -75,7 +75,7 @@ const HtxTextAreaResultLine = forwardRef(
 
     if (isFF(FF_LSDV_4712) || isTextarea) {
       inputProps.onKeyDown = (e) => {
-        if ((e.key === "Enter" && !e.shiftKey) || e.key === "Escape") {
+        if ((e.key === 'Enter' && !e.shiftKey) || e.key === 'Escape') {
           e.preventDefault();
           e.stopPropagation();
           e.target?.blur?.();
@@ -84,16 +84,16 @@ const HtxTextAreaResultLine = forwardRef(
     }
 
     return (
-      <Elem name="item">
-        <Elem name="input" tag={isTextarea ? TextArea : Input} {...inputProps} ref={ref} />
+      <Elem name='item'>
+        <Elem name='input' tag={isTextarea ? TextArea : Input} {...inputProps} ref={ref} />
         {!collapsed && !readOnly && (
           <Elem
-            name="action"
-            aria-label="Delete Region"
+            name='action'
+            aria-label='Delete Region'
             tag={Button}
             icon={<IconTrash />}
-            size="small"
-            type="text"
+            size='small'
+            type='text'
             onClick={() => {
               onDelete(idx);
             }}
@@ -154,7 +154,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
   const isTextArea = rows > 1;
   const isActive = item.perRegionArea === area;
   const shouldFocus = area.isCompleted && area.perRegionFocusTarget === item && area.perRegionFocusRequest;
-  const value = isActive ? item._value : "";
+  const value = isActive ? item._value : '';
   const result = area.results.find((r) => r.from_name === item);
 
   const expand = useCallback(() => {
@@ -170,10 +170,10 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
   const submitValue = useCallback(() => {
     if (result) {
       item.addTextToResult(item._value, result);
-      item.setValue("");
+      item.setValue('');
     } else {
       item.addText(item._value);
-      item.setValue("");
+      item.setValue('');
     }
   }, [item, result]);
 
@@ -183,14 +183,14 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
   const styles = useMemo(() => {
     return color
       ? {
-          "--border-color": color,
+          '--border-color': color,
         }
       : {};
   }, [color]);
 
   useEffect(() => {
     if (isActive && shouldFocus && lastFocusRequest.current < area.perRegionFocusRequest) {
-      (mainInputRef.current || firstResultInputRef.current)?.focus({ cursor: "end" });
+      (mainInputRef.current || firstResultInputRef.current)?.focus({ cursor: 'end' });
       lastFocusRequest.current = area.perRegionFocusRequest;
     }
   }, [isActive, shouldFocus]);
@@ -205,7 +205,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
     ref: mainInputRef,
     value,
     rows: item.rows,
-    className: "is-search",
+    className: 'is-search',
     label: item.label,
     placeholder: item.placeholder,
     autoSize: isTextArea ? { minRows: 1 } : null,
@@ -228,7 +228,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
   if (isTextArea) {
     // allow to add multiline text with shift+enter
     props.onKeyDown = (e) => {
-      if (((e.key === "Enter" && !e.shiftKey) || e.key === "Escape") && !item.annotation.isReadOnly()) {
+      if (((e.key === 'Enter' && !e.shiftKey) || e.key === 'Escape') && !item.annotation.isReadOnly()) {
         e.preventDefault();
         e.stopPropagation();
         if (item.allowsubmit && item._value) {
@@ -257,7 +257,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
 
   return (
     (result || showSubmit) && (
-      <Block name="textarea-tag" mod={{ mode: item.mode, outliner }} style={styles}>
+      <Block name='textarea-tag' mod={{ mode: item.mode, outliner }} style={styles}>
         {result ? (
           <HtxTextAreaResult
             control={item}
@@ -270,7 +270,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
 
         {showSubmit && (
           <Elem
-            name="form"
+            name='form'
             tag={Form}
             onFinish={() => {
               if (item.allowsubmit && item._value && !item.annotation.isReadOnly()) {
@@ -283,7 +283,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
             }}
           >
             <Elem
-              name="input"
+              name='input'
               tag={isTextArea ? TextArea : Input}
               {...props}
               onClick={(e) => {
@@ -297,4 +297,4 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
   );
 });
 
-Registry.addPerRegionView("textarea", PER_REGION_MODES.REGION_LIST, HtxTextAreaRegionView);
+Registry.addPerRegionView('textarea', PER_REGION_MODES.REGION_LIST, HtxTextAreaRegionView);

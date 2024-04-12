@@ -1,31 +1,31 @@
-import { expect } from "chai";
+import { expect } from 'chai';
 
 type LSParams = Record<string, any>;
 
 class LSParamsBuilder {
   params: LSParams = {
-    config: "<View></View>",
+    config: '<View></View>',
     interfaces: [
-      "panel",
-      "update",
-      "submit",
-      "skip",
-      "controls",
-      "infobar",
-      "topbar",
-      "instruction",
-      "side-column",
-      "ground-truth",
-      "annotations:tabs",
-      "annotations:menu",
-      "annotations:current",
-      "annotations:add-new",
-      "annotations:delete",
-      "annotations:view-all",
-      "predictions:tabs",
-      "predictions:menu",
-      "auto-annotation",
-      "edit-history",
+      'panel',
+      'update',
+      'submit',
+      'skip',
+      'controls',
+      'infobar',
+      'topbar',
+      'instruction',
+      'side-column',
+      'ground-truth',
+      'annotations:tabs',
+      'annotations:menu',
+      'annotations:current',
+      'annotations:add-new',
+      'annotations:delete',
+      'annotations:view-all',
+      'predictions:tabs',
+      'predictions:menu',
+      'auto-annotation',
+      'edit-history',
     ],
     task: {
       id: 1,
@@ -131,43 +131,43 @@ export const LabelStudio = {
    * Initializes LabelStudio intance with given configuration
    */
   init(params: LSParams) {
-    cy.log("Initialize LSF");
+    cy.log('Initialize LSF');
     const windowLoadCallback = (win: Cypress.AUTWindow) => {
       win.DEFAULT_LSF_INIT = false;
       win.LSF_CONFIG = {
         interfaces: [
-          "panel",
-          "update",
-          "submit",
-          "skip",
-          "controls",
-          "infobar",
-          "topbar",
-          "instruction",
-          "side-column",
-          "ground-truth",
-          "annotations:tabs",
-          "annotations:menu",
-          "annotations:current",
-          "annotations:add-new",
-          "annotations:delete",
-          "annotations:view-all",
-          "predictions:tabs",
-          "predictions:menu",
-          "auto-annotation",
-          "edit-history",
+          'panel',
+          'update',
+          'submit',
+          'skip',
+          'controls',
+          'infobar',
+          'topbar',
+          'instruction',
+          'side-column',
+          'ground-truth',
+          'annotations:tabs',
+          'annotations:menu',
+          'annotations:current',
+          'annotations:add-new',
+          'annotations:delete',
+          'annotations:view-all',
+          'predictions:tabs',
+          'predictions:menu',
+          'auto-annotation',
+          'edit-history',
         ],
         ...params,
       };
 
-      Cypress.off("window:before:load", windowLoadCallback);
+      Cypress.off('window:before:load', windowLoadCallback);
     };
 
-    Cypress.on("window:before:load", windowLoadCallback);
+    Cypress.on('window:before:load', windowLoadCallback);
 
-    cy.visit("/").then((win) => {
-      cy.log(`Default feature flags set ${JSON.stringify(win.APP_SETTINGS.feature_flags, null, "  ")}`);
-      const labelStudio = new win.LabelStudio("label-studio", win.LSF_CONFIG);
+    cy.visit('/').then((win) => {
+      cy.log(`Default feature flags set ${JSON.stringify(win.APP_SETTINGS.feature_flags, null, '  ')}`);
+      const labelStudio = new win.LabelStudio('label-studio', win.LSF_CONFIG);
 
       if (win.LSF_CONFIG.eventListeners) {
         for (const [event, listener] of Object.entries(win.LSF_CONFIG.eventListeners)) {
@@ -175,8 +175,8 @@ export const LabelStudio = {
         }
       }
       expect(win.LabelStudio.instances.size).to.be.equal(1);
-      cy.get(".lsf-editor").should("be.visible");
-      cy.log("Label Studio initialized");
+      cy.get('.lsf-editor').should('be.visible');
+      cy.log('Label Studio initialized');
     });
   },
 
@@ -219,7 +219,7 @@ export const LabelStudio = {
    * Set feature flags on navigation
    */
   setFeatureFlagsOnPageLoad(flags: Record<string, boolean>) {
-    Cypress.on("window:before:load", (win) => {
+    Cypress.on('window:before:load', (win) => {
       win.FEATURE_FLAGS = flags;
     });
   },
@@ -228,7 +228,7 @@ export const LabelStudio = {
    * Add new settings to previously set feature flags on navigation
    */
   addFeatureFlagsOnPageLoad(flags: Record<string, boolean>) {
-    Cypress.on("window:before:load", (win) => {
+    Cypress.on('window:before:load', (win) => {
       win.FEATURE_FLAGS = {
         ...(win.FEATURE_FLAGS || {}),
         ...flags,
@@ -240,7 +240,7 @@ export const LabelStudio = {
    * Toggle feature flags on and off
    */
   setFeatureFlags(flags: Record<string, boolean>) {
-    cy.log("Setting feature flags");
+    cy.log('Setting feature flags');
     cy.window().then((win) => {
       win.APP_SETTINGS = win.APP_SETTINGS ?? {};
       win.APP_SETTINGS.feature_flags = {

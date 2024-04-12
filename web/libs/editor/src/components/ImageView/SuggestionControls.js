@@ -1,11 +1,11 @@
-import chroma from "chroma-js";
-import Konva from "konva";
-import { observer } from "mobx-react";
-import { useCallback, useEffect, useState } from "react";
-import { Circle, Group, Image, Layer, Rect } from "react-konva";
-import IconCheck from "../../assets/icons/png/check.png";
-import IconCross from "../../assets/icons/png/cross.png";
-import { isDefined } from "../../utils/utilities";
+import chroma from 'chroma-js';
+import Konva from 'konva';
+import { observer } from 'mobx-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Circle, Group, Image, Layer, Rect } from 'react-konva';
+import IconCheck from '../../assets/icons/png/check.png';
+import IconCross from '../../assets/icons/png/cross.png';
+import { isDefined } from '../../utils/utilities';
 
 const getItemPosition = (item) => {
   const { shapeRef: shape, bboxCoordsCanvas: bbox } = item;
@@ -71,18 +71,18 @@ export const SuggestionControls = observer(({ item, useLayer }) => {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <Rect x={0} y={0} width={64} height={32} fill="#000" cornerRadius={16} />
+        <Rect x={0} y={0} width={64} height={32} fill='#000' cornerRadius={16} />
         <ControlButton
           onClick={() => item.annotation.rejectSuggestion(item.id)}
-          fill="#DD0000"
-          iconColor="#fff"
+          fill='#DD0000'
+          iconColor='#fff'
           icon={IconCross}
         />
         <ControlButton
           x={32}
           onClick={() => item.annotation.acceptSuggestion(item.id)}
-          fill="#98C84E"
-          iconColor="#fff"
+          fill='#98C84E'
+          iconColor='#fff'
           icon={IconCheck}
         />
       </Group>
@@ -103,7 +103,7 @@ const ControlButton = ({ x = 0, fill, iconColor, onClick, icon }) => {
   const [img, setImg] = useState(new window.Image());
   const imageSize = 16;
   const imageOffset = 32 / 2 - imageSize / 2;
-  const color = chroma(iconColor ?? "#fff");
+  const color = chroma(iconColor ?? '#fff');
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
@@ -146,7 +146,7 @@ const ControlButton = ({ x = 0, fill, iconColor, onClick, icon }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <Circle x={16} y={16} radius={14} opacity={hovered ? 1 : 0.2} fill={hovered ? fill : "#fff"} />
+      <Circle x={16} y={16} radius={14} opacity={hovered ? 1 : 0.2} fill={hovered ? fill : '#fff'} />
       <Image
         ref={(node) => applyFilter(node)}
         x={imageOffset}

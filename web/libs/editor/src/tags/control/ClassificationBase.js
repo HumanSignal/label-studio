@@ -1,5 +1,5 @@
-import { types } from "mobx-state-tree";
-import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
+import { types } from 'mobx-state-tree';
+import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
 
 /**
  * This is a mixin for a control-tag that is a base of creating classification-like tags.
@@ -8,16 +8,16 @@ import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
  * @see PerItemMixin which allows to apply a created result to just one object-item provide by object-tag (@see MultiItemsMixin)
  * */
 const ClassificationBase = types
-  .model("ClassificationBase", {
+  .model('ClassificationBase', {
     isClassificationTag: true,
   })
   .extend((self) => {
     /* Validation */
     if (self.isControlTag !== true) {
-      throw new Error("The ClassificationBase mixin should be used only for ControlTags");
+      throw new Error('The ClassificationBase mixin should be used only for ControlTags');
     }
 
-    const REQUIRED_PROPERTIES = ["toname"];
+    const REQUIRED_PROPERTIES = ['toname'];
     const notDefinedProperties = REQUIRED_PROPERTIES.filter(
       (name) => !self.$treenode.type.propertyNames.includes(name),
     );
@@ -32,7 +32,7 @@ const ClassificationBase = types
   .views((self) => {
     return {
       selectedValues() {
-        throw new Error("ClassificationBase mixin model needs to implement selectedValues method in views");
+        throw new Error('ClassificationBase mixin model needs to implement selectedValues method in views');
       },
 
       get result() {

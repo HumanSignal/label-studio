@@ -1,16 +1,16 @@
-import { types } from "mobx-state-tree";
+import { types } from 'mobx-state-tree';
 
 const Region = types.model({
   name: types.string,
 });
 
 export const ImageRegion = types.compose(
-  "Image",
+  'Image',
   Region,
   types
     .model({
       id: types.identifier,
-      type: types.literal("image"),
+      type: types.literal('image'),
     })
     .actions(() => ({
       draw() {
@@ -20,12 +20,12 @@ export const ImageRegion = types.compose(
 );
 
 export const TextRegion = types.compose(
-  "Text",
+  'Text',
   Region,
   types
     .model({
       id: types.identifier,
-      type: types.literal("text"),
+      type: types.literal('text'),
     })
     .actions(() => ({
       select() {
@@ -44,7 +44,7 @@ export const TextRegion = types.compose(
 //   type: types.literal(""),
 // });
 
-const TestRaw = types.model("TestRaw", {
+const TestRaw = types.model('TestRaw', {
   regions: types.array(types.union(ImageRegion, TextRegion)),
   // inheritance: types.array(Region), // wrong :(
   meta: types.number,
@@ -57,6 +57,6 @@ const TestMeta = types.model({
   }),
 });
 
-const Test = types.compose("Test", TestRaw, TestMeta);
+const Test = types.compose('Test', TestRaw, TestMeta);
 
 export default Test;

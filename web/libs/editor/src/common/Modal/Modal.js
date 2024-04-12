@@ -1,15 +1,15 @@
-import { createRef } from "react";
-import { render } from "react-dom";
-import { cn } from "../../utils/bem";
-import { Button } from "../Button/Button";
-import { Space } from "../Space/Space";
-import { Modal } from "./ModalPopup";
+import { createRef } from 'react';
+import { render } from 'react-dom';
+import { cn } from '../../utils/bem';
+import { Button } from '../Button/Button';
+import { Space } from '../Space/Space';
+import { Modal } from './ModalPopup';
 
 const standaloneModal = (props) => {
   const modalRef = createRef();
-  const rootDiv = document.createElement("div");
+  const rootDiv = document.createElement('div');
 
-  rootDiv.className = cn("modal-holder").toClassName();
+  rootDiv.className = cn('modal-holder').toClassName();
 
   document.body.appendChild(rootDiv);
 
@@ -45,16 +45,16 @@ export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...pro
     ...props,
     allowClose: false,
     footer: (
-      <Space align="end">
+      <Space align='end'>
         <Button
           onClick={() => {
             onCancel?.();
             modal.close();
           }}
-          size="compact"
+          size='compact'
           autoFocus
         >
-          {cancelText ?? "Cancel"}
+          {cancelText ?? 'Cancel'}
         </Button>
 
         <Button
@@ -62,10 +62,10 @@ export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...pro
             onOk?.();
             modal.close();
           }}
-          size="compact"
-          look={buttonLook ?? "primary"}
+          size='compact'
+          look={buttonLook ?? 'primary'}
         >
-          {okText ?? "OK"}
+          {okText ?? 'OK'}
         </Button>
       </Space>
     ),
@@ -78,16 +78,16 @@ export const info = ({ okText, onOkPress, ...props }) => {
   const modal = standaloneModal({
     ...props,
     footer: (
-      <Space align="end">
+      <Space align='end'>
         <Button
           onClick={() => {
             onOkPress?.();
             modal.close();
           }}
-          look="primary"
-          size="compact"
+          look='primary'
+          size='compact'
         >
-          {okText ?? "OK"}
+          {okText ?? 'OK'}
         </Button>
       </Space>
     ),

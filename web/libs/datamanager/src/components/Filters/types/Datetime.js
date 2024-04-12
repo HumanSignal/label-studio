@@ -1,3 +1,3 @@
-import { DateFields } from "./Date";
+import { DateFields } from './Date';
 
 export const DatetimeFilter = [...DateFields({ time: true })];

@@ -1,5 +1,5 @@
-import { types } from "mobx-state-tree";
-import { isDefined } from "../utils/utilities";
+import { types } from 'mobx-state-tree';
+import { isDefined } from '../utils/utilities';
 
 const SelectedChoiceMixin = types.model().views((self) => ({
   findSelectedChoice(aliasOrValue) {

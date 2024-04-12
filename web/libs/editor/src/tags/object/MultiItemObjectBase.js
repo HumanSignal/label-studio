@@ -1,5 +1,5 @@
-import { types } from "mobx-state-tree";
-import { isDefined } from "../../utils/utilities";
+import { types } from 'mobx-state-tree';
+import { isDefined } from '../../utils/utilities';
 
 /**
  * This mixin is created as a definition of the interface of object-tags that should be able to work with valueList parameter
@@ -12,7 +12,7 @@ const MultiItemObjectBase = types
   .extend((self) => {
     /* Validation */
     if (self.isObjectTag !== true) {
-      throw new Error("The MultiItemObjectBase mixin should be used only for object-tags");
+      throw new Error('The MultiItemObjectBase mixin should be used only for object-tags');
     }
     return {};
   })
@@ -24,13 +24,13 @@ const MultiItemObjectBase = types
      * An index of the last item for multi-items object-tag
      */
     get maxItemIndex() {
-      throw new Error("MultiItemMixin needs to implement maxItemIndex getter in views");
+      throw new Error('MultiItemMixin needs to implement maxItemIndex getter in views');
     },
     /**
      * An index of currently selected object-tag item
      */
     get currentItemIndex() {
-      throw new Error("MultiItemMixin needs to implement currentItemIndex getter in views");
+      throw new Error('MultiItemMixin needs to implement currentItemIndex getter in views');
     },
     /**
      * A list of regions related to the current object item

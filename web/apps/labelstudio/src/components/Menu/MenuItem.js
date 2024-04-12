@@ -1,7 +1,7 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import { cn } from "../../utils/bem";
-import { absoluteURL } from "../../utils/helpers";
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { cn } from '../../utils/bem';
+import { absoluteURL } from '../../utils/helpers';
 
 export const MenuItem = ({
   children,
@@ -17,10 +17,10 @@ export const MenuItem = ({
   onClick,
   ...rest
 }) => {
-  const rootClass = cn("main-menu", { elem: "item" });
+  const rootClass = cn('main-menu', { elem: 'item' });
   const classList = [rootClass.toClassName()];
   const isActive = (() => {
-    const pathname = location.pathname.replace(/\/$/, "");
+    const pathname = location.pathname.replace(/\/$/, '');
     const url = to ?? href;
 
     if (exact) {
@@ -37,13 +37,13 @@ export const MenuItem = ({
 
   const linkContent = (
     <>
-      {icon && <span className={rootClass.elem("item-icon")}>{icon}</span>}
+      {icon && <span className={rootClass.elem('item-icon')}>{icon}</span>}
       {children ?? label}
     </>
   );
 
   const linkAttributes = {
-    className: classList.join(" "),
+    className: classList.join(' '),
     onClick,
     ...rest,
   };

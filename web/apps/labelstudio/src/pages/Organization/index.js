@@ -1,7 +1,7 @@
-import React from "react";
-import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
-import { WebhookPage } from "../WebhookPage/WebhookPage";
-import { PeoplePage } from "./PeoplePage/PeoplePage";
+import React from 'react';
+import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
+import { WebhookPage } from '../WebhookPage/WebhookPage';
+import { PeoplePage } from './PeoplePage/PeoplePage';
 
 const ALLOW_ORGANIZATION_WEBHOOKS = window.APP_SETTINGS.flags?.allow_organization_webhooks;
 
@@ -21,8 +21,8 @@ if (ALLOW_ORGANIZATION_WEBHOOKS) {
 }
 
 export const OrganizationPage = {
-  title: "Organization",
-  path: "/organization",
+  title: 'Organization',
+  path: '/organization',
   exact: true,
   layout: MenuLayout,
   component: PeoplePage,

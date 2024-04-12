@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Block, Elem, cn } from "../../../utils/bem";
-import "./MediaSeeker.styl";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Block, Elem, cn } from '../../../utils/bem';
+import './MediaSeeker.styl';
 
 export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeekEnd, onChange, video }) => {
   /** @type {import("react").RefObject<HTMLElement>} */
@@ -13,7 +13,7 @@ export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeek
    */
   const handleMouseDown = useCallback(
     (e) => {
-      if (cn("audio-seeker").closest(e.target)) {
+      if (cn('audio-seeker').closest(e.target)) {
         e.stopPropagation();
         e.preventDefault();
 
@@ -32,13 +32,13 @@ export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeek
           e.stopPropagation();
           e.preventDefault();
 
-          document.removeEventListener("mousemove", seekProgress);
-          document.removeEventListener("mouseup", cancelEvents);
+          document.removeEventListener('mousemove', seekProgress);
+          document.removeEventListener('mouseup', cancelEvents);
           onSeekEnd?.();
         };
 
-        document.addEventListener("mousemove", seekProgress);
-        document.addEventListener("mouseup", cancelEvents);
+        document.addEventListener('mousemove', seekProgress);
+        document.addEventListener('mouseup', cancelEvents);
 
         onSeekStart?.();
         onChange?.(clickedProgress);
@@ -61,10 +61,10 @@ export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeek
   }, [buffer, duration, currentTime]);
 
   return (
-    <Block name="audio-seeker" ref={seekerRef} onMouseDownCapture={handleMouseDown}>
-      <Elem name="wrapper" mod={{ video }}>
-        <Elem name="progress" style={{ width: `${progress}%` }} />
-        <Elem name="buffer" style={{ width: `${buffered}%` }} />
+    <Block name='audio-seeker' ref={seekerRef} onMouseDownCapture={handleMouseDown}>
+      <Elem name='wrapper' mod={{ video }}>
+        <Elem name='progress' style={{ width: `${progress}%` }} />
+        <Elem name='buffer' style={{ width: `${buffered}%` }} />
       </Elem>
     </Block>
   );

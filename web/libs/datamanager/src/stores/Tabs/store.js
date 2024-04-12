@@ -1,14 +1,14 @@
-import { applySnapshot, clone, destroy, flow, getRoot, getSnapshot, types } from "mobx-state-tree";
-import { isEmpty } from "../../utils/helpers";
-import { History } from "../../utils/history";
-import { guidGenerator } from "../../utils/random";
-import { deserializeJsonFromUrl, serializeJsonForUrl } from "../../utils/urlJSON";
-import { isDefined, unique } from "../../utils/utils";
-import { CustomJSON } from "../types";
-import { Tab } from "./tab";
-import { TabColumn } from "./tab_column";
-import { TabFilterType } from "./tab_filter_type";
-import { TabHiddenColumns } from "./tab_hidden_columns";
+import { applySnapshot, clone, destroy, flow, getRoot, getSnapshot, types } from 'mobx-state-tree';
+import { isEmpty } from '../../utils/helpers';
+import { History } from '../../utils/history';
+import { guidGenerator } from '../../utils/random';
+import { deserializeJsonFromUrl, serializeJsonForUrl } from '../../utils/urlJSON';
+import { isDefined, unique } from '../../utils/utils';
+import { CustomJSON } from '../types';
+import { Tab } from './tab';
+import { TabColumn } from './tab_column';
+import { TabFilterType } from './tab_filter_type';
+import { TabHiddenColumns } from './tab_hidden_columns';
 
 const storeValue = (name, value) => {
   window.localStorage.setItem(name, value);
@@ -18,7 +18,7 @@ const storeValue = (name, value) => {
 const restoreValue = (name) => {
   const value = window.localStorage.getItem(name);
 
-  return value ? (value === "true" ? true : false) : false;
+  return value ? (value === 'true' ? true : false) : false;
 };
 
 const dataCleanup = (tab, columnIds) => {
@@ -28,11 +28,11 @@ const dataCleanup = (tab, columnIds) => {
 
   if (data.filters) {
     data.filters.items = data.filters.items.filter(({ filter }) => {
-      return columnIds.includes(filter.replace(/^filter:/, ""));
+      return columnIds.includes(filter.replace(/^filter:/, ''));
     });
   }
 
-  ["columnsDisplayType", "columnWidths"].forEach((key) => {
+  ['columnsDisplayType', 'columnWidths'].forEach((key) => {
     data[key] = Object.fromEntries(
       Object.entries(data[key] ?? {}).filter(([col]) => {
         return columnIds.includes(col);
@@ -58,24 +58,24 @@ const createNameCopy = (name) => {
 
       if (num) return `Copy (${Number(num) + 1})`;
 
-      return "Copy (2)";
+      return 'Copy (2)';
     });
   } else {
-    newName += " Copy";
+    newName += ' Copy';
   }
 
   return newName;
 };
 
 export const TabStore = types
-  .model("TabStore", {
+  .model('TabStore', {
     selected: types.maybeNull(types.late(() => types.reference(Tab))),
     views: types.optional(types.array(Tab), []),
     availableFilters: types.optional(types.array(TabFilterType), []),
     columnsTargetMap: types.map(types.array(TabColumn)),
     columnsRaw: types.optional(CustomJSON, []),
-    sidebarVisible: restoreValue("sidebarVisible"),
-    sidebarEnabled: restoreValue("sidebarEnabled"),
+    sidebarVisible: restoreValue('sidebarVisible'),
+    sidebarEnabled: restoreValue('sidebarEnabled'),
   })
   .volatile(() => ({
     defaultHidden: null,
@@ -92,7 +92,7 @@ export const TabStore = types
     get columns() {
       const cols = self.columnsTargetMap ?? new Map();
 
-      return cols.get(self.selected?.target ?? "tasks") ?? [];
+      return cols.get(self.selected?.target ?? 'tasks') ?? [];
     },
 
     get dataStore() {
@@ -119,9 +119,9 @@ export const TabStore = types
     setSelected: flow(function* (view, options = {}) {
       let selected;
 
-      if (typeof view === "string") {
+      if (typeof view === 'string') {
         selected = yield self.getViewByKey(view);
-      } else if (typeof view === "number") {
+      } else if (typeof view === 'number') {
         selected = self.views.find((v) => v.id === view);
       } else if (view && view.id) {
         selected = self.views.find((v) => v.id === view.id);
@@ -147,7 +147,7 @@ export const TabStore = types
 
         const root = getRoot(self);
 
-        root.SDK.invoke("tabChanged", selected);
+        root.SDK.invoke('tabChanged', selected);
         selected.selected._invokeChangeEvent();
       }
     }),
@@ -168,7 +168,7 @@ export const TabStore = types
       }
 
       if (view.saved) {
-        yield getRoot(self).apiCall("deleteTab", { tabID: view.id });
+        yield getRoot(self).apiCall('deleteTab', { tabID: view.id });
       }
 
       destroy(view);
@@ -255,7 +255,7 @@ export const TabStore = types
     createDefaultView: flow(function* () {
       self.views.push({
         id: 0,
-        title: "Default",
+        title: 'Default',
         hiddenColumns: self.defaultHidden,
       });
 
@@ -267,7 +267,7 @@ export const TabStore = types
       // so we need to take in from the list once again
       defaultView = self.views[self.views.length - 1];
       self.selected = defaultView;
-      getRoot(self).SDK.hasInterface("tabs") && defaultView.reload();
+      getRoot(self).SDK.hasInterface('tabs') && defaultView.reload();
     }),
 
     snapshotFromUrl(viewQueryParam) {
@@ -287,7 +287,7 @@ export const TabStore = types
     },
 
     saveView: flow(function* (view, { reload, interaction } = {}) {
-      const needsLock = ["ordering", "filter"].includes(interaction);
+      const needsLock = ['ordering', 'filter'].includes(interaction);
 
       if (needsLock) view.lock();
       const { id: tabID } = view;
@@ -297,9 +297,9 @@ export const TabStore = types
       if (interaction !== undefined) Object.assign(params, { interaction });
 
       const root = getRoot(self);
-      const apiMethod = !view.saved && root.apiVersion === 2 ? "createTab" : "updateTab";
+      const apiMethod = !view.saved && root.apiVersion === 2 ? 'createTab' : 'updateTab';
 
-      const result = yield root.apiCall(apiMethod, params, body, { allowToCancel: root.SDK.type === "DE" });
+      const result = yield root.apiCall(apiMethod, params, body, { allowToCancel: root.SDK.type === 'DE' });
 
       if (result.isCanceled) {
         return view;
@@ -317,7 +317,7 @@ export const TabStore = types
         self.views.push({ ...newViewSnapshot, saved: true });
         const newView = self.views[self.views.length - 1];
 
-        root.SDK.hasInterface("tabs") && newView.reload();
+        root.SDK.hasInterface('tabs') && newView.reload();
         self.setSelected(newView);
         destroy(view);
 
@@ -356,17 +356,17 @@ export const TabStore = types
     },
 
     expandFilters() {
-      self.sidebarEnabled = storeValue("sidebarEnabled", true);
-      self.sidebarVisible = storeValue("sidebarVisible", true);
+      self.sidebarEnabled = storeValue('sidebarEnabled', true);
+      self.sidebarVisible = storeValue('sidebarVisible', true);
     },
 
     collapseFilters() {
-      self.sidebarEnabled = storeValue("sidebarEnabled", false);
-      self.sidebarVisible = storeValue("sidebarVisible", false);
+      self.sidebarEnabled = storeValue('sidebarEnabled', false);
+      self.sidebarVisible = storeValue('sidebarVisible', false);
     },
 
     toggleSidebar() {
-      self.sidebarVisible = storeValue("sidebarVisible", !self.sidebarVisible);
+      self.sidebarVisible = storeValue('sidebarVisible', !self.sidebarVisible);
     },
 
     fetchColumns() {
@@ -386,16 +386,16 @@ export const TabStore = types
           result.push(createColumnPath(columns, parentColums).columnPath);
         }
 
-        const parentPath = result.join(".");
+        const parentPath = result.join('.');
 
         if (isDefined(column?.id)) {
           result.push(column.id);
         } else {
-          console.warn("Column or id is not defined", column);
-          console.warn("Columns", columns);
+          console.warn('Column or id is not defined', column);
+          console.warn('Columns', columns);
         }
 
-        const columnPath = result.join(".");
+        const columnPath = result.join('.');
 
         return { parentPath, columnPath };
       };
@@ -454,7 +454,7 @@ export const TabStore = types
 
     fetchTabs: flow(function* (tab, taskID, labeling) {
       const tabId = Number.parseInt(tab);
-      const response = yield getRoot(self).apiCall("tabs");
+      const response = yield getRoot(self).apiCall('tabs');
       const tabs = response.tabs ?? response ?? [];
       const columnIds = self.columns.map((c) => c.id);
 
@@ -495,7 +495,7 @@ export const TabStore = types
       const tabId = Number.parseInt(tabKey);
 
       if (!isNaN(tabKey) && !isNaN(tabId)) {
-        const tabData = yield getRoot(self).apiCall("tab", { tabId });
+        const tabData = yield getRoot(self).apiCall('tab', { tabId });
         const columnIds = (self.columns ?? []).map((c) => c.id);
         const { data, ...tabClean } = dataCleanup(tabData, columnIds);
 

@@ -1,2 +1,2 @@
-export { DOMWatcher } from "./DOMWatcher";
-export { createPropertyWatcher } from "./PropertyWatcher";
+export { DOMWatcher } from './DOMWatcher';
+export { createPropertyWatcher } from './PropertyWatcher';

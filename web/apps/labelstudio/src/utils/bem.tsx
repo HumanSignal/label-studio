@@ -10,8 +10,8 @@ import {
   createElement,
   forwardRef,
   useContext,
-} from "react";
-import { isDefined, isEmptyString } from "./helpers";
+} from 'react';
+import { isDefined, isEmptyString } from './helpers';
 
 interface CNMod {
   [key: string]: unknown;
@@ -58,7 +58,7 @@ type CNComponentProps = {
 
 export type BemComponent = FunctionComponent<CNComponentProps>;
 
-const CSS_PREFIX = process.env.CSS_PREFIX ?? "dm-";
+const CSS_PREFIX = process.env.CSS_PREFIX ?? 'dm-';
 
 const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?: CNMod) => {
   const rootName = block;
@@ -74,7 +74,7 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
 
       if (value !== true) stateClass.push(value as string);
 
-      res.push(stateClass.join("_"));
+      res.push(stateClass.join('_'));
     }
     return res;
   }, [] as string[]);
@@ -89,9 +89,9 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
     const mixes = Array.isArray(mix) ? mix : [mix];
     const mixMap = ([] as CNMix[])
       .concat(...mixes)
-      .filter((m) => isDefined(m) && m !== "")
+      .filter((m) => isDefined(m) && m !== '')
       .map((m) => {
-        if (typeof m === "string") {
+        if (typeof m === 'string') {
           return m;
         }
         return m?.toClassName?.();
@@ -102,14 +102,14 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
   }
 
   const attachNamespace = (cls: string) => {
-    if (typeof cls !== "string") console.error("Non-string classname: ", cls);
+    if (typeof cls !== 'string') console.error('Non-string classname: ', cls);
     return String(cls).startsWith(CSS_PREFIX) ? cls : `${CSS_PREFIX}${cls}`;
   };
 
   return finalClass
     .filter((cls) => !isEmptyString(cls))
     .map(attachNamespace)
-    .join(" ");
+    .join(' ');
 };
 
 const BlockContext = createContext<CN | null>(null);
@@ -158,13 +158,13 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
     },
 
     toCSSSelector() {
-      return `.${this.toClassName().replace(/(\s+)/g, ".")}`;
+      return `.${this.toClassName().replace(/(\s+)/g, '.')}`;
     },
   };
 
-  Object.defineProperty(classNameBuilder, "Block", { value: Block });
-  Object.defineProperty(classNameBuilder, "Elem", { value: Elem });
-  Object.defineProperty(classNameBuilder, "__class", {
+  Object.defineProperty(classNameBuilder, 'Block', { value: Block });
+  Object.defineProperty(classNameBuilder, 'Elem', { value: Elem });
+  Object.defineProperty(classNameBuilder, '__class', {
     value: {
       block,
       elem,
@@ -179,7 +179,7 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
 export const BemWithSpecifiContext = (context: Context<CN | null>) => {
   const LocalContext = context ?? createContext<CN | null>(null);
 
-  const Block: BemComponent = forwardRef(({ tag = "div", name, mod, mix, ...rest }, ref) => {
+  const Block: BemComponent = forwardRef(({ tag = 'div', name, mod, mix, ...rest }, ref) => {
     const rootClass = cn(name);
     const finalMix = ([] as [CNMix?]).concat(mix).filter((cnm) => !!cnm);
     const className = rootClass
@@ -191,13 +191,13 @@ export const BemWithSpecifiContext = (context: Context<CN | null>) => {
     return <LocalContext.Provider value={rootClass}>{createElement(tag, finalProps)}</LocalContext.Provider>;
   });
 
-  Block.displayName = "Block";
+  Block.displayName = 'Block';
 
   const Elem: BemComponent = forwardRef(({ component, block, name, mod, mix, ...rest }, ref) => {
     const blockCtx = useContext(LocalContext);
 
     const finalMix = ([] as [CNMix?]).concat(mix).filter((cnm) => !!cnm);
-    const finalTag = rest.tag ?? "div";
+    const finalTag = rest.tag ?? 'div';
 
     const className = (block ? cn(block) : blockCtx)!
       .elem(name)
@@ -207,12 +207,12 @@ export const BemWithSpecifiContext = (context: Context<CN | null>) => {
 
     const finalProps: any = { ...rest, ref, className };
 
-    if (typeof finalTag !== "string") finalProps.block = blockCtx;
+    if (typeof finalTag !== 'string') finalProps.block = blockCtx;
 
     return createElement(component ?? finalTag, finalProps);
   });
 
-  Elem.displayName = "Elem";
+  Elem.displayName = 'Elem';
 
   return { Block, Elem, Context: LocalContext };
 };

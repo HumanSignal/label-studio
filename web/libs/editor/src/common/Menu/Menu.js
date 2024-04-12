@@ -1,9 +1,9 @@
-import { forwardRef, useCallback, useMemo } from "react";
-import { Block, cn } from "../../utils/bem";
-import { useDropdown } from "../Dropdown/DropdownTrigger";
-import "./Menu.styl";
-import { MenuContext } from "./MenuContext";
-import { MenuItem } from "./MenuItem";
+import { forwardRef, useCallback, useMemo } from 'react';
+import { Block, cn } from '../../utils/bem';
+import { useDropdown } from '../Dropdown/DropdownTrigger';
+import './Menu.styl';
+import { MenuContext } from './MenuContext';
+import { MenuItem } from './MenuItem';
 
 export const Menu = forwardRef(
   ({ children, className, style, size, selectedKeys, closeDropdownOnItemClick, allowClickSelected }, ref) => {
@@ -15,7 +15,7 @@ export const Menu = forwardRef(
 
     const clickHandler = useCallback(
       (e) => {
-        const elem = cn("menu").elem("item").closest(e.target);
+        const elem = cn('menu').elem('item').closest(e.target);
 
         if (dropdown && elem && closeDropdownOnItemClick !== false) {
           dropdown.close();
@@ -36,8 +36,8 @@ export const Menu = forwardRef(
       <MenuContext.Provider value={contextValue}>
         <Block
           ref={ref}
-          tag="ul"
-          name="menu"
+          tag='ul'
+          name='menu'
           mod={{ size, collapsed }}
           mix={className}
           style={style}
@@ -51,15 +51,15 @@ export const Menu = forwardRef(
 );
 
 Menu.Item = MenuItem;
-Menu.Spacer = () => <li className={cn("menu", { elem: "spacer" })} />;
-Menu.Divider = () => <li className={cn("menu", { elem: "divider" })} />;
+Menu.Spacer = () => <li className={cn('menu', { elem: 'spacer' })} />;
+Menu.Divider = () => <li className={cn('menu', { elem: 'divider' })} />;
 Menu.Builder = (url, menuItems) => {
   return (menuItems ?? []).map((item, index) => {
-    if (item === "SPACER") return <Menu.Spacer key={index} />;
-    if (item === "DIVIDER") return <Menu.Divider key={index} />;
+    if (item === 'SPACER') return <Menu.Spacer key={index} />;
+    if (item === 'DIVIDER') return <Menu.Divider key={index} />;
 
     const [path, label] = item;
-    const location = `${url}${path}`.replace(/([/]+)/g, "/");
+    const location = `${url}${path}`.replace(/([/]+)/g, '/');
 
     return (
       <Menu.Item key={index} to={location} exact>
@@ -70,12 +70,12 @@ Menu.Builder = (url, menuItems) => {
 };
 
 Menu.Group = ({ children, title, className, style }) => {
-  const rootClass = cn("menu-group");
+  const rootClass = cn('menu-group');
 
   return (
     <li className={rootClass.mix(className)} style={style}>
-      <div className={rootClass.elem("title")}>{title}</div>
-      <ul className={rootClass.elem("list")}>{children}</ul>
+      <div className={rootClass.elem('title')}>{title}</div>
+      <ul className={rootClass.elem('list')}>{children}</ul>
     </li>
   );
 };

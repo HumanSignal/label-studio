@@ -1,22 +1,22 @@
-import { reaction } from "mobx";
-import { observer } from "mobx-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { IconPlusCircle, LsComment, LsCommentRed, LsSparks } from "../../assets/icons";
-import { Space } from "../../common/Space/Space";
-import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
-import { Userpic } from "../../common/Userpic/Userpic";
-import { Block, Elem } from "../../utils/bem";
-import { isDefined, userDisplayName } from "../../utils/utilities";
-import { GroundTruth } from "../CurrentEntity/GroundTruth";
-import "./Annotations.styl";
+import { reaction } from 'mobx';
+import { observer } from 'mobx-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { IconPlusCircle, LsComment, LsCommentRed, LsSparks } from '../../assets/icons';
+import { Space } from '../../common/Space/Space';
+import { TimeAgo } from '../../common/TimeAgo/TimeAgo';
+import { Userpic } from '../../common/Userpic/Userpic';
+import { Block, Elem } from '../../utils/bem';
+import { isDefined, userDisplayName } from '../../utils/utilities';
+import { GroundTruth } from '../CurrentEntity/GroundTruth';
+import './Annotations.styl';
 
 export const Annotations = observer(({ store, annotationStore, commentStore }) => {
   const dropdownRef = useRef();
   const [opened, setOpened] = useState(false);
-  const enableAnnotations = store.hasInterface("annotations:tabs");
-  const enablePredictions = store.hasInterface("predictions:tabs");
-  const enableCreateAnnotation = store.hasInterface("annotations:add-new");
-  const groundTruthEnabled = store.hasInterface("ground-truth");
+  const enableAnnotations = store.hasInterface('annotations:tabs');
+  const enablePredictions = store.hasInterface('predictions:tabs');
+  const enableCreateAnnotation = store.hasInterface('annotations:add-new');
+  const groundTruthEnabled = store.hasInterface('ground-truth');
 
   const entities = [];
 
@@ -47,7 +47,7 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
       }
     };
 
-    document.addEventListener("click", handleClick);
+    document.addEventListener('click', handleClick);
 
     const runOnPropertyChange = (value) => {
       let _unresolvedComments = 0;
@@ -69,7 +69,7 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
     );
 
     return () => {
-      document.removeEventListener("click", handleClick);
+      document.removeEventListener('click', handleClick);
       reactionDisposer();
     };
   }, []);
@@ -96,12 +96,12 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
           e.preventDefault();
           e.stopPropagation();
           setOpened(false);
-          onAnnotationSelect?.(ent, ent.type === "prediction");
+          onAnnotationSelect?.(ent, ent.type === 'prediction');
         }}
         extra={
-          <Elem name={"icons"}>
-            <Elem name="icon-column">{renderCommentIcon(ent)}</Elem>
-            <Elem name="icon-column">{groundTruthEnabled && <GroundTruth entity={ent} disabled />}</Elem>
+          <Elem name={'icons'}>
+            <Elem name='icon-column'>{renderCommentIcon(ent)}</Elem>
+            <Elem name='icon-column'>{groundTruthEnabled && <GroundTruth entity={ent} disabled />}</Elem>
           </Elem>
         }
       />
@@ -122,18 +122,18 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
 
     return (
       <>
-        <Elem name="draft">{_drafts}</Elem>
-        <Elem name="annotation">{_annotations}</Elem>
+        <Elem name='draft'>{_drafts}</Elem>
+        <Elem name='annotation'>{_annotations}</Elem>
       </>
     );
   };
 
   return enableAnnotations || enablePredictions || enableCreateAnnotation ? (
-    <Elem name="section" mod={{ flat: true }}>
-      <Block name="annotations-list" ref={dropdownRef}>
-        <Elem name="selected">
+    <Elem name='section' mod={{ flat: true }}>
+      <Block name='annotations-list' ref={dropdownRef}>
+        <Elem name='selected'>
           <Annotation
-            aria-label="Annotations List Toggle"
+            aria-label='Annotations List Toggle'
             entity={annotationStore.selected}
             onClick={(e) => {
               e.stopPropagation();
@@ -141,11 +141,11 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
             }}
             extra={
               entities.length > 0 ? (
-                <Space size="none" style={{ marginRight: -8, marginLeft: 8 }}>
-                  <Elem name="counter">
+                <Space size='none' style={{ marginRight: -8, marginLeft: 8 }}>
+                  <Elem name='counter'>
                     {entities.indexOf(annotationStore.selected) + 1}/{entities.length}
                   </Elem>
-                  <Elem name="toggle" mod={{ opened }} />
+                  <Elem name='toggle' mod={{ opened }} />
                 </Space>
               ) : null
             }
@@ -153,8 +153,8 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
         </Elem>
 
         {opened && (
-          <Elem name="list">
-            {store.hasInterface("annotations:add-new") && (
+          <Elem name='list'>
+            {store.hasInterface('annotations:add-new') && (
               <CreateAnnotation annotationStore={annotationStore} onClick={() => setOpened(false)} />
             )}
 
@@ -175,9 +175,9 @@ const CreateAnnotation = observer(({ annotationStore, onClick }) => {
   }, [annotationStore, onClick]);
 
   return (
-    <Elem name="create" aria-label="Create Annotation" onClick={onCreateAnnotation}>
-      <Space size="small">
-        <Elem name="userpic" tag={Userpic} mod={{ prediction: true }}>
+    <Elem name='create' aria-label='Create Annotation' onClick={onCreateAnnotation}>
+      <Space size='small'>
+        <Elem name='userpic' tag={Userpic} mod={{ prediction: true }}>
           <IconPlusCircle />
         </Elem>
         Create Annotation
@@ -187,44 +187,44 @@ const CreateAnnotation = observer(({ annotationStore, onClick }) => {
 });
 
 const Annotation = observer(({ entity, selected, onClick, extra, ...props }) => {
-  const isPrediction = entity.type === "prediction";
+  const isPrediction = entity.type === 'prediction';
   const username = userDisplayName(
     entity.user ?? {
-      firstName: entity.createdBy || "Admin",
+      firstName: entity.createdBy || 'Admin',
     },
   );
 
   return (
-    <Elem {...props} name="entity" mod={{ selected }} onClick={onClick}>
+    <Elem {...props} name='entity' mod={{ selected }} onClick={onClick}>
       <Space spread>
-        <Space size="small">
+        <Space size='small'>
           <Elem
-            name="userpic"
+            name='userpic'
             tag={Userpic}
             showUsername
             username={isPrediction ? entity.createdBy : null}
             user={entity.user ?? { username }}
             mod={{ prediction: isPrediction }}
           >
-            {isPrediction && <LsSparks color="#944BFF" style={{ width: 18, height: 18 }} />}
+            {isPrediction && <LsSparks color='#944BFF' style={{ width: 18, height: 18 }} />}
           </Elem>
-          <Space direction="vertical" size="none">
-            <Elem name="user">
-              <Elem tag="span" name="name">
+          <Space direction='vertical' size='none'>
+            <Elem name='user'>
+              <Elem tag='span' name='name'>
                 {username}
               </Elem>
-              <Elem tag="span" name="entity-id">
+              <Elem tag='span' name='entity-id'>
                 #{entity.pk ?? entity.id}
               </Elem>
             </Elem>
 
             {isDefined(entity.acceptedState) ? (
-              <Elem name="review" mod={{ state: entity.acceptedState }}>
+              <Elem name='review' mod={{ state: entity.acceptedState }}>
                 {entity.acceptedState}
               </Elem>
             ) : (
-              <Elem name="created">
-                created, <Elem name="date" component={TimeAgo} date={entity.createdDate} />
+              <Elem name='created'>
+                created, <Elem name='date' component={TimeAgo} date={entity.createdDate} />
               </Elem>
             )}
           </Space>

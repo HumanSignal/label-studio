@@ -1,14 +1,14 @@
-import { inject, observer } from "mobx-react";
-import React from "react";
-import { taskToLSFormat } from "../../../sdk/lsf-utils";
-import { Block } from "../../../utils/bem";
-import { FF_LSDV_4711, isFF } from "../../../utils/feature-flags";
-import { Spinner } from "../Spinner";
-import "./AnnotationPreview.styl";
+import { inject, observer } from 'mobx-react';
+import React from 'react';
+import { taskToLSFormat } from '../../../sdk/lsf-utils';
+import { Block } from '../../../utils/bem';
+import { FF_LSDV_4711, isFF } from '../../../utils/feature-flags';
+import { Spinner } from '../Spinner';
+import './AnnotationPreview.styl';
 
 const imgDefaultProps = {};
 
-if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = "anonymous";
+if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = 'anonymous';
 
 const wait = (timeout) => new Promise((resolve) => setTimeout(resolve, timeout));
 
@@ -24,12 +24,12 @@ class PreviewGenerator {
     this.running = false;
     this.queue = [];
 
-    this.root = document.querySelector(".offscreen-lsf");
+    this.root = document.querySelector('.offscreen-lsf');
 
     this.lsf = new window.LabelStudio(this.root, {
       user: { id: 1 },
       interfaces: [],
-      config: labelingConfig ?? "",
+      config: labelingConfig ?? '',
       onLabelStudioLoad: () => {
         this.loaded = true;
         this.startQueue();
@@ -109,7 +109,7 @@ export const AnnotationPreview = injector(
     }, [labelingConfig]);
 
     const [preview, setPreview] = React.useState(null);
-    const variant = props.variant ?? "original";
+    const variant = props.variant ?? 'original';
 
     React.useEffect(() => {
       if (preview !== null) return;
@@ -129,27 +129,27 @@ export const AnnotationPreview = injector(
       <img
         {...imgDefaultProps}
         src={preview[`$${name}`][variant]}
-        alt=""
+        alt=''
         style={style}
         width={props.width}
         height={props.height}
       />
     ) : (
-      <Block name="annotation-preview" width={props.width} height={props.height}>
+      <Block name='annotation-preview' width={props.width} height={props.height}>
         <Spinner
-          size={props.size ?? "default"}
+          size={props.size ?? 'default'}
           style={{
-            position: "absolute",
-            left: "50%",
-            top: "50%",
-            transform: "translate3d(-50%, -50%, 0)",
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate3d(-50%, -50%, 0)',
             zIndex: 100,
           }}
         />
         <img
           src={props.fallbackImage}
           style={{ ...(style ?? {}), opacity: 0.5 }}
-          alt=""
+          alt=''
           width={props.width}
           height={props.height}
         />

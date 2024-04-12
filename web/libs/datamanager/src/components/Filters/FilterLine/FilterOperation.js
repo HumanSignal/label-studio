@@ -1,12 +1,12 @@
-import { observer } from "mobx-react";
-import { getRoot } from "mobx-state-tree";
-import React, { useCallback, useMemo } from "react";
-import { Elem } from "../../../utils/bem";
-import { debounce } from "../../../utils/debounce";
-import { FilterDropdown } from "../FilterDropdown";
-import * as FilterInputs from "../types";
-import { Common } from "../types/Common";
-import { allowedFilterOperations } from "../types/Utility";
+import { observer } from 'mobx-react';
+import { getRoot } from 'mobx-state-tree';
+import React, { useCallback, useMemo } from 'react';
+import { Elem } from '../../../utils/bem';
+import { debounce } from '../../../utils/debounce';
+import { FilterDropdown } from '../FilterDropdown';
+import * as FilterInputs from '../types';
+import { Common } from '../types/Common';
+import { allowedFilterOperations } from '../types/Utility';
 
 /** @typedef {{
  * type: keyof typeof FilterInputs,
@@ -61,16 +61,16 @@ export const FilterOperation = observer(({ filter, field, operator, value }) => 
 
   return Input ? (
     <>
-      <Elem block="filter-line" name="column" mix="operation">
+      <Elem block='filter-line' name='column' mix='operation'>
         <FilterDropdown
-          placeholder="Condition"
+          placeholder='Condition'
           value={filter.operator}
           disabled={types.length === 1}
           items={availableOperators ? operators.filter((op) => availableOperators.includes(op.value)) : operators}
           onChange={onOperatorSelected}
         />
       </Elem>
-      <Elem block="filter-line" name="column" mix="value">
+      <Elem block='filter-line' name='column' mix='value'>
         <Input
           {...field}
           key={`${filter.filter.id}-${filter.filter.currentType}`}

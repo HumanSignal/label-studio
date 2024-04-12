@@ -1,22 +1,22 @@
-import Button from "antd/lib/button/index";
-import Form from "antd/lib/form/index";
-import Input from "antd/lib/input/index";
-import { observer } from "mobx-react";
-import { destroy, isAlive, types } from "mobx-state-tree";
-import React, { createRef, useCallback } from "react";
+import Button from 'antd/lib/button/index';
+import Form from 'antd/lib/form/index';
+import Input from 'antd/lib/input/index';
+import { observer } from 'mobx-react';
+import { destroy, isAlive, types } from 'mobx-state-tree';
+import React, { createRef, useCallback } from 'react';
 
-import InfoModal from "../../../components/Infomodal/Infomodal";
-import Registry from "../../../core/Registry";
-import Tree from "../../../core/Tree";
-import Types from "../../../core/Types";
-import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
-import LeadTimeMixin from "../../../mixins/LeadTime";
-import PerItemMixin from "../../../mixins/PerItem";
-import PerRegionMixin, { PER_REGION_MODES } from "../../../mixins/PerRegion";
-import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
-import { ReadOnlyControlMixin } from "../../../mixins/ReadOnlyMixin";
-import RequiredMixin from "../../../mixins/Required";
-import { HtxTextAreaRegion, TextAreaRegionModel } from "../../../regions/TextAreaRegion";
+import InfoModal from '../../../components/Infomodal/Infomodal';
+import Registry from '../../../core/Registry';
+import Tree from '../../../core/Tree';
+import Types from '../../../core/Types';
+import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
+import LeadTimeMixin from '../../../mixins/LeadTime';
+import PerItemMixin from '../../../mixins/PerItem';
+import PerRegionMixin, { PER_REGION_MODES } from '../../../mixins/PerRegion';
+import ProcessAttrsMixin from '../../../mixins/ProcessAttrs';
+import { ReadOnlyControlMixin } from '../../../mixins/ReadOnlyMixin';
+import RequiredMixin from '../../../mixins/Required';
+import { HtxTextAreaRegion, TextAreaRegionModel } from '../../../regions/TextAreaRegion';
 import {
   FF_DEV_1564_DEV_1565,
   FF_DEV_3730,
@@ -24,12 +24,12 @@ import {
   FF_LSDV_4583,
   FF_LSDV_4659,
   isFF,
-} from "../../../utils/feature-flags";
-import ControlBase from "../Base";
-import ClassificationBase from "../ClassificationBase";
-import "./TextAreaRegionView";
+} from '../../../utils/feature-flags';
+import ControlBase from '../Base';
+import ClassificationBase from '../ClassificationBase';
+import './TextAreaRegionView';
 
-import "./TextArea.styl";
+import './TextArea.styl';
 
 const { TextArea } = Input;
 
@@ -89,9 +89,9 @@ const { TextArea } = Input;
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
   allowsubmit: types.optional(types.boolean, true),
-  label: types.optional(types.string, ""),
+  label: types.optional(types.string, ''),
   value: types.maybeNull(types.string),
-  rows: types.optional(types.string, "1"),
+  rows: types.optional(types.string, '1'),
   showsubmitbutton: types.maybeNull(types.boolean),
   placeholder: types.maybeNull(types.string),
   maxsubmissions: types.maybeNull(types.string),
@@ -106,11 +106,11 @@ const TagAttrs = types.model({
 
 const Model = types
   .model({
-    type: "textarea",
+    type: 'textarea',
     // @todo rename to textarearegions to avoid confusion, they are not real regions or results
     regions: types.array(TextAreaRegionModel),
-    _value: types.optional(types.string, ""),
-    children: Types.unionArray(["shortcut"]),
+    _value: types.optional(types.string, ''),
+    children: Types.unionArray(['shortcut']),
   })
   .volatile(() => {
     return {
@@ -128,7 +128,7 @@ const Model = types
     },
 
     get valueType() {
-      return "text";
+      return 'text';
     },
 
     get holdsState() {
@@ -197,7 +197,7 @@ const Model = types
       },
 
       uniqueModal() {
-        InfoModal.warning("There is already an entry with that text. Please enter unique text.");
+        InfoModal.warning('There is already an entry with that text. Please enter unique text.');
       },
 
       setResult(value) {
@@ -276,7 +276,7 @@ const Model = types
         if (!result) return;
 
         // add current stored leadTime to the main stored lead_time
-        result.setMetaValue("lead_time", (result.meta?.lead_time ?? 0) + self.leadTime / 1000);
+        result.setMetaValue('lead_time', (result.meta?.lead_time ?? 0) + self.leadTime / 1000);
 
         self.leadTime = 0;
         self.resetLeadTimeCounters();
@@ -294,7 +294,7 @@ const Model = types
       beforeSend() {
         if (self._value && self._value.length) {
           self.addText(self._value);
-          self._value = "";
+          self._value = '';
         }
       },
 
@@ -329,7 +329,7 @@ const Model = types
             value,
             lastActiveElement.selectionStart,
             lastActiveElement.selectionEnd,
-            "end",
+            'end',
           );
           lastActiveElementModel.setValue(lastActiveElement.value);
         } else {
@@ -349,7 +349,7 @@ const Model = types
   });
 
 const TextAreaModel = types.compose(
-  "TextAreaModel",
+  'TextAreaModel',
   ControlBase,
   ClassificationBase,
   TagAttrs,
@@ -378,7 +378,7 @@ const HtxTextArea = observer(({ item }) => {
     name: item.name,
     value: item._value,
     rows: item.rows,
-    className: "is-search",
+    className: 'is-search',
     label: item.label,
     placeholder: item.placeholder,
     disabled: item.isReadOnly(),
@@ -402,28 +402,28 @@ const HtxTextArea = observer(({ item }) => {
   if (rows > 1) {
     // allow to add multiline text with shift+enter
     props.onKeyDown = (e) => {
-      if (e.key === "Enter" && e.shiftKey && item.allowsubmit && item._value && !item.annotation.isReadOnly()) {
+      if (e.key === 'Enter' && e.shiftKey && item.allowsubmit && item._value && !item.annotation.isReadOnly()) {
         e.preventDefault();
         e.stopPropagation();
         item.addText(item._value);
-        item.setValue("");
+        item.setValue('');
       } else {
         item.countTime();
       }
     };
   }
 
-  const visibleStyle = item.perRegionVisible() ? {} : { display: "none" };
+  const visibleStyle = item.perRegionVisible() ? {} : { display: 'none' };
 
   const showAddButton = !item.isReadOnly() && (item.showsubmitbutton ?? rows !== 1);
   const itemStyle = {};
 
   if (showAddButton) itemStyle.marginBottom = 0;
 
-  visibleStyle.marginTop = "4px";
+  visibleStyle.marginTop = '4px';
 
   return item.displaymode === PER_REGION_MODES.TAG ? (
-    <div className="lsf-text-area" style={visibleStyle}>
+    <div className='lsf-text-area' style={visibleStyle}>
       {Tree.renderChildren(item, item.annotation)}
 
       {item.showSubmit && (
@@ -431,7 +431,7 @@ const HtxTextArea = observer(({ item }) => {
           onFinish={() => {
             if (item.allowsubmit && item._value && !item.annotation.isReadOnly()) {
               item.addText(item._value);
-              item.setValue("");
+              item.setValue('');
             }
 
             return false;
@@ -439,13 +439,13 @@ const HtxTextArea = observer(({ item }) => {
         >
           <Form.Item style={itemStyle}>
             {rows === 1 ? (
-              <Input {...props} aria-label="TextArea Input" />
+              <Input {...props} aria-label='TextArea Input' />
             ) : (
-              <TextArea {...props} aria-label="TextArea Input" />
+              <TextArea {...props} aria-label='TextArea Input' />
             )}
             {showAddButton && (
               <Form.Item>
-                <Button style={{ marginTop: "10px" }} type="primary" htmlType="submit">
+                <Button style={{ marginTop: '10px' }} type='primary' htmlType='submit'>
                   Add
                 </Button>
               </Form.Item>
@@ -455,7 +455,7 @@ const HtxTextArea = observer(({ item }) => {
       )}
 
       {item.regions.length > 0 && (
-        <div style={{ marginBottom: "1em" }}>
+        <div style={{ marginBottom: '1em' }}>
           {item.regions.map((t) => (
             <HtxTextAreaRegion key={t.id} item={t} onFocus={onFocus} />
           ))}
@@ -465,6 +465,6 @@ const HtxTextArea = observer(({ item }) => {
   ) : null;
 });
 
-Registry.addTag("textarea", TextAreaModel, HtxTextArea);
+Registry.addTag('textarea', TextAreaModel, HtxTextArea);
 
 export { TextAreaModel, HtxTextArea };

@@ -1,10 +1,10 @@
-import { getRoot, types } from "mobx-state-tree";
+import { getRoot, types } from 'mobx-state-tree';
 
 const PersistentStateMixin = types
   .model({})
   .views(() => ({
     get persistentValuesKey() {
-      return "labelStudio:storedValues";
+      return 'labelStudio:storedValues';
     },
 
     get persistentValues() {
@@ -28,7 +28,7 @@ const PersistentStateMixin = types
     },
 
     restoreValues() {
-      const stored = JSON.parse(localStorage.getItem(self.persistentValuesKey) || "{}");
+      const stored = JSON.parse(localStorage.getItem(self.persistentValuesKey) || '{}');
 
       if (!stored || stored.task !== getRoot(self).task?.id) return;
       const values = stored.values || {};

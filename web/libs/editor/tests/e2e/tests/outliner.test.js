@@ -1,24 +1,24 @@
-const assert = require("assert");
-const { centerOfBbox } = require("./helpers");
+const assert = require('assert');
+const { centerOfBbox } = require('./helpers');
 
-Feature("Outliner");
+Feature('Outliner');
 
 const IMAGE =
-  "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
+  'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
 
-Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
-  const RESULT_LABELS = ["a", "b", "c"];
+Scenario('Basic details', async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
+  const RESULT_LABELS = ['a', 'b', 'c'];
   const result = [
     {
       value: {
         start: 0,
         end: 4,
-        labels: ["a", "b", "c"],
+        labels: ['a', 'b', 'c'],
       },
-      id: "test_t_1",
-      from_name: "label",
-      to_name: "text",
-      type: "labels",
+      id: 'test_t_1',
+      from_name: 'label',
+      to_name: 'text',
+      type: 'labels',
     },
     {
       value: {
@@ -26,10 +26,10 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
         end: 6,
         labels: [],
       },
-      id: "test_t_2",
-      from_name: "label",
-      to_name: "text",
-      type: "labels",
+      id: 'test_t_2',
+      from_name: 'label',
+      to_name: 'text',
+      type: 'labels',
     },
     {
       value: {
@@ -38,10 +38,10 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
         width: 50,
         height: 50,
       },
-      id: "test_i_1",
-      from_name: "rect",
-      to_name: "img",
-      type: "rectangle",
+      id: 'test_i_1',
+      from_name: 'rect',
+      to_name: 'img',
+      type: 'rectangle',
     },
     {
       original_width: 2242,
@@ -54,11 +54,11 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
         height: 50,
         rotation: 0,
       },
-      id: "test_i_1",
-      from_name: "rect",
-      to_name: "img",
-      type: "rectangle",
-      origin: "manual",
+      id: 'test_i_1',
+      from_name: 'rect',
+      to_name: 'img',
+      type: 'rectangle',
+      origin: 'manual',
     },
     {
       original_width: 2242,
@@ -72,11 +72,11 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
         rotation: 0,
         rating: 4,
       },
-      id: "test_i_1",
-      from_name: "rating",
-      to_name: "img",
-      type: "rating",
-      origin: "manual",
+      id: 'test_i_1',
+      from_name: 'rating',
+      to_name: 'img',
+      type: 'rating',
+      origin: 'manual',
     },
     {
       original_width: 2242,
@@ -88,13 +88,13 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
         width: 50,
         height: 50,
         rotation: 0,
-        text: ["text", "area"],
+        text: ['text', 'area'],
       },
-      id: "test_i_1",
-      from_name: "textarea",
-      to_name: "img",
-      type: "textarea",
-      origin: "manual",
+      id: 'test_i_1',
+      from_name: 'textarea',
+      to_name: 'img',
+      type: 'textarea',
+      origin: 'manual',
     },
     {
       original_width: 2242,
@@ -106,13 +106,13 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
         width: 50,
         height: 50,
         rotation: 0,
-        choices: ["option 1", "option 2"],
+        choices: ['option 1', 'option 2'],
       },
-      id: "test_i_1",
-      from_name: "choices",
-      to_name: "img",
-      type: "choices",
-      origin: "manual",
+      id: 'test_i_1',
+      from_name: 'choices',
+      to_name: 'img',
+      type: 'choices',
+      origin: 'manual',
     },
   ];
   const fillByPressKeyDown = (keysList) => {
@@ -126,7 +126,7 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
     }
   };
 
-  I.amOnPage("/");
+  I.amOnPage('/');
 
   LabelStudio.setFeatureFlags({
     ff_front_1170_outliner_030222_short: true,
@@ -152,12 +152,12 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
 </View>
 `,
     data: {
-      text: "Just a text",
+      text: 'Just a text',
       image: IMAGE,
     },
     annotations: [
       {
-        id: "test",
+        id: 'test',
         result,
       },
     ],
@@ -166,67 +166,67 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
   AtOutliner.seeRegions(3);
   LabelStudio.waitForObjectsReady();
 
-  I.say("Select text region");
+  I.say('Select text region');
   AtOutliner.clickRegion(1);
   I.say("Check it's details");
   for (const value of RESULT_LABELS) {
     AtDetails.seeLabel(value);
   }
   AtDetails.seeLabels(RESULT_LABELS.length);
-  AtDetails.seeText("Just");
+  AtDetails.seeText('Just');
 
-  I.say("Select second text region");
+  I.say('Select second text region');
   AtOutliner.clickRegion(2);
   I.say("Check it's details");
   AtDetails.seeLabels(0);
-  AtDetails.seeText("a");
+  AtDetails.seeText('a');
 
-  I.say("Select image region");
+  I.say('Select image region');
   AtOutliner.clickRegion(3);
 
-  const isRelativeCoords = await LabelStudio.hasFF("fflag_fix_front_dev_3793_relative_coords_short");
+  const isRelativeCoords = await LabelStudio.hasFF('fflag_fix_front_dev_3793_relative_coords_short');
 
   if (isRelativeCoords) {
-    AtDetails.seeFieldWithValue("X", "25");
-    AtDetails.seeFieldWithValue("H", "50");
+    AtDetails.seeFieldWithValue('X', '25');
+    AtDetails.seeFieldWithValue('H', '50');
   }
 
-  I.say("Check perregions displaying");
+  I.say('Check perregions displaying');
 
   AtDetails.seeResultRating(4);
-  AtDetails.seeResultTextarea(["text", "area"]);
-  AtDetails.seeResultChoices(["option 1", "option 2"]);
+  AtDetails.seeResultTextarea(['text', 'area']);
+  AtDetails.seeResultChoices(['option 1', 'option 2']);
 
-  I.say("Add new meta and check result");
+  I.say('Add new meta and check result');
   AtDetails.clickEditMeta();
 
-  fillByPressKeyDown([["M"], ["Space"], ["1"], ["Shift", "Enter"], ["M"], ["Space"], ["2"], ["Enter"]]);
-  AtDetails.seeMeta("M 1");
-  AtDetails.seeMeta("M 2");
+  fillByPressKeyDown([['M'], ['Space'], ['1'], ['Shift', 'Enter'], ['M'], ['Space'], ['2'], ['Enter']]);
+  AtDetails.seeMeta('M 1');
+  AtDetails.seeMeta('M 2');
 
-  I.say("Add line to meta");
+  I.say('Add line to meta');
   AtDetails.clickMeta();
-  fillByPressKeyDown([["Shift", "Enter"], ["3"], ["Enter"]]);
-  AtDetails.seeMeta("3");
-  AtDetails.dontSeeMeta("23");
+  fillByPressKeyDown([['Shift', 'Enter'], ['3'], ['Enter']]);
+  AtDetails.seeMeta('3');
+  AtDetails.dontSeeMeta('23');
 
-  I.say("Check that meta is saved correctly");
+  I.say('Check that meta is saved correctly');
   const resultWithMeta = await LabelStudio.serialize();
 
-  assert.deepStrictEqual(resultWithMeta[2].meta.text, ["M 1\nM 2\n3"]);
+  assert.deepStrictEqual(resultWithMeta[2].meta.text, ['M 1\nM 2\n3']);
 
-  I.say("Remove meta");
+  I.say('Remove meta');
   AtDetails.clickMeta();
-  fillByPressKeyDown([["CommandOrControl", "a"], ["Backspace"], ["Enter"]]);
+  fillByPressKeyDown([['CommandOrControl', 'a'], ['Backspace'], ['Enter']]);
 
-  I.say("Check that meta is removed correctly");
+  I.say('Check that meta is removed correctly');
   const resultWithoutMeta = await LabelStudio.serialize();
 
   assert.deepStrictEqual(resultWithoutMeta[2].meta, undefined);
 });
 
-Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
-  I.amOnPage("/");
+Scenario('Panels manipulations', async ({ I, LabelStudio, AtPanels }) => {
+  I.amOnPage('/');
   LabelStudio.setFeatureFlags({
     ff_front_1170_outliner_030222_short: true,
   });
@@ -237,11 +237,11 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
 </View>
 `,
     data: {
-      text: "Just a text",
+      text: 'Just a text',
     },
     annotations: [
       {
-        id: "test",
+        id: 'test',
         result: [],
       },
     ],
@@ -250,22 +250,22 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
   const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
-  I.say("See panels at default positions");
+  I.say('See panels at default positions');
   AtOutlinerPanel.seePanelAttachedLeft();
   AtDetailsPanel.seePanelAttachedRight();
 
-  I.say("They should be fully visible");
+  I.say('They should be fully visible');
   AtOutlinerPanel.seePanelBody();
   AtDetailsPanel.seePanelBody();
-  I.say("and not collapsed");
+  I.say('and not collapsed');
   AtOutlinerPanel.dontSeeExpandButton();
   AtDetailsPanel.dontSeeExpandButton();
 
-  I.say("Collapse both panels");
+  I.say('Collapse both panels');
   AtOutlinerPanel.collapsePanel();
   AtDetailsPanel.collapsePanel();
 
-  I.say("Make sure there is no body or collapse button");
+  I.say('Make sure there is no body or collapse button');
   AtOutlinerPanel.dontSeePanelBody();
   AtDetailsPanel.dontSeePanelBody();
   AtOutlinerPanel.dontSeeСollapseButton();
@@ -273,19 +273,19 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   AtOutlinerPanel.seeExpandButton();
   AtDetailsPanel.seeExpandButton();
 
-  I.say("Try to move collapsed panel");
+  I.say('Try to move collapsed panel');
   await AtOutlinerPanel.dragPanelBy(400, 0);
 
-  I.say("Check that nothing changes");
+  I.say('Check that nothing changes');
   AtOutlinerPanel.seePanelAttachedLeft();
   AtOutlinerPanel.dontSeePanelBody();
   AtOutlinerPanel.dontSeeСollapseButton();
 
-  I.say("Expand both panels");
+  I.say('Expand both panels');
   AtOutlinerPanel.expandPanel();
   AtDetailsPanel.expandPanel();
 
-  I.say("Make sure that body and collapse appears");
+  I.say('Make sure that body and collapse appears');
   AtOutlinerPanel.seePanelBody();
   AtDetailsPanel.seePanelBody();
   AtOutlinerPanel.seeСollapseButton();
@@ -293,20 +293,20 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   AtOutlinerPanel.dontSeeExpandButton();
   AtDetailsPanel.dontSeeExpandButton();
 
-  I.say("Try to drag one panel over another");
+  I.say('Try to drag one panel over another');
   await AtOutlinerPanel.dragPanelToElement(AtDetailsPanel.locatePanel());
-  I.say("It should not affect other panel");
+  I.say('It should not affect other panel');
   AtDetailsPanel.seePanelAttachedRight();
-  I.say("But it should detach dragged panel");
+  I.say('But it should detach dragged panel');
   AtOutlinerPanel.seePanelDetached();
   {
-    I.say("And x coordinate of panels should be equal due to limitation of moving panel through the border");
+    I.say('And x coordinate of panels should be equal due to limitation of moving panel through the border');
     const panel1HeaderBbox = await AtOutlinerPanel.grabHeaderBbox();
     const panel2HeaderBbox = await AtOutlinerPanel.grabHeaderBbox();
 
     assert.strictEqual(panel1HeaderBbox.x, panel2HeaderBbox.x);
   }
-  I.say("Drag panel somewhere to the center of the screen");
+  I.say('Drag panel somewhere to the center of the screen');
   {
     let panelBbox = await AtOutlinerPanel.grabPanelBbox();
     const panelsContainerBbox = await AtPanels.grabPanelsContainerBbox();
@@ -314,10 +314,10 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
 
     await AtOutlinerPanel.dragPanelTo(panelsContainerCenter.x, panelsContainerCenter.y - panelBbox.height / 2);
 
-    I.say("Try to resize panel in all directions");
+    I.say('Try to resize panel in all directions');
     panelBbox = await AtOutlinerPanel.grabPanelBbox();
     {
-      I.say("drag TopLeft corner");
+      I.say('drag TopLeft corner');
       await AtOutlinerPanel.dragResizerBy(-1, -2, AtOutlinerPanel.resizeTopLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -328,7 +328,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("drag TopRight corner");
+      I.say('drag TopRight corner');
       await AtOutlinerPanel.dragResizerBy(-1, -2, AtOutlinerPanel.resizeTopRight);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -339,7 +339,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("drag BottomRight corner");
+      I.say('drag BottomRight corner');
       await AtOutlinerPanel.dragResizerBy(3, 5, AtOutlinerPanel.resizeBottomRight);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -350,7 +350,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("drag BottomLeft corner");
+      I.say('drag BottomLeft corner');
       await AtOutlinerPanel.dragResizerBy(3, -5, AtOutlinerPanel.resizeBottomLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -361,7 +361,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("drag Top border");
+      I.say('drag Top border');
       await AtOutlinerPanel.dragResizerBy(10, -10, AtOutlinerPanel.resizeTop, 2);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -372,7 +372,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("drag Right border");
+      I.say('drag Right border');
       await AtOutlinerPanel.dragResizerBy(100, -7, AtOutlinerPanel.resizeRight, 2);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -383,7 +383,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("drag Bottom border");
+      I.say('drag Bottom border');
       await AtOutlinerPanel.dragResizerBy(11, 11, AtOutlinerPanel.resizeBottom);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -394,7 +394,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("drag Left border");
+      I.say('drag Left border');
       await AtOutlinerPanel.dragResizerBy(7, -7, AtOutlinerPanel.resizeLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -405,7 +405,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("Check maximal size restriction");
+      I.say('Check maximal size restriction');
       await AtOutlinerPanel.dragResizerBy(-1000, -1000, AtOutlinerPanel.resizeTopLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -416,7 +416,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       panelBbox = newPanelBbox;
     }
     {
-      I.say("Check minimal size restriction");
+      I.say('Check minimal size restriction');
       await AtOutlinerPanel.dragResizerBy(panelBbox.width, panelBbox.height + 50, AtOutlinerPanel.resizeTopLeft);
       const newPanelBbox = await AtOutlinerPanel.grabPanelBbox();
 
@@ -428,14 +428,14 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     }
   }
 
-  I.say("Move details to the left socket");
+  I.say('Move details to the left socket');
   await AtDetailsPanel.dragPanelToLeftSocket();
   AtDetailsPanel.seePanelAttachedLeft();
 
   {
-    I.say("Move outliner to the right socket by moving to the left (check that there is some gap)");
+    I.say('Move outliner to the right socket by moving to the left (check that there is some gap)');
     const panelBbox = await AtOutlinerPanel.grabPanelBbox();
-    const panelContainerWidth = await AtOutlinerPanel.grabPanelsContainerBbox("width");
+    const panelContainerWidth = await AtOutlinerPanel.grabPanelsContainerBbox('width');
     const shiftX = 50;
 
     await AtOutlinerPanel.dragPanelTo(panelContainerWidth - panelBbox.width / 2 - shiftX, panelBbox.y);
@@ -445,7 +445,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     await AtOutlinerPanel.dragPanelBy(-5, 0);
     AtOutlinerPanel.seePanelAttachedRight();
   }
-  I.say("Attached panels should be resizable");
+  I.say('Attached panels should be resizable');
 
   {
     const panelBbox = await AtOutlinerPanel.grabPanelBbox();
@@ -464,12 +464,12 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     assert(newPanelBbox.width - panelBbox.width, 10);
   }
 
-  I.say("Collapse is still working");
+  I.say('Collapse is still working');
   AtOutlinerPanel.collapsePanel();
   AtOutlinerPanel.dontSeePanelBody();
   AtOutlinerPanel.dontSeeСollapseButton();
   AtOutlinerPanel.seeExpandButton();
-  I.say("Drag panel somewhere to the center of the screen");
+  I.say('Drag panel somewhere to the center of the screen');
   {
     const panelBbox = await AtDetailsPanel.grabPanelBbox();
     const panelsContainerBbox = await AtPanels.grabPanelsContainerBbox();
@@ -478,17 +478,17 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
     await AtDetailsPanel.dragPanelTo(panelsContainerCenter.x, panelsContainerCenter.y - panelBbox.height / 2);
     AtDetailsPanel.seePanelDetached();
   }
-  I.say("Collapse detached panel");
+  I.say('Collapse detached panel');
   AtDetailsPanel.collapsePanel();
   AtDetailsPanel.dontSeePanelBody();
   AtDetailsPanel.dontSeeСollapseButton();
   AtDetailsPanel.seeExpandButton();
 
-  I.say("Make sure that it is still movable");
+  I.say('Make sure that it is still movable');
   await AtDetailsPanel.dragPanelToLeftSocket();
-  I.say("and attachable");
+  I.say('and attachable');
   AtDetailsPanel.seePanelAttachedLeft();
-  I.say("and expandable");
+  I.say('and expandable');
   AtDetailsPanel.expandPanel();
   AtDetailsPanel.seePanelBody();
   AtDetailsPanel.seeСollapseButton();

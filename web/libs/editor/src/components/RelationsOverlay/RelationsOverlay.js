@@ -1,48 +1,48 @@
-import { observer } from "mobx-react";
-import { isAlive } from "mobx-state-tree";
-import { PureComponent, createRef, forwardRef, useEffect, useRef } from "react";
-import { useState } from "react";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { observer } from 'mobx-react';
+import { isAlive } from 'mobx-state-tree';
+import { PureComponent, createRef, forwardRef, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
-import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
-import { isDefined } from "../../utils/utilities";
-import NodesConnector from "./NodesConnector";
+import { FF_DEV_3391, isFF } from '../../utils/feature-flags';
+import { isDefined } from '../../utils/utilities';
+import NodesConnector from './NodesConnector';
 
 const ArrowMarker = ({ id, color }) => {
   return (
     <marker
       id={`arrow-${id}`}
-      viewBox="0 0 10 10"
+      viewBox='0 0 10 10'
       refX={8}
       refY={5}
       markerWidth={4}
       markerHeight={4}
-      orient="auto-start-reverse"
+      orient='auto-start-reverse'
     >
-      <path d="M 0 0 L 10 5 L 0 10 z" fill={color} />
+      <path d='M 0 0 L 10 5 L 0 10 z' fill={color} />
     </marker>
   );
 };
 
 const RelationItemRect = ({ x, y, width, height }) => {
-  return <rect x={x} y={y} width={width} height={height} fill="none" />;
+  return <rect x={x} y={y} width={width} height={height} fill='none' />;
 };
 
 const RelationConnector = ({ id, command, color, direction, highlight }) => {
-  const pathColor = highlight ? "#fa541c" : color;
+  const pathColor = highlight ? '#fa541c' : color;
   const pathSettings = {
     d: command,
     stroke: pathColor,
-    fill: "none",
-    strokeLinecap: "round",
+    fill: 'none',
+    strokeLinecap: 'round',
   };
 
   const markers = {};
 
-  if (direction === "bi" || direction === "right") {
+  if (direction === 'bi' || direction === 'right') {
     markers.markerEnd = `url(#arrow-${id})`;
   }
-  if (direction === "bi" || direction === "left") {
+  if (direction === 'bi' || direction === 'left') {
     markers.markerStart = `url(#arrow-${id})`;
   }
 
@@ -64,13 +64,13 @@ const RelationLabel = ({ label, position }) => {
 
   const groupAttributes = {
     transform: `translate(${x}, ${y})`,
-    textAnchor: "middle",
-    dominantBaseline: "middle",
+    textAnchor: 'middle',
+    dominantBaseline: 'middle',
   };
 
   const textAttributes = {
-    fill: "white",
-    style: { fontSize: 12, fontFamily: "arial" },
+    fill: 'white',
+    style: { fontSize: 12, fontFamily: 'arial' },
   };
 
   useEffect(() => {
@@ -87,7 +87,7 @@ const RelationLabel = ({ label, position }) => {
 
   return (
     <g {...groupAttributes}>
-      <rect {...background} stroke="#fff" strokeWidth={2} fill="#a0a" rx="3" />
+      <rect {...background} stroke='#fff' strokeWidth={2} fill='#a0a' rx='3' />
       <text ref={textRef} {...textAttributes}>
         {label}
       </text>
@@ -111,7 +111,7 @@ const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, d
   }, []);
   if (start.width < 1 || start.height < 1 || end.width < 1 || end.height < 1) return null;
   return (
-    <g opacity={dimm && !highlight ? 0.5 : 1} visibility={hideConnection ? "hidden" : "visible"}>
+    <g opacity={dimm && !highlight ? 0.5 : 1} visibility={hideConnection ? 'hidden' : 'visible'}>
       <RelationItemRect {...start} />
       <RelationItemRect {...end} />
       <RelationConnector
@@ -195,17 +195,17 @@ class RelationsOverlay extends PureComponent {
     const style = {
       top: 0,
       left: 0,
-      width: "100%",
-      height: "100%",
-      position: "absolute",
-      pointerEvents: "none",
+      width: '100%',
+      height: '100%',
+      position: 'absolute',
+      pointerEvents: 'none',
       zIndex: 100,
     };
 
     return (
       <AutoSizer onResize={this.onResize}>
         {() => (
-          <svg className="relations-overlay" ref={this.rootNode} xmlns="http://www.w3.org/2000/svg" style={style}>
+          <svg className='relations-overlay' ref={this.rootNode} xmlns='http://www.w3.org/2000/svg' style={style}>
             {this.state.shouldRender && this.renderRelations(relations, visible, hasHighlight, highlighted)}
           </svg>
         )}

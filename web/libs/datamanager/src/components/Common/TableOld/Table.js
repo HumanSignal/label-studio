@@ -1,26 +1,26 @@
-import { observer } from "mobx-react";
-import React, { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FaCode } from "react-icons/fa";
-import { RiCodeLine } from "react-icons/ri";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { VariableSizeList } from "react-window";
-import InfiniteLoader from "react-window-infinite-loader";
-import { LsGear, LsGearNewUI } from "../../../assets/icons";
-import { useSDK } from "../../../providers/SDKProvider";
-import { Block } from "../../../utils/bem";
-import { FF_DEV_3873, FF_LOPS_E_3, FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
-import { isDefined } from "../../../utils/utils";
-import { Button } from "../Button/Button";
-import { FieldsButton } from "../FieldsButton";
-import { Icon } from "../Icon/Icon";
-import { modal } from "../Modal/Modal";
-import { Tooltip } from "../Tooltip/Tooltip";
-import "./Table.styl";
-import { TableCheckboxCell } from "./TableCheckbox";
-import { TableBlock, TableContext, TableElem } from "./TableContext";
-import { TableHead } from "./TableHead/TableHead";
-import { TableRow } from "./TableRow/TableRow";
-import { prepareColumns } from "./utils";
+import { observer } from 'mobx-react';
+import React, { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FaCode } from 'react-icons/fa';
+import { RiCodeLine } from 'react-icons/ri';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { VariableSizeList } from 'react-window';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { LsGear, LsGearNewUI } from '../../../assets/icons';
+import { useSDK } from '../../../providers/SDKProvider';
+import { Block } from '../../../utils/bem';
+import { FF_DEV_3873, FF_LOPS_E_3, FF_LOPS_E_10, isFF } from '../../../utils/feature-flags';
+import { isDefined } from '../../../utils/utils';
+import { Button } from '../Button/Button';
+import { FieldsButton } from '../FieldsButton';
+import { Icon } from '../Icon/Icon';
+import { modal } from '../Modal/Modal';
+import { Tooltip } from '../Tooltip/Tooltip';
+import './Table.styl';
+import { TableCheckboxCell } from './TableCheckbox';
+import { TableBlock, TableContext, TableElem } from './TableContext';
+import { TableHead } from './TableHead/TableHead';
+import { TableRow } from './TableRow/TableRow';
+import { prepareColumns } from './utils';
 
 const Decorator = (decoration) => {
   return {
@@ -54,7 +54,7 @@ export const Table = observer(
     headerExtra,
     ...props
   }) => {
-    const colOrderKey = "dm:columnorder";
+    const colOrderKey = 'dm:columnorder';
     const tableHead = useRef();
     const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const listRef = useRef();
@@ -68,13 +68,13 @@ export const Table = observer(
 
     if (props.onSelectAll && props.onSelectRow) {
       columns.unshift({
-        id: "select",
-        headerClassName: "table__select-all",
-        cellClassName: "select-row",
+        id: 'select',
+        headerClassName: 'table__select-all',
+        cellClassName: 'select-row',
         style: {
           width: 40,
           maxWidth: 40,
-          justifyContent: "center",
+          justifyContent: 'center',
         },
         onClick: (e) => e.stopPropagation(),
         Header: () => {
@@ -83,7 +83,7 @@ export const Table = observer(
               checked={selectedItems.isAllSelected}
               indeterminate={selectedItems.isIndeterminate}
               onChange={() => props.onSelectAll()}
-              className="select-all"
+              className='select-all'
             />
           );
         },
@@ -99,19 +99,19 @@ export const Table = observer(
     }
 
     columns.push({
-      id: "show-source",
-      cellClassName: "show-source",
+      id: 'show-source',
+      cellClassName: 'show-source',
       style: {
         width: 40,
         maxWidth: 40,
-        justifyContent: "center",
+        justifyContent: 'center',
       },
       onClick: (e) => e.stopPropagation(),
       Header() {
         return <div style={{ width: 40 }} />;
       },
       Cell({ data }) {
-        let out = JSON.parse(data.source ?? "{}");
+        let out = JSON.parse(data.source ?? '{}');
 
         out = {
           id: out?.id,
@@ -121,7 +121,7 @@ export const Table = observer(
         };
 
         const onTaskLoad = async () => {
-          if (isFF(FF_LOPS_E_3) && type === "DE") {
+          if (isFF(FF_LOPS_E_3) && type === 'DE') {
             return new Promise((resolve) => resolve(out));
           }
           const response = await api.task({ taskID: out.id });
@@ -130,9 +130,9 @@ export const Table = observer(
         };
 
         return (
-          <Tooltip title="Show task source">
+          <Tooltip title='Show task source'>
             <Button
-              type="link"
+              type='link'
               style={{ width: 32, height: 32, padding: 0 }}
               onClick={() => {
                 modal({
@@ -215,7 +215,7 @@ export const Table = observer(
             wrapperStyle={style}
             style={{
               height: props.rowHeight,
-              width: props.fitContent ? "fit-content" : "auto",
+              width: props.fitContent ? 'fit-content' : 'auto',
             }}
             decoration={Decoration}
           />
@@ -273,7 +273,7 @@ export const Table = observer(
       const listComponent = listRef.current?._listRef;
 
       if (listComponent) {
-        listComponent.scrollToItem(data.indexOf(focusedItem), "center");
+        listComponent.scrollToItem(data.indexOf(focusedItem), 'center');
       }
     }, [data]);
     const tableWrapper = useRef();
@@ -286,18 +286,18 @@ export const Table = observer(
       <>
         {view.root.isLabeling && (
           <Block
-            name="columns__selector"
+            name='columns__selector'
             style={{
               right,
             }}
           >
             {isFF(FF_DEV_3873) ? (
               <FieldsButton
-                className={"columns__selector__button-new"}
+                className={'columns__selector__button-new'}
                 wrapper={FieldsButton.Checkbox}
                 icon={<LsGearNewUI />}
-                style={{ padding: "0" }}
-                tooltip={"Customize Columns"}
+                style={{ padding: '0' }}
+                tooltip={'Customize Columns'}
               />
             ) : (
               <FieldsButton
@@ -307,15 +307,15 @@ export const Table = observer(
                   padding: 0,
                   zIndex: 1000,
                   borderRadius: 0,
-                  height: "45px",
-                  width: "45px",
-                  margin: "-1px",
+                  height: '45px',
+                  width: '45px',
+                  margin: '-1px',
                 }}
               />
             )}
           </Block>
         )}
-        <TableBlock ref={tableWrapper} name="table" mod={{ fit: props.fitToContent }}>
+        <TableBlock ref={tableWrapper} name='table' mod={{ fit: props.fitToContent }}>
           <TableContext.Provider value={contextValue}>
             <StickyList
               ref={listRef}
@@ -343,7 +343,7 @@ export const Table = observer(
 
 const StickyListContext = createContext();
 
-StickyListContext.displayName = "StickyListProvider";
+StickyListContext.displayName = 'StickyListProvider';
 
 const ItemWrapper = ({ data, index, style }) => {
   const { Renderer, stickyItems } = data;
@@ -385,7 +385,7 @@ const StickyList = observer(
 
     return (
       <StickyListContext.Provider value={itemData}>
-        <TableElem tag={AutoSizer} name="auto-size">
+        <TableElem tag={AutoSizer} name='auto-size'>
           {({ width, height }) => (
             <InfiniteLoader
               ref={listRef}
@@ -397,7 +397,7 @@ const StickyList = observer(
             >
               {({ onItemsRendered, ref }) => (
                 <TableElem
-                  name="virual"
+                  name='virual'
                   tag={VariableSizeList}
                   {...rest}
                   ref={ref}
@@ -419,7 +419,7 @@ const StickyList = observer(
   }),
 );
 
-StickyList.displayName = "StickyList";
+StickyList.displayName = 'StickyList';
 
 const innerElementType = forwardRef(({ children, ...rest }, ref) => {
   return (
@@ -428,7 +428,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
         <div ref={ref} {...rest}>
           {stickyItems.map((index) => (
             <TableElem
-              name="sticky-header"
+              name='sticky-header'
               tag={StickyComponent}
               key={index}
               index={index}
@@ -456,7 +456,7 @@ const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
         data: response.data,
       };
 
-      if (sdkType !== "DE") {
+      if (sdkType !== 'DE') {
         formatted.annotations = response.annotations ?? [];
         formatted.predictions = response.predictions ?? [];
       }
@@ -464,5 +464,5 @@ const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
     });
   }, []);
 
-  return <pre>{source ? JSON.stringify(source, null, "  ") : null}</pre>;
+  return <pre>{source ? JSON.stringify(source, null, '  ') : null}</pre>;
 };

@@ -1,9 +1,9 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import { FaEllipsisV } from "react-icons/fa";
-import { Button, Card, Dropdown, Menu } from "../../../components";
-import { Space } from "../../../components/Space/Space";
-import { ApiContext } from "../../../providers/ApiProvider";
-import { StorageSummary } from "./StorageSummary";
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { FaEllipsisV } from 'react-icons/fa';
+import { Button, Card, Dropdown, Menu } from '../../../components';
+import { Space } from '../../../components/Space/Space';
+import { ApiContext } from '../../../providers/ApiProvider';
+import { StorageSummary } from './StorageSummary';
 
 export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDeleteStorage, storageTypes }) => {
   const [syncing, setSyncing] = useState(false);
@@ -15,7 +15,7 @@ export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDelet
     setSyncing(true);
     setSynced(null);
 
-    const result = await api.callApi("syncStorage", {
+    const result = await api.callApi('syncStorage', {
       params: {
         target,
         type: storageData.type,
@@ -35,38 +35,38 @@ export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDelet
     setStorageData(storage);
   }, [storage]);
 
-  const notSyncedYet = synced !== null || ["in_progress", "queued"].includes(storageData.status);
+  const notSyncedYet = synced !== null || ['in_progress', 'queued'].includes(storageData.status);
 
   return (
     <Card
       header={storageData.title.slice(0, 70) ?? `Untitled ${storageData.type}`}
       extra={
         <Dropdown.Trigger
-          align="right"
+          align='right'
           content={
-            <Menu size="compact" style={{ width: 110 }}>
+            <Menu size='compact' style={{ width: 110 }}>
               <Menu.Item onClick={() => onEditStorage(storageData)}>Edit</Menu.Item>
               <Menu.Item onClick={() => onDeleteStorage(storageData)}>Delete</Menu.Item>
             </Menu>
           }
         >
-          <Button type="link" style={{ width: 32, height: 32, marginRight: -10 }} icon={<FaEllipsisV />} />
+          <Button type='link' style={{ width: 32, height: 32, marginRight: -10 }} icon={<FaEllipsisV />} />
         </Dropdown.Trigger>
       }
     >
       <StorageSummary
         target={target}
         storage={storageData}
-        className={rootClass.elem("summary")}
+        className={rootClass.elem('summary')}
         storageTypes={storageTypes}
       />
-      <div className={rootClass.elem("sync")}>
+      <div className={rootClass.elem('sync')}>
         <div>
           <Button waiting={syncing} onClick={startSync} disabled={notSyncedYet}>
             Sync Storage
           </Button>
           {notSyncedYet && (
-            <div className={rootClass.elem("sync-count")}>
+            <div className={rootClass.elem('sync-count')}>
               Syncing may take some time, please refresh the page to see the current status.
             </div>
           )}

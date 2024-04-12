@@ -1,8 +1,8 @@
-import React from "react";
-import { useAPI } from "../../../providers/ApiProvider";
-import { unique } from "../../../utils/helpers";
+import React from 'react';
+import { useAPI } from '../../../providers/ApiProvider';
+import { unique } from '../../../utils/helpers';
 
-const DEFAULT_COLUMN = "$undefined$";
+const DEFAULT_COLUMN = '$undefined$';
 
 export const useImportPage = (project) => {
   const [uploading, setUploadingStatus] = React.useState(false);
@@ -13,21 +13,21 @@ export const useImportPage = (project) => {
   // choose - csv added, block modal until user chooses a way to hangle csv
   // tasks | ts — choice made, all good, this cannot be undone
   const [csvHandling, setCsvHandling] = React.useState(); // undefined | choose | tasks | ts
-  const uploadDisabled = csvHandling === "choose";
+  const uploadDisabled = csvHandling === 'choose';
   const api = useAPI();
 
   // don't use columns from csv if we'll not use it as csv
-  const columns = ["choose", "ts"].includes(csvHandling) ? [DEFAULT_COLUMN] : _columns;
+  const columns = ['choose', 'ts'].includes(csvHandling) ? [DEFAULT_COLUMN] : _columns;
 
   const finishUpload = async () => {
     setUploadingStatus(true);
-    const imported = await api.callApi("reimportFiles", {
+    const imported = await api.callApi('reimportFiles', {
       params: {
         pk: project.id,
       },
       body: {
         file_upload_ids: fileIds,
-        files_as_tasks_list: csvHandling === "tasks",
+        files_as_tasks_list: csvHandling === 'tasks',
       },
     });
 

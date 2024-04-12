@@ -1,4 +1,4 @@
-import styles from "./storybook.module.scss";
+import styles from './storybook.module.scss';
 
 /* eslint-disable-next-line */
 export type StorybookProps = {};

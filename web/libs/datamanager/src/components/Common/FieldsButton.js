@@ -1,11 +1,11 @@
-import { inject, observer } from "mobx-react";
-import React from "react";
-import { Elem } from "../../utils/bem";
-import { Button } from "./Button/Button";
-import { Checkbox } from "./Checkbox/Checkbox";
-import { Dropdown } from "./Dropdown/Dropdown";
-import { Menu } from "./Menu/Menu";
-import { Tooltip } from "./Tooltip/Tooltip";
+import { inject, observer } from 'mobx-react';
+import React from 'react';
+import { Elem } from '../../utils/bem';
+import { Button } from './Button/Button';
+import { Checkbox } from './Checkbox/Checkbox';
+import { Dropdown } from './Dropdown/Dropdown';
+import { Menu } from './Menu/Menu';
+import { Tooltip } from './Tooltip/Tooltip';
 
 const injector = inject(({ store }) => {
   return {
@@ -27,12 +27,12 @@ const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, sele
   };
 
   return (
-    <Menu size="small" selectedKeys={selected ? [selected] : ["none"]} closeDropdownOnItemClick={false}>
+    <Menu size='small' selectedKeys={selected ? [selected] : ['none']} closeDropdownOnItemClick={false}>
       {onReset &&
         MenuItem(
           {
-            key: "none",
-            title: resetTitle ?? "Default",
+            key: 'none',
+            title: resetTitle ?? 'Default',
             wrap: false,
           },
           onReset,
@@ -72,11 +72,11 @@ export const FieldsButton = injector(
     filter,
     selected,
     tooltip,
-    tooltipTheme = "dark",
+    tooltipTheme = 'dark',
   }) => {
     const content = [];
 
-    if (title) content.push(<React.Fragment key="f-button-title">{title}</React.Fragment>);
+    if (title) content.push(<React.Fragment key='f-button-title'>{title}</React.Fragment>);
 
     const renderButton = () => {
       return (
@@ -100,11 +100,11 @@ export const FieldsButton = injector(
         }
         style={{
           maxHeight: 280,
-          overflow: "auto",
+          overflow: 'auto',
         }}
       >
         {tooltip ? (
-          <Elem name={"field-button"} style={{ zIndex: 1000 }}>
+          <Elem name={'field-button'} style={{ zIndex: 1000 }}>
             <Tooltip title={tooltip} theme={tooltipTheme}>
               {renderButton()}
             </Tooltip>
@@ -120,10 +120,10 @@ export const FieldsButton = injector(
 FieldsButton.Checkbox = observer(({ column, children }) => {
   return (
     <Checkbox
-      size="small"
+      size='small'
       checked={!column.hidden}
       onChange={column.toggleVisibility}
-      style={{ width: "100%", height: "100%" }}
+      style={{ width: '100%', height: '100%' }}
     >
       {children}
     </Checkbox>

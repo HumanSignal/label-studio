@@ -1,4 +1,4 @@
-const assert = require("assert");
+const assert = require('assert');
 
 /**
  * Load custom example
@@ -20,27 +20,27 @@ async function initLabelStudio({
   if (window.Konva && window.Konva.stages.length) window.Konva.stages.forEach((stage) => stage.destroy());
 
   const interfaces = [
-    "panel",
-    "update",
-    "submit",
-    "controls",
-    "side-column",
-    "topbar",
-    "annotations:history",
-    "annotations:current",
-    "annotations:tabs",
-    "annotations:menu",
-    "annotations:add-new",
-    "annotations:delete",
-    "predictions:tabs",
-    "predictions:menu",
-    "edit-history",
+    'panel',
+    'update',
+    'submit',
+    'controls',
+    'side-column',
+    'topbar',
+    'annotations:history',
+    'annotations:current',
+    'annotations:tabs',
+    'annotations:menu',
+    'annotations:add-new',
+    'annotations:delete',
+    'predictions:tabs',
+    'predictions:menu',
+    'edit-history',
     ...additionalInterfaces,
   ];
   const task = { data, annotations, predictions };
 
   window.LabelStudio.destroyAll();
-  window.labelStudio = new window.LabelStudio("label-studio", { interfaces, config, task, settings, ...params });
+  window.labelStudio = new window.LabelStudio('label-studio', { interfaces, config, task, settings, ...params });
 }
 
 const createMethodInjectionIntoScript = (fnName, fn) => {
@@ -49,7 +49,7 @@ const createMethodInjectionIntoScript = (fnName, fn) => {
     .map((v, idx) => {
       return `v${idx}`;
     })
-    .join(", ");
+    .join(', ');
   let fnBody = fn.toString();
 
   if (/^(?:(?!function)(?!async)[a-zA-Z])+/.test(fnBody)) {
@@ -60,7 +60,7 @@ const createMethodInjectionIntoScript = (fnName, fn) => {
 }`;
 };
 
-const FN_PREFIX = "fn_";
+const FN_PREFIX = 'fn_';
 const prepareInitialParams = (value, prefix = FN_PREFIX) => {
   if (Array.isArray(value)) {
     const result = [];
@@ -74,7 +74,7 @@ const prepareInitialParams = (value, prefix = FN_PREFIX) => {
     });
     return [result, functions];
   }
-  if (typeof value === "object") {
+  if (typeof value === 'object') {
     const result = {};
     let functions = [];
 
@@ -87,7 +87,7 @@ const prepareInitialParams = (value, prefix = FN_PREFIX) => {
     });
     return [result, functions];
   }
-  if (typeof value === "function") {
+  if (typeof value === 'function') {
     const injection = createMethodInjectionIntoScript(prefix, value);
 
     return [prefix, [injection]];
@@ -99,7 +99,7 @@ const createLabelStudioInitFunction = (params) => {
   const [preparedParams, fns] = prepareInitialParams(params);
 
   return new Function(
-    "",
+    '',
     `
 function linkFunctions(value) {
  if (Array.isArray(value)) {
@@ -117,8 +117,8 @@ function linkFunctions(value) {
  }
  return value;
 }
-function ${createMethodInjectionIntoScript("initLabelStudio", initLabelStudio)}
-const fns = {${fns.join(",")}};
+function ${createMethodInjectionIntoScript('initLabelStudio', initLabelStudio)}
+const fns = {${fns.join(',')}};
 const params = ${JSON.stringify(preparedParams)};
 initLabelStudio(linkFunctions(params));
 `,
@@ -153,10 +153,10 @@ const createAddEventListenerScript = (eventName, callback) => {
     .map((v, idx) => {
       return `v${idx}`;
     })
-    .join(", ");
+    .join(', ');
 
   return new Function(
-    "",
+    '',
     `
     function ${eventName}(${args}) {
       return (${callback.toString()})(${args});
@@ -171,7 +171,7 @@ const createAddEventListenerScript = (eventName, callback) => {
  */
 const waitForImage = () => {
   return new Promise((resolve, reject) => {
-    const img = document.querySelector("[alt=LS]");
+    const img = document.querySelector('[alt=LS]');
 
     if (!img || img.complete) return resolve();
     // this should be rewritten to isReady when it is ready
@@ -187,13 +187,13 @@ const waitForImage = () => {
  * Wait for all audio on the page to be loaded
  */
 const waitForAudio = async () => {
-  const audios = document.querySelectorAll("audio");
+  const audios = document.querySelectorAll('audio');
 
   await Promise.all(
     [...audios].map((audio) => {
       if (audio.readyState === 4) return Promise.resolve(true);
       return new Promise((resolve) => {
-        audio.addEventListener("durationchange", () => {
+        audio.addEventListener('durationchange', () => {
           resolve(true);
         });
       });
@@ -243,7 +243,7 @@ const getCurrentMedia = (type) => {
  * @param {*} data
  */
 const convertToFixed = (data, fractionDigits = 2) => {
-  if (["string", "number"].includes(typeof data)) {
+  if (['string', 'number'].includes(typeof data)) {
     const n = Number(data);
 
     return Number.isNaN(n) ? data : Number.isInteger(n) ? n : +n.toFixed(fractionDigits);
@@ -251,7 +251,7 @@ const convertToFixed = (data, fractionDigits = 2) => {
   if (Array.isArray(data)) {
     return data.map((n) => convertToFixed(n, fractionDigits));
   }
-  if (typeof data === "object") {
+  if (typeof data === 'object') {
     const result = {};
 
     for (const key in data) {
@@ -277,17 +277,17 @@ const convertToFixed = (data, fractionDigits = 2) => {
  */
 const getSizeConvertor = (width, height) =>
   function convert(data, size = width) {
-    if (typeof data === "number") return convertToFixed((data * 100) / size);
+    if (typeof data === 'number') return convertToFixed((data * 100) / size);
     if (Array.isArray(data)) {
       if (data.length === 2) return [convert(data[0]), convert(data[1], height)];
       return data.map((n) => convert(n));
     }
-    if (typeof data === "object") {
+    if (typeof data === 'object') {
       const result = {};
 
       for (const key in data) {
-        if (key === "rotation") result[key] = data[key];
-        else if (key.startsWith("height") || key === "y" || key.endsWith("Y")) result[key] = convert(data[key], height);
+        if (key === 'rotation') result[key] = data[key];
+        else if (key.startsWith('height') || key === 'y' || key.endsWith('Y')) result[key] = convert(data[key], height);
         else result[key] = convert(data[key]);
       }
       return result;
@@ -299,9 +299,9 @@ const delay = (n) => new Promise((resolve) => setTimeout(resolve, n));
 
 // good idea, but it doesn't work :(
 const emulateClick = (source) => {
-  const event = document.createEvent("CustomEvent");
+  const event = document.createEvent('CustomEvent');
 
-  event.initCustomEvent("click", true, true, null);
+  event.initCustomEvent('click', true, true, null);
   event.clientX = source.getBoundingClientRect().top / 2;
   event.clientY = source.getBoundingClientRect().left / 2;
   source.dispatchEvent(event);
@@ -309,14 +309,14 @@ const emulateClick = (source) => {
 
 const emulateKeypress = (params) => {
   document.activeElement.dispatchEvent(
-    new KeyboardEvent("keydown", {
+    new KeyboardEvent('keydown', {
       bubbles: true,
       cancelable: true,
       ...params,
     }),
   );
   document.activeElement.dispatchEvent(
-    new KeyboardEvent("keyup", {
+    new KeyboardEvent('keyup', {
       bubbles: true,
       cancelable: true,
       ...params,
@@ -326,9 +326,9 @@ const emulateKeypress = (params) => {
 
 // click the Rect on the Konva canvas
 const clickRect = () => {
-  const rect = window.Konva.stages[0].findOne("Rect");
+  const rect = window.Konva.stages[0].findOne('Rect');
 
-  rect.fire("click", { clientX: 10, clientY: 10 });
+  rect.fire('click', { clientX: 10, clientY: 10 });
 };
 
 /**
@@ -338,7 +338,7 @@ const clickRect = () => {
 const clickKonva = ([x, y]) => {
   const stage = window.Konva.stages[0];
 
-  stage.fire("click", { clientX: x, clientY: y, evt: { offsetX: x, offsetY: y, timeStamp: Date.now() } });
+  stage.fire('click', { clientX: x, clientY: y, evt: { offsetX: x, offsetY: y, timeStamp: Date.now() } });
 };
 
 /**
@@ -352,14 +352,14 @@ const clickMultipleKonva = async (points) => {
 
   for (const point of points) {
     if (lastPoint) {
-      stage.fire("mousemove", { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
+      stage.fire('mousemove', { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
       await delay();
     }
-    stage.fire("mousedown", { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
+    stage.fire('mousedown', { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
     await delay();
-    stage.fire("mouseup", { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
+    stage.fire('mouseup', { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
     await delay();
-    stage.fire("click", { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
+    stage.fire('click', { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
     lastPoint = point;
     await delay();
   }
@@ -375,13 +375,13 @@ const polygonKonva = async (points) => {
     const stage = window.Konva.stages[0];
 
     for (const point of points) {
-      stage.fire("mousedown", {
+      stage.fire('mousedown', {
         evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now(), preventDefault: () => {} },
       });
-      stage.fire("click", {
+      stage.fire('click', {
         evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now(), preventDefault: () => {} },
       });
-      stage.fire("mouseup", {
+      stage.fire('mouseup', {
         evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now(), preventDefault: () => {} },
       });
       await delay(50);
@@ -391,14 +391,14 @@ const polygonKonva = async (points) => {
     // const firstPoint = stage.getIntersection({ x, y });
 
     // Circles (polygon points) redraw every new click so we can find it only after last click
-    const lastPoint = stage.find("Circle").slice(-1)[0];
-    const firstPoint = lastPoint.parent.find("Circle")[0];
+    const lastPoint = stage.find('Circle').slice(-1)[0];
+    const firstPoint = lastPoint.parent.find('Circle')[0];
     // for closing the Polygon we should place cursor over the first point
 
-    firstPoint.fire("mouseover");
+    firstPoint.fire('mouseover');
     await delay(100);
     // and only after that we can click on it
-    firstPoint.fire("click", { evt: { preventDefault: () => {} } });
+    firstPoint.fire('click', { evt: { preventDefault: () => {} } });
   } catch (e) {
     return String(e);
   }
@@ -415,15 +415,15 @@ const dragKonva = async ([x, y, shiftX, shiftY]) => {
   const stage = window.Konva.stages[0];
   const delay = (timeout = 0) => new Promise((resolve) => setTimeout(resolve, timeout));
 
-  stage.fire("mousedown", { evt: { offsetX: x, offsetY: y } });
+  stage.fire('mousedown', { evt: { offsetX: x, offsetY: y } });
   await delay();
-  stage.fire("mousemove", { evt: { offsetX: x + (shiftX >> 1), offsetY: y + (shiftY >> 1) } });
+  stage.fire('mousemove', { evt: { offsetX: x + (shiftX >> 1), offsetY: y + (shiftY >> 1) } });
   await delay();
   // we should move the cursor to the last point and only after that release the mouse
-  stage.fire("mousemove", { evt: { offsetX: x + shiftX, offsetY: y + shiftY } });
+  stage.fire('mousemove', { evt: { offsetX: x + shiftX, offsetY: y + shiftY } });
   await delay();
   // because some events work on mousemove and not on mouseup
-  stage.fire("mouseup", { evt: { offsetX: x + shiftX, offsetY: y + shiftY } });
+  stage.fire('mouseup', { evt: { offsetX: x + shiftX, offsetY: y + shiftY } });
   // looks like Konva needs some time to update image according to dpi
   await delay(32);
 };
@@ -492,7 +492,7 @@ const getKonvaPixelColorFromPoint = ([x, y]) => {
 };
 
 const clearModalIfPresent = () => {
-  const modal = window.document.querySelector(".ant-modal-root");
+  const modal = window.document.querySelector('.ant-modal-root');
 
   if (modal) {
     modal.remove();
@@ -523,12 +523,12 @@ const centerOfBbox = (bbox) => {
  * @returns {Promise<string>}
  */
 async function generateImageUrl({ width, height }) {
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
 
   canvas.width = width;
   canvas.height = height;
 
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
 
   const centerX = width / 2;
   const centerY = height / 2;
@@ -544,7 +544,7 @@ async function generateImageUrl({ width, height }) {
 }
 
 const getNaturalSize = () => {
-  const imageObject = window.Htx.annotationStore.selected.objects.find((o) => o.type === "image");
+  const imageObject = window.Htx.annotationStore.selected.objects.find((o) => o.type === 'image');
 
   return {
     width: imageObject.naturalWidth,
@@ -552,7 +552,7 @@ const getNaturalSize = () => {
   };
 };
 const getCanvasSize = () => {
-  const imageObject = window.Htx.annotationStore.selected.objects.find((o) => o.type === "image");
+  const imageObject = window.Htx.annotationStore.selected.objects.find((o) => o.type === 'image');
 
   return {
     width: imageObject.canvasSize.width,
@@ -579,7 +579,7 @@ const getImageFrameSize = () => {
 };
 const setZoom = ([scale, x, y]) => {
   return new Promise((resolve) => {
-    Htx.annotationStore.selected.objects.find((o) => o.type === "image").setZoom(scale, x, y);
+    Htx.annotationStore.selected.objects.find((o) => o.type === 'image').setZoom(scale, x, y);
     setTimeout(resolve, 30);
   });
 };
@@ -602,14 +602,14 @@ const countKonvaShapes = async () => {
 
 const isTransformerExist = async () => {
   const stage = window.Konva.stages[0];
-  const anchors = stage.find("._anchor").filter((shape) => shape.getAttr("visible") !== false);
+  const anchors = stage.find('._anchor').filter((shape) => shape.getAttr('visible') !== false);
 
   return !!anchors.length;
 };
 
 const isRotaterExist = async () => {
   const stage = window.Konva.stages[0];
-  const rotaters = stage.find(".rotater").filter((shape) => shape.getAttr("visible") !== false);
+  const rotaters = stage.find('.rotater').filter((shape) => shape.getAttr('visible') !== false);
 
   return !!rotaters.length;
 };
@@ -641,13 +641,13 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
 
   let elem = document.querySelector(selector);
 
-  if (elem.matches("iframe")) {
+  if (elem.matches('iframe')) {
     doc = elem.contentDocument;
     win = elem.contentWindow;
     elem = doc.body;
   }
 
-  const findOnPosition = (root, position, borderSide = "left") => {
+  const findOnPosition = (root, position, borderSide = 'left') => {
     const walker = doc.createTreeWalker(root, NodeFilter.SHOW_ALL);
 
     let lastPosition = 0;
@@ -656,13 +656,13 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
 
     while (currentNode) {
       const isText = currentNode.nodeType === Node.TEXT_NODE;
-      const isBR = currentNode.nodeName === "BR";
+      const isBR = currentNode.nodeName === 'BR';
 
       if (isText || isBR) {
         const length = currentNode.length ? currentNode.length : 1;
 
         if (length + lastPosition >= position || !nextNode) {
-          if (borderSide === "right" && length + lastPosition === position && nextNode) {
+          if (borderSide === 'right' && length + lastPosition === position && nextNode) {
             return { node: nextNode, position: 0 };
           }
           return { node: currentNode, position: isBR ? 0 : Math.min(Math.max(position - lastPosition, 0), length) };
@@ -675,8 +675,8 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
     }
   };
 
-  const start = findOnPosition(elem, rangeStart, "right");
-  const end = findOnPosition(elem, rangeEnd, "left");
+  const start = findOnPosition(elem, rangeStart, 'right');
+  const end = findOnPosition(elem, rangeEnd, 'left');
 
   const range = new win.Range();
   const selection = win.getSelection();
@@ -687,9 +687,9 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
   selection.removeAllRanges();
   selection.addRange(range);
 
-  const evt = new MouseEvent("mouseup");
+  const evt = new MouseEvent('mouseup');
 
-  evt.initMouseEvent("mouseup", true, true);
+  evt.initMouseEvent('mouseup', true, true);
   elem.dispatchEvent(evt);
 };
 
@@ -698,14 +698,14 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
   let isIFrame = false;
   let elem = document.querySelector(selector);
 
-  if (elem.matches("iframe")) {
+  if (elem.matches('iframe')) {
     doc = elem.contentDocument;
     win = elem.contentWindow;
     elem = doc.body;
     isIFrame = true;
   }
 
-  const findOnPosition = (root, position, borderSide = "left") => {
+  const findOnPosition = (root, position, borderSide = 'left') => {
     const walker = doc.createTreeWalker(root, NodeFilter.SHOW_ALL);
 
     let lastPosition = 0;
@@ -714,13 +714,13 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
 
     while (currentNode) {
       const isText = currentNode.nodeType === Node.TEXT_NODE;
-      const isBR = currentNode.nodeName === "BR";
+      const isBR = currentNode.nodeName === 'BR';
 
       if (isText || isBR) {
         const length = currentNode.length ? currentNode.length : 1;
 
         if (length + lastPosition >= position || !nextNode) {
-          if (borderSide === "right" && length + lastPosition === position && nextNode) {
+          if (borderSide === 'right' && length + lastPosition === position && nextNode) {
             return { node: nextNode, position: 0 };
           }
           return { node: currentNode, position: isBR ? 0 : Math.min(Math.max(position - lastPosition, 0), length) };
@@ -733,8 +733,8 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
     }
   };
 
-  const start = findOnPosition(elem, rangeStart, "right");
-  const end = findOnPosition(elem, rangeEnd, "left");
+  const start = findOnPosition(elem, rangeStart, 'right');
+  const end = findOnPosition(elem, rangeEnd, 'left');
 
   const range = new win.Range();
   const selection = win.getSelection();
@@ -787,13 +787,13 @@ const whereIsPixel = ([rgbArray, tolerance]) => {
 };
 
 const dumpJSON = (obj) => {
-  console.log(JSON.stringify(obj, null, "  "));
+  console.log(JSON.stringify(obj, null, '  '));
 };
 
 function _isObject(value) {
   const type = typeof value;
 
-  return value !== null && (type === "object" || type === "function");
+  return value !== null && (type === 'object' || type === 'function');
 }
 
 function _pickBy(obj, predicate, path = []) {

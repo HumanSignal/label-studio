@@ -1,5 +1,5 @@
-import { observer } from "mobx-react";
-import React from "react";
+import { observer } from 'mobx-react';
+import React from 'react';
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -11,14 +11,14 @@ import {
   FaRedo,
   FaTrashAlt,
   FaUndo,
-} from "react-icons/fa";
-import { useShortcut } from "../../../sdk/hotkeys";
-import { Block, Elem } from "../../../utils/bem";
-import { Button } from "../../Common/Button/Button";
-import { Icon } from "../../Common/Icon/Icon";
-import { Space } from "../../Common/Space/Space";
-import { Tooltip } from "../../Common/Tooltip/Tooltip";
-import "./Toolbar.styl";
+} from 'react-icons/fa';
+import { useShortcut } from '../../../sdk/hotkeys';
+import { Block, Elem } from '../../../utils/bem';
+import { Button } from '../../Common/Button/Button';
+import { Icon } from '../../Common/Icon/Icon';
+import { Space } from '../../Common/Space/Space';
+import { Tooltip } from '../../Common/Tooltip/Tooltip';
+import './Toolbar.styl';
 
 const TOOLTIP_DELAY = 0.8;
 
@@ -30,12 +30,12 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
   const { viewingAll: viewAll } = lsf?.annotationStore ?? {};
 
   return lsf?.noTask === false && task ? (
-    <Block name="label-toolbar" mod={{ labelStream: isLabelStream }}>
-      <Elem name="task">
-        <Space size="large">
-          <div style={{ display: "flex", alignItems: "center" }}>
+    <Block name='label-toolbar' mod={{ labelStream: isLabelStream }}>
+      <Elem name='task'>
+        <Space size='large'>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <History history={history}>
-              <div style={{ margin: history ? "0 10px" : 0 }}>Task #{task.id}</div>
+              <div style={{ margin: history ? '0 10px' : 0 }}>Task #{task.id}</div>
             </History>
           </div>
 
@@ -43,8 +43,8 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
         </Space>
       </Elem>
 
-      {!!lsf && !!annotation && annotation.type === "annotation" && (
-        <Elem name="actions">
+      {!!lsf && !!annotation && annotation.type === 'annotation' && (
+        <Elem name='actions'>
           {!viewAll && (
             <SubmissionButtons
               lsf={lsf}
@@ -54,20 +54,20 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
             />
           )}
 
-          <Elem name="tools">
+          <Elem name='tools'>
             <Space>
               {hasInstruction && (
-                <Tooltip title="Labeling Instructions">
+                <Tooltip title='Labeling Instructions'>
                   <Button
-                    look={lsf.showingDescription ? "primary" : "dashed"}
+                    look={lsf.showingDescription ? 'primary' : 'dashed'}
                     icon={<Icon icon={FaInfoCircle} />}
                     onClick={() => lsf.toggleDescription()}
                   />
                 </Tooltip>
               )}
 
-              <Tooltip title="Settings">
-                <Button look="dashed" icon={<Icon icon={FaCog} />} onClick={() => lsf.toggleSettings()} />
+              <Tooltip title='Settings'>
+                <Button look='dashed' icon={<Icon icon={FaCog} />} onClick={() => lsf.toggleSettings()} />
               </Tooltip>
             </Space>
           </Elem>
@@ -78,8 +78,8 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
 });
 
 const LSFOperations = observer(({ history }) => {
-  useShortcut("lsf.undo", () => history?.undo(), {}, [history]);
-  useShortcut("lsf.redo", () => history?.redo(), {}, [history]);
+  useShortcut('lsf.undo', () => history?.undo(), {}, [history]);
+  useShortcut('lsf.redo', () => history?.redo(), {}, [history]);
 
   return history ? (
     <Button.Group>
@@ -108,26 +108,26 @@ const SubmissionButtons = observer(({ lsf, annotation, isLabelStream, disabled }
 
   const buttons = [];
 
-  const submitShortcut = useShortcut("lsf.save-annotation", saveAnnotation, { showShortcut: true }, [disabled]);
-  const rejectShortcut = useShortcut("lsf.reject-task", skipTask, { showShortcut: true }, [disabled]);
+  const submitShortcut = useShortcut('lsf.save-annotation', saveAnnotation, { showShortcut: true }, [disabled]);
+  const rejectShortcut = useShortcut('lsf.reject-task', skipTask, { showShortcut: true }, [disabled]);
 
   buttons.push(
-    <Tooltip key="skip" title={rejectShortcut} mouseEnterDelay={TOOLTIP_DELAY}>
-      <Button look="danger" onClick={skipTask} disabled={disabled} icon={<Icon icon={FaBan} />}>
+    <Tooltip key='skip' title={rejectShortcut} mouseEnterDelay={TOOLTIP_DELAY}>
+      <Button look='danger' onClick={skipTask} disabled={disabled} icon={<Icon icon={FaBan} />}>
         Skip
       </Button>
     </Tooltip>,
   );
 
   buttons.push(
-    <Tooltip key="submit" title={submitShortcut} mouseEnterDelay={TOOLTIP_DELAY}>
+    <Tooltip key='submit' title={submitShortcut} mouseEnterDelay={TOOLTIP_DELAY}>
       <Button
-        look="primary"
+        look='primary'
         disabled={disabled}
         icon={<Icon icon={isNewTask ? FaCheck : FaCheckCircle} />}
         onClick={saveAnnotation}
       >
-        {isNewTask || isLabelStream ? "Submit" : "Update"}
+        {isNewTask || isLabelStream ? 'Submit' : 'Update'}
       </Button>
     </Tooltip>,
   );
@@ -136,7 +136,7 @@ const SubmissionButtons = observer(({ lsf, annotation, isLabelStream, disabled }
 });
 
 const HistoryButton = ({ children, ...rest }) => (
-  <Button {...rest} shape="circle">
+  <Button {...rest} shape='circle'>
     {children}
   </Button>
 );

@@ -1,5 +1,5 @@
-import { observer } from "mobx-react";
-import { type FC, useCallback, useContext, useMemo } from "react";
+import { observer } from 'mobx-react';
+import { type FC, useCallback, useContext, useMemo } from 'react';
 import {
   IconCursor,
   IconDetails,
@@ -12,25 +12,25 @@ import {
   IconSortUpNew,
   IconSpeed,
   IconTagAlt,
-} from "../../../assets/icons";
-import { Button } from "../../../common/Button/Button";
-import { Dropdown } from "../../../common/Dropdown/Dropdown";
+} from '../../../assets/icons';
+import { Button } from '../../../common/Button/Button';
+import { Dropdown } from '../../../common/Dropdown/Dropdown';
 // eslint-disable-next-line
 // @ts-ignore
-import { Menu } from "../../../common/Menu/Menu";
-import { BemWithSpecifiContext } from "../../../utils/bem";
-import { FF_DEV_3873, FF_LSDV_3025, FF_LSDV_4992, isFF } from "../../../utils/feature-flags";
-import { Filter } from "../../Filter/Filter";
-import { SidePanelsContext } from "../SidePanelsContext";
-import "./ViewControls.styl";
+import { Menu } from '../../../common/Menu/Menu';
+import { BemWithSpecifiContext } from '../../../utils/bem';
+import { FF_DEV_3873, FF_LSDV_3025, FF_LSDV_4992, isFF } from '../../../utils/feature-flags';
+import { Filter } from '../../Filter/Filter';
+import { SidePanelsContext } from '../SidePanelsContext';
+import './ViewControls.styl';
 
 const { Block, Elem } = BemWithSpecifiContext();
 
-export type GroupingOptions = "manual" | "label" | "type";
+export type GroupingOptions = 'manual' | 'label' | 'type';
 
-export type OrderingOptions = "score" | "date";
+export type OrderingOptions = 'score' | 'date';
 
-export type OrderingDirection = "asc" | "desc";
+export type OrderingDirection = 'asc' | 'desc';
 
 interface ViewControlsProps {
   ordering: OrderingOptions;
@@ -47,68 +47,68 @@ export const ViewControls: FC<ViewControlsProps> = observer(
     const context = useContext(SidePanelsContext);
     const getGroupingLabels = useCallback((value: GroupingOptions): LabelInfo => {
       switch (value) {
-        case "manual":
+        case 'manual':
           return {
-            label: "Group Manually",
-            selectedLabel: isFF(FF_DEV_3873) ? "Manual" : "Manual Grouping",
+            label: 'Group Manually',
+            selectedLabel: isFF(FF_DEV_3873) ? 'Manual' : 'Manual Grouping',
             icon: <IconList />,
-            tooltip: "Manually Grouped",
+            tooltip: 'Manually Grouped',
           };
-        case "label":
+        case 'label':
           return {
-            label: "Group by Label",
-            selectedLabel: isFF(FF_DEV_3873) ? (isFF(FF_LSDV_4992) ? "By Label" : "Label") : "Grouped by Label",
+            label: 'Group by Label',
+            selectedLabel: isFF(FF_DEV_3873) ? (isFF(FF_LSDV_4992) ? 'By Label' : 'Label') : 'Grouped by Label',
             icon: <IconTagAlt />,
-            tooltip: "Grouped by Label",
+            tooltip: 'Grouped by Label',
           };
-        case "type":
+        case 'type':
           return {
-            label: "Group by Tool",
-            selectedLabel: isFF(FF_DEV_3873) ? (isFF(FF_LSDV_4992) ? "By Tool" : "Tool") : "Grouped by Tool",
+            label: 'Group by Tool',
+            selectedLabel: isFF(FF_DEV_3873) ? (isFF(FF_LSDV_4992) ? 'By Tool' : 'Tool') : 'Grouped by Tool',
             icon: <IconCursor />,
-            tooltip: "Grouped by Tool",
+            tooltip: 'Grouped by Tool',
           };
       }
     }, []);
 
     const getOrderingLabels = useCallback((value: OrderingOptions): LabelInfo => {
       switch (value) {
-        case "date":
+        case 'date':
           return {
-            label: "Order by Time",
-            selectedLabel: "By Time",
+            label: 'Order by Time',
+            selectedLabel: 'By Time',
             icon: <IconDetails />,
           };
-        case "score":
+        case 'score':
           return {
-            label: "Order by Score",
-            selectedLabel: "By Score",
+            label: 'Order by Score',
+            selectedLabel: 'By Score',
             icon: <IconSpeed />,
           };
       }
     }, []);
 
     const renderOrderingDirectionIcon =
-      orderingDirection === "asc" ? (
-        <IconSortUpNew style={{ color: "#898098" }} />
+      orderingDirection === 'asc' ? (
+        <IconSortUpNew style={{ color: '#898098' }} />
       ) : (
-        <IconSortDownNew style={{ color: "#898098" }} />
+        <IconSortDownNew style={{ color: '#898098' }} />
       );
 
     return (
-      <Block name="view-controls" mod={{ collapsed: context.locked, FF_LSDV_4992: isFF(FF_LSDV_4992) }}>
+      <Block name='view-controls' mod={{ collapsed: context.locked, FF_LSDV_4992: isFF(FF_LSDV_4992) }}>
         <Grouping
           value={grouping}
-          options={["manual", "type", "label"]}
+          options={['manual', 'type', 'label']}
           onChange={(value) => onGroupingChange(value)}
           readableValueForKey={getGroupingLabels}
         />
-        {grouping === "manual" && (
-          <Elem name="sort">
+        {grouping === 'manual' && (
+          <Elem name='sort'>
             <Grouping
               value={ordering}
               direction={orderingDirection}
-              options={["score", "date"]}
+              options={['score', 'date']}
               onChange={(value) => onOrderingChange(value)}
               readableValueForKey={getOrderingLabels}
               allowClickSelected
@@ -122,14 +122,14 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             filterData={regions?.regions}
             availableFilters={[
               {
-                label: "Annotation results",
-                path: "labelName",
-                type: "String",
+                label: 'Annotation results',
+                path: 'labelName',
+                type: 'String',
               },
               {
-                label: "Confidence score",
-                path: "score",
-                type: "Number",
+                label: 'Confidence score',
+                path: 'score',
+                type: 'Number',
               },
             ]}
           />
@@ -177,7 +177,7 @@ const Grouping = <T extends string>({
   const dropdownContent = useMemo(() => {
     return (
       <Menu
-        size="medium"
+        size='medium'
         style={{
           width: 200,
           minWidth: 200,
@@ -205,18 +205,18 @@ const Grouping = <T extends string>({
   const style = isFF(FF_LSDV_4992)
     ? {}
     : {
-        padding: "0",
-        whiteSpace: "nowrap",
+        padding: '0',
+        whiteSpace: 'nowrap',
       };
 
   if (isFF(FF_DEV_3873)) {
-    style.padding = "0 12px 0 2px";
+    style.padding = '0 12px 0 2px';
   }
 
   return (
     <Dropdown.Trigger content={dropdownContent} style={{ width: 200 }}>
       <Button
-        type="text"
+        type='text'
         data-testid={`grouping-${value}`}
         {...extraStyles}
         icon={readableValue.icon}
@@ -229,7 +229,7 @@ const Grouping = <T extends string>({
           )
         }
         tooltip={(isFF(FF_LSDV_4992) && readableValue.tooltip) || undefined}
-        tooltipTheme="dark"
+        tooltipTheme='dark'
       >
         {readableValue.selectedLabel}
       </Button>
@@ -248,7 +248,7 @@ interface GroupingMenuItemProps<T extends string> {
 const GroupingMenuItem = <T extends string>({ value, name, label, direction, onChange }: GroupingMenuItemProps<T>) => {
   return (
     <Menu.Item name={name} onClick={() => onChange(name)}>
-      <Elem name="label">
+      <Elem name='label'>
         {label.label}
         <DirectionIndicator direction={direction} name={name} value={value} />
       </Elem>
@@ -264,7 +264,7 @@ interface DirectionIndicator {
 }
 
 const DirectionIndicator: FC<DirectionIndicator> = ({ direction, value, name, wrap = true }) => {
-  const content = direction === "asc" ? <IconSortUp /> : <IconSortDown />;
+  const content = direction === 'asc' ? <IconSortUp /> : <IconSortDown />;
 
   if (!direction || value !== name || isFF(FF_DEV_3873)) return null;
   if (!wrap) return content;
@@ -292,14 +292,14 @@ const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>
   return (
     <Elem
       tag={Button}
-      type="text"
+      type='text'
       disabled={isDisabled}
       onClick={toggleRegionsVisibility}
       mod={{ hidden: isAllHidden }}
-      aria-label={isAllHidden ? "Show all regions" : "Hide all regions"}
+      aria-label={isAllHidden ? 'Show all regions' : 'Hide all regions'}
       icon={isAllHidden ? <IconOutlinerEyeClosed /> : <IconOutlinerEyeOpened />}
-      tooltip={isAllHidden ? "Show all regions" : "Hide all regions"}
-      tooltipTheme="dark"
+      tooltip={isAllHidden ? 'Show all regions' : 'Hide all regions'}
+      tooltipTheme='dark'
     />
   );
 });

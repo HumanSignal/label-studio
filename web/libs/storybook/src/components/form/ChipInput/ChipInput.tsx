@@ -6,11 +6,11 @@ import {
   useMemo,
   useRef,
   useState,
-} from "react";
-import * as z from "zod";
-import { IconCross } from "../../../assets/icons";
-import { Block, Elem } from "../../../utils/bem";
-import "./ChipInput.scss";
+} from 'react';
+import * as z from 'zod';
+import { IconCross } from '../../../assets/icons';
+import { Block, Elem } from '../../../utils/bem';
+import './ChipInput.scss';
 
 const InputFormats = {
   plain: z.string(),
@@ -68,9 +68,9 @@ const validate = (schema: z.ZodString, value: string) => {
 
 const Chip = ({ value, onClose }: ChipProps) => {
   return (
-    <Elem tag="span" name="chip" data-testid="chip">
+    <Elem tag='span' name='chip' data-testid='chip'>
       {value}
-      <Elem tag="button" name="remove" data-testid="chip-remove" onClick={onClose}>
+      <Elem tag='button' name='remove' data-testid='chip-remove' onClick={onClose}>
         <IconCross />
       </Elem>
     </Elem>
@@ -82,16 +82,16 @@ const Chip = ({ value, onClose }: ChipProps) => {
  */
 export const ChipInput = ({
   onChange,
-  className = "",
+  className = '',
   value = [],
-  placeholder = "Enter emails separated by spaces or commas",
+  placeholder = 'Enter emails separated by spaces or commas',
   unique = true,
   ...restProps
 }: ChipInputProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wrapperRef = useRef<HTMLSpanElement | null>(null);
   const [selectedValues, _setSelectedValues] = useState<string[]>([]);
-  const [currentValue, setCurrentValue] = useState("");
+  const [currentValue, setCurrentValue] = useState('');
 
   const setSelectedValues = (input: string[] | ((current: string[]) => string[])) => {
     _setSelectedValues((current) => {
@@ -102,10 +102,10 @@ export const ChipInput = ({
   };
 
   const inputSchema = useMemo(() => {
-    if ("format" in restProps && restProps.format !== undefined) {
+    if ('format' in restProps && restProps.format !== undefined) {
       return InputFormats[restProps.format];
     }
-    if ("validate" in restProps && restProps.validate !== undefined) {
+    if ('validate' in restProps && restProps.validate !== undefined) {
       return restProps.validate;
     }
     return InputFormats.email;
@@ -129,7 +129,7 @@ export const ChipInput = ({
 
     const width = inputRef.current.scrollWidth;
 
-    wrapperRef.current.style.width = currentValue ? `${width}px` : "";
+    wrapperRef.current.style.width = currentValue ? `${width}px` : '';
   }, [currentValue]);
 
   // values should be already valid
@@ -145,7 +145,7 @@ export const ChipInput = ({
   const addValue = (value: string) => {
     const isValid = validate(inputSchema, value);
 
-    setCurrentValue(isValid ? "" : value);
+    setCurrentValue(isValid ? '' : value);
     if (isValid) addValues([value]);
   };
 
@@ -156,10 +156,10 @@ export const ChipInput = ({
   };
 
   const onPaste = (e: ClipboardEvent) => {
-    if (e.type !== "paste") return;
+    if (e.type !== 'paste') return;
     if (e.clipboardData === null) return;
 
-    const value = e.clipboardData.getData("text/plain") ?? "";
+    const value = e.clipboardData.getData('text/plain') ?? '';
     const valid = [];
     let current: string | undefined = value;
 
@@ -176,7 +176,7 @@ export const ChipInput = ({
         valid.push(value);
       } else {
         // invalid values are left in input, so they can be fixed
-        current = [value, current].join(",");
+        current = [value, current].join(',');
       }
     }
     addValues(valid);
@@ -188,7 +188,7 @@ export const ChipInput = ({
     const value = e.currentTarget.value;
     const current: string | undefined = value;
 
-    if (value.length === 0) return setCurrentValue("");
+    if (value.length === 0) return setCurrentValue('');
 
     if (current) setCurrentValue(current);
   };
@@ -204,14 +204,14 @@ export const ChipInput = ({
   // native one instead of synthetic event from React
   useEffect(() => {
     const el = inputRef?.current;
-    el?.addEventListener("paste", onPaste);
+    el?.addEventListener('paste', onPaste);
 
-    return () => el?.removeEventListener("paste", onPaste);
+    return () => el?.removeEventListener('paste', onPaste);
   });
 
   return (
-    <Block name="chip-input" className={className} onClick={onComponentFocus}>
-      <Elem name="content" onClick={onComponentFocus}>
+    <Block name='chip-input' className={className} onClick={onComponentFocus}>
+      <Elem name='content' onClick={onComponentFocus}>
         <span>
           {selectedValues.filter(Boolean).map((value, index) => (
             <Chip key={index} value={value} onClose={() => deleteItem(value)} />
@@ -220,17 +220,17 @@ export const ChipInput = ({
 
         {/* will be hidden on focus */}
         {selectedValues.length === 0 && !currentValue && placeholder && (
-          <Elem tag="span" name="placeholder" data-testid="placeholder">
+          <Elem tag='span' name='placeholder' data-testid='placeholder'>
             {placeholder}
           </Elem>
         )}
-        <Elem tag="span" name="input" ref={wrapperRef}>
+        <Elem tag='span' name='input' ref={wrapperRef}>
           <input
             ref={inputRef}
             value={currentValue}
-            data-testid="chip-input-field"
+            data-testid='chip-input-field'
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === 'Enter') {
                 // we are about to submit form, so add value
                 addValue(e.currentTarget.value);
               }

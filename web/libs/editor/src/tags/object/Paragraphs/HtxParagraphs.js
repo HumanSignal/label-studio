@@ -1,23 +1,23 @@
-import { inject, observer } from "mobx-react";
-import React, { Component } from "react";
+import { inject, observer } from 'mobx-react';
+import React, { Component } from 'react';
 
-import { IconHelp } from "../../../assets/icons";
-import Toggle from "../../../common/Toggle/Toggle";
-import { Tooltip } from "../../../common/Tooltip/Tooltip";
-import ObjectTag from "../../../components/Tags/Object";
-import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_4711, FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
-import { findNodeAt, matchesSelector, splitBoundaries } from "../../../utils/html";
-import { isSelectionContainsSpan } from "../../../utils/selection-tools";
-import { AuthorFilter } from "./AuthorFilter";
-import styles from "./Paragraphs.module.scss";
-import { Phrases } from "./Phrases";
+import { IconHelp } from '../../../assets/icons';
+import Toggle from '../../../common/Toggle/Toggle';
+import { Tooltip } from '../../../common/Tooltip/Tooltip';
+import ObjectTag from '../../../components/Tags/Object';
+import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_4711, FF_LSDV_E_278, isFF } from '../../../utils/feature-flags';
+import { findNodeAt, matchesSelector, splitBoundaries } from '../../../utils/html';
+import { isSelectionContainsSpan } from '../../../utils/selection-tools';
+import { AuthorFilter } from './AuthorFilter';
+import styles from './Paragraphs.module.scss';
+import { Phrases } from './Phrases';
 
 const audioDefaultProps = {};
 
-if (isFF(FF_LSDV_4711)) audioDefaultProps.crossOrigin = "anonymous";
+if (isFF(FF_LSDV_4711)) audioDefaultProps.crossOrigin = 'anonymous';
 
 class HtxParagraphsView extends Component {
-  _regionSpanSelector = ".htx-highlight";
+  _regionSpanSelector = '.htx-highlight';
 
   constructor(props) {
     super(props);
@@ -81,7 +81,7 @@ class HtxParagraphsView extends Component {
   }
 
   removeSurroundingNewlines(text) {
-    return text.replace(/^\n+/, "").replace(/\n+$/, "");
+    return text.replace(/^\n+/, '').replace(/\n+$/, '');
   }
 
   captureDocumentSelection() {
@@ -90,7 +90,7 @@ class HtxParagraphsView extends Component {
     const names = [...this.myRef.current.getElementsByClassName(cls.name)];
 
     names.forEach((el) => {
-      el.style.visibility = "hidden";
+      el.style.visibility = 'hidden';
     });
 
     let i;
@@ -100,7 +100,7 @@ class HtxParagraphsView extends Component {
 
     if (selection.isCollapsed) {
       names.forEach((el) => {
-        el.style.visibility = "unset";
+        el.style.visibility = 'unset';
       });
       return [];
     }
@@ -236,12 +236,12 @@ class HtxParagraphsView extends Component {
           });
         }
       } catch (err) {
-        console.error("Can not get selection", err);
+        console.error('Can not get selection', err);
       }
     }
 
     names.forEach((el) => {
-      el.style.visibility = "unset";
+      el.style.visibility = 'unset';
     });
 
     // BrowserRange#normalize() modifies the DOM structure and deselects the
@@ -262,7 +262,7 @@ class HtxParagraphsView extends Component {
     while (walker.nextNode()) {
       const node = walker.currentNode;
 
-      if (node.nodeName === "SPAN" && node.matches(this._regionSpanSelector) && isSelectionContainsSpan(node)) {
+      if (node.nodeName === 'SPAN' && node.matches(this._regionSpanSelector) && isSelectionContainsSpan(node)) {
         const region = this._determineRegion(node);
 
         regions.push(region);
@@ -280,7 +280,7 @@ class HtxParagraphsView extends Component {
 
   _determineRegion(element) {
     if (matchesSelector(element, this._regionSpanSelector)) {
-      const span = element.tagName === "SPAN" ? element : element.closest(this._regionSpanSelector);
+      const span = element.tagName === 'SPAN' ? element : element.closest(this._regionSpanSelector);
       const { item } = this.props;
 
       return item.regs.find((region) => region.find(span));
@@ -348,7 +348,7 @@ class HtxParagraphsView extends Component {
       phrases[end].innerText.slice(0, endOffset),
     ]
       .flat()
-      .join("");
+      .join('');
   }
 
   _handleUpdate() {
@@ -375,8 +375,8 @@ class HtxParagraphsView extends Component {
         range.setStart(...findNodeAt(startNode, startOffset));
         range.setEnd(...findNodeAt(endNode, endOffset));
 
-        if (r.text && range.toString().replace(/\s+/g, "") !== r.text.replace(/\s+/g, "")) {
-          console.info("Restore broken position", i, range.toString(), "->", r.text, r);
+        if (r.text && range.toString().replace(/\s+/g, '') !== r.text.replace(/\s+/g, '')) {
+          console.info('Restore broken position', i, range.toString(), '->', r.text, r);
           if (
             // span breaks the mock-up by its end, so the start of next one is wrong
             item.regs.slice(0, i).some((other) => r.start === other.end) &&
@@ -384,13 +384,13 @@ class HtxParagraphsView extends Component {
             r.start === r.end
           ) {
             // find region's text in the node (disregarding spaces)
-            const match = startNode.textContent.match(new RegExp(r.text.replace(/\s+/g, "\\s+")));
+            const match = startNode.textContent.match(new RegExp(r.text.replace(/\s+/g, '\\s+')));
 
             if (!match) console.warn("Can't find the text", r);
             const { index = 0 } = match || {};
 
             if (r.endOffset - r.startOffset !== r.text.length)
-              console.warn("Text length differs from region length; possible regions overlap");
+              console.warn('Text length differs from region length; possible regions overlap');
             startOffset = index;
             endOffset = startOffset + r.text.length;
 
@@ -413,8 +413,8 @@ class HtxParagraphsView extends Component {
       }
     });
 
-    Array.from(this.myRef.current.getElementsByTagName("a")).forEach((a) => {
-      a.addEventListener("click", (ev) => {
+    Array.from(this.myRef.current.getElementsByTagName('a')).forEach((a) => {
+      a.addEventListener('click', (ev) => {
         ev.preventDefault();
         return false;
       });
@@ -428,7 +428,7 @@ class HtxParagraphsView extends Component {
       this.state.canScroll
     ) {
       const _padding =
-        Number.parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue("padding-top")) || 0;
+        Number.parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue('padding-top')) || 0;
       const _playingItem = this.props.item._value[item.playingId];
       const _start = _playingItem.start;
       const _end = _playingItem.end;
@@ -450,7 +450,7 @@ class HtxParagraphsView extends Component {
                 if (this.state.inViewPort && this.state.canScroll) {
                   root.scrollTo({
                     top: _pos,
-                    behavior: "smooth",
+                    behavior: 'smooth',
                   });
                 }
               },
@@ -462,7 +462,7 @@ class HtxParagraphsView extends Component {
         if (this.state.inViewPort) {
           root.scrollTo({
             top: _wrapperOffsetTop,
-            behavior: "smooth",
+            behavior: 'smooth',
           });
         }
       }
@@ -472,28 +472,28 @@ class HtxParagraphsView extends Component {
   }
 
   _handleScrollToPhrase() {
-    const _padding = Number.parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue("padding-top")) || 0;
+    const _padding = Number.parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue('padding-top')) || 0;
     const _wrapperOffsetTop = this.activeRef.current?.offsetTop - _padding;
 
     this.myRef.current.scrollTo({
       top: _wrapperOffsetTop,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   }
 
   _handleScrollContainerHeight() {
     const container = this.myRef.current;
-    const mainContentView = document.querySelector(".lsf-main-content");
+    const mainContentView = document.querySelector('.lsf-main-content');
     const mainRect = mainContentView.getBoundingClientRect();
     const visibleHeight = document.documentElement.clientHeight - mainRect.top;
-    const annotationView = document.querySelector(".lsf-main-view__annotation");
+    const annotationView = document.querySelector('.lsf-main-view__annotation');
     const totalVisibleSpace = Math.floor(
       visibleHeight < mainRect.height ? visibleHeight : mainContentView?.offsetHeight || 0,
     );
     const filledSpace = annotationView?.offsetHeight || mainContentView.firstChild?.offsetHeight || 0;
     const containerHeight = container?.offsetHeight || 0;
     const viewPadding =
-      Number.parseInt(window.getComputedStyle(mainContentView)?.getPropertyValue("padding-bottom")) || 0;
+      Number.parseInt(window.getComputedStyle(mainContentView)?.getPropertyValue('padding-bottom')) || 0;
     const height = totalVisibleSpace - (filledSpace - containerHeight) - viewPadding;
     const minHeight = 100;
 
@@ -508,12 +508,12 @@ class HtxParagraphsView extends Component {
 
   componentDidMount() {
     if (isFF(FF_LSDV_E_278) && this.props.item.contextscroll)
-      this._resizeObserver.observe(document.querySelector(".lsf-main-content"));
+      this._resizeObserver.observe(document.querySelector('.lsf-main-content'));
     this._handleUpdate();
   }
 
   componentWillUnmount() {
-    const target = document.querySelector(".lsf-main-content");
+    const target = document.querySelector('.lsf-main-content');
 
     if (target) this._resizeObserver?.unobserve(target);
     this._resizeObserver?.disconnect();
@@ -545,7 +545,7 @@ class HtxParagraphsView extends Component {
         {item.contextscroll && (
           <div className={styles.wrapper_header__buttons}>
             <Toggle
-              data-testid={"auto-scroll-toggle"}
+              data-testid={'auto-scroll-toggle'}
               checked={this.state.canScroll}
               onChange={() => {
                 if (!this.state.canScroll) this._handleScrollToPhrase();
@@ -554,9 +554,9 @@ class HtxParagraphsView extends Component {
                   canScroll: !this.state.canScroll,
                 });
               }}
-              label={"Auto-scroll"}
+              label={'Auto-scroll'}
             />
-            <Tooltip placement="topLeft" title="Automatically sync transcript scrolling with audio playback">
+            <Tooltip placement='topLeft' title='Automatically sync transcript scrolling with audio playback'>
               <IconHelp />
             </Tooltip>
           </div>
@@ -576,7 +576,7 @@ class HtxParagraphsView extends Component {
     if (isFF(FF_DEV_2669) && !item._value) return null;
 
     return (
-      <ObjectTag item={item} className={"lsf-paragraphs"}>
+      <ObjectTag item={item} className={'lsf-paragraphs'}>
         {withAudio && (
           <audio
             {...audioDefaultProps}
@@ -593,7 +593,7 @@ class HtxParagraphsView extends Component {
         {isFF(FF_LSDV_E_278) ? this.renderWrapperHeader() : isFF(FF_DEV_2669) && <AuthorFilter item={item} />}
         <div
           ref={this.myRef}
-          data-testid="phrases-wrapper"
+          data-testid='phrases-wrapper'
           data-update={item._update}
           className={contextScroll ? styles.scroll_container : styles.container}
           onMouseUp={this.onMouseUp.bind(this)}
@@ -610,4 +610,4 @@ class HtxParagraphsView extends Component {
   }
 }
 
-export const HtxParagraphs = inject("store")(observer(HtxParagraphsView));
+export const HtxParagraphs = inject('store')(observer(HtxParagraphsView));

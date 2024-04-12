@@ -1,6 +1,6 @@
-import Konva from "konva";
+import Konva from 'konva';
 
-const EVENTS_NAME = "tr-konva";
+const EVENTS_NAME = 'tr-konva';
 
 class LSTransformerOld extends Konva.Transformer {
   get _outerBack() {
@@ -38,8 +38,8 @@ class LSTransformerOld extends Konva.Transformer {
 
       outerBack
         .setAttrs({
-          x: (x - this.getStage().getAttr("x")) * scale.x,
-          y: (y - this.getStage().getAttr("y")) * scale.y,
+          x: (x - this.getStage().getAttr('x')) * scale.x,
+          y: (y - this.getStage().getAttr('y')) * scale.y,
           width: width * scale.x,
           height: height * scale.y,
           rotation,
@@ -52,4 +52,4 @@ class LSTransformerOld extends Konva.Transformer {
 
 Konva.LSTransformerOld = LSTransformerOld;
 
-export default "LSTransformerOld";
+export default 'LSTransformerOld';

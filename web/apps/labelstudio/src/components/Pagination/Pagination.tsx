@@ -7,13 +7,13 @@ import {
   useEffect,
   useMemo,
   useState,
-} from "react";
-import { Block, Elem } from "../../utils/bem";
-import { clamp, isDefined } from "../../utils/helpers";
-import { useUpdateEffect } from "../../utils/hooks";
-import { Select } from "../Form/Elements";
-import { useValueTracker } from "../Form/Utils";
-import "./Pagination.styl";
+} from 'react';
+import { Block, Elem } from '../../utils/bem';
+import { clamp, isDefined } from '../../utils/helpers';
+import { useUpdateEffect } from '../../utils/hooks';
+import { Select } from '../Form/Elements';
+import { useValueTracker } from '../Form/Utils';
+import './Pagination.styl';
 
 interface PaginationProps {
   name?: string;
@@ -28,7 +28,7 @@ interface PaginationProps {
   waiting?: boolean;
   urlParamName?: string;
   pageSizeOptions?: number[];
-  size?: "small" | "medium" | "large";
+  size?: 'small' | 'medium' | 'large';
   style?: CSSProperties;
   onInit?: (pageNumber: number, pageSize: number) => void;
   onChange?: (pageNumber: number, pageSize: number) => void;
@@ -41,7 +41,7 @@ const isSystemEvent = (e: KeyboardEvent<HTMLInputElement>): boolean => {
     (e.shiftKey && e.code.match(/arrow/i) !== null) ||
     e.metaKey ||
     e.ctrlKey ||
-    e.code === "Backspace"
+    e.code === 'Backspace'
   );
 };
 
@@ -61,7 +61,7 @@ const setStoredPageSize = (name: string, pageSize: number) => {
 
 export const Pagination: FC<PaginationProps> = forwardRef(
   (
-    { allowInput = true, allowRewind = true, disabled = false, size = "medium", pageSizeOptions = [], ...props },
+    { allowInput = true, allowRewind = true, disabled = false, size = 'medium', pageSizeOptions = [], ...props },
     ref,
   ) => {
     const [inputMode, setInputMode] = useState(false);
@@ -123,7 +123,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
 
         urlParams.set(props.urlParamName, page.toString());
 
-        const historyArgs: [any, string, string] = [{ page }, "", `${location.pathname}?${urlParams.toString()}`];
+        const historyArgs: [any, string, string] = [{ page }, '', `${location.pathname}?${urlParams.toString()}`];
 
         if (options.replace) {
           history.replaceState(...historyArgs);
@@ -169,52 +169,52 @@ export const Pagination: FC<PaginationProps> = forwardRef(
         if (!props.urlParamName) return;
 
         const urlParams = new URLSearchParams(location.search);
-        const pageNumberFromURL = Number.parseInt(urlParams.get(props.urlParamName) ?? "");
+        const pageNumberFromURL = Number.parseInt(urlParams.get(props.urlParamName) ?? '');
 
         if (!isNaN(pageNumberFromURL) && pageNumberFromURL !== currentPage) {
           setCurrentPage(pageNumberFromURL);
         }
       };
 
-      window.addEventListener("popstate", popStateHandler);
+      window.addEventListener('popstate', popStateHandler);
 
-      return () => window.removeEventListener("popstate", popStateHandler);
+      return () => window.removeEventListener('popstate', popStateHandler);
     }, [props.urlParamName]);
 
     return totalPages > 1 ? (
-      <Block name="pagination" mod={{ disabled, size, waiting }} style={props.style}>
+      <Block name='pagination' mod={{ disabled, size, waiting }} style={props.style}>
         {props.label && isDefined(pageSize) && (
-          <Elem name="label">
+          <Elem name='label'>
             {props.label}: {visibleItems.start}-{visibleItems.end}
           </Elem>
         )}
-        <Elem name="navigation">
+        <Elem name='navigation'>
           {allowRewind && (
             <>
               <NavigationButton
-                mod={["arrow-left", "arrow-left-double"]}
+                mod={['arrow-left', 'arrow-left-double']}
                 onClick={() => setPageClamped(1)}
                 disabled={currentPage === 1}
               />
-              <Elem name="divider" />
+              <Elem name='divider' />
             </>
           )}
           <NavigationButton
-            mod={["arrow-left"]}
+            mod={['arrow-left']}
             onClick={() => setPageClamped(currentPage - 1)}
             disabled={currentPage === 1}
           />
-          <Elem name="input">
+          <Elem name='input'>
             {inputMode ? (
               <input
-                type="text"
+                type='text'
                 autoFocus
                 defaultValue={currentPage}
-                pattern="[0-9]"
+                pattern='[0-9]'
                 onKeyDown={(e) => {
-                  if (e.code === "Escape") {
+                  if (e.code === 'Escape') {
                     setInputMode(false);
-                  } else if (e.code === "Enter") {
+                  } else if (e.code === 'Enter') {
                     applyPageNumberFromEvent(e);
                   } else if (e.code.match(/[0-9]/) === null && !isSystemEvent(e)) {
                     e.preventDefault();
@@ -227,7 +227,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
               />
             ) : (
               <Elem
-                name="page-indicator"
+                name='page-indicator'
                 onClick={() => {
                   if (allowInput) setInputMode(true);
                 }}
@@ -242,15 +242,15 @@ export const Pagination: FC<PaginationProps> = forwardRef(
             )}
           </Elem>
           <NavigationButton
-            mod={["arrow-right"]}
+            mod={['arrow-right']}
             onClick={() => setPageClamped(currentPage + 1)}
             disabled={currentPage === totalPages}
           />
           {allowRewind && (
             <>
-              <Elem name="divider" />
+              <Elem name='divider' />
               <NavigationButton
-                mod={["arrow-right", "arrow-right-double"]}
+                mod={['arrow-right', 'arrow-right-double']}
                 onClick={() => setPageClamped(totalPages)}
                 disabled={currentPage === totalPages}
               />
@@ -259,7 +259,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
         </Elem>
 
         {pageSizeOptions?.length > 0 && (
-          <Elem name="page-size">
+          <Elem name='page-size'>
             <Select
               value={pageSize}
               options={pageSizeOptions.map((v) => ({ label: `${v} per page`, value: v }))}
@@ -289,7 +289,7 @@ const NavigationButton: FC<{
 
   mod.disabled = props.disabled === true;
 
-  return <Elem name="btn" mod={mod} onClick={props.onClick} />;
+  return <Elem name='btn' mod={mod} onClick={props.onClick} />;
 };
 
 export const usePage = (paramName: string, initialValue = 1) => {

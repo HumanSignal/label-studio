@@ -1,13 +1,13 @@
-const { centerOfBbox } = require("../tests/helpers");
+const { centerOfBbox } = require('../tests/helpers');
 const { I } = inject();
 
 module.exports = {
-  _rootSelector: ".lsf-outliner",
-  _regionListSelector: ".lsf-outliner-tree",
-  _regionListItemSelector: ".lsf-tree__node:not(.lsf-tree__node_type_footer)",
-  _regionListItemSelectedSelector: ".lsf-tree-node-selected",
-  _regionListItemIndex: ".lsf-outliner-item__index",
-  _regionVesibilityActionButton: ".lsf-outliner-item__control_type_visibility button",
+  _rootSelector: '.lsf-outliner',
+  _regionListSelector: '.lsf-outliner-tree',
+  _regionListItemSelector: '.lsf-tree__node:not(.lsf-tree__node_type_footer)',
+  _regionListItemSelectedSelector: '.lsf-tree-node-selected',
+  _regionListItemIndex: '.lsf-outliner-item__index',
+  _regionVesibilityActionButton: '.lsf-outliner-item__control_type_visibility button',
   locateOutliner() {
     return locate(this._rootSelector);
   },
@@ -71,6 +71,6 @@ module.exports = {
       y: toBbox.y + (3 * toBbox.height) / 4,
     };
 
-    return await I.dragAndDropMouse(fromPoint, toPoint, "left", steps);
+    return await I.dragAndDropMouse(fromPoint, toPoint, 'left', steps);
   },
 };

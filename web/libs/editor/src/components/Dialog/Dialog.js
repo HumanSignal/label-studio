@@ -1,8 +1,8 @@
-import { Tag } from "antd";
-import { PropTypes } from "prop-types";
-import React from "react";
+import { Tag } from 'antd';
+import { PropTypes } from 'prop-types';
+import React from 'react';
 
-import styles from "./Dialog.module.scss";
+import styles from './Dialog.module.scss';
 
 export default class DialogView extends React.Component {
   render() {
@@ -12,7 +12,7 @@ export default class DialogView extends React.Component {
     let date;
 
     if (this.props.hint) {
-      hint = <Tag color="blue">{this.props.hint}</Tag>;
+      hint = <Tag color='blue'>{this.props.hint}</Tag>;
     }
 
     if (this.props.bg) {
@@ -23,14 +23,14 @@ export default class DialogView extends React.Component {
       selectedStyle = `${selectedStyle} ${styles.block_selected}`;
       hint = (
         <div>
-          <Tag color="magenta">Selected Message</Tag>
+          <Tag color='magenta'>Selected Message</Tag>
         </div>
       );
 
       if (this.props.hint) {
         hint = (
           <div className={styles.tag}>
-            <Tag color="magenta">{this.props.hint}</Tag>
+            <Tag color='magenta'>{this.props.hint}</Tag>
           </div>
         );
       }
@@ -41,7 +41,7 @@ export default class DialogView extends React.Component {
     }
 
     return (
-      <div className={selectedStyle} style={{ background: bgColor, width: "max-content", maxWidth: "100%" }}>
+      <div className={selectedStyle} style={{ background: bgColor, width: 'max-content', maxWidth: '100%' }}>
         <span className={styles.name}>{this.props.name}:&nbsp;</span>
         <p className={styles.text}>{this.props.text}</p>
         {date}

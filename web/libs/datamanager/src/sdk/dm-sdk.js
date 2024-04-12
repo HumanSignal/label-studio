@@ -39,23 +39,23 @@
  * }} DMConfig
  */
 
-import { inject, observer } from "mobx-react";
-import { destroy } from "mobx-state-tree";
-import { unmountComponentAtNode } from "react-dom";
-import { toCamelCase } from "strman";
-import { instruments } from "../components/DataManager/Toolbar/instruments";
-import { APIProxy } from "../utils/api-proxy";
-import { FF_LSDV_4620_3_ML, isFF } from "../utils/feature-flags";
-import { objectToMap } from "../utils/helpers";
-import { deserializeJsonFromUrl, serializeJsonForUrl } from "../utils/urlJSON";
-import { isDefined } from "../utils/utils";
-import { APIConfig } from "./api-config";
-import { createApp } from "./app-create";
-import { LSFWrapper } from "./lsf-sdk";
-import { taskToLSFormat } from "./lsf-utils";
+import { inject, observer } from 'mobx-react';
+import { destroy } from 'mobx-state-tree';
+import { unmountComponentAtNode } from 'react-dom';
+import { toCamelCase } from 'strman';
+import { instruments } from '../components/DataManager/Toolbar/instruments';
+import { APIProxy } from '../utils/api-proxy';
+import { FF_LSDV_4620_3_ML, isFF } from '../utils/feature-flags';
+import { objectToMap } from '../utils/helpers';
+import { deserializeJsonFromUrl, serializeJsonForUrl } from '../utils/urlJSON';
+import { isDefined } from '../utils/utils';
+import { APIConfig } from './api-config';
+import { createApp } from './app-create';
+import { LSFWrapper } from './lsf-sdk';
+import { taskToLSFormat } from './lsf-utils';
 
 const DEFAULT_TOOLBAR =
-  "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button view-toggle";
+  'actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button view-toggle';
 
 const prepareInstruments = (instruments) => {
   const result = Object.entries(instruments).map(([name, builder]) => [name, builder({ inject, observer })]);
@@ -83,19 +83,19 @@ export class DataManager {
   labelStudioOptions = {};
 
   /** @type {"development" | "production"} */
-  env = "development";
+  env = 'development';
 
   /** @type {"explorer" | "labelstream"} */
-  mode = "explorer";
+  mode = 'explorer';
 
   /** @type {TableConfig} */
   tableConfig = {};
 
   /** @type {Dict<string|null>} */
   links = {
-    import: "/import",
-    export: "/export",
-    settings: "./settings",
+    import: '/import',
+    export: '/export',
+    settings: './settings',
   };
 
   /**
@@ -135,7 +135,7 @@ export class DataManager {
   };
 
   /** @type {"dm" | "labelops"} */
-  type = "dm";
+  type = 'dm';
 
   /**
    * Constructor
@@ -190,17 +190,17 @@ export class DataManager {
 
     this.updateActions(config.actions);
 
-    this.type = config.type ?? "dm";
+    this.type = config.type ?? 'dm';
 
     this.initApp();
   }
 
   get isExplorer() {
-    return this.mode === "labeling";
+    return this.mode === 'labeling';
   }
 
   get isLabelStream() {
-    return this.mode === "labelstream";
+    return this.mode === 'labelstream';
   }
 
   get projectId() {
@@ -243,7 +243,7 @@ export class DataManager {
   addAction(action, callback) {
     const { id } = action;
 
-    if (!id) throw new Error("Action must provide a unique ID");
+    if (!id) throw new Error('Action must provide a unique ID');
 
     this.actions.set(id, { action, callback });
 
@@ -272,7 +272,7 @@ export class DataManager {
 
     actions.forEach(([action, callback]) => {
       if (!isDefined(action.id)) {
-        throw new Error("Every action must provide a unique ID");
+        throw new Error('Every action must provide a unique ID');
       }
       this.addAction(action, callback);
     });
@@ -301,8 +301,8 @@ export class DataManager {
    * @param {Function} callback
    */
   on(eventName, callback) {
-    if (this.lsf && eventName.startsWith("lsf:")) {
-      const evt = toCamelCase(eventName.replace(/^lsf:/, ""));
+    if (this.lsf && eventName.startsWith('lsf:')) {
+      const evt = toCamelCase(eventName.replace(/^lsf:/, ''));
 
       this.lsf?.lsfInstance?.on(evt, callback);
     }
@@ -320,8 +320,8 @@ export class DataManager {
    * @param {Function?} callback
    */
   off(eventName, callback) {
-    if (this.lsf && eventName.startsWith("lsf:")) {
-      const evt = toCamelCase(eventName.replace(/^lsf:/, ""));
+    if (this.lsf && eventName.startsWith('lsf:')) {
+      const evt = toCamelCase(eventName.replace(/^lsf:/, ''));
 
       this.lsf?.lsfInstance?.off(evt, callback);
     }
@@ -336,11 +336,11 @@ export class DataManager {
   }
 
   removeAllListeners() {
-    const lsfEvents = Array.from(this.callbacks.keys()).filter((evt) => evt.startsWith("lsf:"));
+    const lsfEvents = Array.from(this.callbacks.keys()).filter((evt) => evt.startsWith('lsf:'));
 
     lsfEvents.forEach((evt) => {
       const callbacks = Array.from(this.getEventCallbacks(evt));
-      const eventName = toCamelCase(evt.replace(/^lsf:/, ""));
+      const eventName = toCamelCase(evt.replace(/^lsf:/, ''));
 
       callbacks.forEach((clb) => this.lsf?.lsfInstance?.off(eventName, clb));
     });
@@ -374,7 +374,7 @@ export class DataManager {
     this.mode = mode;
     this.store.setMode(mode);
 
-    if (modeChanged) this.invoke("modeChanged", this.mode);
+    if (modeChanged) this.invoke('modeChanged', this.mode);
   }
 
   /**
@@ -383,7 +383,7 @@ export class DataManager {
    * @param {any[]} args
    */
   async invoke(eventName, ...args) {
-    if (eventName.startsWith("lsf:")) return;
+    if (eventName.startsWith('lsf:')) return;
 
     this.getEventCallbacks(eventName).forEach((callback) => callback.apply(this, args));
   }
@@ -399,7 +399,7 @@ export class DataManager {
   /** @private */
   async initApp() {
     this.store = await createApp(this.root, this);
-    this.invoke("ready", [this]);
+    this.invoke('ready', [this]);
   }
 
   initLSF(element) {
@@ -410,7 +410,7 @@ export class DataManager {
       task: this.store.taskStore.selected,
       preload: this.preload,
       // annotation: this.store.annotationStore.selected,
-      isLabelStream: this.mode === "labelstream",
+      isLabelStream: this.mode === 'labelstream',
     });
   }
 
@@ -425,7 +425,7 @@ export class DataManager {
 
     const [task, annotation] = [this.store.taskStore.selected, this.store.annotationStore.selected];
 
-    const isLabelStream = this.mode === "labelstream";
+    const isLabelStream = this.mode === 'labelstream';
     const taskExists = isDefined(this.lsf.task) && isDefined(task);
     const taskSelected = this.lsf.task?.id === task?.id;
 
@@ -482,10 +482,10 @@ export class DataManager {
   }
 
   get toolbarInstruments() {
-    const sections = this.toolbar.split("|").map((s) => s.trim());
+    const sections = this.toolbar.split('|').map((s) => s.trim());
 
     const instrumentsList = sections.map((section) => {
-      return section.split(" ").filter((instrument) => {
+      return section.split(' ').filter((instrument) => {
         const nativeInstrument = !!instruments[instrument];
         const customInstrument = !!this.instruments.has(instrument);
 

@@ -1,16 +1,16 @@
-import { type FC, useEffect, useState } from "react";
+import { type FC, useEffect, useState } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import * as FilterInputs from "./types";
+import * as FilterInputs from './types';
 
-import { Block, Elem } from "../../utils/bem";
-import { FilterDropdown } from "./FilterDropdown";
+import { Block, Elem } from '../../utils/bem';
+import { FilterDropdown } from './FilterDropdown';
 
-import { IconDelete } from "../../assets/icons";
-import { isDefined } from "../../utils/utilities";
-import { type FilterListInterface, Logic } from "./FilterInterfaces";
-import "./FilterRow.styl";
+import { IconDelete } from '../../assets/icons';
+import { isDefined } from '../../utils/utilities';
+import { type FilterListInterface, Logic } from './FilterInterfaces';
+import './FilterRow.styl';
 
 interface FilterRowInterface extends FilterListInterface {
   availableFilters: any;
@@ -51,28 +51,28 @@ export const FilterRow: FC<FilterRowInterface> = ({
   }, [_selectedOperation, _selectedField]);
 
   return (
-    <Block name={"filter-row"} data-testid={"filter-row"}>
-      <Elem name={"column"}>
+    <Block name={'filter-row'} data-testid={'filter-row'}>
+      <Elem name={'column'}>
         {index === 0 ? (
-          <Elem name={"title-row"}>Where</Elem>
+          <Elem name={'title-row'}>Where</Elem>
         ) : (
           <FilterDropdown
             value={logic}
             items={logicItems}
-            dataTestid={"logic-dropdown"}
-            style={{ width: "60px" }}
+            dataTestid={'logic-dropdown'}
+            style={{ width: '60px' }}
             onChange={(value: any) => {
               onChange(index, { logic: value });
             }}
           />
         )}
       </Elem>
-      <Elem name={"column"}>
+      <Elem name={'column'}>
         <FilterDropdown
           value={field}
           items={availableFilters}
-          dataTestid={"field-dropdown"}
-          style={{ width: "140px" }}
+          dataTestid={'field-dropdown'}
+          style={{ width: '140px' }}
           onChange={(value: any) => {
             setSelectedField(availableFilters.findIndex((item: any) => (item.key ?? item.label) === value));
 
@@ -80,19 +80,19 @@ export const FilterRow: FC<FilterRowInterface> = ({
           }}
         />
       </Elem>
-      <Elem name={"column"}>
+      <Elem name={'column'}>
         <FilterDropdown
           value={operation}
           items={FilterInputs?.[availableFilters[_selectedField].type]}
-          dataTestid={"operation-dropdown"}
-          style={{ width: "110px" }}
+          dataTestid={'operation-dropdown'}
+          style={{ width: '110px' }}
           onChange={(value: any) => {
             setSelectedOperation(value);
           }}
         />
       </Elem>
-      <Elem name={"column"}>
-        {_inputComponent && operation !== "empty" && (
+      <Elem name={'column'}>
+        {_inputComponent && operation !== 'empty' && (
           <Elem
             tag={_inputComponent}
             value={value}
@@ -102,13 +102,13 @@ export const FilterRow: FC<FilterRowInterface> = ({
           />
         )}
       </Elem>
-      <Elem name={"column"}>
+      <Elem name={'column'}>
         <Elem
           onClick={() => {
             onDelete(index);
           }}
           data-testid={`delete-row-${index}`}
-          name={"delete"}
+          name={'delete'}
         >
           <IconDelete />
         </Elem>

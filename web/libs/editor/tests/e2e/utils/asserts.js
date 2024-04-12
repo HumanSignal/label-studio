@@ -1,5 +1,5 @@
-const assert = require("assert");
-const Helpers = require("../tests/helpers");
+const assert = require('assert');
+const Helpers = require('../tests/helpers');
 
 function deepEqualWithTolerance(actual, expected, fractionDigits = 2, message) {
   assert.deepStrictEqual(

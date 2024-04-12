@@ -82,5 +82,11 @@
         "noDangerouslySetInnerHtml": "off"
       }
     }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "single"
+    }
   }
 }

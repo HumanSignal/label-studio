@@ -1,9 +1,9 @@
-import { decode, encode } from "@thi.ng/rle-pack";
-import chroma from "chroma-js";
-import Constants from "../core/Constants";
+import { decode, encode } from '@thi.ng/rle-pack';
+import chroma from 'chroma-js';
+import Constants from '../core/Constants';
 
-import * as Colors from "./colors";
-import { FF_LSDV_4583, isFF } from "./feature-flags";
+import * as Colors from './colors';
+import { FF_LSDV_4583, isFF } from './feature-flags';
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -16,8 +16,8 @@ import { FF_LSDV_4583, isFF } from "./feature-flags";
  * @returns {string} Data URL containing the mask as an image.
  */
 function mask2DataURL(singleChannelData, w, h, color) {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
   canvas.width = w;
   canvas.height = h;
@@ -41,17 +41,17 @@ function mask2DataURL(singleChannelData, w, h, color) {
  */
 function maskDataURL2Image(maskDataURL, { color = Constants.FILL_COLOR } = {}) {
   return new Promise((resolve, _reject) => {
-    const img = document.createElement("img");
+    const img = document.createElement('img');
 
     img.onload = () => {
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       const nw = img.width;
       const nh = img.height;
 
       canvas.width = nw;
       canvas.height = nh;
 
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
 
       ctx.drawImage(img, 0, 0);
 
@@ -98,9 +98,9 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
   const endian = checkEndian();
   let finalColor;
 
-  if (endian === "little endian") {
+  if (endian === 'little endian') {
     finalColor = (alpha << 24) | (blue << 16) | (green << 8) | red;
-  } else if (endian === "big endian") {
+  } else if (endian === 'big endian') {
     finalColor = (red << 24) | (green << 16) | (blue << 8) | alpha;
   } else {
     // The most common architectures (x86 and ARM) are both little endian, so just assume that.
@@ -143,8 +143,8 @@ function RLE2Region(item, { color = Constants.FILL_COLOR } = {}) {
   const nw = item.currentImageEntity.naturalWidth;
   const nh = item.currentImageEntity.naturalHeight;
 
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
   canvas.width = nw;
   canvas.height = nh;
@@ -180,7 +180,7 @@ function exportRLE(region) {
   const { naturalWidth, naturalHeight } = region.currentImageEntity;
 
   // Prepare the canvas with sizes of image and stage
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
 
   // We only care about physical size, so set canvas dimensions to
   // image's natural dimensions
@@ -188,12 +188,12 @@ function exportRLE(region) {
   canvas.height = naturalHeight;
 
   // Make canvas offscreen and invisible
-  canvas.style.setProperty("position", "absolute");
-  canvas.style.setProperty("bottom", "200%");
-  canvas.style.setProperty("right", "200%");
-  canvas.style.setProperty("opacity", "0");
+  canvas.style.setProperty('position', 'absolute');
+  canvas.style.setProperty('bottom', '200%');
+  canvas.style.setProperty('right', '200%');
+  canvas.style.setProperty('opacity', '0');
 
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
 
   document.body.appendChild(canvas);
 
@@ -240,10 +240,10 @@ function exportRLE(region) {
         ctx.lineTo(...relativeToAbsolutePoint(points[2 * i], points[2 * i + 1]));
       }
 
-      ctx.strokeStyle = "#000";
+      ctx.strokeStyle = '#000';
       ctx.lineWidth = (touch.relativeStrokeWidth / 100) * naturalWidth;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       ctx.globalCompositeOperation = touch.compositeOperation;
       ctx.stroke();
     });
@@ -293,7 +293,7 @@ function Region2RLE(region) {
 
   !isVisible && layer.show();
   // hide labels on regions and show them later
-  layer.findOne(".highlight").hide();
+  layer.findOne('.highlight').hide();
 
   const width = stage.getWidth();
   const height = stage.getHeight();
@@ -318,7 +318,7 @@ function Region2RLE(region) {
   stage.drawScene();
   // resize to original size
   const canvas = layer.toCanvas({ pixelRatio: nw / region.currentImageEntity.stageWidth });
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
 
   // get the resulting raw data and encode into RLE format
   const data = ctx.getImageData(0, 0, nw, nh);
@@ -326,7 +326,7 @@ function Region2RLE(region) {
   for (let i = data.data.length / 4; i--; ) {
     data.data[i * 4] = data.data[i * 4 + 1] = data.data[i * 4 + 2] = data.data[i * 4 + 3];
   }
-  layer.findOne(".highlight").show();
+  layer.findOne('.highlight').show();
   stage
     .setWidth(width)
     .setHeight(height)
@@ -346,8 +346,8 @@ function Region2RLE(region) {
 }
 
 function brushSizeCircle(size) {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
   canvas.width = size * 4 + 8;
   canvas.height = size * 4 + 8;
@@ -356,7 +356,7 @@ function brushSizeCircle(size) {
   ctx.arc(size / 2 + 4, size / 2 + 4, size / 2, 0, 2 * Math.PI, false);
 
   ctx.lineWidth = 2;
-  ctx.strokeStyle = "white";
+  ctx.strokeStyle = 'white';
   ctx.stroke();
 
   return canvas.toDataURL();
@@ -368,7 +368,7 @@ function brushSizeCircle(size) {
  * @returns {string} Data URL containing inline SVG already enclosed in quotes
  */
 function encodeSVG(data) {
-  data = data.replace(/\s{2,}/g, " ");
+  data = data.replace(/\s{2,}/g, ' ');
 
   const symbols = /[\r\n%#()<>?[\\\]^`{|}]/g;
   const escaped = data.replace(symbols, encodeURIComponent);
@@ -387,10 +387,10 @@ const labelToSVG = (() => {
   const SVG_CACHE = {};
 
   function calculateTextWidth(text) {
-    const svg = document.createElement("svg");
-    const svgText = document.createElement("text");
+    const svg = document.createElement('svg');
+    const svgText = document.createElement('text');
 
-    svgText.style = "font-size: 9.5px; font-weight: bold; color: red; fill: red; font-family: Monaco";
+    svgText.style = 'font-size: 9.5px; font-weight: bold; color: red; fill: red; font-family: Monaco';
     svgText.innerHTML = text;
 
     svg.appendChild(svgText);
@@ -429,7 +429,7 @@ const labelToSVG = (() => {
     }
 
     const xmlns = 'xmlns="http://www.w3.org/2000/svg"';
-    const res = `<svg ${xmlns} height="16" width="${width}">${items.join("")}</svg>`;
+    const res = `<svg ${xmlns} height="16" width="${width}">${items.join('')}</svg>`;
     const enc = encodeSVG(res);
 
     SVG_CACHE[cacheKey] = enc;
@@ -456,7 +456,7 @@ const trim = (canvas) => {
   let copy;
   let width = canvas.width;
   let height = canvas.height;
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
   const bbox = {
     top: null,
     left: null,
@@ -465,7 +465,7 @@ const trim = (canvas) => {
   };
 
   try {
-    copy = document.createElement("canvas").getContext("2d");
+    copy = document.createElement('canvas').getContext('2d');
     const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const l = pixels.data.length;
     let i;
@@ -538,14 +538,14 @@ function checkEndian() {
   uint8Array[1] = 0xbb; // set second byte
 
   if (uint16array[0] === 0xbbaa) {
-    return "little endian";
+    return 'little endian';
   }
   if (uint16array[0] === 0xaabb) {
-    return "big endian";
+    return 'big endian';
   }
   // The most common architectures (x86 and ARM) are both little endian, so just assume that.
-  console.error("Can not determine platform endianness, assuming little endian");
-  return "little endian";
+  console.error('Can not determine platform endianness, assuming little endian');
+  return 'little endian';
 }
 
 export default {

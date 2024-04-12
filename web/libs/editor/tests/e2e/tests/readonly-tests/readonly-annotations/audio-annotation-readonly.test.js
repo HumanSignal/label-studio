@@ -1,22 +1,22 @@
-Feature("Readonly Annotation");
+Feature('Readonly Annotation');
 
-const imageExamples = new DataTable(["example", "regionName"]);
+const imageExamples = new DataTable(['example', 'regionName']);
 
-imageExamples.add([require("../../../examples/audio-regions"), "Beat"]);
+imageExamples.add([require('../../../examples/audio-regions'), 'Beat']);
 
 Data(imageExamples).Scenario(
-  "Audio Readonly Annotations",
+  'Audio Readonly Annotations',
   async ({ I, current, LabelStudio, AtSidebar, AtAudioView }) => {
-    I.amOnPage("/");
+    I.amOnPage('/');
     const { config, result, data } = current.example;
     const regions = result.filter((r) => {
-      return r.type.match("labels");
+      return r.type.match('labels');
     });
 
     const params = {
       annotations: [
         {
-          id: "test",
+          id: 'test',
           readonly: true,
           result,
         },
@@ -29,7 +29,7 @@ Data(imageExamples).Scenario(
 
     await AtAudioView.waitForAudio();
 
-    I.say("Check region is selectable");
+    I.say('Check region is selectable');
     AtSidebar.seeRegions(regions.length);
     AtSidebar.clickRegion(current.regionName);
 
@@ -37,17 +37,17 @@ Data(imageExamples).Scenario(
 
     await AtAudioView.moveRegion(regionId, 100);
 
-    I.say("Results are equal after modification attempt");
+    I.say('Results are equal after modification attempt');
     await LabelStudio.resultsNotChanged(result);
 
-    I.pressKey("Backspace");
-    I.say("Results are equal after deletion attempt");
+    I.pressKey('Backspace');
+    I.say('Results are equal after deletion attempt');
     await LabelStudio.resultsNotChanged(result);
 
     I.say("Can't draw new shape");
-    I.pressKey("1");
+    I.pressKey('1');
 
-    await AtAudioView.createRegion("audio", 50, 100);
+    await AtAudioView.createRegion('audio', 50, 100);
     AtSidebar.seeRegions(regions.length);
   },
 );

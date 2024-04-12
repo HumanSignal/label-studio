@@ -1,4 +1,4 @@
-import { cloneElement, useMemo } from "react";
+import { cloneElement, useMemo } from 'react';
 
 const compareCase = (value, caseValue) => {
   if (Array.isArray(caseValue)) {
@@ -20,7 +20,7 @@ export const Oneof = ({ value, children, className }) => {
   return selectedChild
     ? cloneElement(selectedChild, {
         ...selectedChild.props,
-        className: [className, selectedChild.props.className].join(" "),
+        className: [className, selectedChild.props.className].join(' '),
       })
     : null;
 };

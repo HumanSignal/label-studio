@@ -1,12 +1,12 @@
-import { types } from "mobx-state-tree";
+import { types } from 'mobx-state-tree';
 
-import { customTypes } from "../../core/CustomTypes";
-import Registry from "../../core/Registry";
-import { AnnotationMixin } from "../../mixins/AnnotationMixin";
-import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
-import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
-import { FF_DEV_4081, isFF } from "../../utils/feature-flags";
-import ControlBase from "./Base";
+import { customTypes } from '../../core/CustomTypes';
+import Registry from '../../core/Registry';
+import { AnnotationMixin } from '../../mixins/AnnotationMixin';
+import SeparatedControlMixin from '../../mixins/SeparatedControlMixin';
+import { ToolManagerMixin } from '../../mixins/ToolManagerMixin';
+import { FF_DEV_4081, isFF } from '../../utils/feature-flags';
+import ControlBase from './Base';
 
 /**
  * The `Magicwand` tag makes it possible to click in a region of an image a user is doing segmentation
@@ -98,15 +98,15 @@ import ControlBase from "./Base";
 
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
-  opacity: types.optional(customTypes.range(), "0.6"),
-  blurradius: types.optional(types.string, "5"),
-  defaultthreshold: types.optional(types.string, "15"),
+  opacity: types.optional(customTypes.range(), '0.6'),
+  blurradius: types.optional(types.string, '5'),
+  defaultthreshold: types.optional(types.string, '15'),
 });
 
 const Model = types
   .model({
-    type: "magicwand",
-    removeDuplicatesNamed: "Erase",
+    type: 'magicwand',
+    removeDuplicatesNamed: 'Erase',
   })
   .views((self) => ({
     get hasStates() {
@@ -116,11 +116,11 @@ const Model = types
     },
   }))
   .volatile(() => ({
-    toolNames: ["MagicWand", "Erase"],
+    toolNames: ['MagicWand', 'Erase'],
   }));
 
 const MagicWandModel = types.compose(
-  "MagicWandModel",
+  'MagicWandModel',
   ControlBase,
   AnnotationMixin,
   SeparatedControlMixin,
@@ -133,6 +133,6 @@ const HtxView = () => {
   return null;
 };
 
-isFF(FF_DEV_4081) && Registry.addTag("magicwand", MagicWandModel, HtxView);
+isFF(FF_DEV_4081) && Registry.addTag('magicwand', MagicWandModel, HtxView);
 
 export { HtxView, MagicWandModel };

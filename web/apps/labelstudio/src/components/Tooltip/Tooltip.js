@@ -1,22 +1,22 @@
-import { Children, cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { Block, Elem } from "../../utils/bem";
-import { alignElements } from "../../utils/dom";
-import { isDefined } from "../../utils/helpers";
-import { aroundTransition } from "../../utils/transition";
-import "./Tooltip.styl";
+import { Children, cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Block, Elem } from '../../utils/bem';
+import { alignElements } from '../../utils/dom';
+import { isDefined } from '../../utils/helpers';
+import { aroundTransition } from '../../utils/transition';
+import './Tooltip.styl';
 
 export const Tooltip = forwardRef(({ title, children, alignment, defaultVisible, disabled, style }, ref) => {
   if (!children || Array.isArray(children)) {
-    throw new Error("Tooltip does accept a single child only");
+    throw new Error('Tooltip does accept a single child only');
   }
 
   const triggerElement = ref ?? useRef();
   const tooltipElement = useRef();
   const [offset, setOffset] = useState({});
-  const [visibility, setVisibility] = useState(defaultVisible ? "visible" : null);
+  const [visibility, setVisibility] = useState(defaultVisible ? 'visible' : null);
   const [injected, setInjected] = useState(false);
-  const [align, setAlign] = useState(alignment ?? "top-center");
+  const [align, setAlign] = useState(alignment ?? 'top-center');
 
   const calculatePosition = useCallback(() => {
     const parent = triggerElement.current;
@@ -35,14 +35,14 @@ export const Tooltip = forwardRef(({ title, children, alignment, defaultVisible,
       if (tooltipElement.current) {
         aroundTransition(tooltipElement.current, {
           beforeTransition() {
-            setVisibility(visible ? "before-appear" : "before-disappear");
+            setVisibility(visible ? 'before-appear' : 'before-disappear');
           },
           transition() {
             if (visible) calculatePosition();
-            setVisibility(visible ? "appear" : "disappear");
+            setVisibility(visible ? 'appear' : 'disappear');
           },
           afterTransition() {
-            setVisibility(visible ? "visible" : null);
+            setVisibility(visible ? 'visible' : null);
             if (visible === false) setInjected(false);
           },
         });
@@ -53,18 +53,18 @@ export const Tooltip = forwardRef(({ title, children, alignment, defaultVisible,
 
   const visibilityClasses = useMemo(() => {
     switch (visibility) {
-      case "before-appear":
-        return "before-appear";
-      case "appear":
-        return "appear before-appear";
-      case "before-disappear":
-        return "before-disappear";
-      case "disappear":
-        return "disappear before-disappear";
-      case "visible":
-        return "visible";
+      case 'before-appear':
+        return 'before-appear';
+      case 'appear':
+        return 'appear before-appear';
+      case 'before-disappear':
+        return 'before-disappear';
+      case 'disappear':
+        return 'disappear before-disappear';
+      case 'visible':
+        return 'visible';
       default:
-        return visibility ? "visible" : null;
+        return visibility ? 'visible' : null;
     }
   }, [visibility]);
 
@@ -73,12 +73,12 @@ export const Tooltip = forwardRef(({ title, children, alignment, defaultVisible,
       injected ? (
         <Block
           ref={tooltipElement}
-          name="tooltip"
+          name='tooltip'
           mod={{ align }}
           mix={visibilityClasses}
           style={{ ...offset, ...(style ?? {}) }}
         >
-          <Elem name="body">{title}</Elem>
+          <Elem name='body'>{title}</Elem>
         </Block>
       ) : null,
     [injected, offset, title, visibilityClasses, tooltipElement],
@@ -111,4 +111,4 @@ export const Tooltip = forwardRef(({ title, children, alignment, defaultVisible,
     </>
   );
 });
-Tooltip.displayName = "Tooltip";
+Tooltip.displayName = 'Tooltip';

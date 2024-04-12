@@ -1,33 +1,33 @@
-import React, { Component } from "react";
-import { FaPause, FaPlay } from "react-icons/fa";
-import { Button } from "./Button/Button";
-import { Space } from "./Space/Space";
+import React, { Component } from 'react';
+import { FaPause, FaPlay } from 'react-icons/fa';
+import { Button } from './Button/Button';
+import { Space } from './Space/Space';
 
 const Duration = ({ value, format }) => {
   const formatted = new Date(value * 1000).toISOString().substr(11, 8);
 
-  const parsed = formatted.split(":");
+  const parsed = formatted.split(':');
 
   const result = format.map((unit) => {
     switch (unit) {
-      case "hours":
+      case 'hours':
         return parsed[0];
-      case "minutes":
+      case 'minutes':
         return parsed[1];
-      case "seconds":
+      case 'seconds':
         return parsed[2];
     }
   });
 
-  return result.join(":");
+  return result.join(':');
 };
 
 const PlaybackControl = ({ current, duration, onChange }) => {
   const format = React.useMemo(() => {
     if (duration >= 3600) {
-      return ["hours", "minutes", "seconds"];
+      return ['hours', 'minutes', 'seconds'];
     }
-    return ["minutes", "seconds"];
+    return ['minutes', 'seconds'];
   }, [duration]);
 
   return (
@@ -35,7 +35,7 @@ const PlaybackControl = ({ current, duration, onChange }) => {
       <Space spread>
         <Duration value={current} format={format} />
         <input
-          type="range"
+          type='range'
           min={0}
           max={duration}
           step={0.01}
@@ -72,13 +72,13 @@ export class SharedAudio extends Component {
     const paused = this.state.paused || this.state.audio === null;
 
     return (
-      <Space size="small" style={{ width: "100%", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+      <Space size='small' style={{ width: '100%', alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
         <Button onClick={paused ? this.play : this.pause}>{paused ? <FaPlay /> : <FaPause />}</Button>
 
         {this.state.error ? (
           <div>Unable to play</div>
         ) : this.audio ? (
-          <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
+          <div style={{ display: 'flex', flex: 1, alignItems: 'center' }}>
             <PlaybackControl
               current={this.state.current}
               duration={this.state.duration}
@@ -114,7 +114,7 @@ export class SharedAudio extends Component {
     const audio = new Audio(this.props.src);
 
     document.body.appendChild(audio);
-    audio.classList.add("dm-audio");
+    audio.classList.add('dm-audio');
     audio.currentTime = 0;
     audio.volume = this.state.volume;
 

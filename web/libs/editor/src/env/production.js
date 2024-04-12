@@ -1,5 +1,5 @@
-import External from "../core/External";
-import Messages from "../utils/messages";
+import External from '../core/External';
+import Messages from '../utils/messages';
 
 function getData(task) {
   if (task && task.data) {
@@ -26,13 +26,13 @@ function getState(task) {
 function rootElement(element) {
   let root;
 
-  if (typeof element === "string") {
+  if (typeof element === 'string') {
     root = document.getElementById(element);
   } else {
     root = element;
   }
 
-  root.innerHTML = "";
+  root.innerHTML = '';
 
   return root;
 }

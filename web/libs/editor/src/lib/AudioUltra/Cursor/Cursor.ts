@@ -1,48 +1,48 @@
-import { nanoid } from "nanoid";
-import { type RgbaColorArray, rgba } from "../Common/Color";
-import { Events } from "../Common/Events";
-import { getCursorPositionX, getCursorPositionY, getOffsetLeft, getOffsetTop } from "../Common/Utils";
-import type { Visualizer } from "../Visual/Visualizer";
+import { nanoid } from 'nanoid';
+import { type RgbaColorArray, rgba } from '../Common/Color';
+import { Events } from '../Common/Events';
+import { getCursorPositionX, getCursorPositionY, getOffsetLeft, getOffsetTop } from '../Common/Utils';
+import type { Visualizer } from '../Visual/Visualizer';
 
 interface CursorEvents {
   mouseMove: (event: MouseEvent, cursor: Cursor) => void;
 }
 
 export enum CursorSymbol {
-  auto = "auto",
-  crosshair = "crosshair",
-  default = "default",
-  pointer = "pointer",
-  move = "move",
-  text = "text",
-  wait = "wait",
-  help = "help",
-  progress = "progress",
-  notAllowed = "not-allowed",
-  contextMenu = "context-menu",
-  cell = "cell",
-  verticalText = "vertical-text",
-  alias = "alias",
-  copy = "copy",
-  noDrop = "no-drop",
-  allScroll = "all-scroll",
-  colResize = "col-resize",
-  rowResize = "row-resize",
-  grab = "grab",
-  grabbing = "grabbing",
-  nResize = "n-resize",
-  neResize = "ne-resize",
-  nwResize = "nw-resize",
-  nsResize = "ns-resize",
-  neswResize = "nesw-resize",
-  nwseResize = "nwse-resize",
-  sResize = "s-resize",
-  seResize = "se-resize",
-  swResize = "sw-resize",
-  wResize = "w-resize",
-  ewResize = "ew-resize",
-  zoomIn = "zoom-in",
-  zoomOut = "zoom-out",
+  auto = 'auto',
+  crosshair = 'crosshair',
+  default = 'default',
+  pointer = 'pointer',
+  move = 'move',
+  text = 'text',
+  wait = 'wait',
+  help = 'help',
+  progress = 'progress',
+  notAllowed = 'not-allowed',
+  contextMenu = 'context-menu',
+  cell = 'cell',
+  verticalText = 'vertical-text',
+  alias = 'alias',
+  copy = 'copy',
+  noDrop = 'no-drop',
+  allScroll = 'all-scroll',
+  colResize = 'col-resize',
+  rowResize = 'row-resize',
+  grab = 'grab',
+  grabbing = 'grabbing',
+  nResize = 'n-resize',
+  neResize = 'ne-resize',
+  nwResize = 'nw-resize',
+  nsResize = 'ns-resize',
+  neswResize = 'nesw-resize',
+  nwseResize = 'nwse-resize',
+  sResize = 's-resize',
+  seResize = 'se-resize',
+  swResize = 'sw-resize',
+  wResize = 'w-resize',
+  ewResize = 'ew-resize',
+  zoomIn = 'zoom-in',
+  zoomOut = 'zoom-out',
 }
 
 export interface CursorOptions {
@@ -55,10 +55,10 @@ export interface CursorOptions {
 export class Cursor extends Events<CursorEvents> {
   private visualizer: Visualizer;
   private symbol = CursorSymbol.default;
-  private focusId = "";
+  private focusId = '';
 
-  id = "cursor";
-  color = rgba("rgba(65, 60, 74, 0.16)");
+  id = 'cursor';
+  color = rgba('rgba(65, 60, 74, 0.16)');
   x: number;
   y: number;
   offsetX = 0;
@@ -78,26 +78,26 @@ export class Cursor extends Events<CursorEvents> {
 
   initialize() {
     if (document.getElementById(this.id)) return;
-    const span = document.createElement("span");
+    const span = document.createElement('span');
     const root = document.body;
 
     span.id = this.id;
-    span.style.display = "none";
-    span.style.position = "absolute";
+    span.style.display = 'none';
+    span.style.position = 'absolute';
     this.apply(span);
 
     root?.appendChild(span);
 
     this.set(this.symbol);
-    document.addEventListener("mousemove", this.handleMouseMove);
+    document.addEventListener('mousemove', this.handleMouseMove);
   }
 
   apply(node: HTMLElement) {
     node.style.backgroundColor = this.color.toString();
     node.style.width = `${this.width}px`;
-    node.style.top = "0px";
-    node.style.zIndex = "9998";
-    node.style.pointerEvents = "none";
+    node.style.top = '0px';
+    node.style.zIndex = '9998';
+    node.style.pointerEvents = 'none';
   }
 
   show() {
@@ -109,7 +109,7 @@ export class Cursor extends Events<CursorEvents> {
 
     if (span) {
       span.style.height = `${this.visualizer.height}px`;
-      span.style.display = "block";
+      span.style.display = 'block';
       span.style.top = `${this.offsetY}px`;
       span.style.left = `${this.x + this.offsetX - span.clientWidth / 2}px`;
     }
@@ -119,13 +119,13 @@ export class Cursor extends Events<CursorEvents> {
     const span = document.getElementById(this.id);
 
     if (span) {
-      span.style.display = "none";
+      span.style.display = 'none';
     }
   }
 
   destroy() {
     document.getElementById(this.id)?.remove();
-    document.removeEventListener("mousemove", this.handleMouseMove);
+    document.removeEventListener('mousemove', this.handleMouseMove);
     super.destroy();
   }
 
@@ -141,15 +141,15 @@ export class Cursor extends Events<CursorEvents> {
   }
 
   hasFocus() {
-    return this.focusId !== "";
+    return this.focusId !== '';
   }
 
   get(): CursorSymbol {
     return this.symbol;
   }
 
-  set(cursor: CursorSymbol, id = "") {
-    this.focusId = id || "";
+  set(cursor: CursorSymbol, id = '') {
+    this.focusId = id || '';
     if (cursor === this.symbol) {
       return;
     }
@@ -180,7 +180,7 @@ export class Cursor extends Events<CursorEvents> {
     this.offsetY = getOffsetTop(container);
     this.x = getCursorPositionX(e, container);
     this.y = getCursorPositionY(e, container);
-    this.invoke("mouseMove", [e, this]);
-    this.visualizer.invoke("mouseMove", [e, this]);
+    this.invoke('mouseMove', [e, this]);
+    this.visualizer.invoke('mouseMove', [e, this]);
   };
 }

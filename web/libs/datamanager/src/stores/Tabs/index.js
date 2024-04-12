@@ -1,2 +1,2 @@
-export * from "./store";
-export * from "./tab";
+export * from './store';
+export * from './tab';

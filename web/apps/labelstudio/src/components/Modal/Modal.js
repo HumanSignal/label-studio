@@ -1,19 +1,19 @@
-import React, { createRef } from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { ApiProvider } from "../../providers/ApiProvider";
-import { ConfigProvider } from "../../providers/ConfigProvider";
-import { CurrentUserProvider } from "../../providers/CurrentUser";
-import { MultiProvider } from "../../providers/MultiProvider";
-import { cn } from "../../utils/bem";
-import { Button } from "../Button/Button";
-import { Space } from "../Space/Space";
-import { Modal } from "./ModalPopup";
+import React, { createRef } from 'react';
+import { render, unmountComponentAtNode } from 'react-dom';
+import { ApiProvider } from '../../providers/ApiProvider';
+import { ConfigProvider } from '../../providers/ConfigProvider';
+import { CurrentUserProvider } from '../../providers/CurrentUser';
+import { MultiProvider } from '../../providers/MultiProvider';
+import { cn } from '../../utils/bem';
+import { Button } from '../Button/Button';
+import { Space } from '../Space/Space';
+import { Modal } from './ModalPopup';
 
 const standaloneModal = (props) => {
   const modalRef = createRef();
-  const rootDiv = document.createElement("div");
+  const rootDiv = document.createElement('div');
   let renderCount = 0;
-  rootDiv.className = cn("modal-holder").toClassName();
+  rootDiv.className = cn('modal-holder').toClassName();
 
   document.body.appendChild(rootDiv);
 
@@ -27,7 +27,7 @@ const standaloneModal = (props) => {
         providers={
           props.simple
             ? []
-            : [<ConfigProvider key="config" />, <ApiProvider key="api" />, <CurrentUserProvider key="current-user" />]
+            : [<ConfigProvider key='config' />, <ApiProvider key='api' />, <CurrentUserProvider key='current-user' />]
         }
       >
         <Modal
@@ -65,16 +65,16 @@ export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...pro
     ...props,
     allowClose: false,
     footer: (
-      <Space align="end">
+      <Space align='end'>
         <Button
           onClick={() => {
             onCancel?.();
             modal.close();
           }}
-          size="compact"
+          size='compact'
           autoFocus
         >
-          {cancelText ?? "Cancel"}
+          {cancelText ?? 'Cancel'}
         </Button>
 
         <Button
@@ -82,10 +82,10 @@ export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...pro
             onOk?.();
             modal.close();
           }}
-          size="compact"
-          look={buttonLook ?? "primary"}
+          size='compact'
+          look={buttonLook ?? 'primary'}
         >
-          {okText ?? "OK"}
+          {okText ?? 'OK'}
         </Button>
       </Space>
     ),
@@ -98,16 +98,16 @@ export const info = ({ okText, onOkPress, ...props }) => {
   const modal = standaloneModal({
     ...props,
     footer: (
-      <Space align="end">
+      <Space align='end'>
         <Button
           onClick={() => {
             onOkPress?.();
             modal.close();
           }}
-          look="primary"
-          size="compact"
+          look='primary'
+          size='compact'
         >
-          {okText ?? "OK"}
+          {okText ?? 'OK'}
         </Button>
       </Space>
     ),

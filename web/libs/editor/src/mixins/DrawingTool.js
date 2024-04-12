@@ -1,15 +1,15 @@
-import { types } from "mobx-state-tree";
+import { types } from 'mobx-state-tree';
 
-import throttle from "lodash.throttle";
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
-import { MIN_SIZE } from "../tools/Base";
-import Utils from "../utils";
-import { FF_DEV_3666, FF_DEV_3793, isFF } from "../utils/feature-flags";
+import throttle from 'lodash.throttle';
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from '../components/ImageView/Image';
+import { MIN_SIZE } from '../tools/Base';
+import Utils from '../utils';
+import { FF_DEV_3666, FF_DEV_3793, isFF } from '../utils/feature-flags';
 
 const DrawingTool = types
-  .model("DrawingTool", {
+  .model('DrawingTool', {
     default: true,
-    mode: types.optional(types.enumeration(["drawing", "viewing"]), "viewing"),
+    mode: types.optional(types.enumeration(['drawing', 'viewing']), 'viewing'),
     unselectRegionOnToolChange: true,
   })
   .volatile(() => {
@@ -22,11 +22,11 @@ const DrawingTool = types
       createRegionOptions(opts) {
         return {
           ...opts,
-          coordstype: "px",
+          coordstype: 'px',
         };
       },
       get tagTypes() {
-        console.error("Drawing tool model needs to implement tagTypes getter in views");
+        console.error('Drawing tool model needs to implement tagTypes getter in views');
         return {};
       },
       isIncorrectControl() {
@@ -36,7 +36,7 @@ const DrawingTool = types
         return !self.obj.checkLabels();
       },
       get isDrawing() {
-        return self.mode === "drawing";
+        return self.mode === 'drawing';
       },
       get getActiveShape() {
         return self.currentArea;
@@ -51,7 +51,7 @@ const DrawingTool = types
         return !self.isDrawing && !self.annotation.isReadOnly();
       },
       get defaultDimensions() {
-        console.warn("Drawing tool model needs to implement defaultDimentions getter in views");
+        console.warn('Drawing tool model needs to implement defaultDimentions getter in views');
         return {};
       },
       get MIN_SIZE() {
@@ -82,15 +82,15 @@ const DrawingTool = types
         if (ev.button > 0 || ev.shiftKey) return;
         let fn = `${name}Ev`;
 
-        if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
+        if (typeof self[fn] !== 'undefined') self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
 
         // Emulating of dblclick event, 'cause redrawing will crush the the original one
-        if (name === "click") {
+        if (name === 'click') {
           const ts = ev.timeStamp;
 
           if (ts - lastClick.ts < 300 && self.comparePointsWithThreshold(lastClick, { x, y })) {
             fn = `dbl${fn}`;
-            if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
+            if (typeof self[fn] !== 'undefined') self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
           }
           lastClick = { ts, x, y };
         }
@@ -98,7 +98,7 @@ const DrawingTool = types
 
       comparePointsWithThreshold(p1, p2, threshold = { x: self.MIN_SIZE.X, y: self.MIN_SIZE.Y }) {
         if (!p1 || !p2) return;
-        if (typeof threshold === "number") threshold = { x: threshold, y: threshold };
+        if (typeof threshold === 'number') threshold = { x: threshold, y: threshold };
         return Math.abs(p1.x - p2.x) < threshold.x && Math.abs(p1.y - p2.y) < threshold.y;
       },
     };
@@ -120,7 +120,7 @@ const DrawingTool = types
         self.currentArea = existingUnclosedPolygon;
         self.currentArea.setDrawing(true);
         self.annotation.regionStore.selection._updateResultsFromRegions([self.currentArea]);
-        self.mode = "drawing";
+        self.mode = 'drawing';
         self.annotation.setIsDrawing(true);
         self.annotation.regionStore.selection.drawingSelect(self.currentArea);
         self.listenForClose?.();
@@ -135,7 +135,7 @@ const DrawingTool = types
             value[key] = source[key];
             return value;
           },
-          { coordstype: "px", dynamic: self.dynamic },
+          { coordstype: 'px', dynamic: self.dynamic },
         );
 
         const [main, ...rest] = currentArea.results;
@@ -184,7 +184,7 @@ const DrawingTool = types
 
       startDrawing(x, y) {
         self.annotation.history.freeze();
-        self.mode = "drawing";
+        self.mode = 'drawing';
         self.currentArea = self.createDrawingRegion(self.createRegionOptions({ x, y }));
       },
       finishDrawing() {
@@ -203,12 +203,12 @@ const DrawingTool = types
       _resetState() {
         self.annotation.setIsDrawing(false);
         self.annotation.history.unfreeze();
-        self.mode = "viewing";
+        self.mode = 'viewing';
       },
     };
   });
 
-const TwoPointsDrawingTool = DrawingTool.named("TwoPointsDrawingTool")
+const TwoPointsDrawingTool = DrawingTool.named('TwoPointsDrawingTool')
   .views((self) => ({
     get defaultDimensions() {
       return {
@@ -239,7 +239,7 @@ const TwoPointsDrawingTool = DrawingTool.named("TwoPointsDrawingTool")
         const shape = self.getCurrentArea();
 
         if (!shape) return;
-        const isEllipse = shape.type.includes("ellipse");
+        const isEllipse = shape.type.includes('ellipse');
         const maxStageWidth = isFF(FF_DEV_3793) ? RELATIVE_STAGE_WIDTH : self.obj.stageWidth;
         const maxStageHeight = isFF(FF_DEV_3793) ? RELATIVE_STAGE_HEIGHT : self.obj.stageHeight;
 
@@ -346,7 +346,7 @@ const TwoPointsDrawingTool = DrawingTool.named("TwoPointsDrawingTool")
     };
   });
 
-const MultipleClicksDrawingTool = DrawingTool.named("MultipleClicksMixin")
+const MultipleClicksDrawingTool = DrawingTool.named('MultipleClicksMixin')
   .views(() => ({
     canStart() {
       return !this.current();
@@ -379,10 +379,10 @@ const MultipleClicksDrawingTool = DrawingTool.named("MultipleClicksMixin")
         pointsCount++;
       },
       listenForClose() {
-        console.error("MultipleClicksMixin model needs to implement listenForClose method in actions");
+        console.error('MultipleClicksMixin model needs to implement listenForClose method in actions');
       },
       closeCurrent() {
-        console.error("MultipleClicksMixin model needs to implement closeCurrent method in actions");
+        console.error('MultipleClicksMixin model needs to implement closeCurrent method in actions');
       },
       finishDrawing() {
         if (!self.isDrawing) return;
@@ -463,7 +463,7 @@ const MultipleClicksDrawingTool = DrawingTool.named("MultipleClicksMixin")
     };
   });
 
-const ThreePointsDrawingTool = DrawingTool.named("ThreePointsDrawingTool")
+const ThreePointsDrawingTool = DrawingTool.named('ThreePointsDrawingTool')
   .views((self) => ({
     canStart() {
       return !this.current();
@@ -550,7 +550,7 @@ const ThreePointsDrawingTool = DrawingTool.named("ThreePointsDrawingTool")
         if (!self.canStartDrawing() || self.annotation.isDrawing) return;
         lastEvent = MOUSE_DOWN_EVENT;
         startPoint = { x, y };
-        self.mode = "drawing";
+        self.mode = 'drawing';
       },
       mouseupEv(ev, [x, y]) {
         if (!self.canStartDrawing()) return;

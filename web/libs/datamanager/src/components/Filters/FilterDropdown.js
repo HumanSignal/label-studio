@@ -1,9 +1,9 @@
-import { observer } from "mobx-react";
-import React from "react";
-import { FaCaretDown } from "react-icons/fa";
-import { Icon } from "../Common/Icon/Icon";
-import { Select } from "../Common/Select/Select";
-import { Tag } from "../Common/Tag/Tag";
+import { observer } from 'mobx-react';
+import React from 'react';
+import { FaCaretDown } from 'react-icons/fa';
+import { Icon } from '../Common/Icon/Icon';
+import { Select } from '../Common/Select/Select';
+import { Tag } from '../Common/Tag/Tag';
 
 const TagRender =
   (items) =>
@@ -11,8 +11,8 @@ const TagRender =
     const color = items.find((el) => el.value === rest.value)?.color;
 
     return (
-      <Tag color={color ?? "#000"} {...rest} size="small" className="filter-data-tag">
-        <div className="ant-tag-text">{label}</div>
+      <Tag color={color ?? '#000'} {...rest} size='small' className='filter-data-tag'>
+        <div className='ant-tag-text'>{label}</div>
       </Tag>
     );
   };
@@ -61,15 +61,15 @@ export const FilterDropdown = observer(
         bordered={false}
         style={{
           fontSize: 12,
-          width: "100%",
-          backgroundColor: disabled ? "none" : "#fafafa",
+          width: '100%',
+          backgroundColor: disabled ? 'none' : '#fafafa',
           ...(multiple ? { padding: 0 } : {}),
           ...(style ?? {}),
         }}
-        dropdownStyle={{ minWidth: "fit-content" }}
+        dropdownStyle={{ minWidth: 'fit-content' }}
         onChange={(value) => onChange(outputFormat?.(value) ?? value)}
         disabled={disabled}
-        size="small"
+        size='small'
         suffixIcon={<Icon icon={FaCaretDown} />}
         listItemHeight={20}
         listHeight={600}

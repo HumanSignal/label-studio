@@ -1,5 +1,5 @@
-import { wrapArray } from "../../utils/utilities";
-import { Geometry } from "./Geometry";
+import { wrapArray } from '../../utils/utilities';
+import { Geometry } from './Geometry';
 
 /**
  * @type {import("./Geometry").BBox}
@@ -75,16 +75,16 @@ const stageRelatedBBox = (region, bbox) => {
 
 const _detect = (region) => {
   switch (region.type) {
-    case "textrange":
-    case "richtextregion":
-    case "textarearegion":
-    case "audioregion":
-    case "paragraphs":
-    case "timeseriesregion": {
+    case 'textrange':
+    case 'richtextregion':
+    case 'textarearegion':
+    case 'audioregion':
+    case 'paragraphs':
+    case 'timeseriesregion': {
       const regionBbox = Geometry.getDOMBBox(region.getRegionElement());
       const container = region.parent?.visibleNodeRef?.current;
 
-      if (container?.tagName === "IFRAME") {
+      if (container?.tagName === 'IFRAME') {
         const iframeBbox = Geometry.getDOMBBox(container, true);
 
         return (
@@ -98,11 +98,11 @@ const _detect = (region) => {
 
       return regionBbox;
     }
-    case "rectangleregion":
-    case "ellipseregion":
-    case "polygonregion":
-    case "keypointregion":
-    case "brushregion": {
+    case 'rectangleregion':
+    case 'ellipseregion':
+    case 'polygonregion':
+    case 'keypointregion':
+    case 'brushregion': {
       const bbox = region.bboxCoordsCanvas;
 
       return bbox

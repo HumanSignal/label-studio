@@ -1,8 +1,8 @@
-const assert = require("assert");
+const assert = require('assert');
 
-Feature("OCR scenarios");
+Feature('OCR scenarios');
 
-const createConfig = ({ shapes = ["Rectangle"], textareaProps = "" } = {}) => {
+const createConfig = ({ shapes = ['Rectangle'], textareaProps = '' } = {}) => {
   return `<View>
     <Image name="image" value="$image" zoomcontrol="true"></Image>
     ${shapes
@@ -20,7 +20,7 @@ const createConfig = ({ shapes = ["Rectangle"], textareaProps = "" } = {}) => {
 };
 
 const data = {
-  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Html_headers.png/640px-Html_headers.png",
+  image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Html_headers.png/640px-Html_headers.png',
 };
 
 const H3_POINTS = [
@@ -30,11 +30,11 @@ const H3_POINTS = [
   [1.40625, 55.226824457593686],
 ];
 
-Scenario("Basic scenario", async ({ I, LabelStudio, AtImageView, AtSettings, AtLabels, AtSidebar }) => {
-  I.amOnPage("/");
+Scenario('Basic scenario', async ({ I, LabelStudio, AtImageView, AtSettings, AtLabels, AtSidebar }) => {
+  I.amOnPage('/');
 
   LabelStudio.init({
-    config: createConfig({ shapes: ["Polygon"] }),
+    config: createConfig({ shapes: ['Polygon'] }),
     data,
     settings: {
       preserveSelectedTool: false,
@@ -47,7 +47,7 @@ Scenario("Basic scenario", async ({ I, LabelStudio, AtImageView, AtSettings, AtL
     [AtSettings.GENERAL_SETTINGS.SHOW_LABELS]: true,
   });
   AtSettings.close();
-  AtLabels.clickLabel("Paragraph");
+  AtLabels.clickLabel('Paragraph');
   const canvasSize = await AtImageView.getCanvasSize();
 
   await AtImageView.lookForStage();
@@ -58,11 +58,11 @@ Scenario("Basic scenario", async ({ I, LabelStudio, AtImageView, AtSettings, AtL
   AtSidebar.seeElement('[placeholder="Recognized Text"]');
   const Text = 'The "H3" header';
 
-  I.pressKey("Enter");
+  I.pressKey('Enter');
   for (const key of 'The "H3" header') {
     I.pressKey(key);
   }
-  I.pressKey("Enter");
+  I.pressKey('Enter');
   const results = await LabelStudio.serialize();
   const hasText = results.find(
     (result) => result && result.value && result.value.text && result.value.text[0] === Text,
@@ -73,7 +73,7 @@ Scenario("Basic scenario", async ({ I, LabelStudio, AtImageView, AtSettings, AtL
 
 const REGIONS = [
   {
-    label: "Header",
+    label: 'Header',
     x: 0.625,
     y: 1.183431952662722,
     width: 34.375,
@@ -81,7 +81,7 @@ const REGIONS = [
     text: 'The "H1" Header',
   },
   {
-    label: "Paragraph",
+    label: 'Paragraph',
     x: 0.78125,
     y: 10.453648915187376,
     width: 98.4375,
@@ -89,7 +89,7 @@ const REGIONS = [
     text: 'This is a paragraph contained with the "p" tag. This content repeats itself for demonstration purposes. This content repeats itself for demonstration purposes. This content repeats itself for demonstration purposes. This content repeats itself for demonstration purposes.',
   },
   {
-    label: "Header",
+    label: 'Header',
     x: 0.625,
     y: 23.471400394477318,
     width: 27.1875,
@@ -97,7 +97,7 @@ const REGIONS = [
     text: 'The "H2" Header',
   },
   {
-    label: "Paragraph",
+    label: 'Paragraph',
     x: 0.3125,
     y: 31.558185404339252,
     width: 62.34375,
@@ -105,14 +105,14 @@ const REGIONS = [
     text: 'This paragraph, also contained with the "p" tag, contains an unordered list:',
   },
   {
-    label: "List",
+    label: 'List',
     x: 2.96875,
     y: 37.8698224852071,
     width: 41.5625,
     height: 11.637080867850099,
   },
   {
-    label: "Header",
+    label: 'Header',
     x: 0.3125,
     y: 50.69033530571992,
     width: 22.65625,
@@ -120,15 +120,15 @@ const REGIONS = [
     text: 'The "H3" Header',
   },
   {
-    label: "Paragraph",
+    label: 'Paragraph',
     x: 0.625,
     y: 57.790927021696255,
     width: 98.28125,
     height: 11.242603550295858,
-    text: "This is a paragraph",
+    text: 'This is a paragraph',
   },
   {
-    label: "Header",
+    label: 'Header',
     x: 0.15625,
     y: 71.20315581854044,
     width: 19.0625,
@@ -136,15 +136,15 @@ const REGIONS = [
     text: 'The "H4" Header',
   },
   {
-    label: "Paragraph",
+    label: 'Paragraph',
     x: 0.46875,
     y: 78.10650887573965,
     width: 64.53125,
     height: 4.930966469428008,
-    text: "This is a paragraph",
+    text: 'This is a paragraph',
   },
   {
-    label: "Header",
+    label: 'Header',
     x: 0.625,
     y: 85.20710059171597,
     width: 15.3125,
@@ -152,7 +152,7 @@ const REGIONS = [
     text: 'The "H5" Header',
   },
   {
-    label: "Paragraph",
+    label: 'Paragraph',
     x: 0.46875,
     y: 92.11045364891518,
     width: 41.40625,
@@ -161,12 +161,12 @@ const REGIONS = [
 ];
 
 Scenario(
-  "Drawing multiple blank regions and then attaching labels",
+  'Drawing multiple blank regions and then attaching labels',
   async ({ I, LabelStudio, AtImageView, AtSettings, AtLabels, AtOutliner }) => {
     LabelStudio.setFeatureFlags({
       ff_front_1170_outliner_030222_short: true,
     });
-    I.amOnPage("/");
+    I.amOnPage('/');
     LabelStudio.init({ config: createConfig(), data });
     AtImageView.waitForImage();
     AtSettings.open();
@@ -174,7 +174,7 @@ Scenario(
       [AtSettings.GENERAL_SETTINGS.SHOW_LABELS]: true,
     });
     AtSettings.close();
-    AtLabels.clickLabel("blank");
+    AtLabels.clickLabel('blank');
     const canvasSize = await AtImageView.getCanvasSize();
 
     await AtImageView.lookForStage();
@@ -186,18 +186,18 @@ Scenario(
       height: (r.height * canvasSize.height) / 100,
     }));
 
-    I.say("Drawing");
+    I.say('Drawing');
     for (const region of regions) {
       AtImageView.drawByDrag(region.x, region.y, region.width, region.height);
     }
     AtOutliner.seeRegions(regions.length);
 
-    I.say("Labeling");
+    I.say('Labeling');
     for (const region of Object.values(regions)) {
       AtImageView.dblClickAt(region.x + region.width / 2, region.y + region.height / 2);
       AtLabels.clickLabel(region.label);
       if (region.text) {
-        I.fillField(AtOutliner.locateSelectedItem().find(".lsf-textarea-tag__input"), region.text);
+        I.fillField(AtOutliner.locateSelectedItem().find('.lsf-textarea-tag__input'), region.text);
       }
     }
     const results = await LabelStudio.serialize();
@@ -211,14 +211,14 @@ Scenario(
         assert(hasText, true);
       }
     }
-    session("Deserialization", () => {
-      I.amOnPage("/");
-      LabelStudio.init({ config: createConfig(), data, annotations: [{ id: "test", result: results }] });
+    session('Deserialization', () => {
+      I.amOnPage('/');
+      LabelStudio.init({ config: createConfig(), data, annotations: [{ id: 'test', result: results }] });
       AtImageView.waitForImage();
       AtOutliner.seeRegions(regions.length);
       for (const [idx, region] of Object.entries(regions)) {
         if (region.text) {
-          I.seeInField(AtOutliner.locateRegionIndex(+idx + 1).find(".lsf-textarea-tag__input"), region.text);
+          I.seeInField(AtOutliner.locateRegionIndex(+idx + 1).find('.lsf-textarea-tag__input'), region.text);
         }
       }
     });

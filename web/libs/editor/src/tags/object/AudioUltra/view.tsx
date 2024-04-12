@@ -1,15 +1,15 @@
-import { observer } from "mobx-react";
-import { type FC, useEffect, useRef } from "react";
-import { ErrorMessage } from "../../../components/ErrorMessage/ErrorMessage";
-import { Controls } from "../../../components/Timeline/Controls";
-import { Hotkey } from "../../../core/Hotkey";
-import type { Region } from "../../../lib/AudioUltra/Regions/Region";
-import type { Regions } from "../../../lib/AudioUltra/Regions/Regions";
-import type { Segment } from "../../../lib/AudioUltra/Regions/Segment";
-import { useWaveform } from "../../../lib/AudioUltra/react";
-import { Block } from "../../../utils/bem";
+import { observer } from 'mobx-react';
+import { type FC, useEffect, useRef } from 'react';
+import { ErrorMessage } from '../../../components/ErrorMessage/ErrorMessage';
+import { Controls } from '../../../components/Timeline/Controls';
+import { Hotkey } from '../../../core/Hotkey';
+import type { Region } from '../../../lib/AudioUltra/Regions/Region';
+import type { Regions } from '../../../lib/AudioUltra/Regions/Regions';
+import type { Segment } from '../../../lib/AudioUltra/Regions/Segment';
+import { useWaveform } from '../../../lib/AudioUltra/react';
+import { Block } from '../../../utils/bem';
 
-import "./view.styl";
+import './view.styl';
 
 interface AudioUltraProps {
   item: any;
@@ -23,10 +23,10 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
   const { waveform, ...controls } = useWaveform(rootRef, {
     src: item._value,
     autoLoad: false,
-    waveColor: "#BEB9C5",
-    gridColor: "#BEB9C5",
+    waveColor: '#BEB9C5',
+    gridColor: '#BEB9C5',
     gridWidth: 1,
-    backgroundColor: "#fafafa",
+    backgroundColor: '#fafafa',
     autoCenter: true,
     zoomToCursor: true,
     height: item.height && !isNaN(Number(item.height)) ? Number(item.height) : 96,
@@ -39,7 +39,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
     zoom: item.defaultzoom ? Number(item.defaultzoom) : 1,
     showLabels: item.annotationStore.store.settings.showLabels,
     rate: item.defaultspeed ? Number(item.defaultspeed) : 1,
-    muted: item.muted === "true",
+    muted: item.muted === 'true',
     onLoad: item.onLoad,
     onPlaying: item.onPlaying,
     onSeek: item.onSeek,
@@ -51,7 +51,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       deleteable: !item.readonly,
     },
     timeline: {
-      backgroundColor: "#ffffff",
+      backgroundColor: '#ffffff',
     },
     experimental: {
       backgroundCompute: true,
@@ -61,7 +61,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
   });
 
   useEffect(() => {
-    const hotkeys = Hotkey("Audio", "Audio Segmentation");
+    const hotkeys = Hotkey('Audio', 'Audio Segmentation');
 
     waveform.current?.load();
 
@@ -117,21 +117,21 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       item.updateRegion(region);
     };
 
-    waveform.current?.on("beforeRegionsDraw", updateBeforeRegionDraw);
-    waveform.current?.on("afterRegionsDraw", updateAfterRegionDraw);
-    waveform.current?.on("regionSelected", selectRegion);
-    waveform.current?.on("regionCreated", createRegion);
-    waveform.current?.on("regionUpdatedEnd", updateRegion);
+    waveform.current?.on('beforeRegionsDraw', updateBeforeRegionDraw);
+    waveform.current?.on('afterRegionsDraw', updateAfterRegionDraw);
+    waveform.current?.on('regionSelected', selectRegion);
+    waveform.current?.on('regionCreated', createRegion);
+    waveform.current?.on('regionUpdatedEnd', updateRegion);
 
-    hotkeys.addNamed("region:delete", () => {
+    hotkeys.addNamed('region:delete', () => {
       waveform.current?.regions.clearSegments(false);
     });
 
-    hotkeys.addNamed("segment:delete", () => {
+    hotkeys.addNamed('segment:delete', () => {
       waveform.current?.regions.clearSegments(false);
     });
 
-    hotkeys.addNamed("region:delete-all", () => {
+    hotkeys.addNamed('region:delete-all', () => {
       waveform.current?.regions.clearSegments();
     });
 
@@ -141,7 +141,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
   }, []);
 
   return (
-    <Block name="audio-tag">
+    <Block name='audio-tag'>
       {item.errors?.map((error: any, i: any) => (
         <ErrorMessage key={`err-${i}`} error={error} />
       ))}
@@ -173,7 +173,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
         onZoom={(zoom) => controls.setZoom(zoom)}
         amp={controls.amp}
         onAmpChange={(amp) => controls.setAmp(amp)}
-        mediaType="audio"
+        mediaType='audio'
         toggleVisibility={(layerName: string, isVisible: boolean) => {
           if (waveform.current) {
             const layer = waveform.current?.getLayer(layerName);

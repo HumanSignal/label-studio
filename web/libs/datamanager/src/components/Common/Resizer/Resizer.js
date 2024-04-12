@@ -1,6 +1,6 @@
-import React from "react";
-import { Block, Elem } from "../../../utils/bem";
-import "./Resizer.styl";
+import React from 'react';
+import { Block, Elem } from '../../../utils/bem';
+import './Resizer.styl';
 
 const calculateWidth = (width, minWidth, maxWidth, initialX, currentX) => {
   const offset = currentX - initialX;
@@ -50,9 +50,9 @@ export const Resizer = ({
       };
 
       const stopResize = (evt) => {
-        document.removeEventListener("mousemove", onResize);
-        document.removeEventListener("mouseup", stopResize);
-        document.body.style.removeProperty("user-select");
+        document.removeEventListener('mousemove', onResize);
+        document.removeEventListener('mouseup', stopResize);
+        document.body.style.removeProperty('user-select');
 
         newWidth = calculateWidth(width, minWidth, maxWidth, initialX, evt.pageX);
 
@@ -64,25 +64,25 @@ export const Resizer = ({
         }
       };
 
-      document.addEventListener("mousemove", onResize);
-      document.addEventListener("mouseup", stopResize);
-      document.body.style.userSelect = "none";
+      document.addEventListener('mousemove', onResize);
+      document.addEventListener('mouseup', stopResize);
+      document.body.style.userSelect = 'none';
       setIsResizing(true);
     },
     [maxWidth, minWidth, onResizeCallback, onResizeFinished, width],
   );
 
   return (
-    <Block name="resizer" mix={className} style={{ width }}>
-      <Elem name="content" style={style ?? {}}>
+    <Block name='resizer' mix={className} style={{ width }}>
+      <Elem name='content' style={style ?? {}}>
         {children}
       </Elem>
 
       <Elem
-        name="handle"
+        name='handle'
         ref={resizeHandler}
         style={handleStyle}
-        mod={{ resizing: showResizerLine !== false && isResizing, quickview: type === "quickview" }}
+        mod={{ resizing: showResizerLine !== false && isResizing, quickview: type === 'quickview' }}
         onMouseDown={handleResize}
         onDoubleClick={() => onReset?.()}
       />

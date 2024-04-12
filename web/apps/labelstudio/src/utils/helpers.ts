@@ -35,7 +35,7 @@ export const isDefined = <T>(value: T | undefined | null): value is T => {
 };
 
 export const isEmptyString = (value: any) => {
-  return typeof value === "string" && value.trim() === "";
+  return typeof value === 'string' && value.trim() === '';
 };
 
 export const objectClean = <T extends AnyObject>(source: T) => {
@@ -46,7 +46,7 @@ export const objectClean = <T extends AnyObject>(source: T) => {
       return res;
     }
 
-    if (Object.prototype.toString.call(value) === "[object Object]") {
+    if (Object.prototype.toString.call(value) === '[object Object]') {
       return [...res, [key, objectClean(value as AnyObject)]];
     }
     return [...res, [key, value]];
@@ -56,12 +56,12 @@ export const objectClean = <T extends AnyObject>(source: T) => {
 };
 
 export const numberWithPrecision = (n: number, precision = 1, removeTrailinZero = false) => {
-  if (typeof n !== "number" || isNaN(n)) return "";
+  if (typeof n !== 'number' || isNaN(n)) return '';
 
   let finalNum = n.toFixed(precision);
 
   if (removeTrailinZero) {
-    finalNum = finalNum.replace(/.(0+)$/, "");
+    finalNum = finalNum.replace(/.(0+)$/, '');
   }
 
   return finalNum;
@@ -70,7 +70,7 @@ export const numberWithPrecision = (n: number, precision = 1, removeTrailinZero 
 export const humanReadableNumber = (n: number) => {
   const abs = Math.abs(n);
 
-  if (isNaN(abs) || n === null) return "—";
+  if (isNaN(abs) || n === null) return '—';
   const normalizeNumber = (n: number) => numberWithPrecision(n, 1, true);
 
   let result;
@@ -88,35 +88,35 @@ export const humanReadableNumber = (n: number) => {
   return result || null;
 };
 
-export const absoluteURL = (path = "") => {
+export const absoluteURL = (path = '') => {
   if (path.match(/^https?/) || path.match(/^\/\//)) {
     return path;
   }
-  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
+  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ''), path.replace(/^([/]+)/, '')].join('/');
 };
 
 export const removePrefix = (path: string) => {
   if (APP_SETTINGS.hostname) {
     const hostname = APP_SETTINGS.hostname;
-    const prefix = new URL(hostname).pathname.replace(/([/]+)$/, "");
+    const prefix = new URL(hostname).pathname.replace(/([/]+)$/, '');
 
-    return path.replace(new RegExp(`^${prefix}`), "");
+    return path.replace(new RegExp(`^${prefix}`), '');
   }
 
-  return path || "/";
+  return path || '/';
 };
 
 export const copyText = (text: string) => {
-  const input = document.createElement("textarea");
+  const input = document.createElement('textarea');
 
-  input.style.position = "fixed"; // don't mess up with scroll
+  input.style.position = 'fixed'; // don't mess up with scroll
   document.body.appendChild(input);
 
   input.value = text;
   input.focus();
   input.select();
 
-  document.execCommand("copy");
+  document.execCommand('copy');
   input.remove();
 };
 
@@ -129,17 +129,17 @@ export const clamp = (value: number, min: number, max: number) => {
 };
 
 export const getLastTraceback = (traceback: string): string => {
-  const lines = traceback.split("\n");
+  const lines = traceback.split('\n');
   let lastTraceIndex = -1;
 
   for (let i = lines.length - 1; i >= 0; i--) {
-    if (lines[i].startsWith("  File")) {
+    if (lines[i].startsWith('  File')) {
       lastTraceIndex = i;
       break;
     }
   }
 
-  return lastTraceIndex >= 0 ? lines.slice(lastTraceIndex).join("\n") : traceback;
+  return lastTraceIndex >= 0 ? lines.slice(lastTraceIndex).join('\n') : traceback;
 };
 
 export const isFlagEnabled = (id: string, flagList: Record<string, boolean>, defaultValue = false) => {

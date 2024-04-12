@@ -1,5 +1,5 @@
-import type { FC, MutableRefObject, ReactNode } from "react";
-import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT, DEFAULT_PANEL_WIDTH } from "../constants";
+import type { FC, MutableRefObject, ReactNode } from 'react';
+import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT, DEFAULT_PANEL_WIDTH } from '../constants';
 
 export type TabProps = {
   name: string;
@@ -14,10 +14,10 @@ export type TabProps = {
   locked: boolean;
   breakPointActiveTab?: number;
   setBreakPointActiveTab?: React.Dispatch<React.SetStateAction<number>>;
-  transferTab: EventHandlers["transferTab"];
-  createNewPanel: EventHandlers["createNewPanel"];
-  setActiveTab: EventHandlers["setActiveTab"];
-  checkSnap: EventHandlers["checkSnap"];
+  transferTab: EventHandlers['transferTab'];
+  createNewPanel: EventHandlers['createNewPanel'];
+  setActiveTab: EventHandlers['setActiveTab'];
+  checkSnap: EventHandlers['checkSnap'];
 };
 export interface SidePanelsProps {
   panelsHidden: boolean;
@@ -39,22 +39,22 @@ export interface PanelView {
 }
 
 export enum Side {
-  left = "left",
-  right = "right",
+  left = 'left',
+  right = 'right',
 }
 
 export enum DropSide {
-  left = "left",
-  right = "right",
-  topRight = "right-top",
-  topLeft = "left-top",
-  bottomRight = "right-bottom",
-  bottomLeft = "left-bottom",
+  left = 'left',
+  right = 'right',
+  topRight = 'right-top',
+  topLeft = 'left-top',
+  bottomRight = 'right-bottom',
+  bottomLeft = 'left-bottom',
 }
 
 export enum JoinOrder {
-  top = "top",
-  bottom = "bottom",
+  top = 'top',
+  bottom = 'bottom',
 }
 export interface PanelBBox {
   order: number;
@@ -154,7 +154,7 @@ export const emptyPanel: PanelBBox = {
   panelViews: [],
 };
 
-export type PanelBaseExclusiveProps = "name" | "title";
+export type PanelBaseExclusiveProps = 'name' | 'title';
 
 export type ResizeHandler = (name: string, width: number, height: number, top: number, left: number) => void;
 

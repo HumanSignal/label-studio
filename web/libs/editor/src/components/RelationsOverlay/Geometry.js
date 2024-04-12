@@ -14,7 +14,7 @@
  * y3: number,
  * y4: number}} RectCoordinates Represents 4 corners coordinates of rectangle
  */
-import { clamp } from "../../utils/utilities";
+import { clamp } from '../../utils/utilities';
 
 export class Geometry {
   /**

@@ -1,5 +1,5 @@
-import { types } from "mobx-state-tree";
-import Registry from "../../../core/Registry";
+import { types } from 'mobx-state-tree';
+import Registry from '../../../core/Registry';
 
 export const DrawingRegion = types.union({
   dispatcher(sn) {

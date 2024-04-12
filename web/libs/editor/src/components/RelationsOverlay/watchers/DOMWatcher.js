@@ -8,7 +8,7 @@ export class DOMWatcher {
   }
 
   handleResize() {
-    window.addEventListener("resize", this.onUpdate);
+    window.addEventListener('resize', this.onUpdate);
   }
 
   handleUpdate() {
@@ -22,7 +22,7 @@ export class DOMWatcher {
   };
 
   destroy() {
-    window.removeEventListener("resize", this.onUpdate);
+    window.removeEventListener('resize', this.onUpdate);
     this.observer.disconnect();
   }
 }

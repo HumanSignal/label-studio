@@ -1,6 +1,6 @@
-import { types } from "mobx-state-tree";
-import { guidGenerator } from "../../utils/unique";
-import { Annotation } from "./Annotation";
+import { types } from 'mobx-state-tree';
+import { guidGenerator } from '../../utils/unique';
+import { Annotation } from './Annotation';
 
 // const HistoryActionTypes = types.enumeration([
 //   'prediction',
@@ -17,7 +17,7 @@ import { Annotation } from "./Annotation";
 
 export const HistoryItem = types
   .compose(
-    "HistoryItem",
+    'HistoryItem',
     Annotation,
     types.model({
       /**

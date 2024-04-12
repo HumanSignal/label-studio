@@ -1,8 +1,8 @@
-const assert = require("assert");
-const { formatDateValue } = require("../helpers/DateTime");
-const { serialize, selectText } = require("./helpers");
+const assert = require('assert');
+const { formatDateValue } = require('../helpers/DateTime');
+const { serialize, selectText } = require('./helpers');
 
-Feature("Date Time");
+Feature('Date Time');
 
 const config = `<View>
 <Header>Select text to see related smaller DateTime controls for every region</Header>
@@ -27,32 +27,32 @@ const data = {
 };
 
 const createdDate = {
-  incorrectMin: "1988-01-12",
-  correctMin: "1988-01-13",
-  incorrectMax: "2000-01-01",
-  correctMax: "1999-12-31",
-  result: "31.12.1999",
+  incorrectMin: '1988-01-12',
+  correctMin: '1988-01-13',
+  incorrectMax: '2000-01-01',
+  correctMax: '1999-12-31',
+  result: '31.12.1999',
 };
 
 const regions = [
-  { label: "birth", rangeStart: 83, rangeEnd: 96, text: "14 March 1879", dateValue: "1879-03-14", year: "2022" },
-  { label: "death", rangeStart: 99, rangeEnd: 112, text: "18 April 1955", dateValue: "1955-04-18", year: "2021" },
+  { label: 'birth', rangeStart: 83, rangeEnd: 96, text: '14 March 1879', dateValue: '1879-03-14', year: '2022' },
+  { label: 'death', rangeStart: 99, rangeEnd: 112, text: '18 April 1955', dateValue: '1955-04-18', year: '2021' },
   {
-    label: "event",
+    label: 'event',
     rangeStart: 728,
     rangeEnd: 755,
-    text: "1921 Nobel Prize in Physics",
-    dateValue: "1921-10-10",
-    year: "2020",
+    text: '1921 Nobel Prize in Physics',
+    dateValue: '1921-10-10',
+    year: '2020',
   },
 ];
 
 const params = { config, data };
 
 Scenario(
-  "Check DateTime holds state between annotations and saves result",
+  'Check DateTime holds state between annotations and saves result',
   async ({ I, AtDateTime, AtLabels, AtSidebar, LabelStudio }) => {
-    I.amOnPage("/");
+    I.amOnPage('/');
 
     LabelStudio.init(params);
 
@@ -62,99 +62,99 @@ Scenario(
     I.say(`System format is ${format}`);
 
     ////// GLOBAL
-    I.say("Check validation of required global date control");
+    I.say('Check validation of required global date control');
     I.updateAnnotation();
     I.see('DateTime "created" is required');
-    I.click("OK");
+    I.click('OK');
 
     const checks = {
       incorrect: [
-        [createdDate.incorrectMin, "min date is 1988-01-13"],
-        [createdDate.incorrectMax, "max date is 1999-12-31"],
+        [createdDate.incorrectMin, 'min date is 1988-01-13'],
+        [createdDate.incorrectMax, 'max date is 1999-12-31'],
       ],
       correct: [[createdDate.correctMin], [createdDate.correctMax]],
     };
 
     for (const [incorrect, error] of checks.incorrect) {
-      I.fillField("input[type=date]", formatDateValue(incorrect, format));
+      I.fillField('input[type=date]', formatDateValue(incorrect, format));
       I.updateAnnotation();
-      I.see("is not valid");
+      I.see('is not valid');
       I.see(error);
-      I.click("OK");
-      assert.strictEqual(await I.grabCssPropertyFrom("[type=date]", "border-color"), "rgb(255, 0, 0)");
+      I.click('OK');
+      assert.strictEqual(await I.grabCssPropertyFrom('[type=date]', 'border-color'), 'rgb(255, 0, 0)');
     }
 
     for (const [correct] of checks.correct) {
-      I.fillField("input[type=date]", formatDateValue(correct, format));
+      I.fillField('input[type=date]', formatDateValue(correct, format));
       I.updateAnnotation();
-      I.dontSee("Warning");
-      I.dontSee("is not valid");
+      I.dontSee('Warning');
+      I.dontSee('is not valid');
     }
 
     // this value will be asserted at the end
-    I.fillField("input[type=date]", formatDateValue(createdDate.correctMax, format));
+    I.fillField('input[type=date]', formatDateValue(createdDate.correctMax, format));
 
     ////// PER-REGION
-    I.say("Create regions but leave dates empty");
+    I.say('Create regions but leave dates empty');
     for (const region of regions) {
       AtLabels.clickLabel(region.label);
       AtLabels.seeSelectedLabel(region.label);
       await I.executeScript(selectText, {
-        selector: ".lsf-htx-richtext",
+        selector: '.lsf-htx-richtext',
         rangeStart: region.rangeStart,
         rangeEnd: region.rangeEnd,
       });
-      I.pressKey("Escape");
+      I.pressKey('Escape');
       // to prevent from double-click region handling (its timeout is 0.45s)
       I.wait(0.5);
     }
 
-    I.say("Try to submit and observe validation errors about per-regions");
+    I.say('Try to submit and observe validation errors about per-regions');
     I.updateAnnotation();
     I.see('DateTime "date" is required');
-    I.click("OK");
+    I.click('OK');
 
     // invalid region is selected on validation to reveal per-region control with error
     AtSidebar.seeSelectedRegion(regions[0].label);
-    I.fillField("input[name=date-date]", formatDateValue(regions[0].dateValue, format));
+    I.fillField('input[name=date-date]', formatDateValue(regions[0].dateValue, format));
     I.updateAnnotation();
     // next region with empty required date is selected and error is shown
     I.see('DateTime "date" is required');
-    I.click("OK");
+    I.click('OK');
     AtSidebar.seeSelectedRegion(regions[1].label);
 
     I.say("Fill all per-region date fields and check it's all good");
     regions.forEach((region) => {
-      I.click(locate("li").withText(region.text));
-      I.fillField("input[name=date-date]", formatDateValue(region.dateValue, format));
+      I.click(locate('li').withText(region.text));
+      I.fillField('input[name=date-date]', formatDateValue(region.dateValue, format));
     });
 
-    I.click(locate("li").withText(regions[0].text));
+    I.click(locate('li').withText(regions[0].text));
     // less than min
-    I.selectOption("select[name=year-year]", "1999");
-    assert.strictEqual("", await I.grabValueFrom("select[name=year-year]"));
+    I.selectOption('select[name=year-year]', '1999');
+    assert.strictEqual('', await I.grabValueFrom('select[name=year-year]'));
     // more than max
-    I.selectOption("select[name=year-year]", "2023");
-    assert.strictEqual("", await I.grabValueFrom("select[name=year-year]"));
+    I.selectOption('select[name=year-year]', '2023');
+    assert.strictEqual('', await I.grabValueFrom('select[name=year-year]'));
     // exactly the same as max, should be correct
-    I.selectOption("select[name=year-year]", "2022");
-    assert.strictEqual("2022", await I.grabValueFrom("select[name=year-year]"));
-    I.pressKey("Escape");
+    I.selectOption('select[name=year-year]', '2022');
+    assert.strictEqual('2022', await I.grabValueFrom('select[name=year-year]'));
+    I.pressKey('Escape');
 
     regions.forEach((region) => {
-      I.click(locate("li").withText(region.text));
-      I.selectOption("select[name=year-year]", region.year);
+      I.click(locate('li').withText(region.text));
+      I.selectOption('select[name=year-year]', region.year);
     });
 
     I.updateAnnotation();
-    I.dontSee("Warning");
-    I.dontSee("is required");
+    I.dontSee('Warning');
+    I.dontSee('is required');
 
     regions.forEach((region) => {
-      I.click(locate("li").withText(region.text));
+      I.click(locate('li').withText(region.text));
       // important to see that per-regions change their values
-      I.seeInField("input[name=date-date]", region.dateValue);
-      I.seeInField("select[name=year-year]", region.year);
+      I.seeInField('input[name=date-date]', region.dateValue);
+      I.seeInField('select[name=year-year]', region.year);
     });
 
     const results = await I.executeScript(serialize);
@@ -166,14 +166,14 @@ Scenario(
         const expected = { end: input.rangeEnd, start: input.rangeStart, text: input.text };
 
         switch (result.from_name) {
-          case "label":
+          case 'label':
             expected.labels = [input.label];
             break;
-          case "date":
+          case 'date':
             expected.datetime = input.dateValue;
             break;
           // year is formatted in config to be an ISO date
-          case "year":
+          case 'year':
             expected.datetime = `${input.year}-01-01`;
             break;
         }

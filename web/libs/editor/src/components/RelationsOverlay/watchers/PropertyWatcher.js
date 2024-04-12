@@ -1,5 +1,5 @@
-import { observe } from "mobx";
-import { debounce } from "../../../utils/debounce";
+import { observe } from 'mobx';
+import { debounce } from '../../../utils/debounce';
 
 export const createPropertyWatcher = (props) => {
   return class {
@@ -25,7 +25,7 @@ export const createPropertyWatcher = (props) => {
 
     _watchProperties(element, propsList, disposers) {
       return propsList.reduce((res, property) => {
-        if (typeof property !== "string") {
+        if (typeof property !== 'string') {
           Object.keys(property).forEach((propertyName) => {
             this._watchProperties(element[propertyName], property[propertyName], disposers);
           });

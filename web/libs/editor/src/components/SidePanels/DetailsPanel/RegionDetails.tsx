@@ -1,9 +1,9 @@
-import { Typography } from "antd";
-import { observer } from "mobx-react";
-import { type FC, useEffect, useMemo, useRef } from "react";
-import { Block, Elem, useBEM } from "../../../utils/bem";
-import "./RegionDetails.styl";
-import { RegionEditor } from "./RegionEditor";
+import { Typography } from 'antd';
+import { observer } from 'mobx-react';
+import { type FC, useEffect, useMemo, useRef } from 'react';
+import { Block, Elem, useBEM } from '../../../utils/bem';
+import './RegionDetails.styl';
+import { RegionEditor } from './RegionEditor';
 
 const { Text } = Typography;
 
@@ -20,7 +20,7 @@ const TextResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
 });
 
 const ChoicesResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
-  return <Text mark>{mainValue.join(", ")}</Text>;
+  return <Text mark>{mainValue.join(', ')}</Text>;
 });
 
 const RatingResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
@@ -37,31 +37,31 @@ const ResultItem: FC<{ result: any }> = observer(({ result }) => {
   // const isRegionList = from_name.displaymode === PER_REGION_MODES.REGION_LIST;
 
   const content = useMemo(() => {
-    if (type === "rating") {
+    if (type === 'rating') {
       return (
-        <Elem name="result">
+        <Elem name='result'>
           <Text>Rating: </Text>
-          <Elem name="value">
+          <Elem name='value'>
             <RatingResult mainValue={mainValue} />
           </Elem>
         </Elem>
       );
     }
-    if (type === "textarea") {
+    if (type === 'textarea') {
       return (
-        <Elem name="result">
+        <Elem name='result'>
           <Text>Text: </Text>
-          <Elem name="value">
+          <Elem name='value'>
             <TextResult mainValue={mainValue} />
           </Elem>
         </Elem>
       );
     }
-    if (type === "choices") {
+    if (type === 'choices') {
       return (
-        <Elem name="result">
+        <Elem name='result'>
           <Text>Choices: </Text>
-          <Elem name="value">
+          <Elem name='value'>
             <ChoicesResult mainValue={mainValue} />
           </Elem>
         </Elem>
@@ -69,21 +69,21 @@ const ResultItem: FC<{ result: any }> = observer(({ result }) => {
     }
   }, [type, mainValue]);
 
-  return content ? <Block name="region-meta">{content}</Block> : null;
+  return content ? <Block name='region-meta'>{content}</Block> : null;
 });
 
 export const RegionDetailsMain: FC<{ region: any }> = observer(({ region }) => {
   return (
     <>
-      <Elem name="result">
+      <Elem name='result'>
         {(region?.results as any[]).map((res) => (
           <ResultItem key={res.pid} result={res} />
         ))}
         {region?.text ? (
-          <Block name="region-meta">
-            <Elem name="item">
-              <Elem name="content" mod={{ type: "text" }}>
-                {region.text.replace(/\\n/g, "\n")}
+          <Block name='region-meta'>
+            <Elem name='item'>
+              <Elem name='content' mod={{ type: 'text' }}>
+                {region.text.replace(/\\n/g, '\n')}
               </Elem>
             </Elem>
           </Block>
@@ -125,8 +125,8 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(
         {editMode ? (
           <textarea
             ref={(el) => (input.current = el)}
-            placeholder="Meta"
-            className={bem.elem("meta-text").toClassName()}
+            placeholder='Meta'
+            className={bem.elem('meta-text').toClassName()}
             value={region.normInput}
             onChange={(e) => saveMeta(e.target.value)}
             onBlur={() => {
@@ -134,7 +134,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(
               cancelEditMode?.();
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 saveMeta(region.normInput);
                 cancelEditMode?.();
@@ -143,7 +143,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(
           />
         ) : (
           region.meta?.text && (
-            <Elem name="meta-text" onClick={() => enterEditMode?.()}>
+            <Elem name='meta-text' onClick={() => enterEditMode?.()}>
               {region.meta?.text}
             </Elem>
           )

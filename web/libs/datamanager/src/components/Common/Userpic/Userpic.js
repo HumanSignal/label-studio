@@ -1,10 +1,10 @@
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Block, Elem } from "../../../utils/bem";
-import { Tooltip } from "../Tooltip/Tooltip";
-import "./Userpic.styl";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Block, Elem } from '../../../utils/bem';
+import { Tooltip } from '../Tooltip/Tooltip';
+import './Userpic.styl';
 
 const FALLBACK_IMAGE =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 export const Userpic = forwardRef(
   ({ badge = null, className, faded = false, showUsername, size, src, style, user, username, ...rest }, ref) => {
@@ -27,7 +27,7 @@ export const Userpic = forwardRef(
         } else if (username) {
           setFinalUsername(username);
         } else if (first_name || last_name) {
-          setFinalUsername((first_name?.[0] ?? "") + (last_name?.[0] ?? ""));
+          setFinalUsername((first_name?.[0] ?? '') + (last_name?.[0] ?? ''));
         } else if (email) {
           setFinalUsername(email.substring(0, 2));
         }
@@ -45,28 +45,28 @@ export const Userpic = forwardRef(
     }, [finalSrc]);
 
     const userpic = (
-      <Block ref={ref} name="userpic" mix={className} mod={{ faded }} style={style} {...rest}>
+      <Block ref={ref} name='userpic' mix={className} mod={{ faded }} style={style} {...rest}>
         <Elem
-          tag="img"
-          name="avatar"
+          tag='img'
+          name='avatar'
           ref={imgRef}
           src={finalSrc}
-          alt={(finalUsername ?? "").toUpperCase()}
+          alt={(finalUsername ?? '').toUpperCase()}
           style={{ opacity: imgVisible ? (faded ? 0.3 : 1) : 0 }}
           onLoad={onImageLoaded}
           onError={() => setFinalSrc(FALLBACK_IMAGE)}
           mod={{ faded }}
         />
         {nameVisible && (
-          <Elem tag="span" name="username">
-            {(finalUsername ?? "").toUpperCase()}
+          <Elem tag='span' name='username'>
+            {(finalUsername ?? '').toUpperCase()}
           </Elem>
         )}
 
         {badge &&
           Object.entries(badge).map(([align, content], i) => {
             return (
-              <Elem key={`badge-${i}`} name="badge" mod={{ [align]: true }}>
+              <Elem key={`badge-${i}`} name='badge' mod={{ [align]: true }}>
                 {content}
               </Elem>
             );
@@ -76,7 +76,7 @@ export const Userpic = forwardRef(
 
     const userFullName = useMemo(() => {
       if (user?.first_name || user?.last_name) {
-        return `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
+        return `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim();
       }
       if (user?.email) {
         return user.email;
@@ -88,4 +88,4 @@ export const Userpic = forwardRef(
   },
 );
 
-Userpic.displayName = "Userpic";
+Userpic.displayName = 'Userpic';

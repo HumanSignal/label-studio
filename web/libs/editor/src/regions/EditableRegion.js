@@ -1,7 +1,7 @@
-import { types } from "mobx-state-tree";
+import { types } from 'mobx-state-tree';
 
 export const EditableRegion = types
-  .model("EditableRegion")
+  .model('EditableRegion')
   .volatile(() => ({
     editorEnabled: true,
     /**

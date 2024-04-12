@@ -1,25 +1,25 @@
-Feature("Readonly Results");
+Feature('Readonly Results');
 
-const imageExamples = new DataTable(["example", "regionName"]);
+const imageExamples = new DataTable(['example', 'regionName']);
 
-imageExamples.add([require("../../../examples/timeseries-url-indexed"), "Run"]);
+imageExamples.add([require('../../../examples/timeseries-url-indexed'), 'Run']);
 
 Data(imageExamples).Scenario(
-  "Timeseries Readonly Results",
+  'Timeseries Readonly Results',
   async ({ I, current, LabelStudio, AtSidebar, AtLabels, Tools }) => {
-    I.amOnPage("/");
+    I.amOnPage('/');
     const { config, result: r, data } = current.example;
 
     // mark first result as readonly
     const result = r.map((r, i) => (i === 0 ? { ...r, readonly: true } : r));
 
     // extracts label regions only
-    const regions = result.filter((r) => r.type.match("labels"));
+    const regions = result.filter((r) => r.type.match('labels'));
 
     LabelStudio.init({
       annotations: [
         {
-          id: "test",
+          id: 'test',
           result,
         },
       ],
@@ -27,25 +27,25 @@ Data(imageExamples).Scenario(
       data,
     });
 
-    I.waitForElement(".htx-timeseries-channel", 60);
+    I.waitForElement('.htx-timeseries-channel', 60);
 
-    I.say("TimeSeries loaded");
+    I.say('TimeSeries loaded');
 
-    I.say("Check region is selectable");
+    I.say('Check region is selectable');
     AtSidebar.seeRegions(regions.length);
     AtSidebar.clickRegion(current.regionName);
 
-    I.say("Results are equal after deletion attempt");
-    I.pressKey("Backspace");
+    I.say('Results are equal after deletion attempt');
+    I.pressKey('Backspace');
     await LabelStudio.resultsNotChanged(result);
 
-    const wrapperPosition = await Tools.getElementPosition(".htx-timeseries-channel .overlay");
+    const wrapperPosition = await Tools.getElementPosition('.htx-timeseries-channel .overlay');
 
-    AtLabels.clickLabel("Run");
+    AtLabels.clickLabel('Run');
 
-    I.pressKey("u");
-    I.say("Can draw new shape");
-    I.pressKey("1");
+    I.pressKey('u');
+    I.say('Can draw new shape');
+    I.pressKey('1');
     await I.dragAndDropMouse(
       {
         x: wrapperPosition.x + 50,

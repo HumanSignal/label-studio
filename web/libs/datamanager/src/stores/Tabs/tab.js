@@ -1,32 +1,32 @@
-import deepEqual from "deep-equal";
-import { clone, destroy, flow, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
-import { clamp } from "../../utils/helpers";
-import { History } from "../../utils/history";
-import { guidGenerator } from "../../utils/random";
-import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
-import { normalizeFilterValue } from "./filter_utils";
-import { TabFilter } from "./tab_filter";
-import { TabHiddenColumns } from "./tab_hidden_columns";
-import { TabSelectedItems } from "./tab_selected_items";
+import deepEqual from 'deep-equal';
+import { clone, destroy, flow, getParent, getRoot, getSnapshot, types } from 'mobx-state-tree';
+import { clamp } from '../../utils/helpers';
+import { History } from '../../utils/history';
+import { guidGenerator } from '../../utils/random';
+import { CustomJSON, StringOrNumberID, ThresholdType } from '../types';
+import { normalizeFilterValue } from './filter_utils';
+import { TabFilter } from './tab_filter';
+import { TabHiddenColumns } from './tab_hidden_columns';
+import { TabSelectedItems } from './tab_selected_items';
 
 const THRESHOLD_MIN = 0;
 const THRESHOLD_MIN_DIFF = 0.001;
 
 export const Tab = types
-  .model("View", {
+  .model('View', {
     id: StringOrNumberID,
 
-    title: "Tasks",
+    title: 'Tasks',
     oldTitle: types.maybeNull(types.string),
 
     key: types.optional(types.string, guidGenerator),
 
-    type: types.optional(types.enumeration(["list", "grid"]), "list"),
+    type: types.optional(types.enumeration(['list', 'grid']), 'list'),
 
-    target: types.optional(types.enumeration(["tasks", "annotations"]), "tasks"),
+    target: types.optional(types.enumeration(['tasks', 'annotations']), 'tasks'),
 
     filters: types.array(types.late(() => TabFilter)),
-    conjunction: types.optional(types.enumeration(["and", "or"]), "and"),
+    conjunction: types.optional(types.enumeration(['and', 'or']), 'and'),
     hiddenColumns: types.maybeNull(types.optional(TabHiddenColumns, {})),
     ordering: types.optional(types.array(types.string), []),
     selected: types.optional(TabSelectedItems, {}),
@@ -47,11 +47,11 @@ export const Tab = types
   })
   .volatile(() => {
     const defaultWidth = getComputedStyle(document.body)
-      .getPropertyValue("--menu-sidebar-width")
-      .replace("px", "")
+      .getPropertyValue('--menu-sidebar-width')
+      .replace('px', '')
       .trim();
 
-    const labelingTableWidth = Number.parseInt(localStorage.getItem("labelingTableWidth") ?? defaultWidth ?? 200);
+    const labelingTableWidth = Number.parseInt(localStorage.getItem('labelingTableWidth') ?? defaultWidth ?? 200);
 
     return {
       labelingTableWidth,
@@ -112,8 +112,8 @@ export const Tab = types
     get currentOrder() {
       return self.ordering.length
         ? self.ordering.reduce((res, field) => {
-            const fieldName = field.replace(/^-/, "");
-            const desc = field[0] === "-";
+            const fieldName = field.replace(/^-/, '');
+            const desc = field[0] === '-';
 
             return {
               ...res,
@@ -219,7 +219,7 @@ export const Tab = types
         Object.assign(tab, data);
       }
 
-      self.root.SDK.invoke("tabTypeChanged", { tab: tab.id, type: self.type });
+      self.root.SDK.invoke('tabTypeChanged', { tab: tab.id, type: self.type });
       return tab;
     },
   }))
@@ -237,7 +237,7 @@ export const Tab = types
 
     setType(type) {
       self.type = type;
-      self.root.SDK.invoke("tabTypeChanged", { tab: self.id, type });
+      self.root.SDK.invoke('tabTypeChanged', { tab: self.id, type });
       self.save({ reload: false });
     },
 
@@ -275,12 +275,12 @@ export const Tab = types
       }
 
       self.clearSelection();
-      self.save({ interaction: "ordering" });
+      self.save({ interaction: 'ordering' });
     },
 
     setLabelingTableWidth(width) {
       self.labelingTableWidth = width;
-      localStorage.setItem("labelingTableWidth", self.labelingTableWidth);
+      localStorage.setItem('labelingTableWidth', self.labelingTableWidth);
     },
 
     setGridWidth(width) {
@@ -383,7 +383,7 @@ export const Tab = types
         yield self.dataStore.reload({ query: self.query, interaction });
       }
 
-      getRoot(self).SDK?.invoke?.("tabReloaded", self);
+      getRoot(self).SDK?.invoke?.('tabReloaded', self);
     }),
 
     deleteFilter(filter) {
@@ -434,7 +434,7 @@ export const Tab = types
     }),
 
     delete: flow(function* () {
-      yield self.root.apiCall("deleteTab", { tabID: self.id });
+      yield self.root.apiCall('deleteTab', { tabID: self.id });
     }),
 
     markSaved() {
@@ -451,7 +451,7 @@ export const Tab = types
 
       Object.assign(sn, {
         filters: items ?? [],
-        conjunction: conjunction ?? "and",
+        conjunction: conjunction ?? 'and',
       });
     } else {
       sn.filters = filters;

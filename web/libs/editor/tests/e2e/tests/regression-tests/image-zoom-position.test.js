@@ -1,10 +1,10 @@
-const assert = require("assert");
-const Helpers = require("../helpers");
+const assert = require('assert');
+const Helpers = require('../helpers');
 
-Feature("Image zoom position").tag("@regress");
+Feature('Image zoom position').tag('@regress');
 
 const IMAGE =
-  "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
+  'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
 
 const config = `
   <View>
@@ -13,18 +13,18 @@ const config = `
   </View>`;
 
 async function getStrokeColor() {
-  const circle = window.Konva.stages[0].findOne("Circle");
+  const circle = window.Konva.stages[0].findOne('Circle');
 
   return circle.attrs.stroke;
 }
 
-const relativeCoordsFF = new DataTable(["enabled"]);
+const relativeCoordsFF = new DataTable(['enabled']);
 
 relativeCoordsFF.add([true]);
 relativeCoordsFF.add([false]);
 
 Data(relativeCoordsFF).Scenario(
-  "Zoomed image should keep center image in center of canvas on resizes",
+  'Zoomed image should keep center image in center of canvas on resizes',
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtDetails, AtPanels, current }) => {
     const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
     const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
@@ -35,7 +35,7 @@ Data(relativeCoordsFF).Scenario(
       data: { image: IMAGE },
       annotations: [
         {
-          id: "1000",
+          id: '1000',
           result: [
             {
               original_width: 2242,
@@ -48,11 +48,11 @@ Data(relativeCoordsFF).Scenario(
                 height: 11.016260162601629,
                 rotation: 0,
               },
-              id: "Nrzdt6xVq1",
-              from_name: "rect",
-              to_name: "img",
-              type: "rectangle",
-              origin: "manual",
+              id: 'Nrzdt6xVq1',
+              from_name: 'rect',
+              to_name: 'img',
+              type: 'rectangle',
+              origin: 'manual',
             },
             {
               original_width: 2242,
@@ -65,11 +65,11 @@ Data(relativeCoordsFF).Scenario(
                 height: 6.25,
                 rotation: 0,
               },
-              id: "S_q7c7DTU4",
-              from_name: "rect",
-              to_name: "img",
-              type: "rectangle",
-              origin: "manual",
+              id: 'S_q7c7DTU4',
+              from_name: 'rect',
+              to_name: 'img',
+              type: 'rectangle',
+              origin: 'manual',
             },
           ],
         },
@@ -83,7 +83,7 @@ Data(relativeCoordsFF).Scenario(
       fflag_fix_front_dev_3793_relative_coords_short: FF3793.enabled,
     });
 
-    I.amOnPage("/");
+    I.amOnPage('/');
     LabelStudio.init(params);
     AtImageView.waitForImage();
     AtOutliner.seeRegions(2);
@@ -92,7 +92,7 @@ Data(relativeCoordsFF).Scenario(
 
     AtImageView.selectPanTool();
 
-    I.say("Zoom into the first region");
+    I.say('Zoom into the first region');
     for (let k = 0; k < 3; k++) {
       I.click("[aria-label='zoom-in']");
       AtImageView.drawByDrag(
@@ -105,28 +105,28 @@ Data(relativeCoordsFF).Scenario(
 
     AtImageView.selectMoveTool();
 
-    I.say("Check that there is a region at the center of visible area");
+    I.say('Check that there is a region at the center of visible area');
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
     AtOutliner.seeSelectedRegion();
     // these values depend on screen size, interface elements size, etc.
     // so if they were changed slightly, just replace them with actual data.
-    AtDetails.seeFieldWithValue("X", FF3793.enabled ? "88.567" : "435.75");
-    I.pressKey("U");
+    AtDetails.seeFieldWithValue('X', FF3793.enabled ? '88.567' : '435.75');
+    I.pressKey('U');
 
-    I.say("Collapse the details panel");
+    I.say('Collapse the details panel');
     AtDetailsPanel.collapsePanel();
     await AtImageView.lookForStage();
 
-    I.say("Check that there is a region at the center of visible area");
+    I.say('Check that there is a region at the center of visible area');
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
     AtOutliner.seeSelectedRegion();
-    I.pressKey("U");
+    I.pressKey('U');
 
-    I.say("Collapse the outliner panel");
+    I.say('Collapse the outliner panel');
     AtOutlinerPanel.collapsePanel();
     await AtImageView.lookForStage();
 
-    I.say("The region should be at the right side of visible area");
+    I.say('The region should be at the right side of visible area');
     {
       AtImageView.clickAt(AtImageView.percToX(25), AtImageView.percToY(50));
       const thereIsTransformer = await AtImageView.isTransformerExist();
@@ -138,18 +138,18 @@ Data(relativeCoordsFF).Scenario(
       const thereIsTransformer = await AtImageView.isTransformerExist();
 
       assert.strictEqual(thereIsTransformer, true);
-      I.pressKey("U");
+      I.pressKey('U');
     }
 
-    I.say("Reset changes");
+    I.say('Reset changes');
     AtDetailsPanel.expandPanel();
     AtOutlinerPanel.expandPanel();
     await AtImageView.lookForStage();
-    I.pressKey(["Shift", "1"]);
+    I.pressKey(['Shift', '1']);
     //
     AtImageView.selectPanTool();
 
-    I.say("Zoom into the second region");
+    I.say('Zoom into the second region');
     for (let k = 0; k < 3; k++) {
       I.click("[aria-label='zoom-in']");
       AtImageView.drawByDrag(
@@ -162,22 +162,22 @@ Data(relativeCoordsFF).Scenario(
 
     AtImageView.selectMoveTool();
 
-    I.say("Check that there is a region at the center of visible area");
+    I.say('Check that there is a region at the center of visible area');
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
     AtOutliner.seeSelectedRegion();
-    AtDetails.seeFieldWithValue("X", FF3793.enabled ? "68.75" : "338.25");
-    I.pressKey("U");
+    AtDetails.seeFieldWithValue('X', FF3793.enabled ? '68.75' : '338.25');
+    I.pressKey('U');
 
-    I.say("Collapse the details panel");
+    I.say('Collapse the details panel');
     AtDetailsPanel.collapsePanel();
     await AtImageView.lookForStage();
 
-    I.say("Check that the region is still at the center of visible area");
+    I.say('Check that the region is still at the center of visible area');
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
     AtOutliner.seeSelectedRegion();
-    I.pressKey("U");
+    I.pressKey('U');
 
-    I.say("Resize panels");
+    I.say('Resize panels');
     AtDetailsPanel.expandPanel();
 
     for (const [shiftX, steps] of [
@@ -204,25 +204,25 @@ Data(relativeCoordsFF).Scenario(
     }
     await AtImageView.lookForStage();
 
-    I.say("Check that the region is still at the center of visible area");
+    I.say('Check that the region is still at the center of visible area');
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
     AtOutliner.seeSelectedRegion();
-    I.pressKey("U");
+    I.pressKey('U');
   },
 );
 
 Scenario(
-  "Keeping the zoom center for different image sizes and scaling algorithms",
+  'Keeping the zoom center for different image sizes and scaling algorithms',
   async ({ I, LabelStudio, AtImageView, AtPanels }) => {
     const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
     const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
-    const strokecolor = "rgb(0,111,222)";
+    const strokecolor = 'rgb(0,111,222)';
 
     const keyPointBeSelected = async () => {
       const currentStokeColor = await I.executeScript(getStrokeColor);
       const colorIsChanged = currentStokeColor !== strokecolor;
 
-      assert.strictEqual(colorIsChanged, true, "Stroke color must be changed if we are able to select keypoint");
+      assert.strictEqual(colorIsChanged, true, 'Stroke color must be changed if we are able to select keypoint');
     };
 
     const params = {
@@ -234,7 +234,7 @@ Scenario(
   </View>`,
       annotations: [
         {
-          id: "1000",
+          id: '1000',
           result: [],
         },
       ],
@@ -250,7 +250,7 @@ Scenario(
       [2242, 2802],
       [768, 576],
     ]) {
-      I.amOnPage("/");
+      I.amOnPage('/');
       const imageUrl = await I.executeScript(Helpers.generateImageUrl, { width, height });
 
       LabelStudio.init({
@@ -269,27 +269,27 @@ Scenario(
         AtImageView.percToY(25),
       );
 
-      I.say("Draw a point at the center of visible area");
-      I.pressKey("K");
+      I.say('Draw a point at the center of visible area');
+      I.pressKey('K');
       AtImageView.drawByClick(AtImageView.percToX(50), AtImageView.percToY(50));
 
-      I.say("Collapse the details panel");
+      I.say('Collapse the details panel');
       AtDetailsPanel.collapsePanel();
       await AtImageView.lookForStage();
 
-      I.say("Check that the region is still at the center of visible area");
+      I.say('Check that the region is still at the center of visible area');
       AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
       await keyPointBeSelected();
-      I.pressKey("U");
+      I.pressKey('U');
 
-      I.say("Collapse the outliner panel");
+      I.say('Collapse the outliner panel');
       AtOutlinerPanel.collapsePanel();
       await AtImageView.lookForStage();
 
-      I.say("Check that the region is still at the center of visible area");
+      I.say('Check that the region is still at the center of visible area');
       AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
       await keyPointBeSelected();
-      I.pressKey("U");
+      I.pressKey('U');
 
       AtDetailsPanel.expandPanel();
       AtOutlinerPanel.expandPanel();

@@ -9,15 +9,15 @@ import {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { createPortal } from "react-dom";
-import { useFullscreen } from "../../hooks/useFullscreen";
-import { Block, cn } from "../../utils/bem";
-import { type ElementAlignment, alignElements } from "../../utils/dom";
-import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
-import { aroundTransition } from "../../utils/transition";
-import "./Dropdown.styl";
-import { DropdownContext } from "./DropdownContext";
+} from 'react';
+import { createPortal } from 'react-dom';
+import { useFullscreen } from '../../hooks/useFullscreen';
+import { Block, cn } from '../../utils/bem';
+import { type ElementAlignment, alignElements } from '../../utils/dom';
+import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
+import { aroundTransition } from '../../utils/transition';
+import './Dropdown.styl';
+import { DropdownContext } from './DropdownContext';
 
 let lastIndex = 1;
 
@@ -44,7 +44,7 @@ export interface DropdownProps {
 
 export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
   ({ animated = true, visible = false, ...props }, ref) => {
-    const rootName = cn("dropdown");
+    const rootName = cn('dropdown');
 
     const dropdown = useRef<HTMLElement>();
     const { triggerRef, minIndex } = useContext(DropdownContext) ?? {};
@@ -53,12 +53,12 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const { children } = props;
     const [currentVisible, setVisible] = useState(visible);
     const [offset, setOffset] = useState({});
-    const [visibility, setVisibility] = useState(visible ? "visible" : null);
+    const [visibility, setVisibility] = useState(visible ? 'visible' : null);
 
     const calculatePosition = useCallback(() => {
       const dropdownEl = dropdown.current!;
       const parent = (triggerRef?.current ?? dropdownEl.parentNode) as HTMLElement;
-      const { left, top } = alignElements(parent!, dropdownEl, props.alignment || "bottom-left");
+      const { left, top } = alignElements(parent!, dropdownEl, props.alignment || 'bottom-left');
 
       setOffset({ left, top });
     }, [triggerRef, minIndex]);
@@ -75,20 +75,20 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
           const menu = dropdown.current!;
 
           if (animated === false || disableAnimation === true) {
-            setVisibility(visible ? "visible" : null);
+            setVisibility(visible ? 'visible' : null);
             resolve();
             return;
           }
 
           aroundTransition(menu, {
             transition: () => {
-              setVisibility(visible ? "appear" : "disappear");
+              setVisibility(visible ? 'appear' : 'disappear');
             },
             beforeTransition: () => {
-              setVisibility(visible ? "before-appear" : "before-disappear");
+              setVisibility(visible ? 'before-appear' : 'before-disappear');
             },
             afterTransition: () => {
-              setVisibility(visible ? "visible" : null);
+              setVisibility(visible ? 'visible' : null);
               resolve();
             },
           });
@@ -159,7 +159,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     }, [visible]);
 
     useEffect(() => {
-      if (!isInline && visibility === "before-appear") {
+      if (!isInline && visibility === 'before-appear') {
         calculatePosition();
       }
     }, [visibility, calculatePosition, isInline]);
@@ -179,28 +179,28 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const content = useMemo(() => {
       const ch = children as any;
 
-      return ch.props && ch.props.type === "Menu"
+      return ch.props && ch.props.type === 'Menu'
         ? cloneElement(ch, {
             ...ch.props,
-            className: rootName.elem("menu").mix(ch.props.className),
+            className: rootName.elem('menu').mix(ch.props.className),
           })
         : children;
     }, [children]);
 
     const visibilityClasses = useMemo(() => {
       switch (visibility) {
-        case "before-appear":
-          return "before-appear";
-        case "appear":
-          return "appear before-appear";
-        case "before-disappear":
-          return "before-disappear";
-        case "disappear":
-          return "disappear before-disappear";
-        case "visible":
-          return "visible";
+        case 'before-appear':
+          return 'before-appear';
+        case 'appear':
+          return 'appear before-appear';
+        case 'before-disappear':
+          return 'before-disappear';
+        case 'disappear':
+          return 'disappear before-disappear';
+        case 'visible':
+          return 'visible';
         default:
-          return visible ? "visible" : null;
+          return visible ? 'visible' : null;
       }
     }, [visibility, visible]);
 
@@ -215,7 +215,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const result = (
       <Block
         ref={dropdown}
-        name="dropdown"
+        name='dropdown'
         data-testid={props.dataTestId}
         mix={[props.className, visibilityClasses]}
         style={{
@@ -232,4 +232,4 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
   },
 );
 
-Dropdown.displayName = "Dropdown";
+Dropdown.displayName = 'Dropdown';

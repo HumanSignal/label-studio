@@ -1,10 +1,10 @@
-import { forwardRef } from "react";
-import { Block, Elem } from "../../../../../utils/bem";
-import "./Label.styl";
+import { forwardRef } from 'react';
+import { Block, Elem } from '../../../../../utils/bem';
+import './Label.styl';
 
 const Label = forwardRef(
   ({ text, children, required, placement, description, size, large, style, simple, flat }, ref) => {
-    const tagName = simple ? "div" : "label";
+    const tagName = simple ? 'div' : 'label';
     const mods = {
       size,
       large,
@@ -15,14 +15,14 @@ const Label = forwardRef(
     };
 
     return (
-      <Block ref={ref} name="label" tag={tagName} style={style} mod={mods} data-required={required}>
-        <Elem name="text">
-          <Elem name="content">
+      <Block ref={ref} name='label' tag={tagName} style={style} mod={mods} data-required={required}>
+        <Elem name='text'>
+          <Elem name='content'>
             {text}
-            {description && <Elem name="description">{description}</Elem>}
+            {description && <Elem name='description'>{description}</Elem>}
           </Elem>
         </Elem>
-        <Elem name="field">{children}</Elem>
+        <Elem name='field'>{children}</Elem>
       </Block>
     );
   },

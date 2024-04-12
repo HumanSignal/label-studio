@@ -1,9 +1,9 @@
 const { I } = inject();
-const Helpers = require("../tests/helpers");
+const Helpers = require('../tests/helpers');
 
 module.exports = {
-  _rootSelector: ".lsf-paragraphs",
-  _filterSelector: ".lsf-select__value",
+  _rootSelector: '.lsf-paragraphs',
+  _filterSelector: '.lsf-select__value',
   _phraseSelector: "[class^='phrase--']",
   _phraseDialoguetextSelector: "[class^='dialoguetext--']",
 
@@ -38,8 +38,8 @@ module.exports = {
   clickFilter(...authors) {
     I.click(this.locate(this._filterSelector));
     for (const author of authors) {
-      I.fillField("search_author", author);
-      I.click(locate(".lsf-select__option").withText(author));
+      I.fillField('search_author', author);
+      I.click(locate('.lsf-select__option').withText(author));
     }
     I.click(this.locate(this._filterSelector));
   },

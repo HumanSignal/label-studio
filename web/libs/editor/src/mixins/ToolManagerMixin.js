@@ -1,6 +1,6 @@
-import { types } from "mobx-state-tree";
-import * as Tools from "../tools";
-import ToolsManager from "../tools/Manager";
+import { types } from 'mobx-state-tree';
+import * as Tools from '../tools';
+import ToolsManager from '../tools/Manager';
 
 export const ToolManagerMixin = types.model().actions((self) => {
   return {

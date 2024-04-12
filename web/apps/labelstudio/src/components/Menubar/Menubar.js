@@ -1,5 +1,5 @@
-import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { StaticContent } from "../../app/StaticContent/StaticContent";
+import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { StaticContent } from '../../app/StaticContent/StaticContent';
 import {
   IconBook,
   IconFolder,
@@ -11,27 +11,27 @@ import {
   LsGitHub,
   LsSettings,
   LsSlack,
-} from "../../assets/icons";
-import { ModelsPage } from "../../pages/Organization/Models/ModelsPage";
-import { useConfig } from "../../providers/ConfigProvider";
-import { useContextComponent, useFixedLocation } from "../../providers/RoutesProvider";
-import { cn } from "../../utils/bem";
-import { FF_DIA_835, isFF } from "../../utils/feature-flags";
-import { absoluteURL, isDefined } from "../../utils/helpers";
-import { Breadcrumbs } from "../Breadcrumbs/Breadcrumbs";
-import { Dropdown } from "../Dropdown/Dropdown";
-import { Hamburger } from "../Hamburger/Hamburger";
-import { Menu } from "../Menu/Menu";
-import { Userpic } from "../Userpic/Userpic";
-import { VersionNotifier, VersionProvider } from "../VersionNotifier/VersionNotifier";
-import "./MenuContent.styl";
-import "./MenuSidebar.styl";
-import "./Menubar.styl";
+} from '../../assets/icons';
+import { ModelsPage } from '../../pages/Organization/Models/ModelsPage';
+import { useConfig } from '../../providers/ConfigProvider';
+import { useContextComponent, useFixedLocation } from '../../providers/RoutesProvider';
+import { cn } from '../../utils/bem';
+import { FF_DIA_835, isFF } from '../../utils/feature-flags';
+import { absoluteURL, isDefined } from '../../utils/helpers';
+import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
+import { Dropdown } from '../Dropdown/Dropdown';
+import { Hamburger } from '../Hamburger/Hamburger';
+import { Menu } from '../Menu/Menu';
+import { Userpic } from '../Userpic/Userpic';
+import { VersionNotifier, VersionProvider } from '../VersionNotifier/VersionNotifier';
+import './MenuContent.styl';
+import './MenuSidebar.styl';
+import './Menubar.styl';
 
 export const MenubarContext = createContext();
 
 const LeftContextMenu = ({ className }) => (
-  <StaticContent id="context-menu-left" className={className}>
+  <StaticContent id='context-menu-left' className={className}>
     {(template) => <Breadcrumbs fromTemplate={template} />}
   </StaticContent>
 );
@@ -44,7 +44,7 @@ const RightContextMenu = ({ className, ...props }) => {
       <ContextComponent {...props} {...(contextProps ?? {})} />
     </div>
   ) : (
-    <StaticContent id="context-menu-right" className={className} />
+    <StaticContent id='context-menu-right' className={className} />
   );
 };
 
@@ -61,11 +61,11 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
     props: {},
   });
 
-  const menubarClass = cn("menu-header");
-  const menubarContext = menubarClass.elem("context");
-  const sidebarClass = cn("sidebar");
-  const contentClass = cn("content-wrapper");
-  const contextItem = menubarClass.elem("context-item");
+  const menubarClass = cn('menu-header');
+  const menubarContext = menubarClass.elem('context');
+  const sidebarClass = cn('sidebar');
+  const contentClass = cn('content-wrapper');
+  const contextItem = menubarClass.elem('context-item');
   const showNewsletterDot = !isDefined(config.user.allow_newsletters);
 
   const sidebarPin = useCallback(
@@ -131,8 +131,8 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
       {enabled && (
         <div className={menubarClass}>
           <Dropdown.Trigger dropdown={menuDropdownRef} closeOnClickOutside={!sidebarPinned}>
-            <div className={`${menubarClass.elem("trigger")} main-menu-trigger`}>
-              <img src={absoluteURL("/static/icons/logo-black.svg")} alt="Label Studio Logo" height="22" />
+            <div className={`${menubarClass.elem('trigger')} main-menu-trigger`}>
+              <img src={absoluteURL('/static/icons/logo-black.svg')} alt='Label Studio Logo' height='22' />
               <Hamburger opened={sidebarOpened} />
             </div>
           </Dropdown.Trigger>
@@ -145,65 +145,65 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
 
           <Dropdown.Trigger
             ref={useMenuRef}
-            align="right"
+            align='right'
             content={
               <Menu>
-                <Menu.Item icon={<LsSettings />} label="Account &amp; Settings" href="/user/account" data-external />
+                <Menu.Item icon={<LsSettings />} label='Account &amp; Settings' href='/user/account' data-external />
                 {/* <Menu.Item label="Dark Mode"/> */}
-                <Menu.Item icon={<LsDoor />} label="Log Out" href={absoluteURL("/logout")} data-external />
+                <Menu.Item icon={<LsDoor />} label='Log Out' href={absoluteURL('/logout')} data-external />
                 {showNewsletterDot && (
                   <>
                     <Menu.Divider />
-                    <Menu.Item className={cn("newsletter-menu-item")} href="/user/account" data-external>
+                    <Menu.Item className={cn('newsletter-menu-item')} href='/user/account' data-external>
                       <span>Please check new notification settings in the Account & Settings page</span>
-                      <span className={cn("newsletter-menu-badge")} />
+                      <span className={cn('newsletter-menu-badge')} />
                     </Menu.Item>
                   </>
                 )}
               </Menu>
             }
           >
-            <div title={config.user.email} className={menubarClass.elem("user")}>
+            <div title={config.user.email} className={menubarClass.elem('user')}>
               <Userpic user={config.user} />
-              {showNewsletterDot && <div className={menubarClass.elem("userpic-badge")} />}
+              {showNewsletterDot && <div className={menubarClass.elem('userpic-badge')} />}
             </div>
           </Dropdown.Trigger>
         </div>
       )}
 
       <VersionProvider>
-        <div className={contentClass.elem("body")}>
+        <div className={contentClass.elem('body')}>
           {enabled && (
             <Dropdown
               ref={menuDropdownRef}
               onToggle={sidebarToggle}
-              onVisibilityChanged={() => window.dispatchEvent(new Event("resize"))}
+              onVisibilityChanged={() => window.dispatchEvent(new Event('resize'))}
               visible={sidebarOpened}
-              className={[sidebarClass, sidebarClass.mod({ floating: !sidebarPinned })].join(" ")}
+              className={[sidebarClass, sidebarClass.mod({ floating: !sidebarPinned })].join(' ')}
               style={{ width: 240 }}
             >
               <Menu>
-                <Menu.Item label="Projects" to="/projects" icon={<IconFolder />} data-external exact />
-                <Menu.Item label="Organization" to="/organization" icon={<IconPersonInCircle />} data-external exact />
-                {isFF(FF_DIA_835) && <Menu.Item label="Models" to={ModelsPage.path} icon={<IconModel />} exact />}
+                <Menu.Item label='Projects' to='/projects' icon={<IconFolder />} data-external exact />
+                <Menu.Item label='Organization' to='/organization' icon={<IconPersonInCircle />} data-external exact />
+                {isFF(FF_DIA_835) && <Menu.Item label='Models' to={ModelsPage.path} icon={<IconModel />} exact />}
 
                 <Menu.Spacer />
 
                 <VersionNotifier showNewVersion />
 
-                <Menu.Item label="API" href="/docs/api" icon={<IconTerminal />} target="_blank" />
-                <Menu.Item label="Docs" href="https://labelstud.io/guide" icon={<IconBook />} target="_blank" />
+                <Menu.Item label='API' href='/docs/api' icon={<IconTerminal />} target='_blank' />
+                <Menu.Item label='Docs' href='https://labelstud.io/guide' icon={<IconBook />} target='_blank' />
                 <Menu.Item
-                  label="GitHub"
-                  href="https://github.com/heartexlabs/label-studio"
+                  label='GitHub'
+                  href='https://github.com/heartexlabs/label-studio'
                   icon={<LsGitHub />}
-                  target="_blank"
+                  target='_blank'
                 />
                 <Menu.Item
-                  label="Slack Community"
-                  href="https://slack.labelstud.io/?source=product-menu"
+                  label='Slack Community'
+                  href='https://slack.labelstud.io/?source=product-menu'
                   icon={<LsSlack />}
-                  target="_blank"
+                  target='_blank'
                 />
 
                 <VersionNotifier showCurrentVersion />
@@ -212,18 +212,18 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
 
                 <Menu.Item
                   icon={<IconPin />}
-                  className={sidebarClass.elem("pin")}
+                  className={sidebarClass.elem('pin')}
                   onClick={sidebarPin}
                   active={sidebarPinned}
                 >
-                  {sidebarPinned ? "Unpin menu" : "Pin menu"}
+                  {sidebarPinned ? 'Unpin menu' : 'Pin menu'}
                 </Menu.Item>
               </Menu>
             </Dropdown>
           )}
 
           <MenubarContext.Provider value={providerValue}>
-            <div className={contentClass.elem("content").mod({ withSidebar: sidebarPinned && sidebarOpened })}>
+            <div className={contentClass.elem('content').mod({ withSidebar: sidebarPinned && sidebarOpened })}>
               {children}
             </div>
           </MenubarContext.Provider>

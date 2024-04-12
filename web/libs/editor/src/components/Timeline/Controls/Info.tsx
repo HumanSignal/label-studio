@@ -1,8 +1,8 @@
-import React, { type FC } from "react";
-import { Block, Elem } from "../../../utils/bem";
+import React, { type FC } from 'react';
+import { Block, Elem } from '../../../utils/bem';
 
-import { IconInfoConfig } from "../../../assets/icons/timeline";
-import "./Info.styl";
+import { IconInfoConfig } from '../../../assets/icons/timeline';
+import './Info.styl';
 
 export interface InfoProps {
   text: string;
@@ -10,9 +10,9 @@ export interface InfoProps {
 
 export const Info: FC<InfoProps> = ({ text }) => {
   return (
-    <Block name="control-info">
+    <Block name='control-info'>
       <IconInfoConfig />
-      <Elem name={"tooltip"}>{text}</Elem>
+      <Elem name={'tooltip'}>{text}</Elem>
     </Block>
   );
 };

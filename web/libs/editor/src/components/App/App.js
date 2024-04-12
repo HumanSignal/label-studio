@@ -1,58 +1,58 @@
-import { Result, Spin } from "antd";
-import { Provider, observer } from "mobx-react";
-import { getEnv, getRoot } from "mobx-state-tree";
+import { Result, Spin } from 'antd';
+import { Provider, observer } from 'mobx-react';
+import { getEnv, getRoot } from 'mobx-state-tree';
 /**
  * Libraries
  */
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 /**
  * Core
  */
-import Tree from "../../core/Tree";
-import { TreeValidation } from "../TreeValidation/TreeValidation";
+import Tree from '../../core/Tree';
+import { TreeValidation } from '../TreeValidation/TreeValidation';
 
-import "../../tags/control";
+import '../../tags/control';
 /**
  * Tags
  */
-import "../../tags/object";
-import "../../tags/visual";
+import '../../tags/object';
+import '../../tags/visual';
 
-import { Button } from "../../common/Button/Button";
+import { Button } from '../../common/Button/Button';
 /**
  * Utils and common components
  */
-import { Space } from "../../common/Space/Space";
-import { Block, Elem } from "../../utils/bem";
-import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
-import { sanitizeHtml } from "../../utils/html";
-import { reactCleaner } from "../../utils/reactCleaner";
-import { guidGenerator } from "../../utils/unique";
-import { isDefined, sortAnnotations } from "../../utils/utilities";
+import { Space } from '../../common/Space/Space';
+import { Block, Elem } from '../../utils/bem';
+import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from '../../utils/feature-flags';
+import { sanitizeHtml } from '../../utils/html';
+import { reactCleaner } from '../../utils/reactCleaner';
+import { guidGenerator } from '../../utils/unique';
+import { isDefined, sortAnnotations } from '../../utils/utilities';
 
-import { AnnotationTab } from "../AnnotationTab/AnnotationTab";
-import { DynamicPreannotationsControl } from "../AnnotationTab/DynamicPreannotationsControl";
-import { BottomBar } from "../BottomBar/BottomBar";
-import Debug from "../Debug";
-import { InstructionsModal } from "../InstructionsModal/InstructionsModal";
-import { RelationsOverlay } from "../RelationsOverlay/RelationsOverlay";
-import Segment from "../Segment/Segment";
-import Settings from "../Settings/Settings";
-import { SidePanels } from "../SidePanels/SidePanels";
-import { SideTabsPanels } from "../SidePanels/TabPanels/SideTabsPanels";
-import { SidebarTabs } from "../SidebarTabs/SidebarTabs";
-import { TopBar } from "../TopBar/TopBar";
+import { AnnotationTab } from '../AnnotationTab/AnnotationTab';
+import { DynamicPreannotationsControl } from '../AnnotationTab/DynamicPreannotationsControl';
+import { BottomBar } from '../BottomBar/BottomBar';
+import Debug from '../Debug';
+import { InstructionsModal } from '../InstructionsModal/InstructionsModal';
+import { RelationsOverlay } from '../RelationsOverlay/RelationsOverlay';
+import Segment from '../Segment/Segment';
+import Settings from '../Settings/Settings';
+import { SidePanels } from '../SidePanels/SidePanels';
+import { SideTabsPanels } from '../SidePanels/TabPanels/SideTabsPanels';
+import { SidebarTabs } from '../SidebarTabs/SidebarTabs';
+import { TopBar } from '../TopBar/TopBar';
 /**
  * Components
  */
-import { Annotation } from "./Annotation";
-import Grid from "./Grid";
+import { Annotation } from './Annotation';
+import Grid from './Grid';
 
 /**
  * Styles
  */
-import "./App.styl";
+import './App.styl';
 
 /**
  * App
@@ -68,16 +68,16 @@ class App extends Component {
 
   renderSuccess() {
     return (
-      <Block name="editor">
-        <Result status="success" title={getEnv(this.props.store).messages.DONE} />
+      <Block name='editor'>
+        <Result status='success' title={getEnv(this.props.store).messages.DONE} />
       </Block>
     );
   }
 
   renderNoAnnotation() {
     return (
-      <Block name="editor">
-        <Result status="success" title={getEnv(this.props.store).messages.NO_COMP_LEFT} />
+      <Block name='editor'>
+        <Result status='success' title={getEnv(this.props.store).messages.NO_COMP_LEFT} />
       </Block>
     );
   }
@@ -85,18 +85,18 @@ class App extends Component {
   renderNothingToLabel(store) {
     return (
       <Block
-        name="editor"
+        name='editor'
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          paddingBottom: "30vh",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          paddingBottom: '30vh',
         }}
       >
-        <Result status="success" title={getEnv(this.props.store).messages.NO_NEXT_TASK} />
-        <Block name="sub__result">You have completed all tasks in the queue!</Block>
-        <Button onClick={(e) => store.prevTask(e, true)} look="outlined" style={{ margin: "16px 0" }}>
+        <Result status='success' title={getEnv(this.props.store).messages.NO_NEXT_TASK} />
+        <Block name='sub__result'>You have completed all tasks in the queue!</Block>
+        <Button onClick={(e) => store.prevTask(e, true)} look='outlined' style={{ margin: '16px 0' }}>
           Go to Previous Task
         </Button>
       </Block>
@@ -105,34 +105,34 @@ class App extends Component {
 
   renderNoAccess() {
     return (
-      <Block name="editor">
-        <Result status="warning" title={getEnv(this.props.store).messages.NO_ACCESS} />
+      <Block name='editor'>
+        <Result status='warning' title={getEnv(this.props.store).messages.NO_ACCESS} />
       </Block>
     );
   }
 
   renderConfigValidationException(store) {
     return (
-      <Block name="main-view">
-        <Elem name="annotation">
+      <Block name='main-view'>
+        <Elem name='annotation'>
           <TreeValidation errors={this.props.store.annotationStore.validation} />
         </Elem>
-        {!isFF(FF_DEV_3873) && store.hasInterface("infobar") && <Elem name="infobar">Task #{store.task.id}</Elem>}
+        {!isFF(FF_DEV_3873) && store.hasInterface('infobar') && <Elem name='infobar'>Task #{store.task.id}</Elem>}
       </Block>
     );
   }
 
   renderLoader() {
-    return <Result icon={<Spin size="large" />} />;
+    return <Result icon={<Spin size='large' />} />;
   }
 
   _renderAll(obj) {
     if (obj.length === 1) return <Segment annotation={obj[0]}>{[Tree.renderItem(obj[0].root)]}</Segment>;
 
     return (
-      <div className="ls-renderall">
+      <div className='ls-renderall'>
         {obj.map((c, i) => (
-          <div key={`all-${i}`} className="ls-fade">
+          <div key={`all-${i}`} className='ls-fade'>
             <Segment annotation={c}>{[Tree.renderItem(c.root)]}</Segment>
           </div>
         ))}
@@ -144,12 +144,12 @@ class App extends Component {
     if (as.viewingAll) return this.renderAllAnnotations();
 
     return (
-      <Block key={(as.selectedHistory ?? as.selected)?.id} name="main-view" onScrollCapture={this._notifyScroll}>
-        <Elem name="annotation">
+      <Block key={(as.selectedHistory ?? as.selected)?.id} name='main-view' onScrollCapture={this._notifyScroll}>
+        <Elem name='annotation'>
           {<Annotation root={root} annotation={as.selected} />}
           {this.renderRelations(as.selected)}
         </Elem>
-        {!isFF(FF_DEV_3873) && getRoot(as).hasInterface("infobar") && this._renderInfobar(as)}
+        {!isFF(FF_DEV_3873) && getRoot(as).hasInterface('infobar') && this._renderInfobar(as)}
         {as.selected.hasSuggestionsSupport && <DynamicPreannotationsControl />}
       </Block>
     );
@@ -159,7 +159,7 @@ class App extends Component {
     const { id, queue } = getRoot(as).task;
 
     return (
-      <Elem name="infobar" tag={Space} size="small">
+      <Elem name='infobar' tag={Space} size='small'>
         <span>Task #{id}</span>
 
         {queue && <span>{queue}</span>}
@@ -214,7 +214,7 @@ class App extends Component {
 
     // tags can be styled in config when user is awaiting for suggestions from ML backend
     const mainContent = (
-      <Block name="main-content" mix={store.awaitingSuggestions ? ["requesting"] : []}>
+      <Block name='main-content' mix={store.awaitingSuggestions ? ['requesting'] : []}>
         {as.validation === null
           ? this._renderUI(as.selectedHistory?.root ?? root, as)
           : this.renderConfigValidationException(store)}
@@ -226,7 +226,7 @@ class App extends Component {
 
     return (
       <Block
-        name="editor"
+        name='editor'
         mod={{ fullscreen: settings.fullscreen, _auto_height: !outlinerEnabled }}
         ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
       >
@@ -236,7 +236,7 @@ class App extends Component {
             <InstructionsModal
               visible={store.showingDescription}
               onCancel={() => store.toggleDescription()}
-              title="Labeling Instructions"
+              title='Labeling Instructions'
             >
               {store.description}
             </InstructionsModal>
@@ -250,9 +250,9 @@ class App extends Component {
             </>
           )}
 
-          {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
+          {isDefined(store) && store.hasInterface('topbar') && <TopBar store={store} />}
           <Block
-            name="wrapper"
+            name='wrapper'
             mod={{
               viewAll: viewingAll,
               bsp: settings.bottomSidePanel,
@@ -266,11 +266,11 @@ class App extends Component {
                   panelsHidden={viewingAll}
                   currentEntity={as.selectedHistory ?? as.selected}
                   regions={as.selected.regionStore}
-                  showComments={store.hasInterface("annotations:comments")}
-                  focusTab={store.commentStore.tooltipMessage ? "comments" : null}
+                  showComments={store.hasInterface('annotations:comments')}
+                  focusTab={store.commentStore.tooltipMessage ? 'comments' : null}
                 >
                   {mainContent}
-                  {store.hasInterface("topbar") && <BottomBar store={store} />}
+                  {store.hasInterface('topbar') && <BottomBar store={store} />}
                 </SideTabsPanels>
               ) : (
                 <SidePanels
@@ -286,8 +286,8 @@ class App extends Component {
                 {mainContent}
 
                 {viewingAll === false && (
-                  <Block name="menu" mod={{ bsp: settings.bottomSidePanel }}>
-                    {store.hasInterface("side-column") && (
+                  <Block name='menu' mod={{ bsp: settings.bottomSidePanel }}>
+                    {store.hasInterface('side-column') && (
                       <SidebarTabs>
                         <AnnotationTab store={store} />
                       </SidebarTabs>
@@ -295,12 +295,12 @@ class App extends Component {
                   </Block>
                 )}
 
-                {newUIEnabled && store.hasInterface("topbar") && <BottomBar store={store} />}
+                {newUIEnabled && store.hasInterface('topbar') && <BottomBar store={store} />}
               </>
             )}
           </Block>
         </Provider>
-        {store.hasInterface("debug") && <Debug store={store} />}
+        {store.hasInterface('debug') && <Debug store={store} />}
       </Block>
     );
   }

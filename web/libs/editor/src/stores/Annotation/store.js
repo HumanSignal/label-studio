@@ -1,23 +1,23 @@
-import { destroy, getEnv, getParent, getRoot, types } from "mobx-state-tree";
+import { destroy, getEnv, getParent, getRoot, types } from 'mobx-state-tree';
 
-import { DataValidator, VALIDATORS, ValidationError } from "../../core/DataValidator";
-import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
-import { guidGenerator } from "../../core/Helpers";
-import Registry from "../../core/Registry";
-import Tree from "../../core/Tree";
-import Types from "../../core/Types";
-import { StoreExtender } from "../../mixins/SharedChoiceStore/extender";
-import { ViewModel } from "../../tags/visual";
-import Utils from "../../utils";
-import { FF_DEV_1621, FF_DEV_3034, FF_DEV_3391, FF_DEV_3617, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
-import { emailFromCreatedBy } from "../../utils/utilities";
-import { Annotation } from "./Annotation";
-import { HistoryItem } from "./HistoryItem";
+import { DataValidator, VALIDATORS, ValidationError } from '../../core/DataValidator';
+import { errorBuilder } from '../../core/DataValidator/ConfigValidator';
+import { guidGenerator } from '../../core/Helpers';
+import Registry from '../../core/Registry';
+import Tree from '../../core/Tree';
+import Types from '../../core/Types';
+import { StoreExtender } from '../../mixins/SharedChoiceStore/extender';
+import { ViewModel } from '../../tags/visual';
+import Utils from '../../utils';
+import { FF_DEV_1621, FF_DEV_3034, FF_DEV_3391, FF_DEV_3617, FF_SIMPLE_INIT, isFF } from '../../utils/feature-flags';
+import { emailFromCreatedBy } from '../../utils/utilities';
+import { Annotation } from './Annotation';
+import { HistoryItem } from './HistoryItem';
 
 const SelectedItem = types.union(Annotation, HistoryItem);
 
 const AnnotationStoreModel = types
-  .model("AnnotationStore", {
+  .model('AnnotationStore', {
     selected: types.maybeNull(types.reference(SelectedItem)),
     selectedHistory: types.maybeNull(types.safeReference(SelectedItem)),
 
@@ -59,7 +59,7 @@ const AnnotationStoreModel = types
           //   // comment will save draft automatically
           //   comments.commentFormSubmit();
           // } else
-          if (self.selected.type === "annotation") {
+          if (self.selected.type === 'annotation') {
             // save draft if there are changes waiting to be saved — it's handled inside
             self.selected.saveDraftImmediately();
           }
@@ -119,7 +119,7 @@ const AnnotationStoreModel = types
       self.selected = c;
 
       c.updateObjects();
-      if (c.type === "annotation") c.setInitialValues();
+      if (c.type === 'annotation') c.setInitialValues();
 
       return c;
     }
@@ -137,7 +137,7 @@ const AnnotationStoreModel = types
       c.editable = true;
       c.setupHotKeys();
 
-      getEnv(self).events.invoke("selectAnnotation", c, selected, options ?? {});
+      getEnv(self).events.invoke('selectAnnotation', c, selected, options ?? {});
       if (c.pk) getParent(self).addAnnotationToTaskHistory(c.pk);
       return c;
     }
@@ -158,7 +158,7 @@ const AnnotationStoreModel = types
     }
 
     function deleteAnnotation(annotation) {
-      getEnv(self).events.invoke("deleteAnnotation", self.store, annotation);
+      getEnv(self).events.invoke('deleteAnnotation', self.store, annotation);
 
       /**
        * MST destroy annotation
@@ -182,7 +182,7 @@ const AnnotationStoreModel = types
     function showError(err) {
       if (err) self.addErrors([errorBuilder.generalError(err)]);
       // we have to return at least empty View to display interface
-      return (self.root = ViewModel.create({ id: "error" }));
+      return (self.root = ViewModel.create({ id: 'error' }));
     }
 
     function upsertToName(node) {
@@ -207,7 +207,7 @@ const AnnotationStoreModel = types
       if (self.root) return;
 
       if (!config) {
-        return (self.root = ViewModel.create({ id: "empty" }));
+        return (self.root = ViewModel.create({ id: 'empty' }));
       }
 
       // convert config to mst model
@@ -221,7 +221,7 @@ const AnnotationStoreModel = types
       }
       const modelClass = Registry.getModelByTag(rootModel.type);
       // hacky way to get all the available object tag names
-      const objectTypes = Registry.objectTypes().map((type) => type.name.replace("Model", "").toLowerCase());
+      const objectTypes = Registry.objectTypes().map((type) => type.name.replace('Model', '').toLowerCase());
       const objects = [];
 
       self.validate(VALIDATORS.CONFIG, rootModel);
@@ -295,7 +295,7 @@ const AnnotationStoreModel = types
 
       let pk = options.pk || options.id;
 
-      if (options.type === "annotation" && pk && isNaN(pk)) {
+      if (options.type === 'annotation' && pk && isNaN(pk)) {
         /* something happened where our annotation pk was replaced with the id */
         pk = self.annotations?.[self.annotations.length - 1]?.storedValue?.pk;
       }
@@ -314,7 +314,7 @@ const AnnotationStoreModel = types
         root: self.root,
       };
 
-      if (user && !("createdBy" in node)) node.createdBy = user.displayName;
+      if (user && !('createdBy' in node)) node.createdBy = user.displayName;
       if (options.user) node.user = options.user;
 
       return node;
@@ -322,7 +322,7 @@ const AnnotationStoreModel = types
 
     function addPrediction(options = {}) {
       options.editable = false;
-      options.type = "prediction";
+      options.type = 'prediction';
 
       const item = createItem(options);
 
@@ -340,7 +340,7 @@ const AnnotationStoreModel = types
     }
 
     function addAnnotation(options = {}) {
-      options.type = "annotation";
+      options.type = 'annotation';
 
       const item = createItem(options);
 
@@ -383,7 +383,7 @@ const AnnotationStoreModel = types
 
         // Area id is <uniq-id>#<annotation-id> to be uniq across all tree
         result.forEach((r) => {
-          if ("id" in r) {
+          if ('id' in r) {
             const id = r.id.replace(/#.*$/, `#${c.id}`);
 
             ids[r.id] = id;
@@ -410,7 +410,7 @@ const AnnotationStoreModel = types
     }
 
     function addHistory(options = {}) {
-      options.type = "history";
+      options.type = 'history';
 
       const item = createItem(options);
 
@@ -451,7 +451,7 @@ const AnnotationStoreModel = types
 
       // Area id is <uniq-id>#<annotation-id> to be uniq across all tree
       s.forEach((r) => {
-        if ("id" in r) {
+        if ('id' in r) {
           const id = r.id.replace(/#.*$/, `#${c.id}`);
 
           ids[r.id] = id;
@@ -474,9 +474,9 @@ const AnnotationStoreModel = types
 
       // parent link for the new annotations
       if (entity.pk) {
-        if (entity.type === "prediction") {
+        if (entity.type === 'prediction') {
           c.parent_prediction = Number.parseInt(entity.pk);
-        } else if (entity.type === "annotation") {
+        } else if (entity.type === 'annotation') {
           c.parent_annotation = Number.parseInt(entity.pk);
         }
       }
@@ -561,4 +561,4 @@ const AnnotationStoreModel = types
     };
   });
 
-export default types.compose("AnnotationStore", AnnotationStoreModel, ...(isFF(FF_DEV_3617) ? [StoreExtender] : []));
+export default types.compose('AnnotationStore', AnnotationStoreModel, ...(isFF(FF_DEV_3617) ? [StoreExtender] : []));

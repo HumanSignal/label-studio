@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { cn } from "../../utils/bem";
-import "./RadioGroup.styl";
+import React, { useState } from 'react';
+import { cn } from '../../utils/bem';
+import './RadioGroup.styl';
 
 const RadioContext = React.createContext();
 
@@ -20,8 +20,8 @@ export const RadioGroup = ({ size, value, defaultValue, onChange, children, ...p
         defaultValue,
       }}
     >
-      <div className={cn("radio-group").mod({ size })} style={props.style}>
-        <div className={cn("radio-group").elem("buttons")}>{children}</div>
+      <div className={cn('radio-group').mod({ size })} style={props.style}>
+        <div className={cn('radio-group').elem('buttons')}>{children}</div>
       </div>
     </RadioContext.Provider>
   );
@@ -32,10 +32,10 @@ const RadioButton = ({ value, disabled, children }) => {
   const checked = value === currentValue;
 
   return (
-    <label className={cn("radio-group").elem("button").mod({ checked, disabled })}>
+    <label className={cn('radio-group').elem('button').mod({ checked, disabled })}>
       <input
-        className={cn("radio-group").elem("input")}
-        type="radio"
+        className={cn('radio-group').elem('input')}
+        type='radio'
         value={value}
         checked={value === currentValue}
         onChange={onChange}

@@ -1,15 +1,15 @@
-import { inject, observer } from "mobx-react";
-import React from "react";
-import { LSPlus } from "../../assets/icons";
-import { Block, Elem } from "../../utils/bem";
-import { Interface } from "../Common/Interface";
-import { Space } from "../Common/Space/Space";
-import { Spinner } from "../Common/Spinner";
-import { Tabs, TabsItem } from "../Common/Tabs/Tabs";
-import { FiltersSidebar } from "../Filters/FiltersSidebar/FilterSidebar";
-import { DataView } from "../MainView";
-import "./DataManager.styl";
-import { Toolbar } from "./Toolbar/Toolbar";
+import { inject, observer } from 'mobx-react';
+import React from 'react';
+import { LSPlus } from '../../assets/icons';
+import { Block, Elem } from '../../utils/bem';
+import { Interface } from '../Common/Interface';
+import { Space } from '../Common/Space/Space';
+import { Spinner } from '../Common/Spinner';
+import { Tabs, TabsItem } from '../Common/Tabs/Tabs';
+import { FiltersSidebar } from '../Filters/FiltersSidebar/FilterSidebar';
+import { DataView } from '../MainView';
+import './DataManager.styl';
+import { Toolbar } from './Toolbar/Toolbar';
 
 const injector = inject(({ store }) => {
   const { sidebarEnabled, sidebarVisible } = store.viewsStore ?? {};
@@ -42,15 +42,15 @@ const switchInjector = inject(({ store }) => {
 
 const ProjectSummary = summaryInjector((props) => {
   return (
-    <Space size="large" style={{ paddingRight: "1em", color: "rgba(0,0,0,0.3)" }}>
+    <Space size='large' style={{ paddingRight: '1em', color: 'rgba(0,0,0,0.3)' }}>
       {props.cloudSync && (
-        <Space size="small" style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>
+        <Space size='small' style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>
           Storage sync
-          <Spinner size="small" />
+          <Spinner size='small' />
         </Space>
       )}
-      <span style={{ display: "flex", alignItems: "center", fontSize: 12 }}>
-        <Space size="compact">
+      <span style={{ display: 'flex', alignItems: 'center', fontSize: 12 }}>
+        <Space size='compact'>
           <span>
             Tasks: {props.totalFoundTasks} / {props.totalTasks}
           </span>
@@ -100,13 +100,13 @@ const TabsSwitch = switchInjector(
 
 export const DataManager = injector(({ shrinkWidth }) => {
   return (
-    <Block name="tabs-content">
-      <Elem name="tab" mod={{ shrink: shrinkWidth }}>
-        <Interface name="tabs">
+    <Block name='tabs-content'>
+      <Elem name='tab' mod={{ shrink: shrinkWidth }}>
+        <Interface name='tabs'>
           <TabsSwitch />
         </Interface>
 
-        <Interface name="toolbar">
+        <Interface name='toolbar'>
           <Toolbar />
         </Interface>
 

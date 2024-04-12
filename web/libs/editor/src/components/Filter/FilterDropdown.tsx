@@ -1,5 +1,5 @@
-import React, { type FC } from "react";
-import { Select } from "../../common/Select/Select";
+import React, { type FC } from 'react';
+import { Select } from '../../common/Select/Select';
 
 interface FilterDropdownInterface {
   items: any[];
@@ -40,12 +40,12 @@ export const FilterDropdown: FC<FilterDropdownInterface> = ({
       value={value}
       style={{
         fontSize: 12,
-        width: "100%",
-        backgroundColor: "#fafafa",
+        width: '100%',
+        backgroundColor: '#fafafa',
         ...(style ?? {}),
       }}
       onChange={(value) => onChange(value)}
-      size="small"
+      size='small'
     >
       {items.map(renderOptions)}
     </Select>

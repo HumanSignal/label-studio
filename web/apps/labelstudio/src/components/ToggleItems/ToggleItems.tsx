@@ -1,6 +1,6 @@
-import React, { type CSSProperties } from "react";
-import { cn } from "../../utils/bem";
-import "./ToggleItems.styl";
+import React, { type CSSProperties } from 'react';
+import { cn } from '../../utils/bem';
+import './ToggleItems.styl';
 
 export const ToggleItems = ({
   className,
@@ -17,7 +17,7 @@ export const ToggleItems = ({
   active: string;
   onSelect: (name: string) => any;
 }) => {
-  const rootClass = cn("toggle-items");
+  const rootClass = cn('toggle-items');
 
   return (
     <ul className={rootClass.mod({ big }).mix(className).toString()} style={style}>
@@ -25,7 +25,7 @@ export const ToggleItems = ({
         <li
           key={item}
           className={rootClass
-            .elem("item")
+            .elem('item')
             .mod({ active: item === active })
             .toString()}
           onClick={() => onSelect(item)}

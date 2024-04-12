@@ -1,21 +1,21 @@
-import { Badge, List } from "antd";
-import { observer } from "mobx-react";
-import { isAlive } from "mobx-state-tree";
-import { LsCollapse, LsExpand, LsInvisible, LsSparks, LsVisible } from "../../assets/icons";
-import { Button } from "../../common/Button/Button";
-import Utils from "../../utils";
-import { Node, NodeIcon } from "../Node/Node";
-import styles from "./Entities.module.scss";
+import { Badge, List } from 'antd';
+import { observer } from 'mobx-react';
+import { isAlive } from 'mobx-state-tree';
+import { LsCollapse, LsExpand, LsInvisible, LsSparks, LsVisible } from '../../assets/icons';
+import { Button } from '../../common/Button/Button';
+import Utils from '../../utils';
+import { Node, NodeIcon } from '../Node/Node';
+import styles from './Entities.module.scss';
 
-import chroma from "chroma-js";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Space } from "../../common/Space/Space";
-import Registry from "../../core/Registry";
-import { PER_REGION_MODES } from "../../mixins/PerRegion";
-import { Block, Elem } from "../../utils/bem";
-import { asVars } from "../../utils/styles";
-import { isDefined } from "../../utils/utilities";
-import "./RegionItem.styl";
+import chroma from 'chroma-js';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Space } from '../../common/Space/Space';
+import Registry from '../../core/Registry';
+import { PER_REGION_MODES } from '../../mixins/PerRegion';
+import { Block, Elem } from '../../utils/bem';
+import { asVars } from '../../utils/styles';
+import { isDefined } from '../../utils/utilities';
+import './RegionItem.styl';
 
 const RegionItemDesc = observer(({ item, setDraggable }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -28,8 +28,8 @@ const RegionItemDesc = observer(({ item, setDraggable }) => {
 
   return (
     <Elem
-      name="desc"
-      tag="div"
+      name='desc'
+      tag='div'
       mod={{ collapsed, empty: !(controls?.length > 0) }}
       onMouseEnter={() => {
         setDraggable?.(false);
@@ -38,7 +38,7 @@ const RegionItemDesc = observer(({ item, setDraggable }) => {
         setDraggable?.(true);
       }}
     >
-      <Elem name="controls">
+      <Elem name='controls'>
         {controls.map((tag, idx) => {
           const View = Registry.getPerRegionView(tag.type, PER_REGION_MODES.REGION_LIST);
 
@@ -47,7 +47,7 @@ const RegionItemDesc = observer(({ item, setDraggable }) => {
           ) : null;
         })}
       </Elem>
-      <Elem name="collapse" tag={Button} size="small" type="text" onClick={toggleCollapsed}>
+      <Elem name='collapse' tag={Button} size='small' type='text' onClick={toggleCollapsed}>
         {collapsed ? <LsExpand /> : <LsCollapse />}
       </Elem>
     </Elem>
@@ -70,30 +70,30 @@ const RegionItemContent = observer(({ idx, item, setDraggable }) => {
   return (
     <Block
       ref={itemElRef}
-      name="region-item"
+      name='region-item'
       mod={{ hidden: item.hidden }}
       data-testid={`regionitem:selected=${item.selected}`}
     >
-      <Elem name="header" tag="div">
-        <Elem name="counter">{isDefined(idx) ? idx + 1 : ""}</Elem>
+      <Elem name='header' tag='div'>
+        <Elem name='counter'>{isDefined(idx) ? idx + 1 : ''}</Elem>
 
-        <Elem name="title" tag={Node} node={item} mix={styles.node} />
+        <Elem name='title' tag={Node} node={item} mix={styles.node} />
 
-        <Space size="small">
-          <Elem tag="span" name="id">
+        <Space size='small'>
+          <Elem tag='span' name='id'>
             <NodeIcon node={item} />
           </Elem>
 
-          <Elem name="prediction">
-            {item.origin === "prediction" && <LsSparks style={{ width: 16, height: 16 }} />}
+          <Elem name='prediction'>
+            {item.origin === 'prediction' && <LsSparks style={{ width: 16, height: 16 }} />}
           </Elem>
 
-          {item.isReadOnly() && <Badge count={"ro"} style={{ backgroundColor: "#ccc" }} />}
+          {item.isReadOnly() && <Badge count={'ro'} style={{ backgroundColor: '#ccc' }} />}
 
           {item.score && (
             <Elem
-              tag="span"
-              name="score"
+              tag='span'
+              name='score'
               style={{
                 color: Utils.Colors.getScaleGradient(item.score),
               }}
@@ -105,9 +105,9 @@ const RegionItemContent = observer(({ idx, item, setDraggable }) => {
           {item.hideable && (
             <Elem
               tag={Button}
-              name="toggle"
-              size="small"
-              type="text"
+              name='toggle'
+              size='small'
+              type='text'
               mod={{ active: !item.hidden }}
               onClick={item.toggleHidden}
             >
@@ -149,14 +149,14 @@ export const RegionItem = observer(({ item, idx, flat, setDraggable, onClick }) 
   return (
     <List.Item
       key={item.id}
-      className={classnames.join(" ")}
+      className={classnames.join(' ')}
       onClick={(e) => {
         onClick(e, item);
       }}
       onMouseOver={() => item.setHighlight(true)}
       onMouseOut={() => item.setHighlight(false)}
       style={vars}
-      aria-label="region"
+      aria-label='region'
     >
       <RegionItemContent idx={idx} item={item} setDraggable={setDraggable} />
     </List.Item>

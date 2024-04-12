@@ -1,13 +1,13 @@
-import { sanitizeHtml } from "../html";
+import { sanitizeHtml } from '../html';
 
 const htmlSanitizeList = [
   {
     input: '<iframe src="http://malicious.com"></iframe>',
-    expected: "",
+    expected: '',
   },
   {
     input: "<script>alert('XSS');</script>",
-    expected: "",
+    expected: '',
   },
   {
     input: "\"><img src=x onerror=alert('XSS')>",
@@ -15,15 +15,15 @@ const htmlSanitizeList = [
   },
   {
     input: "<script>alert(1)</script foo='bar'>",
-    expected: "",
+    expected: '',
   },
   {
     input: "><script>alert('XSS')</script>",
-    expected: "&gt;",
+    expected: '&gt;',
   },
   {
     input: '<?xml version="1.0" encoding="ISO-8859-1"?><foo><![CDATA[<script>alert(\'XSS\');</script>]]></foo>',
-    expected: "<foo></foo>",
+    expected: '<foo></foo>',
   },
   {
     input: "It's a test to check if <, > and & are escaped",
@@ -31,8 +31,8 @@ const htmlSanitizeList = [
   },
 ];
 
-describe("Helper function html sanitize", () => {
-  test("sanitize html list", () => {
+describe('Helper function html sanitize', () => {
+  test('sanitize html list', () => {
     htmlSanitizeList.forEach((item) => {
       expect(sanitizeHtml(item.input)).toBe(item.expected);
     });

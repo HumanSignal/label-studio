@@ -1,11 +1,11 @@
-const fs = require("fs/promises");
-const path = require("path");
+const fs = require('fs/promises');
+const path = require('path');
 
-const v8toIstanbul = require("v8-to-istanbul");
-const covDir = "./output/coverage";
-const resDir = "../coverage";
-const basePath = path.resolve("../");
-const basePathRegExp = new RegExp(`${basePath}\\LabelStudio`.replace(/\\/g, "\\\\"), "g");
+const v8toIstanbul = require('v8-to-istanbul');
+const covDir = './output/coverage';
+const resDir = '../coverage';
+const basePath = path.resolve('../');
+const basePathRegExp = new RegExp(`${basePath}\\LabelStudio`.replace(/\\/g, '\\\\'), 'g');
 
 const fixBasePath = (path) => {
   return path.replace(basePathRegExp, basePath);
@@ -20,14 +20,14 @@ async function loadSource(fileName) {
 async function loadSourceMap(fileName) {
   const sourceMap = await fs.readFile(`../build/static/js/${fileName}.map`);
 
-  return JSON.parse(sourceMap.toString().replace(/\/\.\//g, "/"));
+  return JSON.parse(sourceMap.toString().replace(/\/\.\//g, '/'));
 }
 
 const convertCoverage = async (fileName) => {
-  if (fileName.match("_final.coverage")) return;
+  if (fileName.match('_final.coverage')) return;
 
   const coverage = require(`${covDir}/${fileName}`);
-  const basename = path.basename(fileName).replace(".coverage.json", "");
+  const basename = path.basename(fileName).replace('.coverage.json', '');
   const finalName = path.resolve(`${resDir}/${basename}_final.coverage.json`);
 
   for (const entry of coverage) {
@@ -54,7 +54,7 @@ const convertCoverage = async (fileName) => {
     const result = JSON.stringify(
       converter.toIstanbul(),
       (key, value) => {
-        if (key === "") {
+        if (key === '') {
           return Object.fromEntries(
             Object.entries(value).reduce((res, [key, val]) => {
               res.push([fixBasePath(key), val]);
@@ -62,7 +62,7 @@ const convertCoverage = async (fileName) => {
             }, []),
           );
         }
-        if (key === "path") {
+        if (key === 'path') {
           return fixBasePath(value);
         }
         return value;

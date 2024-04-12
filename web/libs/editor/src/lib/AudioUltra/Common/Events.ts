@@ -1,4 +1,4 @@
-import { Destructable } from "./Destructable";
+import { Destructable } from './Destructable';
 
 type AnyFunction = (...args: any[]) => any;
 

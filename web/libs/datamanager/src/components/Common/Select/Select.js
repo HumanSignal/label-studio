@@ -8,12 +8,12 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { shallowEqualArrays } from "shallow-equal";
-import { BemWithSpecifiContext } from "../../../utils/bem";
-import { isDefined } from "../../../utils/utils";
-import { Dropdown } from "../Dropdown/Dropdown";
-import "./Select.styl";
+} from 'react';
+import { shallowEqualArrays } from 'shallow-equal';
+import { BemWithSpecifiContext } from '../../../utils/bem';
+import { isDefined } from '../../../utils/utils';
+import { Dropdown } from '../Dropdown/Dropdown';
+import './Select.styl';
 
 const SelectContext = createContext();
 const { Block, Elem } = BemWithSpecifiContext();
@@ -22,13 +22,13 @@ const findSelectedChild = (children, value) => {
   return Children.toArray(children).reduce((res, child) => {
     if (res !== null) return res;
 
-    if (child.type.displayName === "Select.Option") {
+    if (child.type.displayName === 'Select.Option') {
       if (child.props.value === value) {
         res = child;
       } else if (Array.isArray(value) && value.length === 1) {
         res = findSelectedChild(children, value[0]);
       }
-    } else if (child.type.displayName === "Select.OptGroup") {
+    } else if (child.type.displayName === 'Select.OptGroup') {
       res = findSelectedChild(child.props.children, value);
     }
 
@@ -111,14 +111,14 @@ export const Select = ({ value, defaultValue, size, children, onChange, style, m
       return;
     }
 
-    if (["ArrowDown", "ArrowUp"].includes(e.key)) {
+    if (['ArrowDown', 'ArrowUp'].includes(e.key)) {
       if (dropdown?.current.visible) {
-        focusNext(e.key === "ArrowDown" ? 1 : -1);
+        focusNext(e.key === 'ArrowDown' ? 1 : -1);
       } else {
         dropdown.current?.open();
         focusItem();
       }
-    } else if ((e.code === "Space" || e.code === "Enter") && isDefined(focused)) {
+    } else if ((e.code === 'Space' || e.code === 'Enter') && isDefined(focused)) {
       context.setCurrentValue(focused);
     }
   };
@@ -135,25 +135,25 @@ export const Select = ({ value, defaultValue, size, children, onChange, style, m
 
   return (
     <SelectContext.Provider value={context}>
-      <Block ref={rootRef} name="select" mod={{ size }} style={style} tabIndex={tabIndex} onKeyDown={handleKeyboard}>
+      <Block ref={rootRef} name='select' mod={{ size }} style={style} tabIndex={tabIndex} onKeyDown={handleKeyboard}>
         <Dropdown.Trigger
           ref={dropdown}
-          style={{ maxHeight: 280, overflow: "auto" }}
-          content={<Elem name="list">{children}</Elem>}
+          style={{ maxHeight: 280, overflow: 'auto' }}
+          content={<Elem name='list'>{children}</Elem>}
           onToggle={(visible) => {
             if (!visible) setFocused(null);
           }}
         >
-          <Elem name="selected">
-            <Elem name="value">{selected ?? "Select value"}</Elem>
-            <Elem name="icon" />
+          <Elem name='selected'>
+            <Elem name='value'>{selected ?? 'Select value'}</Elem>
+            <Elem name='icon' />
           </Elem>
         </Dropdown.Trigger>
       </Block>
     </SelectContext.Provider>
   );
 };
-Select.displayName = "Select";
+Select.displayName = 'Select';
 
 Select.Option = ({ value, children, style }) => {
   const { setCurrentValue, multiple, currentValue, focused } = useContext(SelectContext);
@@ -174,7 +174,7 @@ Select.Option = ({ value, children, style }) => {
 
   return (
     <Elem
-      name="option"
+      name='option'
       mod={{
         selected: isSelected,
         focused: isFocused,
@@ -189,14 +189,14 @@ Select.Option = ({ value, children, style }) => {
     </Elem>
   );
 };
-Select.Option.displayName = "Select.Option";
+Select.Option.displayName = 'Select.Option';
 
 Select.OptGroup = ({ label, children, style }) => {
   return (
-    <Elem name="optgroup" style={style}>
-      <Elem name="optgroup-label">{label}</Elem>
-      <Elem name="optgroup-list">{children}</Elem>
+    <Elem name='optgroup' style={style}>
+      <Elem name='optgroup-label'>{label}</Elem>
+      <Elem name='optgroup-list'>{children}</Elem>
     </Elem>
   );
 };
-Select.OptGroup.displayName = "Select.OptGroup";
+Select.OptGroup.displayName = 'Select.OptGroup';

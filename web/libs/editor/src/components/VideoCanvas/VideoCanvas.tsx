@@ -1,11 +1,11 @@
-import { type MutableRefObject, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Block, Elem } from "../../utils/bem";
-import { FF_LSDV_4711, isFF } from "../../utils/feature-flags";
-import { clamp, isDefined } from "../../utils/utilities";
-import "./VideoCanvas.styl";
-import { MAX_ZOOM, MIN_ZOOM } from "./VideoConstants";
-import { VirtualCanvas } from "./VirtualCanvas";
-import { VirtualVideo } from "./VirtualVideo";
+import { type MutableRefObject, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Block, Elem } from '../../utils/bem';
+import { FF_LSDV_4711, isFF } from '../../utils/feature-flags';
+import { clamp, isDefined } from '../../utils/utilities';
+import './VideoCanvas.styl';
+import { MAX_ZOOM, MIN_ZOOM } from './VideoConstants';
+import { VirtualCanvas } from './VirtualCanvas';
+import { VirtualVideo } from './VirtualVideo';
 
 type VideoProps = {
   src: string;
@@ -118,7 +118,7 @@ export const VideoCanvas = memo(
       if (brightness !== 1) result.push(`brightness(${brightness})`);
       if (saturation !== 1) result.push(`saturate(${saturation})`);
 
-      return result.join(" ");
+      return result.join(' ');
     }, [brightness, contrast, saturation]);
 
     const processPan = useCallback(
@@ -158,7 +158,7 @@ export const VideoCanvas = memo(
           context.drawImage(videoRef.current, 0, 0, width, height, offsetLeft, offsetTop, resultWidth, resultHeight);
         }
       } catch (e) {
-        console.log("Error rendering video", e);
+        console.log('Error rendering video', e);
       }
     }, [videoDimensions, zoom, pan, filters, canvasWidth, canvasHeight]);
 
@@ -301,7 +301,7 @@ export const VideoCanvas = memo(
 
     useEffect(() => {
       if (!props.allowInteractions) return;
-      rootRef.current?.addEventListener("wheel", (e) => {
+      rootRef.current?.addEventListener('wheel', (e) => {
         e.preventDefault();
       });
     }, []);
@@ -514,14 +514,14 @@ export const VideoCanvas = memo(
     }, []);
 
     return (
-      <Block ref={rootRef} name="video-canvas">
+      <Block ref={rootRef} name='video-canvas'>
         {loading && (
-          <Elem name="loading">
-            <Block name="spinner" />
+          <Elem name='loading'>
+            <Block name='spinner' />
           </Elem>
         )}
         <Elem
-          name="view"
+          name='view'
           onClick={props.onClick}
           style={{
             width: canvasWidth,
@@ -532,19 +532,19 @@ export const VideoCanvas = memo(
             ref={(instance) => {
               if (instance && canvasRef.current !== instance) {
                 canvasRef.current = instance;
-                contextRef.current = instance.getContext("2d");
+                contextRef.current = instance.getContext('2d');
               }
             }}
             width={canvasWidth}
             height={canvasHeight}
           />
-          {!loading && buffering && <Elem name="buffering" />}
+          {!loading && buffering && <Elem name='buffering' />}
         </Elem>
 
         <VirtualVideo
           ref={videoRef as MutableRefObject<HTMLVideoElement>}
           controls={false}
-          preload="auto"
+          preload='auto'
           src={props.src}
           muted={props.muted ?? false}
           canPlayType={(supported) => (supportedFileTypeRef.current = supported)}
@@ -575,4 +575,4 @@ export const VideoCanvas = memo(
   }),
 );
 
-VideoCanvas.displayName = "VideoCanvas";
+VideoCanvas.displayName = 'VideoCanvas';

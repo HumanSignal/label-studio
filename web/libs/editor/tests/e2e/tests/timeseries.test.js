@@ -1,5 +1,5 @@
-const { initLabelStudio } = require("./helpers");
-const assert = require("assert");
+const { initLabelStudio } = require('./helpers');
+const assert = require('assert');
 
 const config = ({ timeformat }) => `
 <View>
@@ -11,7 +11,7 @@ const config = ({ timeformat }) => `
     <Label value="Other"></Label>
   </TimeSeriesLabels>
   <TimeSeries name="ts" value="$timeseries" valueType="json" timeColumn="time" format="date" ${
-    timeformat ? `timeFormat="${timeformat}"` : ""
+    timeformat ? `timeFormat="${timeformat}"` : ''
   } overviewChannels="two">
     <Channel units="Hz" displayFormat=",.1f" strokeColor="#1f77b4" legend="Sensor 1" column="one" />
     <Channel units="Hz" displayFormat=",.1f" strokeColor="#ff7f0e" legend="Sensor 2" column="two" />
@@ -20,74 +20,74 @@ const config = ({ timeformat }) => `
 `;
 
 const scenarios = {
-  "Works with data sorted ascending by time column": {
+  'Works with data sorted ascending by time column': {
     timeseries: {
       time: [-1, 0, 1, 2, 3],
       one: [13.11794020069087, 95.2190411666738, 37.03620982977559, 16.8961637786484, 49.2981075645916],
       two: [-5.653544080516028, 10.07458649100271, 0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.waitForVisible(".htx-timeseries", 5);
-      I.dontSeeElement(locate(".ls-errors"));
+      I.waitForVisible('.htx-timeseries', 5);
+      I.dontSeeElement(locate('.ls-errors'));
     },
   },
 
-  "Errors with data sorted descending by time column": {
+  'Errors with data sorted descending by time column': {
     timeseries: {
       time: [3, 2, 1],
       one: [37.03620982977559, 16.8961637786484, 49.2981075645916],
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.seeElement(locate(".ls-errors"));
+      I.seeElement(locate('.ls-errors'));
     },
   },
 
-  "Errors with data not sorted by time column": {
+  'Errors with data not sorted by time column': {
     timeseries: {
       time: [1, 3, 2],
       one: [37.03620982977559, 16.8961637786484, 49.2981075645916],
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.seeElement(locate(".ls-errors"));
+      I.seeElement(locate('.ls-errors'));
     },
   },
 
-  "Works with data formatted and sorted ascending by time column": {
-    timeformat: "%Y-%m-%d %H:%M:%S",
+  'Works with data formatted and sorted ascending by time column': {
+    timeformat: '%Y-%m-%d %H:%M:%S',
     timeseries: {
-      time: ["2022-02-07 00:50:00", "2022-02-07 00:51:00", "2022-02-07 00:52:00"],
+      time: ['2022-02-07 00:50:00', '2022-02-07 00:51:00', '2022-02-07 00:52:00'],
       one: [37.03620982977559, 16.8961637786484, 49.2981075645916],
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.waitForVisible(".htx-timeseries", 5);
-      I.dontSeeElement(locate(".ls-errors"));
+      I.waitForVisible('.htx-timeseries', 5);
+      I.dontSeeElement(locate('.ls-errors'));
     },
   },
 
-  "Errors with data formatted and sorted descending by time column": {
-    timeformat: "%Y-%m-%d %H:%M:%S",
+  'Errors with data formatted and sorted descending by time column': {
+    timeformat: '%Y-%m-%d %H:%M:%S',
     timeseries: {
-      time: ["2022-02-07 00:52:00", "2022-02-07 00:51:00", "2022-02-07 00:50:00"],
+      time: ['2022-02-07 00:52:00', '2022-02-07 00:51:00', '2022-02-07 00:50:00'],
       one: [37.03620982977559, 16.8961637786484, 49.2981075645916],
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.seeElement(locate(".ls-errors"));
+      I.seeElement(locate('.ls-errors'));
     },
   },
 
-  "Errors with data formatted and not sorted by time column": {
-    timeformat: "%Y-%m-%d %H:%M:%S",
+  'Errors with data formatted and not sorted by time column': {
+    timeformat: '%Y-%m-%d %H:%M:%S',
     timeseries: {
-      time: ["2022-02-07 00:50:00", "2022-02-07 00:52:00", "2022-02-07 00:51:00"],
+      time: ['2022-02-07 00:50:00', '2022-02-07 00:52:00', '2022-02-07 00:51:00'],
       one: [37.03620982977559, 16.8961637786484, 49.2981075645916],
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.seeElement(locate(".ls-errors"));
+      I.seeElement(locate('.ls-errors'));
     },
   },
 };
@@ -108,28 +108,28 @@ function generateData(stepsNumber) {
   return timeseries;
 }
 
-Feature("TimeSeries datasets");
+Feature('TimeSeries datasets');
 Object.entries(scenarios).forEach(([title, scenario]) =>
   Scenario(title, async ({ I }) => {
     const cfg = config(scenario);
     const params = {
-      annotations: [{ id: "test", result: [] }],
+      annotations: [{ id: 'test', result: [] }],
       config: cfg,
       data: { timeseries: scenario.timeseries },
     };
     // const configTree = Utils.parseXml(config);
 
-    await I.amOnPage("/");
+    await I.amOnPage('/');
     await I.executeScript(initLabelStudio, params);
 
     scenario.assert(I);
   }),
 );
 
-Scenario("TimeSeries with optimized data", async ({ I, LabelStudio, AtTimeSeries }) => {
+Scenario('TimeSeries with optimized data', async ({ I, LabelStudio, AtTimeSeries }) => {
   async function doNotSeeProblems() {
     await I.wait(2);
-    I.seeElement(".htx-timeseries");
+    I.seeElement('.htx-timeseries');
     // The potential errors should be caught by `errorsCollector` plugin
 
     const counters = await I.executeScript(() => {
@@ -143,14 +143,14 @@ Scenario("TimeSeries with optimized data", async ({ I, LabelStudio, AtTimeSeries
     });
 
     if (counters.NaN) {
-      assert.fail("Found element with NaN in attribute");
+      assert.fail('Found element with NaN in attribute');
     }
     if (counters.Infinity) {
-      assert.fail("Found element with Infinity in attribute");
+      assert.fail('Found element with Infinity in attribute');
     }
   }
 
-  I.amOnPage("/");
+  I.amOnPage('/');
 
   const SLICES_COUNT = 10;
   const BAD_MULTIPLIER = 1.9;
@@ -161,7 +161,7 @@ Scenario("TimeSeries with optimized data", async ({ I, LabelStudio, AtTimeSeries
   const params = {
     annotations: [
       {
-        id: "test",
+        id: 'test',
         result: [],
       },
     ],
@@ -172,36 +172,36 @@ Scenario("TimeSeries with optimized data", async ({ I, LabelStudio, AtTimeSeries
   };
 
   LabelStudio.init(params);
-  I.waitForVisible(".htx-timeseries");
+  I.waitForVisible('.htx-timeseries');
 
-  I.say("try to get errors by selecting overview range");
+  I.say('try to get errors by selecting overview range');
   await AtTimeSeries.selectOverviewRange(0.98, 1);
   await doNotSeeProblems();
 
-  I.say("try to get errors by zooming in by mouse wheel");
-  I.pressKeyDown("Control");
+  I.say('try to get errors by zooming in by mouse wheel');
+  I.pressKeyDown('Control');
   for (let i = 0; i < 10; i++) {
     await AtTimeSeries.zoomByMouse(-100, { x: 0.98 });
   }
-  I.pressKeyUp("Control");
+  I.pressKeyUp('Control');
   await doNotSeeProblems();
 
-  I.say("try to get errors by moving handle to the extreme position");
+  I.say('try to get errors by moving handle to the extreme position');
   await AtTimeSeries.moveHandle(1.1);
   await AtTimeSeries.moveHandle(1.1);
   await doNotSeeProblems();
 
-  I.say("try to get errors by moving overview range by click");
+  I.say('try to get errors by moving overview range by click');
   await AtTimeSeries.clickOverview(0.15);
   await doNotSeeProblems();
 
-  I.say("try to get errors by creating micro ranges at overview");
+  I.say('try to get errors by creating micro ranges at overview');
   await AtTimeSeries.selectOverviewRange(0.9, 0.9001);
   await doNotSeeProblems();
   await AtTimeSeries.selectOverviewRange(0.9, 0.8999);
   await doNotSeeProblems();
 
-  I.say("check that every timestamps from timeseries data is available to display");
+  I.say('check that every timestamps from timeseries data is available to display');
   await AtTimeSeries.selectOverviewRange(0.001, 0.0);
   for (let i = 0; i < 20; i++) {
     await AtTimeSeries.zoomByMouse(-100, { x: 0.001 });

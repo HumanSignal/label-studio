@@ -1,26 +1,26 @@
-import { useMemo } from "react";
-import { Menu } from "../Menu/Menu";
+import { useMemo } from 'react';
+import { Menu } from '../Menu/Menu';
 
 export const TabsMenu = ({ onClick, editable = true, closable = true, clonable = true, virtual = false }) => {
   const items = useMemo(
     () => [
       {
-        key: "edit",
-        title: "Rename",
+        key: 'edit',
+        title: 'Rename',
         enabled: editable && !virtual,
-        action: () => onClick("edit"),
+        action: () => onClick('edit'),
       },
       {
-        key: "duplicate",
-        title: "Duplicate",
+        key: 'duplicate',
+        title: 'Duplicate',
         enabled: !virtual && clonable,
-        action: () => onClick("duplicate"),
+        action: () => onClick('duplicate'),
       },
       {
-        key: "save",
-        title: "Save",
+        key: 'save',
+        title: 'Save',
         enabled: virtual,
-        action: () => onClick("save"),
+        action: () => onClick('save'),
       },
     ],
     [editable, closable, clonable, virtual],
@@ -29,7 +29,7 @@ export const TabsMenu = ({ onClick, editable = true, closable = true, clonable =
   const showDivider = useMemo(() => closable && items.some(({ enabled }) => enabled), [items]);
 
   return (
-    <Menu size="medium" onClick={(e) => e.domEvent.stopPropagation()}>
+    <Menu size='medium' onClick={(e) => e.domEvent.stopPropagation()}>
       {items.map((item) =>
         item.enabled ? (
           <Menu.Item key={item.key} onClick={item.action}>
@@ -41,7 +41,7 @@ export const TabsMenu = ({ onClick, editable = true, closable = true, clonable =
       {closable ? (
         <>
           {showDivider && <Menu.Divider />}
-          <Menu.Item onClick={() => onClick("close")}>Close</Menu.Item>
+          <Menu.Item onClick={() => onClick('close')}>Close</Menu.Item>
         </>
       ) : null}
     </Menu>

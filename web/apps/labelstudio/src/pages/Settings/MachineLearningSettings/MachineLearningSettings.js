@@ -1,19 +1,19 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import { IconEmptyPredictions } from "../../../assets/icons";
-import { Button, Spinner } from "../../../components";
-import { Description } from "../../../components/Description/Description";
-import { Divider } from "../../../components/Divider/Divider";
-import { EmptyState } from "../../../components/EmptyState/EmptyState";
-import { Form, Label, Toggle } from "../../../components/Form";
-import { modal } from "../../../components/Modal/Modal";
-import { useAPI } from "../../../providers/ApiProvider";
-import { ProjectContext } from "../../../providers/ProjectProvider";
-import { Block, Elem } from "../../../utils/bem";
-import { CustomBackendForm } from "./Forms";
-import { MachineLearningList } from "./MachineLearningList";
-import "./MachineLearningSettings.styl";
-import { StartModelTraining } from "./StartModelTraining";
-import { TestRequest } from "./TestRequest";
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { IconEmptyPredictions } from '../../../assets/icons';
+import { Button, Spinner } from '../../../components';
+import { Description } from '../../../components/Description/Description';
+import { Divider } from '../../../components/Divider/Divider';
+import { EmptyState } from '../../../components/EmptyState/EmptyState';
+import { Form, Label, Toggle } from '../../../components/Form';
+import { modal } from '../../../components/Modal/Modal';
+import { useAPI } from '../../../providers/ApiProvider';
+import { ProjectContext } from '../../../providers/ProjectProvider';
+import { Block, Elem } from '../../../utils/bem';
+import { CustomBackendForm } from './Forms';
+import { MachineLearningList } from './MachineLearningList';
+import './MachineLearningSettings.styl';
+import { StartModelTraining } from './StartModelTraining';
+import { TestRequest } from './TestRequest';
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
@@ -24,7 +24,7 @@ export const MachineLearningSettings = () => {
 
   const fetchBackends = useCallback(async () => {
     setLoading(true);
-    const models = await api.callApi("mlBackends", {
+    const models = await api.callApi('mlBackends', {
       params: {
         project: project.id,
         include_static: true,
@@ -39,7 +39,7 @@ export const MachineLearningSettings = () => {
   const startTrainingModal = useCallback(
     (backend) => {
       const modalProps = {
-        title: "Start Model Training",
+        title: 'Start Model Training',
         style: { width: 760 },
         closeOnClickOutside: true,
         body: <StartModelTraining backend={backend} />,
@@ -53,7 +53,7 @@ export const MachineLearningSettings = () => {
   const showRequestModal = useCallback(
     (backend) => {
       const modalProps = {
-        title: "Test Request",
+        title: 'Test Request',
         style: { width: 760 },
         closeOnClickOutside: true,
         body: <TestRequest backend={backend} />,
@@ -66,9 +66,9 @@ export const MachineLearningSettings = () => {
 
   const showMLFormModal = useCallback(
     (backend) => {
-      const action = backend ? "updateMLBackend" : "addMLBackend";
+      const action = backend ? 'updateMLBackend' : 'addMLBackend';
       const modalProps = {
-        title: `${backend ? "Edit" : "Connect"} Model`,
+        title: `${backend ? 'Edit' : 'Connect'} Model`,
         style: { width: 760 },
         closeOnClickOutside: false,
         body: (
@@ -96,14 +96,14 @@ export const MachineLearningSettings = () => {
   }, [project.id]);
 
   return (
-    <Block name="ml-settings">
-      <Elem name={"wrapper"}>
+    <Block name='ml-settings'>
+      <Elem name={'wrapper'}>
         {loading && <Spinner size={32} />}
         {loaded && backends.length === 0 && (
           <EmptyState
             icon={<IconEmptyPredictions />}
-            title="Let’s connect your first model"
-            description="Connect a machine learning model to generate predictions. These predictions can be compared side by side, used for efficient pre‒labeling and, to aid in active learning, directing users to the most impactful labeling tasks."
+            title='Let’s connect your first model'
+            description='Connect a machine learning model to generate predictions. These predictions can be compared side by side, used for efficient pre‒labeling and, to aid in active learning, directing users to the most impactful labeling tasks.'
             action={
               <Button primary onClick={() => showMLFormModal()}>
                 Connect Model
@@ -113,7 +113,7 @@ export const MachineLearningSettings = () => {
               <div>
                 Need help?
                 <br />
-                <a href="https://labelstud.io/guide/ml" target="_blank" rel="noreferrer">
+                <a href='https://labelstud.io/guide/ml' target='_blank' rel='noreferrer'>
                   Learn more about connecting models in our docs
                 </a>
               </div>
@@ -131,7 +131,7 @@ export const MachineLearningSettings = () => {
         <Divider height={32} />
 
         {backends.length > 0 && (
-          <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: "1.5em" }}>
+          <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: '1.5em' }}>
             A connected model has been detected! If you wish to fetch predictions from this model, please follow these
             steps:
             <br />
@@ -142,43 +142,43 @@ export const MachineLearningSettings = () => {
             3. Click on <i>Batch predictions</i> from the <i>Actions</i> menu.
             <br />
             <br />
-            Additionally, you can configure the system to use this model for fetching live predictions in{" "}
+            Additionally, you can configure the system to use this model for fetching live predictions in{' '}
             <a
-              style={{ color: "unset", textDecoration: "underline" }}
-              target="_blank"
-              href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
-              rel="noreferrer"
+              style={{ color: 'unset', textDecoration: 'underline' }}
+              target='_blank'
+              href='https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label'
+              rel='noreferrer'
             >
               <i>Label&nbsp;All&nbsp;Tasks</i>
-            </a>{" "}
-            and{" "}
+            </a>{' '}
+            and{' '}
             <a
-              style={{ color: "unset", textDecoration: "underline" }}
-              target="_blank"
-              href="https://labelstud.io/guide/get_started#Interface"
-              rel="noreferrer"
+              style={{ color: 'unset', textDecoration: 'underline' }}
+              target='_blank'
+              href='https://labelstud.io/guide/get_started#Interface'
+              rel='noreferrer'
             >
               <i>Quick View</i>
-            </a>{" "}
+            </a>{' '}
             on the <i>Annotation</i> tab.
           </Description>
         )}
 
         <Form
-          action="updateProject"
+          action='updateProject'
           formData={{ ...project }}
           params={{ pk: project.id }}
           onSubmit={() => fetchProject()}
         >
           {backends.length > 0 && (
             <Form.Row columnCount={1}>
-              <Label text="Configuration" large />
+              <Label text='Configuration' large />
 
               <div style={{ paddingLeft: 16 }}>
                 <Toggle
-                  label="Start model training on annotation submission"
-                  description="This option will send a request to /train with information about annotations. You can use this to enable an Active Learning loop. You can also manually start training through model menu in its card."
-                  name="start_training_on_annotation_update"
+                  label='Start model training on annotation submission'
+                  description='This option will send a request to /train with information about annotations. You can use this to enable an Active Learning loop. You can also manually start training through model menu in its card.'
+                  name='start_training_on_annotation_update'
                 />
               </div>
             </Form.Row>
@@ -187,9 +187,9 @@ export const MachineLearningSettings = () => {
           {backends.length > 0 && (
             <Form.Actions>
               <Form.Indicator>
-                <span case="success">Saved!</span>
+                <span case='success'>Saved!</span>
               </Form.Indicator>
-              <Button type="submit" look="primary" style={{ width: 120 }}>
+              <Button type='submit' look='primary' style={{ width: 120 }}>
                 Save
               </Button>
             </Form.Actions>
@@ -200,5 +200,5 @@ export const MachineLearningSettings = () => {
   );
 };
 
-MachineLearningSettings.title = "Model";
-MachineLearningSettings.path = "/ml";
+MachineLearningSettings.title = 'Model';
+MachineLearningSettings.path = '/ml';

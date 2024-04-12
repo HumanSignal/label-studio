@@ -15,7 +15,7 @@ export class MaskUtil {
    * @param {string} pattern - The pattern to validate against
    * @param {string} proxyChar - The placeholder string
    */
-  constructor(input: HTMLInputElement, pattern: string, onChange: (value: string) => void, proxyChar = "_") {
+  constructor(input: HTMLInputElement, pattern: string, onChange: (value: string) => void, proxyChar = '_') {
     this.input = input;
     this.maskPattern = pattern;
     this.proxyChar = proxyChar;
@@ -29,12 +29,12 @@ export class MaskUtil {
      * @property { string } char - The validation character || required string
      * @property { RegExp } validator - The regular expression to validate against
      */
-    this.mask = pattern.split("").map((char: any) => {
+    this.mask = pattern.split('').map((char: any) => {
       let validator;
 
-      if (char === "A") {
+      if (char === 'A') {
         validator = this.stringValidate;
-      } else if (char === "1") {
+      } else if (char === '1') {
         validator = this.numValidate;
       }
       return { char, validator };
@@ -51,10 +51,10 @@ export class MaskUtil {
         }
         return char.char;
       })
-      .join("");
+      .join('');
 
     /** Characters that need to be escaped */
-    const escape = "\\^$*+?.()|{}[]".split("");
+    const escape = '\\^$*+?.()|{}[]'.split('');
 
     /** Construct a string to be used as a pattern setting in an input component */
     const regExp = this.mask
@@ -62,14 +62,14 @@ export class MaskUtil {
         const { validator, char } = entry;
 
         if (validator) {
-          return validator === this.numValidate ? "\\d" : "[a-zA-Z]";
+          return validator === this.numValidate ? '\\d' : '[a-zA-Z]';
         }
         if (escape.includes(char)) {
           return `\\${char}`;
         }
         return char;
       })
-      .join("");
+      .join('');
 
     /** Provide the regular expression */
     this.regExp = regExp;
@@ -77,10 +77,10 @@ export class MaskUtil {
     input.pattern = regExp;
     input.placeholder = input.placeholder || this.placeholder;
 
-    input.addEventListener("keydown", this.__inputKeydownMask.bind(this));
-    input.addEventListener("paste", this.__inputPaste.bind(this));
-    input.addEventListener("focus", this.__inputFocus.bind(this));
-    input.addEventListener("blur", this.__inputBlur.bind(this));
+    input.addEventListener('keydown', this.__inputKeydownMask.bind(this));
+    input.addEventListener('paste', this.__inputPaste.bind(this));
+    input.addEventListener('focus', this.__inputFocus.bind(this));
+    input.addEventListener('blur', this.__inputBlur.bind(this));
   }
 
   /**
@@ -89,12 +89,12 @@ export class MaskUtil {
    * @return { false | string } - If valid, return the parsed string, otherwise false
    */
   parseRaw(data: any) {
-    data = data || "";
-    const filteredData = data.replace(/\W/g, "");
+    data = data || '';
+    const filteredData = data.replace(/\W/g, '');
 
     if (filteredData.length === this.validators.length) {
       const isValid = filteredData
-        .split("")
+        .split('')
         .map((char: any, index: any) => !!char.match(this.validators[index].validator))
         .reduce((accumulator: any, currentValue: any) => {
           if (currentValue === false) {
@@ -116,7 +116,7 @@ export class MaskUtil {
           }
           return maskObj.char;
         })
-        .join("");
+        .join('');
     }
   }
 
@@ -124,10 +124,10 @@ export class MaskUtil {
    * Remove event listeners
    */
   disconnect() {
-    this.input.addEventListener("keydown", this.__inputKeydownMask.bind(this));
-    this.input.addEventListener("paste", this.__inputPaste.bind(this));
-    this.input.addEventListener("focus", this.__inputFocus.bind(this));
-    this.input.addEventListener("blur", this.__inputBlur.bind(this));
+    this.input.addEventListener('keydown', this.__inputKeydownMask.bind(this));
+    this.input.addEventListener('paste', this.__inputPaste.bind(this));
+    this.input.addEventListener('focus', this.__inputFocus.bind(this));
+    this.input.addEventListener('blur', this.__inputBlur.bind(this));
   }
 
   /** Simple masked value getter */
@@ -140,9 +140,9 @@ export class MaskUtil {
    * @param {string} data - A partial string to mask
    * @return {string} - A masked string with the additional placeholders
    */
-  parsePartial(data = "") {
-    data = data || "";
-    const filteredData = data.replace(/\W/g, "");
+  parsePartial(data = '') {
+    data = data || '';
+    const filteredData = data.replace(/\W/g, '');
     let pointer = -1;
 
     return (
@@ -154,7 +154,7 @@ export class MaskUtil {
           }
           return maskObj.char || this.proxyChar;
         })
-        .join("") || this.placeholder
+        .join('') || this.placeholder
     );
   }
 
@@ -176,7 +176,7 @@ export class MaskUtil {
    */
   __inputBlur(event: any) {
     if (event.target.value === this.placeholder) {
-      this.onChange("");
+      this.onChange('');
     }
   }
 
@@ -204,7 +204,7 @@ export class MaskUtil {
     let mask = this.mask[index];
 
     /** Set up which keys to ignore */
-    const ignored = ["Tab", "Enter", "Escape", "ArrowLeft", "ArrowRight", "Shift"];
+    const ignored = ['Tab', 'Enter', 'Escape', 'ArrowLeft', 'ArrowRight', 'Shift'];
 
     if (ignored.includes(key) || event.metaKey) {
       return;
@@ -215,8 +215,8 @@ export class MaskUtil {
       event.preventDefault();
       let _removingKey = null;
 
-      if (key === "Backspace") _removingKey = 1;
-      else if (key === "Delete") _removingKey = 0;
+      if (key === 'Backspace') _removingKey = 1;
+      else if (key === 'Delete') _removingKey = 0;
 
       if (_removingKey !== null) {
         /** If this is a delete event, replace the deleted element with the placeholder */
@@ -258,11 +258,11 @@ export class MaskUtil {
       /** If this input replaces multiple items, check its validity and format if possible */
       setTimeout(() => {
         let partialValue = event.target.value;
-        const newKey = key === "Backspace" || key === "Delete" ? this.proxyChar : key;
-        const selectionPosition = key === "Backspace" || key === "Delete" ? selectionStart : selectionStart + 1;
+        const newKey = key === 'Backspace' || key === 'Delete' ? this.proxyChar : key;
+        const selectionPosition = key === 'Backspace' || key === 'Delete' ? selectionStart : selectionStart + 1;
 
         for (let i = selectionStart; i < selectionEnd; i++) {
-          if (partialValue[i] !== ":") {
+          if (partialValue[i] !== ':') {
             partialValue = `${partialValue.substring(0, i)}${
               i === selectionStart ? newKey : this.proxyChar
             }${partialValue.substring(i + 1, partialValue.length)}`;
@@ -280,7 +280,7 @@ export class MaskUtil {
    * @param {Event} event - Paste event
    */
   __inputPaste(event: any) {
-    const data = event.clipboardData.getData("text/plain");
+    const data = event.clipboardData.getData('text/plain');
     const maskedData = this.parseRaw(data);
 
     if (maskedData !== false) {

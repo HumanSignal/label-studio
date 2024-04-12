@@ -1,5 +1,5 @@
 module.exports = {
-  plugins: ["codeceptjs"],
+  plugins: ['codeceptjs'],
   globals: {
     Htx: true,
     Feature: true,
@@ -15,8 +15,8 @@ module.exports = {
     within: true,
   },
   rules: {
-    "codeceptjs/no-exclusive-tests": "error",
-    "codeceptjs/no-skipped-tests": "warn",
-    "codeceptjs/no-pause-in-scenario": "error",
+    'codeceptjs/no-exclusive-tests': 'error',
+    'codeceptjs/no-skipped-tests': 'warn',
+    'codeceptjs/no-pause-in-scenario': 'error',
   },
 };

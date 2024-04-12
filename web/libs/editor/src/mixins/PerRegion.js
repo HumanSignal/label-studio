@@ -1,5 +1,5 @@
-import { types } from "mobx-state-tree";
-import { PER_REGION_MODES } from "./PerRegionModes";
+import { types } from 'mobx-state-tree';
+import { PER_REGION_MODES } from './PerRegionModes';
 
 /**
  * This mixing defines perRegion control tag's parameter and related basic functionality
@@ -15,7 +15,7 @@ const PerRegionMixin = types
   .extend((self) => {
     /* Validation */
     if (self.isClassificationTag !== true) {
-      throw new Error("The PerRegionMixin mixin should be used only for classification control-tags");
+      throw new Error('The PerRegionMixin mixin should be used only for classification control-tags');
     }
     return {};
   })
@@ -86,4 +86,4 @@ const PerRegionMixin = types
   }));
 
 export default PerRegionMixin;
-export { PER_REGION_MODES } from "./PerRegionModes";
+export { PER_REGION_MODES } from './PerRegionModes';

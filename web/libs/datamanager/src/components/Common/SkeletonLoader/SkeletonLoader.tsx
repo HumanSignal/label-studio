@@ -1,8 +1,8 @@
-import React, { type ReactChildren } from "react";
-import { Block } from "../../../utils/bem";
-import { SkeletonGap } from "./SkeletonGap";
-import { SkeletonLine } from "./SkeletonLine";
-import "./SkeletonLoader.styl";
+import React, { type ReactChildren } from 'react';
+import { Block } from '../../../utils/bem';
+import { SkeletonGap } from './SkeletonGap';
+import { SkeletonLine } from './SkeletonLine';
+import './SkeletonLoader.styl';
 
 interface SkeletonLoaderProps {
   children?: ReactChildren;
@@ -11,22 +11,22 @@ interface SkeletonLoaderProps {
   darkColor?: string;
 }
 
-export const SkeletonLoader = ({ children, gap = "4px", lightColor, darkColor }: SkeletonLoaderProps) => {
-  const styles: any = { "--skeleton-gap": gap };
+export const SkeletonLoader = ({ children, gap = '4px', lightColor, darkColor }: SkeletonLoaderProps) => {
+  const styles: any = { '--skeleton-gap': gap };
 
-  lightColor && (styles["--skeleton-light-color"] = lightColor);
-  darkColor && (styles["--skeleton-dark-color"] = darkColor);
+  lightColor && (styles['--skeleton-light-color'] = lightColor);
+  darkColor && (styles['--skeleton-dark-color'] = darkColor);
 
   return (
-    <Block name="skeletonLoader" style={styles}>
+    <Block name='skeletonLoader' style={styles}>
       {children ? (
         children
       ) : (
         <>
           <SkeletonLine />
           <SkeletonGap />
-          <SkeletonLine width="40%" height="24px" />
-          <SkeletonLine width="50%" height="12px" />
+          <SkeletonLine width='40%' height='24px' />
+          <SkeletonLine width='50%' height='12px' />
         </>
       )}
     </Block>

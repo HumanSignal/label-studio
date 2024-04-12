@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export const useMedia = (query: string) => {
   const [match, setMatch] = useState(window.matchMedia(query));
@@ -8,9 +8,9 @@ export const useMedia = (query: string) => {
       setMatch(window.matchMedia(query));
     };
 
-    window.addEventListener("resize", handleWindowResize);
+    window.addEventListener('resize', handleWindowResize);
 
-    return () => window.removeEventListener("resize", handleWindowResize);
+    return () => window.removeEventListener('resize', handleWindowResize);
   }, []);
 
   useEffect(() => {

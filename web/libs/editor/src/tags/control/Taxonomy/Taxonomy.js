@@ -1,25 +1,25 @@
-import { Spin } from "antd";
-import { observer } from "mobx-react";
-import { flow, getRoot, types } from "mobx-state-tree";
-import React from "react";
+import { Spin } from 'antd';
+import { observer } from 'mobx-react';
+import { flow, getRoot, types } from 'mobx-state-tree';
+import React from 'react';
 
-import Infomodal from "../../../components/Infomodal/Infomodal";
-import { NewTaxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
-import { Taxonomy } from "../../../components/Taxonomy/Taxonomy";
-import { guidGenerator } from "../../../core/Helpers";
-import Registry from "../../../core/Registry";
-import Tree from "../../../core/Tree";
-import Types from "../../../core/Types";
-import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
-import DynamicChildrenMixin from "../../../mixins/DynamicChildrenMixin";
-import PerItemMixin from "../../../mixins/PerItem";
-import PerRegionMixin from "../../../mixins/PerRegion";
-import { ReadOnlyControlMixin } from "../../../mixins/ReadOnlyMixin";
-import RequiredMixin from "../../../mixins/Required";
-import SelectedChoiceMixin from "../../../mixins/SelectedChoiceMixin";
-import { SharedStoreMixin } from "../../../mixins/SharedChoiceStore/mixin";
-import VisibilityMixin from "../../../mixins/Visibility";
-import { parseValue } from "../../../utils/data";
+import Infomodal from '../../../components/Infomodal/Infomodal';
+import { NewTaxonomy } from '../../../components/NewTaxonomy/NewTaxonomy';
+import { Taxonomy } from '../../../components/Taxonomy/Taxonomy';
+import { guidGenerator } from '../../../core/Helpers';
+import Registry from '../../../core/Registry';
+import Tree from '../../../core/Tree';
+import Types from '../../../core/Types';
+import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
+import DynamicChildrenMixin from '../../../mixins/DynamicChildrenMixin';
+import PerItemMixin from '../../../mixins/PerItem';
+import PerRegionMixin from '../../../mixins/PerRegion';
+import { ReadOnlyControlMixin } from '../../../mixins/ReadOnlyMixin';
+import RequiredMixin from '../../../mixins/Required';
+import SelectedChoiceMixin from '../../../mixins/SelectedChoiceMixin';
+import { SharedStoreMixin } from '../../../mixins/SharedChoiceStore/mixin';
+import VisibilityMixin from '../../../mixins/Visibility';
+import { parseValue } from '../../../utils/data';
 import {
   FF_DEV_3617,
   FF_LEAP_218,
@@ -28,13 +28,13 @@ import {
   FF_TAXONOMY_LABELING,
   FF_TAXONOMY_SELECTED,
   isFF,
-} from "../../../utils/feature-flags";
-import ControlBase from "../Base";
-import ClassificationBase from "../ClassificationBase";
+} from '../../../utils/feature-flags';
+import ControlBase from '../Base';
+import ClassificationBase from '../ClassificationBase';
 
-import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
-import messages from "../../../utils/messages";
-import styles from "./Taxonomy.styl";
+import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
+import messages from '../../../utils/messages';
+import styles from './Taxonomy.styl';
 
 /**
  * @typedef TaxonomyItem
@@ -97,14 +97,14 @@ const TagAttrs = types.model({
   leafsonly: types.optional(types.boolean, false),
   showfullpath: types.optional(types.boolean, false),
   legacy: types.optional(types.boolean, false),
-  pathseparator: types.optional(types.string, " / "),
+  pathseparator: types.optional(types.string, ' / '),
   apiurl: types.maybeNull(types.string),
-  placeholder: "",
+  placeholder: '',
   minwidth: types.maybeNull(types.string),
   maxwidth: types.maybeNull(types.string),
   dropdownwidth: types.maybeNull(types.string),
   maxusages: types.maybeNull(types.string),
-  value: types.optional(types.string, ""),
+  value: types.optional(types.string, ''),
 });
 
 function traverse(root) {
@@ -190,7 +190,7 @@ const TaxonomyLabelingResult = types
        * @returns quazi-label object to act as Label in most places
        */
       findLabel(path) {
-        let title = "";
+        let title = '';
         let items = self.items;
         let item;
 
@@ -220,14 +220,14 @@ const Model = types
   .model({
     pid: types.optional(types.string, guidGenerator),
 
-    type: "taxonomy",
-    [isFF(FF_DEV_3617) ? "_children" : "children"]: Types.unionArray(["choice"]),
+    type: 'taxonomy',
+    [isFF(FF_DEV_3617) ? '_children' : 'children']: Types.unionArray(['choice']),
   })
   .volatile(() => ({
     maxUsagesReached: false,
     selected: [],
     loading: true,
-    _api: "", // will be filled after the first load in updateValue()
+    _api: '', // will be filled after the first load in updateValue()
     _items: [], // items loaded via API
   }))
   .views((self) =>
@@ -263,11 +263,11 @@ const Model = types
     },
 
     get valueType() {
-      return "taxonomy";
+      return 'taxonomy';
     },
 
     get tiedChildren() {
-      return Tree.filterChildrenOfType(self, "ChoiceModel");
+      return Tree.filterChildrenOfType(self, 'ChoiceModel');
     },
 
     get preselectedValues() {
@@ -323,7 +323,7 @@ const Model = types
     },
 
     get defaultChildType() {
-      return "choice";
+      return 'choice';
     },
 
     selectedValues() {
@@ -409,7 +409,7 @@ const Model = types
       // build url with `path` as array (path ['A', 'BC'] => path=A&path=BC)
       const url = new URL(self._api);
 
-      path?.forEach((p) => url.searchParams.append("path", p));
+      path?.forEach((p) => url.searchParams.append('path', p));
 
       if (url.username && url.password) {
         requestOptions = {
@@ -418,8 +418,8 @@ const Model = types
           }),
         };
 
-        url.username = "";
-        url.password = "";
+        url.username = '';
+        url.password = '';
       }
 
       try {
@@ -450,7 +450,7 @@ const Model = types
           self._items = items;
         }
       } catch (err) {
-        const message = messages.ERR_LOADING_HTTP({ attr: "apiUrl", error: String(err), url: self.apiurl });
+        const message = messages.ERR_LOADING_HTTP({ attr: 'apiUrl', error: String(err), url: self.apiurl });
 
         self.annotationStore.addErrors([errorBuilder.generalError(message)]);
 
@@ -581,7 +581,7 @@ const Model = types
   });
 
 const TaxonomyModel = types.compose(
-  "TaxonomyModel",
+  'TaxonomyModel',
   ControlBase,
   ClassificationBase,
   TagAttrs,
@@ -600,10 +600,10 @@ const TaxonomyModel = types.compose(
 
 const HtxTaxonomy = observer(({ item }) => {
   // literal "taxonomy" class name is for external styling
-  const className = [styles.taxonomy, "taxonomy", isFF(FF_TAXONOMY_ASYNC) ? styles.taxonomy__new : ""]
+  const className = [styles.taxonomy, 'taxonomy', isFF(FF_TAXONOMY_ASYNC) ? styles.taxonomy__new : '']
     .filter(Boolean)
-    .join(" ");
-  const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: "none" };
+    .join(' ');
+  const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: 'none' };
   const options = {
     showFullPath: item.showfullpath,
     leafsOnly: item.leafsonly,
@@ -625,7 +625,7 @@ const HtxTaxonomy = observer(({ item }) => {
     return (
       <div className={className} style={visibleStyle}>
         <div className={styles.taxonomy__loading}>
-          <Spin size="small" />
+          <Spin size='small' />
         </div>
       </div>
     );
@@ -660,6 +660,6 @@ const HtxTaxonomy = observer(({ item }) => {
   );
 });
 
-Registry.addTag("taxonomy", TaxonomyModel, HtxTaxonomy);
+Registry.addTag('taxonomy', TaxonomyModel, HtxTaxonomy);
 
 export { HtxTaxonomy, TaxonomyModel, TagAttrs };

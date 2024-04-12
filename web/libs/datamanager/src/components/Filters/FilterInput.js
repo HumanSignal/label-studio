@@ -1,5 +1,5 @@
-import React from "react";
-import Input from "../Common/Input/Input";
+import React from 'react';
+import Input from '../Common/Input/Input';
 
 export const FilterInput = ({ value, type, onChange, placeholder, schema, style }) => {
   const inputRef = React.useRef();
@@ -11,9 +11,9 @@ export const FilterInput = ({ value, type, onChange, placeholder, schema, style 
 
   return (
     <Input
-      size="small"
+      size='small'
       type={type}
-      value={value ?? ""}
+      value={value ?? ''}
       ref={inputRef}
       placeholder={placeholder}
       onChange={onChangeHandler}

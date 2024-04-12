@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 
 type ToggleHookReturn = [boolean, () => any, () => any, () => any];
 

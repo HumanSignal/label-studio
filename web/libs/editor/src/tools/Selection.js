@@ -1,15 +1,15 @@
-import { types } from "mobx-state-tree";
+import { types } from 'mobx-state-tree';
 
-import { IconMoveTool } from "../assets/icons";
-import { AnnotationMixin } from "../mixins/AnnotationMixin";
-import ToolMixin from "../mixins/Tool";
-import { FF_LSDV_4930, isFF } from "../utils/feature-flags";
-import BaseTool from "./Base";
+import { IconMoveTool } from '../assets/icons';
+import { AnnotationMixin } from '../mixins/AnnotationMixin';
+import ToolMixin from '../mixins/Tool';
+import { FF_LSDV_4930, isFF } from '../utils/feature-flags';
+import BaseTool from './Base';
 
 const _Tool = types
-  .model("SelectionTool", {
-    shortcut: "V",
-    group: "control",
+  .model('SelectionTool', {
+    shortcut: 'V',
+    group: 'control',
   })
   .views(() => {
     return {
@@ -17,7 +17,7 @@ const _Tool = types
         return true;
       },
       get viewTooltip() {
-        return "Move";
+        return 'Move';
       },
       get iconComponent() {
         return IconMoveTool;
@@ -70,6 +70,6 @@ const _Tool = types
     };
   });
 
-const Selection = types.compose("MoveTool", ToolMixin, BaseTool, AnnotationMixin, _Tool);
+const Selection = types.compose('MoveTool', ToolMixin, BaseTool, AnnotationMixin, _Tool);
 
 export { Selection };

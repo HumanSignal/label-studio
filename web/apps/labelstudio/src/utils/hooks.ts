@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useHistory } from "react-router";
-import { useFixedLocation } from "../providers/RoutesProvider";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useHistory } from 'react-router';
+import { useFixedLocation } from '../providers/RoutesProvider';
 
 export const useSet = <T>(initialSet: Set<T> = new Set()) => {
   const [set, setSet] = useState(initialSet);
@@ -40,7 +40,7 @@ export const useRefresh = () => {
 
   const refresh = useCallback(
     (redirectPath) => {
-      history.replace("/");
+      history.replace('/');
 
       setTimeout(() => {
         history.replace(redirectPath ?? pathname);

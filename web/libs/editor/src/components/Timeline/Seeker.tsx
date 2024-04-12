@@ -1,9 +1,9 @@
-import { clamp } from "lodash";
-import { type FC, type ReactElement, useCallback, useRef } from "react";
-import { Block, Elem } from "../../utils/bem";
-import type { TimelineMinimapProps } from "./Types";
+import { clamp } from 'lodash';
+import { type FC, type ReactElement, useCallback, useRef } from 'react';
+import { Block, Elem } from '../../utils/bem';
+import type { TimelineMinimapProps } from './Types';
 
-import "./Seeker.styl";
+import './Seeker.styl';
 
 export interface SeekerProps {
   position: number;
@@ -65,12 +65,12 @@ export const Seeker: FC<SeekerProps> = ({
       };
 
       const onMouseUp = () => {
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
       };
 
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
     },
     [length],
   );
@@ -101,12 +101,12 @@ export const Seeker: FC<SeekerProps> = ({
       };
 
       const onMouseUp = () => {
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
       };
 
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
     },
     [length],
   );
@@ -126,11 +126,11 @@ export const Seeker: FC<SeekerProps> = ({
   );
 
   return (
-    <Block name="seeker" ref={rootRef} onMouseDown={onDrag}>
-      <Elem name="track" />
-      {showIndicator && <Elem name="indicator" ref={viewRef} style={{ left: windowOffset, width }} />}
-      <Elem name="position" ref={seekerRef} style={{ left: `${seekerOffset}%` }} />
-      <Elem name="minimap">{minimap}</Elem>
+    <Block name='seeker' ref={rootRef} onMouseDown={onDrag}>
+      <Elem name='track' />
+      {showIndicator && <Elem name='indicator' ref={viewRef} style={{ left: windowOffset, width }} />}
+      <Elem name='position' ref={seekerRef} style={{ left: `${seekerOffset}%` }} />
+      <Elem name='minimap'>{minimap}</Elem>
     </Block>
   );
 };

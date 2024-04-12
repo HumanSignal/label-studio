@@ -1,13 +1,13 @@
-import { observer } from "mobx-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { observer } from 'mobx-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { LsChevron } from "../../assets/icons";
-import { Button } from "../../common/Button/Button";
-import { Block, Elem } from "../../utils/bem";
-import { clamp, sortAnnotations } from "../../utils/utilities";
-import { AnnotationButton } from "./AnnotationButton";
+import { LsChevron } from '../../assets/icons';
+import { Button } from '../../common/Button/Button';
+import { Block, Elem } from '../../utils/bem';
+import { clamp, sortAnnotations } from '../../utils/utilities';
+import { AnnotationButton } from './AnnotationButton';
 
-import "./AnnotationsCarousel.styl";
+import './AnnotationsCarousel.styl';
 
 interface AnnotationsCarouselInterface {
   store: any;
@@ -17,11 +17,11 @@ interface AnnotationsCarouselInterface {
 
 export const AnnotationsCarousel = observer(({ store, annotationStore }: AnnotationsCarouselInterface) => {
   const [entities, setEntities] = useState<any[]>([]);
-  const enableAnnotations = store.hasInterface("annotations:tabs");
-  const enablePredictions = store.hasInterface("predictions:tabs");
-  const enableCreateAnnotation = store.hasInterface("annotations:add-new");
-  const groundTruthEnabled = store.hasInterface("ground-truth");
-  const enableAnnotationDelete = store.hasInterface("annotations:delete");
+  const enableAnnotations = store.hasInterface('annotations:tabs');
+  const enablePredictions = store.hasInterface('predictions:tabs');
+  const enableCreateAnnotation = store.hasInterface('annotations:add-new');
+  const groundTruthEnabled = store.hasInterface('ground-truth');
+  const enableAnnotationDelete = store.hasInterface('annotations:delete');
   const carouselRef = useRef<HTMLElement>();
   const containerRef = useRef<HTMLElement>();
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -65,9 +65,9 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   }, [annotationStore, JSON.stringify(annotationStore.predictions), JSON.stringify(annotationStore.annotations)]);
 
   return enableAnnotations || enablePredictions || enableCreateAnnotation ? (
-    <Block name="annotations-carousel" style={{ "--carousel-left": `${currentPosition}px` }}>
-      <Elem ref={containerRef} name="container">
-        <Elem ref={carouselRef} name="carosel">
+    <Block name='annotations-carousel' style={{ '--carousel-left': `${currentPosition}px` }}>
+      <Elem ref={containerRef} name='container'>
+        <Elem ref={carouselRef} name='carosel'>
           {sortAnnotations(entities).map((entity) => (
             <AnnotationButton
               key={entity?.id}
@@ -85,26 +85,26 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
         </Elem>
       </Elem>
       {(!isLeftDisabled || !isRightDisabled) && (
-        <Elem name="carousel-controls">
+        <Elem name='carousel-controls'>
           <Elem
             tag={Button}
-            name="nav"
+            name='nav'
             disabled={isLeftDisabled}
             mod={{ left: true, disabled: isLeftDisabled }}
-            aria-label="Carousel left"
+            aria-label='Carousel left'
             onClick={(e: MouseEvent) => !isLeftDisabled && updatePosition(e, true)}
           >
-            <Elem name="arrow" mod={{ left: true }} tag={LsChevron} />
+            <Elem name='arrow' mod={{ left: true }} tag={LsChevron} />
           </Elem>
           <Elem
             tag={Button}
-            name="nav"
+            name='nav'
             disabled={isRightDisabled}
             mod={{ right: true, disabled: isRightDisabled }}
-            aria-label="Carousel right"
+            aria-label='Carousel right'
             onClick={(e: MouseEvent) => !isRightDisabled && updatePosition(e, false)}
           >
-            <Elem name="arrow" mod={{ right: true }} tag={LsChevron} />
+            <Elem name='arrow' mod={{ right: true }} tag={LsChevron} />
           </Elem>
         </Elem>
       )}

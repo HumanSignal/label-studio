@@ -1,9 +1,9 @@
 /* global jest, describe, expect, beforeEach, test */
-import { debounce } from "../debounce";
+import { debounce } from '../debounce';
 
 jest.useFakeTimers();
 
-describe("Debounce function", () => {
+describe('Debounce function', () => {
   let func;
   let debouncedFunc;
 
@@ -12,7 +12,7 @@ describe("Debounce function", () => {
     debouncedFunc = debounce(func, 1000);
   });
 
-  test("Execute just once", () => {
+  test('Execute just once', () => {
     for (let i = 0; i < 100; i++) {
       debouncedFunc();
     }

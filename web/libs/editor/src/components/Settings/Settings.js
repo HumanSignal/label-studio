@@ -1,23 +1,23 @@
-import { Checkbox, Modal, Table, Tabs } from "antd";
-import { observer } from "mobx-react";
-import React, { useMemo } from "react";
+import { Checkbox, Modal, Table, Tabs } from 'antd';
+import { observer } from 'mobx-react';
+import React, { useMemo } from 'react';
 
-import { Hotkey } from "../../core/Hotkey";
+import { Hotkey } from '../../core/Hotkey';
 
-import { Block, Elem } from "../../utils/bem";
-import { triggerResizeEvent } from "../../utils/utilities";
-import "./Settings.styl";
+import { Block, Elem } from '../../utils/bem';
+import { triggerResizeEvent } from '../../utils/utilities';
+import './Settings.styl';
 
-import { LsClose } from "../../assets/icons";
-import Toggle from "../../common/Toggle/Toggle";
-import EditorSettings from "../../core/settings/editorsettings";
-import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
-import * as TagSettings from "./TagSettings";
+import { LsClose } from '../../assets/icons';
+import Toggle from '../../common/Toggle/Toggle';
+import EditorSettings from '../../core/settings/editorsettings';
+import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
+import * as TagSettings from './TagSettings';
 
 const HotkeysDescription = () => {
   const columns = [
-    { title: "Shortcut", dataIndex: "combo", key: "combo" },
-    { title: "Description", dataIndex: "descr", key: "descr" },
+    { title: 'Shortcut', dataIndex: 'combo', key: 'combo' },
+    { title: 'Description', dataIndex: 'descr', key: 'descr' },
   ];
 
   const keyNamespaces = Hotkey.namespaces();
@@ -27,14 +27,14 @@ const HotkeysDescription = () => {
       .filter((k) => descr[k])
       .map((k) => ({
         key: k,
-        combo: k.split(",").map((keyGroup) => {
+        combo: k.split(',').map((keyGroup) => {
           return (
-            <Elem name="key-group" key={keyGroup}>
+            <Elem name='key-group' key={keyGroup}>
               {keyGroup
                 .trim()
-                .split("+")
+                .split('+')
                 .map((k) => (
-                  <Elem tag="kbd" name="key" key={k}>
+                  <Elem tag='kbd' name='key' key={k}>
                     {k}
                   </Elem>
                 ))}
@@ -45,15 +45,15 @@ const HotkeysDescription = () => {
       }));
 
   return (
-    <Block name="keys">
-      <Tabs size="small">
+    <Block name='keys'>
+      <Tabs size='small'>
         {Object.entries(keyNamespaces).map(([ns, data]) => {
           if (Object.keys(data.descriptions).length === 0) {
             return null;
           }
           return (
             <Tabs.TabPane key={ns} tab={data.description ?? ns}>
-              <Table columns={columns} dataSource={getData(data.descriptions)} size="small" />
+              <Table columns={columns} dataSource={getData(data.descriptions)} size='small' />
             </Tabs.TabPane>
           );
         })}
@@ -67,8 +67,8 @@ const newUI = isFF(FF_DEV_3873) ? { newUI: true } : {};
 const editorSettingsKeys = Object.keys(EditorSettings);
 
 if (isFF(FF_DEV_3873)) {
-  const enableTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableTooltips");
-  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableLabelTooltips");
+  const enableTooltipsIndex = editorSettingsKeys.findIndex((key) => key === 'enableTooltips');
+  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex((key) => key === 'enableLabelTooltips');
 
   // swap these in the array
   const tmp = editorSettingsKeys[enableTooltipsIndex];
@@ -78,25 +78,25 @@ if (isFF(FF_DEV_3873)) {
 }
 
 const SettingsTag = ({ children }) => {
-  return <Block name="settings-tag">{children}</Block>;
+  return <Block name='settings-tag'>{children}</Block>;
 };
 
 const GeneralSettings = observer(({ store }) => {
   return (
-    <Block name="settings" mod={newUI}>
+    <Block name='settings' mod={newUI}>
       {editorSettingsKeys.map((obj, index) => {
         return (
-          <Elem name="field" tag="label" key={index}>
+          <Elem name='field' tag='label' key={index}>
             {isFF(FF_DEV_3873) ? (
               <>
-                <Block name="settings__label">
-                  <Elem name="title">
+                <Block name='settings__label'>
+                  <Elem name='title'>
                     {EditorSettings[obj].newUI.title}
-                    {EditorSettings[obj].newUI.tags?.split(",").map((tag) => (
+                    {EditorSettings[obj].newUI.tags?.split(',').map((tag) => (
                       <SettingsTag key={tag}>{tag}</SettingsTag>
                     ))}
                   </Elem>
-                  <Block name="description">{EditorSettings[obj].newUI.description}</Block>
+                  <Block name='description'>{EditorSettings[obj].newUI.description}</Block>
                 </Block>
                 <Toggle
                   key={index}
@@ -126,8 +126,8 @@ const GeneralSettings = observer(({ store }) => {
 
 const LayoutSettings = observer(({ store }) => {
   return (
-    <Block name="settings" mod={newUI}>
-      <Elem name="field">
+    <Block name='settings' mod={newUI}>
+      <Elem name='field'>
         <Checkbox
           checked={store.settings.bottomSidePanel}
           onChange={() => {
@@ -139,15 +139,15 @@ const LayoutSettings = observer(({ store }) => {
         </Checkbox>
       </Elem>
 
-      <Elem name="field">
+      <Elem name='field'>
         <Checkbox checked={store.settings.displayLabelsByDefault} onChange={store.settings.toggleSidepanelModel}>
           Display Labels by default in Results panel
         </Checkbox>
       </Elem>
 
-      <Elem name="field">
+      <Elem name='field'>
         <Checkbox
-          value="Show Annotations panel"
+          value='Show Annotations panel'
           defaultChecked={store.settings.showAnnotationsPanel}
           onChange={() => {
             store.settings.toggleAnnotationsPanel();
@@ -157,9 +157,9 @@ const LayoutSettings = observer(({ store }) => {
         </Checkbox>
       </Elem>
 
-      <Elem name="field">
+      <Elem name='field'>
         <Checkbox
-          value="Show Predictions panel"
+          value='Show Predictions panel'
           defaultChecked={store.settings.showPredictionsPanel}
           onChange={() => {
             store.settings.togglePredictionsPanel();
@@ -186,26 +186,26 @@ const LayoutSettings = observer(({ store }) => {
 });
 
 const Settings = {
-  General: { name: "General", component: GeneralSettings },
-  Hotkeys: { name: "Hotkeys", component: HotkeysDescription },
+  General: { name: 'General', component: GeneralSettings },
+  Hotkeys: { name: 'Hotkeys', component: HotkeysDescription },
 };
 
 if (!isFF(FF_DEV_3873)) {
-  Settings.Layout = { name: "Layout", component: LayoutSettings };
+  Settings.Layout = { name: 'Layout', component: LayoutSettings };
 }
 
 const DEFAULT_ACTIVE = Object.keys(Settings)[0];
 
 const DEFAULT_MODAL_SETTINGS = isFF(FF_DEV_3873)
   ? {
-      name: "settings-modal",
-      title: "Labeling Interface Settings",
+      name: 'settings-modal',
+      title: 'Labeling Interface Settings',
       closeIcon: <LsClose />,
     }
   : {
-      name: "settings-modal-old",
-      title: "Settings",
-      bodyStyle: { paddingTop: "0" },
+      name: 'settings-modal-old',
+      title: 'Settings',
+      bodyStyle: { paddingTop: '0' },
     };
 
 export default observer(({ store }) => {
@@ -228,7 +228,7 @@ export default observer(({ store }) => {
       tag={Modal}
       visible={store.showingSettings}
       onCancel={store.toggleSettings}
-      footer=""
+      footer=''
       {...DEFAULT_MODAL_SETTINGS}
     >
       <Tabs defaultActiveKey={DEFAULT_ACTIVE}>

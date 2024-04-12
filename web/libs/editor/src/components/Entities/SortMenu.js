@@ -1,16 +1,16 @@
-import { ThunderboltOutlined } from "@ant-design/icons";
-import { Menu } from "antd";
-import { observer } from "mobx-react";
-import React from "react";
-import { LsDate } from "../../assets/icons";
-import { Block, Elem } from "../../utils/bem";
-import "./SortMenu.styl";
+import { ThunderboltOutlined } from '@ant-design/icons';
+import { Menu } from 'antd';
+import { observer } from 'mobx-react';
+import React from 'react';
+import { LsDate } from '../../assets/icons';
+import { Block, Elem } from '../../utils/bem';
+import './SortMenu.styl';
 
 export const SortMenuIcon = ({ sortKey }) => {
   switch (sortKey) {
-    case "date":
+    case 'date':
       return <LsDate />;
-    case "score":
+    case 'score':
       return <ThunderboltOutlined />;
     default:
       return null;
@@ -19,41 +19,41 @@ export const SortMenuIcon = ({ sortKey }) => {
 
 export const SortMenu = observer(({ regionStore }) => {
   return (
-    <Block name="sort-menu" tag={Menu} selectedKeys={[regionStore.sort]}>
-      <Menu.Item key="date">
+    <Block name='sort-menu' tag={Menu} selectedKeys={[regionStore.sort]}>
+      <Menu.Item key='date'>
         <Elem
-          name="option-inner"
+          name='option-inner'
           onClick={(ev) => {
-            regionStore.setSort("date");
+            regionStore.setSort('date');
             ev.preventDefault();
             return false;
           }}
         >
-          <Elem name="title">
-            <Elem name="icon" tag="span">
-              <SortMenuIcon sortKey="date" />
-            </Elem>{" "}
+          <Elem name='title'>
+            <Elem name='icon' tag='span'>
+              <SortMenuIcon sortKey='date' />
+            </Elem>{' '}
             Date
           </Elem>
-          <span>{regionStore.sort === "date" && (regionStore.sortOrder === "asc" ? "↓" : "↑")}</span>
+          <span>{regionStore.sort === 'date' && (regionStore.sortOrder === 'asc' ? '↓' : '↑')}</span>
         </Elem>
       </Menu.Item>
-      <Menu.Item key="score">
+      <Menu.Item key='score'>
         <Elem
-          name="option-inner"
+          name='option-inner'
           onClick={(ev) => {
-            regionStore.setSort("score");
+            regionStore.setSort('score');
             ev.preventDefault();
             return false;
           }}
         >
-          <Elem name="title">
-            <Elem name="icon" tag="span">
-              <SortMenuIcon sortKey="score" />
-            </Elem>{" "}
+          <Elem name='title'>
+            <Elem name='icon' tag='span'>
+              <SortMenuIcon sortKey='score' />
+            </Elem>{' '}
             Score
           </Elem>
-          <span>{regionStore.sort === "score" && (regionStore.sortOrder === "asc" ? "↓" : "↑")}</span>
+          <span>{regionStore.sort === 'score' && (regionStore.sortOrder === 'asc' ? '↓' : '↑')}</span>
         </Elem>
       </Menu.Item>
     </Block>

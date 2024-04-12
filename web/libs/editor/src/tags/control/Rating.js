@@ -1,19 +1,19 @@
-import { StarOutlined } from "@ant-design/icons";
-import { Rate } from "antd";
-import { inject, observer } from "mobx-react";
-import { types } from "mobx-state-tree";
-import React from "react";
+import { StarOutlined } from '@ant-design/icons';
+import { Rate } from 'antd';
+import { inject, observer } from 'mobx-react';
+import { types } from 'mobx-state-tree';
+import React from 'react';
 
-import InfoModal from "../../components/Infomodal/Infomodal";
-import { guidGenerator } from "../../core/Helpers";
-import Registry from "../../core/Registry";
-import { AnnotationMixin } from "../../mixins/AnnotationMixin";
-import PerItemMixin from "../../mixins/PerItem";
-import PerRegionMixin from "../../mixins/PerRegion";
-import RequiredMixin from "../../mixins/Required";
-import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
-import ControlBase from "./Base";
-import ClassificationBase from "./ClassificationBase";
+import InfoModal from '../../components/Infomodal/Infomodal';
+import { guidGenerator } from '../../core/Helpers';
+import Registry from '../../core/Registry';
+import { AnnotationMixin } from '../../mixins/AnnotationMixin';
+import PerItemMixin from '../../mixins/PerItem';
+import PerRegionMixin from '../../mixins/PerRegion';
+import RequiredMixin from '../../mixins/Required';
+import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
+import ControlBase from './Base';
+import ClassificationBase from './ClassificationBase';
 
 /**
  * The `Rating` tag adds a rating selection to the labeling interface. Use for labeling tasks involving ratings.
@@ -47,10 +47,10 @@ import ClassificationBase from "./ClassificationBase";
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 
-  maxrating: types.optional(types.string, "5"),
-  icon: types.optional(types.string, "star"),
-  size: types.optional(types.string, "medium"),
-  defaultvalue: types.optional(types.string, "0"),
+  maxrating: types.optional(types.string, '5'),
+  icon: types.optional(types.string, 'star'),
+  size: types.optional(types.string, 'medium'),
+  defaultvalue: types.optional(types.string, '0'),
 
   hotkey: types.maybeNull(types.string),
 });
@@ -58,7 +58,7 @@ const TagAttrs = types.model({
 const Model = types
   .model({
     pid: types.optional(types.string, guidGenerator),
-    type: "rating",
+    type: 'rating',
     rating: types.maybeNull(types.number),
   })
   .views((self) => ({
@@ -120,7 +120,7 @@ const Model = types
   }));
 
 const RatingModel = types.compose(
-  "RatingModel",
+  'RatingModel',
   ControlBase,
   ClassificationBase,
   RequiredMixin,
@@ -131,19 +131,19 @@ const RatingModel = types.compose(
   Model,
 );
 
-const HtxRating = inject("store")(
+const HtxRating = inject('store')(
   observer(({ item, store }) => {
     let iconSize;
 
-    if (item.size === "small") {
+    if (item.size === 'small') {
       iconSize = 15;
-    } else if (item.size === "medium") {
+    } else if (item.size === 'medium') {
       iconSize = 25;
-    } else if (item.size === "large") {
+    } else if (item.size === 'large') {
       iconSize = 40;
     }
 
-    const visibleStyle = item.perRegionVisible() ? {} : { display: "none" };
+    const visibleStyle = item.perRegionVisible() ? {} : { display: 'none' };
 
     // rc-rate component listens for keypress event and hit the star if the key is Enter
     // but it doesn't check for any modifiers, so it removes star during submit (ctrl+enter)
@@ -169,13 +169,13 @@ const HtxRating = inject("store")(
           onChange={item.setRating}
         />
         {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && (
-          <sup style={{ fontSize: "9px" }}>[{item.hotkey}]</sup>
+          <sup style={{ fontSize: '9px' }}>[{item.hotkey}]</sup>
         )}
       </div>
     );
   }),
 );
 
-Registry.addTag("rating", RatingModel, HtxRating);
+Registry.addTag('rating', RatingModel, HtxRating);
 
 export { HtxRating, RatingModel };

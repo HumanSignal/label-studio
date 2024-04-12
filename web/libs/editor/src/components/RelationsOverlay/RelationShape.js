@@ -1,4 +1,4 @@
-import { BoundingBox } from "./BoundingBox";
+import { BoundingBox } from './BoundingBox';
 
 /* eslint-disable no-unused-expressions */
 export class RelationShape {

@@ -1,9 +1,9 @@
-import { forwardRef, useCallback, useMemo } from "react";
-import { cn } from "../../utils/bem";
-import { useDropdown } from "../Dropdown/DropdownTrigger";
-import "./Menu.styl";
-import { Block, Elem, MenuContext } from "./MenuContext";
-import { MenuItem } from "./MenuItem";
+import { forwardRef, useCallback, useMemo } from 'react';
+import { cn } from '../../utils/bem';
+import { useDropdown } from '../Dropdown/DropdownTrigger';
+import './Menu.styl';
+import { Block, Elem, MenuContext } from './MenuContext';
+import { MenuItem } from './MenuItem';
 
 export const Menu = forwardRef(
   ({ children, className, style, size, selectedKeys, closeDropdownOnItemClick, contextual }, ref) => {
@@ -15,7 +15,7 @@ export const Menu = forwardRef(
 
     const clickHandler = useCallback(
       (e) => {
-        const elem = cn("main-menu").elem("item").closest(e.target);
+        const elem = cn('main-menu').elem('item').closest(e.target);
 
         if (dropdown && elem && closeDropdownOnItemClick !== false) {
           dropdown.close();
@@ -32,8 +32,8 @@ export const Menu = forwardRef(
       <MenuContext.Provider value={{ selected }}>
         <Block
           ref={ref}
-          tag="ul"
-          name="main-menu"
+          tag='ul'
+          name='main-menu'
           mod={{ size, collapsed, contextual }}
           mix={className}
           style={style}
@@ -47,12 +47,12 @@ export const Menu = forwardRef(
 );
 
 Menu.Item = MenuItem;
-Menu.Spacer = () => <Elem block="main-menu" tag="li" name="spacer" />;
-Menu.Divider = () => <Elem block="main-menu" tag="li" name="divider" />;
+Menu.Spacer = () => <Elem block='main-menu' tag='li' name='spacer' />;
+Menu.Divider = () => <Elem block='main-menu' tag='li' name='divider' />;
 Menu.Builder = (url, menuItems) => {
   return (menuItems ?? []).map((item, index) => {
-    if (item === "SPACER") return <Menu.Spacer key={index} />;
-    if (item === "DIVIDER") return <Menu.Divider key={index} />;
+    if (item === 'SPACER') return <Menu.Spacer key={index} />;
+    if (item === 'DIVIDER') return <Menu.Divider key={index} />;
 
     let pageLabel;
     let pagePath;
@@ -65,7 +65,7 @@ Menu.Builder = (url, menuItems) => {
       pagePath = path;
     }
 
-    if (typeof pagePath === "function") {
+    if (typeof pagePath === 'function') {
       return (
         <Menu.Item key={index} onClick={pagePath}>
           {pageLabel}
@@ -73,7 +73,7 @@ Menu.Builder = (url, menuItems) => {
       );
     }
 
-    const location = `${url}${pagePath}`.replace(/([/]+)/g, "/");
+    const location = `${url}${pagePath}`.replace(/([/]+)/g, '/');
 
     return (
       <Menu.Item key={index} to={location} exact>
@@ -85,9 +85,9 @@ Menu.Builder = (url, menuItems) => {
 
 Menu.Group = ({ children, title, className, style }) => {
   return (
-    <Block name="menu-group" mix={className} style={style}>
-      <Elem name="title">{title}</Elem>
-      <Elem tag="ul" name="list">
+    <Block name='menu-group' mix={className} style={style}>
+      <Elem name='title'>{title}</Elem>
+      <Elem tag='ul' name='list'>
         {children}
       </Elem>
     </Block>

@@ -1,8 +1,8 @@
-import { useCallback, useState } from "react";
-import { Button } from "../../../components";
-import { Description } from "../../../components/Description/Description";
-import { useAPI } from "../../../providers/ApiProvider";
-import { Block } from "../../../utils/bem";
+import { useCallback, useState } from 'react';
+import { Button } from '../../../components';
+import { Description } from '../../../components/Description/Description';
+import { useAPI } from '../../../providers/ApiProvider';
+import { Block } from '../../../utils/bem';
 
 export const StartModelTraining = ({ backend }) => {
   const api = useAPI();
@@ -10,7 +10,7 @@ export const StartModelTraining = ({ backend }) => {
 
   const onStartTraining = useCallback(
     async (backend) => {
-      const res = await api.callApi("trainMLBackend", {
+      const res = await api.callApi('trainMLBackend', {
         params: {
           pk: backend.id,
         },
@@ -22,7 +22,7 @@ export const StartModelTraining = ({ backend }) => {
   );
 
   return (
-    <Block name="test-request">
+    <Block name='test-request'>
       <Description style={{ marginTop: 0, maxWidth: 680 }}>
         You're about to manually trigger your model's training process. This action will start the learning phase based
         on how the train method is implemented in the ML Backend. Proceed to begin this process.

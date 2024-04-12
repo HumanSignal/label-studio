@@ -1,20 +1,20 @@
-import { inject } from "mobx-react";
-import { destroy, getRoot, getType, types } from "mobx-state-tree";
+import { inject } from 'mobx-react';
+import { destroy, getRoot, getType, types } from 'mobx-state-tree';
 
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH, SNAP_TO_PIXEL_MODE } from "../../../components/ImageView/Image";
-import ImageView from "../../../components/ImageView/ImageView";
-import { customTypes } from "../../../core/CustomTypes";
-import Registry from "../../../core/Registry";
-import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
-import { IsReadyWithDepsMixin } from "../../../mixins/IsReadyMixin";
-import { BrushRegionModel } from "../../../regions/BrushRegion";
-import { EllipseRegionModel } from "../../../regions/EllipseRegion";
-import { KeyPointRegionModel } from "../../../regions/KeyPointRegion";
-import { PolygonRegionModel } from "../../../regions/PolygonRegion";
-import { RectRegionModel } from "../../../regions/RectRegion";
-import * as Tools from "../../../tools";
-import ToolsManager from "../../../tools/Manager";
-import { parseValue } from "../../../utils/data";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH, SNAP_TO_PIXEL_MODE } from '../../../components/ImageView/Image';
+import ImageView from '../../../components/ImageView/ImageView';
+import { customTypes } from '../../../core/CustomTypes';
+import Registry from '../../../core/Registry';
+import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
+import { IsReadyWithDepsMixin } from '../../../mixins/IsReadyMixin';
+import { BrushRegionModel } from '../../../regions/BrushRegion';
+import { EllipseRegionModel } from '../../../regions/EllipseRegion';
+import { KeyPointRegionModel } from '../../../regions/KeyPointRegion';
+import { PolygonRegionModel } from '../../../regions/PolygonRegion';
+import { RectRegionModel } from '../../../regions/RectRegion';
+import * as Tools from '../../../tools';
+import ToolsManager from '../../../tools/Manager';
+import { parseValue } from '../../../utils/data';
 import {
   FF_DEV_3377,
   FF_DEV_3666,
@@ -25,14 +25,14 @@ import {
   FF_LSDV_4711,
   FF_ZOOM_OPTIM,
   isFF,
-} from "../../../utils/feature-flags";
-import { guidGenerator } from "../../../utils/unique";
-import { clamp, isDefined } from "../../../utils/utilities";
-import ObjectBase from "../Base";
-import MultiItemObjectBase from "../MultiItemObjectBase";
-import { DrawingRegion } from "./DrawingRegion";
-import { ImageEntityMixin } from "./ImageEntityMixin";
-import { ImageSelection } from "./ImageSelection";
+} from '../../../utils/feature-flags';
+import { guidGenerator } from '../../../utils/unique';
+import { clamp, isDefined } from '../../../utils/utilities';
+import ObjectBase from '../Base';
+import MultiItemObjectBase from '../MultiItemObjectBase';
+import { DrawingRegion } from './DrawingRegion';
+import { ImageEntityMixin } from './ImageEntityMixin';
+import { ImageSelection } from './ImageSelection';
 
 const IMAGE_PRELOAD_COUNT = 3;
 
@@ -94,20 +94,20 @@ const TagAttrs = types.model({
   value: types.maybeNull(types.string),
   valuelist: types.maybeNull(types.string),
   resize: types.maybeNull(types.number),
-  width: types.optional(types.string, "100%"),
+  width: types.optional(types.string, '100%'),
   height: types.maybeNull(types.string),
-  maxwidth: types.optional(types.string, "100%"),
-  maxheight: types.optional(types.string, "calc(100vh - 194px)"),
+  maxwidth: types.optional(types.string, '100%'),
+  maxheight: types.optional(types.string, 'calc(100vh - 194px)'),
   smoothing: types.maybeNull(types.boolean),
 
   // rulers: types.optional(types.boolean, true),
   grid: types.optional(types.boolean, false),
-  gridsize: types.optional(types.string, "30"),
-  gridcolor: types.optional(customTypes.color, "#EEEEF4"),
+  gridsize: types.optional(types.string, '30'),
+  gridcolor: types.optional(customTypes.color, '#EEEEF4'),
 
   zoom: types.optional(types.boolean, true),
   negativezoom: types.optional(types.boolean, false),
-  zoomby: types.optional(types.string, "1.1"),
+  zoomby: types.optional(types.string, '1.1'),
 
   showlabels: types.optional(types.boolean, false),
 
@@ -121,30 +121,30 @@ const TagAttrs = types.model({
   // this property is just to turn lazyload off to e2e tests
   lazyoff: types.optional(types.boolean, false),
 
-  horizontalalignment: types.optional(types.enumeration(["left", "center", "right"]), "left"),
-  verticalalignment: types.optional(types.enumeration(["top", "center", "bottom"]), "top"),
-  defaultzoom: types.optional(types.enumeration(["auto", "original", "fit"]), "fit"),
+  horizontalalignment: types.optional(types.enumeration(['left', 'center', 'right']), 'left'),
+  verticalalignment: types.optional(types.enumeration(['top', 'center', 'bottom']), 'top'),
+  defaultzoom: types.optional(types.enumeration(['auto', 'original', 'fit']), 'fit'),
 
-  crossorigin: types.optional(types.enumeration(["none", "anonymous", "use-credentials"]), "none"),
+  crossorigin: types.optional(types.enumeration(['none', 'anonymous', 'use-credentials']), 'none'),
 });
 
 const IMAGE_CONSTANTS = {
-  rectangleModel: "RectangleModel",
-  rectangleLabelsModel: "RectangleLabelsModel",
-  ellipseModel: "EllipseModel",
-  ellipseLabelsModel: "EllipseLabelsModel",
-  brushLabelsModel: "BrushLabelsModel",
-  rectanglelabels: "rectanglelabels",
-  keypointlabels: "keypointlabels",
-  polygonlabels: "polygonlabels",
-  brushlabels: "brushlabels",
-  brushModel: "BrushModel",
-  ellipselabels: "ellipselabels",
+  rectangleModel: 'RectangleModel',
+  rectangleLabelsModel: 'RectangleLabelsModel',
+  ellipseModel: 'EllipseModel',
+  ellipseLabelsModel: 'EllipseLabelsModel',
+  brushLabelsModel: 'BrushLabelsModel',
+  rectanglelabels: 'rectanglelabels',
+  keypointlabels: 'keypointlabels',
+  polygonlabels: 'polygonlabels',
+  brushlabels: 'brushlabels',
+  brushModel: 'BrushModel',
+  ellipselabels: 'ellipselabels',
 };
 
 const Model = types
   .model({
-    type: "image",
+    type: 'image',
 
     // tools: types.array(BaseTool),
 
@@ -156,7 +156,7 @@ const Model = types
     cursorPositionX: types.optional(types.number, 0),
     cursorPositionY: types.optional(types.number, 0),
 
-    brushControl: types.optional(types.string, "brush"),
+    brushControl: types.optional(types.string, 'brush'),
 
     brushStrokeWidth: types.optional(types.number, 15),
 
@@ -165,7 +165,7 @@ const Model = types
      * brush for Image Segmentation
      * eraser for Image Segmentation
      */
-    mode: types.optional(types.enumeration(["drawing", "viewing", "brush", "eraser"]), "viewing"),
+    mode: types.optional(types.enumeration(['drawing', 'viewing', 'brush', 'eraser']), 'viewing'),
 
     regions: types.array(
       types.union(BrushRegionModel, RectRegionModel, EllipseRegionModel, PolygonRegionModel, KeyPointRegionModel),
@@ -290,12 +290,12 @@ const Model = types
     get imageCrossOrigin() {
       const value = self.crossorigin.toLowerCase();
 
-      if (isFF(FF_LSDV_4711) && (!value || value === "none")) return "anonymous";
+      if (isFF(FF_LSDV_4711) && (!value || value === 'none')) return 'anonymous';
 
       if (!isFF(FF_DEV_4081)) {
         return null;
       }
-      if (!value || value === "none") {
+      if (!value || value === 'none') {
         return null;
       }
       return value;
@@ -389,7 +389,7 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states && states.filter((s) => s.isSelected && s.type.includes("labels"));
+      return states && states.filter((s) => s.isSelected && s.type.includes('labels'));
     },
 
     controlButton() {
@@ -462,21 +462,21 @@ const Model = types
 
       if (isFF(FF_ZOOM_OPTIM)) {
         switch (self.horizontalalignment) {
-          case "center": {
+          case 'center': {
             offset.x = (self.containerWidth - self.canvasSize.width) / 2;
             break;
           }
-          case "right": {
+          case 'right': {
             offset.x = self.containerWidth - self.canvasSize.width;
             break;
           }
         }
         switch (self.verticalalignment) {
-          case "center": {
+          case 'center': {
             offset.y = (self.containerHeight - self.canvasSize.height) / 2;
             break;
           }
-          case "bottom": {
+          case 'bottom': {
             offset.y = self.containerHeight - self.canvasSize.height;
             break;
           }
@@ -497,9 +497,9 @@ const Model = types
         // scale transform leaves gaps on image border, so much better to change image sizes
         width: `${self.stageWidth * self.zoomScale}px`,
         height: `${self.stageHeight * self.zoomScale}px`,
-        transformOrigin: "left top",
+        transformOrigin: 'left top',
         // We should always set some transform to make the image rendering in the same way all the time
-        transform: "translate3d(0,0,0)",
+        transform: 'translate3d(0,0,0)',
         filter: `brightness(${self.brightnessGrade}%) contrast(${self.contrastGrade}%)`,
       };
       const imgTransform = [];
@@ -512,18 +512,18 @@ const Model = types
 
       if (self.rotation) {
         const translate = {
-          90: "0, -100%",
-          180: "-100%, -100%",
-          270: "-100%, 0",
+          90: '0, -100%',
+          180: '-100%, -100%',
+          270: '-100%, 0',
         };
 
         // there is a top left origin already set for zoom; so translate+rotate
         imgTransform.push(`rotate(${self.rotation}deg)`);
-        imgTransform.push(`translate(${translate[self.rotation] || "0, 0"})`);
+        imgTransform.push(`translate(${translate[self.rotation] || '0, 0'})`);
       }
 
       if (imgTransform?.length > 0) {
-        imgStyle.transform = imgTransform.join(" ");
+        imgStyle.transform = imgTransform.join(' ');
       }
       return imgStyle;
     },
@@ -603,15 +603,15 @@ const Model = types
     }
 
     function afterAttach() {
-      if (self.selectioncontrol) manager.addTool("MoveTool", Tools.Selection.create({}, env));
+      if (self.selectioncontrol) manager.addTool('MoveTool', Tools.Selection.create({}, env));
 
-      if (self.zoomcontrol) manager.addTool("ZoomPanTool", Tools.Zoom.create({}, env));
+      if (self.zoomcontrol) manager.addTool('ZoomPanTool', Tools.Zoom.create({}, env));
 
-      if (self.brightnesscontrol) manager.addTool("BrightnessTool", Tools.Brightness.create({}, env));
+      if (self.brightnesscontrol) manager.addTool('BrightnessTool', Tools.Brightness.create({}, env));
 
-      if (self.contrastcontrol) manager.addTool("ContrastTool", Tools.Contrast.create({}, env));
+      if (self.contrastcontrol) manager.addTool('ContrastTool', Tools.Contrast.create({}, env));
 
-      if (self.rotatecontrol) manager.addTool("RotateTool", Tools.Rotate.create({}, env));
+      if (self.rotatecontrol) manager.addTool('RotateTool', Tools.Rotate.create({}, env));
 
       createImageEntities();
     }
@@ -655,7 +655,7 @@ const Model = types
           }
           const manager = self.getToolsManager();
 
-          const isPanning = manager.findSelectedTool()?.toolName === "ZoomPanTool";
+          const isPanning = manager.findSelectedTool()?.toolName === 'ZoomPanTool';
 
           return skipInteractions || isPanning;
         },
@@ -889,7 +889,7 @@ const Model = types
     sizeToFit() {
       const { maxScale } = self;
 
-      self.defaultzoom = "fit";
+      self.defaultzoom = 'fit';
       self.setZoom(maxScale);
       self.updateImageAfterZoom();
       self.resetZoomPositionToCenter();
@@ -898,14 +898,14 @@ const Model = types
     sizeToOriginal() {
       const { maxScale } = self;
 
-      self.defaultzoom = "original";
+      self.defaultzoom = 'original';
       self.setZoom(maxScale > 1 ? 1 : 1 / maxScale);
       self.updateImageAfterZoom();
       self.resetZoomPositionToCenter();
     },
 
     sizeToAuto() {
-      self.defaultzoom = "auto";
+      self.defaultzoom = 'auto';
       self.setZoom(1);
       self.updateImageAfterZoom();
       self.resetZoomPositionToCenter();
@@ -1100,7 +1100,7 @@ const Model = types
       // this happens only after initial load, so it's safe
       self.setReady(true);
 
-      if (self.defaultzoom === "fit") {
+      if (self.defaultzoom === 'fit') {
         self.sizeToFit();
       } else {
         self.sizeToAuto();
@@ -1117,7 +1117,7 @@ const Model = types
         labelStates = self.activeStates() || [];
       } else {
         // there is should be at least one state selected for *labels object
-        labelStates = (self.states() || []).filter((s) => s.type.includes("labels"));
+        labelStates = (self.states() || []).filter((s) => s.type.includes('labels'));
       }
       const selectedStates = self.getAvailableStates();
 
@@ -1246,7 +1246,7 @@ const AbsoluteCoordsCalculations = CoordsCalculations.views(() => ({
 }));
 
 const ImageModel = types.compose(
-  "ImageModel",
+  'ImageModel',
   TagAttrs,
   ObjectBase,
   ...(isFF(FF_LSDV_4583) ? [MultiItemObjectBase] : []),
@@ -1257,9 +1257,9 @@ const ImageModel = types.compose(
   isFF(FF_DEV_3793) ? CoordsCalculations : AbsoluteCoordsCalculations,
 );
 
-const HtxImage = inject("store")(ImageView);
+const HtxImage = inject('store')(ImageView);
 
-Registry.addTag("image", ImageModel, HtxImage);
+Registry.addTag('image', ImageModel, HtxImage);
 Registry.addObjectType(ImageModel);
 
 export { ImageModel, HtxImage };

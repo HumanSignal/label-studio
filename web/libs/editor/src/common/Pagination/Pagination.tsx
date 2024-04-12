@@ -1,8 +1,8 @@
-import React, { type ChangeEvent, type FC, forwardRef, type KeyboardEvent, useCallback, useState } from "react";
-import { Hotkey } from "../../core/Hotkey";
-import { useHotkey } from "../../hooks/useHotkey";
-import { Block, Elem } from "../../utils/bem";
-import "./Pagination.styl";
+import React, { type ChangeEvent, type FC, forwardRef, type KeyboardEvent, useCallback, useState } from 'react';
+import { Hotkey } from '../../core/Hotkey';
+import { useHotkey } from '../../hooks/useHotkey';
+import { Block, Elem } from '../../utils/bem';
+import './Pagination.styl';
 
 interface PaginationProps {
   currentPage: number;
@@ -11,8 +11,8 @@ interface PaginationProps {
   pageSizeOptions?: [];
   pageSizeSelectable: boolean;
   outline?: boolean;
-  align?: "left" | "right";
-  size?: "small" | "medium" | "large";
+  align?: 'left' | 'right';
+  size?: 'small' | 'medium' | 'large';
   noPadding?: boolean;
   hotkey?: {
     prev?: string;
@@ -27,20 +27,20 @@ const isSystemEvent = (e: KeyboardEvent<HTMLInputElement>): boolean => {
     (e.shiftKey && e.code.match(/arrow/i) !== null) ||
     e.metaKey ||
     e.ctrlKey ||
-    e.code === "Backspace"
+    e.code === 'Backspace'
   );
 };
 
 export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
   (
     {
-      size = "medium",
+      size = 'medium',
       pageSizeOptions = [1, 25, 50, 100],
       currentPage,
       pageSize,
       totalPages,
       outline = true,
-      align = "right",
+      align = 'right',
       noPadding = false,
       pageSizeSelectable = true,
       hotkey,
@@ -65,35 +65,35 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
     };
 
     return (
-      <Block name="pagination" mod={{ size, outline, align, noPadding }}>
-        <Elem name="navigation">
+      <Block name='pagination' mod={{ size, outline, align, noPadding }}>
+        <Elem name='navigation'>
           <>
             <NavigationButton
-              mod={["arrow-left", "arrow-left-double"]}
+              mod={['arrow-left', 'arrow-left-double']}
               onClick={() => onChange?.(1)}
               disabled={currentPage === 1}
             />
-            <Elem name="divider" />
+            <Elem name='divider' />
           </>
           <NavigationButton
-            mod={["arrow-left"]}
+            mod={['arrow-left']}
             onClick={() => onChange?.(currentPage - 1)}
             hotkey={hotkey?.prev}
             disabled={currentPage === 1}
           />
-          <Elem name="input">
+          <Elem name='input'>
             {inputMode ? (
               <input
-                type="text"
+                type='text'
                 autoFocus
                 defaultValue={currentPage}
-                pattern="[0-9]"
+                pattern='[0-9]'
                 onKeyDown={(e) => {
                   const _value = Number.parseFloat(e.currentTarget.value);
 
-                  if (e.code === "Escape") {
+                  if (e.code === 'Escape') {
                     setInputMode(false);
-                  } else if (e.code === "Enter") {
+                  } else if (e.code === 'Enter') {
                     if (_value <= totalPages && _value >= 1) {
                       onChange?.(_value);
                     }
@@ -116,7 +116,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
               />
             ) : (
               <Elem
-                name="page-indicator"
+                name='page-indicator'
                 onClick={() => {
                   setInputMode(true);
                 }}
@@ -131,22 +131,22 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
             )}
           </Elem>
           <NavigationButton
-            mod={["arrow-right"]}
+            mod={['arrow-right']}
             onClick={() => onChange?.(currentPage + 1)}
             disabled={currentPage === totalPages}
             hotkey={hotkey?.next}
           />
           <>
-            <Elem name="divider" />
+            <Elem name='divider' />
             <NavigationButton
-              mod={["arrow-right", "arrow-right-double"]}
+              mod={['arrow-right', 'arrow-right-double']}
               onClick={() => onChange?.(totalPages)}
               disabled={currentPage === totalPages}
             />
           </>
         </Elem>
         {pageSizeSelectable && (
-          <Elem name="page-size">
+          <Elem name='page-size'>
             <select value={pageSize} onChange={handleChangeSelect}>
               {renderOptions()}
             </select>
@@ -177,9 +177,9 @@ const NavigationButton: FC<NavigationButtonProps> = ({ mod, disabled, hotkey, on
 
   return hotkey ? (
     <Hotkey.Tooltip name={hotkey}>
-      <Elem name="btn" mod={buttonMod} onClick={actionHandler} />
+      <Elem name='btn' mod={buttonMod} onClick={actionHandler} />
     </Hotkey.Tooltip>
   ) : (
-    <Elem name="btn" mod={buttonMod} onClick={actionHandler} />
+    <Elem name='btn' mod={buttonMod} onClick={actionHandler} />
   );
 };

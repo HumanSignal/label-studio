@@ -1,18 +1,18 @@
-import { inject, observer } from "mobx-react";
-import { useCallback, useMemo, useState } from "react";
-import { IconBan } from "../../assets/icons";
-import { LsChevron } from "../../assets/icons";
-import { Button } from "../../common/Button/Button";
-import { Dropdown } from "../../common/Dropdown/DropdownComponent";
-import { Tooltip } from "../../common/Tooltip/Tooltip";
-import { Block, Elem } from "../../utils/bem";
-import { FF_PROD_E_111, isFF } from "../../utils/feature-flags";
-import { isDefined } from "../../utils/utilities";
-import "./Controls.styl";
+import { inject, observer } from 'mobx-react';
+import { useCallback, useMemo, useState } from 'react';
+import { IconBan } from '../../assets/icons';
+import { LsChevron } from '../../assets/icons';
+import { Button } from '../../common/Button/Button';
+import { Dropdown } from '../../common/Dropdown/DropdownComponent';
+import { Tooltip } from '../../common/Tooltip/Tooltip';
+import { Block, Elem } from '../../utils/bem';
+import { FF_PROD_E_111, isFF } from '../../utils/feature-flags';
+import { isDefined } from '../../utils/utilities';
+import './Controls.styl';
 
 const TOOLTIP_DELAY = 0.8;
 
-const ButtonTooltip = inject("store")(
+const ButtonTooltip = inject('store')(
   observer(({ store, title, children }) => {
     return (
       <Tooltip title={title} enabled={store.settings.enableTooltips} mouseEnterDelay={TOOLTIP_DELAY}>
@@ -31,8 +31,8 @@ const controlsInjector = inject(({ store }) => {
 
 export const Controls = controlsInjector(
   observer(({ store, history, annotation }) => {
-    const isReview = store.hasInterface("review");
-    const isNotQuickView = store.hasInterface("topbar:prevnext");
+    const isReview = store.hasInterface('review');
+    const isNotQuickView = store.hasInterface('topbar:prevnext');
     const historySelected = isDefined(store.annotationStore.selectedHistory);
     const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
     const buttons = [];
@@ -40,7 +40,7 @@ export const Controls = controlsInjector(
     const [isInProgress, setIsInProgress] = useState(false);
 
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
-    const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
+    const submitDisabled = store.hasInterface('annotations:deny-empty') && results.length === 0;
 
     const buttonHandler = useCallback(
       async (e, callback, tooltipMessage) => {
@@ -54,7 +54,7 @@ export const Controls = controlsInjector(
         if (addedCommentThisSession) {
           selected?.submissionInProgress();
           callback();
-        } else if ((currentComment ?? "").trim()) {
+        } else if ((currentComment ?? '').trim()) {
           e.preventDefault();
           selected?.submissionInProgress();
           await commentFormSubmit();
@@ -76,13 +76,13 @@ export const Controls = controlsInjector(
 
     const RejectButton = useMemo(() => {
       return (
-        <ButtonTooltip key="reject" title="Reject annotation: [ Ctrl+Space ]">
+        <ButtonTooltip key='reject' title='Reject annotation: [ Ctrl+Space ]'>
           <Button
-            aria-label="reject-annotation"
+            aria-label='reject-annotation'
             disabled={disabled}
             onClick={async (e) => {
-              if (store.hasInterface("comments:reject") ?? true) {
-                buttonHandler(e, () => store.rejectAnnotation({}), "Please enter a comment before rejecting");
+              if (store.hasInterface('comments:reject') ?? true) {
+                buttonHandler(e, () => store.rejectAnnotation({}), 'Please enter a comment before rejecting');
               } else {
                 const selected = store.annotationStore?.selected;
 
@@ -102,11 +102,11 @@ export const Controls = controlsInjector(
       buttons.push(RejectButton);
 
       buttons.push(
-        <ButtonTooltip key="accept" title="Accept annotation: [ Ctrl+Enter ]">
+        <ButtonTooltip key='accept' title='Accept annotation: [ Ctrl+Enter ]'>
           <Button
-            aria-label="accept-annotation"
+            aria-label='accept-annotation'
             disabled={disabled}
-            look="primary"
+            look='primary'
             onClick={async () => {
               const selected = store.annotationStore?.selected;
 
@@ -115,22 +115,22 @@ export const Controls = controlsInjector(
               store.acceptAnnotation();
             }}
           >
-            {history.canUndo ? "Fix + Accept" : "Accept"}
+            {history.canUndo ? 'Fix + Accept' : 'Accept'}
           </Button>
         </ButtonTooltip>,
       );
     } else if (annotation.skipped) {
       buttons.push(
-        <Elem name="skipped-info" key="skipped">
-          <IconBan color="#d00" /> Was skipped
+        <Elem name='skipped-info' key='skipped'>
+          <IconBan color='#d00' /> Was skipped
         </Elem>,
       );
       buttons.push(
-        <ButtonTooltip key="cancel-skip" title="Cancel skip: []">
+        <ButtonTooltip key='cancel-skip' title='Cancel skip: []'>
           <Button
-            aria-label="cancel-skip"
+            aria-label='cancel-skip'
             disabled={disabled}
-            look="primary"
+            look='primary'
             onClick={async () => {
               const selected = store.annotationStore?.selected;
 
@@ -144,15 +144,15 @@ export const Controls = controlsInjector(
         </ButtonTooltip>,
       );
     } else {
-      if (store.hasInterface("skip")) {
+      if (store.hasInterface('skip')) {
         buttons.push(
-          <ButtonTooltip key="skip" title="Cancel (skip) task: [ Ctrl+Space ]">
+          <ButtonTooltip key='skip' title='Cancel (skip) task: [ Ctrl+Space ]'>
             <Button
-              aria-label="skip-task"
+              aria-label='skip-task'
               disabled={disabled}
               onClick={async (e) => {
-                if (store.hasInterface("comments:skip") ?? true) {
-                  buttonHandler(e, () => store.skipTask({}), "Please enter a comment before skipping");
+                if (store.hasInterface('comments:skip') ?? true) {
+                  buttonHandler(e, () => store.skipTask({}), 'Please enter a comment before skipping');
                 } else {
                   const selected = store.annotationStore?.selected;
 
@@ -168,7 +168,7 @@ export const Controls = controlsInjector(
         );
       }
 
-      const look = disabled || submitDisabled ? "disabled" : "primary";
+      const look = disabled || submitDisabled ? 'disabled' : 'primary';
 
       if (isFF(FF_PROD_E_111)) {
         const isDisabled = disabled || submitDisabled;
@@ -177,8 +177,8 @@ export const Controls = controlsInjector(
         const SubmitOption = ({ isUpdate, onClickMethod }) => {
           return (
             <Button
-              name="submit-option"
-              look="secondary"
+              name='submit-option'
+              look='secondary'
               onClick={async (event) => {
                 event.preventDefault();
 
@@ -186,38 +186,38 @@ export const Controls = controlsInjector(
 
                 selected?.submissionInProgress();
 
-                if ("URLSearchParams" in window) {
+                if ('URLSearchParams' in window) {
                   const searchParams = new URLSearchParams(window.location.search);
 
-                  searchParams.set("exitStream", "true");
+                  searchParams.set('exitStream', 'true');
                   const newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
 
-                  window.history.pushState(null, "", newRelativePathQuery);
+                  window.history.pushState(null, '', newRelativePathQuery);
                 }
 
                 await store.commentStore.commentFormSubmit();
                 onClickMethod();
               }}
             >
-              {`${isUpdate ? "Update" : "Submit"} and exit`}
+              {`${isUpdate ? 'Update' : 'Submit'} and exit`}
             </Button>
           );
         };
 
-        if (userGenerate || (store.explore && !userGenerate && store.hasInterface("submit"))) {
-          const title = submitDisabled ? "Empty annotations denied in this project" : "Save results: [ Ctrl+Enter ]";
+        if (userGenerate || (store.explore && !userGenerate && store.hasInterface('submit'))) {
+          const title = submitDisabled ? 'Empty annotations denied in this project' : 'Save results: [ Ctrl+Enter ]';
 
           buttons.push(
-            <ButtonTooltip key="submit" title={title}>
-              <Elem name="tooltip-wrapper">
+            <ButtonTooltip key='submit' title={title}>
+              <Elem name='tooltip-wrapper'>
                 <Button
-                  aria-label="submit"
-                  name="submit"
+                  aria-label='submit'
+                  name='submit'
                   disabled={isDisabled}
                   look={look}
                   mod={{ has_icon: useExitOption, disabled: isDisabled }}
                   onClick={async (event) => {
-                    if (event.target.classList.contains("lsf-dropdown__trigger")) return;
+                    if (event.target.classList.contains('lsf-dropdown__trigger')) return;
                     const selected = store.annotationStore?.selected;
 
                     selected?.submissionInProgress();
@@ -227,7 +227,7 @@ export const Controls = controlsInjector(
                   icon={
                     useExitOption && (
                       <Dropdown.Trigger
-                        alignment="top-right"
+                        alignment='top-right'
                         content={<SubmitOption onClickMethod={store.submitAnnotation} isUpdate={false} />}
                       >
                         <div>
@@ -244,18 +244,18 @@ export const Controls = controlsInjector(
           );
         }
 
-        if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
+        if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface('update'))) {
           const isUpdate = sentUserGenerate || versions.result;
           const button = (
-            <ButtonTooltip key="update" title="Update this task: [ Alt+Enter ]">
+            <ButtonTooltip key='update' title='Update this task: [ Alt+Enter ]'>
               <Button
-                aria-label="submit"
-                name="submit"
+                aria-label='submit'
+                name='submit'
                 disabled={disabled || submitDisabled}
                 look={look}
                 mod={{ has_icon: useExitOption, disabled: isDisabled }}
                 onClick={async (event) => {
-                  if (event.target.classList.contains("lsf-dropdown__trigger")) return;
+                  if (event.target.classList.contains('lsf-dropdown__trigger')) return;
                   const selected = store.annotationStore?.selected;
 
                   selected?.submissionInProgress();
@@ -265,7 +265,7 @@ export const Controls = controlsInjector(
                 icon={
                   useExitOption && (
                     <Dropdown.Trigger
-                      alignment="top-right"
+                      alignment='top-right'
                       content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
                     >
                       <div>
@@ -275,7 +275,7 @@ export const Controls = controlsInjector(
                   )
                 }
               >
-                {isUpdate ? "Update" : "Submit"}
+                {isUpdate ? 'Update' : 'Submit'}
               </Button>
             </ButtonTooltip>
           );
@@ -283,14 +283,14 @@ export const Controls = controlsInjector(
           buttons.push(button);
         }
       } else {
-        if (userGenerate || (store.explore && !userGenerate && store.hasInterface("submit"))) {
-          const title = submitDisabled ? "Empty annotations denied in this project" : "Save results: [ Ctrl+Enter ]";
+        if (userGenerate || (store.explore && !userGenerate && store.hasInterface('submit'))) {
+          const title = submitDisabled ? 'Empty annotations denied in this project' : 'Save results: [ Ctrl+Enter ]';
 
           buttons.push(
-            <ButtonTooltip key="submit" title={title}>
-              <Elem name="tooltip-wrapper">
+            <ButtonTooltip key='submit' title={title}>
+              <Elem name='tooltip-wrapper'>
                 <Button
-                  aria-label="submit"
+                  aria-label='submit'
                   disabled={disabled || submitDisabled}
                   look={look}
                   onClick={async () => {
@@ -308,12 +308,12 @@ export const Controls = controlsInjector(
           );
         }
 
-        if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
+        if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface('update'))) {
           const isUpdate = sentUserGenerate || versions.result;
           const button = (
-            <ButtonTooltip key="update" title="Update this task: [ Alt+Enter ]">
+            <ButtonTooltip key='update' title='Update this task: [ Alt+Enter ]'>
               <Button
-                aria-label="submit"
+                aria-label='submit'
                 disabled={disabled || submitDisabled}
                 look={look}
                 onClick={async () => {
@@ -324,7 +324,7 @@ export const Controls = controlsInjector(
                   store.updateAnnotation();
                 }}
               >
-                {isUpdate ? "Update" : "Submit"}
+                {isUpdate ? 'Update' : 'Submit'}
               </Button>
             </ButtonTooltip>
           );
@@ -334,6 +334,6 @@ export const Controls = controlsInjector(
       }
     }
 
-    return <Block name="controls">{buttons}</Block>;
+    return <Block name='controls'>{buttons}</Block>;
   }),
 );

@@ -1,11 +1,11 @@
-import { type FC, type RefObject, useCallback, useEffect, useRef } from "react";
-import { ReactComponent as IconSend } from "../../assets/icons/send.svg";
-import { Block, Elem } from "../../utils/bem";
+import { type FC, type RefObject, useCallback, useEffect, useRef } from 'react';
+import { ReactComponent as IconSend } from '../../assets/icons/send.svg';
+import { Block, Elem } from '../../utils/bem';
 
-import { observer } from "mobx-react";
-import { TextArea } from "../../common/TextArea/TextArea";
-import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
-import "./CommentForm.styl";
+import { observer } from 'mobx-react';
+import { TextArea } from '../../common/TextArea/TextArea';
+import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
+import './CommentForm.styl';
 
 export type CommentFormProps = {
   commentStore: any;
@@ -20,23 +20,23 @@ export const CommentForm: FC<CommentFormProps> = observer(
   ({ commentStore, annotationStore, inline = true, onChange, rows = 1, maxRows = 4 }) => {
     const formRef = useRef<HTMLFormElement>(null);
     const actionRef = useRef<{ update?: (text?: string) => void; el?: RefObject<HTMLTextAreaElement> }>({});
-    const clearTooltipMessage = () => commentStore.setTooltipMessage("");
+    const clearTooltipMessage = () => commentStore.setTooltipMessage('');
     const onSubmit = useCallback(
       async (e?: any) => {
         e?.preventDefault?.();
 
-        if (!formRef.current || commentStore.loading === "addComment") return;
+        if (!formRef.current || commentStore.loading === 'addComment') return;
 
-        const comment = new FormData(formRef.current).get("comment") as string;
+        const comment = new FormData(formRef.current).get('comment') as string;
 
         if (!comment.trim()) return;
 
         try {
-          actionRef.current.update?.("");
+          actionRef.current.update?.('');
 
           await commentStore.addComment(comment);
         } catch (err) {
-          actionRef.current.update?.(comment || "");
+          actionRef.current.update?.(comment || '');
           console.error(err);
         }
       },
@@ -45,7 +45,7 @@ export const CommentForm: FC<CommentFormProps> = observer(
 
     const onInput = useCallback(
       (comment: string) => {
-        commentStore.setCurrentComment(comment || "");
+        commentStore.setCurrentComment(comment || '');
       },
       [commentStore],
     );
@@ -69,14 +69,14 @@ export const CommentForm: FC<CommentFormProps> = observer(
       commentStore.setCommentFormSubmit(() => onSubmit());
     }, [actionRef, commentStore]);
 
-    const value = commentStore.currentComment[annotationStore.selected.id] || "";
+    const value = commentStore.currentComment[annotationStore.selected.id] || '';
 
     return (
-      <Block ref={formRef} tag="form" name="comment-form" mod={{ inline }} onSubmit={onSubmit}>
+      <Block ref={formRef} tag='form' name='comment-form' mod={{ inline }} onSubmit={onSubmit}>
         <TextArea
           actionRef={actionRef}
-          name="comment"
-          placeholder="Add a comment"
+          name='comment'
+          placeholder='Add a comment'
           value={value}
           rows={rows}
           maxRows={maxRows}
@@ -85,12 +85,12 @@ export const CommentForm: FC<CommentFormProps> = observer(
           onSubmit={inline ? onSubmit : undefined}
           onBlur={clearTooltipMessage}
         />
-        <Elem tag="div" name="primary-action">
-          <button type="submit">
+        <Elem tag='div' name='primary-action'>
+          <button type='submit'>
             <IconSend />
           </button>
         </Elem>
-        {commentStore.tooltipMessage && <Elem name="tooltipMessage">{commentStore.tooltipMessage}</Elem>}
+        {commentStore.tooltipMessage && <Elem name='tooltipMessage'>{commentStore.tooltipMessage}</Elem>}
       </Block>
     );
   },

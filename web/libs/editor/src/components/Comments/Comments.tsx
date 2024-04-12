@@ -1,12 +1,12 @@
-import { observer } from "mobx-react";
-import { type FC, useEffect } from "react";
-import { useMounted } from "../../common/Utils/useMounted";
-import { Block } from "../../utils/bem";
-import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
-import { CommentForm } from "./CommentForm";
-import { CommentsList } from "./CommentsList";
+import { observer } from 'mobx-react';
+import { type FC, useEffect } from 'react';
+import { useMounted } from '../../common/Utils/useMounted';
+import { Block } from '../../utils/bem';
+import { FF_DEV_3034, isFF } from '../../utils/feature-flags';
+import { CommentForm } from './CommentForm';
+import { CommentsList } from './CommentsList';
 
-import "./Comments.styl";
+import './Comments.styl';
 
 export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: string }> = observer(
   ({ annotationStore, commentStore, cacheKey }) => {
@@ -29,21 +29,21 @@ export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: 
     useEffect(() => {
       const confirmCommentsLoss = (e: any) => {
         if (commentStore.hasUnsaved) {
-          e.returnValue = "You have unpersisted comments which will be lost if continuing.";
+          e.returnValue = 'You have unpersisted comments which will be lost if continuing.';
         }
 
         return e;
       };
 
       // Need to handle this entirely separate to client-side based navigation
-      window.addEventListener("beforeunload", confirmCommentsLoss);
+      window.addEventListener('beforeunload', confirmCommentsLoss);
       return () => {
-        window.removeEventListener("beforeunload", confirmCommentsLoss);
+        window.removeEventListener('beforeunload', confirmCommentsLoss);
       };
     }, [commentStore.hasUnsaved]);
 
     return (
-      <Block name="comments">
+      <Block name='comments'>
         <CommentForm commentStore={commentStore} annotationStore={annotationStore} inline />
         <CommentsList commentStore={commentStore} />
       </Block>

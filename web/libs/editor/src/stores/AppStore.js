@@ -1,28 +1,28 @@
 /* global LSF_VERSION */
 
-import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, walk } from "mobx-state-tree";
+import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, walk } from 'mobx-state-tree';
 
-import uniqBy from "lodash/uniqBy";
-import InfoModal from "../components/Infomodal/Infomodal";
-import { Hotkey } from "../core/Hotkey";
-import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
-import ToolsManager from "../tools/Manager";
-import Utils from "../utils";
-import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
-import { guidGenerator } from "../utils/unique";
-import { clamp, delay, isDefined } from "../utils/utilities";
-import AnnotationStore from "./Annotation/store";
-import { CommentStore } from "./Comment/CommentStore";
-import Project from "./ProjectStore";
-import Settings from "./SettingsStore";
-import Task from "./TaskStore";
-import { UserLabels } from "./UserLabels";
-import { UserExtended } from "./UserStore";
+import uniqBy from 'lodash/uniqBy';
+import InfoModal from '../components/Infomodal/Infomodal';
+import { Hotkey } from '../core/Hotkey';
+import { destroy as destroySharedStore } from '../mixins/SharedChoiceStore/mixin';
+import ToolsManager from '../tools/Manager';
+import Utils from '../utils';
+import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from '../utils/feature-flags';
+import { guidGenerator } from '../utils/unique';
+import { clamp, delay, isDefined } from '../utils/utilities';
+import AnnotationStore from './Annotation/store';
+import { CommentStore } from './Comment/CommentStore';
+import Project from './ProjectStore';
+import Settings from './SettingsStore';
+import Task from './TaskStore';
+import { UserLabels } from './UserLabels';
+import { UserExtended } from './UserStore';
 
-const hotkeys = Hotkey("AppStore", "Global Hotkeys");
+const hotkeys = Hotkey('AppStore', 'Global Hotkeys');
 
 export default types
-  .model("AppStore", {
+  .model('AppStore', {
     /**
      * XML config
      */
@@ -154,7 +154,7 @@ export default types
   .preProcessSnapshot((sn) => {
     // This should only be handled if the sn.user value is an object, and converted to a reference id for other
     // entities.
-    if (typeof sn.user !== "number") {
+    if (typeof sn.user !== 'number') {
       const currentUser = sn.user ?? window.APP_SETTINGS?.user ?? null;
 
       // This should never be null, but just incase the app user is missing from constructor or the window
@@ -168,12 +168,12 @@ export default types
     }
     return {
       ...sn,
-      _autoAnnotation: localStorage.getItem("autoAnnotation") === "true",
-      _autoAcceptSuggestions: localStorage.getItem("autoAcceptSuggestions") === "true",
+      _autoAnnotation: localStorage.getItem('autoAnnotation') === 'true',
+      _autoAcceptSuggestions: localStorage.getItem('autoAcceptSuggestions') === 'true',
     };
   })
   .volatile(() => ({
-    version: typeof LSF_VERSION === "string" ? LSF_VERSION : "0.0.0",
+    version: typeof LSF_VERSION === 'string' ? LSF_VERSION : '0.0.0',
     initialized: false,
     hydrated: false,
     suggestionsRequest: null,
@@ -253,14 +253,14 @@ export default types
 
     function setFlags(flags) {
       const names = [
-        "showingSettings",
-        "showingDescription",
-        "isLoading",
-        "isSubmitting",
-        "noTask",
-        "noAccess",
-        "labeledSuccess",
-        "awaitingSuggestions",
+        'showingSettings',
+        'showingDescription',
+        'isLoading',
+        'isSubmitting',
+        'noTask',
+        'noAccess',
+        'labeledSuccess',
+        'awaitingSuggestions',
       ];
 
       for (const n of names) if (n in flags) self[n] = flags[n];
@@ -306,7 +306,7 @@ export default types
 
       self.attachHotkeys();
 
-      getEnv(self).events.invoke("labelStudioLoad", self);
+      getEnv(self).events.invoke('labelStudioLoad', self);
     }
 
     function attachHotkeys() {
@@ -316,10 +316,10 @@ export default types
       /**
        * Hotkey for submit
        */
-      if (self.hasInterface("submit", "update", "review")) {
-        hotkeys.addNamed("annotation:submit", () => {
+      if (self.hasInterface('submit', 'update', 'review')) {
+        hotkeys.addNamed('annotation:submit', () => {
           const annotationStore = self.annotationStore;
-          const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
+          const shouldDenyEmptyAnnotation = self.hasInterface('annotations:deny-empty');
           const entity = annotationStore.selected;
           const areResultsEmpty = entity.results.length === 0;
 
@@ -328,11 +328,11 @@ export default types
 
           entity?.submissionInProgress();
 
-          if (self.hasInterface("review")) {
+          if (self.hasInterface('review')) {
             self.acceptAnnotation();
-          } else if (!isDefined(entity.pk) && self.hasInterface("submit")) {
+          } else if (!isDefined(entity.pk) && self.hasInterface('submit')) {
             self.submitAnnotation();
-          } else if (self.hasInterface("update")) {
+          } else if (self.hasInterface('update')) {
             self.updateAnnotation();
           }
         });
@@ -341,15 +341,15 @@ export default types
       /**
        * Hotkey for skip task
        */
-      if (self.hasInterface("skip", "review")) {
-        hotkeys.addNamed("annotation:skip", () => {
+      if (self.hasInterface('skip', 'review')) {
+        hotkeys.addNamed('annotation:skip', () => {
           if (self.annotationStore.viewingAll) return;
 
           const entity = self.annotationStore.selected;
 
           entity?.submissionInProgress();
 
-          if (self.hasInterface("review")) {
+          if (self.hasInterface('review')) {
             self.rejectAnnotation();
           } else {
             self.skipTask();
@@ -360,7 +360,7 @@ export default types
       /**
        * Hotkey for delete
        */
-      hotkeys.addNamed("region:delete-all", () => {
+      hotkeys.addNamed('region:delete-all', () => {
         const { selected } = self.annotationStore;
 
         if (window.confirm(getEnv(self).messages.CONFIRM_TO_DELETE_ALL_REGIONS)) {
@@ -369,7 +369,7 @@ export default types
       });
 
       // create relation
-      hotkeys.addNamed("region:relation", () => {
+      hotkeys.addNamed('region:relation', () => {
         const c = self.annotationStore.selected;
 
         if (c && c.highlightedNode && !c.relationMode) {
@@ -378,7 +378,7 @@ export default types
       });
 
       // Focus fist focusable perregion when region is selected
-      hotkeys.addNamed("region:focus", (e) => {
+      hotkeys.addNamed('region:focus', (e) => {
         e.preventDefault();
         const c = self.annotationStore.selected;
 
@@ -388,7 +388,7 @@ export default types
       });
 
       // unselect region
-      hotkeys.addNamed("region:unselect", () => {
+      hotkeys.addNamed('region:unselect', () => {
         const c = self.annotationStore.selected;
 
         if (c && !c.relationMode && !c.isDrawing) {
@@ -400,7 +400,7 @@ export default types
         }
       });
 
-      hotkeys.addNamed("region:visibility", () => {
+      hotkeys.addNamed('region:visibility', () => {
         const c = self.annotationStore.selected;
 
         if (c && !c.relationMode) {
@@ -408,19 +408,19 @@ export default types
         }
       });
 
-      hotkeys.addNamed("annotation:undo", () => {
+      hotkeys.addNamed('annotation:undo', () => {
         const annotation = self.annotationStore.selected;
 
         if (!annotation.isDrawing) annotation.undo();
       });
 
-      hotkeys.addNamed("annotation:redo", () => {
+      hotkeys.addNamed('annotation:redo', () => {
         const annotation = self.annotationStore.selected;
 
         if (!annotation.isDrawing) annotation.redo();
       });
 
-      hotkeys.addNamed("region:exit", () => {
+      hotkeys.addNamed('region:exit', () => {
         const c = self.annotationStore.selected;
 
         if (c && c.relationMode) {
@@ -430,7 +430,7 @@ export default types
         }
       });
 
-      hotkeys.addNamed("region:delete", () => {
+      hotkeys.addNamed('region:delete', () => {
         const c = self.annotationStore.selected;
 
         if (c) {
@@ -438,14 +438,14 @@ export default types
         }
       });
 
-      hotkeys.addNamed("region:cycle", () => {
+      hotkeys.addNamed('region:cycle', () => {
         const c = self.annotationStore.selected;
 
         c && c.regionStore.selectNext();
       });
 
       // duplicate selected regions
-      hotkeys.addNamed("region:duplicate", (e) => {
+      hotkeys.addNamed('region:duplicate', (e) => {
         const { selected } = self.annotationStore;
         const { serializedSelection } = selected || {};
 
@@ -491,7 +491,7 @@ export default types
     }
 
     /* eslint-disable no-unused-vars */
-    function showModal(message, type = "warning") {
+    function showModal(message, type = 'warning') {
       InfoModal[type](message);
 
       // InfoModal.warning("You need to label at least something!");
@@ -502,8 +502,8 @@ export default types
       return new Promise((resolve) => {
         const events = getEnv(self).events;
 
-        if (!events.hasEvent("submitDraft")) return resolve();
-        const res = events.invokeFirst("submitDraft", self, c, params);
+        if (!events.hasEvent('submitDraft')) return resolve();
+        const res = events.invokeFirst('submitDraft', self, c, params);
 
         if (res && res.then) res.then(resolve);
         else resolve(res);
@@ -513,7 +513,7 @@ export default types
     // Set `isSubmitting` flag to block [Submit] and related buttons during request
     // to prevent from sending duplicating requests.
     // Better to return request's Promise from SDK to make this work perfect.
-    function handleSubmittingFlag(fn, defaultMessage = "Error during submit") {
+    function handleSubmittingFlag(fn, defaultMessage = 'Error during submit') {
       if (self.isSubmitting) return;
       self.setFlags({ isSubmitting: true });
       const res = fn();
@@ -537,7 +537,7 @@ export default types
       if (self.isSubmitting) return;
 
       const entity = self.annotationStore.selected;
-      const event = entity.exists ? "updateAnnotation" : "submitAnnotation";
+      const event = entity.exists ? 'updateAnnotation' : 'submitAnnotation';
 
       entity.beforeSend();
 
@@ -561,7 +561,7 @@ export default types
       if (!entity.validate()) return;
 
       handleSubmittingFlag(async () => {
-        await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
+        await getEnv(self).events.invoke('updateAnnotation', self, entity, extraData);
         self.incrementQueuePosition();
       });
       entity.dropDraft();
@@ -571,16 +571,16 @@ export default types
     function skipTask(extraData) {
       if (self.isSubmitting) return;
       handleSubmittingFlag(() => {
-        getEnv(self).events.invoke("skipTask", self, extraData);
+        getEnv(self).events.invoke('skipTask', self, extraData);
         self.incrementQueuePosition();
-      }, "Error during skip, try again");
+      }, 'Error during skip, try again');
     }
 
     function unskipTask() {
       if (self.isSubmitting) return;
       handleSubmittingFlag(() => {
-        getEnv(self).events.invoke("unskipTask", self);
-      }, "Error during cancel skipping task, try again");
+        getEnv(self).events.invoke('unskipTask', self);
+      }, 'Error during cancel skipping task, try again');
     }
 
     function acceptAnnotation() {
@@ -595,9 +595,9 @@ export default types
         const isDirty = entity.history.canUndo;
 
         entity.dropDraft();
-        await getEnv(self).events.invoke("acceptAnnotation", self, { isDirty, entity });
+        await getEnv(self).events.invoke('acceptAnnotation', self, { isDirty, entity });
         self.incrementQueuePosition();
-      }, "Error during accept, try again");
+      }, 'Error during accept, try again');
     }
 
     function rejectAnnotation({ comment = null }) {
@@ -612,9 +612,9 @@ export default types
         const isDirty = entity.history.canUndo;
 
         entity.dropDraft();
-        await getEnv(self).events.invoke("rejectAnnotation", self, { isDirty, entity, comment });
+        await getEnv(self).events.invoke('rejectAnnotation', self, { isDirty, entity, comment });
         self.incrementQueuePosition(-1);
-      }, "Error during reject, try again");
+      }, 'Error during reject, try again');
     }
 
     /**
@@ -622,7 +622,7 @@ export default types
      */
     async function presignUrlForProject(url) {
       // Event invocation returns array of results for all handlers.
-      const urls = await self.events.invoke("presignUrlForProject", self, url);
+      const urls = await self.events.invoke('presignUrlForProject', self, url);
 
       const presignUrl = urls?.[0];
 
@@ -692,7 +692,7 @@ export default types
         // correct annotation will be selected at the end and everything will be called inside.
         predictions.forEach((p) => {
           const obj = as.addPrediction(p);
-          const results = p.result.map((r) => ({ ...r, origin: "prediction" }));
+          const results = p.result.map((r) => ({ ...r, origin: 'prediction' }));
 
           obj.deserializeResults(results, { hidden: true });
         });
@@ -705,7 +705,7 @@ export default types
 
         window.STORE_INIT_OK = true;
         // simple logging to detect if simple init is used on users' machines
-        console.log("LSF: deserialization is finished");
+        console.log('LSF: deserialization is finished');
 
         // next line might be unclear after removing FF_SIMPLE_INIT
         // reversing the list caused problems before when task is reloaded and list is reversed again.
@@ -733,7 +733,7 @@ export default types
           obj.deserializeResults(
             p.result.map((r) => ({
               ...r,
-              origin: "prediction",
+              origin: 'prediction',
             })),
           );
         });
@@ -755,7 +755,7 @@ export default types
 
       if (!self.initialized) {
         self.initialized = true;
-        getEnv(self).events.invoke("storageInitialized", self);
+        getEnv(self).events.invoke('storageInitialized', self);
       }
     }
 
@@ -777,12 +777,12 @@ export default types
 
     const setAutoAnnotation = (value) => {
       self._autoAnnotation = value;
-      localStorage.setItem("autoAnnotation", value);
+      localStorage.setItem('autoAnnotation', value);
     };
 
     const setAutoAcceptSuggestions = (value) => {
       self._autoAcceptSuggestions = value;
-      localStorage.setItem("autoAcceptSuggestions", value);
+      localStorage.setItem('autoAcceptSuggestions', value);
     };
 
     const loadSuggestions = flow(function* (request, dataParser) {
@@ -813,7 +813,7 @@ export default types
       // save draft before postponing; this can be new draft with FF_DEV_4174 off
       // or annotation created from prediction
       await annotation.saveDraft({ was_postponed: true });
-      await getEnv(self).events.invoke("nextTask");
+      await getEnv(self).events.invoke('nextTask');
       self.incrementQueuePosition();
     }
 
@@ -822,7 +822,7 @@ export default types
         const { taskId, annotationId } =
           self.taskHistory[self.taskHistory.findIndex((x) => x.taskId === self.task.id) + 1];
 
-        getEnv(self).events.invoke("nextTask", taskId, annotationId);
+        getEnv(self).events.invoke('nextTask', taskId, annotationId);
         self.incrementQueuePosition();
       }
     }
@@ -835,7 +835,7 @@ export default types
       if (self.canGoPrevTask || shouldGoBack) {
         const { taskId, annotationId } = self.taskHistory[length];
 
-        getEnv(self).events.invoke("prevTask", taskId, annotationId);
+        getEnv(self).events.invoke('prevTask', taskId, annotationId);
         self.incrementQueuePosition(-1);
       }
     }
@@ -845,7 +845,7 @@ export default types
     }
 
     function mergeUsers(users) {
-      self.setUsers(uniqBy([...getSnapshot(self.users), ...users], "id"));
+      self.setUsers(uniqBy([...getSnapshot(self.users), ...users], 'id'));
     }
 
     return {
@@ -910,7 +910,7 @@ export default types
           try {
             destroy(node);
           } catch (e) {
-            console.log("Problem: ", e);
+            console.log('Problem: ', e);
           }
         }
       },

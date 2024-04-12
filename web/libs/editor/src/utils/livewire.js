@@ -100,7 +100,7 @@ this.mousemove = (event) => {
   posGroup.add(shapeGroup);
 
   // draw shape command
-  command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getDrawController().getDrawLayer());
+  command = new dwv.tool.DrawGroupCommand(shapeGroup, 'livewire', app.getDrawController().getDrawLayer());
   // draw
   command.execute();
 };

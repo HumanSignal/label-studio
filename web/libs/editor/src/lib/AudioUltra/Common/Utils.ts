@@ -1,19 +1,19 @@
-import type { Visualizer } from "../Visual/Visualizer";
+import type { Visualizer } from '../Visual/Visualizer';
 
-export const __DEBUG__ = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
-export const OFFSCREEN_CANVAS_SUPPORTED = "OffscreenCanvas" in globalThis;
+export const __DEBUG__ = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+export const OFFSCREEN_CANVAS_SUPPORTED = 'OffscreenCanvas' in globalThis;
 
 const TIME_TOLERANCE = 0.000001;
 
 export enum defaults {
   timelineHeight = 32,
-  timelinePlacement = "top",
+  timelinePlacement = 'top',
 }
 
-type LogLevel = "log" | "warn" | "error" | "info";
+type LogLevel = 'log' | 'warn' | 'error' | 'info';
 
 export const logger =
-  (level: LogLevel = "log") =>
+  (level: LogLevel = 'log') =>
   (...args: any[]) => {
     if (__DEBUG__) {
       // eslint-disable-next-line no-console
@@ -21,10 +21,10 @@ export const logger =
     }
   };
 
-export const log = logger("log");
-export const warn = logger("warn");
-export const error = logger("error");
-export const info = logger("info");
+export const log = logger('log');
+export const warn = logger('warn');
+export const error = logger('error');
+export const info = logger('info');
 
 export const clamp = (value: number, min: number, max: number) => {
   return Math.max(min, Math.min(max, value));
@@ -77,15 +77,15 @@ export const debounce = (
 export const repeat = (str: string, times: number) =>
   Array.from({ length: times })
     .map(() => str)
-    .join("");
+    .join('');
 
-export const roundToStep = (value: number, step: number, roundFunction: "floor" | "ceil" | "round" = "round") => {
+export const roundToStep = (value: number, step: number, roundFunction: 'floor' | 'ceil' | 'round' = 'round') => {
   switch (roundFunction) {
-    case "floor":
+    case 'floor':
       return Math.floor(value / step) * step;
-    case "ceil":
+    case 'ceil':
       return Math.ceil(value / step) * step;
-    case "round":
+    case 'round':
       return Math.round(value / step) * step;
   }
 };

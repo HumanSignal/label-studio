@@ -1,9 +1,9 @@
-const assert = require("assert");
+const assert = require('assert');
 
-Feature("Zoomed transforms").tag("@regress");
+Feature('Zoomed transforms').tag('@regress');
 
 const IMAGE =
-  "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
+  'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
 
 const config = `
   <View>
@@ -12,14 +12,14 @@ const config = `
   </View>`;
 
 Scenario(
-  "Transforming the region on the border of zoomed image",
+  'Transforming the region on the border of zoomed image',
   async ({ I, LabelStudio, AtImageView, AtSidebar }) => {
     const params = {
       config,
       data: { image: IMAGE },
     };
 
-    I.amOnPage("/");
+    I.amOnPage('/');
 
     LabelStudio.setFeatureFlags({
       ff_front_dev_2394_zoomed_transforms_260522_short: true,
@@ -36,9 +36,9 @@ Scenario(
     const height = AtImageView.percToY(100);
 
     // Pan image to the left to see its right border
-    I.pressKeyDown("Shift");
+    I.pressKeyDown('Shift');
     AtImageView.drawByDrag(width - 10, height / 2, -width + 20, 0);
-    I.pressKeyUp("Shift");
+    I.pressKeyUp('Shift');
     // Create the region at the right border of the image
     AtImageView.drawByDrag(width - 30, height / 2, 20, height / 2 - 10);
     AtSidebar.seeRegions(1);
@@ -51,7 +51,7 @@ Scenario(
         [width - 20, height / 2 - 50],
         [width / 2, height / 2],
       ],
-      "steps",
+      'steps',
       50,
     );
 
@@ -63,7 +63,7 @@ Scenario(
 );
 
 Scenario(
-  "Transforming the region on the border of zoomed image after window resize",
+  'Transforming the region on the border of zoomed image after window resize',
   async ({ I, LabelStudio, AtImageView, AtSidebar }) => {
     const wWidth = 1200;
     const wHeight = 900;
@@ -78,7 +78,7 @@ Scenario(
       ff_front_dev_2394_zoomed_transforms_260522_short: true,
     });
 
-    I.amOnPage("/");
+    I.amOnPage('/');
     I.resizeWindow(wWidthSmall, wHeight);
 
     LabelStudio.init(params);
@@ -93,9 +93,9 @@ Scenario(
     const height = AtImageView.percToY(100);
 
     // Pan image to the left to see its right border
-    I.pressKeyDown("Shift");
+    I.pressKeyDown('Shift');
     AtImageView.drawByDrag(width - 10, height / 2, -width + 20, 0);
-    I.pressKeyUp("Shift");
+    I.pressKeyUp('Shift');
 
     // Create the region at the right border of the image
     AtImageView.drawByDrag(width - 30, height / 2, 20, height / 2);
@@ -112,7 +112,7 @@ Scenario(
         [width - 20, height / 2 - 50],
         [width / 2, height / 2 - 50],
       ],
-      "steps",
+      'steps',
       50,
     );
 

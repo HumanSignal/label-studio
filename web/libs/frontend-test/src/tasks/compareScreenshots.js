@@ -1,6 +1,6 @@
-import fs from "fs";
-import pixelmatch from "pixelmatch";
-import { PNG } from "pngjs";
+import fs from 'fs';
+import pixelmatch from 'pixelmatch';
+import { PNG } from 'pngjs';
 
 const readFile = (path) => {
   return new Promise((resolve) => {
@@ -23,8 +23,8 @@ const runComparison = async (options) => {
     },
   );
 
-  const img1 = files.find(({ path }) => path.match("-orig")).file;
-  const img2 = files.find(({ path }) => path.match("-comp")).file;
+  const img1 = files.find(({ path }) => path.match('-orig')).file;
+  const img2 = files.find(({ path }) => path.match('-comp')).file;
   const { width, height } = img1;
   const diff = new PNG({ width, height });
 
@@ -36,9 +36,9 @@ const runComparison = async (options) => {
   const changeRatio = changedPixels / totalPixels;
 
   switch (options.compare) {
-    case "shouldChange":
+    case 'shouldChange':
       return changeRatio > options.treshold;
-    case "shouldNotChange":
+    case 'shouldNotChange':
       return changeRatio <= options.treshold;
   }
   return false;

@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
 export const ImageViewContext = createContext<{ suggestion: boolean }>({ suggestion: false });
 

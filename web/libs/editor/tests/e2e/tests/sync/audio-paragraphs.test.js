@@ -1,7 +1,7 @@
-const assert = require("assert");
-const { FFlagMatrix, FFlagScenario } = require("../../utils/feature-flags");
+const assert = require('assert');
+const { FFlagMatrix, FFlagScenario } = require('../../utils/feature-flags');
 
-Feature("Sync: Audio Paragraphs");
+Feature('Sync: Audio Paragraphs');
 
 const config = `
 <View>
@@ -51,65 +51,65 @@ const configWithScroll = `
 `;
 
 const data = {
-  url: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3",
+  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
   text: [
     {
       end: 3,
-      text: "Dont you hate that?",
+      text: 'Dont you hate that?',
       start: 1,
-      author: "Mia Wallace",
+      author: 'Mia Wallace',
     },
     {
-      text: "Hate what?",
+      text: 'Hate what?',
       start: 3,
-      author: "Vincent Vega:",
+      author: 'Vincent Vega:',
       duration: 1,
     },
     {
-      text: "Uncomfortable silences. Why do we feel its necessary to yak about nonsense in order to be comfortable?",
-      author: "Mia Wallace:",
+      text: 'Uncomfortable silences. Why do we feel its necessary to yak about nonsense in order to be comfortable?',
+      author: 'Mia Wallace:',
       start: 4,
       end: 6,
     },
     {
-      text: "I dont know. Thats a good question.",
+      text: 'I dont know. Thats a good question.',
       start: 6,
       end: 8,
-      author: "Vincent Vega:",
+      author: 'Vincent Vega:',
     },
     {
-      text: "Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.",
-      author: "Mia Wallace:",
+      text: 'Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.',
+      author: 'Mia Wallace:',
       start: 8,
       end: 10,
     },
     {
-      text: "Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.",
-      author: "Mia Wallace:",
+      text: 'Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.',
+      author: 'Mia Wallace:',
       start: 10,
       end: 12,
     },
     {
-      text: "Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.",
-      author: "Mia Wallace:",
+      text: 'Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.',
+      author: 'Mia Wallace:',
       start: 12,
       end: 14,
     },
     {
-      text: "Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.",
-      author: "Mia Wallace:",
+      text: 'Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.',
+      author: 'Mia Wallace:',
       start: 14,
       end: 16,
     },
     {
-      text: "Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.",
-      author: "Mia Wallace:",
+      text: 'Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.',
+      author: 'Mia Wallace:',
       start: 16,
       end: 18,
     },
     {
-      text: "Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.",
-      author: "Mia Wallace:",
+      text: 'Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.',
+      author: 'Mia Wallace:',
       start: 18,
       end: 20,
     },
@@ -119,48 +119,48 @@ const data = {
 const annotations = [
   {
     value: {
-      start: "0",
-      end: "0",
+      start: '0',
+      end: '0',
       startOffset: 0,
       endOffset: 4,
-      text: "Dont",
-      paragraphlabels: ["General: Negative"],
+      text: 'Dont',
+      paragraphlabels: ['General: Negative'],
     },
-    id: "RcHv5CdYBt",
-    from_name: "label",
-    to_name: "text",
-    type: "paragraphlabels",
-    origin: "manual",
+    id: 'RcHv5CdYBt',
+    from_name: 'label',
+    to_name: 'text',
+    type: 'paragraphlabels',
+    origin: 'manual',
   },
   {
     value: {
-      start: "0",
-      end: "0",
+      start: '0',
+      end: '0',
       startOffset: 9,
       endOffset: 13,
-      text: "hate",
-      paragraphlabels: ["General: Positive"],
+      text: 'hate',
+      paragraphlabels: ['General: Positive'],
     },
-    id: "eePG7PVYH7",
-    from_name: "label",
-    to_name: "text",
-    type: "paragraphlabels",
-    origin: "manual",
+    id: 'eePG7PVYH7',
+    from_name: 'label',
+    to_name: 'text',
+    type: 'paragraphlabels',
+    origin: 'manual',
   },
 ];
 
-const params = { annotations: [{ id: "test", result: annotations }], config, data };
+const params = { annotations: [{ id: 'test', result: annotations }], config, data };
 
-FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) => {
+FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) => {
   FFlagScenario(
-    "Audio clip is played when selecting the play button next to a paragraph segment",
+    'Audio clip is played when selecting the play button next to a paragraph segment',
     async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
       LabelStudio.setFeatureFlags({
         ff_front_dev_2715_audio_3_280722_short: true,
         ...flags,
       });
 
-      I.amOnPage("/");
+      I.amOnPage('/');
 
       LabelStudio.init(params);
 
@@ -195,14 +195,14 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
 
   if (flags.fflag_feat_front_lsdv_e_278_contextual_scrolling_short) {
     FFlagScenario(
-      "Playback button states continually change over time according to the paragraph segment which is being played",
+      'Playback button states continually change over time according to the paragraph segment which is being played',
       async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
           ...flags,
         });
 
-        I.amOnPage("/");
+        I.amOnPage('/');
 
         LabelStudio.init(params);
 
@@ -247,7 +247,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
     );
 
     FFlagScenario(
-      "Check if paragraph is scrolling automatically following the audio",
+      'Check if paragraph is scrolling automatically following the audio',
       async ({ I, LabelStudio, AtAudioView }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
@@ -257,7 +257,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
 
         params.config = configWithScroll;
 
-        I.amOnPage("/");
+        I.amOnPage('/');
 
         LabelStudio.init(params);
 
@@ -283,12 +283,12 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
           };
         }, '[data-testid="phrases-wrapper"]');
 
-        await assert(scrollPosition.scrollTop > 200, "Scroll position should be greater than 200");
+        await assert(scrollPosition.scrollTop > 200, 'Scroll position should be greater than 200');
       },
     );
 
     FFlagScenario(
-      "Paragraph should automatically scroll if user seeks audio player",
+      'Paragraph should automatically scroll if user seeks audio player',
       async ({ I, LabelStudio, AtAudioView }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
@@ -298,7 +298,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
 
         params.config = configWithScroll;
 
-        I.amOnPage("/");
+        I.amOnPage('/');
 
         LabelStudio.init(params);
 
@@ -335,7 +335,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
     );
 
     FFlagScenario(
-      "Paragraph shouldnt automatically scroll if user disable the auto-scroll toggle",
+      'Paragraph shouldnt automatically scroll if user disable the auto-scroll toggle',
       async ({ I, LabelStudio, AtAudioView }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
@@ -345,7 +345,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
 
         params.config = configWithScroll;
 
-        I.amOnPage("/");
+        I.amOnPage('/');
 
         LabelStudio.init(params);
 
@@ -378,7 +378,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
     );
 
     FFlagScenario(
-      "Paragraph shouldnt automatically scroll if user manually scroll and the current paragraph is not in the screen",
+      'Paragraph shouldnt automatically scroll if user manually scroll and the current paragraph is not in the screen',
       async ({ I, LabelStudio, AtAudioView }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
@@ -388,7 +388,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
 
         params.config = configWithScroll;
 
-        I.amOnPage("/");
+        I.amOnPage('/');
 
         LabelStudio.init(params);
 
@@ -408,9 +408,9 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
         I.executeScript(() => {
           document.querySelector('[data-testid="phrases-wrapper"]').scrollTo(0, 1000);
 
-          const wheelEvt = document.createEvent("MouseEvents");
+          const wheelEvt = document.createEvent('MouseEvents');
 
-          wheelEvt.initEvent("wheel", true, true);
+          wheelEvt.initEvent('wheel', true, true);
 
           wheelEvt.deltaY = 1200;
 
@@ -428,7 +428,7 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
           };
         }, '[data-testid="phrases-wrapper"]');
 
-        await assert(scrollPosition.scrollTop > 400, "Scroll position should be greater than 200");
+        await assert(scrollPosition.scrollTop > 400, 'Scroll position should be greater than 200');
       },
     );
   }

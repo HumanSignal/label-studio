@@ -1,4 +1,4 @@
-import { types } from "mobx-state-tree";
+import { types } from 'mobx-state-tree';
 
 /**
  * This mixing defines perItem control-tag's parameter and related basic functionality
@@ -12,7 +12,7 @@ const PerItemMixin = types
   .extend((self) => {
     /* Validation */
     if (self.isClassificationTag !== true) {
-      throw new Error("The PerItemMixin mixin should be used only for classification control-tags");
+      throw new Error('The PerItemMixin mixin should be used only for classification control-tags');
     }
     return {};
   })

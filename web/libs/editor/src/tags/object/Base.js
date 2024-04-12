@@ -1,9 +1,9 @@
-import isMatch from "lodash.ismatch";
-import { types } from "mobx-state-tree";
-import InfoModal from "../../components/Infomodal/Infomodal";
-import { AnnotationMixin } from "../../mixins/AnnotationMixin";
-import { FF_DEV_3391, FF_DEV_3666, isFF } from "../../utils/feature-flags";
-import { BaseTag } from "../TagBase";
+import isMatch from 'lodash.ismatch';
+import { types } from 'mobx-state-tree';
+import InfoModal from '../../components/Infomodal/Infomodal';
+import { AnnotationMixin } from '../../mixins/AnnotationMixin';
+import { FF_DEV_3391, FF_DEV_3666, isFF } from '../../utils/feature-flags';
+import { BaseTag } from '../TagBase';
 
 const ObjectBase = types
   .model({

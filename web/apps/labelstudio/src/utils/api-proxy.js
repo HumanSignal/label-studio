@@ -9,7 +9,7 @@
  * }} EndpointConfig
  */
 
-import { formDataToJPO } from "./helpers";
+import { formDataToJPO } from './helpers';
 
 /**
  * @typedef {Dict<string, EndpointConfig>} Endpoints
@@ -44,7 +44,7 @@ export class APIProxy {
   mockDisabled = false;
 
   /** @type {"same-origin"|"cors"} */
-  requestMode = "same-origin";
+  requestMode = 'same-origin';
 
   /** @type {Dict} */
   sharedParams = {};
@@ -86,13 +86,13 @@ export class APIProxy {
       return new URL(url).toString();
     } catch (e) {
       const gateway = new URL(window.location.href);
-      gateway.search = "";
-      gateway.hash = "";
+      gateway.search = '';
+      gateway.hash = '';
 
-      if (url[0] === "/") {
-        gateway.pathname = url.replace(/([/])$/, "");
+      if (url[0] === '/') {
+        gateway.pathname = url.replace(/([/])$/, '');
       } else {
-        gateway.pathname = `${gateway.pathname}/${url}`.replace(/([/]+)/g, "/").replace(/([/])$/, "");
+        gateway.pathname = `${gateway.pathname}/${url}`.replace(/([/]+)/g, '/').replace(/([/])$/, '');
       }
       return gateway.toString();
     }
@@ -106,7 +106,7 @@ export class APIProxy {
     const currentOrigin = window.location.origin;
     const gatewayOrigin = new URL(this.gateway).origin;
 
-    return currentOrigin === gatewayOrigin ? "same-origin" : "cors";
+    return currentOrigin === gatewayOrigin ? 'same-origin' : 'cors';
   }
 
   /**
@@ -151,7 +151,7 @@ export class APIProxy {
 
         const { method, url: apiCallURL } = this.createUrl(methodSettings.path, finalParams, parentPath);
 
-        const requestMethod = method ?? (methodSettings.method ?? "get").toUpperCase();
+        const requestMethod = method ?? (methodSettings.method ?? 'get').toUpperCase();
 
         const initialheaders = Object.assign(
           this.getDefaultHeaders(requestMethod),
@@ -166,15 +166,15 @@ export class APIProxy {
           method: requestMethod,
           headers: requestHeaders,
           mode: this.requestMode,
-          credentials: this.requestMode === "cors" ? "omit" : "same-origin",
+          credentials: this.requestMode === 'cors' ? 'omit' : 'same-origin',
         };
 
         if (signal) {
           requestParams.signal = signal;
         }
 
-        if (requestMethod !== "GET") {
-          const contentType = requestHeaders.get("Content-Type");
+        if (requestMethod !== 'GET') {
+          const contentType = requestHeaders.get('Content-Type');
           const { sharedParams } = this;
           const extendedBody = body ?? {};
 
@@ -191,25 +191,25 @@ export class APIProxy {
 
           if (extendedBody instanceof FormData) {
             requestParams.body = extendedBody;
-          } else if (contentType === "multipart/form-data") {
+          } else if (contentType === 'multipart/form-data') {
             requestParams.body = this.createRequestBody(extendedBody);
-          } else if (contentType === "application/json") {
+          } else if (contentType === 'application/json') {
             requestParams.body = this.bodyToJSON(extendedBody);
           } else {
             requestParams.body = extendedBody;
           }
 
           // @todo better check for files maybe?
-          if (contentType === "multipart/form-data") {
+          if (contentType === 'multipart/form-data') {
             // fetch will set correct header with boundaries
-            requestHeaders.delete("Content-Type");
+            requestHeaders.delete('Content-Type');
           }
         }
 
         /** @type {Response} */
         let rawResponse;
 
-        if (methodSettings.mock && process.env.NODE_ENV === "development" && !this.mockDisabled) {
+        if (methodSettings.mock && process.env.NODE_ENV === 'development' && !this.mockDisabled) {
           rawResponse = await this.mockRequest(apiCallURL, urlParams, requestParams, methodSettings);
         } else {
           rawResponse = await fetch(apiCallURL, requestParams);
@@ -229,7 +229,7 @@ export class APIProxy {
           try {
             const responseData =
               rawResponse.status !== 204
-                ? JSON.parse(this.alwaysExpectJSON ? responseText : responseText || "{}")
+                ? JSON.parse(this.alwaysExpectJSON ? responseText : responseText || '{}')
                 : { ok: true };
 
             if (methodSettings.convert instanceof Function) {
@@ -247,7 +247,7 @@ export class APIProxy {
         responseResult = this.generateException(exception);
       }
 
-      Object.defineProperty(responseResult, "$meta", {
+      Object.defineProperty(responseResult, '$meta', {
         value: responseMeta,
         configurable: false,
         enumerable: false,
@@ -265,14 +265,14 @@ export class APIProxy {
    * @returns {EndpointConfig}
    */
   getSettings(settings) {
-    if (typeof settings === "string") {
+    if (typeof settings === 'string') {
       settings = {
         path: settings,
       };
     }
 
     return {
-      method: "GET",
+      method: 'GET',
       mock: undefined,
       convert: undefined,
       scope: undefined,
@@ -282,11 +282,11 @@ export class APIProxy {
 
   getDefaultHeaders(method) {
     switch (method) {
-      case "POST":
-      case "PATCH":
-      case "DELETE": {
+      case 'POST':
+      case 'PATCH':
+      case 'DELETE': {
         return {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         };
       }
       default:
@@ -307,8 +307,8 @@ export class APIProxy {
     const path = []
       .concat(...(parentPath ?? []), resolvedPath)
       .filter((p) => p !== undefined)
-      .join("/")
-      .replace(/([/]+)/g, "/");
+      .join('/')
+      .replace(/([/]+)/g, '/');
 
     const processedPath = path.replace(/:([^/]+)/g, (...res) => {
       const keyRaw = res[1];
@@ -318,16 +318,16 @@ export class APIProxy {
       usedKeys.push(key);
 
       if (result === undefined) {
-        if (optional === "?") return "";
+        if (optional === '?') return '';
         throw new Error(`Can't find key \`${key}\` in data`);
       }
 
       return result;
     });
 
-    url.pathname += processedPath.replace(/\/+/g, "/").replace(/\/+$/g, "");
+    url.pathname += processedPath.replace(/\/+/g, '/').replace(/\/+$/g, '');
 
-    if (data && typeof data === "object") {
+    if (data && typeof data === 'object') {
       Object.entries(data).forEach(([key, value]) => {
         if (!usedKeys.includes(key)) {
           url.searchParams.set(key, value);
@@ -356,7 +356,7 @@ export class APIProxy {
 
     const methodRegexp = /^(GET|POST|PATCH|DELETE|PUT|HEAD|OPTIONS):/;
     const method = finalEndpoint.match(methodRegexp)?.[1];
-    const path = finalEndpoint.replace(methodRegexp, "");
+    const path = finalEndpoint.replace(methodRegexp, '');
 
     return { method, path };
   }
@@ -404,7 +404,7 @@ export class APIProxy {
 
     return {
       status: fetchResponse.status,
-      error: (exception?.message ?? fetchResponse.statusText) || "Server Error",
+      error: (exception?.message ?? fetchResponse.statusText) || 'Server Error',
       response: await result,
     };
   }
@@ -443,7 +443,7 @@ export class APIProxy {
       try {
         const fakeRequest = new Request(request);
 
-        if (typeof request.body === "string") {
+        if (typeof request.body === 'string') {
           fakeRequest.body = JSON.parse(request.body);
         }
 

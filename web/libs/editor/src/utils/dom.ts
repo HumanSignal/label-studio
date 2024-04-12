@@ -57,42 +57,42 @@ const positioner = (source: HTMLElement, target: HTMLElement) => {
 };
 
 export type ElementAlignment =
-  | "top-center"
-  | "top-left"
-  | "top-right"
-  | "bottom-center"
-  | "bottom-left"
-  | "bottom-right";
+  | 'top-center'
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-center'
+  | 'bottom-left'
+  | 'bottom-right';
 
 export const alignElements = (elem: HTMLElement, target: HTMLElement, align: ElementAlignment, padding = 0) => {
   let offsetLeft = 0;
   let offsetTop = 0;
 
   const pos = positioner(elem, target);
-  const resultAlign = align.split("-");
+  const resultAlign = align.split('-');
 
   switch (align) {
-    case "top-center":
+    case 'top-center':
       offsetTop = pos.top - padding;
       offsetLeft = pos.horizontalCenter;
       break;
-    case "top-left":
+    case 'top-left':
       offsetTop = pos.top - padding;
       offsetLeft = pos.horizontalLeft;
       break;
-    case "top-right":
+    case 'top-right':
       offsetTop = pos.top - padding;
       offsetLeft = pos.horizontalRight;
       break;
-    case "bottom-center":
+    case 'bottom-center':
       offsetTop = pos.bottom + padding;
       offsetLeft = pos.horizontalCenter;
       break;
-    case "bottom-left":
+    case 'bottom-left':
       offsetTop = pos.bottom + padding;
       offsetLeft = pos.horizontalLeft;
       break;
-    case "bottom-right":
+    case 'bottom-right':
       offsetTop = pos.bottom + padding;
       offsetLeft = pos.horizontalRight;
       break;
@@ -102,19 +102,19 @@ export const alignElements = (elem: HTMLElement, target: HTMLElement, align: Ele
 
   if (offsetTop < window.scrollX) {
     offsetTop = pos.bottom + padding;
-    resultAlign[0] = "bottom";
+    resultAlign[0] = 'bottom';
   } else if (offsetTop + pos.target.height > window.scrollX + window.innerHeight) {
     offsetTop = pos.top - padding;
-    resultAlign[0] = "top";
+    resultAlign[0] = 'top';
   }
 
   if (offsetLeft < 0) {
     offsetLeft = pos.horizontalLeft;
-    resultAlign[1] = "left";
+    resultAlign[1] = 'left';
   } else if (offsetLeft + pos.target.width > window.innerWidth) {
     offsetLeft = pos.horizontalRight;
-    resultAlign[1] = "right";
+    resultAlign[1] = 'right';
   }
 
-  return { top: offsetTop, left: offsetLeft, pos, align: resultAlign.join("-") as ElementAlignment };
+  return { top: offsetTop, left: offsetLeft, pos, align: resultAlign.join('-') as ElementAlignment };
 };
