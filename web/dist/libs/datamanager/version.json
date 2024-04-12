@@ -1,6 +1,6 @@
 {
-  "message": "move taxonomy tests to make tests easier",
-  "commit": "5f80ad80318a91a5d7a063377b2ff123a28e828f",
-  "date": "2024-04-12T16:38:07.000Z",
+  "message": "add wait and change the text title",
+  "commit": "1668645049eac0404b2b37fd121ba73659fdc5ef",
+  "date": "2024-04-12T16:48:42.000Z",
   "branch": "fb-leap-999"
 }
