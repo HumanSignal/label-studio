@@ -1,12 +1,12 @@
-import { Input } from 'antd';
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React from 'react';
+import { Input } from "antd";
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import Registry from '../../core/Registry';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import ProcessAttrsMixin from '../../mixins/ProcessAttrs';
-import { FF_DEV_3391, isFF } from '../../utils/feature-flags';
+import Registry from "../../core/Registry";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
+import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
 
 /**
  * Use the Filter tag to add a filter search for a large number of labels or choices. Use with the Labels tag or Choices tag.
@@ -36,14 +36,14 @@ const TagAttrs = types.model({
 
   cleanup: types.optional(types.boolean, true),
 
-  placeholder: types.optional(types.string, 'Quick Filter'),
-  minlength: types.optional(types.string, '3'),
+  placeholder: types.optional(types.string, "Quick Filter"),
+  minlength: types.optional(types.string, "3"),
   hotkey: types.maybeNull(types.string),
 });
 
 const Model = types
   .model({
-    type: 'filter',
+    type: "filter",
     _value: types.maybeNull(types.string),
     ...(isFF(FF_DEV_3391)
       ? {
@@ -106,18 +106,18 @@ const Model = types
       const selected = self.toTag.selectFirstVisible();
 
       if (selected && self.cleanup) {
-        self._value = '';
+        self._value = "";
         self.applyFilter();
       }
     },
   }));
 
-const FilterModel = types.compose('FilterModel', Model, TagAttrs, ProcessAttrsMixin, AnnotationMixin);
+const FilterModel = types.compose("FilterModel", Model, TagAttrs, ProcessAttrsMixin, AnnotationMixin);
 
 const HtxFilter = observer(({ item }) => {
   const tag = item.toTag;
 
-  if (tag.type.indexOf('labels') === -1 && tag.type.indexOf('choices') === -1) return null;
+  if (tag.type.indexOf("labels") === -1 && tag.type.indexOf("choices") === -1) return null;
 
   return (
     <Input
@@ -125,7 +125,7 @@ const HtxFilter = observer(({ item }) => {
         item.setInputRef(ref);
       }}
       value={item._value}
-      size='small'
+      size="small"
       /* addonAfter={"clear"} */
       onChange={item.applyFilterEv}
       onPressEnter={item.selectFirstElement}
@@ -134,6 +134,6 @@ const HtxFilter = observer(({ item }) => {
   );
 });
 
-Registry.addTag('filter', FilterModel, HtxFilter);
+Registry.addTag("filter", FilterModel, HtxFilter);
 
 export { HtxFilter, FilterModel };

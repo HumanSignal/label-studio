@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC } from "react";
 
 export type PageProps = {
   children: React.ReactNode;
@@ -25,7 +25,7 @@ export type PageSettings = {
     }
 );
 
-export type PageLayoutSettingt = Omit<PageSettings, 'path'>;
+export type PageLayoutSettingt = Omit<PageSettings, "path">;
 
 export type PageLayout = PageLayoutSettingt | (PageComponent & PageLayoutSettingt);
 

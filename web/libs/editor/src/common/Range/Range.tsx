@@ -1,10 +1,10 @@
-import { type CSSProperties, type FC, type MouseEvent as RMouseEvent, useCallback } from 'react';
-import { Block, Elem } from '../../utils/bem';
-import { clamp, isDefined } from '../../utils/utilities';
-import { useValueTracker } from '../Utils/useValueTracker';
-import './Range.styl';
+import { type CSSProperties, type FC, type MouseEvent as RMouseEvent, useCallback } from "react";
+import { Block, Elem } from "../../utils/bem";
+import { clamp, isDefined } from "../../utils/utilities";
+import { useValueTracker } from "../Utils/useValueTracker";
+import "./Range.styl";
 
-type RangeAlignment = 'horizontal' | 'vertical';
+type RangeAlignment = "horizontal" | "vertical";
 
 type RangeValueType = number | number[] | string;
 
@@ -41,7 +41,7 @@ export const Range: FC<RangeProps> = ({
   max = 100,
   step = 1,
   size = 120,
-  align = 'horizontal',
+  align = "horizontal",
   resetValue,
   minIcon,
   maxIcon,
@@ -107,7 +107,7 @@ export const Range: FC<RangeProps> = ({
     (e: RMouseEvent<HTMLElement>) => {
       const target = e.currentTarget as HTMLElement;
       const rect = target.getBoundingClientRect();
-      const isHorizontal = align === 'horizontal';
+      const isHorizontal = align === "horizontal";
 
       // Extract all the values regarding current orientation
       const directionDimension = isHorizontal ? rect.width : rect.height;
@@ -135,23 +135,23 @@ export const Range: FC<RangeProps> = ({
     [align, min, max, reverse, currentValue],
   );
 
-  const sizeProperty = align === 'horizontal' ? 'minWidth' : 'minHeight';
+  const sizeProperty = align === "horizontal" ? "minWidth" : "minHeight";
 
   return (
-    <Block name='range' mod={{ align }} style={{ [sizeProperty]: size }}>
+    <Block name="range" mod={{ align }} style={{ [sizeProperty]: size }}>
       {reverse
         ? maxIcon && (
-            <Elem name='icon' onMouseDown={increase}>
+            <Elem name="icon" onMouseDown={increase}>
               {maxIcon}
             </Elem>
           )
         : minIcon && (
-            <Elem name='icon' onMouseDown={decrease}>
+            <Elem name="icon" onMouseDown={decrease}>
               {minIcon}
             </Elem>
           )}
-      <Elem name='body' onClick={onClick}>
-        <Elem name='line' />
+      <Elem name="body" onClick={onClick}>
+        <Elem name="line" />
         <RangeIndicator align={align} reverse={reverse} value={currentValue} valueConvert={valueToPercentage} />
         {isMultiArray ? (
           arrayReverse(currentValue, reverse).map((value, i) => {
@@ -199,12 +199,12 @@ export const Range: FC<RangeProps> = ({
       </Elem>
       {reverse
         ? minIcon && (
-            <Elem name='icon' onMouseDown={decrease}>
+            <Elem name="icon" onMouseDown={decrease}>
               {minIcon}
             </Elem>
           )
         : maxIcon && (
-            <Elem name='icon' onMouseDown={increase}>
+            <Elem name="icon" onMouseDown={increase}>
               {maxIcon}
             </Elem>
           )}
@@ -236,8 +236,8 @@ const RangeHandle: FC<RangeHandleProps> = ({
   reverse = false,
 }) => {
   const currentOffset = valueConvert(value);
-  const offsetProperty = align === 'horizontal' ? (reverse ? 'right' : 'left') : reverse ? 'bottom' : 'top';
-  const mouseProperty = align === 'horizontal' ? 'pageX' : 'pageY';
+  const offsetProperty = align === "horizontal" ? (reverse ? "right" : "left") : reverse ? "bottom" : "top";
+  const mouseProperty = align === "horizontal" ? "pageX" : "pageY";
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -261,12 +261,12 @@ const RangeHandle: FC<RangeHandleProps> = ({
 
       if (isDefined(newValue)) onChange?.(newValue);
 
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
   };
 
   const handleDoubleClick = () => {
@@ -277,7 +277,7 @@ const RangeHandle: FC<RangeHandleProps> = ({
 
   return (
     <Elem
-      name='range-handle'
+      name="range-handle"
       style={{ [offsetProperty]: `${valueConvert(value)}%` }}
       onMouseDownCapture={handleMouseDown}
       onDoubleClick={handleDoubleClick}
@@ -296,7 +296,7 @@ const RangeIndicator: FC<RangeIndicatorProps> = ({ value, valueConvert, align, r
   const style: CSSProperties = {};
   const multi = Array.isArray(value);
 
-  if (align === 'horizontal') {
+  if (align === "horizontal") {
     if (multi) {
       style.left = `${valueConvert(value[0])}%`;
       style.right = `${100 - valueConvert(value[1])}%`;
@@ -306,7 +306,7 @@ const RangeIndicator: FC<RangeIndicatorProps> = ({ value, valueConvert, align, r
     }
 
     if (reverse && !multi) [style.left, style.right] = [style.right, style.left];
-  } else if (align === 'vertical') {
+  } else if (align === "vertical") {
     if (multi) {
       style.top = `${valueConvert(value[0])}%`;
       style.bottom = `${100 - valueConvert(value[1])}%`;
@@ -318,5 +318,5 @@ const RangeIndicator: FC<RangeIndicatorProps> = ({ value, valueConvert, align, r
     if (reverse && !multi) [style.top, style.bottom] = [style.bottom, style.top];
   }
 
-  return <Elem name='indicator' style={style} />;
+  return <Elem name="indicator" style={style} />;
 };

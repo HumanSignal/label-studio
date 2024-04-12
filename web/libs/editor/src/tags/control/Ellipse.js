@@ -1,11 +1,11 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import { customTypes } from '../../core/CustomTypes';
-import Registry from '../../core/Registry';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import SeparatedControlMixin from '../../mixins/SeparatedControlMixin';
-import { ToolManagerMixin } from '../../mixins/ToolManagerMixin';
-import ControlBase from './Base';
+import { customTypes } from "../../core/CustomTypes";
+import Registry from "../../core/Registry";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
+import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
+import ControlBase from "./Base";
 
 /**
  * The `Ellipse` tag is used to add an elliptical bounding box to an image. Use for bounding box image segmentation tasks with ellipses.
@@ -33,11 +33,11 @@ import ControlBase from './Base';
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 
-  opacity: types.optional(customTypes.range(), '0.2'),
-  fillcolor: types.optional(customTypes.color, '#f48a42'),
+  opacity: types.optional(customTypes.range(), "0.2"),
+  fillcolor: types.optional(customTypes.color, "#f48a42"),
 
-  strokewidth: types.optional(types.string, '1'),
-  strokecolor: types.optional(customTypes.color, '#f48a42'),
+  strokewidth: types.optional(types.string, "1"),
+  strokecolor: types.optional(customTypes.color, "#f48a42"),
   fillopacity: types.maybeNull(customTypes.range()),
 
   canrotate: types.optional(types.boolean, true),
@@ -45,7 +45,7 @@ const TagAttrs = types.model({
 
 const Model = types
   .model({
-    type: 'ellipse',
+    type: "ellipse",
   })
   .views((self) => ({
     get hasStates() {
@@ -55,11 +55,11 @@ const Model = types
     },
   }))
   .volatile(() => ({
-    toolNames: ['Ellipse'],
+    toolNames: ["Ellipse"],
   }));
 
 const EllipseModel = types.compose(
-  'EllipseModel',
+  "EllipseModel",
   ControlBase,
   AnnotationMixin,
   SeparatedControlMixin,
@@ -72,6 +72,6 @@ const HtxView = () => {
   return null;
 };
 
-Registry.addTag('ellipse', EllipseModel, HtxView);
+Registry.addTag("ellipse", EllipseModel, HtxView);
 
 export { HtxView, EllipseModel };

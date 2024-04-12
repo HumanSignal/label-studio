@@ -1,22 +1,22 @@
-import chroma from 'chroma-js';
-import { clamp } from 'lodash';
-import { observer } from 'mobx-react';
-import { getParentOfType } from 'mobx-state-tree';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Layer, Rect, Stage, Transformer } from 'react-konva';
-import Constants from '../../../core/Constants';
-import { Annotation } from '../../../stores/Annotation/Annotation';
-import { fixMobxObserve } from '../../../utils/utilities';
-import { Rectangle } from './Rectangle';
-import { createBoundingBoxGetter, createOnDragMoveHandler } from './TransformTools';
+import chroma from "chroma-js";
+import { clamp } from "lodash";
+import { observer } from "mobx-react";
+import { getParentOfType } from "mobx-state-tree";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Layer, Rect, Stage, Transformer } from "react-konva";
+import Constants from "../../../core/Constants";
+import { Annotation } from "../../../stores/Annotation/Annotation";
+import { fixMobxObserve } from "../../../utils/utilities";
+import { Rectangle } from "./Rectangle";
+import { createBoundingBoxGetter, createOnDragMoveHandler } from "./TransformTools";
 
 export const MIN_SIZE = 5;
 
 const SelectionRect = (props) => {
   return (
     <>
-      <Rect {...props} strokeWidth={2} stroke='#fff' />
-      <Rect {...props} fill={chroma('#0099FF').alpha(0.1).css()} strokeWidth={2} stroke='#0099FF' dash={[2, 2]} />
+      <Rect {...props} strokeWidth={2} stroke="#fff" />
+      <Rect {...props} fill={chroma("#0099FF").alpha(0.1).css()} strokeWidth={2} stroke="#0099FF" dash={[2, 2]} />
     </>
   );
 };
@@ -200,7 +200,7 @@ const VideoRegionsPure = ({
       ref={stageRef}
       width={width}
       height={height}
-      style={{ position: 'absolute', zIndex: 1 }}
+      style={{ position: "absolute", zIndex: 1 }}
       listening={listenToEvents}
       {...eventHandlers}
     >

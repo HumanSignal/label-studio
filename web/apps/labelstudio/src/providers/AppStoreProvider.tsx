@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 type Store = {
   project: unknown;
@@ -9,7 +9,7 @@ type Context = {
 };
 
 const AppStoreContext = React.createContext<Context>({} as Context);
-AppStoreContext.displayName = 'AppStoreContext';
+AppStoreContext.displayName = "AppStoreContext";
 
 export const AppStoreProvider: React.FunctionComponent = ({ children }) => {
   const [store, setStore] = React.useState({} as Store);

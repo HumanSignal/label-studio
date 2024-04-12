@@ -1,31 +1,31 @@
-import { Select } from 'antd';
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React from 'react';
+import { Select } from "antd";
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import InfoModal from '../../components/Infomodal/Infomodal';
-import { guidGenerator } from '../../core/Helpers';
-import Registry from '../../core/Registry';
-import Tree from '../../core/Tree';
-import Types from '../../core/Types';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import PerRegionMixin from '../../mixins/PerRegion';
-import RequiredMixin from '../../mixins/Required';
-import SelectedModelMixin from '../../mixins/SelectedModel';
-import VisibilityMixin from '../../mixins/Visibility';
-import { Block } from '../../utils/bem';
-import ControlBase from './Base';
-import './Choices/Choises.styl';
+import InfoModal from "../../components/Infomodal/Infomodal";
+import { guidGenerator } from "../../core/Helpers";
+import Registry from "../../core/Registry";
+import Tree from "../../core/Tree";
+import Types from "../../core/Types";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import PerRegionMixin from "../../mixins/PerRegion";
+import RequiredMixin from "../../mixins/Required";
+import SelectedModelMixin from "../../mixins/SelectedModel";
+import VisibilityMixin from "../../mixins/Visibility";
+import { Block } from "../../utils/bem";
+import ControlBase from "./Base";
+import "./Choices/Choises.styl";
 
-import Infomodal from '../../components/Infomodal/Infomodal';
-import { HintTooltip } from '../../components/Taxonomy/Taxonomy';
-import DynamicChildrenMixin from '../../mixins/DynamicChildrenMixin';
-import PerItemMixin from '../../mixins/PerItem';
-import { ReadOnlyControlMixin } from '../../mixins/ReadOnlyMixin';
-import SelectedChoiceMixin from '../../mixins/SelectedChoiceMixin';
-import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
-import './Choice';
-import ClassificationBase from './ClassificationBase';
+import Infomodal from "../../components/Infomodal/Infomodal";
+import { HintTooltip } from "../../components/Taxonomy/Taxonomy";
+import DynamicChildrenMixin from "../../mixins/DynamicChildrenMixin";
+import PerItemMixin from "../../mixins/PerItem";
+import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
+import SelectedChoiceMixin from "../../mixins/SelectedChoiceMixin";
+import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
+import "./Choice";
+import ClassificationBase from "./ClassificationBase";
 
 const { Option } = Select;
 
@@ -101,9 +101,9 @@ const { Option } = Select;
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
   showinline: types.maybeNull(types.boolean),
-  choice: types.optional(types.enumeration(['single', 'single-radio', 'multiple']), 'single'),
-  layout: types.optional(types.enumeration(['select', 'inline', 'vertical']), 'vertical'),
-  value: types.optional(types.string, ''),
+  choice: types.optional(types.enumeration(["single", "single-radio", "multiple"]), "single"),
+  layout: types.optional(types.enumeration(["select", "inline", "vertical"]), "vertical"),
+  value: types.optional(types.string, ""),
   allownested: types.optional(types.boolean, false),
 });
 
@@ -113,12 +113,12 @@ const Model = types
 
     visible: types.optional(types.boolean, true),
 
-    type: 'choices',
-    children: Types.unionArray(['choice', 'view', 'header', 'hypertext']),
+    type: "choices",
+    children: Types.unionArray(["choice", "view", "header", "hypertext"]),
   })
   .views((self) => ({
     get shouldBeUnselected() {
-      return self.choice === 'single' || self.choice === 'single-radio';
+      return self.choice === "single" || self.choice === "single-radio";
     },
 
     states() {
@@ -146,7 +146,7 @@ const Model = types
     },
 
     get defaultChildType() {
-      return 'choice';
+      return "choice";
     },
 
     // perChoiceVisible() {
@@ -168,8 +168,8 @@ const Model = types
   .actions((self) => ({
     afterCreate() {
       // TODO depricate showInline
-      if (self.showinline === true) self.layout = 'inline';
-      if (self.showinline === false) self.layout = 'vertical';
+      if (self.showinline === true) self.layout = "inline";
+      if (self.showinline === false) self.layout = "vertical";
     },
 
     needsUpdate() {
@@ -218,7 +218,7 @@ const Model = types
 
     return {
       validate() {
-        if (!Super.validate() || (self.choice !== 'multiple' && self.checkResultLength() > 1)) return false;
+        if (!Super.validate() || (self.choice !== "multiple" && self.checkResultLength() > 1)) return false;
       },
 
       checkResultLength() {
@@ -228,7 +228,7 @@ const Model = types
       },
 
       beforeSend() {
-        if (self.choice !== 'multiple' && self.checkResultLength() > 1)
+        if (self.choice !== "multiple" && self.checkResultLength() > 1)
           Infomodal.warning(
             `The number of options selected (${self.checkResultLength()}) exceed the maximum allowed (1). To proceed, first unselect excess options for:\r\n • Choices (${
               self.name
@@ -239,10 +239,10 @@ const Model = types
   });
 
 const ChoicesModel = types.compose(
-  'ChoicesModel',
+  "ChoicesModel",
   ControlBase,
   ClassificationBase,
-  SelectedModelMixin.props({ _child: 'ChoiceModel' }),
+  SelectedModelMixin.props({ _child: "ChoiceModel" }),
   RequiredMixin,
   PerRegionMixin,
   ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
@@ -258,9 +258,9 @@ const ChoicesModel = types.compose(
 const ChoicesSelectLayout = observer(({ item }) => {
   return (
     <Select
-      style={{ width: '100%' }}
+      style={{ width: "100%" }}
       value={item.selectedLabels.map((l) => l._value)}
-      mode={item.choice === 'multiple' ? 'multiple' : ''}
+      mode={item.choice === "multiple" ? "multiple" : ""}
       disabled={item.isReadOnly()}
       onChange={(val) => {
         if (Array.isArray(val)) {
@@ -278,7 +278,7 @@ const ChoicesSelectLayout = observer(({ item }) => {
     >
       {item.tiedChildren.map((i) => (
         <Option key={i._value} value={i._value}>
-          <HintTooltip title={i.hint} wrapper='div'>
+          <HintTooltip title={i.hint} wrapper="div">
             {i._value}
           </HintTooltip>
         </Option>
@@ -289,12 +289,12 @@ const ChoicesSelectLayout = observer(({ item }) => {
 
 const HtxChoices = observer(({ item }) => {
   return (
-    <Block name='choices' mod={{ hidden: !item.isVisible || !item.perRegionVisible(), layout: item.layout }}>
-      {item.layout === 'select' ? <ChoicesSelectLayout item={item} /> : Tree.renderChildren(item, item.annotation)}
+    <Block name="choices" mod={{ hidden: !item.isVisible || !item.perRegionVisible(), layout: item.layout }}>
+      {item.layout === "select" ? <ChoicesSelectLayout item={item} /> : Tree.renderChildren(item, item.annotation)}
     </Block>
   );
 });
 
-Registry.addTag('choices', ChoicesModel, HtxChoices);
+Registry.addTag("choices", ChoicesModel, HtxChoices);
 
 export { HtxChoices, ChoicesModel, TagAttrs };

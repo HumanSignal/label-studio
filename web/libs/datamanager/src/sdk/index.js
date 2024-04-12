@@ -1,1 +1,1 @@
-export { DataManager } from './dm-sdk';
+export { DataManager } from "./dm-sdk";

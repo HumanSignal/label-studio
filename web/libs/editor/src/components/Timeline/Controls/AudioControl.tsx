@@ -1,11 +1,11 @@
-import type React from 'react';
-import { type FC, type MouseEvent, useEffect, useState } from 'react';
-import { Block, Elem } from '../../../utils/bem';
+import type React from "react";
+import { type FC, type MouseEvent, useEffect, useState } from "react";
+import { Block, Elem } from "../../../utils/bem";
 
-import { IconSoundConfig, IconSoundMutedConfig } from '../../../assets/icons/timeline';
-import { ControlButton } from '../Controls';
-import './AudioControl.styl';
-import { Slider } from './Slider';
+import { IconSoundConfig, IconSoundMutedConfig } from "../../../assets/icons/timeline";
+import { ControlButton } from "../Controls";
+import "./AudioControl.styl";
+import { Slider } from "./Slider";
 
 const MAX_VOL = 100;
 
@@ -53,14 +53,14 @@ export const AudioControl: FC<AudioControlProps> = ({ volume, onVolumeChange, on
 
   const renderModal = () => {
     return (
-      <Elem name='modal'>
+      <Elem name="modal">
         <Slider
           min={0}
           max={MAX_VOL}
           value={Math.round(volume * MAX_VOL)}
           onChange={handleSetVolume}
-          description={'Volume'}
-          info={'Increase or decrease the volume of the audio'}
+          description={"Volume"}
+          info={"Increase or decrease the volume of the audio"}
         />
         {renderMuteButton()}
       </Elem>
@@ -69,17 +69,17 @@ export const AudioControl: FC<AudioControlProps> = ({ volume, onVolumeChange, on
 
   const renderMuteButton = () => {
     return (
-      <Elem name={'mute'}>
-        <Elem name='mute-button' onClick={handleSetMute}>
-          {isMuted ? 'Unmute' : 'Mute'}
+      <Elem name={"mute"}>
+        <Elem name="mute-button" onClick={handleSetMute}>
+          {isMuted ? "Unmute" : "Mute"}
         </Elem>
       </Elem>
     );
   };
 
   return (
-    <Block name='audio-control' onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}>
-      <ControlButton look={audioModal ? 'active' : undefined} onClick={onSetModal}>
+    <Block name="audio-control" onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}>
+      <ControlButton look={audioModal ? "active" : undefined} onClick={onSetModal}>
         {isMuted ? <IconSoundMutedConfig /> : <IconSoundConfig />}
       </ControlButton>
       {audioModal && renderModal()}

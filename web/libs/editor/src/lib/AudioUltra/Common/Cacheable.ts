@@ -6,7 +6,7 @@ export class Cacheable {
       return args[0].toString();
     }
 
-    return args.join(':');
+    return args.join(":");
   }
 
   clearCache() {

@@ -1,7 +1,7 @@
-import { flow, types } from 'mobx-state-tree';
-import Papa from 'papaparse';
+import { flow, types } from "mobx-state-tree";
+import Papa from "papaparse";
 
-import { parseTypeAndOption, parseValue } from '../utils/data';
+import { parseTypeAndOption, parseValue } from "../utils/data";
 
 const resolvers = {
   // @todo comments/types
@@ -20,7 +20,7 @@ const resolvers = {
       cell = row[fields[column] ?? fields[0]];
     }
 
-    return String(cell ?? '');
+    return String(cell ?? "");
   },
 };
 

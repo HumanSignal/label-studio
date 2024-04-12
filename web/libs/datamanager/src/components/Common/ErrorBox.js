@@ -1,9 +1,9 @@
-import { inject } from 'mobx-react';
-import React from 'react';
-import { RiErrorWarningFill } from 'react-icons/ri';
-import { Button } from './Button/Button';
-import { Dropdown } from './Dropdown/Dropdown';
-import { Menu } from './Menu/Menu';
+import { inject } from "mobx-react";
+import React from "react";
+import { RiErrorWarningFill } from "react-icons/ri";
+import { Button } from "./Button/Button";
+import { Dropdown } from "./Dropdown/Dropdown";
+import { Menu } from "./Menu/Menu";
 
 const ErrorRenderer = (error, i) => {
   return (
@@ -23,14 +23,14 @@ export const ErrorBox = injector(({ errors }) => {
   return errors?.size > 0 ? (
     <Dropdown.Trigger content={<Menu>{Array.from(errors.values()).map(ErrorRenderer)}</Menu>}>
       <Button
-        type='text'
+        type="text"
         style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: '0 10px',
+          display: "inline-flex",
+          alignItems: "center",
+          padding: "0 10px",
           fontSize: 12,
         }}
-        icon={<RiErrorWarningFill color='#ff5a46' size={18} style={{ marginRight: 5 }} />}
+        icon={<RiErrorWarningFill color="#ff5a46" size={18} style={{ marginRight: 5 }} />}
       >
         Errors occurred
       </Button>

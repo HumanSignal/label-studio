@@ -1,11 +1,11 @@
-import { getParentOfType, getType } from 'mobx-state-tree';
-import type { IAnyComplexType, IAnyStateTreeNode } from 'mobx-state-tree/dist/internal';
-import React from 'react';
+import { getParentOfType, getType } from "mobx-state-tree";
+import type { IAnyComplexType, IAnyStateTreeNode } from "mobx-state-tree/dist/internal";
+import React from "react";
 
-import { parseValue } from '../utils/data';
-import { FF_DEV_3391, isFF } from '../utils/feature-flags';
-import { guidGenerator } from '../utils/unique';
-import Registry from './Registry';
+import { parseValue } from "../utils/data";
+import { FF_DEV_3391, isFF } from "../utils/feature-flags";
+import { guidGenerator } from "../utils/unique";
+import Registry from "./Registry";
 
 interface ConfigNodeBaseProps {
   id: string;
@@ -24,14 +24,14 @@ interface IAnnotation {
   ids: Map<string, IAnyStateTreeNode>;
 }
 
-export const TRAVERSE_SKIP = 'skip';
-export const TRAVERSE_STOP = 'stop';
+export const TRAVERSE_SKIP = "skip";
+export const TRAVERSE_STOP = "stop";
 
 function detectParseError(doc?: Document) {
   let node = doc?.children?.[0];
 
   for (let i = 0; i < 3; i++) {
-    if (node?.tagName === 'parsererror') return node.textContent;
+    if (node?.tagName === "parsererror") return node.textContent;
     node = node?.children?.[0];
   }
 }
@@ -45,7 +45,7 @@ const deepReplaceAttributes = (root: Element, idx: number, indexFlag: string) =>
     for (const name of attrNames) {
       const value = node.getAttribute(name);
 
-      node.setAttribute(name, value?.replace?.(indexFlag, `${idx}`) ?? '');
+      node.setAttribute(name, value?.replace?.(indexFlag, `${idx}`) ?? "");
     }
 
     node.childNodes.forEach((node) => recursiveClone(node as Element));
@@ -57,8 +57,8 @@ const deepReplaceAttributes = (root: Element, idx: number, indexFlag: string) =>
 function tagIntoObject(node: Element, taskData: Record<string, any>, replaces?: Record<string, string>): ConfigNode {
   const props = attrsToProps(node, replaces);
   const type = node.tagName.toLowerCase();
-  const indexFlag = props.indexflag ?? '{{idx}}';
-  const id = isFF(FF_DEV_3391) ? node.getAttribute('name') ?? guidGenerator() : guidGenerator();
+  const indexFlag = props.indexflag ?? "{{idx}}";
+  const id = isFF(FF_DEV_3391) ? node.getAttribute("name") ?? guidGenerator() : guidGenerator();
   const data: ConfigNode = {
     ...props,
     id,
@@ -66,7 +66,7 @@ function tagIntoObject(node: Element, taskData: Record<string, any>, replaces?: 
     type,
   };
 
-  if (type === 'repeater') {
+  if (type === "repeater") {
     const repeaterArray = parseValue(props.on, taskData) || [];
     const views = [];
 
@@ -74,8 +74,8 @@ function tagIntoObject(node: Element, taskData: Record<string, any>, replaces?: 
       const newReplaces: Record<string, string> = { ...replaces, [indexFlag]: i };
       const view = {
         id: guidGenerator(),
-        tagName: 'View',
-        type: 'view',
+        tagName: "View",
+        type: "view",
         children: [...node.children].map((child) => {
           const clonedNode = child.cloneNode(true) as Element;
 
@@ -88,19 +88,19 @@ function tagIntoObject(node: Element, taskData: Record<string, any>, replaces?: 
       views.push(view);
     }
 
-    data.tagName = 'View';
+    data.tagName = "View";
 
-    if (props.mode === 'pagination') {
-      data.type = 'pagedview';
+    if (props.mode === "pagination") {
+      data.type = "pagedview";
     } else {
-      data.type = 'view';
+      data.type = "view";
     }
 
     data.children = views;
   }
   // contains only text nodes; HyperText can contain any structure
-  else if (node.childNodes.length && (!node.children.length || type === 'hypertext')) {
-    data.value = node.innerHTML?.trim() || data.value || '';
+  else if (node.childNodes.length && (!node.children.length || type === "hypertext")) {
+    data.value = node.innerHTML?.trim() || data.value || "";
   } else if (node.children.length) {
     data.children = [...node.children].map((child) => tagIntoObject(child, taskData));
   }
@@ -117,7 +117,7 @@ function cssConverter(style: string) {
   if (!style) return null;
 
   const result: Record<string, string> = {};
-  const attributes = style.split(';');
+  const attributes = style.split(";");
 
   let firstIndexOfColon;
   let i;
@@ -125,20 +125,20 @@ function cssConverter(style: string) {
   let value;
 
   for (i = 0; i < attributes.length; i++) {
-    firstIndexOfColon = attributes[i].indexOf(':');
+    firstIndexOfColon = attributes[i].indexOf(":");
     key = attributes[i].substring(0, firstIndexOfColon);
     value = attributes[i].substring(firstIndexOfColon + 1);
 
-    key = key.replace(/ /g, '');
+    key = key.replace(/ /g, "");
     if (key.length < 1) {
       continue;
     }
 
-    if (value[0] === ' ') {
+    if (value[0] === " ") {
       value = value.substring(1);
     }
 
-    if (value[value.length - 1] === ' ') {
+    if (value[value.length - 1] === " ") {
       value = value.substring(0, value.length - 1);
     }
 
@@ -162,9 +162,9 @@ function attrsToProps(node: Element, replaces?: Record<string, string>): Record<
   for (const attr of node.attributes) {
     const { name, value } = attr;
 
-    if (name !== 'value' && ['true', 'false'].includes(value)) {
+    if (name !== "value" && ["true", "false"].includes(value)) {
       // Convert node of Tree to boolean value
-      props[name.toLowerCase()] = value === 'true';
+      props[name.toLowerCase()] = value === "true";
     } else {
       if (replaces) {
         let finalValue = value;
@@ -189,7 +189,7 @@ function attrsToProps(node: Element, replaces?: Record<string, string>): Record<
 function treeToModel(html: string, store: { task: { dataObj: Record<string, any> } }): ConfigNode {
   const parser = new DOMParser();
 
-  const doc = parser.parseFromString(html, 'application/xml');
+  const doc = parser.parseFromString(html, "application/xml");
 
   const root = doc?.children?.[0];
   const parserError = detectParseError(doc);
@@ -313,7 +313,7 @@ function traverseTree(root: IAnyStateTreeNode, cb: (node: IAnyStateTreeNode) => 
   visitNode(root);
 }
 
-const cleanUpId = (id: string) => id.replace(/@.*/, '');
+const cleanUpId = (id: string) => id.replace(/@.*/, "");
 
 function extractNames(root: IAnyStateTreeNode) {
   const objects: IAnyStateTreeNode[] = [];
@@ -321,7 +321,7 @@ function extractNames(root: IAnyStateTreeNode) {
   const toNames = new Map<string, IAnyStateTreeNode[]>();
 
   // hacky way to get all the available object tag names
-  const objectTypes = Registry.objectTypes().map((type) => type.name.replace('Model', '').toLowerCase());
+  const objectTypes = Registry.objectTypes().map((type) => type.name.replace("Model", "").toLowerCase());
 
   traverseTree(root, (node) => {
     if (node.name) {

@@ -1,23 +1,23 @@
-import Button from 'antd/lib/button/index';
-import Checkbox from 'antd/lib/checkbox/index';
-import Radio from 'antd/lib/radio/index';
-import { inject, observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React, { useCallback, useState } from 'react';
+import Button from "antd/lib/button/index";
+import Checkbox from "antd/lib/checkbox/index";
+import Radio from "antd/lib/radio/index";
+import { inject, observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React, { useCallback, useState } from "react";
 
-import { LsChevron } from '../../assets/icons';
-import Hint from '../../components/Hint/Hint';
-import { HintTooltip } from '../../components/Taxonomy/Taxonomy';
-import Registry from '../../core/Registry';
-import Tree from '../../core/Tree';
-import Types from '../../core/Types';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import ProcessAttrsMixin from '../../mixins/ProcessAttrs';
-import { TagParentMixin } from '../../mixins/TagParentMixin';
-import { Block, Elem } from '../../utils/bem';
-import { FF_DEV_3391, FF_PROD_309, isFF } from '../../utils/feature-flags';
-import { sanitizeHtml } from '../../utils/html';
-import './Choice/Choice.styl';
+import { LsChevron } from "../../assets/icons";
+import Hint from "../../components/Hint/Hint";
+import { HintTooltip } from "../../components/Taxonomy/Taxonomy";
+import Registry from "../../core/Registry";
+import Tree from "../../core/Tree";
+import Types from "../../core/Types";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
+import { TagParentMixin } from "../../mixins/TagParentMixin";
+import { Block, Elem } from "../../utils/bem";
+import { FF_DEV_3391, FF_PROD_309, isFF } from "../../utils/feature-flags";
+import { sanitizeHtml } from "../../utils/html";
+import "./Choice/Choice.styl";
 
 /**
  * The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
@@ -61,23 +61,23 @@ const TagAttrs = types.model({
 
 const Model = types
   .model({
-    type: 'choice',
+    type: "choice",
     visible: types.optional(types.boolean, true),
-    _value: types.optional(types.string, ''),
+    _value: types.optional(types.string, ""),
     // hierarchical Choices used for Taxonomy
-    children: Types.unionArray(['choice']),
-    parentTypes: Types.tagsTypes(['Choices', 'Taxonomy']),
+    children: Types.unionArray(["choice"]),
+    parentTypes: Types.tagsTypes(["Choices", "Taxonomy"]),
     readonly: types.optional(types.boolean, false),
   })
   .views((self) => ({
     get isCheckbox() {
       const choice = self.parent?.choice;
 
-      return choice === 'multiple' || choice === 'single';
+      return choice === "multiple" || choice === "single";
     },
 
     get isSelect() {
-      return self.parent?.layout === 'select';
+      return self.parent?.layout === "select";
     },
 
     // to conform Label's maxUsages check
@@ -99,7 +99,7 @@ const Model = types
     },
 
     get parentChoice() {
-      return Types.getParentTagOfTypeString(self, 'choice');
+      return Types.getParentTagOfTypeString(self, "choice");
     },
     get isSkipped() {
       return !self.nestedResults && !!self.parentChoice;
@@ -159,7 +159,7 @@ const Model = types
     },
   }))
   .actions((self) => {
-    if (self.parent?.type === 'choices')
+    if (self.parent?.type === "choices")
       return {
         onHotKey() {
           return self.toggleSelected();
@@ -168,7 +168,7 @@ const Model = types
     return {};
   });
 
-const ChoiceModel = types.compose('ChoiceModel', TagParentMixin, TagAttrs, ProcessAttrsMixin, Model, AnnotationMixin);
+const ChoiceModel = types.compose("ChoiceModel", TagParentMixin, TagAttrs, ProcessAttrsMixin, Model, AnnotationMixin);
 
 // `name` can't be passed into bem components
 const nameWrapper = (Component, name) => {
@@ -196,12 +196,12 @@ const HtxNewChoiceView = ({ item, store }) => {
 
   return (
     <Block
-      name='choice'
+      name="choice"
       mod={{ layout: item.parent.layout, leaf: item.isLeaf, notLeaf: !item.isLeaf, hidden: !item.visible }}
     >
-      <Elem name='item' mod={{ notLeaf: !item.isLeaf }} style={style}>
+      <Elem name="item" mod={{ notLeaf: !item.isLeaf }} style={style}>
         <Elem
-          name='checkbox'
+          name="checkbox"
           component={nameWrapper(item.isCheckbox ? Checkbox : Radio, item._value)}
           mod={{ notLeaf: !item.isLeaf }}
           checked={item.sel}
@@ -209,13 +209,13 @@ const HtxNewChoiceView = ({ item, store }) => {
           disabled={item.isReadOnly()}
           onChange={changeHandler}
         >
-          <HintTooltip title={item.hint} wrapper='span'>
+          <HintTooltip title={item.hint} wrapper="span">
             {item.html ? <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.html) }} /> : item._value}
             {showHotkey && <Hint>[{item.hotkey}]</Hint>}
           </HintTooltip>
         </Elem>
         {!item.isLeaf ? (
-          <Elem name='toggle' mod={{ collapsed }} component={Button} type='text' onClick={toogleCollapsed}>
+          <Elem name="toggle" mod={{ collapsed }} component={Button} type="text" onClick={toogleCollapsed}>
             <LsChevron />
           </Elem>
         ) : (
@@ -223,7 +223,7 @@ const HtxNewChoiceView = ({ item, store }) => {
         )}
       </Elem>
       {item.nestedResults && item.children?.length ? (
-        <Elem name='children' mod={{ collapsed }}>
+        <Elem name="children" mod={{ collapsed }}>
           {Tree.renderChildren(item, item.annotation)}
         </Elem>
       ) : null}
@@ -231,8 +231,8 @@ const HtxNewChoiceView = ({ item, store }) => {
   );
 };
 
-const HtxChoice = inject('store')(observer(HtxNewChoiceView));
+const HtxChoice = inject("store")(observer(HtxNewChoiceView));
 
-Registry.addTag('choice', ChoiceModel, HtxChoice);
+Registry.addTag("choice", ChoiceModel, HtxChoice);
 
 export { HtxChoice, ChoiceModel };

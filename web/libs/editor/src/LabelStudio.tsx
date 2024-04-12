@@ -1,19 +1,19 @@
-import { configure } from 'mobx';
-import { destroy } from 'mobx-state-tree';
-import { render, unmountComponentAtNode } from 'react-dom';
-import { toCamelCase } from 'strman';
+import { configure } from "mobx";
+import { destroy } from "mobx-state-tree";
+import { render, unmountComponentAtNode } from "react-dom";
+import { toCamelCase } from "strman";
 
-import { LabelStudio as LabelStudioReact } from './Component';
-import App from './components/App/App';
-import { configureStore } from './configureStore';
-import legacyEvents from './core/External';
-import { Hotkey } from './core/Hotkey';
-import defaultOptions from './defaultOptions';
-import { destroy as destroySharedStore } from './mixins/SharedChoiceStore/mixin';
-import { EventInvoker } from './utils/events';
-import { FF_LSDV_4620_3_ML, isFF } from './utils/feature-flags';
-import { cleanDomAfterReact, findReactKey } from './utils/reactCleaner';
-import { isDefined } from './utils/utilities';
+import { LabelStudio as LabelStudioReact } from "./Component";
+import App from "./components/App/App";
+import { configureStore } from "./configureStore";
+import legacyEvents from "./core/External";
+import { Hotkey } from "./core/Hotkey";
+import defaultOptions from "./defaultOptions";
+import { destroy as destroySharedStore } from "./mixins/SharedChoiceStore/mixin";
+import { EventInvoker } from "./utils/events";
+import { FF_LSDV_4620_3_ML, isFF } from "./utils/feature-flags";
+import { cleanDomAfterReact, findReactKey } from "./utils/reactCleaner";
+import { isDefined } from "./utils/utilities";
 
 declare global {
   interface Window {
@@ -61,7 +61,7 @@ export class LabelStudio {
   getRootElement(root: Element | string) {
     let element: Element | null = null;
 
-    if (typeof root === 'string') {
+    if (typeof root === "string") {
       element = document.getElementById(root);
     } else {
       element = root;
@@ -177,7 +177,7 @@ export class LabelStudio {
       const callback = this.options[key];
 
       if (isDefined(callback)) {
-        const eventName = toCamelCase(key.replace(/^on/, ''));
+        const eventName = toCamelCase(key.replace(/^on/, ""));
 
         this.events.on(eventName, callback);
       }

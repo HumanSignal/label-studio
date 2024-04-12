@@ -1,8 +1,8 @@
-import { forwardRef } from 'react';
-import { Range } from '../../../Range/Range';
-import { FormField } from '../../FormField';
-import { useValueTracker } from '../../Utils';
-import { default as Label } from '../Label/Label';
+import { forwardRef } from "react";
+import { Range } from "../../../Range/Range";
+import { FormField } from "../../FormField";
+import { useValueTracker } from "../../Utils";
+import { default as Label } from "../Label/Label";
 
 const RangeField = forwardRef(
   ({ label, className, validate, required, skip, labelProps, description, ...props }, ref) => {
@@ -37,7 +37,7 @@ const RangeField = forwardRef(
     return label ? (
       <Label
         ref={ref}
-        placement='right'
+        placement="right"
         required={required}
         text={label}
         children={formField}

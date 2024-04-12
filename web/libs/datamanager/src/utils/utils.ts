@@ -52,7 +52,7 @@ export const isDefined = <T>(value?: T): value is T => {
 export const isBlank = (value?: string) => {
   if (!isDefined(value)) return true;
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return value.trim().length === 0;
   }
 

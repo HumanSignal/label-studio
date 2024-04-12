@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 import {
   IconAnnotationGroundTruth,
   IconAnnotationSkipped2,
@@ -11,21 +11,21 @@ import {
   LsSparks,
   LsStar,
   LsStarOutline,
-} from '../../assets/icons';
-import { Dropdown } from '../../common/Dropdown/Dropdown';
-import { useDropdown } from '../../common/Dropdown/DropdownTrigger';
-import { TimeAgo } from '../../common/TimeAgo/TimeAgo';
-import { Userpic } from '../../common/Userpic/Userpic';
-import { Block, Elem } from '../../utils/bem';
-import { userDisplayName } from '../../utils/utilities';
-import { isDefined } from '../../utils/utilities';
-import { Tooltip } from './../../common/Tooltip/Tooltip';
-import './AnnotationButton.styl';
+} from "../../assets/icons";
+import { Dropdown } from "../../common/Dropdown/Dropdown";
+import { useDropdown } from "../../common/Dropdown/DropdownTrigger";
+import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
+import { Userpic } from "../../common/Userpic/Userpic";
+import { Block, Elem } from "../../utils/bem";
+import { userDisplayName } from "../../utils/utilities";
+import { isDefined } from "../../utils/utilities";
+import { Tooltip } from "./../../common/Tooltip/Tooltip";
+import "./AnnotationButton.styl";
 
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react";
 // eslint-disable-next-line
 // @ts-ignore
-import { confirm } from '../../common/Modal/Modal';
+import { confirm } from "../../common/Modal/Modal";
 interface AnnotationButtonInterface {
   entity?: any;
   capabilities?: any;
@@ -46,22 +46,22 @@ const renderCommentIcon = (ent: any) => {
 
 const renderCommentTooltip = (ent: any) => {
   if (ent.unresolved_comment_count > 0) {
-    return 'Unresolved Comments';
+    return "Unresolved Comments";
   }
   if (ent.comment_count > 0) {
-    return 'All Comments Resolved';
+    return "All Comments Resolved";
   }
 
-  return '';
+  return "";
 };
 
 export const AnnotationButton = observer(
   ({ entity, capabilities, annotationStore, onAnnotationChange }: AnnotationButtonInterface) => {
     const iconSize = 37;
-    const isPrediction = entity.type === 'prediction';
+    const isPrediction = entity.type === "prediction";
     const username = userDisplayName(
       entity.user ?? {
-        firstName: entity.createdBy || 'Admin',
+        firstName: entity.createdBy || "Admin",
       },
     );
     const [isGroundTruth, setIsGroundTruth] = useState<boolean>();
@@ -79,7 +79,7 @@ export const AnnotationButton = observer(
       const { selected, id, type } = entity;
 
       if (!selected) {
-        if (type === 'prediction') {
+        if (type === "prediction") {
           annotationStore.selectPrediction(id);
         } else {
           annotationStore.selectAnnotation(id);
@@ -107,7 +107,7 @@ export const AnnotationButton = observer(
       const deleteAnnotation = useCallback(() => {
         clickHandler();
         confirm({
-          title: 'Delete annotation?',
+          title: "Delete annotation?",
           body: (
             <>
               This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
@@ -115,38 +115,38 @@ export const AnnotationButton = observer(
               This action cannot be undone.
             </>
           ),
-          buttonLook: 'destructive',
-          okText: 'Delete',
+          buttonLook: "destructive",
+          okText: "Delete",
           onOk: () => {
             entity.list.deleteAnnotation(entity);
           },
         });
       }, [entity]);
-      const isPrediction = entity.type === 'prediction';
+      const isPrediction = entity.type === "prediction";
       const isDraft = !isDefined(entity.pk);
       const showGroundTruth = capabilities.groundTruthEnabled && !isPrediction && !isDraft;
       const showDuplicateAnnotation = capabilities.enableCreateAnnotation && !isDraft;
 
       return (
-        <Block name='AnnotationButtonContextMenu'>
+        <Block name="AnnotationButtonContextMenu">
           {showGroundTruth && (
-            <Elem name='option' mod={{ groundTruth: true }} onClick={setGroundTruth}>
+            <Elem name="option" mod={{ groundTruth: true }} onClick={setGroundTruth}>
               {isGroundTruth ? (
                 <>
-                  <LsStar color='#FFC53D' width={iconSize} height={iconSize} /> {'Unset '}
+                  <LsStar color="#FFC53D" width={iconSize} height={iconSize} /> {"Unset "}
                 </>
               ) : (
                 <>
                   <LsStarOutline width={iconSize} height={iconSize} />
-                  {'Set '}
+                  {"Set "}
                 </>
               )}
               as Ground Truth
             </Elem>
           )}
           {showDuplicateAnnotation && (
-            <Elem name='option' mod={{ duplicate: true }} onClick={duplicateAnnotation}>
-              <Elem name='icon'>
+            <Elem name="option" mod={{ duplicate: true }} onClick={duplicateAnnotation}>
+              <Elem name="icon">
                 <IconDuplicate width={20} height={24} />
               </Elem>
               Duplicate Annotation
@@ -154,11 +154,11 @@ export const AnnotationButton = observer(
           )}
           {capabilities.enableAnnotationDelete && !isPrediction && (
             <>
-              <Elem name='seperator' />
-              <Elem name='option' mod={{ delete: true }} onClick={deleteAnnotation}>
-                <Elem name='icon'>
+              <Elem name="seperator" />
+              <Elem name="option" mod={{ delete: true }} onClick={deleteAnnotation}>
+                <Elem name="icon">
                   <IconTrashRect width={14} height={18} />
-                </Elem>{' '}
+                </Elem>{" "}
                 Delete Annotation
               </Elem>
             </>
@@ -168,11 +168,11 @@ export const AnnotationButton = observer(
     };
 
     return (
-      <Block name='annotation-button' mod={{ selected: entity.selected, contextMenuOpen: isContextMenuOpen }}>
-        <Elem name='mainSection' onClick={clickHandler}>
-          <Elem name='picSection'>
+      <Block name="annotation-button" mod={{ selected: entity.selected, contextMenuOpen: isContextMenuOpen }}>
+        <Elem name="mainSection" onClick={clickHandler}>
+          <Elem name="picSection">
             <Elem
-              name='userpic'
+              name="userpic"
               tag={Userpic}
               showUsername
               username={isPrediction ? entity.createdBy : null}
@@ -195,45 +195,45 @@ export const AnnotationButton = observer(
             </Elem>
           )} */}
           </Elem>
-          <Elem name='main'>
-            <Elem name='user'>
-              <Elem tag='span' name='name'>
+          <Elem name="main">
+            <Elem name="user">
+              <Elem tag="span" name="name">
                 {username}
               </Elem>
-              <Elem tag='span' name='entity-id'>
+              <Elem tag="span" name="entity-id">
                 #{entity.pk ?? entity.id}
               </Elem>
             </Elem>
-            <Elem name='created'>
-              <Elem name='date' component={TimeAgo} date={entity.createdDate} />
+            <Elem name="created">
+              <Elem name="date" component={TimeAgo} date={entity.createdDate} />
             </Elem>
           </Elem>
           {!isPrediction && (
-            <Elem name='icons'>
+            <Elem name="icons">
               {entity.draftId > 0 && (
-                <Tooltip title={'Draft'}>
-                  <Elem name='icon' mod={{ draft: true }}>
-                    <IconDraftCreated2 color='#0099FF' />
+                <Tooltip title={"Draft"}>
+                  <Elem name="icon" mod={{ draft: true }}>
+                    <IconDraftCreated2 color="#0099FF" />
                   </Elem>
                 </Tooltip>
               )}
               {entity.skipped && (
-                <Tooltip title={'Skipped'}>
-                  <Elem name='icon' mod={{ skipped: true }}>
-                    <IconAnnotationSkipped2 color='#DD0000' />
+                <Tooltip title={"Skipped"}>
+                  <Elem name="icon" mod={{ skipped: true }}>
+                    <IconAnnotationSkipped2 color="#DD0000" />
                   </Elem>
                 </Tooltip>
               )}
               {isGroundTruth && (
-                <Tooltip title={'Ground-truth'}>
-                  <Elem name='icon' mod={{ groundTruth: true }}>
+                <Tooltip title={"Ground-truth"}>
+                  <Elem name="icon" mod={{ groundTruth: true }}>
                     <IconAnnotationGroundTruth />
                   </Elem>
                 </Tooltip>
               )}
               {CommentIcon && (
                 <Tooltip title={renderCommentTooltip(entity)}>
-                  <Elem name='icon' mod={{ comments: true }}>
+                  <Elem name="icon" mod={{ comments: true }}>
                     <CommentIcon />
                   </Elem>
                 </Tooltip>
@@ -241,12 +241,12 @@ export const AnnotationButton = observer(
             </Elem>
           )}
         </Elem>
-        <Elem name='contextMenu'>
+        <Elem name="contextMenu">
           <Dropdown.Trigger
             content={<ContextMenu entity={entity} capabilities={capabilities} annotationStore={annotationStore} />}
             onToggle={(isVisible) => setIsContextMenuOpen(isVisible)}
           >
-            <Elem name='ellipsisIcon'>
+            <Elem name="ellipsisIcon">
               <IconEllipsis width={28} height={28} />
             </Elem>
           </Dropdown.Trigger>

@@ -1,18 +1,18 @@
-import { type FC, type MouseEvent as RMouseEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { type FC, type MouseEvent as RMouseEvent, useCallback, useMemo, useRef, useState } from "react";
 import {
   IconArrowLeftSmall,
   IconArrowRightSmall,
   IconOutlinerDrag,
   LsCollapseSmall,
   LsExpandSmall,
-} from '../../../assets/icons';
-import { useDrag } from '../../../hooks/useDrag';
-import { Block, Elem } from '../../../utils/bem';
-import { clamp, isDefined } from '../../../utils/utilities';
-import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MIN_HEIGHT, DEFAULT_PANEL_WIDTH, PANEL_HEADER_HEIGHT } from '../constants';
-import './PanelTabsBase.styl';
-import { type BaseProps, Side } from './types';
-import { resizers } from './utils';
+} from "../../../assets/icons";
+import { useDrag } from "../../../hooks/useDrag";
+import { Block, Elem } from "../../../utils/bem";
+import { clamp, isDefined } from "../../../utils/utilities";
+import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MIN_HEIGHT, DEFAULT_PANEL_WIDTH, PANEL_HEADER_HEIGHT } from "../constants";
+import "./PanelTabsBase.styl";
+import { type BaseProps, Side } from "./types";
+import { resizers } from "./utils";
 
 const distance = (x1: number, x2: number, y1: number, y2: number) => {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
@@ -71,7 +71,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
   const isParentOfCollapsedPanel = attachedKeys && attachedKeys[0] === key;
   const isChildOfGroup = attachedKeys && attachedKeys.includes(key) && attachedKeys[0] !== key;
   const collapsedHeader = !(collapsed && !isParentOfCollapsedPanel);
-  const tooltipText = visible && !collapsed ? 'Collapse' : 'Expand';
+  const tooltipText = visible && !collapsed ? "Collapse" : "Expand";
 
   handlers.current = {
     onResize,
@@ -88,12 +88,12 @@ export const PanelTabsBase: FC<BaseProps> = ({
   const style = useMemo(() => {
     const dynamicStyle = visible
       ? {
-          height: locked ? DEFAULT_PANEL_HEIGHT : collapsed ? '100%' : height ?? '100%',
-          width: locked ? '100%' : !collapsed ? width ?? '100%' : PANEL_HEADER_HEIGHT,
+          height: locked ? DEFAULT_PANEL_HEIGHT : collapsed ? "100%" : height ?? "100%",
+          width: locked ? "100%" : !collapsed ? width ?? "100%" : PANEL_HEADER_HEIGHT,
         }
       : {
-          width: collapsed ? '100%' : width ?? DEFAULT_PANEL_WIDTH,
-          height: collapsed ? '100%' : PANEL_HEADER_HEIGHT,
+          width: collapsed ? "100%" : width ?? DEFAULT_PANEL_WIDTH,
+          height: collapsed ? "100%" : PANEL_HEADER_HEIGHT,
         };
 
     return {
@@ -115,7 +115,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
     return {
       detached: locked ? false : detached,
       hidden: !visible,
-      alignment: detached ? 'left' : alignment ?? 'left',
+      alignment: detached ? "left" : alignment ?? "left",
       disabled: locked,
       collapsed,
       dragTop: dragTop && attachedKeys && attachedKeys[0] === key,
@@ -131,7 +131,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
 
       onMouseDown(e: any) {
         const el = e.target as HTMLElement;
-        const collapseClassName = '[class*=__toggle]';
+        const collapseClassName = "[class*=__toggle]";
 
         if (el.matches(collapseClassName) || el.closest(collapseClassName) || collapsed) return;
 
@@ -189,14 +189,14 @@ export const PanelTabsBase: FC<BaseProps> = ({
         const type = target.dataset.resize;
         const shift = (() => {
           switch (type) {
-            case 'top-left':
-              return 'top-left';
-            case 'top':
-            case 'top-right':
-              return 'top';
-            case 'left':
-            case 'bottom-left':
-              return 'left';
+            case "top-left":
+              return "top-left";
+            case "top":
+            case "top-right":
+              return "top";
+            case "left":
+            case "bottom-left":
+              return "left";
           }
         })();
         const resizeDirections = (() => {
@@ -219,8 +219,8 @@ export const PanelTabsBase: FC<BaseProps> = ({
           const wMod = resizeDirections.x ? e.pageX - sX : 0;
           const hMod = resizeDirections.y ? e.pageY - sY : 0;
 
-          const shiftLeft = isDefined(shift) && ['left', 'top-left'].includes(shift);
-          const shiftTop = isDefined(shift) && ['top', 'top-left'].includes(shift);
+          const shiftLeft = isDefined(shift) && ["left", "top-left"].includes(shift);
+          const shiftTop = isDefined(shift) && ["top", "top-left"].includes(shift);
 
           const width = clamp(shiftLeft ? w - wMod : w + wMod, DEFAULT_PANEL_WIDTH, maxWidth);
           const height = clamp(shiftTop ? h - hMod : h + hMod, DEFAULT_PANEL_MIN_HEIGHT, t + h);
@@ -249,7 +249,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
       passive: true,
 
       onMouseDown(e) {
-        setResizing('grouped-top');
+        setResizing("grouped-top");
         handlers.current.onResizeStart?.();
         return { sY: e.pageY, h: height };
       },
@@ -284,16 +284,16 @@ export const PanelTabsBase: FC<BaseProps> = ({
   );
 
   return (
-    <Block ref={panelRef} name='tabs-panel' mod={mods} style={{ ...style, ...coordinates }}>
-      <Elem name='content'>
+    <Block ref={panelRef} name="tabs-panel" mod={mods} style={{ ...style, ...coordinates }}>
+      <Elem name="content">
         {!locked && collapsedHeader && (
           <>
             {isChildOfGroup && visible && (
               <Elem
-                name='grouped-top'
+                name="grouped-top"
                 ref={resizeGroup}
-                mod={{ drag: 'grouped-top' === resizing }}
-                data-resize={'grouped-top'}
+                mod={{ drag: "grouped-top" === resizing }}
+                data-resize={"grouped-top"}
               />
             )}
             <Elem
@@ -303,16 +303,16 @@ export const PanelTabsBase: FC<BaseProps> = ({
               }}
               id={key}
               mod={{ collapsed }}
-              name='header'
+              name="header"
             >
-              <Elem name='header-left'>
-                {!collapsed && <Elem name='icon' style={{ pointerEvents: 'none' }} tag={IconOutlinerDrag} width={8} />}
-                {!visible && !collapsed && <Elem name='title'>{panelViews.map((view) => view.title).join(' ')}</Elem>}
+              <Elem name="header-left">
+                {!collapsed && <Elem name="icon" style={{ pointerEvents: "none" }} tag={IconOutlinerDrag} width={8} />}
+                {!visible && !collapsed && <Elem name="title">{panelViews.map((view) => view.title).join(" ")}</Elem>}
               </Elem>
-              <Elem name='header-right'>
+              <Elem name="header-right">
                 {(!detached || collapsed) && (
                   <Elem
-                    name='toggle'
+                    name="toggle"
                     mod={{ detached, collapsed, alignment }}
                     onClick={handleGroupPanelToggle}
                     data-tooltip={`${tooltipText} Group`}
@@ -322,7 +322,7 @@ export const PanelTabsBase: FC<BaseProps> = ({
                 )}
                 {!collapsed && (
                   <Elem
-                    name='toggle'
+                    name="toggle"
                     mod={{ detached, collapsed, alignment }}
                     onClick={handlePanelToggle}
                     data-tooltip={tooltipText}
@@ -335,21 +335,21 @@ export const PanelTabsBase: FC<BaseProps> = ({
           </>
         )}
         {visible && !collapsed && (
-          <Elem name='body'>
-            {lockPanelContents && <Elem name='shield' />}
+          <Elem name="body">
+            {lockPanelContents && <Elem name="shield" />}
             {children}
           </Elem>
         )}
       </Elem>
       {visible && !positioning && !locked && (
-        <Elem name='resizers' ref={resizerRef} mod={{ locked: positioning || locked }}>
+        <Elem name="resizers" ref={resizerRef} mod={{ locked: positioning || locked }}>
           {resizers.map((res) => {
             const shouldRender = collapsed
               ? false
-              : ((res === 'left' || res === 'right') && alignment !== res) || detached;
+              : ((res === "left" || res === "right") && alignment !== res) || detached;
 
             return shouldRender ? (
-              <Elem key={res} name='resizer' mod={{ drag: res === resizing }} data-resize={res} />
+              <Elem key={res} name="resizer" mod={{ drag: res === resizing }} data-resize={res} />
             ) : null;
           })}
         </Elem>

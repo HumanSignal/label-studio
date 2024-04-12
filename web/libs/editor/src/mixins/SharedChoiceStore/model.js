@@ -1,5 +1,5 @@
-import { detach, types } from 'mobx-state-tree';
-import Types from '../../core/Types';
+import { detach, types } from "mobx-state-tree";
+import Types from "../../core/Types";
 
 /**
  * Shared Store Model is used to hold children of tags such Taxonomy and Choices.
@@ -8,10 +8,10 @@ import Types from '../../core/Types';
  * defined by `sharedStore` attribute.
  */
 export const SharedStoreModel = types
-  .model('SharedStoreModel', {
+  .model("SharedStoreModel", {
     id: types.identifier,
     locked: false,
-    children: Types.unionArray(['choice']),
+    children: Types.unionArray(["choice"]),
   })
   .actions((self) => ({
     setChildren(val) {

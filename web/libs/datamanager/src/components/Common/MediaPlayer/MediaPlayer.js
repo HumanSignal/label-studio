@@ -1,18 +1,18 @@
-import { createRef, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { forwardRef } from 'react';
-import { FaPause, FaPlay } from 'react-icons/fa';
-import { Block, Elem } from '../../../utils/bem';
-import { FF_LSDV_4711, isFF } from '../../../utils/feature-flags';
-import { filename } from '../../../utils/helpers';
-import { Space } from '../Space/Space';
-import { Spinner } from '../Spinner';
-import { Duration } from './Duration';
-import './MediaPlayer.styl';
-import { MediaSeeker } from './MediaSeeker';
+import { createRef, useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { forwardRef } from "react";
+import { FaPause, FaPlay } from "react-icons/fa";
+import { Block, Elem } from "../../../utils/bem";
+import { FF_LSDV_4711, isFF } from "../../../utils/feature-flags";
+import { filename } from "../../../utils/helpers";
+import { Space } from "../Space/Space";
+import { Spinner } from "../Spinner";
+import { Duration } from "./Duration";
+import "./MediaPlayer.styl";
+import { MediaSeeker } from "./MediaSeeker";
 
 const mediaDefaultProps = {};
 
-if (isFF(FF_LSDV_4711)) mediaDefaultProps.crossOrigin = 'anonymous';
+if (isFF(FF_LSDV_4711)) mediaDefaultProps.crossOrigin = "anonymous";
 
 const initialState = {
   duration: 0,
@@ -37,30 +37,30 @@ export const MediaPlayer = ({ src, video = false }) => {
 
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
-      case 'duration':
+      case "duration":
         return { ...state, duration: action.payload };
-      case 'current':
+      case "current":
         return { ...state, currentTime: action.payload };
-      case 'loaded':
+      case "loaded":
         return { ...state, loaded: true };
-      case 'error':
+      case "error":
         return { ...state, error: true, resetSource: state.loaded ? state.resetSource + 1 : state.resetSource };
-      case 'play':
+      case "play":
         return { ...state, playing: true };
-      case 'pause':
+      case "pause":
         return { ...state, playing: false };
-      case 'buffer':
+      case "buffer":
         return { ...state, buffer: action.payload };
-      case 'resetSource':
+      case "resetSource":
         return { ...state, resetSource: 0, loaded: false, error: false };
     }
   }, initialState);
 
   const format = useMemo(() => {
     if (state.duration >= 3600) {
-      return ['hours', 'minutes', 'seconds'];
+      return ["hours", "minutes", "seconds"];
     }
-    return ['minutes', 'seconds'];
+    return ["minutes", "seconds"];
   }, [state.duration]);
 
   const play = useCallback(() => {
@@ -108,14 +108,14 @@ export const MediaPlayer = ({ src, video = false }) => {
     src,
     ref: media,
     controls: false,
-    preload: 'metadata',
-    onPlay: () => dispatch({ type: 'play' }),
-    onPause: () => dispatch({ type: 'pause' }),
-    onTimeUpdate: () => dispatch({ type: 'current', payload: media.current.currentTime }),
-    onDurationChange: () => dispatch({ type: 'duration', payload: media.current.duration }),
-    onCanPlay: () => dispatch({ type: 'loaded' }),
-    onProgress: () => dispatch({ type: 'buffer', payload: media.current.buffered }),
-    onError: () => dispatch({ type: 'error' }),
+    preload: "metadata",
+    onPlay: () => dispatch({ type: "play" }),
+    onPause: () => dispatch({ type: "pause" }),
+    onTimeUpdate: () => dispatch({ type: "current", payload: media.current.currentTime }),
+    onDurationChange: () => dispatch({ type: "duration", payload: media.current.duration }),
+    onCanPlay: () => dispatch({ type: "loaded" }),
+    onProgress: () => dispatch({ type: "buffer", payload: media.current.buffered }),
+    onError: () => dispatch({ type: "error" }),
   };
 
   useEffect(() => {
@@ -124,7 +124,7 @@ export const MediaPlayer = ({ src, video = false }) => {
     // force reload on error if the source previously loaded,
     // as it may just require a new presigned url
     if (state.resetSource > 0) {
-      dispatch({ type: 'resetSource' });
+      dispatch({ type: "resetSource" });
       hasReloaded.current = true;
       media.current.load();
     }
@@ -146,22 +146,22 @@ export const MediaPlayer = ({ src, video = false }) => {
   const showError = isFF(FF_LSDV_4711) ? !state.resetSource && state.error : state.error;
 
   return enabled ? (
-    <Block name='player' mod={{ video }} onClick={(e) => e.stopPropagation()}>
-      {video && <MediaSource type='video' onClick={togglePlay} {...mediaProps} />}
+    <Block name="player" mod={{ video }} onClick={(e) => e.stopPropagation()}>
+      {video && <MediaSource type="video" onClick={togglePlay} {...mediaProps} />}
       {showError ? (
-        <Elem name='loading'>Unable to play</Elem>
+        <Elem name="loading">Unable to play</Elem>
       ) : state.loaded ? (
-        <Elem name='playback'>
-          <Elem name='controls' tag={Space} spread>
-            <Space size='small'>
-              <Elem name='play' onClick={togglePlay}>
+        <Elem name="playback">
+          <Elem name="controls" tag={Space} spread>
+            <Space size="small">
+              <Elem name="play" onClick={togglePlay}>
                 {state.playing ? <FaPause /> : <FaPlay />}
               </Elem>
-              {!video && <Elem name='track'>{filename(src)}</Elem>}
+              {!video && <Elem name="track">{filename(src)}</Elem>}
             </Space>
-            <Elem tag={Space} size='small' name='time'>
+            <Elem tag={Space} size="small" name="time">
               <Duration value={state.currentTime} format={format} />
-              {' / '}
+              {" / "}
               <Duration value={state.duration} format={format} />
             </Elem>
           </Elem>
@@ -177,38 +177,38 @@ export const MediaPlayer = ({ src, video = false }) => {
           />
         </Elem>
       ) : (
-        <Elem name='loading'>
-          <Spinner size='24' />
+        <Elem name="loading">
+          <Spinner size="24" />
         </Elem>
       )}
 
-      {!video && <MediaSource type='audio' {...mediaProps} ref={media} />}
+      {!video && <MediaSource type="audio" {...mediaProps} ref={media} />}
     </Block>
   ) : (
     <Block
-      name='player'
+      name="player"
       onClick={(e) => {
         e.stopPropagation();
         setEnabled(true);
         waitForPlayer();
       }}
     >
-      <Elem name='controls' tag={Space} spread>
-        <Space size='small'>
-          <Elem name='play'>
+      <Elem name="controls" tag={Space} spread>
+        <Space size="small">
+          <Elem name="play">
             <FaPlay />
           </Elem>
-          <Elem name='track'>Click to load</Elem>
+          <Elem name="track">Click to load</Elem>
         </Space>
-        <Elem tag={Space} size='small' name='time' />
+        <Elem tag={Space} size="small" name="time" />
       </Elem>
     </Block>
   );
 };
 
-const MediaSource = forwardRef(({ type = 'audio', src, ...props }, ref) => {
+const MediaSource = forwardRef(({ type = "audio", src, ...props }, ref) => {
   return (
-    <Elem {...mediaDefaultProps} name='media' tag={type} ref={ref} {...props}>
+    <Elem {...mediaDefaultProps} name="media" tag={type} ref={ref} {...props}>
       <source src={src} />
     </Elem>
   );

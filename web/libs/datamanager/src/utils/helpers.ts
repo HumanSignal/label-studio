@@ -1,4 +1,4 @@
-import { toCamelCase } from 'strman';
+import { toCamelCase } from "strman";
 
 export const formDataToJPO = (formData: FormData) => {
   if (formData instanceof FormData) {
@@ -24,7 +24,7 @@ export const filename = (string: string) => {
   if (string) {
     return (
       string
-        .split('/')
+        .split("/")
         .slice(-1)[0]
         .match(/([^?]+)/g)?.[0] ?? string
     );
@@ -32,11 +32,11 @@ export const filename = (string: string) => {
 };
 
 export const isEmptyString = (value: any) => {
-  return typeof value === 'string' && value.trim().length === 0;
+  return typeof value === "string" && value.trim().length === 0;
 };
 
 export const isEmptyObject = (value: any) => {
-  return (typeof value === 'object' && !value) || Object.keys(value).length === 0;
+  return (typeof value === "object" && !value) || Object.keys(value).length === 0;
 };
 
 export const isEmptyArray = (value: any) => {
@@ -67,7 +67,7 @@ export const camelizeKeys = <T extends AnyObject>(source: T): KeysToCamelCase<T>
   const split = Object.entries(source);
 
   const pairs: Pair[] = split.map<Pair>(([key, value]) => {
-    if (Object.prototype.toString.call(value) === '[object Object]') {
+    if (Object.prototype.toString.call(value) === "[object Object]") {
       return [toCamelCase(key), camelizeKeys(value as T)];
     }
 
@@ -97,7 +97,7 @@ export const objectClean = <T extends AnyObject>(source: T) => {
       return res;
     }
 
-    if (Object.prototype.toString.call(value) === '[object Object]') {
+    if (Object.prototype.toString.call(value) === "[object Object]") {
       return [...res, [key, objectClean(value as AnyObject)]];
     }
     return [...res, [key, value]];
@@ -110,11 +110,11 @@ export const clamp = (value: number, min: number, max: number) => {
   return Math.max(min, Math.min(value, max));
 };
 
-export const absoluteURL = (path = '') => {
+export const absoluteURL = (path = "") => {
   if (path.match(/^https?/) || path.match(/^\/\//)) {
     return path;
   }
-  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ''), path.replace(/^([/]+)/, '')].join('/');
+  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
 };
 
 export const isDefined = <T>(value?: T): value is NonNullable<T> => {

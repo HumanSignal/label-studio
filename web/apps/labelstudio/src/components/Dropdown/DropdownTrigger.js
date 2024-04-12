@@ -8,9 +8,9 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import { Dropdown } from './DropdownComponent';
-import { DropdownContext } from './DropdownContext';
+} from "react";
+import { Dropdown } from "./DropdownComponent";
+import { DropdownContext } from "./DropdownContext";
 
 export const DropdownTrigger = forwardRef(
   ({ tag, children, dropdown, content, toggle, closeOnClickOutside = true, ...props }, ref) => {
@@ -61,7 +61,7 @@ export const DropdownTrigger = forwardRef(
     const triggerClone = cloneElement(triggerEL, {
       ...triggerEL.props,
       tag,
-      key: 'dd-trigger',
+      key: "dd-trigger",
       ref: triggerRef,
       onClickCapture: triggerEL.props?.onClick ? null : handleToggle,
     });
@@ -73,8 +73,8 @@ export const DropdownTrigger = forwardRef(
     ) : null;
 
     useEffect(() => {
-      document.addEventListener('click', handleClick, { capture: true });
-      return () => document.removeEventListener('click', handleClick, { capture: true });
+      document.addEventListener("click", handleClick, { capture: true });
+      return () => document.removeEventListener("click", handleClick, { capture: true });
     }, [handleClick]);
 
     const contextValue = useMemo(

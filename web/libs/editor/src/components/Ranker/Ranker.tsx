@@ -1,10 +1,10 @@
-import React, { createContext, useCallback, useEffect, useState } from 'react';
-import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import React, { createContext, useCallback, useEffect, useState } from "react";
+import { DragDropContext, type DropResult } from "react-beautiful-dnd";
 
-import Column from './Column';
-import type { NewBoardData } from './createData';
+import Column from "./Column";
+import type { NewBoardData } from "./createData";
 
-import styles from './Ranker.module.scss';
+import styles from "./Ranker.module.scss";
 
 interface BoardProps {
   inputData: NewBoardData;

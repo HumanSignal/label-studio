@@ -1,24 +1,24 @@
-import { inject, observer } from 'mobx-react';
-import { getType, types } from 'mobx-state-tree';
-import ColorScheme from 'pleasejs';
-import React from 'react';
+import { inject, observer } from "mobx-react";
+import { getType, types } from "mobx-state-tree";
+import ColorScheme from "pleasejs";
+import React from "react";
 
-import { Tooltip } from '../../common/Tooltip/Tooltip';
-import InfoModal from '../../components/Infomodal/Infomodal';
-import { Label } from '../../components/Label/Label';
-import Constants from '../../core/Constants';
-import { customTypes } from '../../core/CustomTypes';
-import { guidGenerator } from '../../core/Helpers';
-import Registry from '../../core/Registry';
-import Types from '../../core/Types';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import ProcessAttrsMixin from '../../mixins/ProcessAttrs';
-import { TagParentMixin } from '../../mixins/TagParentMixin';
-import ToolsManager from '../../tools/Manager';
-import Utils from '../../utils';
-import { parseValue } from '../../utils/data';
-import { FF_DEV_2128, isFF } from '../../utils/feature-flags';
-import { sanitizeHtml } from '../../utils/html';
+import { Tooltip } from "../../common/Tooltip/Tooltip";
+import InfoModal from "../../components/Infomodal/Infomodal";
+import { Label } from "../../components/Label/Label";
+import Constants from "../../core/Constants";
+import { customTypes } from "../../core/CustomTypes";
+import { guidGenerator } from "../../core/Helpers";
+import Registry from "../../core/Registry";
+import Types from "../../core/Types";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
+import { TagParentMixin } from "../../mixins/TagParentMixin";
+import ToolsManager from "../../tools/Manager";
+import Utils from "../../utils";
+import { parseValue } from "../../utils/data";
+import { FF_DEV_2128, isFF } from "../../utils/feature-flags";
+import { sanitizeHtml } from "../../utils/html";
 
 /**
  * The `Label` tag represents a single label. Use with the `Labels` tag, including `BrushLabels`, `EllipseLabels`, `HyperTextLabels`, `KeyPointLabels`, and other `Labels` tags to specify the value of a specific label.
@@ -57,11 +57,11 @@ const TagAttrs = types.model({
   hint: types.maybeNull(types.string),
   hotkey: types.maybeNull(types.string),
   showalias: types.optional(types.boolean, false),
-  aliasstyle: types.optional(types.string, 'opacity: 0.6'),
-  size: types.optional(types.string, 'medium'),
+  aliasstyle: types.optional(types.string, "opacity: 0.6"),
+  size: types.optional(types.string, "medium"),
   background: types.optional(customTypes.color, Constants.LABEL_BACKGROUND),
-  selectedcolor: types.optional(customTypes.color, '#ffffff'),
-  granularity: types.maybeNull(types.enumeration(['symbol', 'word', 'sentence', 'paragraph'])),
+  selectedcolor: types.optional(customTypes.color, "#ffffff"),
+  granularity: types.maybeNull(types.enumeration(["symbol", "word", "sentence", "paragraph"])),
   groupcancontain: types.maybeNull(types.string),
   // childrencheck: types.optional(types.enumeration(["any", "all"]), "any")
   ...(isFF(FF_DEV_2128) ? { html: types.maybeNull(types.string) } : {}),
@@ -70,19 +70,19 @@ const TagAttrs = types.model({
 const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
-    type: 'label',
+    type: "label",
     visible: types.optional(types.boolean, true),
-    _value: types.optional(types.string, ''),
+    _value: types.optional(types.string, ""),
     parentTypes: Types.tagsTypes([
-      'Labels',
-      'EllipseLabels',
-      'RectangleLabels',
-      'PolygonLabels',
-      'KeyPointLabels',
-      'BrushLabels',
-      'HyperTextLabels',
-      'TimeSeriesLabels',
-      'ParagraphLabels',
+      "Labels",
+      "EllipseLabels",
+      "RectangleLabels",
+      "PolygonLabels",
+      "KeyPointLabels",
+      "BrushLabels",
+      "HyperTextLabels",
+      "TimeSeriesLabels",
+      "ParagraphLabels",
     ]),
   })
   .volatile((self) => {
@@ -179,8 +179,8 @@ const Model = types
         // @todo but check for regions created by tools
         // @todo lot of tests!
         if (self.selected) return true; // we are unselecting a label which is always ok
-        if (labels.type === 'labels') return true; // universal labels are fine to select
-        if (labels.type.includes(region.type.replace(/region$/, ''))) return true; // region type is in label type
+        if (labels.type === "labels") return true; // universal labels are fine to select
+        if (labels.type.includes(region.type.replace(/region$/, ""))) return true; // region type is in label type
         if (labels.type.includes(region.results[0].type)) return true; // any result type of the region is in label type
 
         return false;
@@ -194,7 +194,7 @@ const Model = types
 
         self.annotation.toNames
           .get(labels.toname)
-          .filter((tag) => tag.type && tag.type.endsWith('labels') && tag.name !== labels.name);
+          .filter((tag) => tag.type && tag.type.endsWith("labels") && tag.name !== labels.name);
 
         // unselect other tools if they exist and selected
         const manager = ToolsManager.getInstance({ name: self.parent.toname });
@@ -297,9 +297,9 @@ const Model = types
     },
   }));
 
-const LabelModel = types.compose('LabelModel', TagParentMixin, TagAttrs, ProcessAttrsMixin, Model, AnnotationMixin);
+const LabelModel = types.compose("LabelModel", TagParentMixin, TagAttrs, ProcessAttrsMixin, Model, AnnotationMixin);
 
-const HtxLabelView = inject('store')(
+const HtxLabelView = inject("store")(
   observer(({ item, store }) => {
     const hotkey =
       (store.settings.enableTooltips || store.settings.enableLabelTooltips) &&
@@ -331,6 +331,6 @@ const HtxLabelView = inject('store')(
   }),
 );
 
-Registry.addTag('label', LabelModel, HtxLabelView);
+Registry.addTag("label", LabelModel, HtxLabelView);
 
 export { HtxLabelView, LabelModel };

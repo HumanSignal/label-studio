@@ -1,26 +1,26 @@
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React from 'react';
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import Constants from '../core/Constants';
-import ToolMixin from '../mixins/Tool';
-import BaseTool from './Base';
+import Constants from "../core/Constants";
+import ToolMixin from "../mixins/Tool";
+import BaseTool from "./Base";
 
-import { IconContrastTool } from '../assets/icons';
-import { Range } from '../common/Range/Range';
-import { Tool } from '../components/Toolbar/Tool';
+import { IconContrastTool } from "../assets/icons";
+import { Range } from "../common/Range/Range";
+import { Tool } from "../components/Toolbar/Tool";
 
 const ToolView = observer(({ item }) => {
   return (
     <Tool
       active={item.selected}
-      ariaLabel='contrast'
-      label='Contrast'
+      ariaLabel="contrast"
+      label="Contrast"
       controlsOnHover
       controls={[
         <Range
-          key='contrast'
-          align='vertical'
+          key="contrast"
+          align="vertical"
           reverse
           continuous
           minIcon={<IconContrastTool style={{ width: 22, height: 22, opacity: 0.2 }} />}
@@ -38,7 +38,7 @@ const ToolView = observer(({ item }) => {
 });
 
 const _Tool = types
-  .model('ContrastTool', {
+  .model("ContrastTool", {
     contrast: types.optional(types.number, Constants.CONTRAST_VALUE),
   })
   .views((self) => ({

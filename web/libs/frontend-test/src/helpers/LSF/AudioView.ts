@@ -6,13 +6,13 @@ type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>
 
 export const AudioView = {
   get root() {
-    return cy.get('.lsf-audio-tag');
+    return cy.get(".lsf-audio-tag");
   },
   get drawingArea() {
-    return this.root.get('canvas');
+    return this.root.get("canvas");
   },
   get timelineControls() {
-    return this.root.get('.lsf-timeline-controls');
+    return this.root.get(".lsf-timeline-controls");
   },
   get currentTimebox() {
     return cy.get('[data-testid="timebox-current-time"] > .lsf-time-box__input-time');
@@ -21,16 +21,16 @@ export const AudioView = {
     return cy.get('[data-testid="timebox-end-time"] > .lsf-time-box__input-time');
   },
   get configButton() {
-    return this.timelineControls.get('.lsf-audio-config > .lsf-button');
+    return this.timelineControls.get(".lsf-audio-config > .lsf-button");
   },
   get volumeButton() {
-    return this.timelineControls.get('.lsf-audio-control > .lsf-button');
+    return this.timelineControls.get(".lsf-audio-control > .lsf-button");
   },
   get loadingBar() {
-    return this.root.get('loading-progress-bar', { timeout: 10000 });
+    return this.root.get("loading-progress-bar", { timeout: 10000 });
   },
   isReady() {
-    this.loadingBar.should('not.exist');
+    this.loadingBar.should("not.exist");
   },
   get playButton() {
     return cy.get(`[data-testid="playback-button:play"]`);
@@ -39,7 +39,7 @@ export const AudioView = {
     return cy.get(`[data-testid="playback-button:pause"]`);
   },
   seekCurrentTimebox(to: number) {
-    let timeString = '';
+    let timeString = "";
     timeString = `0000${to}000`;
 
     this.currentTimebox.click({ force: true }).clear().type(timeString, { force: true }).blur();
@@ -92,18 +92,18 @@ export const AudioView = {
     cy.log(`Draw rectangle at (${x}, ${y}) of size ${width}x${height}`);
     this.drawingArea
       .scrollIntoView()
-      .trigger('mousedown', x, y, {
-        eventConstructor: 'MouseEvent',
+      .trigger("mousedown", x, y, {
+        eventConstructor: "MouseEvent",
         buttons: 1,
         ...options,
       })
-      .trigger('mousemove', x + width, y + height, {
-        eventConstructor: 'MouseEvent',
+      .trigger("mousemove", x + width, y + height, {
+        eventConstructor: "MouseEvent",
         buttons: 1,
         ...options,
       })
-      .trigger('mouseup', x + width, y + height, {
-        eventConstructor: 'MouseEvent',
+      .trigger("mouseup", x + width, y + height, {
+        eventConstructor: "MouseEvent",
         buttons: 1,
         ...options,
       })

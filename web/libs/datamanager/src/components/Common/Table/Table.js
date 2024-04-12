@@ -1,23 +1,23 @@
-import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { FaCode } from 'react-icons/fa';
-import { RiCodeLine } from 'react-icons/ri';
-import { LsGear, LsGearNewUI } from '../../../assets/icons';
-import { useSDK } from '../../../providers/SDKProvider';
-import { Block, Elem } from '../../../utils/bem';
-import { FF_DEV_3873, FF_LOPS_E_3, FF_LOPS_E_10, isFF } from '../../../utils/feature-flags';
-import { isDefined } from '../../../utils/utils';
-import { Button } from '../Button/Button';
-import { FieldsButton } from '../FieldsButton';
-import { Icon } from '../Icon/Icon';
-import { modal } from '../Modal/Modal';
-import { Tooltip } from '../Tooltip/Tooltip';
-import './Table.styl';
-import { TableCheckboxCell } from './TableCheckbox';
-import { TableBlock, TableContext, TableElem } from './TableContext';
-import { TableHead } from './TableHead/TableHead';
-import { TableRow } from './TableRow/TableRow';
-import { prepareColumns } from './utils';
+import { observer } from "mobx-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { FaCode } from "react-icons/fa";
+import { RiCodeLine } from "react-icons/ri";
+import { LsGear, LsGearNewUI } from "../../../assets/icons";
+import { useSDK } from "../../../providers/SDKProvider";
+import { Block, Elem } from "../../../utils/bem";
+import { FF_DEV_3873, FF_LOPS_E_3, FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
+import { isDefined } from "../../../utils/utils";
+import { Button } from "../Button/Button";
+import { FieldsButton } from "../FieldsButton";
+import { Icon } from "../Icon/Icon";
+import { modal } from "../Modal/Modal";
+import { Tooltip } from "../Tooltip/Tooltip";
+import "./Table.styl";
+import { TableCheckboxCell } from "./TableCheckbox";
+import { TableBlock, TableContext, TableElem } from "./TableContext";
+import { TableHead } from "./TableHead/TableHead";
+import { TableRow } from "./TableRow/TableRow";
+import { prepareColumns } from "./utils";
 
 const Decorator = (decoration) => {
   return {
@@ -48,14 +48,14 @@ const RowRenderer = observer(({ row, index, stopInteractions, rowHeight, fitCont
   };
 
   return (
-    <TableElem key={`${row.id}-${index}`} name='row-wrapper' mod={mods} onClick={(e) => onRowClick?.(row, e)}>
+    <TableElem key={`${row.id}-${index}`} name="row-wrapper" mod={mods} onClick={(e) => onRowClick?.(row, e)}>
       <TableRow
         key={row.id}
         data={row}
         even={index % 2 === 0}
         style={{
           height: rowHeight,
-          width: fitContent ? 'fit-content' : 'auto',
+          width: fitContent ? "fit-content" : "auto",
         }}
         decoration={decoration}
       />
@@ -88,7 +88,7 @@ export const Table = observer(
     headerExtra,
     ...props
   }) => {
-    const colOrderKey = 'dm:columnorder';
+    const colOrderKey = "dm:columnorder";
     const tableHead = useRef();
     const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const columns = prepareColumns(props.columns, props.hiddenColumns);
@@ -101,17 +101,17 @@ export const Table = observer(
 
     if (props.onSelectAll && props.onSelectRow) {
       columns.unshift({
-        id: 'select',
-        headerClassName: 'table__select-all',
-        cellClassName: 'select-row',
+        id: "select",
+        headerClassName: "table__select-all",
+        cellClassName: "select-row",
         style: {
           width: 40,
           maxWidth: 40,
-          justifyContent: 'center',
+          justifyContent: "center",
         },
         onClick: (e) => e.stopPropagation(),
         Header: () => {
-          return <SelectionObserver selection={selectedItems} onSelect={props.onSelectAll} className='select-all' />;
+          return <SelectionObserver selection={selectedItems} onSelect={props.onSelectAll} className="select-all" />;
         },
         Cell: ({ data }) => {
           return (
@@ -122,19 +122,19 @@ export const Table = observer(
     }
 
     columns.push({
-      id: 'show-source',
-      cellClassName: 'show-source',
+      id: "show-source",
+      cellClassName: "show-source",
       style: {
         width: 40,
         maxWidth: 40,
-        justifyContent: 'center',
+        justifyContent: "center",
       },
       onClick: (e) => e.stopPropagation(),
       Header() {
         return <div style={{ width: 40 }} />;
       },
       Cell({ data }) {
-        let out = JSON.parse(data.source ?? '{}');
+        let out = JSON.parse(data.source ?? "{}");
 
         out = {
           id: out?.id,
@@ -144,7 +144,7 @@ export const Table = observer(
         };
 
         const onTaskLoad = async () => {
-          if (isFF(FF_LOPS_E_3) && type === 'DE') {
+          if (isFF(FF_LOPS_E_3) && type === "DE") {
             return new Promise((resolve) => resolve(out));
           }
           const response = await api.task({ taskID: out.id });
@@ -153,9 +153,9 @@ export const Table = observer(
         };
 
         return (
-          <Tooltip title='Show task source'>
+          <Tooltip title="Show task source">
             <Button
-              type='link'
+              type="link"
               style={{ width: 32, height: 32, padding: 0 }}
               onClick={() => {
                 modal({
@@ -195,26 +195,26 @@ export const Table = observer(
       const highlightedIndex = data.indexOf(focusedItem) - 1;
       const highlightedElement = tableWrapper.current?.children[highlightedIndex];
 
-      if (highlightedElement) highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (highlightedElement) highlightedElement.scrollIntoView({ behavior: "smooth", block: "center" });
     }, [tableWrapper.current]);
 
     return (
       <>
         {view.root.isLabeling && (
-          <Block name='column-selector'>
+          <Block name="column-selector">
             {isFF(FF_DEV_3873) ? (
               <Elem
-                name='button-new'
+                name="button-new"
                 tag={FieldsButton}
-                className={'newUi'}
+                className={"newUi"}
                 icon={<LsGearNewUI />}
-                tooltip={'Customize Columns'}
+                tooltip={"Customize Columns"}
                 style={{ padding: 0 }}
                 wrapper={FieldsButton.Checkbox}
               />
             ) : (
               <Elem
-                name='button'
+                name="button"
                 tag={FieldsButton}
                 icon={<LsGear />}
                 wrapper={FieldsButton.Checkbox}
@@ -223,7 +223,7 @@ export const Table = observer(
             )}
           </Block>
         )}
-        <TableBlock ref={tableWrapper} name='table' mod={{ fit: props.fitToContent }}>
+        <TableBlock ref={tableWrapper} name="table" mod={{ fit: props.fitToContent }}>
           <TableContext.Provider value={contextValue}>
             <TableHead
               ref={tableHead}
@@ -271,7 +271,7 @@ const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
         data: response.data,
       };
 
-      if (sdkType !== 'DE') {
+      if (sdkType !== "DE") {
         formatted.annotations = response.annotations ?? [];
         formatted.predictions = response.predictions ?? [];
       }
@@ -279,5 +279,5 @@ const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
     });
   }, []);
 
-  return <pre>{source ? JSON.stringify(source, null, '  ') : null}</pre>;
+  return <pre>{source ? JSON.stringify(source, null, "  ") : null}</pre>;
 };

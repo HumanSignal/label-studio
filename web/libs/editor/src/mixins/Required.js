@@ -1,5 +1,5 @@
-import { getParent, types } from 'mobx-state-tree';
-import { FF_LSDV_4583, isFF } from '../utils/feature-flags';
+import { getParent, types } from "mobx-state-tree";
+import { FF_LSDV_4583, isFF } from "../utils/feature-flags";
 
 const RequiredMixin = types
   .model({
@@ -26,7 +26,7 @@ const RequiredMixin = types
           for (const reg of objectTag.allRegs) {
             const s = reg.results.find((s) => s.from_name === self);
 
-            if (self.visiblewhen === 'region-selected') {
+            if (self.visiblewhen === "region-selected") {
               if (self.whentagname) {
                 const label = reg.labeling?.from_name?.name;
 

@@ -10,7 +10,7 @@ import {
   createElement,
   forwardRef,
   useContext,
-} from 'react';
+} from "react";
 
 interface CNMod {
   [key: string]: unknown;
@@ -60,7 +60,7 @@ type WrappedComponentProps<CN extends FC<any>, TN extends TagNames> = {
     [key in keyof Parameters<CN>[0]]: Parameters<CN>[0][key];
   });
 
-const CSS_PREFIX = process.env.CSS_PREFIX ?? 'dm-';
+const CSS_PREFIX = process.env.CSS_PREFIX ?? "dm-";
 
 const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?: CNMod) => {
   const rootName = block;
@@ -76,7 +76,7 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
 
       if (value !== true) stateClass.push(value as string);
 
-      res.push(stateClass.join('_'));
+      res.push(stateClass.join("_"));
     }
     return res;
   }, [] as string[]);
@@ -92,13 +92,13 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
     const mixMap = ([] as CNMix[])
       .concat(...mixes)
       .filter((m) => {
-        if (typeof m === 'string') {
-          return m.trim() !== '';
+        if (typeof m === "string") {
+          return m.trim() !== "";
         }
         return m !== undefined && m !== null;
       })
       .map((m) => {
-        if (typeof m === 'string') {
+        if (typeof m === "string") {
           return m;
         }
         return m?.toClassName?.();
@@ -109,11 +109,11 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
   }
 
   const attachNamespace = (cls: string) => {
-    if (typeof cls !== 'string') console.error('Non-string classname: ', cls);
+    if (typeof cls !== "string") console.error("Non-string classname: ", cls);
     return String(cls).startsWith(CSS_PREFIX) ? cls : `${CSS_PREFIX}${cls}`;
   };
 
-  return finalClass.map(attachNamespace).join(' ');
+  return finalClass.map(attachNamespace).join(" ");
 };
 
 const BlockContext = createContext<CN | null>(null);
@@ -162,13 +162,13 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
     },
 
     toCSSSelector() {
-      return `.${this.toClassName().replace(/(\s+)/g, '.')}`;
+      return `.${this.toClassName().replace(/(\s+)/g, ".")}`;
     },
   };
 
-  Object.defineProperty(classNameBuilder, 'Block', { value: Block });
-  Object.defineProperty(classNameBuilder, 'Elem', { value: Elem });
-  Object.defineProperty(classNameBuilder, '__class', {
+  Object.defineProperty(classNameBuilder, "Block", { value: Block });
+  Object.defineProperty(classNameBuilder, "Elem", { value: Elem });
+  Object.defineProperty(classNameBuilder, "__class", {
     value: {
       block,
       elem,
@@ -185,7 +185,7 @@ export const BemWithSpecifiContext = (context?: Context<CN | null>) => {
 
   const Block = forwardRef(
     <T extends FC<any>, D extends TagNames>(
-      { tag = 'div', name, mod, mix, ...rest }: WrappedComponentProps<T, D>,
+      { tag = "div", name, mod, mix, ...rest }: WrappedComponentProps<T, D>,
       ref: any,
     ) => {
       const rootClass = cn(name);
@@ -195,7 +195,7 @@ export const BemWithSpecifiContext = (context?: Context<CN | null>) => {
         .mix(...(finalMix as CNMix[]), rest.className)
         .toClassName();
       const finalProps =
-        tag.toString() === 'Symbol(react.fragment)' ? { ...rest, ref } : ({ ...rest, ref, className } as any);
+        tag.toString() === "Symbol(react.fragment)" ? { ...rest, ref } : ({ ...rest, ref, className } as any);
 
       return createElement(
         Context.Provider,
@@ -209,7 +209,7 @@ export const BemWithSpecifiContext = (context?: Context<CN | null>) => {
 
   const Elem = forwardRef(
     <T extends FC<any>, D extends TagNames>(
-      { tag = 'div', component, block, name, mod, mix, ...rest }: WrappedComponentProps<T, D>,
+      { tag = "div", component, block, name, mod, mix, ...rest }: WrappedComponentProps<T, D>,
       ref: any,
     ) => {
       const blockCtx = useContext(Context);
@@ -224,16 +224,16 @@ export const BemWithSpecifiContext = (context?: Context<CN | null>) => {
 
       const finalProps: any = { ...rest, ref, className };
 
-      if (typeof tag !== 'string') finalProps.block = blockCtx;
+      if (typeof tag !== "string") finalProps.block = blockCtx;
       if (component) finalProps.tag = tag;
 
       return createElement(component ?? tag, finalProps);
     },
   );
 
-  Block.displayName = 'Block';
+  Block.displayName = "Block";
 
-  Elem.displayName = 'Elem';
+  Elem.displayName = "Elem";
 
   return { Block, Elem, Context };
 };

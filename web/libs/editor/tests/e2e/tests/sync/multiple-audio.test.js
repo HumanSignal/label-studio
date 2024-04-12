@@ -1,8 +1,8 @@
 /* global Feature, Scenario */
 
-const assert = require('assert');
+const assert = require("assert");
 
-Feature('Sync: Multiple Audio');
+Feature("Sync: Multiple Audio");
 
 const config = `
 <View>
@@ -12,21 +12,21 @@ const config = `
 `;
 
 const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3",
 };
 
 const annotations = [];
 
-const params = { annotations: [{ id: 'test', result: annotations }], config, data };
+const params = { annotations: [{ id: "test", result: annotations }], config, data };
 
-Scenario('Play/pause of multiple synced audio stay in sync', async ({ I, LabelStudio, AtAudioView }) => {
+Scenario("Play/pause of multiple synced audio stay in sync", async ({ I, LabelStudio, AtAudioView }) => {
   LabelStudio.setFeatureFlags({
     fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
     ff_front_dev_2715_audio_3_280722_short: true,
     fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
   });
 
-  I.amOnPage('/');
+  I.amOnPage("/");
 
   LabelStudio.init(params);
 
@@ -68,27 +68,27 @@ Scenario('Play/pause of multiple synced audio stay in sync', async ({ I, LabelSt
   }
 });
 
-Scenario('Looping of multiple synced audio stay in sync', async ({ I, LabelStudio, AtAudioView }) => {
+Scenario("Looping of multiple synced audio stay in sync", async ({ I, LabelStudio, AtAudioView }) => {
   LabelStudio.setFeatureFlags({
     fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
     ff_front_dev_2715_audio_3_280722_short: true,
     fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
   });
 
-  I.amOnPage('/');
+  I.amOnPage("/");
 
   LabelStudio.init(params);
 
   await AtAudioView.waitForAudio();
   await AtAudioView.lookForStage();
 
-  I.say('Draw an audio segment to start looping');
+  I.say("Draw an audio segment to start looping");
   AtAudioView.dragAudioElement(160, 80);
   {
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] =
       await AtAudioView.getCurrentAudio();
 
-    I.say('Audio is playing');
+    I.say("Audio is playing");
 
     // Check that the audio timing is within 0.3 seconds of each other (to account for rounding errors, and the fact
     // that playback timers will not be perfectly precise)
@@ -103,13 +103,13 @@ Scenario('Looping of multiple synced audio stay in sync', async ({ I, LabelStudi
     assert.equal(audioPaused1, false);
   }
 
-  I.say('Audio played to the same point in time');
+  I.say("Audio played to the same point in time");
   AtAudioView.clickPauseButton();
   {
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] =
       await AtAudioView.getCurrentAudio();
 
-    I.say('Audio is paused');
+    I.say("Audio is paused");
 
     assert.equal(audioPaused1, audioPaused2);
     assert.equal(audioPaused1, true);
@@ -122,7 +122,7 @@ Scenario('Looping of multiple synced audio stay in sync', async ({ I, LabelStudi
   }
 
   I.say(
-    'Clicking outside of the audio segment and then clicking play should restart the audio from the beginning of the segment',
+    "Clicking outside of the audio segment and then clicking play should restart the audio from the beginning of the segment",
   );
   AtAudioView.clickAt(250);
   AtAudioView.clickPlayButton();
@@ -130,7 +130,7 @@ Scenario('Looping of multiple synced audio stay in sync', async ({ I, LabelStudi
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] =
       await AtAudioView.getCurrentAudio();
 
-    I.say('Audio is playing');
+    I.say("Audio is playing");
 
     assert.equal(audioPaused1, audioPaused2);
     assert.equal(audioPaused1, false);
@@ -143,14 +143,14 @@ Scenario('Looping of multiple synced audio stay in sync', async ({ I, LabelStudi
   }
 });
 
-Scenario('Seeking of multiple synced audio stay in sync', async ({ I, LabelStudio, AtAudioView }) => {
+Scenario("Seeking of multiple synced audio stay in sync", async ({ I, LabelStudio, AtAudioView }) => {
   LabelStudio.setFeatureFlags({
     fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
     ff_front_dev_2715_audio_3_280722_short: true,
     fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
   });
 
-  I.amOnPage('/');
+  I.amOnPage("/");
 
   LabelStudio.init(params);
 

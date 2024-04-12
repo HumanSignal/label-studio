@@ -1,6 +1,6 @@
 class NumberHelper {
   private get _baseRootSelector() {
-    return '.lsf-number';
+    return ".lsf-number";
   }
 
   private _rootSelector: string;
@@ -22,11 +22,11 @@ class NumberHelper {
   }
 
   hasValue(value: string) {
-    this.input.should('have.value', value);
+    this.input.should("have.value", value);
   }
 }
 
-const Number = new NumberHelper('&:eq(0)');
+const Number = new NumberHelper("&:eq(0)");
 const useNumber = (rootSelector: string) => {
   return new NumberHelper(rootSelector);
 };

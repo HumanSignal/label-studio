@@ -1,13 +1,13 @@
-import { inject, observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React from 'react';
+import { inject, observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import Ranker from '../../components/Ranker/Ranker';
-import Registry from '../../core/Registry';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import ProcessAttrsMixin from '../../mixins/ProcessAttrs';
-import { parseValue } from '../../utils/data';
-import Base from './Base';
+import Ranker from "../../components/Ranker/Ranker";
+import Registry from "../../core/Registry";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
+import { parseValue } from "../../utils/data";
+import Base from "./Base";
 
 /**
  * The `List` tag is used to display a list of similar items like articles, search results, etc. Task data referred in `value` parameter should be an array of objects with `id`, `title`, and `body` fields.
@@ -41,14 +41,14 @@ import Base from './Base';
  */
 const Model = types
   .model({
-    type: 'list',
+    type: "list",
     value: types.maybeNull(types.string),
     _value: types.frozen([]),
-    title: types.optional(types.string, ''),
+    title: types.optional(types.string, ""),
   })
   .views((self) => ({
     get ranker() {
-      return self.annotation.toNames.get(self.name)?.filter((t) => t.type === 'ranker');
+      return self.annotation.toNames.get(self.name)?.filter((t) => t.type === "ranker");
     },
     // index of all items from _value
     get items() {
@@ -78,9 +78,9 @@ const Model = types
     },
   }));
 
-const ListModel = types.compose('ListModel', Base, ProcessAttrsMixin, AnnotationMixin, Model);
+const ListModel = types.compose("ListModel", Base, ProcessAttrsMixin, AnnotationMixin, Model);
 
-const HtxList = inject('store')(
+const HtxList = inject("store")(
   observer(({ item }) => {
     const data = item.dataSource;
 
@@ -96,7 +96,7 @@ const HtxList = inject('store')(
   }),
 );
 
-Registry.addTag('list', ListModel, HtxList);
+Registry.addTag("list", ListModel, HtxList);
 Registry.addObjectType(ListModel);
 
 export { HtxList, ListModel };

@@ -85,8 +85,8 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "single",
-      "jsxQuoteStyle": "single"
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double"
     }
   }
 }

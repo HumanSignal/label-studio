@@ -1,5 +1,5 @@
-import { isAlive, types } from 'mobx-state-tree';
-import { ImageEntity } from './ImageEntity';
+import { isAlive, types } from "mobx-state-tree";
+import { ImageEntity } from "./ImageEntity";
 
 export const ImageEntityMixin = types
   .model({

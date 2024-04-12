@@ -1,8 +1,8 @@
-import { types } from 'mobx-state-tree';
-import { isValidElement } from 'react';
+import { types } from "mobx-state-tree";
+import { isValidElement } from "react";
 
 export const CustomJSON = types.custom({
-  name: 'JSON',
+  name: "JSON",
   toSnapshot(value) {
     return JSON.stringify(value);
   },
@@ -14,10 +14,10 @@ export const CustomJSON = types.custom({
     }
   },
   isTargetType(value) {
-    return typeof value === 'object' || typeof value === 'string';
+    return typeof value === "object" || typeof value === "string";
   },
   getValidationMessage() {
-    return 'Error parsing JSON';
+    return "Error parsing JSON";
   },
 });
 
@@ -26,7 +26,7 @@ export const StringOrNumber = types.union(types.string, types.number);
 export const StringOrNumberID = types.union(types.identifier, types.identifierNumber);
 
 export const CustomCalback = types.custom({
-  name: 'callback',
+  name: "callback",
   toSnapshot(value) {
     return value;
   },
@@ -34,15 +34,15 @@ export const CustomCalback = types.custom({
     return value;
   },
   isTargetType(value) {
-    return typeof value === 'function';
+    return typeof value === "function";
   },
   getValidationMessage() {
-    return 'is not a function';
+    return "is not a function";
   },
 });
 
 export const HtmlOrReact = types.custom({
-  name: 'validElement',
+  name: "validElement",
   toSnapshot(value) {
     return value;
   },
@@ -53,11 +53,11 @@ export const HtmlOrReact = types.custom({
     return isValidElement(value);
   },
   getValidationMessage() {
-    return 'is not a valid element';
+    return "is not a valid element";
   },
 });
 
-export const ThresholdType = types.model('ThresholdType', {
+export const ThresholdType = types.model("ThresholdType", {
   min: types.maybeNull(types.number),
   max: types.maybeNull(types.number),
 });

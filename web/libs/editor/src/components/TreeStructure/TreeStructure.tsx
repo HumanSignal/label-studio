@@ -1,7 +1,7 @@
-import type React from 'react';
-import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
-import { VariableSizeList } from 'react-window';
-import { FF_DEV_4075, isFF } from '../../utils/feature-flags';
+import type React from "react";
+import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { VariableSizeList } from "react-window";
+import { FF_DEV_4075, isFF } from "../../utils/feature-flags";
 
 type ExtendedData = Readonly<{
   id: string;
@@ -58,7 +58,7 @@ const countChildNodes = (item: RowItem[]) => {
   return counter;
 };
 
-const blankItem = (path: string[], depth: number): RowItem => ({ label: '', depth, path, isOpen: true });
+const blankItem = (path: string[], depth: number): RowItem => ({ label: "", depth, path, isOpen: true });
 let heightAccumulator: { [key: string]: number } = {};
 
 const TreeStructure = ({
@@ -94,7 +94,7 @@ const TreeStructure = ({
   const containerRef = useRef<RefObject<HTMLDivElement> | any>();
   const scrollableElement = containerRef.current?.firstChild;
 
-  if (scrollableElement) scrollableElement.style.overflowX = 'hidden';
+  if (scrollableElement) scrollableElement.style.overflowX = "hidden";
 
   const rowHeightCalc = (index: number): number => {
     return heightAccumulator[`${index}`] || rowHeight;

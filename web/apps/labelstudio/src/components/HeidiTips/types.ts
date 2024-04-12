@@ -1,4 +1,4 @@
-import type { TipsCollection } from './content';
+import type { TipsCollection } from "./content";
 
 export type Tip = {
   title: string;

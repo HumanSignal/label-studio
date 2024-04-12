@@ -1,15 +1,15 @@
-import { format, isMatch, isValid } from 'date-fns';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { default as DP } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { FaExchangeAlt } from 'react-icons/fa';
-import { BemWithSpecifiContext } from '../../../utils/bem';
-import { isDefined } from '../../../utils/utils';
-import { Dropdown } from '../Dropdown/Dropdown';
-import { Icon } from '../Icon/Icon';
-import Input from '../Input/Input';
-import './DatePicker.global.styl';
-import './DatePicker.styl';
+import { format, isMatch, isValid } from "date-fns";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { default as DP } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { FaExchangeAlt } from "react-icons/fa";
+import { BemWithSpecifiContext } from "../../../utils/bem";
+import { isDefined } from "../../../utils/utils";
+import { Dropdown } from "../Dropdown/Dropdown";
+import { Icon } from "../Icon/Icon";
+import Input from "../Input/Input";
+import "./DatePicker.global.styl";
+import "./DatePicker.styl";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -18,8 +18,8 @@ export const DatePicker = ({
   value,
   selectRange = false,
   showTime = false,
-  dateFormat = 'MM.dd.yyyy',
-  timeFormat = 'HH:mm',
+  dateFormat = "MM.dd.yyyy",
+  timeFormat = "HH:mm",
   onChange,
 }) => {
   const finalFormat = showTime ? `${dateFormat} ${timeFormat}` : dateFormat;
@@ -30,7 +30,7 @@ export const DatePicker = ({
   const dropdownRef = useRef();
 
   const formatDate = (date) => {
-    if (!isDefined(date)) return '';
+    if (!isDefined(date)) return "";
 
     const parsedDate = new Date(date === null ? Date.now() : date);
 
@@ -38,7 +38,7 @@ export const DatePicker = ({
       return format(parsedDate, finalFormat);
     }
 
-    return '';
+    return "";
   };
 
   const [initialStartDate, initialEndDate] = selectRange ? value : [].concat(value);
@@ -103,7 +103,7 @@ export const DatePicker = ({
   });
 
   return (
-    <Block name='datepicker'>
+    <Block name="datepicker">
       <Dropdown.Trigger
         ref={dropdownRef}
         toggle={false}
@@ -121,20 +121,20 @@ export const DatePicker = ({
           />
         }
       >
-        <Elem name='output' mod={{ range: selectRange }}>
+        <Elem name="output" mod={{ range: selectRange }}>
           <Input
             size={size}
-            value={startDate || ''}
+            value={startDate || ""}
             onChange={(e) => updateDate(e.target.value, setStartDate, setRealStartDate)}
           />
           {selectRange && (
             <>
-              <Elem name='separator'>
+              <Elem name="separator">
                 <Icon icon={FaExchangeAlt} />
               </Elem>
               <Input
                 size={size}
-                value={endDate || ''}
+                value={endDate || ""}
                 onChange={(e) => updateDate(e.target.value, setEndDate, setRealEndDate)}
               />
             </>

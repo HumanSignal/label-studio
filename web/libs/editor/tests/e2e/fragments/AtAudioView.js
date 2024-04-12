@@ -1,29 +1,29 @@
 const { I } = inject();
-const assert = require('assert');
+const assert = require("assert");
 
-const Helpers = require('../tests/helpers');
+const Helpers = require("../tests/helpers");
 
 module.exports = {
-  _stageSelector: '#waveform-layer-main',
-  _progressBarSelector: 'loading-progress-bar',
-  _controlMenuSelector: '.lsf-audio-control',
-  _settingsMenuSelector: '.lsf-audio-config',
-  _volumeSliderSelector: '.lsf-audio-slider__range',
-  _volumeInputSelector: '.lsf-audio-slider__input',
-  _muteButtonSelector: '.lsf-audio-control__mute-button',
-  _playbackSpeedSliderSelector: '.lsf-audio-config__modal > .lsf-audio-slider:nth-child(1) .lsf-audio-slider__range',
-  _playbackSpeedInputSelector: '.lsf-audio-config__modal > .lsf-audio-slider:nth-child(1) .lsf-audio-slider__input',
-  _amplitudeSliderSelector: '.lsf-audio-config__modal > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__range',
-  _amplitudeInputSelector: '.lsf-audio-config__modal > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__input',
-  _hideTimelineButtonSelector: '.lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(1)',
-  _hideWaveformButtonSelector: '.lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(2)',
+  _stageSelector: "#waveform-layer-main",
+  _progressBarSelector: "loading-progress-bar",
+  _controlMenuSelector: ".lsf-audio-control",
+  _settingsMenuSelector: ".lsf-audio-config",
+  _volumeSliderSelector: ".lsf-audio-slider__range",
+  _volumeInputSelector: ".lsf-audio-slider__input",
+  _muteButtonSelector: ".lsf-audio-control__mute-button",
+  _playbackSpeedSliderSelector: ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(1) .lsf-audio-slider__range",
+  _playbackSpeedInputSelector: ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(1) .lsf-audio-slider__input",
+  _amplitudeSliderSelector: ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__range",
+  _amplitudeInputSelector: ".lsf-audio-config__modal > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__input",
+  _hideTimelineButtonSelector: ".lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(1)",
+  _hideWaveformButtonSelector: ".lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(2)",
   _audioElementSelector: '[data-testid="waveform-audio"]',
   _seekBackwardButtonSelector:
-    '.lsf-audio-tag .lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(1)',
+    ".lsf-audio-tag .lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(1)",
   _playButtonSelector:
-    '.lsf-audio-tag .lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(2)',
+    ".lsf-audio-tag .lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(2)",
   _seekForwardButtonSelector:
-    '.lsf-audio-tag .lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(3)',
+    ".lsf-audio-tag .lsf-timeline-controls__main-controls > .lsf-timeline-controls__group:nth-child(2) > button:nth-child(3)",
   _errorSelector: '[data-testid="error:audio"]',
   _httpErrorSelector: '[data-testid="error:http"]',
 
@@ -38,10 +38,10 @@ module.exports = {
   async waitForAudio() {
     await I.executeScript(Helpers.waitForAudio);
     I.waitForInvisible(this._progressBarSelector);
-    I.waitForDetached('loading-progress-bar', 10);
+    I.waitForDetached("loading-progress-bar", 10);
   },
   getCurrentAudio() {
-    return I.executeScript(Helpers.getCurrentMedia, 'audio');
+    return I.executeScript(Helpers.getCurrentMedia, "audio");
   },
   /**
    * Mousedown - mousemove - mouseup drawing on the AudioView. Works in couple of lookForStage.
@@ -203,9 +203,9 @@ module.exports = {
 
     I.clickAt(stageBBox.x + stageBBox.width * x, stageBBox.y + stageBBox.height * y); // click to focus the canvas
 
-    I.pressKeyDown('Control');
+    I.pressKeyDown("Control");
     I.mouseWheel({ deltaY });
-    I.pressKeyUp('Control');
+    I.pressKeyUp("Control");
   },
 
   /**
@@ -220,8 +220,8 @@ module.exports = {
     this.toggleControlsMenu();
     I.seeInField(this._volumeInputSelector, value);
     I.seeInField(this._volumeSliderSelector, value);
-    const volume = await I.grabAttributeFrom(this._audioElementSelector, 'volume');
-    const muted = await I.grabAttributeFrom(this._audioElementSelector, 'muted');
+    const volume = await I.grabAttributeFrom(this._audioElementSelector, "volume");
+    const muted = await I.grabAttributeFrom(this._audioElementSelector, "muted");
 
     if (muted) {
       assert.equal(volume, null, "Volume doesn't match in audio element");
@@ -259,7 +259,7 @@ module.exports = {
     I.seeInField(this._playbackSpeedInputSelector, value);
     I.seeInField(this._playbackSpeedSliderSelector, value);
 
-    const playbackSpeed = await I.grabAttributeFrom(this._audioElementSelector, 'playbackRate');
+    const playbackSpeed = await I.grabAttributeFrom(this._audioElementSelector, "playbackRate");
 
     assert.equal(playbackSpeed, value, "Playback speed doesn't match in audio element");
 
@@ -277,7 +277,7 @@ module.exports = {
     this.toggleSettingsMenu();
     // it was not easy to set this field, so we have to carefully remove value and put it
     I.doubleClick(locate(this._playbackSpeedInputSelector));
-    I.pressKey('Backspace');
+    I.pressKey("Backspace");
     I.fillField(this._playbackSpeedInputSelector, value);
     this.toggleSettingsMenu();
   },
@@ -340,8 +340,8 @@ module.exports = {
    * @returns {Promise<void>}
    */
   async seeIsPlaying(playing) {
-    const isPaused = await I.grabAttributeFrom(this._audioElementSelector, 'paused');
+    const isPaused = await I.grabAttributeFrom(this._audioElementSelector, "paused");
 
-    assert.equal(!isPaused, playing, playing ? 'Audio is not playing' : 'Audio is playing');
+    assert.equal(!isPaused, playing, playing ? "Audio is not playing" : "Audio is playing");
   },
 };

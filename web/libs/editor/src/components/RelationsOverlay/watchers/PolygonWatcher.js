@@ -1,5 +1,5 @@
-import { observe } from 'mobx';
-import { debounce } from '../../../utils/debounce';
+import { observe } from "mobx";
+import { debounce } from "../../../utils/debounce";
 
 export class PolygonWatcher {
   constructor(root, element, callback) {
@@ -11,7 +11,7 @@ export class PolygonWatcher {
   }
 
   handleUpdate() {
-    this.disposers = ['x', 'y', 'width', 'height'].map((property) => {
+    this.disposers = ["x", "y", "width", "height"].map((property) => {
       return observe(this.element, property, this.onUpdate, true);
     });
   }

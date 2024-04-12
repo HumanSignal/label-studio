@@ -1,8 +1,8 @@
-import { getRoot, types } from 'mobx-state-tree';
-import { StringOrNumber } from '../types';
+import { getRoot, types } from "mobx-state-tree";
+import { StringOrNumber } from "../types";
 
 export const TabSelectedItems = types
-  .model('TabSelectedItems', {
+  .model("TabSelectedItems", {
     all: false,
     list: types.optional(types.array(StringOrNumber), []),
   })
@@ -15,7 +15,7 @@ export const TabSelectedItems = types
     },
 
     get listName() {
-      return self.all ? 'excluded' : 'included';
+      return self.all ? "excluded" : "included";
     },
 
     get hasSelected() {
@@ -96,7 +96,7 @@ export const TabSelectedItems = types
     },
 
     _invokeChangeEvent() {
-      getRoot(self).SDK.invoke('taskSelectionChanged', self);
+      getRoot(self).SDK.invoke("taskSelectionChanged", self);
     },
   }))
   .preProcessSnapshot((sn) => {

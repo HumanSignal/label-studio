@@ -1,9 +1,9 @@
-import { getEnv, getParent, getRoot, getType, types } from 'mobx-state-tree';
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from '../components/ImageView/Image';
-import { guidGenerator } from '../core/Helpers';
-import { isDefined } from '../utils/utilities';
-import { AnnotationMixin } from './AnnotationMixin';
-import { ReadOnlyRegionMixin } from './ReadOnlyMixin';
+import { getEnv, getParent, getRoot, getType, types } from "mobx-state-tree";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
+import { guidGenerator } from "../core/Helpers";
+import { isDefined } from "../utils/utilities";
+import { AnnotationMixin } from "./AnnotationMixin";
+import { ReadOnlyRegionMixin } from "./ReadOnlyMixin";
 
 const RegionsMixin = types
   .model({
@@ -14,14 +14,14 @@ const RegionsMixin = types
 
     filtered: types.optional(types.boolean, false),
 
-    parentID: types.optional(types.string, ''),
+    parentID: types.optional(types.string, ""),
 
     fromSuggestion: false,
 
     // Dynamic preannotations enabled
     dynamic: false,
 
-    origin: types.optional(types.enumeration(['prediction', 'prediction-changed', 'manual']), 'manual'),
+    origin: types.optional(types.enumeration(["prediction", "prediction-changed", "manual"]), "manual"),
 
     item_index: types.maybeNull(types.number),
   })
@@ -51,7 +51,7 @@ const RegionsMixin = types
     },
 
     get editable() {
-      throw new Error('Not implemented');
+      throw new Error("Not implemented");
     },
 
     get isCompleted() {
@@ -130,7 +130,7 @@ const RegionsMixin = types
       },
 
       setItemIndex(index) {
-        if (!isDefined(index)) throw new Error('Index must be provided for', self);
+        if (!isDefined(index)) throw new Error("Index must be provided for", self);
         self.item_index = index;
       },
 
@@ -186,7 +186,7 @@ const RegionsMixin = types
       updateAppearenceFromState() {},
 
       serialize() {
-        console.error('Region class needs to implement serialize');
+        console.error("Region class needs to implement serialize");
       },
 
       selectRegion() {},
@@ -197,7 +197,7 @@ const RegionsMixin = types
        * @param {boolean} tryToKeepStates try to keep states selected if such settings enabled
        */
       unselectRegion(tryToKeepStates = false) {
-        console.log('UNSELECT REGION', 'you should not be here');
+        console.log("UNSELECT REGION", "you should not be here");
         // eslint-disable-next-line no-constant-condition
         if (1) return;
         const annotation = self.annotation;
@@ -283,8 +283,8 @@ const RegionsMixin = types
       },
 
       notifyDrawingFinished({ destroy = false } = {}) {
-        if (self.origin === 'prediction') {
-          self.origin = 'prediction-changed';
+        if (self.origin === "prediction") {
+          self.origin = "prediction-changed";
         }
 
         // everything below is related to dynamic preannotations
@@ -299,7 +299,7 @@ const RegionsMixin = types
           self.drawingTimeout = setTimeout(() => {
             const connectedRegions = self.getConnectedDynamicRegions(destroy);
 
-            env.events.invoke('regionFinishedDrawing', self, connectedRegions);
+            env.events.invoke("regionFinishedDrawing", self, connectedRegions);
           }, timeout);
         }
       },

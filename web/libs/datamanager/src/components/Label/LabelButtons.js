@@ -1,5 +1,5 @@
-import { Component } from 'react';
-import ReactDOM from 'react-dom';
+import { Component } from "react";
+import ReactDOM from "react-dom";
 
 export class LabelButtons extends Component {
   state = {
@@ -47,7 +47,7 @@ export class LabelButtons extends Component {
   }
 
   updateElement(target) {
-    const panel = target.querySelector('.ls-panel');
+    const panel = target.querySelector(".ls-panel");
 
     if (panel && !this.isConnected) {
       this.createButtonsWrapper(panel);
@@ -63,11 +63,11 @@ export class LabelButtons extends Component {
   createButtonsWrapper(root) {
     /** @type {HTMLElement} */
     const child = root.childNodes[0];
-    const className = child.getAttribute('class');
+    const className = child.getAttribute("class");
 
-    const wrapper = document.createElement('div');
+    const wrapper = document.createElement("div");
 
-    wrapper.setAttribute('class', className);
+    wrapper.setAttribute("class", className);
 
     child.after(wrapper);
     this.setState({ element: wrapper });

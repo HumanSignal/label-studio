@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
 /**
  * @todo rework this into MetaMixin for all the meta data
@@ -48,7 +48,7 @@ const NormalizationMixin = types
      * Delete meta text
      */
     deleteMetaText() {
-      self.setMetaText('');
+      self.setMetaText("");
     },
   }));
 

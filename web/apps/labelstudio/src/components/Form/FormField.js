@@ -1,7 +1,7 @@
-import { forwardRef, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { isDefined } from '../../utils/helpers';
-import { FormContext } from './FormContext';
-import * as Validators from './Validation/Validators';
+import { forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { isDefined } from "../../utils/helpers";
+import { FormContext } from "./FormContext";
+import * as Validators from "./Validation/Validators";
 
 export const FormField = forwardRef(
   (
@@ -56,14 +56,14 @@ export const FormField = forwardRef(
       };
 
       if (dep) {
-        dep.field.addEventListener('change', handler);
+        dep.field.addEventListener("change", handler);
         field = dep.field;
       } else {
         console.warn(`Dependency field not found ${dependency}`);
       }
 
       setDependencyField(field);
-      return () => dep.field.removeEventListener('change', handler);
+      return () => dep.field.removeEventListener("change", handler);
     }, [context, field, dependency]);
 
     const setValueCallback = useCallback(
@@ -75,24 +75,24 @@ export const FormField = forwardRef(
 
         if (setValue instanceof Function) {
           setValue(value);
-        } else if (input.type === 'checkbox' || input.type === 'radio') {
+        } else if (input.type === "checkbox" || input.type === "radio") {
           input.checked = value ?? input.checked;
         } else if (value === null) {
-          input.value = '';
+          input.value = "";
         } else {
           input.value = value;
         }
 
-        const evt = document.createEvent('HTMLEvents');
+        const evt = document.createEvent("HTMLEvents");
 
-        evt.initEvent('change', false, true);
+        evt.initEvent("change", false, true);
         input.dispatchEvent(evt);
       },
       [field],
     );
 
     useEffect(() => {
-      const isProtected = skipAutofill && (!allowEmpty || protectedValue) && field.current.type === 'password';
+      const isProtected = skipAutofill && (!allowEmpty || protectedValue) && field.current.type === "password";
 
       context?.registerField({
         label,

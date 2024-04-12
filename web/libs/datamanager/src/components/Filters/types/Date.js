@@ -1,7 +1,7 @@
-import { isValid } from 'date-fns';
-import { observer } from 'mobx-react';
-import React from 'react';
-import { DatePicker } from '../../Common/DatePicker/DatePicker';
+import { isValid } from "date-fns";
+import { observer } from "mobx-react";
+import React from "react";
+import { DatePicker } from "../../Common/DatePicker/DatePicker";
 
 export const DateTimeInput = observer(({ value, range, time, onChange }) => {
   const onValueChange = React.useCallback(
@@ -38,34 +38,34 @@ export const DateTimeInput = observer(({ value, range, time, onChange }) => {
   }, [range, value]);
 
   return (
-    <DatePicker size='small' value={dateValue} selectRange={range} showTime={time === true} onChange={onValueChange} />
+    <DatePicker size="small" value={dateValue} selectRange={range} showTime={time === true} onChange={onValueChange} />
   );
 });
 
 export const DateFields = (extraProps) => {
   return [
     {
-      key: 'less',
-      label: 'is before',
-      valueType: 'single',
+      key: "less",
+      label: "is before",
+      valueType: "single",
       input: (props) => <DateTimeInput {...props} {...(extraProps ?? {})} />,
     },
     {
-      key: 'greater',
-      label: 'is after',
-      valueType: 'single',
+      key: "greater",
+      label: "is after",
+      valueType: "single",
       input: (props) => <DateTimeInput {...props} {...(extraProps ?? {})} />,
     },
     {
-      key: 'in',
-      label: 'is between',
-      valueType: 'range',
+      key: "in",
+      label: "is between",
+      valueType: "range",
       input: (props) => <DateTimeInput range {...props} {...(extraProps ?? {})} />,
     },
     {
-      key: 'not_in',
-      label: 'not between',
-      valueType: 'range',
+      key: "not_in",
+      label: "not between",
+      valueType: "range",
       input: (props) => <DateTimeInput range {...props} {...(extraProps ?? {})} />,
     },
   ];

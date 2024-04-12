@@ -57,7 +57,7 @@ export const transformData = (columns: Array<InputItem[]>, titles: string[]) => 
 
     queryData.columns[id] = {
       id,
-      title: titles[idx] || '',
+      title: titles[idx] || "",
       itemIds: items.map((item) => item.id),
     };
 

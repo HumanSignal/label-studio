@@ -1,5 +1,5 @@
-import { getRoot } from 'mobx-state-tree';
-import { Fragment } from 'react';
+import { getRoot } from "mobx-state-tree";
+import { Fragment } from "react";
 
 const ProjectLink = ({ project }) => {
   const projectID = project.id;
@@ -24,16 +24,16 @@ export const ProjectCell = (cell) => {
   return (
     <div
       style={{
-        maxHeight: '100%',
-        overflow: 'hidden',
+        maxHeight: "100%",
+        overflow: "hidden",
         fontSize: 12,
-        lineHeight: '16px',
+        lineHeight: "16px",
       }}
     >
       {projectList &&
         projectList.map((projectRef, index) => (
           <Fragment key={projectRef.project_id}>
-            {index > 0 && ', '}
+            {index > 0 && ", "}
             <ProjectLink project={projectRef} />
           </Fragment>
         ))}

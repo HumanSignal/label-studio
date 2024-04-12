@@ -1,14 +1,14 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import { NodeViews } from '../components/Node/Node';
-import { TwoPointsDrawingTool } from '../mixins/DrawingTool';
-import ToolMixin from '../mixins/Tool';
-import BaseTool, { DEFAULT_DIMENSIONS } from './Base';
+import { NodeViews } from "../components/Node/Node";
+import { TwoPointsDrawingTool } from "../mixins/DrawingTool";
+import ToolMixin from "../mixins/Tool";
+import BaseTool, { DEFAULT_DIMENSIONS } from "./Base";
 
 const _Tool = types
-  .model('EllipseTool', {
-    group: 'segmentation',
-    shortcut: 'O',
+  .model("EllipseTool", {
+    group: "segmentation",
+    shortcut: "O",
   })
   .views((self) => {
     const Super = {
@@ -18,12 +18,12 @@ const _Tool = types
     return {
       get tagTypes() {
         return {
-          stateTypes: 'ellipselabels',
-          controlTagTypes: ['ellipselabels', 'ellipse'],
+          stateTypes: "ellipselabels",
+          controlTagTypes: ["ellipselabels", "ellipse"],
         };
       },
       get viewTooltip() {
-        return 'Ellipse region';
+        return "Ellipse region";
       },
       get iconComponent() {
         return self.dynamic ? NodeViews.EllipseRegionModel.altIcon : NodeViews.EllipseRegionModel.icon;

@@ -1,6 +1,6 @@
-import { formatDistanceToNow } from 'date-fns';
-import { destroy, detach } from 'mobx-state-tree';
-import { toCamelCase } from 'strman';
+import { formatDistanceToNow } from "date-fns";
+import { destroy, detach } from "mobx-state-tree";
+import { toCamelCase } from "strman";
 
 /**
  * Internal helper to check if parameter is a string
@@ -8,7 +8,7 @@ import { toCamelCase } from 'strman';
  * @returns {boolean}
  */
 export const isString = (value: any): value is string => {
-  return typeof value === 'string' || value instanceof String;
+  return typeof value === "string" || value instanceof String;
 };
 
 /**
@@ -53,7 +53,7 @@ export function getUrl(i: number, text: string) {
   const myRegexp = /^(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/g; // eslint-disable-line no-useless-escape
   const match = myRegexp.exec(stringToTest);
 
-  return match && match.length ? match[1] : '';
+  return match && match.length ? match[1] : "";
 }
 
 /**
@@ -62,8 +62,8 @@ export function getUrl(i: number, text: string) {
  * @param {boolean} [relative=true] - Whether relative urls are good or nood
  */
 export function isValidObjectURL(str: string, relative = false) {
-  if (typeof str !== 'string') return false;
-  if (relative && str.startsWith('/')) return true;
+  if (typeof str !== "string") return false;
+  if (relative && str.startsWith("/")) return true;
   return /^https?:\/\//.test(str);
 }
 
@@ -74,7 +74,7 @@ export function isValidObjectURL(str: string, relative = false) {
  * @returns {string}
  */
 export function toTimeString(ms: number) {
-  if (typeof ms === 'number') {
+  if (typeof ms === "number") {
     return new Date(ms).toUTCString().match(/(\d\d:\d\d:\d\d)/)?.[0];
   }
 }
@@ -105,9 +105,9 @@ export function atobUnicode(str: string) {
   // Going backwards: from bytestream, to percent-encoding, to original string.
   return decodeURIComponent(
     atob(str)
-      .split('')
+      .split("")
       .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
-      .join(''),
+      .join(""),
   );
 }
 
@@ -116,12 +116,12 @@ export function atobUnicode(str: string) {
  * @param {string} unsafe
  */
 export function escapeHtml(unsafe: string) {
-  return (unsafe ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return (unsafe ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 /**
@@ -190,7 +190,7 @@ export const userDisplayName = (user: Record<string, string> = {}) => {
   return firstName || lastName
     ? [firstName, lastName]
         .filter((n) => !!n)
-        .join(' ')
+        .join(" ")
         .trim()
     : user.username || user.email;
 };
@@ -208,7 +208,7 @@ export const emailFromCreatedBy = (createdBy: string) => {
 export const camelizeKeys = (object: any): Record<string, unknown> => {
   return Object.fromEntries(
     Object.entries(object).map(([key, value]) => {
-      if (Object.prototype.toString.call(value) === '[object Object]') {
+      if (Object.prototype.toString.call(value) === "[object Object]") {
         return [toCamelCase(key), camelizeKeys(value)];
       }
       return [toCamelCase(key), value];
@@ -226,20 +226,20 @@ export function minMax(items: number[]) {
 
 // Detects if current OS is macOS
 export function isMacOS() {
-  return navigator.platform.indexOf('Mac') > -1;
+  return navigator.platform.indexOf("Mac") > -1;
 }
 
 export const triggerResizeEvent = () => {
-  const event = new Event('resize');
+  const event = new Event("resize");
 
-  event.initEvent('resize', false, false);
+  event.initEvent("resize", false, false);
   window.dispatchEvent(event);
 };
 
 export const humanDateDiff = (date: string | number): string => {
   const fnsDate = formatDistanceToNow(new Date(date), { addSuffix: true });
 
-  if (fnsDate === 'less than a minute ago') return 'just now';
+  if (fnsDate === "less than a minute ago") return "just now";
   return fnsDate;
 };
 

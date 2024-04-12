@@ -1,3 +1,3 @@
-import cypress from 'cypress';
+import cypress from "cypress";
 
 cypress.run();

@@ -1,18 +1,18 @@
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 /* global test, expect, jest */
-import Enzyme, { render } from 'enzyme';
-import { HtxHeader } from '../Header';
+import Enzyme, { render } from "enzyme";
+import { HtxHeader } from "../Header";
 
 Enzyme.configure({ adapter: new Adapter() });
 
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useLayoutEffect: jest.requireActual('react').useEffect,
+jest.mock("react", () => ({
+  ...jest.requireActual("react"),
+  useLayoutEffect: jest.requireActual("react").useEffect,
 }));
 
-test('Header basic test', () => {
+test("Header basic test", () => {
   const confStore = {
-    _value: 'header text',
+    _value: "header text",
     underline: true,
     size: 1,
   };
@@ -20,5 +20,5 @@ test('Header basic test', () => {
   const view = render(<HtxHeader item={confStore} />);
   const text = view.text();
 
-  expect(text).toBe('header text');
+  expect(text).toBe("header text");
 });

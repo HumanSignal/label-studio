@@ -1,6 +1,6 @@
-import { getRoot, getSnapshot, types } from 'mobx-state-tree';
-import React from 'react';
-import { toStudlyCaps } from 'strman';
+import { getRoot, getSnapshot, types } from "mobx-state-tree";
+import React from "react";
+import { toStudlyCaps } from "strman";
 import {
   CommentCheck,
   CommentRed,
@@ -10,94 +10,94 @@ import {
   LsStarSquare,
   LsThumbsDown,
   LsThumbsUp,
-} from '../../assets/icons';
-import * as CellViews from '../../components/CellViews';
-import { all } from '../../utils/utils';
-import { StringOrNumberID } from '../types';
+} from "../../assets/icons";
+import * as CellViews from "../../components/CellViews";
+import { all } from "../../utils/utils";
+import { StringOrNumberID } from "../types";
 
 export const ViewColumnType = types.enumeration([
-  'String',
-  'Number',
-  'Boolean',
-  'Datetime',
-  'List',
-  'Image',
-  'Audio',
-  'AudioPlus',
-  'Video',
-  'Text',
-  'HyperText',
-  'TimeSeries',
-  'Unknown',
+  "String",
+  "Number",
+  "Boolean",
+  "Datetime",
+  "List",
+  "Image",
+  "Audio",
+  "AudioPlus",
+  "Video",
+  "Text",
+  "HyperText",
+  "TimeSeries",
+  "Unknown",
 ]);
 
 export const ViewColumnTypeShort = (type) => {
   switch (type) {
     default:
-    case 'String':
-      return 'str';
-    case 'Number':
-      return 'num';
-    case 'Boolean':
-      return 'bool';
-    case 'Datetime':
-      return 'date';
-    case 'Image':
-      return 'img';
-    case 'Audio':
-      return 'aud';
-    case 'AudioPlus':
-      return 'aud';
-    case 'Video':
-      return 'vid';
-    case 'Text':
-      return 'txt';
-    case 'HyperText':
-      return 'html';
-    case 'TimeSeries':
-      return 'ts';
+    case "String":
+      return "str";
+    case "Number":
+      return "num";
+    case "Boolean":
+      return "bool";
+    case "Datetime":
+      return "date";
+    case "Image":
+      return "img";
+    case "Audio":
+      return "aud";
+    case "AudioPlus":
+      return "aud";
+    case "Video":
+      return "vid";
+    case "Text":
+      return "txt";
+    case "HyperText":
+      return "html";
+    case "TimeSeries":
+      return "ts";
   }
 };
 
 export const ViewColumnTypeName = (type) => {
   switch (type) {
     default:
-    case 'String':
-      return 'String';
-    case 'Number':
-      return 'Number';
-    case 'Boolean':
-      return 'Boolean';
-    case 'Datetime':
-      return 'Date Time';
-    case 'Image':
-      return 'Image';
-    case 'Audio':
-      return 'Audio';
-    case 'AudioPlus':
-      return 'Audio';
-    case 'Video':
-      return 'Video';
-    case 'Text':
-      return 'Text';
-    case 'HyperText':
-      return 'Hyper Text';
-    case 'TimeSeries':
-      return 'Time Series';
+    case "String":
+      return "String";
+    case "Number":
+      return "Number";
+    case "Boolean":
+      return "Boolean";
+    case "Datetime":
+      return "Date Time";
+    case "Image":
+      return "Image";
+    case "Audio":
+      return "Audio";
+    case "AudioPlus":
+      return "Audio";
+    case "Video":
+      return "Video";
+    case "Text":
+      return "Text";
+    case "HyperText":
+      return "Hyper Text";
+    case "TimeSeries":
+      return "Time Series";
   }
 };
 
 export const TabColumn = types
-  .model('ViewColumn', {
+  .model("ViewColumn", {
     id: StringOrNumberID,
     title: types.string,
     alias: types.string,
-    type: types.optional(ViewColumnType, 'String'),
+    type: types.optional(ViewColumnType, "String"),
     displayType: types.optional(types.maybeNull(ViewColumnType), null),
     defaultHidden: types.optional(types.boolean, false),
     parent: types.maybeNull(types.late(() => types.reference(TabColumn))),
     children: types.maybeNull(types.array(types.late(() => types.reference(TabColumn)))),
-    target: types.enumeration(['tasks', 'annotations']),
+    target: types.enumeration(["tasks", "annotations"]),
     orderable: types.optional(types.boolean, true),
     help: types.maybeNull(types.string),
   })
@@ -122,7 +122,7 @@ export const TabColumn = types
         if (!self.parent) {
           const value = data[self.alias];
 
-          return typeof value === 'object' ? null : value;
+          return typeof value === "object" ? null : value;
         }
 
         try {
@@ -130,7 +130,7 @@ export const TabColumn = types
 
           return value ?? null;
         } catch {
-          console.log('Error generating accessor', {
+          console.log("Error generating accessor", {
             id: self.alias,
             parent: self.parent?.alias,
             data,
@@ -187,22 +187,22 @@ export const TabColumn = types
       switch (self.alias) {
         default:
           return null;
-        case 'total_annotations':
-          return <LsAnnotation width='20' height='20' style={{ color: '#0099FF' }} />;
-        case 'cancelled_annotations':
-          return <LsBanSquare width='20' height='20' style={{ color: '#DD0000' }} />;
-        case 'total_predictions':
-          return <LsSparkSquare width='20' height='20' style={{ color: '#944BFF' }} />;
-        case 'reviews_accepted':
-          return <LsThumbsUp width='20' height='20' style={{ color: '#2AA000' }} />;
-        case 'reviews_rejected':
-          return <LsThumbsDown width='20' height='20' style={{ color: '#DD0000' }} />;
-        case 'ground_truth':
-          return <LsStarSquare width='20' height='20' style={{ color: '#FFB700' }} />;
-        case 'comment_count':
-          return <CommentCheck width='20' height='20' style={{ color: '#FFB700' }} />;
-        case 'unresolved_comment_count':
-          return <CommentRed width='20' height='20' style={{ color: '#FFB700' }} />;
+        case "total_annotations":
+          return <LsAnnotation width="20" height="20" style={{ color: "#0099FF" }} />;
+        case "cancelled_annotations":
+          return <LsBanSquare width="20" height="20" style={{ color: "#DD0000" }} />;
+        case "total_predictions":
+          return <LsSparkSquare width="20" height="20" style={{ color: "#944BFF" }} />;
+        case "reviews_accepted":
+          return <LsThumbsUp width="20" height="20" style={{ color: "#2AA000" }} />;
+        case "reviews_rejected":
+          return <LsThumbsDown width="20" height="20" style={{ color: "#DD0000" }} />;
+        case "ground_truth":
+          return <LsStarSquare width="20" height="20" style={{ color: "#FFB700" }} />;
+        case "comment_count":
+          return <CommentCheck width="20" height="20" style={{ color: "#FFB700" }} />;
+        case "unresolved_comment_count":
+          return <CommentRed width="20" height="20" style={{ color: "#FFB700" }} />;
       }
     },
 

@@ -1,8 +1,8 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { Label } from '..';
-import { BemWithSpecifiContext } from '../../../../utils/bem';
-import { FormField } from '../../FormField';
-import './RadioGroup.styl';
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { Label } from "..";
+import { BemWithSpecifiContext } from "../../../../utils/bem";
+import { FormField } from "../../FormField";
+import "./RadioGroup.styl";
 
 const RadioContext = createContext();
 const { Block, Elem } = BemWithSpecifiContext();
@@ -50,9 +50,9 @@ export const RadioGroup = ({
             isSimple: simple === true,
           }}
         >
-          <Block name='radio-group' mod={{ size, simple }} mix={className}>
-            <input ref={ref} name={props.name} type='hidden' defaultValue={currentValue} />
-            <Elem name='buttons'>{children}</Elem>
+          <Block name="radio-group" mod={{ size, simple }} mix={className}>
+            <input ref={ref} name={props.name} type="hidden" defaultValue={currentValue} />
+            <Elem name="buttons">{children}</Elem>
           </Block>
         </RadioContext.Provider>
       )}
@@ -87,16 +87,16 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
   }, [props.checked]);
 
   return (
-    <Elem name='button' mod={{ checked, disabled }} onClickCapture={clickHandler}>
+    <Elem name="button" mod={{ checked, disabled }} onClickCapture={clickHandler}>
       {isSimple ? (
-        <Label placement='right' text={label} description={description}>
+        <Label placement="right" text={label} description={description}>
           <input
-            type='radio'
+            type="radio"
             value={value}
             checked={checked}
             disabled={disabled}
             readOnly
-            style={{ pointerEvents: 'none' }}
+            style={{ pointerEvents: "none" }}
           />
         </Label>
       ) : (

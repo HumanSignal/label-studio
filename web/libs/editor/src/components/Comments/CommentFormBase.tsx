@@ -1,10 +1,10 @@
-import { type FC, type RefObject, useCallback, useRef } from 'react';
-import { ReactComponent as IconSend } from '../../assets/icons/send.svg';
-import { Block, Elem } from '../../utils/bem';
+import { type FC, type RefObject, useCallback, useRef } from "react";
+import { ReactComponent as IconSend } from "../../assets/icons/send.svg";
+import { Block, Elem } from "../../utils/bem";
 
-import { observer } from 'mobx-react';
-import { TextArea } from '../../common/TextArea/TextArea';
-import './CommentForm.styl';
+import { observer } from "mobx-react";
+import { TextArea } from "../../common/TextArea/TextArea";
+import "./CommentForm.styl";
 
 export type CommentFormProps = {
   value?: string;
@@ -17,7 +17,7 @@ export type CommentFormProps = {
 };
 
 export const CommentFormBase: FC<CommentFormProps> = observer(
-  ({ value = '', inline = true, onChange, onSubmit, onBlur, rows = 1, maxRows = 4 }) => {
+  ({ value = "", inline = true, onChange, onSubmit, onBlur, rows = 1, maxRows = 4 }) => {
     const formRef = useRef<HTMLFormElement>(null);
     const actionRef = useRef<{ update?: (text?: string) => void; el?: RefObject<HTMLTextAreaElement> }>({});
 
@@ -27,7 +27,7 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
 
         if (!formRef.current) return;
 
-        const comment = (new FormData(formRef.current).get('comment') as string)?.trim();
+        const comment = (new FormData(formRef.current).get("comment") as string)?.trim();
 
         if (!comment) return;
 
@@ -38,17 +38,17 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
 
     const onInput = useCallback(
       (comment: string) => {
-        onChange?.(comment || '');
+        onChange?.(comment || "");
       },
       [onChange],
     );
 
     return (
-      <Block ref={formRef} tag='form' name='comment-form' mod={{ inline }} onSubmit={submitHandler}>
+      <Block ref={formRef} tag="form" name="comment-form" mod={{ inline }} onSubmit={submitHandler}>
         <TextArea
           actionRef={actionRef}
-          name='comment'
-          placeholder='Add a comment'
+          name="comment"
+          placeholder="Add a comment"
           value={value}
           rows={rows}
           maxRows={maxRows}
@@ -64,8 +64,8 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
           }}
           onBlur={(e) => onBlur?.(e)}
         />
-        <Elem tag='div' name='primary-action'>
-          <button type='submit'>
+        <Elem tag="div" name="primary-action">
+          <button type="submit">
             <IconSend />
           </button>
         </Elem>

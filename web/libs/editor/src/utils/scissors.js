@@ -370,7 +370,7 @@ dwv.math.Scissors.prototype.setDimensions = function (width, height) {
 dwv.math.Scissors.prototype.setData = function (data) {
   if (this.width === -1 || this.height === -1) {
     // The width and height should have already been set
-    throw new Error('Dimensions have not been set.');
+    throw new Error("Dimensions have not been set.");
   }
 
   this.greyscale = dwv.math.computeGreyscale(data, this.width, this.height);

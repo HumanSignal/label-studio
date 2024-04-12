@@ -16,7 +16,7 @@ declare namespace Cypress {
     ): Chainable<JQuery<Element>>;
     compareScreenshot(
       name: string,
-      assert: 'shouldChange' | 'shouldNotChange' | 'diff',
+      assert: "shouldChange" | "shouldNotChange" | "diff",
       screenshotCompareOptions?: Partial<Loggable & Timeoutable & CompareScreenshotOptions & Tresholdable>,
     ): Chainable<JQuery<Element>>;
     matchImageSnapshot(options?: { name?: string; threshold?: number }): Chainable<JQuery<Element>>;

@@ -1,24 +1,24 @@
-import { FaCaretDown, FaChevronDown } from 'react-icons/fa';
-import { Block } from '../../../utils/bem';
-import { FF_LOPS_E_10, FF_SELF_SERVE, isFF } from '../../../utils/feature-flags';
-import { ErrorBox } from '../../Common/ErrorBox';
-import { FieldsButton } from '../../Common/FieldsButton';
-import { FiltersPane } from '../../Common/FiltersPane';
-import { Icon } from '../../Common/Icon/Icon';
-import { Interface } from '../../Common/Interface';
-import { ExportButton, ImportButton } from '../../Common/SDKButtons';
-import { Tooltip } from '../../Common/Tooltip/Tooltip';
-import { ActionsButton } from './ActionsButton';
-import { GridWidthButton } from './GridWidthButton';
-import { LabelButton } from './LabelButton';
-import { LoadingPossum } from './LoadingPossum';
-import { OrderButton } from './OrderButton';
-import { RefreshButton } from './RefreshButton';
-import { ViewToggle } from './ViewToggle';
+import { FaCaretDown, FaChevronDown } from "react-icons/fa";
+import { Block } from "../../../utils/bem";
+import { FF_LOPS_E_10, FF_SELF_SERVE, isFF } from "../../../utils/feature-flags";
+import { ErrorBox } from "../../Common/ErrorBox";
+import { FieldsButton } from "../../Common/FieldsButton";
+import { FiltersPane } from "../../Common/FiltersPane";
+import { Icon } from "../../Common/Icon/Icon";
+import { Interface } from "../../Common/Interface";
+import { ExportButton, ImportButton } from "../../Common/SDKButtons";
+import { Tooltip } from "../../Common/Tooltip/Tooltip";
+import { ActionsButton } from "./ActionsButton";
+import { GridWidthButton } from "./GridWidthButton";
+import { LabelButton } from "./LabelButton";
+import { LoadingPossum } from "./LoadingPossum";
+import { OrderButton } from "./OrderButton";
+import { RefreshButton } from "./RefreshButton";
+import { ViewToggle } from "./ViewToggle";
 
 const style = {
-  minWidth: '110px',
-  justifyContent: 'space-between',
+  minWidth: "110px",
+  justifyContent: "space-between",
 };
 
 /**
@@ -50,13 +50,13 @@ const ImportButtonWithChecks = ({ size }) => {
   // Disabled buttons ignore hover, so we use wrapper to properly handle a tooltip
   return (
     <Tooltip
-      title='You must upgrade your plan to import data'
+      title="You must upgrade your plan to import data"
       style={{
         maxWidth: 200,
-        textAlign: 'center',
+        textAlign: "center",
       }}
     >
-      <Block name='button-wrapper'>
+      <Block name="button-wrapper">
         <ImportButton disabled size={size}>
           Import
         </ImportButton>
@@ -66,7 +66,7 @@ const ImportButtonWithChecks = ({ size }) => {
 };
 
 export const instruments = {
-  'view-toggle': ({ size }) => {
+  "view-toggle": ({ size }) => {
     return <ViewToggle size={size} style={style} />;
   },
   columns: ({ size }) => {
@@ -78,13 +78,13 @@ export const instruments = {
       iconProps.style = {
         marginRight: 3,
       };
-      iconProps.color = '#1F1F1F';
+      iconProps.color = "#1F1F1F";
     }
     return (
       <FieldsButton
         wrapper={FieldsButton.Checkbox}
         trailingIcon={<Icon {...iconProps} icon={isNewUI ? FaChevronDown : FaCaretDown} />}
-        title={'Columns'}
+        title={"Columns"}
         size={size}
         style={style}
       />
@@ -96,34 +96,34 @@ export const instruments = {
   ordering: ({ size }) => {
     return <OrderButton size={size} style={style} />;
   },
-  'grid-size': ({ size }) => {
+  "grid-size": ({ size }) => {
     return <GridWidthButton size={size} />;
   },
   refresh: ({ size }) => {
     return <RefreshButton size={size} />;
   },
-  'loading-possum': () => {
+  "loading-possum": () => {
     return <LoadingPossum />;
   },
-  'label-button': ({ size }) => {
+  "label-button": ({ size }) => {
     return <LabelButton size={size} />;
   },
   actions: ({ size }) => {
     return <ActionsButton size={size} style={style} />;
   },
-  'error-box': () => {
+  "error-box": () => {
     return <ErrorBox />;
   },
-  'import-button': ({ size }) => {
+  "import-button": ({ size }) => {
     return (
-      <Interface name='import'>
+      <Interface name="import">
         <ImportButtonWithChecks size={size} />
       </Interface>
     );
   },
-  'export-button': ({ size }) => {
+  "export-button": ({ size }) => {
     return (
-      <Interface name='export'>
+      <Interface name="export">
         <ExportButton size={size}>Export</ExportButton>
       </Interface>
     );

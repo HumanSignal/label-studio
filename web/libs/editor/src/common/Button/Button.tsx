@@ -1,4 +1,4 @@
-import type Keymaster from 'keymaster';
+import type Keymaster from "keymaster";
 import {
   type ButtonHTMLAttributes,
   type CSSProperties,
@@ -7,32 +7,32 @@ import {
   cloneElement,
   forwardRef,
   useMemo,
-} from 'react';
-import { Hotkey } from '../../core/Hotkey';
-import { useHotkey } from '../../hooks/useHotkey';
-import { Block, type CNTagName, Elem } from '../../utils/bem';
-import { isDefined } from '../../utils/utilities';
-import { Tooltip } from '../Tooltip/Tooltip';
-import './Button.styl';
+} from "react";
+import { Hotkey } from "../../core/Hotkey";
+import { useHotkey } from "../../hooks/useHotkey";
+import { Block, type CNTagName, Elem } from "../../utils/bem";
+import { isDefined } from "../../utils/utilities";
+import { Tooltip } from "../Tooltip/Tooltip";
+import "./Button.styl";
 
-type HTMLButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'>;
+type HTMLButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type">;
 
 export interface ButtonProps extends HTMLButtonProps {
-  type?: 'text' | 'link';
+  type?: "text" | "link";
   href?: string;
   extra?: JSX.Element;
   className?: string;
-  size?: 'small' | 'medium' | 'compact' | 'large';
+  size?: "small" | "medium" | "compact" | "large";
   waiting?: boolean;
   icon?: JSX.Element;
   tag?: CNTagName;
-  look?: 'primary' | 'danger' | 'destructive' | 'alt' | 'outlined' | 'active' | 'disabled';
+  look?: "primary" | "danger" | "destructive" | "alt" | "outlined" | "active" | "disabled";
   primary?: boolean;
   danger?: boolean;
   style?: CSSProperties;
   hotkey?: keyof typeof Hotkey.keymap;
   tooltip?: string;
-  tooltipTheme?: 'light' | 'dark';
+  tooltipTheme?: "light" | "dark";
   nopadding?: boolean;
 }
 
@@ -61,13 +61,13 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
       danger,
       hotkey,
       tooltip,
-      tooltipTheme = 'light',
+      tooltipTheme = "light",
       nopadding,
       ...rest
     },
     ref,
   ) => {
-    const finalTag = tag ?? (rest.href ? 'a' : 'button');
+    const finalTag = tag ?? (rest.href ? "a" : "button");
 
     const mods = {
       size,
@@ -81,7 +81,7 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
     };
 
     if (primary) {
-      mods.look = 'primary';
+      mods.look = "primary";
     }
 
     const iconElem = useMemo(() => {
@@ -89,9 +89,9 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
       if (isDefined(icon.props.size)) return icon;
 
       switch (size) {
-        case 'small':
+        case "small":
           return cloneElement(icon, { ...icon.props, size: 12, width: 12, height: 12 });
-        case 'compact':
+        case "compact":
           return cloneElement(icon, { ...icon.props, size: 14, width: 14, height: 14 });
         default:
           return icon;
@@ -101,15 +101,15 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
     useHotkey(hotkey, rest.onClick as unknown as Keymaster.KeyHandler);
 
     const buttonBody = (
-      <Block name='button' mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
+      <Block name="button" mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
         <>
           {iconElem && (
-            <Elem tag='span' name='icon'>
+            <Elem tag="span" name="icon">
               {iconElem}
             </Elem>
           )}
           {iconElem && children ? <span>{children}</span> : children}
-          {extra !== undefined ? <Elem name='extra'>{extra}</Elem> : null}
+          {extra !== undefined ? <Elem name="extra">{extra}</Elem> : null}
         </>
       </Block>
     );
@@ -134,11 +134,11 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
   },
 );
 
-Button.displayName = 'Button';
+Button.displayName = "Button";
 
 const Group: FC<ButtonGroupProps> = ({ className, children, collapsed }) => {
   return (
-    <Block name='button-group' mod={{ collapsed }} mix={className}>
+    <Block name="button-group" mod={{ collapsed }} mix={className}>
       {children}
     </Block>
   );

@@ -1,15 +1,15 @@
-import { type FC, type MouseEvent, useCallback, useContext, useMemo } from 'react';
+import { type FC, type MouseEvent, useCallback, useContext, useMemo } from "react";
 import {
   IconInterpolationAdd,
   IconInterpolationRemove,
   IconKeypointAdd,
   IconKeypointDelete,
-} from '../../../../assets/icons/timeline';
-import { TimelineContext } from '../../Context';
-import { ControlButton } from '../../Controls';
-import type { TimelineExtraControls } from '../../Types';
+} from "../../../../assets/icons/timeline";
+import { TimelineContext } from "../../Context";
+import { ControlButton } from "../../Controls";
+import type { TimelineExtraControls } from "../../Types";
 
-type Actions = 'keypoint_add' | 'keypoint_remove' | 'lifespan_add' | 'lifespan_remove';
+type Actions = "keypoint_add" | "keypoint_remove" | "lifespan_add" | "lifespan_remove";
 type DataType = {
   frame: number;
 };
@@ -29,11 +29,11 @@ export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({ onActio
   const onKeypointToggle = useCallback(
     (e: MouseEvent) => {
       if (canAddKeypoint) {
-        onAction?.(e, 'keypoint_add', {
+        onAction?.(e, "keypoint_add", {
           frame: position,
         });
       } else {
-        onAction?.(e, 'keypoint_remove', {
+        onAction?.(e, "keypoint_remove", {
           frame: closestKeypoint!.frame,
         });
       }
@@ -44,11 +44,11 @@ export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({ onActio
   const onLifespanToggle = useCallback(
     (e: MouseEvent) => {
       if (canAddLifespan) {
-        onAction?.(e, 'lifespan_add', {
+        onAction?.(e, "lifespan_add", {
           frame: closestKeypoint!.frame,
         });
       } else {
-        onAction?.(e, 'lifespan_remove', {
+        onAction?.(e, "lifespan_remove", {
           frame: closestKeypoint!.frame,
         });
       }
@@ -74,11 +74,11 @@ export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({ onActio
 
   return (
     <>
-      <ControlButton onClick={onKeypointToggle} disabled={!hasSelectedRegion} tooltip='Toggle Keypoint'>
+      <ControlButton onClick={onKeypointToggle} disabled={!hasSelectedRegion} tooltip="Toggle Keypoint">
         {keypointIcon}
       </ControlButton>
 
-      <ControlButton onClick={onLifespanToggle} disabled={!closestKeypoint} tooltip='Toggle Interpolation'>
+      <ControlButton onClick={onLifespanToggle} disabled={!closestKeypoint} tooltip="Toggle Interpolation">
         {interpolationIcon}
       </ControlButton>
     </>

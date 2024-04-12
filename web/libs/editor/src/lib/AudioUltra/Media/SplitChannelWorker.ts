@@ -1,4 +1,4 @@
-import { ComputeWorker } from '../Common/Worker';
+import { ComputeWorker } from "../Common/Worker";
 
 export function splitChannels({
   value,

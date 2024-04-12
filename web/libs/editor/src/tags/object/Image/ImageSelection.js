@@ -1,7 +1,7 @@
-import { getParent, types } from 'mobx-state-tree';
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from '../../../components/ImageView/Image';
-import { FF_DEV_3793, isFF } from '../../../utils/feature-flags';
-import { ImageSelectionPoint } from './ImageSelectionPoint';
+import { getParent, types } from "mobx-state-tree";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../../../components/ImageView/Image";
+import { FF_DEV_3793, isFF } from "../../../utils/feature-flags";
+import { ImageSelectionPoint } from "./ImageSelectionPoint";
 
 export const ImageSelection = types
   .model({

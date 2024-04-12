@@ -1,11 +1,11 @@
-import type { KonvaEventObject } from 'konva/lib/Node';
-import { observer } from 'mobx-react';
-import { type FC, useMemo } from 'react';
-import { Group, Rect } from 'react-konva';
-import { LabelOnVideoBbox } from '../../../components/ImageView/LabelOnRegion';
-import { useRegionStyles } from '../../../hooks/useRegionColor';
-import { getNodeAbsoluteDimensions, normalizeNodeDimentions } from './tools';
-import type { WorkingArea } from './types';
+import type { KonvaEventObject } from "konva/lib/Node";
+import { observer } from "mobx-react";
+import { type FC, useMemo } from "react";
+import { Group, Rect } from "react-konva";
+import { LabelOnVideoBbox } from "../../../components/ImageView/LabelOnRegion";
+import { useRegionStyles } from "../../../hooks/useRegionColor";
+import { getNodeAbsoluteDimensions, normalizeNodeDimentions } from "./tools";
+import type { WorkingArea } from "./types";
 
 type RectPropsExtend = typeof Rect;
 
@@ -49,13 +49,13 @@ const RectanglePure: FC<RectProps> = ({
   const onDimensionUpdate = (e: KonvaEventObject<Event>) => {
     const node = e.target;
 
-    if (e.type === 'dragmove') onDragMove(e as KonvaEventObject<DragEvent>);
+    if (e.type === "dragmove") onDragMove(e as KonvaEventObject<DragEvent>);
 
     reg.updateShape(getNodeAbsoluteDimensions(node, workingArea), frame);
   };
 
   const onTransform = (e: KonvaEventObject<Event>) => {
-    normalizeNodeDimentions(e.target, 'rect');
+    normalizeNodeDimentions(e.target, "rect");
   };
 
   return (
@@ -70,7 +70,7 @@ const RectanglePure: FC<RectProps> = ({
       />
       <Rect
         {...newBox}
-        fill={style.fillColor ?? '#fff'}
+        fill={style.fillColor ?? "#fff"}
         stroke={style.strokeColor}
         strokeScaleEnabled={false}
         selected={selected}

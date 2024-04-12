@@ -1,38 +1,38 @@
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react";
 
-import { IconViewAll, LsPlus } from '../../assets/icons';
-import { Button } from '../../common/Button/Button';
-import { Tooltip } from '../../common/Tooltip/Tooltip';
-import { Block, Elem } from '../../utils/bem';
-import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
-import { DynamicPreannotationsToggle } from '../AnnotationTab/DynamicPreannotationsToggle';
-import { AnnotationsCarousel } from '../AnnotationsCarousel/AnnotationsCarousel';
-import { Actions } from './Actions';
-import { Annotations } from './Annotations';
-import { Controls } from './Controls';
-import { CurrentTask } from './CurrentTask';
+import { IconViewAll, LsPlus } from "../../assets/icons";
+import { Button } from "../../common/Button/Button";
+import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { Block, Elem } from "../../utils/bem";
+import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
+import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
+import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
+import { Actions } from "./Actions";
+import { Annotations } from "./Annotations";
+import { Controls } from "./Controls";
+import { CurrentTask } from "./CurrentTask";
 
-import './TopBar.styl';
+import "./TopBar.styl";
 
 export const TopBar = observer(({ store }) => {
   const annotationStore = store.annotationStore;
   const entity = annotationStore?.selected;
-  const isPrediction = entity?.type === 'prediction';
+  const isPrediction = entity?.type === "prediction";
 
   const isViewAll = annotationStore?.viewingAll === true;
 
   return store ? (
-    <Block name='topbar' mod={{ newLabelingUI: isFF(FF_DEV_3873) }}>
+    <Block name="topbar" mod={{ newLabelingUI: isFF(FF_DEV_3873) }}>
       {isFF(FF_DEV_3873) ? (
-        <Elem name='group'>
+        <Elem name="group">
           <CurrentTask store={store} />
-          {store.hasInterface('annotations:view-all') && (
-            <Tooltip title='View all annotations'>
+          {store.hasInterface("annotations:view-all") && (
+            <Tooltip title="View all annotations">
               <Button
-                className={'topbar__button'}
+                className={"topbar__button"}
                 icon={<IconViewAll />}
-                type='text'
-                aria-label='View All'
+                type="text"
+                aria-label="View All"
                 onClick={annotationStore.toggleViewingAllAnnotations}
                 primary={isViewAll}
                 style={{
@@ -44,13 +44,13 @@ export const TopBar = observer(({ store }) => {
               />
             </Tooltip>
           )}
-          {store.hasInterface('annotations:add-new') && (
-            <Tooltip placement='topLeft' title='Create a new annotation'>
+          {store.hasInterface("annotations:add-new") && (
+            <Tooltip placement="topLeft" title="Create a new annotation">
               <Button
                 icon={<LsPlus />}
-                className={'topbar__button'}
-                type='text'
-                aria-label='View All'
+                className={"topbar__button"}
+                type="text"
+                aria-label="View All"
                 onClick={(event) => {
                   event.preventDefault();
                   const created = store.annotationStore.createAnnotation();
@@ -76,21 +76,21 @@ export const TopBar = observer(({ store }) => {
         </Elem>
       ) : (
         <>
-          <Elem name='group'>
+          <Elem name="group">
             <CurrentTask store={store} />
             {!isViewAll && (
               <Annotations store={store} annotationStore={store.annotationStore} commentStore={store.commentStore} />
             )}
             <Actions store={store} />
           </Elem>
-          <Elem name='group'>
+          <Elem name="group">
             {!isViewAll && (
-              <Elem name='section'>
+              <Elem name="section">
                 <DynamicPreannotationsToggle />
               </Elem>
             )}
-            {!isViewAll && store.hasInterface('controls') && (store.hasInterface('review') || !isPrediction) && (
-              <Elem name='section' mod={{ flat: true }} style={{ width: 320, boxSizing: 'border-box' }}>
+            {!isViewAll && store.hasInterface("controls") && (store.hasInterface("review") || !isPrediction) && (
+              <Elem name="section" mod={{ flat: true }} style={{ width: 320, boxSizing: "border-box" }}>
                 <Controls annotation={entity} />
               </Elem>
             )}

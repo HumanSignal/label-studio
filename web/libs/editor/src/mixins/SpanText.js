@@ -1,8 +1,8 @@
-import { getRoot, types } from 'mobx-state-tree';
+import { getRoot, types } from "mobx-state-tree";
 
-import Constants, { defaultStyle } from '../core/Constants';
-import Utils from '../utils';
-import { highlightRange } from '../utils/html';
+import Constants, { defaultStyle } from "../core/Constants";
+import Utils from "../utils";
+import { highlightRange } from "../utils/html";
 
 export default types
   .model()
@@ -31,7 +31,7 @@ export default types
 
     createSpans() {
       const labelColor = self.getLabelColor();
-      const spans = highlightRange(self, 'htx-highlight', { backgroundColor: labelColor });
+      const spans = highlightRange(self, "htx-highlight", { backgroundColor: labelColor });
 
       const lastSpan = spans[spans.length - 1];
 
@@ -57,11 +57,11 @@ export default types
 
     applyCSSClass(lastSpan) {
       if (!lastSpan) return;
-      const classes = ['htx-highlight', 'htx-highlight-last'];
+      const classes = ["htx-highlight", "htx-highlight-last"];
       const settings = getRoot(self).settings;
 
       if (!self.parent.showlabels && !settings.showLabels) {
-        classes.push('htx-no-label');
+        classes.push("htx-no-label");
       } else {
         // @todo multilabeling with different labels?
         const names = self.labeling?.mainValue;
@@ -72,7 +72,7 @@ export default types
 
         classes.push(cssCls);
       }
-      lastSpan.className = classes.filter(Boolean).join(' ');
+      lastSpan.className = classes.filter(Boolean).join(" ");
     },
 
     addEventsToSpans(spans) {
@@ -128,7 +128,7 @@ export default types
         if (first.scrollIntoViewIfNeeded) {
           first.scrollIntoViewIfNeeded();
         } else {
-          first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          first.scrollIntoView({ block: "center", behavior: "smooth" });
         }
       }
     },
@@ -164,7 +164,7 @@ export default types
 
           if (mspans.length) mspans.forEach((s) => set(s, h, { left: false, right: false }));
         } else {
-          const zpx = '0px';
+          const zpx = "0px";
 
           set(fspan, zpx);
           set(lspan, zpx);
@@ -179,7 +179,7 @@ export default types
       self.setHighlight(self.highlighted);
 
       if (self.hidden) {
-        self.updateSpansColor('transparent', 0);
+        self.updateSpansColor("transparent", 0);
         if (self._spans) {
           self._spans.forEach((span) => {
             span.style.cursor = Constants.DEFAULT_CURSOR;

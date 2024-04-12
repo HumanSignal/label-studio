@@ -1,9 +1,9 @@
-import chroma from 'chroma-js';
-import { observe } from 'mobx';
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { ImageViewContext } from '../components/ImageView/ImageViewContext';
-import Constants, { defaultStyle } from '../core/Constants';
-import { isDefined } from '../utils/utilities';
+import chroma from "chroma-js";
+import { observe } from "mobx";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { ImageViewContext } from "../components/ImageView/ImageViewContext";
+import Constants, { defaultStyle } from "../core/Constants";
+import { isDefined } from "../utils/utilities";
 
 const defaultStyles = {
   defaultOpacity: defaultStyle.opacity,
@@ -90,16 +90,16 @@ export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}
   }, [region, suggestion, options, highlighted, shouldFill]);
 
   useEffect(() => {
-    const disposeObserver = ['highlighted', 'fill'].map((prop) => {
+    const disposeObserver = ["highlighted", "fill"].map((prop) => {
       try {
         return observe(
           region,
           prop,
           ({ newValue }) => {
             switch (prop) {
-              case 'highlighted':
+              case "highlighted":
                 return setHighlighted(newValue);
-              case 'fill':
+              case "fill":
                 return setShouldFill(newValue);
             }
           },

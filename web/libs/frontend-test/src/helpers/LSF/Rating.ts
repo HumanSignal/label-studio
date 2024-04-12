@@ -1,6 +1,6 @@
 class RatingHelper {
   private get _baseRootSelector() {
-    return '.ant-rate';
+    return ".ant-rate";
   }
 
   private _rootSelector: string;
@@ -22,11 +22,11 @@ class RatingHelper {
   }
 
   hasValue(value: number) {
-    this.rates.filter('[aria-checked="true"]').should('have.lengthOf', value);
+    this.rates.filter('[aria-checked="true"]').should("have.lengthOf", value);
   }
 }
 
-const Rating = new RatingHelper('&:eq(0)');
+const Rating = new RatingHelper("&:eq(0)");
 const useRating = (rootSelector: string) => {
   return new RatingHelper(rootSelector);
 };

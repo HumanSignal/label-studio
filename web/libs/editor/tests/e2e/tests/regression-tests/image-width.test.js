@@ -1,8 +1,8 @@
-const assert = require('assert');
+const assert = require("assert");
 
-Feature('Image width parameter').tag('@regress');
+Feature("Image width parameter").tag("@regress");
 
-const IMAGE = 'https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg';
+const IMAGE = "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg";
 
 const config = `
   <View>
@@ -18,7 +18,7 @@ Scenario(
       data: { image: IMAGE },
     };
 
-    I.amOnPage('/');
+    I.amOnPage("/");
     LabelStudio.init(params);
     AtImageView.waitForImage();
     AtSidebar.seeRegions(0);

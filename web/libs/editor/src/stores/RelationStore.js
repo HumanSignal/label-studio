@@ -1,21 +1,21 @@
-import { destroy, getParentOfType, getRoot, isAlive, types } from 'mobx-state-tree';
+import { destroy, getParentOfType, getRoot, isAlive, types } from "mobx-state-tree";
 
-import { guidGenerator } from '../core/Helpers';
-import Tree, { TRAVERSE_SKIP } from '../core/Tree';
-import Area from '../regions/Area';
-import { isDefined } from '../utils/utilities';
+import { guidGenerator } from "../core/Helpers";
+import Tree, { TRAVERSE_SKIP } from "../core/Tree";
+import Area from "../regions/Area";
+import { isDefined } from "../utils/utilities";
 
 /**
  * Relation between two different nodes
  */
 const Relation = types
-  .model('Relation', {
+  .model("Relation", {
     id: types.optional(types.identifier, guidGenerator),
 
     node1: types.reference(Area),
     node2: types.reference(Area),
 
-    direction: types.optional(types.enumeration(['left', 'right', 'bi']), 'right'),
+    direction: types.optional(types.enumeration(["left", "right", "bi"]), "right"),
 
     // labels
     labels: types.maybeNull(types.array(types.string)),
@@ -60,7 +60,7 @@ const Relation = types
   }))
   .actions((self) => ({
     rotateDirection() {
-      const d = ['left', 'right', 'bi'];
+      const d = ["left", "right", "bi"];
       let idx = d.findIndex((item) => item === self.direction);
 
       idx = idx + 1;
@@ -100,7 +100,7 @@ const Relation = types
   }));
 
 const RelationStore = types
-  .model('RelationStore', {
+  .model("RelationStore", {
     relations: types.array(Relation),
   })
   .volatile(() => ({
@@ -127,7 +127,7 @@ const RelationStore = types
       let relationsTag = null;
 
       Tree.traverseTree(appStore.annotationStore.root, (node) => {
-        if (node.type === 'relations') {
+        if (node.type === "relations") {
           relationsTag = node;
           return TRAVERSE_SKIP;
         }
@@ -189,7 +189,7 @@ const RelationStore = types
         const s = {
           from_id: r.node1.cleanId,
           to_id: r.node2.cleanId,
-          type: 'relation',
+          type: "relation",
           direction: r.direction,
         };
 

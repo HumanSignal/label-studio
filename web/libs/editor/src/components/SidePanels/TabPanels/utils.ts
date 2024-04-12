@@ -1,8 +1,8 @@
-import type { FC, MutableRefObject, ReactNode } from 'react';
-import { clamp } from '../../../utils/utilities';
-import { Comments, History, Info, Relations } from '../DetailsPanel/DetailsPanel';
-import { OutlinerComponent } from '../OutlinerPanel/OutlinerPanel';
-import type { PanelProps } from '../PanelBase';
+import type { FC, MutableRefObject, ReactNode } from "react";
+import { clamp } from "../../../utils/utilities";
+import { Comments, History, Info, Relations } from "../DetailsPanel/DetailsPanel";
+import { OutlinerComponent } from "../OutlinerPanel/OutlinerPanel";
+import type { PanelProps } from "../PanelBase";
 import {
   DEFAULT_PANEL_HEIGHT,
   DEFAULT_PANEL_MAX_HEIGHT,
@@ -10,7 +10,7 @@ import {
   DEFAULT_PANEL_MIN_HEIGHT,
   DEFAULT_PANEL_WIDTH,
   PANEL_HEADER_HEIGHT,
-} from '../constants';
+} from "../constants";
 import {
   JoinOrder,
   type PanelBBox,
@@ -20,7 +20,7 @@ import {
   type StoredPanelState,
   type ViewportSize,
   emptyPanel,
-} from './types';
+} from "./types";
 
 export const determineLeftOrRight = (event: any, droppableElement?: ReactNode) => {
   const element = droppableElement || (event.target as HTMLElement);
@@ -31,7 +31,7 @@ export const determineLeftOrRight = (event: any, droppableElement?: ReactNode) =
   return x > half ? Side.right : Side.left;
 };
 
-export const determineDroppableArea = (droppingElement: HTMLElement) => droppingElement?.id?.includes('droppable');
+export const determineDroppableArea = (droppingElement: HTMLElement) => droppingElement?.id?.includes("droppable");
 
 export const stateRemovedTab = (state: Record<string, PanelBBox>, movingPanel: string, movingTab: number) => {
   const newState = { ...state };
@@ -78,7 +78,7 @@ export const renameKeys = (state: Record<string, PanelBBox>) => {
   const newState = {};
 
   Object.keys(state).forEach((panelKey: string) => {
-    const newKey = `${state[panelKey].panelViews.map((view) => view.name).join('-')}`;
+    const newKey = `${state[panelKey].panelViews.map((view) => view.name).join("-")}`;
     const panel = { ...state[panelKey] };
 
     Object.assign(newState, { [newKey]: panel });
@@ -129,40 +129,40 @@ export const panelComponents: { [key: string]: FC<PanelProps> } = {
 
 const panelViews = [
   {
-    name: 'regions',
-    title: 'Regions',
+    name: "regions",
+    title: "Regions",
     component: panelComponents.regions as FC<PanelProps>,
     active: true,
   },
   {
-    name: 'history',
-    title: 'History',
+    name: "history",
+    title: "History",
     component: panelComponents.history as FC<PanelProps>,
     active: false,
   },
 
   {
-    name: 'relations',
-    title: 'Relations',
+    name: "relations",
+    title: "Relations",
     component: panelComponents.relations as FC<PanelProps>,
     active: false,
   },
   {
-    name: 'info',
-    title: 'Info',
+    name: "info",
+    title: "Info",
     component: panelComponents.info as FC<PanelProps>,
     active: true,
   },
   {
-    name: 'comments',
-    title: 'Comments',
+    name: "comments",
+    title: "Comments",
     component: panelComponents.comments as FC<PanelProps>,
     active: false,
   },
 ];
 
 export const enterprisePanelDefault: Record<string, PanelBBox> = {
-  'info-comments-history': {
+  "info-comments-history": {
     order: 1,
     top: 0,
     left: 0,
@@ -177,7 +177,7 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
     panelViews: [panelViews[3], panelViews[4], panelViews[1]],
   },
-  'regions-relations': {
+  "regions-relations": {
     order: 2,
     top: 0,
     left: 0,
@@ -195,7 +195,7 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
 };
 
 export const openSourcePanelDefault: Record<string, PanelBBox> = {
-  'info-history': {
+  "info-history": {
     order: 1,
     top: 0,
     left: 0,
@@ -210,7 +210,7 @@ export const openSourcePanelDefault: Record<string, PanelBBox> = {
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
     panelViews: [panelViews[3], panelViews[1]],
   },
-  'regions-relations': {
+  "regions-relations": {
     order: 2,
     top: 0,
     left: 0,
@@ -229,7 +229,7 @@ export const openSourcePanelDefault: Record<string, PanelBBox> = {
 
 export const partialEmptyBaseProps = {
   ...emptyPanel,
-  name: 'breakpointCollapsed',
+  name: "breakpointCollapsed",
   positioning: false,
   height: DEFAULT_PANEL_HEIGHT,
   maxHeight: DEFAULT_PANEL_HEIGHT,
@@ -248,7 +248,7 @@ export const partialEmptyBaseProps = {
   panelViews: [panelViews[0], panelViews[1], panelViews[2], panelViews[3], panelViews[4]],
 };
 
-export const resizers = ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'top', 'bottom', 'right', 'left'];
+export const resizers = ["top-left", "top-right", "bottom-left", "bottom-right", "top", "bottom", "right", "left"];
 
 export const checkCollapsedPanelsHaveData = (collapsedSide: PanelsCollapsed, panelData: Record<string, PanelBBox>) => {
   const collapsedCopy = { ...collapsedSide };
@@ -266,7 +266,7 @@ export const checkCollapsedPanelsHaveData = (collapsedSide: PanelsCollapsed, pan
 };
 
 export const restorePanel = (showComments: boolean): StoredPanelState => {
-  const previousState = window.localStorage.getItem('panelState');
+  const previousState = window.localStorage.getItem("panelState");
   const parsed: StoredPanelState | null = previousState && JSON.parse(previousState);
   const panelData = parsed && parsed.panelData;
   const defaultCollapsedSide = { [Side.left]: false, [Side.right]: false };
@@ -308,7 +308,7 @@ export const savePanels = (
   panelData: Record<string, PanelBBox>,
   collapsedSide: { [Side.left]: boolean; [Side.right]: boolean },
 ) => {
-  window.localStorage.setItem('panelState', JSON.stringify({ panelData, collapsedSide }));
+  window.localStorage.setItem("panelState", JSON.stringify({ panelData, collapsedSide }));
 };
 
 export const getLeftKeys = (state: Record<string, PanelBBox>) =>
@@ -569,7 +569,7 @@ export const findPanelViewByName = (
   state: Record<string, PanelBBox>,
   name: string,
 ): { panelName: string; tab: PanelView; panelViewIndex: number } | undefined => {
-  const panelName = Object.keys(state).find((panelKey) => panelKey.includes(name)) || '';
+  const panelName = Object.keys(state).find((panelKey) => panelKey.includes(name)) || "";
   const panelViewIndex = state[panelName]?.panelViews.findIndex((view: { name: string }) => view.name === name);
 
   return panelViewIndex >= 0

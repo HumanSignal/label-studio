@@ -1,22 +1,22 @@
-import { format } from 'date-fns';
-import { cloneDeep } from 'lodash';
-import React, { useEffect, useState } from 'react';
-import { LsCross, LsPlus } from '../../assets/icons';
-import { Button } from '../../components';
-import { Form, Input, Label, Toggle } from '../../components/Form';
-import { modal } from '../../components/Modal/Modal';
-import { useModalControls } from '../../components/Modal/ModalPopup';
-import { Space } from '../../components/Space/Space';
-import { useAPI } from '../../providers/ApiProvider';
-import { useProject } from '../../providers/ProjectProvider';
-import { Block, Elem, cn } from '../../utils/bem';
-import { WebhookDeleteModal } from './WebhookDeleteModal';
-import './WebhookPage.styl';
+import { format } from "date-fns";
+import { cloneDeep } from "lodash";
+import React, { useEffect, useState } from "react";
+import { LsCross, LsPlus } from "../../assets/icons";
+import { Button } from "../../components";
+import { Form, Input, Label, Toggle } from "../../components/Form";
+import { modal } from "../../components/Modal/Modal";
+import { useModalControls } from "../../components/Modal/ModalPopup";
+import { Space } from "../../components/Space/Space";
+import { useAPI } from "../../providers/ApiProvider";
+import { useProject } from "../../providers/ProjectProvider";
+import { Block, Elem, cn } from "../../utils/bem";
+import { WebhookDeleteModal } from "./WebhookDeleteModal";
+import "./WebhookPage.styl";
 
 const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectActive }) => {
   // if webhook === null - create mod
   // else update
-  const rootClass = cn('webhook-detail');
+  const rootClass = cn("webhook-detail");
 
   const api = useAPI();
   const [headers, setHeaders] = useState(Object.entries(webhook?.headers || []));
@@ -36,7 +36,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
   }, [project]);
 
   const onAddHeaderClick = () => {
-    setHeaders([...headers, ['', '']]);
+    setHeaders([...headers, ["", ""]]);
   };
   const onHeaderRemove = (index) => {
     const newHeaders = cloneDeep(headers);
@@ -47,10 +47,10 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
   const onHeaderChange = (aim, event, index) => {
     const newHeaders = cloneDeep(headers);
 
-    if (aim === 'key') {
+    if (aim === "key") {
       newHeaders[index][0] = event.target.value;
     }
-    if (aim === 'value') {
+    if (aim === "value") {
       newHeaders[index][1] = event.target.value;
     }
     setHeaders(newHeaders);
@@ -85,25 +85,25 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
 
   if (projectId === undefined) return <></>;
   return (
-    <Block name='webhook'>
-      <Elem name='title'>
+    <Block name="webhook">
+      <Elem name="title">
         <>
           <Elem
-            tag='span'
-            name='title-base'
+            tag="span"
+            name="title-base"
             onClick={() => {
               onSelectActive(null);
             }}
           >
             Webhooks
-          </Elem>{' '}
-          / {webhook === null ? 'New Webhook' : 'Edit Webhook'}
+          </Elem>{" "}
+          / {webhook === null ? "New Webhook" : "Edit Webhook"}
         </>
       </Elem>
-      <Elem name='content'>
-        <Block name={'webhook-detail'}>
+      <Elem name="content">
+        <Block name={"webhook-detail"}>
           <Form
-            action={webhook === null ? 'createWebhook' : 'updateWebhook'}
+            action={webhook === null ? "createWebhook" : "updateWebhook"}
             params={webhook === null ? {} : { pk: webhook.id }}
             formData={webhook}
             prepareData={(data) => {
@@ -111,7 +111,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                 ...data,
                 project: projectId,
                 send_for_all_actions: sendForAllActions,
-                headers: Object.fromEntries(headers.filter(([key]) => key !== '')),
+                headers: Object.fromEntries(headers.filter(([key]) => key !== "")),
                 actions: Array.from(actions),
                 is_active: isActive,
                 send_payload: sendPayload,
@@ -124,12 +124,12 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
               }
             }}
           >
-            <Form.Row style={{ marginBottom: '40px' }} columnCount={1}>
-              <Label text='Payload URL' style={{ marginLeft: '-16px' }} large />
-              <Space className={rootClass.elem('url-space')}>
-                <Input name='url' className={rootClass.elem('url-input')} placeholder='URL' />
-                <Space align='end' className={rootClass.elem('activator')}>
-                  <span className={rootClass.elem('black-text')}>Is Active</span>
+            <Form.Row style={{ marginBottom: "40px" }} columnCount={1}>
+              <Label text="Payload URL" style={{ marginLeft: "-16px" }} large />
+              <Space className={rootClass.elem("url-space")}>
+                <Input name="url" className={rootClass.elem("url-input")} placeholder="URL" />
+                <Space align="end" className={rootClass.elem("activator")}>
+                  <span className={rootClass.elem("black-text")}>Is Active</span>
                   <Toggle
                     skip
                     checked={isActive}
@@ -140,39 +140,39 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                 </Space>
               </Space>
             </Form.Row>
-            <Form.Row style={{ marginBottom: '40px' }} columnCount={1}>
-              <div className={rootClass.elem('headers')}>
-                <div className={rootClass.elem('headers-content')}>
-                  <Space spread className={rootClass.elem('headers-control')}>
-                    <Label text='Headers' large />
+            <Form.Row style={{ marginBottom: "40px" }} columnCount={1}>
+              <div className={rootClass.elem("headers")}>
+                <div className={rootClass.elem("headers-content")}>
+                  <Space spread className={rootClass.elem("headers-control")}>
+                    <Label text="Headers" large />
                     <Button
-                      type='button'
+                      type="button"
                       onClick={onAddHeaderClick}
-                      className={rootClass.elem('headers-add')}
+                      className={rootClass.elem("headers-add")}
                       icon={<LsPlus />}
                     />
                   </Space>
                   {headers.map(([headKey, headValue], index) => {
                     return (
-                      <Space key={index} className={rootClass.elem('headers-row')} columnCount={3}>
+                      <Space key={index} className={rootClass.elem("headers-row")} columnCount={3}>
                         <Input
-                          className={rootClass.elem('headers-input')}
+                          className={rootClass.elem("headers-input")}
                           skip
-                          placeholder='header'
+                          placeholder="header"
                           value={headKey}
-                          onChange={(e) => onHeaderChange('key', e, index)}
+                          onChange={(e) => onHeaderChange("key", e, index)}
                         />
                         <Input
-                          className={rootClass.elem('headers-input')}
+                          className={rootClass.elem("headers-input")}
                           skip
-                          placeholder='value'
+                          placeholder="value"
                           value={headValue}
-                          onChange={(e) => onHeaderChange('value', e, index)}
+                          onChange={(e) => onHeaderChange("value", e, index)}
                         />
                         <div>
                           <Button
-                            className={rootClass.elem('headers-remove')}
-                            type='button'
+                            className={rootClass.elem("headers-remove")}
+                            type="button"
                             icon={<LsCross />}
                             onClick={() => onHeaderRemove(index)}
                           />
@@ -183,26 +183,26 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                 </div>
               </div>
             </Form.Row>
-            <Block name='webhook-payload' style={{ marginBottom: '40px' }}>
-              <Elem name='title'>
-                <Label text='Payload' large />
+            <Block name="webhook-payload" style={{ marginBottom: "40px" }}>
+              <Elem name="title">
+                <Label text="Payload" large />
               </Elem>
-              <Elem name='content'>
-                <Elem name='content-row'>
+              <Elem name="content">
+                <Elem name="content-row">
                   <Toggle
                     skip
                     checked={sendPayload}
                     onChange={(e) => {
                       setSendPayload(e.target.checked);
                     }}
-                    label='Send payload'
+                    label="Send payload"
                   />
                 </Elem>
-                <Elem name='content-row'>
+                <Elem name="content-row">
                   <Toggle
                     skip
                     checked={sendForAllActions}
-                    label='Send for all actions'
+                    label="Send for all actions"
                     onChange={(e) => {
                       setSendForAllActions(e.target.checked);
                     }}
@@ -210,11 +210,11 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                 </Elem>
                 <div>
                   {!sendForAllActions ? (
-                    <Elem name='content-row-actions'>
-                      <Elem tag='h4' name='title' mod={{ black: true }}>
+                    <Elem name="content-row-actions">
+                      <Elem tag="h4" name="title" mod={{ black: true }}>
                         Send Payload for
                       </Elem>
-                      <Elem name='actions'>
+                      <Elem name="actions">
                         {Object.entries(webhooksInfo).map(([key, value]) => {
                           return (
                             <Form.Row key={key} columnCount={1}>
@@ -222,7 +222,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                                 <Toggle
                                   skip
                                   name={key}
-                                  type='checkbox'
+                                  type="checkbox"
                                   label={value.name}
                                   onChange={onActionChange}
                                   checked={actions.has(key)}
@@ -237,16 +237,16 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                 </div>
               </Elem>
             </Block>
-            <Elem name='controls'>
+            <Elem name="controls">
               {webhook === null ? null : (
                 <Button
-                  look='danger'
-                  type='button'
-                  className={rootClass.elem('delete-button')}
+                  look="danger"
+                  type="button"
+                  className={rootClass.elem("delete-button")}
                   onClick={() =>
                     WebhookDeleteModal({
                       onDelete: async () => {
-                        await api.callApi('deleteWebhook', { params: { pk: webhook.id } });
+                        await api.callApi("deleteWebhook", { params: { pk: webhook.id } });
                         onBack();
                         await fetchWebhooks();
                       },
@@ -256,14 +256,14 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                   Delete Webhook...
                 </Button>
               )}
-              <div className={rootClass.elem('status')}>
+              <div className={rootClass.elem("status")}>
                 <Form.Indicator />
               </div>
-              <Button type='button' className={rootClass.elem('cancel-button')} onClick={onBack}>
+              <Button type="button" className={rootClass.elem("cancel-button")} onClick={onBack}>
                 Cancel
               </Button>
-              <Button primary className={rootClass.elem('save-button')}>
-                {webhook === null ? 'Add Webhook' : 'Save'}
+              <Button primary className={rootClass.elem("save-button")}>
+                {webhook === null ? "Add Webhook" : "Save"}
               </Button>
             </Elem>
           </Form>

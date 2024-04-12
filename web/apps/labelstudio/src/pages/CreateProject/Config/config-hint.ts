@@ -2,10 +2,10 @@
  * Highly improved version of CodeMirror's XML hint addon
  * https://codemirror.net/5/addon/hint/xml-hint.js
  */
-import CM from 'codemirror';
+import CM from "codemirror";
 
 const Pos = CM.Pos;
-const topTags = ['View'];
+const topTags = ["View"];
 
 function matches(hint: string, typed: string, matchInMiddle?: boolean) {
   if (matchInMiddle) return hint.includes(typed);
@@ -62,13 +62,13 @@ type CMHintOptions = {
  * @param data current hint
  */
 function richHint(el: Element, self: any, data: CMHintResult) {
-  const name = document.createElement('b');
+  const name = document.createElement("b");
 
   name.appendChild(document.createTextNode(data.name ?? data.text));
-  name.className = 'CodeMirror-hint-name';
+  name.className = "CodeMirror-hint-name";
 
   if (data.link) {
-    const link = document.createElement('a');
+    const link = document.createElement("a");
 
     link.href = data.link;
     link.appendChild(name);
@@ -79,25 +79,25 @@ function richHint(el: Element, self: any, data: CMHintResult) {
   }
 
   if (data.type) {
-    const type = document.createElement('span');
-    const value = Array.isArray(data.type) ? data.type.join(' | ') : data.type;
+    const type = document.createElement("span");
+    const value = Array.isArray(data.type) ? data.type.join(" | ") : data.type;
 
     type.appendChild(document.createTextNode(value));
-    type.className = 'CodeMirror-hint-type';
-    el.appendChild(document.createTextNode(' '));
+    type.className = "CodeMirror-hint-type";
+    el.appendChild(document.createTextNode(" "));
     el.appendChild(type);
   }
 
   if (data.description) {
-    const description = document.createElement('span');
+    const description = document.createElement("span");
 
-    description.className = 'CodeMirror-hint-description';
+    description.className = "CodeMirror-hint-description";
     description.appendChild(document.createTextNode(data.description));
-    el.appendChild(document.createTextNode(' — '));
+    el.appendChild(document.createTextNode(" — "));
     el.appendChild(description);
   }
 
-  el.classList.add('CodeMirror-hint-tag');
+  el.classList.add("CodeMirror-hint-tag");
 }
 
 function getHints(cm: any, options: CMHintOptions) {
@@ -124,18 +124,18 @@ function getHints(cm: any, options: CMHintOptions) {
   const tag = /\btag\b/.test(token.type) && !/>$/.test(token.string);
   const tagName = tag && /^\w/.test(token.string);
   let tagStart: number | undefined;
-  let tagType: 'open' | 'close' | null = null;
+  let tagType: "open" | "close" | null = null;
 
   if (tagName) {
     const before = cm.getLine(cur.line).slice(Math.max(0, token.start - 2), token.start);
 
-    tagType = /<\/$/.test(before) ? 'close' : /<$/.test(before) ? 'open' : null;
+    tagType = /<\/$/.test(before) ? "close" : /<$/.test(before) ? "open" : null;
 
-    if (tagType) tagStart = token.start - (tagType === 'close' ? 2 : 1);
-  } else if (tag && token.string === '<') {
-    tagType = 'open';
-  } else if (tag && token.string === '</') {
-    tagType = 'close';
+    if (tagType) tagStart = token.start - (tagType === "close" ? 2 : 1);
+  } else if (tag && token.string === "<") {
+    tagType = "open";
+  } else if (tag && token.string === "</") {
+    tagType = "close";
   }
 
   const tagInfo = inner.mode.xmlCurrentTag(inner.state);
@@ -153,16 +153,16 @@ function getHints(cm: any, options: CMHintOptions) {
     const curTag = inner && tags[inner];
     const childList = inner ? curTag && curTag.children : topTags;
 
-    if (childList && tagType !== 'close') {
+    if (childList && tagType !== "close") {
       for (const name of childList)
         if (!prefix || matches(name, prefix, matchInMiddle))
           result.push({ text: `<${name}`, name, description: tags[name].description, render: richHint });
-    } else if (tagType !== 'close') {
+    } else if (tagType !== "close") {
       for (const name in tags)
-        if (name !== '!attrs' && (!prefix || matches(name, prefix, matchInMiddle)))
+        if (name !== "!attrs" && (!prefix || matches(name, prefix, matchInMiddle)))
           result.push({ text: `<${name}`, name, description: tags[name].description, render: richHint });
     }
-    if (inner && (!prefix || (tagType === 'close' && matches(inner, prefix, matchInMiddle))))
+    if (inner && (!prefix || (tagType === "close" && matches(inner, prefix, matchInMiddle))))
       result.push({ text: `</${inner}>`, render: richHint });
   } else {
     // Attribute completion
@@ -170,18 +170,18 @@ function getHints(cm: any, options: CMHintOptions) {
     const attrs = curTag && curTag.attrs;
 
     if (!attrs) return;
-    if (token.type === 'string' || token.string === '=') {
+    if (token.type === "string" || token.string === "=") {
       // Attribute value completion
       const before = cm.getRange(
         Pos(cur.line, Math.max(0, cur.ch - 60)),
-        Pos(cur.line, token.type === 'string' ? token.start : token.end),
+        Pos(cur.line, token.type === "string" ? token.start : token.end),
       );
       const atName = before.match(/([^\s\u00a0=<>"']+)=$/);
       const atValues = atName?.[1] ? attrs[atName[1]]?.type : undefined;
 
       if (!atName || !Object.prototype.hasOwnProperty.call(attrs, atName[1])) return;
       if (!atValues || !Array.isArray(atValues)) return;
-      if (token.type === 'string') {
+      if (token.type === "string") {
         prefix = token.string;
         let n = 0;
 
@@ -214,7 +214,7 @@ function getHints(cm: any, options: CMHintOptions) {
       return returnHintsFromAtValues(atValues);
     }
     // An attribute name completion
-    if (token.type === 'attribute') {
+    if (token.type === "attribute") {
       prefix = token.string;
       replaceToken = true;
     }
@@ -237,4 +237,4 @@ function getHints(cm: any, options: CMHintOptions) {
   return returnHints();
 }
 
-CM.registerHelper('hint', 'xml', getHints);
+CM.registerHelper("hint", "xml", getHints);

@@ -5,7 +5,7 @@ const loadedScripts = new Set();
  * @param {HTMLScriptElement} script
  */
 const isScriptTag = (script) => {
-  return [null, undefined, '', 'text/javascript'].includes(script.type);
+  return [null, undefined, "", "text/javascript"].includes(script.type);
 };
 
 /**
@@ -13,7 +13,7 @@ const isScriptTag = (script) => {
  * @param {String} scriptContent
  */
 const createScriptLink = (scriptContent) => {
-  const blob = new Blob([scriptContent], { type: 'text/javascript' });
+  const blob = new Blob([scriptContent], { type: "text/javascript" });
   return URL.createObjectURL(blob).toString();
 };
 
@@ -49,7 +49,7 @@ export const clearScriptsCache = () => {
 const swapScripts = (targetScript, sourceScript) => {
   return new Promise((resolve) => {
     /**@type {HTMLScriptElement} */
-    const newScript = document.createElement('script');
+    const newScript = document.createElement("script");
 
     sourceScript = sourceScript ?? targetScript;
 
@@ -64,28 +64,28 @@ const swapScripts = (targetScript, sourceScript) => {
     // when it's explicitly no async attribute
     if (!sourceScript.async) {
       const onScriptLoaded = ({ type }) => {
-        newScript.removeEventListener('load', onScriptLoaded);
-        newScript.removeEventListener('error', onScriptLoaded);
-        resolve(type === 'error' ? false : newScript);
+        newScript.removeEventListener("load", onScriptLoaded);
+        newScript.removeEventListener("error", onScriptLoaded);
+        resolve(type === "error" ? false : newScript);
       };
 
-      newScript.addEventListener('load', onScriptLoaded);
-      newScript.addEventListener('error', onScriptLoaded);
+      newScript.addEventListener("load", onScriptLoaded);
+      newScript.addEventListener("error", onScriptLoaded);
     } else {
       resolve();
     }
 
     if (sourceScript.dataset.alwaysReload !== undefined) {
-      newScript.dataset.alwaysReload = '';
+      newScript.dataset.alwaysReload = "";
     }
 
     if (sourceScript.id) newScript.id = sourceScript.id;
     if (sourceScript.className) newScript.className = sourceScript.className;
 
-    newScript.dataset.replaced = 'true';
+    newScript.dataset.replaced = "true";
     newScript.async = sourceScript.async;
     newScript.defer = sourceScript.defer;
-    newScript.type = 'text/javascript';
+    newScript.type = "text/javascript";
     newScript.src = src;
 
     targetScript.parentNode.insertBefore(newScript, targetScript);
@@ -122,7 +122,7 @@ const scriptIterator = function* (scripts) {
  * @param {HTMLElement} root
  */
 export const reInsertScripts = async (root) => {
-  const scripts = root.querySelectorAll('script');
+  const scripts = root.querySelectorAll("script");
 
   if (!scripts.length) return [];
 

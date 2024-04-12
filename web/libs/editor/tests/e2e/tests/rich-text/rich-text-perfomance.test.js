@@ -1,7 +1,7 @@
-const assert = require('assert');
-const { createRandomIntWithSeed } = require('../helpers');
+const assert = require("assert");
+const { createRandomIntWithSeed } = require("../helpers");
 
-Feature('Richtext perfomance');
+Feature("Richtext perfomance");
 
 Before(({ LabelStudio }) => {
   LabelStudio.setFeatureFlags({
@@ -11,9 +11,9 @@ Before(({ LabelStudio }) => {
 });
 
 // Generate text and results generator
-const SYMBOLS = 'abcdefghijklmnopqrstuvwxyz';
-const NEWLINE = '/n';
-const SPACE = ' ';
+const SYMBOLS = "abcdefghijklmnopqrstuvwxyz";
+const NEWLINE = "/n";
+const SPACE = " ";
 const MIN_WORD_SIZE = 2;
 const MAX_WORD_SIZE = 23;
 
@@ -42,7 +42,7 @@ function generateAnnotationParams(sybolsNum, regionsNum, seed = 42) {
       words.push(SPACE);
     }
   }
-  const text = words.join('');
+  const text = words.join("");
 
   return {
     config: `<View>
@@ -56,17 +56,17 @@ function generateAnnotationParams(sybolsNum, regionsNum, seed = 42) {
     },
     annotations: [
       {
-        id: 'test',
+        id: "test",
         result: Array.from({ length: regionsNum }, (v, idx) => {
           const startOffset = randomInt(0, text.length - 2);
           const endOffset = startOffset + Math.min(randomInt(1, 50), text.length - startOffset);
 
           return {
             id: `1_${idx}`,
-            from_name: 'label',
-            to_name: 'text',
-            type: 'labels',
-            value: { start: startOffset, end: endOffset, labels: ['Label'] },
+            from_name: "label",
+            to_name: "text",
+            type: "labels",
+            value: { start: startOffset, end: endOffset, labels: ["Label"] },
           };
         }),
       },
@@ -75,18 +75,18 @@ function generateAnnotationParams(sybolsNum, regionsNum, seed = 42) {
 }
 
 // Feel free to make this test skipped in case of needness
-Scenario('Rich text initialization in hightload conditions', async ({ I, LabelStudio, AtOutliner }) => {
+Scenario("Rich text initialization in hightload conditions", async ({ I, LabelStudio, AtOutliner }) => {
   const SYMBOLS_NUM = 100000;
   const REGIONS_NUM = 2000;
 
   // Generate text and results to reach 100K symbols and 2К labels
   const params = generateAnnotationParams(SYMBOLS_NUM, REGIONS_NUM);
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   I.executeScript(async () => {
     new Promise((resolve) => {
       const watchLabelStudioReady = () => {
-        const isReady = window.document.querySelector('.lsf-richtext');
+        const isReady = window.document.querySelector(".lsf-richtext");
 
         if (isReady) {
           window._startTime = Date.now();

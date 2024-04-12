@@ -1,7 +1,7 @@
-import { inject } from 'mobx-react';
-import { LsRefresh, LsRefresh2 } from '../../../assets/icons';
-import { FF_LOPS_E_10, isFF } from '../../../utils/feature-flags';
-import { Button } from '../../Common/Button/Button';
+import { inject } from "mobx-react";
+import { LsRefresh, LsRefresh2 } from "../../../assets/icons";
+import { FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
+import { Button } from "../../Common/Button/Button";
 
 const isNewUI = isFF(FF_LOPS_E_10);
 
@@ -17,10 +17,10 @@ export const RefreshButton = injector(({ store, needsDataFetch, projectFetch, si
   return (
     <Button
       size={size}
-      look={needsDataFetch && 'primary'}
+      look={needsDataFetch && "primary"}
       waiting={projectFetch}
       onClick={async () => {
-        await store.fetchProject({ force: true, interaction: 'refresh' });
+        await store.fetchProject({ force: true, interaction: "refresh" });
         await store.currentView?.reload();
       }}
       style={{

@@ -1,9 +1,9 @@
-const { recorder, event } = require('codeceptjs');
-const Container = require('codeceptjs/lib/container');
-const { assert } = require('chai');
-const format = require('util').format;
+const { recorder, event } = require("codeceptjs");
+const Container = require("codeceptjs/lib/container");
+const { assert } = require("chai");
+const format = require("util").format;
 
-const supportedHelpers = ['Playwright'];
+const supportedHelpers = ["Playwright"];
 
 /**
  * @typedef {boolean|RegExp|RegExp[]} ErrorsFilters
@@ -42,13 +42,13 @@ const defaultConfig = {
   },
 };
 
-const UNCAUGHT_ERROR = 'uncaughtError';
-const CONSOLE_ERROR = 'consoleError';
-const CONSOLE_WARNING = 'consoleWarning';
+const UNCAUGHT_ERROR = "uncaughtError";
+const CONSOLE_ERROR = "consoleError";
+const CONSOLE_WARNING = "consoleWarning";
 
-const IGNORE_ACTION = 'ignore';
-const DISPLAY_ACTION = 'display';
-const INTERRUPT_ACTION = 'interrupt';
+const IGNORE_ACTION = "ignore";
+const DISPLAY_ACTION = "display";
+const INTERRUPT_ACTION = "interrupt";
 
 /**
  * This plugin can monitor three types of errors inside the browser. They are console errors, console warnings and uncaught errors.
@@ -61,13 +61,13 @@ module.exports = (config) => {
   const helper = helpers[Object.keys(helpers).find((helper) => supportedHelpers.includes(helper))];
 
   if (!helper) {
-    console.error(`Errors collector plugin is only supported in ${supportedHelpers.join(', ')}`);
+    console.error(`Errors collector plugin is only supported in ${supportedHelpers.join(", ")}`);
     return;
   }
 
   const options = Object.assign({}, defaultConfig, config);
 
-  for (const key of ['filter', 'uncaughtErrorFilter', 'consoleErrorFilter', 'consoleWarningFilter']) {
+  for (const key of ["filter", "uncaughtErrorFilter", "consoleErrorFilter", "consoleWarningFilter"]) {
     options[key] = Object.assign({}, defaultConfig[key], options[key]);
   }
 
@@ -78,7 +78,7 @@ module.exports = (config) => {
   }
 
   ErrorCollector.prototype.testMessage = (filter, message) => {
-    if (typeof filter === 'boolean') return filter;
+    if (typeof filter === "boolean") return filter;
     if (filter instanceof RegExp) return filter.test(message);
     if (Array.isArray(filter)) return filter.some((f) => f.test(message));
     return false;
@@ -104,16 +104,16 @@ module.exports = (config) => {
   ErrorCollector.prototype.run = function () {
     const { page } = this;
 
-    page.on('console', async (msg) => {
+    page.on("console", async (msg) => {
       const type = msg.type();
       let messageType;
 
       switch (type) {
-        case 'error': {
+        case "error": {
           messageType = CONSOLE_ERROR;
           break;
         }
-        case 'warning': {
+        case "warning": {
           messageType = CONSOLE_WARNING;
           break;
         }
@@ -128,7 +128,7 @@ module.exports = (config) => {
         this.handleMessage(messageType, format(...args));
       }
     });
-    page.on('pageerror', (exception) => {
+    page.on("pageerror", (exception) => {
       this.handleMessage(UNCAUGHT_ERROR, exception);
     });
   };
@@ -158,8 +158,8 @@ module.exports = (config) => {
   });
 
   event.dispatcher.on(event.step.before, async (step) => {
-    if (step.name === 'amOnPage') {
-      recorder.add('run collector', async () => {
+    if (step.name === "amOnPage") {
+      recorder.add("run collector", async () => {
         try {
           if (!errorCollectors.isRunningOn(step.helper.page)) {
             errorCollectors.runErrorsCollectorOn(step.helper.page);
@@ -171,7 +171,7 @@ module.exports = (config) => {
     }
   });
   event.dispatcher.on(event.step.after, async () => {
-    recorder.add('check for errors', async () => {
+    recorder.add("check for errors", async () => {
       for (const err of errorCollectors.errors) {
         if (err instanceof Error) {
           assert.fail(err.stack);

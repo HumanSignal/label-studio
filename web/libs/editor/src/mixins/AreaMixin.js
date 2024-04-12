@@ -1,10 +1,10 @@
-import { destroy, isAlive, types } from 'mobx-state-tree';
-import { defaultStyle } from '../core/Constants';
-import { guidGenerator } from '../core/Helpers';
-import Result from '../regions/Result';
-import { FF_LSDV_4930, FF_TAXONOMY_LABELING, isFF } from '../utils/feature-flags';
-import { PER_REGION_MODES } from './PerRegion';
-import { ReadOnlyRegionMixin } from './ReadOnlyMixin';
+import { destroy, isAlive, types } from "mobx-state-tree";
+import { defaultStyle } from "../core/Constants";
+import { guidGenerator } from "../core/Helpers";
+import Result from "../regions/Result";
+import { FF_LSDV_4930, FF_TAXONOMY_LABELING, isFF } from "../utils/feature-flags";
+import { PER_REGION_MODES } from "./PerRegion";
+import { ReadOnlyRegionMixin } from "./ReadOnlyMixin";
 
 let ouid = 1;
 
@@ -18,7 +18,7 @@ export const AreaMixinBase = types
   .views((self) => ({
     // self id without annotation id added to uniquiness across all the tree
     get cleanId() {
-      return self.id.replace(/#.*/, '');
+      return self.id.replace(/#.*/, "");
     },
 
     /**
@@ -43,7 +43,7 @@ export const AreaMixinBase = types
     },
 
     get texting() {
-      return isAlive(self) && self.results.find((r) => r.type === 'textarea' && r.hasValue);
+      return isAlive(self) && self.results.find((r) => r.type === "textarea" && r.hasValue);
     },
 
     get tag() {
@@ -56,8 +56,8 @@ export const AreaMixinBase = types
       if (!labels || !value) return false;
       // label can contain comma, so check for full match first
       if (labels.includes(value)) return true;
-      if (value.includes(',')) {
-        return value.split(',').some((v) => labels.includes(v));
+      if (value.includes(",")) {
+        return value.split(",").some((v) => labels.includes(v));
       }
       return false;
     },
@@ -94,13 +94,13 @@ export const AreaMixinBase = types
 
     getLabelText(joinstr) {
       const label = self.labeling;
-      const text = self.texting?.mainValue?.[0]?.replace(/\n\r|\n/, ' ');
+      const text = self.texting?.mainValue?.[0]?.replace(/\n\r|\n/, " ");
       const labelNames = label?.getSelectedString(joinstr);
       const labelText = [];
 
       if (labelNames) labelText.push(labelNames);
       if (text) labelText.push(text);
-      return labelText.join(': ');
+      return labelText.join(": ");
     },
 
     get parent() {
@@ -227,4 +227,4 @@ export const AreaMixinBase = types
     },
   }));
 
-export const AreaMixin = types.compose('AreaMixin', AreaMixinBase, ReadOnlyRegionMixin);
+export const AreaMixin = types.compose("AreaMixin", AreaMixinBase, ReadOnlyRegionMixin);

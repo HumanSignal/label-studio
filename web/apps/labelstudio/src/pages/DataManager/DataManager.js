@@ -1,24 +1,24 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { generatePath, useHistory } from 'react-router';
-import { NavLink } from 'react-router-dom';
-import { Spinner } from '../../components';
-import { Button } from '../../components/Button/Button';
-import { modal } from '../../components/Modal/Modal';
-import { Space } from '../../components/Space/Space';
-import { ToastContext } from '../../components/Toast/Toast';
-import { useAPI } from '../../providers/ApiProvider';
-import { useLibrary } from '../../providers/LibraryProvider';
-import { useProject } from '../../providers/ProjectProvider';
-import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
-import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
-import { Block, Elem } from '../../utils/bem';
-import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
-import { isDefined } from '../../utils/helpers';
-import { ImportModal } from '../CreateProject/Import/ImportModal';
-import { ExportPage } from '../ExportPage/ExportPage';
-import { APIConfig } from './api-config';
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { generatePath, useHistory } from "react-router";
+import { NavLink } from "react-router-dom";
+import { Spinner } from "../../components";
+import { Button } from "../../components/Button/Button";
+import { modal } from "../../components/Modal/Modal";
+import { Space } from "../../components/Space/Space";
+import { ToastContext } from "../../components/Toast/Toast";
+import { useAPI } from "../../providers/ApiProvider";
+import { useLibrary } from "../../providers/LibraryProvider";
+import { useProject } from "../../providers/ProjectProvider";
+import { useContextProps, useFixedLocation, useParams } from "../../providers/RoutesProvider";
+import { addAction, addCrumb, deleteAction, deleteCrumb } from "../../services/breadrumbs";
+import { Block, Elem } from "../../utils/bem";
+import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
+import { isDefined } from "../../utils/helpers";
+import { ImportModal } from "../CreateProject/Import/ImportModal";
+import { ExportPage } from "../ExportPage/ExportPage";
+import { APIConfig } from "./api-config";
 
-import './DataManager.styl';
+import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
@@ -65,8 +65,8 @@ export const DataManagerPage = ({ ...props }) => {
   const history = useHistory();
   const api = useAPI();
   const { project } = useProject();
-  const LabelStudio = useLibrary('lsf');
-  const DataManager = useLibrary('dm');
+  const LabelStudio = useLibrary("lsf");
+  const DataManager = useLibrary("dm");
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const dataManagerRef = useRef();
@@ -79,7 +79,7 @@ export const DataManagerPage = ({ ...props }) => {
     if (!project?.id) return;
     if (dataManagerRef.current) return;
 
-    const mlBackends = await api.callApi('mlBackends', {
+    const mlBackends = await api.callApi("mlBackends", {
       params: { project: project.id },
     });
 
@@ -95,42 +95,42 @@ export const DataManagerPage = ({ ...props }) => {
 
     Object.assign(window, { dataManager });
 
-    dataManager.on('crash', () => setCrashed());
+    dataManager.on("crash", () => setCrashed());
 
-    dataManager.on('settingsClicked', () => {
-      history.push(buildLink('/settings/labeling', { id: params.id }));
+    dataManager.on("settingsClicked", () => {
+      history.push(buildLink("/settings/labeling", { id: params.id }));
     });
 
-    dataManager.on('importClicked', () => {
-      history.push(buildLink('/data/import', { id: params.id }));
+    dataManager.on("importClicked", () => {
+      history.push(buildLink("/data/import", { id: params.id }));
     });
 
-    dataManager.on('exportClicked', () => {
-      history.push(buildLink('/data/export', { id: params.id }));
+    dataManager.on("exportClicked", () => {
+      history.push(buildLink("/data/export", { id: params.id }));
     });
 
-    dataManager.on('error', (response) => {
+    dataManager.on("error", (response) => {
       api.handleError(response);
     });
 
-    dataManager.on('toast', ({ message, type }) => {
+    dataManager.on("toast", ({ message, type }) => {
       toast.show({ message, type });
     });
 
-    dataManager.on('navigate', (route) => {
-      const target = route.replace(/^projects/, '');
+    dataManager.on("navigate", (route) => {
+      const target = route.replace(/^projects/, "");
 
       if (target) history.push(buildLink(target, { id: params.id }));
-      else history.push('/projects/');
+      else history.push("/projects/");
     });
 
     if (interactiveBacked) {
-      dataManager.on('lsf:regionFinishedDrawing', (reg, group) => {
+      dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
         const ids = group.map((r) => r.cleanId);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
-        const suggestionsRequest = api.callApi('mlInteractive', {
+        const suggestionsRequest = api.callApi("mlInteractive", {
           params: { pk: interactiveBacked.id },
           body: {
             task: task.id,
@@ -169,11 +169,11 @@ export const DataManagerPage = ({ ...props }) => {
       <div
         style={{
           flex: 1,
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <Spinner size={64} />
@@ -182,17 +182,17 @@ export const DataManagerPage = ({ ...props }) => {
   }
 
   return crashed ? (
-    <Block name='crash'>
-      <Elem name='info'>Project was deleted or not yet created</Elem>
+    <Block name="crash">
+      <Elem name="info">Project was deleted or not yet created</Elem>
 
-      <Button to='/projects'>Back to projects</Button>
+      <Button to="/projects">Back to projects</Button>
     </Block>
   ) : (
-    <Block ref={root} name='datamanager' />
+    <Block ref={root} name="datamanager" />
   );
 };
 
-DataManagerPage.path = '/data';
+DataManagerPage.path = "/data";
 DataManagerPage.pages = {
   ExportPage,
   ImportModal,
@@ -200,19 +200,19 @@ DataManagerPage.pages = {
 DataManagerPage.context = ({ dmRef }) => {
   const location = useFixedLocation();
   const { project } = useProject();
-  const [mode, setMode] = useState(dmRef?.mode ?? 'explorer');
+  const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
   const links = {
-    '/settings': 'Settings',
+    "/settings": "Settings",
   };
 
   const updateCrumbs = (currentMode) => {
-    const isExplorer = currentMode === 'explorer';
-    const dmPath = location.pathname.replace(DataManagerPage.path, '');
+    const isExplorer = currentMode === "explorer";
+    const dmPath = location.pathname.replace(DataManagerPage.path, "");
 
     if (isExplorer) {
       deleteAction(dmPath);
-      deleteCrumb('dm-crumb');
+      deleteCrumb("dm-crumb");
     } else {
       if (!isFF(FF_OPTIC_2)) {
         addAction(dmPath, (e) => {
@@ -222,19 +222,19 @@ DataManagerPage.context = ({ dmRef }) => {
         });
       }
       addCrumb({
-        key: 'dm-crumb',
-        title: 'Labeling',
+        key: "dm-crumb",
+        title: "Labeling",
       });
     }
   };
 
   const showLabelingInstruction = (currentMode) => {
-    const isLabelStream = currentMode === 'labelstream';
+    const isLabelStream = currentMode === "labelstream";
     const { expert_instruction, show_instruction } = project;
 
     if (isLabelStream && show_instruction && expert_instruction) {
       modal({
-        title: 'Labeling Instructions',
+        title: "Labeling Instructions",
         body: <div dangerouslySetInnerHTML={{ __html: expert_instruction }} />,
         style: { width: 680 },
       });
@@ -249,22 +249,22 @@ DataManagerPage.context = ({ dmRef }) => {
 
   useEffect(() => {
     if (dmRef) {
-      dmRef.on('modeChanged', onDMModeChanged);
+      dmRef.on("modeChanged", onDMModeChanged);
     }
 
     return () => {
-      dmRef?.off?.('modeChanged', onDMModeChanged);
+      dmRef?.off?.("modeChanged", onDMModeChanged);
     };
   }, [dmRef, project]);
 
   return project && project.id ? (
-    <Space size='small'>
-      {project.expert_instruction && mode !== 'explorer' && (
+    <Space size="small">
+      {project.expert_instruction && mode !== "explorer" && (
         <Button
-          size='compact'
+          size="compact"
           onClick={() => {
             modal({
-              title: 'Instructions',
+              title: "Instructions",
               body: () => <div dangerouslySetInnerHTML={{ __html: project.expert_instruction }} />,
             });
           }}
@@ -274,7 +274,7 @@ DataManagerPage.context = ({ dmRef }) => {
       )}
 
       {Object.entries(links).map(([path, label]) => (
-        <Button key={path} tag={NavLink} size='compact' to={`/projects/${project.id}${path}`} data-external>
+        <Button key={path} tag={NavLink} size="compact" to={`/projects/${project.id}${path}`} data-external>
           {label}
         </Button>
       ))}

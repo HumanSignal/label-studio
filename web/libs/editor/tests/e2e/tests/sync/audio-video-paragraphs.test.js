@@ -1,7 +1,7 @@
-const assert = require('assert');
-const { FFlagMatrix, FFlagScenario } = require('../../utils/feature-flags');
+const assert = require("assert");
+const { FFlagMatrix, FFlagScenario } = require("../../utils/feature-flags");
 
-Feature('Sync: Audio Video Paragraphs');
+Feature("Sync: Audio Video Paragraphs");
 
 const config = `
 <View>
@@ -24,32 +24,32 @@ const config = `
 `;
 
 const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3",
   text: [
     {
       end: 5.6,
-      text: 'Dont you hate that?',
+      text: "Dont you hate that?",
       start: 3.1,
-      author: 'Mia Wallace',
+      author: "Mia Wallace",
     },
     {
-      text: 'Hate what?',
+      text: "Hate what?",
       start: 4.2,
-      author: 'Vincent Vega:',
+      author: "Vincent Vega:",
       duration: 3.1,
     },
     {
-      text: 'Uncomfortable silences. Why do we feel its necessary to yak about nonsense in order to be comfortable?',
-      author: 'Mia Wallace:',
+      text: "Uncomfortable silences. Why do we feel its necessary to yak about nonsense in order to be comfortable?",
+      author: "Mia Wallace:",
     },
     {
-      text: 'I dont know. Thats a good question.',
+      text: "I dont know. Thats a good question.",
       start: 90,
-      author: 'Vincent Vega:',
+      author: "Vincent Vega:",
     },
     {
-      text: 'Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.',
-      author: 'Mia Wallace:',
+      text: "Thats when you know you found somebody really special. When you can just shut the door closed a minute, and comfortably share silence.",
+      author: "Mia Wallace:",
     },
   ],
 };
@@ -57,48 +57,48 @@ const data = {
 const annotations = [
   {
     value: {
-      start: '0',
-      end: '0',
+      start: "0",
+      end: "0",
       startOffset: 0,
       endOffset: 4,
-      text: 'Dont',
-      paragraphlabels: ['General: Negative'],
+      text: "Dont",
+      paragraphlabels: ["General: Negative"],
     },
-    id: 'RcHv5CdYBt',
-    from_name: 'label',
-    to_name: 'text',
-    type: 'paragraphlabels',
-    origin: 'manual',
+    id: "RcHv5CdYBt",
+    from_name: "label",
+    to_name: "text",
+    type: "paragraphlabels",
+    origin: "manual",
   },
   {
     value: {
-      start: '0',
-      end: '0',
+      start: "0",
+      end: "0",
       startOffset: 9,
       endOffset: 13,
-      text: 'hate',
-      paragraphlabels: ['General: Positive'],
+      text: "hate",
+      paragraphlabels: ["General: Positive"],
     },
-    id: 'eePG7PVYH7',
-    from_name: 'label',
-    to_name: 'text',
-    type: 'paragraphlabels',
-    origin: 'manual',
+    id: "eePG7PVYH7",
+    from_name: "label",
+    to_name: "text",
+    type: "paragraphlabels",
+    origin: "manual",
   },
 ];
 
-const params = { annotations: [{ id: 'test', result: annotations }], config, data };
+const params = { annotations: [{ id: "test", result: annotations }], config, data };
 
-FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) => {
+FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) => {
   FFlagScenario(
-    'Play/pause is synced between audio, video and paragraphs when interacting with paragraph interface',
+    "Play/pause is synced between audio, video and paragraphs when interacting with paragraph interface",
     async ({ I, LabelStudio, AtAudioView, AtVideoView }) => {
       LabelStudio.setFeatureFlags({
         ff_front_dev_2715_audio_3_280722_short: true,
         ...flags,
       });
 
-      I.amOnPage('/');
+      I.amOnPage("/");
 
       LabelStudio.init(params);
 
@@ -106,7 +106,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       await AtAudioView.lookForStage();
 
       {
-        I.say('Audio, Video, and Paragraph Audio are starting at 0');
+        I.say("Audio, Video, and Paragraph Audio are starting at 0");
 
         const [{ currentTime: startingParagraphAudioTime }, { currentTime: startingAudioTime }] =
           await AtAudioView.getCurrentAudio();
@@ -120,7 +120,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       I.click('[aria-label="play"]');
       I.wait(1);
       {
-        I.say('Audio, Video, and Paragraph Audio are playing');
+        I.say("Audio, Video, and Paragraph Audio are playing");
 
         const [{ paused: paragraphAudioPaused }, { paused: audioPaused }] = await AtAudioView.getCurrentAudio();
         const [{ paused: videoPaused }] = await AtVideoView.getCurrentVideo();
@@ -137,7 +137,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       I.click('[aria-label="pause"]');
       I.wait(1);
       {
-        I.say('Audio, Video and Paragraph Audio are played to the same time and are now paused');
+        I.say("Audio, Video and Paragraph Audio are played to the same time and are now paused");
 
         const [
           { currentTime: currentParagraphAudioTime, paused: paragraphAudioPaused },
@@ -169,14 +169,14 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
   );
 
   FFlagScenario(
-    'Play/pause is synced between audio, video when interacting with audio interface',
+    "Play/pause is synced between audio, video when interacting with audio interface",
     async ({ I, LabelStudio, AtAudioView, AtVideoView }) => {
       LabelStudio.setFeatureFlags({
         ff_front_dev_2715_audio_3_280722_short: true,
         ...flags,
       });
 
-      I.amOnPage('/');
+      I.amOnPage("/");
 
       LabelStudio.init(params);
 
@@ -184,7 +184,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       await AtAudioView.lookForStage();
 
       {
-        I.say('Audio, Video are starting at 0');
+        I.say("Audio, Video are starting at 0");
 
         const [, { currentTime: currentAudioTime }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: currentVideoTime }] = await AtVideoView.getCurrentVideo();
@@ -196,7 +196,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       AtAudioView.clickPlayButton();
       I.wait(1);
       {
-        I.say('Audio, Video are playing');
+        I.say("Audio, Video are playing");
 
         const [, { paused: audioPaused }] = await AtAudioView.getCurrentAudio();
         const [{ paused: videoPaused }] = await AtVideoView.getCurrentVideo();
@@ -208,7 +208,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       AtAudioView.clickPauseButton();
       I.wait(1);
       {
-        I.say('Audio, Video are played to the same time and are now paused');
+        I.say("Audio, Video are played to the same time and are now paused");
 
         const [, { currentTime: currentAudioTime, paused: audioPaused }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: currentVideoTime, paused: videoPaused }] = await AtVideoView.getCurrentVideo();
@@ -225,14 +225,14 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
   );
 
   FFlagScenario(
-    'Play/pause is synced between audio, video when interacting with video interface',
+    "Play/pause is synced between audio, video when interacting with video interface",
     async ({ I, LabelStudio, AtAudioView, AtVideoView }) => {
       LabelStudio.setFeatureFlags({
         ff_front_dev_2715_audio_3_280722_short: true,
         ...flags,
       });
 
-      I.amOnPage('/');
+      I.amOnPage("/");
 
       LabelStudio.init(params);
 
@@ -240,7 +240,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       await AtAudioView.lookForStage();
 
       {
-        I.say('Audio, Video are starting at 0');
+        I.say("Audio, Video are starting at 0");
 
         const [, { currentTime: currentAudioTime }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: currentVideoTime }] = await AtVideoView.getCurrentVideo();
@@ -252,7 +252,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       AtVideoView.clickPlayButton();
       I.wait(1);
       {
-        I.say('Audio, Video are playing');
+        I.say("Audio, Video are playing");
 
         const [, { paused: audioPaused }] = await AtAudioView.getCurrentAudio();
         const [{ paused: videoPaused }] = await AtVideoView.getCurrentVideo();
@@ -264,7 +264,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       AtVideoView.clickPauseButton();
       I.wait(1);
       {
-        I.say('Audio, Video are played to the same time and are now paused');
+        I.say("Audio, Video are played to the same time and are now paused");
 
         const [, { currentTime: currentAudioTime, paused: audioPaused }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: currentVideoTime, paused: videoPaused }] = await AtVideoView.getCurrentVideo();
@@ -282,14 +282,14 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
   );
 
   FFlagScenario(
-    'Seeking is synced between audio, video when interacting with audio interface',
+    "Seeking is synced between audio, video when interacting with audio interface",
     async ({ I, LabelStudio, AtAudioView, AtVideoView }) => {
       LabelStudio.setFeatureFlags({
         ff_front_dev_2715_audio_3_280722_short: true,
         ...flags,
       });
 
-      I.amOnPage('/');
+      I.amOnPage("/");
 
       LabelStudio.init(params);
 
@@ -305,7 +305,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
 
       AtAudioView.clickAt(100);
       {
-        I.say('Seek by clicking on some point in the audio timeline');
+        I.say("Seek by clicking on some point in the audio timeline");
         const [, { currentTime: startingAudioTime }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: startingVideoTime }] = await AtVideoView.getCurrentVideo();
 
@@ -314,7 +314,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
 
       AtAudioView.clickAtBeginning();
       {
-        I.say('Seek to beginning by clicking on the first point in the audio timeline');
+        I.say("Seek to beginning by clicking on the first point in the audio timeline");
         const [, { currentTime: startingAudioTime }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: startingVideoTime }] = await AtVideoView.getCurrentVideo();
 
@@ -323,7 +323,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
 
       AtAudioView.clickAt(300);
       {
-        I.say('Seek by clicking on some point further in the audio timeline');
+        I.say("Seek by clicking on some point further in the audio timeline");
         const [, { currentTime: startingAudioTime }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: startingVideoTime }] = await AtVideoView.getCurrentVideo();
 
@@ -332,7 +332,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
 
       AtAudioView.clickAtEnd();
       {
-        I.say('Seek to end by clicking on the last point in the audio timeline');
+        I.say("Seek to end by clicking on the last point in the audio timeline");
         const [, { currentTime: startingAudioTime }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: startingVideoTime }] = await AtVideoView.getCurrentVideo();
 
@@ -345,7 +345,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       I.wait(1);
       {
         I.say(
-          'Seek playback from paragraph. Audio, video and paragraph audio are played to the same time and are now paused',
+          "Seek playback from paragraph. Audio, video and paragraph audio are played to the same time and are now paused",
         );
 
         const [
@@ -378,14 +378,14 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
   );
 
   FFlagScenario(
-    'Playback speed is synced between audio, video, paragraph audio when interacting with audio interface',
+    "Playback speed is synced between audio, video, paragraph audio when interacting with audio interface",
     async ({ I, LabelStudio, AtAudioView, AtVideoView }) => {
       LabelStudio.setFeatureFlags({
         ff_front_dev_2715_audio_3_280722_short: true,
         ...flags,
       });
 
-      I.amOnPage('/');
+      I.amOnPage("/");
 
       LabelStudio.init(params);
 
@@ -407,7 +407,7 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       AtAudioView.setPlaybackSpeedInput(1.5);
       await AtAudioView.seePlaybackSpeed(1.5);
       {
-        I.say('Changing playback speed to 1.5x for audio, video and paragraph audio during playback');
+        I.say("Changing playback speed to 1.5x for audio, video and paragraph audio during playback");
         const [{ playbackRate: paragraphAudioPlaybackRate }, { playbackRate: audioPlaybackRate }] =
           await AtAudioView.getCurrentAudio();
         const [{ playbackRate: videoPlaybackRate }] = await AtVideoView.getCurrentVideo();
@@ -421,19 +421,19 @@ FFlagMatrix(['fflag_feat_front_lsdv_e_278_contextual_scrolling_short'], (flags) 
       AtAudioView.setPlaybackSpeedInput(1);
       await AtAudioView.seePlaybackSpeed(1);
       {
-        I.say('Changing playback speed to 1x for audio, video and paragraph audio during playback');
+        I.say("Changing playback speed to 1x for audio, video and paragraph audio during playback");
         const [{ playbackRate: paragraphAudioPlaybackRate }, { playbackRate: audioPlaybackRate }] =
           await AtAudioView.getCurrentAudio();
         const [{ playbackRate: videoPlaybackRate }] = await AtVideoView.getCurrentVideo();
 
-        assert.equal(audioPlaybackRate, paragraphAudioPlaybackRate, 'Audio and Paragraphs speed rate is equal');
-        assert.equal(videoPlaybackRate, audioPlaybackRate, 'Video and Audio speed rate is equal');
-        assert.equal(audioPlaybackRate, 1, 'Audio speed rate is 1');
+        assert.equal(audioPlaybackRate, paragraphAudioPlaybackRate, "Audio and Paragraphs speed rate is equal");
+        assert.equal(videoPlaybackRate, audioPlaybackRate, "Video and Audio speed rate is equal");
+        assert.equal(audioPlaybackRate, 1, "Audio speed rate is 1");
       }
 
       AtAudioView.clickPauseButton();
       {
-        I.say('Audio, video and paragraph audio played to the same time');
+        I.say("Audio, video and paragraph audio played to the same time");
         const [_, { currentTime: currentAudioTime }] = await AtAudioView.getCurrentAudio();
         const [{ currentTime: currentVideoTime }] = await AtVideoView.getCurrentVideo();
 

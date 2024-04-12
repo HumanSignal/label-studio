@@ -1,4 +1,4 @@
-import { ImageView, LabelStudio, Labels, Sidebar } from '@humansignal/frontend-test/helpers/LSF';
+import { ImageView, LabelStudio, Labels, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 
 const config = `
   <View>
@@ -11,10 +11,10 @@ const config = `
 `;
 
 const image =
-  'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
+  "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
 
-describe('Basic Image scenario', () => {
-  it('Should be able to draw a simple rectangle', () => {
+describe("Basic Image scenario", () => {
+  it("Should be able to draw a simple rectangle", () => {
     LabelStudio.init({
       config,
       task: {
@@ -28,14 +28,14 @@ describe('Basic Image scenario', () => {
     ImageView.waitForImage();
     Sidebar.hasNoRegions();
 
-    Labels.select('Planet');
+    Labels.select("Planet");
 
     ImageView.drawRect(20, 20, 100, 100);
 
     Sidebar.hasRegions(1);
   });
 
-  it('Should check that the canvas changed', () => {
+  it("Should check that the canvas changed", () => {
     LabelStudio.init({
       config,
       task: {
@@ -49,13 +49,13 @@ describe('Basic Image scenario', () => {
     ImageView.waitForImage();
     Sidebar.hasNoRegions();
 
-    ImageView.capture('canvas');
+    ImageView.capture("canvas");
 
-    Labels.select('Moonwalker');
+    Labels.select("Moonwalker");
 
     ImageView.drawRect(20, 20, 100, 100);
 
     Sidebar.hasRegions(1);
-    ImageView.canvasShouldChange('canvas', 0);
+    ImageView.canvasShouldChange("canvas", 0);
   });
 });

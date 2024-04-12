@@ -1,18 +1,18 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import Registry from '../core/Registry';
-import { AreaMixin } from '../mixins/AreaMixin';
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
-import { interpolateProp } from '../utils/props';
-import { VideoRegion, onlyProps } from './VideoRegion';
+import Registry from "../core/Registry";
+import { AreaMixin } from "../mixins/AreaMixin";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import { interpolateProp } from "../utils/props";
+import { VideoRegion, onlyProps } from "./VideoRegion";
 
 const Model = types
-  .model('VideoRectangleRegionModel', {
-    type: 'videorectangleregion',
+  .model("VideoRectangleRegionModel", {
+    type: "videorectangleregion",
   })
   .volatile(() => ({
-    props: ['x', 'y', 'width', 'height', 'rotation'],
+    props: ["x", "y", "width", "height", "rotation"],
   }))
   .views((self) => ({
     getShape(frame) {
@@ -72,7 +72,7 @@ const Model = types
   }));
 
 const VideoRectangleRegionModel = types.compose(
-  'VideoRectangleRegionModel',
+  "VideoRectangleRegionModel",
   RegionsMixin,
   VideoRegion,
   AreaMixin,
@@ -80,6 +80,6 @@ const VideoRectangleRegionModel = types.compose(
   Model,
 );
 
-Registry.addRegionType(VideoRectangleRegionModel, 'video');
+Registry.addRegionType(VideoRectangleRegionModel, "video");
 
 export { VideoRectangleRegionModel };

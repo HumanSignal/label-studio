@@ -1,9 +1,9 @@
-import '../../tags/control/Label';
-import '../../tags/control/RectangleLabels';
-import '../../tags/object/Image';
-import '../../tags/object/RichText';
+import "../../tags/control/Label";
+import "../../tags/control/RectangleLabels";
+import "../../tags/object/Image";
+import "../../tags/object/RichText";
 /* global it, expect */
-import Tree from '../Tree';
+import Tree from "../Tree";
 
 // IMPORTANT NOTE
 // all tests are disabled because they wait `validation` in the root component
@@ -23,10 +23,10 @@ it.skip("Should fail if a tag referenced by toName doesn't exist", () => {
 
   const errorItem = result.validation[0];
 
-  expect(errorItem.error).toBe('ERR_TAG_NOT_FOUND');
+  expect(errorItem.error).toBe("ERR_TAG_NOT_FOUND");
 });
 
-it.skip('Should fail if a tag referenced by toName is not image', () => {
+it.skip("Should fail if a tag referenced by toName is not image", () => {
   const result = Tree.treeToModel(`
   <View>
     <HyperText name="img" value="$text"></HyperText>
@@ -39,10 +39,10 @@ it.skip('Should fail if a tag referenced by toName is not image', () => {
 
   const errorItem = result.validation[0];
 
-  expect(errorItem.error).toBe('ERR_TAG_UNSUPPORTED');
+  expect(errorItem.error).toBe("ERR_TAG_UNSUPPORTED");
 });
 
-it.skip('Should fail if tag lacks mandatory attribute toName', () => {
+it.skip("Should fail if tag lacks mandatory attribute toName", () => {
   const result = Tree.treeToModel(`
   <View>
     <Image name="img" value="$image"></Image>
@@ -55,10 +55,10 @@ it.skip('Should fail if tag lacks mandatory attribute toName', () => {
 
   const errorItem = result.validation[0];
 
-  expect(errorItem.error).toBe('ERR_REQUIRED');
+  expect(errorItem.error).toBe("ERR_REQUIRED");
 });
 
-it.skip('Should fail if opacity attribute is out of range', () => {
+it.skip("Should fail if opacity attribute is out of range", () => {
   const result = Tree.treeToModel(`
   <View>
     <Image name="img" value="$image"></Image>
@@ -71,10 +71,10 @@ it.skip('Should fail if opacity attribute is out of range', () => {
 
   const errorItem = result.validation[0];
 
-  expect(errorItem.error).toBe('ERR_BAD_TYPE');
+  expect(errorItem.error).toBe("ERR_BAD_TYPE");
 });
 
-it.skip('Should fail if color is not a proper CSS color', () => {
+it.skip("Should fail if color is not a proper CSS color", () => {
   const result = Tree.treeToModel(`
   <View>
     <Image name="img" value="$image"></Image>
@@ -87,5 +87,5 @@ it.skip('Should fail if color is not a proper CSS color', () => {
 
   const errorItem = result.validation[0];
 
-  expect(errorItem.error).toBe('ERR_BAD_TYPE');
+  expect(errorItem.error).toBe("ERR_BAD_TYPE");
 });

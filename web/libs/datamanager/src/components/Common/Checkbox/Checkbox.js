@@ -1,9 +1,9 @@
-import React from 'react';
-import { cn } from '../../../utils/bem';
-import './Checkbox.styl';
+import React from "react";
+import { cn } from "../../../utils/bem";
+import "./Checkbox.styl";
 
 export const Checkbox = ({ checked, indeterminate, style, onChange, children, ...props }) => {
-  const rootClass = cn('checkbox');
+  const rootClass = cn("checkbox");
   const checkboxRef = React.createRef();
   const withLabel = !!children;
 
@@ -12,25 +12,25 @@ export const Checkbox = ({ checked, indeterminate, style, onChange, children, ..
   }, [checkboxRef, indeterminate]);
 
   const checkboxContent = (
-    <span className={rootClass.elem('box')}>
+    <span className={rootClass.elem("box")}>
       <input
         {...props}
         ref={checkboxRef}
         checked={!!checked}
-        className={rootClass.elem('input')}
-        type='checkbox'
+        className={rootClass.elem("input")}
+        type="checkbox"
         onChange={(e) => {
           onChange?.(e);
         }}
       />
-      <span className={rootClass.elem('check').mod({ checked, indeterminate })} />
+      <span className={rootClass.elem("check").mod({ checked, indeterminate })} />
     </span>
   );
 
   return (
     <div className={rootClass.mod({ withLabel }).mix(props.className)} style={style}>
       {children ? (
-        <label className={rootClass.elem('label')}>
+        <label className={rootClass.elem("label")}>
           {checkboxContent} {children}
         </label>
       ) : (

@@ -1,10 +1,10 @@
-import { observer } from 'mobx-react';
-import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
-import { IconBan, LsGrid, LsPlus, LsSparks, LsStar } from '../../assets/icons';
-import { Space } from '../../common/Space/Space';
-import { Userpic } from '../../common/Userpic/Userpic';
-import { Block, Elem } from '../../utils/bem';
-import './AnnotationTabs.styl';
+import { observer } from "mobx-react";
+import React, { forwardRef, useCallback, useEffect, useRef } from "react";
+import { IconBan, LsGrid, LsPlus, LsSparks, LsStar } from "../../assets/icons";
+import { Space } from "../../common/Space/Space";
+import { Userpic } from "../../common/Userpic/Userpic";
+import { Block, Elem } from "../../utils/bem";
+import "./AnnotationTabs.styl";
 
 export const EntityTab = observer(
   forwardRef(
@@ -13,7 +13,7 @@ export const EntityTab = observer(
 
       return (
         <Block
-          name='entity-tab'
+          name="entity-tab"
           ref={ref}
           mod={{ selected, bordered }}
           style={style}
@@ -23,9 +23,9 @@ export const EntityTab = observer(
             onClick?.(entity, prediction);
           }}
         >
-          <Space size='small'>
+          <Space size="small">
             <Elem
-              name='userpic'
+              name="userpic"
               tag={Userpic}
               showUsername
               username={prediction ? entity.createdBy : null}
@@ -35,13 +35,13 @@ export const EntityTab = observer(
               {prediction && <LsSparks style={{ width: 16, height: 16 }} />}
             </Elem>
 
-            <Elem name='identifier'>
-              ID {entity.pk ?? entity.id} {isUnsaved && '*'}
+            <Elem name="identifier">
+              ID {entity.pk ?? entity.id} {isUnsaved && "*"}
             </Elem>
 
-            {displayGroundTruth && entity.ground_truth && <Elem name='ground-truth' tag={LsStar} />}
+            {displayGroundTruth && entity.ground_truth && <Elem name="ground-truth" tag={LsStar} />}
 
-            {entity.skipped && <Elem name='skipped' tag={IconBan} />}
+            {entity.skipped && <Elem name="skipped" tag={IconBan} />}
           </Space>
         </Block>
       );
@@ -96,39 +96,39 @@ export const AnnotationTabs = observer(
 
         list.scrollTo({
           left: xOffset,
-          behavior: 'smooth',
+          behavior: "smooth",
         });
       }
     }, [store.annotationStore.selected, selectedRef, listRef]);
 
     return visible && !tabsDisabled ? (
       <Block
-        name='annotation-tabs'
+        name="annotation-tabs"
         mod={{ viewAll: allowViewAll, addNew: allowCreateNew }}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {allowCreateNew && (
-          <Elem tag='button' name='add' onClick={onCreateAnnotation}>
+          <Elem tag="button" name="add" onClick={onCreateAnnotation}>
             <LsPlus />
           </Elem>
         )}
 
-        <Elem name='list' ref={listRef}>
+        <Elem name="list" ref={listRef}>
           {list.map((entity) => (
             <EntityTab
               key={entity.id}
               entity={entity}
               selected={entity.selected}
               onClick={onAnnotationSelect}
-              displayGroundTruth={store.hasInterface('ground-truth')}
-              prediction={entity.type === 'prediction'}
+              displayGroundTruth={store.hasInterface("ground-truth")}
+              prediction={entity.type === "prediction"}
               ref={entity.selected ? selectedRef : undefined}
             />
           ))}
         </Elem>
 
         {allowViewAll && (
-          <Elem tag='button' name='all' mod={{ active: as.viewingAll }} onClick={onToggleVisibility}>
+          <Elem tag="button" name="all" mod={{ active: as.viewingAll }} onClick={onToggleVisibility}>
             <LsGrid />
           </Elem>
         )}

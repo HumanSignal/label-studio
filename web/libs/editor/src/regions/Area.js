@@ -1,23 +1,23 @@
-import { types } from 'mobx-state-tree';
-import Registry from '../core/Registry';
-import Tree from '../core/Tree';
-import { AreaMixin } from '../mixins/AreaMixin';
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
-import { AudioRegionModel } from './AudioRegion';
-import { BrushRegionModel } from './BrushRegion';
-import { EllipseRegionModel } from './EllipseRegion';
-import { KeyPointRegionModel } from './KeyPointRegion';
-import { ParagraphsRegionModel } from './ParagraphsRegion';
-import { PolygonRegionModel } from './PolygonRegion';
-import { RectRegionModel } from './RectRegion';
-import { RichTextRegionModel } from './RichTextRegion';
-import { TimeSeriesRegionModel } from './TimeSeriesRegion';
-import { VideoRectangleRegionModel } from './VideoRectangleRegion';
+import { types } from "mobx-state-tree";
+import Registry from "../core/Registry";
+import Tree from "../core/Tree";
+import { AreaMixin } from "../mixins/AreaMixin";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import { AudioRegionModel } from "./AudioRegion";
+import { BrushRegionModel } from "./BrushRegion";
+import { EllipseRegionModel } from "./EllipseRegion";
+import { KeyPointRegionModel } from "./KeyPointRegion";
+import { ParagraphsRegionModel } from "./ParagraphsRegion";
+import { PolygonRegionModel } from "./PolygonRegion";
+import { RectRegionModel } from "./RectRegion";
+import { RichTextRegionModel } from "./RichTextRegion";
+import { TimeSeriesRegionModel } from "./TimeSeriesRegion";
+import { VideoRectangleRegionModel } from "./VideoRectangleRegion";
 
 // general Area type for classification Results which doesn't belong to any real Area
 const ClassificationArea = types.compose(
-  'ClassificationArea',
+  "ClassificationArea",
   RegionsMixin,
   NormalizationMixin,
   AreaMixin,

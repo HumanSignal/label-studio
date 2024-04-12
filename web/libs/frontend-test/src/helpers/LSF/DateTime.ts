@@ -1,6 +1,6 @@
 class DateTimeHelper {
   private get _baseRootSelector() {
-    return '.htx-datetime';
+    return ".htx-datetime";
   }
 
   private _rootSelector: string;
@@ -32,7 +32,7 @@ class DateTimeHelper {
       .split(/[^\d\-:]/)
       .filter((value) => value.match(this._dateRegExp) || value.match(this._timeRegExp));
 
-    cy.wrap(parts).should('have.lengthOf.at.least', 1);
+    cy.wrap(parts).should("have.lengthOf.at.least", 1);
 
     for (const value of parts) {
       if (value.match(this._dateRegExp)) {
@@ -52,20 +52,20 @@ class DateTimeHelper {
       .split(/[^\d\-:]/)
       .filter((value) => value.match(this._dateRegExp) || value.match(this._timeRegExp));
 
-    cy.wrap(parts).should('have.lengthOf.at.least', 1);
+    cy.wrap(parts).should("have.lengthOf.at.least", 1);
 
     for (const value of parts) {
       if (value.match(this._dateRegExp)) {
-        this.dateInput.should('have.value', value);
+        this.dateInput.should("have.value", value);
       }
       if (value.match(this._timeRegExp)) {
-        this.timeInput.should('have.value', value);
+        this.timeInput.should("have.value", value);
       }
     }
   }
 }
 
-const DateTime = new DateTimeHelper('&:eq(0)');
+const DateTime = new DateTimeHelper("&:eq(0)");
 const useDateTime = (rootSelector: string) => {
   return new DateTimeHelper(rootSelector);
 };

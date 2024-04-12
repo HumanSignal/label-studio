@@ -1,11 +1,11 @@
-import { clamp } from 'lodash';
-import { type FC, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useMemoizedHandlers } from '../../../../hooks/useMemoizedHandlers';
-import { Block, Elem } from '../../../../utils/bem';
-import { isDefined } from '../../../../utils/utilities';
-import type { TimelineViewProps } from '../../Types';
-import './Frames.styl';
-import { Keypoints } from './Keypoints';
+import { clamp } from "lodash";
+import { type FC, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemoizedHandlers } from "../../../../hooks/useMemoizedHandlers";
+import { Block, Elem } from "../../../../utils/bem";
+import { isDefined } from "../../../../utils/utilities";
+import type { TimelineViewProps } from "../../Types";
+import "./Frames.styl";
+import { Keypoints } from "./Keypoints";
 
 const toSteps = (num: number, step: number) => {
   return Math.floor(num / step);
@@ -64,10 +64,10 @@ export const Frames: FC<TimelineViewProps> = ({
       `repeating-linear-gradient(90deg, #fff 1px, #fff ${step - 1}px, rgba(255,255,255,0) ${
         step - 1
       }px, rgba(255,255,255,0) ${step + 1}px)`,
-      'linear-gradient(0deg, #FAFAFA, rgba(255,255,255,0) 50%)',
+      "linear-gradient(0deg, #FAFAFA, rgba(255,255,255,0) 50%)",
     ];
 
-    return bg.join(', ');
+    return bg.join(", ");
   }, [step]);
 
   const setScroll = useCallback(
@@ -151,13 +151,13 @@ export const Frames: FC<TimelineViewProps> = ({
       };
 
       const onMouseUp = () => {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
         setHoverEnabled(true);
       };
 
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
     },
     [currentOffsetX, setIndicatorOffset, step],
   );
@@ -220,12 +220,12 @@ export const Frames: FC<TimelineViewProps> = ({
       const onMouseUp = () => {
         setHoverEnabled(true);
         setRegionSelectionDisabled(false);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
       };
 
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
     },
     [currentOffsetX, setIndicatorOffset],
   );
@@ -254,9 +254,9 @@ export const Frames: FC<TimelineViewProps> = ({
       if (!allowScroll) e.preventDefault();
     };
 
-    target.addEventListener('wheel', handler);
+    target.addEventListener("wheel", handler);
 
-    return () => target.removeEventListener('wheel', handler);
+    return () => target.removeEventListener("wheel", handler);
   }, []);
 
   useEffect(() => {
@@ -328,33 +328,33 @@ export const Frames: FC<TimelineViewProps> = ({
   }, [position, framesInView, step]);
 
   const styles = {
-    '--frame-size': `${step}px`,
-    '--view-size': `${viewWidth}px`,
-    '--offset': `${timelineStartOffset}px`,
+    "--frame-size": `${step}px`,
+    "--view-size": `${viewWidth}px`,
+    "--offset": `${timelineStartOffset}px`,
   };
 
   return (
-    <Block name='timeline-frames' style={styles as any}>
-      <Elem name='controls'>
+    <Block name="timeline-frames" style={styles as any}>
+      <Elem name="controls">
         <Elem
-          name='indicator'
+          name="indicator"
           onMouseDown={handleMovement}
           style={{ left: clamp(seekerOffset - step, timelineStartOffset - step, viewWidth) }}
         />
 
         {isDefined(hoverOffset) && hoverEnabled && (
           <Elem
-            name='hover'
+            name="hover"
             style={{ left: roundToStep(hoverOffset, step), marginLeft: timelineStartOffset }}
             data-frame={toSteps(currentOffsetX + hoverOffset, step) + 1}
           />
         )}
       </Elem>
 
-      <Elem name='labels-bg' style={{ width: timelineStartOffset }} />
+      <Elem name="labels-bg" style={{ width: timelineStartOffset }} />
 
       <Elem
-        name='scroll'
+        name="scroll"
         ref={scrollable as any}
         onWheel={scrollHandler}
         onMouseMove={hoverHandler}
@@ -362,7 +362,7 @@ export const Frames: FC<TimelineViewProps> = ({
         onClickCapture={scrollClickHandler}
         onMouseDown={onFrameScrub}
       >
-        <Elem name='filler'>
+        <Elem name="filler">
           <KeypointsVirtual
             regions={regions}
             scrollTop={currentOffsetY}
@@ -373,7 +373,7 @@ export const Frames: FC<TimelineViewProps> = ({
         </Elem>
       </Elem>
 
-      <Elem name='background' style={{ backgroundImage: background }} />
+      <Elem name="background" style={{ backgroundImage: background }} />
     </Block>
   );
 };
@@ -383,7 +383,7 @@ interface KeypointsVirtualProps {
   startOffset: number;
   scrollTop: number;
   disabled?: boolean;
-  onSelectRegion: TimelineViewProps['onSelectRegion'];
+  onSelectRegion: TimelineViewProps["onSelectRegion"];
 }
 
 const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scrollTop, disabled, onSelectRegion }) => {
@@ -397,7 +397,7 @@ const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scr
   }, [scrollTop, regions.length]);
 
   return (
-    <Elem name='keypoints' style={{ height: regions.length * height }}>
+    <Elem name="keypoints" style={{ height: regions.length * height }}>
       {regions.map((region, i) => {
         return region.sequence.length > 0 ? (
           <Keypoints

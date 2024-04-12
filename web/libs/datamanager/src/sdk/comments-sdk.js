@@ -1,4 +1,4 @@
-import { FF_DEV_3034, isFF } from '../utils/feature-flags';
+import { FF_DEV_3034, isFF } from "../utils/feature-flags";
 
 export class CommentsSdk {
   constructor(lsf, dm) {
@@ -8,12 +8,12 @@ export class CommentsSdk {
   }
 
   bindEventHandlers() {
-    ['comments:create', 'comments:update', 'comments:delete', 'comments:list'].forEach((evt) => this.lsf.off(evt));
+    ["comments:create", "comments:update", "comments:delete", "comments:list"].forEach((evt) => this.lsf.off(evt));
 
-    this.lsf.on('comments:create', this.createComment);
-    this.lsf.on('comments:update', this.updateComment);
-    this.lsf.on('comments:delete', this.deleteComment);
-    this.lsf.on('comments:list', this.listComments);
+    this.lsf.on("comments:create", this.createComment);
+    this.lsf.on("comments:update", this.updateComment);
+    this.lsf.on("comments:delete", this.deleteComment);
+    this.lsf.on("comments:list", this.listComments);
   }
 
   createComment = async (comment) => {
@@ -27,7 +27,7 @@ export class CommentsSdk {
     } else if (isFF(FF_DEV_3034) && comment.draft) {
       body.draft = comment.draft;
     }
-    const { $meta: _, ...newComment } = await this.dm.apiCall('createComment', undefined, {
+    const { $meta: _, ...newComment } = await this.dm.apiCall("createComment", undefined, {
       body,
     });
 
@@ -37,14 +37,14 @@ export class CommentsSdk {
   updateComment = async (comment) => {
     if (!comment.id || comment.id < 0) return; // Don't allow an update with an incorrect id
 
-    const res = await this.dm.apiCall('updateComment', { id: comment.id }, { body: comment });
+    const res = await this.dm.apiCall("updateComment", { id: comment.id }, { body: comment });
 
     return res;
   };
 
   listComments = async (params) => {
     const listParams = {
-      ordering: params.ordering || '-id',
+      ordering: params.ordering || "-id",
       expand_created_by: true,
     };
 
@@ -56,7 +56,7 @@ export class CommentsSdk {
       return [];
     }
 
-    const res = await this.dm.apiCall('listComments', listParams);
+    const res = await this.dm.apiCall("listComments", listParams);
 
     const commentUsers = [];
     const comments = res.map((comment) => {
@@ -74,7 +74,7 @@ export class CommentsSdk {
   deleteComment = async (comment) => {
     if (!comment.id || comment.id < 0) return; // Don't allow an update with an incorrect id
 
-    const res = await this.dm.apiCall('deleteComment', { id: comment.id }, { body: comment });
+    const res = await this.dm.apiCall("deleteComment", { id: comment.id }, { body: comment });
 
     return res;
   };

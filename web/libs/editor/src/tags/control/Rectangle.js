@@ -1,12 +1,12 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import { customTypes } from '../../core/CustomTypes';
-import Registry from '../../core/Registry';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import SeparatedControlMixin from '../../mixins/SeparatedControlMixin';
-import { ToolManagerMixin } from '../../mixins/ToolManagerMixin';
-import { FF_DEV_2132, FF_DEV_3793, FF_LSDV_4673, isFF } from '../../utils/feature-flags';
-import ControlBase from './Base';
+import { customTypes } from "../../core/CustomTypes";
+import Registry from "../../core/Registry";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
+import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
+import { FF_DEV_2132, FF_DEV_3793, FF_LSDV_4673, isFF } from "../../utils/feature-flags";
+import ControlBase from "./Base";
 
 /**
  * The `Rectangle` tag is used to add a rectangle (Bounding Box) to an image without selecting a label. This can be useful when you have only one label to assign to a rectangle.
@@ -34,11 +34,11 @@ import ControlBase from './Base';
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 
-  opacity: types.optional(customTypes.range(), '0.2'),
-  fillcolor: types.optional(customTypes.color, '#f48a42'),
+  opacity: types.optional(customTypes.range(), "0.2"),
+  fillcolor: types.optional(customTypes.color, "#f48a42"),
 
-  strokewidth: types.optional(types.string, '1'),
-  strokecolor: types.optional(customTypes.color, '#f48a42'),
+  strokewidth: types.optional(types.string, "1"),
+  strokecolor: types.optional(customTypes.color, "#f48a42"),
   fillopacity: types.maybeNull(customTypes.range()),
 
   canrotate: types.optional(types.boolean, true),
@@ -46,14 +46,14 @@ const TagAttrs = types.model({
 
 const Model = types
   .model({
-    type: 'rectangle',
+    type: "rectangle",
   })
   .volatile(() => ({
-    toolNames: isFF(FF_DEV_2132) && (!isFF(FF_DEV_3793) || isFF(FF_LSDV_4673)) ? ['Rect', 'Rect3Point'] : ['Rect'],
+    toolNames: isFF(FF_DEV_2132) && (!isFF(FF_DEV_3793) || isFF(FF_LSDV_4673)) ? ["Rect", "Rect3Point"] : ["Rect"],
   }));
 
 const RectangleModel = types.compose(
-  'RectangleModel',
+  "RectangleModel",
   ControlBase,
   AnnotationMixin,
   SeparatedControlMixin,
@@ -66,6 +66,6 @@ const HtxView = () => {
   return null;
 };
 
-Registry.addTag('rectangle', RectangleModel, HtxView);
+Registry.addTag("rectangle", RectangleModel, HtxView);
 
 export { HtxView, RectangleModel };

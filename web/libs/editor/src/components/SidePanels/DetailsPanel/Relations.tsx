@@ -1,17 +1,17 @@
-import { Select } from 'antd';
-import { observer } from 'mobx-react';
-import { type FC, useCallback, useMemo, useState } from 'react';
-import { IconMenu, IconRelationBi, IconRelationLeft, IconRelationRight, IconTrash } from '../../../assets/icons';
-import { IconEyeClosed, IconEyeOpened } from '../../../assets/icons/timeline';
-import { Button } from '../../../common/Button/Button';
-import { Block, Elem } from '../../../utils/bem';
-import { wrapArray } from '../../../utils/utilities';
-import { RegionItem } from './RegionItem';
-import './Relations.styl';
+import { Select } from "antd";
+import { observer } from "mobx-react";
+import { type FC, useCallback, useMemo, useState } from "react";
+import { IconMenu, IconRelationBi, IconRelationLeft, IconRelationRight, IconTrash } from "../../../assets/icons";
+import { IconEyeClosed, IconEyeOpened } from "../../../assets/icons/timeline";
+import { Button } from "../../../common/Button/Button";
+import { Block, Elem } from "../../../utils/bem";
+import { wrapArray } from "../../../utils/utilities";
+import { RegionItem } from "./RegionItem";
+import "./Relations.styl";
 
 const RealtionsComponent: FC<any> = ({ relationStore }) => {
   return (
-    <Block name='relations'>
+    <Block name="relations">
       <RelationsList relations={relationStore.relations} />
     </Block>
   );
@@ -54,11 +54,11 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
     const { direction } = relation;
 
     switch (direction) {
-      case 'left':
+      case "left":
         return <IconRelationLeft data-direction={relation.direction} />;
-      case 'right':
+      case "right":
         return <IconRelationRight data-direction={relation.direction} />;
-      case 'bi':
+      case "bi":
         return <IconRelationBi data-direction={relation.direction} />;
       default:
         return null;
@@ -68,22 +68,22 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
   // const;
 
   return (
-    <Elem name='item' mod={{ hidden: !relation.visible }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      <Elem name='content'>
-        <Elem name='icon' onClick={relation.rotateDirection}>
-          <Elem name='direction'>{directionIcon}</Elem>
+    <Elem name="item" mod={{ hidden: !relation.visible }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <Elem name="content">
+        <Elem name="icon" onClick={relation.rotateDirection}>
+          <Elem name="direction">{directionIcon}</Elem>
         </Elem>
-        <Elem name='nodes'>
+        <Elem name="nodes">
           <RegionItem compact withActions={false} withIds={false} region={relation.node1} />
           <RegionItem compact withActions={false} withIds={false} region={relation.node2} />
         </Elem>
-        <Elem name='actions'>
-          <Elem name='action'>
+        <Elem name="actions">
+          <Elem name="action">
             {(hovered || relation.showMeta) && relation.hasRelations && (
               <Button
                 primary={relation.showMeta}
-                aria-label={`${relation.showMeta ? 'Hide' : 'Show'} Relation Labels`}
-                type={relation.showMeta ? undefined : 'text'}
+                aria-label={`${relation.showMeta ? "Hide" : "Show"} Relation Labels`}
+                type={relation.showMeta ? undefined : "text"}
                 onClick={relation.toggleMeta}
                 style={{ padding: 0 }}
               >
@@ -91,23 +91,23 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
               </Button>
             )}
           </Elem>
-          <Elem name='action'>
+          <Elem name="action">
             {(hovered || !relation.visible) && (
               <Button
-                type='text'
+                type="text"
                 onClick={relation.toggleVisibility}
-                aria-label={`${relation.visible ? 'Hide' : 'Show'} Relation`}
+                aria-label={`${relation.visible ? "Hide" : "Show"} Relation`}
               >
                 {relation.visible ? <IconEyeOpened /> : <IconEyeClosed />}
               </Button>
             )}
           </Elem>
-          <Elem name='action'>
+          <Elem name="action">
             {hovered && (
               <Button
-                type='text'
+                type="text"
                 danger
-                aria-label='Delete Relation'
+                aria-label="Delete Relation"
                 onClick={() => {
                   relation.node1.setHighlight(false);
                   relation.node2.setHighlight(false);
@@ -130,7 +130,7 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
   const { children, choice } = control;
 
   const selectionMode = useMemo(() => {
-    return choice === 'multiple' ? 'multiple' : undefined;
+    return choice === "multiple" ? "multiple" : undefined;
   }, [choice]);
 
   const onChange = useCallback(
@@ -143,11 +143,11 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
   );
 
   return (
-    <Block name='relation-meta'>
+    <Block name="relation-meta">
       <Select
         mode={selectionMode}
-        style={{ width: '100%' }}
-        placeholder='Select labels'
+        style={{ width: "100%" }}
+        placeholder="Select labels"
         value={selectedValues}
         onChange={onChange}
       >

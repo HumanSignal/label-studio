@@ -1,14 +1,14 @@
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 /* global test, expect, describe */
-import Enzyme, { mount } from 'enzyme';
-import { createRef } from 'react';
-import { PanelBase, type PanelProps } from '../PanelBase';
+import Enzyme, { mount } from "enzyme";
+import { createRef } from "react";
+import { PanelBase, type PanelProps } from "../PanelBase";
 
 Enzyme.configure({ adapter: new Adapter() });
 
-describe('PanelBase', () => {
-  test('Panel', async () => {
-    const panelName = 'details';
+describe("PanelBase", () => {
+  test("Panel", async () => {
+    const panelName = "details";
     const rootRef = createRef<HTMLDivElement>();
     let isCurrentlyExpanded = true;
     const sampleProps: Partial<PanelProps> = {
@@ -21,7 +21,7 @@ describe('PanelBase', () => {
       height: 400,
       visible: true,
       detached: false,
-      alignment: 'left',
+      alignment: "left",
       onResize: () => {},
       onResizeStart: () => {},
       onResizeEnd: () => {},
@@ -40,20 +40,20 @@ describe('PanelBase', () => {
       expanded: false,
       locked: false,
       currentEntity: {
-        id: 'BKHog',
+        id: "BKHog",
         pk: null,
         selected: true,
-        type: 'annotation',
-        createdDate: '2023-02-27T10:43:14.795',
+        type: "annotation",
+        createdDate: "2023-02-27T10:43:14.795",
         createdAgo: null,
-        createdBy: 'Admin',
+        createdBy: "Admin",
         user: '{avatar: null, email: "yousif@heartex.com", firstNa…}',
         parent_prediction: null,
         parent_annotation: null,
         last_annotation_history: null,
         comment_count: null,
         unresolved_comment_count: null,
-        loadedDate: 'Mon Feb 27 2023 10:43:14 GMT-0500 (Eastern Standard Time)',
+        loadedDate: "Mon Feb 27 2023 10:43:14 GMT-0500 (Eastern Standard Time)",
         leadTime: null,
         userGenerate: true,
         update: false,
@@ -61,12 +61,12 @@ describe('PanelBase', () => {
         localUpdate: false,
         ground_truth: false,
         skipped: false,
-        history: '{createdIdx: 0, history: Array(1), isFrozen: false,…}',
+        history: "{createdIdx: 0, history: Array(1), isFrozen: false,…}",
         dragMode: false,
         editable: true,
         readonly: false,
         relationMode: false,
-        relationStore: '{_relations: Array(0), highlighted: undefined, show…}',
+        relationStore: "{_relations: Array(0), highlighted: undefined, show…}",
         areas: {},
         suggestions: {},
         regionStore: {},
@@ -77,12 +77,12 @@ describe('PanelBase', () => {
         draftSelected: false,
         autosaveDelay: 5000,
         isDraftSaving: false,
-        versions: '{draft: undefined, result: Array(0)}',
-        resultSnapshot: '',
+        versions: "{draft: undefined, result: Array(0)}",
+        resultSnapshot: "",
         autosave: () => {},
       },
     };
-    const sampleContent = 'Sample Panel';
+    const sampleContent = "Sample Panel";
     const view = mount(
       <div>
         {/* eslint-disable-next-line */
@@ -93,10 +93,10 @@ describe('PanelBase', () => {
       </div>,
     );
 
-    expect(view.find('.dm-panel__title').text()).toBe(panelName);
-    expect(view.find('.dm-panel__body .dm-details').text()).toBe(sampleContent);
+    expect(view.find(".dm-panel__title").text()).toBe(panelName);
+    expect(view.find(".dm-panel__body .dm-details").text()).toBe(sampleContent);
     expect(isCurrentlyExpanded).toBe(true);
-    view.find('.dm-panel__toggle').simulate('click');
+    view.find(".dm-panel__toggle").simulate("click");
     expect(isCurrentlyExpanded).toBe(false);
   });
 });

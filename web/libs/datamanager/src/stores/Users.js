@@ -1,9 +1,9 @@
-import { types } from 'mobx-state-tree';
-import { camelizeKeys } from '../utils/helpers';
-import { StringOrNumberID } from './types';
+import { types } from "mobx-state-tree";
+import { camelizeKeys } from "../utils/helpers";
+import { StringOrNumberID } from "./types";
 
 export const User = types
-  .model('User', {
+  .model("User", {
     id: StringOrNumberID,
     firstName: types.string,
     lastName: types.string,
@@ -17,7 +17,7 @@ export const User = types
     get fullName() {
       return [self.firstName, self.lastName]
         .filter((n) => !!n)
-        .join(' ')
+        .join(" ")
         .trim();
     },
 

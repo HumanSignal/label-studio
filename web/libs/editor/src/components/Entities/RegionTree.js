@@ -1,11 +1,11 @@
-import { Spin, Tree } from 'antd';
-import { observer } from 'mobx-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Utils from '../../utils';
-import styles from './Entities.module.scss';
+import { Spin, Tree } from "antd";
+import { observer } from "mobx-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Utils from "../../utils";
+import styles from "./Entities.module.scss";
 
-import { LsChevron } from '../../assets/icons';
-import { RegionItem } from './RegionItem';
+import { LsChevron } from "../../assets/icons";
+import { RegionItem } from "./RegionItem";
 
 export const RegionTree = observer(({ regionStore }) => {
   // @todo improve list render
@@ -24,7 +24,7 @@ export const RegionTree = observer(({ regionStore }) => {
 
   if (deferred)
     return (
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: "center" }}>
         <Spin />
       </div>
     );
@@ -54,7 +54,7 @@ export const RegionTree = observer(({ regionStore }) => {
       blockNode={true}
       defaultExpandAll={true}
       autoExpandParent={true}
-      switcherIcon={<LsChevron opacity='0.25' />}
+      switcherIcon={<LsChevron opacity="0.25" />}
       onDragStart={({ event, node }) => {
         if (node.classification || !canDrag.current) {
           event.preventDefault();
@@ -66,7 +66,7 @@ export const RegionTree = observer(({ regionStore }) => {
         if (node.classification) return false;
         const dropKey = node.props.eventKey;
         const dragKey = dragNode.props.eventKey;
-        const dropPos = node.props.pos.split('-');
+        const dropPos = node.props.pos.split("-");
 
         dropPosition = dropPosition - Number.parseInt(dropPos[dropPos.length - 1]);
         const treeDepth = dropPos.length;
@@ -77,7 +77,7 @@ export const RegionTree = observer(({ regionStore }) => {
         regionStore.unhighlightAll();
 
         if (treeDepth === 2 && dropToGap && dropPosition === -1) {
-          dragReg.setParentID('');
+          dragReg.setParentID("");
         } else if (dropPosition !== -1) {
           // check if the dragReg can be a child of dropReg
           const selDrop = dropReg.labeling?.selectedLabels || [];
@@ -86,7 +86,7 @@ export const RegionTree = observer(({ regionStore }) => {
           if (labelWithConstraint.length) {
             const selDrag = dragReg.labeling.selectedLabels;
 
-            const set1 = Utils.Checkers.flatten(labelWithConstraint.map((l) => l.groupcancontain.split(',')));
+            const set1 = Utils.Checkers.flatten(labelWithConstraint.map((l) => l.groupcancontain.split(",")));
             const set2 = Utils.Checkers.flatten(selDrag.map((l) => (l.alias ? [l.alias, l.value] : [l.value])));
 
             if (set1.filter((value) => -1 !== set2.indexOf(value)).length === 0) return;

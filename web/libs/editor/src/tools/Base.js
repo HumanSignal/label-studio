@@ -1,8 +1,8 @@
-import { observer } from 'mobx-react';
-import { getEnv, getSnapshot, getType, types } from 'mobx-state-tree';
-import React from 'react';
-import { toKebabCase } from 'strman';
-import { Tool } from '../components/Toolbar/Tool';
+import { observer } from "mobx-react";
+import { getEnv, getSnapshot, getType, types } from "mobx-state-tree";
+import React from "react";
+import { toKebabCase } from "strman";
+import { Tool } from "../components/Toolbar/Tool";
 
 const ToolView = observer(({ item }) => {
   return (
@@ -22,7 +22,7 @@ const ToolView = observer(({ item }) => {
 });
 
 const BaseTool = types
-  .model('BaseTool', {
+  .model("BaseTool", {
     smart: false,
     unselectRegionOnToolChange: false,
     removeDuplicatesNamed: types.maybeNull(types.string),

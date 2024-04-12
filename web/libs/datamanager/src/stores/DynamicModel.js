@@ -1,5 +1,5 @@
-import { types } from 'mobx-state-tree';
-import { CustomJSON, StringOrNumberID } from './types';
+import { types } from "mobx-state-tree";
+import { CustomJSON, StringOrNumberID } from "./types";
 
 const registry = new Map();
 
@@ -13,18 +13,18 @@ export const DynamicModel = (name, columns, properties) => {
   const typeWrapper = (type) => types.optional(types.maybeNull(type), null);
 
   columns?.forEach((col) => {
-    if (col.parent || col.id === 'id') return;
+    if (col.parent || col.id === "id") return;
 
     let propertyType;
 
     switch (col.type) {
-      case 'Number':
+      case "Number":
         propertyType = typeWrapper(types.number);
         break;
-      case 'Boolean':
+      case "Boolean":
         propertyType = typeWrapper(types.boolean);
         break;
-      case 'List':
+      case "List":
         propertyType = typeWrapper(CustomJSON);
         break;
       default:

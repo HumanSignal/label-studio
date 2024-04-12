@@ -1,4 +1,4 @@
-import { MediaPlayer } from '../Common/MediaPlayer/MediaPlayer';
+import { MediaPlayer } from "../Common/MediaPlayer/MediaPlayer";
 
 export const AudioCell = (column) => {
   return <MediaPlayer src={column.value} />;

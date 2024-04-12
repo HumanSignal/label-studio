@@ -1,8 +1,8 @@
-import color from 'chroma-js';
-import React from 'react';
-import { Block } from '../../../utils/bem';
-import { colors } from '../../../utils/colors';
-import './Tag.styl';
+import color from "chroma-js";
+import React from "react";
+import { Block } from "../../../utils/bem";
+import { colors } from "../../../utils/colors";
+import "./Tag.styl";
 
 const prepareColor = (colorString) => {
   const baseColor = color(colorString);
@@ -10,7 +10,7 @@ const prepareColor = (colorString) => {
   return {
     color: baseColor,
     background: baseColor.desaturate(2).brighten(2.2),
-    'shadow-color': baseColor.desaturate(1).brighten(1.22),
+    "shadow-color": baseColor.desaturate(1).brighten(1.22),
   };
 };
 
@@ -30,7 +30,7 @@ export const Tag = ({ className, style, size, color, children }) => {
   const styles = { ...(style ?? {}), ...finalColor };
 
   return (
-    <Block tag='span' name='tag' mod={{ size }} mix={className} style={styles}>
+    <Block tag="span" name="tag" mod={{ size }} mix={className} style={styles}>
       {children}
     </Block>
   );

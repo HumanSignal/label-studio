@@ -1,22 +1,22 @@
-import { PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
-import { observer } from 'mobx-react';
-import { getRoot } from 'mobx-state-tree';
-import { useCallback, useEffect, useState } from 'react';
-import { IconPause, IconPlay } from '../../../assets/icons';
-import { FF_LSDV_E_278, isFF } from '../../../utils/feature-flags';
-import styles from './Paragraphs.module.scss';
+import { PauseCircleOutlined, PlayCircleOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import { observer } from "mobx-react";
+import { getRoot } from "mobx-state-tree";
+import { useCallback, useEffect, useState } from "react";
+import { IconPause, IconPlay } from "../../../assets/icons";
+import { FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
+import styles from "./Paragraphs.module.scss";
 
 const formatTime = (seconds) => {
-  if (isNaN(seconds)) return '';
+  if (isNaN(seconds)) return "";
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = Math.round(seconds % 60);
 
-  const formattedHours = String(hours).padStart(2, '0');
-  const formattedMinutes = String(minutes).padStart(2, '0');
-  const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+  const formattedHours = String(hours).padStart(2, "0");
+  const formattedMinutes = String(minutes).padStart(2, "0");
+  const formattedSeconds = String(remainingSeconds).padStart(2, "0");
 
   return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 };
@@ -34,8 +34,8 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
     (element, start, duration, isPlaying = true) => {
       if (!element || !isFF(FF_LSDV_E_278) || !item.contextscroll) return;
 
-      const _animationKeyFrame = element.animate([{ top: `${start}%` }, { top: '100%' }], {
-        easing: 'linear',
+      const _animationKeyFrame = element.animate([{ top: `${start}%` }, { top: "100%" }], {
+        easing: "linear",
         duration: duration * 1000,
       });
 
@@ -60,7 +60,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
       const startValue = 100 - (seekDuration * 100) / duration;
 
       if (startValue > 0 && startValue < 100)
-        animateElement(activeRef.current?.querySelector('.reading-line'), startValue, seekDuration, seek.playing);
+        animateElement(activeRef.current?.querySelector(".reading-line"), startValue, seekDuration, seek.playing);
       else setIsSeek(isSeeking);
     },
     [seek, playingId],
@@ -86,7 +86,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
             setIsInViewport(entries[0].isIntersecting);
           },
           {
-            rootMargin: '0px',
+            rootMargin: "0px",
           },
         );
 
@@ -99,7 +99,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
   useEffect(() => {
     if (!isFF(FF_LSDV_E_278) || !item.contextscroll) return;
 
-    item.syncHandlers?.set('seek', (seek) => {
+    item.syncHandlers?.set("seek", (seek) => {
       item.handleSyncPlay(seek);
       setSeek(seek);
       setIsInViewport(true);
@@ -156,14 +156,14 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
         key={`${item.name}-${idx}`}
         ref={isActive ? activeRef : null}
         data-testid={`phrase:${idx}`}
-        className={`${classNames.join(' ')} ${isFF(FF_LSDV_E_278) && styles.newUI}`}
+        className={`${classNames.join(" ")} ${isFF(FF_LSDV_E_278) && styles.newUI}`}
         style={style?.phrase}
       >
         {isContentVisible && withAudio && !isNaN(v.start) && (
           <Button
-            type='text'
+            type="text"
             className={isFF(FF_LSDV_E_278) ? styles.playNewUi : styles.play}
-            aria-label={isPlaying ? 'pause' : 'play'}
+            aria-label={isPlaying ? "pause" : "play"}
             icon={
               isPlaying ? (
                 isFF(FF_LSDV_E_278) ? (
@@ -184,14 +184,14 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
           />
         )}
         {isFF(FF_LSDV_E_278) ? (
-          <span className={styles.titleWrapper} data-skip-node='true'>
+          <span className={styles.titleWrapper} data-skip-node="true">
             <span className={cls?.name} style={style?.name}>
               {v[item.namekey]}
             </span>
             <span className={styles.time}>{withFormattedTime(item)}</span>
           </span>
         ) : (
-          <span className={cls?.name} data-skip-node='true' style={style?.name}>
+          <span className={cls?.name} data-skip-node="true" style={style?.name}>
             {v[item.namekey]}
           </span>
         )}
@@ -199,7 +199,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewport }
         {isFF(FF_LSDV_E_278) ? (
           <span className={styles.wrapperText}>
             {isActive && (
-              <span ref={readingLineRef} className={`${styles.readingLine} reading-line`} data-skip-node='true' />
+              <span ref={readingLineRef} className={`${styles.readingLine} reading-line`} data-skip-node="true" />
             )}
             <span className={`${cls?.text}`}>{v[item.textkey]}</span>
           </span>

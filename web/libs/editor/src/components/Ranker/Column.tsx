@@ -1,11 +1,11 @@
-import { useContext } from 'react';
+import { useContext } from "react";
 
-import Item from './Item';
-import { CollapsedContext } from './Ranker';
-import { StrictModeDroppable } from './StrictModeDroppable';
-import type { InputItem, NewColumnData } from './createData';
+import Item from "./Item";
+import { CollapsedContext } from "./Ranker";
+import { StrictModeDroppable } from "./StrictModeDroppable";
+import type { InputItem, NewColumnData } from "./createData";
 
-import styles from './Ranker.module.scss';
+import styles from "./Ranker.module.scss";
 
 interface ColumnProps {
   column: NewColumnData;
@@ -26,7 +26,7 @@ const CollapsibleColumnTitle = ({ items, title }: { items: InputItem[]; title: s
     );
 
   return (
-    <h1 className={[styles.columnTitle, collapsed ? styles.collapsed : styles.expanded].join(' ')}>
+    <h1 className={[styles.columnTitle, collapsed ? styles.collapsed : styles.expanded].join(" ")}>
       {title}
       <button onClick={toggle}>
         <span />
@@ -50,7 +50,7 @@ const Column = (props: ColumnProps) => {
   );
 
   return (
-    <div className={[styles.column, 'htx-ranker-column'].join(' ')}>
+    <div className={[styles.column, "htx-ranker-column"].join(" ")}>
       {title}
       <StrictModeDroppable droppableId={column.id}>
         {(provided) => (

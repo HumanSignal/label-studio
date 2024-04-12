@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 const libraryQueue = new Map();
 
@@ -30,8 +30,8 @@ const requestLabelStudio = (libraries) => async (library) => {
         if (scriptSrc) {
           assets.push(
             new Promise((resolve) => {
-              const script = document.createElement('script');
-              script.type = 'text/javascript';
+              const script = document.createElement("script");
+              script.type = "text/javascript";
               script.onload = () => {
                 resolve();
               };
@@ -45,9 +45,9 @@ const requestLabelStudio = (libraries) => async (library) => {
         if (cssSrc) {
           assets.push(
             new Promise((resolve) => {
-              const link = document.createElement('link');
-              link.rel = 'stylesheet';
-              link.type = 'text/css';
+              const link = document.createElement("link");
+              link.rel = "stylesheet";
+              link.type = "text/css";
               link.onload = () => {
                 resolve();
               };

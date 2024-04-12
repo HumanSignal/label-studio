@@ -1,13 +1,13 @@
-import chroma from 'chroma-js';
-import { type CSSProperties, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Block, Elem } from '../../utils/bem';
-import { FF_DEV_1507, isFF } from '../../utils/feature-flags';
-import { isDefined, userDisplayName } from '../../utils/utilities';
-import { Tooltip } from '../Tooltip/Tooltip';
-import './Userpic.styl';
+import chroma from "chroma-js";
+import { type CSSProperties, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Block, Elem } from "../../utils/bem";
+import { FF_DEV_1507, isFF } from "../../utils/feature-flags";
+import { isDefined, userDisplayName } from "../../utils/utilities";
+import { Tooltip } from "../Tooltip/Tooltip";
+import "./Userpic.styl";
 
 const FALLBACK_IMAGE =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 interface UserpicProps {
   badge?: Record<string, any> | null;
@@ -67,7 +67,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const background = useMemo(() => {
       if (isDefined(user.id)) {
         const color =
-          localStorage.getItem(`userpic-color-${user.id}`) ?? chroma.average([chroma.random(), '#cfcfcf']).css();
+          localStorage.getItem(`userpic-color-${user.id}`) ?? chroma.average([chroma.random(), "#cfcfcf"]).css();
 
         localStorage.setItem(`userpic-color-${user.id}`, color);
         return color;
@@ -78,9 +78,9 @@ export const Userpic = forwardRef<any, UserpicProps>(
 
     const textColor = useMemo(() => {
       if (background) {
-        const contrast = chroma.contrast(background, '#fff');
+        const contrast = chroma.contrast(background, "#fff");
 
-        return contrast >= 4.5 ? '#fff' : '#000';
+        return contrast >= 4.5 ? "#fff" : "#000";
       }
 
       return null;
@@ -94,25 +94,25 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const stylesheet = { ...(style ?? {}), background, color: textColor };
 
     const userpic = (
-      <Block ref={ref} name='userpic' mix={className} mod={{ faded }} style={stylesheet} {...rest}>
+      <Block ref={ref} name="userpic" mix={className} mod={{ faded }} style={stylesheet} {...rest}>
         {children ? (
           children
         ) : (
           <>
             <Elem
-              tag='img'
-              name='avatar'
+              tag="img"
+              name="avatar"
               ref={imgRef}
               src={finalSrc}
-              alt={(displayName ?? '').toUpperCase()}
+              alt={(displayName ?? "").toUpperCase()}
               style={{ opacity: imgVisible ? (faded ? 0.3 : 1) : 0 }}
               onLoad={onImageLoaded}
               onError={() => setFinalSrc(FALLBACK_IMAGE)}
               mod={{ faded }}
             />
             {nameVisible && (
-              <Elem tag='span' name='username'>
-                {(displayName ?? '').slice(0, 2).toUpperCase()}
+              <Elem tag="span" name="username">
+                {(displayName ?? "").slice(0, 2).toUpperCase()}
               </Elem>
             )}
           </>
@@ -121,7 +121,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
         {badge &&
           Object.entries(badge).map(([align, content], i) => {
             return (
-              <Elem key={`badge-${i}`} name='badge' mod={{ [align]: true }}>
+              <Elem key={`badge-${i}`} name="badge" mod={{ [align]: true }}>
                 {content}
               </Elem>
             );
@@ -131,7 +131,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
 
     const userFullName = useMemo(() => {
       if (user?.firstName || user?.lastName) {
-        return `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
+        return `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
       }
       if (user?.email) {
         return user.email;
@@ -143,4 +143,4 @@ export const Userpic = forwardRef<any, UserpicProps>(
   },
 );
 
-Userpic.displayName = 'Userpic';
+Userpic.displayName = "Userpic";

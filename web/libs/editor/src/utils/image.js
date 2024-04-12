@@ -1,5 +1,5 @@
-import Konva from 'konva';
-import { FF_DEV_3793, isFF } from './feature-flags';
+import Konva from "konva";
+import { FF_DEV_3793, isFF } from "./feature-flags";
 
 export function reverseCoordinates(r1, r2) {
   let r1X = r1.x;
@@ -248,12 +248,12 @@ export function getTransformedImageData(
     canvasHeight = viewportHeight;
   }
 
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
 
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   const [viewportNaturalX, viewportNaturalY] = getActualZoomingPosition(
     naturalWidth,
@@ -303,7 +303,7 @@ export function getTransformedImageData(
   try {
     transformedData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   } catch (err) {
-    const msg = 'Please configure CORS cross-domain headers correctly for getting image labeling data';
+    const msg = "Please configure CORS cross-domain headers correctly for getting image labeling data";
 
     alert(msg);
     console.error(msg);

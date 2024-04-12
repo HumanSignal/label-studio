@@ -1,16 +1,16 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
-import { ErrorWrapper } from '../../components/Error/Error';
-import { modal } from '../../components/Modal/Modal';
-import { ConfigContext } from '../../providers/ConfigProvider';
-import { absoluteURL, removePrefix } from '../../utils/helpers';
-import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from '../../utils/scripts';
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router";
+import { ErrorWrapper } from "../../components/Error/Error";
+import { modal } from "../../components/Modal/Modal";
+import { ConfigContext } from "../../providers/ConfigProvider";
+import { absoluteURL, removePrefix } from "../../utils/helpers";
+import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from "../../utils/scripts";
 
 const pageCache = new Map();
 
 const pageFromHTML = (html) => {
   const parser = new DOMParser();
-  const document = parser.parseFromString(html, 'text/html');
+  const document = parser.parseFromString(html, "text/html");
   return document;
 };
 
@@ -23,7 +23,7 @@ const loadAsyncPage = async (url) => {
     const html = await response.text();
 
     if (response.status === 401) {
-      location.href = absoluteURL('/');
+      location.href = absoluteURL("/");
       return;
     }
 
@@ -49,8 +49,8 @@ const loadAsyncPage = async (url) => {
       body: () => (
         <ErrorWrapper
           possum={false}
-          title={'Connection refused'}
-          message={'Server not responding. Is it still running?'}
+          title={"Connection refused"}
+          message={"Server not responding. Is it still running?"}
         />
       ),
       simple: true,
@@ -77,8 +77,8 @@ const swapNodes = async (oldNode, newNode) => {
  * @param {Document} newPage
  */
 const swapAppSettings = async (oldPage, newPage) => {
-  const oldSettings = oldPage.querySelector('script#app-settings');
-  const newSettings = newPage.querySelector('script#app-settings');
+  const oldSettings = oldPage.querySelector("script#app-settings");
+  const newSettings = newPage.querySelector("script#app-settings");
 
   if (oldSettings && newSettings) {
     await replaceScript(oldSettings, {
@@ -93,8 +93,8 @@ const swapAppSettings = async (oldPage, newPage) => {
  * @param {Document} newPage
  */
 const swapContent = async (oldPage, newPage) => {
-  const currentContent = oldPage.querySelector('#dynamic-content');
-  const newContent = newPage.querySelector('#dynamic-content');
+  const currentContent = oldPage.querySelector("#dynamic-content");
+  const newContent = newPage.querySelector("#dynamic-content");
 
   if (currentContent && newContent) {
     await swapNodes(currentContent, newContent);
@@ -113,15 +113,15 @@ const nodesToSignatures = (nodes) => {
  * @param {HTMLHeadElement} newHead
  */
 const swapHeadScripts = async (oldHead, newHead) => {
-  swapNodes(oldHead.querySelector('title'), newHead.querySelector('title'));
+  swapNodes(oldHead.querySelector("title"), newHead.querySelector("title"));
 
   const fragment = document.createDocumentFragment();
 
-  Array.from(newHead.querySelectorAll('script'))
+  Array.from(newHead.querySelectorAll("script"))
     .filter((script) => isScriptValid(script))
     .forEach((script) => fragment.appendChild(script));
 
-  Array.from(oldHead.querySelectorAll('script'))
+  Array.from(oldHead.querySelectorAll("script"))
     .filter((script) => isScriptValid(script))
     .forEach((script) => script.remove());
 
@@ -134,7 +134,7 @@ const swapHeadScripts = async (oldHead, newHead) => {
  * @param {Document} newPage
  */
 const swapStylesheets = async (oldPage, newPage) => {
-  const linkSelector = ['style:not([data-replaced])', 'link[rel=stylesheet]:not([data-replaced])'].join(', ');
+  const linkSelector = ["style:not([data-replaced])", "link[rel=stylesheet]:not([data-replaced])"].join(", ");
   const oldStyles = Array.from(oldPage.querySelectorAll(linkSelector));
   const newStyles = Array.from(newPage.querySelectorAll(linkSelector));
 
@@ -166,7 +166,7 @@ const swapPageParts = async (newPage, onReady) => {
 const isVisitable = (target) => {
   if (!target) return false;
   if (target.dataset.external) return false;
-  if (target.getAttribute('href').match(/#/)) return false;
+  if (target.getAttribute("href").match(/#/)) return false;
   if (target.origin !== location.origin) return false;
 
   return true;
@@ -174,7 +174,7 @@ const isVisitable = (target) => {
 
 const locationWithoutHash = () => {
   const { href } = location;
-  return href.replace(/#(.*)/g, '');
+  return href.replace(/#(.*)/g, "");
 };
 
 const fetchPage = async (locationUrl) => {
@@ -219,10 +219,10 @@ export const AsyncPage = ({ children }) => {
 
   const onLinkClick = useCallback(async (e) => {
     /**@type {HTMLAnchorElement} */
-    const target = e.target.closest('a[href]:not([target]):not([download])');
+    const target = e.target.closest("a[href]:not([target]):not([download])");
 
     if (!isVisitable(target)) return;
-    if (target.matches('[data-external]')) return;
+    if (target.matches("[data-external]")) return;
     if (e.metaKey || e.ctrlKey) return;
 
     e.preventDefault();
@@ -246,11 +246,11 @@ export const AsyncPage = ({ children }) => {
   // useEffect(onPopState, [location]);
 
   useEffect(() => {
-    document.addEventListener('click', onLinkClick, { capture: true });
-    window.addEventListener('popstate', onPopState);
+    document.addEventListener("click", onLinkClick, { capture: true });
+    window.addEventListener("popstate", onPopState);
     return () => {
-      document.removeEventListener('click', onLinkClick, { capture: true });
-      window.removeEventListener('popstate', onPopState);
+      document.removeEventListener("click", onLinkClick, { capture: true });
+      window.removeEventListener("popstate", onPopState);
     };
   }, []);
 

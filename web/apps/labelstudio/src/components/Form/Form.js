@@ -1,25 +1,25 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { shallowEqualObjects } from 'shallow-equal';
-import { ApiProvider } from '../../providers/ApiProvider';
-import { MultiProvider } from '../../providers/MultiProvider';
-import { Block, Elem, cn } from '../../utils/bem';
-import { debounce } from '../../utils/debounce';
-import { isDefined, objectClean } from '../../utils/helpers';
-import { Button } from '../Button/Button';
-import { Oneof } from '../Oneof/Oneof';
-import { Space } from '../Space/Space';
-import { Counter, Input, Select, Toggle } from './Elements';
-import './Form.styl';
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { shallowEqualObjects } from "shallow-equal";
+import { ApiProvider } from "../../providers/ApiProvider";
+import { MultiProvider } from "../../providers/MultiProvider";
+import { Block, Elem, cn } from "../../utils/bem";
+import { debounce } from "../../utils/debounce";
+import { isDefined, objectClean } from "../../utils/helpers";
+import { Button } from "../Button/Button";
+import { Oneof } from "../Oneof/Oneof";
+import { Space } from "../Space/Space";
+import { Counter, Input, Select, Toggle } from "./Elements";
+import "./Form.styl";
 import {
   FormContext,
   FormResponseContext,
   FormStateContext,
   FormSubmissionContext,
   FormValidationContext,
-} from './FormContext';
-import * as Validators from './Validation/Validators';
+} from "./FormContext";
+import * as Validators from "./Validation/Validators";
 
-const PASSWORD_PROTECTED_VALUE = 'got ya, suspicious hacker!';
+const PASSWORD_PROTECTED_VALUE = "got ya, suspicious hacker!";
 
 export default class Form extends React.Component {
   state = {
@@ -60,19 +60,19 @@ export default class Form extends React.Component {
 
   render() {
     const providers = [
-      <FormContext.Provider key='form-ctx' value={this} />,
-      <FormValidationContext.Provider key='form-validation-ctx' value={this.state.validation} />,
-      <FormSubmissionContext.Provider key='form-submission-ctx' value={this.state.submitting} />,
-      <FormStateContext.Provider key='form-state-ctx' value={this.state.state} />,
-      <FormResponseContext.Provider key='form-response' value={this.state.lastResponse} />,
-      <ApiProvider key='form-api' ref={this.apiRef} />,
+      <FormContext.Provider key="form-ctx" value={this} />,
+      <FormValidationContext.Provider key="form-validation-ctx" value={this.state.validation} />,
+      <FormSubmissionContext.Provider key="form-submission-ctx" value={this.state.submitting} />,
+      <FormStateContext.Provider key="form-state-ctx" value={this.state.state} />,
+      <FormResponseContext.Provider key="form-response" value={this.state.lastResponse} />,
+      <ApiProvider key="form-api" ref={this.apiRef} />,
     ];
 
     return (
       <MultiProvider providers={providers}>
         <form
           ref={this.formElement}
-          className={cn('form')}
+          className={cn("form")}
           action={this.props.action}
           onSubmit={this.onFormSubmitted}
           onChange={this.onFormChanged}
@@ -132,10 +132,10 @@ export default class Form extends React.Component {
     this.validateFields();
 
     if (!this.validation.size) {
-      this.setState({ step: 'submitting' });
+      this.setState({ step: "submitting" });
       this.submit();
     } else {
-      this.setState({ step: 'invalid' });
+      this.setState({ step: "invalid" });
     }
   };
 
@@ -179,8 +179,8 @@ export default class Form extends React.Component {
       if (full === true || !skipField) {
         const value = (() => {
           const inputValue = field.value;
-          if (['checkbox', 'radio'].includes(field.type)) {
-            if (isDefined(inputValue) && !['', 'on', 'off', 'true', 'false'].includes(inputValue)) {
+          if (["checkbox", "radio"].includes(field.type)) {
+            if (isDefined(inputValue) && !["", "on", "off", "true", "false"].includes(inputValue)) {
               return field.checked ? inputValue : null;
             }
 
@@ -208,7 +208,7 @@ export default class Form extends React.Component {
   async submit({ fieldsFilter } = {}) {
     this.setState({ submitting: true, lastResponse: null });
 
-    const rawAction = this.formElement.current.getAttribute('action');
+    const rawAction = this.formElement.current.getAttribute("action");
     const useApi = this.api.isValidMethod(rawAction);
     const data = this.assembleFormData({ asJSON: useApi, fieldsFilter });
     const body = this.props.prepareData?.(data) ?? data;
@@ -223,7 +223,7 @@ export default class Form extends React.Component {
     this.setState(
       {
         submitting: false,
-        state: success ? 'success' : 'fail',
+        state: success ? "success" : "fail",
       },
       () => {
         setTimeout(() => {
@@ -252,7 +252,7 @@ export default class Form extends React.Component {
 
   async submitWithFetch(body) {
     const action = this.formElement.current.action;
-    const method = (this.props.method ?? 'POST').toUpperCase();
+    const method = (this.props.method ?? "POST").toUpperCase();
     const response = await fetch(action, { method, body });
 
     try {
@@ -349,17 +349,17 @@ export default class Form extends React.Component {
 }
 
 const ValidationRenderer = ({ validation }) => {
-  const rootClass = cn('form-validation');
+  const rootClass = cn("form-validation");
 
   return (
     <div className={rootClass}>
       {Array.from(validation).map(([name, result]) => (
-        <div key={name} className={rootClass.elem('group')} onClick={() => result.field.focus()}>
-          <div className={rootClass.elem('field')}>{result.label}</div>
+        <div key={name} className={rootClass.elem("group")} onClick={() => result.field.focus()}>
+          <div className={rootClass.elem("field")}>{result.label}</div>
 
-          <div className={rootClass.elem('messages')}>
+          <div className={rootClass.elem("messages")}>
             {result.messages.map((message, i) => (
-              <div key={`${name}-${i}`} className={rootClass.elem('message')}>
+              <div key={`${name}-${i}`} className={rootClass.elem("message")}>
                 {message}
               </div>
             ))}
@@ -375,11 +375,11 @@ Form.Validator = Validators;
 Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   const styles = {};
 
-  if (columnCount) styles['--column-count'] = columnCount;
-  if (rowGap) styles['--row-gap'] = rowGap;
+  if (columnCount) styles["--column-count"] = columnCount;
+  if (rowGap) styles["--row-gap"] = rowGap;
 
   return (
-    <div className={cn('form').elem('row').mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
+    <div className={cn("form").elem("row").mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
@@ -412,7 +412,7 @@ Form.Builder = React.forwardRef(
         const triggerUpdate = props.autosubmit !== true && field.trigger_form_update === true;
         const getValue = () => {
           const isProtected =
-            field.skipAutofill && (!field.allowEmpty || field.protectedValue) && field.type === 'password';
+            field.skipAutofill && (!field.allowEmpty || field.protectedValue) && field.type === "password";
 
           if (isProtected) {
             return PASSWORD_PROTECTED_VALUE;
@@ -439,20 +439,20 @@ Form.Builder = React.forwardRef(
 
         const InputComponent = (() => {
           switch (field.type) {
-            case 'select':
+            case "select":
               return Select;
-            case 'counter':
+            case "counter":
               return Counter;
-            case 'toggle':
+            case "toggle":
               return Toggle;
             default:
               return Input;
           }
         })();
 
-        if (['checkbox', 'radio', 'toggle'].includes(field.type)) {
+        if (["checkbox", "radio", "toggle"].includes(field.type)) {
           commonProps.checked = getValue();
-        } else if (field.type === 'counter') {
+        } else if (field.type === "counter") {
           commonProps.value = getValue();
         } else {
           commonProps.defaultValue = getValue();
@@ -464,7 +464,7 @@ Form.Builder = React.forwardRef(
 
     const renderColumns = (columns) => {
       return columns.map((col, index) => (
-        <div className={cn('form').elem('column')} key={index} style={{ width: col.width }}>
+        <div className={cn("form").elem("column")} key={index} style={{ width: col.width }}>
           {renderFields(col.fields)}
         </div>
       ));
@@ -521,7 +521,7 @@ Form.Builder = React.forwardRef(
         {children}
         {props.autosubmit !== true && withActions === true && (
           <Form.Actions>
-            <Button type='submit' look='primary' style={{ width: 120 }}>
+            <Button type="submit" look="primary" style={{ width: 120 }}>
               Save
             </Button>
           </Form.Actions>
@@ -532,11 +532,11 @@ Form.Builder = React.forwardRef(
 );
 
 Form.Actions = ({ children, valid, extra, size }) => {
-  const rootClass = cn('form');
+  const rootClass = cn("form");
 
   return (
-    <div className={rootClass.elem('submit').mod({ size })}>
-      <div className={rootClass.elem('info').mod({ valid })}>{extra}</div>
+    <div className={rootClass.elem("submit").mod({ size })}>
+      <div className={rootClass.elem("info").mod({ valid })}>{extra}</div>
 
       <Space>{children}</Space>
     </div>
@@ -547,9 +547,9 @@ Form.Indicator = () => {
   const state = React.useContext(FormStateContext);
 
   return (
-    <Block name='form-indicator'>
+    <Block name="form-indicator">
       <Oneof value={state}>
-        <Elem tag='span' mod={{ type: state }} name='item' case='success'>
+        <Elem tag="span" mod={{ type: state }} name="item" case="success">
           Saved!
         </Elem>
       </Oneof>
@@ -561,7 +561,7 @@ Form.ResponseParser = ({ children }) => {
   const callback = children;
 
   if (callback instanceof Function === false) {
-    throw new Error('Response Parser only accepts function as a child');
+    throw new Error("Response Parser only accepts function as a child");
   }
 
   const response = useContext(FormResponseContext);

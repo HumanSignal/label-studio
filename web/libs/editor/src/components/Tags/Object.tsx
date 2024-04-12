@@ -1,5 +1,5 @@
-import { observer } from 'mobx-react';
-import React, { type CSSProperties, type FC } from 'react';
+import { observer } from "mobx-react";
+import React, { type CSSProperties, type FC } from "react";
 
 interface ObjectTagViewProps {
   item: any;
@@ -15,7 +15,7 @@ const ObjectTagView: FC<ObjectTagViewProps> = ({ item, style, className, childre
 
   return (
     <div
-      className={['lsf-object', className].join(' ')}
+      className={["lsf-object", className].join(" ")}
       data-needs-update={item._needsUpdate}
       style={style}
       {...moreProps}

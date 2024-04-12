@@ -12,23 +12,23 @@ const FRAME_RESERVED_HEIGHT = 24;
 export const VideoView = {
   get root() {
     cy.log("Get VideoView's root");
-    return cy.get('.lsf-video-segmentation');
+    return cy.get(".lsf-video-segmentation");
   },
   get drawingArea() {
     cy.log("Get VideoView's drawing area");
-    return this.root.get('.konvajs-content');
+    return this.root.get(".konvajs-content");
   },
   get timelineContainer() {
-    return this.root.get('.lsf-video-segmentation__timeline');
+    return this.root.get(".lsf-video-segmentation__timeline");
   },
   get timelineToolbar() {
-    return this.root.get('.lsf-timeline__topbar');
+    return this.root.get(".lsf-timeline__topbar");
   },
   get timeLineLabels() {
-    return this.root.get('.lsf-timeline-frames__labels-bg');
+    return this.root.get(".lsf-timeline-frames__labels-bg");
   },
   get timeframesArea() {
-    return this.root.get('.lsf-timeline-frames__scroll');
+    return this.root.get(".lsf-timeline-frames__scroll");
   },
   /**
    * Clicks at the coordinates on the drawing area
@@ -65,9 +65,9 @@ export const VideoView = {
     cy.log(`Draw rectangle at (${x}, ${y}) of size ${width}x${height}`);
     this.drawingArea
       .scrollIntoView()
-      .trigger('mousedown', x, y, { eventConstructor: 'MouseEvent', buttons: 1, ...options })
-      .trigger('mousemove', x + width, y + height, { eventConstructor: 'MouseEvent', buttons: 1, ...options })
-      .trigger('mouseup', x + width, y + height, { eventConstructor: 'MouseEvent', buttons: 1, ...options })
+      .trigger("mousedown", x, y, { eventConstructor: "MouseEvent", buttons: 1, ...options })
+      .trigger("mousemove", x + width, y + height, { eventConstructor: "MouseEvent", buttons: 1, ...options })
+      .trigger("mouseup", x + width, y + height, { eventConstructor: "MouseEvent", buttons: 1, ...options })
       // We need this while the Video tag creates new regions in useEffect hook (it means not immediately)
       // This problem could be solved in VideoRegions component of lsf
       // Without this wait we get absence of a region on screenshots
@@ -103,7 +103,7 @@ export const VideoView = {
       const pointX = bbox.width + (idx - 0.5) * FRAME_WIDTH;
       const pointY = FRAME_RESERVED_HEIGHT / 2;
 
-      this.timeframesArea.scrollIntoView().trigger('mouseover', pointX, pointY).click(pointX, pointY, options);
+      this.timeframesArea.scrollIntoView().trigger("mouseover", pointX, pointY).click(pointX, pointY, options);
     });
   },
 
@@ -112,7 +112,7 @@ export const VideoView = {
    * @param {string} name name of the screenshot
    */
   captureCanvas(name: string) {
-    return this.drawingArea.captureScreenshot(name, { withHidden: ['.lsf-video-canvas'] });
+    return this.drawingArea.captureScreenshot(name, { withHidden: [".lsf-video-canvas"] });
   },
 
   /**
@@ -122,7 +122,7 @@ export const VideoView = {
    * @param treshold to compare image. It's a relation between original number of pixels vs changed number of pixels
    */
   canvasShouldChange(name: string, treshold = 0.1) {
-    return this.drawingArea.compareScreenshot(name, 'shouldChange', { withHidden: ['.lsf-video-canvas'], treshold });
+    return this.drawingArea.compareScreenshot(name, "shouldChange", { withHidden: [".lsf-video-canvas"], treshold });
   },
 
   /**
@@ -132,6 +132,6 @@ export const VideoView = {
    * @param treshold to compare image. It's a relation between original number of pixels vs changed number of pixels
    */
   canvasShouldNotChange(name: string, treshold = 0.1) {
-    return this.drawingArea.compareScreenshot(name, 'shouldNotChange', { withHidden: ['.lsf-video-canvas'], treshold });
+    return this.drawingArea.compareScreenshot(name, "shouldNotChange", { withHidden: [".lsf-video-canvas"], treshold });
   },
 };

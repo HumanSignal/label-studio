@@ -1,8 +1,8 @@
-import React, { type FC, useCallback, useEffect, useState } from 'react';
-import { MaskUtil } from '../../utils/InputMask';
-import { Block, Elem } from '../../utils/bem';
+import React, { type FC, useCallback, useEffect, useState } from "react";
+import { MaskUtil } from "../../utils/InputMask";
+import { Block, Elem } from "../../utils/bem";
 
-import './TimeBox.styl';
+import "./TimeBox.styl";
 
 export interface TimerProps {
   sidepanel: boolean;
@@ -25,7 +25,7 @@ export const TimeBox: FC<TimerProps> = ({
 
   useEffect(() => {
     if (inputRef.current)
-      new MaskUtil(inputRef.current, '11:11:11:111', (data: string) => {
+      new MaskUtil(inputRef.current, "11:11:11:111", (data: string) => {
         setCurrentInputTime(data);
       });
   }, []);
@@ -39,9 +39,9 @@ export const TimeBox: FC<TimerProps> = ({
     let formatted = time > 3600 ? timeDate.substr(11, 8) : `00:${timeDate.substr(14, 5)}`;
 
     if (input) {
-      const isHour = timeDate.substr(11, 2) !== '00';
+      const isHour = timeDate.substr(11, 2) !== "00";
 
-      formatted = timeDate.substr(isHour ? 11 : 14, isHour ? 12 : 9).replace('.', ':');
+      formatted = timeDate.substr(isHour ? 11 : 14, isHour ? 12 : 9).replace(".", ":");
 
       formatted = !isHour ? `00:${formatted}` : formatted;
     }
@@ -50,10 +50,10 @@ export const TimeBox: FC<TimerProps> = ({
   }, []);
 
   const convertTextToTime = (value: string) => {
-    const splittedValue = value.split(':').reverse();
+    const splittedValue = value.split(":").reverse();
     let totalTime = 0;
 
-    if (value.indexOf('_') >= 0) return;
+    if (value.indexOf("_") >= 0) return;
 
     const calcs = [(x: number) => x / 1000, (x: number) => x, (x: number) => x * 60, (x: number) => x * 60 * 60];
 
@@ -65,17 +65,17 @@ export const TimeBox: FC<TimerProps> = ({
   };
 
   const handleBlurInput = (e: React.FormEvent<HTMLInputElement>) => {
-    const splittedValue = e.currentTarget.value.split(':');
+    const splittedValue = e.currentTarget.value.split(":");
 
     splittedValue[0] =
       splittedValue[0].toString().length === 1 ? `0${splittedValue[0].toString()}` : `${splittedValue[0]}`;
 
-    convertTextToTime(splittedValue.join(':'));
+    convertTextToTime(splittedValue.join(":"));
     setCurrentInputTime(formatTime(value || 0, true));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.currentTarget?.blur?.();
     }
   };
@@ -83,11 +83,11 @@ export const TimeBox: FC<TimerProps> = ({
   const renderInputTime = () => {
     return (
       <Elem
-        name={'input-time'}
+        name={"input-time"}
         maxLength={12}
-        tag={'input'}
+        tag={"input"}
         ref={inputRef}
-        type='text'
+        type="text"
         readOnly={readonly}
         value={currentInputTime}
         onKeyDown={handleKeyDown}
@@ -98,7 +98,7 @@ export const TimeBox: FC<TimerProps> = ({
   };
 
   return (
-    <Block name='time-box' mod={{ inverted, sidepanel }} {...props}>
+    <Block name="time-box" mod={{ inverted, sidepanel }} {...props}>
       {renderInputTime()}
     </Block>
   );

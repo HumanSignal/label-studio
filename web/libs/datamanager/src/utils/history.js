@@ -1,4 +1,4 @@
-import { isDefined } from './utils';
+import { isDefined } from "./utils";
 
 export const History = {
   getParams(urlInstance) {

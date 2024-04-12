@@ -1,17 +1,17 @@
-import { Tooltip } from 'antd';
-import { observer } from 'mobx-react';
-import { type FC, useState } from 'react';
-import { IconCheck, IconEllipsis } from '../../assets/icons';
-import { Dropdown } from '../../common/Dropdown/Dropdown';
-import { Menu } from '../../common/Menu/Menu';
-import { Space } from '../../common/Space/Space';
-import { Userpic } from '../../common/Userpic/Userpic';
-import { Block, Elem } from '../../utils/bem';
-import { humanDateDiff, userDisplayName } from '../../utils/utilities';
-import { CommentFormBase } from './CommentFormBase';
+import { Tooltip } from "antd";
+import { observer } from "mobx-react";
+import { type FC, useState } from "react";
+import { IconCheck, IconEllipsis } from "../../assets/icons";
+import { Dropdown } from "../../common/Dropdown/Dropdown";
+import { Menu } from "../../common/Menu/Menu";
+import { Space } from "../../common/Space/Space";
+import { Userpic } from "../../common/Userpic/Userpic";
+import { Block, Elem } from "../../utils/bem";
+import { humanDateDiff, userDisplayName } from "../../utils/utilities";
+import { CommentFormBase } from "./CommentFormBase";
 
-import { Button } from '../../common/Button/Button';
-import './CommentItem.styl';
+import { Button } from "../../common/Button/Button";
+import "./CommentItem.styl";
 
 interface Comment {
   comment: {
@@ -70,9 +70,9 @@ export const CommentItem: FC<any> = observer(
 
       if (isPersisted && time)
         return (
-          <Elem name='date'>
-            <Tooltip placement='topRight' title={new Date(time).toLocaleString()}>
-              {`${isEdited ? 'updated' : ''} ${humanDateDiff(time)}`}
+          <Elem name="date">
+            <Tooltip placement="topRight" title={new Date(time).toLocaleString()}>
+              {`${isEdited ? "updated" : ""} ${humanDateDiff(time)}`}
             </Tooltip>
           </Elem>
         );
@@ -80,26 +80,26 @@ export const CommentItem: FC<any> = observer(
     };
 
     return (
-      <Block name='comment-item' mod={{ resolved }}>
-        <Space spread size='medium' truncated>
-          <Space size='small' truncated>
-            <Elem tag={Userpic} user={createdBy} name='userpic' showUsername username={createdBy} />
-            <Elem name='name' tag='span'>
+      <Block name="comment-item" mod={{ resolved }}>
+        <Space spread size="medium" truncated>
+          <Space size="small" truncated>
+            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy} />
+            <Elem name="name" tag="span">
               {userDisplayName(createdBy)}
             </Elem>
           </Space>
 
-          <Space size='small'>
-            <Elem name='resolved' component={IconCheck} />
-            <Elem name='saving' mod={{ hide: isPersisted }}>
-              <Elem name='dot' />
+          <Space size="small">
+            <Elem name="resolved" component={IconCheck} />
+            <Elem name="saving" mod={{ hide: isPersisted }}>
+              <Elem name="dot" />
             </Elem>
             <TimeTracker />
           </Space>
         </Space>
 
-        <Elem name='content'>
-          <Elem name='text'>
+        <Elem name="content">
+          <Elem name="text">
             {isEditMode ? (
               <CommentFormBase
                 value={currentComment}
@@ -110,13 +110,13 @@ export const CommentItem: FC<any> = observer(
                 }}
               />
             ) : isConfirmDelete ? (
-              <Elem name='confirmForm'>
-                <Elem name='question'>Are you sure?</Elem>
-                <Elem name='controls'>
-                  <Button onClick={() => deleteComment()} size='compact' look='danger' autoFocus>
+              <Elem name="confirmForm">
+                <Elem name="question">Are you sure?</Elem>
+                <Elem name="controls">
+                  <Button onClick={() => deleteComment()} size="compact" look="danger" autoFocus>
                     Yes
                   </Button>
-                  <Button onClick={() => setConfirmMode(false)} size='compact'>
+                  <Button onClick={() => setConfirmMode(false)} size="compact">
                     No
                   </Button>
                 </Elem>
@@ -127,7 +127,7 @@ export const CommentItem: FC<any> = observer(
           </Elem>
 
           <Elem
-            name='actions'
+            name="actions"
             onClick={(e: any) => {
               e.stopPropagation();
               e.preventDefault();
@@ -136,8 +136,8 @@ export const CommentItem: FC<any> = observer(
             {isPersisted && (
               <Dropdown.Trigger
                 content={
-                  <Menu size='auto'>
-                    <Menu.Item onClick={toggleResolve}>{resolved ? 'Unresolve' : 'Resolve'}</Menu.Item>
+                  <Menu size="auto">
+                    <Menu.Item onClick={toggleResolve}>{resolved ? "Unresolve" : "Resolve"}</Menu.Item>
                     {currentUser?.id === createdBy.id && (
                       <>
                         <Menu.Item
@@ -150,7 +150,7 @@ export const CommentItem: FC<any> = observer(
                             }
                           }}
                         >
-                          {isEditMode ? 'Cancel edit' : 'Edit'}
+                          {isEditMode ? "Cancel edit" : "Edit"}
                         </Menu.Item>
                         {!isConfirmDelete && (
                           <Menu.Item
@@ -166,7 +166,7 @@ export const CommentItem: FC<any> = observer(
                   </Menu>
                 }
               >
-                <Button size='small' type='text' icon={<IconEllipsis />} />
+                <Button size="small" type="text" icon={<IconEllipsis />} />
               </Dropdown.Trigger>
             )}
           </Elem>

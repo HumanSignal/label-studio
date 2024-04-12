@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 // @ts-ignore
-import { info } from '../Common/Utils';
-import { BaseAudioDecoder } from './BaseAudioDecoder';
+import { info } from "../Common/Utils";
+import { BaseAudioDecoder } from "./BaseAudioDecoder";
 
 export class WebAudioDecoder extends BaseAudioDecoder {
   private arraybuffer?: ArrayBuffer;
@@ -13,7 +13,7 @@ export class WebAudioDecoder extends BaseAudioDecoder {
   async init(arraybuffer: ArrayBuffer) {
     this.arraybuffer = arraybuffer;
 
-    info('decode:worker:ready', this.src);
+    info("decode:worker:ready", this.src);
   }
 
   /**
@@ -22,20 +22,20 @@ export class WebAudioDecoder extends BaseAudioDecoder {
   async decode(options?: { multiChannel?: boolean; captureAudioBuffer?: boolean }): Promise<void | AudioBuffer> {
     // If the worker has cached data we can skip the decode step
     if (this.sourceDecoded) {
-      info('decode:cached', this.src);
+      info("decode:cached", this.src);
       return;
     }
     if (this.sourceDecodeCancelled) {
-      throw new Error('WebAudioDecoder decode cancelled and contains no data, did you call decoder.renew()?');
+      throw new Error("WebAudioDecoder decode cancelled and contains no data, did you call decoder.renew()?");
     }
     // The decoding process is already in progress, so wait for it to finish
     if (this.decodingPromise) {
-      info('decode:inprogress', this.src);
+      info("decode:inprogress", this.src);
       return this.decodingPromise;
     }
-    if (!this.arraybuffer) throw new Error('WebAudioDecoder not initialized, did you call decoder.init()?');
+    if (!this.arraybuffer) throw new Error("WebAudioDecoder not initialized, did you call decoder.init()?");
 
-    info('decode:start', this.src);
+    info("decode:start", this.src);
 
     // Generate a unique id for this decode operation
     this.decodeId = Date.now();
@@ -48,9 +48,9 @@ export class WebAudioDecoder extends BaseAudioDecoder {
           this.context = this.createOfflineAudioContext();
         }
         if (!this.context || !this.arraybuffer)
-          return reject(new Error('WebAudioDecoder not initialized, did you call decoder.init()?'));
+          return reject(new Error("WebAudioDecoder not initialized, did you call decoder.init()?"));
         // Safari doesn't support promise based decodeAudioData by default
-        if ('webkitAudioContext' in window) {
+        if ("webkitAudioContext" in window) {
           this.context?.decodeAudioData(
             this.arraybuffer,
             (data) => resolve(data),
@@ -73,7 +73,7 @@ export class WebAudioDecoder extends BaseAudioDecoder {
 
       this.chunks = chunks;
 
-      info('decode:complete', this.src);
+      info("decode:complete", this.src);
 
       if (options?.captureAudioBuffer) {
         this.buffer = buffer;

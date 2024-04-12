@@ -1,21 +1,21 @@
-import { CompressOutlined, DeleteOutlined, LinkOutlined, PlusOutlined } from '@ant-design/icons';
-import { Badge, Form, Input } from 'antd';
-import { Typography } from 'antd';
-import { observer } from 'mobx-react';
-import React, { Fragment } from 'react';
+import { CompressOutlined, DeleteOutlined, LinkOutlined, PlusOutlined } from "@ant-design/icons";
+import { Badge, Form, Input } from "antd";
+import { Typography } from "antd";
+import { observer } from "mobx-react";
+import React, { Fragment } from "react";
 
-import { IconWarning } from '../../assets/icons';
-import { Button } from '../../common/Button/Button';
-import { Space } from '../../common/Space/Space';
-import { Tag } from '../../common/Tag/Tag';
-import { Tooltip } from '../../common/Tooltip/Tooltip';
-import { Hotkey } from '../../core/Hotkey';
-import { PER_REGION_MODES } from '../../mixins/PerRegion';
-import { Block, Elem } from '../../utils/bem';
-import Hint from '../Hint/Hint';
-import { NodeDebug, NodeMinimal } from '../Node/Node';
-import styles from './Entity.module.scss';
-import './Entity.styl';
+import { IconWarning } from "../../assets/icons";
+import { Button } from "../../common/Button/Button";
+import { Space } from "../../common/Space/Space";
+import { Tag } from "../../common/Tag/Tag";
+import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { Hotkey } from "../../core/Hotkey";
+import { PER_REGION_MODES } from "../../mixins/PerRegion";
+import { Block, Elem } from "../../utils/bem";
+import Hint from "../Hint/Hint";
+import { NodeDebug, NodeMinimal } from "../Node/Node";
+import styles from "./Entity.module.scss";
+import "./Entity.styl";
 
 const { Paragraph, Text } = Typography;
 
@@ -24,7 +24,7 @@ const renderLabels = (element) => {
     <Text key={element.pid} className={styles.labels}>
       Labels:&nbsp;
       {element.selectedLabels.map((label) => {
-        const bgColor = label.background || '#000000';
+        const bgColor = label.background || "#000000";
 
         return (
           <Tag key={label.id} color={bgColor} solid>
@@ -37,27 +37,27 @@ const renderLabels = (element) => {
 };
 
 const renderResult = (result) => {
-  if (result.type.endsWith('labels')) {
+  if (result.type.endsWith("labels")) {
     return renderLabels(result);
   }
-  if (result.type === 'rating') {
+  if (result.type === "rating") {
     return <Paragraph>Rating: {result.mainValue}</Paragraph>;
   }
   if (
-    result.type === 'textarea' &&
+    result.type === "textarea" &&
     !(result.from_name.perregion && result.from_name.displaymode === PER_REGION_MODES.REGION_LIST)
   ) {
     return (
       <Paragraph className={styles.row}>
         <Text>Text: </Text>
         <Text mark className={styles.long}>
-          {result.mainValue.join('\n')}
+          {result.mainValue.join("\n")}
         </Text>
       </Paragraph>
     );
   }
-  if (result.type === 'choices') {
-    return <Paragraph>Choices: {result.mainValue.join(', ')}</Paragraph>;
+  if (result.type === "choices") {
+    return <Paragraph>Choices: {result.mainValue.join(", ")}</Paragraph>;
   }
 
   return null;
@@ -75,9 +75,9 @@ export default observer(({ store, annotation }) => {
 
   if (hasEditableRegions) {
     entityButtons.push(
-      <Hotkey.Tooltip key='relations' placement='topLeft' name='region:relation'>
+      <Hotkey.Tooltip key="relations" placement="topLeft" name="region:relation">
         <Button
-          aria-label='Create Relation'
+          aria-label="Create Relation"
           className={styles.button}
           onClick={() => {
             annotation.startRelationMode(node);
@@ -92,7 +92,7 @@ export default observer(({ store, annotation }) => {
     );
 
     entityButtons.push(
-      <Tooltip key='meta' placement='topLeft' title='Add Meta Information'>
+      <Tooltip key="meta" placement="topLeft" title="Add Meta Information">
         <Button
           className={styles.button}
           onClick={() => {
@@ -107,33 +107,33 @@ export default observer(({ store, annotation }) => {
   }
 
   entityButtons.push(
-    <Hotkey.Tooltip key='unselect' placement='topLeft' name='region:unselect'>
+    <Hotkey.Tooltip key="unselect" placement="topLeft" name="region:unselect">
       <Button
         className={styles.button}
-        type='dashed'
+        type="dashed"
         onClick={() => {
           annotation.unselectAll();
         }}
       >
         <CompressOutlined />
-        <Hotkey.Hint name='region:unselect' />
+        <Hotkey.Hint name="region:unselect" />
       </Button>
     </Hotkey.Tooltip>,
   );
 
   return (
-    <Block name='entity'>
-      <Elem name='info' tag={Space} spread>
-        <Elem name='node'>
+    <Block name="entity">
+      <Elem name="info" tag={Space} spread>
+        <Elem name="node">
           {node ? (
             <>
               <Node node={node} /> (ID: {node.id})
             </>
           ) : (
-            `${selectionSize} Region${selectionSize > 1 ? 's are' : ' is'} selected`
+            `${selectionSize} Region${selectionSize > 1 ? "s are" : " is"} selected`
           )}
         </Elem>
-        {!hasEditableNodes && <Badge count={'readonly'} style={{ backgroundColor: '#ccc' }} />}
+        {!hasEditableNodes && <Badge count={"readonly"} style={{ backgroundColor: "#ccc" }} />}
       </Elem>
       <div className={`${styles.statesblk} ls-entity-states`}>
         {node?.score && (
@@ -149,8 +149,8 @@ export default observer(({ store, annotation }) => {
             Meta: <Text code>{node.meta.text}</Text>
             &nbsp;
             <DeleteOutlined
-              type='delete'
-              style={{ cursor: 'pointer' }}
+              type="delete"
+              style={{ cursor: "pointer" }}
               onClick={() => {
                 node.deleteMetaText();
               }}
@@ -162,9 +162,9 @@ export default observer(({ store, annotation }) => {
       </div>
 
       {node?.isDrawing && (
-        <Elem name='warning'>
+        <Elem name="warning">
           <IconWarning />
-          <Elem name='warning-text'>Incomplete {node.type.replace('region', '')}</Elem>
+          <Elem name="warning-text">Incomplete {node.type.replace("region", "")}</Elem>
         </Elem>
       )}
 
@@ -173,9 +173,9 @@ export default observer(({ store, annotation }) => {
           <Space>{entityButtons}</Space>
 
           {hasEditableNodes && (
-            <Hotkey.Tooltip placement='topLeft' name='region:delete'>
+            <Hotkey.Tooltip placement="topLeft" name="region:delete">
               <Button
-                look='danger'
+                look="danger"
                 className={styles.button}
                 onClick={() => {
                   annotation.deleteSelectedRegions();
@@ -183,7 +183,7 @@ export default observer(({ store, annotation }) => {
               >
                 <DeleteOutlined />
 
-                <Hotkey.Hint name='region:delete' />
+                <Hotkey.Hint name="region:delete" />
               </Button>
             </Hotkey.Tooltip>
           )}
@@ -206,7 +206,7 @@ export default observer(({ store, annotation }) => {
 
       {editMode && (
         <Form
-          style={{ marginTop: '0.5em', marginBottom: '0.5em' }}
+          style={{ marginTop: "0.5em", marginBottom: "0.5em" }}
           onFinish={() => {
             node.setMetaText(node.normInput);
             setEditMode(false);
@@ -219,17 +219,17 @@ export default observer(({ store, annotation }) => {
 
               node.setNormInput(value);
             }}
-            style={{ marginBottom: '0.5em' }}
-            placeholder='Meta Information'
+            style={{ marginBottom: "0.5em" }}
+            placeholder="Meta Information"
           />
 
-          <Button type='primary' htmlType='submit' style={{ marginRight: '0.5em' }}>
+          <Button type="primary" htmlType="submit" style={{ marginRight: "0.5em" }}>
             Add
           </Button>
 
           <Button
-            type='danger'
-            htmlType='reset'
+            type="danger"
+            htmlType="reset"
             onClick={(ev) => {
               setEditMode(false);
 

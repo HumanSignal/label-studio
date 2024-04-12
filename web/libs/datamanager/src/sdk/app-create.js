@@ -2,12 +2,12 @@
  * views?: any[]
  * }} AppOptions */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { App } from '../components/App/App';
-import { AppStore } from '../stores/AppStore';
-import * as DataStores from '../stores/DataStores';
-import { registerModel } from '../stores/DynamicModel';
+import React from "react";
+import ReactDOM from "react-dom";
+import { App } from "../components/App/App";
+import { AppStore } from "../stores/AppStore";
+import * as DataStores from "../stores/DataStores";
+import { registerModel } from "../stores/DynamicModel";
 
 const createDynamicModels = (columns) => {
   const grouppedColumns = columns.reduce((res, column) => {
@@ -23,11 +23,11 @@ const createDynamicModels = (columns) => {
   });
 
   if (columns.length === 0) {
-    registerModel('tasksStore', DataStores.tasks?.create());
+    registerModel("tasksStore", DataStores.tasks?.create());
   }
 
   /** temporary solution until we'll have annotations */
-  registerModel('annotationsStore', DataStores.annotations?.create());
+  registerModel("annotationsStore", DataStores.annotations?.create());
 };
 
 /**
@@ -37,13 +37,13 @@ const createDynamicModels = (columns) => {
  * @returns {Promise<AppStore>}
  */
 export const createApp = async (rootNode, datamanager) => {
-  const isLabelStream = datamanager.mode === 'labelstream';
+  const isLabelStream = datamanager.mode === "labelstream";
 
   const response = await datamanager.api.columns();
 
   if (!response || response.error) {
     const message = `
-      ${response?.error ?? ''}
+      ${response?.error ?? ""}
       LS API not available; check \`API_GATEWAY\` and \`LS_ACCESS_TOKEN\` env vars;
       also check \`data-project-id\` in \`public/index.html\`
     `;

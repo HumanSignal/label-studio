@@ -1,9 +1,9 @@
-import wp from '@cypress/webpack-preprocessor';
+import wp from "@cypress/webpack-preprocessor";
 
 const options = {
   webpackOptions: {
     resolve: {
-      extensions: ['.ts', '.tsx', '.js'],
+      extensions: [".ts", ".tsx", ".js"],
       alias: {
         data: `${process.cwd()}/data`,
       },
@@ -12,7 +12,7 @@ const options = {
       rules: [
         {
           test: /\.tsx?$/,
-          loader: 'ts-loader',
+          loader: "ts-loader",
           options: { transpileOnly: true },
         },
       ],
@@ -25,5 +25,5 @@ const options = {
  * @param {Cypress.PluginEvents} on Event subscriber
  */
 export const setupTypescript = (on) => {
-  on('file:preprocessor', wp(options));
+  on("file:preprocessor", wp(options));
 };

@@ -1,14 +1,14 @@
-import { inject } from 'mobx-react';
-import { LsCheckAlt, LsCrossAlt } from '../../../assets/icons';
-import { useSDK } from '../../../providers/SDKProvider';
-import { Block, Elem } from '../../../utils/bem';
-import { isDefined } from '../../../utils/utils';
-import { Space } from '../../Common/Space/Space';
-import { Tooltip } from '../../Common/Tooltip/Tooltip';
-import { Userpic } from '../../Common/Userpic/Userpic';
-import { Common } from '../../Filters/types';
-import { VariantSelect } from '../../Filters/types/List';
-import './Annotators.styl';
+import { inject } from "mobx-react";
+import { LsCheckAlt, LsCrossAlt } from "../../../assets/icons";
+import { useSDK } from "../../../providers/SDKProvider";
+import { Block, Elem } from "../../../utils/bem";
+import { isDefined } from "../../../utils/utils";
+import { Space } from "../../Common/Space/Space";
+import { Tooltip } from "../../Common/Tooltip/Tooltip";
+import { Userpic } from "../../Common/Userpic/Userpic";
+import { Common } from "../../Filters/types";
+import { VariantSelect } from "../../Filters/types/List";
+import "./Annotators.styl";
 
 export const Annotators = (cell) => {
   const { value, column, original: task } = cell;
@@ -18,23 +18,23 @@ export const Annotators = (cell) => {
   const extra = userList.length - renderable.length;
 
   return (
-    <Block name='annotators'>
+    <Block name="annotators">
       {renderable.map((item) => {
         const user = item.user ?? item;
         const { annotated, reviewed, review } = item;
 
         const userpicIsFaded =
           (isDefined(annotated) && annotated === false) || (isDefined(reviewed) && reviewed === false);
-        const suppressStats = column.alias === 'comment_authors';
+        const suppressStats = column.alias === "comment_authors";
 
         return (
           <Elem
             key={`user-${user.id}`}
-            name='item'
+            name="item"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              sdk.invoke('userCellClick', e, column.alias, task, user, suppressStats);
+              sdk.invoke("userCellClick", e, column.alias, task, user, suppressStats);
             }}
           >
             <Tooltip title={user.fullName || user.email}>
@@ -43,8 +43,8 @@ export const Annotators = (cell) => {
                 faded={userpicIsFaded}
                 badge={{
                   bottomRight: review && (
-                    <Block name='userpic-badge' mod={{ [review]: true }}>
-                      {review === 'rejected' ? <LsCrossAlt /> : <LsCheckAlt />}
+                    <Block name="userpic-badge" mod={{ [review]: true }}>
+                      {review === "rejected" ? <LsCrossAlt /> : <LsCheckAlt />}
                     </Block>
                   ),
                 }}
@@ -55,11 +55,11 @@ export const Annotators = (cell) => {
       })}
       {extra > 0 && (
         <Elem
-          name='item'
+          name="item"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            sdk.invoke('userCellCounterClick', e, column.alias, task, userList);
+            sdk.invoke("userCellCounterClick", e, column.alias, task, userList);
           }}
         >
           <Userpic username={`+${extra}`} />
@@ -79,7 +79,7 @@ Annotators.FilterItem = UsersInjector(({ users, item }) => {
   const user = users.find((u) => u.id === item);
 
   return user ? (
-    <Space size='small'>
+    <Space size="small">
       <Userpic user={user} size={16} key={`user-${item}`} />
       {user.displayName}
     </Space>
@@ -89,15 +89,15 @@ Annotators.FilterItem = UsersInjector(({ users, item }) => {
 Annotators.filterable = true;
 Annotators.customOperators = [
   {
-    key: 'contains',
-    label: 'contains',
-    valueType: 'list',
+    key: "contains",
+    label: "contains",
+    valueType: "list",
     input: (props) => <VariantSelect {...props} />,
   },
   {
-    key: 'not_contains',
-    label: 'not contains',
-    valueType: 'list',
+    key: "not_contains",
+    label: "not contains",
+    valueType: "list",
     input: (props) => <VariantSelect {...props} />,
   },
   ...Common,

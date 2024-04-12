@@ -1,11 +1,11 @@
-import { inject, observer } from 'mobx-react';
-import React, { useEffect, useRef } from 'react';
-import { FaAngleDown, FaChevronDown } from 'react-icons/fa';
-import { FF_LOPS_E_10, isFF } from '../../utils/feature-flags';
-import { Filters } from '../Filters/Filters';
-import { Badge } from './Badge/Badge';
-import { Button } from './Button/Button';
-import { Dropdown } from './Dropdown/Dropdown';
+import { inject, observer } from "mobx-react";
+import React, { useEffect, useRef } from "react";
+import { FaAngleDown, FaChevronDown } from "react-icons/fa";
+import { FF_LOPS_E_10, isFF } from "../../utils/feature-flags";
+import { Filters } from "../Filters/Filters";
+import { Badge } from "./Badge/Badge";
+import { Button } from "./Button/Button";
+import { Dropdown } from "./Dropdown/Dropdown";
 
 const buttonInjector = inject(({ store }) => {
   const { viewsStore, currentView } = store;
@@ -24,16 +24,16 @@ export const FiltersButton = buttonInjector(
 
       return (
         <Button ref={ref} size={size} onClick={() => sidebarEnabled && viewsStore.toggleSidebar()} {...rest}>
-          Filters{' '}
+          Filters{" "}
           {hasFilters && (
-            <Badge size='small' style={{ marginLeft: 5 }}>
+            <Badge size="small" style={{ marginLeft: 5 }}>
               {activeFiltersNumber}
             </Badge>
           )}
           {isFF(FF_LOPS_E_10) ? (
-            <FaChevronDown size='12' style={{ marginLeft: 8, marginRight: -7 }} color='#1F1F1F' />
+            <FaChevronDown size="12" style={{ marginLeft: 8, marginRight: -7 }} color="#1F1F1F" />
           ) : (
-            <FaAngleDown size='16' style={{ marginLeft: 4 }} color='#0077FF' />
+            <FaAngleDown size="16" style={{ marginLeft: 4 }} color="#0077FF" />
           )}
         </Button>
       );

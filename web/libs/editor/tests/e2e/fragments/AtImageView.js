@@ -1,20 +1,20 @@
 const { I } = inject();
 
-const assert = require('assert');
-const Helpers = require('../tests/helpers');
+const assert = require("assert");
+const Helpers = require("../tests/helpers");
 
 module.exports = {
-  _stageSelector: '.konvajs-content',
+  _stageSelector: ".konvajs-content",
   _stageFrameSelector: '[class^="frame--"]',
   _stageBBox: null,
 
-  _toolBarSelector: '.lsf-toolbar',
+  _toolBarSelector: ".lsf-toolbar",
   _zoomPresetsSelector: '[title^="Zoom presets"]',
 
   _rootSelector: '[class^="lsf-object wrapperComponent--"]',
   _paginationSelector: '[class^="pagination--"]',
-  _paginationPrevBtnSelector: '.lsf-pagination__btn_arrow-left:not(.lsf-pagination__btn_arrow-left-double)',
-  _paginationNextBtnSelector: '.lsf-pagination__btn_arrow-right:not(.lsf-pagination__btn_arrow-right-double)',
+  _paginationPrevBtnSelector: ".lsf-pagination__btn_arrow-left:not(.lsf-pagination__btn_arrow-left-double)",
+  _paginationNextBtnSelector: ".lsf-pagination__btn_arrow-right:not(.lsf-pagination__btn_arrow-right-double)",
 
   locateRoot() {
     return locate(this._rootSelector);
@@ -75,9 +75,9 @@ module.exports = {
   },
 
   async waitForImage() {
-    I.say('Waiting for image to be loaded');
+    I.say("Waiting for image to be loaded");
     await I.executeScript(Helpers.waitForImage);
-    I.waitForVisible('canvas', 5);
+    I.waitForVisible("canvas", 5);
   },
 
   async getNaturalSize() {
@@ -263,7 +263,7 @@ module.exports = {
    * @param {"steps"|"rate"} mode - mode of firing mousemove event
    * @param {number} parameter - parameter for mode
    */
-  drawThroughPoints(points, mode = 'steps', parameter = 1) {
+  drawThroughPoints(points, mode = "steps", parameter = 1) {
     I.scrollPageToTop();
     const calcSteps = {
       steps: () => parameter,
@@ -301,11 +301,11 @@ module.exports = {
       return regions[regionIndex]?.cleanId ?? undefined;
     }, regionIndex);
 
-    assert.notEqual(regionId, undefined, 'Region not found');
+    assert.notEqual(regionId, undefined, "Region not found");
 
     const position = await this.getRegionAbsoultePosition(regionId, false);
 
-    I.say('Clicking on a region at', `${position.x} ${position.y}`);
+    I.say("Clicking on a region at", `${position.x} ${position.y}`);
 
     this.clickAt(position.x, position.y);
   },
@@ -313,7 +313,7 @@ module.exports = {
   async dragRegion(regions, findIndex, shiftX = 50, shiftY = 50) {
     const region = regions.find(findIndex);
 
-    assert.notEqual(region, undefined, 'Region not found');
+    assert.notEqual(region, undefined, "Region not found");
 
     const position = await this.getRegionAbsoultePosition(region.id);
 
@@ -325,25 +325,25 @@ module.exports = {
   },
 
   selectPanTool() {
-    I.say('Select pan tool');
-    I.pressKey('H');
+    I.say("Select pan tool");
+    I.pressKey("H");
   },
 
   selectMoveTool() {
-    I.say('Select move tool');
-    I.pressKey('V');
+    I.say("Select move tool");
+    I.pressKey("V");
   },
 
   async multiImageGoForwardWithHotkey() {
-    I.say('Attempting to go to the next image');
-    I.pressKey('Ctrl+d');
+    I.say("Attempting to go to the next image");
+    I.pressKey("Ctrl+d");
 
     await this.waitForImage();
   },
 
   async multiImageGoBackwardWithHotkey() {
-    I.say('Attempting to go to the next image');
-    I.pressKey('Ctrl+a');
+    I.say("Attempting to go to the next image");
+    I.pressKey("Ctrl+a");
 
     await this.waitForImage();
   },

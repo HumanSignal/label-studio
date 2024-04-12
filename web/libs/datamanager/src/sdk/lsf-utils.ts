@@ -1,5 +1,5 @@
-import type { APIAnnotation, APIPrediction, APITask, LSFAnnotation, LSFTaskData } from '../types/Task';
-import { FF_LSDV_5035, isFF } from '../utils/feature-flags';
+import type { APIAnnotation, APIPrediction, APITask, LSFAnnotation, LSFTaskData } from "../types/Task";
+import { FF_LSDV_5035, isFF } from "../utils/feature-flags";
 
 /**
  * Converts the task from the server format to the
@@ -50,7 +50,7 @@ export const predictionToLSF = (prediction: APIPrediction) => {
     id: undefined,
     pk: String(prediction.id),
     createdAgo: prediction.created_ago,
-    createdBy: prediction.model_version?.trim() ?? '',
+    createdBy: prediction.model_version?.trim() ?? "",
     createdDate: prediction.created_at,
   };
 };

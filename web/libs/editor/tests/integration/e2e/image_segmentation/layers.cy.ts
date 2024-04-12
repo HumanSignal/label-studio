@@ -1,8 +1,8 @@
-import { ImageView, LabelStudio, Sidebar } from '@humansignal/frontend-test/helpers/LSF';
-import { simpleConfig, simpleImageData, simpleResult } from '../../data/image_segmentation/layers';
+import { ImageView, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
+import { simpleConfig, simpleImageData, simpleResult } from "../../data/image_segmentation/layers";
 
-describe('Image Segmentation - Layers', () => {
-  it('should keep selected region over unselected one', () => {
+describe("Image Segmentation - Layers", () => {
+  it("should keep selected region over unselected one", () => {
     LabelStudio.params().config(simpleConfig).data(simpleImageData).withResult(simpleResult).init();
 
     ImageView.waitForImage();

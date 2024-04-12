@@ -1,5 +1,5 @@
-import { getParent, types } from 'mobx-state-tree';
-import Utilities from '../utils';
+import { getParent, types } from "mobx-state-tree";
+import Utilities from "../utils";
 
 /**
  * Model for HTTP Basic Authorization
@@ -15,7 +15,7 @@ const AuthStore = types.model({
  * Task Store
  */
 const TaskStore = types
-  .model('Task', {
+  .model("Task", {
     id: types.maybeNull(types.number),
     load: types.optional(types.boolean, false),
     auth: types.maybeNull(AuthStore),
@@ -39,7 +39,7 @@ const TaskStore = types
       if (Utilities.Checkers.isStringJSON(self.data)) {
         return JSON.parse(self.data);
       }
-      if (typeof self.data === 'object') {
+      if (typeof self.data === "object") {
         return self.data;
       }
       return null;

@@ -1,33 +1,33 @@
-import { isDefined } from '../../utils/utilities';
-import type { FilterListInterface } from './FilterInterfaces';
+import { isDefined } from "../../utils/utilities";
+import type { FilterListInterface } from "./FilterInterfaces";
 
 export const FilterItemsByOperation = (items: any[], filterItem: FilterListInterface) => {
-  if ((!filterItem.value || filterItem.value === '') && filterItem.operation !== 'empty') return items;
+  if ((!filterItem.value || filterItem.value === "") && filterItem.operation !== "empty") return items;
 
   switch (filterItem.operation) {
-    case 'contains':
+    case "contains":
       return contains(items, filterItem);
-    case 'not_contains':
+    case "not_contains":
       return notcontains(items, filterItem);
-    case 'in':
+    case "in":
       return between(items, filterItem);
-    case 'not_in':
+    case "not_in":
       return notbetween(items, filterItem);
-    case 'regex':
+    case "regex":
       return regex(items, filterItem);
-    case 'empty':
+    case "empty":
       return empty(items, filterItem);
-    case 'greater':
+    case "greater":
       return greater(items, filterItem);
-    case 'less':
+    case "less":
       return less(items, filterItem);
-    case 'less_or_equal':
+    case "less_or_equal":
       return lessOrEqual(items, filterItem);
-    case 'greater_or_equal':
+    case "greater_or_equal":
       return greaterOrEqual(items, filterItem);
-    case 'equal':
+    case "equal":
       return equal(items, filterItem);
-    case 'not_equal':
+    case "not_equal":
       return notequal(items, filterItem);
     default:
       return items;
@@ -38,9 +38,9 @@ export const FilterItems = (items: any[], filterList: FilterListInterface[]) => 
   const _filteredList = [[...items]];
 
   for (let i = 0; i < filterList.length; i++) {
-    if (!filterList[i].value && filterList[i].operation !== 'empty') continue;
+    if (!filterList[i].value && filterList[i].operation !== "empty") continue;
 
-    if (filterList[i].logic === 'and') {
+    if (filterList[i].logic === "and") {
       // 0 is equal to AND, 1 is equal to OR
       _filteredList[_filteredList.length - 1] = FilterItemsByOperation(
         _filteredList[_filteredList.length - 1],
@@ -168,7 +168,7 @@ const regex = (items: any[], filterItem: FilterListInterface) => {
   try {
     return items.filter((obj) => {
       const item = getFilteredPath(filterItem.path, obj);
-      const regex = new RegExp(filterItem.value, 'g');
+      const regex = new RegExp(filterItem.value, "g");
 
       return item.match(regex);
     });
@@ -181,11 +181,11 @@ const empty = (items: any[], filterItem: FilterListInterface) => {
   return items.filter((obj) => {
     const item = getFilteredPath(filterItem.path, obj);
 
-    return item === '' || !item || item === null || item === undefined || item === 'blank';
+    return item === "" || !item || item === null || item === undefined || item === "blank";
   });
 };
 
-const getFilteredPath = (path: string | string[], items: any[], separator = '.') => {
+const getFilteredPath = (path: string | string[], items: any[], separator = ".") => {
   const properties = Array.isArray(path) ? path : path.split(separator);
 
   return properties.reduce((prev, curr) => prev?.[curr], items);

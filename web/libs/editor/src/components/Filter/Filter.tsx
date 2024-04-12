@@ -1,15 +1,15 @@
-import { Dropdown } from '../../common/Dropdown/Dropdown';
-import { Block, Elem } from '../../utils/bem';
+import { Dropdown } from "../../common/Dropdown/Dropdown";
+import { Block, Elem } from "../../utils/bem";
 
-import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { IconFilter } from '../../assets/icons';
-import { Button } from '../../common/Button/Button';
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
+import { IconFilter } from "../../assets/icons";
+import { Button } from "../../common/Button/Button";
 
-import { FF_DEV_3873, isFF } from '../../utils/feature-flags';
-import './Filter.styl';
-import type { FilterInterface, FilterListInterface } from './FilterInterfaces';
-import { FilterRow } from './FilterRow';
-import { FilterItems } from './filter-util';
+import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
+import "./Filter.styl";
+import type { FilterInterface, FilterListInterface } from "./FilterInterfaces";
+import { FilterRow } from "./FilterRow";
+import { FilterItems } from "./filter-util";
 
 export const Filter: FC<FilterInterface> = ({ availableFilters, filterData, onChange, animated = true }) => {
   const [filterList, setFilterList] = useState<FilterListInterface[]>([]);
@@ -23,11 +23,11 @@ export const Filter: FC<FilterInterface> = ({ availableFilters, filterData, onCh
     setFilterList((filterList) => [
       ...filterList,
       {
-        field: availableFilters[0]?.label ?? '',
-        logic: 'and',
-        operation: '',
-        value: '',
-        path: '',
+        field: availableFilters[0]?.label ?? "",
+        logic: "and",
+        operation: "",
+        value: "",
+        path: "",
       },
     ]);
   }, [setFilterList, availableFilters]);
@@ -62,7 +62,7 @@ export const Filter: FC<FilterInterface> = ({ availableFilters, filterData, onCh
         newList.splice(index, 1);
 
         if (newList[0]) {
-          newList[0].logic = 'and';
+          newList[0].logic = "and";
         }
 
         onChange(FilterItems(filterData, newList));
@@ -75,7 +75,7 @@ export const Filter: FC<FilterInterface> = ({ availableFilters, filterData, onCh
 
   const renderFilterList = useMemo(() => {
     return filterList.map(({ field, operation, logic, value }, index) => (
-      <Block key={index} name='filter-item'>
+      <Block key={index} name="filter-item">
         <FilterRow
           index={index}
           availableFilters={availableFilters}
@@ -92,10 +92,10 @@ export const Filter: FC<FilterInterface> = ({ availableFilters, filterData, onCh
 
   const renderFilter = useMemo(() => {
     return (
-      <Block name={'filter'}>
-        {filterList.length > 0 ? renderFilterList : <Elem name='empty'>No filters applied</Elem>}
-        <Button look='alt' size='small' type={'text'} onClick={addNewFilterListItem}>
-          Add {filterList.length ? 'Another Filter' : 'Filter'}
+      <Block name={"filter"}>
+        {filterList.length > 0 ? renderFilterList : <Elem name="empty">No filters applied</Elem>}
+        <Button look="alt" size="small" type={"text"} onClick={addNewFilterListItem}>
+          Add {filterList.length ? "Another Filter" : "Filter"}
         </Button>
       </Block>
     );
@@ -106,23 +106,23 @@ export const Filter: FC<FilterInterface> = ({ availableFilters, filterData, onCh
   }, []);
 
   return (
-    <Dropdown.Trigger content={renderFilter} dataTestId={'dropdown'} animated={animated} onToggle={onToggle}>
-      <Block data-testid={'filter-button'} name={'filter-button'} mod={{ active }}>
-        <Elem name={'icon'}>
+    <Dropdown.Trigger content={renderFilter} dataTestId={"dropdown"} animated={animated} onToggle={onToggle}>
+      <Block data-testid={"filter-button"} name={"filter-button"} mod={{ active }}>
+        <Elem name={"icon"}>
           <IconFilter />
         </Elem>
         <Elem
-          name={'text'}
+          name={"text"}
           style={{
             fontSize: isFF(FF_DEV_3873) && 12,
             fontWeight: isFF(FF_DEV_3873) && 500,
-            lineHeight: isFF(FF_DEV_3873) && '24px',
+            lineHeight: isFF(FF_DEV_3873) && "24px",
           }}
         >
           Filter
         </Elem>
         {filterList.length > 0 && (
-          <Elem name={'filter-length'} data-testid={'filter-length'}>
+          <Elem name={"filter-length"} data-testid={"filter-length"}>
             {filterList.length}
           </Elem>
         )}

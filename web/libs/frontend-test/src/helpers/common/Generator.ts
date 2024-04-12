@@ -12,12 +12,12 @@ export const random = (min: number, max?: number) => {
 export const Generator = {
   generateImageUrl({ width, height }) {
     return cy.document().then((doc) => {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
 
       canvas.width = width;
       canvas.height = height;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
 
       const centerX = width / 2;
       const centerY = height / 2;
@@ -29,19 +29,19 @@ export const Generator = {
         ctx.strokeRect(0, centerY - k, width, k * 2);
       }
 
-      const dataUrl = canvas.toDataURL('image/png');
+      const dataUrl = canvas.toDataURL("image/png");
 
       return dataUrl;
     });
   },
   generatePixeledImageUrl({ width, height }) {
     return cy.document().then((doc) => {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
 
       canvas.width = width;
       canvas.height = height;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
 
       const centerX = width / 2;
       const centerY = height / 2;
@@ -53,7 +53,7 @@ export const Generator = {
         }
       }
 
-      const dataUrl = canvas.toDataURL('image/png');
+      const dataUrl = canvas.toDataURL("image/png");
 
       return dataUrl;
     });

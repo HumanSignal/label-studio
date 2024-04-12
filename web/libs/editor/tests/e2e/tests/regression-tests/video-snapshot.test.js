@@ -1,13 +1,13 @@
-const assert = require('assert');
+const assert = require("assert");
 
-Feature('Video region snapshots').tag('@regress');
+Feature("Video region snapshots").tag("@regress");
 
-Scenario('Restoring video regions from snapshots', async ({ I, LabelStudio, AtSidebar }) => {
-  I.amOnPage('/');
+Scenario("Restoring video regions from snapshots", async ({ I, LabelStudio, AtSidebar }) => {
+  I.amOnPage("/");
   LabelStudio.init({
     annotations: [
       {
-        id: '1001',
+        id: "1001",
         result: [
           {
             value: {
@@ -25,11 +25,11 @@ Scenario('Restoring video regions from snapshots', async ({ I, LabelStudio, AtSi
               ],
               framesCount: 1009,
             },
-            id: 'tJhYZLMC9G',
-            from_name: 'box',
-            to_name: 'video',
-            type: 'videorectangle',
-            origin: 'manual',
+            id: "tJhYZLMC9G",
+            from_name: "box",
+            to_name: "video",
+            type: "videorectangle",
+            origin: "manual",
           },
         ],
       },
@@ -39,28 +39,28 @@ Scenario('Restoring video regions from snapshots', async ({ I, LabelStudio, AtSi
   <Video name="video" value="$video" />
   <VideoRectangle name="box" toName="video" />
 </View>`,
-    data: { video: '/files/opossum_intro.webm' },
+    data: { video: "/files/opossum_intro.webm" },
   });
 
-  I.say('waitForObjectsReady');
+  I.say("waitForObjectsReady");
   LabelStudio.waitForObjectsReady();
 
   {
-    I.say('Check the video annotation creation');
+    I.say("Check the video annotation creation");
     const result = await LabelStudio.serialize();
 
     assert.notStrictEqual(result[0].value.sequence.length, 0);
   }
 
   {
-    I.say('Check restoring the snapshot from history');
+    I.say("Check restoring the snapshot from history");
     LabelStudio.clearModalIfPresent();
     AtSidebar.seeRegions(1);
     AtSidebar.clickRegion(1);
-    I.say('delete region');
-    I.pressKey('Backspace');
-    I.say('undo action');
-    I.click('.lsf-history-buttons__action[aria-label=Undo]');
+    I.say("delete region");
+    I.pressKey("Backspace");
+    I.say("undo action");
+    I.click(".lsf-history-buttons__action[aria-label=Undo]");
     const result = await LabelStudio.serialize();
 
     assert.notStrictEqual(result[0].value.sequence.length, 0);

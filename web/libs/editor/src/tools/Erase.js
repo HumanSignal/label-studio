@@ -1,15 +1,15 @@
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React from 'react';
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import { IconEraserTool } from '../assets/icons';
-import { Range } from '../common/Range/Range';
-import { Tool } from '../components/Toolbar/Tool';
-import { DrawingTool } from '../mixins/DrawingTool';
-import ToolMixin from '../mixins/Tool';
-import Canvas from '../utils/canvas';
-import { clamp, findClosestParent } from '../utils/utilities';
-import BaseTool from './Base';
+import { IconEraserTool } from "../assets/icons";
+import { Range } from "../common/Range/Range";
+import { Tool } from "../components/Toolbar/Tool";
+import { DrawingTool } from "../mixins/DrawingTool";
+import ToolMixin from "../mixins/Tool";
+import Canvas from "../utils/canvas";
+import { clamp, findClosestParent } from "../utils/utilities";
+import BaseTool from "./Base";
 
 const MIN_SIZE = 1;
 const MAX_SIZE = 50;
@@ -18,11 +18,11 @@ const IconDot = ({ size }) => {
   return (
     <span
       style={{
-        display: 'block',
+        display: "block",
         width: size,
         height: size,
-        background: 'rgba(0, 0, 0, 0.25)',
-        borderRadius: '100%',
+        background: "rgba(0, 0, 0, 0.25)",
+        borderRadius: "100%",
       }}
     />
   );
@@ -31,9 +31,9 @@ const IconDot = ({ size }) => {
 const ToolView = observer(({ item }) => {
   return (
     <Tool
-      label='Eraser'
-      ariaLabel='eraser'
-      shortcut='E'
+      label="Eraser"
+      ariaLabel="eraser"
+      shortcut="E"
       active={item.selected}
       extraShortcuts={item.extraShortcuts}
       tool={item}
@@ -50,9 +50,9 @@ const ToolView = observer(({ item }) => {
 });
 
 const _Tool = types
-  .model('EraserTool', {
+  .model("EraserTool", {
     strokeWidth: types.optional(types.number, 10),
-    group: 'segmentation',
+    group: "segmentation",
     unselectRegionOnToolChange: false,
   })
   .volatile(() => ({
@@ -69,12 +69,12 @@ const _Tool = types
     get controls() {
       return [
         <Range
-          key='eraser-size'
+          key="eraser-size"
           value={self.strokeWidth}
           min={MIN_SIZE}
           max={MAX_SIZE}
           reverse
-          align='vertical'
+          align="vertical"
           minIcon={<IconDot size={8} />}
           maxIcon={<IconDot size={16} />}
           onChange={(value) => {
@@ -85,14 +85,14 @@ const _Tool = types
     },
     get extraShortcuts() {
       return {
-        '[': [
-          'Decrease size',
+        "[": [
+          "Decrease size",
           () => {
             self.setStroke(clamp(self.strokeWidth - 5, MIN_SIZE, MAX_SIZE));
           },
         ],
-        ']': [
-          'Increase size',
+        "]": [
+          "Increase size",
           () => {
             self.setStroke(clamp(self.strokeWidth + 5, MIN_SIZE, MAX_SIZE));
           },
@@ -109,9 +109,9 @@ const _Tool = types
         const val = 24;
         const stage = self.obj.stageRef;
         const base64 = Canvas.brushSizeCircle(val);
-        const cursor = ["url('", base64, "')", ' ', Math.floor(val / 2) + 4, ' ', Math.floor(val / 2) + 4, ', auto'];
+        const cursor = ["url('", base64, "')", " ", Math.floor(val / 2) + 4, " ", Math.floor(val / 2) + 4, ", auto"];
 
-        stage.container().style.cursor = cursor.join('');
+        stage.container().style.cursor = cursor.join("");
       },
 
       afterUpdateSelected() {
@@ -127,13 +127,13 @@ const _Tool = types
       },
 
       mouseupEv() {
-        if (self.mode !== 'drawing') return;
-        self.mode = 'viewing';
+        if (self.mode !== "drawing") return;
+        self.mode = "viewing";
         brush.endPath();
       },
 
       mousemoveEv(ev, _, [x, y]) {
-        if (self.mode !== 'drawing') return;
+        if (self.mode !== "drawing") return;
         if (
           !findClosestParent(
             ev.target,
@@ -143,7 +143,7 @@ const _Tool = types
         )
           return;
 
-        if (brush?.type === 'brushregion') {
+        if (brush?.type === "brushregion") {
           self.addPoint(x, y);
         }
       },
@@ -161,10 +161,10 @@ const _Tool = types
         brush = self.getSelectedShape;
         if (!brush) return;
 
-        if (brush && brush.type === 'brushregion') {
-          self.mode = 'drawing';
+        if (brush && brush.type === "brushregion") {
+          self.mode = "drawing";
           brush.beginPath({
-            type: 'eraser',
+            type: "eraser",
             opacity: 1,
             strokeWidth: self.strokeWidth,
           });

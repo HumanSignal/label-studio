@@ -7,12 +7,12 @@ export const prepareColumns = (columns, hidden) => {
 export const getProperty = (object, path) => {
   try {
     const normalizedPath = path
-      .split('.')
+      .split(".")
       .map((p) => `["${p}"]`)
-      .join('');
+      .join("");
 
     // eslint-disable-next-line no-new-func
-    const fn = new Function('object', `return object${normalizedPath}`);
+    const fn = new Function("object", `return object${normalizedPath}`);
 
     return fn(object);
   } catch {

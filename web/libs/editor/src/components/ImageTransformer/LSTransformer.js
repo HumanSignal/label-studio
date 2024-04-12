@@ -1,8 +1,8 @@
-import Konva from 'konva';
+import Konva from "konva";
 
-import IconRotate from '../../assets/icons/rotate.svg';
+import IconRotate from "../../assets/icons/rotate.svg";
 
-const EVENTS_NAME = 'tr-konva';
+const EVENTS_NAME = "tr-konva";
 
 // Copies of local methods from Konva's original implementation
 function getCenter(shape) {
@@ -76,9 +76,9 @@ class LSTransformer extends Konva.Transformer {
       this.add(rotateButton);
       rotateButton.moveToBottom(); // to not overlap other controls
 
-      rotateButton.on('mousedown touchstart', this.handleMouseDown);
+      rotateButton.on("mousedown touchstart", this.handleMouseDown);
 
-      rotateButton.on('mouseover', () => {
+      rotateButton.on("mouseover", () => {
         if (!this.isMouseDown) {
           this.getStage().content.style.cursor = `url(${IconRotate}) 16 16, pointer`;
         }
@@ -86,22 +86,22 @@ class LSTransformer extends Konva.Transformer {
         this.isMouseOver = true;
       });
 
-      rotateButton.on('mouseout', () => {
+      rotateButton.on("mouseout", () => {
         this.isMouseOver = false;
 
         if (!this.isMouseDown) {
-          this.getStage().content.style.cursor = '';
+          this.getStage().content.style.cursor = "";
         }
       });
 
-      rotateButton.on('dragstart', (e) => {
+      rotateButton.on("dragstart", (e) => {
         const anchorNode = this.findOne(`.${this._movingAnchorName}`);
 
         anchorNode.stopDrag();
         e.cancelBubble = true;
       });
 
-      rotateButton.on('dragend', (e) => {
+      rotateButton.on("dragend", (e) => {
         e.cancelBubble = true;
       });
     }
@@ -121,7 +121,7 @@ class LSTransformer extends Konva.Transformer {
 
     stage.content.style.cursor = `url(${IconRotate}) 16 16, pointer`;
     this.isMouseDown = true;
-    this._movingAnchorName = e.target.name().split(' ')[0];
+    this._movingAnchorName = e.target.name().split(" ")[0];
 
     // we save angle between vector to current pointer and shape rotation
     // and we keep this angle the same during mousemove by changing shape rotation
@@ -129,15 +129,15 @@ class LSTransformer extends Konva.Transformer {
     this.origin = origin;
 
     if (window) {
-      window.addEventListener('mousemove', this.handleMouseMove);
-      window.addEventListener('touchmove', this.handleMouseMove);
-      window.addEventListener('mouseup', this.handleMouseUp, true);
-      window.addEventListener('touchend', this.handleMouseUp, true);
+      window.addEventListener("mousemove", this.handleMouseMove);
+      window.addEventListener("touchmove", this.handleMouseMove);
+      window.addEventListener("mouseup", this.handleMouseUp, true);
+      window.addEventListener("touchend", this.handleMouseUp, true);
     }
 
-    this._fire('transformstart', { evt: e, target: this.getNode() });
+    this._fire("transformstart", { evt: e, target: this.getNode() });
     this._nodes.forEach((target) => {
-      target._fire('transformstart', { evt: e, target });
+      target._fire("transformstart", { evt: e, target });
     });
   };
 
@@ -146,25 +146,25 @@ class LSTransformer extends Konva.Transformer {
     this.origin = undefined;
 
     if (!this.isMouseOver) {
-      this.getStage().content.style.cursor = '';
+      this.getStage().content.style.cursor = "";
     }
 
     if (window) {
-      window.removeEventListener('mousemove', this.handleMouseMove);
-      window.removeEventListener('touchmove', this.handleMouseMove);
-      window.removeEventListener('mouseup', this.handleMouseUp, true);
-      window.removeEventListener('touchend', this.handleMouseUp, true);
+      window.removeEventListener("mousemove", this.handleMouseMove);
+      window.removeEventListener("touchmove", this.handleMouseMove);
+      window.removeEventListener("mouseup", this.handleMouseUp, true);
+      window.removeEventListener("touchend", this.handleMouseUp, true);
     }
 
     const node = this.getNode();
 
-    this._fire('transformend', { evt: e, target: node });
+    this._fire("transformend", { evt: e, target: node });
     if (node) {
       this._nodes.forEach((target) => {
-        target._fire('transformend', { evt: e, target });
+        target._fire("transformend", { evt: e, target });
       });
     }
-    this._movingAnchorName = '';
+    this._movingAnchorName = "";
   };
 
   handleMouseMove = (e) => {
@@ -197,19 +197,19 @@ class LSTransformer extends Konva.Transformer {
 
   refreshRotationList() {
     return {
-      'top-left': {
+      "top-left": {
         x: 0,
         y: 0,
       },
-      'top-right': {
+      "top-right": {
         x: this.getWidth(),
         y: 0,
       },
-      'bottom-left': {
+      "bottom-left": {
         x: 0,
         y: this.getHeight(),
       },
-      'bottom-right': {
+      "bottom-right": {
         x: this.getWidth(),
         y: this.getHeight(),
       },
@@ -271,8 +271,8 @@ class LSTransformer extends Konva.Transformer {
 
       outerBack
         .setAttrs({
-          x: (x - this.getStage().getAttr('x')) * scale.x,
-          y: (y - this.getStage().getAttr('y')) * scale.y,
+          x: (x - this.getStage().getAttr("x")) * scale.x,
+          y: (y - this.getStage().getAttr("y")) * scale.y,
           width: width * scale.x,
           height: height * scale.y,
           rotation,
@@ -285,4 +285,4 @@ class LSTransformer extends Konva.Transformer {
 
 Konva.LSTransformer = LSTransformer;
 
-export default 'LSTransformer';
+export default "LSTransformer";

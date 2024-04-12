@@ -1,32 +1,32 @@
-import { inject, observer } from 'mobx-react';
-import { useMemo, useState } from 'react';
-import { useWindowSize } from '../../common/Utils/useWindowSize';
-import { Block, Elem } from '../../utils/bem';
-import { isDefined } from '../../utils/utilities';
-import './FlyoutMenu.styl';
-import { Tool } from './Tool';
-import './Tool.styl';
-import './Toolbar.styl';
-import { ToolbarProvider } from './ToolbarContext';
+import { inject, observer } from "mobx-react";
+import { useMemo, useState } from "react";
+import { useWindowSize } from "../../common/Utils/useWindowSize";
+import { Block, Elem } from "../../utils/bem";
+import { isDefined } from "../../utils/utilities";
+import "./FlyoutMenu.styl";
+import { Tool } from "./Tool";
+import "./Tool.styl";
+import "./Toolbar.styl";
+import { ToolbarProvider } from "./ToolbarContext";
 
-export const Toolbar = inject('store')(
+export const Toolbar = inject("store")(
   observer(({ store, tools, expanded }) => {
     const [toolbar, setToolbar] = useState(null);
     const windowSize = useWindowSize();
 
     const alignment = useMemo(() => {
-      if (!isDefined(toolbar)) return 'right';
+      if (!isDefined(toolbar)) return "right";
 
       const bbox = toolbar.getBoundingClientRect();
 
       if (bbox.left < 200) {
-        return 'right';
+        return "right";
       }
       if (windowSize.width - bbox.right < 200) {
-        return 'left';
+        return "left";
       }
 
-      return 'right';
+      return "right";
     }, [toolbar, windowSize]);
 
     const toolGroups = tools
@@ -43,12 +43,12 @@ export const Toolbar = inject('store')(
 
     return (
       <ToolbarProvider value={{ expanded, alignment }}>
-        <Block ref={(el) => setToolbar(el)} name='toolbar' mod={{ alignment, expanded }}>
+        <Block ref={(el) => setToolbar(el)} name="toolbar" mod={{ alignment, expanded }}>
           {Object.entries(toolGroups).map(([name, tools], i) => {
             const visibleTools = tools.filter((t) => t.viewClass);
 
             return visibleTools.length ? (
-              <Elem name='group' key={`toolset-${name}-${i}`}>
+              <Elem name="group" key={`toolset-${name}-${i}`}>
                 {visibleTools
                   .sort((a, b) => a.index - b.index)
                   .map((tool, i) => {
@@ -80,16 +80,16 @@ const SmartTools = observer(({ tools }) => {
 
   return (
     tools.length > 0 && (
-      <Elem name='group'>
+      <Elem name="group">
         <Tool
           smart
-          label='Auto-Detect'
+          label="Auto-Detect"
           active={hasSelected}
           icon={selected.iconClass}
-          shortcut='M'
+          shortcut="M"
           extra={
             tools.length > 1 ? (
-              <Elem name='smart'>
+              <Elem name="smart">
                 {tools.map((t, i) => {
                   const ToolView = t.viewClass;
 

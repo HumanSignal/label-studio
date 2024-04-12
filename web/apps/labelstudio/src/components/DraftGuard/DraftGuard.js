@@ -1,9 +1,9 @@
-import { useContext, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
-import { ToastContext } from '../Toast/Toast';
+import { useContext, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
+import { ToastContext } from "../Toast/Toast";
 
-export const DRAFT_GUARD_KEY = 'DRAFT_GUARD';
+export const DRAFT_GUARD_KEY = "DRAFT_GUARD";
 
 export const draftGuardCallback = {
   current: null,
@@ -39,10 +39,10 @@ export const DraftGuard = () => {
             const status = res?.$meta?.status;
 
             if (status === 200 || status === 201) {
-              toast.show({ message: 'Draft saved successfully', type: 'info' });
+              toast.show({ message: "Draft saved successfully", type: "info" });
               unblock();
             } else if (status !== undefined) {
-              toast.show({ message: 'There was an error saving your draft', type: 'error' });
+              toast.show({ message: "There was an error saving your draft", type: "error" });
             } else {
               unblock();
             }

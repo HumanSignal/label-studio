@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { MIN_SIZE } from '../../tools/Base';
-import { FF_DEV_2671, FF_ZOOM_OPTIM, isFF } from '../../utils/feature-flags';
-import { getBoundingBoxAfterChanges } from '../../utils/image';
-import LSTransformer from './LSTransformer';
-import LSTransformerOld from './LSTransformerOld';
+import React, { Component } from "react";
+import { MIN_SIZE } from "../../tools/Base";
+import { FF_DEV_2671, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
+import { getBoundingBoxAfterChanges } from "../../utils/image";
+import LSTransformer from "./LSTransformer";
+import LSTransformerOld from "./LSTransformerOld";
 
 const EPSILON = 0.001;
 
@@ -61,11 +61,11 @@ export default class TransformerComponent extends Component {
       });
 
       if (!shapeContainer) return;
-      if (shapeContainer.hasName('_transformable')) selectedNodes.push(shapeContainer);
+      if (shapeContainer.hasName("_transformable")) selectedNodes.push(shapeContainer);
       if (!shapeContainer.find) return;
 
       const transformableElements = shapeContainer.find((node) => {
-        return node.hasName('_transformable');
+        return node.hasName("_transformable");
       }, true);
 
       selectedNodes.push(...transformableElements);
@@ -148,7 +148,7 @@ export default class TransformerComponent extends Component {
       const fixed = this.fitBBoxToScaledStage(clientRect, stageDimensions);
 
       // if bounding box is out of stage — do nothing
-      if (['x', 'y', 'width', 'height'].some((key) => Math.abs(fixed[key] - clientRect[key]) > EPSILON)) return oldBox;
+      if (["x", "y", "width", "height"].some((key) => Math.abs(fixed[key] - clientRect[key]) > EPSILON)) return oldBox;
       return newBox;
     }
     return this.fitBBoxToScaledStage(newBox, stageDimensions);

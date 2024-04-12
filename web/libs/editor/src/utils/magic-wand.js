@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 
-import chroma from 'chroma-js';
+import chroma from "chroma-js";
 
 // Magic Wand (Fuzzy Selection Tool) for Javascript
 //

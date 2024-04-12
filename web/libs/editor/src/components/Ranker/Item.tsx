@@ -1,11 +1,11 @@
-import { useContext, useMemo } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { useContext, useMemo } from "react";
+import { Draggable } from "react-beautiful-dnd";
 
-import { sanitizeHtml } from '../../utils/html';
-import { CollapsedContext } from './Ranker';
-import type { InputItem } from './createData';
+import { sanitizeHtml } from "../../utils/html";
+import { CollapsedContext } from "./Ranker";
+import type { InputItem } from "./createData";
 
-import styles from './Ranker.module.scss';
+import styles from "./Ranker.module.scss";
 
 interface ItemProps {
   item: InputItem;
@@ -21,11 +21,11 @@ const Item = (props: ItemProps) => {
   const { item, index, readonly } = props;
 
   // @todo document html parameter later after proper tests
-  const html = useMemo(() => (item.html ? sanitizeHtml(item.html) : ''), [item.html]);
+  const html = useMemo(() => (item.html ? sanitizeHtml(item.html) : ""), [item.html]);
   const [collapsible, collapsedMap, toggleCollapsed] = useContext(CollapsedContext);
   const collapsed = collapsedMap[item.id] ?? false;
   const toggle = collapsible ? () => toggleCollapsed(item.id, !collapsed) : undefined;
-  const classNames = [styles.item, 'htx-ranker-item'];
+  const classNames = [styles.item, "htx-ranker-item"];
 
   if (collapsible) classNames.push(collapsed ? styles.collapsed : styles.expanded);
 
@@ -37,7 +37,7 @@ const Item = (props: ItemProps) => {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             style={{ ...provided.draggableProps.style }}
-            className={classNames.join(' ')}
+            className={classNames.join(" ")}
             ref={provided.innerRef}
             data-ranker-id={item.id}
           >

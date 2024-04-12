@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
 export const SDKContext = React.createContext(null);
-SDKContext.displayName = 'SDK';
+SDKContext.displayName = "SDK";
 
 export const SDKProvider = ({ sdk, children }) => {
   return <SDKContext.Provider value={sdk}>{children}</SDKContext.Provider>;

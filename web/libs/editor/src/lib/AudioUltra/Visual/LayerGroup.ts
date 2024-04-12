@@ -1,4 +1,4 @@
-import { Layer, type RendererOptions } from './Layer';
+import { Layer, type RendererOptions } from "./Layer";
 
 export class LayerGroup extends Layer {
   layers: Layer[];

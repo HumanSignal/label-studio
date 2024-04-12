@@ -1,4 +1,4 @@
-import React, { type FC, memo, type MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { type FC, memo, type MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   IconBackward,
   IconChevronLeft,
@@ -14,18 +14,18 @@ import {
   IconPlay,
   IconPrev,
   IconRewind,
-} from '../../assets/icons/timeline';
-import { Button, type ButtonProps } from '../../common/Button/Button';
-import { Space } from '../../common/Space/Space';
-import { Block, Elem } from '../../utils/bem';
-import { FF_DEV_2715, isFF } from '../../utils/feature-flags';
-import { isDefined } from '../../utils/utilities';
-import { TimeDurationControl } from '../TimeDurationControl/TimeDurationControl';
-import { TimelineContext } from './Context';
-import './Controls.styl';
-import { AudioControl } from './Controls/AudioControl';
-import { ConfigControl } from './Controls/ConfigControl';
-import * as SideControls from './SideControls';
+} from "../../assets/icons/timeline";
+import { Button, type ButtonProps } from "../../common/Button/Button";
+import { Space } from "../../common/Space/Space";
+import { Block, Elem } from "../../utils/bem";
+import { FF_DEV_2715, isFF } from "../../utils/feature-flags";
+import { isDefined } from "../../utils/utilities";
+import { TimeDurationControl } from "../TimeDurationControl/TimeDurationControl";
+import { TimelineContext } from "./Context";
+import "./Controls.styl";
+import { AudioControl } from "./Controls/AudioControl";
+import { ConfigControl } from "./Controls/ConfigControl";
+import * as SideControls from "./SideControls";
 import type {
   TimelineControlsFormatterOptions,
   TimelineControlsProps,
@@ -33,7 +33,7 @@ import type {
   TimelineCustomControls,
   TimelineProps,
   TimelineStepFunction,
-} from './Types';
+} from "./Types";
 
 const positionFromTime = ({ time, fps }: TimelineControlsFormatterOptions) => {
   const roundedFps = Math.round(fps).toString();
@@ -41,7 +41,7 @@ const positionFromTime = ({ time, fps }: TimelineControlsFormatterOptions) => {
   const currentSecond = (time * 1000) % 1000;
   const result = Math.round(currentSecond / fpsMs).toString();
 
-  return result.padStart(roundedFps.length, '0');
+  return result.padStart(roundedFps.length, "0");
 };
 
 export const Controls: FC<TimelineControlsProps> = memo(
@@ -115,7 +115,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
 
     const renderControls = () => {
       return (
-        <Elem name='group' tag={Space} size='small' style={{ gridAutoColumns: 'auto' }}>
+        <Elem name="group" tag={Space} size="small" style={{ gridAutoColumns: "auto" }}>
           <ConfigControl
             onSetModal={onSetConfigModal}
             onAmpChange={props.onAmpChange}
@@ -144,23 +144,23 @@ export const Controls: FC<TimelineControlsProps> = memo(
     useEffect(() => {
       const keyboardHandler = (e: KeyboardEvent) => {
         if (!settings?.stepSize) return;
-        const altMode = e.key === 'Shift';
+        const altMode = e.key === "Shift";
 
-        if (e.type === 'keydown' && altMode && !altControlsMode) {
+        if (e.type === "keydown" && altMode && !altControlsMode) {
           setAltControlsMode(true);
-        } else if (e.type === 'keyup' && altMode && altControlsMode) {
+        } else if (e.type === "keyup" && altMode && altControlsMode) {
           setAltControlsMode(false);
         }
       };
 
-      document.addEventListener('keydown', keyboardHandler);
-      document.addEventListener('keyup', keyboardHandler);
-      document.addEventListener('click', closeModalHandler);
+      document.addEventListener("keydown", keyboardHandler);
+      document.addEventListener("keyup", keyboardHandler);
+      document.addEventListener("click", closeModalHandler);
 
       return () => {
-        document.removeEventListener('keydown', keyboardHandler);
-        document.removeEventListener('keyup', keyboardHandler);
-        document.removeEventListener('click', closeModalHandler);
+        document.removeEventListener("keydown", keyboardHandler);
+        document.removeEventListener("keyup", keyboardHandler);
+        document.removeEventListener("click", closeModalHandler);
       };
     }, [altControlsMode]);
 
@@ -169,11 +169,11 @@ export const Controls: FC<TimelineControlsProps> = memo(
     };
 
     return (
-      <Block name='timeline-controls' tag={Space} spread style={{ gridAutoColumns: 'auto' }}>
-        {isFF(FF_DEV_2715) && mediaType === 'audio' ? (
+      <Block name="timeline-controls" tag={Space} spread style={{ gridAutoColumns: "auto" }}>
+        {isFF(FF_DEV_2715) && mediaType === "audio" ? (
           renderControls()
         ) : (
-          <Elem name='group' tag={Space} size='small' style={{ gridAutoColumns: 'auto' }}>
+          <Elem name="group" tag={Space} size="small" style={{ gridAutoColumns: "auto" }}>
             {props.controls &&
               Object.entries(props.controls).map(([name, enabled]) => {
                 if (enabled === false) return;
@@ -196,11 +196,11 @@ export const Controls: FC<TimelineControlsProps> = memo(
             {customControls?.left}
           </Elem>
         )}
-        <Elem name='main-controls'>
-          <Elem name='group' tag={Space} collapsed>
+        <Elem name="main-controls">
+          <Elem name="group" tag={Space} collapsed>
             {extraControls}
           </Elem>
-          <Elem name='group' tag={Space} collapsed>
+          <Elem name="group" tag={Space} collapsed>
             {customControls?.leftCenter}
             <AltControls
               showAlterantive={altControlsMode && !disableFrames}
@@ -244,7 +244,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
               }
             />
             <ControlButton
-              data-testid={`playback-button:${playing ? 'pause' : 'play'}`}
+              data-testid={`playback-button:${playing ? "pause" : "play"}`}
               onClick={handlePlay}
               hotkey={settings?.playpauseHotkey}
             >
@@ -290,22 +290,22 @@ export const Controls: FC<TimelineControlsProps> = memo(
             />
             {customControls?.rightCenter}
           </Elem>
-          <Elem name='group' tag={Space} collapsed>
+          <Elem name="group" tag={Space} collapsed>
             {!disableFrames && allowViewCollapse && (
-              <ControlButton tooltip='Toggle Timeline' onClick={() => onToggleCollapsed?.(!collapsed)}>
+              <ControlButton tooltip="Toggle Timeline" onClick={() => onToggleCollapsed?.(!collapsed)}>
                 {collapsed ? <IconExpand /> : <IconCollapse />}
               </ControlButton>
             )}
             {allowFullscreen && (
-              <ControlButton tooltip='Fullscreen' onClick={() => onFullScreenToggle?.(false)}>
+              <ControlButton tooltip="Fullscreen" onClick={() => onFullScreenToggle?.(false)}>
                 {fullscreen ? <IconFullscreenExit /> : <IconFullscreen />}
               </ControlButton>
             )}
           </Elem>
         </Elem>
 
-        <Elem name='group' tag={Space} size='small'>
-          {isFF(FF_DEV_2715) && mediaType === 'audio' ? (
+        <Elem name="group" tag={Space} size="small">
+          {isFF(FF_DEV_2715) && mediaType === "audio" ? (
             <>
               {customControls?.right}
               <TimeDurationControl
@@ -339,7 +339,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
 
 export const ControlButton: FC<ButtonProps & { disabled?: boolean }> = ({ children, ...props }) => {
   return (
-    <Button {...props} type='text' style={{ width: 36, height: 36, padding: 0 }}>
+    <Button {...props} type="text" style={{ width: 36, height: 36, padding: 0 }}>
       {children}
     </Button>
   );
@@ -351,7 +351,7 @@ interface TimeDisplay {
   duration: number;
   framerate: number;
   length: number;
-  formatPosition?: TimelineProps['formatPosition'];
+  formatPosition?: TimelineProps["formatPosition"];
 }
 
 const TimeDisplay: FC<TimeDisplay> = ({ currentTime, position, duration, framerate, length, formatPosition }) => {
@@ -362,11 +362,11 @@ const TimeDisplay: FC<TimeDisplay> = ({ currentTime, position, duration, framera
   const totalTimeFormatted = formatter({ time: duration, ...commonOptions });
 
   return (
-    <Elem name='time'>
-      <Elem name='time-section'>
+    <Elem name="time">
+      <Elem name="time-section">
         <Time time={currentTime} position={currentTimeFormatted} />
       </Elem>
-      <Elem name='time-section'>
+      <Elem name="time-section">
         <Time time={Math.max(duration, 0)} position={totalTimeFormatted} />
       </Elem>
     </Elem>
@@ -397,7 +397,7 @@ const AltControls: FC<AltControlsProps> = (props) => {
   return props.showAlterantive ? props.alt : props.main;
 };
 
-type ControlGroups = Record<TimelineCustomControls['position'], JSX.Element[]>;
+type ControlGroups = Record<TimelineCustomControls["position"], JSX.Element[]>;
 
 const useCustomControls = (customControls?: TimelineCustomControls[]): ControlGroups | null => {
   if (!customControls) return null;

@@ -1,12 +1,12 @@
-import { types } from 'mobx-state-tree';
-import { User } from './Users';
-import { StringOrNumberID } from './types';
+import { types } from "mobx-state-tree";
+import { User } from "./Users";
+import { StringOrNumberID } from "./types";
 
 export const Assignee = types
-  .model('Assignee', {
+  .model("Assignee", {
     id: StringOrNumberID,
     user: types.late(() => types.reference(User)),
-    review: types.maybeNull(types.enumeration(['accepted', 'rejected', 'fixed'])),
+    review: types.maybeNull(types.enumeration(["accepted", "rejected", "fixed"])),
     reviewed: types.maybeNull(types.boolean),
     annotated: types.maybeNull(types.boolean),
   })
@@ -39,7 +39,7 @@ export const Assignee = types
   .preProcessSnapshot((sn) => {
     let result = sn;
 
-    if (typeof sn === 'number') {
+    if (typeof sn === "number") {
       result = {
         id: sn,
         user: sn,

@@ -1,10 +1,10 @@
-import { flow, getEnv, types } from 'mobx-state-tree';
-import Utils from '../../utils';
-import { camelizeKeys } from '../../utils/utilities';
-import { UserExtended } from '../UserStore';
+import { flow, getEnv, types } from "mobx-state-tree";
+import Utils from "../../utils";
+import { camelizeKeys } from "../../utils/utilities";
+import { UserExtended } from "../UserStore";
 
 export const Comment = types
-  .model('Comment', {
+  .model("Comment", {
     id: types.identifierNumber,
     text: types.string,
     createdAt: types.optional(types.string, Utils.UDate.currentISODate()),
@@ -34,7 +34,7 @@ export const Comment = types
       self.isResolved = !self.isResolved;
 
       try {
-        yield self.sdk.invoke('comments:update', {
+        yield self.sdk.invoke("comments:update", {
           id: self.id,
           is_resolved: self.isResolved,
         });
@@ -58,7 +58,7 @@ export const Comment = types
 
     const updateComment = flow(function* (comment) {
       if (self.isPersisted && !self.isDeleted) {
-        yield self.sdk.invoke('comments:update', {
+        yield self.sdk.invoke("comments:update", {
           id: self.id,
           text: comment,
         });
@@ -69,7 +69,7 @@ export const Comment = types
 
     const deleteComment = flow(function* () {
       if (self.isPersisted && !self.isDeleted && self.isConfirmDelete) {
-        yield self.sdk.invoke('comments:delete', {
+        yield self.sdk.invoke("comments:delete", {
           id: self.id,
         });
       }

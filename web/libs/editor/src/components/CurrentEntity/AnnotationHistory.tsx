@@ -1,7 +1,7 @@
-import { Tooltip } from 'antd';
-import { when } from 'mobx';
-import { inject, observer } from 'mobx-react';
-import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Tooltip } from "antd";
+import { when } from "mobx";
+import { inject, observer } from "mobx-react";
+import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   IconAnnotationAccepted,
   IconAnnotationImported,
@@ -14,25 +14,25 @@ import {
   IconCheck,
   IconDraftCreated,
   LsSparks,
-} from '../../assets/icons';
-import { Space } from '../../common/Space/Space';
-import { Userpic } from '../../common/Userpic/Userpic';
-import { Block, Elem } from '../../utils/bem';
-import { humanDateDiff, userDisplayName } from '../../utils/utilities';
-import './AnnotationHistory.styl';
+} from "../../assets/icons";
+import { Space } from "../../common/Space/Space";
+import { Userpic } from "../../common/Userpic/Userpic";
+import { Block, Elem } from "../../utils/bem";
+import { humanDateDiff, userDisplayName } from "../../utils/utilities";
+import "./AnnotationHistory.styl";
 
 type HistoryItemType =
-  | 'prediction'
-  | 'imported'
-  | 'submitted'
-  | 'updated'
-  | 'skipped'
-  | 'accepted'
-  | 'rejected'
-  | 'fixed_and_accepted'
-  | 'draft_created'
-  | 'deleted_review'
-  | 'propagated_annotation';
+  | "prediction"
+  | "imported"
+  | "submitted"
+  | "updated"
+  | "skipped"
+  | "accepted"
+  | "rejected"
+  | "fixed_and_accepted"
+  | "draft_created"
+  | "deleted_review"
+  | "propagated_annotation";
 
 const injector = inject(({ store }) => {
   const as = store.annotationStore;
@@ -66,27 +66,27 @@ const DraftState: FC<{
 
   return (
     <HistoryItem
-      key='draft'
+      key="draft"
       user={annotation.user ?? { email: annotation.createdBy }}
       date={annotation.draftSaved}
       extra={
         annotation.isDraftSaving ? (
-          <Elem name='saving'>
-            <Elem name='spin' />
+          <Elem name="saving">
+            <Elem name="spin" />
           </Elem>
         ) : hasUnsavedChanges ? (
-          <Elem name='saving'>
-            <Elem name='dot' />
+          <Elem name="saving">
+            <Elem name="dot" />
           </Elem>
         ) : hasChanges ? (
-          <Elem name='saving'>
-            <Elem name='saved' component={IconCheck} />
+          <Elem name="saving">
+            <Elem name="saved" component={IconCheck} />
           </Elem>
         ) : null
       }
       inline={inline}
-      comment=''
-      acceptedState='draft_created'
+      comment=""
+      acceptedState="draft_created"
       selected={isSelected}
       onClick={() => {
         store.selectHistory(null);
@@ -113,7 +113,7 @@ const AnnotationHistoryComponent: FC<any> = ({
     !annotationStore.selectedHistory && (annotation.draftSelected || (!annotation.versions.draft && hasChanges));
 
   return (
-    <Block name='annotation-history' mod={{ inline }}>
+    <Block name="annotation-history" mod={{ inline }}>
       {showDraft && <DraftState annotation={annotation} isSelected={isDraftSelected} inline={inline} />}
 
       {enabled &&
@@ -184,32 +184,32 @@ const HistoryItemComponent: FC<{
   inline = false,
   onClick,
 }) => {
-  const isPrediction = entity?.type === 'prediction';
+  const isPrediction = entity?.type === "prediction";
 
   const reason = useMemo(() => {
     switch (acceptedState) {
-      case 'accepted':
-        return 'Accepted';
-      case 'rejected':
-        return 'Rejected';
-      case 'fixed_and_accepted':
-        return 'Fixed';
-      case 'updated':
-        return 'Updated';
-      case 'submitted':
-        return 'Submitted';
-      case 'prediction':
-        return 'From prediction';
-      case 'imported':
-        return 'Imported';
-      case 'skipped':
-        return 'Skipped';
-      case 'draft_created':
-        return 'Draft';
-      case 'deleted_review':
-        return 'Review deleted';
-      case 'propagated_annotation':
-        return 'Propagated';
+      case "accepted":
+        return "Accepted";
+      case "rejected":
+        return "Rejected";
+      case "fixed_and_accepted":
+        return "Fixed";
+      case "updated":
+        return "Updated";
+      case "submitted":
+        return "Submitted";
+      case "prediction":
+        return "From prediction";
+      case "imported":
+        return "Imported";
+      case "skipped":
+        return "Skipped";
+      case "draft_created":
+        return "Draft";
+      case "deleted_review":
+        return "Review deleted";
+      case "propagated_annotation":
+        return "Propagated";
       default:
         return null;
     }
@@ -225,29 +225,29 @@ const HistoryItemComponent: FC<{
   );
 
   return (
-    <Block name='history-item' mod={{ inline, selected, disabled }} onClick={handleClick}>
-      <Space spread size='medium' truncated>
-        <Space size='small' truncated>
+    <Block name="history-item" mod={{ inline, selected, disabled }} onClick={handleClick}>
+      <Space spread size="medium" truncated>
+        <Space size="small" truncated>
           <Elem
             tag={Userpic}
             user={user}
-            name='userpic'
+            name="userpic"
             showUsername
             username={isPrediction ? entity.createdBy : null}
             mod={{ prediction: isPrediction }}
           >
             {isPrediction && <LsSparks style={{ width: 16, height: 16 }} />}
           </Elem>
-          <Elem name='name' tag='span'>
+          <Elem name="name" tag="span">
             {isPrediction ? entity.createdBy : userDisplayName(user)}
           </Elem>
         </Space>
 
-        <Space size='small'>
-          {extra && <Elem name='date'>{extra}</Elem>}
+        <Space size="small">
+          {extra && <Elem name="date">{extra}</Elem>}
           {date && (
-            <Elem name='date'>
-              <Tooltip placement='topRight' title={new Date(date).toLocaleString()}>
+            <Elem name="date">
+              <Tooltip placement="topRight" title={new Date(date).toLocaleString()}>
                 {humanDateDiff(date)}
               </Tooltip>
             </Elem>
@@ -255,7 +255,7 @@ const HistoryItemComponent: FC<{
         </Space>
       </Space>
       {(reason || comment) && (
-        <Elem name='action' tag={Space} size='small'>
+        <Elem name="action" tag={Space} size="small">
           {acceptedState && <HistoryIcon type={acceptedState} />}
           <HistoryComment comment={comment} reason={reason} />
         </Elem>
@@ -284,21 +284,21 @@ const HistoryComment: FC<{
   }, []);
 
   return (
-    <Elem name='comment' ref={commentRef} mod={{ collapsed }}>
-      <Elem name='comment-content' data-reason={`${reason}${comment ? ': ' : ''}`}>
+    <Elem name="comment" ref={commentRef} mod={{ collapsed }}>
+      <Elem name="comment-content" data-reason={`${reason}${comment ? ": " : ""}`}>
         {comment}
       </Elem>
 
       {collapsible && (
         <Elem
-          name='collapse-comment'
+          name="collapse-comment"
           mod={{ collapsed }}
           onClick={(e: MouseEvent) => {
             e.stopPropagation();
             setCollapsed((v) => !v);
           }}
         >
-          {collapsed ? 'Show more' : 'Show less'}
+          {collapsed ? "Show more" : "Show less"}
         </Elem>
       )}
     </Elem>
@@ -308,40 +308,40 @@ const HistoryComment: FC<{
 const HistoryIcon: FC<{ type: HistoryItemType }> = ({ type }) => {
   const icon = useMemo(() => {
     switch (type) {
-      case 'submitted':
-        return <IconAnnotationSubmitted style={{ color: '#0099FF' }} />;
-      case 'updated':
-        return <IconAnnotationSubmitted style={{ color: '#0099FF' }} />;
-      case 'draft_created':
-        return <IconDraftCreated style={{ color: '#0099FF' }} />;
-      case 'accepted':
-        return <IconAnnotationAccepted style={{ color: '#2AA000' }} />;
-      case 'rejected':
-        return <IconAnnotationRejected style={{ color: '#dd0000' }} />;
-      case 'fixed_and_accepted':
-        return <IconAnnotationAccepted style={{ color: '#FA8C16' }} />;
-      case 'prediction':
-        return <IconAnnotationPrediction style={{ color: '#944BFF' }} />;
-      case 'imported':
-        return <IconAnnotationImported style={{ color: '#2AA000' }} />;
-      case 'skipped':
-        return <IconAnnotationSkipped style={{ color: '#dd0000' }} />;
-      case 'deleted_review':
-        return <IconAnnotationReviewRemoved style={{ color: '#dd0000' }} />;
-      case 'propagated_annotation':
-        return <IconAnnotationPropagated style={{ color: '#2AA000' }} />;
+      case "submitted":
+        return <IconAnnotationSubmitted style={{ color: "#0099FF" }} />;
+      case "updated":
+        return <IconAnnotationSubmitted style={{ color: "#0099FF" }} />;
+      case "draft_created":
+        return <IconDraftCreated style={{ color: "#0099FF" }} />;
+      case "accepted":
+        return <IconAnnotationAccepted style={{ color: "#2AA000" }} />;
+      case "rejected":
+        return <IconAnnotationRejected style={{ color: "#dd0000" }} />;
+      case "fixed_and_accepted":
+        return <IconAnnotationAccepted style={{ color: "#FA8C16" }} />;
+      case "prediction":
+        return <IconAnnotationPrediction style={{ color: "#944BFF" }} />;
+      case "imported":
+        return <IconAnnotationImported style={{ color: "#2AA000" }} />;
+      case "skipped":
+        return <IconAnnotationSkipped style={{ color: "#dd0000" }} />;
+      case "deleted_review":
+        return <IconAnnotationReviewRemoved style={{ color: "#dd0000" }} />;
+      case "propagated_annotation":
+        return <IconAnnotationPropagated style={{ color: "#2AA000" }} />;
       default:
         return null;
     }
   }, [type]);
 
-  return icon && <Elem name='history-icon'>{icon}</Elem>;
+  return icon && <Elem name="history-icon">{icon}</Elem>;
 };
 
 const HistoryItem = observer(HistoryItemComponent);
 
-HistoryItem.displayName = 'HistoryItem';
+HistoryItem.displayName = "HistoryItem";
 
 export const AnnotationHistory = injector(observer(AnnotationHistoryComponent));
 
-AnnotationHistory.displayName = 'AnnotationHistory';
+AnnotationHistory.displayName = "AnnotationHistory";

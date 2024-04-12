@@ -1,14 +1,14 @@
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React from 'react';
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import { guidGenerator } from '../../core/Helpers';
-import Registry from '../../core/Registry';
-import Types from '../../core/Types';
-import LabelMixin from '../../mixins/LabelMixin';
-import SelectedModelMixin from '../../mixins/SelectedModel';
-import ControlBase from './Base';
-import { HtxLabels, LabelsModel } from './Labels/Labels';
+import { guidGenerator } from "../../core/Helpers";
+import Registry from "../../core/Registry";
+import Types from "../../core/Types";
+import LabelMixin from "../../mixins/LabelMixin";
+import SelectedModelMixin from "../../mixins/SelectedModel";
+import ControlBase from "./Base";
+import { HtxLabels, LabelsModel } from "./Labels/Labels";
 
 /**
  * The `ParagraphLabels` tag creates labeled paragraphs. Use with the `Paragraphs` tag to label a paragraph of text.
@@ -34,10 +34,10 @@ import { HtxLabels, LabelsModel } from './Labels/Labels';
  */
 
 const ModelAttrs = types
-  .model('ParagraphLabelsModel', {
+  .model("ParagraphLabelsModel", {
     pid: types.optional(types.string, guidGenerator),
-    type: 'paragraphlabels',
-    children: Types.unionArray(['label', 'header', 'view', 'hypertext']),
+    type: "paragraphlabels",
+    children: Types.unionArray(["label", "header", "view", "hypertext"]),
   })
   .views((self) => ({
     get hasStates() {
@@ -55,22 +55,22 @@ const ModelAttrs = types
     },
   }));
 
-const Model = LabelMixin.props({ _type: 'paragraphlabels' });
+const Model = LabelMixin.props({ _type: "paragraphlabels" });
 
 const Composition = types.compose(
   ControlBase,
   LabelsModel,
   ModelAttrs,
   Model,
-  SelectedModelMixin.props({ _child: 'LabelModel' }),
+  SelectedModelMixin.props({ _child: "LabelModel" }),
 );
 
-const ParagraphLabelsModel = types.compose('ParagraphLabelsModel', Composition);
+const ParagraphLabelsModel = types.compose("ParagraphLabelsModel", Composition);
 
 const HtxParagraphLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
 });
 
-Registry.addTag('paragraphlabels', ParagraphLabelsModel, HtxParagraphLabels);
+Registry.addTag("paragraphlabels", ParagraphLabelsModel, HtxParagraphLabels);
 
 export { HtxParagraphLabels, ParagraphLabelsModel };

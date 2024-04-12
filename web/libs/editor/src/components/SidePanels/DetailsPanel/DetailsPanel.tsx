@@ -1,17 +1,17 @@
-import { inject, observer } from 'mobx-react';
-import type { FC } from 'react';
-import { Block, Elem } from '../../../utils/bem';
-import { FF_DEV_2290, isFF } from '../../../utils/feature-flags';
-import { Comments as CommentsComponent } from '../../Comments/Comments';
-import { AnnotationHistory } from '../../CurrentEntity/AnnotationHistory';
+import { inject, observer } from "mobx-react";
+import type { FC } from "react";
+import { Block, Elem } from "../../../utils/bem";
+import { FF_DEV_2290, isFF } from "../../../utils/feature-flags";
+import { Comments as CommentsComponent } from "../../Comments/Comments";
+import { AnnotationHistory } from "../../CurrentEntity/AnnotationHistory";
 // eslint-disable-next-line
 // @ts-ignore
-import { DraftPanel } from '../../DraftPanel/DraftPanel';
-import { PanelBase, type PanelProps } from '../PanelBase';
-import './DetailsPanel.styl';
-import { RegionDetailsMain, RegionDetailsMeta } from './RegionDetails';
-import { RegionItem } from './RegionItem';
-import { Relations as RelationsComponent } from './Relations';
+import { DraftPanel } from "../../DraftPanel/DraftPanel";
+import { PanelBase, type PanelProps } from "../PanelBase";
+import "./DetailsPanel.styl";
+import { RegionDetailsMain, RegionDetailsMeta } from "./RegionDetails";
+import { RegionItem } from "./RegionItem";
+import { Relations as RelationsComponent } from "./Relations";
 interface DetailsPanelProps extends PanelProps {
   regions: any;
   selection: any;
@@ -21,7 +21,7 @@ const DetailsPanelComponent: FC<DetailsPanelProps> = ({ currentEntity, regions, 
   const selectedRegions = regions.selection;
 
   return (
-    <PanelBase {...props} currentEntity={currentEntity} name='details' title='Details'>
+    <PanelBase {...props} currentEntity={currentEntity} name="details" title="Details">
       <Content selection={selectedRegions} currentEntity={currentEntity} />
     </PanelBase>
   );
@@ -31,7 +31,7 @@ const DetailsComponent: FC<DetailsPanelProps> = ({ currentEntity, regions }) => 
   const selectedRegions = regions.selection;
 
   return (
-    <Block name='details-tab'>
+    <Block name="details-tab">
       <Content selection={selectedRegions} currentEntity={currentEntity} />
     </Block>
   );
@@ -41,14 +41,14 @@ const Content: FC<any> = observer(({ selection, currentEntity }) => {
   return <>{selection.size ? <RegionsPanel regions={selection} /> : <GeneralPanel currentEntity={currentEntity} />}</>;
 });
 
-const CommentsTab: FC<any> = inject('store')(
+const CommentsTab: FC<any> = inject("store")(
   observer(({ store }) => {
     return (
       <>
-        {store.hasInterface('annotations:comments') && store.commentStore.isCommentable && (
-          <Block name='comments-panel'>
-            <Elem name='section-tab'>
-              <Elem name='section-content'>
+        {store.hasInterface("annotations:comments") && store.commentStore.isCommentable && (
+          <Block name="comments-panel">
+            <Elem name="section-tab">
+              <Elem name="section-content">
                 <CommentsComponent
                   annotationStore={store.annotationStore}
                   commentStore={store.commentStore}
@@ -63,16 +63,16 @@ const CommentsTab: FC<any> = inject('store')(
   }),
 );
 
-const RelationsTab: FC<any> = inject('store')(
+const RelationsTab: FC<any> = inject("store")(
   observer(({ currentEntity }) => {
     const { relationStore } = currentEntity;
 
     return (
       <>
-        <Block name='relations'>
-          <Elem name='section-tab'>
-            <Elem name='section-head'>Relations ({relationStore.size})</Elem>
-            <Elem name='section-content'>
+        <Block name="relations">
+          <Elem name="section-tab">
+            <Elem name="section-head">Relations ({relationStore.size})</Elem>
+            <Elem name="section-content">
               <RelationsComponent relationStore={relationStore} />
             </Elem>
           </Elem>
@@ -82,23 +82,23 @@ const RelationsTab: FC<any> = inject('store')(
   }),
 );
 
-const HistoryTab: FC<any> = inject('store')(
+const HistoryTab: FC<any> = inject("store")(
   observer(({ store, currentEntity }) => {
-    const showAnnotationHistory = store.hasInterface('annotations:history');
+    const showAnnotationHistory = store.hasInterface("annotations:history");
     const showDraftInHistory = isFF(FF_DEV_2290);
 
     return (
       <>
-        <Block name='history'>
+        <Block name="history">
           {!showDraftInHistory ? (
             <DraftPanel item={currentEntity} />
           ) : (
-            <Elem name='section-tab'>
-              <Elem name='section-head'>
+            <Elem name="section-tab">
+              <Elem name="section-head">
                 Annotation History
                 <span>#{currentEntity.pk ?? currentEntity.id}</span>
               </Elem>
-              <Elem name='section-content'>
+              <Elem name="section-content">
                 <AnnotationHistory inline showDraft={showDraftInHistory} enabled={showAnnotationHistory} />
               </Elem>
             </Elem>
@@ -109,13 +109,13 @@ const HistoryTab: FC<any> = inject('store')(
   }),
 );
 
-const InfoTab: FC<any> = inject('store')(
+const InfoTab: FC<any> = inject("store")(
   observer(({ selection }) => {
     return (
       <>
-        <Block name='info'>
-          <Elem name='section-tab'>
-            <Elem name='section-head'>Selection Details</Elem>
+        <Block name="info">
+          <Elem name="section-tab">
+            <Elem name="section-head">Selection Details</Elem>
             <RegionsPanel regions={selection} />
           </Elem>
         </Block>
@@ -124,10 +124,10 @@ const InfoTab: FC<any> = inject('store')(
   }),
 );
 
-const GeneralPanel: FC<any> = inject('store')(
+const GeneralPanel: FC<any> = inject("store")(
   observer(({ store, currentEntity }) => {
     const { relationStore } = currentEntity;
-    const showAnnotationHistory = store.hasInterface('annotations:history');
+    const showAnnotationHistory = store.hasInterface("annotations:history");
     const showDraftInHistory = isFF(FF_DEV_2290);
 
     return (
@@ -135,26 +135,26 @@ const GeneralPanel: FC<any> = inject('store')(
         {!showDraftInHistory ? (
           <DraftPanel item={currentEntity} />
         ) : (
-          <Elem name='section'>
-            <Elem name='section-head'>
+          <Elem name="section">
+            <Elem name="section-head">
               Annotation History
               <span>#{currentEntity.pk ?? currentEntity.id}</span>
             </Elem>
-            <Elem name='section-content'>
+            <Elem name="section-content">
               <AnnotationHistory inline showDraft={showDraftInHistory} enabled={showAnnotationHistory} />
             </Elem>
           </Elem>
         )}
-        <Elem name='section'>
-          <Elem name='section-head'>Relations ({relationStore.size})</Elem>
-          <Elem name='section-content'>
+        <Elem name="section">
+          <Elem name="section-head">Relations ({relationStore.size})</Elem>
+          <Elem name="section-content">
             <RelationsComponent relationStore={relationStore} />
           </Elem>
         </Elem>
-        {store.hasInterface('annotations:comments') && store.commentStore.isCommentable && (
-          <Elem name='section'>
-            <Elem name='section-head'>Comments</Elem>
-            <Elem name='section-content'>
+        {store.hasInterface("annotations:comments") && store.commentStore.isCommentable && (
+          <Elem name="section">
+            <Elem name="section-head">Comments</Elem>
+            <Elem name="section-content">
               <CommentsComponent
                 annotationStore={store.annotationStore}
                 commentStore={store.commentStore}
@@ -168,7 +168,7 @@ const GeneralPanel: FC<any> = inject('store')(
   }),
 );
 
-GeneralPanel.displayName = 'GeneralPanel';
+GeneralPanel.displayName = "GeneralPanel";
 
 const RegionsPanel: FC<{ regions: any }> = observer(({ regions }) => {
   return (

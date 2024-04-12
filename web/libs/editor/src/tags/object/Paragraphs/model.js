@@ -1,19 +1,19 @@
-import { getRoot, types } from 'mobx-state-tree';
-import ColorScheme from 'pleasejs';
-import { createRef } from 'react';
+import { getRoot, types } from "mobx-state-tree";
+import ColorScheme from "pleasejs";
+import { createRef } from "react";
 
-import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
-import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
-import RegionsMixin from '../../../mixins/Regions';
-import { SyncableMixin } from '../../../mixins/Syncable';
-import { ParagraphsRegionModel } from '../../../regions/ParagraphsRegion';
-import Utils from '../../../utils';
-import { parseValue } from '../../../utils/data';
-import { FF_DEV_2669, FF_DEV_2918, FF_DEV_3666, FF_LSDV_E_278, isFF } from '../../../utils/feature-flags';
-import messages from '../../../utils/messages';
-import { clamp, isDefined, isValidObjectURL } from '../../../utils/utilities';
-import ObjectBase from '../Base';
-import styles from './Paragraphs.module.scss';
+import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
+import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
+import RegionsMixin from "../../../mixins/Regions";
+import { SyncableMixin } from "../../../mixins/Syncable";
+import { ParagraphsRegionModel } from "../../../regions/ParagraphsRegion";
+import Utils from "../../../utils";
+import { parseValue } from "../../../utils/data";
+import { FF_DEV_2669, FF_DEV_2918, FF_DEV_3666, FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
+import messages from "../../../utils/messages";
+import { clamp, isDefined, isValidObjectURL } from "../../../utils/utilities";
+import ObjectBase from "../Base";
+import styles from "./Paragraphs.module.scss";
 
 /**
  * The `Paragraphs` tag displays paragraphs of text on the labeling interface. Use to label dialogue transcripts for NLP and NER projects.
@@ -69,30 +69,30 @@ import styles from './Paragraphs.module.scss';
  * @param {string} [textKey=text]         - The key field to use for the text
  * @param {boolean} [contextScroll=false] - Turn on contextual scroll mode
  */
-const TagAttrs = types.model('ParagraphsModel', {
+const TagAttrs = types.model("ParagraphsModel", {
   value: types.maybeNull(types.string),
-  valuetype: types.optional(types.enumeration(['json', 'url']), () => (window.LS_SECURE_MODE ? 'url' : 'json')),
+  valuetype: types.optional(types.enumeration(["json", "url"]), () => (window.LS_SECURE_MODE ? "url" : "json")),
   audiourl: types.maybeNull(types.string),
   showplayer: false,
 
   highlightcolor: types.maybeNull(types.string),
   showlabels: types.optional(types.boolean, false),
 
-  layout: types.optional(types.enumeration(['none', 'dialogue']), 'none'),
+  layout: types.optional(types.enumeration(["none", "dialogue"]), "none"),
 
   // @todo add `valueType=url` to Paragraphs and make autodetection of `savetextresult`
-  savetextresult: types.optional(types.enumeration(['none', 'no', 'yes']), () =>
-    window.LS_SECURE_MODE ? 'no' : 'yes',
+  savetextresult: types.optional(types.enumeration(["none", "no", "yes"]), () =>
+    window.LS_SECURE_MODE ? "no" : "yes",
   ),
 
-  namekey: types.optional(types.string, 'author'),
-  textkey: types.optional(types.string, 'text'),
+  namekey: types.optional(types.string, "author"),
+  textkey: types.optional(types.string, "text"),
   contextscroll: types.optional(types.boolean, false),
 });
 
 const Model = types
-  .model('ParagraphsModel', {
-    type: 'paragraphs',
+  .model("ParagraphsModel", {
+    type: "paragraphs",
     _update: types.optional(types.number, 1),
   })
   .views((self) => ({
@@ -108,7 +108,7 @@ const Model = types
 
     get audio() {
       if (!self.audiourl) return null;
-      if (self.audiourl[0] === '$') {
+      if (self.audiourl[0] === "$") {
         const store = getRoot(self);
         const val = self.audiourl.substr(1);
 
@@ -118,21 +118,21 @@ const Model = types
     },
 
     layoutStyles(data) {
-      if (self.layout === 'dialogue') {
+      if (self.layout === "dialogue") {
         const seed = data[self.namekey];
         const color = ColorScheme.make_color({ seed })[0];
 
         if (isFF(FF_LSDV_E_278)) {
           return {
             phrase: {
-              '--highlight-color': color,
-              '--background-color': '#FFF',
+              "--highlight-color": color,
+              "--background-color": "#FFF",
             },
             name: { color },
             inactive: {
               phrase: {
-                '--highlight-color': Utils.Colors.convertToRGBA(color, 0.4),
-                '--background-color': '#FAFAFA',
+                "--highlight-color": Utils.Colors.convertToRGBA(color, 0.4),
+                "--background-color": "#FAFAFA",
               },
               name: { color: Utils.Colors.convertToRGBA(color, 0.9) },
             },
@@ -147,7 +147,7 @@ const Model = types
     },
 
     get layoutClasses() {
-      if (self.layout === 'dialogue') {
+      if (self.layout === "dialogue") {
         return {
           phrase: styles.phrase,
           name: styles.dialoguename,
@@ -169,7 +169,7 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states && states.filter((s) => s.isSelected && s._type === 'paragraphlabels');
+      return states && states.filter((s) => s.isSelected && s._type === "paragraphlabels");
     },
 
     isVisibleForAuthorFilter(data) {
@@ -184,7 +184,7 @@ const PlayableAndSyncable = types
   .volatile(() => ({
     _value: null,
     filterByAuthor: [],
-    searchAuthor: '',
+    searchAuthor: "",
     playingId: -1,
     playing: false, // just internal state for UI
     audioRef: createRef(),
@@ -253,10 +253,10 @@ const PlayableAndSyncable = types
     },
 
     registerSyncHandlers() {
-      self.syncHandlers.set('pause', self.stopNow);
-      self.syncHandlers.set('play', self.handleSyncPlay);
-      self.syncHandlers.set('seek', self.handleSyncPlay);
-      self.syncHandlers.set('speed', self.handleSyncSpeed);
+      self.syncHandlers.set("pause", self.stopNow);
+      self.syncHandlers.set("play", self.handleSyncPlay);
+      self.syncHandlers.set("seek", self.handleSyncPlay);
+      self.syncHandlers.set("speed", self.handleSyncSpeed);
     },
 
     handleSyncPlay({ time, playing }) {
@@ -309,7 +309,7 @@ const PlayableAndSyncable = types
 
       audio.pause();
       self.playing = false;
-      self.triggerSync('pause');
+      self.triggerSync("pause");
     },
 
     /**
@@ -367,7 +367,7 @@ const PlayableAndSyncable = types
 
       if (isPaused) {
         audio.play();
-        self.triggerSync('play');
+        self.triggerSync("play");
       }
 
       self.playing = true;
@@ -400,7 +400,7 @@ const PlayableAndSyncable = types
       audio.play();
       self.playing = true;
       self.playingId = idx;
-      self.triggerSync('play');
+      self.triggerSync("play");
       self.trackPlayingId();
     },
   }))
@@ -422,7 +422,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
   updateValue(store) {
     const value = parseValue(self.value, store.task.dataObj);
 
-    if (self.valuetype === 'url') {
+    if (self.valuetype === "url") {
       const url = value;
 
       if (!isValidObjectURL(url, true)) {
@@ -435,8 +435,8 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
           message.push(`URL is empty, check ${value} in data JSON.`);
         }
         if (window.LS_SECURE_MODE) message.unshift('In SECURE MODE valuetype set to "url" by default.');
-        store.annotationStore.addErrors([errorBuilder.generalError(message.join('\n'))]);
-        self.setRemoteValue('');
+        store.annotationStore.addErrors([errorBuilder.generalError(message.join("\n"))]);
+        self.setRemoteValue("");
         return;
       }
       fetch(url)
@@ -449,7 +449,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
           const message = messages.ERR_LOADING_HTTP({ attr: self.value, error: String(e), url });
 
           store.annotationStore.addErrors([errorBuilder.generalError(message)]);
-          self.setRemoteValue('');
+          self.setRemoteValue("");
         });
     } else {
       self.setRemoteValue(value);
@@ -460,7 +460,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
     const errors = [];
 
     if (!Array.isArray(val)) {
-      errors.push('Provided data is not an array');
+      errors.push("Provided data is not an array");
     } else {
       if (!(self.namekey in val[0])) {
         errors.push(`"${self.namekey}" field not found in task data; check your <b>nameKey</b> parameter`);
@@ -472,13 +472,13 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
     if (errors.length) {
       const general = [
         `Task data (provided as <b>${self.value}</b>) has wrong format.<br/>`,
-        'It should be an array of objects with fields,',
+        "It should be an array of objects with fields,",
         'defined by <b>nameKey</b> ("author" by default)',
         'and <b>textKey</b> ("text" by default)',
-      ].join(' ');
+      ].join(" ");
 
       self.store.annotationStore.addErrors([
-        errorBuilder.generalError(`${general}<ul>${errors.map((error) => `<li>${error}</li>`).join('')}</ul>`),
+        errorBuilder.generalError(`${general}<ul>${errors.map((error) => `<li>${error}</li>`).join("")}</ul>`),
       ]);
       return;
     }
@@ -568,4 +568,4 @@ const paragraphModelMixins = [
   ParagraphsLoadingModel,
 ].filter(Boolean);
 
-export const ParagraphsModel = types.compose('ParagraphsModel', ...paragraphModelMixins);
+export const ParagraphsModel = types.compose("ParagraphsModel", ...paragraphModelMixins);

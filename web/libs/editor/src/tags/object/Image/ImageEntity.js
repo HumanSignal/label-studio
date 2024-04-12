@@ -1,6 +1,6 @@
-import { types } from 'mobx-state-tree';
-import { FileLoader } from '../../../utils/FileLoader';
-import { clamp } from '../../../utils/utilities';
+import { types } from "mobx-state-tree";
+import { FileLoader } from "../../../utils/FileLoader";
+import { clamp } from "../../../utils/utilities";
 
 const fileLoader = new FileLoader();
 

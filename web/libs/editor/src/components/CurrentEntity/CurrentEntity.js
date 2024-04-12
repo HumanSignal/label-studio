@@ -1,13 +1,13 @@
-import { inject, observer } from 'mobx-react';
-import { Space } from '../../common/Space/Space';
-import { useRegionsCopyPaste } from '../../hooks/useRegionsCopyPaste';
-import { Block, Elem } from '../../utils/bem';
-import { FF_DEV_2290, isFF } from '../../utils/feature-flags';
-import { DraftPanel } from '../DraftPanel/DraftPanel';
-import { AnnotationHistory } from './AnnotationHistory.tsx';
-import './CurrentEntity.styl';
+import { inject, observer } from "mobx-react";
+import { Space } from "../../common/Space/Space";
+import { useRegionsCopyPaste } from "../../hooks/useRegionsCopyPaste";
+import { Block, Elem } from "../../utils/bem";
+import { FF_DEV_2290, isFF } from "../../utils/feature-flags";
+import { DraftPanel } from "../DraftPanel/DraftPanel";
+import { AnnotationHistory } from "./AnnotationHistory.tsx";
+import "./CurrentEntity.styl";
 
-const injector = inject('store');
+const injector = inject("store");
 
 export const CurrentEntity = injector(
   observer(({ entity, showHistory = true }) => {
@@ -16,7 +16,7 @@ export const CurrentEntity = injector(
     useRegionsCopyPaste(entity);
 
     return entity ? (
-      <Block name='annotation' onClick={(e) => e.stopPropagation()}>
+      <Block name="annotation" onClick={(e) => e.stopPropagation()}>
         {/* <Elem name="info" tag={Space} spread>
         <Elem name="id">
           {entity.type === 'annotation' ? <LsAnnotation /> : <LsSparks color="#944BFF"/>}
@@ -52,9 +52,9 @@ export const CurrentEntity = injector(
 
         {/* {showHistory && !entity.userGenerate && ( */}
         {showHistory && (
-          <Elem tag={Space} spread name='title'>
+          <Elem tag={Space} spread name="title">
             Annotation History
-            <Elem name='id'>#{entity.pk ?? entity.id}</Elem>
+            <Elem name="id">#{entity.pk ?? entity.id}</Elem>
           </Elem>
         )}
         <AnnotationHistory enabled={showHistory} showDraft={showDraftInHistory} />

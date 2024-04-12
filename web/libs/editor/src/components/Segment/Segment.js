@@ -1,7 +1,7 @@
-import { PropTypes } from 'prop-types';
-import React from 'react';
+import { PropTypes } from "prop-types";
+import React from "react";
 
-import styles from './Segment.module.scss';
+import styles from "./Segment.module.scss";
 
 /**
  * Segment Component

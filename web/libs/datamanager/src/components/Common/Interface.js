@@ -1,4 +1,4 @@
-import { inject, observer } from 'mobx-react';
+import { inject, observer } from "mobx-react";
 
 const injector = inject(({ store }) => {
   return {

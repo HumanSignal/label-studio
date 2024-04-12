@@ -1,19 +1,19 @@
-import React, { useRef, useState } from 'react';
-import { IconOutlinerDrag } from '../../../assets/icons';
-import { useDrag } from '../../../hooks/useDrag';
-import { Block, Elem } from '../../../utils/bem';
-import { FF_OUTLINER_OPTIM, isFF } from '../../../utils/feature-flags';
-import { DEFAULT_PANEL_HEIGHT } from '../constants';
-import './Tabs.styl';
-import { type BaseProps, Side, type TabProps } from './types';
-import { determineDroppableArea, determineLeftOrRight } from './utils';
+import React, { useRef, useState } from "react";
+import { IconOutlinerDrag } from "../../../assets/icons";
+import { useDrag } from "../../../hooks/useDrag";
+import { Block, Elem } from "../../../utils/bem";
+import { FF_OUTLINER_OPTIM, isFF } from "../../../utils/feature-flags";
+import { DEFAULT_PANEL_HEIGHT } from "../constants";
+import "./Tabs.styl";
+import { type BaseProps, Side, type TabProps } from "./types";
+import { determineDroppableArea, determineLeftOrRight } from "./utils";
 
 const classAddedTabs: (Element | undefined)[] = [];
 
 enum DragOverHeightClasses {
-  tabLeft = 'lsf-drag_over_tab_left',
-  tabRight = 'lsf-drag_over_tab_right',
-  emptyTabSpace = 'lsf-drag_over_empty_tab_space',
+  tabLeft = "lsf-drag_over_tab_left",
+  tabRight = "lsf-drag_over_tab_right",
+  emptyTabSpace = "lsf-drag_over_empty_tab_space",
 }
 
 const removeHoverClasses = () => {
@@ -74,7 +74,7 @@ const Tab = ({
 
         setActiveTab(panelKey, tabIndex);
         rootRef.current?.append(ghostTabRef.current!);
-        ghostTabRef.current!.style.pointerEvents = 'all';
+        ghostTabRef.current!.style.pointerEvents = "all";
 
         const tab = tabRef.current!;
         const page = rootRef.current!.getBoundingClientRect();
@@ -86,7 +86,7 @@ const Tab = ({
       },
       onMouseMove(event, data) {
         if (!data) return;
-        document.body.style.cursor = 'grabbing';
+        document.body.style.cursor = "grabbing";
         window.getSelection()?.removeAllRanges();
 
         dragging.current = true;
@@ -96,12 +96,12 @@ const Tab = ({
 
         if (ghostTabRef.current) {
           setShouldShowGhostTab(true);
-          ghostTabRef.current!.style.display = 'block';
+          ghostTabRef.current!.style.display = "block";
           ghostTabRef.current!.style.top = `${newY}px`;
           ghostTabRef.current!.style.left = `${newX}px`;
         }
         const dropTargets = document.elementsFromPoint(event.clientX, event.clientY);
-        const dropTarget = dropTargets.find((target, index) => target.id.includes('droppable') && index > 0);
+        const dropTarget = dropTargets.find((target, index) => target.id.includes("droppable") && index > 0);
         let side: Side | undefined = determineLeftOrRight(event, dropTarget);
         const tabHeight = ghostTabRef.current?.getBoundingClientRect().height;
 
@@ -109,7 +109,7 @@ const Tab = ({
 
         removeHoverClasses();
         if ((dropTarget as HTMLElement)?.id === `${panelKey}_${tabIndex}_droppable`) return;
-        if ((dropTarget as HTMLElement)?.id.includes('droppable-space')) side = undefined;
+        if ((dropTarget as HTMLElement)?.id.includes("droppable-space")) side = undefined;
         addHoverClasses(side, dropTarget);
       },
       onMouseUp(event, data) {
@@ -117,10 +117,10 @@ const Tab = ({
         classAddedTabs.length = 0;
         tabRef.current?.append(ghostTabRef.current!);
         if (ghostTabRef.current?.style) {
-          ghostTabRef.current.style.display = 'none';
+          ghostTabRef.current.style.display = "none";
           setShouldShowGhostTab(false);
         }
-        document.body.style.cursor = 'auto';
+        document.body.style.cursor = "auto";
 
         if (!data || !dragging.current) return;
         dragging.current = false;
@@ -138,8 +138,8 @@ const Tab = ({
           const dropTarget = document.elementFromPoint(event.clientX, event.clientY);
           const dropTargetId = dropTarget?.id;
 
-          if (!dropTargetId || !dropTargetId?.includes('droppable')) return;
-          const droppedOnIndices = dropTargetId.split('_');
+          if (!dropTargetId || !dropTargetId?.includes("droppable")) return;
+          const droppedOnIndices = dropTargetId.split("_");
           const receivingPanel = droppedOnIndices[0];
           const receivingTab = Number.parseInt(droppedOnIndices[1]);
           const dropSide = determineLeftOrRight(event, dropTarget as HTMLElement);
@@ -160,31 +160,31 @@ const Tab = ({
   const Label = () => (
     <Elem
       id={`${panelKey}_${tabIndex}_droppable`}
-      name='tab'
+      name="tab"
       mod={{ active: locked ? tabIndex === breakPointActiveTab : active }}
     >
-      {!locked && <Elem name='icon' tag={IconOutlinerDrag} width={8} />}
+      {!locked && <Elem name="icon" tag={IconOutlinerDrag} width={8} />}
       {tabText}
     </Elem>
   );
 
   return (
-    <Block name='panel-tabs'>
-      <Elem name='draggable-tab' id={`${tabText}-draggable`} ref={tabRef}>
+    <Block name="panel-tabs">
+      <Elem name="draggable-tab" id={`${tabText}-draggable`} ref={tabRef}>
         <Label />
       </Elem>
       <Elem
         ref={ghostTabRef}
-        name='ghost-tab'
+        name="ghost-tab"
         style={{
           width: `${panelWidth}px`,
-          height: 'fit-content',
+          height: "fit-content",
           maxHeight: `${DEFAULT_PANEL_HEIGHT}px`,
-          overflow: 'hidden',
+          overflow: "hidden",
         }}
       >
         <Label />
-        {shouldShowGhostTab && <Elem name='contents'>{children}</Elem>}
+        {shouldShowGhostTab && <Elem name="contents">{children}</Elem>}
       </Elem>
     </Block>
   );
@@ -197,13 +197,13 @@ export const Tabs = (props: BaseProps) => {
 
   return (
     <>
-      <Block name='tabs' mix={isFF(FF_OUTLINER_OPTIM) ? 'ff_outliner_optim' : void 0}>
-        <Elem name='tabs-row'>
+      <Block name="tabs" mix={isFF(FF_OUTLINER_OPTIM) ? "ff_outliner_optim" : void 0}>
+        <Elem name="tabs-row">
           {props.panelViews.map((view, index) => {
             const { component: Component } = view;
 
             return (
-              <Elem name='tab-container' key={`${view.title}-${index}-tab`} mod={{ active: view.active }}>
+              <Elem name="tab-container" key={`${view.title}-${index}-tab`} mod={{ active: view.active }}>
                 <Tab
                   name={view.name}
                   rootRef={props.root}
@@ -222,16 +222,16 @@ export const Tabs = (props: BaseProps) => {
                   breakPointActiveTab={props.breakPointActiveTab}
                   setBreakPointActiveTab={props.setBreakPointActiveTab}
                 >
-                  <Elem name='content'>
-                    <Component key={`${view.title}-${index}-ghost`} {...props} name={'outliner'} />
+                  <Elem name="content">
+                    <Component key={`${view.title}-${index}-ghost`} {...props} name={"outliner"} />
                   </Elem>
                 </Tab>
               </Elem>
             );
           })}
-          <Elem id={`${props.name}_${props.panelViews.length}-droppable-space`} name='drop-space-after' />
+          <Elem id={`${props.name}_${props.panelViews.length}-droppable-space`} name="drop-space-after" />
         </Elem>
-        <Elem name='contents'>{ActiveComponent && <ActiveComponent {...props} />}</Elem>
+        <Elem name="contents">{ActiveComponent && <ActiveComponent {...props} />}</Elem>
       </Block>
     </>
   );

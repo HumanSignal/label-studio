@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
 
-import { IconRotateLeftTool, IconRotateRightTool } from '../assets/icons';
-import { Tool } from '../components/Toolbar/Tool';
-import ToolMixin from '../mixins/Tool';
-import BaseTool from './Base';
+import { IconRotateLeftTool, IconRotateRightTool } from "../assets/icons";
+import { Tool } from "../components/Toolbar/Tool";
+import ToolMixin from "../mixins/Tool";
+import BaseTool from "./Base";
 
 const ToolView = observer(({ item }) => {
   return (
@@ -14,9 +14,9 @@ const ToolView = observer(({ item }) => {
       <Tool
         active={item.selected}
         icon={<IconRotateLeftTool />}
-        ariaLabel='rotate-left'
-        label='Rotate Left'
-        shortcut='alt+left'
+        ariaLabel="rotate-left"
+        label="Rotate Left"
+        shortcut="alt+left"
         onClick={() => {
           item.rotate(-90);
         }}
@@ -24,9 +24,9 @@ const ToolView = observer(({ item }) => {
       <Tool
         active={item.selected}
         icon={<IconRotateRightTool />}
-        ariaLabel='rotate-right'
-        label='Rotate Right'
-        shortcut='alt+right'
+        ariaLabel="rotate-right"
+        label="Rotate Right"
+        shortcut="alt+right"
         onClick={() => {
           item.rotate(90);
         }}
@@ -36,8 +36,8 @@ const ToolView = observer(({ item }) => {
 });
 
 const _Tool = types
-  .model('RotateTool', {
-    group: 'control',
+  .model("RotateTool", {
+    group: "control",
   })
   .views((self) => ({
     get viewClass() {

@@ -1,13 +1,13 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
-import sanitizeHtml from 'sanitize-html';
-import { LsSlack } from '../../assets/icons';
-import { Block, Elem } from '../../utils/bem';
-import { absoluteURL, copyText } from '../../utils/helpers';
-import { Button } from '../Button/Button';
-import { Space } from '../Space/Space';
-import './Error.styl';
+import React, { Fragment, useCallback, useMemo, useState } from "react";
+import sanitizeHtml from "sanitize-html";
+import { LsSlack } from "../../assets/icons";
+import { Block, Elem } from "../../utils/bem";
+import { absoluteURL, copyText } from "../../utils/helpers";
+import { Button } from "../Button/Button";
+import { Space } from "../Space/Space";
+import "./Error.styl";
 
-const SLACK_INVITE_URL = 'https://slack.labelstud.io/?source=product-error-msg';
+const SLACK_INVITE_URL = "https://slack.labelstud.io/?source=product-error-msg";
 
 export const ErrorWrapper = ({
   title,
@@ -21,7 +21,7 @@ export const ErrorWrapper = ({
   possum = false,
 }) => {
   const preparedStackTrace = useMemo(() => {
-    return (stacktrace ?? '').trim();
+    return (stacktrace ?? "").trim();
   }, [stacktrace]);
 
   const [copied, setCopied] = useState(false);
@@ -33,22 +33,22 @@ export const ErrorWrapper = ({
   }, [preparedStackTrace]);
 
   return (
-    <Block name='error-message'>
+    <Block name="error-message">
       {possum !== false && (
         <Elem
-          tag='img'
-          name='heidi'
-          src={absoluteURL('/static/images/opossum_broken.svg')}
-          height='111'
+          tag="img"
+          name="heidi"
+          src={absoluteURL("/static/images/opossum_broken.svg")}
+          height="111"
           alt="Heidi's down"
         />
       )}
 
-      {title && <Elem name='title'>{title}</Elem>}
+      {title && <Elem name="title">{title}</Elem>}
 
       {message && (
         <Elem
-          name='detail'
+          name="detail"
           dangerouslySetInnerHTML={{
             __html: sanitizeHtml(String(message)),
           }}
@@ -57,19 +57,19 @@ export const ErrorWrapper = ({
 
       {preparedStackTrace && (
         <Elem
-          name='stracktrace'
+          name="stracktrace"
           dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(preparedStackTrace.replace(/(\n)/g, '<br>')),
+            __html: sanitizeHtml(preparedStackTrace.replace(/(\n)/g, "<br>")),
           }}
         />
       )}
 
       {validation?.length > 0 && (
-        <Elem tag='ul' name='validation'>
+        <Elem tag="ul" name="validation">
           {validation.map(([field, errors]) => (
             <Fragment key={field}>
               {[].concat(errors).map((err, i) => (
-                <Elem tag='li' key={i} name='message' dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }} />
+                <Elem tag="li" key={i} name="message" dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }} />
               ))}
             </Fragment>
           ))}
@@ -77,7 +77,7 @@ export const ErrorWrapper = ({
       )}
 
       {(version || errorId) && (
-        <Elem name='version'>
+        <Elem name="version">
           <Space>
             {version && `Version: ${version}`}
             {errorId && `Error ID: ${errorId}`}
@@ -85,16 +85,16 @@ export const ErrorWrapper = ({
         </Elem>
       )}
 
-      <Elem name='actions'>
+      <Elem name="actions">
         <Space spread>
-          <Elem tag={Button} name='action-slack' target='_blank' icon={<LsSlack />} href={SLACK_INVITE_URL}>
+          <Elem tag={Button} name="action-slack" target="_blank" icon={<LsSlack />} href={SLACK_INVITE_URL}>
             Ask on Slack
           </Elem>
 
-          <Space size='small'>
+          <Space size="small">
             {preparedStackTrace && (
               <Button disabled={copied} onClick={copyStacktrace} style={{ width: 180 }}>
-                {copied ? 'Copied' : 'Copy Stacktrace'}
+                {copied ? "Copied" : "Copy Stacktrace"}
               </Button>
             )}
             {onGoBack && <Button onClick={onGoBack}>Go Back</Button>}

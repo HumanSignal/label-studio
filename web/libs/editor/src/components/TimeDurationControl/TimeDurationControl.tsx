@@ -1,8 +1,8 @@
-import React, { type FC } from 'react';
-import { Block } from '../../utils/bem';
+import React, { type FC } from "react";
+import { Block } from "../../utils/bem";
 
-import { TimeBox } from './TimeBox';
-import './TimeDurationControl.styl';
+import { TimeBox } from "./TimeBox";
+import "./TimeDurationControl.styl";
 
 export interface TimerProps {
   isSidepanel: boolean | undefined;
@@ -40,20 +40,20 @@ export const TimeDurationControl: FC<TimerProps> = ({
   };
 
   return (
-    <Block name='timer-duration-control'>
+    <Block name="timer-duration-control">
       <TimeBox
         sidepanel={isSidepanel}
         readonly={startTimeReadonly}
         value={_currentTime}
         onChange={handleChangeCurrentTime}
-        data-testid='timebox-current-time'
+        data-testid="timebox-current-time"
       />
       <TimeBox
         sidepanel={isSidepanel}
         readonly={endTimeReadonly}
         value={endTime}
         onChange={handleChangeEndTime}
-        data-testid='timebox-end-time'
+        data-testid="timebox-end-time"
         inverted
       />
     </Block>

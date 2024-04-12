@@ -1,5 +1,5 @@
-import '@heartex/ls-test/cypress/support/e2e';
-import { CURRENT_FLAGS } from '../../feature-flags';
+import "@heartex/ls-test/cypress/support/e2e";
+import { CURRENT_FLAGS } from "../../feature-flags";
 
 before(() => {
   cy.window().then((win) => {
@@ -9,7 +9,7 @@ before(() => {
         feature_flags: CURRENT_FLAGS,
       },
     });
-    cy.log('Default Feature Flags set');
-    cy.log(JSON.stringify(win.APP_SETTINGS.feature_flags, null, '  '));
+    cy.log("Default Feature Flags set");
+    cy.log(JSON.stringify(win.APP_SETTINGS.feature_flags, null, "  "));
   });
 });

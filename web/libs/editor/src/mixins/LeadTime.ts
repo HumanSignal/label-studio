@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
 // both approaches are valid, so code is ready for both,
 // but currently we use instant logic hardcoded

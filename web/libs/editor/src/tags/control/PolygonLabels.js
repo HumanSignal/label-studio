@@ -1,14 +1,14 @@
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React from 'react';
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import Registry from '../../core/Registry';
-import Types from '../../core/Types';
-import LabelMixin from '../../mixins/LabelMixin';
-import SelectedModelMixin from '../../mixins/SelectedModel';
-import ControlBase from './Base';
-import { HtxLabels, LabelsModel } from './Labels/Labels';
-import { PolygonModel } from './Polygon';
+import Registry from "../../core/Registry";
+import Types from "../../core/Types";
+import LabelMixin from "../../mixins/LabelMixin";
+import SelectedModelMixin from "../../mixins/SelectedModel";
+import ControlBase from "./Base";
+import { HtxLabels, LabelsModel } from "./Labels/Labels";
+import { PolygonModel } from "./Polygon";
 
 /**
  * The `PolygonLabels` tag is used to create labeled polygons. Use to apply labels to polygons in semantic segmentation tasks.
@@ -42,12 +42,12 @@ import { PolygonModel } from './Polygon';
  */
 
 const Validation = types.model({
-  controlledTags: Types.unionTag(['Image']),
+  controlledTags: Types.unionTag(["Image"]),
 });
 
-const ModelAttrs = types.model('PolygonLabelsModel', {
-  type: 'polygonlabels',
-  children: Types.unionArray(['label', 'header', 'view', 'hypertext']),
+const ModelAttrs = types.model("PolygonLabelsModel", {
+  type: "polygonlabels",
+  children: Types.unionArray(["label", "header", "view", "hypertext"]),
 });
 
 const Composition = types.compose(
@@ -57,15 +57,15 @@ const Composition = types.compose(
   PolygonModel,
   Validation,
   LabelMixin,
-  SelectedModelMixin.props({ _child: 'LabelModel' }),
+  SelectedModelMixin.props({ _child: "LabelModel" }),
 );
 
-const PolygonLabelsModel = types.compose('PolygonLabelsModel', Composition);
+const PolygonLabelsModel = types.compose("PolygonLabelsModel", Composition);
 
 const HtxPolygonLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
 });
 
-Registry.addTag('polygonlabels', PolygonLabelsModel, HtxPolygonLabels);
+Registry.addTag("polygonlabels", PolygonLabelsModel, HtxPolygonLabels);
 
 export { HtxPolygonLabels, PolygonLabelsModel };

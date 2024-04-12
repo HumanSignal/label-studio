@@ -1,9 +1,9 @@
 import BaseTimelinePlugin, {
   type TimelinePluginParams as BaseTimelinePluginParams,
-} from 'wavesurfer.js/src/plugin/timeline';
+} from "wavesurfer.js/src/plugin/timeline";
 
 export interface TimelinePluginParams extends BaseTimelinePluginParams {
-  labelPlacement?: 'top' | 'right';
+  labelPlacement?: "top" | "right";
   notchHeight?: number;
 }
 
@@ -12,7 +12,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
   static create(params: TimelinePluginParams) {
     return {
-      name: 'timeline',
+      name: "timeline",
       deferInit: params && params.deferInit ? params.deferInit : false,
       params,
       instance: TimelinePlugin,
@@ -27,7 +27,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   get wrapperHeight() {
     const { fontSize, height, labelPadding, labelPlacement } = this.params as any;
 
-    if (labelPlacement === 'top') {
+    if (labelPlacement === "top") {
       return height;
     }
 
@@ -42,11 +42,11 @@ export class TimelinePlugin extends BaseTimelinePlugin {
         notchHeight: 8,
         fontSize: 12,
         labelPadding: 6,
-        labelPlacement: 'top',
+        labelPlacement: "top",
       },
       params,
     );
-    if (this.params.labelPlacement === 'top') {
+    if (this.params.labelPlacement === "top") {
       this.params.height = this.params.fontSize! + (this.params.height as number) + this.params.labelPadding! * 2;
     }
   }
@@ -55,28 +55,28 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     const wsParams = this.wavesurfer.params;
 
     if (this.container instanceof HTMLElement) {
-      this.container.innerHTML = '';
+      this.container.innerHTML = "";
 
-      (this.wrapper as any) = this.container.appendChild(document.createElement('timeline'));
+      (this.wrapper as any) = this.container.appendChild(document.createElement("timeline"));
     }
     if (this.wrapper) {
       this.util.style(this.wrapper, {
-        display: 'block',
-        position: 'relative',
-        userSelect: 'none',
-        webkitUserSelect: 'none',
+        display: "block",
+        position: "relative",
+        userSelect: "none",
+        webkitUserSelect: "none",
         height: `${this.wrapperHeight}px`,
       });
 
       if (wsParams.fillParent || wsParams.scrollParent) {
         this.util.style(this.wrapper, {
-          width: '100%',
-          overflowX: 'hidden',
-          overflowY: 'hidden',
+          width: "100%",
+          overflowX: "hidden",
+          overflowY: "hidden",
         });
       }
 
-      this.wrapper.addEventListener('click', (this as any)._onWrapperClick);
+      this.wrapper.addEventListener("click", (this as any)._onWrapperClick);
     }
   }
 
@@ -100,7 +100,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   }
 
   intervalFnOrVal = (option: any, pixelsPerSecond: number) =>
-    typeof option === 'function' ? option(pixelsPerSecond) : option;
+    typeof option === "function" ? option(pixelsPerSecond) : option;
 
   updatePositioning(width: number, duration: number) {
     const baseOffset = (this.params as any).offset;
@@ -141,12 +141,12 @@ export class TimelinePlugin extends BaseTimelinePlugin {
    * @param {number} x X-position
    * @param {number} y Y-position
    */
-  fillText(text: string, x: number, y: number, align = '') {
+  fillText(text: string, x: number, y: number, align = "") {
     let textWidth: number;
     let xOffset = 0;
 
     this.canvases.forEach((canvas) => {
-      const context = canvas.getContext('2d');
+      const context = canvas.getContext("2d");
 
       if (context) {
         const canvasWidth = context.canvas.width;
@@ -158,7 +158,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
         if (xOffset + canvasWidth > x && context) {
           textWidth = context.measureText(text).width;
 
-          if (align === 'center') {
+          if (align === "center") {
             x = x - textWidth / 2;
           }
           context.fillText(text, x - xOffset, y);
@@ -182,14 +182,14 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
     const primaryLabelInterval = this.intervalFnOrVal(this.params.primaryLabelInterval, pixelsPerSecond);
     const pxRatio = (this as any).pixelRatio;
-    const height = (labelPlacement === 'top' ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
+    const height = (labelPlacement === "top" ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
 
     this.setFonts(`${this.fontSize}px ${this.params.fontFamily}`);
 
     this.renderPositions((i, curSeconds, curPixel) => {
       if (i % primaryLabelInterval === 0) {
         switch (labelPlacement) {
-          case 'top':
+          case "top":
             this.setFillStyles(primaryColor!);
             this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
 
@@ -198,10 +198,10 @@ export class TimelinePlugin extends BaseTimelinePlugin {
               (formatTime as any)(curSeconds, pixelsPerSecond),
               curPixel * pxRatio,
               height + Math.ceil(labelPadding! * 1.5),
-              'center',
+              "center",
             );
             break;
-          case 'right':
+          case "right":
           default:
             this.setFillStyles(primaryColor!);
             this.fillRect(curPixel, 0, 1, height);
@@ -228,14 +228,14 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
     const secondaryLabelInterval = this.intervalFnOrVal(this.params.secondaryLabelInterval, pixelsPerSecond);
     const pxRatio = (this as any).pixelRatio;
-    const height = (labelPlacement === 'top' ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
+    const height = (labelPlacement === "top" ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
 
     this.setFonts(`${this.fontSize}px ${this.params.fontFamily}`);
 
     this.renderPositions((i, curSeconds, curPixel) => {
       if (i % secondaryLabelInterval === 0 && i % primaryLabelInterval !== 0) {
         switch (labelPlacement) {
-          case 'top':
+          case "top":
             this.setFillStyles(secondaryColor!);
             this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
 
@@ -244,10 +244,10 @@ export class TimelinePlugin extends BaseTimelinePlugin {
               (formatTime as any)(curSeconds, pixelsPerSecond),
               curPixel * pxRatio,
               height + Math.ceil(labelPadding! * 1.5),
-              'center',
+              "center",
             );
             break;
-          case 'right':
+          case "right":
           default:
             this.setFillStyles(secondaryColor!);
             this.fillRect(curPixel, 0, 1, height);
@@ -266,7 +266,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
     const pxRatio = (this as any).pixelRatio;
 
-    const baseHeight = labelPlacement === 'top' ? (notchHeight as number) : (_baseHeight as number);
+    const baseHeight = labelPlacement === "top" ? (notchHeight as number) : (_baseHeight as number);
     const height = (baseHeight as number) * (notchPercentHeight! / 100) * pxRatio;
 
     this.setFillStyles(unlabeledNotchColor!);
@@ -274,10 +274,10 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     this.renderPositions((i, _, curPixel) => {
       if (i % secondaryLabelInterval !== 0 && i % primaryLabelInterval !== 0) {
         switch (labelPlacement) {
-          case 'top':
+          case "top":
             this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
             break;
-          case 'right':
+          case "right":
           default:
             this.fillRect(curPixel, 0, 1, height);
             break;

@@ -1,26 +1,26 @@
 class TaxonomyHelper {
   private get _baseRootSelector() {
-    return '.taxonomy';
+    return ".taxonomy";
   }
 
   public selectors = {
     root: this._baseRootSelector,
-    selected: '.htx-taxonomy-selected',
-    input: '.htx-taxonomy',
-    dropdown: '[class^=taxonomy__dropdown]',
-    item: '[class^=taxonomy__item]',
+    selected: ".htx-taxonomy-selected",
+    input: ".htx-taxonomy",
+    dropdown: "[class^=taxonomy__dropdown]",
+    item: "[class^=taxonomy__item]",
     open: '[class*="taxonomy_open--"]',
     closed: ':not([class*="taxonomy_open--"])',
   };
 
   private _new_selectors = {
     root: this._baseRootSelector,
-    selected: '.ant-select-selector',
-    input: '.htx-taxonomy',
-    dropdown: '.ant-select-dropdown',
-    item: '.ant-select-tree-treenode',
-    open: '.ant-select-open',
-    closed: ':not(.ant-select-open)',
+    selected: ".ant-select-selector",
+    input: ".htx-taxonomy",
+    dropdown: ".ant-select-dropdown",
+    item: ".ant-select-tree-treenode",
+    open: ".ant-select-open",
+    closed: ":not(.ant-select-open)",
   };
 
   public isNew = false;
@@ -49,10 +49,10 @@ class TaxonomyHelper {
     return this.dropdown.contains(this.selectors.item, text).scrollIntoView();
   }
   hasSelected(text) {
-    return this.selected.contains('div', text).should('exist');
+    return this.selected.contains("div", text).should("exist");
   }
   hasNoSelected(text) {
-    return this.selected.contains('div', text).should('not.exist');
+    return this.selected.contains("div", text).should("not.exist");
   }
   open() {
     this.input.filter(this.selectors.closed).click();
@@ -62,7 +62,7 @@ class TaxonomyHelper {
   }
 }
 
-const Taxonomy = new TaxonomyHelper('&:eq(0)');
+const Taxonomy = new TaxonomyHelper("&:eq(0)");
 const useTaxonomy = (rootSelector: string, isNew = false) => {
   return new TaxonomyHelper(rootSelector, isNew);
 };

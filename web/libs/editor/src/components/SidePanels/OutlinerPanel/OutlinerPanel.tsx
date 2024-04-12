@@ -1,12 +1,12 @@
-import { observer } from 'mobx-react';
-import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { IconInfo } from '../../../assets/icons/outliner';
-import { Block, Elem } from '../../../utils/bem';
-import { FF_LSDV_4992, FF_OUTLINER_OPTIM, isFF } from '../../../utils/feature-flags';
-import { PanelBase, type PanelProps } from '../PanelBase';
-import './OutlinerPanel.styl';
-import { OutlinerTree } from './OutlinerTree';
-import { ViewControls } from './ViewControls';
+import { observer } from "mobx-react";
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
+import { IconInfo } from "../../../assets/icons/outliner";
+import { Block, Elem } from "../../../utils/bem";
+import { FF_LSDV_4992, FF_OUTLINER_OPTIM, isFF } from "../../../utils/feature-flags";
+import { PanelBase, type PanelProps } from "../PanelBase";
+import "./OutlinerPanel.styl";
+import { OutlinerTree } from "./OutlinerTree";
+import { ViewControls } from "./ViewControls";
 
 interface OutlinerPanelProps extends PanelProps {
   regions: any;
@@ -19,10 +19,10 @@ interface OutlinerTreeComponentProps {
 const OutlinerFFClasses: string[] = [];
 
 if (isFF(FF_LSDV_4992)) {
-  OutlinerFFClasses.push('ff_hide_all_regions');
+  OutlinerFFClasses.push("ff_hide_all_regions");
 }
 if (isFF(FF_OUTLINER_OPTIM)) {
-  OutlinerFFClasses.push('ff_outliner_optim');
+  OutlinerFFClasses.push("ff_outliner_optim");
 }
 
 const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) => {
@@ -56,7 +56,7 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
   regions.setGrouping(group);
 
   return (
-    <PanelBase {...props} name='outliner' mix={OutlinerFFClasses} title='Outliner'>
+    <PanelBase {...props} name="outliner" mix={OutlinerFFClasses} title="Outliner">
       <ViewControls
         ordering={regions.sort}
         regions={regions}
@@ -93,7 +93,7 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
   );
 
   return (
-    <Block name='outliner' mix={OutlinerFFClasses}>
+    <Block name="outliner" mix={OutlinerFFClasses}>
       <ViewControls
         ordering={regions.sort}
         regions={regions}
@@ -119,10 +119,10 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
   return (
     <>
       {allRegionsHidden ? (
-        <Block name='filters-info'>
+        <Block name="filters-info">
           <IconInfo width={21} height={20} />
-          <Elem name='filters-title'>All regions hidden</Elem>
-          <Elem name='filters-description'>Adjust or remove the filters to view</Elem>
+          <Elem name="filters-title">All regions hidden</Elem>
+          <Elem name="filters-description">Adjust or remove the filters to view</Elem>
         </Block>
       ) : regions?.regions?.length > 0 ? (
         <>
@@ -130,19 +130,19 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
             regions={regions}
             footer={
               hiddenRegions > 0 && (
-                <Block name='filters-info'>
+                <Block name="filters-info">
                   <IconInfo width={21} height={20} />
-                  <Elem name='filters-title'>
-                    There {hiddenRegions === 1 ? 'is' : 'are'} {hiddenRegions} hidden region{hiddenRegions > 1 && 's'}
+                  <Elem name="filters-title">
+                    There {hiddenRegions === 1 ? "is" : "are"} {hiddenRegions} hidden region{hiddenRegions > 1 && "s"}
                   </Elem>
-                  <Elem name='filters-description'>Adjust or remove filters to view</Elem>
+                  <Elem name="filters-description">Adjust or remove filters to view</Elem>
                 </Block>
               )
             }
           />
         </>
       ) : (
-        <Elem name='empty'>Regions not added</Elem>
+        <Elem name="empty">Regions not added</Elem>
       )}
     </>
   );

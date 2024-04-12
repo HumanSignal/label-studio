@@ -1,17 +1,17 @@
-import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, MoreOutlined, SwapOutlined } from '@ant-design/icons';
-import { Button, List, Select } from 'antd';
-import { observer } from 'mobx-react';
-import { getRoot, isValidReference } from 'mobx-state-tree';
-import React from 'react';
+import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, MoreOutlined, SwapOutlined } from "@ant-design/icons";
+import { Button, List, Select } from "antd";
+import { observer } from "mobx-react";
+import { getRoot, isValidReference } from "mobx-state-tree";
+import React from "react";
 
-import globalStyles from '../../styles/global.module.scss';
-import { wrapArray } from '../../utils/utilities';
-import { NodeMinimal } from '../Node/Node';
-import styles from './Relations.module.scss';
+import globalStyles from "../../styles/global.module.scss";
+import { wrapArray } from "../../utils/utilities";
+import { NodeMinimal } from "../Node/Node";
+import styles from "./Relations.module.scss";
 
-import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
-import { Block, Elem } from '../../utils/bem';
-import './Relations.styl';
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import { Block, Elem } from "../../utils/bem";
+import "./Relations.styl";
 
 const { Option } = Select;
 
@@ -20,12 +20,12 @@ const RelationMeta = observer(({ rl }) => {
   const selected = r.getSelected().map((v) => v.value);
 
   return (
-    <div style={{ marginTop: '10px' }}>
+    <div style={{ marginTop: "10px" }}>
       <h4 className={styles.header}>LABELS</h4>
       <Select
-        mode={r.choice === 'multiple' ? 'multiple' : ''}
-        style={{ width: '100%' }}
-        placeholder='Please select'
+        mode={r.choice === "multiple" ? "multiple" : ""}
+        style={{ width: "100%" }}
+        placeholder="Please select"
         defaultValue={selected}
         onChange={(val) => {
           const values = wrapArray(val);
@@ -66,7 +66,7 @@ const Relation = observer(({ rl }) => {
         <div>
           <NodeMinimal node={rl.node1} />
         </div>
-        <Button onClick={() => rl.rotateDirection()} size='small' className={styles.relationbtn}>
+        <Button onClick={() => rl.rotateDirection()} size="small" className={styles.relationbtn}>
           {iconMap[rl.direction]}
         </Button>
         <div>
@@ -102,7 +102,7 @@ const ListItem = observer(({ item }) => {
         <div>
           {item.hasRelations && (
             <Button
-              size='small'
+              size="small"
               onClick={() => {
                 item.toggleMeta();
               }}
@@ -113,7 +113,7 @@ const ListItem = observer(({ item }) => {
           )}
           &nbsp;
           <Button
-            size='small'
+            size="small"
             className={styles.button}
             onClick={() => {
               item.node1.setHighlight(false);
@@ -139,14 +139,14 @@ const RelationsComponent = ({ store }) => {
   const relationsUIVisible = annotation.relationStore.showConnections;
 
   return (
-    <Block name='relations'>
+    <Block name="relations">
       {/* override LS styles' height */}
-      <Elem name='header'>
-        <Elem name='title'>Relations ({relations.length})</Elem>
+      <Elem name="header">
+        <Elem name="title">Relations ({relations.length})</Elem>
         {hasRelations && (
           <Button
-            size='small'
-            type='link'
+            size="small"
+            type="link"
             icon={relationsUIVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
             onClick={() => annotation.relationStore.toggleConnections()}
             className={[relationsUIVisible ? styles.uihidden : styles.uivisible, globalStyles.link]}
@@ -154,12 +154,12 @@ const RelationsComponent = ({ store }) => {
         )}
       </Elem>
 
-      <Elem name='content'>
+      <Elem name="content">
         {hasRelations ? (
           <List
-            size='small'
+            size="small"
             bordered
-            itemLayout='vertical'
+            itemLayout="vertical"
             className={styles.list}
             dataSource={annotation.relationStore.relations}
             renderItem={(item) => <ListItem item={item} />}

@@ -1,26 +1,26 @@
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import React from 'react';
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import React from "react";
 
-import Constants from '../core/Constants';
-import ToolMixin from '../mixins/Tool';
-import BaseTool from './Base';
+import Constants from "../core/Constants";
+import ToolMixin from "../mixins/Tool";
+import BaseTool from "./Base";
 
-import { IconBrightnessTool } from '../assets/icons';
-import { Range } from '../common/Range/Range';
-import { Tool } from '../components/Toolbar/Tool';
+import { IconBrightnessTool } from "../assets/icons";
+import { Range } from "../common/Range/Range";
+import { Tool } from "../components/Toolbar/Tool";
 
 const ToolView = observer(({ item }) => {
   return (
     <Tool
       active={item.selected}
-      ariaLabel='brightness'
-      label='Brightness'
+      ariaLabel="brightness"
+      label="Brightness"
       controlsOnHover
       controls={[
         <Range
-          key='brightness'
-          align='vertical'
+          key="brightness"
+          align="vertical"
           reverse
           continuous
           minIcon={<IconBrightnessTool style={{ width: 22, height: 22, opacity: 0.2 }} />}

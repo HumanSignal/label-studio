@@ -1,12 +1,12 @@
 export const simpleImageData = {
-  image: 'https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg',
+  image: "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg",
 };
 export const simpleMIGData = {
   images: [
-    'https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg',
-    'https://data.heartex.net/open-images/train_0/mini/00155094b7acc33b.jpg',
-    'https://data.heartex.net/open-images/train_0/mini/00133643bbf063a9.jpg',
-    'https://data.heartex.net/open-images/train_0/mini/0061ec6e9576b520.jpg',
+    "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg",
+    "https://data.heartex.net/open-images/train_0/mini/00155094b7acc33b.jpg",
+    "https://data.heartex.net/open-images/train_0/mini/00133643bbf063a9.jpg",
+    "https://data.heartex.net/open-images/train_0/mini/0061ec6e9576b520.jpg",
   ],
 };
 
@@ -296,10 +296,10 @@ export const requiredPerItemMIGTextareaConfig = `<View>
 
 export const perRegionRegionsResult = [
   {
-    id: 'rect_1',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_1",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     item_index: 0,
     value: {
       x: 10,
@@ -309,10 +309,10 @@ export const perRegionRegionsResult = [
     },
   },
   {
-    id: 'rect_2',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_2",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     item_index: 1,
     value: {
       x: 55,
@@ -326,22 +326,22 @@ export const perRegionRegionsResult = [
 /* <DateTime /> */
 export const perTagDateTimeResult = [
   {
-    id: 'datetime_1',
-    type: 'datetime',
-    from_name: 'datetime',
-    to_name: 'image',
+    id: "datetime_1",
+    type: "datetime",
+    from_name: "datetime",
+    to_name: "image",
     value: {
-      datetime: '2000-01-01T01:01',
+      datetime: "2000-01-01T01:01",
     },
   },
 ];
 
 export const perRegionDateTimeResult = [
   {
-    id: 'rect_1',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_1",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 0,
       y: 0,
@@ -350,12 +350,12 @@ export const perRegionDateTimeResult = [
     },
   },
   {
-    id: 'rect_1',
-    type: 'datetime',
-    from_name: 'datetime',
-    to_name: 'image',
+    id: "rect_1",
+    type: "datetime",
+    from_name: "datetime",
+    to_name: "image",
     value: {
-      datetime: '2000-01-01T01:01',
+      datetime: "2000-01-01T01:01",
       x: 0,
       y: 0,
       width: 50,
@@ -363,10 +363,10 @@ export const perRegionDateTimeResult = [
     },
   },
   {
-    id: 'rect_2',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_2",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 50,
       y: 0,
@@ -378,32 +378,32 @@ export const perRegionDateTimeResult = [
 
 export const perItemDateTimeResult = [
   {
-    id: 'datetime_1',
-    type: 'datetime',
-    from_name: 'datetime',
-    to_name: 'image',
+    id: "datetime_1",
+    type: "datetime",
+    from_name: "datetime",
+    to_name: "image",
     value: {
-      datetime: '2000-01-01T01:01',
+      datetime: "2000-01-01T01:01",
     },
     item_index: 0,
   },
   {
-    id: 'datetime_2',
-    type: 'datetime',
-    from_name: 'datetime',
-    to_name: 'image',
+    id: "datetime_2",
+    type: "datetime",
+    from_name: "datetime",
+    to_name: "image",
     value: {
-      datetime: '2000-02-02T02:02',
+      datetime: "2000-02-02T02:02",
     },
     item_index: 1,
   },
   {
-    id: 'datetime_3',
-    type: 'datetime',
-    from_name: 'datetime',
-    to_name: 'image',
+    id: "datetime_3",
+    type: "datetime",
+    from_name: "datetime",
+    to_name: "image",
     value: {
-      datetime: '2000-03-03T03:03',
+      datetime: "2000-03-03T03:03",
     },
     item_index: 2,
   },
@@ -412,22 +412,22 @@ export const perItemDateTimeResult = [
 /* <Choices /> */
 export const perTagChoicesResult = [
   {
-    id: 'choice_1',
-    type: 'choices',
-    from_name: 'choices',
-    to_name: 'image',
+    id: "choice_1",
+    type: "choices",
+    from_name: "choices",
+    to_name: "image",
     value: {
-      choices: ['Choice 1'],
+      choices: ["Choice 1"],
     },
   },
 ];
 
 export const perRegionChoicesResult = [
   {
-    id: 'rect_1',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_1",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 0,
       y: 0,
@@ -436,23 +436,23 @@ export const perRegionChoicesResult = [
     },
   },
   {
-    id: 'rect_1',
-    type: 'choices',
-    from_name: 'choices',
-    to_name: 'image',
+    id: "rect_1",
+    type: "choices",
+    from_name: "choices",
+    to_name: "image",
     value: {
       x: 0,
       y: 0,
       width: 50,
       height: 100,
-      choices: ['Choice 2'],
+      choices: ["Choice 2"],
     },
   },
   {
-    id: 'rect_2',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_2",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 50,
       y: 0,
@@ -464,32 +464,32 @@ export const perRegionChoicesResult = [
 
 export const perItemChoicesResult = [
   {
-    id: 'choice_1',
-    type: 'choices',
-    from_name: 'choices',
-    to_name: 'image',
+    id: "choice_1",
+    type: "choices",
+    from_name: "choices",
+    to_name: "image",
     value: {
-      choices: ['Choice 1'],
+      choices: ["Choice 1"],
     },
     item_index: 0,
   },
   {
-    id: 'choice_2',
-    type: 'choices',
-    from_name: 'choices',
-    to_name: 'image',
+    id: "choice_2",
+    type: "choices",
+    from_name: "choices",
+    to_name: "image",
     value: {
-      choices: ['Choice 2'],
+      choices: ["Choice 2"],
     },
     item_index: 1,
   },
   {
-    id: 'choice_3',
-    type: 'choices',
-    from_name: 'choices',
-    to_name: 'image',
+    id: "choice_3",
+    type: "choices",
+    from_name: "choices",
+    to_name: "image",
     value: {
-      choices: ['Choice 3'],
+      choices: ["Choice 3"],
     },
     item_index: 2,
   },
@@ -498,10 +498,10 @@ export const perItemChoicesResult = [
 /* <Number /> */
 export const perTagNumberResult = [
   {
-    id: 'number_1',
-    type: 'number',
-    from_name: 'number',
-    to_name: 'image',
+    id: "number_1",
+    type: "number",
+    from_name: "number",
+    to_name: "image",
     value: {
       number: 123,
     },
@@ -510,10 +510,10 @@ export const perTagNumberResult = [
 
 export const perRegionNumberResult = [
   {
-    id: 'rect_1',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_1",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 0,
       y: 0,
@@ -522,10 +522,10 @@ export const perRegionNumberResult = [
     },
   },
   {
-    id: 'rect_1',
-    type: 'number',
-    from_name: 'number',
-    to_name: 'image',
+    id: "rect_1",
+    type: "number",
+    from_name: "number",
+    to_name: "image",
     value: {
       number: 123,
       x: 0,
@@ -535,10 +535,10 @@ export const perRegionNumberResult = [
     },
   },
   {
-    id: 'rect_2',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_2",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 50,
       y: 0,
@@ -550,30 +550,30 @@ export const perRegionNumberResult = [
 
 export const perItemNumberResult = [
   {
-    id: 'number_1',
-    type: 'number',
-    from_name: 'number',
-    to_name: 'image',
+    id: "number_1",
+    type: "number",
+    from_name: "number",
+    to_name: "image",
     value: {
       number: 123,
     },
     item_index: 0,
   },
   {
-    id: 'number_2',
-    type: 'number',
-    from_name: 'number',
-    to_name: 'image',
+    id: "number_2",
+    type: "number",
+    from_name: "number",
+    to_name: "image",
     value: {
       number: 456,
     },
     item_index: 1,
   },
   {
-    id: 'number_3',
-    type: 'number',
-    from_name: 'number',
-    to_name: 'image',
+    id: "number_3",
+    type: "number",
+    from_name: "number",
+    to_name: "image",
     value: {
       number: 789,
     },
@@ -584,10 +584,10 @@ export const perItemNumberResult = [
 /* <Rating /> */
 export const perTagRatingResult = [
   {
-    id: 'rating_1',
-    type: 'rating',
-    from_name: 'rating',
-    to_name: 'image',
+    id: "rating_1",
+    type: "rating",
+    from_name: "rating",
+    to_name: "image",
     value: {
       rating: 4,
     },
@@ -596,10 +596,10 @@ export const perTagRatingResult = [
 
 export const perRegionRatingResult = [
   {
-    id: 'rect_1',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_1",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 0,
       y: 0,
@@ -608,10 +608,10 @@ export const perRegionRatingResult = [
     },
   },
   {
-    id: 'rect_1',
-    type: 'rating',
-    from_name: 'rating',
-    to_name: 'image',
+    id: "rect_1",
+    type: "rating",
+    from_name: "rating",
+    to_name: "image",
     value: {
       rating: 4,
       x: 0,
@@ -621,10 +621,10 @@ export const perRegionRatingResult = [
     },
   },
   {
-    id: 'rect_2',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_2",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 50,
       y: 0,
@@ -636,30 +636,30 @@ export const perRegionRatingResult = [
 
 export const perItemRatingResult = [
   {
-    id: 'rating_1',
-    type: 'rating',
-    from_name: 'rating',
-    to_name: 'image',
+    id: "rating_1",
+    type: "rating",
+    from_name: "rating",
+    to_name: "image",
     value: {
       rating: 3,
     },
     item_index: 0,
   },
   {
-    id: 'rating_2',
-    type: 'rating',
-    from_name: 'rating',
-    to_name: 'image',
+    id: "rating_2",
+    type: "rating",
+    from_name: "rating",
+    to_name: "image",
     value: {
       rating: 4,
     },
     item_index: 1,
   },
   {
-    id: 'rating_3',
-    type: 'rating',
-    from_name: 'rating',
-    to_name: 'image',
+    id: "rating_3",
+    type: "rating",
+    from_name: "rating",
+    to_name: "image",
     value: {
       rating: 5,
     },
@@ -670,22 +670,22 @@ export const perItemRatingResult = [
 /* <Taxonomy /> */
 export const perTagTaxonomyResult = [
   {
-    id: 'taxonomy_1',
-    type: 'taxonomy',
-    from_name: 'taxonomy',
-    to_name: 'image',
+    id: "taxonomy_1",
+    type: "taxonomy",
+    from_name: "taxonomy",
+    to_name: "image",
     value: {
-      taxonomy: [['Choice 1']],
+      taxonomy: [["Choice 1"]],
     },
   },
 ];
 
 export const perRegionTaxonomyResult = [
   {
-    id: 'rect_1',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_1",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 0,
       y: 0,
@@ -694,23 +694,23 @@ export const perRegionTaxonomyResult = [
     },
   },
   {
-    id: 'rect_1',
-    type: 'taxonomy',
-    from_name: 'taxonomy',
-    to_name: 'image',
+    id: "rect_1",
+    type: "taxonomy",
+    from_name: "taxonomy",
+    to_name: "image",
     value: {
       x: 0,
       y: 0,
       width: 50,
       height: 100,
-      taxonomy: [['Choice 2']],
+      taxonomy: [["Choice 2"]],
     },
   },
   {
-    id: 'rect_2',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_2",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 50,
       y: 0,
@@ -722,32 +722,32 @@ export const perRegionTaxonomyResult = [
 
 export const perItemTaxonomyResult = [
   {
-    id: 'taxonomy_1',
-    type: 'taxonomy',
-    from_name: 'taxonomy',
-    to_name: 'image',
+    id: "taxonomy_1",
+    type: "taxonomy",
+    from_name: "taxonomy",
+    to_name: "image",
     value: {
-      taxonomy: [['Choice 1']],
+      taxonomy: [["Choice 1"]],
     },
     item_index: 0,
   },
   {
-    id: 'taxonomy_2',
-    type: 'taxonomy',
-    from_name: 'taxonomy',
-    to_name: 'image',
+    id: "taxonomy_2",
+    type: "taxonomy",
+    from_name: "taxonomy",
+    to_name: "image",
     value: {
-      taxonomy: [['Choice 2']],
+      taxonomy: [["Choice 2"]],
     },
     item_index: 1,
   },
   {
-    id: 'taxonomy_3',
-    type: 'taxonomy',
-    from_name: 'taxonomy',
-    to_name: 'image',
+    id: "taxonomy_3",
+    type: "taxonomy",
+    from_name: "taxonomy",
+    to_name: "image",
     value: {
-      taxonomy: [['Choice 3']],
+      taxonomy: [["Choice 3"]],
     },
     item_index: 2,
   },
@@ -756,22 +756,22 @@ export const perItemTaxonomyResult = [
 /* <Textarea /> */
 export const perTagTextareaResult = [
   {
-    id: 'textarea_1',
-    type: 'textarea',
-    from_name: 'textarea',
-    to_name: 'image',
+    id: "textarea_1",
+    type: "textarea",
+    from_name: "textarea",
+    to_name: "image",
     value: {
-      text: ['Text 1'],
+      text: ["Text 1"],
     },
   },
 ];
 
 export const perRegionTextareaResult = [
   {
-    id: 'rect_1',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_1",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 0,
       y: 0,
@@ -780,12 +780,12 @@ export const perRegionTextareaResult = [
     },
   },
   {
-    id: 'rect_1',
-    type: 'textarea',
-    from_name: 'textarea',
-    to_name: 'image',
+    id: "rect_1",
+    type: "textarea",
+    from_name: "textarea",
+    to_name: "image",
     value: {
-      text: ['Text 1'],
+      text: ["Text 1"],
       x: 0,
       y: 0,
       width: 50,
@@ -793,10 +793,10 @@ export const perRegionTextareaResult = [
     },
   },
   {
-    id: 'rect_2',
-    type: 'rectangle',
-    from_name: 'rect',
-    to_name: 'image',
+    id: "rect_2",
+    type: "rectangle",
+    from_name: "rect",
+    to_name: "image",
     value: {
       x: 50,
       y: 0,
@@ -808,32 +808,32 @@ export const perRegionTextareaResult = [
 
 export const perItemTextareaResult = [
   {
-    id: 'textarea_1',
-    type: 'textarea',
-    from_name: 'textarea',
-    to_name: 'image',
+    id: "textarea_1",
+    type: "textarea",
+    from_name: "textarea",
+    to_name: "image",
     value: {
-      text: ['Text 1'],
+      text: ["Text 1"],
     },
     item_index: 0,
   },
   {
-    id: 'textarea_2',
-    type: 'textarea',
-    from_name: 'textarea',
-    to_name: 'image',
+    id: "textarea_2",
+    type: "textarea",
+    from_name: "textarea",
+    to_name: "image",
     value: {
-      text: ['Text 2'],
+      text: ["Text 2"],
     },
     item_index: 1,
   },
   {
-    id: 'textarea_3',
-    type: 'textarea',
-    from_name: 'textarea',
-    to_name: 'image',
+    id: "textarea_3",
+    type: "textarea",
+    from_name: "textarea",
+    to_name: "image",
     value: {
-      text: ['Text 3'],
+      text: ["Text 3"],
     },
     item_index: 2,
   },

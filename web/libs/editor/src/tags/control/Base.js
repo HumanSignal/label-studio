@@ -1,7 +1,7 @@
-import { getRoot, types } from 'mobx-state-tree';
-import { SNAP_TO_PIXEL_MODE } from '../../components/ImageView/Image';
-import { FF_DEV_3391, FF_SNAP_TO_PIXEL, isFF } from '../../utils/feature-flags';
-import { BaseTag } from '../TagBase';
+import { getRoot, types } from "mobx-state-tree";
+import { SNAP_TO_PIXEL_MODE } from "../../components/ImageView/Image";
+import { FF_DEV_3391, FF_SNAP_TO_PIXEL, isFF } from "../../utils/feature-flags";
+import { BaseTag } from "../TagBase";
 
 const ControlBase = types
   .model({
@@ -44,7 +44,7 @@ const ControlBase = types
     },
 
     selectedValues() {
-      throw new Error('Control tag needs to implement selectedValues method in views');
+      throw new Error("Control tag needs to implement selectedValues method in views");
     },
 
     get result() {
@@ -54,7 +54,7 @@ const ControlBase = types
     getSnappedPoint(point) {
       if (!isFF(FF_SNAP_TO_PIXEL)) return point;
 
-      if (self.snap === 'pixel') {
+      if (self.snap === "pixel") {
         return self.toNameTag.snapPointToPixel(point, self.snapMode);
       }
       return point;

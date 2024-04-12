@@ -1,18 +1,18 @@
-import { observer } from 'mobx-react';
-import { getRoot } from 'mobx-state-tree';
-import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
-import { Group, Label, Path, Rect, Tag, Text } from 'react-konva';
+import { observer } from "mobx-react";
+import { getRoot } from "mobx-state-tree";
+import React, { Fragment, useCallback, useContext, useMemo, useState } from "react";
+import { Group, Label, Path, Rect, Tag, Text } from "react-konva";
 
-import Constants from '../../core/Constants';
-import Utils from '../../utils';
-import { ImageViewContext } from './ImageViewContext';
+import Constants from "../../core/Constants";
+import Utils from "../../utils";
+import { ImageViewContext } from "./ImageViewContext";
 
 const NON_ADJACENT_CORNER_RADIUS = 4;
 const ADJACENT_CORNER_RADIUS = [4, 4, 0, 0];
 const TAG_PATH =
-  'M13.47,2.52c-0.27-0.27-0.71-0.27-1.59-0.27h-0.64c-1.51,0-2.26,0-2.95,0.29C7.61,2.82,7.07,3.35,6,4.43L3.65,6.78c-0.93,0.93-1.4,1.4-1.4,1.97c0,0.58,0.46,1.04,1.39,1.97l1.63,1.63c0.93,0.93,1.39,1.39,1.97,1.39s1.04-0.46,1.97-1.39L11.57,10c1.07-1.07,1.61-1.61,1.89-2.29c0.28-0.68,0.28-1.44,0.28-2.96V4.11C13.74,3.23,13.74,2.8,13.47,2.52z M10.5,6.9c-0.77,0-1.4-0.63-1.4-1.4s0.63-1.39,1.4-1.39s1.39,0.63,1.39,1.4S11.27,6.9,10.5,6.9z';
+  "M13.47,2.52c-0.27-0.27-0.71-0.27-1.59-0.27h-0.64c-1.51,0-2.26,0-2.95,0.29C7.61,2.82,7.07,3.35,6,4.43L3.65,6.78c-0.93,0.93-1.4,1.4-1.4,1.97c0,0.58,0.46,1.04,1.39,1.97l1.63,1.63c0.93,0.93,1.39,1.39,1.97,1.39s1.04-0.46,1.97-1.39L11.57,10c1.07-1.07,1.61-1.61,1.89-2.29c0.28-0.68,0.28-1.44,0.28-2.96V4.11C13.74,3.23,13.74,2.8,13.47,2.52z M10.5,6.9c-0.77,0-1.4-0.63-1.4-1.4s0.63-1.39,1.4-1.39s1.39,0.63,1.39,1.4S11.27,6.9,10.5,6.9z";
 const OCR_PATH =
-  'M13,1v2H6C4.11,3,3.17,3,2.59,3.59C2,4.17,2,5.11,2,7v2c0,1.89,0,2.83,0.59,3.41C3.17,13,4.11,13,6,13h7v2h1V1H13z M6,9.5C5.17,9.5,4.5,8.83,4.5,8S5.17,6.5,6,6.5S7.5,7.17,7.5,8S6.83,9.5,6,9.5z M11,9.5c-0.83,0-1.5-0.67-1.5-1.5s0.67-1.5,1.5-1.5s1.5,0.67,1.5,1.5S11.83,9.5,11,9.5z';
+  "M13,1v2H6C4.11,3,3.17,3,2.59,3.59C2,4.17,2,5.11,2,7v2c0,1.89,0,2.83,0.59,3.41C3.17,13,4.11,13,6,13h7v2h1V1H13z M6,9.5C5.17,9.5,4.5,8.83,4.5,8S5.17,6.5,6,6.5S7.5,7.17,7.5,8S6.83,9.5,6,9.5z M11,9.5c-0.83,0-1.5-0.67-1.5-1.5s0.67-1.5,1.5-1.5s1.5,0.67,1.5,1.5S11.83,9.5,11,9.5z";
 
 const LabelOnBbox = ({
   x,
@@ -71,7 +71,7 @@ const LabelOnBbox = ({
         let bottomLeft = 0;
         let bottomRight = 0;
 
-        if (typeof cornerRadius === 'number') {
+        if (typeof cornerRadius === "number") {
           topLeft = topRight = bottomLeft = bottomRight = Math.min(cornerRadius, width / 2, height / 2);
         } else {
           topLeft = Math.min(cornerRadius[0], width / 2, height / 2);
@@ -111,7 +111,7 @@ const LabelOnBbox = ({
             text={score.toFixed(2)}
             fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
             fontSize={fontSize}
-            fill='white'
+            fill="white"
             padding={0}
             lineHeight={(1 / fontSize) * height}
           />
@@ -138,8 +138,8 @@ const LabelOnBbox = ({
               lineHeight={(1 / fontSize) * height}
               height={height}
               width={width}
-              wrap='none'
-              ellipsis='true'
+              wrap="none"
+              ellipsis="true"
               fill={Constants.SHOW_LABEL_FILL}
               padding={0}
             />
@@ -161,7 +161,7 @@ const LabelOnBbox = ({
 const LabelOnEllipse = observer(({ item, color, strokewidth }) => {
   const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
-  const labelText = item.getLabelText(',');
+  const labelText = item.getLabelText(",");
   const obj = item.parent;
 
   if (!isLabeling && !isTexting) return null;
@@ -186,7 +186,7 @@ const LabelOnEllipse = observer(({ item, color, strokewidth }) => {
 const LabelOnRect = observer(({ item, color, strokewidth }) => {
   const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
-  const labelText = item.getLabelText(',');
+  const labelText = item.getLabelText(",");
   const obj = item.parent;
 
   if (!isLabeling && !isTexting) return null;
@@ -214,7 +214,7 @@ const LabelOnRect = observer(({ item, color, strokewidth }) => {
 const LabelOnPolygon = observer(({ item, color }) => {
   const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
-  const labelText = item.getLabelText(',');
+  const labelText = item.getLabelText(",");
 
   if (!isLabeling && !isTexting) return null;
 
@@ -262,7 +262,7 @@ const LabelOnMask = observer(({ item, color }) => {
 
   const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
-  const labelText = item.getLabelText(',');
+  const labelText = item.getLabelText(",");
 
   if (!isLabeling && !isTexting) return null;
 
@@ -270,7 +270,7 @@ const LabelOnMask = observer(({ item, color }) => {
 
   if (!bbox) return null;
   return (
-    <Group name='region-label'>
+    <Group name="region-label">
       <Rect
         x={bbox.left}
         y={bbox.top}
@@ -301,7 +301,7 @@ const LabelOnMask = observer(({ item, color }) => {
 const LabelOnKP = observer(({ item, color }) => {
   const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
-  const labelText = item.getLabelText(',');
+  const labelText = item.getLabelText(",");
 
   if (!isLabeling && !isTexting) return null;
 
@@ -325,7 +325,7 @@ const LabelOnKP = observer(({ item, color }) => {
 const LabelOnVideoBbox = observer(({ reg, box, color, scale, strokeWidth, adjacent = false }) => {
   const isLabeling = !!reg.labeling;
   const isTexting = !!reg.texting;
-  const labelText = reg.getLabelText(',');
+  const labelText = reg.getLabelText(",");
 
   if (!isLabeling && !isTexting) return null;
 
