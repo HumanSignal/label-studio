@@ -32,7 +32,6 @@ Scenario('Play/pause of multiple synced audio stay in sync', async function({ I,
 
   await AtAudioView.waitForAudio();
   await AtAudioView.lookForStage();
-
   {
     const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
 
@@ -77,10 +76,17 @@ Scenario('Looping of multiple synced audio stay in sync', async function({ I, La
 
   await AtAudioView.waitForAudio();
   await AtAudioView.lookForStage();
+  {
+    const [{ currentTime: audioTime1 }, { currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
+
+    assert.equal(audioTime1, audioTime2);
+    assert.equal(audioTime1, 0);
+  }
 
   I.say('Draw an audio segment to start looping');
   I.wait(1);
   AtAudioView.dragAudioElement(160, 80);
+  I.wait(1);
   {
     const [{ paused: audioPaused1, currentTime: audioTime1 }, { paused: audioPaused2, currentTime: audioTime2 }] = await AtAudioView.getCurrentAudio();
 
