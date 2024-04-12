@@ -174,12 +174,14 @@ Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   await session('Deserialization', async () => {
     I.amOnPage('/');
+    I.wait(1);
     LabelStudio.init({
       ...params,
       annotations: [{
         id: 'test', result,
       }],
     });
+    I.wait(1);
     I.say('Restore user labels');
     LabelStudio.initUserLabels(userLabels);
 
