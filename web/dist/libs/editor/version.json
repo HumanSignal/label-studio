@@ -1,6 +1,6 @@
 {
-  "message": "change from open taxonomy by click to open by search",
-  "commit": "9bc4938a5789eb872bc31a0a5205cb99a32873bb",
-  "date": "2024-04-12T17:23:02.000Z",
+  "message": "add wait object to be ready",
+  "commit": "1c0434d59431e2f86e92e5de1ca669712b1d3544",
+  "date": "2024-04-12T17:36:47.000Z",
   "branch": "fb-leap-999"
 }
