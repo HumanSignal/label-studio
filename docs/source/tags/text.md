@@ -1,7 +1,7 @@
 ---
 title: Text
 type: tags
-order: 306
+order: 308
 meta_title: Text Tags for Text Objects
 meta_description: Customize Label Studio with the Text tag to annotate text for NLP and NER machine learning and data science projects.
 ---
