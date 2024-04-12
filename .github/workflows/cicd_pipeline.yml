@@ -118,6 +118,15 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
+  biome:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true'
+    uses: ./.github/workflows/biome.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
   build-frontend:
     name: "Build"
     needs:
@@ -443,6 +452,7 @@ jobs:
       - bandit
       - ruff
       - blue
+      - biome
       - pytest
       - migrations
       - build-docker
