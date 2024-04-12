@@ -260,9 +260,8 @@ const Model = types
 
         if (dist_points < r) {
           return true;
-        } else {
-          return false;
         }
+        return false;
       },
 
       destroyRegion() {

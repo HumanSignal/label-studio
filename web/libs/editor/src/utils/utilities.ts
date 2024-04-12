@@ -209,9 +209,8 @@ export const camelizeKeys = (object: any): Record<string, unknown> => {
     Object.entries(object).map(([key, value]) => {
       if (Object.prototype.toString.call(value) === "[object Object]") {
         return [toCamelCase(key), camelizeKeys(value)];
-      } else {
-        return [toCamelCase(key), value];
       }
+      return [toCamelCase(key), value];
     }),
   );
 };

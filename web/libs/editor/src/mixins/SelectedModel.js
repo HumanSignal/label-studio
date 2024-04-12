@@ -84,12 +84,11 @@ const SelectedModelMixin = types
     checkMaxUsages() {
       if (isFF(FF_DEV_3666)) {
         return self.tiedChildren.filter((c) => !c.canBeUsed());
-      } else {
-        const list = self.tiedChildren.filter((c) => !c.canBeUsed());
-
-        if (list.length) list.forEach((c) => c.setSelected(false));
-        return list;
       }
+      const list = self.tiedChildren.filter((c) => !c.canBeUsed());
+
+      if (list.length) list.forEach((c) => c.setSelected(false));
+      return list;
     },
 
     selectFirstVisible() {

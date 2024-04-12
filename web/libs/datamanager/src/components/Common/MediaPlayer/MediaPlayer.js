@@ -59,9 +59,8 @@ export const MediaPlayer = ({ src, video = false }) => {
   const format = useMemo(() => {
     if (state.duration >= 3600) {
       return ["hours", "minutes", "seconds"];
-    } else {
-      return ["minutes", "seconds"];
     }
+    return ["minutes", "seconds"];
   }, [state.duration]);
 
   const play = useCallback(() => {
@@ -97,7 +96,8 @@ export const MediaPlayer = ({ src, video = false }) => {
   const waitForPlayer = useCallback(() => {
     if (state?.error) {
       return;
-    } else if (state?.loaded) {
+    }
+    if (state?.loaded) {
       play();
     } else {
       setTimeout(() => waitForPlayer(), 10);

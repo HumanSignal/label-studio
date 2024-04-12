@@ -359,14 +359,13 @@ const HtxVideoView = ({ item, store }) => {
         return true;
       }
       // Audio v1,v2
-      else {
-        if (_playing === false) {
-          item.ref.current.play();
-          item.triggerSyncPlay();
-          return true;
-        }
-        return _playing;
+
+      if (_playing === false) {
+        item.ref.current.play();
+        item.triggerSyncPlay();
+        return true;
       }
+      return _playing;
     });
   }, []);
 
@@ -381,14 +380,13 @@ const HtxVideoView = ({ item, store }) => {
         return false;
       }
       // Audio v1,v2
-      else {
-        if (_playing === true) {
-          item.ref.current.pause();
-          item.triggerSyncPause();
-          return false;
-        }
-        return _playing;
+
+      if (_playing === true) {
+        item.ref.current.pause();
+        item.triggerSyncPause();
+        return false;
       }
+      return _playing;
     });
   }, []);
 

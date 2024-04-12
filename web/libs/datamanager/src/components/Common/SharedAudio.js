@@ -26,9 +26,8 @@ const PlaybackControl = ({ current, duration, onChange }) => {
   const format = React.useMemo(() => {
     if (duration >= 3600) {
       return ["hours", "minutes", "seconds"];
-    } else {
-      return ["minutes", "seconds"];
     }
+    return ["minutes", "seconds"];
   }, [duration]);
 
   return (

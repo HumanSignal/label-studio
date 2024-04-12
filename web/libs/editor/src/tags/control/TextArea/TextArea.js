@@ -144,9 +144,8 @@ const Model = types
         const num = Number.parseInt(self.maxsubmissions);
 
         return self.submissionsNum < num;
-      } else {
-        return true;
       }
+      return true;
     },
 
     get serializableValue() {

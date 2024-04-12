@@ -248,9 +248,8 @@ function renderChildren(item: IAnyStateTreeNode, annotation: IAnnotation) {
     return item.children.map((el: IAnyStateTreeNode) => {
       return renderItem(el, annotation);
     });
-  } else {
-    return null;
   }
+  return null;
 }
 
 /**

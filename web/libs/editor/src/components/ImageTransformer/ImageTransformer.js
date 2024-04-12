@@ -150,9 +150,8 @@ export default class TransformerComponent extends Component {
       // if bounding box is out of stage — do nothing
       if (["x", "y", "width", "height"].some((key) => Math.abs(fixed[key] - clientRect[key]) > EPSILON)) return oldBox;
       return newBox;
-    } else {
-      return this.fitBBoxToScaledStage(newBox, stageDimensions);
     }
+    return this.fitBBoxToScaledStage(newBox, stageDimensions);
   };
 
   dragBoundFunc = (pos) => {
@@ -280,8 +279,7 @@ export default class TransformerComponent extends Component {
 
     if (isFF(FF_DEV_2671)) {
       return this.renderLSTransformer();
-    } else {
-      return this.renderOldLSTransformer();
     }
+    return this.renderOldLSTransformer();
   }
 }

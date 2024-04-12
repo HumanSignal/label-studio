@@ -48,7 +48,8 @@ let LabelStudioDM;
 const resolveLabelStudio = async () => {
   if (LabelStudioDM) {
     return LabelStudioDM;
-  } else if (window.LabelStudio) {
+  }
+  if (window.LabelStudio) {
     return (LabelStudioDM = window.LabelStudio);
   }
 };
@@ -718,23 +719,22 @@ export class LSFWrapper {
 
       showToast && this.draftToast(res?.$meta?.status);
       return res;
-    } else {
-      let response;
-
-      if (annotationDoesntExist) {
-        response = await this.datamanager.apiCall("createDraftForTask", { taskID: this.task.id }, data);
-      } else {
-        response = await this.datamanager.apiCall(
-          "createDraftForAnnotation",
-          { taskID: this.task.id, annotationID: annotation.pk },
-          data,
-        );
-      }
-      response?.id && annotation.setDraftId(response?.id);
-      showToast && this.draftToast(response?.$meta?.status);
-
-      return response;
     }
+    let response;
+
+    if (annotationDoesntExist) {
+      response = await this.datamanager.apiCall("createDraftForTask", { taskID: this.task.id }, data);
+    } else {
+      response = await this.datamanager.apiCall(
+        "createDraftForAnnotation",
+        { taskID: this.task.id, annotationID: annotation.pk },
+        data,
+      );
+    }
+    response?.id && annotation.setDraftId(response?.id);
+    showToast && this.draftToast(response?.$meta?.status);
+
+    return response;
   };
 
   onSkipTask = async (_, { comment } = {}) => {
@@ -750,10 +750,9 @@ export class LSFWrapper {
 
         if (id === undefined) {
           return this.datamanager.apiCall("submitAnnotation", params, options);
-        } else {
-          params.annotationID = id;
-          return this.datamanager.apiCall("updateAnnotation", params, options);
         }
+        params.annotationID = id;
+        return this.datamanager.apiCall("updateAnnotation", params, options);
       },
       true,
       this.shouldLoadNext(),
