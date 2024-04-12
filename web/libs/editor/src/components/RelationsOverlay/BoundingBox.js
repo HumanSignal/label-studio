@@ -1,5 +1,5 @@
-import { wrapArray } from '../../utils/utilities';
-import { Geometry } from './Geometry';
+import { wrapArray } from "../../utils/utilities";
+import { Geometry } from "./Geometry";
 
 /**
  * @type {import("./Geometry").BBox}
@@ -15,7 +15,7 @@ export class BoundingBox {
   static bbox(region) {
     const bbox = _detect(region);
 
-    return wrapArray(bbox).map(bbox => Object.assign({ ...DEFAULT_BBOX }, bbox));
+    return wrapArray(bbox).map((bbox) => Object.assign({ ...DEFAULT_BBOX }, bbox));
   }
 
   /**
@@ -73,45 +73,46 @@ const stageRelatedBBox = (region, bbox) => {
   };
 };
 
-const _detect = region => {
+const _detect = (region) => {
   switch (region.type) {
-    case 'textrange':
-    case 'richtextregion':
-    case 'textarearegion':
-    case 'audioregion':
-    case 'paragraphs':
-    case 'timeseriesregion': {
+    case "textrange":
+    case "richtextregion":
+    case "textarearegion":
+    case "audioregion":
+    case "paragraphs":
+    case "timeseriesregion": {
       const regionBbox = Geometry.getDOMBBox(region.getRegionElement());
       const container = region.parent?.visibleNodeRef?.current;
 
-      if (container?.tagName === 'IFRAME') {
+      if (container?.tagName === "IFRAME") {
         const iframeBbox = Geometry.getDOMBBox(container, true);
 
-        return regionBbox?.map(bbox => ({
-          ...bbox,
-          x: bbox.x + iframeBbox.x,
-          y: bbox.y + iframeBbox.y,
-        })) || null;
+        return (
+          regionBbox?.map((bbox) => ({
+            ...bbox,
+            x: bbox.x + iframeBbox.x,
+            y: bbox.y + iframeBbox.y,
+          })) || null
+        );
       }
 
       return regionBbox;
     }
-    case 'rectangleregion':
-    case 'ellipseregion':
-    case 'polygonregion':
-    case 'keypointregion':
-    case 'brushregion': {
+    case "rectangleregion":
+    case "ellipseregion":
+    case "polygonregion":
+    case "keypointregion":
+    case "brushregion": {
       const bbox = region.bboxCoordsCanvas;
 
-      return bbox ? stageRelatedBBox(
-        region,
-        {
-          x: bbox.left,
-          y: bbox.top,
-          width: bbox.right - bbox.left,
-          height: bbox.bottom - bbox.top,
-        },
-      ) : DEFAULT_BBOX;
+      return bbox
+        ? stageRelatedBBox(region, {
+            x: bbox.left,
+            y: bbox.top,
+            width: bbox.right - bbox.left,
+            height: bbox.bottom - bbox.top,
+          })
+        : DEFAULT_BBOX;
     }
     default: {
       console.warn(`Unknown region type: ${region.type}`);

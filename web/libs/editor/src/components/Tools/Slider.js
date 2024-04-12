@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from 'react';
-import { Button, Slider, Tooltip } from 'antd';
-import { observer } from 'mobx-react';
+import { Button, Slider, Tooltip } from "antd";
+import { observer } from "mobx-react";
+import React, { Component, Fragment } from "react";
 
-import styles from './Styles.module.scss';
+import styles from "./Styles.module.scss";
 
 export default observer(
   class SliderTool extends Component {
@@ -22,7 +22,7 @@ export default observer(
           <Tooltip title={this.props.title} placement="left">
             <Button
               shape="circle"
-              type={this.props.selected ? 'primary' : 'default'}
+              type={this.props.selected ? "primary" : "default"}
               className={styles.button}
               onClick={this.props.onClick}
             >

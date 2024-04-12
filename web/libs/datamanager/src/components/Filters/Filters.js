@@ -1,7 +1,7 @@
 import { inject } from "mobx-react";
 import React from "react";
 import { FaCaretSquareRight, FaPlus } from "react-icons/fa";
-import { Block, cn, Elem } from "../../utils/bem";
+import { Block, Elem, cn } from "../../utils/bem";
 import { Button } from "../Common/Button/Button";
 import { Icon } from "../Common/Icon/Icon";
 import { Tooltip } from "../Common/Tooltip/Tooltip";
@@ -70,12 +70,7 @@ export const Filters = injector(({ views, currentView, filters }) => {
         )}
       </Elem>
       <Elem name="actions">
-        <Button
-          type="primary"
-          size="small"
-          onClick={() => currentView.createFilter()}
-          icon={<FaPlus />}
-        >
+        <Button type="primary" size="small" onClick={() => currentView.createFilter()} icon={<FaPlus />}>
           Add {filters.length ? "Another Filter" : "Filter"}
         </Button>
 

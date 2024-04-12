@@ -1,19 +1,19 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button, Spinner } from '../../../components';
-import { Description } from '../../../components/Description/Description';
-import { Divider } from '../../../components/Divider/Divider';
-import { Form, Label, Toggle } from '../../../components/Form';
-import { modal } from '../../../components/Modal/Modal';
-import { EmptyState } from '../../../components/EmptyState/EmptyState';
-import { IconEmptyPredictions } from '../../../assets/icons';
-import { useAPI } from '../../../providers/ApiProvider';
-import { ProjectContext } from '../../../providers/ProjectProvider';
-import { MachineLearningList } from './MachineLearningList';
-import { CustomBackendForm } from './Forms';
-import { TestRequest } from './TestRequest';
-import { StartModelTraining } from './StartModelTraining';
-import { Block, Elem } from '../../../utils/bem';
-import './MachineLearningSettings.styl';
+import { useCallback, useContext, useEffect, useState } from "react";
+import { IconEmptyPredictions } from "../../../assets/icons";
+import { Button, Spinner } from "../../../components";
+import { Description } from "../../../components/Description/Description";
+import { Divider } from "../../../components/Divider/Divider";
+import { EmptyState } from "../../../components/EmptyState/EmptyState";
+import { Form, Label, Toggle } from "../../../components/Form";
+import { modal } from "../../../components/Modal/Modal";
+import { useAPI } from "../../../providers/ApiProvider";
+import { ProjectContext } from "../../../providers/ProjectProvider";
+import { Block, Elem } from "../../../utils/bem";
+import { CustomBackendForm } from "./Forms";
+import { MachineLearningList } from "./MachineLearningList";
+import "./MachineLearningSettings.styl";
+import { StartModelTraining } from "./StartModelTraining";
+import { TestRequest } from "./TestRequest";
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
@@ -24,7 +24,7 @@ export const MachineLearningSettings = () => {
 
   const fetchBackends = useCallback(async () => {
     setLoading(true);
-    const models = await api.callApi('mlBackends', {
+    const models = await api.callApi("mlBackends", {
       params: {
         project: project.id,
         include_static: true,
@@ -66,9 +66,9 @@ export const MachineLearningSettings = () => {
 
   const showMLFormModal = useCallback(
     (backend) => {
-      const action = backend ? 'updateMLBackend' : 'addMLBackend';
+      const action = backend ? "updateMLBackend" : "addMLBackend";
       const modalProps = {
-        title: `${backend ? 'Edit' : 'Connect'} Model`,
+        title: `${backend ? "Edit" : "Connect"} Model`,
         style: { width: 760 },
         closeOnClickOutside: false,
         body: (
@@ -97,31 +97,27 @@ export const MachineLearningSettings = () => {
 
   return (
     <Block name="ml-settings">
-      <Elem name={'wrapper'}>
+      <Elem name={"wrapper"}>
         {loading && <Spinner size={32} />}
         {loaded && backends.length === 0 && (
           <EmptyState
             icon={<IconEmptyPredictions />}
             title="Let’s connect your first model"
             description="Connect a machine learning model to generate predictions. These predictions can be compared side by side, used for efficient pre‒labeling and, to aid in active learning, directing users to the most impactful labeling tasks."
-            action={(
+            action={
               <Button primary onClick={() => showMLFormModal()}>
                 Connect Model
               </Button>
-            )}
-            footer={(
+            }
+            footer={
               <div>
                 Need help?
-                <br/>
-                <a
-                  href="https://labelstud.io/guide/ml"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <br />
+                <a href="https://labelstud.io/guide/ml" target="_blank" rel="noreferrer">
                   Learn more about connecting models in our docs
                 </a>
               </div>
-            )}
+            }
           />
         )}
         <MachineLearningList
@@ -136,27 +132,34 @@ export const MachineLearningSettings = () => {
 
         {backends.length > 0 && (
           <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: "1.5em" }}>
-            A connected model has been detected! If you wish to fetch
-            predictions from this model, please follow these steps:
+            A connected model has been detected! If you wish to fetch predictions from this model, please follow these
+            steps:
             <br />
             <br />
             1. Navigate to the <i>Data Manager</i>.<br />
-            2. Select the desired tasks.<br />
-            3. Click on <i>Batch predictions</i> from the{' '}
-            <i>Actions</i> menu.
+            2. Select the desired tasks.
+            <br />
+            3. Click on <i>Batch predictions</i> from the <i>Actions</i> menu.
             <br />
             <br />
-            Additionally, you can configure the system to use this model for
-            fetching live predictions in {" "}
+            Additionally, you can configure the system to use this model for fetching live predictions in{" "}
             <a
               style={{ color: "unset", textDecoration: "underline" }}
-              target="_blank" href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
-            ><i>Label&nbsp;All&nbsp;Tasks</i></a>{" "}
+              target="_blank"
+              href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
+              rel="noreferrer"
+            >
+              <i>Label&nbsp;All&nbsp;Tasks</i>
+            </a>{" "}
             and{" "}
             <a
               style={{ color: "unset", textDecoration: "underline" }}
-              target="_blank" href="https://labelstud.io/guide/get_started#Interface"
-            ><i>Quick View</i></a>{" "}
+              target="_blank"
+              href="https://labelstud.io/guide/get_started#Interface"
+              rel="noreferrer"
+            >
+              <i>Quick View</i>
+            </a>{" "}
             on the <i>Annotation</i> tab.
           </Description>
         )}
@@ -197,5 +200,5 @@ export const MachineLearningSettings = () => {
   );
 };
 
-MachineLearningSettings.title = 'Model';
-MachineLearningSettings.path = '/ml';
+MachineLearningSettings.title = "Model";
+MachineLearningSettings.path = "/ml";

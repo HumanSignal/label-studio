@@ -1,31 +1,22 @@
-import React from 'react';
-import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
-import { PeoplePage } from './PeoplePage/PeoplePage';
-import { WebhookPage } from '../WebhookPage/WebhookPage';
+import React from "react";
+import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
+import { WebhookPage } from "../WebhookPage/WebhookPage";
+import { PeoplePage } from "./PeoplePage/PeoplePage";
 
 const ALLOW_ORGANIZATION_WEBHOOKS = window.APP_SETTINGS.flags?.allow_organization_webhooks;
 
-
 const MenuLayout = ({ children, ...routeProps }) => {
-  let menuItems = [PeoplePage];
+  const menuItems = [PeoplePage];
 
-  if (ALLOW_ORGANIZATION_WEBHOOKS){
-    menuItems.push(
-      WebhookPage,
-    );
+  if (ALLOW_ORGANIZATION_WEBHOOKS) {
+    menuItems.push(WebhookPage);
   }
-  return (
-    <SidebarMenu
-      menuItems={menuItems}
-      path={routeProps.match.url}
-      children={children}
-    />
-  );
+  return <SidebarMenu menuItems={menuItems} path={routeProps.match.url} children={children} />;
 };
 
 const organizationPages = {};
 
-if (ALLOW_ORGANIZATION_WEBHOOKS){
+if (ALLOW_ORGANIZATION_WEBHOOKS) {
   organizationPages[WebhookPage] = WebhookPage;
 }
 

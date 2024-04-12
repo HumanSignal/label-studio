@@ -38,10 +38,10 @@ export const Spinner = injector(({ SDK, visible = true, ...props }) => {
     <div
       {...props}
       style={{ width: size, height: size }}
-      children={(
+      children={
         <div style={{ width: "100%", height: "100%" }}>
           {ExternalSpinner ? (
-            <ExternalSpinner size={size}/>
+            <ExternalSpinner size={size} />
           ) : (
             <img
               src={source.x1}
@@ -51,7 +51,7 @@ export const Spinner = injector(({ SDK, visible = true, ...props }) => {
             />
           )}
         </div>
-      )}
+      }
     />
   ) : null;
 });
