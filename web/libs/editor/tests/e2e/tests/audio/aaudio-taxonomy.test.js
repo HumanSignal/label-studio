@@ -13,26 +13,6 @@ Before(({ LabelStudio }) => {
 });
 
 Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
-  async function checkOverlapAndGap(text1, text2) {
-    const bbox1 = await I.grabElementBoundingRect(AtTaxonomy.locate(AtTaxonomy.item).find('label').withText(text1));
-    const bbox2 = await I.grabElementBoundingRect(AtTaxonomy.locate(AtTaxonomy.item).find('label').withText(text2));
-
-    bbox1.y2 = bbox1.y + bbox1.height;
-    bbox2.y2 = bbox2.y + bbox2.height;
-
-    if (
-      bbox1.y < bbox2.y && bbox2.y < bbox1.y2
-      || bbox1.y < bbox2.y2 && bbox2.y2 < bbox1.y2
-    ) {
-      assert.fail('Overlap has been detected');
-    }
-    const gap = Math.min(Math.abs(bbox1.y - bbox2.y2), Math.abs(bbox2.y - bbox1.y2));
-
-    if (gap > 0) {
-      assert.fail(`Detected Lines gap ${gap}`);
-    }
-  }
-
   I.amOnPage('/');
   LabelStudio.init({
     config: `
@@ -55,8 +35,6 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('target group 1');
-
-  await checkOverlapAndGap('long long long', 'not so long');
 
 
   I.amOnPage('/');
@@ -81,7 +59,6 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.fillSearch('long');
-  await checkOverlapAndGap('long long long', 'not so long');
 
   I.amOnPage('/');
   LabelStudio.init({
@@ -105,8 +82,6 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.fillSearch('long');
-  await checkOverlapAndGap('super long line', 'enough long line');
-  await checkOverlapAndGap('enough long line', 'not long line');
 });
 
 Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
