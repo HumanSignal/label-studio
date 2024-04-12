@@ -76,7 +76,6 @@
         "noParameterAssign": "off"
       },
       "nursery": {
-        "noFocusedTests": "off",
         "noSkippedTests": "off",
         "noUselessTernary": "off",
         "useSortedClasses": "off"
