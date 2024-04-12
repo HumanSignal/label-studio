@@ -8,7 +8,7 @@ export const Button = React.forwardRef(
   ({ children, type, extra, className, size, waiting, icon, tag, look, ...rest }, ref) => {
     const finalTag = tag ?? (rest.href ? "a" : "button");
 
-    const mods = {
+    let mods = {
       size,
       waiting,
       type,
