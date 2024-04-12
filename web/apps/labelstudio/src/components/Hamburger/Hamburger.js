@@ -7,9 +7,9 @@ export const Hamburger = ({ opened, animated = true }) => {
 
   return (
     <span className={root.mod({ animated, opened })}>
-      <span></span>
-      <span></span>
-      <span></span>
+      <span />
+      <span />
+      <span />
     </span>
   );
 };

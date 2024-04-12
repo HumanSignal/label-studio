@@ -23,7 +23,7 @@ export const Checkbox = ({ checked, indeterminate, style, onChange, children, ..
           onChange?.(e);
         }}
       />
-      <span className={rootClass.elem("check").mod({ checked, indeterminate })}></span>
+      <span className={rootClass.elem("check").mod({ checked, indeterminate })} />
     </span>
   );
 

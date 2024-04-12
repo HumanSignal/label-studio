@@ -62,7 +62,7 @@ const Toggle = forwardRef(
                 onChange?.(e);
               }}
             />
-            <span className={rootClass.elem("indicator")}></span>
+            <span className={rootClass.elem("indicator")} />
           </div>
         )}
       </FormField>

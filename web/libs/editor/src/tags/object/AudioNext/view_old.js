@@ -43,7 +43,7 @@ const HtxAudioView = ({ store, item }) => {
         />
 
         <AudioControls item={item} store={store} />
-        <div style={{ marginBottom: "4px" }}></div>
+        <div style={{ marginBottom: "4px" }} />
       </Fragment>
     </ObjectTag>
   );
