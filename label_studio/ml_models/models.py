@@ -65,8 +65,9 @@ class ModelVersion(models.Model):
         """
         Deletes Predictions associated with ModelVersion
         """
-        model_run = ModelRun.objects.get(model_version=self.id)
-        model_run.delete_predictions()
+        model_runs = ModelRun.objects.filter(model_version=self.id)
+        for model_run in model_runs:
+            model_run.delete_predictions()
         super().delete(*args, **kwargs)
 
 
