@@ -184,4 +184,3 @@ class ModelRun(models.Model):
         """
         self.delete_predictions()
         super().delete(*args, **kwargs)
-
