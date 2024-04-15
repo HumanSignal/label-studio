@@ -29,18 +29,11 @@ export const AutoAcceptToggle = injector(observer(({
     <Block name="auto-accept">
       <Elem name="wrapper">
         <Space spread>
-          <Toggle
-            checked={store.autoAcceptSuggestions}
-            onChange={(e) => {
-              const checked = e.target.checked;
-
-              store.setAutoAcceptSuggestions(checked);
-            }}
-            label="Auto-Accept Suggestions"
-            style={{ color: '#7F64FF' }}
-          />
-          {suggestions.size > 0 && (
+          {suggestions.size > 0 ? (
             <Space size="small">
+              <Elem name="info">
+                {suggestions.size} suggestion{suggestions.size > 0 && 's'}
+              </Elem>
               <Elem name="action" tag={Button} mod={{ type: 'reject' }} onClick={() => annotation.rejectAllSuggestions()}>
                 <IconCross/>
               </Elem>
@@ -48,6 +41,13 @@ export const AutoAcceptToggle = injector(observer(({
                 <IconCheck/>
               </Elem>
             </Space>
+          ) : (
+            <Toggle
+              checked={store.autoAcceptSuggestions}
+              onChange={(e) => store.setAutoAcceptSuggestions(e.target.checked)}
+              label="Auto-Accept Suggestions"
+              style={{ color: '#7F64FF' }}
+            />
           )}
         </Space>
       </Elem>
