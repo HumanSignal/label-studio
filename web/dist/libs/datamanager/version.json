@@ -1,13 +1,6 @@
 {
-<<<<<<< HEAD
-  "message": "fixes for LEAP-872, LEAP-935, LEAP-942, including moving the",
-  "commit": "aee7114e2aa471825bc343e35d7001dc6db3e79b",
-  "date": "2024-04-10T04:07:25.000Z",
-  "branch": "dev/move-auto-accept"
-=======
-  "message": "Merge branch 'develop' into 'fb-leap-859/colimn-special-characters'",
-  "commit": "f3fa69b33601204f47e6ccc049aefa899b531986",
-  "date": "2024-04-11T15:28:30.000Z",
-  "branch": "fb-leap-859/colimn-special-characters"
->>>>>>> origin/develop
+  "message": "Merge branch 'develop' into 'fb-ml-release-blocker'",
+  "commit": "7fb6687cecee267e60df5c8a25defdb5ff78cdb4",
+  "date": "2024-04-15T16:53:38.000Z",
+  "branch": "fb-ml-release-blocker"
 }
