@@ -57,21 +57,19 @@ class ModelVersion(models.Model):
 
     parent_model = models.ForeignKey(ModelInterface, related_name='model_versions', on_delete=models.CASCADE)
 
+    prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+
     @property
     def full_title(self):
         return f'{self.parent_model.title}__{self.title}'
 
-    prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
-
-    def delete_predictions(self):
+    def delete(self, *args, **kwargs):
         """
-        Deletes any predictions that have originated from a ModelVersion
-
-        Currently assumes that we are setting the `model_version` field of Prediction
-        to ModelVersion.full_title
+        Deletes Predictions associated with ModelVersion
         """
-
-        predictions = Prediction.objects.filter(model_version=self.full_title).delete()
+        model_run = ModelRun.objects.get(model_version=self.id)
+        model_run.delete_predictions()
+        super().delete(*args, **kwargs)
 
 
 class ThirdPartyModelVersion(ModelVersion):
@@ -173,26 +171,17 @@ class ModelRun(models.Model):
     def error_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
 
+    def delete_predictions(self):
+        """
+        Deletes any predictions that have originated from a ModelRun
+        """
 
-@receiver(pre_delete, sender=ModelVersion)
-def delete_predictions_model_version(sender, instance, **kwargs):
-    """
-    Deletes all Prediction objects associated with a ModelVersion when
-    deleting that ModelVersion
-    """
+        predictions = Prediction.objects.filter(model_run=self.id).delete()
 
-    instance.delete_predictions()
+    def delete(self, *args, **kwargs):
+        """
+        Deletes Predictions associated with ModelRun
+        """
+        self.delete_predictions()
+        super().delete(*args, **kwargs)
 
-
-@receiver(pre_delete, sender=ModelVersion)
-def delete_predictions_model_run(sender, instance, **kwargs):
-    """
-    Deletes all Prediction objects associated with a ModelVersion when
-    deleting a ModelRun.
-
-    We only allow for a single ModelRun object to exist per-ModelVersion,
-    so when we start a new run, we delete the existing one. We want to delete
-    Predictions in that case so we only have the new ones from new ModelRun
-    """
-
-    instance.model_version.delete_predictions()
