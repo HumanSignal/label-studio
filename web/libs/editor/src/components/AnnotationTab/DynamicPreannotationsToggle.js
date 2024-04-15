@@ -32,7 +32,6 @@ export const DynamicPreannotationsToggle = inject('store')(observer(({ store }) 
             label="Auto-Annotation"
             style={{ color: '#7F64FF' }}
           />
-          
         </Space>
       </Elem>
     </Block>

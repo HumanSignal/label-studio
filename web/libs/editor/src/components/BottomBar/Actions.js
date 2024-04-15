@@ -52,7 +52,7 @@ export const Actions = ({ store }) => {
       {!isViewAll && (
         <Elem name="section">
           <DynamicPreannotationsToggle />
-	  <AutoAcceptToggle />
+          <AutoAcceptToggle />
         </Elem>
       )}
     </Elem>

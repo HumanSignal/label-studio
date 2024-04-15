@@ -1,5 +1,4 @@
 import { inject, observer } from 'mobx-react';
-import { useEffect } from 'react';
 
 import { Block, Elem } from '../../utils/bem';
 import { Button } from '../../common/Button/Button';
@@ -34,7 +33,7 @@ export const AutoAcceptToggle = injector(observer(({
             checked={store.autoAcceptSuggestions}
             onChange={(e) => {
               const checked = e.target.checked;
-              
+
               store.setAutoAcceptSuggestions(checked);
             }}
             label="Auto-Accept Suggestions"
