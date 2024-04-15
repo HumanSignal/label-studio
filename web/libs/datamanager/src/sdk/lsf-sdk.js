@@ -442,7 +442,8 @@ export class LSFWrapper {
       }
     } else {
       if (this.annotations.length === 0 && this.predictions.length > 0 && !this.isInteractivePreannotations) {
-        annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
+        const predictionByModelVersion = this.predictions.find(p => p.createdBy === this.project.model_version);
+        annotation = cs.addAnnotationFromPrediction(predictionByModelVersion);
       } else if (this.annotations.length > 0 && id && id !== "auto") {
         annotation = this.annotations.find((c) => c.pk === id || c.id === id);
       } else if (this.annotations.length > 0 && (id === "auto" || hasAutoAnnotations)) {
