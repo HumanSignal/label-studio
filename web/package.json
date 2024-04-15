@@ -20,9 +20,13 @@
     "version:libs": "nx run-many --target=version",
     "docs": "nx run-many --target=docs",
     "watch": "nx run-many --target=build --configuration=production --watch",
-    "test:unit": "yarn lsf:unit && yarn ls:unit && yarn dm:unit",
     "test:e2e": "yarn ls:e2e && yarn lsf:e2e",
     "test:integration": "yarn lsf:integration",
+    "test:unit": "nx run-many --target=unit",
+    "test:coverage": "yarn test:unit --coverage",
+    "test:affected": "nx affected --target=test:unit --base=develop",
+    "test:watch": "yarn test:unit --all --watch",
+    "test:watch:affected": "yarn test --watch",
     "postinstall": "npx -y copy-files-from-to"
   },
   "husky": {
@@ -90,7 +94,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.5",
+    "@babel/core": "^7.23.2",
     "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.12.13",
     "@babel/plugin-proposal-optional-chaining": "^7.12.17",

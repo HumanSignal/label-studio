@@ -3,7 +3,7 @@ const Helpers = require('../helpers');
 
 Feature('Image zoom position').tag('@regress');
 
-const IMAGE = 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
+const IMAGE = 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg';
 
 const config = `
   <View>
@@ -182,6 +182,9 @@ Data(relativeCoordsFF).Scenario('Zoomed image should keep center image in center
   for (const [shiftX, steps] of [[-200, 25], [200, 25], [-200, 1], [200, 1]]) {
     await AtOutlinerPanel.dragResizerBy(shiftX, 0, AtOutlinerPanel.resizeRight, steps);
   }
+
+  I.wait(1);
+
   await AtImageView.lookForStage();
 
   I.say('Check that the region is still at the center of visible area');

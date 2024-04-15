@@ -1,3 +1,5 @@
+import { toStudlyCaps } from "strman";
+
 export { Agreement } from './Agreement/Agreement';
 export {
   Annotators,
@@ -15,3 +17,9 @@ export { StringCell as Text } from "./StringCell";
 export { VideoCell as Video } from "./VideoCell";
 export { ProjectCell as Project } from './ProjectCell';
 
+export function normalizeCellAlias(alias) {
+  // remove trailing separators to make `toStudlyCaps` safe
+  const safeAlias = alias.replace(/[-_\s]+$/g, '');
+ 
+  return toStudlyCaps(safeAlias);
+}
