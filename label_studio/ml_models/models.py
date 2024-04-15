@@ -3,8 +3,6 @@
 
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import pre_delete
-from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
@@ -176,7 +174,7 @@ class ModelRun(models.Model):
         Deletes any predictions that have originated from a ModelRun
         """
 
-        predictions = Prediction.objects.filter(model_run=self.id).delete()
+        Prediction.objects.filter(model_run=self.id).delete()
 
     def delete(self, *args, **kwargs):
         """
