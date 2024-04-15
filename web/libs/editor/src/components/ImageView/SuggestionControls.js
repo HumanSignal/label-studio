@@ -84,22 +84,14 @@ export const SuggestionControls = observer(({ item, useLayer }) => {
           cornerRadius={16}
         />
         <ControlButton
-          onClick={() => {
-            const ann = item.annotation;
-            ann.rejectSuggestion(item.id);
-            ann.deleteAllDynamicregions(true);
-          }}
+          onClick={() => item.annotation.rejectSuggestion(item.id)}
           fill="#DD0000"
           iconColor="#fff"
           icon={IconCross}
         />
         <ControlButton
           x={32}
-          onClick={() => {
-            const ann = item.annotation;            
-            ann.acceptSuggestion(item.id);
-            ann.deleteAllDynamicregions(true);
-          }}
+          onClick={() => item.annotation.acceptSuggestion(item.id)}
           fill="#98C84E"
           iconColor="#fff"
           icon={IconCheck}
