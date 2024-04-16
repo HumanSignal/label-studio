@@ -1283,7 +1283,7 @@ export const Annotation = types
     },
 
     rejectAllSuggestions() {
-      Array.from(self.suggestions.keys).forEach((id) => {
+      Array.from(self.suggestions.keys()).forEach((id) => {
         self.suggestions.delete(id);
       });
       self.deleteAllDynamicregions(isFF(FF_DEV_1284));

@@ -148,9 +148,6 @@ class App extends Component {
           {this.renderRelations(as.selected)}
         </Elem>
         {(!isFF(FF_DEV_3873)) && getRoot(as).hasInterface('infobar') && this._renderInfobar(as)}
-        {as.selected.hasSuggestionsSupport && (
-          <DynamicPreannotationsControl />
-        )}
       </Block>
     );
   }
