@@ -21,12 +21,17 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
 <div class="release-note">
 <a name="2101post2md"></a>
 
-## Label Studio Enterprise 2.10.1.post2
+## Label Studio Enterprise 2.10.1-2
+
+<div class="onprem-highlight">Bug fix</div>
+
+*Apr 02, 2024*
+
 Helm Chart version: 1.4.0
 
 ### Bug fixes
 
-- Fixed an issue that prevented the docker-compose instance from start, due to a misconfiguration in the internal discovery settings.
+- Fixed an issue that prevented the docker-compose instance from starting due to a misconfiguration in the internal discovery settings.
 
 
 
@@ -35,7 +40,12 @@ Helm Chart version: 1.4.0
 </div><div class="release-note">
 <a name="2101post1md"></a>
 
-## Label Studio Enterprise 2.10.1.post1
+## Label Studio Enterprise 2.10.1-1
+
+<div class="onprem-highlight">Security-related fixes</div>
+
+*Mar 13, 2024*
+
 Helm Chart version: 1.4.0
 
 ### Security
@@ -46,29 +56,16 @@ Helm Chart version: 1.4.0
 
 
 
-
 </div><div class="release-note">
 <a name="2101md"></a>
 
 ## Label Studio Enterprise 2.10.1
 
-<div class="onprem-highlight">
-  
-Release summary:
-    
-- Enhancements:
-    - Added a new **Reset Cache** action for projects. 
-- Security:
-    - Fixed an issue with activity logs. 
-- Various bug fixes
-
-For more details, see the full release notes below. 
-  
-</div>
+<div class="onprem-highlight">New <b>Reset Cache</b> action for projects, security update for activity logs, various bug fixes</div>
 
 *Mar 12, 2024*
 
-**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.4.0
+Helm chart version: 1.4.0
 
 ### Enhancements
 
@@ -106,25 +103,11 @@ Fixed an issue where sensitive information was available in activity logs.
 
 ## Label Studio Enterprise 2.10.0
 
-<div class="onprem-highlight">
-    
-Release summary:
-    
-- Enhancements:
-    - More granular API-level controls, including datetime filtering for annotation history.
-    - UI updates for better performance and user experience, such as improved text formatting in the grid view and a confirmation message after deleting a user.
-- Security:
-    - Implemented comprehensive HTML sanitization for a secure user experience.
-    - Increased SSRF protection with banning IPs within reserved blocks and improved error messages.
-- Bug fixes:
-    - Various fixes for issues related to tags, video annotation, comments, refresh action, label stream, hotkeys, data manager, relations, screen resizing, dropdowns, region selection, member management, and more.
-
-For more details, see the full release notes below. 
-</div>
+<div class="onprem-highlight">Granular API-level control over annotation history, UI enhancements for performance and user experience, security updates, bug fixes</div>
 
 *Feb 13, 2024*
 
-**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:**  1.4.0
+Helm chart version:  1.4.0
 
 ### Enhancements
 
@@ -217,7 +200,7 @@ For more details, see the full release notes below.
 
 *Jan 26, 2024*
 
-**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.3.3
+Helm chart version: 1.3.3
 
 ### Bug fixes
 - Fixed an issue where users were unable to use the **View all annotations** option when the project included images that had an empty URL.
@@ -236,7 +219,7 @@ For more details, see the full release notes below.
 
 *Jan 23, 2024*
 
-**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.3.3
+Helm chart version: 1.3.3
 
 ### Bug fixes
 - Hotfix for displaying non-string values in Text tag
@@ -255,7 +238,7 @@ For more details, see the full release notes below.
 
 *Jan 16, 2024*
 
-**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.3.3
+Helm chart version: 1.3.3
 
 ### Enhancements
 
@@ -295,7 +278,7 @@ For more details, see the full release notes below.
 
 *Dec 19, 2023*
 
-**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.3.2
+Helm chart version: 1.3.2
 
 ### Enhancements
 
@@ -386,7 +369,7 @@ For more details, see the full release notes below.
 
 *Nov 21, 2023*
 
-**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.2.9
+Helm chart version: 1.2.9
 
 ### New Features
 
