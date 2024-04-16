@@ -98,8 +98,8 @@ By default, labels also have hotkeys. For example, pressing `1` on your keyboard
 
 You can use the [labeling settings](#Configure-your-labeling-settings) to disable this behavior or ensure that the hotkeys are visible:
 
-* **Labeling hotkeys**--Enables hotkeys for labels and choices. 
-* **Show hotkeys on labels**--If hotkeys for labels and choices are enabled, this will display the hotkey value next to the option.
+* **Labeling hotkeys** -- Enables hotkeys for labels and choices. 
+* **Show hotkeys on labels** -- If hotkeys for labels and choices are enabled, this will display the hotkey value next to the option.
 
 
 For example, in the screenshot below, both settings are enabled. Pressing `1` would select the "Cat" choice and pressing `4` would select the "Opossum" label. 
