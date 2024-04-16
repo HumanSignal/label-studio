@@ -8,11 +8,25 @@ import Toggle from '../../common/Toggle/Toggle';
 
 import './AutoAcceptToggle.styl';
 
-export const AutoAcceptToggle = inject('store')(observer(({ store }) => {
-  if (!store.autoAnnotation) return null;
-
+// we need to inject all of them to trigger rerender on changes to suggestions
+const injector = inject(({ store }) => {
   const annotation = store.annotationStore?.selected;
   const suggestions = annotation?.suggestions;
+
+  return {
+    store,
+    annotation,
+    suggestions,
+  };
+});
+
+export const AutoAcceptToggle = injector(observer(({
+  store,
+  annotation,
+  suggestions,
+}) => {
+  if (!store.autoAnnotation) return null;
+
   const withSuggestions = annotation.hasSuggestionsSupport && !store.forceAutoAcceptSuggestions;
   const loading = store.awaitingSuggestions;
 
