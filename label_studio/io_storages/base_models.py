@@ -26,7 +26,6 @@ from io_storages.utils import get_uri_via_regex
 from rq.job import Job
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationSerializer, PredictionSerializer
-from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
 
@@ -523,12 +522,16 @@ class ExportStorage(Storage, ProjectStorageMixin):
 
     def _get_serialized_data(self, annotation):
         user = self.project.organization.created_by
-        flag = flag_set('fflag_feat_optic_650_target_storage_task_format_long', user=user)
+        flag = flag_set(
+            'fflag_feat_optic_650_target_storage_task_format_long', user=user, override_system_default=False
+        )
         if settings.FUTURE_SAVE_TASK_TO_STORAGE or flag:
             # export task with annotations
             # TODO: we have to rewrite save_all_annotations, because this func will be called for each annotation
             # TODO: instead of each task, however, we have to call it only once per task
-            return ExportDataSerializer(annotation.task, context={'project': self.project}).data
+            expand = ['annotations.reviews']
+            context = {'project': self.project}
+            return ExportDataSerializer(annotation.task, context=context, expand=expand).data
         else:
             serializer_class = load_func(settings.STORAGE_ANNOTATION_SERIALIZER)
             # deprecated functionality - save only annotation
@@ -616,12 +619,7 @@ class ExportStorageLink(models.Model):
     @staticmethod
     def get_key(annotation):
         # get user who created the organization explicitly using filter/values_list to avoid prefetching
-        user_id = (
-            Annotation.objects.filter(id=annotation.id)
-            .values_list('project__organization__created_by', flat=True)
-            .first()
-        )
-        user = User.objects.filter(id=user_id).first()
+        user = getattr(annotation, 'cached_user', None)
         flag = flag_set('fflag_feat_optic_650_target_storage_task_format_long', user=user)
 
         if settings.FUTURE_SAVE_TASK_TO_STORAGE or flag:
