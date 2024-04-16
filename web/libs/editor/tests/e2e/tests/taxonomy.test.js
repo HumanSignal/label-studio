@@ -595,20 +595,20 @@ Scenario('Taxonomy dynamic items', async ({ I, LabelStudio, AtTaxonomy }) => {
         },
       ],
     },
-      {
-        value: 'Options',
-        children: [
-          {
-            value: 'Option 1',
-          },
-          {
-            value: 'Option 2',
-          },
-          {
-            value: 'Option 3',
-          },
-        ],
-      }],
+    {
+      value: 'Options',
+      children: [
+        {
+          value: 'Option 1',
+        },
+        {
+          value: 'Option 2',
+        },
+        {
+          value: 'Option 3',
+        },
+      ],
+    }],
   };
 
   I.amOnPage('/');
