@@ -1,32 +1,18 @@
 import { inject, observer } from 'mobx-react';
 
-import { Block, Elem } from '../../utils/bem';
-import { Button } from '../../common/Button/Button';
 import { IconCheck, IconCross } from '../../assets/icons';
+import { Button } from '../../common/Button/Button';
+import { Block, Elem } from '../../utils/bem';
 import { Space } from '../../common/Space/Space';
 import Toggle from '../../common/Toggle/Toggle';
 
 import './AutoAcceptToggle.styl';
 
-const injector = inject(({ store }) => {
-  const annotation = store.annotationStore?.selected;
-  const suggestions = annotation?.suggestions;
-
-  return {
-    store,
-    annotation,
-    suggestions,
-    interfaces: Array.from(store?.interfaces),
-  };
-});
-
-export const AutoAcceptToggle = injector(observer(({
-  store,
-  annotation,
-  suggestions,
-}) => {
+export const AutoAcceptToggle = inject('store')(observer(({ store }) => {
   if (!store.autoAnnotation) return null;
 
+  const annotation = store.annotationStore?.selected;
+  const suggestions = annotation?.suggestions;
   const withSuggestions = annotation.hasSuggestionsSupport && !store.forceAutoAcceptSuggestions;
   const loading = store.awaitingSuggestions;
 

@@ -36,7 +36,6 @@ import { isDefined, sortAnnotations } from '../../utils/utilities';
  */
 import { Annotation } from './Annotation';
 import { AnnotationTab } from '../AnnotationTab/AnnotationTab';
-import { DynamicPreannotationsControl } from '../AnnotationTab/DynamicPreannotationsControl';
 import { BottomBar } from '../BottomBar/BottomBar';
 import Debug from '../Debug';
 import Grid from './Grid';
