@@ -71,16 +71,19 @@ const SmartTools = observer(({ tools = {} }) => {
   const hasSelected = tools.some(t => t.selected);
 
   const autoAnnotations = useMemo(() => {
-    const annotation = tools.find(t => t.annotation)
-    let acceptCallback = () => void 0;
-    let rejectCallback = acceptCallback;
-    if (annotation?.suggestions?.size >= 0) {
-      acceptCallback = annotation.acceptAllSuggestions;
-      rejectCallback = annotation.rejectAllSuggestions;
-    }
+    const annotation = tools.find(t => t.annotation);
+    const hasSuggestions = annotation?.suggestions?.size >= 0;
     return {
-      accept: acceptCallback,
-      reject: rejectCallback
+      accept: () => {
+        console.log(annotation);
+        console.log('auto accepting.');
+        if (hasSuggestions) annotation.acceptAllSuggestions();
+      },
+      reject: () => {
+        console.log(annotation);
+        console.log('auto rejecting');
+        if (hasSuggestions) annotation.rejectAllSuggestions();
+      }
     }
   }, [tools]);
 
