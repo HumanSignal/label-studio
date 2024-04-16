@@ -85,6 +85,10 @@ module.exports.config = {
     //   enabled: true,
     //   coverageDir: 'output/coverage',
     // },
+    preventLSFInit: {
+      require: './plugins/preventLSFInit.js',
+      enabled: true,
+    },
     featureFlags: {
       require: './plugins/featureFlags.js',
       enabled: true,

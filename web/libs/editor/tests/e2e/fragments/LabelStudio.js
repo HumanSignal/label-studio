@@ -60,7 +60,20 @@ module.exports = {
   },
 
   initUserLabels(userLabels) {
-    return I.executeScript((userLabels) => {
+    return I.executeScript(async (userLabels) => {
+      await new Promise(resolve => {
+        const watchHtxReady = () => {
+          const isReady = !!window.Htx;
+
+          if (isReady) {
+            resolve(true);
+          } else {
+            setTimeout(watchHtxReady, 16);
+          }
+        };
+
+        watchHtxReady();
+      });
       window.Htx.userLabels?.init(userLabels);
     }, userLabels);
   },
