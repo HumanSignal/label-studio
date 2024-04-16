@@ -1,19 +1,20 @@
 .auto-accept
-  top 0
   height 44px
   display flex
-  z-index 100
   align-items center
-  position sticky
   box-sizing border-box
   background-color #fff
+  margin-left: 16px;
 
   &__wrapper
     width 100%
 
+    &_loading
+      // toggle will not be disabled, because it's usable even when loading
+      opacity: 0.5;
+
   &__info
     font-size: 16px;
-    margin-left: 16px;
 
   &__action
     padding 0
@@ -36,3 +37,19 @@
       &_reject svg
         width 12.5px
         height 12.5px
+
+  &__spinner
+    width 16px
+    height 16px
+    border-radius 100%;
+    box-sizing border-box
+    border 2px solid #FFD666
+    border-right-color transparent
+    animation waiting-spin 1s linear infinite
+
+@keyframes waiting-spin
+  0%
+    transform rotate(0deg)
+
+  100%
+    transform rotate(360deg)
