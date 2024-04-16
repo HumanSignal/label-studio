@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-999: Fix E2E tests on LSO",
-  "commit": "fb5ec88bb19db108e7962fbf69daf99930b23c91",
-  "date": "2024-04-16T12:59:57.000Z",
+  "message": "Merge branch 'fb-leap-999-alt' of ssh://github.com/heartexlabs/label-studio into fb-leap-999-alt",
+  "commit": "337ad9f36a0fb4f8ddaf582dadc0ca7f9778d6b2",
+  "date": "2024-04-16T14:20:19.000Z",
   "branch": "fb-leap-999-alt"
 }
