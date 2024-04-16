@@ -544,10 +544,12 @@ class ExportStorage(Storage, ProjectStorageMixin):
         annotation_exported = 0
         total_annotations = Annotation.objects.filter(project=self.project).count()
         self.info_set_in_progress()
+        self.cached_user = self.project.organization.created_by
 
         for annotation in Annotation.objects.filter(project=self.project).iterator(
             chunk_size=settings.STORAGE_EXPORT_CHUNK_SIZE
         ):
+            annotation.cached_user = self.cached_user
             self.save_annotation(annotation)
 
             # update progress counters

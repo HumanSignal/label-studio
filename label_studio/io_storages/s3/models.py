@@ -197,11 +197,6 @@ class S3ImportStorage(ProjectStorageMixin, S3ImportStorageBase):
 
 class S3ExportStorage(S3StorageMixin, ExportStorage):
     def save_annotation(self, annotation):
-        self.cached_user = getattr(self, 'cached_user', None)
-        if self.cached_user is None:
-            self.cached_user = self.project.organization.created_by
-        annotation.cached_user = self.cached_user
-
         client, s3 = self.get_client_and_resource()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
@@ -213,6 +208,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         # put object into storage
         additional_params = {}
 
+        self.cached_user = getattr(self, 'cached_user', self.project.organization.created_by)
         if flag_set(
             'fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user=self.cached_user
         ):

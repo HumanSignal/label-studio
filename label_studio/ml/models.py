@@ -9,11 +9,12 @@ from django.db.models import Count, JSONField, Q
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-from ml.api_connector import PREDICT_URL, TIMEOUT_PREDICT, MLApi
 from projects.models import Project
 from tasks.models import Prediction
 from tasks.serializers import PredictionSerializer, TaskSimpleSerializer
 from webhooks.serializers import Webhook, WebhookSerializer
+
+from ml.api_connector import PREDICT_URL, TIMEOUT_PREDICT, MLApi
 
 logger = logging.getLogger(__name__)
 
