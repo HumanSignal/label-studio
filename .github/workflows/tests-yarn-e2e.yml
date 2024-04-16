@@ -51,6 +51,8 @@ jobs:
         id: run-lsf-server
         timeout-minutes: 1
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        env:
+          NODE_ENV: production
         run: |
           set -xeuo pipefail
           

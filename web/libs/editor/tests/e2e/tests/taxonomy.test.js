@@ -34,27 +34,28 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
   }
 
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config: `
-      <View>
-        <Text name="text" value="$text"/>
-        <Taxonomy name="taxonomy" toName="text">
-          <Choice value="target group 1">
-            <Choice value="london london london london london london london" />
-            <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
-            <Choice value="not so long line"/>
-          </Choice>
-        </Taxonomy>
-      </View>`,
+<View>
+  <Text name="text" value="$text"/>
+  <Taxonomy name="taxonomy" toName="text">
+    <Choice value="target group">
+      <Choice value="london london london london london london london" />
+      <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
+      <Choice value="not so long line"/>
+    </Choice>
+  </Taxonomy>
+</View>`,
     data: {
       text: 'Annotation 1',
     },
   });
+
   AtTaxonomy.clickTaxonomy();
-  AtTaxonomy.toggleGroupWithText('target group 1');
+  AtTaxonomy.toggleGroupWithText('target group');
 
   await checkOverlapAndGap('long long long', 'not so long');
+
 
   I.amOnPage('/');
   LabelStudio.init({
@@ -62,7 +63,7 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
 <View>
   <Text name="text" value="$text"/>
   <Taxonomy name="taxonomy" toName="text">
-    <Choice value="target group 2">
+    <Choice value="target group">
       <Choice value="london london london london london london london" />
       <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
       <Choice value="not so long line"/>
@@ -84,7 +85,7 @@ Scenario('Lines overlap', async ({ I, LabelStudio, AtTaxonomy }) => {
 <View>
   <Text name="text" value="$text"/>
   <Taxonomy name="taxonomy" toName="text">
-    <Choice value="target group 3">
+    <Choice value="target group">
       <Choice value="super long line ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ..."/>
       <Choice value="enough long line ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ..."/>
       <Choice value="not long line ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ..."/>
@@ -128,7 +129,6 @@ Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
   };
 
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init(params);
 
   I.say('Add item to the root');
@@ -170,7 +170,6 @@ Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   await session('Deserialization', async () => {
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       ...params,
       annotations: [{
@@ -227,7 +226,6 @@ Scenario('Add custom items', async ({ I, LabelStudio, AtTaxonomy }) => {
 
 Scenario('Non unique values filtering', async ({ I, LabelStudio, AtTaxonomy }) => {
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config: `
 <View>
@@ -245,7 +243,6 @@ Scenario('Non unique values filtering', async ({ I, LabelStudio, AtTaxonomy }) =
       text: 'Text',
     },
   });
-  I.wait(1);
   AtTaxonomy.clickTaxonomy();
   I.seeElement(AtTaxonomy.locateItemByText('a').at(1));
   I.dontSeeElement(AtTaxonomy.locateItemByText('a').at(2));
@@ -285,7 +282,6 @@ Scenario('Taxonomy read only in history', async ({ I, LabelStudio, AtTaxonomy })
     ff_front_1170_outliner_030222_short: false,
   });
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config: `
 <View>
@@ -306,7 +302,6 @@ Scenario('Taxonomy read only in history', async ({ I, LabelStudio, AtTaxonomy })
     },
     annotations: [{ id: 2, result: [] }],
   });
-  I.wait(1);
   I.click('.lsf-history-item');
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.seeSelectedValues(['ab', 'c']);
@@ -326,7 +321,6 @@ Scenario('Taxonomy read only in history', async ({ I, LabelStudio, AtTaxonomy })
 
 Scenario('Taxonomy readonly result', async ({ I, LabelStudio, AtTaxonomy }) => {
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config: `
 <View>
@@ -359,7 +353,6 @@ Scenario('Taxonomy readonly result', async ({ I, LabelStudio, AtTaxonomy }) => {
       ],
     }],
   });
-  I.wait(1);
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.seeSelectedValues(['ab', 'c']);
   AtTaxonomy.toggleGroupWithText('a');
@@ -397,7 +390,6 @@ Scenario('Taxonomy per region', async ({ I, LabelStudio, AtTaxonomy, AtOutliner 
   };
 
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config,
     data,
@@ -477,7 +469,6 @@ Scenario('Taxonomy per region', async ({ I, LabelStudio, AtTaxonomy, AtOutliner 
 
   await session('Deserialization', async () => {
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       config,
       data,
@@ -527,8 +518,8 @@ Scenario('Aliases in Taxonomy', async ({ I, LabelStudio, AtTaxonomy }) => {
   </Taxonomy>
 </View>
 `;
+
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config: createConfig(),
     data: {
@@ -552,7 +543,6 @@ Scenario('Aliases in Taxonomy', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   await session('Deserialization', async () => {
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       config: createConfig(),
       data: {
@@ -575,7 +565,6 @@ Scenario('Aliases in Taxonomy', async ({ I, LabelStudio, AtTaxonomy }) => {
   await session('ShowFullPath', async () => {
     //showFullPath
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       config: createConfig({ showFullPath: true }),
       data: {
@@ -606,23 +595,23 @@ Scenario('Taxonomy dynamic items', async ({ I, LabelStudio, AtTaxonomy }) => {
         },
       ],
     },
-    {
-      value: 'Options',
-      children: [
-        {
-          value: 'Option 1',
-        },
-        {
-          value: 'Option 2',
-        },
-        {
-          value: 'Option 3',
-        },
-      ],
-    }],
+      {
+        value: 'Options',
+        children: [
+          {
+            value: 'Option 1',
+          },
+          {
+            value: 'Option 2',
+          },
+          {
+            value: 'Option 3',
+          },
+        ],
+      }],
   };
+
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config: `
 <View>
@@ -652,7 +641,6 @@ Scenario('Taxonomy dynamic items', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   await session('Deserialization', async () => {
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       config: `
 <View>
@@ -702,7 +690,6 @@ Scenario('Taxonomy maxUsages', async ({ I, LabelStudio, AtTaxonomy }) => {
 `;
 
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config,
     data: {
@@ -763,14 +750,12 @@ Scenario('Taxonomy visibleWhen', async ({ I, LabelStudio, AtTaxonomy }) => {
 `;
 
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config: createConfig(),
     data: {
       text: 'A text',
     },
   });
-  I.wait(1);
   I.say('Should see values of choices and work with them');
   AtTaxonomy.clickTaxonomy();
   AtTaxonomy.toggleGroupWithText('One to three');
@@ -814,7 +799,6 @@ Scenario('Taxonomy visibleWhen', async ({ I, LabelStudio, AtTaxonomy }) => {
 
   await session('Deserialization', async () => {
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       config: createConfig(),
       data: {
@@ -838,7 +822,6 @@ Scenario('Taxonomy visibleWhen', async ({ I, LabelStudio, AtTaxonomy }) => {
   await session('ShowFullPath', async () => {
     //showFullPath
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       config: createConfig({ showFullPath: true }),
       data: {
@@ -885,7 +868,6 @@ Scenario('Taxonomy visibleWhen with aliases', async ({ I, LabelStudio, AtTaxonom
 `;
 
   I.amOnPage('/');
-  I.wait(1);
   LabelStudio.init({
     config: createConfig(),
     data: {
@@ -935,7 +917,6 @@ Scenario('Taxonomy visibleWhen with aliases', async ({ I, LabelStudio, AtTaxonom
 
   await session('Deserialization', async () => {
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       config: createConfig(),
       data: {
@@ -959,7 +940,6 @@ Scenario('Taxonomy visibleWhen with aliases', async ({ I, LabelStudio, AtTaxonom
   await session('ShowFullPath', async () => {
     //showFullPath
     I.amOnPage('/');
-    I.wait(1);
     LabelStudio.init({
       config: createConfig({ showFullPath: true }),
       data: {
