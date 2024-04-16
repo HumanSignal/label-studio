@@ -53,6 +53,7 @@ jobs:
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
         env:
           NODE_ENV: production
+          BUILD_NO_MINIMIZATION: true
         run: |
           set -xeuo pipefail
           
