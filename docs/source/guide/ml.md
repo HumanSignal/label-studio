@@ -206,7 +206,7 @@ Either enable the **Interactive preannotations** option when adding a model, or 
 
 #### Smart tools
 
-Smart tools duplicate the tools that you have set up to use through your labeling configuration (e.g. rectangles) to allow interaction with the ML backend. Smart tools are currently for Rectangle, Ellipse, Polygon, Keypoint, and Brush tags. 
+Smart tools duplicate the tools that you have set up to use through your labeling configuration (e.g. rectangles) to allow interaction with the ML backend. Smart tools are currently for [`Rectangle`](/tags/rectangle), [`Ellipse`](/tags/ellipse), [`Polygon`](/tags/polygon), [`KeyPoint`](/tags/keypoint), and [`Brush`](/tags/brush) tags. 
 
 Smart tools are dynamic and can change behavior or appearance based on the context, leveraging machine learning predictions. For example, smart tools can automatically detect and suggest annotations for objects in images, which annotators can then review and refine. This can significantly speed up the labeling process, especially when dealing with large datasets.
 

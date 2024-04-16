@@ -48,7 +48,7 @@ If disabled, users will need to click the **Show instructions** action at the bo
 
 </dd>
 
-<dt>Pre-labeling</dt>
+<dt>Live Predictions</dt>
 
 <dd>
 
@@ -83,7 +83,7 @@ And the following actions are available from the overflow menu next to a connect
 
 ## Predictions
 
-From here you can view predictions that have been imported or generated through training. For more information, see [Import pre-annotated data into Label Studio](predictions). 
+From here you can view predictions that have been imported or generated when executing the **Retrieve Predictions** action from the Data Manager. For more information, see [Import pre-annotated data into Label Studio](predictions). 
 
 ## Cloud storage
 

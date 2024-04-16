@@ -151,7 +151,7 @@ Configure additional settings for annotators.
 
 </dd>
 
-<dt id="predictions">Predictions</dt>
+<dt id="predictions">Live Predictions</dt>
 
 <dd>
 
