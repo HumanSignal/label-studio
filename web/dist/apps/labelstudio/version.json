@@ -1,6 +1,6 @@
 {
-  "message": "Fix create-docs script to also handle JSX/TS/TSX",
-  "commit": "ff0754d70c8115d42b7096ce6ccf0bd77b7dcdf3",
-  "date": "2024-04-12T17:22:27.000Z",
-  "branch": "fb-optic-592/js-jsx-conversion"
+  "message": "fix: LEAP-999: Fix E2E tests on LSO",
+  "commit": "fb5ec88bb19db108e7962fbf69daf99930b23c91",
+  "date": "2024-04-16T12:59:57.000Z",
+  "branch": "fb-leap-999-alt"
 }
