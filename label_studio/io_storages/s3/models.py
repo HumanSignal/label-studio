@@ -214,7 +214,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         ):
             if self.aws_sse_kms_key_id:
                 additional_params['SSEKMSKeyId'] = self.aws_sse_kms_key_id
-                additional_params['ServerSideEncryption'] = 'aws:kms'
+                additional_params['ServerSideEncryption'] = 'aws:kms' 
             else:
                 additional_params['ServerSideEncryption'] = 'AES256'
 
