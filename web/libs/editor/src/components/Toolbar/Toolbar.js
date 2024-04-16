@@ -70,14 +70,19 @@ const SmartTools = observer(({ tools = {} }) => {
 
   const hasSelected = tools.some(t => t.selected);
 
-  const handleSuggestions = (action) => {
-    const annotation = tools.find(t => t.annotation);
+  const autoAnnotations = useMemo(() => {
+    const annotation = tools.find(t => t.annotation)
+    let acceptCallback = () => void 0;
+    let rejectCallback = acceptCallback;
     if (annotation?.suggestions?.size >= 0) {
-      if (action === 'accept') return annotation.acceptAllSugestions;  // Return accept all suggestions callback.
-      if (action === 'reject') return annotation.rejectAllSugestions;  // Return reject all suggestions callback.
+      acceptCallback = annotation.acceptAllSuggestions;
+      rejectCallback = annotation.rejectAllSuggestions;
     }
-    return () => void 0;  // Return empty callback.
-  }
+    return {
+      accept: acceptCallback,
+      reject: rejectCallback
+    }
+  }, [tools]);
 
   return tools.length > 0 && (
     <Elem name="group">
@@ -122,8 +127,8 @@ const SmartTools = observer(({ tools = {} }) => {
           nextTool.manager.selectTool(nextTool, true);
         }}
         extraShortcuts={{
-            'y' : ['Accept Auto Annotations', handleSuggestions('accept')],
-            'n' : ['Reject Auto Annotations', handleSuggestions('reject')],
+            'y' : ['Accept Auto Annotations', autoAnnotations.accept],
+            'n' : ['Reject Auto Annotations', autoAnnotations.reject],
         }}
       />
     </Elem>
