@@ -1,13 +1,6 @@
 {
-<<<<<<< HEAD
-  "message": "Update lsf-sdk.js",
-  "commit": "16b7952dfc234d420f2563d0b2bbac2b60254de4",
-  "date": "2024-04-15T12:11:06.000Z",
+  "message": "Merge branch 'develop' into 'fb-LEAP-1004'",
+  "commit": "2174366308f877c5eed33bb1ba03346e6eb8d76e",
+  "date": "2024-04-16T12:46:28.000Z",
   "branch": "fb-LEAP-1004"
-=======
-  "message": "Fix create-docs script to also handle JSX/TS/TSX",
-  "commit": "ff0754d70c8115d42b7096ce6ccf0bd77b7dcdf3",
-  "date": "2024-04-12T17:22:27.000Z",
-  "branch": "fb-optic-592/js-jsx-conversion"
->>>>>>> origin/develop
 }
