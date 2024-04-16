@@ -1535,18 +1535,21 @@ h1+.admonition {
   position: relative;
 }
 
-.content-markdown .release-note::before {
-  content: "";
+.content-markdown .release-note-toggle {
+  appearance: none;
+  border: 0;
   width: 24px;
   height: 24px;
   position: absolute;
   top: calc(2rem + 6px);
   left: -12px;
-  background-image: url('data:image/svg+xml,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="%2312110D"/><path d="M11.75 5V18.5" stroke="%23FDFDFC"/><path d="M18.5 11.75L5 11.75" stroke="%23FDFDFC"/></svg>');
+  cursor: pointer;
+  background: url('data:image/svg+xml,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="%2312110D"/><path d="M11.75 5V18.5" stroke="%23FDFDFC"/><path d="M18.5 11.75L5 11.75" stroke="%23FDFDFC"/></svg>');
+
 }
 
-.content-markdown .release-note:has(.expanded)::before {
-  background-image: url('data:image/svg+xml,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="%2312110D"/><path d="M18.5 11.75L5 11.75" stroke="%23FDFDFC"/></svg>');
+.content-markdown .release-note:has(.expanded) .release-note-toggle {
+  background: url('data:image/svg+xml,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="%2312110D"/><path d="M18.5 11.75L5 11.75" stroke="%23FDFDFC"/></svg>');
 }
 
 .content-markdown .release-note h2 {
