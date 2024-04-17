@@ -809,7 +809,6 @@ export default types
       } catch(e) {
         self.setFlags({ awaitingSuggestions: false });
         // @todo handle errors + situation when task is changed
-        return;
       }
     });
 
