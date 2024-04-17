@@ -208,7 +208,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         # put object into storage
         additional_params = {}
 
-        self.cached_user = getattr(self, 'cached_user', annotation.task.project.organization.created_by)
+        self.cached_user = getattr(self, 'cached_user', self.project.organization.created_by)
         if flag_set(
             'fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user=self.cached_user
         ):
