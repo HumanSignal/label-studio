@@ -352,8 +352,10 @@ function Region2RLE(region) {
 function brushSizeCircle(size) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  const canvasSize = size * 4 + 8;
-  const circlePos = size / 2 + 4;
+  const canvasPadding = 8;
+  const canvasOffset = 4;
+  const canvasSize = size * 4 + canvasPadding;
+  const circlePos = size / 2 + canvasOffset;
   const circleRadius = size / 2;
 
   canvas.width = canvasSize;
