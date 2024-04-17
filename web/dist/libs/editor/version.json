@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-LEAP-1004'",
-  "commit": "2174366308f877c5eed33bb1ba03346e6eb8d76e",
-  "date": "2024-04-16T12:46:28.000Z",
-  "branch": "fb-LEAP-1004"
+  "message": "fix: LEAP-947: Check task when we get a response from ML",
+  "commit": "041aa9e00d8c46dee455da6132fec3bc19d85d5c",
+  "date": "2024-04-17T13:44:08.000Z",
+  "branch": "fb-leap-947/wrong-task-suggestions"
 }
