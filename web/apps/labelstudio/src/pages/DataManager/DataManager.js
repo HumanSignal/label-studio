@@ -140,7 +140,20 @@ export const DataManagerPage = ({ ...props }) => {
           },
         });
 
-        lsf.loadSuggestions(suggestionsRequest, (response) => {
+        // we'll check that we are processing the same task
+        const wrappedRequest = new Promise(async (resolve, reject) => {
+          const response = await suggestionsRequest;
+
+          // right now task might be an old task,
+          // so in order to get a current one we need to get it from lsf
+          if (task.id === dataManager.lsf.task.id) {
+            resolve(response);
+          } else {
+            reject();
+          }
+        });
+
+        lsf.loadSuggestions(wrappedRequest, (response) => {
           if (response.data) {
             return response.data.result;
           }
