@@ -223,6 +223,21 @@ const validateParentTag = (element, model) => {
 };
 
 /**
+ * Validates if visual tags have name attribute
+ * @param {Object} element
+ */
+const validateVisualTags = (element) => {
+  const visualTags = ['Collapse', 'Filter', 'Header', 'Style', 'View'];
+  const { tagName } = element;
+
+  if (visualTags.includes(tagName) && element.name) {
+    return errorBuilder.generalError('Attribute <b>name</b> is not allowed for tag <b>' + tagName + '</b>.');
+  }
+
+  return null;
+}
+
+/**
  * Validate other tag attributes other than name and toName
  * @param {Object} child
  * @param {import("mobx-state-tree").IModelType} model
@@ -300,6 +315,11 @@ export class ConfigValidator {
         const parentValidation = validateParentTag(child, model);
 
         if (parentValidation !== null) validationResult.push(parentValidation);
+
+        //validate visualTags
+        const visualTagsValidation = validateVisualTags(child);
+
+        if (visualTagsValidation !== null) validationResult.push(visualTagsValidation);
 
         validationResult.push(...validatePerRegion(child));
 
