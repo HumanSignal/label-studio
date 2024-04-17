@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-947: Check task when we get a response from ML",
-  "commit": "041aa9e00d8c46dee455da6132fec3bc19d85d5c",
-  "date": "2024-04-17T13:44:08.000Z",
+  "message": "Remove excess return",
+  "commit": "860bbb419e7fe230bede0b7ce2477b77f0a4f0ea",
+  "date": "2024-04-17T14:27:59.000Z",
   "branch": "fb-leap-947/wrong-task-suggestions"
 }
