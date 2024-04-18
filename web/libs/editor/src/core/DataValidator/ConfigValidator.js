@@ -231,7 +231,7 @@ const validateVisualTags = (element) => {
   const { tagName } = element;
 
   if (visualTags.includes(tagName) && element.name) {
-    return errorBuilder.generalError('Attribute <b>name</b> is not allowed for tag <b>' + tagName + '</b>.');
+    return errorBuilder.generalError(`Attribute <b>name</b> is not allowed for tag <b>${tagName}</b>.`);
   }
 
   return null;
@@ -316,7 +316,7 @@ export class ConfigValidator {
 
         if (parentValidation !== null) validationResult.push(parentValidation);
 
-        //validate visualTags
+        // Validate visual tags
         const visualTagsValidation = validateVisualTags(child);
 
         if (visualTagsValidation !== null) validationResult.push(visualTagsValidation);
