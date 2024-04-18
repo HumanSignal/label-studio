@@ -139,9 +139,9 @@ jobs:
     needs:
       - changed_files
     if: |
-      github.event_name == 'push' &&
-      ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
-        || startsWith(github.ref_name, 'ls-release/') )
+      ( github.event_name == 'push' && github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' ) ||
+      ( github.event_name == 'push' && startsWith(github.ref_name, 'ls-release/') ) ||
+      ( github.event_name == 'pull_request' && startsWith(github.head_ref, 'fb-build-') )
     permissions:
       contents: read
       checks: write
