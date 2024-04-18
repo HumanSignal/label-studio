@@ -1363,3 +1363,43 @@ stages:
         taxonomy_other: null
   response:
     status_code: 201
+
+
+---
+test_name: Validate Table tag with task data on import
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+
+stages:
+- # Signup to the system
+  id: signup
+  type: ref
+
+- # Create a project with Table labeling configuration
+  name: create project
+  request:
+    data:
+      label_config: ' <View><Table name="table" value="$table"/><Choices name="sentiment" toName="table" choice="single" showInLine="true"> <Choice value="1"/></Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- # Import a task with List to the project
+  name: import task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      - table:
+        - "test1"
+        - "test2"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201

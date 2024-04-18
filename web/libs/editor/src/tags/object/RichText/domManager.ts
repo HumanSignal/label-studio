@@ -1,10 +1,19 @@
-import { flatten, isDefined } from '../../../utils/utilities';
+import {flatten, isDefined} from '../../../utils/utilities';
 
 // line feed
 const LF = '\n';
+// carriage return
+const CF = '\r';
 
 type DDExtraText = string;
 
+
+/**
+ * Normalize text for displaying it.
+ * It replaces all line breaks with '\n' symbol.
+ * This is a variant used historically, but it converts \r\n to \n\n which might be not correct
+ * @todo check if we can convert \r\n to \n without getting any problems
+ */
 function normalizeText(text: string) {
   return text.replace(/[\n\r]/g, '\\n');
 }
@@ -366,7 +375,11 @@ class DomData {
     let fromIdx = this.displayedTextPos;
     const contentParts = [];
 
-    while (displayedText[fromIdx] === LF) {
+    // it should be just LF but in some OS / browsers it's CRLF (at least)
+    // `fromIdx` is only an inner counter that does not affect start/end offsets in results
+    // and the only problem here could be with normalizeText function
+    /** @see `normalizeText` */
+    while (displayedText[fromIdx] === LF || displayedText[fromIdx] === CF) {
       fromIdx++;
     }
     let toIdx = fromIdx;

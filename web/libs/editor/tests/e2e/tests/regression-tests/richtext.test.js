@@ -293,7 +293,7 @@ Scenario('Neighboring nested regions misplacement', async ({ I, LabelStudio, AtS
     },
   ]);
 
-  Data(startBeforeEndParams).Scenario('Start before end problem', async ({ I, LabelStudio, AtSidebar, AtRichText, current }) => {
+  Data(startBeforeEndParams).Scenario('Start before end problem', async ({ I, LabelStudio, AtSidebar, current }) => {
     const { tag, content, range } = current;
 
     LabelStudio.setFeatureFlags({

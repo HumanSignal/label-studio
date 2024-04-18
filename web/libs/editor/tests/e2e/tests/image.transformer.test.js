@@ -4,8 +4,7 @@ const Helpers = require('./helpers');
 
 Feature('Image transformer');
 
-const IMAGE =
-  'https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg';
+const IMAGE = 'https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg';
 
 const annotationEmpty = {
   id: '1000',
@@ -247,17 +246,22 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransfor
     const { shapeName } = current;
     const Shape = shapes[shapeName];
 
-    I.amOnPage('/');
-
     LabelStudio.setFeatureFlags({
       'ff_front_dev_2394_zoomed_transforms_260522_short': true,
+      'fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short': true,
+      'fflag_fix_front_dev_3793_relative_coords_short': true,
     });
+
+    I.amOnPage('/');
 
     LabelStudio.init(getParamsWithShape(shapeName, Shape.params));
     AtImageView.waitForImage();
     AtSidebar.seeRegions(0);
     await AtImageView.lookForStage();
+    const naturalSize = await AtImageView.getNaturalSize();
     const canvasSize = await AtImageView.getCanvasSize();
+    // region sizes are relative (0 to 100) so we have to convert sizes we use for them...
+    // ...relatively to displayed image size, which is canvas size when we open the page
     const convertToImageSize = Helpers.getSizeConvertor(canvasSize.width, canvasSize.height);
 
     // Draw a region in bbox {x1:50,y1:50,x2:150,y2:150}
@@ -275,26 +279,22 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransfor
 
     assert.strictEqual(isTransformerExist, true);
 
-    AtImageView.setZoom(3, 0, 0);
+    // we display an image to fit to canvas size on page load, so initial zoom is not 1;
+    // to do an x3 zoom we have to calculate current zoom and multiply it by 3
+    AtImageView.setZoom(3 * canvasSize.width / naturalSize.width, 0, 0);
 
     // Transform the shape
     AtImageView.drawByDrag(150, 150, -150, -150);
-    I.wait(1);
 
     AtImageView.drawByDrag(0, 0, -300, -100);
-    I.wait(1);
 
     AtImageView.drawByDrag(0, 0, 150, 150);
-    I.wait(1);
 
     // Check resulting sizes
     const rectangleResult = await LabelStudio.serialize();
-
-    I.wait(10);
-
     const exceptedResult = Shape.byBBox(50, 50, 300, 300).result;
 
-    Asserts.deepEqualWithTolerance(rectangleResult[0].value, convertToImageSize(exceptedResult), 0);
+    Asserts.deepEqualWithTolerance(rectangleResult[0].value, convertToImageSize(exceptedResult), 2);
   });
 
 Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator))
@@ -916,7 +916,7 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionTr
     // Drag shapes by holding onto the transformer background
     dragShapes(transformerBboxCenter, { x: 150, y: 150 }, false);
     // Move back throught history to check that transformer's background moving with it
-    I.pressKey(['Control', 'z']);
+    I.pressKey(['CommandOrControl', 'z']);
     // Drag shapes by holding onto the transformer background again
     dragShapes(transformerBboxCenter, { x: 100, y: 100 }, false);
 
@@ -998,7 +998,7 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       Shape.byBBox(bbox.width, bbox.y + bbox.height, -bbox.width, -bbox.height).result.x,
     );
     // reset position by undo
-    I.pressKey(['Control', 'z']);
+    I.pressKey(['CommandOrControl', 'z']);
 
     I.say('Drag the region over the top border');
     AtImageView.drawThroughPoints([
@@ -1013,7 +1013,7 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       Shape.byBBox(bbox.x + bbox.width, bbox.height, -bbox.width, -bbox.height).result.y,
     );
     // reset position by undo
-    I.pressKey(['Control', 'z']);
+    I.pressKey(['CommandOrControl', 'z']);
 
     I.say('Drag the region over the right border');
     AtImageView.drawThroughPoints([
@@ -1029,7 +1029,7 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       Shape.byBBox(canvasSize.width, bbox.y + bbox.height, -bbox.width, -bbox.height).result.x,
     );
     // reset position by undo
-    I.pressKey(['Control', 'z']);
+    I.pressKey(['CommandOrControl', 'z']);
 
     I.say('Drag the region over the bottom border');
     AtImageView.drawThroughPoints([
@@ -1142,7 +1142,7 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       Shape.byBBox(bbox2.width, transformerBbox.y + bbox2.height, -bbox2.width, -bbox2.height).result.x,
     );
     // reset position by undo
-    I.pressKey(['Control', 'z']);
+    I.pressKey(['CommandOrControl', 'z']);
 
     I.say('Drag the region over the top border');
     AtImageView.drawThroughPoints([
@@ -1161,7 +1161,7 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       Shape.byBBox(transformerBbox.x + bbox2.width, bbox2.height, -bbox2.width, -bbox2.height).result.y,
     );
     // reset position by undo
-    I.pressKey(['Control', 'z']);
+    I.pressKey(['CommandOrControl', 'z']);
 
     I.say('Drag the region over the right border');
     AtImageView.drawThroughPoints([
@@ -1181,7 +1181,7 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       Shape.byBBox(canvasSize.width - transformerBbox.width + bbox2.width, transformerBbox.y + bbox2.height, -bbox2.width, -bbox2.height).result.x,
     );
     // reset position by undo
-    I.pressKey(['Control', 'z']);
+    I.pressKey(['CommandOrControl', 'z']);
 
     I.say('Drag the region over the bottom border');
     AtImageView.drawThroughPoints([
@@ -1262,7 +1262,7 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator))
       );
 
       // undo rotation
-      I.pressKey(['Control', 'z']);
+      I.pressKey(['CommandOrControl', 'z']);
       // clear unnecessary waypoints
       rotatorWayPoints.pop();
     }

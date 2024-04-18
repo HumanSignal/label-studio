@@ -9,7 +9,14 @@
 !deploy/default.conf
 !label_studio/**
 label_studio/frontend
-!web/**
+
+# FRONTEND
+!web
+!.git
+# Re-ignore node_modules and nx cache
+**/node_modules
+**/.nx
+
 !README.md
 !licenses/**
 !LICENSE

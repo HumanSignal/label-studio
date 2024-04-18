@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+
 import logging
 from collections import defaultdict
 
@@ -39,9 +40,24 @@ def remove_duplicates_job(project, queryset, **kwargs):
     move_annotations(duplicates)
     remove_duplicated_tasks(duplicates, project, queryset)
 
+    # totally update tasks counters
+    project._update_tasks_counters_and_task_states(
+        project.tasks.all(),
+        maximum_annotations_changed=True,
+        overlap_cohort_percentage_changed=True,
+        tasks_number_changed=False,
+        from_scratch=True,
+    )
+
 
 def remove_duplicated_tasks(duplicates, project, queryset):
-    """Remove duplicated tasks from queryset with condition that they don't have annotations"""
+    """Remove duplicated tasks from queryset with condition that they don't have annotations
+
+    :param duplicates: dict with duplicated tasks
+    :param project: Project instance
+    :param queryset: queryset with input tasks
+    :return: queryset with tasks which should be kept
+    """
     removing = []
     # prepare main tasks which won't be deleted
     for data in duplicates:
@@ -53,7 +69,7 @@ def remove_duplicated_tasks(duplicates, project, queryset):
         new_root = []
         for task in root:
             # keep all tasks with annotations in safety
-            if task['total_annotations'] > 0:
+            if task['total_annotations'] + task['cancelled_annotations'] > 0:
                 one_task_saved = True
             else:
                 new_root.append(task)
@@ -68,6 +84,7 @@ def remove_duplicated_tasks(duplicates, project, queryset):
 
     # get the final queryset for removing tasks
     queryset = queryset.filter(id__in=removing, annotations__isnull=True)
+    kept = queryset.exclude(id__in=removing, annotations__isnull=True)
 
     # check that we don't remove tasks with annotations
     if queryset.count() != len(removing):
@@ -79,7 +96,7 @@ def remove_duplicated_tasks(duplicates, project, queryset):
 
     delete_tasks(project, queryset)
     logger.info(f'Removed {len(removing)} duplicated tasks')
-    return removing
+    return kept
 
 
 def move_annotations(duplicates):
@@ -95,18 +112,19 @@ def move_annotations(duplicates):
         i, first = 0, root[0]
         for i, task in enumerate(root):
             first = task
-            if task['total_annotations'] > 0:
+            if task['total_annotations'] + task['cancelled_annotations'] > 0:
                 break
 
         # move annotations to the first task
         for task in root[i + 1 :]:
-            if task['total_annotations'] > 0:
+            if task['total_annotations'] + task['cancelled_annotations'] > 0:
                 Task.objects.get(id=task['id']).annotations.update(task_id=first['id'])
-                total_moved_annotations += task['total_annotations']
+                total_moved_annotations += task['total_annotations'] + task['cancelled_annotations']
                 logger.info(
                     f"Moved {task['total_annotations']} annotations from task {task['id']} to task {first['id']}"
                 )
                 task['total_annotations'] = 0
+                task['cancelled_annotations'] = 0
 
 
 def restore_storage_links_for_duplicated_tasks(duplicates) -> None:
@@ -150,7 +168,11 @@ def restore_storage_links_for_duplicated_tasks(duplicates) -> None:
                     link_instance = storage_link_class.objects.get(id=source[2])
 
                     # assign existing StorageLink to other duplicated tasks
-                    link = storage_link_class(task_id=task['id'], key=link_instance.key, storage=link_instance.storage)
+                    link = storage_link_class(
+                        task_id=task['id'],
+                        key=link_instance.key,
+                        storage=link_instance.storage,
+                    )
                     link.save()
                     total_restored_links += 1
                     logger.info(f"Restored storage link for task {task['id']} from source task {source[0]['id']}")
@@ -168,7 +190,7 @@ def find_duplicated_tasks_by_data(project, queryset):
             storages += [field]
 
     groups = defaultdict(list)
-    tasks = list(queryset.values('data', 'id', 'total_annotations', *storages))
+    tasks = list(queryset.values('data', 'id', 'total_annotations', 'cancelled_annotations', *storages))
     logger.info(f'Retrieved {len(tasks)} tasks from queryset')
 
     for task in list(tasks):

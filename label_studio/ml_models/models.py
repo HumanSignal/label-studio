@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
+from tasks.models import Prediction
 
 
 def validate_string_list(value):
@@ -54,11 +55,20 @@ class ModelVersion(models.Model):
 
     parent_model = models.ForeignKey(ModelInterface, related_name='model_versions', on_delete=models.CASCADE)
 
+    prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+
     @property
     def full_title(self):
         return f'{self.parent_model.title}__{self.title}'
 
-    prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+    def delete(self, *args, **kwargs):
+        """
+        Deletes Predictions associated with ModelVersion
+        """
+        model_runs = ModelRun.objects.filter(model_version=self.id)
+        for model_run in model_runs:
+            model_run.delete_predictions()
+        super().delete(*args, **kwargs)
 
 
 class ThirdPartyModelVersion(ModelVersion):
@@ -141,7 +151,9 @@ class ModelRun(models.Model):
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
-    triggered_at = models.DateTimeField(_('triggered at'))
+    triggered_at = models.DateTimeField(_('triggered at'), null=True, default=None)
+
+    predictions_updated_at = models.DateTimeField(_('predictions updated at'), null=True, default=None)
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
 
@@ -158,6 +170,16 @@ class ModelRun(models.Model):
     def error_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
 
-    @property
-    def base_file_path(self):
-        return 's3://sandbox2-datasets-for-prompter-workflow/adala/hakan_test'   # TODO decide on path to use for LSE
+    def delete_predictions(self):
+        """
+        Deletes any predictions that have originated from a ModelRun
+        """
+
+        Prediction.objects.filter(model_run=self.id).delete()
+
+    def delete(self, *args, **kwargs):
+        """
+        Deletes Predictions associated with ModelRun
+        """
+        self.delete_predictions()
+        super().delete(*args, **kwargs)
