@@ -25,33 +25,29 @@ export const Relations = {
   get descendingOrderRelationButton() {
     return cy.get('[aria-label="Sort by descending"]');
   },
+  get hiddenRelations() {
+    return this.relations
+      .should('be.visible')
+      .get('.lsf-relations__item_hidden .lsf-relations__content');
+  },
   hasRelations(count: number) {
     cy.get('.lsf-details__section-head').should('have.text', `Relations (${count})`);
   },
   hasRelation(from: string, to: string) {
     cy.get('.lsf-relations').contains(from).closest('.lsf-relations').contains(to);
   },
+  hasHiddenRelations(count: number) {
+    this.hiddenRelations.should('have.length', count);
+  },
   toggleCreation() {
     cy.get('.lsf-region-actions__group_align_left > :nth-child(1) > .lsf-button__icon').click();
   },
-  toggleCreationWithHotkey() {
-    // hotkey is alt + r
-    cy.get('body').type('{alt}r');
-  },
-  hiddenRelations() {
-    return this.relations
-      .should('be.visible')
-      .get('.lsf-relations__item_hidden .lsf-relations__content');
-  },
-  hasHiddenRelations(value: number) {
-    this.hiddenRelations.should('have.length', value);
-  },
   toggleRelationVisibility(idx) {
-    this.relations
+    cy.get('.lsf-relations__item')
       .eq(idx)
       .trigger('mouseover')
-      .find('lsf-relations__actions')
-      .find('lsf-relations__action .lsf-button_look_')
+      .find('.lsf-relations__actions')
+      .closest('.lsf-relations__action')
       .click({ force: true });
   }
 };

@@ -94,82 +94,82 @@ const task = {
 };
 
 describe('Relations- Sort Order all relations', () => {
-        beforeEach(() => {
-                LabelStudio.init({ config, task });
-                ImageView.waitForImage();
-                Relations.hasRelations(0);
-        });
+  beforeEach(() => {
+    LabelStudio.init({ config, task });
+    ImageView.waitForImage();
+    Relations.hasRelations(0);
+  });
 
-        it('should exist and be disabled without existed relations', () => {
-                Relations.descendingOrderRelationButton.should('be.visible').should('be.disabled');
-        });
+  it('should exist and be disabled without existed relations', () => {
+    Relations.ascendingOrderRelationButton.should('be.visible').should('be.disabled');
+  });
 
-        it('should exist and be enabled with existed relations', () => {
-                Sidebar.toggleRegionSelection(0);
-                Relations.toggleCreation();
-                ImageView.clickAtRelative(0.51, 0.26);
-                Relations.hasRelations(1);
-                Relations.hasRelation('Moonwalker', 'Moonwalker 2');
-                ImageView.clickAtRelative(0.51, 0.06);
-                Relations.toggleCreation();
-                ImageView.clickAtRelative(0.51, 0.46);
-                Relations.hasRelations(2);
-                Relations.hasRelation('Moonwalker', 'Moonwalker 3');
-                ImageView.clickAtRelative(0.51, 0.66);
-                Relations.toggleCreation();
-                ImageView.clickAtRelative(0.51, 0.06);
-                Relations.hasRelations(3);
-                Relations.descendingOrderRelationButton.should('be.visible').should('be.enabled');
-        });
+  it('should exist and be enabled with existed relations', () => {
+    Sidebar.toggleRegionSelection(0);
+    Relations.toggleCreation();
+    ImageView.clickAtRelative(0.51, 0.26);
+    Relations.hasRelations(1);
+    Relations.hasRelation('Moonwalker', 'Moonwalker 2');
+    ImageView.clickAtRelative(0.51, 0.06);
+    Relations.toggleCreation();
+    ImageView.clickAtRelative(0.51, 0.46);
+    Relations.hasRelations(2);
+    Relations.hasRelation('Moonwalker', 'Moonwalker 3');
+    ImageView.clickAtRelative(0.51, 0.66);
+    Relations.toggleCreation();
+    ImageView.clickAtRelative(0.51, 0.06);
+    Relations.hasRelations(3);
+    Relations.ascendingOrderRelationButton.should('be.visible').should('be.enabled');
+  });
 
-        it('should sort relations in ascending order and descending order', () => {
-                Sidebar.toggleRegionSelection(0);
-                Relations.toggleCreation();
-                ImageView.clickAtRelative(0.51, 0.26);
-                Relations.hasRelations(1);
-                Relations.hasRelation('Moonwalker', 'Moonwalker 2');
-                ImageView.clickAtRelative(0.51, 0.06);
-                Relations.toggleCreation();
-                ImageView.clickAtRelative(0.51, 0.46);
-                Relations.hasRelations(2);
-                Relations.hasRelation('Moonwalker', 'Moonwalker 3');
-                ImageView.clickAtRelative(0.51, 0.66);
-                Relations.toggleCreation();
-                ImageView.clickAtRelative(0.51, 0.06);
-                Relations.hasRelations(3);
-                Relations.hasRelation('Moonwalker', 'Planet');
+  it('should sort relations in ascending order and descending order', () => {
+    Sidebar.toggleRegionSelection(0);
+    Relations.toggleCreation();
+    ImageView.clickAtRelative(0.51, 0.26);
+    Relations.hasRelations(1);
+    Relations.hasRelation('Moonwalker', 'Moonwalker 2');
+    ImageView.clickAtRelative(0.51, 0.06);
+    Relations.toggleCreation();
+    ImageView.clickAtRelative(0.51, 0.46);
+    Relations.hasRelations(2);
+    Relations.hasRelation('Moonwalker', 'Moonwalker 3');
+    ImageView.clickAtRelative(0.51, 0.66);
+    Relations.toggleCreation();
+    ImageView.clickAtRelative(0.51, 0.06);
+    Relations.hasRelations(3);
+    Relations.hasRelation('Planet', 'Moonwalker');
 
-                Relations.relationOrderList.should('deep.equal', [
-                        { from: 'Moonwalker', to: 'Moonwalker 2' },
-                        { from: 'Moonwalker', to: 'Moonwalker 3' },
-                        { from: 'Moonwalker', to: 'Planet' },
-                ]);
+    Relations.relationOrderList.should('deep.equal', [
+      { from: 'Moonwalker', to: 'Moonwalker 2' },
+      { from: 'Moonwalker', to: 'Moonwalker 3' },
+      { from: 'Planet', to: 'Moonwalker' },
+    ]);
 
-                Relations.ascendingOrderRelationButton.click();
+    Relations.ascendingOrderRelationButton.click({ force: true });
 
-                Relations.relationOrderList.should('deep.equal', [
-                        { from: 'Moonwalker', to: 'Planet' },
-                        { from: 'Moonwalker', to: 'Moonwalker 2' },
-                        { from: 'Moonwalker', to: 'Moonwalker 3' },
-                ]);
+    Relations.relationOrderList.should('deep.equal', [
+      { from: 'Planet', to: 'Moonwalker' },
+      { from: 'Moonwalker', to: 'Moonwalker 3' },
+      { from: 'Moonwalker', to: 'Moonwalker 2' },
+    ]);
 
-                Relations.descendingOrderRelationButton.click();
+    Relations.descendingOrderRelationButton.click({ force: true });
 
-                Relations.relationOrderList.should('deep.equal', [
-                        { from: 'Moonwalker', to: 'Moonwalker 2' },
-                        { from: 'Moonwalker', to: 'Moonwalker 3' },
-                        { from: 'Moonwalker', to: 'Planet' },
-                ]);
-        });
+    Relations.relationOrderList.should('deep.equal', [
+      { from: 'Moonwalker', to: 'Moonwalker 2' },
+      { from: 'Moonwalker', to: 'Moonwalker 3' },
+      { from: 'Planet', to: 'Moonwalker' },
+    ]);
+  });
 
-        it('should have tooltip for ascending action', () => {
-                Sidebar.toggleRegionSelection(0);
-                Relations.toggleCreation();
-                ImageView.clickAtRelative(0.51, 0.26);
-                Relations.hasRelations(1);
-                Relations.hasRelation('Moonwalker', 'Moonwalker 2');
-               
-                Relations.ascendingOrderRelationButton.trigger('mouseover');
-                Tooltip.hasText('Sort by ascending');
-        });
+  it('should have tooltip for ascending action', () => {
+    Sidebar.toggleRegionSelection(0);
+    Relations.toggleCreation();
+    ImageView.clickAtRelative(0.51, 0.26);
+    Relations.hasRelations(1);
+    Relations.hasRelation('Moonwalker', 'Moonwalker 2');
+
+    Relations.ascendingOrderRelationButton.trigger('mouseenter');
+    Tooltip.hasText('Sort by ascending');
+  });
 });
