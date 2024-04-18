@@ -6,6 +6,10 @@ from rest_framework import status
 
 from label_studio.tests.utils import make_project, register_ml_backend_mock
 
+ORIG_MODEL_NAME = 'basic_ml_backend'
+PROJECT_CONFIG = """<View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>"""
+
 
 @pytest.fixture
 def ml_backend_for_test_api(ml_backend):
@@ -23,12 +27,71 @@ def mock_gethostbyname(mocker):
 
 
 @pytest.mark.django_db
+def test_ml_backend_set_for_prelabeling(business_client, ml_backend_for_test_api, mock_gethostbyname):
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_ml_backend_creation',
+        ),
+        user=business_client.user,
+    )
+
+    assert project.model_version == ''
+
+    # create ML backend
+    response = business_client.post(
+        '/api/ml/',
+        data={
+            'project': project.id,
+            'title': 'ml_backend_title',
+            'url': 'https://ml_backend_for_test_api',
+        },
+    )
+    assert response.status_code == 201
+
+    project.refresh_from_db()
+    assert project.model_version == 'ml_backend_title'
+
+
+@pytest.mark.django_db
+def test_ml_backend_not_set_for_prelabeling(business_client, ml_backend_for_test_api, mock_gethostbyname):
+    """We are not setting it when its already set for another name,
+    for example when predictions were uploaded before"""
+
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_ml_backend_creation',
+        ),
+        user=business_client.user,
+    )
+
+    project.model_version = ORIG_MODEL_NAME
+    project.save()
+
+    # create ML backend
+    response = business_client.post(
+        '/api/ml/',
+        data={
+            'project': project.id,
+            'title': 'ml_backend_title',
+            'url': 'https://ml_backend_for_test_api',
+        },
+    )
+    assert response.status_code == 201
+
+    project.refresh_from_db()
+    assert project.model_version == ORIG_MODEL_NAME
+
+
+@pytest.mark.django_db
 def test_model_version_on_save(business_client, ml_backend_for_test_api, mock_gethostbyname):
     project = make_project(
         config=dict(
             is_published=True,
-            label_config="""<View><Image name="image" value="$image_url"/><Choices name="label"
-          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>""",
+            label_config=PROJECT_CONFIG,
             title='test_ml_backend_creation',
         ),
         user=business_client.user,
@@ -86,8 +149,7 @@ def test_model_version_on_delete(business_client, ml_backend_for_test_api, mock_
     project = make_project(
         config=dict(
             is_published=True,
-            label_config="""<View><Image name="image" value="$image_url"/><Choices name="label"
-          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>""",
+            label_config=PROJECT_CONFIG,
             title='test_ml_backend_creation',
         ),
         user=business_client.user,
@@ -135,8 +197,7 @@ def test_security_write_only_payload(business_client, ml_backend_for_test_api, m
     project = make_project(
         config=dict(
             is_published=True,
-            label_config="""<View><Image name="image" value="$image_url"/><Choices name="label"
-          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>""",
+            label_config=PROJECT_CONFIG,
             title='test_ml_backend_creation',
         ),
         user=business_client.user,
@@ -226,8 +287,7 @@ def test_ml_backend_predict_test_api_post_random_true(business_client):
     project = make_project(
         config=dict(
             is_published=True,
-            label_config="""<View><Image name="image" value="$image_url"/><Choices name="label"
-          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>""",
+            label_config=PROJECT_CONFIG,
             title='test_ml_backend_creation',
         ),
         user=business_client.user,

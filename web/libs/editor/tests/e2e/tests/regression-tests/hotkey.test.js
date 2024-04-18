@@ -1,6 +1,6 @@
 Feature('Hotkeys').tag('@regress');
 
-const AUDIO_URL = 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3';
+const AUDIO_URL = 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3';
 
 Scenario('Hotkeys on re-initing lsf', async function({ I, LabelStudio, AtAudioView, AtSidebar }) {
   const params = {
