@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
+from tasks.models import Prediction
 
 
 def validate_string_list(value):
@@ -54,11 +55,20 @@ class ModelVersion(models.Model):
 
     parent_model = models.ForeignKey(ModelInterface, related_name='model_versions', on_delete=models.CASCADE)
 
+    prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+
     @property
     def full_title(self):
         return f'{self.parent_model.title}__{self.title}'
 
-    prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+    def delete(self, *args, **kwargs):
+        """
+        Deletes Predictions associated with ModelVersion
+        """
+        model_runs = ModelRun.objects.filter(model_version=self.id)
+        for model_run in model_runs:
+            model_run.delete_predictions()
+        super().delete(*args, **kwargs)
 
 
 class ThirdPartyModelVersion(ModelVersion):
@@ -159,3 +169,17 @@ class ModelRun(models.Model):
     @property
     def error_file_name(self):
         return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
+
+    def delete_predictions(self):
+        """
+        Deletes any predictions that have originated from a ModelRun
+        """
+
+        Prediction.objects.filter(model_run=self.id).delete()
+
+    def delete(self, *args, **kwargs):
+        """
+        Deletes Predictions associated with ModelRun
+        """
+        self.delete_predictions()
+        super().delete(*args, **kwargs)
