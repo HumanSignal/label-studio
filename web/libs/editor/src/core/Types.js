@@ -12,9 +12,8 @@ function _oneOf(lookup, err) {
       dispatcher: (sn) => {
         if (arr.find((val) => sn.type === val)) {
           return lookup(sn.type);
-        } else {
-          throw Error(err + sn.type);
         }
+        throw Error(err + sn.type);
       },
     });
 }
@@ -48,9 +47,8 @@ function allModelsTypes() {
         if (!sn) return types.literal(undefined);
         if (Registry.tags.includes(sn.type)) {
           return Registry.getModelByTag(sn.type);
-        } else {
-          throw Error("Not expecting tag: " + sn.type);
         }
+        throw Error("Not expecting tag: " + sn.type);
       },
     },
     Registry.modelsArr(),

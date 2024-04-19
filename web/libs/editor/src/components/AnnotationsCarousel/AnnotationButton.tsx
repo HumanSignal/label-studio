@@ -36,7 +36,8 @@ interface AnnotationButtonInterface {
 const renderCommentIcon = (ent: any) => {
   if (ent.unresolved_comment_count > 0) {
     return LsCommentUnresolved;
-  } else if (ent.comment_count > 0) {
+  }
+  if (ent.comment_count > 0) {
     return LsCommentResolved;
   }
 
@@ -46,7 +47,8 @@ const renderCommentIcon = (ent: any) => {
 const renderCommentTooltip = (ent: any) => {
   if (ent.unresolved_comment_count > 0) {
     return "Unresolved Comments";
-  } else if (ent.comment_count > 0) {
+  }
+  if (ent.comment_count > 0) {
     return "All Comments Resolved";
   }
 

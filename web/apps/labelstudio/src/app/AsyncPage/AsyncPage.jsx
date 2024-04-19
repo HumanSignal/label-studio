@@ -18,33 +18,32 @@ const loadAsyncPage = async (url) => {
   try {
     if (pageCache.has(url)) {
       return pageCache.get(url);
-    } else {
-      const response = await fetch(url);
-      const html = await response.text();
-
-      if (response.status === 401) {
-        location.href = absoluteURL("/");
-        return;
-      }
-
-      if (!response.ok) {
-        modal({
-          body: () => (
-            <ErrorWrapper
-              title={`Error ${response.status}: ${response.statusText}`}
-              errorId={response.status}
-              stacktrace={`Cannot load url ${url}\n\n${html}`}
-            />
-          ),
-          allowClose: false,
-          style: { width: 680 },
-        });
-        return null;
-      }
-
-      pageCache.set(url, html);
-      return html;
     }
+    const response = await fetch(url);
+    const html = await response.text();
+
+    if (response.status === 401) {
+      location.href = absoluteURL("/");
+      return;
+    }
+
+    if (!response.ok) {
+      modal({
+        body: () => (
+          <ErrorWrapper
+            title={`Error ${response.status}: ${response.statusText}`}
+            errorId={response.status}
+            stacktrace={`Cannot load url ${url}\n\n${html}`}
+          />
+        ),
+        allowClose: false,
+        style: { width: 680 },
+      });
+      return null;
+    }
+
+    pageCache.set(url, html);
+    return html;
   } catch (err) {
     modal({
       body: () => (

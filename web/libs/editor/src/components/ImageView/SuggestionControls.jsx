@@ -92,9 +92,8 @@ export const SuggestionControls = observer(({ item, useLayer }) => {
     ) : (
       content
     );
-  } else {
-    return null;
   }
+  return null;
 });
 
 const ControlButton = ({ x = 0, fill, iconColor, onClick, icon }) => {

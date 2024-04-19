@@ -77,7 +77,8 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
   const renderCommentIcon = (ent) => {
     if (ent.unresolved_comment_count > 0) {
       return <LsCommentRed />;
-    } else if (ent.comment_count > 0) {
+    }
+    if (ent.comment_count > 0) {
       return <LsComment />;
     }
 

@@ -46,7 +46,8 @@ const ResultItem: FC<{ result: any }> = observer(({ result }) => {
           </Elem>
         </Elem>
       );
-    } else if (type === "textarea") {
+    }
+    if (type === "textarea") {
       return (
         <Elem name="result">
           <Text>Text: </Text>
@@ -55,7 +56,8 @@ const ResultItem: FC<{ result: any }> = observer(({ result }) => {
           </Elem>
         </Elem>
       );
-    } else if (type === "choices") {
+    }
+    if (type === "choices") {
       return (
         <Elem name="result">
           <Text>Choices: </Text>
