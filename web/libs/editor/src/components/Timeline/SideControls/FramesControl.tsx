@@ -60,7 +60,7 @@ const FrameInput: FC<FrameInputProps> = ({ length, position, onChange, onFinishE
 
         if (!allowedKey && !e.metaKey) e.preventDefault();
 
-        const value = parseInt(input.current!.value);
+        const value = Number.parseInt(input.current!.value);
         const step = e.shiftKey ? 10 : 1;
 
         if (e.key === "Enter") {

@@ -35,7 +35,7 @@ const TimelineComponent: FC<TimelineProps> = ({
 }) => {
   const View = Views[mode];
 
-  const [currentPosition, setCurrentPosition] = useState(clamp(position, 1, Infinity));
+  const [currentPosition, setCurrentPosition] = useState(clamp(position, 1, Number.POSITIVE_INFINITY));
   const [seekOffset, setSeekOffset] = useState(0);
   const [seekVisibleWidth, setSeekVisibleWidth] = useState(0);
   const [viewCollapsed, setViewCollapsed] = useLocalStorageState("video-timeline", false, {

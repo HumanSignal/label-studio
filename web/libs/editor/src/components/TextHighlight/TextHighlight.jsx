@@ -186,22 +186,22 @@ class TextHighlight extends Component {
     /**
      * Start position of selected item
      */
-    let startContainerPosition = parseInt(range.startContainer.parentNode.dataset.position);
+    let startContainerPosition = Number.parseInt(range.startContainer.parentNode.dataset.position);
     /**
      * End position of selected item
      */
-    let endContainerPosition = parseInt(range.endContainer.parentNode.dataset.position);
+    let endContainerPosition = Number.parseInt(range.endContainer.parentNode.dataset.position);
 
     if (!range.startContainer.parentNode.dataset.position) {
       if (!range.startContainer.dataset) return;
 
-      startContainerPosition = parseInt(range.startContainer.dataset.position);
+      startContainerPosition = Number.parseInt(range.startContainer.dataset.position);
     }
 
     if (!range.endContainer.parentNode.dataset.position) {
       if (!range.endContainer.dataset) return;
 
-      endContainerPosition = parseInt(range.endContainer.dataset.position);
+      endContainerPosition = Number.parseInt(range.endContainer.dataset.position);
     }
 
     const startHL = startContainerPosition < endContainerPosition ? startContainerPosition : endContainerPosition;
@@ -338,7 +338,7 @@ class TextHighlight extends Component {
       // }
       // console.log(textCharIndex, range.start, range.end)
 
-      for (; rangeCharIndex < parseInt(range.end) + 1; rangeCharIndex++) {
+      for (; rangeCharIndex < Number.parseInt(range.end) + 1; rangeCharIndex++) {
         /**
          * Emoji handler
          */

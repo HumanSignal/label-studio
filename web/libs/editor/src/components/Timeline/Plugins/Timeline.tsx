@@ -105,7 +105,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   updatePositioning(width: number, duration: number) {
     const baseOffset = (this.params as any).offset;
     const pixelsPerSecond = width / duration;
-    const totalSeconds = parseInt(duration as any, 10) + 1;
+    const totalSeconds = Number.parseInt(duration as any, 10) + 1;
     const timeInterval = this.intervalFnOrVal(this.params.timeInterval, pixelsPerSecond);
 
     let curPixel = pixelsPerSecond * (this.params as any).offset;

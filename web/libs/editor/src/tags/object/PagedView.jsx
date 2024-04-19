@@ -75,7 +75,7 @@ const getStoredPageSize = (name, defaultValue) => {
   const value = localStorage.getItem(`pages:${name}`);
 
   if (value) {
-    return parseInt(value);
+    return Number.parseInt(value);
   }
 
   return defaultValue ?? undefined;
@@ -90,7 +90,7 @@ const getQueryPage = () => {
   const page = params.get(PAGE_QUERY_PARAM);
 
   if (page) {
-    return parseInt(page);
+    return Number.parseInt(page);
   }
 
   return 1;
@@ -136,7 +136,7 @@ const HtxPagedView = observer(({ item }) => {
     const last = item.annotation.lastSelectedRegion;
 
     if (last) {
-      const _pageNumber = parseFloat(last.object.name.split("_")[1]) + 1;
+      const _pageNumber = Number.parseFloat(last.object.name.split("_")[1]) + 1;
 
       setPage(Math.ceil(_pageNumber / pageSize));
     }

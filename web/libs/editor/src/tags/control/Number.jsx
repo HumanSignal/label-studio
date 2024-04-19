@@ -89,7 +89,7 @@ const Model = types
           errors.push(`Value must be less than or equal to ${self.max}`);
         }
         if (isDefined(self.step)) {
-          const step = parseFloat(self.step);
+          const step = Number.parseFloat(self.step);
           const basis = isDefined(self.min) ? +self.min : 0;
           const delta = (value - basis) % step;
 

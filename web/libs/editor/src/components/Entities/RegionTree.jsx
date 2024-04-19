@@ -68,7 +68,7 @@ export const RegionTree = observer(({ regionStore }) => {
         const dragKey = dragNode.props.eventKey;
         const dropPos = node.props.pos.split("-");
 
-        dropPosition = dropPosition - parseInt(dropPos[dropPos.length - 1]);
+        dropPosition = dropPosition - Number.parseInt(dropPos[dropPos.length - 1]);
         const treeDepth = dropPos.length;
 
         const dropReg = regionStore.findRegionID(dropKey);

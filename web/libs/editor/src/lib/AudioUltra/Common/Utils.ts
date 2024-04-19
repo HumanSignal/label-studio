@@ -110,7 +110,7 @@ export const minmax = (array: ArrayLike<number>) => {
 
     return [min, max];
   }
-  return [Infinity, Infinity];
+  return [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
 };
 
 export const averageMinMax = (data: Float32Array) => {

@@ -475,9 +475,9 @@ const AnnotationStoreModel = types
       // parent link for the new annotations
       if (entity.pk) {
         if (entity.type === "prediction") {
-          c.parent_prediction = parseInt(entity.pk);
+          c.parent_prediction = Number.parseInt(entity.pk);
         } else if (entity.type === "annotation") {
-          c.parent_annotation = parseInt(entity.pk);
+          c.parent_annotation = Number.parseInt(entity.pk);
         }
       }
 
