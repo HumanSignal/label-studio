@@ -12,8 +12,8 @@ from data_manager.actions.basic import delete_tasks
 from io_storages.azure_blob.models import AzureBlobImportStorageLink
 from io_storages.gcs.models import GCSImportStorageLink
 from io_storages.localfiles.models import LocalFilesImportStorageLink
-from io_storages.s3.models import S3ImportStorageLink
 from io_storages.redis.models import RedisImportStorageLink
+from io_storages.s3.models import S3ImportStorageLink
 from tasks.models import Task
 
 logger = logging.getLogger(__name__)
