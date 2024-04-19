@@ -84,7 +84,6 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "useBlockStatements": "off",
         "useConsistentArrayType": "off",
         "useDefaultParameterLast": "off",
         "useExponentiationOperator": "off",
