@@ -72,7 +72,6 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
-        "noNonoctalDecimalEscape": "off",
         "noStringCaseMismatch": "off",
         "noSwitchDeclarations": "off",
         "noUnnecessaryContinue": "off",
