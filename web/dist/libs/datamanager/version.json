@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-433: Fix cursor disappearence issue in labeling interface",
-  "commit": "c4ec37a38c40ce2718efffcf7405da3a41fee6c0",
-  "date": "2024-04-15T16:00:24.000Z",
+  "message": "Merge branch 'develop' into 'fb-leap-433'",
+  "commit": "586ff57ef07af6b44783bd19ecab4c92e3c5f7e7",
+  "date": "2024-04-19T15:46:00.000Z",
   "branch": "fb-leap-433"
 }
