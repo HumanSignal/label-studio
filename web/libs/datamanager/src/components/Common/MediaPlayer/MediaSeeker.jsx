@@ -49,7 +49,7 @@ export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeek
 
   useEffect(() => {
     if (duration > 0 && buffer) {
-      for (var i = 0; i < buffer.length; i++) {
+      for (let i = 0; i < buffer.length; i++) {
         if (buffer.start(buffer.length - 1 - i) < currentTime) {
           const size = (buffer.end(buffer.length - 1 - i) / duration) * 100;
 
