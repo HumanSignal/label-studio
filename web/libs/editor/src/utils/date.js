@@ -31,9 +31,9 @@ export function msToHMS(ms) {
 export function prettyDate(time) {
   if (typeof time !== "string" && !(time instanceof Date) && !checkISO(time)) return;
 
-  const date = new Date(time),
-    diff = (new Date().getTime() - date.getTime()) / 1000,
-    day_diff = Math.floor(diff / 86400);
+  const date = new Date(time);
+  const diff = (new Date().getTime() - date.getTime()) / 1000;
+  const day_diff = Math.floor(diff / 86400);
 
   if (isNaN(day_diff) || day_diff < 0) return;
 

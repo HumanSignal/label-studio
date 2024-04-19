@@ -104,7 +104,8 @@ const versionLib = async () => {
   const currentPwd = process.cwd();
   // if the currentPwd includes 'node_modules', we are running from within the monorepo package itself
   // and we have to account for the difference
-  let workspaceRoot, currentProjectPath;
+  let workspaceRoot;
+  let currentProjectPath;
   if (currentPwd.includes("node_modules")) {
     const [_workspaceRoot, nodeModulesPath, _currentProjectPath] = currentPwd.split("web");
     workspaceRoot = path.join(_workspaceRoot, "web", nodeModulesPath);
