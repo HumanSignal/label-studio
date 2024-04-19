@@ -72,7 +72,6 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
-        "noVoidElementsWithChildren": "off",
         "useIsNan": "off",
         "noChildrenProp": "off",
         "noConstantCondition": "off",
