@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-ml-release-blocker'",
-  "commit": "ca5ca9fde589a0d7fe849630cbb78703bb2cdc43",
-  "date": "2024-04-18T16:44:49.000Z",
-  "branch": "fb-ml-release-blocker"
+  "message": "excluding 2 random errors, follow up",
+  "commit": "88feb23cf19495bec998dc693f0455bb00bbfb07",
+  "date": "2024-04-12T22:35:26.000Z",
+  "branch": "fb-echo-27/regenerate-first-release-commit-to-review"
 }
