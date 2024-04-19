@@ -9,10 +9,6 @@ import '../../tags/control/Choice';
 import '../../tags/visual/Header';
 import { ConfigValidator } from "../DataValidator/ConfigValidator";
 
-function createStore(utterances) {
-  return { task: { dataObj: { utterances } } };
-}
-
 it('Should fail if a tag referenced by toName doesn\'t exist', () => {
   const result = ConfigValidator.validate(Tree.treeToModel(`
   <View>
@@ -22,7 +18,7 @@ it('Should fail if a tag referenced by toName doesn\'t exist', () => {
       <Label value="Moonwalker" background="blue"></Label>
     </RectangleLabels>
   </View>
-  `, createStore(['hello', 'world'])));
+  `, {}));
 
   expect(result[0].error).toBe('ERR_TAG_NOT_FOUND');
 });
@@ -36,7 +32,7 @@ it('Should fail if a tag referenced by toName is not image', () => {
       <Label value="Moonwalker" background="blue"></Label>
     </RectangleLabels>
   </View>
-  `, createStore(['hello', 'world'])));
+  `, {}));
 
   expect(result[0].error).toBe('ERR_TAG_UNSUPPORTED');
 });
@@ -66,7 +62,7 @@ it('Should fail if opacity attribute is out of range', () => {
       <Label value="Moonwalker" background="blue"></Label>
     </RectangleLabels>
   </View>
-  `, createStore(['hello', 'world'])));
+  `, {}));
 
   expect(result[0].error).toBe('ERR_BAD_TYPE');
 });
@@ -80,7 +76,7 @@ it('Should fail if color is not a proper CSS color', () => {
       <Label value="Moonwalker" background="verywrongcolor"></Label>
     </RectangleLabels>
   </View>
-  `, createStore(['hello', 'world'])));
+  `, {}));
 
   expect(result[0].error).toBe('ERR_BAD_TYPE');
 });
@@ -103,7 +99,7 @@ it('Should fail if visual tags have name attribute', () => {
         <Label value="Car" background="blue"/>
       </PolygonLabels>
     </View>
-  `, createStore(['hello', 'world'])));
+  `, {}));
 
   expect(result[0].error).toBe('ERR_GENERAL');
   expect(result[0].value).toBe('Attribute <b>name</b> is not allowed for tag <b>Header</b>.');
