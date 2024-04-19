@@ -1,9 +1,9 @@
-import { observer } from 'mobx-react';
-import { FC, useCallback, useState } from 'react';
-import { ObjectTag } from '../../../components/Tags/Object';
-import { Timeline } from '../../../components/Timeline/Timeline';
-import { Block } from '../../../utils/bem';
-import { WS_SPEED, WS_VOLUME, WS_ZOOM_X } from './constants';
+import { observer } from "mobx-react";
+import { type FC, useCallback, useState } from "react";
+import { ObjectTag } from "../../../components/Tags/Object";
+import { Timeline } from "../../../components/Timeline/Timeline";
+import { Block } from "../../../utils/bem";
+import { WS_SPEED, WS_VOLUME, WS_ZOOM_X } from "./constants";
 
 interface AudioNextProps {
   item: any;
@@ -11,8 +11,14 @@ interface AudioNextProps {
 
 const numberify = (val: any, defaults: Record<string, number>) => {
   const numVal = Number(val);
-  
-  return isNaN(val) ? defaults.default : (numVal < defaults.min ? defaults.min : (numVal > defaults.max ? defaults.max : numVal));
+
+  return isNaN(val)
+    ? defaults.default
+    : numVal < defaults.min
+      ? defaults.min
+      : numVal > defaults.max
+        ? defaults.max
+        : numVal;
 };
 
 const AudioNextView: FC<AudioNextProps> = ({ item }) => {
@@ -49,7 +55,7 @@ const AudioNextView: FC<AudioNextProps> = ({ item }) => {
     const value = Math.floor((time * 1000) % roundedFps);
     const result = Math.floor(time >= 0 ? value : roundedFps);
 
-    return result.toString().padStart(3, '0');
+    return result.toString().padStart(3, "0");
   }, []);
 
   const handlePlay = useCallback(() => {

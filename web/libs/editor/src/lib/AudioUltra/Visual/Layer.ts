@@ -1,34 +1,34 @@
-import { clamp, OFFSCREEN_CANVAS_SUPPORTED } from '../Common/Utils';
-import { Events } from '../Common/Events';
-import { LayerGroup } from './LayerGroup';
+import { clamp, OFFSCREEN_CANVAS_SUPPORTED } from "../Common/Utils";
+import { Events } from "../Common/Events";
+import type { LayerGroup } from "./LayerGroup";
 
 export type CanvasCompositeOperation =
-  | 'source-over'
-  | 'source-in'
-  | 'source-out'
-  | 'source-atop'
-  | 'destination-over'
-  | 'destination-in'
-  | 'destination-out'
-  | 'destination-atop'
-  | 'lighter'
-  | 'copy'
-  | 'xor'
-  | 'multiply'
-  | 'screen'
-  | 'overlay'
-  | 'darken'
-  | 'lighten'
-  | 'color-dodge'
-  | 'color-burn'
-  | 'hard-light'
-  | 'soft-light'
-  | 'difference'
-  | 'exclusion'
-  | 'hue'
-  | 'saturation'
-  | 'color'
-  | 'luminosity';
+  | "source-over"
+  | "source-in"
+  | "source-out"
+  | "source-atop"
+  | "destination-over"
+  | "destination-in"
+  | "destination-out"
+  | "destination-atop"
+  | "lighter"
+  | "copy"
+  | "xor"
+  | "multiply"
+  | "screen"
+  | "overlay"
+  | "darken"
+  | "lighten"
+  | "color-dodge"
+  | "color-burn"
+  | "hard-light"
+  | "soft-light"
+  | "difference"
+  | "exclusion"
+  | "hue"
+  | "saturation"
+  | "color"
+  | "luminosity";
 
 export interface RendererOptions {
   container: HTMLElement;
@@ -55,13 +55,13 @@ export type TextMetricKeys = keyof TextMetrics;
 const USE_FALLBACK = false;
 
 const textMetricKeys: TextMetricKeys[] = [
-  'actualBoundingBoxAscent',
-  'actualBoundingBoxDescent',
-  'actualBoundingBoxLeft',
-  'actualBoundingBoxRight',
-  'fontBoundingBoxAscent',
-  'fontBoundingBoxDescent',
-  'width',
+  "actualBoundingBoxAscent",
+  "actualBoundingBoxDescent",
+  "actualBoundingBoxLeft",
+  "actualBoundingBoxRight",
+  "fontBoundingBoxAscent",
+  "fontBoundingBoxDescent",
+  "width",
 ];
 
 export class Layer extends Events<LayerEvents> {
@@ -72,9 +72,8 @@ export class Layer extends Events<LayerEvents> {
   private _context!: RenderingContext;
   private _bufferContext!: RenderingContext;
   private _bufferCanvas!: HTMLCanvasElement | OffscreenCanvas;
-  private compositeOperation: CanvasCompositeOperation = 'source-over';
+  private compositeOperation: CanvasCompositeOperation = "source-over";
   private compositeAsGroup = false;
-
 
   /**
    * Float value of the layer opacity between 0 and 1.
@@ -154,7 +153,7 @@ export class Layer extends Events<LayerEvents> {
       this.context.setTransform(0, 0, 0, 0, 0, 0);
     }
     this.save();
-    this.invoke('layerUpdated', [this]);
+    this.invoke("layerUpdated", [this]);
   }
 
   show() {
@@ -187,7 +186,13 @@ export class Layer extends Events<LayerEvents> {
 
   roundRect(x: number, y: number, width: number, height: number, radius: number) {
     this.context?.beginPath();
-    this.context?.roundRect(x * this.pixelRatio, y * this.pixelRatio, width * this.pixelRatio, height * this.pixelRatio, radius);
+    this.context?.roundRect(
+      x * this.pixelRatio,
+      y * this.pixelRatio,
+      width * this.pixelRatio,
+      height * this.pixelRatio,
+      radius,
+    );
     this.context?.fill();
   }
 
@@ -198,7 +203,7 @@ export class Layer extends Events<LayerEvents> {
   fitText(text: string, x: number, y: number, maxWidth: number) {
     if (!this.context) return;
     const finalWidth = maxWidth / this.pixelRatio;
-    const ellipsisWidth = this.measureText('...').width;
+    const ellipsisWidth = this.measureText("...").width;
     let textWidth = this.measureText(text).width;
     let finalText = text;
 
@@ -212,7 +217,7 @@ export class Layer extends Events<LayerEvents> {
         textWidth = this.measureText(finalText).width;
       }
 
-      finalText += '...';
+      finalText += "...";
     }
 
     this.fillText(finalText, x, y, maxWidth);
@@ -225,7 +230,7 @@ export class Layer extends Events<LayerEvents> {
 
     const result: Partial<Record<TextMetricKeys, number>> = {};
 
-    textMetricKeys.forEach(key => {
+    textMetricKeys.forEach((key) => {
       result[key as TextMetricKeys] = data[key];
     });
 
@@ -285,7 +290,7 @@ export class Layer extends Events<LayerEvents> {
   }
 
   get strokeStyle() {
-    if (!this.context) return '';
+    if (!this.context) return "";
     return this.context.strokeStyle;
   }
 
@@ -295,7 +300,7 @@ export class Layer extends Events<LayerEvents> {
   }
 
   get fillStyle() {
-    if (!this.context) return '';
+    if (!this.context) return "";
     return this.context.fillStyle;
   }
 
@@ -315,7 +320,7 @@ export class Layer extends Events<LayerEvents> {
   }
 
   get font() {
-    if (!this.context) return '';
+    if (!this.context) return "";
     return this.context.font;
   }
 
@@ -353,7 +358,7 @@ export class Layer extends Events<LayerEvents> {
         context = targetCanvas.context;
         targetOpacity = targetCanvas.opacity;
       } else {
-        context = targetCanvas.getContext('2d');
+        context = targetCanvas.getContext("2d");
       }
 
       if (!context) return;
@@ -380,7 +385,8 @@ export class Layer extends Events<LayerEvents> {
   }
 
   private createCanvas() {
-    if (this.group) { // Do not create canvas if it is apart of a group
+    if (this.group) {
+      // Do not create canvas if it is apart of a group
       this.canvas = this.group.canvas;
       this._context = this.group.context;
       return;
@@ -398,20 +404,20 @@ export class Layer extends Events<LayerEvents> {
   }
 
   private createVisibleCanvas() {
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     const { pixelRatio } = this;
 
     const width = this.container.clientWidth;
-    const height = (this.options.height ?? 100);
+    const height = this.options.height ?? 100;
 
-    canvas.id = `waveform-layer-${this.options.name ?? 'default'}`;
+    canvas.id = `waveform-layer-${this.options.name ?? "default"}`;
     canvas.width = width * pixelRatio;
     canvas.height = this.isVisible ? height * pixelRatio : 0;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
-    canvas.style.visibility = this.isVisible ? 'visible' : 'hidden';
+    canvas.style.visibility = this.isVisible ? "visible" : "hidden";
 
-    this._context = canvas.getContext('2d')!;
+    this._context = canvas.getContext("2d")!;
 
     this._context.globalAlpha = this.compositeAsGroup ? clamp(this.opacity * 1.5, 0, 1) : this.opacity;
     this._context.globalCompositeOperation = this.compositeOperation;
@@ -426,13 +432,13 @@ export class Layer extends Events<LayerEvents> {
     if (OFFSCREEN_CANVAS_SUPPORTED && !USE_FALLBACK) {
       const { pixelRatio } = this;
       const width = this.container.clientWidth;
-      const height = (this.options.height ?? 100);
+      const height = this.options.height ?? 100;
 
       // For better performance we're using experimental
       // OffscreenCanvas as a rendering backend
       canvas = new OffscreenCanvas(width * pixelRatio, height * pixelRatio);
 
-      this._context = canvas.getContext('2d')!;
+      this._context = canvas.getContext("2d")!;
 
       const globalAlpha = this.compositeAsGroup ? clamp(this.opacity * 1.5, 0, 1) : this.opacity;
 
@@ -443,11 +449,11 @@ export class Layer extends Events<LayerEvents> {
       canvas = this.createVisibleCanvas();
 
       Object.assign(canvas.style, {
-        right: '100%',
-        bottom: '100%',
+        right: "100%",
+        bottom: "100%",
         opacity: 0,
-        position: 'absolute',
-        visibility: this.isVisible ? 'visible' : 'hidden',
+        position: "absolute",
+        visibility: this.isVisible ? "visible" : "hidden",
       });
     }
 
@@ -472,7 +478,7 @@ export class Layer extends Events<LayerEvents> {
       // OffscreenCanvas as a rendering backend
       canvas = new OffscreenCanvas(width * pixelRatio, height * pixelRatio);
 
-      this._bufferContext = canvas.getContext('2d')!;
+      this._bufferContext = canvas.getContext("2d")!;
 
       const globalAlpha = this.compositeAsGroup ? clamp(this.opacity * 1.5, 0, 1) : this.opacity;
 
@@ -483,11 +489,11 @@ export class Layer extends Events<LayerEvents> {
       canvas = this.createVisibleCanvas();
 
       Object.assign(canvas.style, {
-        right: '100%',
-        bottom: '100%',
+        right: "100%",
+        bottom: "100%",
         opacity: 0,
-        position: 'absolute',
-        visibility: 'hidden',
+        position: "absolute",
+        visibility: "hidden",
       });
     }
 

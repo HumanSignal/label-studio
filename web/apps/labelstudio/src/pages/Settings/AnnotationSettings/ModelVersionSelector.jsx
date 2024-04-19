@@ -1,12 +1,12 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { useAPI } from '../../../providers/ApiProvider';
-import { Label, Select } from '../../../components/Form';
-import { ProjectContext } from '../../../providers/ProjectProvider';
+import { useCallback, useContext, useEffect, useState } from "react";
+import { useAPI } from "../../../providers/ApiProvider";
+import { Label, Select } from "../../../components/Form";
+import { ProjectContext } from "../../../providers/ProjectProvider";
 
 export const ModelVersionSelector = ({
-  name = 'model_version',
-  valueName = 'model_version',
-  apiName = 'projectModelVersions',
+  name = "model_version",
+  valueName = "model_version",
+  apiName = "projectModelVersions",
   ...props
 }) => {
   const api = useAPI();
@@ -15,7 +15,7 @@ export const ModelVersionSelector = ({
   const [versions, setVersions] = useState([]);
   const [models, setModels] = useState([]);
   const [version, setVersion] = useState(null);
-  const [placeholder, setPlaceholder] = useState('');
+  const [placeholder, setPlaceholder] = useState("");
 
   useEffect(() => {
     setVersion(project?.[valueName] || null);
@@ -36,10 +36,10 @@ export const ModelVersionSelector = ({
 
     if (modelVersions?.live?.length > 0) {
       const liveModels = modelVersions.live.map((item) => {
-        const label = item.title + ' (' + item.readable_state + ')';
+        const label = item.title + " (" + item.readable_state + ")";
 
         return {
-          group: 'Models',
+          group: "Models",
           value: item.title,
           label,
         };
@@ -50,10 +50,10 @@ export const ModelVersionSelector = ({
 
     if (modelVersions?.static?.length > 0) {
       const staticModels = modelVersions.static.map((item) => {
-        const label = item.model_version + ' (' + item.count + ' predictions)';
+        const label = item.model_version + " (" + item.count + " predictions)";
 
         return {
-          group: 'Predictions',
+          group: "Predictions",
           value: item.model_version,
           label,
         };
@@ -63,7 +63,7 @@ export const ModelVersionSelector = ({
     }
 
     if (!modelVersions?.static?.length && !modelVersions?.live?.length) {
-      setPlaceholder('No model or predictions available');
+      setPlaceholder("No model or predictions available");
     }
 
     setLoading(false);
@@ -73,10 +73,8 @@ export const ModelVersionSelector = ({
 
   return (
     <div>
-      <p>
-        Select which predictions or which model you want to use:
-      </p>
-      <div style={{ display: 'flex', alignItems: 'center', width: 400 }}>
+      <p>Select which predictions or which model you want to use:</p>
+      <div style={{ display: "flex", alignItems: "center", width: 400 }}>
         <div style={{ flex: 1, paddingRight: 16 }}>
           <Select
             name={name}
@@ -84,13 +82,7 @@ export const ModelVersionSelector = ({
             value={version}
             onChange={(e) => setVersion(e.target.value)}
             options={[...models, ...versions]}
-            placeholder={
-              loading
-                ? 'Loading ...'
-                : placeholder
-                  ? placeholder
-                  : 'Please select model or predictions'
-            }
+            placeholder={loading ? "Loading ..." : placeholder ? placeholder : "Please select model or predictions"}
             {...props}
           />
         </div>

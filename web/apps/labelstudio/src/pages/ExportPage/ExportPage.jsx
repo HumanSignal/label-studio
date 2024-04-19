@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router';
-import { Button } from '../../components';
-import { Form, Input } from '../../components/Form';
-import { Modal } from '../../components/Modal/Modal';
-import { Space } from '../../components/Space/Space';
-import { useAPI } from '../../providers/ApiProvider';
-import { useFixedLocation, useParams } from '../../providers/RoutesProvider';
-import { BemWithSpecifiContext } from '../../utils/bem';
-import { isDefined } from '../../utils/helpers';
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router";
+import { Button } from "../../components";
+import { Form, Input } from "../../components/Form";
+import { Modal } from "../../components/Modal/Modal";
+import { Space } from "../../components/Space/Space";
+import { useAPI } from "../../providers/ApiProvider";
+import { useFixedLocation, useParams } from "../../providers/RoutesProvider";
+import { BemWithSpecifiContext } from "../../utils/bem";
+import { isDefined } from "../../utils/helpers";
 import "./ExportPage.styl";
 
 // const formats = {
@@ -16,7 +16,7 @@ import "./ExportPage.styl";
 // };
 
 const downloadFile = (blob, filename) => {
-  const link = document.createElement('a');
+  const link = document.createElement("a");
 
   link.href = URL.createObjectURL(blob);
   link.download = filename;
@@ -25,7 +25,7 @@ const downloadFile = (blob, filename) => {
 
 const { Block, Elem } = BemWithSpecifiContext();
 
-const wait = () => new Promise(resolve => setTimeout(resolve, 5000));
+const wait = () => new Promise((resolve) => setTimeout(resolve, 5000));
 
 export const ExportPage = () => {
   const history = useHistory();
@@ -37,7 +37,7 @@ export const ExportPage = () => {
   const [downloading, setDownloading] = useState(false);
   const [downloadingMessage, setDownloadingMessage] = useState(false);
   const [availableFormats, setAvailableFormats] = useState([]);
-  const [currentFormat, setCurrentFormat] = useState('JSON');
+  const [currentFormat, setCurrentFormat] = useState("JSON");
 
   /** @type {import('react').RefObject<Form>} */
   const form = useRef();
@@ -55,7 +55,7 @@ export const ExportPage = () => {
       booleansAsNumbers: true,
     });
 
-    const response = await api.callApi('exportRaw', {
+    const response = await api.callApi("exportRaw", {
       params: {
         pk: pageParams.id,
         ...params,
@@ -65,7 +65,7 @@ export const ExportPage = () => {
     if (response.ok) {
       const blob = await response.blob();
 
-      downloadFile(blob, response.headers.get('filename'));
+      downloadFile(blob, response.headers.get("filename"));
     } else {
       api.handleError(response);
     }
@@ -77,22 +77,26 @@ export const ExportPage = () => {
 
   useEffect(() => {
     if (isDefined(pageParams.id)) {
-      api.callApi("previousExports", {
-        params: {
-          pk: pageParams.id,
-        },
-      }).then(({ export_files }) => {
-        setPreviousExports(export_files.slice(0, 1));
-      });
+      api
+        .callApi("previousExports", {
+          params: {
+            pk: pageParams.id,
+          },
+        })
+        .then(({ export_files }) => {
+          setPreviousExports(export_files.slice(0, 1));
+        });
 
-      api.callApi("exportFormats", {
-        params: {
-          pk: pageParams.id,
-        },
-      }).then(formats => {
-        setAvailableFormats(formats);
-        setCurrentFormat(formats[0]?.name);
-      });
+      api
+        .callApi("exportFormats", {
+          params: {
+            pk: pageParams.id,
+          },
+        })
+        .then((formats) => {
+          setAvailableFormats(formats);
+          setCurrentFormat(formats[0]?.name);
+        });
     }
   }, [pageParams]);
 
@@ -144,10 +148,10 @@ export const ExportPage = () => {
   return (
     <Modal
       onHide={() => {
-        const path = location.pathname.replace(ExportPage.path, '');
+        const path = location.pathname.replace(ExportPage.path, "");
         const search = location.search;
 
-        history.replace(`${path}${search !== '?' ? search : ''}`);
+        history.replace(`${path}${search !== "?" ? search : ""}`);
       }}
       title="Export data"
       style={{ width: 720 }}
@@ -160,11 +164,11 @@ export const ExportPage = () => {
         <FormatInfo
           availableFormats={availableFormats}
           selected={currentFormat}
-          onClick={format => setCurrentFormat(format.name)}
+          onClick={(format) => setCurrentFormat(format.name)}
         />
 
         <Form ref={form}>
-          <Input type="hidden" name="exportType" value={currentFormat}/>
+          <Input type="hidden" name="exportType" value={currentFormat} />
 
           {/* {aggregation} */}
 
@@ -176,22 +180,12 @@ export const ExportPage = () => {
         </Form>
 
         <Elem name="footer">
-          <Space style={{ width: '100%' }} spread>
-            <Elem name="recent">
-              {/* {exportHistory} */}
-            </Elem>
+          <Space style={{ width: "100%" }} spread>
+            <Elem name="recent">{/* {exportHistory} */}</Elem>
             <Elem name="actions">
               <Space>
-                {downloadingMessage && (
-                  "Files are being prepared. It might take some time."
-                )}
-                <Elem
-                  tag={Button}
-                  name="finish"
-                  look="primary"
-                  onClick={proceedExport}
-                  waiting={downloading}
-                >
+                {downloadingMessage && "Files are being prepared. It might take some time."}
+                <Elem tag={Button} name="finish" look="primary" onClick={proceedExport} waiting={downloading}>
                   Export
                 </Elem>
               </Space>
@@ -208,7 +202,7 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
     <Block name="formats">
       <Elem name="info">You can export dataset in one of the following formats:</Elem>
       <Elem name="list">
-        {availableFormats.map(format => (
+        {availableFormats.map((format) => (
           <Elem
             key={format.name}
             name="item"
@@ -223,7 +217,9 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
 
               <Space size="small">
                 {format.tags?.map?.((tag, index) => (
-                  <Elem key={index} name="tag">{tag}</Elem>
+                  <Elem key={index} name="tag">
+                    {tag}
+                  </Elem>
                 ))}
               </Space>
             </Elem>
@@ -234,14 +230,20 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
       </Elem>
       <Elem name="feedback">
         Can't find an export format?
-        <br/>
-        Please let us know in
-        {" "}
-        <a className="no-go" href="https://slack.labelstud.io/?source=product-export" target="_blank">Slack</a>
-        {" "}
-        or submit an issue to the
-        {" "}
-        <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues" target="_blank" rel="noreferrer">Repository</a>
+        <br />
+        Please let us know in{" "}
+        <a className="no-go" href="https://slack.labelstud.io/?source=product-export" target="_blank" rel="noreferrer">
+          Slack
+        </a>{" "}
+        or submit an issue to the{" "}
+        <a
+          className="no-go"
+          href="https://github.com/heartexlabs/label-studio-converter/issues"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Repository
+        </a>
       </Elem>
     </Block>
   );

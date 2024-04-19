@@ -4,13 +4,7 @@ import { FilterInput } from "../FilterInput";
 
 const BaseInput = observer(({ value, onChange, placeholder }) => {
   return (
-    <FilterInput
-      type="text"
-      value={value}
-      onChange={onChange}
-      style={{ fontSize: 14 }}
-      placeholder={placeholder}
-    />
+    <FilterInput type="text" value={value} onChange={onChange} style={{ fontSize: 14 }} placeholder={placeholder} />
   );
 });
 

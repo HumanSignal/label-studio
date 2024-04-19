@@ -1,9 +1,9 @@
-import chroma from 'chroma-js';
-import React, { useMemo } from 'react';
-import { Block, Elem } from '../../utils/bem';
-import { asVars } from '../../utils/styles';
+import chroma from "chroma-js";
+import React, { useMemo } from "react";
+import { Block, Elem } from "../../utils/bem";
+import { asVars } from "../../utils/styles";
 
-import './Label.styl';
+import "./Label.styl";
 
 export const Label = React.forwardRef(
   (

@@ -2,14 +2,14 @@ export class Loader extends HTMLElement {
   _loaded: number;
   _total: number;
   _initializing = false;
-  _error = '';
+  _error = "";
 
   constructor() {
     super();
     this._loaded = 0;
     this._total = 0;
 
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
@@ -126,7 +126,7 @@ export class Loader extends HTMLElement {
   }
 
   get value() {
-    return Math.round(this.loaded / this.total * 100);
+    return Math.round((this.loaded / this.total) * 100);
   }
 
   convertBytesToMegabytes(bytes: number) {
@@ -136,11 +136,11 @@ export class Loader extends HTMLElement {
   update() {
     if (!this.shadowRoot) return;
 
-    const bar = this.shadowRoot.querySelector('.progress-bar') as HTMLElement;
-    const text = this.shadowRoot.querySelector('#text') as HTMLElement;
-    const loadedText = this.shadowRoot.querySelector('#loaded') as HTMLElement;
-    const totalText = this.shadowRoot.querySelector('#total') as HTMLElement;
-    const percentageText = this.shadowRoot.querySelector('#percentage') as HTMLElement;
+    const bar = this.shadowRoot.querySelector(".progress-bar") as HTMLElement;
+    const text = this.shadowRoot.querySelector("#text") as HTMLElement;
+    const loadedText = this.shadowRoot.querySelector("#loaded") as HTMLElement;
+    const totalText = this.shadowRoot.querySelector("#total") as HTMLElement;
+    const percentageText = this.shadowRoot.querySelector("#percentage") as HTMLElement;
 
     if (!bar) return;
 
@@ -149,8 +149,8 @@ export class Loader extends HTMLElement {
     requestAnimationFrame(() => {
       // If an error occurred, show the error message and hide the progress bar
       if (this._error) {
-        if (!text.classList.contains('error')) {
-          text.classList.add('error');
+        if (!text.classList.contains("error")) {
+          text.classList.add("error");
         }
         text.innerText = this._error;
         return;
@@ -165,8 +165,7 @@ export class Loader extends HTMLElement {
 
       // Indeterminate progress bar is given if no calculable total available.
       if (total < 0) {
-        if (!bar.classList.contains('progress-bar-indeterminate')) 
-          bar.classList.add('progress-bar-indeterminate');
+        if (!bar.classList.contains("progress-bar-indeterminate")) bar.classList.add("progress-bar-indeterminate");
 
         if (this.loaded > 0) {
           loadedText.innerText = `${this.convertBytesToMegabytes(this.loaded)} MB`;
@@ -184,13 +183,13 @@ export class Loader extends HTMLElement {
           totalText.innerText = `${this.convertBytesToMegabytes(this.total)} MB`;
           percentageText.innerText = `(${value}%)`;
         }
-        text.innerText = 'Initializing...';
-        bar.classList.add('progress-bar-indeterminate');
+        text.innerText = "Initializing...";
+        bar.classList.add("progress-bar-indeterminate");
         return;
       }
 
       // Update progress bar
-      bar.style.setProperty('--ls-loader-position', `${value - 100}%`);
+      bar.style.setProperty("--ls-loader-position", `${value - 100}%`);
       if (value > 0) {
         percentageText.innerText = `(${value}%)`;
       }
@@ -204,8 +203,8 @@ export class Loader extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['hidden'];
+    return ["hidden"];
   }
 }
 
-customElements.define('loading-progress-bar', Loader);
+customElements.define("loading-progress-bar", Loader);
