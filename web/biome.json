@@ -67,7 +67,6 @@
         "noForEach": "off",
         "noUselessSwitchCase": "off",
         "useOptionalChain": "off",
-        "useSimplifiedLogicExpression": "off",
         "noBannedTypes": "off",
         "noStaticOnlyClass": "off"
       },
