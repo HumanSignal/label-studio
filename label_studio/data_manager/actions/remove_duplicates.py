@@ -13,6 +13,7 @@ from io_storages.azure_blob.models import AzureBlobImportStorageLink
 from io_storages.gcs.models import GCSImportStorageLink
 from io_storages.localfiles.models import LocalFilesImportStorageLink
 from io_storages.s3.models import S3ImportStorageLink
+from io_storages.redis.models import RedisImportStorageLink
 from tasks.models import Task
 
 logger = logging.getLogger(__name__)
@@ -136,7 +137,7 @@ def restore_storage_links_for_duplicated_tasks(duplicates) -> None:
         'io_storages_gcsimportstoragelink': GCSImportStorageLink,
         'io_storages_azureblobimportstoragelink': AzureBlobImportStorageLink,
         'io_storages_localfilesimportstoragelink': LocalFilesImportStorageLink,
-        # 'io_storages_redisimportstoragelink',
+        'io_storages_redisimportstoragelink': RedisImportStorageLink,
         # 'lse_io_storages_lses3importstoragelink'  # not supported yet
     }
 
