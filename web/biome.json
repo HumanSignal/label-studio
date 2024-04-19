@@ -48,7 +48,6 @@
         "noImplicitAnyLet": "off",
         "noShadowRestrictedNames": "off",
         "useDefaultSwitchClauseLast": "off",
-        "noSkippedTests": "off",
         "useGetterReturn": "off"
       },
       "complexity": {
