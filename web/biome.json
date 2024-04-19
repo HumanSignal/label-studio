@@ -86,7 +86,6 @@
         "noNonNullAssertion": "off",
         "useDefaultParameterLast": "off",
         "useNodejsImportProtocol": "off",
-        "useShorthandArrayType": "off",
         "useShorthandAssign": "off",
         "useSingleCaseStatement": "off",
         "useSingleVarDeclarator": "off",
