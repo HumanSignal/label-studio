@@ -36,7 +36,6 @@ import { isDefined, sortAnnotations } from '../../utils/utilities';
  */
 import { Annotation } from './Annotation';
 import { AnnotationTab } from '../AnnotationTab/AnnotationTab';
-import { DynamicPreannotationsControl } from '../AnnotationTab/DynamicPreannotationsControl';
 import { BottomBar } from '../BottomBar/BottomBar';
 import Debug from '../Debug';
 import Grid from './Grid';
@@ -148,9 +147,6 @@ class App extends Component {
           {this.renderRelations(as.selected)}
         </Elem>
         {(!isFF(FF_DEV_3873)) && getRoot(as).hasInterface('infobar') && this._renderInfobar(as)}
-        {as.selected.hasSuggestionsSupport && (
-          <DynamicPreannotationsControl />
-        )}
       </Block>
     );
   }

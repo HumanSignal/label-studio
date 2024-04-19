@@ -71,7 +71,7 @@ export default {
         The request parameters are invalid.
         If you are using S3, make sure you’ve specified the right bucket region name.
       </p>
-      <p>URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code></p>
+      <p>URL: <code><a href="${encodeURI(url)}" target="_blank" rel="noreferrer">${htmlEscape(url)}</a></code></p>
     </div>`;
   },
 
@@ -90,7 +90,7 @@ export default {
           <li>Network is reachable</li>
         </ul>
       </p>
-      <p>URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code></p>
+      <p>URL: <code><a href="${encodeURI(url)}" target="_blank" rel="noreferrer">${htmlEscape(url)}</a></code></p>
     </div>`;
   },
 
@@ -114,7 +114,7 @@ export default {
       <p>
         Technical description: <code>${error}</code>
         <br />
-        URL: <code><a href="${encodeURI(url)}" target="_blank">${htmlEscape(url)}</a></code>
+        URL: <code><a href="${encodeURI(url)}" target="_blank" rel="noreferrer">${htmlEscape(url)}</a></code>
       </p>
     </div>`;
   },
