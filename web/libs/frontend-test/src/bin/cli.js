@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs";
 import { stdout } from "process";
 
-const packageDir = `./node_modules/@heartexlabs/ls-test`;
+const packageDir = "./node_modules/@heartexlabs/ls-test";
 const assetsDir = path.resolve(packageDir, "bin/assets");
 const workspaceDir = path.resolve();
 const relativePath = (p) => path.resolve(assetsDir, p);
