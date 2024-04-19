@@ -7,9 +7,9 @@ import pytest
 from django.db import transaction
 from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobImportStorageLink
 from io_storages.gcs.models import GCSImportStorage, GCSImportStorageLink
-from io_storages.s3.models import S3ImportStorage, S3ImportStorageLink
 from io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesImportStorageLink
 from io_storages.redis.models import RedisImportStorage, RedisImportStorageLink
+from io_storages.s3.models import S3ImportStorage, S3ImportStorageLink
 from projects.models import Project
 
 from ..utils import make_annotation, make_prediction, make_task, project_id  # noqa
@@ -100,13 +100,16 @@ def test_action_delete_all_annotations(tasks_count, annotations_count, predictio
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("storage_model, link_model", [
-    (AzureBlobImportStorage, AzureBlobImportStorageLink),
-    (GCSImportStorage, GCSImportStorageLink),
-    (S3ImportStorage, S3ImportStorageLink),
-    (LocalFilesImportStorage, LocalFilesImportStorageLink),
-    (RedisImportStorage, RedisImportStorageLink),
-])
+@pytest.mark.parametrize(
+    'storage_model, link_model',
+    [
+        (AzureBlobImportStorage, AzureBlobImportStorageLink),
+        (GCSImportStorage, GCSImportStorageLink),
+        (S3ImportStorage, S3ImportStorageLink),
+        (LocalFilesImportStorage, LocalFilesImportStorageLink),
+        (RedisImportStorage, RedisImportStorageLink),
+    ],
+)
 def test_action_remove_duplicates(business_client, project_id, storage_model, link_model):
     # Setup
     project = Project.objects.get(pk=project_id)
