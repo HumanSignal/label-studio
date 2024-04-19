@@ -305,7 +305,7 @@ module.exports = {
 
     const position = await this.getRegionAbsoultePosition(regionId, false);
 
-    I.say("Clicking on a region at", position.x + " " + position.y);
+    I.say("Clicking on a region at", `${position.x} ${position.y}`);
 
     this.clickAt(position.x, position.y);
   },
@@ -317,7 +317,7 @@ module.exports = {
 
     const position = await this.getRegionAbsoultePosition(region.id);
 
-    I.say("Drag region by " + shiftX + " " + shiftY);
+    I.say(`Drag region by ${shiftX} ${shiftY}`);
     await I.dragAndDropMouse(position, {
       x: position.x + shiftX,
       y: position.y + shiftY,

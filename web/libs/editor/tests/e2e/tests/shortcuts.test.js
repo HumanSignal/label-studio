@@ -70,7 +70,7 @@ Data(configParams).Scenario(
     I.pressKeyUp("Shift");
     // A| |B!
     // Shortcut by clicking button (the cursor is in the middle)
-    I.click(locate(".ant-tag").toXPath() + "[contains(text(), '[ + ]')]");
+    I.click(`${locate(".ant-tag").toXPath()}[contains(text(), '[ + ]')]`);
     // A + |B!
     I.pressKey("ArrowLeft");
     // A +| B!
@@ -184,7 +184,7 @@ Data(configParams).Scenario("Should work with existent regions.", async ({ I, La
   I.pressKeyUp("Shift");
   // A| |B!
   // Shortcut by clicking button (the cursor is in the middle)
-  I.click(locate(".ant-tag").toXPath() + "[contains(text(), '[ + ]')]");
+  I.click(`${locate(".ant-tag").toXPath()}[contains(text(), '[ + ]')]`);
   // A + |B!
   I.pressKey("ArrowLeft");
   // A +| B!

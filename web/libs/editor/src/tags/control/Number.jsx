@@ -104,7 +104,7 @@ const Model = types
         return true;
       },
       getSelectedString() {
-        return self.number + " star";
+        return `${self.number} star`;
       },
 
       needsUpdate() {

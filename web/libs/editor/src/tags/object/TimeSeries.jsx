@@ -754,7 +754,7 @@ const Overview = observer(({ item, data, series }) => {
       .attr("viewBox", [0, 0, width + margin.left + margin.right, focusHeight + margin.bottom])
       .style("display", "block")
       .append("g")
-      .attr("transform", "translate(" + margin.left + ",0)");
+      .attr("transform", `translate(${margin.left},0)`);
 
     gAxis.current = focus.current.append("g").attr("transform", `translate(0,${focusHeight})`);
 

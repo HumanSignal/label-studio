@@ -48,7 +48,7 @@ function allModelsTypes() {
         if (Registry.tags.includes(sn.type)) {
           return Registry.getModelByTag(sn.type);
         }
-        throw Error("Not expecting tag: " + sn.type);
+        throw Error(`Not expecting tag: ${sn.type}`);
       },
     },
     Registry.modelsArr(),

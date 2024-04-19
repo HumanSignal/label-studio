@@ -5,7 +5,7 @@ const v8toIstanbul = require("v8-to-istanbul");
 const covDir = "./output/coverage";
 const resDir = "../coverage";
 const basePath = path.resolve("../");
-const basePathRegExp = new RegExp((basePath + "\\LabelStudio").replace(/\\/g, "\\\\"), "g");
+const basePathRegExp = new RegExp(`${basePath}\\LabelStudio`.replace(/\\/g, "\\\\"), "g");
 
 const fixBasePath = (path) => {
   return path.replace(basePathRegExp, basePath);

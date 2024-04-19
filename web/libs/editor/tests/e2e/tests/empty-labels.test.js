@@ -67,7 +67,7 @@ examples.forEach((example) => {
 
     Utils.xmlForEachNode(configTree, (node) => {
       if (node["#name"].toLowerCase().endsWith("labels") && node.$) {
-        node.$.name = "Not-" + node.$.name;
+        node.$.name = `Not-${node.$.name}`;
       }
     });
     params.config = Utils.renderXml(configTree);

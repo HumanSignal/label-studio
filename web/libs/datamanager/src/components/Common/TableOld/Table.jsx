@@ -136,7 +136,7 @@ export const Table = observer(
               style={{ width: 32, height: 32, padding: 0 }}
               onClick={() => {
                 modal({
-                  title: "Source for task " + out?.id,
+                  title: `Source for task ${out?.id}`,
                   style: { width: 800 },
                   body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
                 });

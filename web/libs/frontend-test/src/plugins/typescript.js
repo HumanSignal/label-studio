@@ -5,7 +5,7 @@ const options = {
     resolve: {
       extensions: [".ts", ".tsx", ".js"],
       alias: {
-        data: process.cwd() + "/data",
+        data: `${process.cwd()}/data`,
       },
     },
     module: {
