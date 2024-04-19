@@ -76,9 +76,7 @@
         "noCommaOperator": "off",
         "noParameterAssign": "off"
       },
-      "nursery": {
-        "useSortedClasses": "off"
-      },
+      "nursery": {},
       "security": {
         "noDangerouslySetInnerHtml": "off"
       }
