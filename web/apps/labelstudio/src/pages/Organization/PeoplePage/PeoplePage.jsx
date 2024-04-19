@@ -121,7 +121,7 @@ export const PeoplePage = () => {
     <Block name="people">
       <Elem name="controls">
         <Space spread>
-          <Space></Space>
+          <Space />
 
           <Space>
             <Button icon={<LsPlus />} primary onClick={showInvitationModal}>
