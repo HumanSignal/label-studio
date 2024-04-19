@@ -65,7 +65,6 @@
       },
       "complexity": {
         "noForEach": "off",
-        "noExtraBooleanCast": "off",
         "noThisInStatic": "off",
         "noUselessConstructor": "off",
         "noUselessFragments": "off",
