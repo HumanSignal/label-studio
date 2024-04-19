@@ -314,7 +314,7 @@ const AnnotationStoreModel = types
         root: self.root,
       };
 
-      if (user && !("createdBy" in node)) node["createdBy"] = user.displayName;
+      if (user && !("createdBy" in node)) node.createdBy = user.displayName;
       if (options.user) node.user = options.user;
 
       return node;

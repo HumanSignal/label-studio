@@ -86,7 +86,7 @@ const Model = types
       };
 
       if (self.object.savetextresult === "yes") {
-        res.value["text"] = self.text;
+        res.value.text = self.text;
       }
 
       return res;

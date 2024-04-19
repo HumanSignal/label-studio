@@ -131,32 +131,32 @@ const panelViews = [
   {
     name: "regions",
     title: "Regions",
-    component: panelComponents["regions"] as FC<PanelProps>,
+    component: panelComponents.regions as FC<PanelProps>,
     active: true,
   },
   {
     name: "history",
     title: "History",
-    component: panelComponents["history"] as FC<PanelProps>,
+    component: panelComponents.history as FC<PanelProps>,
     active: false,
   },
 
   {
     name: "relations",
     title: "Relations",
-    component: panelComponents["relations"] as FC<PanelProps>,
+    component: panelComponents.relations as FC<PanelProps>,
     active: false,
   },
   {
     name: "info",
     title: "Info",
-    component: panelComponents["info"] as FC<PanelProps>,
+    component: panelComponents.info as FC<PanelProps>,
     active: true,
   },
   {
     name: "comments",
     title: "Comments",
-    component: panelComponents["comments"] as FC<PanelProps>,
+    component: panelComponents.comments as FC<PanelProps>,
     active: false,
   },
 ];
