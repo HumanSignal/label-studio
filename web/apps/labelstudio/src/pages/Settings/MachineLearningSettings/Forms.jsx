@@ -44,7 +44,7 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
         />
       </Form.Row>
 
-      {(backend?.auth_method == "BASIC_AUTH" || selectedAuthMethod == "BASIC_AUTH") && (
+      {(backend?.auth_method === "BASIC_AUTH" || selectedAuthMethod === "BASIC_AUTH") && (
         <Form.Row columnCount={2}>
           <Input name="basic_auth_user" label="Basic auth user" />
           {backend?.basic_auth_pass_is_set ? (
