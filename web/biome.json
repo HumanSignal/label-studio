@@ -84,7 +84,6 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noShoutyConstants": "off",
         "noUnusedTemplateLiteral": "off",
         "noUselessElse": "off",
         "noVar": "off",
