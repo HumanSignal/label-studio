@@ -155,7 +155,7 @@ export default observer(({ store, annotation }) => {
           </Text>
         )}
 
-        <Fragment>{node?.results.map(renderResult)}</Fragment>
+        {node?.results.map(renderResult)}
       </div>
 
       {node?.isDrawing && (
