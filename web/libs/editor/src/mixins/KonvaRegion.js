@@ -28,8 +28,8 @@ export const KonvaRegionMixin = types
           !!self.bboxCoordsCanvas &&
           !!self.object &&
           self.bboxCoordsCanvas.right >= self.object.viewPortBBoxCoords.left &&
-            self.bboxCoordsCanvas.bottom >= self.object.viewPortBBoxCoords.top &&
-            self.bboxCoordsCanvas.left <= self.object.viewPortBBoxCoords.right &&
+          self.bboxCoordsCanvas.bottom >= self.object.viewPortBBoxCoords.top &&
+          self.bboxCoordsCanvas.left <= self.object.viewPortBBoxCoords.right &&
           self.bboxCoordsCanvas.top <= self.object.viewPortBBoxCoords.bottom
         );
       },
