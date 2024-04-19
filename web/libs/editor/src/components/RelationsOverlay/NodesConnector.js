@@ -106,7 +106,7 @@ const calculateTopPath = ({ x1, y1, w1, x2, y2, w2, limit }) => {
   const l1 = Math.min(top, y1 - limit);
   const l2 = Math.min(top, y2 - limit);
 
-  const toEnd = xw1 < xw2 ? true : false;
+  const toEnd = xw1 < xw2;
 
   return { x1: xw1, x2: xw2, y1, y2, l1, l2, toEnd };
 };
@@ -140,7 +140,7 @@ const calculateSidePath = ({ x1, y1, w1, h1, x2, y2, w2, h2, limit }) => {
     l2 = Math.max(left, xs2 + limit);
   }
 
-  const toEnd = ys1 < ys2 ? true : false;
+  const toEnd = ys1 < ys2;
 
   return { x1: xs1, x2: xs2, y1: ys1, y2: ys2, l1, l2, toEnd, renderingSide };
 };

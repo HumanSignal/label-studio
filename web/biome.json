@@ -71,7 +71,6 @@
         "useRegexLiterals": "off",
         "useSimplifiedLogicExpression": "off",
         "noBannedTypes": "off",
-        "noUselessTernary": "off",
         "noStaticOnlyClass": "off"
       },
       "correctness": {

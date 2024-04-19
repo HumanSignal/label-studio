@@ -18,7 +18,7 @@ const storeValue = (name, value) => {
 const restoreValue = (name) => {
   const value = window.localStorage.getItem(name);
 
-  return value ? (value === "true" ? true : false) : false;
+  return value ? value === "true" : false;
 };
 
 const dataCleanup = (tab, columnIds) => {
