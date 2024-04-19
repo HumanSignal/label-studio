@@ -65,7 +65,6 @@
       },
       "complexity": {
         "noForEach": "off",
-        "noThisInStatic": "off",
         "noUselessConstructor": "off",
         "noUselessFragments": "off",
         "noUselessLoneBlockStatements": "off",
