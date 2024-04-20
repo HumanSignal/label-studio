@@ -14,8 +14,9 @@ from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImpor
 from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
 from io_storages.redis.models import RedisExportStorage, RedisImportStorage
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
-from ml.models import MLBackend
 from tasks.models import Annotation, Prediction, Task
+
+from ml.models import MLBackend
 
 
 @contextlib.contextmanager
