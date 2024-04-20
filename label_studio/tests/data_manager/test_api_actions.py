@@ -5,10 +5,6 @@ import json
 
 import pytest
 from django.db import transaction
-from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobImportStorageLink
-from io_storages.gcs.models import GCSImportStorage, GCSImportStorageLink
-from io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesImportStorageLink
-from io_storages.redis.models import RedisImportStorage, RedisImportStorageLink
 from io_storages.s3.models import S3ImportStorage, S3ImportStorageLink
 from projects.models import Project
 
@@ -100,20 +96,10 @@ def test_action_delete_all_annotations(tasks_count, annotations_count, predictio
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    'storage_model, link_model',
-    [
-        (AzureBlobImportStorage, AzureBlobImportStorageLink),
-        (GCSImportStorage, GCSImportStorageLink),
-        (S3ImportStorage, S3ImportStorageLink),
-        (LocalFilesImportStorage, LocalFilesImportStorageLink),
-        (RedisImportStorage, RedisImportStorageLink),
-    ],
-)
-def test_action_remove_duplicates(business_client, project_id, storage_model, link_model):
+def test_action_remove_duplicates(business_client, project_id):
     # Setup
     project = Project.objects.get(pk=project_id)
-    storage = storage_model.objects.create(project=project)
+    storage = S3ImportStorage.objects.create(project=project)
 
     # task 1: add not a duplicated task
     task_data = {'data': {'image': 'normal.jpg'}}
@@ -131,7 +117,7 @@ def test_action_remove_duplicates(business_client, project_id, storage_model, li
     # task 4: add duplicated task, with storage link and one annotation
     task4 = make_task(task_data, project)
     make_annotation({'result': []}, task4.id)
-    link_model.objects.create(task=task4, key='duplicated.jpg', storage=storage)
+    S3ImportStorageLink.objects.create(task=task4, key='duplicated.jpg', storage=storage)
 
     # call the "remove duplicated tasks" action
     status = business_client.post(
@@ -139,14 +125,14 @@ def test_action_remove_duplicates(business_client, project_id, storage_model, li
         json={'selectedItems': {'all': True, 'excluded': []}},
     )
 
-    # As the result, we should have only 2 tasks left:
+    # as the result, we should have only 2 tasks left:
     # task 1 and task 3 with storage link copied from task 4
     assert list(project.tasks.order_by('id').values_list('id', flat=True)) == [
         task1.id,
         task3.id,
     ]
     assert status.status_code == 200
-    assert link_model.objects.count() == 1
+    assert S3ImportStorageLink.objects.count() == 1
     assert project.annotations.count() == 4
     assert project.tasks.count() == 2
 

@@ -11,8 +11,7 @@ from core.redis import start_job_async_or_sync
 from data_manager.actions.basic import delete_tasks
 from io_storages.azure_blob.models import AzureBlobImportStorageLink
 from io_storages.gcs.models import GCSImportStorageLink
-from io_storages.localfiles.models import LocalFilesImportStorageLink
-from io_storages.redis.models import RedisImportStorageLink
+from io_storages.localfiles.models import LocalFilesImportStorage
 from io_storages.s3.models import S3ImportStorageLink
 from tasks.models import Task
 
@@ -136,8 +135,8 @@ def restore_storage_links_for_duplicated_tasks(duplicates) -> None:
         'io_storages_s3importstoragelink': S3ImportStorageLink,
         'io_storages_gcsimportstoragelink': GCSImportStorageLink,
         'io_storages_azureblobimportstoragelink': AzureBlobImportStorageLink,
-        'io_storages_localfilesimportstoragelink': LocalFilesImportStorageLink,
-        'io_storages_redisimportstoragelink': RedisImportStorageLink,
+        'io_storages_localfilesimportstoragelink': LocalFilesImportStorage,
+        # 'io_storages_redisimportstoragelink',
         # 'lse_io_storages_lses3importstoragelink'  # not supported yet
     }
 
