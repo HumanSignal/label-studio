@@ -712,3 +712,13 @@ You must [enable organization-level webhooks](webhooks.html#Enable-organization-
 ```
 
 
+### Start Training 
+
+### Webhook payload details
+
+| Key | Type | Description                                         |
+| --- | --- |-----------------------------------------------------| 
+| action | string | Name of the action. In this case, `START_TRAINING`. | 
+| id | integer | ID of the project where training is started.        | 
+
+
