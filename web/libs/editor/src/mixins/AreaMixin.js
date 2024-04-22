@@ -180,6 +180,21 @@ export const AreaMixinBase = types
       self.results.push(r);
     },
 
+    /**
+     * Applies additional data from the given result.
+     * In the results we have almost all data meaningful stored in value but in regions we have two places for it:
+     * - region itself (fields in model)
+     * - related results (in results array)
+     * so for some fields we should control more if we want to apply fields that could be in both places into the region.
+     * This method also helps to avoid region type detection at the deserialization stage.
+     *
+     * @param {Object} result - The result object containing additional data.
+     * @returns {void}
+     */
+    applyAdditionalDataFromResult(_result) {
+      // This method should be overridden if we need to get some additional data from result on deserialize
+    },
+
     removeResult(r) {
       const index = self.results.indexOf(r);
 

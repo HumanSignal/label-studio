@@ -21,7 +21,7 @@ const config = `
 `;
 
 const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3',
 };
 
 const annotations = [
@@ -90,7 +90,7 @@ Scenario('Check the audio controls work', async function({ I, LabelStudio, AtAud
   await AtAudioView.seePlaybackSpeed(1);
 
   AtAudioView.setPlaybackSpeedInput(2);
- 
+
   await AtAudioView.seePlaybackSpeed(2);
 
   I.say('Check the amplitude updates');

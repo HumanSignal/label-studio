@@ -136,7 +136,7 @@ stages:
   request:
     data:
       project: '{project_pk}'
-      title: My Testing ML backend
+      title: "ml_backend"
       url: https://test.heartex.mlbackend.com:9090
     method: POST
     url: '{django_live_url}/api/ml'
@@ -147,25 +147,7 @@ stages:
   response:
     status_code: 200
     json:
-      model_version: ''
-- name: change_project_model_to_ml_backend
-  request:
-    method: PATCH
-    url: '{django_live_url}/api/projects/{project_pk}'
-    data:
-      model_version: "My Testing ML backend"
-  response:
-    status_code: 200
-    json:
-      model_version: "My Testing ML backend"
-- name: check_project_model_after_project_change
-  request:
-    method: GET
-    url: '{django_live_url}/api/projects/{project_pk}'
-  response:
-    status_code: 200
-    json:
-      model_version: "My Testing ML backend"
+      model_version: "ml_backend"
 
 ---
 test_name: model_change_before_ML_added
@@ -305,15 +287,15 @@ stages:
   request:
     data:
       project: '{project_pk}'
-      title: My Testing ML backend
+      title: "ml_backend"
       url: https://test.heartex.mlbackend.com:9090
     method: POST
     url: '{django_live_url}/api/ml'
-- name: check_project_model_not_change_after_ml_added_to_empty
+- name: check_project_model_change_after_ml_added_to_empty
   request:
     method: GET
     url: '{django_live_url}/api/projects/{project_pk}'
   response:
     status_code: 200
     json:
-      model_version: ""
+      model_version: "ml_backend"
