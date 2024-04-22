@@ -19,13 +19,6 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
-      - name: Configure git
-        shell: bash
-        run: |
-          set -xeuo pipefail
-          git config --global user.name 'robot-ci-heartex'
-          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
