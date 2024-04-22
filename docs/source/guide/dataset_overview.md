@@ -56,6 +56,7 @@ This targeted approach to data gathering not only saves valuable time but also c
 | **Supported storage for import** | Google Cloud storage <br><br>AWS S3 <br><br>Azure blob storage |
 | **Number of storage sources per dataset** | One |
 | **Maximum number of records per dataset** | 1 million |
+| **Maximum number of records returned per search** | 16,384 |
 | **Number of datasets per org** | 10 |
 | **Supported search types** | Natural language search <br><br>Similarity search |
 | **Supported filter types** | Similarity score |

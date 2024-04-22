@@ -22,6 +22,9 @@ Label studio provides several search mechanisms:
 * **Combined searches** - Combine similarity searching and natural language searching. 
 * **Filtering** - Reduce your dataset to only show records that have a certain threshold of similarity to your searches.
 
+!!! attention
+    Search results are limited to 16,384 records at a time. All records with the dataset are stored, but the Label Studio interface is limited to returning a smaller subset per search. As you change your search query, you’ll see different sets of records (all with a max of 16,384 at a time).
+
 ## How searches work
 
 ### Embeddings 

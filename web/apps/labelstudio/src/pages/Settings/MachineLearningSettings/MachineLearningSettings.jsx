@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Button, Spinner } from '../../../components';
 import { Description } from '../../../components/Description/Description';
-import { Divider } from '../../../components/Divider/Divider';
 import { Form, Label, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
 import { EmptyState } from '../../../components/EmptyState/EmptyState';
@@ -132,33 +132,24 @@ export const MachineLearningSettings = () => {
           backends={backends}
         />
 
-        <Divider height={32} />
-
         {backends.length > 0 && (
-          <Description style={{ marginTop: 0, maxWidth: 680, lineHeight: "1.5em" }}>
-            A connected model has been detected! If you wish to fetch
-            predictions from this model, please follow these steps:
-            <br />
-            <br />
-            1. Navigate to the <i>Data Manager</i>.<br />
-            2. Select the desired tasks.<br />
-            3. Click on <i>Batch predictions</i> from the{' '}
-            <i>Actions</i> menu.
-            <br />
-            <br />
-            Additionally, you can configure the system to use this model for
-            fetching live predictions in {" "}
-            <a
-              style={{ color: "unset", textDecoration: "underline" }}
-              target="_blank" href="https://labelstud.io/guide/labeling.html#Choose-which-tasks-to-label"
-            ><i>Label&nbsp;All&nbsp;Tasks</i></a>{" "}
-            and{" "}
-            <a
-              style={{ color: "unset", textDecoration: "underline" }}
-              target="_blank" href="https://labelstud.io/guide/get_started#Interface"
-            ><i>Quick View</i></a>{" "}
-            on the <i>Annotation</i> tab.
-          </Description>
+          <>
+            <Description>
+              A connected model has been detected! If you wish to fetch
+              predictions from this model, please follow these steps:
+              <br />
+              <br />
+              1. Navigate to the <i>Data Manager</i>.<br />
+              2. Select the desired tasks.<br />
+              3. Click on <i>Retrieve predictions</i> from the <i>Actions</i> menu.
+            </Description>
+            <Description>
+              If you want to use the model predictions for prelabeling, please configure this in the
+              {" "}
+              <NavLink to="annotation">Annotation settings</NavLink>
+              .
+            </Description>
+          </>
         )}
 
         <Form

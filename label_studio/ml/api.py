@@ -88,6 +88,15 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         ml_backend = serializer.save()
         ml_backend.update_state()
 
+        project = ml_backend.project
+
+        # In case we are adding the model, let's set it as the default
+        # to obtain predictions. This approach is consistent with uploading
+        # offline predictions, which would be set automatically.
+        if project.show_collab_predictions and not project.model_version:
+            project.model_version = ml_backend.title
+            project.save(update_fields=['model_version'])
+
 
 @method_decorator(
     name='patch',

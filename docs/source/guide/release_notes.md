@@ -18,34 +18,65 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
 !!! note 
     Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
 
-<div class="release-note">
+
+<a name="2110md"></a>
+
+## Label Studio Enterprise 2.11.0
+
+<div class="onprem-highlight">New ability to configure project-level roles, setting to hide the Cloud Storage page from Manager roles, other enhancements and bug fixes </div>
+
+*Apr 09, 2024*
+
+Helm Chart version: 1.4.2
+
+### New features
+
+#### Project-level roles
+
+You can now assign the Reviewer or Annotator role to users on a per-project basis. This will help simplify team management and allow more flexibility for project managers within your organization to meet the needs of each project.  
+
+This feature was previously only available to organizations who had enabled SCIM for their user management. Now, project-level roles can be assigned as part of the project membership settings, and is applicable to any user who has the Annotator or Reviewer role at the organization level. For example, a user can be an Annotator at the organization level, but have the Reviewer role for a specific project. Similarly, a user with the Reviewer role at the organization level can be assigned as an Annotator to different projects as needed. 
+
+For more information, see [Project-level roles](#Project-level-roles).
+
+![Screenshot of the project-level roles](/images/releases/2-11-0-project-level-roles.png)
+
+### Enhancements
+
+- Added support for `X-Api-Key: <token>` as an alternative to `Authentication: Token <token>`. This will make it easier to use API keys when integrating with cloud-based services. 
+- Small UI improvement to make it clearer which project members are included in the project by default.
+- There is a new setting in place that can control access to the Cloud Storage page for users with the Manager role. If you would like to enable this setting, set the `HIDE_STORAGE_SETTINGS_FOR_MANAGER` environment variable to `True`.
+- Several enhancements for organizations with SCIM enabled, including:
+    - More detailed error messages.
+    - Allow workspace and role mappings to support multiple SCIM groups.
+
+### Bug fixes
+
+- Fixed an issue where Google Cloud Logging was not working due to a missing dependency.
+- Fixed an issue where `/api/version` was not reporting all updates.
+- Fixed an issue where, after revoking an invite to users who are already in projects, the project failed to load.
+
+
+
+
 <a name="2101post2md"></a>
-
-## Label Studio Enterprise 2.10.1-2
-
-<div class="onprem-highlight">Bug fix</div>
 
 *Apr 02, 2024*
 
+## Label Studio Enterprise 2.10.1.post2
 Helm Chart version: 1.4.0
 
 ### Bug fixes
 
-- Fixed an issue that prevented the docker-compose instance from starting due to a misconfiguration in the internal discovery settings.
+- Fixed an issue that prevented the docker-compose instance from start, due to a misconfiguration in the internal discovery settings.
 
 
 
-
-
-</div><div class="release-note">
 <a name="2101post1md"></a>
-
-## Label Studio Enterprise 2.10.1-1
-
-<div class="onprem-highlight">Security-related fixes</div>
 
 *Mar 13, 2024*
 
+## Label Studio Enterprise 2.10.1.post1
 Helm Chart version: 1.4.0
 
 ### Security
@@ -55,17 +86,27 @@ Helm Chart version: 1.4.0
 
 
 
-
-</div><div class="release-note">
 <a name="2101md"></a>
 
 ## Label Studio Enterprise 2.10.1
 
-<div class="onprem-highlight">New <b>Reset Cache</b> action for projects, security update for activity logs, various bug fixes</div>
+<div class="onprem-highlight">
+  
+Release summary:
+    
+- Enhancements:
+    - Added a new **Reset Cache** action for projects. 
+- Security:
+    - Fixed an issue with activity logs. 
+- Various bug fixes
+
+For more details, see the full release notes below. 
+  
+</div>
 
 *Mar 12, 2024*
 
-Helm chart version: 1.4.0
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.4.0
 
 ### Enhancements
 
@@ -95,19 +136,29 @@ Fixed an issue where sensitive information was available in activity logs.
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="2100md"></a>
 
 ## Label Studio Enterprise 2.10.0
 
-<div class="onprem-highlight">Granular API-level control over annotation history, UI enhancements for performance and user experience, security updates, bug fixes</div>
+<div class="onprem-highlight">
+    
+Release summary:
+    
+- Enhancements:
+    - More granular API-level controls, including datetime filtering for annotation history.
+    - UI updates for better performance and user experience, such as improved text formatting in the grid view and a confirmation message after deleting a user.
+- Security:
+    - Implemented comprehensive HTML sanitization for a secure user experience.
+    - Increased SSRF protection with banning IPs within reserved blocks and improved error messages.
+- Bug fixes:
+    - Various fixes for issues related to tags, video annotation, comments, refresh action, label stream, hotkeys, data manager, relations, screen resizing, dropdowns, region selection, member management, and more.
+
+For more details, see the full release notes below. 
+</div>
 
 *Feb 13, 2024*
 
-Helm chart version:  1.4.0
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:**  1.4.0
 
 ### Enhancements
 
@@ -188,10 +239,6 @@ Helm chart version:  1.4.0
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="290-2md"></a>
 
 ## Label Studio Enterprise 2.9.0-2
@@ -200,17 +247,13 @@ Helm chart version:  1.4.0
 
 *Jan 26, 2024*
 
-Helm chart version: 1.3.3
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.3.3
 
 ### Bug fixes
 - Fixed an issue where users were unable to use the **View all annotations** option when the project included images that had an empty URL.
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="290-1md"></a>
 
 ## Label Studio Enterprise 2.9.0-1
@@ -219,17 +262,13 @@ Helm chart version: 1.3.3
 
 *Jan 23, 2024*
 
-Helm chart version: 1.3.3
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.3.3
 
 ### Bug fixes
 - Hotfix for displaying non-string values in Text tag
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="290md"></a>
 
 ## Label Studio Enterprise 2.9.0
@@ -238,7 +277,7 @@ Helm chart version: 1.3.3
 
 *Jan 16, 2024*
 
-Helm chart version: 1.3.3
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.3.3
 
 ### Enhancements
 
@@ -266,10 +305,6 @@ Helm chart version: 1.3.3
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="280md"></a>
 
 ## Label Studio Enterprise 2.8.0
@@ -278,7 +313,7 @@ Helm chart version: 1.3.3
 
 *Dec 19, 2023*
 
-Helm chart version: 1.3.2
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.3.2
 
 ### Enhancements
 
@@ -341,10 +376,6 @@ Helm chart version: 1.3.2
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="270-1md"></a>
 
 ## Label Studio Enterprise 2.7.0-1
@@ -357,10 +388,6 @@ Helm chart version: 1.3.2
 - Fix UWSGI config to support IPv4 only host networks.
 
 
-
-
-
-</div><div class="release-note">
 <a name="270md"></a>
 
 ## Label Studio Enterprise 2.7.0
@@ -369,7 +396,7 @@ Helm chart version: 1.3.2
 
 *Nov 21, 2023*
 
-Helm chart version: 1.2.9
+**[Helm chart](https://github.com/HumanSignal/charts/tree/master/heartex/label-studio) version:** 1.2.9
 
 ### New Features
 
@@ -439,10 +466,6 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="260-2md"></a>
 
 ## Label Studio Enterprise 2.6.0-2
@@ -456,10 +479,6 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="260-1md"></a>
 
 ## Label Studio Enterprise 2.6.0-1
@@ -473,10 +492,6 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 - Fixed an issue where `PATCH api/tasks/<id>` was returning errors. 
 
 
-
-
-
-</div><div class="release-note">
 <a name="260md"></a>
 
 ## Label Studio Enterprise 2.6.0
@@ -514,10 +529,6 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 
 
 
-
-
-
-</div><div class="release-note">
 <a name="250-1md"></a>
 
 ## Label Studio Enterprise 2.5.0-1
@@ -530,10 +541,6 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 - Security fix for Data Manager
 
 
-
-
-
-</div><div class="release-note">
 <a name="250md"></a>
 
 ## Label Studio Enterprise 2.5.0
@@ -569,10 +576,6 @@ For more information, see [Introducing Label Distribution Charts for Label Group
 - Fixed an issue with login page indexing that was preventing users from being added to projects. 
 - Fixed an issue where the predictions counter was not correct when using project-level role mapping. 
 
-
-
-
-</div><div class="release-note">
 <a name="2410md"></a>
 
 ## Label Studio Enterprise 2.4.10
@@ -1707,10 +1710,6 @@ Label Studio 2.2.8 includes the following bug fixes:
 - Fixed 404 on skip.
 
 
-
-
-
-</div><div class="release-note">
 <a name="220md"></a>
 
 ## Label Studio Enterprise 2.2.0

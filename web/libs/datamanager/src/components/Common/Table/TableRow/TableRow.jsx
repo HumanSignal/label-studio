@@ -1,12 +1,12 @@
 import { observer } from "mobx-react";
 import React from "react";
-import { toStudlyCaps } from 'strman';
 import { Block } from "../../../../utils/bem";
+import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
+import { normalizeCellAlias } from "../../../CellViews";
+import { SkeletonLoader } from "../../SkeletonLoader";
 import { TableContext, TableElem } from "../TableContext";
 import { getProperty, getStyle } from "../utils";
 import "./TableRow.styl";
-import { SkeletonLoader } from "../../SkeletonLoader";
-import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
 
 const CellRenderer = observer(
   ({ col: colInput, data, decoration, cellViews }) => {
@@ -24,7 +24,7 @@ const CellRenderer = observer(
 
 
     const valuePath = id.split(":")[1] ?? id;
-    const altType = toStudlyCaps(valuePath);
+    const altType = normalizeCellAlias(valuePath);
     const value = getProperty(data, valuePath);
 
     const Renderer = cellViews[altType] ?? cellViews[col.original.currentType] ?? cellViews.String;

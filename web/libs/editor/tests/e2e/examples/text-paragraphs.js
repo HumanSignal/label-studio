@@ -9,7 +9,7 @@ const config = `
 `;
 
 const data = {
-  audio: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  audio: 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3',
   dialogue: [
     {
       start: 3.1,
