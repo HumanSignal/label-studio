@@ -4,6 +4,7 @@ import Constants from '../core/Constants';
 
 import * as Colors from './colors';
 import { FF_LSDV_4583, isFF } from './feature-flags';
+import {SceneCanvas} from "konva/lib/Canvas";
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -266,6 +267,67 @@ function exportRLE(region) {
   return encode(imageData, imageData.length);
 }
 
+
+/**
+ * Modify the layer to fix konva canvas scaling issue where sometimes the pixel ratio multiplied by the
+ * current image entity width becomes smaller than the expected output width. Causing it to floored to the next valid
+ * integer which throws off the RLE conversion.
+ *
+ * Taken from https://github.com/konvajs/konva/blob/master/src/Node.ts
+ *
+ * @param layer
+ * @param config
+ */
+function getCanvasBySize (layer, config) {
+  config = config || {};
+
+  const box = layer.getClientRect();
+
+  const stage = layer.getStage(),
+    x = config.x !== undefined ? config.x : Math.floor(box.x),
+    y = config.y !== undefined ? config.y : Math.floor(box.y),
+    pixelRatio = config.pixelRatio || 1,
+    canvas = new SceneCanvas({
+      width:
+        config.width || Math.ceil(box.width) || (stage ? stage.width() : 0),
+      height:
+        config.height ||
+        Math.ceil(box.height) ||
+        (stage ? stage.height() : 0),
+      pixelRatio: pixelRatio,
+    }),
+    context = canvas.getContext();
+
+  const bufferCanvas = new SceneCanvas({
+    // width and height already multiplied by pixelRatio
+    // so we need to revert that
+    // also increase size by x nd y offset to make sure content fits canvas
+    width: canvas.width / canvas.pixelRatio + Math.abs(x),
+    height: canvas.height / canvas.pixelRatio + Math.abs(y),
+    pixelRatio: canvas.pixelRatio,
+  });
+
+  if (config.scale) {
+    // Scale the canvas after creation to keep pixel ratio of 1.
+    canvas.getContext().scale(config.scale.width, config.scale.height);
+    bufferCanvas.getContext().scale(config.scale.width, config.scale.height);
+  }
+
+  if (config.imageSmoothingEnabled === false) {
+    context._context.imageSmoothingEnabled = false;
+  }
+  context.save();
+
+  if (x || y) {
+    context.translate(-1 * x, -1 * y);
+  }
+
+  layer.drawScene(canvas, undefined, bufferCanvas);
+  context.restore();
+
+  return canvas._canvas;
+}
+
 /**
  * Given a brush region return the RLE encoded array.
  * @param {BrushRegion} region BrushRegtion to turn into RLE array.
@@ -281,7 +343,6 @@ function Region2RLE(region) {
     nh = region.currentImageEntity.naturalHeight;
   const stage = region.object?.stageRef;
   const parent = region.parent;
-
   if (!stage) {
     console.error(`Stage not found for area #${region.cleanId}`);
     return;
@@ -320,10 +381,13 @@ function Region2RLE(region) {
     .setOffsetY(0)
     .setRotation(0);
   stage.drawScene();
-  // resize to original size
-  const canvas = layer.toCanvas({ pixelRatio: nw / region.currentImageEntity.stageWidth });
-  const ctx = canvas.getContext('2d');
 
+  const scale = {
+    width: nw / region.currentImageEntity.stageWidth,
+    height: nh / region.currentImageEntity.stageHeight
+  }
+  const canvas = getCanvasBySize(layer, {width: nw, height: nw, scale})
+  const ctx = canvas.getContext('2d');
   // get the resulting raw data and encode into RLE format
   const data = ctx.getImageData(0, 0, nw, nh);
 
@@ -345,7 +409,6 @@ function Region2RLE(region) {
   const rle = encode(data.data, data.data.length);
 
   !isVisible && layer.hide();
-
   return rle;
 }
 

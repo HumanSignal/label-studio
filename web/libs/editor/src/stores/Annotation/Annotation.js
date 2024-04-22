@@ -1057,8 +1057,9 @@ export const Annotation = types
 
     setSuggestions(rawSuggestions) {
       const { history } = self;
-
+      console.log('setting suggestions')
       self.suggestions.clear();
+      console.log(rawSuggestions)
 
       if (!rawSuggestions) return;
       self.deserializeResults(rawSuggestions, {
@@ -1333,7 +1334,6 @@ export const Annotation = types
           }
         }
       }
-
       self.areas.set(itemId, {
         ...item.toJSON(),
         id: itemId,
@@ -1341,8 +1341,10 @@ export const Annotation = types
       });
       const area = self.areas.get(itemId);
       const activeStates = area.object.activeStates();
-
       activeStates.forEach(state => {
+        if (state.smart && state.toolNames.includes('KeyPoint')) {
+          return;   // Ignore smart keypoint.
+        }
         area.setValue(state);
       });
       self.suggestions.delete(id);

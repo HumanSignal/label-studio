@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Group, Image, Layer, Shape } from 'react-konva';
+import {Group, Image, Layer, Rect, Shape} from 'react-konva';
 import { observer } from 'mobx-react';
 import { getParent, getRoot, getType, hasParent, isAlive, types } from 'mobx-state-tree';
 
@@ -21,6 +21,7 @@ import { colorToRGBAArray, rgbArrayToHex } from '../utils/colors';
 import { FF_DEV_3793, FF_DEV_4081, FF_ZOOM_OPTIM, isFF } from '../utils/feature-flags';
 import { AliveRegion } from './AliveRegion';
 import { RegionWrapper } from './RegionWrapper';
+import {decode} from "@thi.ng/rle-pack";
 
 const highlightOptions = {
   shadowColor: 'red',
@@ -211,7 +212,6 @@ const Model = types
        */
       get bboxCoords() {
         const bbox = self.bboxCoordsCanvas;
-
         if (!bbox) return null;
         if (!isFF(FF_DEV_3793)) return bbox;
 
@@ -267,7 +267,8 @@ const Model = types
       },
 
       prepareCoords([x, y]) {
-        return self.parent.zoomOriginalCoords([x, y]);
+        const coords = self.parent.zoomOriginalCoords([x, y]);
+        return coords;
       },
 
       preDraw(x, y) {
@@ -556,6 +557,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
       if (image) {
         if (!imageData) {
           context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
+
           if (isFF(FF_ZOOM_OPTIM)) {
             imageData = context.getImageData(item.parent.alignmentOffset.x, item.parent.alignmentOffset.y, item.parent.stageWidth, item.parent.stageHeight);
           } else {
@@ -626,7 +628,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     item.parent?.stageHeight,
     item.maskDataURL,
     item.rle,
-    image,
+    image
   ]);
 
   const setLayerRef = useCallback((ref) => {
@@ -659,6 +661,98 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     width: item.parent.stageWidth,
     height: item.parent.stageHeight,
   } : null;
+
+  // Bounding box computation.
+
+  const computeBBox = useCallback((data) => {
+    // Compute bounding box.
+    if (data.width <= 1 || data.height <= 1) return null;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = data.width;
+    canvas.height = data.height;
+
+    if (data.image) {
+      ctx.drawImage(data.image, 0, 0);
+    }  // Draw image.
+
+    data.touches.forEach(touch => {
+      const points = touch.points;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(points[0] / data.scale, points[1] / data.scale);
+      for (let i = 0; i < points.length / 2; i++) {
+        ctx.lineTo(points[2 * i] / data.scale, points[2 * i + 1] / data.scale);
+      }
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = touch.strokeWidth;
+      ctx.strokeStyle = touch.type === 'eraser' ? '#ff0000' : '#00ff00';
+      ctx.globalCompositeOperation = touch.compositeOperation;
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    const imageData = ctx.getImageData(0, 0, data.width, data.height);
+    const bbox = Geometry.getImageDataBBox(imageData.data, imageData.width, imageData.height);
+    if (bbox === null) return null;
+    return {
+      x: bbox.x * data.scale,
+      y: bbox.y * data.scale,
+      width: bbox.width * data.scale,
+      height: bbox.height * data.scale
+    }
+
+  }, [item.id]);
+
+  const bboxInfo = useRef({
+      updated: false,
+      width: 0,
+      height: 0,
+      scale: 1,
+      touches: [],
+      image: null,
+      bbox: null,
+      update: function (width, height, scale, touches, image) {
+        if (this.width !== width || this.height !== height || this.scale !== scale ||
+            this.touches.length !== touches.length || this.image !== image) {
+          this.width = width;
+          this.height = height;
+          this.scale = scale;
+          this.touches = touches;
+          this.image = image;
+          this.updated = true;
+        }
+      }
+    });
+
+  // Use memo to compute and return bounding box if visible and has been updated.
+  const bbox = useMemo(() => {
+    if (!store?.settings?.showBrushRegionBBoxes) return {show: false, x: 0, y: 0, width: 0, height: 0};
+    const info = bboxInfo.current;
+    info.update(
+      item.parent?.naturalWidth || 0,
+      item.parent?.naturalHeight || 0,
+      item.parent?.stageZoom || 1.0,
+      item.touches,
+      image
+    );
+    const showBBox = item.annotation.selectionSize === 0;
+    if (showBBox && info.updated) {
+      info.bbox = computeBBox(info);
+      info.updated = false;
+    }
+    if (!showBBox || info.bbox === null) {
+      return {show: false, x: 0, y: 0, width: 0, height: 0};
+    }
+    return {
+      show: true, ...info.bbox
+    }
+  }, [item.annotation.selectionSize, computeBBox, image, item.parent?.naturalWidth,
+    item.parent?.naturalHeight, item.parent?.stageZoom, item.touches.length, item.touches,
+    store?.settings?.showBrushRegionBBoxes]);
 
   return (
     <RegionWrapper item={item}>
@@ -763,6 +857,12 @@ const HtxBrushView = ({ item, setShapeRef }) => {
         <Group>
           <LabelOnMask item={item} color={item.strokeColor} />
         </Group>
+      </Layer>
+      <Layer
+        id={item.cleanId + '_bbox'}>
+        {/* Bounding box for debugging */}
+        {bbox.show && <Rect stroke={'red'} x={bbox.x} y={bbox.y} width={bbox.width} height={bbox.height}
+                            listening={false}/>}
       </Layer>
     </RegionWrapper>
 

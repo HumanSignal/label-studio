@@ -36,6 +36,15 @@ export default {
     'onChangeEvent': 'toggleShowLabels',
     'defaultValue': false,
   },
+  'showBrushRegionBBoxes': {
+    'newUI': {
+      'title': 'Show brush bounding boxes',
+      'description': 'When no region is selected, all brush tool regions bounding boxes will be shown.'
+    },
+    'description': 'Show brush region bounding boxes',
+    'onChangeEvent': 'toggleBrushRegionBBoxes',
+    'defaultValue': false
+  },
   'continuousLabeling': {
     'newUI': {
       'title': 'Keep label selected after creating a region',

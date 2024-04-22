@@ -622,8 +622,6 @@ export default types.model('RegionStore', {
     const hidingIsAllowed = self.annotation.store.settings.hideNonActiveRegions;
     const hasSelection = self.selectedIds.length > 0;
 
-    console.log(hidingIsAllowed)
-
     self.filteredRegions.forEach(area => {
       const isActive = self.selectedIds.includes(area.id);
       // Toggle area.

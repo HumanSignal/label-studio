@@ -250,7 +250,10 @@ const Model = types.model({
   },
 
   get regionsInSelectionArea() {
-    return self.regs.filter(region => region.isInSelectionArea);
+    console.log('regions in selection area.')
+    const regs =  self.regs.filter(region => region.isInSelectionArea);
+    console.log(regs)
+    return regs;
   },
 
   get selectedShape() {
@@ -1147,7 +1150,6 @@ const Model = types.model({
 
       const x = self.canvasToInternalX(canvasX);
       const y = self.canvasToInternalY(canvasY);
-
       self.getToolsManager().event(name, ev.evt || ev, x, y, canvasX, canvasY);
     },
   }));
