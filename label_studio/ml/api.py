@@ -27,11 +27,11 @@ logger = logging.getLogger(__name__)
         tags=['Machine Learning'],
         operation_summary='Add ML Backend',
         operation_description="""
-    Add an ML backend to a project using the Label Studio UI or by sending a POST request using the following cURL 
+    Add an ML backend to a project using the Label Studio UI or by sending a POST request using the following cURL
     command:
     ```bash
     curl -X POST -H 'Content-type: application/json' {host}/api/ml -H 'Authorization: Token abc123'\\
-    --data '{{"url": "http://localhost:9090", "project": {{project_id}}}}' 
+    --data '{{"url": "http://localhost:9090", "project": {{project_id}}}}'
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
@@ -107,7 +107,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     Update ML backend parameters using the Label Studio UI or by sending a PATCH request using the following cURL command:
     ```bash
     curl -X PATCH -H 'Content-type: application/json' {host}/api/ml/{{ml_backend_ID}} -H 'Authorization: Token abc123'\\
-    --data '{{"url": "http://localhost:9091"}}' 
+    --data '{{"url": "http://localhost:9091"}}'
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
@@ -166,9 +166,9 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Machine Learning'],
         operation_summary='Train',
         operation_description="""
-        After you add an ML backend, call this API with the ML backend ID to start training with 
-        already-labeled tasks. 
-        
+        After you add an ML backend, call this API with the ML backend ID to start training with
+        already-labeled tasks.
+
         Get the ML backend ID by [listing the ML backends for a project](https://labelstud.io/api/#operation/api_ml_list).
         """,
         manual_parameters=[
@@ -219,7 +219,7 @@ class MLBackendTrainAPI(APIView):
         tags=['Machine Learning'],
         operation_summary='Predict',
         operation_description="""
-        After you add an ML backend, call this API with the ML backend ID to run a test prediction on specific task data               
+        After you add an ML backend, call this API with the ML backend ID to run a test prediction on specific task data
         """,
         manual_parameters=[
             openapi.Parameter(
@@ -274,7 +274,7 @@ class MLBackendPredictTestAPI(APIView):
         operation_summary='Request Interactive Annotation',
         operation_description="""
         Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
-        predicted region based on annotator input. 
+        predicted region based on annotator input.
         See [set up machine learning](https://labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
         """,
         manual_parameters=[
@@ -299,8 +299,8 @@ class MLBackendInteractiveAnnotating(APIView):
 
     permission_required = all_permissions.tasks_view
 
-    def _error_response(self, message, log_function=logger.info):
-        log_function(message)
+    def _error_response(self, message, *args, **kwargs):
+        logger.info(message)
         return Response({'errors': [message]}, status=status.HTTP_200_OK)
 
     def _get_task(self, ml_backend, validated_data):
