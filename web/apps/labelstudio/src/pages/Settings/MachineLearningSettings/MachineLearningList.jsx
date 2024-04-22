@@ -85,11 +85,11 @@ const BackendCard = ({
         <div className={rootClass.elem("menu")}>
           <Dropdown.Trigger align="right" content={(
             <Menu size="medium" contextual>
-              <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
-              <Menu.Item onClick={() => confirmDelete(backend)} isDangerous>Delete</Menu.Item>
-              <Menu.Divider />
+              <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>                            
               <Menu.Item onClick={() => onTestRequest(backend)}>Send Test Request</Menu.Item>
               <Menu.Item onClick={() => onStartTrain(backend)}>Start Training</Menu.Item>
+              <Menu.Divider />
+              <Menu.Item onClick={() => confirmDelete(backend)} isDangerous>Delete</Menu.Item>
             </Menu>
           )}>
             <Button type="link" icon={<LsEllipsis />} style={{ padding: "15px" }} />

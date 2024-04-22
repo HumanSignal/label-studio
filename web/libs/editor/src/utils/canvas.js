@@ -183,7 +183,7 @@ function exportRLE(region) {
   // Prepare the canvas with sizes of image and stage
   const canvas = document.createElement('canvas');
 
-  // We only care about physical size, so set canvas dimensions to 
+  // We only care about physical size, so set canvas dimensions to
   // image's natural dimensions
   canvas.width = naturalWidth;
   canvas.height = naturalHeight;
@@ -352,12 +352,24 @@ function Region2RLE(region) {
 function brushSizeCircle(size) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
+  const canvasPadding = 8;
+  const canvasOffset = 4;
+  const canvasSize = size * 4 + canvasPadding;
+  const circlePos = size / 2 + canvasOffset;
+  const circleRadius = size / 2;
 
-  canvas.width = size * 4 + 8;
-  canvas.height = size * 4 + 8;
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
 
   ctx.beginPath();
-  ctx.arc(size / 2 + 4, size / 2 + 4, size / 2, 0, 2 * Math.PI, false);
+  ctx.arc(circlePos, circlePos, circleRadius, 0, 2 * Math.PI, false);
+
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'black';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(circlePos, circlePos, circleRadius, 0, 2 * Math.PI, false);
 
   ctx.lineWidth = 2;
   ctx.strokeStyle = 'white';
