@@ -5,6 +5,7 @@ from core.feature_flags import flag_set
 from io_storages.base_models import ImportStorage
 
 from .azure_blob.api import AzureBlobExportStorageListAPI, AzureBlobImportStorageListAPI
+from .azure_serviceprincipal.api import AzureServicePrincipalExportStorageListAPI,AzureServicePrincipalImportStorageListAPI
 from .gcs.api import GCSExportStorageListAPI, GCSImportStorageListAPI
 from .redis.api import RedisExportStorageListAPI, RedisImportStorageListAPI
 from .s3.api import S3ExportStorageListAPI, S3ImportStorageListAPI
@@ -28,9 +29,15 @@ def get_storage_list():
         },
         {
             'name': 'azure',
-            'title': 'Microsoft Azure',
+            'title': 'Microsoft Azure - AccountKey',
             'import_list_api': AzureBlobImportStorageListAPI,
             'export_list_api': AzureBlobExportStorageListAPI,
+        },
+        {
+            'name': 'azure_spi',
+            'title': 'Microsoft Azure - Service Principal',
+            'import_list_api': AzureServicePrincipalImportStorageListAPI,
+            'export_list_api': AzureServicePrincipalExportStorageListAPI,
         },
         {
             'name': 'redis',

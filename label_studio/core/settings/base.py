@@ -391,6 +391,7 @@ STATIC_URL = '/static/'
 #    STATIC_URL = FORCE_SCRIPT_NAME + STATIC_URL
 logger.info(f'=> Static URL is set to: {STATIC_URL}')
 
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
@@ -523,6 +524,7 @@ IO_STORAGES_IMPORT_LINK_NAMES = [
     'io_storages_s3importstoragelink',
     'io_storages_gcsimportstoragelink',
     'io_storages_azureblobimportstoragelink',
+    'io_storages_azureserviceprincipalimportstoragelink',
     'io_storages_localfilesimportstoragelink',
     'io_storages_redisimportstoragelink',
 ]

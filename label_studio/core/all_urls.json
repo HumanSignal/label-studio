@@ -684,6 +684,66 @@
         "decorators": ""
     },
     {
+        "url": "/api/storages/azure_spi/",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalImportStorageListAPI",
+        "name": "storages:api:storage-azure-spi-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure_spi/<int:pk>",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalImportStorageDetailAPI",
+        "name": "storages:api:storage-azure-spi-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure_spi/<int:pk>/sync",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalImportStorageSyncAPI",
+        "name": "storages:api:storage-azure-spi-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure_spi/validate",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalImportStorageValidateAPI",
+        "name": "storages:api:storage-azure-spi-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/azure_spi/form",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalImportStorageFormLayoutAPI",
+        "name": "storages:api:storage-azure-spi-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalExportStorageListAPI",
+        "name": "storages:api:export-storage-azure-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure/<int:pk>",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalExportStorageDetailAPI",
+        "name": "storages:api:export-storage-azure-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure/<int:pk>/sync",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalExportStorageSyncAPI",
+        "name": "storages:api:export-storage-azure-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure/validate",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalExportStorageValidateAPI",
+        "name": "storages:api:export-storage-azure-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/azure/form",
+        "module": "io_storages.azure_serviceprincipal.api.AzureServicePrincipalExportStorageFormLayoutAPI",
+        "name": "storages:api:export-storage-azure-form",
+        "decorators": ""
+    },
+    {
         "url": "/api/storages/azure/",
         "module": "io_storages.azure_blob.api.AzureBlobImportStorageListAPI",
         "name": "storages:api:storage-azure-list",
