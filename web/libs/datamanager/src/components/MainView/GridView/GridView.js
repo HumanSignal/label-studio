@@ -25,15 +25,35 @@ const GridHeader = observer(({ row, selected }) => {
 
 const GridBody = observer(({ row, fields }) => {
   const dataFields = fields.filter((f) => f.parent?.alias === "data");
+  const thumbnail = dataFields.filter(field=>field.alias=="thumbnail")
 
   return dataFields.map((field, index) => {
     const valuePath = field.id.split(":")[1] ?? field.id;
-    const value = getProperty(row, valuePath);
-
+    let value = getProperty(row, valuePath);
+    let field_type = field.currentType
+    /**There is a thumbnail:
+     * In this case, we ignore every other image fields....
+     */
+    if (field_type=='Image' && thumbnail.length>0)
+    {
+      return null;
+    }
+    /**The value is an array...
+     * In this case, we take the first element of the array
+     */
+    if (Array.isArray(value)){
+      value = value[0]
+    }
+    /**The field is "Thumbnail" 
+     * We cast it as image */
+    if (field.alias=='thumbnail'){
+      field_type='Image';
+    }
+    
     return (
       <GridDataGroup
         key={`${row.id}-${index}`}
-        type={field.currentType}
+        type={field_type}
         value={value}
         field={field}
         row={row}
