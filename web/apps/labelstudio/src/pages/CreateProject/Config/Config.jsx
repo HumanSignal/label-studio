@@ -352,7 +352,7 @@ const Configurator = ({
 
     setLoading(true);
 
-    const validation = await api.callApi(`validateConfig`, {
+    const validation = await api.callApi("validateConfig", {
       params: { pk: project.id },
       body: { label_config: configToCheck },
       errorFilter: () => true,
@@ -399,7 +399,7 @@ const Configurator = ({
         setTemplate(config);
       } catch (e) {
         setParserError({
-          detail: `Parser error`,
+          detail: "Parser error",
           validation_errors: [e.message],
         });
       }
