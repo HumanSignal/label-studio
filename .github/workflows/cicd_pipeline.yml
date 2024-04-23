@@ -454,6 +454,5 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-failures: tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
-          allowed-skips: gitleaks, bandit, ruff, blue, pytest, migrations, conda-test, build-docker
+          allowed-skips: gitleaks, bandit, ruff, blue, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
           jobs: ${{ toJSON(needs) }}
