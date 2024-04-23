@@ -229,10 +229,9 @@ const Model = types.model({
           }
           break;
         case 'subgroup':
-          const labels_without_groups = labels.selectedLabels.filter((label)=>!label.subgroup)
-          const labels_in_same_group = labels.selectedLabels.filter((label)=>label.subgroup==self.subgroup)
+          const other_in_same_group = labels.selectedLabels.filter((label)=>label.subgroup==self.subgroup && label.alias!=self.alias)
           /** We unselect labels in the same group */
-          labels_in_same_group.map((l)=>l.setSelected(false))
+          other_in_same_group.map((l)=>l.setSelected(false))
           self.setSelected(!self.selected)
       }
     }
