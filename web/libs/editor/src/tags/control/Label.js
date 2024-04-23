@@ -219,6 +219,7 @@ const Model = types.model({
       switch (labels.choice) {
         case 'multiple':
           self.setSelected(!self.selected);
+          break;
         case 'single':
           if (!self.selected) {
             labels.unselectAll();
@@ -226,6 +227,7 @@ const Model = types.model({
           } else {
             labels.unselectAll();
           }
+          break;
         case 'subgroup':
           const labels_without_groups = labels.selectedLabels.filter((label)=>!label.subgroup)
           const labels_in_same_group = labels.selectedLabels.filter((label)=>label.subgroup==self.subgroup)
