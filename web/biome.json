@@ -49,7 +49,6 @@
         "noShadowRestrictedNames": "off",
         "useDefaultSwitchClauseLast": "off",
         "noSkippedTests": "off",
-        "noFocusedTests": "off",
         "useGetterReturn": "off"
       },
       "complexity": {

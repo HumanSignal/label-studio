@@ -40,7 +40,7 @@ describe("Video segmentation", () => {
   });
 
   describe("Transformer", () => {
-    it.only("Should be invisible out of the lifespan", () => {
+    it("Should be invisible out of the lifespan", () => {
       LabelStudio.params().config(simpleVideoConfig).data(simpleVideoData).withResult(simpleVideoResult).init();
       LabelStudio.waitForObjectsReady();
       Sidebar.hasRegions(1);
