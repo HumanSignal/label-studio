@@ -74,6 +74,8 @@ const IMAGE_PRELOAD_COUNT = 3;
  * @param {boolean} [smoothing]               - Enable smoothing, by default it uses user settings
  * @param {string=} [width=100%]              - Image width
  * @param {string=} [maxWidth=750px]          - Maximum image width
+ * @param {string=} [height=100%]             - Image height
+ * @param {string=} [maxheight=calc(100vh - 200px)]         - Maximum image height
  * @param {boolean=} [zoom=false]             - Enable zooming an image with the mouse wheel
  * @param {boolean=} [negativeZoom=false]     - Enable zooming out an image
  * @param {float=} [zoomBy=1.1]               - Scale factor
@@ -97,7 +99,7 @@ const TagAttrs = types.model({
   width: types.optional(types.string, '100%'),
   height: types.maybeNull(types.string),
   maxwidth: types.optional(types.string, '100%'),
-  maxheight: types.optional(types.string, 'calc(100vh - 194px)'),
+  maxheight: types.optional(types.string, 'calc(100vh - 200px)'),
   smoothing: types.maybeNull(types.boolean),
 
   // rulers: types.optional(types.boolean, true),

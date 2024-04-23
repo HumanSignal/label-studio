@@ -115,21 +115,29 @@
     top: 0;
   }
 }
-
-.withGallery {
-  margin-bottom: 80px;
-}
+// No longer necessary with fused toolbar
+// .withGallery {
+//   // margin-bottom: 80px;
+// }
 
 .withPagination {
   padding-top: 30px; // pagination height 24px + 6px offset
 }
 
+.toolContainer {
+  display:flex;
+  flex-direction: column;
+  position:sticky;
+  top:70px;
+}
+
 .gallery {
-  position: absolute;
-  bottom: -80px;
+  position: relative;
+  bottom: -20px;
   display: flex;
+  flex-direction: column;
   overflow-x: auto;
-  width: 100%;
+  width: 50px;
   padding-bottom: 8px; // for scroll
 
   img {

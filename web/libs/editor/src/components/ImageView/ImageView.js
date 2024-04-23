@@ -1109,23 +1109,25 @@ export default observer(
               />
             ) : null}
           </div>
-
-          {toolsReady && imageIsLoaded && this.renderTools()}
-          {item.images.length > 1 && (
-            <div className={styles.gallery}>
-              {item.images.map((src, i) => (
-                <img
-                  {...imgDefaultProps}
-                  alt=""
-                  key={src}
-                  src={src}
-                  className={i === item.currentImage && styles.active}
-                  height="60"
-                  onClick={() => item.setCurrentImage(i)}
-                />
-              ))}
+          <div className={styles.toolContainer}>
+            {item.images.length > 1 && (
+              <div className={styles.gallery}>
+                {item.images.map((src, i) => (
+                  <img
+                    {...imgDefaultProps}
+                    alt=""
+                    key={src}
+                    src={src}
+                    className={i === item.currentImage && styles.active}
+                    height="60"
+                    onClick={() => item.setCurrentImage(i)}
+                  />
+                ))}
+                {toolsReady && imageIsLoaded && this.renderTools()}
+              </div>
+            )}
             </div>
-          )}
+          
         </ObjectTag>
       );
     }
