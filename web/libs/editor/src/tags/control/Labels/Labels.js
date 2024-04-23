@@ -185,6 +185,7 @@ const HtxLabelGroup = observer(({item}) => {
 
               }}
           >
+            <Option key={group_name} value={'-'}/>
             {elements.map((el)=>{
               return (
                 <Option key={el._value} value={el._value}>
