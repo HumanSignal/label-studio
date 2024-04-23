@@ -36,13 +36,13 @@ export default {
     'onChangeEvent': 'toggleShowLabels',
     'defaultValue': false,
   },
-  'showBrushRegionBBoxes': {
+  'enableRegionBoxes': {
     'newUI': {
-      'title': 'Show brush bounding boxes',
-      'description': 'When no region is selected, all brush tool regions bounding boxes will be shown.'
+      'title': 'Enable or disable visual boxes for regions',
+      'description': 'Toggle the visual bounding boxes for the regions'
     },
-    'description': 'Show brush region bounding boxes',
-    'onChangeEvent': 'toggleBrushRegionBBoxes',
+    'description': 'Enable or disable visual boxes for regions',
+    'onChangeEvent': 'toggleRegionBoxes',
     'defaultValue': false
   },
   'continuousLabeling': {

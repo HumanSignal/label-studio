@@ -739,7 +739,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
 
   // Use memo to compute and return bounding box if visible and has been updated.
   const bbox = useMemo(() => {
-    if (!store?.settings?.showBrushRegionBBoxes) return {show: false, x: 0, y: 0, width: 0, height: 0};
+    if (!store?.settings.annotation.regionStore.showRegionBoundingBoxes) return {show: false, x: 0, y: 0, width: 0, height: 0};
     const info = bboxInfo.current;
     info.update(
       item.parent?.naturalWidth || 0,
@@ -761,7 +761,24 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     }
   }, [item.annotation.selectionSize, computeBBox, image, item.parent?.naturalWidth,
     item.parent?.naturalHeight, item.parent?.stageZoom, item.touches.length, item.touches,
-    store?.settings?.showBrushRegionBBoxes]);
+    store?.settings.annotation.regionStore.showRegionBoundingBoxes]);
+
+
+  useEffect(() => {
+    const hitCanvas = layerRef.current.hitCanvas._canvas;
+    if (!store?.settings.annotation.regionStore.showRegionHitBoxes) return;
+    const container = stage.getContainer();
+    const oldOpacity = hitCanvas.style.opacity;
+    const oldPointerEvents = hitCanvas.style.pointerEvents;
+    container.appendChild(hitCanvas);
+    hitCanvas.style.opacity = 1;
+    hitCanvas.style.pointerEvents = 'none';
+    return () => {
+      hitCanvas.style.opacity = oldOpacity;
+      hitCanvas.style.pointerEvents = oldPointerEvents;
+      container.removeChild(hitCanvas);
+    }
+  }, [store?.settings.annotation.regionStore.showRegionHitBoxes]);
 
   return (
     <RegionWrapper item={item}>

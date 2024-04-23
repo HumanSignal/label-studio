@@ -155,6 +155,9 @@ export default types.model('RegionStore', {
   ),
   selection: types.optional(SelectionMap, {}),
 
+  _showRegionBoundingBoxes: types.optional(types.boolean, false),
+  _showRegionHitBoxes: types.optional(types.boolean, false)
+
 }).views(self => {
   let lastClickedItem;
   const getShiftClickSelectedRange = (item, tree) => {
@@ -419,8 +422,29 @@ export default types.model('RegionStore', {
       return window.localStorage.getItem(localStorageKeys.view) ?? self.view;
     },
 
+    get showRegionBoundingBoxes() {
+      if (!self.annotation.store.settings.enableRegionBoxes) return false;
+      return self._showRegionBoundingBoxes;
+    },
+
+    get showRegionHitBoxes() {
+      if (!self.annotation.store.settings.enableRegionBoxes) return false;
+      return self._showRegionHitBoxes;
+    }
+
   };
 }).actions(self => ({
+
+  setRegionBoundingBoxes(value) {
+    if (!self.annotation.store.settings.enableRegionBoxes) return;
+    self._showRegionBoundingBoxes = value;
+  },
+
+  setRegionHitBoxes(value) {
+    if (!self.annotation.store.settings.enableRegionBoxes) return;
+    self._showRegionHitBoxes = value;
+  },
+
   addRegion(region) {
     self.regions.push(region);
     getEnv(self).events.invoke('entityCreate', region);

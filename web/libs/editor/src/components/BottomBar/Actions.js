@@ -5,6 +5,7 @@ import { EditingHistory } from './HistoryActions';
 import { DynamicPreannotationsToggle } from '../AnnotationTab/DynamicPreannotationsToggle';
 import { GroundTruth } from '../CurrentEntity/GroundTruth';
 import { Tooltip } from '../../common/Tooltip/Tooltip';
+import {RegionBoxesToggle} from "../AnnotationTab/RegionBoxesToggle";
 
 export const Actions = ({ store }) => {
   const annotationStore = store.annotationStore;
@@ -52,6 +53,7 @@ export const Actions = ({ store }) => {
 
         <Elem name="section">
           <DynamicPreannotationsToggle />
+          <RegionBoxesToggle />
         </Elem>
       )}
     </Elem>

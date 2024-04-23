@@ -56,7 +56,7 @@ const SettingsModel = types
 
     hideAutoAnnotationTooltip: types.optional(types.boolean, false),
 
-    showBrushRegionBBoxes: types.optional(types.boolean, false),
+    enableRegionBoxes: types.optional(types.boolean, false),
 
     hideNonActiveRegions: types.optional(types.boolean, false),
 
@@ -168,9 +168,8 @@ const SettingsModel = types
       self.enableActiveRegionOpacity = !self.enableActiveRegionOpacity;
     },
 
-    toggleBrushRegionBBoxes() {
-      self.showBrushRegionBBoxes = !self.showBrushRegionBBoxes
-      console.log('toggling bboxes.')
+    toggleRegionBoxes() {
+      self.enableRegionBoxes = !self.enableRegionBoxes
     },
 
     toggleAutoAnnotationTooltip() {
