@@ -426,7 +426,8 @@ class HtxParagraphsView extends Component {
       this.lastPlayingId !== item.playingId &&
       this.state.canScroll
     ) {
-      const _padding = parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue("padding-top")) || 0;
+      const _padding =
+        Number.parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue("padding-top")) || 0;
       const _playingItem = this.props.item._value[item.playingId];
       const _start = _playingItem.start;
       const _end = _playingItem.end;
@@ -470,7 +471,7 @@ class HtxParagraphsView extends Component {
   }
 
   _handleScrollToPhrase() {
-    const _padding = parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue("padding-top")) || 0;
+    const _padding = Number.parseInt(window.getComputedStyle(this.myRef.current)?.getPropertyValue("padding-top")) || 0;
     const _wrapperOffsetTop = this.activeRef.current?.offsetTop - _padding;
 
     this.myRef.current.scrollTo({
@@ -490,7 +491,8 @@ class HtxParagraphsView extends Component {
     );
     const filledSpace = annotationView?.offsetHeight || mainContentView.firstChild?.offsetHeight || 0;
     const containerHeight = container?.offsetHeight || 0;
-    const viewPadding = parseInt(window.getComputedStyle(mainContentView)?.getPropertyValue("padding-bottom")) || 0;
+    const viewPadding =
+      Number.parseInt(window.getComputedStyle(mainContentView)?.getPropertyValue("padding-bottom")) || 0;
     const height = totalVisibleSpace - (filledSpace - containerHeight) - viewPadding;
     const minHeight = 100;
 
@@ -531,7 +533,7 @@ class HtxParagraphsView extends Component {
             onChange={() => {
               if (!this.activeRef.current) return;
               const _timeoutDelay =
-                parseFloat(window.getComputedStyle(this.activeRef.current).transitionDuration) * 1000;
+                Number.parseFloat(window.getComputedStyle(this.activeRef.current).transitionDuration) * 1000;
 
               setTimeout(() => {
                 this._handleScrollToPhrase();

@@ -243,7 +243,7 @@ const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, valu
         }
 
         if (safeValue) {
-          value = parseFloat(value);
+          value = Number.parseFloat(value);
         }
       }
 

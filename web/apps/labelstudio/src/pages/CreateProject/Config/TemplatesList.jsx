@@ -17,7 +17,7 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe }) => {
   const picked = templates
     .filter((recipe) => recipe.group === group)
     // templates without `order` go to the end of the list
-    .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+    .sort((a, b) => (a.order ?? Number.POSITIVE_INFINITY) - (b.order ?? Number.POSITIVE_INFINITY));
 
   return (
     <ul>

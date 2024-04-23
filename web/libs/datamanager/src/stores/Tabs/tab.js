@@ -51,7 +51,7 @@ export const Tab = types
       .replace("px", "")
       .trim();
 
-    const labelingTableWidth = parseInt(localStorage.getItem("labelingTableWidth") ?? defaultWidth ?? 200);
+    const labelingTableWidth = Number.parseInt(localStorage.getItem("labelingTableWidth") ?? defaultWidth ?? 200);
 
     return {
       labelingTableWidth,

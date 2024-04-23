@@ -486,7 +486,7 @@ const Model = types
     },
 
     get zoomBy() {
-      return parseFloat(self.zoomby);
+      return Number.parseFloat(self.zoomby);
     },
     get isDrawing() {
       return !!self.drawingRegion;
@@ -799,7 +799,7 @@ const Model = types
      * Set zoom
      */
     setZoom(scale) {
-      scale = clamp(scale, 1, Infinity);
+      scale = clamp(scale, 1, Number.POSITIVE_INFINITY);
       self.currentZoom = scale;
 
       // cool comment about all this stuff

@@ -7,7 +7,7 @@ export const useRegionsCopyPaste = (entity: any) => {
       if ((el as Node).nodeType !== Node.ELEMENT_NODE) return false;
 
       const element = el as HTMLElement;
-      const tabIndex = parseInt(element.getAttribute("tabindex") ?? "", 10);
+      const tabIndex = Number.parseInt(element.getAttribute("tabindex") ?? "", 10);
       const isFocusable = element.matches("a, button, input, textarea, select, details, [tabindex], [contenteditable]");
 
       return isFocusable || tabIndex > -1;
