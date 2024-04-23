@@ -231,11 +231,11 @@ const Model = types
     };
   })
   .actions((self) => {
-    let pathPoints,
-      cachedPoints,
-      lastPointX = -1,
-      lastPointY = -1,
-      maskImage;
+    let pathPoints;
+    let cachedPoints;
+    let lastPointX = -1;
+    let lastPointY = -1;
+    let maskImage;
 
     return {
       afterCreate() {

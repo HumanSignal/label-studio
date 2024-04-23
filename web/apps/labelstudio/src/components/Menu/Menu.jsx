@@ -54,7 +54,8 @@ Menu.Builder = (url, menuItems) => {
     if (item === "SPACER") return <Menu.Spacer key={index} />;
     if (item === "DIVIDER") return <Menu.Divider key={index} />;
 
-    let pageLabel, pagePath;
+    let pageLabel;
+    let pagePath;
 
     if (Array.isArray(item)) {
       [pagePath, pageLabel] = item;

@@ -273,8 +273,8 @@ export class Geometry {
    */
   static getImageDataBBox(imageData, w, h) {
     if (imageData.length !== w * h * 4) return null;
-    const min = { x: w, y: h },
-      max = { x: 0, y: 0 };
+    const min = { x: w, y: h };
+    const max = { x: 0, y: 0 };
 
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
