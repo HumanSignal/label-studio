@@ -6,7 +6,8 @@ import re
 from datetime import datetime, timedelta,timezone
 from urllib.parse import urlparse
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas,UserDelegationKey
+from azure.storage.blob import BlobSasPermissions,generate_blob_sas,UserDelegationKey
+from azure.storage.blob import ContainerClient,BlobServiceClient
 from core.redis import start_job_async_or_sync
 from core.utils.params import get_env
 from django.conf import settings
@@ -34,7 +35,6 @@ AZURE_SIGNED_URL_TEMPLATE = Template('${account_url}/${container_name}/${blob_na
 AZURE_URL_PATTERN = r"https?://(?P<account_name>.*).blob.core.windows.net/(?P<container_name>[^/]+)/(?P<blob_name>.+)?(?P<sas_token>.*)"
 
 class AzureServicePrincipalStorageMixin(models.Model):
-    container = models.TextField(_('container'), null=True, blank=True, help_text='Azure blob container')
     prefix = models.TextField(_('prefix'), null=True, blank=True, help_text='Azure blob prefix name')
     regex_filter = models.TextField(
         _('regex_filter'), null=True, blank=True, help_text='Cloud storage regex for filtering objects'
@@ -43,6 +43,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
         _('use_blob_urls'), default=False, help_text='Interpret objects as BLOBs and generate URLs'
     )
     account_name = models.TextField(_('account_name'), null=True, blank=True, help_text='Azure Blob account name')
+    container = models.TextField(_('container'), null=True, blank=True, help_text='Azure blob container')
     tenant_id = models.TextField(_('tenant_id'),null=True,blank=True, help_text='Azure Tenant ID')
     client_id = models.TextField(_('client_id'),null=True,blank=True, help_text='Azure Blob Service Principal Client ID')
     client_secret = models.TextField(_('client_secret'),null=True,blank=True, help_text='Azure Blob Service Principal Client Secret')
@@ -54,7 +55,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
         # A function to create a key if necessary...
         def create_key():
             delegation_key_expiry_time = datetime.now() + timedelta(days=1)
-            blob_service_client,_ = self.get_client_and_container()        
+            blob_service_client = self.blobservice_client        
             user_delegation_key = blob_service_client.get_user_delegation_key(
                 key_start_time=datetime.now(),
                 key_expiry_time=delegation_key_expiry_time
@@ -80,11 +81,23 @@ class AzureServicePrincipalStorageMixin(models.Model):
                 key = create_key()
         return key
     
+    @property
+    def blobservice_client(self)->BlobServiceClient:
+        account_url = self.get_account_url()
+        credential = ClientSecretCredential(self.tenant_id,self.client_id,self.client_secret)
+        blobservice_client = BlobServiceClient(account_url,credential=credential)
+        return blobservice_client
+    
+    @property
+    def container_client(self)->ContainerClient:
+        blobservice_client = self.blobservice_client
+        container_client = blobservice_client.get_container_client((str(self.container)))
+        return container_client
+
     def get_account_name(self):
         return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
 
     def get_account_url(self):
-        account_name = self.get_account_name()
         account_name = self.get_account_name()
         if not account_name:
             raise ValueError(
@@ -98,23 +111,11 @@ class AzureServicePrincipalStorageMixin(models.Model):
             account_url = account_name
         return account_url
 
-    def get_client_and_container(self):
-        account_url = self.get_account_url()
-        credential = ClientSecretCredential(self.tenant_id,self.client_id,self.client_secret)
-        client = BlobServiceClient(account_url,credential=credential)
-        container = client.get_container_client(str(self.container))
-        return client, container
-
-    def get_container(self):
-        _, container = self.get_client_and_container()
-        return container
-
     def validate_connection(self, **kwargs):
         logger.debug('Validating Azure Blob Storage connection')
-        container = self.get_container()
 
         try:
-            container_properties = container.get_container_properties()
+            container_properties = self.container_client.get_container_properties()
             logger.debug(f'Container exists: {container_properties.name}')
         except ResourceNotFoundError:
             raise KeyError(f'Container not found: {self.container}')
@@ -124,7 +125,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
             logger.debug(f'Test connection to container {self.container} with prefix {self.prefix}')
             prefix = str(self.prefix)
             try:
-                blob = next(container.list_blob_names(name_starts_with=prefix))
+                blob = next(self.container_client.list_blob_names(name_starts_with=prefix))
             except StopIteration:
                 blob = None
 
@@ -170,9 +171,8 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
         return sas_token
 
     def iterkeys(self):
-        container = self.get_container()
         prefix = str(self.prefix) if self.prefix else ''
-        files = container.list_blobs(name_starts_with=prefix)
+        files = self.container_client.list_blobs(name_starts_with=prefix)
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
 
         for file in files:
@@ -190,8 +190,7 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
             data_key = settings.DATA_UNDEFINED_NAME
             return {data_key: f'{self.url_scheme}://{self.container}/{key}'}
 
-        container = self.get_container()
-        blob = container.download_blob(key)
+        blob = self.container_client.download_blob(key)
         blob_str = blob.content_as_text()
         value = json.loads(blob_str)
         if not isinstance(value, dict):
@@ -212,8 +211,7 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
         return url
 
     def get_blob_metadata(self, key)->dict:
-        container = self.get_container()
-        blob = container.get_blob_client(key)
+        blob = self.container_client.get_blob_client(key)
         return dict(blob.get_blob_properties())
 
     def resolve_uri(self, uri, task=None):
@@ -258,7 +256,6 @@ class AzureServicePrincipalImportStorage(ProjectStorageMixin, AzureServicePrinci
 
 class AzureServicePrincipalExportStorage(AzureServicePrincipalStorageMixin, ExportStorage):  # note: order is important!
     def save_annotation(self, annotation):
-        container = self.get_container()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
         # get key that identifies this object in storage
@@ -266,7 +263,7 @@ class AzureServicePrincipalExportStorage(AzureServicePrincipalStorageMixin, Expo
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # put object into storage
-        blob = container.get_blob_client(key)
+        blob = self.container_client.get_blob_client(key)
         blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
 
         # create link if everything ok
