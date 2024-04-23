@@ -1,6 +1,6 @@
 {
-  "message": "Merge remote-tracking branch 'origin/develop' into optic-590",
-  "commit": "0d6b01956d10e17a2c8c4a0f42497a8c0104cc24",
-  "date": "2024-04-22T13:18:11.000Z",
-  "branch": "optic-590"
+  "message": "Remove unecesary github conf set up on action ci",
+  "commit": "937598f41d8cfec002ffbad589b7326844f3e55d",
+  "date": "2024-04-22T21:52:06.000Z",
+  "branch": "fb-echo-27-regenerate-first-release-commit-to-review-test-ci"
 }

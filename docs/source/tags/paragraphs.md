@@ -75,19 +75,19 @@ Paragraphs with audio
               layout="dialogue" textKey="text" nameKey="author"
               showPlayer="true"
               />
-  
+
   <Choices name="choices" toName="paragraphs" choice="multiple">
       <Choice value="Good quality"/>
       <Choice value="Fast speech"/>
-  </Choices>    
+  </Choices>
 </View>
 
-<!-- {"data": { 
+<!-- {"data": {
   "para": [
     {"text": "test 1", "author": "A", "start": 0.0, "end": 1.0},
     {"text": "test 2", "author": "B", "start": 1.0, "end": 2.0},
     {"text": "test 3", "author": "A", "start": 2.0, "end": 3.0}
-  ], 
+  ],
   "audio": "/static/samples/game.wav"
 }}
 -->
