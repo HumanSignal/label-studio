@@ -14,9 +14,9 @@ const wait = (timeout) => new Promise((resolve) => setTimeout(resolve, timeout))
 
 class PreviewGenerator {
   static getInstance(labelingConfig) {
-    if (this._instance) return this._instance;
+    if (PreviewGenerator._instance) return PreviewGenerator._instance;
 
-    return (this._instance = new PreviewGenerator(labelingConfig));
+    return (PreviewGenerator._instance = new PreviewGenerator(labelingConfig));
   }
 
   constructor(labelingConfig) {
