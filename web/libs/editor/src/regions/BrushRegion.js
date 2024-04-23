@@ -551,20 +551,21 @@ const HtxBrushView = ({ item, setShapeRef }) => {
 
   // Drawing hit area by shape color to detect interactions inside the Konva
   const imageHitFunc = useMemo(() => {
-    let imageData;
+    let _image;  // Internal image.
+    let _initialised = false;
 
     return (context, shape) => {
       if (image) {
-        if (!imageData) {
+        if (!_image && !_initialised) {
+          // Create a image to draw for each hit func instead of put data.
           context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
-
+          let imageData;
           if (isFF(FF_ZOOM_OPTIM)) {
             imageData = context.getImageData(item.parent.alignmentOffset.x, item.parent.alignmentOffset.y, item.parent.stageWidth, item.parent.stageHeight);
           } else {
             imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
           }
           const colorParts = colorToRGBAArray(shape.colorKey);
-
           for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
             if (imageData.data[i * 4 + 3] > 0) {
               for (let k = 0; k < 3; k++) {
@@ -572,8 +573,16 @@ const HtxBrushView = ({ item, setShapeRef }) => {
               }
             }
           }
+          _initialised = true;
+          createImageBitmap(imageData)
+            .then(newImage => {
+              _image = newImage;
+            })
+
         }
-        context.putImageData(imageData, 0, 0);
+        if (_image) {
+          context.drawImage(_image, 0,0, item.parent.stageWidth, item.parent.stageHeight);
+        }
       }
     };
   }, [image, item.parent?.stageWidth, item.parent?.stageHeight]);
