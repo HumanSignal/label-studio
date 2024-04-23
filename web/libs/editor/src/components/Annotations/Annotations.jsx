@@ -210,7 +210,7 @@ class Annotations extends Component {
     const { store } = this.props;
 
     const title = (
-      <div className={styles.title + " " + styles.titlespace}>
+      <div className={`${styles.title} ${styles.titlespace}`}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <h3>Annotations</h3>
         </div>

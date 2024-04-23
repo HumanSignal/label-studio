@@ -135,7 +135,7 @@ export default observer(({ store, annotation }) => {
         </Elem>
         {!hasEditableNodes && <Badge count={"readonly"} style={{ backgroundColor: "#ccc" }} />}
       </Elem>
-      <div className={styles.statesblk + " ls-entity-states"}>
+      <div className={`${styles.statesblk} ls-entity-states`}>
         {node?.score && (
           <Fragment>
             <Text>
@@ -168,7 +168,7 @@ export default observer(({ store, annotation }) => {
         </Elem>
       )}
 
-      <div className={styles.block + " ls-entity-buttons"}>
+      <div className={`${styles.block} ls-entity-buttons`}>
         <Space spread>
           <Space>{entityButtons}</Space>
 

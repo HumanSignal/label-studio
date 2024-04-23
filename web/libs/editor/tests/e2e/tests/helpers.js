@@ -594,7 +594,7 @@ const countKonvaShapes = async () => {
   let count = 0;
 
   regions.forEach((region) => {
-    count += stage.find("." + region.id).filter((node) => node.isVisible()).length;
+    count += stage.find(`.${region.id}`).filter((node) => node.isVisible()).length;
   });
 
   return count;
