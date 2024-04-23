@@ -229,10 +229,17 @@ const Model = types.model({
           }
           break;
         case 'subgroup':
-          const other_in_same_group = labels.selectedLabels.filter((label)=>label.subgroup==self.subgroup && label.alias!=self.alias)
+          const was_already_selected = self.selected
+          const label_in_samegroup = labels.selectedLabels.filter((label)=>label.subgroup==self.subgroup)
           /** We unselect labels in the same group */
-          other_in_same_group.map((l)=>l.setSelected(false))
+          label_in_samegroup.map((l)=>l.setSelected(false))
+          if (was_already_selected && self.subgroup!=null){
+            // Allow Unselect in subgroup
+            self.setSelected(false)
+          } else
+          {
           self.setSelected(!self.selected)
+          }
       }
     }
 
