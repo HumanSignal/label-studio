@@ -78,7 +78,6 @@
         "noParameterAssign": "off"
       },
       "nursery": {
-        "noConsole": "off",
         "useSortedClasses": "off"
       },
       "security": {
