@@ -117,7 +117,7 @@ export const Range = forwardRef(
           mod={{ "with-icon": isDefined(minIcon) || isDefined(maxIcon) }}
           style={{ [sizeProperty]: size }}
         >
-          <Elem name="line"></Elem>
+          <Elem name="line" />
           <RangeIndicator align={align} reverse={reverse} value={currentValue} valueConvert={valueToPercentage} />
           {multi ? (
             arrayReverse(currentValue, reverse).map((value, i, list) => {
