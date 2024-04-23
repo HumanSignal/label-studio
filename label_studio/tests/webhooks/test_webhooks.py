@@ -407,18 +407,17 @@ def test_start_training_webhook(setup_project_dialog, project_webhook, business_
         - It checks that the request method was POST.
         - The request URL and the JSON payload are validated against expected values.
     """
+    from ml.models import MLBackend
+
     webhook = project_webhook
     project = webhook.project
-    ml_backend_id = 2  # Assuming this is the ID of your ML backend
-
-    from ml.models import MLBackend
     ml = MLBackend.objects.create(project=project)
 
     # Mock the POST request to the ML backend train endpoint
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
         response = business_client.post(
-            reverse('ml:api:ml-backend-train', kwargs={'pk': ml_backend_id}),
+            f'/api/ml/{ml.id}/train',
             data=json.dumps({'action': 'START_TRAINING'}),
             content_type='application/json',
         )
