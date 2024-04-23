@@ -135,7 +135,8 @@ class DDBlock {
 
     if (el instanceof DDSpanElement) {
       return el.findTextElement(pos, avoid);
-    } else if (el instanceof DDTextElement) {
+    }
+    if (el instanceof DDTextElement) {
       return el;
     }
   }

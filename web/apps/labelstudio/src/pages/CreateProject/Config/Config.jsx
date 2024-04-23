@@ -245,7 +245,8 @@ const ConfigureColumn = ({ template, obj, columns }) => {
     if (value === "-") {
       setIsManual(true);
       return;
-    } else if (isManual) {
+    }
+    if (isManual) {
       setIsManual(false);
     }
 

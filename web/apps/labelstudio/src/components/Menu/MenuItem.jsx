@@ -25,9 +25,8 @@ export const MenuItem = ({
 
     if (exact) {
       return pathname === url;
-    } else {
-      return pathname.includes(url);
     }
+    return pathname.includes(url);
   })();
 
   if (isActive || active) classList.push(rootClass.mod({ active: true }));

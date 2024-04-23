@@ -294,11 +294,11 @@ const Model = types
 
       if (!isFF(FF_DEV_4081)) {
         return null;
-      } else if (!value || value === "none") {
-        return null;
-      } else {
-        return value;
       }
+      if (!value || value === "none") {
+        return null;
+      }
+      return value;
     },
 
     get fillerHeight() {
@@ -652,13 +652,12 @@ const Model = types
             const canInteractWithRegions = tool?.canInteractWithRegions;
 
             return !canInteractWithRegions;
-          } else {
-            const manager = self.getToolsManager();
-
-            const isPanning = manager.findSelectedTool()?.toolName === "ZoomPanTool";
-
-            return skipInteractions || isPanning;
           }
+          const manager = self.getToolsManager();
+
+          const isPanning = manager.findSelectedTool()?.toolName === "ZoomPanTool";
+
+          return skipInteractions || isPanning;
         },
       },
       actions: {

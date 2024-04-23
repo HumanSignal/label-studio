@@ -25,9 +25,8 @@ const prepareColor = (colorString: string, solid: boolean) => {
 const getColor = (colorString: string | ColorName) => {
   if (colorString) {
     return colors[colorString as ColorName] ?? colorString;
-  } else {
-    return colors.blue;
   }
+  return colors.blue;
 };
 
 interface TagProps {

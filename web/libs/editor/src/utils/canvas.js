@@ -548,13 +548,13 @@ function checkEndian() {
 
   if (uint16array[0] === 0xbbaa) {
     return "little endian";
-  } else if (uint16array[0] === 0xaabb) {
-    return "big endian";
-  } else {
-    // The most common architectures (x86 and ARM) are both little endian, so just assume that.
-    console.error("Can not determine platform endianness, assuming little endian");
-    return "little endian";
   }
+  if (uint16array[0] === 0xaabb) {
+    return "big endian";
+  }
+  // The most common architectures (x86 and ARM) are both little endian, so just assume that.
+  console.error("Can not determine platform endianness, assuming little endian");
+  return "little endian";
 }
 
 export default {

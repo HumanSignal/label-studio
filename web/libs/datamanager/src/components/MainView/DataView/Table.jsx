@@ -135,7 +135,8 @@ export const DataView = injector(
               <Spinner size="large" />
             </Block>
           );
-        } else if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
+        }
+        if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
           return (
             <Block name="syncInProgress">
               <Elem name="title" tag="h3">
@@ -157,7 +158,8 @@ export const DataView = injector(
               )}
             </Block>
           );
-        } else if (
+        }
+        if (
           store.SDK.type === "DE" &&
           (total === 0 || data.length === 0 || !hasData) &&
           datasetStatusID === "completed"
@@ -170,7 +172,8 @@ export const DataView = injector(
               <Elem name="text">Try adjusting the filter or similarity search parameters</Elem>
             </Block>
           );
-        } else if (store.SDK.type === "DE" && (total === 0 || data.length === 0 || !hasData)) {
+        }
+        if (store.SDK.type === "DE" && (total === 0 || data.length === 0 || !hasData)) {
           return (
             <Block name="syncInProgress">
               <Elem name="title" tag="h3">
@@ -187,7 +190,8 @@ export const DataView = injector(
               </Button>
             </Block>
           );
-        } else if (total === 0 || !hasData) {
+        }
+        if (total === 0 || !hasData) {
           return (
             <Block name="no-results">
               <Elem name="description">

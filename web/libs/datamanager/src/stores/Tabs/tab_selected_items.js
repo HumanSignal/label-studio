@@ -39,17 +39,15 @@ export const TabSelectedItems = types
         const totalCount = getRoot(self).dataStore.total ?? 0;
 
         return totalCount - self.length;
-      } else {
-        return self.length;
       }
+      return self.length;
     },
 
     isSelected(id) {
       if (self.all) {
         return !self.list.includes(id);
-      } else {
-        return self.list.includes(id);
       }
+      return self.list.includes(id);
     },
   }))
   .actions((self) => ({

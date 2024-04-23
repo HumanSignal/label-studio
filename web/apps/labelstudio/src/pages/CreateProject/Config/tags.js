@@ -110,7 +110,7 @@ const Labels = {
           return position & Node.DOCUMENT_POSITION_FOLLOWING ? "top" : "bottom";
         }
         if (direction[1] === "column") return direction[2] ? "top" : "bottom";
-        else return direction[2] ? "left" : "right";
+        return direction[2] ? "left" : "right";
       },
     },
     filter: {

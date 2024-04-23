@@ -666,9 +666,8 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
             return { node: nextNode, position: 0 };
           }
           return { node: currentNode, position: isBR ? 0 : Math.min(Math.max(position - lastPosition, 0), length) };
-        } else {
-          lastPosition += length;
         }
+        lastPosition += length;
       }
 
       currentNode = nextNode;
@@ -725,9 +724,8 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
             return { node: nextNode, position: 0 };
           }
           return { node: currentNode, position: isBR ? 0 : Math.min(Math.max(position - lastPosition, 0), length) };
-        } else {
-          lastPosition += length;
         }
+        lastPosition += length;
       }
 
       currentNode = nextNode;
