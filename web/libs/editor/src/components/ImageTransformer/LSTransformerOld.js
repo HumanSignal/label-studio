@@ -50,6 +50,6 @@ class LSTransformerOld extends Konva.Transformer {
   }
 }
 
-Konva["LSTransformerOld"] = LSTransformerOld;
+Konva.LSTransformerOld = LSTransformerOld;
 
 export default "LSTransformerOld";
