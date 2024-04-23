@@ -58,19 +58,15 @@ Scenario("Brush relations shouldn't crash everything", async ({ I, LabelStudio, 
     // save the central point
     regionsCentralPoints.push({ x, y });
   }
-
-  // Check that we can create a relation between the brush regions
-  {
-    // switch to the move tool for easy region selecting
-    I.pressKey("v");
-    // select the first region
-    AtImageView.clickAt(regionsCentralPoints[0].x, regionsCentralPoints[0].y);
-    // create relation to the second region
-    I.pressKey(["alt", "r"]);
-    AtImageView.clickAt(regionsCentralPoints[1].x, regionsCentralPoints[1].y);
-    // check that the relation has been created
-    AtSidebar.seeRelations(1);
-  }
+  // switch to the move tool for easy region selecting
+  I.pressKey("v");
+  // select the first region
+  AtImageView.clickAt(regionsCentralPoints[0].x, regionsCentralPoints[0].y);
+  // create relation to the second region
+  I.pressKey(["alt", "r"]);
+  AtImageView.clickAt(regionsCentralPoints[1].x, regionsCentralPoints[1].y);
+  // check that the relation has been created
+  AtSidebar.seeRelations(1);
 
   // Check that relations work fine on a brush restoration (from rle)
   {
@@ -86,19 +82,15 @@ Scenario("Brush relations shouldn't crash everything", async ({ I, LabelStudio, 
     AtImageView.waitForImage();
     // Check that relation still exist
     AtSidebar.seeRelations(1);
-
-    // Try to create new relation with restored regions
-    {
-      // switch to the move tool for easy region selecting
-      I.pressKey("v");
-      // select the third region
-      AtImageView.clickAt(regionsCentralPoints[2].x, regionsCentralPoints[2].y);
-      // create relation to the fourth region
-      I.pressKey(["alt", "r"]);
-      AtImageView.clickAt(regionsCentralPoints[3].x, regionsCentralPoints[3].y);
-      // check that the relation has been created
-      AtSidebar.seeRelations(2);
-    }
+    // switch to the move tool for easy region selecting
+    I.pressKey("v");
+    // select the third region
+    AtImageView.clickAt(regionsCentralPoints[2].x, regionsCentralPoints[2].y);
+    // create relation to the fourth region
+    I.pressKey(["alt", "r"]);
+    AtImageView.clickAt(regionsCentralPoints[3].x, regionsCentralPoints[3].y);
+    // check that the relation has been created
+    AtSidebar.seeRelations(2);
 
     /// The potential errors should be caught by `errorsCollector` plugin
   }
