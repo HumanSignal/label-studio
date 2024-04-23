@@ -551,38 +551,26 @@ const HtxBrushView = ({ item, setShapeRef }) => {
 
   // Drawing hit area by shape color to detect interactions inside the Konva
   const imageHitFunc = useMemo(() => {
-    let _image;  // Internal image.
-    let _initialised = false;
+
+    const data = {image: null, initialised: false};
 
     return (context, shape) => {
-      if (image) {
-        if (!_image && !_initialised) {
-          // Create a image to draw for each hit func instead of put data.
-          context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
-          let imageData;
-          if (isFF(FF_ZOOM_OPTIM)) {
-            imageData = context.getImageData(item.parent.alignmentOffset.x, item.parent.alignmentOffset.y, item.parent.stageWidth, item.parent.stageHeight);
-          } else {
-            imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
-          }
-          const colorParts = colorToRGBAArray(shape.colorKey);
-          for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
-            if (imageData.data[i * 4 + 3] > 0) {
-              for (let k = 0; k < 3; k++) {
-                imageData.data[i * 4 + k] = colorParts[k];
-              }
-            }
-          }
-          _initialised = true;
-          createImageBitmap(imageData)
-            .then(newImage => {
-              _image = newImage;
-            })
-
-        }
-        if (_image) {
-          context.drawImage(_image, 0,0, item.parent.stageWidth, item.parent.stageHeight);
-        }
+      // Initialise the data image if not exists
+      if (image && !data.initialised) {
+        data.initialised = true;
+        Canvas.ImageToMaskBitmap(
+          image,
+          {width: item.parent.stageWidth, height: item.parent.stageHeight},
+          isFF(FF_ZOOM_OPTIM) ? item.parent.alignmentOffset : {x: 0, y: 0},
+          colorToRGBAArray(shape.colorKey)
+        )
+          .then(maskBitMap => {
+            data.image = maskBitMap;
+          })
+      }
+      // If data image exists draw it.
+      if (data.image) {
+        context.drawImage(data.image, 0,0, item.parent.stageWidth, item.parent.stageHeight);
       }
     };
   }, [image, item.parent?.stageWidth, item.parent?.stageHeight]);
@@ -771,7 +759,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     const oldOpacity = hitCanvas.style.opacity;
     const oldPointerEvents = hitCanvas.style.pointerEvents;
     container.appendChild(hitCanvas);
-    hitCanvas.style.opacity = 1;
+    hitCanvas.style.opacity = '1.0';
     hitCanvas.style.pointerEvents = 'none';
     return () => {
       hitCanvas.style.opacity = oldOpacity;

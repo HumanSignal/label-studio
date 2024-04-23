@@ -5,6 +5,7 @@ import Constants from '../core/Constants';
 import * as Colors from './colors';
 import { FF_LSDV_4583, isFF } from './feature-flags';
 import {SceneCanvas} from "konva/lib/Canvas";
+import {colorToRGBAArray} from "./colors";
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -170,6 +171,40 @@ function RLE2Region(item, { color = Constants.FILL_COLOR } = {}) {
   new_image.src = canvas.toDataURL();
   return new_image;
 }
+
+
+/**
+ * Create a image bit map where all pixels are converted to the provided mask colour.
+ *
+ * @param image
+ * @param size
+ * @param offset
+ * @param maskColour
+ * @return {Promise}
+ * @constructor
+ */
+function ImageToMaskBitmap(image, size, offset, maskColour) {
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = size.width;
+  canvas.height = size.height;
+
+  ctx.drawImage(image, 0, 0, size.width, size.height);
+
+  const imageData = ctx.getImageData(offset.x, offset.y, size.width, size.height);
+
+  for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
+    if (imageData.data[i * 4 + 3] > 0) {
+      for (let k = 0; k < 3; k++) {
+        imageData.data[i * 4 + k] = maskColour[k];
+      }
+    }
+  }
+
+  return createImageBitmap(imageData);
+}
+
 
 /**
 * Exports region using canvas. Doesn't require Konva#Stage access
@@ -644,6 +679,7 @@ function checkEndian() {
 export default {
   Region2RLE,
   RLE2Region,
+  ImageToMaskBitmap,
   mask2DataURL,
   maskDataURL2Image,
   brushSizeCircle,
