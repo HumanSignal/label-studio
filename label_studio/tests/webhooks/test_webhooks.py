@@ -390,3 +390,49 @@ def test_webhooks_for_tasks_from_storages(configured_project, business_client, o
     assert r.json()['action'] == WebhookAction.TASKS_CREATED
     assert 'tasks' in r.json()
     assert 'project' in r.json()
+
+
+@pytest.mark.django_db
+def test_start_training_webhook(setup_project_dialog, project_webhook, business_client):
+    """
+    1. Setup: The test uses the project_webhook fixture, which assumes that a webhook
+    is already configured for the project.
+    2. Mocking the POST Request: The requests_mock.Mocker is used to mock
+    the POST request to the webhook URL. This is where you expect the START_TRAINING action to be sent.
+    3. Making the Request: The test makes a POST request to the /api/ml/{id}/train endpoint.
+
+    Assertions:
+        - The response status code is checked to ensure the request was successful.
+        - It verifies that exactly one request was made to the webhook URL.
+        - It checks that the request method was POST.
+        - The request URL and the JSON payload are validated against expected values.
+    """
+    webhook = project_webhook
+    project = webhook.project
+    ml_backend_id = 2  # Assuming this is the ID of your ML backend
+
+    from ml.models import MLBackend
+    ml = MLBackend.objects.create(project=project)
+
+    # Mock the POST request to the ML backend train endpoint
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        response = business_client.post(
+            reverse('ml:api:ml-backend-train', kwargs={'pk': ml_backend_id}),
+            data=json.dumps({'action': 'START_TRAINING'}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == 200
+    request_history = m.request_history
+    assert len(request_history) == 1
+    assert request_history[0].method == 'POST'
+    assert request_history[0].url == webhook.url
+    assert request_history[0].json() == {
+        'action': 'START_TRAINING',
+        'project': {
+            'id': project.id,
+            'title': project.title,
+            'description': project.description
+        }
+    }
