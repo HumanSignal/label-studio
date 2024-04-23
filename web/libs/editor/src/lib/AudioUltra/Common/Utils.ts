@@ -31,7 +31,7 @@ export const clamp = (value: number, min: number, max: number) => {
 };
 
 export const toPrecision = (value: number, precision = 2) => {
-  const multiplier = Math.pow(10, precision);
+  const multiplier = 10 ** precision;
 
   return Math.round(value * multiplier) / multiplier;
 };

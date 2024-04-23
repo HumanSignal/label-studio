@@ -15,7 +15,7 @@ import { resizers } from "./utils";
 import "./PanelTabsBase.styl";
 
 const distance = (x1: number, x2: number, y1: number, y2: number) => {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 };
 
 export const PanelTabsBase: FC<BaseProps> = ({
