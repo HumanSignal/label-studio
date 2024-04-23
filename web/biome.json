@@ -41,7 +41,6 @@
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
         "noGlobalIsNan": "off",
-        "noSparseArray": "off",
         "noUnsafeNegation": "off",
         "useIsArray": "off",
         "useValidTypeof": "off",
