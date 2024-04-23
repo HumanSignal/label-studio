@@ -30,7 +30,6 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "noAriaUnsupportedElements": "off",
         "noAutofocus": "off",
         "noDistractingElements": "off",
         "noHeaderScope": "off",
