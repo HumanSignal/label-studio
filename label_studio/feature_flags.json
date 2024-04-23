@@ -1983,7 +1983,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 5,
+      "version": 7,
       "deleted": false
     },
     "fflag_feat_back_optic_506_changing_scim_group_mapping_setting_removes_users_from_lse_group": {

@@ -529,7 +529,7 @@ class ExportStorage(Storage, ProjectStorageMixin):
             # export task with annotations
             # TODO: we have to rewrite save_all_annotations, because this func will be called for each annotation
             # TODO: instead of each task, however, we have to call it only once per task
-            expand = ['annotations.reviews']
+            expand = ['annotations.reviews', 'annotations.completed_by']
             context = {'project': self.project}
             return ExportDataSerializer(annotation.task, context=context, expand=expand).data
         else:
@@ -622,6 +622,9 @@ class ExportStorageLink(models.Model):
     def get_key(annotation):
         # get user who created the organization explicitly using filter/values_list to avoid prefetching
         user = getattr(annotation, 'cached_user', None)
+        # when signal for annotation save is called, user is not cached
+        if user is None:
+            user = annotation.project.organization.created_by
         flag = flag_set('fflag_feat_optic_650_target_storage_task_format_long', user=user)
 
         if settings.FUTURE_SAVE_TASK_TO_STORAGE or flag:
