@@ -16,6 +16,8 @@ import { Block } from '../../../utils/bem';
 import ControlBase from '../Base';
 import '../Label';
 import './Labels.styl';
+import { Select } from 'antd';
+const { Option } = Select;
 
 /**
  * The `Labels` tag provides a set of labels for labeling regions in tasks for machine learning and data science projects. Use the `Labels` tag to create a set of labels that can be assigned to identified region and specify the values of labels to assign to regions.
@@ -57,7 +59,7 @@ import './Labels.styl';
  * @meta_description Customize Label Studio by using the Labels tag to provide a set of labels for labeling regions in tasks for machine learning and data science projects.
  * @param {string} name                      - Name of the element
  * @param {string} toName                    - Name of the element that you want to label
- * @param {single|multiple=} [choice=single] - Configure whether you can select one or multiple labels for a region
+ * @param {single|multiple|subgroup=} [choice=single] - Configure whether you can select one or multiple labels for a region
  * @param {number} [maxUsages]               - Maximum number of times a label can be used per task
  * @param {boolean} [showInline=true]        - Whether to show labels in the same visual line
  * @param {float=} [opacity=0.6]             - Opacity of rectangle highlighting the label
@@ -69,7 +71,7 @@ import './Labels.styl';
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 
-  choice: types.optional(types.enumeration(['single', 'multiple']), 'single'),
+  choice: types.optional(types.enumeration(['single', 'multiple','subgroup']), 'single'),
   maxusages: types.maybeNull(types.string),
   showinline: types.optional(types.boolean, true),
 
@@ -96,13 +98,12 @@ const ModelAttrs = types.model({
   pid: types.optional(types.string, guidGenerator),
   type: 'labels',
   children: Types.unionArray(['label', 'header', 'view', 'text', 'hypertext', 'richtext']),
-
   visible: types.optional(types.boolean, true),
 });
 
 const Model = LabelMixin.views(self => ({
   get shouldBeUnselected() {
-    return self.choice === 'single';
+    return self.choice === 'single' || self.choice ==='subgroup';
   },
   get defaultChildType() {
     return 'label';
@@ -145,10 +146,62 @@ const LabelsModel = types.compose(
   SelectedModelMixin.props({ _child: 'LabelModel' }),
 );
 
+
+function renderGrouplessChildren(item, annotation) {
+  /**
+   * We Render here only children that are not part of a group...
+   */
+  if (item && item.children && item.children.length) {
+    return item.children.map((el) => {
+      if (el.subgroup === null){
+        return Tree.renderItem(el, annotation);
+      }
+    });
+  } 
+  return null;
+}
+
+const HtxLabelGroup = observer(({item}) => {
+  const group_names = Array.from(new Set(item.children.map((el)=>el.subgroup))).filter(el=>el);
+  return group_names.map((group_name)=>{
+    const elements = item.children.filter(el=>el.subgroup == group_name)
+    return (<Select 
+              value ={elements.filter(el=>el.selected).length? elements.filter(el=>el.selected) : group_name}
+              onChange={function(val) {
+                /**We unselect other labels from the group*/
+                item.children.map((el)=>{
+                  if (el.subgroup==group_name && el.selected){
+                    el.toggleSelected()
+                  }
+                })
+                /** Then we select the one we just selected */ 
+                if (item.children.filter((el)=>!el.subgroup && el.selected).length)
+                {
+                  const c = item.findLabel(val);
+                  if (c) {
+                    c.toggleSelected();
+                  }                
+                }
+
+              }}
+          >
+            {elements.map((el)=>{
+              return (
+                <Option key={el._value} value={el._value}>
+                  {el._value}
+                </Option>
+              )
+              })}
+          </Select>)
+    })
+  });
+
+
 const HtxLabels = observer(({ item }) => {
   return (
     <Block name="labels" mod={{ hidden: !item.visible, inline: item.showinline }}>
-      {Tree.renderChildren(item, item.annotation)}
+      {renderGrouplessChildren(item, item.annotation)}
+      <HtxLabelGroup item={item}/>
     </Block>
   );
 });

@@ -49,7 +49,9 @@ import { sanitizeHtml } from '../../utils/html';
  * @param {symbol|word} [granularity]       - Set control based on symbol or word selection (only for Text)
  * @param {string} [html]                   - HTML code is used to display label button instead of raw text provided by `value` (should be properly escaped)
  * @param {int} [category]                  - Category is used in the export (in label-studio-converter lib) to make an order of labels for YOLO and COCO
- */
+ * @param {str} [subgroup]                  - The group corresponding to this label. If in a group, it will be displayed as a combobox and be additive
+
+*/
 const TagAttrs = types.model({
   value: types.maybeNull(types.string),
   selected: types.optional(types.boolean, false),
@@ -64,6 +66,8 @@ const TagAttrs = types.model({
   selectedcolor: types.optional(customTypes.color, '#ffffff'),
   granularity: types.maybeNull(types.enumeration(['symbol', 'word', 'sentence', 'paragraph'])),
   groupcancontain: types.maybeNull(types.string),
+  subgroup:types.maybeNull(types.string),
+
   // childrencheck: types.optional(types.enumeration(["any", "all"]), "any")
   ...(isFF(FF_DEV_2128) ? { html: types.maybeNull(types.string) } : {}),
 });
@@ -212,23 +216,22 @@ const Model = types.model({
       /**
        * Multiple
        */
-      if (!labels.shouldBeUnselected) {
-        self.setSelected(!self.selected);
-      }
-
-      /**
-       * Single
-       */
-      if (labels.shouldBeUnselected) {
-        /**
-         * Current not selected
-         */
-        if (!self.selected) {
-          labels.unselectAll();
+      switch (labels.choice) {
+        case 'multiple':
           self.setSelected(!self.selected);
-        } else {
-          labels.unselectAll();
-        }
+        case 'single':
+          if (!self.selected) {
+            labels.unselectAll();
+            self.setSelected(!self.selected);
+          } else {
+            labels.unselectAll();
+          }
+        case 'subgroup':
+          const labels_without_groups = labels.selectedLabels.filter((label)=>!label.subgroup)
+          const labels_in_same_group = labels.selectedLabels.filter((label)=>label.subgroup==self.subgroup)
+          /** We unselect labels in the same group */
+          labels_in_same_group.map((l)=>l.setSelected(false))
+          self.setSelected(!self.selected)
       }
     }
 
@@ -251,7 +254,6 @@ const Model = types.model({
       }
     });
   },
-
   setVisible(val) {
     self.visible = val;
   },
@@ -312,7 +314,6 @@ const HtxLabelView = inject('store')(
         )}
       </Label>
     );
-
     return item.hint
       ? <Tooltip title={item.hint}>{label}</Tooltip>
       : label;
