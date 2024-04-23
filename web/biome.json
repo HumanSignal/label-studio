@@ -73,7 +73,6 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
-        "noConstAssign": "off",
         "noInvalidNewBuiltin": "off",
         "noNewSymbol": "off",
         "noNonoctalDecimalEscape": "off",
