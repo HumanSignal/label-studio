@@ -1,36 +1,36 @@
-import Konva from 'konva';
-import React, { memo, useContext, useEffect, useMemo } from 'react';
-import { Group, Line } from 'react-konva';
-import { destroy, detach, getRoot, isAlive, types } from 'mobx-state-tree';
+import Konva from "konva";
+import React, { memo, useContext, useEffect, useMemo } from "react";
+import { Group, Line } from "react-konva";
+import { destroy, detach, getRoot, isAlive, types } from "mobx-state-tree";
 
-import Constants from '../core/Constants';
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
-import Registry from '../core/Registry';
-import { ImageModel } from '../tags/object/Image';
-import { LabelOnPolygon } from '../components/ImageView/LabelOnRegion';
-import { PolygonPoint, PolygonPointView } from './PolygonPoint';
-import { green } from '@ant-design/colors';
-import { guidGenerator } from '../core/Helpers';
-import { AreaMixin } from '../mixins/AreaMixin';
-import { useRegionStyles } from '../hooks/useRegionColor';
-import { AliveRegion } from './AliveRegion';
-import { KonvaRegionMixin } from '../mixins/KonvaRegion';
-import { observer } from 'mobx-react';
-import { createDragBoundFunc } from '../utils/image';
-import { ImageViewContext } from '../components/ImageView/ImageViewContext';
-import { FF_DEV_2432, FF_DEV_3793, isFF } from '../utils/feature-flags';
-import { fixMobxObserve } from '../utils/utilities';
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from '../components/ImageView/Image';
+import Constants from "../core/Constants";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import Registry from "../core/Registry";
+import { ImageModel } from "../tags/object/Image";
+import { LabelOnPolygon } from "../components/ImageView/LabelOnRegion";
+import { PolygonPoint, PolygonPointView } from "./PolygonPoint";
+import { green } from "@ant-design/colors";
+import { guidGenerator } from "../core/Helpers";
+import { AreaMixin } from "../mixins/AreaMixin";
+import { useRegionStyles } from "../hooks/useRegionColor";
+import { AliveRegion } from "./AliveRegion";
+import { KonvaRegionMixin } from "../mixins/KonvaRegion";
+import { observer } from "mobx-react";
+import { createDragBoundFunc } from "../utils/image";
+import { ImageViewContext } from "../components/ImageView/ImageViewContext";
+import { FF_DEV_2432, FF_DEV_3793, isFF } from "../utils/feature-flags";
+import { fixMobxObserve } from "../utils/utilities";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 
 const PolygonRegionAbsoluteCoordsDEV3793 = types
   .model({
-    coordstype: types.optional(types.enumeration(['px', 'perc']), 'perc'),
+    coordstype: types.optional(types.enumeration(["px", "perc"]), "perc"),
   })
-  .actions(self => ({
+  .actions((self) => ({
     updateImageSize(wp, hp, sw, sh) {
-      if (self.coordstype === 'px') {
-        self.points.forEach(p => {
+      if (self.coordstype === "px") {
+        self.points.forEach((p) => {
           const x = (sw * p.relativeX) / RELATIVE_STAGE_WIDTH;
           const y = (sh * p.relativeY) / RELATIVE_STAGE_HEIGHT;
 
@@ -38,12 +38,12 @@ const PolygonRegionAbsoluteCoordsDEV3793 = types
         });
       }
 
-      if (!self.annotation.sentUserGenerate && self.coordstype === 'perc') {
-        self.points.forEach(p => {
+      if (!self.annotation.sentUserGenerate && self.coordstype === "perc") {
+        self.points.forEach((p) => {
           const x = (sw * p.x) / RELATIVE_STAGE_WIDTH;
           const y = (sh * p.y) / RELATIVE_STAGE_HEIGHT;
 
-          self.coordstype = 'px';
+          self.coordstype = "px";
           p._setPos(x, y);
         });
       }
@@ -54,7 +54,7 @@ const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
-    type: 'polygonregion',
+    type: "polygonregion",
     object: types.late(() => types.reference(ImageModel)),
 
     points: types.array(types.union(PolygonPoint, types.array(types.number)), []),
@@ -70,24 +70,27 @@ const Model = types
     supportsRotate: false,
     supportsScale: true,
   }))
-  .views(self => ({
+  .views((self) => ({
     get store() {
       return getRoot(self);
     },
     get bboxCoords() {
       if (!self.points?.length || !isAlive(self)) return {};
 
-      const bbox = self.points.reduce((bboxCoords, point) => ({
-        left: Math.min(bboxCoords.left, point.x),
-        top: Math.min(bboxCoords.top, point.y),
-        right: Math.max(bboxCoords.right, point.x),
-        bottom: Math.max(bboxCoords.bottom, point.y),
-      }), {
-        left: self.points[0].x,
-        top: self.points[0].y,
-        right: self.points[0].x,
-        bottom: self.points[0].y,
-      });
+      const bbox = self.points.reduce(
+        (bboxCoords, point) => ({
+          left: Math.min(bboxCoords.left, point.x),
+          top: Math.min(bboxCoords.top, point.y),
+          right: Math.max(bboxCoords.right, point.x),
+          bottom: Math.max(bboxCoords.bottom, point.y),
+        }),
+        {
+          left: self.points[0].x,
+          top: self.points[0].y,
+          right: self.points[0].x,
+          bottom: self.points[0].y,
+        },
+      );
 
       if (!isFF(FF_DEV_3793)) {
         // recalc on resize
@@ -100,7 +103,7 @@ const Model = types
       return getFlattenedPoints(this.points);
     },
   }))
-  .actions(self => {
+  .actions((self) => {
     return {
       afterCreate() {
         if (!self.points.length) return;
@@ -198,13 +201,14 @@ const Model = types
           x: self.parent.canvasToInternalX(x),
           y: self.parent.canvasToInternalY(y),
         });
-        const isMatchWithPrevPoint = self.points[insertIdx - 1] && self.parent.isSamePixel(pointCoords, self.points[insertIdx - 1]);
-        const isMatchWithNextPoint = self.points[insertIdx] && self.parent.isSamePixel(pointCoords, self.points[insertIdx]);
+        const isMatchWithPrevPoint =
+          self.points[insertIdx - 1] && self.parent.isSamePixel(pointCoords, self.points[insertIdx - 1]);
+        const isMatchWithNextPoint =
+          self.points[insertIdx] && self.parent.isSamePixel(pointCoords, self.points[insertIdx]);
 
         if (isMatchWithPrevPoint || isMatchWithNextPoint) {
           return;
         }
-
 
         const p = {
           id: guidGenerator(),
@@ -308,12 +312,9 @@ const Model = types
 
         const value = {
           points: isFF(FF_DEV_3793)
-            ? self.points.map(p => [p.x, p.y])
-            : self.points.map(p => [self.convertXToPerc(p.x), self.convertYToPerc(p.y)]),
-          ...(isFF(FF_DEV_2432)
-            ? { closed: self.closed }
-            : {}
-          ),
+            ? self.points.map((p) => [p.x, p.y])
+            : self.points.map((p) => [self.convertXToPerc(p.x), self.convertYToPerc(p.y)]),
+          ...(isFF(FF_DEV_2432) ? { closed: self.closed } : {}),
         };
 
         return self.parent.createSerializedResult(self, value);
@@ -322,7 +323,7 @@ const Model = types
   });
 
 const PolygonRegionModel = types.compose(
-  'PolygonRegionModel',
+  "PolygonRegionModel",
   RegionsMixin,
   AreaMixin,
   NormalizationMixin,
@@ -340,39 +341,27 @@ const PolygonRegionModel = types.compose(
 function getAnchorPoint({ flattenedPoints, cursorX, cursorY }) {
   const [point1X, point1Y, point2X, point2Y] = flattenedPoints;
   const y =
-    (
-      (point2X - point1X) * (point2X * point1Y - point1X * point2Y) +
+    ((point2X - point1X) * (point2X * point1Y - point1X * point2Y) +
       (point2X - point1X) * (point2Y - point1Y) * cursorX +
-      (point2Y - point1Y) * (point2Y - point1Y) * cursorY
-    ) /
-    (
-      (point2Y - point1Y) * (point2Y - point1Y) +
-      (point2X - point1X) * (point2X - point1X)
-    );
+      (point2Y - point1Y) * (point2Y - point1Y) * cursorY) /
+    ((point2Y - point1Y) * (point2Y - point1Y) + (point2X - point1X) * (point2X - point1X));
   const x =
     cursorX -
-    (
-      (point2Y - point1Y) *
-      (point2X * point1Y - point1X * point2Y + cursorX * (point2Y - point1Y) - cursorY * (point2X - point1X))
-    ) /
-    (
-      (point2Y - point1Y) * (point2Y - point1Y) +
-      (point2X - point1X) * (point2X - point1X)
-    );
+    ((point2Y - point1Y) *
+      (point2X * point1Y - point1X * point2Y + cursorX * (point2Y - point1Y) - cursorY * (point2X - point1X))) /
+      ((point2Y - point1Y) * (point2Y - point1Y) + (point2X - point1X) * (point2X - point1X));
 
   return [x, y];
 }
 
 function getFlattenedPoints(points) {
-  const p = points.map(p => [p.canvasX, p.canvasY]);
+  const p = points.map((p) => [p.canvasX, p.canvasY]);
 
-  return p.reduce(function(flattenedPoints, point) {
-    return flattenedPoints.concat(point);
-  }, []);
+  return p.reduce((flattenedPoints, point) => flattenedPoints.concat(point), []);
 }
 
 function getHoverAnchor({ layer }) {
-  return layer.findOne('.hoverAnchor');
+  return layer.findOne(".hoverAnchor");
 }
 
 /**
@@ -380,7 +369,7 @@ function getHoverAnchor({ layer }) {
  */
 function createHoverAnchor({ point, group, layer, zoom }) {
   const hoverAnchor = new Konva.Circle({
-    name: 'hoverAnchor',
+    name: "hoverAnchor",
     x: point[0],
     y: point[1],
     stroke: green.primary,
@@ -411,60 +400,62 @@ function removeHoverAnchor({ layer }) {
   layer.draw();
 }
 
-const Poly = memo(observer(({ item, colors, dragProps, draggable }) => {
-  const { flattenedPoints } = item;
-  const name = 'poly';
+const Poly = memo(
+  observer(({ item, colors, dragProps, draggable }) => {
+    const { flattenedPoints } = item;
+    const name = "poly";
 
-  return (
-    <Group key={name} name={name}>
-      <Line
-        name="_transformable"
-        lineJoin="round"
-        lineCap="square"
-        stroke={colors.strokeColor}
-        strokeWidth={colors.strokeWidth}
-        strokeScaleEnabled={false}
-        perfectDrawEnabled={false}
-        shadowForStrokeEnabled={false}
-        points={flattenedPoints}
-        fill={colors.fillColor}
-        closed={true}
-        {...dragProps}
-        onTransformEnd={e => {
-          if (e.target !== e.currentTarget) return;
+    return (
+      <Group key={name} name={name}>
+        <Line
+          name="_transformable"
+          lineJoin="round"
+          lineCap="square"
+          stroke={colors.strokeColor}
+          strokeWidth={colors.strokeWidth}
+          strokeScaleEnabled={false}
+          perfectDrawEnabled={false}
+          shadowForStrokeEnabled={false}
+          points={flattenedPoints}
+          fill={colors.fillColor}
+          closed={true}
+          {...dragProps}
+          onTransformEnd={(e) => {
+            if (e.target !== e.currentTarget) return;
 
-          const t = e.target;
+            const t = e.target;
 
-          const d = [t.getAttr('x', 0), t.getAttr('y', 0)];
-          const scale = [t.getAttr('scaleX', 1), t.getAttr('scaleY', 1)];
-          const points = t.getAttr('points');
+            const d = [t.getAttr("x", 0), t.getAttr("y", 0)];
+            const scale = [t.getAttr("scaleX", 1), t.getAttr("scaleY", 1)];
+            const points = t.getAttr("points");
 
-          item.setPoints(
-            points.reduce((result, coord, idx) => {
-              const isXCoord = idx % 2 === 0;
+            item.setPoints(
+              points.reduce((result, coord, idx) => {
+                const isXCoord = idx % 2 === 0;
 
-              if (isXCoord) {
-                const point = item.control?.getSnappedPoint({
-                  x: item.parent.canvasToInternalX(coord * scale[0] + d[0]),
-                  y: item.parent.canvasToInternalY(points[idx + 1] * scale[1] + d[1]),
-                });
+                if (isXCoord) {
+                  const point = item.control?.getSnappedPoint({
+                    x: item.parent.canvasToInternalX(coord * scale[0] + d[0]),
+                    y: item.parent.canvasToInternalY(points[idx + 1] * scale[1] + d[1]),
+                  });
 
-                result.push(point.x, point.y);
-              }
-              return result;
-            }, []),
-          );
+                  result.push(point.x, point.y);
+                }
+                return result;
+              }, []),
+            );
 
-          t.setAttr('x', 0);
-          t.setAttr('y', 0);
-          t.setAttr('scaleX', 1);
-          t.setAttr('scaleY', 1);
-        }}
-        draggable={draggable}
-      />
-    </Group>
-  );
-}));
+            t.setAttr("x", 0);
+            t.setAttr("y", 0);
+            t.setAttr("scaleX", 1);
+            t.setAttr("scaleY", 1);
+          }}
+          draggable={draggable}
+        />
+      </Group>
+    );
+  }),
+);
 
 /**
  * Line between 2 points
@@ -473,27 +464,29 @@ const Edge = observer(({ name, item, idx, p1, p2, closed, regionStyles }) => {
   const insertIdx = idx + 1; // idx1 + 1 or idx2
   const flattenedPoints = [p1.canvasX, p1.canvasY, p2.canvasX, p2.canvasY];
 
-  const lineProps = closed ? {
-    stroke: 'transparent',
-    strokeWidth: regionStyles.strokeWidth,
-    strokeScaleEnabled: false,
-  } : {
-    stroke: regionStyles.strokeColor,
-    strokeWidth: regionStyles.strokeWidth,
-    strokeScaleEnabled: false,
-  };
+  const lineProps = closed
+    ? {
+        stroke: "transparent",
+        strokeWidth: regionStyles.strokeWidth,
+        strokeScaleEnabled: false,
+      }
+    : {
+        stroke: regionStyles.strokeColor,
+        strokeWidth: regionStyles.strokeWidth,
+        strokeScaleEnabled: false,
+      };
 
   return (
     <Group
       key={name}
       name={name}
-      onClick={e => item.handleLineClick({ e, flattenedPoints, insertIdx })}
-      onMouseMove={e => {
+      onClick={(e) => item.handleLineClick({ e, flattenedPoints, insertIdx })}
+      onMouseMove={(e) => {
         if (!item.closed || !item.selected || item.isReadOnly()) return;
 
         item.handleMouseMove({ e, flattenedPoints });
       }}
-      onMouseLeave={e => item.handleMouseLeave({ e })}
+      onMouseLeave={(e) => item.handleMouseLeave({ e })}
     >
       <Line
         lineJoin="round"
@@ -509,39 +502,41 @@ const Edge = observer(({ name, item, idx, p1, p2, closed, regionStyles }) => {
   );
 });
 
-const Edges = memo(observer(({ item, regionStyles }) => {
-  const { points,closed } = item;
-  const name = 'borders';
+const Edges = memo(
+  observer(({ item, regionStyles }) => {
+    const { points, closed } = item;
+    const name = "borders";
 
-  if (item.closed && (item.parent.useTransformer || !item.selected)) {
-    return null;
-  }
-  return (
-    <Group key={name} name={name}>
-      {points.map((p, idx) => {
-        const idx1 = idx;
-        const idx2 = idx === points.length - 1 ? 0 : idx + 1;
+    if (item.closed && (item.parent.useTransformer || !item.selected)) {
+      return null;
+    }
+    return (
+      <Group key={name} name={name}>
+        {points.map((p, idx) => {
+          const idx1 = idx;
+          const idx2 = idx === points.length - 1 ? 0 : idx + 1;
 
-        if (!closed && idx2 === 0) {
-          return null;
-        }
+          if (!closed && idx2 === 0) {
+            return null;
+          }
 
-        return (
-          <Edge
-            key={`border_${idx1}_${idx2}`}
-            name={`border_${idx1}_${idx2}`}
-            item={item}
-            idx={idx1}
-            p1={points[idx]}
-            p2={points[idx2]}
-            closed={closed}
-            regionStyles={regionStyles}
-          />
-        );
-      })}
-    </Group>
-  );
-}));
+          return (
+            <Edge
+              key={`border_${idx1}_${idx2}`}
+              name={`border_${idx1}_${idx2}`}
+              item={item}
+              idx={idx1}
+              p1={points[idx]}
+              p2={points[idx2]}
+              closed={closed}
+              regionStyles={regionStyles}
+            />
+          );
+        })}
+      </Group>
+    );
+  }),
+);
 
 const HtxPolygonView = ({ item, setShapeRef }) => {
   const { store } = item;
@@ -561,7 +556,7 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
   }
 
   function renderCircles(points) {
-    const name = 'anchors';
+    const name = "anchors";
 
     if (item.closed && (item.parent.useTransformer || !item.selected)) {
       return null;
@@ -573,12 +568,11 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
     );
   }
 
-
   const dragProps = useMemo(() => {
     let isDragging = false;
 
     return {
-      onDragStart: e => {
+      onDragStart: (e) => {
         if (e.target !== e.currentTarget) return;
         if (item.parent.getSkipInteractions()) {
           e.currentTarget.stopDrag(e.evt);
@@ -590,28 +584,27 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
         item.annotation.history.freeze(item.id);
       },
       dragBoundFunc: createDragBoundFunc(item, { x: -item.bboxCoords.left, y: -item.bboxCoords.top }),
-      onDragEnd: e => {
+      onDragEnd: (e) => {
         if (!isDragging) return;
         const t = e.target;
 
         if (e.target === e.currentTarget) {
-
           item.annotation.setDragMode(false);
 
           const point = item.control?.getSnappedPoint({
-            x: item.parent?.canvasToInternalX(t.getAttr('x')),
-            y: item.parent?.canvasToInternalY(t.getAttr('y')),
+            x: item.parent?.canvasToInternalX(t.getAttr("x")),
+            y: item.parent?.canvasToInternalY(t.getAttr("y")),
           });
 
           point.x = item.parent?.internalToCanvasX(point.x);
           point.y = item.parent?.internalToCanvasY(point.y);
 
-          item.points.forEach(p => p.movePoint(point.x, point.y));
+          item.points.forEach((p) => p.movePoint(point.x, point.y));
           item.annotation.history.unfreeze(item.id);
         }
 
-        t.setAttr('x', 0);
-        t.setAttr('y', 0);
+        t.setAttr("x", 0);
+        t.setAttr("y", 0);
         isDragging = false;
       },
     };
@@ -630,7 +623,7 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
     <Group
       key={item.id ? item.id : guidGenerator(5)}
       name={item.id}
-      ref={el => setShapeRef(el)}
+      ref={(el) => setShapeRef(el)}
       onMouseOver={() => {
         if (store.annotationStore.selected.relationMode) {
           item.setHighlight(true);
@@ -646,7 +639,7 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
           item.setHighlight(false);
         }
       }}
-      onClick={e => {
+      onClick={(e) => {
         // create regions over another regions with Cmd/Ctrl pressed
         if (item.parent.getSkipInteractions()) return;
         if (item.isDrawing) return;
@@ -670,16 +663,23 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
 
       {item.mouseOverStartPoint}
 
-      {item.points && item.closed ? <Poly item={item} colors={regionStyles} dragProps={dragProps} draggable={!item.isReadOnly() && item.inSelection && item.parent?.selectedRegions?.length > 1}/> : null}
-      {(item.points && !item.isReadOnly()) ? <Edges item={item} regionStyles={regionStyles}/> : null}
-      {(item.points && !item.isReadOnly()) ? renderCircles(item.points) : null}
+      {item.points && item.closed ? (
+        <Poly
+          item={item}
+          colors={regionStyles}
+          dragProps={dragProps}
+          draggable={!item.isReadOnly() && item.inSelection && item.parent?.selectedRegions?.length > 1}
+        />
+      ) : null}
+      {item.points && !item.isReadOnly() ? <Edges item={item} regionStyles={regionStyles} /> : null}
+      {item.points && !item.isReadOnly() ? renderCircles(item.points) : null}
     </Group>
   );
 };
 
 const HtxPolygon = AliveRegion(HtxPolygonView);
 
-Registry.addTag('polygonregion', PolygonRegionModel, HtxPolygon);
-Registry.addRegionType(PolygonRegionModel, 'image', value => !!value.points);
+Registry.addTag("polygonregion", PolygonRegionModel, HtxPolygon);
+Registry.addRegionType(PolygonRegionModel, "image", (value) => !!value.points);
 
 export { PolygonRegionModel, HtxPolygon };

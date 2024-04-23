@@ -1,14 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import { HtxTextNode } from './Node';
+import { HtxTextNode } from "./Node";
 
 /**
  * Node for URL
  * @param {*} props
  */
-const UrlNode = props => {
-  const style = { wordWrap: 'break-word' };
+const UrlNode = (props) => {
+  const style = { wordWrap: "break-word" };
 
   return (
     <HtxTextNode

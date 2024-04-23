@@ -1,28 +1,28 @@
-import { getRoot, isAlive, types } from 'mobx-state-tree';
-import React, { useContext } from 'react';
-import { Rect } from 'react-konva';
-import { ImageViewContext } from '../components/ImageView/ImageViewContext';
-import { LabelOnRect } from '../components/ImageView/LabelOnRegion';
-import Constants from '../core/Constants';
-import { guidGenerator } from '../core/Helpers';
-import Registry from '../core/Registry';
-import { useRegionStyles } from '../hooks/useRegionColor';
-import { AreaMixin } from '../mixins/AreaMixin';
-import { KonvaRegionMixin } from '../mixins/KonvaRegion';
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
-import { ImageModel } from '../tags/object/Image';
-import { rotateBboxCoords } from '../utils/bboxCoords';
-import { FF_DEV_3793, isFF } from '../utils/feature-flags';
-import { createDragBoundFunc } from '../utils/image';
-import { AliveRegion } from './AliveRegion';
-import { EditableRegion } from './EditableRegion';
-import { RegionWrapper } from './RegionWrapper';
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from '../components/ImageView/Image';
+import { getRoot, isAlive, types } from "mobx-state-tree";
+import React, { useContext } from "react";
+import { Rect } from "react-konva";
+import { ImageViewContext } from "../components/ImageView/ImageViewContext";
+import { LabelOnRect } from "../components/ImageView/LabelOnRegion";
+import Constants from "../core/Constants";
+import { guidGenerator } from "../core/Helpers";
+import Registry from "../core/Registry";
+import { useRegionStyles } from "../hooks/useRegionColor";
+import { AreaMixin } from "../mixins/AreaMixin";
+import { KonvaRegionMixin } from "../mixins/KonvaRegion";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import { ImageModel } from "../tags/object/Image";
+import { rotateBboxCoords } from "../utils/bboxCoords";
+import { FF_DEV_3793, isFF } from "../utils/feature-flags";
+import { createDragBoundFunc } from "../utils/image";
+import { AliveRegion } from "./AliveRegion";
+import { EditableRegion } from "./EditableRegion";
+import { RegionWrapper } from "./RegionWrapper";
+import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 
 const RectRegionAbsoluteCoordsDEV3793 = types
   .model({
-    coordstype: types.optional(types.enumeration(['px', 'perc']), 'perc'),
+    coordstype: types.optional(types.enumeration(["px", "perc"]), "perc"),
   })
   .volatile(() => ({
     relativeX: 0,
@@ -31,17 +31,17 @@ const RectRegionAbsoluteCoordsDEV3793 = types
     relativeWidth: 0,
     relativeHeight: 0,
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterCreate() {
       switch (self.coordstype) {
-        case 'perc': {
+        case "perc": {
           self.relativeX = self.x;
           self.relativeY = self.y;
           self.relativeWidth = self.width;
           self.relativeHeight = self.height;
           break;
         }
-        case 'px': {
+        case "px": {
           const { stageWidth, stageHeight } = self.parent;
 
           if (stageWidth && stageHeight) {
@@ -71,17 +71,17 @@ const RectRegionAbsoluteCoordsDEV3793 = types
       return self.setPosition(x, y, width, height, rotation);
     },
     updateImageSize(wp, hp, sw, sh) {
-      if (self.coordstype === 'px') {
+      if (self.coordstype === "px") {
         self.x = (sw * self.relativeX) / RELATIVE_STAGE_WIDTH;
         self.y = (sh * self.relativeY) / RELATIVE_STAGE_HEIGHT;
         self.width = (sw * self.relativeWidth) / RELATIVE_STAGE_WIDTH;
         self.height = (sh * self.relativeHeight) / RELATIVE_STAGE_HEIGHT;
-      } else if (self.coordstype === 'perc') {
+      } else if (self.coordstype === "perc") {
         self.x = (sw * self.x) / RELATIVE_STAGE_WIDTH;
         self.y = (sh * self.y) / RELATIVE_STAGE_HEIGHT;
         self.width = (sw * self.width) / RELATIVE_STAGE_WIDTH;
         self.height = (sh * self.height) / RELATIVE_STAGE_HEIGHT;
-        self.coordstype = 'px';
+        self.coordstype = "px";
       }
     },
 
@@ -124,10 +124,10 @@ const RectRegionAbsoluteCoordsDEV3793 = types
       const dx1 = pointB.x - pointA.x;
       const dy1 = pointB.y - pointA.y;
       const dy2 = pointB.y - cursor.y;
-      const dx2 = dy2 / dx1 * dy1; // dx2 / dy1 = dy2 / dx1 (triangle is rotated)
+      const dx2 = (dy2 / dx1) * dy1; // dx2 / dy1 = dy2 / dx1 (triangle is rotated)
       const dx3 = cursor.x - pointB.x - dx2;
       const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-      const d3 = dx3 / d2 * dx2; // dx3 / d2 = d3 / dx2 (triangle is inverted)
+      const d3 = (dx3 / d2) * dx2; // dx3 / d2 = d3 / dx2 (triangle is inverted)
       const h = d2 + d3;
 
       return Math.abs(h);
@@ -142,7 +142,7 @@ const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
-    type: 'rectangleregion',
+    type: "rectangleregion",
     object: types.late(() => types.reference(ImageModel)),
 
     x: types.number,
@@ -165,7 +165,7 @@ const Model = types
     opacity: 1,
 
     fill: true,
-    fillColor: '#ff8800', // Constants.FILL_COLOR,
+    fillColor: "#ff8800", // Constants.FILL_COLOR,
     fillOpacity: 0.2,
 
     strokeColor: Constants.STROKE_COLOR,
@@ -176,11 +176,11 @@ const Model = types
     hideable: true,
 
     editableFields: [
-      { property: 'x', label: 'X' },
-      { property: 'y', label: 'Y' },
-      { property: 'width', label: 'W' },
-      { property: 'height', label: 'H' },
-      { property: 'rotation', label: 'icon:angle' },
+      { property: "x", label: "X" },
+      { property: "y", label: "Y" },
+      { property: "width", label: "W" },
+      { property: "height", label: "H" },
+      { property: "rotation", label: "icon:angle" },
     ],
   }))
   .volatile(() => {
@@ -191,7 +191,7 @@ const Model = types
       supportsScale: true,
     };
   })
-  .views(self => ({
+  .views((self) => ({
     get store() {
       return getRoot(self);
     },
@@ -223,7 +223,7 @@ const Model = types
       return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.height) : self.height;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterCreate() {
       self.startX = self.x;
       self.startY = self.y;
@@ -248,7 +248,7 @@ const Model = types
     },
 
     isAboveTheLine(a, b, c) {
-      return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) < 0;
+      return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) < 0;
     },
 
     draw(x, y, points) {
@@ -257,13 +257,17 @@ const Model = types
       const canvasY = self.parent.internalToCanvasY(y);
 
       if (points.length === 1) {
-        const canvasWidth = self.getDistanceBetweenPoints({ x: canvasX, y: canvasY }, {
-          x: self.canvasX,
-          y: self.canvasY,
-        });
+        const canvasWidth = self.getDistanceBetweenPoints(
+          { x: canvasX, y: canvasY },
+          {
+            x: self.canvasX,
+            y: self.canvasY,
+          },
+        );
 
         self.width = self.parent.canvasToInternalX(canvasWidth);
-        self.rotation = self.rotationAtCreation = Math.atan2(canvasY - self.canvasY, canvasX - self.canvasX) * (180 / Math.PI);
+        self.rotation = self.rotationAtCreation =
+          Math.atan2(canvasY - self.canvasY, canvasX - self.canvasX) * (180 / Math.PI);
       } else if (points.length === 2) {
         const canvasPoints = points.map(({ x, y }) => ({
           x: self.parent.internalToCanvasX(x),
@@ -387,10 +391,11 @@ const Model = types
      */
     serialize() {
       const value = {
-        x: (self.parent.stageWidth > 1 && !isFF(FF_DEV_3793)) ? self.convertXToPerc(self.x) : self.x,
-        y: (self.parent.stageWidth > 1 && !isFF(FF_DEV_3793)) ? self.convertYToPerc(self.y) : self.y,
-        width: (self.parent.stageWidth > 1 && !isFF(FF_DEV_3793)) ? self.convertHDimensionToPerc(self.width) : self.width,
-        height: (self.parent.stageWidth > 1 && !isFF(FF_DEV_3793)) ? self.convertVDimensionToPerc(self.height) : self.height,
+        x: self.parent.stageWidth > 1 && !isFF(FF_DEV_3793) ? self.convertXToPerc(self.x) : self.x,
+        y: self.parent.stageWidth > 1 && !isFF(FF_DEV_3793) ? self.convertYToPerc(self.y) : self.y,
+        width: self.parent.stageWidth > 1 && !isFF(FF_DEV_3793) ? self.convertHDimensionToPerc(self.width) : self.width,
+        height:
+          self.parent.stageWidth > 1 && !isFF(FF_DEV_3793) ? self.convertVDimensionToPerc(self.height) : self.height,
         rotation: self.rotation,
       };
 
@@ -399,7 +404,7 @@ const Model = types
   }));
 
 const RectRegionModel = types.compose(
-  'RectRegionModel',
+  "RectRegionModel",
   RegionsMixin,
   NormalizationMixin,
   AreaMixin,
@@ -424,22 +429,22 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
   if (!suggestion && !item.isReadOnly()) {
     eventHandlers.onTransform = ({ target }) => {
       // resetting the skew makes transformations weird but predictable
-      target.setAttr('skewX', 0);
-      target.setAttr('skewY', 0);
+      target.setAttr("skewX", 0);
+      target.setAttr("skewY", 0);
     };
     eventHandlers.onTransformEnd = (e) => {
       const t = e.target;
 
       item.setPosition(
-        t.getAttr('x'),
-        t.getAttr('y'),
-        t.getAttr('width') * t.getAttr('scaleX'),
-        t.getAttr('height') * t.getAttr('scaleY'),
-        t.getAttr('rotation'),
+        t.getAttr("x"),
+        t.getAttr("y"),
+        t.getAttr("width") * t.getAttr("scaleX"),
+        t.getAttr("height") * t.getAttr("scaleY"),
+        t.getAttr("rotation"),
       );
 
-      t.setAttr('scaleX', 1);
-      t.setAttr('scaleY', 1);
+      t.setAttr("scaleX", 1);
+      t.setAttr("scaleY", 1);
 
       item.notifyDrawingFinished();
     };
@@ -455,14 +460,8 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
     eventHandlers.onDragEnd = (e) => {
       const t = e.target;
 
-      item.setPosition(
-        t.getAttr('x'),
-        t.getAttr('y'),
-        t.getAttr('width'),
-        t.getAttr('height'),
-        t.getAttr('rotation'),
-      );
-      item.setScale(t.getAttr('scaleX'), t.getAttr('scaleY'));
+      item.setPosition(t.getAttr("x"), t.getAttr("y"), t.getAttr("width"), t.getAttr("height"), t.getAttr("rotation"));
+      item.setScale(t.getAttr("scaleX"), t.getAttr("scaleY"));
       item.annotation.history.unfreeze(item.id);
 
       item.notifyDrawingFinished();
@@ -479,7 +478,7 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
       <Rect
         x={item.canvasX}
         y={item.canvasY}
-        ref={node => setShapeRef(node)}
+        ref={(node) => setShapeRef(node)}
         width={item.canvasWidth}
         height={item.canvasHeight}
         fill={regionStyles.fillColor}
@@ -512,7 +511,7 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
             item.setHighlight(false);
           }
         }}
-        onClick={e => {
+        onClick={(e) => {
           if (item.parent.getSkipInteractions()) return;
           if (store.annotationStore.selected.relationMode) {
             stage.container().style.cursor = Constants.DEFAULT_CURSOR;
@@ -530,7 +529,7 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
 
 const HtxRectangle = AliveRegion(HtxRectangleView);
 
-Registry.addTag('rectangleregion', RectRegionModel, HtxRectangle);
-Registry.addRegionType(RectRegionModel, 'image');
+Registry.addTag("rectangleregion", RectRegionModel, HtxRectangle);
+Registry.addRegionType(RectRegionModel, "image");
 
 export { RectRegionModel, HtxRectangle };

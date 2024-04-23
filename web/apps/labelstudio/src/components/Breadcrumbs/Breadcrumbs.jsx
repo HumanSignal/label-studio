@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { useConfig } from '../../providers/ConfigProvider';
-import { useBreadcrumbs, useFindRouteComponent } from '../../providers/RoutesProvider';
-import { BemWithSpecifiContext } from '../../utils/bem';
-import { absoluteURL } from '../../utils/helpers';
-import { Dropdown } from '../Dropdown/Dropdown';
-import { Menu } from '../Menu/Menu';
-import './Breadcrumbs.styl';
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { useConfig } from "../../providers/ConfigProvider";
+import { useBreadcrumbs, useFindRouteComponent } from "../../providers/RoutesProvider";
+import { BemWithSpecifiContext } from "../../utils/bem";
+import { absoluteURL } from "../../utils/helpers";
+import { Dropdown } from "../Dropdown/Dropdown";
+import { Menu } from "../Menu/Menu";
+import "./Breadcrumbs.styl";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -65,13 +65,22 @@ export const Breadcrumbs = () => {
               <span onClick={item.onClick}>{title}</span>
             </Elem>
           ) : dropdownSubmenu ? (
-            <Elem key={key} tag="li" component={Dropdown.Trigger} name="item" mod={{ last: isLastItem }} content={dropdownSubmenu}>
+            <Elem
+              key={key}
+              tag="li"
+              component={Dropdown.Trigger}
+              name="item"
+              mod={{ last: isLastItem }}
+              content={dropdownSubmenu}
+            >
               <span>{title}</span>
             </Elem>
-          ) : (href && !isLastItem) ? (
+          ) : href && !isLastItem ? (
             <Elem key={key} tag="li" name="item" mod={{ last: isLastItem }}>
               {isInternal ? (
-                <NavLink to={href} data-external={true}>{title}</NavLink>
+                <NavLink to={href} data-external={true}>
+                  {title}
+                </NavLink>
               ) : (
                 <a href={absoluteURL(href)}>{title}</a>
               )}

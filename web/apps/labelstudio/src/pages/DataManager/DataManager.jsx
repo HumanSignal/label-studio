@@ -1,22 +1,22 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { generatePath, useHistory } from 'react-router';
-import { NavLink } from 'react-router-dom';
-import { Spinner } from '../../components';
-import { Button } from '../../components/Button/Button';
-import { modal } from '../../components/Modal/Modal';
-import { Space } from '../../components/Space/Space';
-import { useAPI } from '../../providers/ApiProvider';
-import { useLibrary } from '../../providers/LibraryProvider';
-import { useProject } from '../../providers/ProjectProvider';
-import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
-import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
-import { Block, Elem } from '../../utils/bem';
-import { isDefined } from '../../utils/helpers';
-import { ImportModal } from '../CreateProject/Import/ImportModal';
-import { ExportPage } from '../ExportPage/ExportPage';
-import { APIConfig } from './api-config';
-import { ToastContext } from '../../components/Toast/Toast';
-import { FF_OPTIC_2, isFF } from '../../utils/feature-flags';
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { generatePath, useHistory } from "react-router";
+import { NavLink } from "react-router-dom";
+import { Spinner } from "../../components";
+import { Button } from "../../components/Button/Button";
+import { modal } from "../../components/Modal/Modal";
+import { Space } from "../../components/Space/Space";
+import { useAPI } from "../../providers/ApiProvider";
+import { useLibrary } from "../../providers/LibraryProvider";
+import { useProject } from "../../providers/ProjectProvider";
+import { useContextProps, useFixedLocation, useParams } from "../../providers/RoutesProvider";
+import { addAction, addCrumb, deleteAction, deleteCrumb } from "../../services/breadrumbs";
+import { Block, Elem } from "../../utils/bem";
+import { isDefined } from "../../utils/helpers";
+import { ImportModal } from "../CreateProject/Import/ImportModal";
+import { ExportPage } from "../ExportPage/ExportPage";
+import { APIConfig } from "./api-config";
+import { ToastContext } from "../../components/Toast/Toast";
+import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
 
 import "./DataManager.styl";
 
@@ -65,8 +65,8 @@ export const DataManagerPage = ({ ...props }) => {
   const history = useHistory();
   const api = useAPI();
   const { project } = useProject();
-  const LabelStudio = useLibrary('lsf');
-  const DataManager = useLibrary('dm');
+  const LabelStudio = useLibrary("lsf");
+  const DataManager = useLibrary("dm");
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const dataManagerRef = useRef();
@@ -85,15 +85,13 @@ export const DataManagerPage = ({ ...props }) => {
 
     const interactiveBacked = (mlBackends ?? []).find(({ is_interactive }) => is_interactive);
 
-    const dataManager = (dataManagerRef.current = dataManagerRef.current ?? await initializeDataManager(
-      root.current,
-      props,
-      {
+    const dataManager = (dataManagerRef.current =
+      dataManagerRef.current ??
+      (await initializeDataManager(root.current, props, {
         ...params,
         project,
         autoAnnotation: isDefined(interactiveBacked),
-      },
-    ));
+      })));
 
     Object.assign(window, { dataManager });
 
@@ -111,7 +109,7 @@ export const DataManagerPage = ({ ...props }) => {
       history.push(buildLink("/data/export", { id: params.id }));
     });
 
-    dataManager.on("error", response => {
+    dataManager.on("error", (response) => {
       api.handleError(response);
     });
 
@@ -129,7 +127,7 @@ export const DataManagerPage = ({ ...props }) => {
     if (interactiveBacked) {
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
-        const ids = group.map(r => r.cleanId);
+        const ids = group.map((r) => r.cleanId);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
         const suggestionsRequest = api.callApi("mlInteractive", {
@@ -166,18 +164,19 @@ export const DataManagerPage = ({ ...props }) => {
     return () => destroyDM();
   }, [root, init]);
 
-
   if (!DataManager || !LabelStudio) {
     return (
-      <div style={{
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        display: "flex",
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <Spinner size={64}/>
+      <div
+        style={{
+          flex: 1,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Spinner size={64} />
       </div>
     );
   }
@@ -186,12 +185,10 @@ export const DataManagerPage = ({ ...props }) => {
     <Block name="crash">
       <Elem name="info">Project was deleted or not yet created</Elem>
 
-      <Button to="/projects">
-        Back to projects
-      </Button>
+      <Button to="/projects">Back to projects</Button>
     </Block>
   ) : (
-    <Block ref={root} name="datamanager"/>
+    <Block ref={root} name="datamanager" />
   );
 };
 
@@ -206,16 +203,16 @@ DataManagerPage.context = ({ dmRef }) => {
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
   const links = {
-    '/settings': 'Settings',
+    "/settings": "Settings",
   };
 
   const updateCrumbs = (currentMode) => {
-    const isExplorer = currentMode === 'explorer';
-    const dmPath = location.pathname.replace(DataManagerPage.path, '');
+    const isExplorer = currentMode === "explorer";
+    const dmPath = location.pathname.replace(DataManagerPage.path, "");
 
     if (isExplorer) {
       deleteAction(dmPath);
-      deleteCrumb('dm-crumb');
+      deleteCrumb("dm-crumb");
     } else {
       if (!isFF(FF_OPTIC_2)) {
         addAction(dmPath, (e) => {
@@ -232,13 +229,13 @@ DataManagerPage.context = ({ dmRef }) => {
   };
 
   const showLabelingInstruction = (currentMode) => {
-    const isLabelStream = currentMode === 'labelstream';
+    const isLabelStream = currentMode === "labelstream";
     const { expert_instruction, show_instruction } = project;
 
     if (isLabelStream && show_instruction && expert_instruction) {
       modal({
         title: "Labeling Instructions",
-        body: <div dangerouslySetInnerHTML={{ __html: expert_instruction }}/>,
+        body: <div dangerouslySetInnerHTML={{ __html: expert_instruction }} />,
         style: { width: 680 },
       });
     }
@@ -252,35 +249,32 @@ DataManagerPage.context = ({ dmRef }) => {
 
   useEffect(() => {
     if (dmRef) {
-      dmRef.on('modeChanged', onDMModeChanged);
+      dmRef.on("modeChanged", onDMModeChanged);
     }
 
     return () => {
-      dmRef?.off?.('modeChanged', onDMModeChanged);
+      dmRef?.off?.("modeChanged", onDMModeChanged);
     };
   }, [dmRef, project]);
 
   return project && project.id ? (
     <Space size="small">
-      {(project.expert_instruction && mode !== 'explorer') && (
-        <Button size="compact" onClick={() => {
-          modal({
-            title: "Instructions",
-            body: () => <div dangerouslySetInnerHTML={{ __html: project.expert_instruction }}/>,
-          });
-        }}>
+      {project.expert_instruction && mode !== "explorer" && (
+        <Button
+          size="compact"
+          onClick={() => {
+            modal({
+              title: "Instructions",
+              body: () => <div dangerouslySetInnerHTML={{ __html: project.expert_instruction }} />,
+            });
+          }}
+        >
           Instructions
         </Button>
       )}
 
       {Object.entries(links).map(([path, label]) => (
-        <Button
-          key={path}
-          tag={NavLink}
-          size="compact"
-          to={`/projects/${project.id}${path}`}
-          data-external
-        >
+        <Button key={path} tag={NavLink} size="compact" to={`/projects/${project.id}${path}`} data-external>
           {label}
         </Button>
       ))}

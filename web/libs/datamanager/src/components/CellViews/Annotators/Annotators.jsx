@@ -23,7 +23,8 @@ export const Annotators = (cell) => {
         const user = item.user ?? item;
         const { annotated, reviewed, review } = item;
 
-        const userpicIsFaded = (isDefined(annotated) && annotated === false) || (isDefined(reviewed) && reviewed === false);
+        const userpicIsFaded =
+          (isDefined(annotated) && annotated === false) || (isDefined(reviewed) && reviewed === false);
         const suppressStats = column.alias === "comment_authors";
 
         return (
@@ -43,7 +44,7 @@ export const Annotators = (cell) => {
                 badge={{
                   bottomRight: review && (
                     <Block name="userpic-badge" mod={{ [review]: true }}>
-                      {review === 'rejected' ? <LsCrossAlt/> : <LsCheckAlt/>}
+                      {review === "rejected" ? <LsCrossAlt /> : <LsCheckAlt />}
                     </Block>
                   ),
                 }}
@@ -52,13 +53,16 @@ export const Annotators = (cell) => {
           </Elem>
         );
       })}
-      {(extra > 0) && (
-        <Elem name="item" onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          sdk.invoke("userCellCounterClick", e, column.alias, task, userList );
-        }}>
-          <Userpic username={`+${extra}`}/>
+      {extra > 0 && (
+        <Elem
+          name="item"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            sdk.invoke("userCellCounterClick", e, column.alias, task, userList);
+          }}
+        >
+          <Userpic username={`+${extra}`} />
         </Elem>
       )}
     </Block>
@@ -72,25 +76,29 @@ const UsersInjector = inject(({ store }) => {
 });
 
 Annotators.FilterItem = UsersInjector(({ users, item }) => {
-  const user = users.find(u => u.id === item);
+  const user = users.find((u) => u.id === item);
 
   return user ? (
     <Space size="small">
-      <Userpic user={user} size={16} key={`user-${item}`}/>
+      <Userpic user={user} size={16} key={`user-${item}`} />
       {user.displayName}
     </Space>
   ) : null;
 });
 
 Annotators.filterable = true;
-Annotators.customOperators = [{
-  key: "contains",
-  label: "contains",
-  valueType: "list",
-  input: (props) => <VariantSelect {...props}/>,
-}, {
-  key: "not_contains",
-  label: "not contains",
-  valueType: "list",
-  input: (props) => <VariantSelect {...props}/>,
-}, ...Common];
+Annotators.customOperators = [
+  {
+    key: "contains",
+    label: "contains",
+    valueType: "list",
+    input: (props) => <VariantSelect {...props} />,
+  },
+  {
+    key: "not_contains",
+    label: "not contains",
+    valueType: "list",
+    input: (props) => <VariantSelect {...props} />,
+  },
+  ...Common,
+];

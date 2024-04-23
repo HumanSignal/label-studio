@@ -1,6 +1,5 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-const BaseTag = types
-  .model('BaseTag');
+const BaseTag = types.model("BaseTag");
 
 export { BaseTag };

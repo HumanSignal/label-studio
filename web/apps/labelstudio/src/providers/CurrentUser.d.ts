@@ -1,5 +1,5 @@
-import { APIFullUser } from "../../types/User";
+import type { APIFullUser } from "../../types/User";
 
 declare const useCurrentUser: () => {
-  user: APIFullUser,
+  user: APIFullUser;
 };

@@ -1,5 +1,5 @@
-import { types } from 'mobx-state-tree';
-import { ConfigValidator } from './ConfigValidator';
+import { types } from "mobx-state-tree";
+import { ConfigValidator } from "./ConfigValidator";
 
 /**@typedef {(errors: any[]) => void} ErrorCallback */
 
@@ -25,12 +25,12 @@ export const ValidationError = types
     value: types.maybeNull(types.string),
     validType: types.maybeNull(ValidType),
   })
-  .views(self => ({
+  .views((self) => ({
     get identifier() {
       return [self.modelName, self.field, self.error, self.value]
         .concat(...[self.validType])
-        .filter(el => el !== null)
-        .join('-');
+        .filter((el) => el !== null)
+        .join("-");
     },
   }));
 
@@ -64,7 +64,7 @@ export class DataValidator {
     let errors = [];
 
     if (validator) {
-      errors = (validator.validate(data) ?? []).map(compiledError => {
+      errors = (validator.validate(data) ?? []).map((compiledError) => {
         try {
           return ValidationError.create(compiledError);
         } catch (err) {

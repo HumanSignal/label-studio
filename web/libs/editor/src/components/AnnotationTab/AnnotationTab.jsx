@@ -1,12 +1,12 @@
-import { observer } from 'mobx-react';
-import { Block, Elem } from '../../utils/bem';
-import { CurrentEntity } from '../CurrentEntity/CurrentEntity';
-import Entities from '../Entities/Entities';
-import Entity from '../Entity/Entity';
-import Relations from '../Relations/Relations';
-import { Comments } from '../Comments/Comments';
+import { observer } from "mobx-react";
+import { Block, Elem } from "../../utils/bem";
+import { CurrentEntity } from "../CurrentEntity/CurrentEntity";
+import Entities from "../Entities/Entities";
+import Entity from "../Entity/Entity";
+import Relations from "../Relations/Relations";
+import { Comments } from "../Comments/Comments";
 
-import './CommentsSection.styl';
+import "./CommentsSection.styl";
 
 export const AnnotationTab = observer(({ store }) => {
   const as = store.annotationStore;
@@ -16,48 +16,34 @@ export const AnnotationTab = observer(({ store }) => {
 
   return (
     <>
-      {store.hasInterface('annotations:current') && (
+      {store.hasInterface("annotations:current") && (
         <CurrentEntity
           entity={as.selected}
-          showControls={store.hasInterface('controls')}
-          canDelete={store.hasInterface('annotations:delete')}
-          showHistory={store.hasInterface('annotations:history')}
-          showGroundTruth={store.hasInterface('ground-truth')}
+          showControls={store.hasInterface("controls")}
+          canDelete={store.hasInterface("annotations:delete")}
+          showHistory={store.hasInterface("annotations:history")}
+          showGroundTruth={store.hasInterface("ground-truth")}
         />
       )}
 
       {selectionSize ? (
         <Entity store={store} annotation={annotation} />
       ) : hasSegmentation ? (
-        <p style={{ marginTop: 12, marginBottom: 0, paddingInline: 15 }}>
-          No Region selected
-        </p>
+        <p style={{ marginTop: 12, marginBottom: 0, paddingInline: 15 }}>No Region selected</p>
       ) : null}
 
-      {hasSegmentation && (
-        <Entities
-          store={store}
-          annotation={annotation}
-          regionStore={annotation.regionStore}
-        />
-      )}
+      {hasSegmentation && <Entities store={store} annotation={annotation} regionStore={annotation.regionStore} />}
 
-      {hasSegmentation && (
-        <Relations store={store} item={annotation} />
-      )}
+      {hasSegmentation && <Relations store={store} item={annotation} />}
 
-      {store.hasInterface('annotations:comments') && store.commentStore.isCommentable && (
+      {store.hasInterface("annotations:comments") && store.commentStore.isCommentable && (
         <Block name="comments-section">
           <Elem name="header">
             <Elem name="title">Comments</Elem>
           </Elem>
 
           <Elem name="content">
-            <Comments
-              annotationStore={as}
-              commentStore={store.commentStore}
-              cacheKey={`task.${store.task.id}`}
-            />
+            <Comments annotationStore={as} commentStore={store.commentStore} cacheKey={`task.${store.task.id}`} />
           </Elem>
         </Block>
       )}

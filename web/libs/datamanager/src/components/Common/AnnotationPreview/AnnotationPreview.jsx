@@ -8,10 +8,9 @@ import "./AnnotationPreview.styl";
 
 const imgDefaultProps = {};
 
-if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = 'anonymous';
+if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = "anonymous";
 
-const wait = (timeout) =>
-  new Promise((resolve) => setTimeout(resolve, timeout));
+const wait = (timeout) => new Promise((resolve) => setTimeout(resolve, timeout));
 
 class PreviewGenerator {
   static getInstance(labelingConfig) {
@@ -136,11 +135,7 @@ export const AnnotationPreview = injector(
         height={props.height}
       />
     ) : (
-      <Block
-        name="annotation-preview"
-        width={props.width}
-        height={props.height}
-      >
+      <Block name="annotation-preview" width={props.width} height={props.height}>
         <Spinner
           size={props.size ?? "default"}
           style={{

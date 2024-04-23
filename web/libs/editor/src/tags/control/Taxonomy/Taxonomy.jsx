@@ -1,25 +1,25 @@
-import React from 'react';
-import { observer } from 'mobx-react';
-import { flow, getRoot, types } from 'mobx-state-tree';
-import { Spin } from 'antd';
+import React from "react";
+import { observer } from "mobx-react";
+import { flow, getRoot, types } from "mobx-state-tree";
+import { Spin } from "antd";
 
-import Infomodal from '../../../components/Infomodal/Infomodal';
-import { NewTaxonomy } from '../../../components/NewTaxonomy/NewTaxonomy';
-import { Taxonomy } from '../../../components/Taxonomy/Taxonomy';
-import { guidGenerator } from '../../../core/Helpers';
-import Registry from '../../../core/Registry';
-import Tree from '../../../core/Tree';
-import Types from '../../../core/Types';
-import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
-import DynamicChildrenMixin from '../../../mixins/DynamicChildrenMixin';
-import PerItemMixin from '../../../mixins/PerItem';
-import PerRegionMixin from '../../../mixins/PerRegion';
-import { ReadOnlyControlMixin } from '../../../mixins/ReadOnlyMixin';
-import RequiredMixin from '../../../mixins/Required';
-import SelectedChoiceMixin from '../../../mixins/SelectedChoiceMixin';
-import { SharedStoreMixin } from '../../../mixins/SharedChoiceStore/mixin';
-import VisibilityMixin from '../../../mixins/Visibility';
-import { parseValue } from '../../../utils/data';
+import Infomodal from "../../../components/Infomodal/Infomodal";
+import { NewTaxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { Taxonomy } from "../../../components/Taxonomy/Taxonomy";
+import { guidGenerator } from "../../../core/Helpers";
+import Registry from "../../../core/Registry";
+import Tree from "../../../core/Tree";
+import Types from "../../../core/Types";
+import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
+import DynamicChildrenMixin from "../../../mixins/DynamicChildrenMixin";
+import PerItemMixin from "../../../mixins/PerItem";
+import PerRegionMixin from "../../../mixins/PerRegion";
+import { ReadOnlyControlMixin } from "../../../mixins/ReadOnlyMixin";
+import RequiredMixin from "../../../mixins/Required";
+import SelectedChoiceMixin from "../../../mixins/SelectedChoiceMixin";
+import { SharedStoreMixin } from "../../../mixins/SharedChoiceStore/mixin";
+import VisibilityMixin from "../../../mixins/Visibility";
+import { parseValue } from "../../../utils/data";
 import {
   FF_DEV_3617,
   FF_LEAP_218,
@@ -27,14 +27,14 @@ import {
   FF_TAXONOMY_ASYNC,
   FF_TAXONOMY_LABELING,
   FF_TAXONOMY_SELECTED,
-  isFF
-} from '../../../utils/feature-flags';
-import ControlBase from '../Base';
-import ClassificationBase from '../ClassificationBase';
+  isFF,
+} from "../../../utils/feature-flags";
+import ControlBase from "../Base";
+import ClassificationBase from "../ClassificationBase";
 
-import styles from './Taxonomy.styl';
-import messages from '../../../utils/messages';
-import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
+import styles from "./Taxonomy.styl";
+import messages from "../../../utils/messages";
+import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
 
 /**
  * @typedef TaxonomyItem
@@ -89,7 +89,7 @@ import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
  * @param {string} [placeholder=]         - What to display as prompt on the input
  * @param {boolean} [perRegion]           - Use this tag to classify specific regions instead of the whole object
  * @param {boolean} [perItem]             - Use this tag to classify specific items inside the object instead of the whole object[^FF_LSDV_4583]
- * @param {boolean} [legacy]              - Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable.  
+ * @param {boolean} [legacy]              - Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable.
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
@@ -97,14 +97,14 @@ const TagAttrs = types.model({
   leafsonly: types.optional(types.boolean, false),
   showfullpath: types.optional(types.boolean, false),
   legacy: types.optional(types.boolean, false),
-  pathseparator: types.optional(types.string, ' / '),
+  pathseparator: types.optional(types.string, " / "),
   apiurl: types.maybeNull(types.string),
-  placeholder: '',
+  placeholder: "",
   minwidth: types.maybeNull(types.string),
   maxwidth: types.maybeNull(types.string),
   dropdownwidth: types.maybeNull(types.string),
   maxusages: types.maybeNull(types.string),
-  value: types.optional(types.string, ''),
+  value: types.optional(types.string, ""),
 });
 
 function traverse(root) {
@@ -121,7 +121,7 @@ function traverse(root) {
     return result;
   };
 
-  const visitNode = function(node, parents = []) {
+  const visitNode = (node, parents = []) => {
     const label = node.value;
     const hint = node.hint;
     const path = [...parents, node.alias ?? label];
@@ -149,14 +149,14 @@ const ChildrenSnapshots = new Map();
  */
 const TaxonomyLabelingResult = types
   .model({})
-  .views(self => ({
+  .views((self) => ({
     get result() {
       // @todo make it without duplication of ClassificationBase code
       if (!self.isLabeling && !self.perregion) {
         if (self.peritem) {
           return self._perItemResult;
         }
-        return self.annotation.results.find(r => r.from_name === self);
+        return self.annotation.results.find((r) => r.from_name === self);
       }
 
       // per-region Taxonomy and Taxonomy as a labeling tool share the same way to find a result,
@@ -165,14 +165,14 @@ const TaxonomyLabelingResult = types
 
       if (!area) return null;
 
-      return self.annotation.results.find(r => r.from_name === self && r.area === area);
+      return self.annotation.results.find((r) => r.from_name === self && r.area === area);
     },
     get canRemoveItems() {
       if (!self.isLabeling) return true;
       return !self.result;
     },
   }))
-  .actions(self => {
+  .actions((self) => {
     const Super = {
       updateResult: self.updateResult,
     };
@@ -190,12 +190,12 @@ const TaxonomyLabelingResult = types
        * @returns quazi-label object to act as Label in most places
        */
       findLabel(path) {
-        let title = '';
+        let title = "";
         let items = self.items;
         let item;
 
         for (const value of path) {
-          item = items?.find(item => item.path.at(-1) === value);
+          item = items?.find((item) => item.path.at(-1) === value);
 
           if (!item) return null;
 
@@ -220,28 +220,32 @@ const Model = types
   .model({
     pid: types.optional(types.string, guidGenerator),
 
-    type: 'taxonomy',
-    [isFF(FF_DEV_3617) ? '_children' : 'children']: Types.unionArray(['choice']),
+    type: "taxonomy",
+    [isFF(FF_DEV_3617) ? "_children" : "children"]: Types.unionArray(["choice"]),
   })
   .volatile(() => ({
     maxUsagesReached: false,
     selected: [],
     loading: true,
-    _api: '', // will be filled after the first load in updateValue()
+    _api: "", // will be filled after the first load in updateValue()
     _items: [], // items loaded via API
   }))
-  .views(self => isFF(FF_DEV_3617) ? ({
-    get children() {
-      return self._children;
-    },
-    set children(val) {
-      self._children = val;
-    },
-    get isLabeling() {
-      return isFF(FF_TAXONOMY_LABELING) && self.labeling;
-    },
-  }) : ({}))
-  .views(self => ({
+  .views((self) =>
+    isFF(FF_DEV_3617)
+      ? {
+          get children() {
+            return self._children;
+          },
+          set children(val) {
+            self._children = val;
+          },
+          get isLabeling() {
+            return isFF(FF_TAXONOMY_LABELING) && self.labeling;
+          },
+        }
+      : {},
+  )
+  .views((self) => ({
     get userLabels() {
       return self.annotation.store.userLabels;
     },
@@ -259,15 +263,15 @@ const Model = types
     },
 
     get valueType() {
-      return 'taxonomy';
+      return "taxonomy";
     },
 
     get tiedChildren() {
-      return Tree.filterChildrenOfType(self, 'ChoiceModel');
+      return Tree.filterChildrenOfType(self, "ChoiceModel");
     },
 
     get preselectedValues() {
-      return self.tiedChildren.filter(c => c.selected === true && !c.isSkipped).map(c => c.resultValue);
+      return self.tiedChildren.filter((c) => c.selected === true && !c.isSkipped).map((c) => c.resultValue);
     },
 
     get isLoadedByApi() {
@@ -286,7 +290,7 @@ const Model = types
         const lastIndex = path.length - 1;
 
         for (let depth = 0; depth < lastIndex; depth++) {
-          current = current.children?.find(item => item.label === path[depth]);
+          current = current.children?.find((item) => item.label === path[depth]);
           if (!current) break;
         }
 
@@ -300,13 +304,13 @@ const Model = types
     },
 
     get selectedItems() {
-      const full = self.selected.map(path => {
+      const full = self.selected.map((path) => {
         /** @type {TaxonomyItem[]} items */
         let items = self.items;
         const levels = [];
 
         for (const value of path) {
-          const item = items.find(item => item.path.at(-1) === value);
+          const item = items.find((item) => item.path.at(-1) === value);
 
           levels.push({ label: item?.label ?? value, value });
           items = item?.children ?? [];
@@ -319,7 +323,7 @@ const Model = types
     },
 
     get defaultChildType() {
-      return 'choice';
+      return "choice";
     },
 
     selectedValues() {
@@ -354,7 +358,7 @@ const Model = types
       return findItem(self.items);
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterAttach() {
       // we are not mixing items from API with other kinds of items
       if (self.isLoadedByApi) return;
@@ -379,7 +383,7 @@ const Model = types
      * Load items from `apiUrl` and set them indirectly to `items` (via `_items`)
      * @param {string[]} path to load nested items by this path
      */
-    loadItems: flow(function * (path) {
+    loadItems: flow(function* (path) {
       if (!self._api) return;
       let requestOptions = {};
 
@@ -391,7 +395,7 @@ const Model = types
       if (path) {
         item = { children: self.items };
         for (const level of path) {
-          item = item.children?.find(ch => ch.path.at(-1) === level);
+          item = item.children?.find((ch) => ch.path.at(-1) === level);
           if (!item) return;
         }
       }
@@ -405,17 +409,17 @@ const Model = types
       // build url with `path` as array (path ['A', 'BC'] => path=A&path=BC)
       const url = new URL(self._api);
 
-      path?.forEach(p => url.searchParams.append('path', p));
+      path?.forEach((p) => url.searchParams.append("path", p));
 
       if (url.username && url.password) {
         requestOptions = {
           headers: new Headers({
-            'Authorization': `Basic ${btoa(`${url.username}:${url.password}`)}`,
+            Authorization: `Basic ${btoa(`${url.username}:${url.password}`)}`,
           }),
         };
 
-        url.username = '';
-        url.password = '';
+        url.username = "";
+        url.password = "";
       }
 
       try {
@@ -429,13 +433,14 @@ const Model = types
         const data = dataRaw.items ?? dataRaw;
         const prefix = path ?? [];
         // recursive convertor to internal format
-        const convert = (items, path) => items.map(({ alias, children, isLeaf, value, ...rest }) => {
-          const item = { label: value, path: [...path, alias ?? value], depth: path.length, isLeaf, ...rest };
+        const convert = (items, path) =>
+          items.map(({ alias, children, isLeaf, value, ...rest }) => {
+            const item = { label: value, path: [...path, alias ?? value], depth: path.length, isLeaf, ...rest };
 
-          if (children) item.children = convert(children, item.path);
+            if (children) item.children = convert(children, item.path);
 
-          return item;
-        });
+            return item;
+          });
         const items = convert(data, prefix);
 
         if (path) {
@@ -445,7 +450,7 @@ const Model = types
           self._items = items;
         }
       } catch (err) {
-        const message = messages.ERR_LOADING_HTTP({ attr: 'apiUrl', error: String(err), url: self.apiurl });
+        const message = messages.ERR_LOADING_HTTP({ attr: "apiUrl", error: String(err), url: self.apiurl });
 
         self.annotationStore.addErrors([errorBuilder.generalError(message)]);
 
@@ -466,8 +471,8 @@ const Model = types
         const root = getRoot(self);
         // SharedChoiceStore doesn't call `updateValue()` because it's annotation agnostic,
         // so call it here right after Taxonomy is attached
-        const updateChildrenValue = children => {
-          children?.map(child => {
+        const updateChildrenValue = (children) => {
+          children?.map((child) => {
             child.updateValue?.(root);
             updateChildrenValue(child.children);
           });
@@ -503,7 +508,7 @@ const Model = types
       // should be checked only for Taxonomy as labbeling tool
       if (self.canRemoveItems === false && !checked.length) return;
 
-      self.selected = checked.map(s => s.path ?? s);
+      self.selected = checked.map((s) => s.path ?? s);
       self.maxUsagesReached = self.selected.length >= self.maxusages;
       self.updateResult();
     },
@@ -519,8 +524,8 @@ const Model = types
     onDeleteLabel(path) {
       self.userLabels?.deleteLabel(self.name, path);
     },
-
-  })).actions(self => {
+  }))
+  .actions((self) => {
     const Super = {
       validate: self.validate,
     };
@@ -532,11 +537,13 @@ const Model = types
 
       beforeSend() {
         if (self.maxusages && self.selected.length > self.maxusages)
-          Infomodal.warning(`The number of options selected (${self.selected.length}) exceed the maximum allowed (${self.maxusages}). To proceed, first unselect excess options for:\r\n • Taxonomy (${self.name})`);
+          Infomodal.warning(
+            `The number of options selected (${self.selected.length}) exceed the maximum allowed (${self.maxusages}). To proceed, first unselect excess options for:\r\n • Taxonomy (${self.name})`,
+          );
       },
     };
   })
-  .actions(self => {
+  .actions((self) => {
     const Super = {
       updateValue: self.updateValue,
     };
@@ -547,7 +554,7 @@ const Model = types
        * Will store correct api url and load items from it.
        * Also used for Dynamic Children.
        */
-      updateValue: flow(function * (store) {
+      updateValue: flow(function* (store) {
         if (!self.isLoadedByApi) return Super.updateValue?.(store);
 
         self._api = parseValue(self.apiurl, store.task.dataObj);
@@ -573,7 +580,8 @@ const Model = types
     return sn;
   });
 
-const TaxonomyModel = types.compose('TaxonomyModel',
+const TaxonomyModel = types.compose(
+  "TaxonomyModel",
   ControlBase,
   ClassificationBase,
   TagAttrs,
@@ -592,12 +600,10 @@ const TaxonomyModel = types.compose('TaxonomyModel',
 
 const HtxTaxonomy = observer(({ item }) => {
   // literal "taxonomy" class name is for external styling
-  const className = [
-    styles.taxonomy,
-    'taxonomy',
-    isFF(FF_TAXONOMY_ASYNC) ? styles.taxonomy__new : '',
-  ].filter(Boolean).join(' ');
-  const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: 'none' };
+  const className = [styles.taxonomy, "taxonomy", isFF(FF_TAXONOMY_ASYNC) ? styles.taxonomy__new : ""]
+    .filter(Boolean)
+    .join(" ");
+  const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: "none" };
   const options = {
     showFullPath: item.showfullpath,
     leafsOnly: item.leafsonly,
@@ -619,7 +625,7 @@ const HtxTaxonomy = observer(({ item }) => {
     return (
       <div className={className} style={visibleStyle}>
         <div className={styles.taxonomy__loading}>
-          <Spin size="small"/>
+          <Spin size="small" />
         </div>
       </div>
     );
@@ -627,7 +633,7 @@ const HtxTaxonomy = observer(({ item }) => {
 
   return (
     <div className={className} style={visibleStyle}>
-      {(isFF(FF_TAXONOMY_ASYNC) && !item.legacy) ? (
+      {isFF(FF_TAXONOMY_ASYNC) && !item.legacy ? (
         <NewTaxonomy
           items={item.items}
           selected={item.selectedItems}
@@ -654,6 +660,6 @@ const HtxTaxonomy = observer(({ item }) => {
   );
 });
 
-Registry.addTag('taxonomy', TaxonomyModel, HtxTaxonomy);
+Registry.addTag("taxonomy", TaxonomyModel, HtxTaxonomy);
 
 export { HtxTaxonomy, TaxonomyModel, TagAttrs };

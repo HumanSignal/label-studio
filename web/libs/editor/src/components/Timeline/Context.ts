@@ -1,5 +1,5 @@
-import { createContext } from 'react';
-import { TimelineContextValue } from './Types';
+import { createContext } from "react";
+import type { TimelineContextValue } from "./Types";
 
 export const TimelineContext = createContext<TimelineContextValue>({
   position: 0,

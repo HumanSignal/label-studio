@@ -7,11 +7,7 @@ import { debounce } from "../../utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
 
-const operatorNames = Array.from(
-  new Set(
-    [].concat(...Object.values(Filters).map((f) => f.map((op) => op.key))),
-  ),
-);
+const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
 
 const Operators = types.enumeration(operatorNames);
 
@@ -56,8 +52,7 @@ export const TabFilter = types
     },
 
     get componentValueType() {
-      return self.component?.find(({ key }) => key === self.operator)
-        ?.valueType;
+      return self.component?.find(({ key }) => key === self.operator)?.valueType;
     },
 
     get target() {
@@ -164,7 +159,7 @@ export const TabFilter = types
       self.view.deleteFilter(self);
     },
 
-    save: flow(function * (force = false) {
+    save: flow(function* (force = false) {
       const isValid = self.isValidFilter;
 
       if (force !== true) {
@@ -185,9 +180,7 @@ export const TabFilter = types
     }),
 
     setDefaultValue() {
-      self.setValue(
-        getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue,
-      );
+      self.setValue(getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue);
     },
 
     setValueDelayed(value) {
@@ -206,6 +199,7 @@ export const TabFilter = types
     saveDelayed: debounce(() => {
       self.save();
     }, 300),
-  })).preProcessSnapshot((sn) => {
+  }))
+  .preProcessSnapshot((sn) => {
     return { ...sn, value: sn.value ?? null };
   });

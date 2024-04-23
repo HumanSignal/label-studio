@@ -1,19 +1,19 @@
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { type MutableRefObject, useEffect, useRef, useState } from "react";
 
-import { isTimeRelativelySimilar } from '../Common/Utils';
-import { Layer } from '../Visual/Layer';
-import { Waveform, WaveformOptions } from '../Waveform';
+import { isTimeRelativelySimilar } from "../Common/Utils";
+import type { Layer } from "../Visual/Layer";
+import { Waveform, type WaveformOptions } from "../Waveform";
 
 export const useWaveform = (
   containter: MutableRefObject<HTMLElement | null | undefined>,
-  options: Omit<WaveformOptions, 'container'> & {
-    onLoad?: (wf: Waveform) => void,
-    onSeek?: (time: number) => void,
-    onPlaying?: (playing: boolean) => void,
-    onRateChange?: (rate: number) => void,
-    onError?: (error: Error) => void,
-    autoLoad?: boolean,
-    showLabels?: boolean,
+  options: Omit<WaveformOptions, "container"> & {
+    onLoad?: (wf: Waveform) => void;
+    onSeek?: (time: number) => void;
+    onPlaying?: (playing: boolean) => void;
+    onRateChange?: (rate: number) => void;
+    onError?: (error: Error) => void;
+    autoLoad?: boolean;
+    showLabels?: boolean;
   },
 ) => {
   const waveform = useRef<Waveform>();
@@ -39,39 +39,39 @@ export const useWaveform = (
       wf.load();
     }
 
-    wf.on('load', () => {
+    wf.on("load", () => {
       options?.onLoad?.(wf);
     });
-    wf.on('play', () => {
+    wf.on("play", () => {
       setPlaying(true);
     });
-    wf.on('pause', () => {
+    wf.on("pause", () => {
       setPlaying(false);
     });
-    wf.on('error', (error) => {
+    wf.on("error", (error) => {
       options?.onError?.(error);
     });
-    wf.on('playing', (time: number) => {
+    wf.on("playing", (time: number) => {
       if (playing && !isTimeRelativelySimilar(time, currentTime, duration)) {
         options?.onSeek?.(time);
       }
       setCurrentTime(time);
     });
-    wf.on('seek', (time: number) => {
+    wf.on("seek", (time: number) => {
       if (!isTimeRelativelySimilar(time, currentTime, duration)) {
         options?.onSeek?.(time);
         setCurrentTime(time);
       }
     });
-    wf.on('zoom', setZoom);
-    wf.on('muted', setMuted);
-    wf.on('durationChanged', setDuration);
-    wf.on('volumeChanged', setVolume);
-    wf.on('rateChanged', (newRate) => {
+    wf.on("zoom", setZoom);
+    wf.on("muted", setMuted);
+    wf.on("durationChanged", setDuration);
+    wf.on("volumeChanged", setVolume);
+    wf.on("rateChanged", (newRate) => {
       options?.onRateChange?.(newRate);
       setRate(newRate);
     });
-    wf.on('layersUpdated', (layers) => {
+    wf.on("layersUpdated", (layers) => {
       const layersArray = [];
       const layerVis = new Map();
 
