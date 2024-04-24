@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-947/wrong-task-suggestions'",
-  "commit": "c045329afafb47a3f94c68aa7610ef5d18603cb8",
-  "date": "2024-04-22T23:35:48.000Z",
-  "branch": "fb-leap-947/wrong-task-suggestions"
+  "message": "fix: LEAP-921: Fix the way of updating users in store",
+  "commit": "831427864bbd70e32a598c21a7c07a1983a630c8",
+  "date": "2024-04-24T13:06:36.000Z",
+  "branch": "fb-leap-921/annotation-history"
 }
