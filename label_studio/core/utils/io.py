@@ -146,7 +146,7 @@ def path_to_open_binary_file(filepath) -> io.BufferedReader:
     Copy the file at filepath to a named temporary file and return that file object.
     Unusually, this function deliberately doesn't close the file; the caller is responsible for this.
     """
-    tmp = NamedTemporaryFile(delete=True)
+    tmp = NamedTemporaryFile()
     shutil.copy2(filepath, tmp.name)
     return tmp
 
