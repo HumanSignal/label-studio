@@ -798,11 +798,17 @@ export default types
       self.suggestionsRequest = requestId;
 
       self.setFlags({ awaitingSuggestions: true });
-      const response = yield request;
 
-      if (requestId === self.suggestionsRequest) {
-        self.annotationStore.selected.setSuggestions(dataParser(response));
+      try {
+        const response = yield request;
+
+        if (requestId === self.suggestionsRequest) {
+          self.annotationStore.selected.setSuggestions(dataParser(response));
+          self.setFlags({ awaitingSuggestions: false });
+        }
+      } catch(e) {
         self.setFlags({ awaitingSuggestions: false });
+        // @todo handle errors + situation when task is changed
       }
     });
 
