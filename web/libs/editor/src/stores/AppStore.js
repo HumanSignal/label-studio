@@ -871,9 +871,7 @@ export default types
         oldUsersMap[user.id] = user;
       });
       const newUsers = users.map(user => {
-        const oldUser = oldUsersMap[user.id];
-
-        return oldUser ? { ...oldUser, ...user } : user;
+        return { ...oldUsersMap[user.id], ...user };
       });
       self.setUsers(uniqBy([...newUsers, ...oldUsers], 'id'));
     }
