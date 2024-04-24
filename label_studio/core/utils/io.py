@@ -8,7 +8,7 @@ import os
 import shutil
 import socket
 from contextlib import contextmanager
-from tempfile import NamedTemporaryFile, mkdtemp, mkstemp
+from tempfile import mkdtemp, mkstemp
 
 import pkg_resources
 import requests
@@ -16,6 +16,7 @@ import ujson as json
 import yaml
 from appdirs import user_cache_dir, user_config_dir, user_data_dir
 from django.conf import settings
+from django.core.files.temp import NamedTemporaryFile
 from urllib3.util import parse_url
 
 # full path import results in unit test failures
