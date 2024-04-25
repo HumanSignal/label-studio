@@ -420,7 +420,7 @@ def test_start_training_webhook(setup_project_dialog, ml_start_training_webhook,
 
     webhook = ml_start_training_webhook
     project = webhook.project
-    ml = MLBackend.objects.create(project=project, url="http://localhost:9090")
+    ml = MLBackend.objects.create(project=project, url='http://0.0.0.0:9090')
 
     # Mock the POST request to the ML backend train endpoint
     with requests_mock.Mocker(real_http=True) as m:
@@ -438,5 +438,5 @@ def test_start_training_webhook(setup_project_dialog, ml_start_training_webhook,
     assert request_history[0].url == webhook.url
     assert request_history[0].json() == {
         'action': 'START_TRAINING',
-        'project': {'id': project.id, 'title': project.title, 'description': project.description}
+        'project': {'id': project.id, 'title': project.title, 'description': project.description},
     }
