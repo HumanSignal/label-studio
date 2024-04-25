@@ -31,6 +31,15 @@ def project_webhook(configured_project):
         url=uri,
     )
 
+@pytest.fixture
+def ml_start_training_webhook(configured_project):
+    organization = configured_project.organization
+    uri = 'http://0.0.0.0:9090/webhook'
+    return Webhook.objects.create(
+        organization=organization,
+        project=configured_project,
+        url=uri,
+    )
 
 @pytest.mark.django_db
 def test_run_webhook(setup_project_dialog, organization_webhook):
@@ -393,7 +402,7 @@ def test_webhooks_for_tasks_from_storages(configured_project, business_client, o
 
 
 @pytest.mark.django_db
-def test_start_training_webhook(setup_project_dialog, project_webhook, business_client):
+def test_start_training_webhook(setup_project_dialog, ml_start_training_webhook, business_client):
     """
     1. Setup: The test uses the project_webhook fixture, which assumes that a webhook
     is already configured for the project.
@@ -409,12 +418,9 @@ def test_start_training_webhook(setup_project_dialog, project_webhook, business_
     """
     from ml.models import MLBackend
 
-    webhook = project_webhook
+    webhook = ml_start_training_webhook
     project = webhook.project
-    ml = MLBackend.objects.create(
-        project=project,
-        url="http://localhost:9090"
-    )
+    ml = MLBackend.objects.create(project=project, url="http://localhost:9090")
 
     # Mock the POST request to the ML backend train endpoint
     with requests_mock.Mocker(real_http=True) as m:
@@ -432,9 +438,5 @@ def test_start_training_webhook(setup_project_dialog, project_webhook, business_
     assert request_history[0].url == webhook.url
     assert request_history[0].json() == {
         'action': 'START_TRAINING',
-        'project': {
-            'id': project.id,
-            'title': project.title,
-            'description': project.description
-        }
+        'project': {'id': project.id, 'title': project.title, 'description': project.description}
     }
