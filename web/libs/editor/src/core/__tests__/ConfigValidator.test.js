@@ -82,7 +82,7 @@ it('Should fail if color is not a proper CSS color', () => {
 });
 
 
-it('Should fail if visual tags have name attribute', () => {
+it.skip('Should fail if visual tags have name attribute', () => {
   const result = ConfigValidator.validate(Tree.treeToModel(`
     <View>
       <Header name="w3"/>

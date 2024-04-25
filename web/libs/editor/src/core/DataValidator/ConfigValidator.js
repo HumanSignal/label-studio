@@ -316,11 +316,6 @@ export class ConfigValidator {
 
         if (parentValidation !== null) validationResult.push(parentValidation);
 
-        // Validate visual tags
-        const visualTagsValidation = validateVisualTags(child);
-
-        if (visualTagsValidation !== null) validationResult.push(visualTagsValidation);
-
         validationResult.push(...validatePerRegion(child));
 
         validationResult.push(...validateAttributes(child, model, propertiesToSkip));
