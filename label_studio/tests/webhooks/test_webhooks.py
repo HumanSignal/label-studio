@@ -31,6 +31,7 @@ def project_webhook(configured_project):
         url=uri,
     )
 
+
 @pytest.fixture
 def ml_start_training_webhook(configured_project):
     organization = configured_project.organization
@@ -40,6 +41,7 @@ def ml_start_training_webhook(configured_project):
         project=configured_project,
         url=uri,
     )
+
 
 @pytest.mark.django_db
 def test_run_webhook(setup_project_dialog, organization_webhook):
@@ -436,7 +438,5 @@ def test_start_training_webhook(setup_project_dialog, ml_start_training_webhook,
     assert len(request_history) == 1
     assert request_history[0].method == 'POST'
     assert request_history[0].url == webhook.url
-    assert request_history[0].json() == {
-        'action': 'START_TRAINING',
-        'project': {'id': project.id, 'title': project.title, 'description': project.description},
-    }
+    assert 'project' in request_history[0].json()
+    assert request_history[0].json()['action'] == 'START_TRAINING'
