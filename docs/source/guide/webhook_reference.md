@@ -714,11 +714,22 @@ You must [enable organization-level webhooks](webhooks.html#Enable-organization-
 
 ### Start Training 
 
+This webhook is triggered when a user clicks `Start Training` button on the ML Model card in the Project Settings page.
+This event will be sent to the ML Backend and can be caught in the model.fit(event, ...) method:
+
+```
+class MyModel(LabelStudioMLBase):
+  def fit(self, event, *args, **kwargs):
+    if event == 'START_TRAINING': 
+      ...
+```
+
 ### Webhook payload details
 
-| Key | Type | Description                                         |
-| --- | --- |-----------------------------------------------------| 
-| action | string | Name of the action. In this case, `START_TRAINING`. | 
-| id | integer | ID of the project where training is started.        | 
+| Key | Type | Description                           |
+| --- | --- |---------------------------------------| 
+| action | string | Name of the action: `START_TRAINING`. | 
+| id | integer | ID of the project where training is started. |
+| project | JSON dictionary | All fields related to the project that was updated. See the [API documentation for updating a project](/api#operation/api_projects_partial_update). |
 
 
