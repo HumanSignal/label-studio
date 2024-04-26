@@ -14,9 +14,8 @@ const formatNumber = (num) => {
 
   if (num % 1 === 0) {
     return number;
-  } else {
-    return number.toFixed(2);
   }
+  return number.toFixed(2);
 };
 
 export const Agreement = (column) => {

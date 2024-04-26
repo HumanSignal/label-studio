@@ -163,9 +163,8 @@ Select.Option = ({ value, children, style }) => {
 
     if (multiple) {
       return currentValue.map((v) => String(v)).includes(option);
-    } else {
-      return option === String(currentValue);
     }
+    return option === String(currentValue);
   }, [value, focused, currentValue]);
 
   const isFocused = useMemo(() => {

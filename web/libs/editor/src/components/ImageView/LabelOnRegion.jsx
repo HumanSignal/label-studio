@@ -50,9 +50,8 @@ const LabelOnBbox = ({
 
     if (currentTextWidth > textMaxWidth) {
       return textMaxWidth;
-    } else {
-      return null;
     }
+    return null;
   }, [textEl, text, maxWidth, scale]);
 
   const tagSceneFunc = useCallback(

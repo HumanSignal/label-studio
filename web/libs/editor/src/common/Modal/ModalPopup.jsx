@@ -148,9 +148,8 @@ export class Modal extends Component {
       const Content = this.state.body;
 
       return Content instanceof Function ? <Content /> : Content;
-    } else {
-      return this.props.children;
     }
+    return this.props.children;
   }
 }
 

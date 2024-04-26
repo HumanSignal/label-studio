@@ -201,7 +201,8 @@ const Result = types
 
       if (control.visiblewhen === "choice-selected") {
         return isChoiceSelected();
-      } else if (control.visiblewhen === "choice-unselected") {
+      }
+      if (control.visiblewhen === "choice-unselected") {
         return !isChoiceSelected();
       }
 

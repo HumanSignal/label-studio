@@ -72,7 +72,7 @@ class HtxParagraphsView extends Component {
     }
     // if the selection is made to the very beginning of the next phrase, we need to
     // move the offset to the end of the previous phrase
-    else if (!isStart && fullOffset === 0) {
+    if (!isStart && fullOffset === 0) {
       phraseNode = this.phraseElements[phraseIndex - 1];
       return [phraseNode.textContent.length, phraseNode, phraseIndex - 1, phraseIndex];
     }

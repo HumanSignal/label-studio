@@ -342,7 +342,7 @@ const findIdxContainer = (el, globidx) => {
 
     if (node.nodeName === "#text") {
       if (len - node.length <= 0) return node;
-      else len = len - node.length;
+      len = len - node.length;
     } else if (node.nodeName === "BR") {
       len = len - 1;
     } else if (node.childNodes.length > 0) {

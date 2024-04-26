@@ -39,9 +39,11 @@ const renderLabels = (element) => {
 const renderResult = (result) => {
   if (result.type.endsWith("labels")) {
     return renderLabels(result);
-  } else if (result.type === "rating") {
+  }
+  if (result.type === "rating") {
     return <Paragraph>Rating: {result.mainValue}</Paragraph>;
-  } else if (
+  }
+  if (
     result.type === "textarea" &&
     !(result.from_name.perregion && result.from_name.displaymode === PER_REGION_MODES.REGION_LIST)
   ) {
@@ -53,7 +55,8 @@ const renderResult = (result) => {
         </Text>
       </Paragraph>
     );
-  } else if (result.type === "choices") {
+  }
+  if (result.type === "choices") {
     return <Paragraph>Choices: {result.mainValue.join(", ")}</Paragraph>;
   }
 

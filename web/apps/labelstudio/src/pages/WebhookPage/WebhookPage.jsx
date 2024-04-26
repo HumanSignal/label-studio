@@ -25,12 +25,10 @@ const Webhook = () => {
     if (history.location.pathname.startsWith("/projects")) {
       if (Object.keys(project).length === 0) {
         return null;
-      } else {
-        return project.id;
       }
-    } else {
-      return undefined;
+      return project.id;
     }
+    return undefined;
   }, [project, history]);
 
   console.log(projectId, history.location.pathname);

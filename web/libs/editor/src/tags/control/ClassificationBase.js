@@ -62,11 +62,11 @@ const ClassificationBase = types
       validate() {
         if (self.perregion) {
           return self._validatePerRegion();
-        } else if (self.peritem && isFF(FF_LSDV_4583)) {
-          return self._validatePerItem();
-        } else {
-          return self._validatePerObject();
         }
+        if (self.peritem && isFF(FF_LSDV_4583)) {
+          return self._validatePerItem();
+        }
+        return self._validatePerObject();
       },
       /**
        * Validates the value.

@@ -85,7 +85,6 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noUselessElse": "off",
         "noVar": "off",
         "useBlockStatements": "off",
         "useConsistentArrayType": "off",

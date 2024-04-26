@@ -198,12 +198,11 @@ export default class Form extends React.Component {
 
     if (asJSON) {
       return requestBody.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
-    } else {
-      const formData = new FormData();
-
-      requestBody.forEach(([key, value]) => formData.append(key, value));
-      return formData;
     }
+    const formData = new FormData();
+
+    requestBody.forEach(([key, value]) => formData.append(key, value));
+    return formData;
   }
 
   async submit({ fieldsFilter } = {}) {
@@ -246,10 +245,9 @@ export default class Form extends React.Component {
     if (response === null) {
       this.props.onError?.();
       return false;
-    } else {
-      this.props.onSubmit?.(response);
-      return true;
     }
+    this.props.onSubmit?.(response);
+    return true;
   }
 
   async submitWithFetch(body) {
@@ -279,9 +277,8 @@ export default class Form extends React.Component {
       if (response.ok) {
         this.props.onSubmit?.(result);
         return true;
-      } else {
-        this.props.onError?.(result);
       }
+      this.props.onError?.(result);
     } catch (err) {
       console.log(err);
       this.props.onError?.(err);

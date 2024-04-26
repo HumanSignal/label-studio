@@ -326,28 +326,27 @@ const PolygonPointView = observer(({ item, name }) => {
         draggable={!item.parent.isReadOnly() && draggable}
       />
     );
-  } else {
-    return (
-      <Rect
-        name={name}
-        key={name}
-        x={item.x - w / 2}
-        y={item.y - w / 2}
-        width={w}
-        height={w}
-        fill={fill}
-        stroke="black"
-        strokeWidth={stroke[item.size]}
-        strokeScaleEnabled={false}
-        perfectDrawEnabled={false}
-        shadowForStrokeEnabled={false}
-        dragOnTop={false}
-        {...dragOpts}
-        {...startPointAttr}
-        draggable={!item.parent.isReadOnly()}
-      />
-    );
   }
+  return (
+    <Rect
+      name={name}
+      key={name}
+      x={item.x - w / 2}
+      y={item.y - w / 2}
+      width={w}
+      height={w}
+      fill={fill}
+      stroke="black"
+      strokeWidth={stroke[item.size]}
+      strokeScaleEnabled={false}
+      perfectDrawEnabled={false}
+      shadowForStrokeEnabled={false}
+      dragOnTop={false}
+      {...dragOpts}
+      {...startPointAttr}
+      draggable={!item.parent.isReadOnly()}
+    />
+  );
 });
 
 export { PolygonPoint, PolygonPointView };
