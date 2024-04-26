@@ -14,6 +14,7 @@ import { EventInvoker } from './utils/events';
 import { FF_LSDV_4620_3_ML, isFF } from './utils/feature-flags';
 import { cleanDomAfterReact, findReactKey } from './utils/reactCleaner';
 import { isDefined } from './utils/utilities';
+import Hotkeys from './components/Hotkeys/Hotkeys';
 
 declare global {
   interface Window { Htx: any }
@@ -158,6 +159,7 @@ export class LabelStudio {
         this.store.selfDestroy();
       }
       destroy(this.store);
+      Hotkey.unbindAll();
       if (isFF(FF_LSDV_4620_3_ML)) {
         /*
             ...
