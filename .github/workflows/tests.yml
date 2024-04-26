@@ -28,7 +28,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
-      collect_analytics: true
+      COLLECT_ANALYTICS: true
       DEBUG_CONTEXTLOG: true
       LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
@@ -88,7 +88,7 @@ jobs:
       PYTHONPATH: .
       LOG_LEVEL: ERROR
       LOG_DIR: pytest_logs
-      collect_analytics: true
+      COLLECT_ANALYTICS: true
       DEBUG_CONTEXTLOG: true
       LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
@@ -188,7 +188,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
-      collect_analytics: true
+      COLLECT_ANALYTICS: true
       DEBUG_CONTEXTLOG: true
       LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-windows-sqlite
@@ -235,6 +235,6 @@ jobs:
 
       - name: Test with pytest
         env:
-          collect_analytics: 0
+          COLLECT_ANALYTICS: 0
         working-directory: label_studio
         run: poetry run pytest -vv -n auto
