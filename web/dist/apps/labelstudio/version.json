@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1036: Revert validation on attr name",
-  "commit": "5d7bfb6bea01f7948958f465b2057288f7d67e9d",
-  "date": "2024-04-25T15:15:25.000Z",
-  "branch": "fb-leap-1036"
+  "message": "fix: LEAP-851: Fix security vulnerability",
+  "commit": "dd14625d13f2b529878e1ba972c2a48da9158105",
+  "date": "2024-04-26T19:07:41.000Z",
+  "branch": "fb-leap-851"
 }
