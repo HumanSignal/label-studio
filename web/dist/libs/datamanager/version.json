@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1036: Revert validation on attr name",
-  "commit": "5d7bfb6bea01f7948958f465b2057288f7d67e9d",
-  "date": "2024-04-25T15:15:25.000Z",
-  "branch": "fb-leap-1036"
+  "message": "Merge branch 'develop' into fb-dia-989/hotkeys-stuck",
+  "commit": "36c467cfe5b9818429e1fa0335506988fc8e883f",
+  "date": "2024-04-26T14:18:03.000Z",
+  "branch": "fb-dia-989/hotkeys-stuck"
 }
