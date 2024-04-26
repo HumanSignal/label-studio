@@ -40,7 +40,7 @@ const TimelineComponent: FC<TimelineProps> = ({
   const [seekVisibleWidth, setSeekVisibleWidth] = useState(0);
   const [viewCollapsed, setViewCollapsed] = useLocalStorageState("video-timeline", false, {
     fromString(value) {
-      return value === "true" ? true : false;
+      return value === "true";
     },
     toString(value) {
       return String(value);

@@ -55,7 +55,7 @@ const _Tool = types
     group: "segmentation",
     shortcut: "B",
     smart: true,
-    unselectRegionOnToolChange: isFF(FF_DEV_4081) ? false : true,
+    unselectRegionOnToolChange: !isFF(FF_DEV_4081),
   })
   .volatile(() => ({
     canInteractWithRegions: false,
