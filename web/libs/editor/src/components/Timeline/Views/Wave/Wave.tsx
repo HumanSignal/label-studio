@@ -56,7 +56,7 @@ export const Wave: FC<TimelineViewProps> = ({
   const [loading, setLoading] = useState(true);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [scale, setScale] = useState(parseInt(data.defaultscale, 10) || 1);
+  const [scale, setScale] = useState(Number.parseInt(data.defaultscale, 10) || 1);
   const storedPosition = useRef({
     zoom: currentZoom,
     scroll: scrollOffset,

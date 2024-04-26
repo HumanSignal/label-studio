@@ -25,7 +25,7 @@ const Counter = ({
   defaultValue,
   ...props
 }) => {
-  const [min, max] = [props.min ?? -Infinity, props.max ?? Infinity];
+  const [min, max] = [props.min ?? Number.NEGATIVE_INFINITY, props.max ?? Number.POSITIVE_INFINITY];
 
   const normalizeValue = (value) => {
     const val = Number(String(value).replace(` ${postfix}`, ""));

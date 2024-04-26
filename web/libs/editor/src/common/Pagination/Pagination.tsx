@@ -89,7 +89,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
                 defaultValue={currentPage}
                 pattern="[0-9]"
                 onKeyDown={(e) => {
-                  const _value = parseFloat(e.currentTarget.value);
+                  const _value = Number.parseFloat(e.currentTarget.value);
 
                   if (e.code === "Escape") {
                     setInputMode(false);
@@ -105,7 +105,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
                   }
                 }}
                 onBlur={(e) => {
-                  const _value = parseFloat(e.currentTarget.value);
+                  const _value = Number.parseFloat(e.currentTarget.value);
 
                   if (_value <= totalPages && _value >= 1) {
                     onChange?.(_value);

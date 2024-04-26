@@ -11,7 +11,7 @@ const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", /[0-9]/];
 const CounterContext = React.createContext(null);
 
 const Counter = ({ label, className, validate, required, skip, labelProps, ...props }) => {
-  const [min, max] = [props.min ?? -Infinity, props.max ?? Infinity];
+  const [min, max] = [props.min ?? Number.NEGATIVE_INFINITY, props.max ?? Number.POSITIVE_INFINITY];
 
   const normalizeValue = (value) => Math.max(min, Math.min(max, value));
 

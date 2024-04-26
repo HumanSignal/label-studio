@@ -41,7 +41,7 @@ export const Slider: FC<SliderProps> = ({ description, info, max, min, value, st
     const noZero = e.currentTarget.value.match(/^\.[0-9]*$/);
     const normalizedValue = noZero ? "0" + e.currentTarget.value : e.currentTarget.value;
 
-    const newValue = parseFloat(normalizedValue);
+    const newValue = Number.parseFloat(normalizedValue);
 
     if (isNaN(newValue)) {
       setValueError(e.currentTarget.value);

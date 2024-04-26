@@ -141,7 +141,7 @@ const Tab = ({
           if (!dropTargetId || !dropTargetId?.includes("droppable")) return;
           const droppedOnIndices = dropTargetId.split("_");
           const receivingPanel = droppedOnIndices[0];
-          const receivingTab = parseInt(droppedOnIndices[1]);
+          const receivingTab = Number.parseInt(droppedOnIndices[1]);
           const dropSide = determineLeftOrRight(event, dropTarget as HTMLElement);
 
           if (

@@ -58,7 +58,7 @@ export const TimeBox: FC<TimerProps> = ({
     const calcs = [(x: number) => x / 1000, (x: number) => x, (x: number) => x * 60, (x: number) => x * 60 * 60];
 
     splittedValue.forEach((value, index) => {
-      totalTime += calcs[index](parseFloat(value));
+      totalTime += calcs[index](Number.parseFloat(value));
     });
 
     onChange(totalTime);

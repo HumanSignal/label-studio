@@ -3,7 +3,7 @@ require("jest-fetch-mock").enableMocks();
 // Mock HTMLMediaElement data and methods not implemented by jsdom.
 window.HTMLMediaElement.prototype._mock = {
   paused: true,
-  duration: NaN,
+  duration: Number.NaN,
   _loaded: false,
   // Emulates the media file loading
   _load: function mediaInit(media) {

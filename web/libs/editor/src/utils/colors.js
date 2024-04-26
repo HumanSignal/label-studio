@@ -214,7 +214,7 @@ export function hexToRGBA(hex, opacity) {
   const rgb = hexToRGBArray(hex);
   let a = 0.3;
 
-  if (typeof parseInt(opacity) === "number") {
+  if (typeof Number.parseInt(opacity) === "number") {
     a = opacity;
   }
 
