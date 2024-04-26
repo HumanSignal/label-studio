@@ -83,7 +83,7 @@ export const CommentItem: FC<any> = observer(
       <Block name="comment-item" mod={{ resolved }}>
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy}></Elem>
+            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy} />
             <Elem name="name" tag="span">
               {userDisplayName(createdBy)}
             </Elem>

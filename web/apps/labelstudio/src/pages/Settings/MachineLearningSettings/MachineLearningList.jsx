@@ -105,7 +105,7 @@ const BackendState = ({ backend }) => {
 
   return (
     <div className={cn("ml").elem("status")}>
-      <span className={cn("ml").elem("indicator").mod({ state })}></span>
+      <span className={cn("ml").elem("indicator").mod({ state })} />
       <Oneof value={state} className={cn("ml").elem("status-label")}>
         <span case="DI">Disconnected</span>
         <span case="CO">Connected</span>
