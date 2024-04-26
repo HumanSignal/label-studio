@@ -31,7 +31,6 @@
       "recommended": true,
       "a11y": {
         "noAutofocus": "off",
-        "useValidAriaRole": "off",
         "noRedundantAlt": "off",
         "noSvgWithoutTitle": "off",
         "useAltText": "off",
