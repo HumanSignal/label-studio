@@ -532,7 +532,8 @@ class ChannelD3 extends React.Component {
 
     this.useOptimizedData = series.length > optimizedWidthWithZoom;
 
-    let originalSeries, originalTimes;
+    let originalSeries;
+    let originalTimes;
 
     if (isFF(FF_LSDV_4881)) {
       originalSeries = series.filter((x) => {

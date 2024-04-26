@@ -87,7 +87,6 @@
         "noNonNullAssertion": "off",
         "useDefaultParameterLast": "off",
         "useNodejsImportProtocol": "off",
-        "useSingleVarDeclarator": "off",
         "useTemplate": "off",
         "noArguments": "off",
         "noCommaOperator": "off",

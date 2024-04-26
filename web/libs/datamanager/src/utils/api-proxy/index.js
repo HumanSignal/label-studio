@@ -151,7 +151,8 @@ export class APIProxy {
    */
   createApiCallExecutor(methodSettings, parentPath, raw = false) {
     return async (urlParams, { headers, body } = {}) => {
-      let responseResult, responseMeta;
+      let responseResult;
+      let responseMeta;
 
       try {
         const finalParams = {
