@@ -1,8 +1,6 @@
-
-
 class TextareaHelper {
   private get _baseRootSelector() {
-    return '.lsf-text-area';
+    return ".lsf-text-area";
   }
 
   private _rootSelector: string;
@@ -16,13 +14,11 @@ class TextareaHelper {
   }
 
   get input() {
-    return this.root
-      .find('[aria-label="TextArea Input"]');
+    return this.root.find('[aria-label="TextArea Input"]');
   }
 
   get rows() {
-    return this.root
-      .find('[class^="row--"]');
+    return this.root.find('[class^="row--"]');
   }
 
   row(idx: number) {
@@ -38,7 +34,7 @@ class TextareaHelper {
   }
 
   rowInput(idx: number) {
-    return this.row(idx).find('.ant-input');
+    return this.row(idx).find(".ant-input");
   }
 
   rowType(idx: number, text: string) {
@@ -50,16 +46,13 @@ class TextareaHelper {
   }
 
   hasNoValue(text: string) {
-    this.rows.contains(text).should('not.exist');
+    this.rows.contains(text).should("not.exist");
   }
 }
 
-const Textarea = new TextareaHelper('&:eq(0)');
+const Textarea = new TextareaHelper("&:eq(0)");
 const useTextarea = (rootSelector: string) => {
   return new TextareaHelper(rootSelector);
 };
 
-export {
-  Textarea,
-  useTextarea
-};
+export { Textarea, useTextarea };

@@ -13,13 +13,16 @@ export const Menu = React.forwardRef(
       return new Set(selectedKeys ?? []);
     }, [selectedKeys]);
 
-    const clickHandler = useCallback((e) => {
-      const elem = cn('menu').elem('item').closest(e.target);
+    const clickHandler = useCallback(
+      (e) => {
+        const elem = cn("menu").elem("item").closest(e.target);
 
-      if (dropdown && elem && closeDropdownOnItemClick !== false) {
-        dropdown.close();
-      }
-    }, [dropdown]);
+        if (dropdown && elem && closeDropdownOnItemClick !== false) {
+          dropdown.close();
+        }
+      },
+      [dropdown],
+    );
 
     const collapsed = useMemo(() => {
       return !!dropdown;
@@ -27,7 +30,15 @@ export const Menu = React.forwardRef(
 
     return (
       <MenuContext.Provider value={{ selected }}>
-        <Block ref={ref} tag="ul" name="menu" mod={{ size, collapsed }} mix={className} style={style} onClick={clickHandler}>
+        <Block
+          ref={ref}
+          tag="ul"
+          name="menu"
+          mod={{ size, collapsed }}
+          mix={className}
+          style={style}
+          onClick={clickHandler}
+        >
           {children}
         </Block>
       </MenuContext.Provider>

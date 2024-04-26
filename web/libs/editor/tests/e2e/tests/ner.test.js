@@ -1,8 +1,8 @@
-const { initLabelStudio, serialize } = require('./helpers');
+const { initLabelStudio, serialize } = require("./helpers");
 
-const assert = require('assert');
+const assert = require("assert");
 
-Feature('NER');
+Feature("NER");
 
 const configSimple = `
   <View>
@@ -29,24 +29,24 @@ const text = `<div>
 
 const results = [
   {
-    start: '/div[1]/h2[1]/span[1]/text()[1]',
+    start: "/div[1]/h2[1]/span[1]/text()[1]",
     startOffset: 1,
-    end: '/div[1]/h2[1]/span[3]/text()[1]',
+    end: "/div[1]/h2[1]/span[3]/text()[1]",
     endOffset: 1,
-    hypertextlabels: ['Term'],
-    text: 'Named-entity recognition',
+    hypertextlabels: ["Term"],
+    text: "Named-entity recognition",
     globalOffsets: {
       end: 28,
       start: 4,
     },
   },
   {
-    start: '/div[1]/p[1]/b[2]/text()[1]',
+    start: "/div[1]/p[1]/b[2]/text()[1]",
     startOffset: 0,
-    end: '/div[1]/p[1]/b[2]/text()[1]',
+    end: "/div[1]/p[1]/b[2]/text()[1]",
     endOffset: 3,
-    hypertextlabels: ['Abbr'],
-    text: 'NER',
+    hypertextlabels: ["Abbr"],
+    text: "NER",
     globalOffsets: {
       end: 61,
       start: 58,
@@ -54,39 +54,39 @@ const results = [
   },
 ];
 
-Scenario('NER labeling for HyperText', async function({ I }) {
+Scenario("NER labeling for HyperText", async ({ I }) => {
   const params = {
     config: configSimple,
     data: { text },
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   I.executeScript(initLabelStudio, params);
 
   // create regions inside iframe
-  I.switchTo('iframe');
-  I.pressKey('1');
-  I.click('[data-testid=r1-start]');
-  I.pressKeyDown('Shift');
-  I.click('[data-testid=r1-end]');
-  I.pressKeyUp('Shift');
+  I.switchTo("iframe");
+  I.pressKey("1");
+  I.click("[data-testid=r1-start]");
+  I.pressKeyDown("Shift");
+  I.click("[data-testid=r1-end]");
+  I.pressKeyUp("Shift");
 
-  I.pressKey('2');
-  I.doubleClick('b:nth-child(2)');
+  I.pressKey("2");
+  I.doubleClick("b:nth-child(2)");
 
-  I.click('[data-testid=r1-mid]');
-  I.pressKey(['alt', 'r']);
-  I.click('b:nth-child(2)');
+  I.click("[data-testid=r1-mid]");
+  I.pressKey(["alt", "r"]);
+  I.click("b:nth-child(2)");
   I.switchTo();
 
-  I.see('Relations (1)');
+  I.see("Relations (1)");
 
   const result = await I.executeScript(serialize);
 
   assert.equal(result.length, 3);
   assert.deepEqual(result[0].value, results[0]);
   assert.deepEqual(result[1].value, results[1]);
-  assert.equal(result[2].type, 'relation');
+  assert.equal(result[2].type, "relation");
   assert.equal(result[2].from_id, result[0].id);
   assert.equal(result[2].to_id, result[1].id);
 });

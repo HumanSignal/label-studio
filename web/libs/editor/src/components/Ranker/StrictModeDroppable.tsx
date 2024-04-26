@@ -9,8 +9,8 @@
 /**
  * libraries
  */
-import { useEffect, useState } from 'react';
-import { Droppable, DroppableProps } from 'react-beautiful-dnd';
+import { useEffect, useState } from "react";
+import { Droppable, type DroppableProps } from "react-beautiful-dnd";
 
 export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
   const [enabled, setEnabled] = useState(false);

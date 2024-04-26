@@ -1,13 +1,13 @@
-import { Destructable } from '../Common/Destructable';
-import { WaveformAudio } from '../Media/WaveformAudio';
-import { clamp } from '../Common/Utils';
-import { Waveform } from '../Waveform';
+import { Destructable } from "../Common/Destructable";
+import type { WaveformAudio } from "../Media/WaveformAudio";
+import { clamp } from "../Common/Utils";
+import type { Waveform } from "../Waveform";
 
 export abstract class Player extends Destructable {
   protected audio?: WaveformAudio;
   protected wf: Waveform;
   protected timer!: number;
-  protected loop: { start: number, end: number } | null = null;
+  protected loop: { start: number; end: number } | null = null;
   protected timestamp = 0;
   protected time = 0;
   protected connected = false;
@@ -50,7 +50,7 @@ export abstract class Player extends Destructable {
     this.updateCurrentSourceTime(timeChanged);
 
     if (notify && timeChanged) {
-      this.wf.invoke('seek', [this.time]);
+      this.wf.invoke("seek", [this.time]);
     }
   }
 
@@ -77,14 +77,14 @@ export abstract class Player extends Destructable {
       }
       this.adjustVolume();
 
-      this.wf.invoke('volumeChanged', [this.volume]);
+      this.wf.invoke("volumeChanged", [this.volume]);
     }
   }
 
   protected abstract adjustVolume(): void;
 
   get muted() {
-    return this._volume === 0 ;
+    return this._volume === 0;
   }
 
   set muted(muted: boolean) {
@@ -96,7 +96,7 @@ export abstract class Player extends Destructable {
       this.unmute();
     }
 
-    this.wf.invoke('muted', [this.muted]);
+    this.wf.invoke("muted", [this.muted]);
   }
 
   mute() {
@@ -124,7 +124,7 @@ export abstract class Player extends Destructable {
     this._rate = value;
 
     if (rateChanged) {
-      this.wf.invoke('rateChanged', [value]);
+      this.wf.invoke("rateChanged", [value]);
     }
   }
 
@@ -134,7 +134,7 @@ export abstract class Player extends Destructable {
 
   init(audio: WaveformAudio) {
     this.audio = audio;
-    this.audio.on('canplay', this.handleCanPlay);
+    this.audio.on("canplay", this.handleCanPlay);
   }
 
   seek(time: number) {
@@ -188,7 +188,7 @@ export abstract class Player extends Destructable {
   private playEnded() {
     this.ended = true;
     this.pause();
-    this.wf.invoke('playend');
+    this.wf.invoke("playend");
   }
 
   pause() {
@@ -197,8 +197,8 @@ export abstract class Player extends Destructable {
     this.disconnectSource();
     this.playing = false;
     this.loop = null;
-    this.wf.invoke('pause');
-    this.wf.invoke('seek', [this.currentTime]);
+    this.wf.invoke("pause");
+    this.wf.invoke("seek", [this.currentTime]);
   }
 
   stop() {
@@ -228,7 +228,7 @@ export abstract class Player extends Destructable {
       this.currentTime = start;
     }
     this.playSource(start, end);
-    this.wf.invoke('play');
+    this.wf.invoke("play");
   }
 
   protected playSource(start?: number, duration?: number) {
@@ -259,8 +259,8 @@ export abstract class Player extends Destructable {
     const looping = selected.length > 0;
 
     if (looping) {
-      const regionsStart = Math.min(...selected.map(r => r.start));
-      const regionsEnd = Math.max(...selected.map(r => r.end));
+      const regionsStart = Math.min(...selected.map((r) => r.start));
+      const regionsEnd = Math.max(...selected.map((r) => r.end));
 
       const start = clamp(this.currentTime, regionsStart, regionsEnd);
 
@@ -340,10 +340,10 @@ export abstract class Player extends Destructable {
 
     if (!this.loop && this.time >= this.duration - tick) {
       this.time = this.duration;
-      this.wf.invoke('playing', [this.duration]);
+      this.wf.invoke("playing", [this.duration]);
       this.playEnded();
     } else {
-      this.wf.invoke('playing', [this.time]);
+      this.wf.invoke("playing", [this.time]);
     }
   }
 
