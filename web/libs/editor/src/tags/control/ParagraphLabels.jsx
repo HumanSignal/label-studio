@@ -49,7 +49,7 @@ const ModelAttrs = types
     get serializableValue() {
       const obj = {};
 
-      obj["paragraphlabels"] = self.selectedValues();
+      obj.paragraphlabels = self.selectedValues();
 
       return obj;
     },

@@ -419,9 +419,9 @@ const HtxTextArea = observer(({ item }) => {
   const showAddButton = !item.isReadOnly() && (item.showsubmitbutton ?? rows !== 1);
   const itemStyle = {};
 
-  if (showAddButton) itemStyle["marginBottom"] = 0;
+  if (showAddButton) itemStyle.marginBottom = 0;
 
-  visibleStyle["marginTop"] = "4px";
+  visibleStyle.marginTop = "4px";
 
   return item.displaymode === PER_REGION_MODES.TAG ? (
     <div className="lsf-text-area" style={visibleStyle}>

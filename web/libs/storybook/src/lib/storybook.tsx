@@ -5,7 +5,7 @@ export type StorybookProps = {};
 
 export function Storybook(props: StorybookProps) {
   return (
-    <div className={styles["container"]}>
+    <div className={styles.container}>
       <h1>Welcome to Storybook!</h1>
     </div>
   );
