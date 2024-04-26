@@ -444,7 +444,7 @@ PackJSON.prototype.decodeStringLen = function () {
 };
 
 PackJSON.prototype.packInConstants = function (value) {
-  const re = new RegExp("\\.", "g");
+  const re = /\./g;
 
   value = value.replace(re, ".-");
   this.definitions.forEach((definition, idx) => {
@@ -461,7 +461,7 @@ PackJSON.prototype.resolveConstants = function (value) {
 
     value = value.replace(re, definition);
   });
-  const re = new RegExp("\\.-", "g");
+  const re = /\.-/g;
 
   value = value.replace(re, ".");
   return value;

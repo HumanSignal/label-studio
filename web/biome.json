@@ -68,7 +68,6 @@
         "noUselessFragments": "off",
         "noUselessSwitchCase": "off",
         "useOptionalChain": "off",
-        "useRegexLiterals": "off",
         "useSimplifiedLogicExpression": "off",
         "noBannedTypes": "off",
         "noStaticOnlyClass": "off"
