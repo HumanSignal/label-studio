@@ -46,7 +46,7 @@ Cypress.Commands.add(
       cy.get(hiddenSelector).invoke("css", "visibility", "hidden");
     }
     obj.screenshot(
-      screenshotName + "-orig",
+      `${screenshotName}-orig`,
       Object.assign({ log: false }, screenshotOptions, {
         onAfterScreenshot(_el, screenshot) {
           screenshotOptions.onAfterScreenshot?.(_el, screenshot);
@@ -99,7 +99,7 @@ Cypress.Commands.add(
       cy.get(hiddenSelector).invoke("css", "visibility", "hidden");
     }
     obj.screenshot(
-      screenshotName + "-comp",
+      `${screenshotName}-comp`,
       Object.assign({ log: false }, screenshotOptions, {
         onAfterScreenshot(_el, currentScreenshot) {
           screenshotOptions.onAfterScreenshot?.(_el, currentScreenshot);

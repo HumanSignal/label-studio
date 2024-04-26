@@ -21,16 +21,14 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
       : 0;
 
   // help text for tasks and annotations
-  const tasks_added_help = last_sync_count + " new tasks added during the last sync.";
-  const tasks_total_help =
-    tasks_existed +
-    " tasks that have been found and already synced will not be added to the project again.\n" +
-    (tasks_existed + last_sync_count) +
-    " tasks have been added in total for this storage.";
-  const annotations_help = last_sync_count + " annotations successfully saved during the last sync.";
+  const tasks_added_help = `${last_sync_count} new tasks added during the last sync.`;
+  const tasks_total_help = `${tasks_existed} tasks that have been found and already synced will not be added to the project again.\n${
+    tasks_existed + last_sync_count
+  } tasks have been added in total for this storage.`;
+  const annotations_help = `${last_sync_count} annotations successfully saved during the last sync.`;
   const total_annotations_help =
     typeof storage.meta?.total_annotations !== "undefined"
-      ? storage.meta.total_annotations + " total annotations seen in the project at the sync moment."
+      ? `${storage.meta.total_annotations} total annotations seen in the project at the sync moment.`
       : "";
 
   const handleButtonClick = () => {
@@ -115,7 +113,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
         </DescriptionList.Item>
 
         {target === "export" ? (
-          <DescriptionList.Item term="Annotations" help={annotations_help + "\n" + total_annotations_help}>
+          <DescriptionList.Item term="Annotations" help={`${annotations_help}\n${total_annotations_help}`}>
             <Tooltip title={annotations_help}>
               <span>{last_sync_count}</span>
             </Tooltip>
@@ -124,8 +122,8 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
             </Tooltip>
           </DescriptionList.Item>
         ) : (
-          <DescriptionList.Item term="Tasks" help={tasks_added_help + "\n" + tasks_total_help}>
-            <Tooltip title={tasks_added_help + "\n" + tasks_total_help} style={{ whiteSpace: "pre-wrap" }}>
+          <DescriptionList.Item term="Tasks" help={`${tasks_added_help}\n${tasks_total_help}`}>
+            <Tooltip title={`${tasks_added_help}\n${tasks_total_help}`} style={{ whiteSpace: "pre-wrap" }}>
               <span>{last_sync_count + tasks_existed}</span>
             </Tooltip>
             <Tooltip title={tasks_added_help}>

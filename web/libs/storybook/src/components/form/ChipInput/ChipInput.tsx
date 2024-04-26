@@ -129,7 +129,7 @@ export const ChipInput = ({
 
     const width = inputRef.current.scrollWidth;
 
-    wrapperRef.current.style.width = currentValue ? width + "px" : "";
+    wrapperRef.current.style.width = currentValue ? `${width}px` : "";
   }, [currentValue]);
 
   // values should be already valid

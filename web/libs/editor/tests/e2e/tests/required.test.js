@@ -90,7 +90,7 @@ Scenario("Check required param", async ({ I }) => {
   const waitForError = (name) => {
     I.waitForText("OK");
     I.see("Warning");
-    I.see('Checkbox "' + name + '" is required');
+    I.see(`Checkbox "${name}" is required`);
     I.seeElement(".ant-modal");
     I.click("OK");
     I.waitToHide(".ant-modal");
@@ -139,7 +139,7 @@ Scenario("Check required param in complex config", async ({ I }) => {
     // Two possible errors:
     // - Checkbox "name" is required.
     // - Input for the textarea "name" is required.
-    I.see('"' + name + '" is required');
+    I.see(`"${name}" is required`);
     I.seeElement(".ant-modal");
     I.click("OK");
     I.waitToHide(".ant-modal");
@@ -208,7 +208,7 @@ Scenario("Check required param with visibleWhen='choice-unselected'", async ({ I
   const waitForError = (name) => {
     I.waitForText("OK");
     I.see("Warning");
-    I.see('Checkbox "' + name + '" is required');
+    I.see(`Checkbox "${name}" is required`);
     I.seeElement(".ant-modal");
     I.click("OK");
     I.waitToHide(".ant-modal");

@@ -36,7 +36,7 @@ export const ModelVersionSelector = ({
 
     if (modelVersions?.live?.length > 0) {
       const liveModels = modelVersions.live.map((item) => {
-        const label = item.title + " (" + item.readable_state + ")";
+        const label = `${item.title} (${item.readable_state})`;
 
         return {
           group: "Models",
@@ -50,7 +50,7 @@ export const ModelVersionSelector = ({
 
     if (modelVersions?.static?.length > 0) {
       const staticModels = modelVersions.static.map((item) => {
-        const label = item.model_version + " (" + item.count + " predictions)";
+        const label = `${item.model_version} (${item.count} predictions)`;
 
         return {
           group: "Predictions",

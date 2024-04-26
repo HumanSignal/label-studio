@@ -761,7 +761,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
         </Group>
       </Layer>
       <Layer
-        id={item.cleanId + "_labels"}
+        id={`${item.cleanId}_labels`}
         ref={(ref) => {
           if (ref) {
             ref.canvas._canvas.style.opacity = item.opacity;

@@ -47,7 +47,7 @@ function formatTimeCallback(seconds, pxPerSec) {
 
   if (minutes > 0) {
     if (seconds < 10) {
-      secondsStr = "0" + secondsStr;
+      secondsStr = `0${secondsStr}`;
     }
     return `${minutes}:${secondsStr}`;
   }
@@ -467,7 +467,7 @@ export default class Waveform extends React.Component {
       this.props.onLoad(this.wavesurfer);
     }
 
-    this.hotkeys.addNamed("audio:back", this.onBack, Hotkey.DEFAULT_SCOPE + "," + Hotkey.INPUT_SCOPE);
+    this.hotkeys.addNamed("audio:back", this.onBack, `${Hotkey.DEFAULT_SCOPE},${Hotkey.INPUT_SCOPE}`);
   }
 
   componentWillUnmount() {

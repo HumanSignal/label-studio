@@ -371,7 +371,7 @@ const HtxDateTime = inject("store")(
         {item.showMonth && (
           <select
             {...visual}
-            name={item.name + "-date"}
+            name={`${item.name}-date`}
             disabled={disabled}
             value={item.month}
             onChange={disabled ? undefined : item.onMonthChange}
@@ -387,7 +387,7 @@ const HtxDateTime = inject("store")(
         {item.showYear && (
           <select
             {...visual}
-            name={item.name + "-year"}
+            name={`${item.name}-year`}
             disabled={disabled}
             value={item.year || ""}
             onChange={disabled ? undefined : item.onYearChange}
@@ -405,7 +405,7 @@ const HtxDateTime = inject("store")(
             {...visual}
             type="date"
             readOnly={disabled}
-            name={item.name + "-date"}
+            name={`${item.name}-date`}
             value={dateInputValue}
             min={item.min}
             max={item.max}
@@ -418,7 +418,7 @@ const HtxDateTime = inject("store")(
             {...visual}
             type="time"
             readOnly={disabled}
-            name={item.name + "-time"}
+            name={`${item.name}-time`}
             value={item.time ?? ""}
             min={minTime}
             max={maxTime}

@@ -43,7 +43,7 @@ function traverseFileTree(item, path) {
     } else if (item.isDirectory) {
       // Get folder contents
       const dirReader = item.createReader();
-      const dirPath = path + item.name + "/";
+      const dirPath = `${path + item.name}/`;
 
       dirReader.readEntries((entries) => {
         Promise.all(entries.map((entry) => traverseFileTree(entry, dirPath)))
@@ -333,7 +333,7 @@ export const ImportPage = ({
       <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }} />
 
       <header>
-        <form className={importClass.elem("url-form") + " inline"} method="POST" onSubmit={onLoadURL}>
+        <form className={`${importClass.elem("url-form")} inline`} method="POST" onSubmit={onLoadURL}>
           <input placeholder="Dataset URL" name="url" ref={urlRef} />
           <button type="submit">Add URL</button>
         </form>

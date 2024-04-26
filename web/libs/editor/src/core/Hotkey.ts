@@ -382,7 +382,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
       for (let i = 0; i <= combs.length; i++) {
         let comb;
 
-        if (prefix) comb = prefix + "+" + combs[i];
+        if (prefix) comb = `${prefix}+${combs[i]}`;
         else comb = combs[i];
 
         if (!{}.hasOwnProperty.call(_hotkeys_map, comb)) return comb;

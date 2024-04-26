@@ -830,7 +830,7 @@ export class LSFWrapper {
     searchParams.delete(paramName);
     let newRelativePathQuery = window.location.pathname;
 
-    if (searchParams.toString()) newRelativePathQuery += "?" + searchParams.toString();
+    if (searchParams.toString()) newRelativePathQuery += `?${searchParams.toString()}`;
     window.history.pushState(null, "", newRelativePathQuery);
     return !!urlParam;
   };
