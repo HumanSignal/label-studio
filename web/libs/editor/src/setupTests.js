@@ -3,8 +3,8 @@
  */
 /* global jest, global */
 
-import { configure } from 'enzyme';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import { configure } from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
 const localStorageMock = {
   getItem: jest.fn(),

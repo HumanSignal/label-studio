@@ -10,10 +10,9 @@ import { Duration } from "./Duration";
 import { forwardRef } from "react";
 import { FF_LSDV_4711, isFF } from "../../../utils/feature-flags";
 
-
 const mediaDefaultProps = {};
 
-if (isFF(FF_LSDV_4711)) mediaDefaultProps.crossOrigin = 'anonymous';
+if (isFF(FF_LSDV_4711)) mediaDefaultProps.crossOrigin = "anonymous";
 
 const initialState = {
   duration: 0,
@@ -37,24 +36,31 @@ export const MediaPlayer = ({ src, video = false }) => {
   const [enabled, setEnabled] = useState(false);
 
   const [state, dispatch] = useReducer((state, action) => {
-    switch(action.type) {
-      case "duration": return { ...state, duration: action.payload };
-      case "current": return { ...state, currentTime: action.payload };
-      case "loaded": return { ...state, loaded: true };
-      case "error": return { ...state, error: true, resetSource: state.loaded ? state.resetSource + 1 : state.resetSource };
-      case "play": return { ...state, playing: true };
-      case "pause": return { ...state, playing: false };
-      case "buffer": return { ...state, buffer: action.payload };
-      case "resetSource": return { ...state, resetSource: 0, loaded: false, error: false };
+    switch (action.type) {
+      case "duration":
+        return { ...state, duration: action.payload };
+      case "current":
+        return { ...state, currentTime: action.payload };
+      case "loaded":
+        return { ...state, loaded: true };
+      case "error":
+        return { ...state, error: true, resetSource: state.loaded ? state.resetSource + 1 : state.resetSource };
+      case "play":
+        return { ...state, playing: true };
+      case "pause":
+        return { ...state, playing: false };
+      case "buffer":
+        return { ...state, buffer: action.payload };
+      case "resetSource":
+        return { ...state, resetSource: 0, loaded: false, error: false };
     }
   }, initialState);
 
   const format = useMemo(() => {
     if (state.duration >= 3600) {
       return ["hours", "minutes", "seconds"];
-    } else {
-      return ["minutes", "seconds"];
     }
+    return ["minutes", "seconds"];
   }, [state.duration]);
 
   const play = useCallback(() => {
@@ -90,7 +96,8 @@ export const MediaPlayer = ({ src, video = false }) => {
   const waitForPlayer = useCallback(() => {
     if (state?.error) {
       return;
-    } else if (state?.loaded) {
+    }
+    if (state?.loaded) {
       play();
     } else {
       setTimeout(() => waitForPlayer(), 10);
@@ -102,8 +109,8 @@ export const MediaPlayer = ({ src, video = false }) => {
     ref: media,
     controls: false,
     preload: "metadata",
-    onPlay: () => dispatch({ type: 'play' }),
-    onPause: () => dispatch({ type: 'pause' }),
+    onPlay: () => dispatch({ type: "play" }),
+    onPause: () => dispatch({ type: "pause" }),
     onTimeUpdate: () => dispatch({ type: "current", payload: media.current.currentTime }),
     onDurationChange: () => dispatch({ type: "duration", payload: media.current.duration }),
     onCanPlay: () => dispatch({ type: "loaded" }),
@@ -139,31 +146,23 @@ export const MediaPlayer = ({ src, video = false }) => {
   const showError = isFF(FF_LSDV_4711) ? !state.resetSource && state.error : state.error;
 
   return enabled ? (
-    <Block name="player" mod={{ video }} onClick={e => e.stopPropagation()}>
-      {video && (
-        <MediaSource type="video" onClick={togglePlay} {...mediaProps} />
-      )}
+    <Block name="player" mod={{ video }} onClick={(e) => e.stopPropagation()}>
+      {video && <MediaSource type="video" onClick={togglePlay} {...mediaProps} />}
       {showError ? (
-        <Elem name="loading">
-          Unable to play
-        </Elem>
+        <Elem name="loading">Unable to play</Elem>
       ) : state.loaded ? (
         <Elem name="playback">
           <Elem name="controls" tag={Space} spread>
             <Space size="small">
               <Elem name="play" onClick={togglePlay}>
-                {state.playing ? <FaPause/> : <FaPlay/>}
+                {state.playing ? <FaPause /> : <FaPlay />}
               </Elem>
-              {!video && (
-                <Elem name="track">
-                  {filename(src)}
-                </Elem>
-              )}
+              {!video && <Elem name="track">{filename(src)}</Elem>}
             </Space>
             <Elem tag={Space} size="small" name="time">
-              <Duration value={state.currentTime} format={format}/>
+              <Duration value={state.currentTime} format={format} />
               {" / "}
-              <Duration value={state.duration} format={format}/>
+              <Duration value={state.duration} format={format} />
             </Elem>
           </Elem>
 
@@ -179,31 +178,29 @@ export const MediaPlayer = ({ src, video = false }) => {
         </Elem>
       ) : (
         <Elem name="loading">
-          <Spinner size="24"/>
+          <Spinner size="24" />
         </Elem>
       )}
 
-      {!video && (
-        <MediaSource type="audio" {...mediaProps} ref={media}/>
-      )}
+      {!video && <MediaSource type="audio" {...mediaProps} ref={media} />}
     </Block>
   ) : (
-    <Block name="player" onClick={(e) => {
-      e.stopPropagation();
-      setEnabled(true);
-      waitForPlayer();
-    }}>
+    <Block
+      name="player"
+      onClick={(e) => {
+        e.stopPropagation();
+        setEnabled(true);
+        waitForPlayer();
+      }}
+    >
       <Elem name="controls" tag={Space} spread>
         <Space size="small">
           <Elem name="play">
-            <FaPlay/>
+            <FaPlay />
           </Elem>
-          <Elem name="track">
-            Click to load
-          </Elem>
+          <Elem name="track">Click to load</Elem>
         </Space>
-        <Elem tag={Space} size="small" name="time">
-        </Elem>
+        <Elem tag={Space} size="small" name="time" />
       </Elem>
     </Block>
   );
@@ -212,7 +209,7 @@ export const MediaPlayer = ({ src, video = false }) => {
 const MediaSource = forwardRef(({ type = "audio", src, ...props }, ref) => {
   return (
     <Elem {...mediaDefaultProps} name="media" tag={type} ref={ref} {...props}>
-      <source src={src}/>
+      <source src={src} />
     </Elem>
   );
 });

@@ -1,13 +1,13 @@
-import emojiRegex from 'emoji-regex';
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import emojiRegex from "emoji-regex";
+import React, { Component } from "react";
+import { observer } from "mobx-react";
 
-import Utils from '../../utils';
-import Range from './Range';
-import { HtxTextNode } from './Node';
-import UrlNode from './UrlNode';
-import EmojiNode from './EmojiNode';
-import styles from './TextHighlight.module.scss';
+import Utils from "../../utils";
+import Range from "./Range";
+import { HtxTextNode } from "./Node";
+import UrlNode from "./UrlNode";
+import EmojiNode from "./EmojiNode";
+import styles from "./TextHighlight.module.scss";
 
 class TextHighlight extends Component {
   constructor() {
@@ -21,7 +21,7 @@ class TextHighlight extends Component {
    */
   getRange(charIndex) {
     if (this.props.ranges && this.props.ranges.length) {
-      return this.props.ranges.find(range => charIndex >= range.start && charIndex <= range.end);
+      return this.props.ranges.find((range) => charIndex >= range.start && charIndex <= range.end);
     }
   }
 
@@ -52,7 +52,7 @@ class TextHighlight extends Component {
     let arrOverlap = [];
 
     if (this.props.ranges) {
-      this.props.ranges.map(range => {
+      this.props.ranges.map((range) => {
         if (charIndex >= range.start && charIndex <= range.end) {
           return (arrOverlap = [...arrOverlap, range.id]);
         }
@@ -80,7 +80,7 @@ class TextHighlight extends Component {
     let arrOverlap = [];
 
     if (this.props.ranges) {
-      this.props.ranges.map(range => {
+      this.props.ranges.map((range) => {
         if (charIndex >= range.start && charIndex <= range.end) {
           return (arrOverlap = [...arrOverlap, range.id]);
         }
@@ -106,7 +106,7 @@ class TextHighlight extends Component {
     let arrOverlap = [];
 
     if (this.props.ranges) {
-      this.props.ranges.map(range => {
+      this.props.ranges.map((range) => {
         if (charIndex >= range.start && charIndex <= range.end) {
           return (arrOverlap = [...arrOverlap, range.id]);
         }
@@ -133,7 +133,7 @@ class TextHighlight extends Component {
       return false;
     }
 
-    let text = '';
+    let text = "";
 
     if (window.getSelection) {
       /**
@@ -142,15 +142,12 @@ class TextHighlight extends Component {
        */
       // text = window.getSelection().toString();
 
-      if (window.getSelection().type === 'None') return;
+      if (window.getSelection().type === "None") return;
 
       /**
        * Create clone range
        */
-      const cloneCont = window
-        .getSelection()
-        .getRangeAt(0)
-        .cloneRange();
+      const cloneCont = window.getSelection().getRangeAt(0).cloneRange();
 
       /**
        * The Range.cloneContents() returns a DocumentFragment copying the objects of type Node included in the Range.
@@ -159,21 +156,21 @@ class TextHighlight extends Component {
       /**
        * Create virtual div with text
        */
-      const virtualDiv = document.createElement('div');
+      const virtualDiv = document.createElement("div");
 
       virtualDiv.appendChild(selectionContents);
 
-      const elementsWithSup = virtualDiv.getElementsByTagName('sup');
+      const elementsWithSup = virtualDiv.getElementsByTagName("sup");
 
       if (elementsWithSup.length > 0) {
         for (let i = 0; i < elementsWithSup.length; i++) {
-          elementsWithSup[i].innerText = '';
+          elementsWithSup[i].innerText = "";
         }
         text = virtualDiv.innerText;
       } else {
         text = virtualDiv.innerText;
       }
-    } else if (document.selection && document.selection.type !== 'Control') {
+    } else if (document.selection && document.selection.type !== "Control") {
       text = document.selection.createRange().text;
     }
 
@@ -189,22 +186,22 @@ class TextHighlight extends Component {
     /**
      * Start position of selected item
      */
-    let startContainerPosition = parseInt(range.startContainer.parentNode.dataset.position);
+    let startContainerPosition = Number.parseInt(range.startContainer.parentNode.dataset.position);
     /**
      * End position of selected item
      */
-    let endContainerPosition = parseInt(range.endContainer.parentNode.dataset.position);
+    let endContainerPosition = Number.parseInt(range.endContainer.parentNode.dataset.position);
 
     if (!range.startContainer.parentNode.dataset.position) {
       if (!range.startContainer.dataset) return;
 
-      startContainerPosition = parseInt(range.startContainer.dataset.position);
+      startContainerPosition = Number.parseInt(range.startContainer.dataset.position);
     }
 
     if (!range.endContainer.parentNode.dataset.position) {
       if (!range.endContainer.dataset) return;
 
-      endContainerPosition = parseInt(range.endContainer.dataset.position);
+      endContainerPosition = Number.parseInt(range.endContainer.dataset.position);
     }
 
     const startHL = startContainerPosition < endContainerPosition ? startContainerPosition : endContainerPosition;
@@ -262,7 +259,8 @@ class TextHighlight extends Component {
   getNode(i, range, text, url, isEmoji) {
     if (url.length) {
       return this.getUrlNode(i, range, url);
-    } else if (isEmoji) {
+    }
+    if (isEmoji) {
       return this.getEmojiNode(i, range);
     }
 
@@ -340,7 +338,7 @@ class TextHighlight extends Component {
       // }
       // console.log(textCharIndex, range.start, range.end)
 
-      for (; rangeCharIndex < parseInt(range.end) + 1; rangeCharIndex++) {
+      for (; rangeCharIndex < Number.parseInt(range.end) + 1; rangeCharIndex++) {
         /**
          * Emoji handler
          */

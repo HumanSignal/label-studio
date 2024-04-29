@@ -1,11 +1,11 @@
-import React from 'react';
-import { PropTypes } from 'prop-types';
-import { getEnv } from 'mobx-state-tree';
-import { inject, observer } from 'mobx-react';
+import React from "react";
+import { PropTypes } from "prop-types";
+import { getEnv } from "mobx-state-tree";
+import { inject, observer } from "mobx-react";
 
-import { ErrorMessage } from '../ErrorMessage/ErrorMessage';
+import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 
-export const TreeValidation = inject('store')(
+export const TreeValidation = inject("store")(
   observer(({ store, errors }) => {
     return (
       <div className="ls-errors">

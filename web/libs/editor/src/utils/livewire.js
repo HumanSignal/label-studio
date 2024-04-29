@@ -2,7 +2,7 @@
 
 export function Livewire() {}
 
-this.mousedown = function(event) {
+this.mousedown = (event) => {
   // first time
   if (!self.started) {
     self.started = true;
@@ -12,10 +12,10 @@ this.mousedown = function(event) {
     clearPaths();
     clearParentPoints();
     // do the training from the first point
-    var p = new dwv.math.FastPoint2D(event._x, event._y);
+    const p = new dwv.math.FastPoint2D(event._x, event._y);
     scissors.doTraining(p);
     // add the initial point to the path
-    var p0 = new dwv.math.Point2D(event._x, event._y);
+    const p0 = new dwv.math.Point2D(event._x, event._y);
     path.addPoint(p0);
     path.addControlPoint(p0);
   } else {
@@ -36,23 +36,23 @@ this.mousedown = function(event) {
     else {
       path = currentPath;
       clearParentPoints();
-      var pn = new dwv.math.FastPoint2D(event._x, event._y);
+      const pn = new dwv.math.FastPoint2D(event._x, event._y);
       scissors.doTraining(pn);
       path.addControlPoint(currentPath.getPoint(0));
     }
   }
 };
 
-this.mousemove = function(event) {
+this.mousemove = (event) => {
   if (!self.started) {
     return;
   }
   // set the point to find the path to
-  var p = new dwv.math.FastPoint2D(event._x, event._y);
+  let p = new dwv.math.FastPoint2D(event._x, event._y);
   scissors.setPoint(p);
   // do the work
-  var results = 0;
-  var stop = false;
+  let results = 0;
+  let stop = false;
   while (!parentPoints[p.y][p.x] && !stop) {
     results = scissors.doWork();
 
@@ -60,9 +60,9 @@ this.mousemove = function(event) {
       stop = true;
     } else {
       // fill parents
-      for (var i = 0; i < results.length - 1; i += 2) {
-        var _p = results[i];
-        var _q = results[i + 1];
+      for (let i = 0; i < results.length - 1; i += 2) {
+        const _p = results[i];
+        const _q = results[i + 1];
         parentPoints[_p.y][_p.x] = _q;
       }
     }
@@ -90,12 +90,12 @@ this.mousemove = function(event) {
     shapeGroup.destroy();
   }
   // create shape
-  var factory = new dwv.tool.RoiFactory();
+  const factory = new dwv.tool.RoiFactory();
   shapeGroup = factory.create(currentPath.pointArray, self.style);
   shapeGroup.id(dwv.math.guid());
 
   // get the position group
-  var posGroup = app.getDrawController().getCurrentPosGroup();
+  const posGroup = app.getDrawController().getCurrentPosGroup();
   // add shape group to position group
   posGroup.add(shapeGroup);
 
@@ -105,7 +105,7 @@ this.mousemove = function(event) {
   command.execute();
 };
 
-this.dblclick = function(/*event*/) {
+this.dblclick = (/*event*/) => {
   // save command in undo stack
   app.addToUndoStack(command);
   // set flag

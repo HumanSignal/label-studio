@@ -107,12 +107,12 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.13.0",
     "@babel/runtime": "^7.12.13",
+    "@biomejs/biome": "1.7.1",
     "@cypress/code-coverage": "^3.12.9",
     "@cypress/webpack-preprocessor": "^5.17.0",
     "@nx/cypress": "17.0.3",
     "@nx/jest": "17.0.3",
     "@nx/js": "17.2.8",
-    "@nx/linter": "17.0.3",
     "@nx/react": "17.0.3",
     "@nx/storybook": "^17.2.8",
     "@nx/vite": "17.2.8",
@@ -168,7 +168,7 @@
     "jest": "^29.4.1",
     "jest-environment-jsdom": "^29.4.1",
     "jest-fetch-mock": "^3.0.3",
-    "lint-staged": "^9.5.0",
+    "jsdoc-to-markdown": "8.0.1",
     "loader-utils": "^3.2.1",
     "mini-css-extract-plugin": "^2.7.6",
     "nx": "17.0.3",
@@ -198,8 +198,7 @@
     "webpack": "^5.77.0",
     "webpack-cli": "^5.0.1",
     "webpack-merge": "^5.9.0",
-    "yargs": "^17.7.1",
-    "jsdoc-to-markdown": "8.0.1"
+    "yargs": "^17.7.1"
   },
   "resolutions": {
     "jpeg-js": "0.4.4",
@@ -228,9 +227,7 @@
         "@babel/preset-env",
         {
           "targets": {
-            "browsers": [
-              "last 2 Chrome versions"
-            ]
+            "browsers": ["last 2 Chrome versions"]
           }
         }
       ]

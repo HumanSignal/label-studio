@@ -1,19 +1,11 @@
 import deepEqual from "deep-equal";
-import {
-  clone,
-  destroy,
-  flow,
-  getParent,
-  getRoot,
-  getSnapshot,
-  types
-} from "mobx-state-tree";
+import { clone, destroy, flow, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
-import { normalizeFilterValue } from './filter_utils';
+import { normalizeFilterValue } from "./filter_utils";
 import { TabFilter } from "./tab_filter";
 import { TabHiddenColumns } from "./tab_hidden_columns";
 import { TabSelectedItems } from "./tab_selected_items";
-import { History } from '../../utils/history';
+import { History } from "../../utils/history";
 import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
 import { clamp } from "../../utils/helpers";
 
@@ -31,10 +23,7 @@ export const Tab = types
 
     type: types.optional(types.enumeration(["list", "grid"]), "list"),
 
-    target: types.optional(
-      types.enumeration(["tasks", "annotations"]),
-      "tasks",
-    ),
+    target: types.optional(types.enumeration(["tasks", "annotations"]), "tasks"),
 
     filters: types.array(types.late(() => TabFilter)),
     conjunction: types.optional(types.enumeration(["and", "or"]), "and"),
@@ -57,11 +46,12 @@ export const Tab = types
     threshold: types.optional(types.maybeNull(ThresholdType), null),
   })
   .volatile(() => {
-    const defaultWidth = getComputedStyle(document.body).getPropertyValue("--menu-sidebar-width").replace("px", "").trim();
+    const defaultWidth = getComputedStyle(document.body)
+      .getPropertyValue("--menu-sidebar-width")
+      .replace("px", "")
+      .trim();
 
-    const labelingTableWidth = parseInt(
-      localStorage.getItem("labelingTableWidth") ?? defaultWidth ?? 200,
-    );
+    const labelingTableWidth = Number.parseInt(localStorage.getItem("labelingTableWidth") ?? defaultWidth ?? 200);
 
     return {
       labelingTableWidth,
@@ -122,17 +112,17 @@ export const Tab = types
     get currentOrder() {
       return self.ordering.length
         ? self.ordering.reduce((res, field) => {
-          const fieldName = field.replace(/^-/, "");
-          const desc = field[0] === "-";
+            const fieldName = field.replace(/^-/, "");
+            const desc = field[0] === "-";
 
-          return {
-            ...res,
-            [fieldName]: desc,
-            desc,
-            field: fieldName,
-            column: self.columns.find((c) => c.id === fieldName),
-          };
-        }, {})
+            return {
+              ...res,
+              [fieldName]: desc,
+              desc,
+              field: fieldName,
+              column: self.columns.find((c) => c.id === fieldName),
+            };
+          }, {})
         : null;
     },
 
@@ -151,11 +141,7 @@ export const Tab = types
           type: el.filter.currentType,
         };
 
-        filterItem.value = normalizeFilterValue(
-          filterItem.type,
-          filterItem.operator,
-          filterItem.value,
-        );
+        filterItem.value = normalizeFilterValue(filterItem.type, filterItem.operator, filterItem.value);
 
         return filterItem;
       });
@@ -315,9 +301,9 @@ export const Tab = types
       }
       /* if we have a min and max we need to make sure we save that too.
       this prevents firing 2 view save requests to accomplish the same thing */
-      return ( !isNaN(min) && !isNaN(max) ) ? self.setSemanticSearchThreshold(min, max) : self.save();
+      return !isNaN(min) && !isNaN(max) ? self.setSemanticSearchThreshold(min, max) : self.save();
     },
-    
+
     setSemanticSearchThreshold(_min, max) {
       const min = clamp(_min ?? THRESHOLD_MIN, THRESHOLD_MIN, max - THRESHOLD_MIN_DIFF);
 
@@ -358,7 +344,7 @@ export const Tab = types
           return columnID === filter.field.id;
         });
 
-        filters.forEach(f => {
+        filters.forEach((f) => {
           if (f.type !== type) f.delete();
         });
 
@@ -409,8 +395,7 @@ export const Tab = types
     },
 
     afterAttach() {
-      self.hiddenColumns =
-        self.hiddenColumns ?? clone(self.parent.defaultHidden);
+      self.hiddenColumns = self.hiddenColumns ?? clone(self.parent.defaultHidden);
     },
 
     afterCreate() {

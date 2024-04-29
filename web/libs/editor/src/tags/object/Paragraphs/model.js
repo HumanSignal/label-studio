@@ -1,19 +1,19 @@
-import { createRef } from 'react';
-import { getRoot, types } from 'mobx-state-tree';
-import ColorScheme from 'pleasejs';
+import { createRef } from "react";
+import { getRoot, types } from "mobx-state-tree";
+import ColorScheme from "pleasejs";
 
-import { errorBuilder } from '../../../core/DataValidator/ConfigValidator';
-import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
-import RegionsMixin from '../../../mixins/Regions';
-import { SyncableMixin } from '../../../mixins/Syncable';
-import { ParagraphsRegionModel } from '../../../regions/ParagraphsRegion';
-import Utils from '../../../utils';
-import { parseValue } from '../../../utils/data';
-import { FF_DEV_2669, FF_DEV_2918, FF_DEV_3666, FF_LSDV_E_278, isFF } from '../../../utils/feature-flags';
-import messages from '../../../utils/messages';
-import { clamp, isDefined, isValidObjectURL } from '../../../utils/utilities';
-import ObjectBase from '../Base';
-import styles from './Paragraphs.module.scss';
+import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
+import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
+import RegionsMixin from "../../../mixins/Regions";
+import { SyncableMixin } from "../../../mixins/Syncable";
+import { ParagraphsRegionModel } from "../../../regions/ParagraphsRegion";
+import Utils from "../../../utils";
+import { parseValue } from "../../../utils/data";
+import { FF_DEV_2669, FF_DEV_2918, FF_DEV_3666, FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
+import messages from "../../../utils/messages";
+import { clamp, isDefined, isValidObjectURL } from "../../../utils/utilities";
+import ObjectBase from "../Base";
+import styles from "./Paragraphs.module.scss";
 
 /**
  * The `Paragraphs` tag displays paragraphs of text on the labeling interface. Use to label dialogue transcripts for NLP and NER projects.
@@ -37,19 +37,19 @@ import styles from './Paragraphs.module.scss';
  *               layout="dialogue" textKey="text" nameKey="author"
  *               showPlayer="true"
  *               />
- *   
+ *
  *   <Choices name="choices" toName="paragraphs" choice="multiple">
  *       <Choice value="Good quality"/>
  *       <Choice value="Fast speech"/>
- *   </Choices>    
+ *   </Choices>
  * </View>
- * 
- * <!-- {"data": { 
+ *
+ * <!-- {"data": {
  *   "para": [
  *     {"text": "test 1", "author": "A", "start": 0.0, "end": 1.0},
  *     {"text": "test 2", "author": "B", "start": 1.0, "end": 2.0},
  *     {"text": "test 3", "author": "A", "start": 2.0, "end": 3.0}
- *   ], 
+ *   ],
  *   "audio": "/static/samples/game.wav"
  * }}
  * -->
@@ -69,33 +69,33 @@ import styles from './Paragraphs.module.scss';
  * @param {string} [textKey=text]         - The key field to use for the text
  * @param {boolean} [contextScroll=false] - Turn on contextual scroll mode
  */
-const TagAttrs = types.model('ParagraphsModel', {
+const TagAttrs = types.model("ParagraphsModel", {
   value: types.maybeNull(types.string),
-  valuetype: types.optional(types.enumeration(['json', 'url']), () => (window.LS_SECURE_MODE ? 'url' : 'json')),
+  valuetype: types.optional(types.enumeration(["json", "url"]), () => (window.LS_SECURE_MODE ? "url" : "json")),
   audiourl: types.maybeNull(types.string),
   showplayer: false,
 
   highlightcolor: types.maybeNull(types.string),
   showlabels: types.optional(types.boolean, false),
 
-  layout: types.optional(types.enumeration(['none', 'dialogue']), 'none'),
+  layout: types.optional(types.enumeration(["none", "dialogue"]), "none"),
 
   // @todo add `valueType=url` to Paragraphs and make autodetection of `savetextresult`
-  savetextresult: types.optional(types.enumeration(['none', 'no', 'yes']), () =>
-    window.LS_SECURE_MODE ? 'no' : 'yes',
+  savetextresult: types.optional(types.enumeration(["none", "no", "yes"]), () =>
+    window.LS_SECURE_MODE ? "no" : "yes",
   ),
 
-  namekey: types.optional(types.string, 'author'),
-  textkey: types.optional(types.string, 'text'),
+  namekey: types.optional(types.string, "author"),
+  textkey: types.optional(types.string, "text"),
   contextscroll: types.optional(types.boolean, false),
 });
 
 const Model = types
-  .model('ParagraphsModel', {
-    type: 'paragraphs',
+  .model("ParagraphsModel", {
+    type: "paragraphs",
     _update: types.optional(types.number, 1),
   })
-  .views(self => ({
+  .views((self) => ({
     get hasStates() {
       const states = self.states();
 
@@ -108,7 +108,7 @@ const Model = types
 
     get audio() {
       if (!self.audiourl) return null;
-      if (self.audiourl[0] === '$') {
+      if (self.audiourl[0] === "$") {
         const store = getRoot(self);
         const val = self.audiourl.substr(1);
 
@@ -118,37 +118,36 @@ const Model = types
     },
 
     layoutStyles(data) {
-      if (self.layout === 'dialogue') {
+      if (self.layout === "dialogue") {
         const seed = data[self.namekey];
         const color = ColorScheme.make_color({ seed })[0];
 
         if (isFF(FF_LSDV_E_278)) {
           return {
             phrase: {
-              '--highlight-color': color,
-              '--background-color': '#FFF',
+              "--highlight-color": color,
+              "--background-color": "#FFF",
             },
             name: { color },
             inactive: {
               phrase: {
-                '--highlight-color': Utils.Colors.convertToRGBA(color, 0.4),
-                '--background-color': '#FAFAFA',
+                "--highlight-color": Utils.Colors.convertToRGBA(color, 0.4),
+                "--background-color": "#FAFAFA",
               },
               name: { color: Utils.Colors.convertToRGBA(color, 0.9) },
             },
           };
-        } else {
-          return {
-            phrase: { backgroundColor: Utils.Colors.convertToRGBA(color, 0.25) },
-          };
         }
+        return {
+          phrase: { backgroundColor: Utils.Colors.convertToRGBA(color, 0.25) },
+        };
       }
 
       return {};
     },
 
     get layoutClasses() {
-      if (self.layout === 'dialogue') {
+      if (self.layout === "dialogue") {
         return {
           phrase: styles.phrase,
           name: styles.dialoguename,
@@ -170,7 +169,7 @@ const Model = types
     activeStates() {
       const states = self.states();
 
-      return states && states.filter(s => s.isSelected && s._type === 'paragraphlabels');
+      return states && states.filter((s) => s.isSelected && s._type === "paragraphlabels");
     },
 
     isVisibleForAuthorFilter(data) {
@@ -180,18 +179,19 @@ const Model = types
     },
   }));
 
-const PlayableAndSyncable = types.model()
+const PlayableAndSyncable = types
+  .model()
   .volatile(() => ({
     _value: null,
     filterByAuthor: [],
-    searchAuthor: '',
+    searchAuthor: "",
     playingId: -1,
     playing: false, // just internal state for UI
     audioRef: createRef(),
     audioDuration: null,
     audioFrameHandler: null,
   }))
-  .views(self => ({
+  .views((self) => ({
     /**
      * All regions indices that are active at the given time.
      * @param {number} time
@@ -217,11 +217,11 @@ const PlayableAndSyncable = types.model()
     get regionsStartEnd() {
       if (!self.audioDuration) return [];
 
-      return self._value?.map(value => {
+      return self._value?.map((value) => {
         if (value.start === undefined) return {};
 
         const start = clamp(value.start ?? 0, 0, self.audioDuration);
-        const _end = value.duration ? start + value.duration : (value.end ?? self.audioDuration);
+        const _end = value.duration ? start + value.duration : value.end ?? self.audioDuration;
         const end = clamp(_end, start, self.audioDuration);
 
         return { start, end };
@@ -231,7 +231,7 @@ const PlayableAndSyncable = types.model()
       return Object.values(self.regionsStartEnd);
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     /**
      * Wrapper to always send important data during sync
      * @param {string} event
@@ -242,18 +242,21 @@ const PlayableAndSyncable = types.model()
 
       if (!audio) return;
 
-      self.syncSend({
-        playing: !audio.paused,
-        time: audio.currentTime,
-        ...data,
-      }, event);
+      self.syncSend(
+        {
+          playing: !audio.paused,
+          time: audio.currentTime,
+          ...data,
+        },
+        event,
+      );
     },
 
     registerSyncHandlers() {
-      self.syncHandlers.set('pause', self.stopNow);
-      self.syncHandlers.set('play', self.handleSyncPlay);
-      self.syncHandlers.set('seek', self.handleSyncPlay);
-      self.syncHandlers.set('speed', self.handleSyncSpeed);
+      self.syncHandlers.set("pause", self.stopNow);
+      self.syncHandlers.set("play", self.handleSyncPlay);
+      self.syncHandlers.set("seek", self.handleSyncPlay);
+      self.syncHandlers.set("speed", self.handleSyncSpeed);
     },
 
     handleSyncPlay({ time, playing }) {
@@ -282,7 +285,7 @@ const PlayableAndSyncable = types.model()
       if (audio) audio.muted = muted;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     handleAudioLoaded(e) {
       const audio = e.target;
 
@@ -306,7 +309,7 @@ const PlayableAndSyncable = types.model()
 
       audio.pause();
       self.playing = false;
-      self.triggerSync('pause');
+      self.triggerSync("pause");
     },
 
     /**
@@ -364,7 +367,7 @@ const PlayableAndSyncable = types.model()
 
       if (isPaused) {
         audio.play();
-        self.triggerSync('play');
+        self.triggerSync("play");
       }
 
       self.playing = true;
@@ -397,11 +400,11 @@ const PlayableAndSyncable = types.model()
       audio.play();
       self.playing = true;
       self.playingId = idx;
-      self.triggerSync('play');
+      self.triggerSync("play");
       self.trackPlayingId();
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     setAuthorSearch(value) {
       self.searchAuthor = value;
     },
@@ -411,149 +414,148 @@ const PlayableAndSyncable = types.model()
     },
   }));
 
-const ParagraphsLoadingModel = types.model()
-  .actions(self => ({
-    needsUpdate() {
-      self._update = self._update + 1;
-    },
+const ParagraphsLoadingModel = types.model().actions((self) => ({
+  needsUpdate() {
+    self._update = self._update + 1;
+  },
 
-    updateValue(store) {
-      const value = parseValue(self.value, store.task.dataObj);
+  updateValue(store) {
+    const value = parseValue(self.value, store.task.dataObj);
 
-      if (self.valuetype === 'url') {
-        const url = value;
+    if (self.valuetype === "url") {
+      const url = value;
 
-        if (!isValidObjectURL(url, true)) {
-          const message = [];
+      if (!isValidObjectURL(url, true)) {
+        const message = [];
 
-          if (url) {
-            message.push(`URL (${url}) is not valid.`);
-            message.push('You should not put data directly into your task if you use valuetype="url".');
-          } else {
-            message.push(`URL is empty, check ${value} in data JSON.`);
-          }
-          if (window.LS_SECURE_MODE) message.unshift('In SECURE MODE valuetype set to "url" by default.');
-          store.annotationStore.addErrors([errorBuilder.generalError(message.join('\n'))]);
-          self.setRemoteValue('');
-          return;
+        if (url) {
+          message.push(`URL (${url}) is not valid.`);
+          message.push('You should not put data directly into your task if you use valuetype="url".');
+        } else {
+          message.push(`URL is empty, check ${value} in data JSON.`);
         }
-        fetch(url)
-          .then(res => {
-            if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-            return res.json();
-          })
-          .then(self.setRemoteValue)
-          .catch(e => {
-            const message = messages.ERR_LOADING_HTTP({ attr: self.value, error: String(e), url });
-
-            store.annotationStore.addErrors([errorBuilder.generalError(message)]);
-            self.setRemoteValue('');
-          });
-      } else {
-        self.setRemoteValue(value);
-      }
-    },
-
-    setRemoteValue(val) {
-      const errors = [];
-
-      if (!Array.isArray(val)) {
-        errors.push('Provided data is not an array');
-      } else {
-        if (!(self.namekey in val[0])) {
-          errors.push(`"${self.namekey}" field not found in task data; check your <b>nameKey</b> parameter`);
-        }
-        if (!(self.textkey in val[0])) {
-          errors.push(`"${self.textkey}" field not found in task data; check your <b>textKey</b> parameter`);
-        }
-      }
-      if (errors.length) {
-        const general = [
-          `Task data (provided as <b>${self.value}</b>) has wrong format.<br/>`,
-          'It should be an array of objects with fields,',
-          'defined by <b>nameKey</b> ("author" by default)',
-          'and <b>textKey</b> ("text" by default)',
-        ].join(' ');
-
-        self.store.annotationStore.addErrors([
-          errorBuilder.generalError(`${general}<ul>${errors.map(error => `<li>${error}</li>`).join('')}</ul>`),
-        ]);
+        if (window.LS_SECURE_MODE) message.unshift('In SECURE MODE valuetype set to "url" by default.');
+        store.annotationStore.addErrors([errorBuilder.generalError(message.join("\n"))]);
+        self.setRemoteValue("");
         return;
       }
-      const contextScroll = isFF(FF_LSDV_E_278) && self.contextscroll;
+      fetch(url)
+        .then((res) => {
+          if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+          return res.json();
+        })
+        .then(self.setRemoteValue)
+        .catch((e) => {
+          const message = messages.ERR_LOADING_HTTP({ attr: self.value, error: String(e), url });
 
-      const value = contextScroll ? val.sort((a, b) => {
+          store.annotationStore.addErrors([errorBuilder.generalError(message)]);
+          self.setRemoteValue("");
+        });
+    } else {
+      self.setRemoteValue(value);
+    }
+  },
 
-        if (!a.start) return 1;
-        if (!b.start) return -1;
-        const aEnd = a.end ? a.end : a.start + a.duration || 0;
-        const bEnd = b.end ? b.end : b.start + b.duration || 0;
+  setRemoteValue(val) {
+    const errors = [];
 
-        if (a.start === b.start) return aEnd - bEnd;
-        return a.start - b.start;
-      }) : val;
-      
-      self._value = value;
-      self.needsUpdate();
-    },
-
-    createRegion(p) {
-      const r = ParagraphsRegionModel.create({
-        pid: p.id,
-        ...p,
-      });
-
-      r._range = p._range;
-
-      self.regions.push(r);
-      self.annotation.addRegion(r);
-
-      return r;
-    },
-
-    addRegions(ranges) {
-      const areas = [];
-      const states = isFF(FF_DEV_3666) ? self.getAvailableStates() : self.activeStates();
-
-      if (states.length === 0) return;
-
-      const control = states[0];
-      const labels = { [control.valueType]: control.selectedValues() };
-
-      for (const range of ranges) {
-        const area = self.annotation.createResult(range, labels, control, self);
-
-        area.setText(range.text);
-
-        area.notifyDrawingFinished();
-
-        area._range = range._range;
-        areas.push(area);
+    if (!Array.isArray(val)) {
+      errors.push("Provided data is not an array");
+    } else {
+      if (!(self.namekey in val[0])) {
+        errors.push(`"${self.namekey}" field not found in task data; check your <b>nameKey</b> parameter`);
       }
-      return areas;
-    },
-
-    addRegion(range) {
-      if (isFF(FF_DEV_2918)) {
-        return self.addRegions([range])[0];
-      } else {
-        const states = isFF(FF_DEV_3666) ? self.getAvailableStates() : self.activeStates();
-
-        if (states.length === 0) return;
-
-        const control = states[0];
-        const labels = { [control.valueType]: control.selectedValues() };
-        const area = self.annotation.createResult(range, labels, control, self);
-
-        area.setText(range.text);
-
-        area.notifyDrawingFinished();
-
-        area._range = range._range;
-        return area;
+      if (!(self.textkey in val[0])) {
+        errors.push(`"${self.textkey}" field not found in task data; check your <b>textKey</b> parameter`);
       }
-    },
-  }));
+    }
+    if (errors.length) {
+      const general = [
+        `Task data (provided as <b>${self.value}</b>) has wrong format.<br/>`,
+        "It should be an array of objects with fields,",
+        'defined by <b>nameKey</b> ("author" by default)',
+        'and <b>textKey</b> ("text" by default)',
+      ].join(" ");
+
+      self.store.annotationStore.addErrors([
+        errorBuilder.generalError(`${general}<ul>${errors.map((error) => `<li>${error}</li>`).join("")}</ul>`),
+      ]);
+      return;
+    }
+    const contextScroll = isFF(FF_LSDV_E_278) && self.contextscroll;
+
+    const value = contextScroll
+      ? val.sort((a, b) => {
+          if (!a.start) return 1;
+          if (!b.start) return -1;
+          const aEnd = a.end ? a.end : a.start + a.duration || 0;
+          const bEnd = b.end ? b.end : b.start + b.duration || 0;
+
+          if (a.start === b.start) return aEnd - bEnd;
+          return a.start - b.start;
+        })
+      : val;
+
+    self._value = value;
+    self.needsUpdate();
+  },
+
+  createRegion(p) {
+    const r = ParagraphsRegionModel.create({
+      pid: p.id,
+      ...p,
+    });
+
+    r._range = p._range;
+
+    self.regions.push(r);
+    self.annotation.addRegion(r);
+
+    return r;
+  },
+
+  addRegions(ranges) {
+    const areas = [];
+    const states = isFF(FF_DEV_3666) ? self.getAvailableStates() : self.activeStates();
+
+    if (states.length === 0) return;
+
+    const control = states[0];
+    const labels = { [control.valueType]: control.selectedValues() };
+
+    for (const range of ranges) {
+      const area = self.annotation.createResult(range, labels, control, self);
+
+      area.setText(range.text);
+
+      area.notifyDrawingFinished();
+
+      area._range = range._range;
+      areas.push(area);
+    }
+    return areas;
+  },
+
+  addRegion(range) {
+    if (isFF(FF_DEV_2918)) {
+      return self.addRegions([range])[0];
+    }
+    const states = isFF(FF_DEV_3666) ? self.getAvailableStates() : self.activeStates();
+
+    if (states.length === 0) return;
+
+    const control = states[0];
+    const labels = { [control.valueType]: control.selectedValues() };
+    const area = self.annotation.createResult(range, labels, control, self);
+
+    area.setText(range.text);
+
+    area.notifyDrawingFinished();
+
+    area._range = range._range;
+    return area;
+  },
+}));
 
 const paragraphModelMixins = [
   RegionsMixin,
@@ -566,4 +568,4 @@ const paragraphModelMixins = [
   ParagraphsLoadingModel,
 ].filter(Boolean);
 
-export const ParagraphsModel = types.compose('ParagraphsModel', ...paragraphModelMixins);
+export const ParagraphsModel = types.compose("ParagraphsModel", ...paragraphModelMixins);
