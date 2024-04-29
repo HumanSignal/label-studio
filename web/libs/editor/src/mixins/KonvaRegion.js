@@ -1,10 +1,11 @@
-import { types } from 'mobx-state-tree';
-import { FF_DBLCLICK_DELAY, FF_DEV_3793, FF_ZOOM_OPTIM, isFF } from '../utils/feature-flags';
-export const KonvaRegionMixin = types.model({})
+import { types } from "mobx-state-tree";
+import { FF_DBLCLICK_DELAY, FF_DEV_3793, FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
+export const KonvaRegionMixin = types
+  .model({})
   .views((self) => {
     return {
       get bboxCoords() {
-        console.warn('KonvaRegionMixin needs to implement bboxCoords getter in regions');
+        console.warn("KonvaRegionMixin needs to implement bboxCoords getter in regions");
         return null;
       },
       get bboxCoordsCanvas() {
@@ -22,16 +23,19 @@ export const KonvaRegionMixin = types.model({})
       },
       get inViewPort() {
         if (!isFF(FF_ZOOM_OPTIM)) return true;
-        return !!self && !!self.bboxCoordsCanvas && !!self.object && (
-          self.bboxCoordsCanvas.right >= self.object.viewPortBBoxCoords.left
-          && self.bboxCoordsCanvas.bottom >= self.object.viewPortBBoxCoords.top
-          && self.bboxCoordsCanvas.left <= self.object.viewPortBBoxCoords.right
-          && self.bboxCoordsCanvas.top <= self.object.viewPortBBoxCoords.bottom
+        return (
+          !!self &&
+          !!self.bboxCoordsCanvas &&
+          !!self.object &&
+          self.bboxCoordsCanvas.right >= self.object.viewPortBBoxCoords.left &&
+          self.bboxCoordsCanvas.bottom >= self.object.viewPortBBoxCoords.top &&
+          self.bboxCoordsCanvas.left <= self.object.viewPortBBoxCoords.right &&
+          self.bboxCoordsCanvas.top <= self.object.viewPortBBoxCoords.bottom
         );
       },
       get control() {
         // that's a little bit tricky, but it seems that having a tools field is necessary for the region-creating control tag and it's might be a clue
-        return self.results.find(result => result.from_name.tools)?.from_name;
+        return self.results.find((result) => result.from_name.tools)?.from_name;
       },
       get canRotate() {
         return self.control?.canrotate && self.supportsRotate;
@@ -43,7 +47,7 @@ export const KonvaRegionMixin = types.model({})
       },
     };
   })
-  .actions(self => {
+  .actions((self) => {
     let deferredSelectId = null;
 
     return {
@@ -68,7 +72,7 @@ export const KonvaRegionMixin = types.model({})
         let viewport = canvas;
 
         // `.lsf-main-content` is the main scrollable container for LSF
-        while (viewport && !viewport.scrollTop && !viewport.className.includes('main-content')) {
+        while (viewport && !viewport.scrollTop && !viewport.className.includes("main-content")) {
           viewport = viewport.parentElement;
         }
         if (!viewport) return;
@@ -87,21 +91,21 @@ export const KonvaRegionMixin = types.model({})
         // comparing the closest point of region from top or bottom image edge
         // and how deep is this edge hidden behind respective edge of viewport
         const overTop = rBBox.top - (vBBox.top - cBBox.top);
-        const overBottom = (canvas.clientHeight - rBBox.bottom) - (cBBox.bottom - vBBox.bottom) - INFOBAR_HEIGHT;
+        const overBottom = canvas.clientHeight - rBBox.bottom - (cBBox.bottom - vBBox.bottom) - INFOBAR_HEIGHT;
         // huge images should be scrolled to the closest edge, not to hidden one
         const isHuge = zoomedIn && canvas.clientHeight > viewport.clientHeight;
 
         // huge region or image cut off by viewport edges — do nothing
         if (overTop < 0 && overBottom < 0) return;
 
-        if (overTop < 0 && -overTop / height > (1 - VISIBLE_AREA)) {
+        if (overTop < 0 && -overTop / height > 1 - VISIBLE_AREA) {
           // if image is still visible enough — don't scroll
-          if (zoomedIn && (cBBox.bottom - vBBox.top) / viewport.clientHeight > (1 - VISIBLE_AREA)) return;
-          viewport.scrollBy({ top: isHuge ? -overBottom : overTop, left: 0, behavior: 'smooth' });
-        } else if (overBottom < 0 && -overBottom / height > (1 - VISIBLE_AREA)) {
+          if (zoomedIn && (cBBox.bottom - vBBox.top) / viewport.clientHeight > 1 - VISIBLE_AREA) return;
+          viewport.scrollBy({ top: isHuge ? -overBottom : overTop, left: 0, behavior: "smooth" });
+        } else if (overBottom < 0 && -overBottom / height > 1 - VISIBLE_AREA) {
           // if image is still visible enough — don't scroll
-          if (zoomedIn && (vBBox.bottom - cBBox.top) / viewport.clientHeight > (1 - VISIBLE_AREA)) return;
-          viewport.scrollBy({ top: isHuge ? overTop : -overBottom, left: 0, behavior: 'smooth' });
+          if (zoomedIn && (vBBox.bottom - cBBox.top) / viewport.clientHeight > 1 - VISIBLE_AREA) return;
+          viewport.scrollBy({ top: isHuge ? overTop : -overBottom, left: 0, behavior: "smooth" });
         }
       },
 

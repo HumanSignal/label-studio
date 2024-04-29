@@ -1,19 +1,19 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Button, Spinner } from '../../../components';
-import { Description } from '../../../components/Description/Description';
-import { Form, Label, Toggle } from '../../../components/Form';
-import { modal } from '../../../components/Modal/Modal';
-import { EmptyState } from '../../../components/EmptyState/EmptyState';
-import { IconEmptyPredictions } from '../../../assets/icons';
-import { useAPI } from '../../../providers/ApiProvider';
-import { ProjectContext } from '../../../providers/ProjectProvider';
-import { MachineLearningList } from './MachineLearningList';
-import { CustomBackendForm } from './Forms';
-import { TestRequest } from './TestRequest';
-import { StartModelTraining } from './StartModelTraining';
-import { Block, Elem } from '../../../utils/bem';
-import './MachineLearningSettings.styl';
+import { useCallback, useContext, useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { Button, Spinner } from "../../../components";
+import { Description } from "../../../components/Description/Description";
+import { Form, Label, Toggle } from "../../../components/Form";
+import { modal } from "../../../components/Modal/Modal";
+import { EmptyState } from "../../../components/EmptyState/EmptyState";
+import { IconEmptyPredictions } from "../../../assets/icons";
+import { useAPI } from "../../../providers/ApiProvider";
+import { ProjectContext } from "../../../providers/ProjectProvider";
+import { MachineLearningList } from "./MachineLearningList";
+import { CustomBackendForm } from "./Forms";
+import { TestRequest } from "./TestRequest";
+import { StartModelTraining } from "./StartModelTraining";
+import { Block, Elem } from "../../../utils/bem";
+import "./MachineLearningSettings.styl";
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
@@ -24,7 +24,7 @@ export const MachineLearningSettings = () => {
 
   const fetchBackends = useCallback(async () => {
     setLoading(true);
-    const models = await api.callApi('mlBackends', {
+    const models = await api.callApi("mlBackends", {
       params: {
         project: project.id,
         include_static: true,
@@ -39,7 +39,7 @@ export const MachineLearningSettings = () => {
   const startTrainingModal = useCallback(
     (backend) => {
       const modalProps = {
-        title: `Start Model Training`,
+        title: "Start Model Training",
         style: { width: 760 },
         closeOnClickOutside: true,
         body: <StartModelTraining backend={backend} />,
@@ -53,7 +53,7 @@ export const MachineLearningSettings = () => {
   const showRequestModal = useCallback(
     (backend) => {
       const modalProps = {
-        title: `Test Request`,
+        title: "Test Request",
         style: { width: 760 },
         closeOnClickOutside: true,
         body: <TestRequest backend={backend} />,
@@ -66,9 +66,9 @@ export const MachineLearningSettings = () => {
 
   const showMLFormModal = useCallback(
     (backend) => {
-      const action = backend ? 'updateMLBackend' : 'addMLBackend';
+      const action = backend ? "updateMLBackend" : "addMLBackend";
       const modalProps = {
-        title: `${backend ? 'Edit' : 'Connect'} Model`,
+        title: `${backend ? "Edit" : "Connect"} Model`,
         style: { width: 760 },
         closeOnClickOutside: false,
         body: (
@@ -97,31 +97,27 @@ export const MachineLearningSettings = () => {
 
   return (
     <Block name="ml-settings">
-      <Elem name={'wrapper'}>
+      <Elem name={"wrapper"}>
         {loading && <Spinner size={32} />}
         {loaded && backends.length === 0 && (
           <EmptyState
             icon={<IconEmptyPredictions />}
             title="Let’s connect your first model"
             description="Connect a machine learning model to generate predictions. These predictions can be compared side by side, used for efficient pre‒labeling and, to aid in active learning, directing users to the most impactful labeling tasks."
-            action={(
+            action={
               <Button primary onClick={() => showMLFormModal()}>
                 Connect Model
               </Button>
-            )}
-            footer={(
+            }
+            footer={
               <div>
                 Need help?
-                <br/>
-                <a
-                  href="https://labelstud.io/guide/ml"
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <br />
+                <a href="https://labelstud.io/guide/ml" target="_blank" rel="noreferrer">
                   Learn more about connecting models in our docs
                 </a>
               </div>
-            )}
+            }
           />
         )}
         <MachineLearningList
@@ -135,19 +131,18 @@ export const MachineLearningSettings = () => {
         {backends.length > 0 && (
           <>
             <Description>
-              A connected model has been detected! If you wish to fetch
-              predictions from this model, please follow these steps:
+              A connected model has been detected! If you wish to fetch predictions from this model, please follow these
+              steps:
               <br />
               <br />
               1. Navigate to the <i>Data Manager</i>.<br />
-              2. Select the desired tasks.<br />
+              2. Select the desired tasks.
+              <br />
               3. Click on <i>Retrieve predictions</i> from the <i>Actions</i> menu.
             </Description>
             <Description>
-              If you want to use the model predictions for prelabeling, please configure this in the
-              {" "}
-              <NavLink to="annotation">Annotation settings</NavLink>
-              .
+              If you want to use the model predictions for prelabeling, please configure this in the{" "}
+              <NavLink to="annotation">Annotation settings</NavLink>.
             </Description>
           </>
         )}
@@ -188,5 +183,5 @@ export const MachineLearningSettings = () => {
   );
 };
 
-MachineLearningSettings.title = 'Model';
-MachineLearningSettings.path = '/ml';
+MachineLearningSettings.title = "Model";
+MachineLearningSettings.path = "/ml";

@@ -1,4 +1,4 @@
-const assert = require('assert');
+const assert = require("assert");
 
 /**
  * Load custom example
@@ -17,48 +17,50 @@ async function initLabelStudio({
   additionalInterfaces = [],
   params = {},
 }) {
-  if (window.Konva && window.Konva.stages.length) window.Konva.stages.forEach(stage => stage.destroy());
+  if (window.Konva && window.Konva.stages.length) window.Konva.stages.forEach((stage) => stage.destroy());
 
   const interfaces = [
-    'panel',
-    'update',
-    'submit',
-    'controls',
-    'side-column',
-    'topbar',
-    'annotations:history',
-    'annotations:current',
-    'annotations:tabs',
-    'annotations:menu',
-    'annotations:add-new',
-    'annotations:delete',
-    'predictions:tabs',
-    'predictions:menu',
-    'edit-history',
+    "panel",
+    "update",
+    "submit",
+    "controls",
+    "side-column",
+    "topbar",
+    "annotations:history",
+    "annotations:current",
+    "annotations:tabs",
+    "annotations:menu",
+    "annotations:add-new",
+    "annotations:delete",
+    "predictions:tabs",
+    "predictions:menu",
+    "edit-history",
     ...additionalInterfaces,
   ];
   const task = { data, annotations, predictions };
 
   window.LabelStudio.destroyAll();
-  window.labelStudio = new window.LabelStudio('label-studio', { interfaces, config, task, settings, ...params });
+  window.labelStudio = new window.LabelStudio("label-studio", { interfaces, config, task, settings, ...params });
 }
 
 const createMethodInjectionIntoScript = (fnName, fn) => {
-  const args = (new Array(fn.length)).fill().map((v, idx) => {
-    return `v${idx}`;
-  }).join(', ');
+  const args = new Array(fn.length)
+    .fill()
+    .map((v, idx) => {
+      return `v${idx}`;
+    })
+    .join(", ");
   let fnBody = fn.toString();
 
-  if ((/^(?:(?!function)(?!async)[a-zA-Z])+/).test(fnBody)) {
+  if (/^(?:(?!function)(?!async)[a-zA-Z])+/.test(fnBody)) {
     fnBody = `function ${fnBody}`;
   }
-  return (
-    `${fnName}(${args}) {
+  return `${fnName}(${args}) {
   return (${fnBody})(${args});
-}`);
+}`;
 };
 
-const FN_PREFIX = 'fn_';
+const FN_PREFIX = "fn_";
 const prepareInitialParams = (value, prefix = FN_PREFIX) => {
   if (Array.isArray(value)) {
     const result = [];
@@ -72,11 +74,11 @@ const prepareInitialParams = (value, prefix = FN_PREFIX) => {
     });
     return [result, functions];
   }
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     const result = {};
     let functions = [];
 
-    Object.keys(value).forEach(key => {
+    Object.keys(value).forEach((key) => {
       const param = value[key];
       const [resParam, resFns] = prepareInitialParams(param, `${prefix}_${key}`);
 
@@ -85,7 +87,7 @@ const prepareInitialParams = (value, prefix = FN_PREFIX) => {
     });
     return [result, functions];
   }
-  if (typeof value === 'function') {
+  if (typeof value === "function") {
     const injection = createMethodInjectionIntoScript(prefix, value);
 
     return [prefix, [injection]];
@@ -96,7 +98,9 @@ const prepareInitialParams = (value, prefix = FN_PREFIX) => {
 const createLabelStudioInitFunction = (params) => {
   const [preparedParams, fns] = prepareInitialParams(params);
 
-  return new Function('', `
+  return new Function(
+    "",
+    `
 function linkFunctions(value) {
  if (Array.isArray(value)) {
     return value.map(val => linkFunctions(val));
@@ -113,11 +117,12 @@ function linkFunctions(value) {
  }
  return value;
 }
-function ${createMethodInjectionIntoScript('initLabelStudio', initLabelStudio)}
-const fns = {${fns.join(',')}};
+function ${createMethodInjectionIntoScript("initLabelStudio", initLabelStudio)}
+const fns = {${fns.join(",")}};
 const params = ${JSON.stringify(preparedParams)};
 initLabelStudio(linkFunctions(params));
-`);
+`,
+  );
 };
 
 const setFeatureFlagsDefaultValue = (value) => {
@@ -143,16 +148,22 @@ const hasFF = (fflag) => {
 };
 
 const createAddEventListenerScript = (eventName, callback) => {
-  const args = (new Array(callback.length)).fill().map((v, idx) => {
-    return `v${idx}`;
-  }).join(', ');
+  const args = new Array(callback.length)
+    .fill()
+    .map((v, idx) => {
+      return `v${idx}`;
+    })
+    .join(", ");
 
-  return new Function('', `
+  return new Function(
+    "",
+    `
     function ${eventName}(${args}) {
       return (${callback.toString()})(${args});
     }
     window.labelStudio.on("${eventName}",${eventName});
-`);
+`,
+  );
 };
 
 /**
@@ -160,7 +171,7 @@ const createAddEventListenerScript = (eventName, callback) => {
  */
 const waitForImage = () => {
   return new Promise((resolve, reject) => {
-    const img = document.querySelector('[alt=LS]');
+    const img = document.querySelector("[alt=LS]");
 
     if (!img || img.complete) return resolve();
     // this should be rewritten to isReady when it is ready
@@ -176,13 +187,13 @@ const waitForImage = () => {
  * Wait for all audio on the page to be loaded
  */
 const waitForAudio = async () => {
-  const audios = document.querySelectorAll('audio');
+  const audios = document.querySelectorAll("audio");
 
   await Promise.all(
-    [...audios].map(audio => {
+    [...audios].map((audio) => {
       if (audio.readyState === 4) return Promise.resolve(true);
-      return new Promise(resolve => {
-        audio.addEventListener('durationchange', () => {
+      return new Promise((resolve) => {
+        audio.addEventListener("durationchange", () => {
           resolve(true);
         });
       });
@@ -190,14 +201,13 @@ const waitForAudio = async () => {
   );
 };
 
-
 /**
  * Wait for objects ready
  */
 const waitForObjectsReady = async () => {
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     const watchObjectsReady = () => {
-      const isReady = window.Htx.annotationStore.selected.objects.every(object => object.isReady);
+      const isReady = window.Htx.annotationStore.selected.objects.every((object) => object.isReady);
 
       if (isReady) {
         resolve(true);
@@ -216,7 +226,7 @@ const waitForObjectsReady = async () => {
 const getCurrentMedia = (type) => {
   const media = document.querySelectorAll(type);
 
-  return [...media].map(m => ({
+  return [...media].map((m) => ({
     currentTime: m.currentTime,
     duration: m.duration,
     playbackRate: m.playbackRate,
@@ -233,15 +243,15 @@ const getCurrentMedia = (type) => {
  * @param {*} data
  */
 const convertToFixed = (data, fractionDigits = 2) => {
-  if (['string', 'number'].includes(typeof data)) {
+  if (["string", "number"].includes(typeof data)) {
     const n = Number(data);
 
     return Number.isNaN(n) ? data : Number.isInteger(n) ? n : +n.toFixed(fractionDigits);
   }
   if (Array.isArray(data)) {
-    return data.map(n => convertToFixed(n, fractionDigits));
+    return data.map((n) => convertToFixed(n, fractionDigits));
   }
-  if (typeof data === 'object') {
+  if (typeof data === "object") {
     const result = {};
 
     for (const key in data) {
@@ -267,17 +277,17 @@ const convertToFixed = (data, fractionDigits = 2) => {
  */
 const getSizeConvertor = (width, height) =>
   function convert(data, size = width) {
-    if (typeof data === 'number') return convertToFixed((data * 100) / size);
+    if (typeof data === "number") return convertToFixed((data * 100) / size);
     if (Array.isArray(data)) {
       if (data.length === 2) return [convert(data[0]), convert(data[1], height)];
-      return data.map(n => convert(n));
+      return data.map((n) => convert(n));
     }
-    if (typeof data === 'object') {
+    if (typeof data === "object") {
       const result = {};
 
       for (const key in data) {
-        if (key === 'rotation') result[key] = data[key];
-        else if (key.startsWith('height') || key === 'y' || key.endsWith('Y')) result[key] = convert(data[key], height);
+        if (key === "rotation") result[key] = data[key];
+        else if (key.startsWith("height") || key === "y" || key.endsWith("Y")) result[key] = convert(data[key], height);
         else result[key] = convert(data[key]);
       }
       return result;
@@ -285,13 +295,13 @@ const getSizeConvertor = (width, height) =>
     return data;
   };
 
-const delay = n => new Promise(resolve => setTimeout(resolve, n));
+const delay = (n) => new Promise((resolve) => setTimeout(resolve, n));
 
 // good idea, but it doesn't work :(
-const emulateClick = source => {
-  const event = document.createEvent('CustomEvent');
+const emulateClick = (source) => {
+  const event = document.createEvent("CustomEvent");
 
-  event.initCustomEvent('click', true, true, null);
+  event.initCustomEvent("click", true, true, null);
   event.clientX = source.getBoundingClientRect().top / 2;
   event.clientY = source.getBoundingClientRect().left / 2;
   source.dispatchEvent(event);
@@ -299,14 +309,14 @@ const emulateClick = source => {
 
 const emulateKeypress = (params) => {
   document.activeElement.dispatchEvent(
-    new KeyboardEvent('keydown', {
+    new KeyboardEvent("keydown", {
       bubbles: true,
       cancelable: true,
       ...params,
     }),
   );
   document.activeElement.dispatchEvent(
-    new KeyboardEvent('keyup', {
+    new KeyboardEvent("keyup", {
       bubbles: true,
       cancelable: true,
       ...params,
@@ -314,13 +324,11 @@ const emulateKeypress = (params) => {
   );
 };
 
-
-
 // click the Rect on the Konva canvas
 const clickRect = () => {
-  const rect = window.Konva.stages[0].findOne('Rect');
+  const rect = window.Konva.stages[0].findOne("Rect");
 
-  rect.fire('click', { clientX: 10, clientY: 10 });
+  rect.fire("click", { clientX: 10, clientY: 10 });
 };
 
 /**
@@ -330,7 +338,7 @@ const clickRect = () => {
 const clickKonva = ([x, y]) => {
   const stage = window.Konva.stages[0];
 
-  stage.fire('click', { clientX: x, clientY: y, evt: { offsetX: x, offsetY: y, timeStamp: Date.now() } });
+  stage.fire("click", { clientX: x, clientY: y, evt: { offsetX: x, offsetY: y, timeStamp: Date.now() } });
 };
 
 /**
@@ -339,19 +347,19 @@ const clickKonva = ([x, y]) => {
  */
 const clickMultipleKonva = async (points) => {
   const stage = window.Konva.stages[0];
-  const delay = (timeout = 0) => new Promise(resolve => setTimeout(resolve, timeout));
+  const delay = (timeout = 0) => new Promise((resolve) => setTimeout(resolve, timeout));
   let lastPoint;
 
   for (const point of points) {
     if (lastPoint) {
-      stage.fire('mousemove', { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
+      stage.fire("mousemove", { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
       await delay();
     }
-    stage.fire('mousedown', { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
+    stage.fire("mousedown", { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
     await delay();
-    stage.fire('mouseup', { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
+    stage.fire("mouseup", { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
     await delay();
-    stage.fire('click', { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
+    stage.fire("click", { evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now() } });
     lastPoint = point;
     await delay();
   }
@@ -363,17 +371,17 @@ const clickMultipleKonva = async (points) => {
  */
 const polygonKonva = async (points) => {
   try {
-    const delay = (timeout = 0) => new Promise(resolve => setTimeout(resolve, timeout));
+    const delay = (timeout = 0) => new Promise((resolve) => setTimeout(resolve, timeout));
     const stage = window.Konva.stages[0];
 
     for (const point of points) {
-      stage.fire('mousedown', {
+      stage.fire("mousedown", {
         evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now(), preventDefault: () => {} },
       });
-      stage.fire('click', {
+      stage.fire("click", {
         evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now(), preventDefault: () => {} },
       });
-      stage.fire('mouseup', {
+      stage.fire("mouseup", {
         evt: { offsetX: point[0], offsetY: point[1], timeStamp: Date.now(), preventDefault: () => {} },
       });
       await delay(50);
@@ -383,14 +391,14 @@ const polygonKonva = async (points) => {
     // const firstPoint = stage.getIntersection({ x, y });
 
     // Circles (polygon points) redraw every new click so we can find it only after last click
-    const lastPoint = stage.find('Circle').slice(-1)[0];
-    const firstPoint = lastPoint.parent.find('Circle')[0];
+    const lastPoint = stage.find("Circle").slice(-1)[0];
+    const firstPoint = lastPoint.parent.find("Circle")[0];
     // for closing the Polygon we should place cursor over the first point
 
-    firstPoint.fire('mouseover');
+    firstPoint.fire("mouseover");
     await delay(100);
     // and only after that we can click on it
-    firstPoint.fire('click', { evt: { preventDefault: () => {} } });
+    firstPoint.fire("click", { evt: { preventDefault: () => {} } });
   } catch (e) {
     return String(e);
   }
@@ -405,17 +413,17 @@ const polygonKonva = async (points) => {
  */
 const dragKonva = async ([x, y, shiftX, shiftY]) => {
   const stage = window.Konva.stages[0];
-  const delay = (timeout = 0) => new Promise(resolve => setTimeout(resolve, timeout));
+  const delay = (timeout = 0) => new Promise((resolve) => setTimeout(resolve, timeout));
 
-  stage.fire('mousedown', { evt: { offsetX: x, offsetY: y } });
+  stage.fire("mousedown", { evt: { offsetX: x, offsetY: y } });
   await delay();
-  stage.fire('mousemove', { evt: { offsetX: x + (shiftX >> 1), offsetY: y + (shiftY >> 1) } });
+  stage.fire("mousemove", { evt: { offsetX: x + (shiftX >> 1), offsetY: y + (shiftY >> 1) } });
   await delay();
   // we should move the cursor to the last point and only after that release the mouse
-  stage.fire('mousemove', { evt: { offsetX: x + shiftX, offsetY: y + shiftY } });
+  stage.fire("mousemove", { evt: { offsetX: x + shiftX, offsetY: y + shiftY } });
   await delay();
   // because some events work on mousemove and not on mouseup
-  stage.fire('mouseup', { evt: { offsetX: x + shiftX, offsetY: y + shiftY } });
+  stage.fire("mouseup", { evt: { offsetX: x + shiftX, offsetY: y + shiftY } });
   // looks like Konva needs some time to update image according to dpi
   await delay(32);
 };
@@ -432,7 +440,7 @@ const hasKonvaPixelColorAtPoint = ([x, y, rgbArray, tolerance]) => {
   let result = false;
 
   const areEqualRGB = (a, b) => {
-    for (let i = 3; i--;) {
+    for (let i = 3; i--; ) {
       if (Math.abs(a[i] - b[i]) > tolerance) {
         return false;
       }
@@ -452,7 +460,7 @@ const hasKonvaPixelColorAtPoint = ([x, y, rgbArray, tolerance]) => {
 };
 
 const areEqualRGB = (a, b, tolerance) => {
-  for (let i = 3; i--;) {
+  for (let i = 3; i--; ) {
     if (Math.abs(a[i] - b[i]) > tolerance) {
       return false;
     }
@@ -484,7 +492,7 @@ const getKonvaPixelColorFromPoint = ([x, y]) => {
 };
 
 const clearModalIfPresent = () => {
-  const modal = window.document.querySelector('.ant-modal-root');
+  const modal = window.document.querySelector(".ant-modal-root");
 
   if (modal) {
     modal.remove();
@@ -515,12 +523,12 @@ const centerOfBbox = (bbox) => {
  * @returns {Promise<string>}
  */
 async function generateImageUrl({ width, height }) {
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
 
   canvas.width = width;
   canvas.height = height;
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   const centerX = width / 2;
   const centerY = height / 2;
@@ -536,7 +544,7 @@ async function generateImageUrl({ width, height }) {
 }
 
 const getNaturalSize = () => {
-  const imageObject = window.Htx.annotationStore.selected.objects.find(o => o.type === 'image');
+  const imageObject = window.Htx.annotationStore.selected.objects.find((o) => o.type === "image");
 
   return {
     width: imageObject.naturalWidth,
@@ -544,7 +552,7 @@ const getNaturalSize = () => {
   };
 };
 const getCanvasSize = () => {
-  const imageObject = window.Htx.annotationStore.selected.objects.find(o => o.type === 'image');
+  const imageObject = window.Htx.annotationStore.selected.objects.find((o) => o.type === "image");
 
   return {
     width: imageObject.canvasSize.width,
@@ -571,7 +579,7 @@ const getImageFrameSize = () => {
 };
 const setZoom = ([scale, x, y]) => {
   return new Promise((resolve) => {
-    Htx.annotationStore.selected.objects.find(o => o.type === 'image').setZoom(scale, x, y);
+    Htx.annotationStore.selected.objects.find((o) => o.type === "image").setZoom(scale, x, y);
     setTimeout(resolve, 30);
   });
 };
@@ -585,8 +593,8 @@ const countKonvaShapes = async () => {
   const regions = Htx.annotationStore.selected.regionStore.regions;
   let count = 0;
 
-  regions.forEach(region => {
-    count += stage.find('.' + region.id).filter(node => node.isVisible()).length;
+  regions.forEach((region) => {
+    count += stage.find(`.${region.id}`).filter((node) => node.isVisible()).length;
   });
 
   return count;
@@ -594,21 +602,21 @@ const countKonvaShapes = async () => {
 
 const isTransformerExist = async () => {
   const stage = window.Konva.stages[0];
-  const anchors = stage.find('._anchor').filter(shape => shape.getAttr('visible') !== false);
+  const anchors = stage.find("._anchor").filter((shape) => shape.getAttr("visible") !== false);
 
   return !!anchors.length;
 };
 
 const isRotaterExist = async () => {
   const stage = window.Konva.stages[0];
-  const rotaters = stage.find('.rotater').filter(shape => shape.getAttr('visible') !== false);
+  const rotaters = stage.find(".rotater").filter((shape) => shape.getAttr("visible") !== false);
 
   return !!rotaters.length;
 };
 
 const getRegionAbsoultePosition = async (shapeId) => {
   const stage = window.Konva.stages[0];
-  const region = stage.findOne(shape => String(shape._id) === String(shapeId));
+  const region = stage.findOne((shape) => String(shape._id) === String(shapeId));
 
   if (!region) return null;
 
@@ -633,13 +641,13 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
 
   let elem = document.querySelector(selector);
 
-  if (elem.matches('iframe')) {
+  if (elem.matches("iframe")) {
     doc = elem.contentDocument;
     win = elem.contentWindow;
     elem = doc.body;
   }
 
-  const findOnPosition = (root, position, borderSide = 'left') => {
+  const findOnPosition = (root, position, borderSide = "left") => {
     const walker = doc.createTreeWalker(root, NodeFilter.SHOW_ALL);
 
     let lastPosition = 0;
@@ -648,19 +656,18 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
 
     while (currentNode) {
       const isText = currentNode.nodeType === Node.TEXT_NODE;
-      const isBR = currentNode.nodeName === 'BR';
+      const isBR = currentNode.nodeName === "BR";
 
       if (isText || isBR) {
         const length = currentNode.length ? currentNode.length : 1;
 
         if (length + lastPosition >= position || !nextNode) {
-          if (borderSide === 'right' && length + lastPosition === position && nextNode) {
+          if (borderSide === "right" && length + lastPosition === position && nextNode) {
             return { node: nextNode, position: 0 };
           }
           return { node: currentNode, position: isBR ? 0 : Math.min(Math.max(position - lastPosition, 0), length) };
-        } else {
-          lastPosition += length;
         }
+        lastPosition += length;
       }
 
       currentNode = nextNode;
@@ -668,8 +675,8 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
     }
   };
 
-  const start = findOnPosition(elem, rangeStart, 'right');
-  const end = findOnPosition(elem, rangeEnd, 'left');
+  const start = findOnPosition(elem, rangeStart, "right");
+  const end = findOnPosition(elem, rangeEnd, "left");
 
   const range = new win.Range();
   const selection = win.getSelection();
@@ -680,9 +687,9 @@ const selectText = async ({ selector, rangeStart, rangeEnd }) => {
   selection.removeAllRanges();
   selection.addRange(range);
 
-  const evt = new MouseEvent('mouseup');
+  const evt = new MouseEvent("mouseup");
 
-  evt.initMouseEvent('mouseup', true, true);
+  evt.initMouseEvent("mouseup", true, true);
   elem.dispatchEvent(evt);
 };
 
@@ -691,14 +698,14 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
   let isIFrame = false;
   let elem = document.querySelector(selector);
 
-  if (elem.matches('iframe')) {
+  if (elem.matches("iframe")) {
     doc = elem.contentDocument;
     win = elem.contentWindow;
     elem = doc.body;
     isIFrame = true;
   }
 
-  const findOnPosition = (root, position, borderSide = 'left') => {
+  const findOnPosition = (root, position, borderSide = "left") => {
     const walker = doc.createTreeWalker(root, NodeFilter.SHOW_ALL);
 
     let lastPosition = 0;
@@ -707,19 +714,18 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
 
     while (currentNode) {
       const isText = currentNode.nodeType === Node.TEXT_NODE;
-      const isBR = currentNode.nodeName === 'BR';
+      const isBR = currentNode.nodeName === "BR";
 
       if (isText || isBR) {
         const length = currentNode.length ? currentNode.length : 1;
 
         if (length + lastPosition >= position || !nextNode) {
-          if (borderSide === 'right' && length + lastPosition === position && nextNode) {
+          if (borderSide === "right" && length + lastPosition === position && nextNode) {
             return { node: nextNode, position: 0 };
           }
           return { node: currentNode, position: isBR ? 0 : Math.min(Math.max(position - lastPosition, 0), length) };
-        } else {
-          lastPosition += length;
         }
+        lastPosition += length;
       }
 
       currentNode = nextNode;
@@ -727,9 +733,8 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
     }
   };
 
-  const start = findOnPosition(elem, rangeStart, 'right');
-  const end = findOnPosition(elem, rangeEnd, 'left');
-
+  const start = findOnPosition(elem, rangeStart, "right");
+  const end = findOnPosition(elem, rangeEnd, "left");
 
   const range = new win.Range();
   const selection = win.getSelection();
@@ -744,7 +749,7 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
   const bboxes = [rangeRects.at(0), rangeRects.at(-1)];
   const iframeOffset = isIFrame ? elem.getBoundingClientRect() : { left: 0, top: 0 };
 
-  return bboxes.map(bbox => ({
+  return bboxes.map((bbox) => ({
     x: bbox.left + iframeOffset.left,
     y: bbox.top + iframeOffset.top,
     width: bbox.width,
@@ -756,7 +761,7 @@ const getSelectionCoordinates = ({ selector, rangeStart, rangeEnd }) => {
 const whereIsPixel = ([rgbArray, tolerance]) => {
   const stage = window.Konva.stages[0];
   const areEqualRGB = (a, b) => {
-    for (let i = 3; i--;) {
+    for (let i = 3; i--; ) {
       if (Math.abs(a[i] - b[i]) > tolerance) {
         return false;
       }
@@ -782,13 +787,13 @@ const whereIsPixel = ([rgbArray, tolerance]) => {
 };
 
 const dumpJSON = (obj) => {
-  console.log(JSON.stringify(obj, null, '  '));
+  console.log(JSON.stringify(obj, null, "  "));
 };
 
 function _isObject(value) {
   const type = typeof value;
 
-  return value !== null && (type === 'object' || type === 'function');
+  return value !== null && (type === "object" || type === "function");
 }
 
 function _pickBy(obj, predicate, path = []) {
@@ -837,21 +842,19 @@ async function doDrawingAction(I, { msg, fromX, fromY, toX, toY }) {
 
 // `mulberry32` (simple generator with a 32-bit state)
 function createRandomWithSeed(seed) {
-  return function() {
-    let t = seed += 0x6D2B79F5;
+  return () => {
+    let t = (seed += 0x6d2b79f5);
 
-    t = Math.imul(t ^ t >>> 15, t | 1);
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
 
 function createRandomIntWithSeed(seed) {
   const random = createRandomWithSeed(seed);
 
-  return function(min, max) {
-    return Math.floor(random() * (max - min + 1) + min);
-  };
+  return (min, max) => Math.floor(random() * (max - min + 1) + min);
 }
 
 module.exports = {

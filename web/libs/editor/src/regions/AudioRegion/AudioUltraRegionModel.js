@@ -1,25 +1,24 @@
-import { types } from 'mobx-state-tree';
-import { AudioModel } from '../../tags/object/AudioNext';
-import Utils from '../../utils';
-import Constants from '../../core/Constants';
+import { types } from "mobx-state-tree";
+import { AudioModel } from "../../tags/object/AudioNext";
+import Utils from "../../utils";
+import Constants from "../../core/Constants";
 
 export const AudioUltraRegionModel = types
-  .model('AudioUltraRegionModel', {
-    type: 'audioregion',
+  .model("AudioUltraRegionModel", {
+    type: "audioregion",
     object: types.late(() => types.reference(AudioModel)),
 
     start: types.number,
     end: types.number,
     channel: types.optional(types.number, 0),
 
-    selectedregionbg: types.optional(types.string, 'rgba(0, 0, 0, 0.5)'),
+    selectedregionbg: types.optional(types.string, "rgba(0, 0, 0, 0.5)"),
   })
   .volatile(() => ({
     hideable: true,
   }))
-  .views(self => ({
+  .views((self) => ({
     wsRegionOptions() {
-
       const reg = {
         id: self.id,
         start: self.start,
@@ -34,7 +33,7 @@ export const AudioUltraRegionModel = types
       return reg;
     },
   }))
-  .actions(self => {
+  .actions((self) => {
     /**
      * @returns {AudioRegionResult}
      */
@@ -140,7 +139,7 @@ export const AudioUltraRegionModel = types
 
       setProperty(propName, value) {
         Super.setProperty(propName, value);
-        if (['start', 'end'].includes(propName)) {
+        if (["start", "end"].includes(propName)) {
           self.updatePosition();
         }
       },

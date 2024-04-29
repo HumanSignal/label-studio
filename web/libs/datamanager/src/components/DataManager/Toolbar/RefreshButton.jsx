@@ -17,10 +17,10 @@ export const RefreshButton = injector(({ store, needsDataFetch, projectFetch, si
   return (
     <Button
       size={size}
-      look={needsDataFetch && 'primary'}
+      look={needsDataFetch && "primary"}
       waiting={projectFetch}
       onClick={async () => {
-        await store.fetchProject({ force: true, interaction: 'refresh' });
+        await store.fetchProject({ force: true, interaction: "refresh" });
         await store.currentView?.reload();
       }}
       style={{

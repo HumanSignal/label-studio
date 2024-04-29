@@ -7,48 +7,42 @@ export const simpleRegionsConfig = `<View>
   </Labels>
 </View>`;
 
-export const simpleRegionsData = 'Some simple text';
+export const simpleRegionsData = "Some simple text";
 export const simpleRegionsResult = [
   {
-    'id': 'label_1',
-    'value': {
-      'start': 0,
-      'end': 4,
-      'labels': [
-        'Label 1',
-      ],
+    id: "label_1",
+    value: {
+      start: 0,
+      end: 4,
+      labels: ["Label 1"],
     },
-    'from_name': 'label',
-    'to_name': 'text',
-    'type': 'labels',
-    'origin': 'manual',
+    from_name: "label",
+    to_name: "text",
+    type: "labels",
+    origin: "manual",
   },
   {
-    'id': 'label_2',
-    'value': {
-      'start': 5,
-      'end': 11,
-      'labels': [
-        'Label 2',
-      ],
+    id: "label_2",
+    value: {
+      start: 5,
+      end: 11,
+      labels: ["Label 2"],
     },
-    'from_name': 'label',
-    'to_name': 'text',
-    'type': 'labels',
-    'origin': 'manual',
+    from_name: "label",
+    to_name: "text",
+    type: "labels",
+    origin: "manual",
   },
   {
-    'id': 'label_3',
-    'value': {
-      'start': 12,
-      'end': 16,
-      'labels': [
-        'Label 3',
-      ],
+    id: "label_3",
+    value: {
+      start: 12,
+      end: 16,
+      labels: ["Label 3"],
     },
-    'from_name': 'label',
-    'to_name': 'text',
-    'type': 'labels',
-    'origin': 'manual',
+    from_name: "label",
+    to_name: "text",
+    type: "labels",
+    origin: "manual",
   },
 ];

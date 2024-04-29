@@ -1,24 +1,17 @@
-import React from 'react';
-import { FaMinus, FaPlus } from 'react-icons/fa';
-import { Block, Elem } from '../../../../utils/bem';
-import { Oneof } from '../../../Oneof/Oneof';
-import { FormField } from '../../FormField';
-import { default as Label } from '../Label/Label';
-import './Counter.styl';
+import React from "react";
+import { FaMinus, FaPlus } from "react-icons/fa";
+import { Block, Elem } from "../../../../utils/bem";
+import { Oneof } from "../../../Oneof/Oneof";
+import { FormField } from "../../FormField";
+import { default as Label } from "../Label/Label";
+import "./Counter.styl";
 
-const allowedKeys = [
-  'ArrowUp',
-  'ArrowDown',
-  'Backspace',
-  'Delete',
-  /[0-9]/,
-];
+const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", /[0-9]/];
 
 const CounterContext = React.createContext(null);
 
-const Counter = ({label, className, validate, required, skip, labelProps, ...props}) => {
-
-  const [min, max] = [props.min ?? -Infinity, props.max ?? Infinity];
+const Counter = ({ label, className, validate, required, skip, labelProps, ...props }) => {
+  const [min, max] = [props.min ?? Number.NEGATIVE_INFINITY, props.max ?? Number.POSITIVE_INFINITY];
 
   const normalizeValue = (value) => Math.max(min, Math.min(max, value));
 
@@ -40,23 +33,22 @@ const Counter = ({label, className, validate, required, skip, labelProps, ...pro
 
   /**@type {(e: import('react').SyntheticEvent<HTMLInputElement, KeyboardEvent>)} */
   const onInputHandler = (e) => {
-    const allowedKey = allowedKeys.find(k => (k instanceof RegExp) ? k.test(e.key) : k === e.key );
+    const allowedKey = allowedKeys.find((k) => (k instanceof RegExp ? k.test(e.key) : k === e.key));
 
     if (!allowedKey && !e.metaKey) e.preventDefault();
 
-    if (allowedKey === 'ArrowUp') {
+    if (allowedKey === "ArrowUp") {
       increase();
       e.preventDefault();
-    } else if (allowedKey === 'ArrowDown') {
+    } else if (allowedKey === "ArrowDown") {
       decrease();
       e.preventDefault();
     }
   };
 
-
   /**@type {(e: import('react').SyntheticEvent<HTMLInputElement, ClipboardEvent>)} */
   const onPasteHandler = (e) => {
-    const content = e.nativeEvent.clipboardData.getData('text');
+    const content = e.nativeEvent.clipboardData.getData("text");
     const isNumerical = /([0-9]+)/.test(content);
 
     if (!isNumerical) e.preventDefault();
@@ -89,8 +81,8 @@ const Counter = ({label, className, validate, required, skip, labelProps, ...pro
     setFocused();
     input.current.focus();
     getSelection().removeAllRanges();
-    if (type === 'increase') return increase();
-    else if (type === 'decrease') return decrease();
+    if (type === "increase") return increase();
+    if (type === "decrease") return decrease();
   };
 
   const field = (
@@ -102,11 +94,12 @@ const Counter = ({label, className, validate, required, skip, labelProps, ...pro
       setValue={setNewValue}
       skip={skip}
       onDependencyChanged={(f) => {
-        if (f.type === 'checkbox') setDisabled(!f.checked);
+        if (f.type === "checkbox") setDisabled(!f.checked);
       }}
       {...props}
-    >{(ref, dep) => {
-        const depDisabled = (dep?.type === 'checkbox' && dep?.checked === false) || false;
+    >
+      {(ref, dep) => {
+        const depDisabled = (dep?.type === "checkbox" && dep?.checked === false) || false;
         const fieldDisabled = disabled ?? depDisabled;
         const contextValue = {
           currentValue,
@@ -114,13 +107,13 @@ const Counter = ({label, className, validate, required, skip, labelProps, ...pro
           max,
           disabled: fieldDisabled,
           ref,
-          onClickHandler
+          onClickHandler,
         };
 
         return (
           <CounterContext.Provider value={contextValue}>
-            <Block name="counter" mod={{focused, disabled: fieldDisabled}} mix={className}>
-              <CounterButton type="decrease"/>
+            <Block name="counter" mod={{ focused, disabled: fieldDisabled }} mix={className}>
+              <CounterButton type="decrease" />
 
               <Elem
                 ref={ref}
@@ -136,29 +129,21 @@ const Counter = ({label, className, validate, required, skip, labelProps, ...pro
                 onBlur={onBlurHandler}
               />
 
-              <CounterButton type="increase"/>
+              <CounterButton type="increase" />
             </Block>
           </CounterContext.Provider>
         );
-      }}</FormField>
+      }}
+    </FormField>
   );
 
-  return (label ? (
-    <Label
-      {...(labelProps ?? {})}
-      text={label}
-      required={required}
-      children={field}
-    />
-  ) : field);
+  return label ? <Label {...(labelProps ?? {})} text={label} required={required} children={field} /> : field;
 };
 
+const CounterButton = ({ type }) => {
+  const { currentValue, min, max, disabled, ref, onClickHandler } = React.useContext(CounterContext);
 
-
-const CounterButton = ({type}) => {
-  const {currentValue, min, max, disabled, ref, onClickHandler} = React.useContext(CounterContext);
-
-  const compareLimit = type === 'increase' ? max : min;
+  const compareLimit = type === "increase" ? max : min;
 
   return (
     <Elem
@@ -167,14 +152,14 @@ const CounterButton = ({type}) => {
       name="btn"
       mod={{
         type,
-        disabled: currentValue === compareLimit || disabled
+        disabled: currentValue === compareLimit || disabled,
       }}
       onClick={onClickHandler(type, ref)}
-      onMouseDownCapture={e => e.preventDefault()}
+      onMouseDownCapture={(e) => e.preventDefault()}
     >
       <Oneof value={type}>
-        <FaMinus case="decrease"/>
-        <FaPlus case="increase"/>
+        <FaMinus case="decrease" />
+        <FaPlus case="increase" />
       </Oneof>
     </Elem>
   );

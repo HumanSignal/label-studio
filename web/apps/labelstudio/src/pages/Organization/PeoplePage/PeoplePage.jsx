@@ -19,14 +19,15 @@ import { SelectedUser } from "./SelectedUser";
 const InvitationModal = ({ link }) => {
   return (
     <Block name="invite">
-      <Input
-        value={link}
-        style={{ width: '100%' }}
-        readOnly
-      />
+      <Input value={link} style={{ width: "100%" }} readOnly />
 
-      <Description style={{ width: '70%', marginTop: 16 }}>
-        Invite people to join your Label Studio instance. People that you invite have full access to all of your projects. <a href="https://labelstud.io/guide/signup.html" target="_blank">Learn more</a>.
+      <Description style={{ width: "70%", marginTop: 16 }}>
+        Invite people to join your Label Studio instance. People that you invite have full access to all of your
+        projects.{" "}
+        <a href="https://labelstud.io/guide/signup.html" target="_blank" rel="noreferrer">
+          Learn more
+        </a>
+        .
       </Description>
     </Block>
   );
@@ -40,63 +41,70 @@ export const PeoplePage = () => {
 
   const [link, setLink] = useState();
 
-  const selectUser = useCallback((user) => {
-    setSelectedUser(user);
+  const selectUser = useCallback(
+    (user) => {
+      setSelectedUser(user);
 
-    localStorage.setItem('selectedUser', user?.id);
-  }, [setSelectedUser]);
+      localStorage.setItem("selectedUser", user?.id);
+    },
+    [setSelectedUser],
+  );
 
-  const setInviteLink = useCallback((link) => {
-    const hostname = config.hostname || location.origin;
+  const setInviteLink = useCallback(
+    (link) => {
+      const hostname = config.hostname || location.origin;
 
-    setLink(`${hostname}${link}`);
-  }, [config, setLink]);
+      setLink(`${hostname}${link}`);
+    },
+    [config, setLink],
+  );
 
   const updateLink = useCallback(() => {
-    api.callApi('resetInviteLink').then(({ invite_url }) => {
+    api.callApi("resetInviteLink").then(({ invite_url }) => {
       setInviteLink(invite_url);
     });
   }, [setInviteLink]);
 
-  const inviteModalProps = useCallback((link) => ({
-    title: "Invite people",
-    style: { width: 640, height: 472 },
-    body: () => (
-      <InvitationModal link={link} />
-    ),
-    footer: () => {
-      const [copied, setCopied] = useState(false);
+  const inviteModalProps = useCallback(
+    (link) => ({
+      title: "Invite people",
+      style: { width: 640, height: 472 },
+      body: () => <InvitationModal link={link} />,
+      footer: () => {
+        const [copied, setCopied] = useState(false);
 
-      const copyLink = useCallback(() => {
-        setCopied(true);
-        copyText(link);
-        setTimeout(() => setCopied(false), 1500);
-      }, []);
+        const copyLink = useCallback(() => {
+          setCopied(true);
+          copyText(link);
+          setTimeout(() => setCopied(false), 1500);
+        }, []);
 
-      return (
-        <Space spread>
-          <Space>
-            <Button style={{ width: 170 }} onClick={() => updateLink()}>
-              Reset Link
-            </Button>
+        return (
+          <Space spread>
+            <Space>
+              <Button style={{ width: 170 }} onClick={() => updateLink()}>
+                Reset Link
+              </Button>
+            </Space>
+            <Space>
+              <Button primary style={{ width: 170 }} onClick={copyLink}>
+                {copied ? "Copied!" : "Copy link"}
+              </Button>
+            </Space>
           </Space>
-          <Space>
-            <Button primary style={{ width: 170 }} onClick={copyLink}>
-              {copied ? "Copied!" : "Copy link"}
-            </Button>
-          </Space>
-        </Space>
-      );
-    },
-    bareFooter: true,
-  }), []);
+        );
+      },
+      bareFooter: true,
+    }),
+    [],
+  );
 
   const showInvitationModal = useCallback(() => {
     inviteModal.current = modal(inviteModalProps(link));
   }, [inviteModalProps, link]);
 
   const defaultSelected = useMemo(() => {
-    return localStorage.getItem('selectedUser');
+    return localStorage.getItem("selectedUser");
   }, []);
 
   useEffect(() => {
@@ -113,7 +121,7 @@ export const PeoplePage = () => {
     <Block name="people">
       <Elem name="controls">
         <Space spread>
-          <Space></Space>
+          <Space />
 
           <Space>
             <Button icon={<LsPlus />} primary onClick={showInvitationModal}>
@@ -130,12 +138,9 @@ export const PeoplePage = () => {
         />
 
         {selectedUser ? (
-          <SelectedUser
-            user={selectedUser}
-            onClose={() => selectUser(null)}
-          />
-        ) : isFF(FF_LSDV_E_297) && (
-          <HeidiTips collection="organizationPage" />
+          <SelectedUser user={selectedUser} onClose={() => selectUser(null)} />
+        ) : (
+          isFF(FF_LSDV_E_297) && <HeidiTips collection="organizationPage" />
         )}
       </Elem>
     </Block>

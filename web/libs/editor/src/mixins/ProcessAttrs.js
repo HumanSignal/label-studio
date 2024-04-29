@@ -1,13 +1,16 @@
-import { flow, types } from 'mobx-state-tree';
-import Papa from 'papaparse';
+import { flow, types } from "mobx-state-tree";
+import Papa from "papaparse";
 
-import { parseTypeAndOption, parseValue } from '../utils/data';
+import { parseTypeAndOption, parseValue } from "../utils/data";
 
 const resolvers = {
   // @todo comments/types
   csv(content, options = {}) {
     const header = !options.headless;
-    const { data, meta: { fields } } = Papa.parse(content, { delimiter: options.separator, header });
+    const {
+      data,
+      meta: { fields },
+    } = Papa.parse(content, { delimiter: options.separator, header });
     const { column = header ? fields[0] : 0 } = options;
     const row = data[0];
     let cell = row[column];
@@ -17,7 +20,7 @@ const resolvers = {
       cell = row[fields[column] ?? fields[0]];
     }
 
-    return String(cell ?? '');
+    return String(cell ?? "");
   },
 };
 
@@ -25,7 +28,7 @@ const ProcessAttrsMixin = types
   .model({
     resolver: types.maybeNull(types.string),
   })
-  .actions(self => ({
+  .actions((self) => ({
     updateLocalValue(value) {
       self._value = value;
     },
@@ -39,7 +42,7 @@ const ProcessAttrsMixin = types
      * format: <type>(<separator>option=value)*
      * currently only csv type supported, separator is | by default
      */
-    resolveValue: flow(function * (value) {
+    resolveValue: flow(function* (value) {
       if (!self.resolver) return value;
 
       const { type, options } = parseTypeAndOption(self.resolver);
