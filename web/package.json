@@ -107,12 +107,12 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.13.0",
     "@babel/runtime": "^7.12.13",
+    "@biomejs/biome": "1.7.1",
     "@cypress/code-coverage": "^3.12.9",
     "@cypress/webpack-preprocessor": "^5.17.0",
     "@nx/cypress": "17.0.3",
     "@nx/jest": "17.0.3",
     "@nx/js": "17.2.8",
-    "@nx/linter": "17.0.3",
     "@nx/react": "17.0.3",
     "@nx/storybook": "^17.2.8",
     "@nx/vite": "17.2.8",
@@ -229,9 +229,7 @@
         "@babel/preset-env",
         {
           "targets": {
-            "browsers": [
-              "last 2 Chrome versions"
-            ]
+            "browsers": ["last 2 Chrome versions"]
           }
         }
       ]

@@ -5,9 +5,9 @@ import { HtxHeader } from "../Header";
 
 Enzyme.configure({ adapter: new Adapter() });
 
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useLayoutEffect: jest.requireActual('react').useEffect,
+jest.mock("react", () => ({
+  ...jest.requireActual("react"),
+  useLayoutEffect: jest.requireActual("react").useEffect,
 }));
 
 test("Header basic test", () => {

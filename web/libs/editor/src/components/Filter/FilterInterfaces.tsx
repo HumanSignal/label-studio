@@ -1,6 +1,6 @@
 export enum Logic {
-  and = 'And',
-  or = 'Or',
+  and = "And",
+  or = "Or",
 }
 
 export interface FilterInterface {
@@ -16,11 +16,11 @@ export interface FilterListInterface {
   operation?: string | string[] | undefined;
   value?: any;
   path?: string;
-  logic?: 'and' | 'or';
+  logic?: "and" | "or";
 }
 
 export interface AvailableFiltersInterface {
   label: string;
   path: string;
-  type: 'Boolean' | 'Common' | 'Number' | 'String' | string;
+  type: "Boolean" | "Common" | "Number" | "String" | string;
 }

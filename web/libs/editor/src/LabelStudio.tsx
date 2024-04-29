@@ -17,7 +17,9 @@ import { isDefined } from './utils/utilities';
 import Hotkeys from './components/Hotkeys/Hotkeys';
 
 declare global {
-  interface Window { Htx: any }
+  interface Window {
+    Htx: any;
+  }
 }
 
 configure({
@@ -33,12 +35,12 @@ type LSFTask = any;
 // because those options will go as initial values for AppStore
 // but it's not types yet, so here is some excerpt of its params
 type LSFOptions = Record<string, any> & {
-  interfaces: string[],
-  keymap: Keymap,
-  user: LSFUser,
-  users: LSFUser[],
-  task: LSFTask,
-}
+  interfaces: string[];
+  keymap: Keymap;
+  user: LSFUser;
+  users: LSFUser[];
+  task: LSFTask;
+};
 
 export class LabelStudio {
   static Component = LabelStudioReact;
@@ -46,8 +48,8 @@ export class LabelStudio {
   static instances = new Set<LabelStudio>();
 
   static destroyAll() {
-    this.instances.forEach(inst => inst.destroy?.());
-    this.instances.clear();
+    LabelStudio.instances.forEach((inst) => inst.destroy?.());
+    LabelStudio.instances.clear();
   }
 
   options: Partial<LSFOptions>;
@@ -60,7 +62,7 @@ export class LabelStudio {
   getRootElement(root: Element | string) {
     let element: Element | null = null;
 
-    if (typeof root === 'string') {
+    if (typeof root === "string") {
       element = document.getElementById(root);
     } else {
       element = root;
@@ -114,9 +116,7 @@ export class LabelStudio {
       if (isRendered) {
         clearRenderedApp();
       }
-      render((
-        <App store={this.store} />
-      ), rootElement);
+      render(<App store={this.store} />, rootElement);
     };
 
     const clearRenderedApp = () => {
@@ -175,11 +175,11 @@ export class LabelStudio {
   supportLegacyEvents() {
     const keys = Object.keys(legacyEvents);
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
       const callback = this.options[key];
 
       if (isDefined(callback)) {
-        const eventName = toCamelCase(key.replace(/^on/, ''));
+        const eventName = toCamelCase(key.replace(/^on/, ""));
 
         this.events.on(eventName, callback);
       }

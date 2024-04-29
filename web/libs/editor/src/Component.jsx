@@ -1,6 +1,6 @@
-import { Component } from 'react';
-import App from './components/App/App';
-import { configureStore } from './configureStore';
+import { Component } from "react";
+import App from "./components/App/App";
+import { configureStore } from "./configureStore";
 
 export class LabelStudio extends Component {
   state = {
@@ -24,8 +24,6 @@ export class LabelStudio extends Component {
   }
 
   render() {
-    return this.state.initialized ? (
-      <App store={this.store} />
-    ) : null;
+    return this.state.initialized ? <App store={this.store} /> : null;
   }
 }

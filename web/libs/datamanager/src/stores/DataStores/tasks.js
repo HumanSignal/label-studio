@@ -9,14 +9,14 @@ import { FF_DEV_2536, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
 const fileAttributes = types.model({
-  "certainty": types.optional(types.maybeNull(types.number), 0),
-  "distance": types.optional(types.maybeNull(types.number), 0),
-  "id": types.optional(types.maybeNull(types.string), ""),
+  certainty: types.optional(types.maybeNull(types.number), 0),
+  distance: types.optional(types.maybeNull(types.number), 0),
+  id: types.optional(types.maybeNull(types.string), ""),
 });
 
 const exportedModel = types.model({
-  "project_id": types.optional(types.maybeNull(types.number), null),
-  "created_at": types.optional(types.maybeNull(types.string), ""),
+  project_id: types.optional(types.maybeNull(types.number), null),
+  created_at: types.optional(types.maybeNull(types.string), ""),
 });
 
 export const create = (columns) => {
@@ -36,11 +36,13 @@ export const create = (columns) => {
     allow_postpone: types.maybeNull(types.boolean),
     unique_lock_id: types.maybeNull(types.string),
     updated_by: types.optional(types.array(Assignee), []),
-    ...(isFF(FF_LOPS_E_3) ? { 
-      _additional: types.optional(fileAttributes, {}),
-      candidate_task_id: types.optional(types.string, ""),
-      project: types.union(types.number, types.optional(types.array(exportedModel), [])), //number for Projects, array of exportedModel for Datasets
-    } : {}),
+    ...(isFF(FF_LOPS_E_3)
+      ? {
+          _additional: types.optional(fileAttributes, {}),
+          candidate_task_id: types.optional(types.string, ""),
+          project: types.union(types.number, types.optional(types.array(exportedModel), [])), //number for Projects, array of exportedModel for Datasets
+        }
+      : {}),
   })
     .views((self) => ({
       get lastAnnotation() {
@@ -50,14 +52,14 @@ export const create = (columns) => {
     .actions((self) => ({
       mergeAnnotations(annotations) {
         // skip drafts, they'll be added later
-        self.annotations = annotations.filter(a => a.pk).map((c) => {
-          const existingAnnotation = self.annotations.find(
-            (ec) => ec.id === Number(c.pk),
-          );
+        self.annotations = annotations
+          .filter((a) => a.pk)
+          .map((c) => {
+            const existingAnnotation = self.annotations.find((ec) => ec.id === Number(c.pk));
 
-          if (existingAnnotation) {
-            return existingAnnotation;
-          } else {
+            if (existingAnnotation) {
+              return existingAnnotation;
+            }
             return {
               id: c.id,
               pk: c.pk,
@@ -67,8 +69,7 @@ export const create = (columns) => {
               userGenerate: !!c.userGenerate,
               sentUserGenerate: !!c.sentUserGenerate,
             };
-          }
-        });
+          });
       },
 
       updateAnnotation(annotation) {
@@ -93,15 +94,13 @@ export const create = (columns) => {
 
       deleteDraft(id) {
         if (!self.drafts) return;
-        const index = self.drafts.findIndex(d => d.id === id);
+        const index = self.drafts.findIndex((d) => d.id === id);
 
         if (index >= 0) self.drafts.splice(index, 1);
       },
 
       loadAnnotations: flow(function* () {
-        const annotations = yield Promise.all([
-          getRoot(self).apiCall("annotations", { taskID: self.id }),
-        ]);
+        const annotations = yield Promise.all([getRoot(self).apiCall("annotations", { taskID: self.id })]);
 
         self.annotations = annotations[0];
       }),
@@ -167,10 +166,8 @@ export const create = (columns) => {
           return null;
         }
 
-        const labelStreamModeChanged = self.selected && (
-          self.selected.assigned_task !== taskData.assigned_task
-          && taskData.assigned_task === false
-        );
+        const labelStreamModeChanged =
+          self.selected && self.selected.assigned_task !== taskData.assigned_task && taskData.assigned_task === false;
 
         const task = self.applyTaskSnapshot(taskData);
 
@@ -199,7 +196,7 @@ export const create = (columns) => {
         return task;
       },
 
-      mergeSnapshot(taskID, taskData){
+      mergeSnapshot(taskID, taskData) {
         const task = self.list.find(({ id }) => id === taskID);
         const snapshot = task ? { ...getSnapshot(task) } : {};
 
@@ -221,21 +218,20 @@ export const create = (columns) => {
       postProcessData(data) {
         const { total_annotations, total_predictions, similarity_score_upper_limit } = data;
 
-        if (total_annotations !== null)
-          self.totalAnnotations = total_annotations;
-        if (total_predictions !== null)
-          self.totalPredictions = total_predictions;
+        if (total_annotations !== null) self.totalAnnotations = total_annotations;
+        if (total_predictions !== null) self.totalPredictions = total_predictions;
         if (!isNaN(similarity_score_upper_limit))
-          self.similarityUpperLimit = (Math.ceil(similarity_score_upper_limit * SIMILARITY_UPPER_LIMIT_PRECISION) / SIMILARITY_UPPER_LIMIT_PRECISION);
+          self.similarityUpperLimit =
+            Math.ceil(similarity_score_upper_limit * SIMILARITY_UPPER_LIMIT_PRECISION) /
+            SIMILARITY_UPPER_LIMIT_PRECISION;
       },
-
     }))
     .preProcessSnapshot((snapshot) => {
       const { total_annotations, total_predictions, similarity_score_upper_limit, ...sn } = snapshot;
 
       return {
         ...sn,
-        reviewers: (sn.reviewers ?? []).map(r => ({
+        reviewers: (sn.reviewers ?? []).map((r) => ({
           id: r,
           annotated: false,
           review: null,
