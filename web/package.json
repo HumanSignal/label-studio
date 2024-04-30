@@ -170,7 +170,6 @@
     "jest-environment-jsdom": "^29.4.1",
     "jest-fetch-mock": "^3.0.3",
     "jsdoc-to-markdown": "8.0.1",
-    "lint-staged": "^9.5.0",
     "loader-utils": "^3.2.1",
     "mini-css-extract-plugin": "^2.7.6",
     "nx": "17.0.3",
@@ -229,7 +228,9 @@
         "@babel/preset-env",
         {
           "targets": {
-            "browsers": ["last 2 Chrome versions"]
+            "browsers": [
+              "last 2 Chrome versions"
+            ]
           }
         }
       ]
