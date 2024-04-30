@@ -1,5 +1,5 @@
 export const simpleData = {
-  text: 'This text exists for no reason',
+  text: "This text exists for no reason",
 };
 export const choicesConfig = `<View>
   <Text name="text" value="$text" />

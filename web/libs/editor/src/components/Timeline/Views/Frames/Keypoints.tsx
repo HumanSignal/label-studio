@@ -1,11 +1,11 @@
-import chroma from 'chroma-js';
-import { CSSProperties, FC, memo, MouseEvent, useCallback, useContext, useMemo } from 'react';
-import { Block, Elem } from '../../../../utils/bem';
-import { clamp } from '../../../../utils/utilities';
-import { TimelineContext } from '../../Context';
-import { TimelineRegion } from '../../Types';
-import './Keypoints.styl';
-import { Lifespan, visualizeLifespans } from './Utils';
+import chroma from "chroma-js";
+import { type CSSProperties, type FC, memo, type MouseEvent, useCallback, useContext, useMemo } from "react";
+import { Block, Elem } from "../../../../utils/bem";
+import { clamp } from "../../../../utils/utilities";
+import { TimelineContext } from "../../Context";
+import type { TimelineRegion } from "../../Types";
+import "./Keypoints.styl";
+import { type Lifespan, visualizeLifespans } from "./Utils";
 
 export interface KeypointsProps {
   idx: number;
@@ -15,13 +15,7 @@ export interface KeypointsProps {
   onSelectRegion?: (e: MouseEvent<HTMLDivElement>, id: string, select?: boolean) => void;
 }
 
-export const Keypoints: FC<KeypointsProps> = ({
-  idx,
-  region,
-  startOffset,
-  renderable,
-  onSelectRegion,
-}) => {
+export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, renderable, onSelectRegion }) => {
   const { step, seekOffset, visibleWidth, length } = useContext(TimelineContext);
   const { label, color, visible, sequence, selected } = region;
 
@@ -41,12 +35,17 @@ export const Keypoints: FC<KeypointsProps> = ({
   const start = firtsPoint.frame - 1;
   const offset = start * step;
 
-  const styles = useMemo((): CSSProperties => ({
-    '--offset': `${startOffset}px`,
-    '--color': color,
-    '--point-color': chroma(color).alpha(1).css(),
-    '--lifespan-color': chroma(color).alpha(visible ? 0.4 : 1).css(),
-  }), [startOffset, color, visible]);
+  const styles = useMemo(
+    (): CSSProperties => ({
+      "--offset": `${startOffset}px`,
+      "--color": color,
+      "--point-color": chroma(color).alpha(1).css(),
+      "--lifespan-color": chroma(color)
+        .alpha(visible ? 0.4 : 1)
+        .css(),
+    }),
+    [startOffset, color, visible],
+  );
 
   const lifespans = useMemo(() => {
     if (!renderable) return [];
@@ -60,32 +59,26 @@ export const Keypoints: FC<KeypointsProps> = ({
     });
   }, [sequence, start, step, renderable, minVisibleKeypointPosition, maxVisibleKeypointPosition]);
 
-  const onSelectRegionHandler = useCallback((e: MouseEvent<HTMLDivElement>, select?: boolean) => {
-    e.stopPropagation();
-    onSelectRegion?.(e, region.id, select);
-  }, [region.id, onSelectRegion]);
+  const onSelectRegionHandler = useCallback(
+    (e: MouseEvent<HTMLDivElement>, select?: boolean) => {
+      e.stopPropagation();
+      onSelectRegion?.(e, region.id, select);
+    },
+    [region.id, onSelectRegion],
+  );
 
   return (
-    <Block
-      name="keypoints"
-      style={styles}
-      mod={{ selected }}
-    >
+    <Block name="keypoints" style={styles} mod={{ selected }}>
       <Elem name="label" onClick={onSelectRegionHandler}>
-        <Elem name="name">
-          {label}
-        </Elem>
+        <Elem name="name">{label}</Elem>
         <Elem name="data">
-          <Elem name="data-item" mod={{ faded: true }}>{idx}</Elem>
+          <Elem name="data-item" mod={{ faded: true }}>
+            {idx}
+          </Elem>
         </Elem>
       </Elem>
       <Elem name="keypoints" onClick={(e: any) => onSelectRegionHandler(e, true)}>
-        <LifespansList
-          lifespans={lifespans}
-          step={step}
-          visible={visible}
-          offset={offset}
-        />
+        <LifespansList lifespans={lifespans} step={step} visible={visible} offset={offset} />
       </Elem>
     </Block>
   );
@@ -98,12 +91,7 @@ interface LifespansListProps {
   visible: boolean;
 }
 
-const LifespansList: FC<LifespansListProps> = ({
-  lifespans,
-  step,
-  offset,
-  visible,
-}) => {
+const LifespansList: FC<LifespansListProps> = ({ lifespans, step, offset, visible }) => {
   return (
     <>
       {lifespans.map((lifespan, i) => {
@@ -138,40 +126,32 @@ interface LifespanItemProps {
   points: number[];
 }
 
-const LifespanItem: FC<LifespanItemProps> = memo(({
-  mainOffset,
-  width,
-  start,
-  step,
-  offset,
-  enabled,
-  visible,
-  isLast,
-  points,
-}) => {
-  const left = useMemo(() => {
-    return mainOffset + offset + (step / 2);
-  }, [mainOffset, offset, step]);
+const LifespanItem: FC<LifespanItemProps> = memo(
+  ({ mainOffset, width, start, step, offset, enabled, visible, isLast, points }) => {
+    const left = useMemo(() => {
+      return mainOffset + offset + step / 2;
+    }, [mainOffset, offset, step]);
 
-  const right = useMemo(() => {
-    return (isLast && enabled) ? 0 : 'auto';
-  }, [isLast, enabled]);
+    const right = useMemo(() => {
+      return isLast && enabled ? 0 : "auto";
+    }, [isLast, enabled]);
 
-  const finalWidth = useMemo(() => {
-    return (isLast && enabled) ? 'auto' : width;
-  }, [isLast, enabled]);
+    const finalWidth = useMemo(() => {
+      return isLast && enabled ? "auto" : width;
+    }, [isLast, enabled]);
 
-  const style = useMemo(() => {
-    return { left, width: finalWidth, right };
-  }, [left, right, finalWidth]);
+    const style = useMemo(() => {
+      return { left, width: finalWidth, right };
+    }, [left, right, finalWidth]);
 
-  return (
-    <Elem name="lifespan" mod={{ hidden: !visible }} style={style}>
-      {points.map((frame, i) => {
-        const left = (frame - start) * step;
+    return (
+      <Elem name="lifespan" mod={{ hidden: !visible }} style={style}>
+        {points.map((frame, i) => {
+          const left = (frame - start) * step;
 
-        return <Elem key={i} name="point" style={{ left }} />;
-      })}
-    </Elem>
-  );
-});
+          return <Elem key={i} name="point" style={{ left }} />;
+        })}
+      </Elem>
+    );
+  },
+);

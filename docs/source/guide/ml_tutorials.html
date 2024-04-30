@@ -1,49 +1,225 @@
 ---
+cards:
+- categories:
+  - Natural Language Processing
+  - Named Entity Recognition
+  - SpaCy
+  image: /tutorials/spacy.png
+  meta_description: Tutorial on how to use Label Studio and spaCy for faster NER and
+    POS labeling
+  meta_title: Use spaCy models with Label Studio
+  order: 70
+  tier: all
+  title: spaCy models for NER
+  type: blog
+  url: /tutorials/spacy.html
+- categories:
+  - Natural Language Processing
+  - Text Classification
+  - Scikit-learn
+  image: /tutorials/scikit-learn.png
+  meta_description: Tutorial on how to use an example ML backend for Label Studio
+    with Scikit-learn logistic regression
+  meta_title: Sklearn Text Classifier model for Label Studio
+  order: 50
+  tier: all
+  title: Sklearn Text Classifier model
+  type: blog
+  url: /tutorials/sklearn_text_classifier.html
+- categories:
+  - Generative AI
+  - Large Language Model
+  - OpenAI
+  - Azure
+  - ChatGPT
+  image: /tutorials/llm-interactive.png
+  meta_description: Label Studio tutorial for interactive LLM labeling with OpenAI
+    or Azure API
+  meta_title: Interactive LLM labeling with OpenAI or Azure API
+  order: 5
+  tier: all
+  title: Interactive LLM labeling with GPT
+  type: blog
+  url: /tutorials/llm_interactive.html
+- categories:
+  - Computer Vision
+  - Object Detection
+  - Image Annotation
+  - OpenMMLab
+  - MMDetection
+  image: /tutorials/openmmlab.png
+  meta_description: This is a tutorial on how to use the example MMDetection model
+    backend with Label Studio for image segmentation tasks.
+  meta_title: Object detection in images with Label Studio and MMDetection
+  order: 65
+  tier: all
+  title: Object detection with bounding boxes using MMDetection
+  type: blog
+  url: /tutorials/mmdetection-3.html
+- categories:
+  - Computer Vision
+  - Optical Character Recognition
+  - Tesseract
+  image: /tutorials/tesseract.png
+  meta_description: Tutorial for how to use Label Studio and Tesseract to assist with
+    your OCR projects
+  meta_title: Interactive bounding boxes OCR in Label Studio with a Tesseract backend
+  order: 55
+  tier: all
+  title: Interactive bounding boxes OCR with Tesseract
+  type: blog
+  url: /tutorials/tesseract.html
+- categories:
+  - Natural Language Processing
+  - Named Entity Recognition
+  - Flair
+  image: /tutorials/flair.png
+  meta_description: Tutorial on how to use Label Studio and Flair for faster NER labeling
+  meta_title: Use Flair with Label Studio
+  order: 75
+  tier: all
+  title: NER labeling with Flair
+  type: blog
+  url: /tutorials/flair.html
+- categories:
+  - Computer Vision
+  - Image Annotation
+  - Object Detection
+  - Zero-shot Image Segmentation
+  - Grounding DINO
+  - Segment Anything Model
+  image: /tutorials/grounding-dino.png
+  meta_description: Label Studio tutorial for using Grounding DINO for zero-shot object
+    detection in images
+  meta_title: Image segmentation in Label Studio using a Grounding DINO backend
+  order: 15
+  tier: all
+  title: Zero-shot object detection and image segmentation with Grounding DINO
+  type: blog
+  url: /tutorials/grounding_dino.html
+- categories:
+  - Natural Language Processing
+  - Named Entity Recognition
+  - Interactive matching
+  image: /tutorials/interactive-substring-matching.png
+  meta_description: Use the interactive substring matching model for labeling NER
+    tasks in Label Studio
+  meta_title: Interactive substring matching for NER tasks
+  order: 30
+  tier: all
+  title: Interactive substring matching for NER tasks
+  type: blog
+  url: /tutorials/interactive_substring_matching.html
+- categories:
+  - Natural Language Processing
+  - Named Entity Recognition
+  - Hugging Face
+  image: /tutorials/hf-ner.png
+  meta_description: This tutorial explains how to run a Hugging Face NER backend in
+    Label Studio.
+  meta_title: Label Studio tutorial to run Hugging Face NER backend
+  order: 25
+  tier: all
+  title: Hugging Face NER
+  type: blog
+  url: /tutorials/huggingface_ner.html
+- categories:
+  - Computer Vision
+  - Object Detection
+  - Image Annotation
+  - Segment Anything Model
+  - Facebook
+  - ONNX
+  image: /tutorials/segment-anything.png
+  meta_description: Label Studio tutorial for labeling images with MobileSAM or ONNX
+    SAM.
+  meta_title: Interactive annotation in Label Studio with Segment Anything Model (SAM)
+  order: 10
+  tier: all
+  title: Interactive annotation with Segment Anything Model
+  type: blog
+  url: /tutorials/segment_anything_model.html
+- categories:
+  - Natural Language Processing
+  - Text Classification
+  - BERT
+  - Hugging Face
+  image: /tutorials/bert.png
+  meta_description: Tutorial on how to use BERT-based text classification with your
+    Label Studio project
+  meta_title: BERT-based text classification
+  order: 35
+  tier: all
+  title: Classify text with a BERT model
+  type: blog
+  url: /tutorials/bert_classifier.html
+- categories:
+  - Audio/Speech Processing
+  - Automatic Speech Recognition
+  - NeMo
+  - NVidia
+  image: /tutorials/nvidia.png
+  meta_description: Tutorial on how to use set up Nvidia NeMo to use for ASR tasks
+    in Label Studio
+  meta_title: Automatic Speech Recognition with NeMo
+  order: 60
+  tier: all
+  title: Automatic Speech Recognition with NVidia NeMo
+  type: blog
+  url: /tutorials/nemo_asr.html
+- categories:
+  - Computer Vision
+  - Optical Character Recognition
+  - EasyOCR
+  image: /tutorials/easyocr.png
+  meta_description: The EasyOCR model connection integrates the capabilities of EasyOCR
+    with Label Studio to assist in machine learning labeling tasks involving Optical
+    Character Recognition (OCR).
+  meta_title: EasyOCR model connection for transcribing text in images
+  order: 40
+  tier: all
+  title: Transcribe text from images with EasyOCR
+  type: blog
+  url: /tutorials/easyocr.html
+- categories:
+  - Generative AI
+  - Large Language Model
+  - Text Generation
+  - Hugging Face
+  image: /tutorials/hf-llm.png
+  meta_description: This tutorial explains how to run Hugging Face Large Language
+    model backend in Label Studio. Hugging Face Large Language Model Backend is a
+    machine learning backend designed to work with Label Studio, providing a custom
+    model for text generation.
+  meta_title: Label Studio tutorial to run Hugging Face Large Language Model backend
+  order: 20
+  tier: all
+  title: Hugging Face Large Language Model (LLM)
+  type: blog
+  url: /tutorials/huggingface_llm.html
+- categories:
+  - Generative AI
+  - Retrieval Augmented Generation
+  - Google
+  - OpenAI
+  - Langchain
+  image: /tutorials/langchain.png
+  meta_description: Use Langchain, OpenAI, and Google to generate responses based
+    on Google search results.
+  meta_title: RAG with a Langchain search agent
+  order: 45
+  tier: all
+  title: RAG with a Langchain search agent
+  type: blog
+  url: /tutorials/langchain_search_agent.html
+layout: templates
+meta_description: Tutorial documentation for setting up a machine learning model with
+  predictions using PyTorch, GPT2, Sci-kit learn, and other popular frameworks.
+meta_title: Machine Learning Example Tutorials
+order: 365
+order_enterprise: 320
+section: Machine learning
+tier: all
 title: ML Examples and Tutorials
 type: guide
-tier: all
-order: 260
-order_enterprise: 260
-section: "Automate Labeling"
-meta_title: Machine Learning Example Tutorials
-meta_description: Tutorial documentation for setting up a machine learning model with predictions using PyTorch, GPT2, Sci-kit learn, and other popular frameworks.
-layout: templates
-cards:
-- title: Create a simple ML backend
-  categories:
-  - image classification
-  - starter
-  image: "/images/thumbnails/create-simple-ml-backend.png" 
-  url: "/tutorials/dummy_model.html"
-
-- title: Text classification with Scikit-Learn
-  categories:
-  - text classification
-  image: "/images/thumbnails/scikit-learn.png"
-  url: "/tutorials/sklearn-text-classifier.html"
-
-- title: OpenMMLab Image object detector
-  categories:
-  - object detection
-  - image
-  image: "/images/thumbnails/openmmlab.png"
-  url: "/tutorials/object-detector.html"
-
-- title: Transfer learning for images with PyTorch
-  categories:
-  - image classification
-  image: "/images/thumbnails/pytorch.png"
-  url: "/tutorials/pytorch-image-transfer-learning.html"
-
-- title: Chatbot response generation with HuggingFace's GPT2 model
-  categories:
-  - Text generation
-  image: "/images/thumbnails/huggingface.png"
-  url: "/tutorials/gpt.html"
-
-- title: Automatic Speech Recognition with Nvidia's NeMo
-  categories:
-  - Audio ASR
-  image: "/images/thumbnails/nvidia.png"
-  url: "/tutorials/nemo_asr.html"
 ---

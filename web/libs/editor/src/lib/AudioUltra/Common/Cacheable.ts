@@ -6,14 +6,14 @@ export class Cacheable {
       return args[0].toString();
     }
 
-    return args.join(':');
+    return args.join(":");
   }
 
   clearCache() {
     this.cache.clear();
   }
 
-  cached(key: number|string|Array<string|number>, fn: () => any) {
+  cached(key: number | string | Array<string | number>, fn: () => any) {
     const cacheKey = this.createKey(key);
 
     if (this.cache.has(cacheKey)) {
@@ -27,4 +27,3 @@ export class Cacheable {
     return result;
   }
 }
-

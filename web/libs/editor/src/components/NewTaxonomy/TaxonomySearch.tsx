@@ -1,28 +1,33 @@
-import React, { ChangeEvent, KeyboardEvent, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  type ChangeEvent,
+  type KeyboardEvent,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 
-import './TaxonomySearch.styl';
-import { Block } from '../../utils/bem';
-import { AntTaxonomyItem } from './NewTaxonomy';
-import { debounce } from 'lodash';
+import "./TaxonomySearch.styl";
+import { Block } from "../../utils/bem";
+import type { AntTaxonomyItem } from "./NewTaxonomy";
+import { debounce } from "lodash";
 
 type TaxonomySearchProps = {
-  treeData: AntTaxonomyItem[],
-  onChange: (list: AntTaxonomyItem[], expandedKeys: React.Key[] | null) => void,
-}
+  treeData: AntTaxonomyItem[];
+  onChange: (list: AntTaxonomyItem[], expandedKeys: React.Key[] | null) => void;
+};
 
 export type TaxonomySearchRef = {
-  resetValue: () => void,
-  focus: () => void,
-}
+  resetValue: () => void;
+  focus: () => void;
+};
 
-const TaxonomySearch = React.forwardRef<TaxonomySearchRef, TaxonomySearchProps>(({
-  treeData,
-  onChange,
-}, ref) => {
+const TaxonomySearch = React.forwardRef<TaxonomySearchRef, TaxonomySearchProps>(({ treeData, onChange }, ref) => {
   useImperativeHandle(ref, (): TaxonomySearchRef => {
     return {
       resetValue() {
-        setInputValue('');
+        setInputValue("");
         onChange(treeData, []);
       },
       focus() {
@@ -32,7 +37,7 @@ const TaxonomySearch = React.forwardRef<TaxonomySearchRef, TaxonomySearchProps>(
   });
 
   const inputRef = useRef<HTMLInputElement>();
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
     const _filteredData = filterTreeData(treeData, inputValue);
@@ -44,10 +49,9 @@ const TaxonomySearch = React.forwardRef<TaxonomySearchRef, TaxonomySearchProps>(
   // the `treeNode.title` is not a string but a react component,
   // so we have to look for the title in children (1 or 2 levels deep)
   const getTitle = useCallback((treeNodeTitle: any): string => {
-    if (typeof treeNodeTitle === 'string') return treeNodeTitle;
+    if (typeof treeNodeTitle === "string") return treeNodeTitle;
 
-    if (typeof treeNodeTitle.props.children === 'object')
-      return getTitle(treeNodeTitle.props.children);
+    if (typeof treeNodeTitle.props.children === "object") return getTitle(treeNodeTitle.props.children);
 
     return treeNodeTitle.props.children;
   }, []);
@@ -77,14 +81,13 @@ const TaxonomySearch = React.forwardRef<TaxonomySearchRef, TaxonomySearchProps>(
 
     const dig = (list: AntTaxonomyItem[], keepAll = false) => {
       return list.reduce<AntTaxonomyItem[]>((total, dataNode) => {
-        const children = dataNode['children'];
+        const children = dataNode.children;
 
         const match = keepAll || filterTreeNode(searchValue, dataNode);
         const childList = children?.length ? dig(children, match) : undefined;
 
         if (match || childList?.length) {
-          if (!keepAll && dataNode['children']?.length)
-            _expandedKeys.push(dataNode.key);
+          if (!keepAll && dataNode.children?.length) _expandedKeys.push(dataNode.key);
 
           total.push({
             ...dataNode,
@@ -103,28 +106,31 @@ const TaxonomySearch = React.forwardRef<TaxonomySearchRef, TaxonomySearchProps>(
     };
   }, []);
 
-  const handleSearch = useCallback(debounce(async (e: ChangeEvent<HTMLInputElement>) => {
-    const _filteredData = filterTreeData(treeData, e.target.value);
+  const handleSearch = useCallback(
+    debounce(async (e: ChangeEvent<HTMLInputElement>) => {
+      const _filteredData = filterTreeData(treeData, e.target.value);
 
-    onChange(_filteredData.filteredDataTree, _filteredData.expandedKeys);
-  }, 300), [treeData]);
+      onChange(_filteredData.filteredDataTree, _filteredData.expandedKeys);
+    }, 300),
+    [treeData],
+  );
 
   return (
     <Block
       ref={inputRef}
       value={inputValue}
-      tag={'input'}
+      tag={"input"}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
         handleSearch(e);
       }}
       onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
         // to prevent selected items from being deleted
-        if (e.key === 'Backspace' || e.key === 'Delete') e.stopPropagation();
+        if (e.key === "Backspace" || e.key === "Delete") e.stopPropagation();
       }}
-      placeholder={'Search'}
-      data-testid={'taxonomy-search'}
-      name={'taxonomy-search-input'}
+      placeholder={"Search"}
+      data-testid={"taxonomy-search"}
+      name={"taxonomy-search-input"}
     />
   );
 });

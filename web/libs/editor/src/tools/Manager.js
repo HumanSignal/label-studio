@@ -1,6 +1,6 @@
-import { destroy } from 'mobx-state-tree';
-import { guidGenerator } from '../utils/unique';
-import { FF_DEV_4081, isFF } from '../utils/feature-flags';
+import { destroy } from "mobx-state-tree";
+import { guidGenerator } from "../utils/unique";
+import { FF_DEV_4081, isFF } from "../utils/feature-flags";
 
 /** @type {Map<any, ToolsManager>} */
 const INSTANCES = new Map();
@@ -33,9 +33,7 @@ class ToolsManager {
     INSTANCES.clear();
   }
 
-  constructor({
-    name,
-  } = {}) {
+  constructor({ name } = {}) {
     this.name = name;
     this.tools = {};
     this._default_tool = null;
@@ -61,8 +59,10 @@ class ToolsManager {
     if (isFF(FF_DEV_4081) && removeDuplicatesNamed && toolName === removeDuplicatesNamed) {
       const findme = new RegExp(`^.*?#${name}.*$`);
 
-      if (Object.keys(this.tools).some(entry => findme.test(entry))) {
-        console.log(`Ignoring duplicate tool ${name} because it matches removeDuplicatesNamed ${removeDuplicatesNamed}`);
+      if (Object.keys(this.tools).some((entry) => findme.test(entry))) {
+        console.log(
+          `Ignoring duplicate tool ${name} because it matches removeDuplicatesNamed ${removeDuplicatesNamed}`,
+        );
         return;
       }
     }
@@ -87,14 +87,14 @@ class ToolsManager {
   unselectAll() {
     // when one of the tool get selected you need to unselect all
     // other active tools
-    Object.values(this.tools).forEach(t => {
-      if (typeof t.selected !== 'undefined') t.setSelected(false);
+    Object.values(this.tools).forEach((t) => {
+      if (typeof t.selected !== "undefined") t.setSelected(false);
     });
 
     const stage = this.obj?.stageRef;
 
     if (stage) {
-      stage.container().style.cursor = 'default';
+      stage.container().style.cursor = "default";
     }
   }
 
@@ -104,19 +104,19 @@ class ToolsManager {
 
     // if there are no tools selected, there are no specific labels to unselect
     // also this will skip annotation init
-    if (currentTool && newSelection === 'segmentation') {
-      const toolType = tool.control.type.replace(/labels$/, '');
+    if (currentTool && newSelection === "segmentation") {
+      const toolType = tool.control.type.replace(/labels$/, "");
       const currentLabels = tool.obj.activeStates();
       // labels of different types; we can't create regions with different tools simultaneously, so we have to unselect them
-      const unrelatedLabels = currentLabels.filter(tag => {
-        const type = tag.type.replace(/labels$/, '');
+      const unrelatedLabels = currentLabels.filter((tag) => {
+        const type = tag.type.replace(/labels$/, "");
 
-        if (tag.type === 'labels') return false;
+        if (tag.type === "labels") return false;
         if (type === toolType) return false;
         return true;
       });
 
-      unrelatedLabels.forEach(tag => tag.unselectAll());
+      unrelatedLabels.forEach((tag) => tag.unselectAll());
     }
 
     currentTool?.handleToolSwitch?.(tool);
@@ -146,23 +146,21 @@ class ToolsManager {
   }
 
   addToolsFromControl(s) {
-    const self = this;
-
     if (s.tools) {
       const t = s.tools;
 
-      Object.keys(t).forEach(k => {
-        self.addTool(k, t[k], s.removeDuplicatesNamed, s.name || s.id);
+      Object.keys(t).forEach((k) => {
+        this.addTool(k, t[k], s.removeDuplicatesNamed, s.name || s.id);
       });
     }
   }
 
   findSelectedTool() {
-    return Object.values(this.tools).find(t => t.selected);
+    return Object.values(this.tools).find((t) => t.selected);
   }
 
   findDrawingTool() {
-    return Object.values(this.tools).find(t => t.isDrawing);
+    return Object.values(this.tools).find((t) => t.isDrawing);
   }
 
   event(name, ev, ...args) {
@@ -185,13 +183,13 @@ class ToolsManager {
   }
 
   removeAllTools() {
-    Object.values(this.tools).forEach(t => destroy(t));
+    Object.values(this.tools).forEach((t) => destroy(t));
     this.tools = {};
     this._default_tool = null;
   }
 
   get hasSelected() {
-    return Object.values(this.tools).some(t => t.selected);
+    return Object.values(this.tools).some((t) => t.selected);
   }
 }
 

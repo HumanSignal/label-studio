@@ -191,7 +191,7 @@ class MLApi(BaseHTTPAPI):
         # Identify if feature flag is turned on
         if flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', user):
             request = {
-                'action': 'PROJECT_UPDATED',
+                'action': 'START_TRAINING',
                 'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data,
             }
             return self._request('webhook', request, verbose=False, timeout=TIMEOUT_PREDICT)

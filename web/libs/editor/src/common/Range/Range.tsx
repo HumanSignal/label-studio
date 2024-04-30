@@ -1,12 +1,12 @@
-import { CSSProperties, FC, MouseEvent as RMouseEvent, useCallback } from 'react';
-import { Block, Elem } from '../../utils/bem';
-import { clamp, isDefined } from '../../utils/utilities';
-import { useValueTracker } from '../Utils/useValueTracker';
-import './Range.styl';
+import { type CSSProperties, type FC, type MouseEvent as RMouseEvent, useCallback } from "react";
+import { Block, Elem } from "../../utils/bem";
+import { clamp, isDefined } from "../../utils/utilities";
+import { useValueTracker } from "../Utils/useValueTracker";
+import "./Range.styl";
 
-type RangeAlignment = 'horizontal' | 'vertical';
+type RangeAlignment = "horizontal" | "vertical";
 
-type RangeValueType = number | number[] | string
+type RangeValueType = number | number[] | string;
 
 export interface RangeProps {
   value?: RangeValueType;
@@ -41,7 +41,7 @@ export const Range: FC<RangeProps> = ({
   max = 100,
   step = 1,
   size = 120,
-  align = 'horizontal',
+  align = "horizontal",
   resetValue,
   minIcon,
   maxIcon,
@@ -51,10 +51,7 @@ export const Range: FC<RangeProps> = ({
 }) => {
   const initialValue = value ?? defaultValue ?? (multi ? [0, 100] : 0);
 
-  const [currentValue, setValue] = useValueTracker<RangeValueType>(
-    initialValue,
-    defaultValue ?? initialValue,
-  );
+  const [currentValue, setValue] = useValueTracker<RangeValueType>(initialValue, defaultValue ?? initialValue);
 
   let currentValueShadow = currentValue;
 
@@ -65,9 +62,7 @@ export const Range: FC<RangeProps> = ({
   };
 
   const updateValue = (value: RangeValueType, notify = true, force = false) => {
-    const newValue = (multi && Array.isArray(value))
-      ? value.map(roundToStep)
-      : roundToStep(value as number);
+    const newValue = multi && Array.isArray(value) ? value.map(roundToStep) : roundToStep(value as number);
 
     if (currentValueShadow !== newValue || force) {
       setValue(newValue);
@@ -76,110 +71,119 @@ export const Range: FC<RangeProps> = ({
     }
   };
 
-  const valueToPercentage = useCallback((value) => {
-    const realMax = max - min;
-    const realValue = value - min;
+  const valueToPercentage = useCallback(
+    (value) => {
+      const realMax = max - min;
+      const realValue = value - min;
 
-    return realValue / realMax * 100;
-  }, [min, max]);
+      return (realValue / realMax) * 100;
+    },
+    [min, max],
+  );
 
-  const offsetToValue = useCallback((offset) => {
-    const realMax = max - min;
-    const value = clamp((realMax * (offset / size)) + min, min, max);
+  const offsetToValue = useCallback(
+    (offset) => {
+      const realMax = max - min;
+      const value = clamp(realMax * (offset / size) + min, min, max);
 
-    return value;
-  }, [min, max, size]);
+      return value;
+    },
+    [min, max, size],
+  );
 
   const increase = useCallback(() => {
     if (multi) return;
     if (onMaxIconClick) return onMaxIconClick(currentValue);
-    updateValue(currentValue as number + step);
+    updateValue((currentValue as number) + step);
   }, [step, multi, currentValue]);
 
   const decrease = useCallback(() => {
     if (multi) return;
     if (onMinIconClick) return onMinIconClick(currentValue);
-    updateValue(currentValue as number - step);
+    updateValue((currentValue as number) - step);
   }, [step, multi, currentValue]);
 
-  const onClick = useCallback((e: RMouseEvent<HTMLElement>) => {
-    const target = e.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    const isHorizontal = align === 'horizontal';
+  const onClick = useCallback(
+    (e: RMouseEvent<HTMLElement>) => {
+      const target = e.currentTarget as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      const isHorizontal = align === "horizontal";
 
-    // Extract all the values regarding current orientation
-    const directionDimension = isHorizontal ? rect.width : rect.height;
-    const parentOffset = isHorizontal ? rect.left : rect.top;
-    const mousePosition = isHorizontal ? e.clientX : e.clientY;
+      // Extract all the values regarding current orientation
+      const directionDimension = isHorizontal ? rect.width : rect.height;
+      const parentOffset = isHorizontal ? rect.left : rect.top;
+      const mousePosition = isHorizontal ? e.clientX : e.clientY;
 
-    // Calculate relative offset
-    const offset = clamp(mousePosition - parentOffset, 0, directionDimension);
-    const position = offset / directionDimension;
-    let newValue = ((max - min) * position) + min;
+      // Calculate relative offset
+      const offset = clamp(mousePosition - parentOffset, 0, directionDimension);
+      const position = offset / directionDimension;
+      let newValue = (max - min) * position + min;
 
-    if (reverse) newValue = max - newValue;
+      if (reverse) newValue = max - newValue;
 
-    if (multi && Array.isArray(currentValue)) {
-      const valueIndex = position > 0.5 ? 1 : 0;
-      const patch = [...currentValue];
+      if (multi && Array.isArray(currentValue)) {
+        const valueIndex = position > 0.5 ? 1 : 0;
+        const patch = [...currentValue];
 
-      patch[valueIndex] = newValue;
+        patch[valueIndex] = newValue;
 
-      updateValue(patch, true, false);
-    } else {
-      updateValue(newValue, true, false);
-    }
-  }, [align, min, max, reverse, currentValue]);
+        updateValue(patch, true, false);
+      } else {
+        updateValue(newValue, true, false);
+      }
+    },
+    [align, min, max, reverse, currentValue],
+  );
 
-  const sizeProperty = align === 'horizontal' ? 'minWidth' : 'minHeight';
+  const sizeProperty = align === "horizontal" ? "minWidth" : "minHeight";
 
   return (
     <Block name="range" mod={{ align }} style={{ [sizeProperty]: size }}>
-      {reverse ? (
-        maxIcon && <Elem name="icon" onMouseDown={increase}>{maxIcon}</Elem>
-      ) : (
-        minIcon && <Elem name="icon" onMouseDown={decrease}>{minIcon}</Elem>
-      )}
+      {reverse
+        ? maxIcon && (
+            <Elem name="icon" onMouseDown={increase}>
+              {maxIcon}
+            </Elem>
+          )
+        : minIcon && (
+            <Elem name="icon" onMouseDown={decrease}>
+              {minIcon}
+            </Elem>
+          )}
       <Elem name="body" onClick={onClick}>
-        <Elem name="line"/>
-        <RangeIndicator
-          align={align}
-          reverse={reverse}
-          value={currentValue}
-          valueConvert={valueToPercentage}
-        />
-        {isMultiArray ? arrayReverse(currentValue, reverse).map((value, i) => {
-          const index = reverse ? i === 0 ? 1 : 0 : i;
-          const preservedValueIndex = index === 0 ? 1 : 0;
+        <Elem name="line" />
+        <RangeIndicator align={align} reverse={reverse} value={currentValue} valueConvert={valueToPercentage} />
+        {isMultiArray ? (
+          arrayReverse(currentValue, reverse).map((value, i) => {
+            const index = reverse ? (i === 0 ? 1 : 0) : i;
+            const preservedValueIndex = index === 0 ? 1 : 0;
 
-          const getValue = (val: number) => {
-            const result = [];
-            const secondValue = currentValue[preservedValueIndex];
+            const getValue = (val: number) => {
+              const result = [];
+              const secondValue = currentValue[preservedValueIndex];
 
-            result[index] = index === 0
-              ? clamp(val, min, secondValue)
-              : clamp(val, secondValue, max);
-            result[preservedValueIndex] = currentValue[preservedValueIndex];
+              result[index] = index === 0 ? clamp(val, min, secondValue) : clamp(val, secondValue, max);
+              result[preservedValueIndex] = currentValue[preservedValueIndex];
 
-            return result;
-          };
+              return result;
+            };
 
-          return (
-            <RangeHandle
-              key={`handle-${index}`}
-              align={align}
-              value={value}
-              bodySize={size}
-              reverse={reverse}
-              resetValue={(resetValue as number[])[index]}
-              valueConvert={valueToPercentage}
-              offsetConvert={offsetToValue}
-              onChangePosition={(val) => updateValue(getValue(val), false)}
-              onChange={(val) => updateValue(getValue(val), true, true)}
-            />
-
-          );
-        }) : (
+            return (
+              <RangeHandle
+                key={`handle-${index}`}
+                align={align}
+                value={value}
+                bodySize={size}
+                reverse={reverse}
+                resetValue={(resetValue as number[])[index]}
+                valueConvert={valueToPercentage}
+                offsetConvert={offsetToValue}
+                onChangePosition={(val) => updateValue(getValue(val), false)}
+                onChange={(val) => updateValue(getValue(val), true, true)}
+              />
+            );
+          })
+        ) : (
           <RangeHandle
             align={align}
             bodySize={size}
@@ -193,11 +197,17 @@ export const Range: FC<RangeProps> = ({
           />
         )}
       </Elem>
-      {reverse ? (
-        minIcon && <Elem name="icon" onMouseDown={decrease}>{minIcon}</Elem>
-      ) : (
-        maxIcon && <Elem name="icon" onMouseDown={increase}>{maxIcon}</Elem>
-      )}
+      {reverse
+        ? minIcon && (
+            <Elem name="icon" onMouseDown={decrease}>
+              {minIcon}
+            </Elem>
+          )
+        : maxIcon && (
+            <Elem name="icon" onMouseDown={increase}>
+              {maxIcon}
+            </Elem>
+          )}
     </Block>
   );
 };
@@ -226,10 +236,8 @@ const RangeHandle: FC<RangeHandleProps> = ({
   reverse = false,
 }) => {
   const currentOffset = valueConvert(value);
-  const offsetProperty = align === 'horizontal'
-    ? reverse ? 'right' : 'left'
-    : reverse ? 'bottom' : 'top';
-  const mouseProperty = align === 'horizontal' ? 'pageX' : 'pageY';
+  const offsetProperty = align === "horizontal" ? (reverse ? "right" : "left") : reverse ? "bottom" : "top";
+  const mouseProperty = align === "horizontal" ? "pageX" : "pageY";
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -238,10 +246,8 @@ const RangeHandle: FC<RangeHandleProps> = ({
     let newValue: number;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const mouseOffset = reverse
-        ? initialOffset - e[mouseProperty]
-        : e[mouseProperty] - initialOffset;
-      const offset = clamp(mouseOffset + (currentOffset / 100 * bodySize), 0, bodySize);
+      const mouseOffset = reverse ? initialOffset - e[mouseProperty] : e[mouseProperty] - initialOffset;
+      const offset = clamp(mouseOffset + (currentOffset / 100) * bodySize, 0, bodySize);
 
       newValue = offsetConvert(offset);
 
@@ -255,12 +261,12 @@ const RangeHandle: FC<RangeHandleProps> = ({
 
       if (isDefined(newValue)) onChange?.(newValue);
 
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
   };
 
   const handleDoubleClick = () => {
@@ -286,16 +292,11 @@ export interface RangeIndicatorProps {
   reverse: boolean;
 }
 
-const RangeIndicator: FC<RangeIndicatorProps> = ({
-  value,
-  valueConvert,
-  align,
-  reverse,
-}) => {
+const RangeIndicator: FC<RangeIndicatorProps> = ({ value, valueConvert, align, reverse }) => {
   const style: CSSProperties = {};
   const multi = Array.isArray(value);
 
-  if (align === 'horizontal') {
+  if (align === "horizontal") {
     if (multi) {
       style.left = `${valueConvert(value[0])}%`;
       style.right = `${100 - valueConvert(value[1])}%`;
@@ -305,7 +306,7 @@ const RangeIndicator: FC<RangeIndicatorProps> = ({
     }
 
     if (reverse && !multi) [style.left, style.right] = [style.right, style.left];
-  } else if (align === 'vertical') {
+  } else if (align === "vertical") {
     if (multi) {
       style.top = `${valueConvert(value[0])}%`;
       style.bottom = `${100 - valueConvert(value[1])}%`;
@@ -317,7 +318,5 @@ const RangeIndicator: FC<RangeIndicatorProps> = ({
     if (reverse && !multi) [style.top, style.bottom] = [style.bottom, style.top];
   }
 
-  return (
-    <Elem name="indicator" style={style}/>
-  );
+  return <Elem name="indicator" style={style} />;
 };
