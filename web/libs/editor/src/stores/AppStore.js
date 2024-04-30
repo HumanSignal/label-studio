@@ -1,37 +1,28 @@
 /* global LSF_VERSION */
 
-import {
-  destroy,
-  detach,
-  flow,
-  getEnv, getParent,
-  getSnapshot,
-  isRoot,
-  types,
-  walk
-} from 'mobx-state-tree';
+import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, walk } from "mobx-state-tree";
 
-import uniqBy from 'lodash/uniqBy';
-import InfoModal from '../components/Infomodal/Infomodal';
-import { Hotkey } from '../core/Hotkey';
-import ToolsManager from '../tools/Manager';
-import Utils from '../utils';
-import { guidGenerator } from '../utils/unique';
-import { clamp, delay, isDefined } from '../utils/utilities';
-import AnnotationStore from './Annotation/store';
-import Project from './ProjectStore';
-import Settings from './SettingsStore';
-import Task from './TaskStore';
-import { UserExtended } from './UserStore';
-import { UserLabels } from './UserLabels';
-import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from '../utils/feature-flags';
-import { CommentStore } from './Comment/CommentStore';
-import { destroy as destroySharedStore } from '../mixins/SharedChoiceStore/mixin';
+import uniqBy from "lodash/uniqBy";
+import InfoModal from "../components/Infomodal/Infomodal";
+import { Hotkey } from "../core/Hotkey";
+import ToolsManager from "../tools/Manager";
+import Utils from "../utils";
+import { guidGenerator } from "../utils/unique";
+import { clamp, delay, isDefined } from "../utils/utilities";
+import AnnotationStore from "./Annotation/store";
+import Project from "./ProjectStore";
+import Settings from "./SettingsStore";
+import Task from "./TaskStore";
+import { UserExtended } from "./UserStore";
+import { UserLabels } from "./UserLabels";
+import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
+import { CommentStore } from "./Comment/CommentStore";
+import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
 
-const hotkeys = Hotkey('AppStore', 'Global Hotkeys');
+const hotkeys = Hotkey("AppStore", "Global Hotkeys");
 
 export default types
-  .model('AppStore', {
+  .model("AppStore", {
     /**
      * XML config
      */
@@ -46,11 +37,14 @@ export default types
 
     /**
      * History of task {taskId, annotationId}:
-    */
-    taskHistory: types.array(types.model({
-      taskId: types.number,
-      annotationId: types.maybeNull(types.string),
-    }), []),
+     */
+    taskHistory: types.array(
+      types.model({
+        taskId: types.number,
+        annotationId: types.maybeNull(types.string),
+      }),
+      [],
+    ),
 
     /**
      * Configure the visual UI shown to the user
@@ -160,41 +154,39 @@ export default types
   .preProcessSnapshot((sn) => {
     // This should only be handled if the sn.user value is an object, and converted to a reference id for other
     // entities.
-    if (typeof sn.user !== 'number') {
+    if (typeof sn.user !== "number") {
       const currentUser = sn.user ?? window.APP_SETTINGS?.user ?? null;
 
       // This should never be null, but just incase the app user is missing from constructor or the window
       if (currentUser) {
         sn.user = currentUser.id;
 
-        sn.users = sn.users?.length ? [
-          currentUser,
-          ...sn.users.filter(({ id }) => id !== currentUser.id),
-        ] : [currentUser];
+        sn.users = sn.users?.length
+          ? [currentUser, ...sn.users.filter(({ id }) => id !== currentUser.id)]
+          : [currentUser];
       }
-
     }
     return {
       ...sn,
-      _autoAnnotation: localStorage.getItem('autoAnnotation') === 'true',
-      _autoAcceptSuggestions: localStorage.getItem('autoAcceptSuggestions') === 'true',
+      _autoAnnotation: localStorage.getItem("autoAnnotation") === "true",
+      _autoAcceptSuggestions: localStorage.getItem("autoAcceptSuggestions") === "true",
     };
   })
   .volatile(() => ({
-    version: typeof LSF_VERSION === 'string' ? LSF_VERSION : '0.0.0',
+    version: typeof LSF_VERSION === "string" ? LSF_VERSION : "0.0.0",
     initialized: false,
     hydrated: false,
     suggestionsRequest: null,
     // @todo should be removed along with the FF; it's used to detect FF in other parts
     simpleInit: isFF(FF_SIMPLE_INIT),
   }))
-  .views(self => ({
+  .views((self) => ({
     get events() {
       return getEnv(self).events;
     },
     get hasSegmentation() {
       // not an object and not a classification
-      const isSegmentation = t => !t.getAvailableStates && !t.perRegionVisible;
+      const isSegmentation = (t) => !t.getAvailableStates && !t.perRegionVisible;
 
       return Array.from(self.annotationStore.names.values()).some(isSegmentation);
     },
@@ -231,7 +223,7 @@ export default types
       return self.forceAutoAcceptSuggestions || self._autoAcceptSuggestions;
     },
   }))
-  .actions(self => {
+  .actions((self) => {
     let appControls;
 
     function setAppControls(controls) {
@@ -261,14 +253,14 @@ export default types
 
     function setFlags(flags) {
       const names = [
-        'showingSettings',
-        'showingDescription',
-        'isLoading',
-        'isSubmitting',
-        'noTask',
-        'noAccess',
-        'labeledSuccess',
-        'awaitingSuggestions',
+        "showingSettings",
+        "showingDescription",
+        "isLoading",
+        "isSubmitting",
+        "noTask",
+        "noAccess",
+        "labeledSuccess",
+        "awaitingSuggestions",
       ];
 
       for (const n of names) if (n in flags) self[n] = flags[n];
@@ -280,7 +272,7 @@ export default types
      * @returns {string | undefined}
      */
     function hasInterface(...names) {
-      return self.interfaces.find(i => names.includes(i)) !== undefined;
+      return self.interfaces.find((i) => names.includes(i)) !== undefined;
     }
 
     function addInterface(name) {
@@ -289,7 +281,7 @@ export default types
 
     function toggleInterface(name, value) {
       const index = self.interfaces.indexOf(name);
-      const newValue = value ?? (index < 0);
+      const newValue = value ?? index < 0;
 
       if (newValue) {
         if (index < 0) self.interfaces.push(name);
@@ -314,7 +306,7 @@ export default types
 
       self.attachHotkeys();
 
-      getEnv(self).events.invoke('labelStudioLoad', self);
+      getEnv(self).events.invoke("labelStudioLoad", self);
     }
 
     function attachHotkeys() {
@@ -324,10 +316,10 @@ export default types
       /**
        * Hotkey for submit
        */
-      if (self.hasInterface('submit', 'update', 'review')) {
-        hotkeys.addNamed('annotation:submit', () => {
+      if (self.hasInterface("submit", "update", "review")) {
+        hotkeys.addNamed("annotation:submit", () => {
           const annotationStore = self.annotationStore;
-          const shouldDenyEmptyAnnotation = self.hasInterface('annotations:deny-empty');
+          const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
           const entity = annotationStore.selected;
           const areResultsEmpty = entity.results.length === 0;
 
@@ -336,11 +328,11 @@ export default types
 
           entity?.submissionInProgress();
 
-          if (self.hasInterface('review')) {
+          if (self.hasInterface("review")) {
             self.acceptAnnotation();
-          } else if (!isDefined(entity.pk) && self.hasInterface('submit')) {
+          } else if (!isDefined(entity.pk) && self.hasInterface("submit")) {
             self.submitAnnotation();
-          } else if (self.hasInterface('update')) {
+          } else if (self.hasInterface("update")) {
             self.updateAnnotation();
           }
         });
@@ -349,15 +341,15 @@ export default types
       /**
        * Hotkey for skip task
        */
-      if (self.hasInterface('skip', 'review')) {
-        hotkeys.addNamed('annotation:skip', () => {
+      if (self.hasInterface("skip", "review")) {
+        hotkeys.addNamed("annotation:skip", () => {
           if (self.annotationStore.viewingAll) return;
 
           const entity = self.annotationStore.selected;
 
           entity?.submissionInProgress();
 
-          if (self.hasInterface('review')) {
+          if (self.hasInterface("review")) {
             self.rejectAnnotation();
           } else {
             self.skipTask();
@@ -368,7 +360,7 @@ export default types
       /**
        * Hotkey for delete
        */
-      hotkeys.addNamed('region:delete-all', () => {
+      hotkeys.addNamed("region:delete-all", () => {
         const { selected } = self.annotationStore;
 
         if (window.confirm(getEnv(self).messages.CONFIRM_TO_DELETE_ALL_REGIONS)) {
@@ -377,7 +369,7 @@ export default types
       });
 
       // create relation
-      hotkeys.addNamed('region:relation', () => {
+      hotkeys.addNamed("region:relation", () => {
         const c = self.annotationStore.selected;
 
         if (c && c.highlightedNode && !c.relationMode) {
@@ -386,7 +378,7 @@ export default types
       });
 
       // Focus fist focusable perregion when region is selected
-      hotkeys.addNamed('region:focus', (e) => {
+      hotkeys.addNamed("region:focus", (e) => {
         e.preventDefault();
         const c = self.annotationStore.selected;
 
@@ -396,11 +388,11 @@ export default types
       });
 
       // unselect region
-      hotkeys.addNamed('region:unselect', function() {
+      hotkeys.addNamed("region:unselect", () => {
         const c = self.annotationStore.selected;
 
         if (c && !c.relationMode && !c.isDrawing) {
-          self.annotationStore.history.forEach(obj => {
+          self.annotationStore.history.forEach((obj) => {
             obj.unselectAll();
           });
 
@@ -408,7 +400,7 @@ export default types
         }
       });
 
-      hotkeys.addNamed('region:visibility', function() {
+      hotkeys.addNamed("region:visibility", () => {
         const c = self.annotationStore.selected;
 
         if (c && !c.relationMode) {
@@ -416,19 +408,19 @@ export default types
         }
       });
 
-      hotkeys.addNamed('annotation:undo', function() {
+      hotkeys.addNamed("annotation:undo", () => {
         const annotation = self.annotationStore.selected;
 
         if (!annotation.isDrawing) annotation.undo();
       });
 
-      hotkeys.addNamed('annotation:redo', function() {
+      hotkeys.addNamed("annotation:redo", () => {
         const annotation = self.annotationStore.selected;
 
         if (!annotation.isDrawing) annotation.redo();
       });
 
-      hotkeys.addNamed('region:exit', () => {
+      hotkeys.addNamed("region:exit", () => {
         const c = self.annotationStore.selected;
 
         if (c && c.relationMode) {
@@ -438,7 +430,7 @@ export default types
         }
       });
 
-      hotkeys.addNamed('region:delete', () => {
+      hotkeys.addNamed("region:delete", () => {
         const c = self.annotationStore.selected;
 
         if (c) {
@@ -446,14 +438,14 @@ export default types
         }
       });
 
-      hotkeys.addNamed('region:cycle', () => {
+      hotkeys.addNamed("region:cycle", () => {
         const c = self.annotationStore.selected;
 
         c && c.regionStore.selectNext();
       });
 
       // duplicate selected regions
-      hotkeys.addNamed('region:duplicate', (e) => {
+      hotkeys.addNamed("region:duplicate", (e) => {
         const { selected } = self.annotationStore;
         const { serializedSelection } = selected || {};
 
@@ -499,7 +491,7 @@ export default types
     }
 
     /* eslint-disable no-unused-vars */
-    function showModal(message, type = 'warning') {
+    function showModal(message, type = "warning") {
       InfoModal[type](message);
 
       // InfoModal.warning("You need to label at least something!");
@@ -507,11 +499,11 @@ export default types
     /* eslint-enable no-unused-vars */
 
     function submitDraft(c, params = {}) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         const events = getEnv(self).events;
 
-        if (!events.hasEvent('submitDraft')) return resolve();
-        const res = events.invokeFirst('submitDraft', self, c, params);
+        if (!events.hasEvent("submitDraft")) return resolve();
+        const res = events.invokeFirst("submitDraft", self, c, params);
 
         if (res && res.then) res.then(resolve);
         else resolve(res);
@@ -521,7 +513,7 @@ export default types
     // Set `isSubmitting` flag to block [Submit] and related buttons during request
     // to prevent from sending duplicating requests.
     // Better to return request's Promise from SDK to make this work perfect.
-    function handleSubmittingFlag(fn, defaultMessage = 'Error during submit') {
+    function handleSubmittingFlag(fn, defaultMessage = "Error during submit") {
       if (self.isSubmitting) return;
       self.setFlags({ isSubmitting: true });
       const res = fn();
@@ -531,7 +523,7 @@ export default types
       // but block for at least 0.2s to prevent from double clicking.
 
       Promise.race([Promise.all([res, delay(200)]), delay(5000)])
-        .catch(err => {
+        .catch((err) => {
           showModal(err?.message || err || defaultMessage);
           console.error(err);
         })
@@ -545,7 +537,7 @@ export default types
       if (self.isSubmitting) return;
 
       const entity = self.annotationStore.selected;
-      const event = entity.exists ? 'updateAnnotation' : 'submitAnnotation';
+      const event = entity.exists ? "updateAnnotation" : "submitAnnotation";
 
       entity.beforeSend();
 
@@ -569,7 +561,7 @@ export default types
       if (!entity.validate()) return;
 
       handleSubmittingFlag(async () => {
-        await getEnv(self).events.invoke('updateAnnotation', self, entity, extraData);
+        await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
         self.incrementQueuePosition();
       });
       entity.dropDraft();
@@ -579,16 +571,16 @@ export default types
     function skipTask(extraData) {
       if (self.isSubmitting) return;
       handleSubmittingFlag(() => {
-        getEnv(self).events.invoke('skipTask', self, extraData);
+        getEnv(self).events.invoke("skipTask", self, extraData);
         self.incrementQueuePosition();
-      }, 'Error during skip, try again');
+      }, "Error during skip, try again");
     }
 
     function unskipTask() {
       if (self.isSubmitting) return;
       handleSubmittingFlag(() => {
-        getEnv(self).events.invoke('unskipTask', self);
-      }, 'Error during cancel skipping task, try again');
+        getEnv(self).events.invoke("unskipTask", self);
+      }, "Error during cancel skipping task, try again");
     }
 
     function acceptAnnotation() {
@@ -603,9 +595,9 @@ export default types
         const isDirty = entity.history.canUndo;
 
         entity.dropDraft();
-        await getEnv(self).events.invoke('acceptAnnotation', self, { isDirty, entity });
+        await getEnv(self).events.invoke("acceptAnnotation", self, { isDirty, entity });
         self.incrementQueuePosition();
-      }, 'Error during accept, try again');
+      }, "Error during accept, try again");
     }
 
     function rejectAnnotation({ comment = null }) {
@@ -620,10 +612,9 @@ export default types
         const isDirty = entity.history.canUndo;
 
         entity.dropDraft();
-        await getEnv(self).events.invoke('rejectAnnotation', self, { isDirty, entity, comment });
+        await getEnv(self).events.invoke("rejectAnnotation", self, { isDirty, entity, comment });
         self.incrementQueuePosition(-1);
-
-      }, 'Error during reject, try again');
+      }, "Error during reject, try again");
     }
 
     /**
@@ -631,7 +622,7 @@ export default types
      */
     async function presignUrlForProject(url) {
       // Event invocation returns array of results for all handlers.
-      const urls = await self.events.invoke('presignUrlForProject', self, url);
+      const urls = await self.events.invoke("presignUrlForProject", self, url);
 
       const presignUrl = urls?.[0];
 
@@ -699,9 +690,9 @@ export default types
         // add predictions and annotations to the store;
         // `hidden` will stop them from calling any rendering helpers;
         // correct annotation will be selected at the end and everything will be called inside.
-        predictions.forEach(p => {
+        predictions.forEach((p) => {
           const obj = as.addPrediction(p);
-          const results = p.result.map(r => ({ ...r, origin: 'prediction' }));
+          const results = p.result.map((r) => ({ ...r, origin: "prediction" }));
 
           obj.deserializeResults(results, { hidden: true });
         });
@@ -714,7 +705,7 @@ export default types
 
         window.STORE_INIT_OK = true;
         // simple logging to detect if simple init is used on users' machines
-        console.log('LSF: deserialization is finished');
+        console.log("LSF: deserialization is finished");
 
         // next line might be unclear after removing FF_SIMPLE_INIT
         // reversing the list caused problems before when task is reloaded and list is reversed again.
@@ -735,14 +726,16 @@ export default types
         // annotation history is set when annotation is selected,
         // so no need to set it here
       } else {
-        (predictions ?? []).forEach(p => {
+        (predictions ?? []).forEach((p) => {
           const obj = as.addPrediction(p);
 
           as.selectPrediction(obj.id);
-          obj.deserializeResults(p.result.map(r => ({
-            ...r,
-            origin: 'prediction',
-          })));
+          obj.deserializeResults(
+            p.result.map((r) => ({
+              ...r,
+              origin: "prediction",
+            })),
+          );
         });
 
         [...(completions ?? []), ...(annotations ?? [])]?.forEach((c) => {
@@ -762,7 +755,7 @@ export default types
 
       if (!self.initialized) {
         self.initialized = true;
-        getEnv(self).events.invoke('storageInitialized', self);
+        getEnv(self).events.invoke("storageInitialized", self);
       }
     }
 
@@ -775,7 +768,7 @@ export default types
       if (!history.length || !as.selected?.pk) return;
       if (Number(as.selected.pk) !== Number(history[0].annotation_id)) return;
 
-      (history ?? []).forEach(item => {
+      (history ?? []).forEach((item) => {
         const obj = as.addHistory(item);
 
         obj.deserializeResults(item.result ?? [], { hidden: true });
@@ -784,12 +777,12 @@ export default types
 
     const setAutoAnnotation = (value) => {
       self._autoAnnotation = value;
-      localStorage.setItem('autoAnnotation', value);
+      localStorage.setItem("autoAnnotation", value);
     };
 
     const setAutoAcceptSuggestions = (value) => {
       self._autoAcceptSuggestions = value;
-      localStorage.setItem('autoAcceptSuggestions', value);
+      localStorage.setItem("autoAcceptSuggestions", value);
     };
 
     const loadSuggestions = flow(function* (request, dataParser) {
@@ -798,11 +791,17 @@ export default types
       self.suggestionsRequest = requestId;
 
       self.setFlags({ awaitingSuggestions: true });
-      const response = yield request;
 
-      if (requestId === self.suggestionsRequest) {
-        self.annotationStore.selected.setSuggestions(dataParser(response));
+      try {
+        const response = yield request;
+
+        if (requestId === self.suggestionsRequest) {
+          self.annotationStore.selected.setSuggestions(dataParser(response));
+          self.setFlags({ awaitingSuggestions: false });
+        }
+      } catch (e) {
         self.setFlags({ awaitingSuggestions: false });
+        // @todo handle errors + situation when task is changed
       }
     });
 
@@ -820,32 +819,30 @@ export default types
       // save draft before postponing; this can be new draft with FF_DEV_4174 off
       // or annotation created from prediction
       await annotation.saveDraft({ was_postponed: true });
-      await getEnv(self).events.invoke('nextTask');
+      await getEnv(self).events.invoke("nextTask");
       self.incrementQueuePosition();
-
     }
 
     function nextTask() {
-
       if (self.canGoNextTask) {
-        const { taskId, annotationId } = self.taskHistory[self.taskHistory.findIndex((x) => x.taskId === self.task.id) + 1];
+        const { taskId, annotationId } =
+          self.taskHistory[self.taskHistory.findIndex((x) => x.taskId === self.task.id) + 1];
 
-        getEnv(self).events.invoke('nextTask', taskId, annotationId);
+        getEnv(self).events.invoke("nextTask", taskId, annotationId);
         self.incrementQueuePosition();
-
       }
-
     }
 
     function prevTask(e, shouldGoBack = false) {
-      const length = shouldGoBack ? self.taskHistory.length - 1 : self.taskHistory.findIndex((x) => x.taskId === self.task.id) - 1;
+      const length = shouldGoBack
+        ? self.taskHistory.length - 1
+        : self.taskHistory.findIndex((x) => x.taskId === self.task.id) - 1;
 
       if (self.canGoPrevTask || shouldGoBack) {
         const { taskId, annotationId } = self.taskHistory[length];
 
-        getEnv(self).events.invoke('prevTask', taskId, annotationId);
+        getEnv(self).events.invoke("prevTask", taskId, annotationId);
         self.incrementQueuePosition(-1);
-
       }
     }
 
@@ -854,7 +851,7 @@ export default types
     }
 
     function mergeUsers(users) {
-      self.setUsers(uniqBy([...getSnapshot(self.users), ...users], 'id'));
+      self.setUsers(uniqBy([...getSnapshot(self.users), ...users], "id"));
     }
 
     return {
@@ -919,7 +916,7 @@ export default types
           try {
             destroy(node);
           } catch (e) {
-            console.log('Problem: ', e);
+            console.log("Problem: ", e);
           }
         }
       },

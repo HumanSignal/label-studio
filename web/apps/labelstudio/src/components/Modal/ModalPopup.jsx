@@ -1,10 +1,9 @@
-
-import React, { createContext, useContext } from 'react';
-import { createPortal } from 'react-dom';
-import { LsCross } from '../../assets/icons';
-import { BemWithSpecifiContext, cn } from '../../utils/bem';
-import { aroundTransition } from '../../utils/transition';
-import { Button } from '../Button/Button';
+import React, { createContext, useContext } from "react";
+import { createPortal } from "react-dom";
+import { LsCross } from "../../assets/icons";
+import { BemWithSpecifiContext, cn } from "../../utils/bem";
+import { aroundTransition } from "../../utils/transition";
+import { Button } from "../Button/Button";
 import "./Modal.styl";
 
 const { Block, Elem } = BemWithSpecifiContext();
@@ -12,8 +11,7 @@ const { Block, Elem } = BemWithSpecifiContext();
 const ModalContext = createContext();
 
 export class Modal extends React.Component {
-
-  modalRef = React.createRef()
+  modalRef = React.createRef();
 
   constructor(props) {
     super(props);
@@ -23,7 +21,7 @@ export class Modal extends React.Component {
       body: props.body,
       footer: props.footer,
       visible: props.animateAppearance ? false : props.visible ?? false,
-      transition: props.visible ? 'visible' : null,
+      transition: props.visible ? "visible" : null,
     };
   }
 
@@ -34,16 +32,16 @@ export class Modal extends React.Component {
 
     // with `allowToInterceptEscape` we can prevent closing modal on escape
     // by handling it inside modal, before event will be bubbled here
-    document.addEventListener('keydown', this.closeOnEscape, { capture: !this.props.allowToInterceptEscape });
+    document.addEventListener("keydown", this.closeOnEscape, { capture: !this.props.allowToInterceptEscape });
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', this.closeOnEscape, { capture: !this.props.allowToInterceptEscape });
+    document.removeEventListener("keydown", this.closeOnEscape, { capture: !this.props.allowToInterceptEscape });
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.visible !== this.state.visible) {
-      document.body.style.overflow = this.state.visible ? 'hidden' : '';
+      document.body.style.overflow = this.state.visible ? "hidden" : "";
     }
   }
 
@@ -63,7 +61,7 @@ export class Modal extends React.Component {
 
   hide(onHidden) {
     return new Promise((resolve) => {
-      this.transition('disappear', () => {
+      this.transition("disappear", () => {
         this.setState({ visible: false }, () => {
           this.props.onHide?.();
           resolve();
@@ -84,10 +82,7 @@ export class Modal extends React.Component {
       visible: this.props.visible || this.state.visible,
     };
 
-    const mixes = [
-      this.transitionClass,
-      this.props.className,
-    ];
+    const mixes = [this.transitionClass, this.props.className];
 
     const modalSizeStyle = {};
 
@@ -102,19 +97,13 @@ export class Modal extends React.Component {
               {!bare && (
                 <Modal.Header>
                   <Elem name="title">{this.state.title}</Elem>
-                  {this.props.allowClose !== false  && (
-                    <Elem tag={Button} name="close" type="text" icon={<LsCross/>}/>
-                  )}
+                  {this.props.allowClose !== false && <Elem tag={Button} name="close" type="text" icon={<LsCross />} />}
                 </Modal.Header>
               )}
               <Elem name="body" mod={{ bare }}>
                 {this.body}
               </Elem>
-              {this.props.footer && (
-                <Modal.Footer bare={this.props.bareFooter}>
-                  {this.footer}
-                </Modal.Footer>
-              )}
+              {this.props.footer && <Modal.Footer bare={this.props.bareFooter}>{this.footer}</Modal.Footer>}
             </Elem>
           </Elem>
         </Block>
@@ -129,52 +118,60 @@ export class Modal extends React.Component {
     const { closeOnClickOutside } = this.props;
     const allowClose = this.props.allowClose !== false;
     const isInModal = this.modalRef.current.contains(e.target);
-    const content = cn('modal').elem('content').closest(e.target);
-    const close = cn('modal').elem('close').closest(e.target);
+    const content = cn("modal").elem("content").closest(e.target);
+    const close = cn("modal").elem("close").closest(e.target);
 
     if (allowClose && ((isInModal && close) || (content === null && closeOnClickOutside !== false))) {
       this.hide();
     }
-  }
+  };
 
   closeOnEscape = (e) => {
     if (this.props.allowClose === false) return;
-    if (e.key !== 'Escape') return;
+    if (e.key !== "Escape") return;
     if (!this.state.visible) return;
 
     e.stopPropagation();
     e.preventDefault();
     this.hide();
-  }
+  };
 
   transition(type, onFinish) {
     return aroundTransition(this.modalRef.current, {
-      transition: async () => new Promise(resolve => {
-        this.setState({ transition: type }, () => {
-          resolve();
-        });
-      }),
-      beforeTransition: async () => new Promise(resolve => {
-        this.setState({ transition: `before-${type}` }, () => {
-          resolve();
-        });
-      }),
-      afterTransition: async () => new Promise(resolve => {
-        this.setState({ transition: type === 'appear' ? "visible" : null }, () => {
-          onFinish?.();
-          resolve();
-        });
-      }),
+      transition: async () =>
+        new Promise((resolve) => {
+          this.setState({ transition: type }, () => {
+            resolve();
+          });
+        }),
+      beforeTransition: async () =>
+        new Promise((resolve) => {
+          this.setState({ transition: `before-${type}` }, () => {
+            resolve();
+          });
+        }),
+      afterTransition: async () =>
+        new Promise((resolve) => {
+          this.setState({ transition: type === "appear" ? "visible" : null }, () => {
+            onFinish?.();
+            resolve();
+          });
+        }),
     });
   }
 
   get transitionClass() {
     switch (this.state.transition) {
-      case "before-appear": return "before-appear";
-      case "appear": return "appear before-appear";
-      case "before-disappear": return "before-disappear";
-      case "disappear": return "disappear before-disappear";
-      case "visible": return "visible";
+      case "before-appear":
+        return "before-appear";
+      case "appear":
+        return "appear before-appear";
+      case "before-disappear":
+        return "before-disappear";
+      case "disappear":
+        return "disappear before-disappear";
+      case "visible":
+        return "visible";
     }
     return null;
   }
@@ -183,17 +180,16 @@ export class Modal extends React.Component {
     if (this.state.body) {
       const Content = this.state.body;
 
-      return Content instanceof Function ? <Content/> : Content;
-    } else {
-      return this.props.children;
+      return Content instanceof Function ? <Content /> : Content;
     }
+    return this.props.children;
   }
 
   get footer() {
     if (this.state.footer) {
       const Content = this.state.footer;
 
-      return Content instanceof Function ? <Content/> : Content;
+      return Content instanceof Function ? <Content /> : Content;
     }
 
     return null;

@@ -4,7 +4,7 @@ import { useCallback, useMemo } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import { useShortcut } from "../../../sdk/hotkeys";
 import { Block, Elem } from "../../../utils/bem";
-import { FF_DEV_2536, FF_DEV_4008, FF_LOPS_86, FF_OPTIC_2, isFF } from '../../../utils/feature-flags';
+import { FF_DEV_2536, FF_DEV_4008, FF_LOPS_86, FF_OPTIC_2, isFF } from "../../../utils/feature-flags";
 import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
 import { ImportButton } from "../../Common/SDKButtons";
@@ -81,47 +81,42 @@ export const DataView = injector(
       [dataStore.hasNextPage],
     );
 
-    const columnHeaderExtra = useCallback(
-      ({ parent, original, help }, decoration) => {
-        const children = [];
+    const columnHeaderExtra = useCallback(({ parent, original, help }, decoration) => {
+      const children = [];
 
-        if (parent) {
-          children.push(
-            <Tag
-              key="column-type"
-              color="blue"
-              style={{ fontWeight: "500", fontSize: 14, cursor: "pointer", width: 45, padding: 0 }}
-            >
-              {original?.readableType ?? parent.title}
-            </Tag>,
-          );
-        }
+      if (parent) {
+        children.push(
+          <Tag
+            key="column-type"
+            color="blue"
+            style={{ fontWeight: "500", fontSize: 14, cursor: "pointer", width: 45, padding: 0 }}
+          >
+            {original?.readableType ?? parent.title}
+          </Tag>,
+        );
+      }
 
-        if (help && decoration?.help !== false) {
-          children.push(
-            <Tooltip key="help-tooltip" title={help}>
-              <Icon icon={FaQuestionCircle} style={{ opacity: 0.5 }} />
-            </Tooltip>,
-          );
-        }
+      if (help && decoration?.help !== false) {
+        children.push(
+          <Tooltip key="help-tooltip" title={help}>
+            <Icon icon={FaQuestionCircle} style={{ opacity: 0.5 }} />
+          </Tooltip>,
+        );
+      }
 
-        return children.length ? <>{children}</> : null;
-      },
-      [],
-    );
+      return children.length ? <>{children}</> : null;
+    }, []);
 
     const onSelectAll = useCallback(() => view.selectAll(), [view]);
 
-    const onRowSelect = useCallback((id) => view.toggleSelected(id), [
-      view,
-    ]);
+    const onRowSelect = useCallback((id) => view.toggleSelected(id), [view]);
 
     const onRowClick = useCallback(
       async (item, e) => {
         const itemID = item.task_id ?? item.id;
 
-        if (store.SDK.type === 'DE') {
-          store.SDK.invoke('recordPreview', item, columns, getRoot(view).taskStore.associatedList);
+        if (store.SDK.type === "DE") {
+          store.SDK.invoke("recordPreview", item, columns, getRoot(view).taskStore.associatedList);
         } else if (e.metaKey || e.ctrlKey) {
           window.open(`./?task=${itemID}`, "_blank");
         } else {
@@ -140,41 +135,63 @@ export const DataView = injector(
               <Spinner size="large" />
             </Block>
           );
-        } else if (store.SDK.type === 'DE' && ['canceled', 'failed'].includes(datasetStatusID)) {
+        }
+        if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
           return (
             <Block name="syncInProgress">
-              <Elem name='title' tag="h3">Failed to sync data</Elem>
+              <Elem name="title" tag="h3">
+                Failed to sync data
+              </Elem>
               {isFF(FF_LOPS_86) ? (
                 <>
-                  <Elem name='text'>Check your storage settings and resync to import records</Elem>
-                  <Button onClick={async () => {
-                    window.open('./settings/storage');
-                  }}>Manage Storage</Button>
+                  <Elem name="text">Check your storage settings and resync to import records</Elem>
+                  <Button
+                    onClick={async () => {
+                      window.open("./settings/storage");
+                    }}
+                  >
+                    Manage Storage
+                  </Button>
                 </>
               ) : (
-                <Elem name='text'>Check your storage settings. You may need to recreate this dataset</Elem>
+                <Elem name="text">Check your storage settings. You may need to recreate this dataset</Elem>
               )}
             </Block>
           );
-        } else if (store.SDK.type === 'DE' && (total === 0 || data.length === 0 || !hasData) && datasetStatusID === 'completed') {
+        }
+        if (
+          store.SDK.type === "DE" &&
+          (total === 0 || data.length === 0 || !hasData) &&
+          datasetStatusID === "completed"
+        ) {
           return (
             <Block name="syncInProgress">
-              <Elem name='title' tag="h3">Nothing found</Elem>
-              <Elem name='text'>Try adjusting the filter or similarity search parameters</Elem>
+              <Elem name="title" tag="h3">
+                Nothing found
+              </Elem>
+              <Elem name="text">Try adjusting the filter or similarity search parameters</Elem>
             </Block>
           );
-        } else if (store.SDK.type === 'DE' && (total === 0 || data.length === 0 || !hasData)) {
+        }
+        if (store.SDK.type === "DE" && (total === 0 || data.length === 0 || !hasData)) {
           return (
             <Block name="syncInProgress">
-              <Elem name='title' tag="h3">Hang tight! Records are syncing in the background</Elem>
-              <Elem name='text'>Press the button below to see any synced records</Elem>
-              <Button onClick={async () => {
-                await store.fetchProject({ force: true, interaction: 'refresh' });
-                await store.currentView?.reload();
-              }}>Refresh</Button>
+              <Elem name="title" tag="h3">
+                Hang tight! Records are syncing in the background
+              </Elem>
+              <Elem name="text">Press the button below to see any synced records</Elem>
+              <Button
+                onClick={async () => {
+                  await store.fetchProject({ force: true, interaction: "refresh" });
+                  await store.currentView?.reload();
+                }}
+              >
+                Refresh
+              </Button>
             </Block>
           );
-        } else if (total === 0 || !hasData) {
+        }
+        if (total === 0 || !hasData) {
           return (
             <Block name="no-results">
               <Elem name="description">
@@ -207,27 +224,21 @@ export const DataView = injector(
       const column = col.original;
 
       if (column.icon) {
-        return (
-          <Tooltip title={column.help ?? col.title}>
-            {column.icon}
-          </Tooltip>
-        );
+        return <Tooltip title={column.help ?? col.title}>{column.icon}</Tooltip>;
       }
 
       return column.title;
     };
 
-    const commonDecoration = useCallback((
-      alias,
-      size,
-      align = "flex-start",
-      help = false,
-    ) => ({
-      alias,
-      content: decorationContent,
-      style: (col) => ({ width: col.width ?? size, justifyContent: align }),
-      help,
-    }), []);
+    const commonDecoration = useCallback(
+      (alias, size, align = "flex-start", help = false) => ({
+        alias,
+        content: decorationContent,
+        style: (col) => ({ width: col.width ?? size, justifyContent: align }),
+        help,
+      }),
+      [],
+    );
 
     const decoration = useMemo(
       () => [
@@ -247,11 +258,11 @@ export const DataView = injector(
           },
         },
         {
-          resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type !== 'DE',
+          resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type !== "DE",
           style: { width: 150, justifyContent: "center" },
         },
         {
-          resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type === 'DE',
+          resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type === "DE",
           style: { width: 150 },
         },
         {
@@ -341,9 +352,7 @@ export const DataView = injector(
     });
 
     useEffect(() => {
-      const updateDatasetStatus = (dataset) => (
-        dataset?.status?.id && setDatasetStatusID(dataset?.status?.id)
-      );
+      const updateDatasetStatus = (dataset) => dataset?.status?.id && setDatasetStatusID(dataset?.status?.id);
 
       getRoot(store).SDK.on("datasetUpdated", updateDatasetStatus);
       return () => getRoot(store).SDK.off("datasetUpdated", updateDatasetStatus);
@@ -351,11 +360,7 @@ export const DataView = injector(
 
     // Render the UI for your table
     return (
-      <Block
-        name="data-view"
-        className="dm-content"
-        style={{ pointerEvents: isLocked ? "none" : "auto" }}
-      >
+      <Block name="data-view" className="dm-content" style={{ pointerEvents: isLocked ? "none" : "auto" }}>
         {renderContent(content)}
       </Block>
     );

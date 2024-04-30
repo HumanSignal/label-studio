@@ -372,7 +372,7 @@ def project_dialog():
     label = """<View>
       <TextEditor>
         <Text name="dialog" value="$dialog"></Text>
-        <Header name="header" value="Your answer is:"></Header>
+        <Header value="Your answer is:"></Header>
         <TextArea name="answer"></TextArea>
       </TextEditor>
     </View>"""

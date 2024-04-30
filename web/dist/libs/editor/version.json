@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-433'",
-  "commit": "586ff57ef07af6b44783bd19ecab4c92e3c5f7e7",
-  "date": "2024-04-19T15:46:00.000Z",
-  "branch": "fb-leap-433"
+  "message": "Remove unecesary github conf set up on action ci",
+  "commit": "3a11b690480584b6849991e72b66ec074e4dad74",
+  "date": "2024-04-22T21:52:06.000Z",
+  "branch": "fb-echo-27-regenerate-first-release-commit-to-review"
 }

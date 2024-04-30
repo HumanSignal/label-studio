@@ -70,12 +70,7 @@ export const Filters = injector(({ views, currentView, filters }) => {
         )}
       </Elem>
       <Elem name="actions">
-        <Button
-          type="primary"
-          size="small"
-          onClick={() => currentView.createFilter()}
-          icon={<FaPlus />}
-        >
+        <Button type="primary" size="small" onClick={() => currentView.createFilter()} icon={<FaPlus />}>
           Add {filters.length ? "Another Filter" : "Filter"}
         </Button>
 

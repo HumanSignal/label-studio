@@ -1,15 +1,15 @@
-import { createRef } from 'react';
-import { render } from 'react-dom';
-import { cn } from '../../utils/bem';
-import { Button } from '../Button/Button';
-import { Space } from '../Space/Space';
-import { Modal } from './ModalPopup';
+import { createRef } from "react";
+import { render } from "react-dom";
+import { cn } from "../../utils/bem";
+import { Button } from "../Button/Button";
+import { Space } from "../Space/Space";
+import { Modal } from "./ModalPopup";
 
-const standaloneModal = props => {
+const standaloneModal = (props) => {
   const modalRef = createRef();
-  const rootDiv = document.createElement('div');
+  const rootDiv = document.createElement("div");
 
-  rootDiv.className = cn('modal-holder').toClassName();
+  rootDiv.className = cn("modal-holder").toClassName();
 
   document.body.appendChild(rootDiv);
 
@@ -54,7 +54,7 @@ export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...pro
           size="compact"
           autoFocus
         >
-          {cancelText ?? 'Cancel'}
+          {cancelText ?? "Cancel"}
         </Button>
 
         <Button
@@ -63,9 +63,9 @@ export const confirm = ({ okText, onOk, cancelText, onCancel, buttonLook, ...pro
             modal.close();
           }}
           size="compact"
-          look={buttonLook ?? 'primary'}
+          look={buttonLook ?? "primary"}
         >
-          {okText ?? 'OK'}
+          {okText ?? "OK"}
         </Button>
       </Space>
     ),
@@ -87,7 +87,7 @@ export const info = ({ okText, onOkPress, ...props }) => {
           look="primary"
           size="compact"
         >
-          {okText ?? 'OK'}
+          {okText ?? "OK"}
         </Button>
       </Space>
     ),

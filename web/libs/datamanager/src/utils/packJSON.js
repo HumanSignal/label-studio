@@ -1,8 +1,8 @@
 /** @deprecated Buggy legacy library, don't use it. Use utils/urlJSON instead. */
 
-const CODES = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.';
+const CODES = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.";
 // Not used symbols _!~*'()
-const NUM_CODES = '0123456789.e+-';
+const NUM_CODES = "0123456789.e+-";
 const NUM_CODES_SIZE = Math.ceil(Math.log(NUM_CODES.length) / Math.log(2));
 
 const MAX_INT_SIZE = Math.log(Number.MAX_SAFE_INTEGER) / Math.log(2);
@@ -19,29 +19,34 @@ function PackJSONBuffer(domain = CODES) {
   this.bufferCellSize = Math.floor(Math.log(domain.length) / Math.log(2));
   this.clear();
 }
-Object.defineProperty(PackJSONBuffer.prototype, 'lastCell', {
-  get() { return this.buffer[this.buffer.length - 1]; },
-  set(val) { this.buffer[this.buffer.length - 1] = val; },
+Object.defineProperty(PackJSONBuffer.prototype, "lastCell", {
+  get() {
+    return this.buffer[this.buffer.length - 1];
+  },
+  set(val) {
+    this.buffer[this.buffer.length - 1] = val;
+  },
 });
 PackJSONBuffer.prototype.MAX_INT_CHUNK_SIZE = 30;
-PackJSONBuffer.prototype.pushChunk = function(size, val) {
-  if (this.readonly) throw Error('Cannot push the chunk. The value is readonly');
+PackJSONBuffer.prototype.pushChunk = function (size, val) {
+  if (this.readonly) throw Error("Cannot push the chunk. The value is readonly");
   while (size > 0) {
     if (this.avaliableBufferCellSize === 0) {
       this.buffer.push(0);
       this.avaliableBufferCellSize = this.bufferCellSize;
     }
     if (this.avaliableBufferCellSize >= size) {
-      this.lastCell |= ((1 << this.bufferCellSize) - 1) & val << (this.avaliableBufferCellSize -= size);
+      this.lastCell |= ((1 << this.bufferCellSize) - 1) & (val << (this.avaliableBufferCellSize -= size));
       size = 0;
     } else {
-      this.lastCell |= ((1 << this.bufferCellSize) - 1) & val >> (size -= this.avaliableBufferCellSize);
+      this.lastCell |= ((1 << this.bufferCellSize) - 1) & (val >> (size -= this.avaliableBufferCellSize));
       this.avaliableBufferCellSize = 0;
     }
   }
 };
-PackJSONBuffer.prototype.readChunk = function(size) {
-  if (size > this.MAX_INT_CHUNK_SIZE) throw Error(`Unsupported size of a chunk. Couldn't be greater than ${this.MAX_INT_CHUNK_SIZE}`);
+PackJSONBuffer.prototype.readChunk = function (size) {
+  if (size > this.MAX_INT_CHUNK_SIZE)
+    throw Error(`Unsupported size of a chunk. Couldn't be greater than ${this.MAX_INT_CHUNK_SIZE}`);
   let chunk = 0;
   let cellIdx;
   let cellPos;
@@ -59,29 +64,27 @@ PackJSONBuffer.prototype.readChunk = function(size) {
   }
   return chunk;
 };
-PackJSONBuffer.prototype.seek = function(pos) {
+PackJSONBuffer.prototype.seek = function (pos) {
   this.pos = pos;
 };
-PackJSONBuffer.prototype.readBytes = function(length) {
-  return (new Uint8Array(length)).map(() => this.readChunk(8));
+PackJSONBuffer.prototype.readBytes = function (length) {
+  return new Uint8Array(length).map(() => this.readChunk(8));
 };
-PackJSONBuffer.prototype.clear = function() {
+PackJSONBuffer.prototype.clear = function () {
   this.buffer = [];
   this.avaliableBufferCellSize = 0;
   this.readonly = false;
   this.pos = 0;
 };
-PackJSONBuffer.prototype.toString = function() {
-  return this.buffer.map((domainIdx) => this.domain[domainIdx]).join('');
+PackJSONBuffer.prototype.toString = function () {
+  return this.buffer.map((domainIdx) => this.domain[domainIdx]).join("");
 };
-PackJSONBuffer.prototype.fromString = function(string) {
-  this.buffer = string.split('').map((char) => this.domain.indexOf(char));
+PackJSONBuffer.prototype.fromString = function (string) {
+  this.buffer = string.split("").map((char) => this.domain.indexOf(char));
   this.readonly = true;
   this.pos = 0;
 };
-PackJSONBuffer.fromString = function(string, domain) {
-  return (new PackJSONBuffer(domain)).fromString(string);
-};
+PackJSONBuffer.fromString = (string, domain) => new PackJSONBuffer(domain).fromString(string);
 
 /*
 body:= [...value]
@@ -127,22 +130,22 @@ const DICT_DEFINITION_TYPE = 1;
 
 const CONST_CODE = 6;
 
-const PackJSON = function(domain) {
+const PackJSON = function (domain) {
   this.buffer = new PackJSONBuffer(domain);
 };
 
-PackJSON.prototype.stringify = function(json) {
+PackJSON.prototype.stringify = function (json) {
   this.buffer.clear();
   this.makeDictionaries(json);
   this.encode(json);
   return this.buffer.toString();
 };
-PackJSON.prototype.parse = function(string) {
+PackJSON.prototype.parse = function (string) {
   this.buffer.fromString(string);
   this.definitions = [];
   return this.decode();
 };
-PackJSON.prototype.makeDictionaries = function(json) {
+PackJSON.prototype.makeDictionaries = function (json) {
   this.sharedValuesCount = 0;
   this.sharedNumbersDict = {};
   this.sharedStringsDict = {};
@@ -150,23 +153,23 @@ PackJSON.prototype.makeDictionaries = function(json) {
   this.collectObjectWords(json);
   this.encodeDefinitions();
 };
-PackJSON.prototype.collectObjectWords = function(value) {
+PackJSON.prototype.collectObjectWords = function (value) {
   switch (typeof value) {
-    case 'number': {
+    case "number": {
       if (this.tmpSharedValuesSet.has(value) && this.sharedStringsDict[value] === undefined) {
         this.sharedNumbersDict[value] = this.sharedValuesCount++;
       }
       this.tmpSharedValuesSet.add(value);
       break;
     }
-    case 'string': {
+    case "string": {
       if (this.tmpSharedValuesSet.has(value) && this.sharedStringsDict[value] === undefined) {
         this.sharedStringsDict[value] = this.sharedValuesCount++;
       }
       this.tmpSharedValuesSet.add(value);
       break;
     }
-    case 'object': {
+    case "object": {
       if (value === null) return;
       if (Array.isArray(value)) {
         value.forEach((v) => this.collectObjectWords(v));
@@ -180,23 +183,23 @@ PackJSON.prototype.collectObjectWords = function(value) {
     }
   }
 };
-PackJSON.prototype.encode = function(value) {
+PackJSON.prototype.encode = function (value) {
   const type = typeof value;
 
   switch (type) {
-    case 'boolean': {
+    case "boolean": {
       this.encodeSpec(value);
       break;
     }
-    case 'number': {
+    case "number": {
       this.encodeNumber(value);
       break;
     }
-    case 'string': {
+    case "string": {
       this.encodeString(value);
       break;
     }
-    case 'object': {
+    case "object": {
       if (value === null) {
         this.encodeSpec(value);
       } else if (Array.isArray(value)) {
@@ -208,7 +211,7 @@ PackJSON.prototype.encode = function(value) {
     }
   }
 };
-PackJSON.prototype.decode = function() {
+PackJSON.prototype.decode = function () {
   const code = this.buffer.readChunk(CODE_SIZE);
 
   switch (code) {
@@ -235,15 +238,15 @@ PackJSON.prototype.decode = function() {
     }
   }
 };
-PackJSON.prototype.encodeSpec = function(value) {
+PackJSON.prototype.encodeSpec = function (value) {
   this.buffer.pushChunk(CODE_SIZE, SPEC_CODE);
   this.buffer.pushChunk(SPEC_SIZE, SPEC_LITERALS.indexOf(value));
 };
-PackJSON.prototype.decodeSpec = function() {
+PackJSON.prototype.decodeSpec = function () {
   return SPEC_LITERALS[this.buffer.readChunk(SPEC_SIZE)];
 };
 
-PackJSON.prototype.encodeNumber = function(value) {
+PackJSON.prototype.encodeNumber = function (value) {
   if (this.definitions?.indexOf(value) > -1) {
     return this.encodeConst(this.sharedNumbersDict[value]);
   }
@@ -253,18 +256,21 @@ PackJSON.prototype.encodeNumber = function(value) {
     this.buffer.pushChunk(1, value < 0);
     value = Math.abs(value);
     this.buffer.pushChunk(MAX_INT_SIZE.toString(2).length, value.toString(2).length);
-    value.toString(32).split('').forEach((b32, idx) => {
-      const val = parseInt(b32, 32);
+    value
+      .toString(32)
+      .split("")
+      .forEach((b32, idx) => {
+        const val = Number.parseInt(b32, 32);
 
-      this.buffer.pushChunk(idx ? 5 : val.toString(2).length, val);
-    });
+        this.buffer.pushChunk(idx ? 5 : val.toString(2).length, val);
+      });
   } else {
     const stringValue = JSON.stringify(value);
 
     if (stringValue.length * NUM_CODES_SIZE < 64) {
       this.buffer.pushChunk(NUMBER_TYPE_SIZE, NUMBER_STRING_TYPE);
       this.buffer.pushChunk((64 / NUM_CODES_SIZE - 1).toString(2).length, stringValue.length);
-      stringValue.split('').forEach((ch) => {
+      stringValue.split("").forEach((ch) => {
         this.buffer.pushChunk(NUM_CODES_SIZE, NUM_CODES.indexOf(ch));
       });
     } else {
@@ -275,21 +281,27 @@ PackJSON.prototype.encodeNumber = function(value) {
     }
   }
 };
-PackJSON.prototype.decodeNumber = function() {
+PackJSON.prototype.decodeNumber = function () {
   const type = this.buffer.readChunk(NUMBER_TYPE_SIZE);
 
   switch (type) {
     case NUMBER_INTEGER_TYPE: {
       const sign = this.buffer.readChunk(1);
       const size = this.buffer.readChunk(MAX_INT_SIZE.toString(2).length);
-      const b32 = Array.apply(null, new Array(Math.ceil(size / 5))).map((v, idx) => this.buffer.readChunk(idx ? 5 : size % 5 || 5).toString(32)).join('');
+      const b32 = Array.apply(null, new Array(Math.ceil(size / 5)))
+        .map((v, idx) => this.buffer.readChunk(idx ? 5 : size % 5 || 5).toString(32))
+        .join("");
 
-      return (sign ? -1 : 1) * parseInt(b32, 32);
+      return (sign ? -1 : 1) * Number.parseInt(b32, 32);
     }
     case NUMBER_STRING_TYPE: {
       const length = this.buffer.readChunk((64 / NUM_CODES_SIZE - 1).toString(2).length);
 
-      return JSON.parse(Array.apply(null, new Array(length)).map(() => NUM_CODES[this.buffer.readChunk(NUM_CODES_SIZE)]).join(''));
+      return JSON.parse(
+        Array.apply(null, new Array(length))
+          .map(() => NUM_CODES[this.buffer.readChunk(NUM_CODES_SIZE)])
+          .join(""),
+      );
     }
     case NUMBER_FLOAT_TYPE: {
       const bytes = this.buffer.readBytes(8);
@@ -299,13 +311,13 @@ PackJSON.prototype.decodeNumber = function() {
   }
 };
 
-PackJSON.prototype.encodeString = function(value) {
+PackJSON.prototype.encodeString = function (value) {
   if (this.definitions?.indexOf(value) > -1) {
     return this.encodeConst(this.sharedStringsDict[value]);
   }
   value = this.packInConstants(value);
   this.buffer.pushChunk(CODE_SIZE, STRING_CODE);
-  const knownCharsCount = value.split('').filter((ch) => {
+  const knownCharsCount = value.split("").filter((ch) => {
     const idx = CODES.indexOf(ch);
 
     return idx > -1 && idx < CODES.length - 1;
@@ -314,13 +326,17 @@ PackJSON.prototype.encodeString = function(value) {
   const potentialInfrequentCharsStringSize = knownCharsCount * 6 + unknownCharsCount * (6 + 16);
   const potentialOnlyCodesStringSize = value.length * 16;
   const potentialMarkedCharsStringSize = knownCharsCount * 7 + unknownCharsCount * 17;
-  const minSize = Math.min(potentialInfrequentCharsStringSize, potentialOnlyCodesStringSize, potentialMarkedCharsStringSize);
+  const minSize = Math.min(
+    potentialInfrequentCharsStringSize,
+    potentialOnlyCodesStringSize,
+    potentialMarkedCharsStringSize,
+  );
 
   switch (minSize) {
     case potentialInfrequentCharsStringSize: {
       this.buffer.pushChunk(STRING_TYPE_SIZE, INFREQUENT_CODES_STRING_TYPE);
       this.encodeStringLen(value);
-      value.split('').forEach((ch) => {
+      value.split("").forEach((ch) => {
         const idx = CODES.indexOf(ch);
 
         if (idx > -1 && idx < CODES.length - 1) {
@@ -335,7 +351,7 @@ PackJSON.prototype.encodeString = function(value) {
     case potentialOnlyCodesStringSize: {
       this.buffer.pushChunk(STRING_TYPE_SIZE, ONLY_CODES_STRING_TYPE);
       this.encodeStringLen(value);
-      value.split('').forEach((ch) => {
+      value.split("").forEach((ch) => {
         this.buffer.pushChunk(16, ch.charCodeAt(0));
       });
       break;
@@ -343,7 +359,7 @@ PackJSON.prototype.encodeString = function(value) {
     case potentialMarkedCharsStringSize: {
       this.buffer.pushChunk(STRING_TYPE_SIZE, MARKED_CHARS_STRING_TYPE);
       this.encodeStringLen(value);
-      value.split('').forEach((ch) => {
+      value.split("").forEach((ch) => {
         const idx = CODES.indexOf(ch);
 
         if (idx > -1) {
@@ -358,59 +374,65 @@ PackJSON.prototype.encodeString = function(value) {
     }
   }
 };
-PackJSON.prototype.encodeStringLen = function(value) {
-  const stringLengthParts = (value.length).toString(1 << STRING_LEN_BLOCK_SIZE).split('');
+PackJSON.prototype.encodeStringLen = function (value) {
+  const stringLengthParts = value.length.toString(1 << STRING_LEN_BLOCK_SIZE).split("");
 
   stringLengthParts.forEach((lenBlock, idx) => {
-    this.buffer.pushChunk(STRING_LEN_BLOCK_SIZE, parseInt(lenBlock, 1 << STRING_LEN_BLOCK_SIZE));
+    this.buffer.pushChunk(STRING_LEN_BLOCK_SIZE, Number.parseInt(lenBlock, 1 << STRING_LEN_BLOCK_SIZE));
     this.buffer.pushChunk(1, idx === stringLengthParts.length - 1); // stop chain marker
   });
 };
 
-PackJSON.prototype.decodeString = function() {
+PackJSON.prototype.decodeString = function () {
   const value = this._decodeString();
 
   return this.resolveConstants(value);
 };
 
-PackJSON.prototype._decodeString = function() {
+PackJSON.prototype._decodeString = function () {
   const stingType = this.buffer.readChunk(STRING_TYPE_SIZE);
 
   switch (stingType) {
     case INFREQUENT_CODES_STRING_TYPE: {
       const length = this.decodeStringLen();
 
-      return Array.apply(null, new Array(length)).map(() => {
-        const idx = this.buffer.readChunk(6);
+      return Array.apply(null, new Array(length))
+        .map(() => {
+          const idx = this.buffer.readChunk(6);
 
-        if (idx > -1 && idx < CODES.length - 2) {
-          return CODES[idx];
-        }
-        if (idx === CODES.length - 1) {
-          return String.fromCharCode(this.buffer.readChunk(16));
-        }
-      }).join('');
+          if (idx > -1 && idx < CODES.length - 2) {
+            return CODES[idx];
+          }
+          if (idx === CODES.length - 1) {
+            return String.fromCharCode(this.buffer.readChunk(16));
+          }
+        })
+        .join("");
     }
     case ONLY_CODES_STRING_TYPE: {
       const length = this.decodeStringLen();
 
-      return Array.apply(null, new Array(length)).map(() => String.fromCharCode(this.buffer.readChunk(16))).join('');
+      return Array.apply(null, new Array(length))
+        .map(() => String.fromCharCode(this.buffer.readChunk(16)))
+        .join("");
     }
     case MARKED_CHARS_STRING_TYPE: {
       const length = this.decodeStringLen();
 
-      return Array.apply(null, new Array(length)).map(() => {
-        const isCode = this.buffer.readChunk(1);
+      return Array.apply(null, new Array(length))
+        .map(() => {
+          const isCode = this.buffer.readChunk(1);
 
-        if (!isCode) {
-          return CODES[this.buffer.readChunk(6)];
-        }
-        return String.fromCharCode(this.buffer.readChunk(16));
-      }).join('');
+          if (!isCode) {
+            return CODES[this.buffer.readChunk(6)];
+          }
+          return String.fromCharCode(this.buffer.readChunk(16));
+        })
+        .join("");
     }
   }
 };
-PackJSON.prototype.decodeStringLen = function() {
+PackJSON.prototype.decodeStringLen = function () {
   const stringLengthParts = [];
   let shouldStop = false;
 
@@ -418,39 +440,39 @@ PackJSON.prototype.decodeStringLen = function() {
     stringLengthParts.push(this.buffer.readChunk(STRING_LEN_BLOCK_SIZE).toString(1 << STRING_LEN_BLOCK_SIZE));
     shouldStop = this.buffer.readChunk(1);
   } while (!shouldStop);
-  return parseInt(stringLengthParts.join(''), 1 << STRING_LEN_BLOCK_SIZE);
+  return Number.parseInt(stringLengthParts.join(""), 1 << STRING_LEN_BLOCK_SIZE);
 };
 
-PackJSON.prototype.packInConstants = function(value) {
-  const re = new RegExp('\\.', 'g');
+PackJSON.prototype.packInConstants = function (value) {
+  const re = /\./g;
 
-  value = value.replace(re, '.-');
+  value = value.replace(re, ".-");
   this.definitions.forEach((definition, idx) => {
-    const re = new RegExp(definition, 'g');
+    const re = new RegExp(definition, "g");
 
     value = value.replace(re, `.${idx}`);
   });
   return value;
 };
 
-PackJSON.prototype.resolveConstants = function(value) {
+PackJSON.prototype.resolveConstants = function (value) {
   this.definitions.forEach((definition, idx) => {
-    const re = new RegExp(`\\.${idx}`, 'g');
+    const re = new RegExp(`\\.${idx}`, "g");
 
     value = value.replace(re, definition);
   });
-  const re = new RegExp('\\.-', 'g');
+  const re = /\.-/g;
 
-  value = value.replace(re, '.');
+  value = value.replace(re, ".");
   return value;
 };
 
-PackJSON.prototype.pushStopCode = function() {
+PackJSON.prototype.pushStopCode = function () {
   this.buffer.pushChunk(CODE_SIZE, SPEC_CODE);
   this.buffer.pushChunk(SPEC_SIZE, 0);
 };
 
-PackJSON.prototype.encodeArray = function(value) {
+PackJSON.prototype.encodeArray = function (value) {
   this.buffer.pushChunk(CODE_SIZE, ARRAY_CODE);
   const len = value.length;
 
@@ -460,7 +482,7 @@ PackJSON.prototype.encodeArray = function(value) {
   this.pushStopCode();
 };
 
-PackJSON.prototype.decodeArray = function() {
+PackJSON.prototype.decodeArray = function () {
   const res = [];
 
   while (!(this.buffer.readChunk(CODE_SIZE + SPEC_SIZE) === 0)) {
@@ -470,7 +492,7 @@ PackJSON.prototype.decodeArray = function() {
   return res;
 };
 
-PackJSON.prototype.encodeObject = function(value) {
+PackJSON.prototype.encodeObject = function (value) {
   this.buffer.pushChunk(CODE_SIZE, OBJECT_CODE);
   for (const [key, val] of Object.entries(value)) {
     this.encode(key);
@@ -479,8 +501,8 @@ PackJSON.prototype.encodeObject = function(value) {
   this.pushStopCode();
 };
 
-PackJSON.prototype.decodeObject = function() {
-  const res = { };
+PackJSON.prototype.decodeObject = function () {
+  const res = {};
 
   while (!(this.buffer.readChunk(CODE_SIZE + SPEC_SIZE) === 0)) {
     this.buffer.seek(this.buffer.pos - (CODE_SIZE + SPEC_SIZE));
@@ -489,7 +511,7 @@ PackJSON.prototype.decodeObject = function() {
   return res;
 };
 
-PackJSON.prototype.encodeDefinitions = function() {
+PackJSON.prototype.encodeDefinitions = function () {
   const definitions = [];
 
   this.definitions = [];
@@ -509,7 +531,7 @@ PackJSON.prototype.encodeDefinitions = function() {
   this.pushStopCode();
 };
 
-PackJSON.prototype.decodeDefinitions = function() {
+PackJSON.prototype.decodeDefinitions = function () {
   this.buffer.readChunk(DEFINITION_TYPE_SIZE);
   while (!(this.buffer.readChunk(CODE_SIZE + SPEC_SIZE) === 0)) {
     this.buffer.seek(this.buffer.pos - (CODE_SIZE + SPEC_SIZE));
@@ -520,12 +542,12 @@ PackJSON.prototype.decodeDefinitions = function() {
   return this.decode();
 };
 
-PackJSON.prototype.encodeConst = function(idx) {
+PackJSON.prototype.encodeConst = function (idx) {
   this.buffer.pushChunk(CODE_SIZE, CONST_CODE);
   this.buffer.pushChunk(this.definitionIndexSize, idx);
 };
 
-PackJSON.prototype.decodeConst = function() {
+PackJSON.prototype.decodeConst = function () {
   const definitionIndex = this.buffer.readChunk(this.definitionIndexSize);
 
   return this.definitions[definitionIndex];
@@ -533,7 +555,4 @@ PackJSON.prototype.decodeConst = function() {
 
 const packJSON = new PackJSON();
 
-export {
-  PackJSON,
-  packJSON
-};
+export { PackJSON, packJSON };

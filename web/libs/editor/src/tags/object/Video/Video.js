@@ -1,12 +1,12 @@
-import { getRoot, types } from 'mobx-state-tree';
-import React from 'react';
+import { getRoot, types } from "mobx-state-tree";
+import React from "react";
 
-import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
-import IsReadyMixin from '../../../mixins/IsReadyMixin';
-import ProcessAttrsMixin from '../../../mixins/ProcessAttrs';
-import { SyncableMixin } from '../../../mixins/Syncable';
-import { parseValue } from '../../../utils/data';
-import ObjectBase from '../Base';
+import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
+import IsReadyMixin from "../../../mixins/IsReadyMixin";
+import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
+import { SyncableMixin } from "../../../mixins/Syncable";
+import { parseValue } from "../../../utils/data";
+import ObjectBase from "../Base";
 
 /**
  * Video tag plays a simple video file. Use for video annotation tasks such as classification and transcription.
@@ -46,15 +46,15 @@ import ObjectBase from '../Base';
 const TagAttrs = types.model({
   value: types.maybeNull(types.string),
   hotkey: types.maybeNull(types.string),
-  framerate: types.optional(types.string, '24'),
-  height: types.optional(types.string, '600'),
+  framerate: types.optional(types.string, "24"),
+  height: types.optional(types.string, "600"),
   muted: false,
 });
 
 const Model = types
   .model({
-    type: 'video',
-    _value: types.optional(types.string, ''),
+    type: "video",
+    _value: types.optional(types.string, ""),
     // special flag to store labels inside result, but under original type
     // @todo make it able to be disabled
     mergeLabelsAndResults: true,
@@ -66,7 +66,7 @@ const Model = types
     frame: 1,
     length: 1,
   }))
-  .views(self => ({
+  .views((self) => ({
     get store() {
       return getRoot(self);
     },
@@ -76,21 +76,21 @@ const Model = types
     },
 
     control() {
-      return self.annotation.toNames.get(self.name)?.find(s => !s.type.endsWith('labels'));
+      return self.annotation.toNames.get(self.name)?.find((s) => !s.type.endsWith("labels"));
     },
 
     videoControl() {
-      return self.annotation.toNames.get(self.name)?.find(s => s.type.includes('video'));
+      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video"));
     },
 
     states() {
-      return self.annotation.toNames.get(self.name)?.filter(s => s.type.endsWith('labels'));
+      return self.annotation.toNames.get(self.name)?.filter((s) => s.type.endsWith("labels"));
     },
 
     activeStates() {
       const states = self.states();
 
-      return states ? states.filter(c => c.isSelected === true) : null;
+      return states ? states.filter((c) => c.isSelected === true) : null;
     },
 
     get hasStates() {
@@ -99,50 +99,53 @@ const Model = types
       return states && states.length > 0;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterCreate() {
       // normalize framerate — should be string with number of frames per second
       const framerate = Number(parseValue(self.framerate, self.store.task?.dataObj));
 
-      if (!framerate || isNaN(framerate)) self.framerate = '24';
+      if (!framerate || isNaN(framerate)) self.framerate = "24";
       else if (framerate < 1) self.framerate = String(1 / framerate);
       else self.framerate = String(framerate);
     },
   }))
   ////// Sync actions
-  .actions(self => ({
+  .actions((self) => ({
     ////// Outgoing
 
     /**
      * Wrapper to always send important data
-     * @param {string} event 
-     * @param {any} data 
+     * @param {string} event
+     * @param {any} data
      */
     triggerSync(event, data) {
       if (!self.ref.current) return;
 
-      self.syncSend({
-        playing: self.ref.current.playing,
-        time: self.ref.current.currentTime,
-        ...data,
-      }, event);
+      self.syncSend(
+        {
+          playing: self.ref.current.playing,
+          time: self.ref.current.currentTime,
+          ...data,
+        },
+        event,
+      );
     },
 
     triggerSyncPlay() {
-      self.triggerSync('play', { playing: true });
+      self.triggerSync("play", { playing: true });
     },
 
     triggerSyncPause() {
-      self.triggerSync('pause', { playing: false });
+      self.triggerSync("pause", { playing: false });
     },
 
     ////// Incoming
 
     registerSyncHandlers() {
-      ['play', 'pause', 'seek'].forEach(event => {
+      ["play", "pause", "seek"].forEach((event) => {
         self.syncHandlers.set(event, self.handleSync);
       });
-      self.syncHandlers.set('speed', self.handleSyncSpeed);
+      self.syncHandlers.set("speed", self.handleSyncSpeed);
     },
 
     handleSync(data) {
@@ -168,14 +171,14 @@ const Model = types
     },
 
     handleSeek() {
-      self.triggerSync('seek');
+      self.triggerSync("seek");
     },
 
     syncMuted(muted) {
       self.muted = muted;
     },
   }))
-  .actions(self => {
+  .actions((self) => {
     return {
       setLength(length) {
         self.length = length;
@@ -207,14 +210,14 @@ const Model = types
         ];
 
         if (!control) {
-          console.error('NO CONTROL');
+          console.error("NO CONTROL");
           return;
         }
 
         const area = self.annotation.createResult({ sequence }, {}, control, self);
 
         // add labels
-        self.activeStates().forEach(state => {
+        self.activeStates().forEach((state) => {
           area.setValue(state);
         });
 
@@ -226,12 +229,13 @@ const Model = types
       },
 
       findRegion(id) {
-        return self.regs.find(reg => reg.cleanId === id);
+        return self.regs.find((reg) => reg.cleanId === id);
       },
     };
   });
 
-export const VideoModel = types.compose('VideoModel',
+export const VideoModel = types.compose(
+  "VideoModel",
   SyncableMixin,
   TagAttrs,
   ProcessAttrsMixin,

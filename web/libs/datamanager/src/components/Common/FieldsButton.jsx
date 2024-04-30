@@ -13,49 +13,48 @@ const injector = inject(({ store }) => {
   };
 });
 
-const FieldsMenu = observer(
-  ({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
-    const MenuItem = (col, onClick) => {
-      return (
-        <Menu.Item key={col.key} name={col.key} onClick={onClick}>
-          {WrapperComponent && col.wra !== false ? (
-            <WrapperComponent column={col}>{col.title}</WrapperComponent>
-          ) : (
-            col.title
-          )}
-        </Menu.Item>
-      );
-    };
-
+const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
+  const MenuItem = (col, onClick) => {
     return (
-      <Menu size="small" selectedKeys={selected ? [selected] : ["none"]} closeDropdownOnItemClick={false}>
-        {onReset &&
-          MenuItem(
-            {
-              key: "none",
-              title: resetTitle ?? "Default",
-              wrap: false,
-            },
-            onReset,
-          )}
-
-        {columns.map((col) => {
-          if (col.children) {
-            return (
-              <Menu.Group key={col.key} title={col.title}>
-                {col.children.map((col) => MenuItem(col, () => onClick?.(col)))}
-              </Menu.Group>
-            );
-          } else if (!col.parent) {
-            return MenuItem(col, () => onClick?.(col));
-          }
-
-          return null;
-        })}
-      </Menu>
+      <Menu.Item key={col.key} name={col.key} onClick={onClick}>
+        {WrapperComponent && col.wra !== false ? (
+          <WrapperComponent column={col}>{col.title}</WrapperComponent>
+        ) : (
+          col.title
+        )}
+      </Menu.Item>
     );
-  },
-);
+  };
+
+  return (
+    <Menu size="small" selectedKeys={selected ? [selected] : ["none"]} closeDropdownOnItemClick={false}>
+      {onReset &&
+        MenuItem(
+          {
+            key: "none",
+            title: resetTitle ?? "Default",
+            wrap: false,
+          },
+          onReset,
+        )}
+
+      {columns.map((col) => {
+        if (col.children) {
+          return (
+            <Menu.Group key={col.key} title={col.title}>
+              {col.children.map((col) => MenuItem(col, () => onClick?.(col)))}
+            </Menu.Group>
+          );
+        }
+        if (!col.parent) {
+          return MenuItem(col, () => onClick?.(col));
+        }
+
+        return null;
+      })}
+    </Menu>
+  );
+});
 
 export const FieldsButton = injector(
   ({
@@ -77,20 +76,11 @@ export const FieldsButton = injector(
   }) => {
     const content = [];
 
-    if (title)
-      content.push(
-        <React.Fragment key="f-button-title">{title}</React.Fragment>,
-      );
+    if (title) content.push(<React.Fragment key="f-button-title">{title}</React.Fragment>);
 
     const renderButton = () => {
       return (
-        <Button
-          size={size}
-          icon={icon}
-          extra={trailingIcon}
-          style={style}
-          className={className}
-        >
+        <Button size={size} icon={icon} extra={trailingIcon} style={style} className={className}>
           {content.length ? content : null}
         </Button>
       );
@@ -98,7 +88,7 @@ export const FieldsButton = injector(
 
     return (
       <Dropdown.Trigger
-        content={(
+        content={
           <FieldsMenu
             columns={filter ? columns.filter(filter) : columns}
             WrapperComponent={wrapper}
@@ -107,16 +97,14 @@ export const FieldsButton = injector(
             selected={selected}
             resetTitle={resetTitle}
           />
-        )}
+        }
         style={{
           maxHeight: 280,
-          overflow: 'auto',
+          overflow: "auto",
         }}
       >
         {tooltip ? (
-          <Elem name={'field-button'}
-            style={{ zIndex: 1000 }}
-          >
+          <Elem name={"field-button"} style={{ zIndex: 1000 }}>
             <Tooltip title={tooltip} theme={tooltipTheme}>
               {renderButton()}
             </Tooltip>

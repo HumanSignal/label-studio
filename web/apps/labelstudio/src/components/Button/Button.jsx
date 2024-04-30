@@ -1,25 +1,11 @@
-import React from 'react';
-import { Block, Elem } from '../../utils/bem';
-import { isDefined } from '../../utils/helpers';
-import { FormSubmissionContext } from '../Form/FormContext';
+import React from "react";
+import { Block, Elem } from "../../utils/bem";
+import { isDefined } from "../../utils/helpers";
+import { FormSubmissionContext } from "../Form/FormContext";
 import "./Button.styl";
 
 export const Button = React.forwardRef(
-  (
-    {
-      children,
-      type,
-      extra,
-      className,
-      size,
-      waiting,
-      icon,
-      tag,
-      look,
-      ...rest
-    },
-    ref,
-  ) => {
+  ({ children, type, extra, className, size, waiting, icon, tag, look, ...rest }, ref) => {
     const finalTag = tag ?? (rest.href ? "a" : "button");
 
     const mods = {
@@ -34,7 +20,7 @@ export const Button = React.forwardRef(
     const formSubmitting = React.useContext(FormSubmissionContext);
 
     if (formSubmitting === true) {
-      if (mods.look?.includes?.("primary") && type === 'submit') {
+      if (mods.look?.includes?.("primary") && type === "submit") {
         mods.waiting = true;
       } else {
         rest.disabled = true;
@@ -42,7 +28,7 @@ export const Button = React.forwardRef(
     }
 
     if (rest.primary) {
-      mods.look = 'primary';
+      mods.look = "primary";
       delete rest.primary;
     }
 
@@ -61,15 +47,7 @@ export const Button = React.forwardRef(
     }, [icon, size]);
 
     return (
-      <Block
-        name="button"
-        mod={mods}
-        mix={className}
-        ref={ref}
-        tag={finalTag}
-        type={type}
-        {...rest}
-      >
+      <Block name="button" mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
         <>
           {iconElem && (
             <Elem tag="span" name="icon">

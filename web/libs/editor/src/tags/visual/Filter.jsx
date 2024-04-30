@@ -1,12 +1,12 @@
-import React from 'react';
-import { types } from 'mobx-state-tree';
-import { observer } from 'mobx-react';
-import { Input } from 'antd';
+import React from "react";
+import { types } from "mobx-state-tree";
+import { observer } from "mobx-react";
+import { Input } from "antd";
 
-import ProcessAttrsMixin from '../../mixins/ProcessAttrs';
-import Registry from '../../core/Registry';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import { FF_DEV_3391, isFF } from '../../utils/feature-flags';
+import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
+import Registry from "../../core/Registry";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
 
 /**
  * Use the Filter tag to add a filter search for a large number of labels or choices. Use with the Labels tag or Choices tag.
@@ -36,42 +36,43 @@ const TagAttrs = types.model({
 
   cleanup: types.optional(types.boolean, true),
 
-  placeholder: types.optional(types.string, 'Quick Filter'),
-  minlength: types.optional(types.string, '3'),
+  placeholder: types.optional(types.string, "Quick Filter"),
+  minlength: types.optional(types.string, "3"),
   hotkey: types.maybeNull(types.string),
 });
 
 const Model = types
   .model({
-    type: 'filter',
+    type: "filter",
     _value: types.maybeNull(types.string),
     ...(isFF(FF_DEV_3391)
       ? {
-        id: types.identifier,
-        name: types.string,
-      } : {
-        name: types.identifier,
-      }),
+          id: types.identifier,
+          name: types.string,
+        }
+      : {
+          name: types.identifier,
+        }),
     toname: types.maybeNull(types.string),
   })
-  .views(self => ({
+  .views((self) => ({
     get toTag() {
       return self.annotation.names.get(self.toname);
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     applyFilter() {
       let value = self._value;
       const tch = self.toTag.tiedChildren;
 
       if (Number(self.minlength) > value.length) {
-        tch.filter(ch => !ch.visible).forEach(ch => ch.setVisible(true));
+        tch.filter((ch) => !ch.visible).forEach((ch) => ch.setVisible(true));
         return;
       }
 
       if (!self.casesensetive) value = value.toLowerCase();
 
-      tch.forEach(ch => {
+      tch.forEach((ch) => {
         let chval = ch._value;
 
         if (!self.casesensetive) chval = chval.toLowerCase();
@@ -105,22 +106,22 @@ const Model = types
       const selected = self.toTag.selectFirstVisible();
 
       if (selected && self.cleanup) {
-        self._value = '';
+        self._value = "";
         self.applyFilter();
       }
     },
   }));
 
-const FilterModel = types.compose('FilterModel', Model, TagAttrs, ProcessAttrsMixin, AnnotationMixin);
+const FilterModel = types.compose("FilterModel", Model, TagAttrs, ProcessAttrsMixin, AnnotationMixin);
 
 const HtxFilter = observer(({ item }) => {
   const tag = item.toTag;
 
-  if (tag.type.indexOf('labels') === -1 && tag.type.indexOf('choices') === -1) return null;
+  if (tag.type.indexOf("labels") === -1 && tag.type.indexOf("choices") === -1) return null;
 
   return (
     <Input
-      ref={ref => {
+      ref={(ref) => {
         item.setInputRef(ref);
       }}
       value={item._value}
@@ -133,6 +134,6 @@ const HtxFilter = observer(({ item }) => {
   );
 });
 
-Registry.addTag('filter', FilterModel, HtxFilter);
+Registry.addTag("filter", FilterModel, HtxFilter);
 
 export { HtxFilter, FilterModel };

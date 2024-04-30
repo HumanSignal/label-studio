@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
 /**
  * This mixing defines perItem control-tag's parameter and related basic functionality
@@ -8,20 +8,22 @@ import { types } from 'mobx-state-tree';
 const PerItemMixin = types
   .model({
     peritem: types.optional(types.boolean, false),
-  }).extend(self => {
+  })
+  .extend((self) => {
     /* Validation */
     if (self.isClassificationTag !== true) {
-      throw new Error('The PerItemMixin mixin should be used only for classification control-tags');
+      throw new Error("The PerItemMixin mixin should be used only for classification control-tags");
     }
     return {};
-  }).views(self => ({
+  })
+  .views((self) => ({
     get _perItemResult() {
-      return self.annotation.results.find(r => {
+      return self.annotation.results.find((r) => {
         return r.from_name === self && r.area.item_index === self.toNameTag.currentItemIndex;
       });
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     /**
      * Validates all values related to the current classification per item (Multi Items Segmentation).
      *
@@ -34,22 +36,21 @@ const PerItemMixin = types
     _validatePerItem() {
       const objectTag = self.toNameTag;
 
-      return self.annotation.regions
-        .every((reg) => {
-          const result = reg.results.find(s => s.from_name === self);
+      return self.annotation.regions.every((reg) => {
+        const result = reg.results.find((s) => s.from_name === self);
 
-          if (!result?.hasValue) {
-            return true;
-          }
-          const value = result.mainValue;
-          const isValid = self.validateValue(value);
-
-          if (!isValid) {
-            objectTag.setCurrentItem(reg.item_index);
-            return false;
-          }
+        if (!result?.hasValue) {
           return true;
-        });
+        }
+        const value = result.mainValue;
+        const isValid = self.validateValue(value);
+
+        if (!isValid) {
+          objectTag.setCurrentItem(reg.item_index);
+          return false;
+        }
+        return true;
+      });
     },
     createPerItemResult() {
       self.createPerObjectResult({

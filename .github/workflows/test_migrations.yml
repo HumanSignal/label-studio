@@ -16,7 +16,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
-      collect_analytics: true
+      COLLECT_ANALYTICS: true
       DEBUG_CONTEXTLOG: true
       LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite

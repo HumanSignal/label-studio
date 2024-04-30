@@ -1,13 +1,13 @@
-import React, { Fragment } from 'react';
-import { Button } from 'antd';
-import { observer } from 'mobx-react';
-import { PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import React, { Fragment } from "react";
+import { Button } from "antd";
+import { observer } from "mobx-react";
+import { PauseCircleOutlined, PlayCircleOutlined } from "@ant-design/icons";
 
-import Hint from '../../../components/Hint/Hint';
+import Hint from "../../../components/Hint/Hint";
 
 const AudioControls = ({ item, store }) => {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1em' }}>
+    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1em" }}>
       <Button
         type="primary"
         onClick={() => {
