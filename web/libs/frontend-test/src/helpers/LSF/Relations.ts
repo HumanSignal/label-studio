@@ -42,6 +42,10 @@ export const Relations = {
   toggleCreation() {
     cy.get('.lsf-region-actions__group_align_left > :nth-child(1) > .lsf-button__icon').click();
   },
+  toggleCreationWithHotkey() {
+    // hotkey is alt + r
+    cy.get('body').type('{alt}r');
+  },
   toggleRelationVisibility(idx) {
     cy.get('.lsf-relations__item')
       .eq(idx)
