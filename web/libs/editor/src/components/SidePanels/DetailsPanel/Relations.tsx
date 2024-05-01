@@ -10,9 +10,7 @@ import { Select } from 'antd';
 import './Relations.styl';
 
 const RealtionsComponent: FC<any> = ({ relationStore }) => {
-  const relations = useCallback(() => {
-    return relationStore.orderedRelations;
-  }, [relationStore])();
+  const relations = relationStore.orderedRelations;
 
   return (
     <Block name="relations">
