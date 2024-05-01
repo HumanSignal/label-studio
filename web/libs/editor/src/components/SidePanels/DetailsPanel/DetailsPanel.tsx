@@ -64,8 +64,8 @@ const CommentsTab: FC<any> = inject("store")(
   }),
 );
 
-const RelationsTab: FC<any> = inject('store')
-  (observer(({ currentEntity }) => {
+const RelationsTab: FC<any> = inject("store")(
+  observer(({ currentEntity }) => {
     const { relationStore } = currentEntity;
 
     return (
@@ -128,10 +128,10 @@ const InfoTab: FC<any> = inject("store")(
   }),
 );
 
-const GeneralPanel: FC<any> = inject('store')(
+const GeneralPanel: FC<any> = inject("store")(
   observer(({ store, currentEntity }) => {
     const { relationStore } = currentEntity;
-    const showAnnotationHistory = store.hasInterface('annotations:history');
+    const showAnnotationHistory = store.hasInterface("annotations:history");
     const showDraftInHistory = isFF(FF_DEV_2290);
 
     return (
