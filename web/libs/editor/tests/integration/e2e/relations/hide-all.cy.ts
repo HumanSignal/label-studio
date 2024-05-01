@@ -93,7 +93,7 @@ const task = {
   data: { image },
 };
 
-describe('Relations- Hide/Show all relations', () => {
+describe('Relations: Hide/Show all relations', () => {
   beforeEach(() => {
     LabelStudio.init({ config, task });
     ImageView.waitForImage();

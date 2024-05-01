@@ -93,7 +93,7 @@ const task = {
   data: { image },
 };
 
-describe('Relations- Sort Order all relations', () => {
+describe('Relations: Sort Order all relations', () => {
   beforeEach(() => {
     LabelStudio.init({ config, task });
     ImageView.waitForImage();
