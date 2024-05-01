@@ -1,10 +1,10 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import InfoModal from '../../components/Infomodal/Infomodal';
-import Registry from '../../core/Registry';
-import Tree from '../../core/Tree';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import ControlBase from './Base';
+import InfoModal from "../../components/Infomodal/Infomodal";
+import Registry from "../../core/Registry";
+import Tree from "../../core/Tree";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import ControlBase from "./Base";
 
 /**
  * The `Pairwise` tag is used to compare two different objects and select one item from the list. If you want annotators to compare two objects and determine whether they are similar or not, use the `Choices` tag.
@@ -45,12 +45,12 @@ const TagAttrs = types.model({
 
 const Model = types
   .model({
-    type: 'pairwise',
-    selected: types.maybeNull(types.enumeration(['left', 'right', 'none'])),
+    type: "pairwise",
+    selected: types.maybeNull(types.enumeration(["left", "right", "none"])),
   })
-  .views(self => ({
+  .views((self) => ({
     get names() {
-      return self.toname.split(',');
+      return self.toname.split(",");
     },
 
     get left() {
@@ -62,14 +62,14 @@ const Model = types
     },
 
     get valueType() {
-      return 'selected';
+      return "selected";
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     updateResult() {
       const { result, selected } = self;
 
-      if (selected === 'none') {
+      if (selected === "none") {
         if (result) result.area.removeResult(result);
       } else {
         if (result) result.setValue(selected);
@@ -79,27 +79,25 @@ const Model = types
       }
     },
 
-    setResult(dir = 'none') {
+    setResult(dir = "none") {
       self.selected = dir;
-      self.left.addProp('style', dir === 'left' ? self._selection : {});
-      self.right.addProp('style', dir === 'right' ? self._selection : {});
+      self.left.addProp("style", dir === "left" ? self._selection : {});
+      self.right.addProp("style", dir === "right" ? self._selection : {});
     },
 
     selectLeft() {
-      self.setResult(self.selected === 'left' ? 'none' : 'left');
+      self.setResult(self.selected === "left" ? "none" : "left");
       self.updateResult();
     },
 
     selectRight() {
-      self.setResult(self.selected === 'right' ? 'none' : 'right');
+      self.setResult(self.selected === "right" ? "none" : "right");
       self.updateResult();
     },
 
     afterCreate() {
       if (self.names.length !== 2 || self.names[0] === self.names[1]) {
-        InfoModal.error(
-          'Incorrect toName parameter on Pairwise, must be two names separated by a comma: name1,name2',
-        );
+        InfoModal.error("Incorrect toName parameter on Pairwise, must be two names separated by a comma: name1,name2");
       }
 
       let selection = {};
@@ -112,8 +110,8 @@ const Model = types
         }
       } else {
         selection = {
-          backgroundColor: '#f6ffed',
-          border: '1px solid #b7eb8f',
+          backgroundColor: "#f6ffed",
+          border: "1px solid #b7eb8f",
         };
       }
 
@@ -128,20 +126,20 @@ const Model = types
     annotationAttached() {
       // @todo annotation attached in a weird way, so do that next tick, with fixed tree
       setTimeout(() => {
-        self.left.addProp('onClick', self.selectLeft);
-        self.right.addProp('onClick', self.selectRight);
+        self.left.addProp("onClick", self.selectLeft);
+        self.right.addProp("onClick", self.selectRight);
         self.setResult(self.result?.value.selected);
       });
     },
   }));
 
-const PairwiseModel = types.compose('PairwiseModel', ControlBase, TagAttrs, Model, AnnotationMixin);
+const PairwiseModel = types.compose("PairwiseModel", ControlBase, TagAttrs, Model, AnnotationMixin);
 
 const HtxPairwise = () => {
   return null;
 };
 
-Registry.addTag('pairwise', PairwiseModel, HtxPairwise);
+Registry.addTag("pairwise", PairwiseModel, HtxPairwise);
 Registry.addObjectType(PairwiseModel);
 
 export { HtxPairwise, PairwiseModel };

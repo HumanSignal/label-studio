@@ -1,9 +1,9 @@
-import { destroy, getParentOfType, getRoot, isAlive, types } from 'mobx-state-tree';
+import { destroy, getParentOfType, getRoot, isAlive, types } from "mobx-state-tree";
 
-import { guidGenerator } from '../core/Helpers';
-import Tree, { TRAVERSE_SKIP } from '../core/Tree';
-import Area from '../regions/Area';
-import { isDefined } from '../utils/utilities';
+import { guidGenerator } from "../core/Helpers";
+import Tree, { TRAVERSE_SKIP } from "../core/Tree";
+import Area from "../regions/Area";
+import { isDefined } from "../utils/utilities";
 
 
 const localStorageKeys = {
@@ -14,13 +14,13 @@ const localStorageKeys = {
  * Relation between two different nodes
  */
 const Relation = types
-  .model('Relation', {
+  .model("Relation", {
     id: types.optional(types.identifier, guidGenerator),
 
     node1: types.reference(Area),
     node2: types.reference(Area),
 
-    direction: types.optional(types.enumeration(['left', 'right', 'bi']), 'right'),
+    direction: types.optional(types.enumeration(["left", "right", "bi"]), "right"),
 
     // labels
     labels: types.maybeNull(types.array(types.string)),
@@ -29,7 +29,7 @@ const Relation = types
     showMeta: false,
     visible: true,
   }))
-  .views(self => ({
+  .views((self) => ({
     get parent() {
       return getParentOfType(self, RelationStore);
     },
@@ -39,7 +39,7 @@ const Relation = types
     },
 
     get selectedValues() {
-      return self.labels?.filter(relationLabel => {
+      return self.labels?.filter((relationLabel) => {
         return self.control?.values.includes(relationLabel);
       });
     },
@@ -56,21 +56,17 @@ const Relation = types
       // as we don't currently have a unified solution for multi-object segmentation
       // and the Image tag is the only one to support it, we rely on its API
       // TODO: make multi-object solution more generic
-      if (isDefined(sIdx) &&
-          start.object.multiImage && 
-          sIdx !== start.object.currentImage) return false;
+      if (isDefined(sIdx) && start.object.multiImage && sIdx !== start.object.currentImage) return false;
 
-      if (isDefined(eIdx) &&
-          end.object.multiImage && 
-          eIdx !== end.object.currentImage) return false;
+      if (isDefined(eIdx) && end.object.multiImage && eIdx !== end.object.currentImage) return false;
 
       return true;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     rotateDirection() {
-      const d = ['left', 'right', 'bi'];
-      let idx = d.findIndex(item => item === self.direction);
+      const d = ["left", "right", "bi"];
+      let idx = d.findIndex((item) => item === self.direction);
 
       idx = idx + 1;
       if (idx >= d.length) idx = 0;
@@ -109,7 +105,7 @@ const Relation = types
   }));
 
 const RelationStore = types
-  .model('RelationStore', {
+  .model("RelationStore", {
     relations: types.array(Relation),
     order: types.optional(
       types.enumeration(['asc', 'desc']),
@@ -123,9 +119,9 @@ const RelationStore = types
     _highlighted: null,
     control: null,
   }))
-  .views(self => ({
+  .views((self) => ({
     get highlighted() {
-      return self.relations.find(r => r.id === self._highlighted);
+      return self.relations.find((r) => r.id === self._highlighted);
     },
     get size() {
       return self.relations.length;
@@ -145,15 +141,15 @@ const RelationStore = types
       return self.control?.values ?? [];
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     afterAttach() {
       const appStore = getRoot(self);
 
       // find <Relations> tag in the tree
       let relationsTag = null;
 
-      Tree.traverseTree(appStore.annotationStore.root, function(node) {
-        if (node.type === 'relations') {
+      Tree.traverseTree(appStore.annotationStore.root, (node) => {
+        if (node.type === "relations") {
           relationsTag = node;
           return TRAVERSE_SKIP;
         }
@@ -168,12 +164,12 @@ const RelationStore = types
       const id2 = node2?.id || node2;
 
       if (!id2) {
-        return self.relations.filter(rl => {
+        return self.relations.filter((rl) => {
           return rl.node1.id === id1 || rl.node2.id === id1;
         });
       }
 
-      return self.relations.filter(rl => {
+      return self.relations.filter((rl) => {
         return rl.node1.id === id1 && rl.node2.id === id2;
       });
     },
@@ -194,7 +190,7 @@ const RelationStore = types
     },
 
     deleteRelation(rl) {
-      self.relations = self.relations.filter(r => r.id !== rl.id);
+      self.relations = self.relations.filter((r) => r.id !== rl.id);
       destroy(rl);
     },
 
@@ -206,20 +202,20 @@ const RelationStore = types
     },
 
     deleteAllRelations() {
-      self.relations.forEach(rl => destroy(rl));
+      self.relations.forEach((rl) => destroy(rl));
       self.relations = [];
     },
 
     serialize() {
-      return self.relations.map(r => {
+      return self.relations.map((r) => {
         const s = {
           from_id: r.node1.cleanId,
           to_id: r.node2.cleanId,
-          type: 'relation',
+          type: "relation",
           direction: r.direction,
         };
 
-        if (r.selectedValues) s['labels'] = r.selectedValues;
+        if (r.selectedValues) s.labels = r.selectedValues;
 
         return s;
       });

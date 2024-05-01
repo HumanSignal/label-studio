@@ -1,1 +1,1 @@
-export { ChipInput } from './src/components/ChipInput';
+export { ChipInput } from "./src/components/ChipInput";

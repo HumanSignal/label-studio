@@ -1,13 +1,13 @@
-import { getParent, getRoot, getSnapshot, types } from 'mobx-state-tree';
-import { guidGenerator } from '../core/Helpers';
-import Registry from '../core/Registry';
-import Tree from '../core/Tree';
-import { AnnotationMixin } from '../mixins/AnnotationMixin';
-import { isDefined } from '../utils/utilities';
-import { FF_LSDV_4583, isFF } from '../utils/feature-flags';
+import { getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
+import { guidGenerator } from "../core/Helpers";
+import Registry from "../core/Registry";
+import Tree from "../core/Tree";
+import { AnnotationMixin } from "../mixins/AnnotationMixin";
+import { isDefined } from "../utils/utilities";
+import { FF_LSDV_4583, isFF } from "../utils/feature-flags";
 
 const Result = types
-  .model('Result', {
+  .model("Result", {
     id: types.optional(types.identifier, guidGenerator),
     // pid: types.optional(types.string, guidGenerator),
 
@@ -33,30 +33,30 @@ const Result = types
     to_name: types.late(() => types.reference(types.union(...Registry.objectTypes()))),
     // @todo some general type, maybe just a `string`
     type: types.enumeration([
-      'labels',
-      'hypertextlabels',
-      'paragraphlabels',
-      'rectangle',
-      'keypoint',
-      'polygon',
-      'brush',
-      'ellipse',
-      'magicwand',
-      'rectanglelabels',
-      'keypointlabels',
-      'polygonlabels',
-      'brushlabels',
-      'ellipselabels',
-      'timeserieslabels',
-      'choices',
-      'datetime',
-      'number',
-      'taxonomy',
-      'textarea',
-      'rating',
-      'pairwise',
-      'videorectangle',
-      'ranker',
+      "labels",
+      "hypertextlabels",
+      "paragraphlabels",
+      "rectangle",
+      "keypoint",
+      "polygon",
+      "brush",
+      "ellipse",
+      "magicwand",
+      "rectanglelabels",
+      "keypointlabels",
+      "polygonlabels",
+      "brushlabels",
+      "ellipselabels",
+      "timeserieslabels",
+      "choices",
+      "datetime",
+      "number",
+      "taxonomy",
+      "textarea",
+      "rating",
+      "pairwise",
+      "videorectangle",
+      "ranker",
     ]),
     // @todo much better to have just a value, not a hash with empty fields
     value: types.model({
@@ -68,7 +68,7 @@ const Result = types
       text: types.maybe(types.union(types.string, types.array(types.string))),
       choices: types.maybe(types.array(types.union(types.string, types.array(types.string)))),
       // pairwise
-      selected: types.maybe(types.enumeration(['left', 'right'])),
+      selected: types.maybe(types.enumeration(["left", "right"])),
       // @todo all other *labels
       labels: types.maybe(types.array(types.string)),
       htmllabels: types.maybe(types.array(types.string)),
@@ -86,11 +86,11 @@ const Result = types
     // info about object and region
     meta: types.frozen(),
   })
-  .views(self => ({
+  .views((self) => ({
     get perRegionStates() {
       const states = self.states;
 
-      return states && states.filter(s => s.perregion === true);
+      return states && states.filter((s) => s.perregion === true);
     },
 
     get store() {
@@ -110,8 +110,8 @@ const Result = types
       const mainValue = self.mainValue?.toJSON?.() ? self.mainValue?.toJSON?.() : self.mainValue;
 
       if (typeof value !== typeof mainValue) return null;
-      if (self.type.endsWith('labels')) {
-        return value.filter(x => mainValue.includes(x));
+      if (self.type.endsWith("labels")) {
+        return value.filter((x) => mainValue.includes(x));
       }
       return value === mainValue ? value : null;
     },
@@ -125,7 +125,7 @@ const Result = types
     },
 
     get editable() {
-      throw new Error('Not implemented');
+      throw new Error("Not implemented");
     },
 
     isReadOnly() {
@@ -136,8 +136,8 @@ const Result = types
       return self.readonly;
     },
 
-    getSelectedString(joinstr = ' ') {
-      return self.mainValue?.join(joinstr) || '';
+    getSelectedString(joinstr = " ") {
+      return self.mainValue?.join(joinstr) || "";
     },
 
     // @todo check all usages of selectedLabels:
@@ -147,7 +147,7 @@ const Result = types
       if (self.mainValue?.length === 0 && self.from_name.allowempty) {
         return self.from_name.findLabel(null);
       }
-      return self.mainValue?.map(value => self.from_name.findLabel(value)).filter(Boolean) ?? [];
+      return self.mainValue?.map((value) => self.from_name.findLabel(value)).filter(Boolean) ?? [];
     },
 
     /**
@@ -163,34 +163,46 @@ const Result = types
       }
 
       // picks leaf's (last item in a path) value for Taxonomy or usual Choice value for Choices
-      const innerResults = (r) =>
-        r.map(s => Array.isArray(s) ? s.at(-1) : s);
+      const innerResults = (r) => r.map((s) => (Array.isArray(s) ? s.at(-1) : s));
 
       const isChoiceSelected = () => {
         const tagName = control.whentagname;
-        const choiceValues = control.whenchoicevalue?.split(',') ?? null;
-        const results = self.annotation.results.filter(r => ['choices', 'taxonomy'].includes(r.type) && r !== self);
+        const choiceValues = control.whenchoicevalue?.split(",") ?? null;
+        const results = self.annotation.results.filter((r) => ["choices", "taxonomy"].includes(r.type) && r !== self);
 
         if (tagName) {
-          const result = results.find(r => {
+          const result = results.find((r) => {
             if (r.from_name.name !== tagName) return false;
             // for perRegion choices we should check that they are in the same area
             return !r.from_name.perregion || r.area === self.area;
           });
 
           if (!result) return false;
-          if (choiceValues && !choiceValues.some(v => innerResults(result.mainValue).some(vv => result.from_name.selectedChoicesMatch(v, vv)))) return false;
+          if (
+            choiceValues &&
+            !choiceValues.some((v) =>
+              innerResults(result.mainValue).some((vv) => result.from_name.selectedChoicesMatch(v, vv)),
+            )
+          )
+            return false;
         } else {
           if (!results.length) return false;
           // if no given choice value is selected in any choice result
-          if (choiceValues && !results.some(r => choiceValues.some(v => innerResults(r.mainValue).some(vv => r.from_name.selectedChoicesMatch(v, vv))))) return false;
+          if (
+            choiceValues &&
+            !results.some((r) =>
+              choiceValues.some((v) => innerResults(r.mainValue).some((vv) => r.from_name.selectedChoicesMatch(v, vv))),
+            )
+          )
+            return false;
         }
         return true;
       };
 
-      if (control.visiblewhen === 'choice-selected') {
+      if (control.visiblewhen === "choice-selected") {
         return isChoiceSelected();
-      } else if (control.visiblewhen === 'choice-unselected') {
+      }
+      if (control.visiblewhen === "choice-unselected") {
         return !isChoiceSelected();
       }
 
@@ -238,11 +250,11 @@ const Result = types
     },
   }))
   .volatile(() => ({
-    pid: '',
+    pid: "",
     selected: false,
     // highlighted: types.optional(types.boolean, false),
   }))
-  .actions(self => ({
+  .actions((self) => ({
     setValue(value) {
       self.value[self.from_name.valueType] = value;
     },
@@ -268,7 +280,7 @@ const Result = types
     // update region appearence based on it's current states, for
     // example bbox needs to update its colors when you change the
     // label, becuase it takes color from the label
-    updateAppearenceFromState() { },
+    updateAppearenceFromState() {},
 
     serialize(options) {
       const sn = getSnapshot(self);
@@ -286,7 +298,7 @@ const Result = types
       if (!isDefined(data.value)) data.value = {};
       // with `mergeLabelsAndResults` control uses only one result even with external `Labels`
       if (self.to_name.mergeLabelsAndResults) {
-        if (type === 'labels') return null;
+        if (type === "labels") return null;
         // add labels to the main region, not nested ones
         if (self.area?.labels?.length && !self.from_name.perregion) data.value.labels = self.area.labels;
       }
@@ -307,7 +319,7 @@ const Result = types
       }
 
       if (self.area.parentID) {
-        data.parentID = self.area.parentID.replace(/#.*/, '');
+        data.parentID = self.area.parentID.replace(/#.*/, "");
       }
 
       Object.assign(data, { id, from_name, to_name, type, origin: self.area.origin });
@@ -316,7 +328,7 @@ const Result = types
         Object.assign(data.value, { [valueType]: value[valueType] });
       }
 
-      if (typeof score === 'number') data.score = score;
+      if (typeof score === "number") data.score = score;
 
       if (self.isSelfReadOnly()) data.readonly = true;
 
@@ -337,7 +349,7 @@ const Result = types
 
       self.annotation.relationStore.deleteNodeRelation(self);
 
-      if (self.type === 'polygonregion') {
+      if (self.type === "polygonregion") {
         self.destroyRegion();
       }
 
@@ -359,4 +371,4 @@ const Result = types
     },
   }));
 
-export default types.compose('Result', Result, AnnotationMixin);
+export default types.compose("Result", Result, AnnotationMixin);

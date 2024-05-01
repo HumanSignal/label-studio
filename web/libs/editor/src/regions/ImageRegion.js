@@ -1,7 +1,7 @@
-import { getParent, getRoot, hasParent, types } from 'mobx-state-tree';
-import { guidGenerator } from '../core/Helpers';
-import { AnnotationMixin } from '../mixins/AnnotationMixin';
-import { ReadOnlyRegionMixin } from '../mixins/ReadOnlyMixin';
+import { getParent, getRoot, hasParent, types } from "mobx-state-tree";
+import { guidGenerator } from "../core/Helpers";
+import { AnnotationMixin } from "../mixins/AnnotationMixin";
+import { ReadOnlyRegionMixin } from "../mixins/ReadOnlyMixin";
 
 // @todo remove file
 const RegionMixin = types
@@ -16,13 +16,13 @@ const RegionMixin = types
     selected: types.optional(types.boolean, false),
     highlighted: types.optional(types.boolean, false),
 
-    parentID: types.optional(types.string, ''),
+    parentID: types.optional(types.string, ""),
   })
-  .views(self => ({
+  .views((self) => ({
     get perRegionStates() {
       const states = self.states;
 
-      return states && states.filter(s => s.perregion === true);
+      return states && states.filter((s) => s.perregion === true);
     },
 
     get store() {
@@ -34,7 +34,7 @@ const RegionMixin = types
     },
 
     get labelsState() {
-      return self.states.find(s => s.type.indexOf('labels') !== -1);
+      return self.states.find((s) => s.type.indexOf("labels") !== -1);
     },
 
     isReadOnly() {
@@ -56,7 +56,7 @@ const RegionMixin = types
       return true;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     setParentID(id) {
       self.parentID = id;
     },
@@ -67,7 +67,7 @@ const RegionMixin = types
     updateAppearenceFromState() {},
 
     serialize() {
-      console.error('Region class needs to implement serialize');
+      console.error("Region class needs to implement serialize");
     },
 
     selectRegion() {
@@ -132,7 +132,7 @@ const RegionMixin = types
 
       self.annotation.relationStore.deleteNodeRelation(self);
 
-      if (self.type === 'polygonregion') {
+      if (self.type === "polygonregion") {
         self.destroyRegion();
       }
 
