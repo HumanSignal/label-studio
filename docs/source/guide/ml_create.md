@@ -151,7 +151,9 @@ Other methods and parameters are available within the `LabelStudioMLBase` class:
 
 ## 4. Ensure the ML backend can access Label Studio data
 
-Depending on how you are getting data into Label Studio, you may need to set `LABEL_STUDIO_URL`. See [Allow the ML backend to access Label Studio data](ml#Allow-the-ML-backend-to-access-Label-Studio-data). 
+If your data is stored in a cloud, local directory, or has been imported into Label Studio, you will need to set the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables. 
+
+For more information, see [Allow the ML backend to access Label Studio data](ml#Allow-the-ML-backend-to-access-Label-Studio-data). 
 
 ## 5. Run the ML backend server
 
