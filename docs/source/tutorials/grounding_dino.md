@@ -50,7 +50,7 @@ See [here](https://github.com/IDEA-Research/GroundingDINO) for more details abou
 
 5. Create a project and edit the labeling config (an example is provided below). When editing the labeling config, make sure to add all rectangle labels under the `RectangleLabels` tag, and all corresponding brush labels under the `BrushLabels` tag.
 
-    ```xml
+```xml
 <View>
   <Image name="image" value="$image"/>
   <Style>
