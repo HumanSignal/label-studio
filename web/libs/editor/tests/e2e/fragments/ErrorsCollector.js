@@ -9,7 +9,7 @@ function startErrorsCollector() {
 
   CEErrorsCollector.prototype.errorHandler = function (ev) {
     // Ignore not meaningful error
-    if (ev.message === "ResizeObserver loop limit exceeded") return;
+    // if (ev.message === "ResizeObserver loop limit exceeded") return;
 
     this.errors.push(ev.message);
   };
