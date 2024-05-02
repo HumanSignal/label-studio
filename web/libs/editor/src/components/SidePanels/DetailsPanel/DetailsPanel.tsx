@@ -11,8 +11,8 @@ import { RegionItem } from "./RegionItem";
 import { Relations as RelationsComponent } from "./Relations";
 // eslint-disable-next-line
 // @ts-ignore
-import { DraftPanel } from '../../DraftPanel/DraftPanel';
-import { RelationsControls } from './RelationsControls';
+import { DraftPanel } from "../../DraftPanel/DraftPanel";
+import { RelationsControls } from "./RelationsControls";
 interface DetailsPanelProps extends PanelProps {
   regions: any;
   selection: any;
@@ -141,37 +141,29 @@ const GeneralPanel: FC<any> = inject("store")(
         ) : (
           <Elem name="section">
             <Elem name="section-head">
-                Annotation History
+              Annotation History
               <span>#{currentEntity.pk ?? currentEntity.id}</span>
             </Elem>
             <Elem name="section-content">
-              <AnnotationHistory
-                inline
-                showDraft={showDraftInHistory}
-                enabled={showAnnotationHistory}
-              />
+              <AnnotationHistory inline showDraft={showDraftInHistory} enabled={showAnnotationHistory} />
             </Elem>
           </Elem>
         )}
         <Elem name="section">
           <Elem name="view-control">
-              <Elem name="section-head">Relations ({relationStore.size})</Elem>
-              <RelationsControls relationStore={relationStore} />
+            <Elem name="section-head">Relations ({relationStore.size})</Elem>
+            <RelationsControls relationStore={relationStore} />
           </Elem>
           <Elem name="section-content">
-            <RelationsComponent
-              relationStore={relationStore}
-            />
+            <RelationsComponent relationStore={relationStore} />
           </Elem>
         </Elem>
-        {store.hasInterface('annotations:comments') && store.commentStore.isCommentable && (
+        {store.hasInterface("annotations:comments") && store.commentStore.isCommentable && (
           <Elem name="section">
-            <Elem name="section-head">
-              Comments
-            </Elem>
+            <Elem name="section-head">Comments</Elem>
             <Elem name="section-content">
               <CommentsComponent
-                annotationStore={store.annotationStore} 
+                annotationStore={store.annotationStore}
                 commentStore={store.commentStore}
                 cacheKey={`task.${store.task.id}`}
               />
@@ -182,7 +174,6 @@ const GeneralPanel: FC<any> = inject("store")(
     );
   }),
 );
-
 
 GeneralPanel.displayName = "GeneralPanel";
 

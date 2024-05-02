@@ -1,13 +1,13 @@
 export const Relations = {
   get relations() {
-    return cy.get('.lsf-relations');
+    return cy.get(".lsf-relations");
   },
   get relationOrderList() {
     const relationList = [];
 
-    cy.get('.lsf-relations__item').each(($el) => {
-      const from = $el.find('.lsf-detailed-region .lsf-labels-list span').first().text().trim();
-      const to = $el.find('.lsf-detailed-region .lsf-labels-list span').last().text().trim();
+    cy.get(".lsf-relations__item").each(($el) => {
+      const from = $el.find(".lsf-detailed-region .lsf-labels-list span").first().text().trim();
+      const to = $el.find(".lsf-detailed-region .lsf-labels-list span").last().text().trim();
       relationList.push({ from, to });
     });
 
@@ -26,9 +26,7 @@ export const Relations = {
     return cy.get('[aria-label="Sort by descending"]');
   },
   get hiddenRelations() {
-    return this.relations
-      .should('be.visible')
-      .get('.lsf-relations__item_hidden .lsf-relations__content');
+    return this.relations.should("be.visible").get(".lsf-relations__item_hidden .lsf-relations__content");
   },
   hasRelations(count: number) {
     cy.get(".lsf-details__section-head").should("have.text", `Relations (${count})`);
@@ -37,7 +35,7 @@ export const Relations = {
     cy.get(".lsf-relations").contains(from).closest(".lsf-relations").contains(to);
   },
   hasHiddenRelations(count: number) {
-    this.hiddenRelations.should('have.length', count);
+    this.hiddenRelations.should("have.length", count);
   },
   toggleCreation() {
     cy.get(".lsf-region-actions__group_align_left > :nth-child(1) > .lsf-button__icon").click();
@@ -47,11 +45,11 @@ export const Relations = {
     cy.get("body").type("{alt}r");
   },
   toggleRelationVisibility(idx) {
-    cy.get('.lsf-relations__item')
+    cy.get(".lsf-relations__item")
       .eq(idx)
-      .trigger('mouseover')
-      .find('.lsf-relations__actions')
-      .closest('.lsf-relations__action')
+      .trigger("mouseover")
+      .find(".lsf-relations__actions")
+      .closest(".lsf-relations__action")
       .click({ force: true });
-  }
+  },
 };

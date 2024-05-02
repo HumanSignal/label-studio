@@ -1,18 +1,18 @@
-import React, { FC, useCallback } from "react";
+import React, { type FC, useCallback } from "react";
 import { observer } from "mobx-react";
 import { Block, Elem } from "../../../utils/bem";
 import { Button } from "../../../common/Button/Button";
-import './RelationsControls.styl';
+import "./RelationsControls.styl";
 import { IconOutlinerEyeClosed, IconOutlinerEyeOpened, IconSortDownNew, IconSortUpNew } from "../../../assets/icons";
 
 const RelationsControlsComponent: FC<any> = ({ relationStore }) => {
   return (
-    <Block name='relation-controls'>
+    <Block name="relation-controls">
       <ToggleRelationsVisibilityButton relationStore={relationStore} />
       <ToggleRelationsOrderButton relationStore={relationStore} />
     </Block>
-  )
-}
+  );
+};
 
 interface ToggleRelationsVisibilityButtonProps {
   relationStore: any;
@@ -25,8 +25,8 @@ const ToggleRelationsVisibilityButton = observer<FC<ToggleRelationsVisibilityBut
       e.stopPropagation();
       relationStore.toggleAllVisibility();
     },
-    [relationStore]
-  )
+    [relationStore],
+  );
 
   const isDisabled = !relationStore?.relations?.length;
   const isAllHidden = !(!isDisabled && relationStore.isAllHidden);
@@ -38,13 +38,13 @@ const ToggleRelationsVisibilityButton = observer<FC<ToggleRelationsVisibilityBut
       disabled={isDisabled}
       onClick={toggleRelationsVisibility}
       mod={{ hidden: isAllHidden }}
-      aria-label={isAllHidden ? 'Show all relations' : 'Hide all relations'}
+      aria-label={isAllHidden ? "Show all relations" : "Hide all relations"}
       icon={isAllHidden ? <IconOutlinerEyeClosed /> : <IconOutlinerEyeOpened />}
-      tooltip={isAllHidden ? 'Show all relations' : 'Hide all relations'}
+      tooltip={isAllHidden ? "Show all relations" : "Hide all relations"}
       tooltipTheme="dark"
     />
   );
-})
+});
 
 interface ToggleRelationsOrderButtonProps {
   relationStore: any;
@@ -57,11 +57,11 @@ const ToggleRelationsOrderButton = observer<FC<ToggleRelationsOrderButtonProps>>
       e.stopPropagation();
       relationStore.toggleOrder();
     },
-    [relationStore]
-  )
+    [relationStore],
+  );
 
   const isDisabled = !relationStore?.relations?.length;
-  const isAsc = relationStore.order === 'asc';
+  const isAsc = relationStore.order === "asc";
 
   return (
     <Elem
@@ -70,12 +70,12 @@ const ToggleRelationsOrderButton = observer<FC<ToggleRelationsOrderButtonProps>>
       onClick={toggleRelationsOrder}
       disabled={isDisabled}
       mod={{ order: relationStore.order }}
-      aria-label={isAsc ? 'Sort by ascending' : 'Sort by descending'}
+      aria-label={isAsc ? "Sort by ascending" : "Sort by descending"}
       icon={isAsc ? <IconSortUpNew /> : <IconSortDownNew />}
-      tooltip={isAsc ? 'Sort by ascending' : 'Sort by descending'}
+      tooltip={isAsc ? "Sort by ascending" : "Sort by descending"}
       tooltipTheme="dark"
     />
   );
-})
+});
 
 export const RelationsControls = observer(RelationsControlsComponent);
