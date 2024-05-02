@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-851: Fix security vulnerability",
-  "commit": "dd14625d13f2b529878e1ba972c2a48da9158105",
-  "date": "2024-04-26T19:07:41.000Z",
+  "message": "Merge branch 'develop' into 'fb-leap-851'",
+  "commit": "42b15dcf633900902686551b308b3ff658ae3014",
+  "date": "2024-05-02T19:54:13.000Z",
   "branch": "fb-leap-851"
 }
