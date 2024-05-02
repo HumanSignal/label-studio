@@ -142,6 +142,60 @@ Some of them work without any additional configuration. Check the **Required par
 | [interactive_substring_matching](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/interactive_substring_matching) | Simple keywords search                                                                                                                    | ❌               | ✅                | ❌        | None                                          |
 | [langchain_search_agent](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/langchain_search_agent)                 | RAG pipeline with Google Search and [Langchain](https://langchain.com/)                                                                   | ✅               | ✅                | ✅        | OPENAI_API_KEY, GOOGLE_CSE_ID, GOOGLE_API_KEY |
 
+## Allow the ML backend to access Label Studio data
+
+In most cases, you will need to set your environment variables to allow the ML backend access to the data in Label Studio. 
+
+Label Studio tasks can have multiple sources of resource files:
+
+* Direct `http` and `https` links.  
+    Example: `task['data'] = {"image": "http://example.com/photo_1.jpg"}`
+
+* Files that have been uploaded to Label Studio using the **Import** action.  
+    Example: `task['data'] = {"image": "https://ls-instance/data/upload/42/photo_1.jpg"}`
+
+* Files added through a [local storage connection](storage#Local-storage).  
+    Example: `task['data'] = {"image": "https://ls-instance/data/local-files/?d=folder/photo_1.jpg"}`
+
+* Files added through a [cloud storage](storage) (S3, GCS, Azure) connection.  
+    Example: `task['data'] = {"image": "s3://bucket/prefix/photo_1.jpg"}`
+
+When Label Studio invokes the `predict(tasks)` method on an ML backend, it sends tasks containing data sub-dictionaries with links to resource files. 
+
+Downloading files from direct `http` and `https` links (the first example above) is straightforward. However, the other three types (imported files, local storage files, and cloud storage files) are more complex. 
+
+To address this, the ML backend utilizes the `get_local_path(url, task_id)` function from the `label_studio_tools` package (this package is pre-installed with `label-studio-ml-backend`):
+
+```python
+from label_studio_tools.core.utils.io import get_local_path
+
+class MLBackend(LabelStudioMLBase)
+  def predict(tasks):
+    task = tasks[0]
+    locaL_path = get_local_path(task['data']['image'], task_id=task['id'])
+    with open(locaL_path, 'r') as f:
+      f.read()
+```
+
+The `get_local_path()` function resolves URIs to URLs, then downloads and caches the file.
+
+For this to work, you must specify the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables for your ML backend before using `get_local_path`. 
+
+Note the following:
+
+* `LABEL_STUDIO_URL` must be accessible from the ML backend instance. 
+
+* If you are running the ML backend in Docker, `LABEL_STUDIO_URL` can’t contain `localhost`. Use the full IP address instead. You can get this using the `ifconfig` (Unix) or `ipconfig` (Windows) commands.
+
+* `LABEL_STUDIO_URL` must start either with `http://` or `https://`.
+
+To find your `LABEL_STUDIO_API_KEY`, open Label Studio and go to your [user account page](user_account#Access-token). 
+
+<div class="enterprise-only">
+
+Note that your user must also have access to the project that you are connecting to ML backend.
+
+</div>
 
 ## Model training
 
