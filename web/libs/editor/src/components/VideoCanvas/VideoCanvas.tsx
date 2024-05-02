@@ -342,7 +342,9 @@ export const VideoCanvas = memo(
 
     useEffect(() => {
       const observer = new ResizeObserver(() => {
-        props.onResize?.(videoDimensions);
+        requestAnimationFrame(() => {
+          props.onResize?.(videoDimensions);
+        })
       });
 
       observer.observe(rootRef.current!);

@@ -185,11 +185,13 @@ const HtxVideoView = ({ item, store }) => {
 
   useEffect(() => {
     const onResize = () => {
-      const block = videoContainerRef.current;
+      requestAnimationFrame(() => {
+        const block = videoContainerRef.current;
 
-      if (block) {
-        setVideoSize([block.clientWidth, block.clientHeight]);
-      }
+        if (block) {
+          setVideoSize([block.clientWidth, block.clientHeight]);
+        }
+      })
     };
 
     const onKeyDown = (e) => {
@@ -213,7 +215,7 @@ const HtxVideoView = ({ item, store }) => {
 
     document.addEventListener("keydown", onKeyDown);
 
-    const observer = new ResizeObserver(() => onResize());
+    const observer = new ResizeObserver(onResize);
     const [vContainer, vBlock] = [videoContainerRef.current, videoBlockRef.current];
 
     observer.observe(vContainer);

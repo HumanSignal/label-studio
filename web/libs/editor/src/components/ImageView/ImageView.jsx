@@ -126,23 +126,23 @@ const SelectionBorders = observer(({ item, selectionArea }) => {
 
   const points = bbox
     ? [
-        {
-          x: bbox.left,
-          y: bbox.top,
-        },
-        {
-          x: bbox.right,
-          y: bbox.top,
-        },
-        {
-          x: bbox.left,
-          y: bbox.bottom,
-        },
-        {
-          x: bbox.right,
-          y: bbox.bottom,
-        },
-      ]
+      {
+        x: bbox.left,
+        y: bbox.top,
+      },
+      {
+        x: bbox.right,
+        y: bbox.top,
+      },
+      {
+        x: bbox.left,
+        y: bbox.bottom,
+      },
+      {
+        x: bbox.right,
+        y: bbox.bottom,
+      },
+    ]
     : [];
   const ANCHOR_SIZE = isFF(FF_DEV_3793) ? 6 / item.stageScale : 6;
 
@@ -828,15 +828,17 @@ export default observer(
     }
 
     onResize = debounce(() => {
-      if (!this?.props?.item?.containerRef) return;
-      const { offsetWidth, offsetHeight } = this.props.item.containerRef;
+      requestAnimationFrame(() => {
+        if (!this?.props?.item?.containerRef) return;
+        const { offsetWidth, offsetHeight } = this.props.item.containerRef;
 
-      if (this.props.item.naturalWidth <= 1) return;
-      if (this.lastOffsetWidth === offsetWidth && this.lastOffsetHeight === offsetHeight) return;
+        if (this.props.item.naturalWidth <= 1) return;
+        if (this.lastOffsetWidth === offsetWidth && this.lastOffsetHeight === offsetHeight) return;
 
-      this.props.item.onResize(offsetWidth, offsetHeight, true);
-      this.lastOffsetWidth = offsetWidth;
-      this.lastOffsetHeight = offsetHeight;
+        this.props.item.onResize(offsetWidth, offsetHeight, true);
+        this.lastOffsetWidth = offsetWidth;
+        this.lastOffsetHeight = offsetHeight;
+      });
     }, 16);
 
     componentDidMount() {
@@ -867,7 +869,7 @@ export default observer(
 
     componentWillUnmount() {
       this.detachObserver();
-      window.removeEventListener("resize", this.onResize);
+      window.removeEventListener("resize", this.snResize);
 
       hotkeys.removeDescription("shift");
     }
@@ -1049,7 +1051,7 @@ export default observer(
                 onMouseDown={this.handleMouseDown}
                 onMouseMove={this.handleMouseMove}
                 onMouseUp={this.handleMouseUp}
-                onWheel={item.zoom ? this.handleZoom : () => {}}
+                onWheel={item.zoom ? this.handleZoom : () => { }}
               />
             ) : null}
           </div>
