@@ -1,8 +1,8 @@
-const { initLabelStudio, serialize, selectText } = require('./helpers');
+const { initLabelStudio, serialize, selectText } = require("./helpers");
 
-const assert = require('assert');
+const assert = require("assert");
 
-Feature('NERText');
+Feature("NERText");
 
 function removeTextFromResult(result) {
   return result.map(({ value: { start, end, labels }, ...r }) => ({ ...r, value: { start, end, labels } }));
@@ -18,26 +18,26 @@ const configSimple = `
   </View>
 `;
 
-const url = 'https://htx-pub.s3.amazonaws.com/example.txt';
+const url = "https://htx-pub.s3.amazonaws.com/example.txt";
 const configUrl = configSimple.replace('value="$text"', 'valueType="url" value="$url"');
 const configUrlSaveText = configUrl.replace('valueType="url"', 'valueType="url" saveTextResult="yes"');
 
 const resultsFromUrl = [
   {
-    id: 'Hnyt9sO_RX',
-    from_name: 'ner',
-    to_name: 'text',
-    type: 'labels',
-    origin: 'manual',
-    value: { start: 0, end: 17, labels: ['Person'], text: 'George Washington' },
+    id: "Hnyt9sO_RX",
+    from_name: "ner",
+    to_name: "text",
+    type: "labels",
+    origin: "manual",
+    value: { start: 0, end: 17, labels: ["Person"], text: "George Washington" },
   },
   {
-    id: 'tQHRBpvGo0',
-    from_name: 'ner',
-    to_name: 'text',
-    type: 'labels',
-    origin: 'manual',
-    value: { start: 453, end: 474, labels: ['Words'], text: 'Father of His Country' },
+    id: "tQHRBpvGo0",
+    from_name: "ner",
+    to_name: "text",
+    type: "labels",
+    origin: "manual",
+    value: { start: 453, end: 474, labels: ["Words"], text: "Father of His Country" },
   },
 ];
 
@@ -53,48 +53,48 @@ const text = `"But I don’t want to go among mad people," Alice remarked.
 
 const results = [
   {
-    id: 'abcdef',
-    from_name: 'ner',
-    to_name: 'text',
-    type: 'labels',
-    origin: 'manual',
-    value: { start: 175, end: 180, labels: ['Person'], text: 'Alice' },
+    id: "abcdef",
+    from_name: "ner",
+    to_name: "text",
+    type: "labels",
+    origin: "manual",
+    value: { start: 175, end: 180, labels: ["Person"], text: "Alice" },
   },
   {
-    id: 'qwerty',
-    from_name: 'ner',
-    to_name: 'text',
-    type: 'labels',
-    parentID: 'abcdef',
-    origin: 'manual',
-    value: { start: 1, end: 40, labels: ['Words'], text: 'But I don’t want to go among mad people' },
+    id: "qwerty",
+    from_name: "ner",
+    to_name: "text",
+    type: "labels",
+    parentID: "abcdef",
+    origin: "manual",
+    value: { start: 1, end: 40, labels: ["Words"], text: "But I don’t want to go among mad people" },
   },
 ];
 
 const resultsWithoutText = removeTextFromResult(results);
 
 const newResult = {
-  id: 'WpqCf9g_3z',
-  from_name: 'ner',
-  to_name: 'text',
-  type: 'labels',
-  origin: 'manual',
-  value: { start: 233, end: 237, text: 'come', labels: ['Words'] },
+  id: "WpqCf9g_3z",
+  from_name: "ner",
+  to_name: "text",
+  type: "labels",
+  origin: "manual",
+  value: { start: 233, end: 237, text: "come", labels: ["Words"] },
 };
 
-Scenario('NERText', async function({ I, AtTopbar }) {
+Scenario("NERText", async ({ I, AtTopbar }) => {
   const params = {
-    annotations: [{ id: 'TestCmpl', result: results }],
+    annotations: [{ id: "TestCmpl", result: results }],
     config: configSimple,
     data: { text },
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   I.executeScript(initLabelStudio, params);
   // better to always check the text are on the page,
   // so there are no errors and text is displayed correctly;
   // text should not be from regions to check the object tag, not the regions list
-  I.see('Alice remarked');
+  I.see("Alice remarked");
 
   let result;
 
@@ -106,9 +106,9 @@ Scenario('NERText', async function({ I, AtTopbar }) {
   I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
 
-  I.pressKey('2');
+  I.pressKey("2");
   I.executeScript(selectText, {
-    selector: '.lsf-htx-richtext',
+    selector: ".lsf-htx-richtext",
     rangeStart: 233,
     rangeEnd: 237,
   });
@@ -119,51 +119,51 @@ Scenario('NERText', async function({ I, AtTopbar }) {
   assert.deepEqual(result, [newResult]);
 
   // delete this new annotation
-  AtTopbar.clickAria('Delete');
-  I.click('Proceed'); // approve
+  AtTopbar.clickAria("Delete");
+  I.click("Proceed"); // approve
 
-  I.pressKey('1');
+  I.pressKey("1");
   I.executeScript(selectText, {
-    selector: '.lsf-htx-richtext',
+    selector: ".lsf-htx-richtext",
     rangeStart: 233,
     rangeEnd: 237,
   });
   result = await I.executeScript(serialize);
 
   newResult.id = result[2].id;
-  newResult.value.labels = ['Person'];
+  newResult.value.labels = ["Person"];
   assert.deepEqual(result, [...results, newResult]);
 
   // @todo this hotkey doesn't work. why?
   // I.pressKey('R')
   I.wait(5);
-  I.click(locate('li').withText('Alice'));
-  I.click('Create Relation');
-  I.click(locate('.htx-highlight').withText('come'));
+  I.click(locate("li").withText("Alice"));
+  I.click("Create Relation");
+  I.click(locate(".htx-highlight").withText("come"));
   I.wait(1);
-  I.click(locate('.htx-highlight').withText('come'));
+  I.click(locate(".htx-highlight").withText("come"));
 
-  I.see('Relations (1)');
+  I.see("Relations (1)");
 
   result = await I.executeScript(serialize);
   assert.equal(result.length, 4);
   assert.deepEqual(result[0].value, results[0].value);
   assert.deepEqual(result[1].value, results[1].value);
-  assert.equal(result[3].type, 'relation');
+  assert.equal(result[3].type, "relation");
   assert.equal(result[3].from_id, result[0].id);
   assert.equal(result[3].to_id, result[2].id);
 });
 
-Scenario('NER Text with text field missing', async function({ I }) {
+Scenario("NER Text with text field missing", async ({ I }) => {
   const params = {
-    annotations: [{ id: 'TestCmpl', result: resultsWithoutText }],
+    annotations: [{ id: "TestCmpl", result: resultsWithoutText }],
     config: configSimple,
     data: { text },
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   I.executeScript(initLabelStudio, params);
-  I.see('Alice remarked');
+  I.see("Alice remarked");
 
   // restore saved result and check it back that it didn't change
   const result = await I.executeScript(serialize);
@@ -172,17 +172,17 @@ Scenario('NER Text with text field missing', async function({ I }) {
 });
 
 // for security reasons text is not saved by default for valueType=url
-Scenario('NER Text from url', async function({ I }) {
+Scenario("NER Text from url", async ({ I }) => {
   const params = {
-    annotations: [{ id: 'TestCmpl', result: resultsFromUrl }],
+    annotations: [{ id: "TestCmpl", result: resultsFromUrl }],
     config: configUrl,
     data: { url },
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   I.executeScript(initLabelStudio, params);
   // wait for text to be loaded
-  I.see('American political leader');
+  I.see("American political leader");
 
   // restore saved result and check it back that it didn't change
   const result = await I.executeScript(serialize);
@@ -190,17 +190,17 @@ Scenario('NER Text from url', async function({ I }) {
   assert.deepEqual(result, resultsFromUrlWithoutText);
 });
 
-Scenario('NER Text from url with text saved', async function({ I }) {
+Scenario("NER Text from url with text saved", async ({ I }) => {
   const params = {
-    annotations: [{ id: 'TestCmpl', result: resultsFromUrlWithoutText }],
+    annotations: [{ id: "TestCmpl", result: resultsFromUrlWithoutText }],
     config: configUrlSaveText,
     data: { url },
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   I.executeScript(initLabelStudio, params);
   // wait for text to be loaded
-  I.see('American political leader');
+  I.see("American political leader");
 
   // restore saved result and check it back that it didn't change
   const result = await I.executeScript(serialize);
@@ -208,14 +208,14 @@ Scenario('NER Text from url with text saved', async function({ I }) {
   assert.deepEqual(result, resultsFromUrl);
 });
 
-Scenario('NER Text with SECURE MODE and wrong valueType', async function({ I, LabelStudio }) {
+Scenario("NER Text with SECURE MODE and wrong valueType", async ({ I, LabelStudio }) => {
   const params = {
-    annotations: [{ id: 'TestCmpl', result: results }],
+    annotations: [{ id: "TestCmpl", result: results }],
     config: configSimple,
     data: { url },
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   I.executeScript(() => {
     window.OLD_LS_SECURE_MODE = window.LS_SECURE_MODE;
     window.LS_SECURE_MODE = true;
@@ -223,31 +223,31 @@ Scenario('NER Text with SECURE MODE and wrong valueType', async function({ I, La
 
   LabelStudio.init(params);
 
-  I.see('In SECURE MODE'); // error about valueType in secure mode
-  I.dontSee('American political leader');
+  I.see("In SECURE MODE"); // error about valueType in secure mode
+  I.dontSee("American political leader");
 
   I.executeScript(() => {
     window.LS_SECURE_MODE = window.OLD_LS_SECURE_MODE;
   });
 });
 
-Scenario('NER Text with SECURE MODE', async function({ I, LabelStudio }) {
+Scenario("NER Text with SECURE MODE", async ({ I, LabelStudio }) => {
   const params = {
-    annotations: [{ id: 'TestCmpl', result: resultsFromUrl }],
+    annotations: [{ id: "TestCmpl", result: resultsFromUrl }],
     config: configUrl,
     data: { url },
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   I.executeScript(() => {
     window.OLD_LS_SECURE_MODE = window.LS_SECURE_MODE;
     window.LS_SECURE_MODE = true;
   });
   LabelStudio.init(params);
 
-  I.waitForElement('.lsf-richtext__line', 60);
+  I.waitForElement(".lsf-richtext__line", 60);
 
-  I.see('American political leader');
+  I.see("American political leader");
 
   // restore saved result and check it back that it didn't change
   const result = await I.executeScript(serialize);
@@ -260,14 +260,14 @@ Scenario('NER Text with SECURE MODE', async function({ I, LabelStudio }) {
   });
 });
 
-Scenario('NER Text regions in Outliner', async function({ I, LabelStudio }) {
+Scenario("NER Text regions in Outliner", async ({ I, LabelStudio }) => {
   const params = {
-    annotations: [{ id: 'TestCmpl', result: resultsFromUrl }],
+    annotations: [{ id: "TestCmpl", result: resultsFromUrl }],
     config: configUrl,
     data: { url },
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   // enabling both flags for New UI, but will work with Outliner one only as well
   LabelStudio.setFeatureFlags({
     ff_front_1170_outliner_030222_short: true,
@@ -275,10 +275,10 @@ Scenario('NER Text regions in Outliner', async function({ I, LabelStudio }) {
   });
   LabelStudio.init(params);
 
-  I.waitForElement('.lsf-richtext__line', 60);
+  I.waitForElement(".lsf-richtext__line", 60);
 
-  I.see('American political leader');
+  I.see("American political leader");
 
-  I.seeElement(locate('.lsf-outliner-item').withText(resultsFromUrl[0].value.text));
-  I.seeElement(locate('.lsf-outliner-item').withText(resultsFromUrl[1].value.text));
+  I.seeElement(locate(".lsf-outliner-item").withText(resultsFromUrl[0].value.text));
+  I.seeElement(locate(".lsf-outliner-item").withText(resultsFromUrl[1].value.text));
 });

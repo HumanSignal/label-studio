@@ -40,7 +40,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: Setup Conda
-        uses: conda-incubator/setup-miniconda@v3.0.3
+        uses: conda-incubator/setup-miniconda@v3.0.4
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}

@@ -4,7 +4,7 @@ on:
     types: [created]
 
 env:
-  commands_list: |
+  pull_request_commands_list: |
     help
     frontend
     ff
@@ -13,6 +13,7 @@ env:
     docker
 
   issue_commands_list: |
+    help
     jira
 
 jobs:
@@ -23,62 +24,46 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
-      - name: 'Validate command'
+      - name: "React to comment"
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          comment-id: ${{ github.event.comment.id }}
+          reactions: eyes
+
+      - name: "Validate command"
         id: determine_command
         uses: actions/github-script@v7
         env:
-          COMMANDS_LIST: ${{ env.commands_list }}
-          ISSUE_COMMANDS_LIST: ${{ env.issue_commands_list }}
+          COMMANDS_LIST: ${{ github.event.issue.pull_request && env.pull_request_commands_list || env.issue_commands_list }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
-            const body = context.payload.comment.body.toLowerCase().trim()
-            const commands_list = process.env.COMMANDS_LIST.split("\n")
-            const issue_commands_list = process.env.ISSUE_COMMANDS_LIST.split("\n")
-            console.log("Detected PR comment: " + body)
-            console.log("Commands list: " + commands_list)
-            console.log("Issue commands list: " + issue_commands_list)
-            commandArray = body.split(/\s+/)
-            const contextCommand = commandArray[0].split('/')[1].trim();
-            console.log("contextCommand: " + contextCommand)
-            core.setOutput('command_state', 'known')
-            core.setOutput('is_issue_command', 'false')
-            if (! commands_list.includes(contextCommand)) {
-              core.setOutput('command_state', 'unknown')
-              core.setOutput('command', contextCommand)
-            }
-            if (issue_commands_list.includes(contextCommand)) {
-              core.setOutput('is_issue_command', 'true')
-            }
+            const body = context.payload.comment.body.toLowerCase().trim();
+            const commands_list = process.env.COMMANDS_LIST.split("\n");
+            console.log(commands_list);
+            const command = body.replace(/^\/+/, '').split(/\s+/)[0];
+            core.setOutput('command', command);            
+            core.setOutput('command-state', commands_list.includes(command) ? 'known' : 'unknown');
 
-      - name: Slash Command Dispatch for Issues
+      - name: "Slash Command Dispatch"
         id: scd_issues
-        if: ${{ steps.determine_command.outputs.command_state != 'unknown' && steps.determine_command.outputs.is_issue_command == 'true' }}
+        if: steps.determine_command.outputs.command-state == 'known'
         uses: peter-evans/slash-command-dispatch@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           reaction-token: ${{ secrets.GIT_PAT }}
-          issue-type: "issue"
+          issue-type: ${{ github.event.issue.pull_request && 'pull-request' || 'issue' }}
           reactions: true
-          commands: ${{ env.issue_commands_list }}
+          commands: ${{ github.event.issue.pull_request && env.pull_request_commands_list || env.issue_commands_list }}
 
-      - name: Slash Command Dispatch for PRs
-        id: scd_prs
-        if: ${{ steps.determine_command.outputs.command_state != 'unknown' && steps.determine_command.outputs.is_issue_command != 'true' }}
-        uses: peter-evans/slash-command-dispatch@v4
-        with:
-          token: ${{ secrets.GIT_PAT }}
-          reaction-token: ${{ secrets.GIT_PAT }}
-          issue-type: "pull-request"
-          reactions: true
-          commands: ${{ env.commands_list }}
-
-      - name: Edit comment with error message
-        if: ${{ steps.determine_command.outputs.command_state == 'unknown' }}
+      - name: "Edit comment with error message"
+        if: steps.determine_command.outputs.command-state != 'known'
         uses: peter-evans/create-or-update-comment@v4
         with:
+          token: ${{ secrets.GIT_PAT }}
           comment-id: ${{ github.event.comment.id }}
           body: |
-            > '/${{ steps.determine_command.outputs.command }}' is an unknown command.
+            > '/${{ steps.determine_command.outputs.command }}' is an unknown ${{ github.event.issue.pull_request && 'pull-request' || 'issue' }} command.
             > See '/help'
-          reactions: eyes, confused
+          reactions: confused

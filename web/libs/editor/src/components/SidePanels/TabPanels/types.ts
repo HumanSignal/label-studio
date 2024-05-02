@@ -1,24 +1,24 @@
-import { FC, MutableRefObject, ReactNode } from 'react';
-import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT, DEFAULT_PANEL_WIDTH } from '../constants';
+import type { FC, MutableRefObject, ReactNode } from "react";
+import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT, DEFAULT_PANEL_WIDTH } from "../constants";
 
 export type TabProps = {
-  name: string,
-  rootRef: MutableRefObject<HTMLDivElement | undefined>,
-  tabTitle: string,
-  panelKey: string,
-  tabIndex: number,
-  active: boolean,
-  children: ReactNode,
-  panelWidth: number,
-  viewLength: number,
-  locked: boolean,
-  breakPointActiveTab?: number,
-  setBreakPointActiveTab?: React.Dispatch<React.SetStateAction<number>>,
-  transferTab: EventHandlers['transferTab'],
-  createNewPanel: EventHandlers['createNewPanel'],
-  setActiveTab: EventHandlers['setActiveTab'],
-  checkSnap: EventHandlers['checkSnap'],
-}
+  name: string;
+  rootRef: MutableRefObject<HTMLDivElement | undefined>;
+  tabTitle: string;
+  panelKey: string;
+  tabIndex: number;
+  active: boolean;
+  children: ReactNode;
+  panelWidth: number;
+  viewLength: number;
+  locked: boolean;
+  breakPointActiveTab?: number;
+  setBreakPointActiveTab?: React.Dispatch<React.SetStateAction<number>>;
+  transferTab: EventHandlers["transferTab"];
+  createNewPanel: EventHandlers["createNewPanel"];
+  setActiveTab: EventHandlers["setActiveTab"];
+  checkSnap: EventHandlers["checkSnap"];
+};
 export interface SidePanelsProps {
   panelsHidden: boolean;
   store: any;
@@ -27,7 +27,10 @@ export interface SidePanelsProps {
   focusTab: string;
 }
 
-export interface ViewportSize { width: number, height: number }
+export interface ViewportSize {
+  width: number;
+  height: number;
+}
 export interface PanelView {
   title: string;
   name: string;
@@ -36,22 +39,22 @@ export interface PanelView {
 }
 
 export enum Side {
-  left = 'left',
-  right = 'right',
+  left = "left",
+  right = "right",
 }
 
 export enum DropSide {
-  left = 'left',
-  right = 'right',
-  topRight = 'right-top',
-  topLeft = 'left-top',
-  bottomRight = 'right-bottom',
-  bottomLeft = 'left-bottom',
+  left = "left",
+  right = "right",
+  topRight = "right-top",
+  topLeft = "left-top",
+  bottomRight = "right-bottom",
+  bottomLeft = "left-bottom",
 }
 
 export enum JoinOrder {
-  top = 'top',
-  bottom = 'bottom',
+  top = "top",
+  bottom = "bottom",
 }
 export interface PanelBBox {
   order: number;
@@ -73,8 +76,8 @@ export interface PanelBBox {
 export interface EventHandlers {
   onResize: (key: string, w: number, h: number, t: number, l: number) => void;
   onGroupHeightResize: (key: string, h: number, t: number) => void;
-  onResizeStart: ()=> void;
-  onResizeEnd: ()=> void;
+  onResizeStart: () => void;
+  onResizeEnd: () => void;
   onPositionChange: (key: string, t: number, l: number, detached: boolean, alignment: Side) => void;
   onVisibilityChange: (key: string, visible: boolean) => void;
   onPositionChangeBegin: (key: string, x: number, y: number, side: Side, detached: boolean) => void;
@@ -86,56 +89,54 @@ export interface EventHandlers {
     receivingTab: number,
     dropSide: Side,
   ) => void;
-  createNewPanel(
-    name: string,
-    movingPanel: string,
-    movingTab: number,
-    left: number,
-    top: number,
-  ): void;
+  createNewPanel(name: string, movingPanel: string, movingTab: number, left: number, top: number): void;
   setActiveTab: (key: string, tabIndex: number) => void;
   checkSnap: (left: number, panelWidth: number, top: number, height: number) => void;
 }
 export type CommonProps = EventHandlers & {
-  root: MutableRefObject<HTMLDivElement | undefined>,
-  regions: any,
-  selection: any,
-  currentEntity: any,
-}
+  root: MutableRefObject<HTMLDivElement | undefined>;
+  regions: any;
+  selection: any;
+  currentEntity: any;
+};
 
-export interface PanelsCollapsed { [Side.left]: boolean, [Side.right]: boolean }
+export interface PanelsCollapsed {
+  [Side.left]: boolean;
+  [Side.right]: boolean;
+}
 
 export type StoredPanelState = {
-  panelData: Record<string, PanelBBox>,
-  collapsedSide: PanelsCollapsed,
-}
+  panelData: Record<string, PanelBBox>;
+  collapsedSide: PanelsCollapsed;
+};
 
-export type BaseProps = PanelBBox & CommonProps & {
-  name: string,
-  top: number,
-  left: number,
-  positioning: boolean,
-  maxWidth: number,
-  zIndex: number,
-  expanded: boolean,
-  alignment: Side,
-  locked: boolean,
-  panelViews: PanelView[],
-  attachedKeys: string[] | undefined,
-  sidePanelCollapsed: PanelsCollapsed,
-  breakPointActiveTab: number,
-  setBreakPointActiveTab?: React.Dispatch<React.SetStateAction<number>>,
-  setSidePanelCollapsed: React.Dispatch<React.SetStateAction<PanelsCollapsed>>,
-  dragTop: boolean,
-  dragBottom: boolean,
-  lockPanelContents: boolean,
-}
+export type BaseProps = PanelBBox &
+  CommonProps & {
+    name: string;
+    top: number;
+    left: number;
+    positioning: boolean;
+    maxWidth: number;
+    zIndex: number;
+    expanded: boolean;
+    alignment: Side;
+    locked: boolean;
+    panelViews: PanelView[];
+    attachedKeys: string[] | undefined;
+    sidePanelCollapsed: PanelsCollapsed;
+    breakPointActiveTab: number;
+    setBreakPointActiveTab?: React.Dispatch<React.SetStateAction<number>>;
+    setSidePanelCollapsed: React.Dispatch<React.SetStateAction<PanelsCollapsed>>;
+    dragTop: boolean;
+    dragBottom: boolean;
+    lockPanelContents: boolean;
+  };
 
 export type Result = {
-  detached: BaseProps[],
-  left:BaseProps[],
-  right:BaseProps[],
-}
+  detached: BaseProps[];
+  left: BaseProps[];
+  right: BaseProps[];
+};
 
 export const emptyPanel: PanelBBox = {
   order: 0,
@@ -153,11 +154,11 @@ export const emptyPanel: PanelBBox = {
   panelViews: [],
 };
 
-export type PanelBaseExclusiveProps = 'name' | 'title'
+export type PanelBaseExclusiveProps = "name" | "title";
 
 export type ResizeHandler = (name: string, width: number, height: number, top: number, left: number) => void;
 
-export type SnapHandler = (name: string) => void
+export type SnapHandler = (name: string) => void;
 
 export type PositionChangeHandler = (name: string, top: number, left: number, detached: boolean) => void;
 

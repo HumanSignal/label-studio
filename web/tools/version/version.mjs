@@ -1,27 +1,27 @@
-import path from 'node:path';
-import {spawn} from 'node:child_process';
-import fs from 'node:fs/promises';
+import path from "node:path";
+import { spawn } from "node:child_process";
+import fs from "node:fs/promises";
 
 const git = async (command, options) => {
   // create a promise based git wrapper around a spawned process
   return new Promise((resolve, reject) => {
     const currentPwd = process.cwd();
-    const child = spawn('git', [command, ...options], {
+    const child = spawn("git", [command, ...options], {
       cwd: currentPwd,
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ["ignore", "pipe", "pipe"],
     });
-    let stdout = '';
-    let stderr = '';
+    let stdout = "";
+    let stderr = "";
 
-    child.stdout.on('data', (data) => {
+    child.stdout.on("data", (data) => {
       stdout += data;
     });
 
-    child.stderr.on('data', (data) => {
+    child.stderr.on("data", (data) => {
       stderr += data;
     });
 
-    child.on('close', (code) => {
+    child.on("close", (code) => {
       if (code === 0) {
         resolve(stdout);
       } else {
@@ -29,7 +29,7 @@ const git = async (command, options) => {
       }
     });
   });
-}
+};
 
 /**
  * Get the commits affecting the current project
@@ -37,9 +37,9 @@ const git = async (command, options) => {
  * @returns {Promise<string>}
  */
 const gitLog = async (options = []) => {
-  const log = await git('log', options);
+  const log = await git("log", options);
   return log.trim();
-}
+};
 
 /**
  * Get the branch info of the current project
@@ -47,10 +47,9 @@ const gitLog = async (options = []) => {
  * @returns {Promise<string>}
  */
 const gitBranch = async (options = []) => {
-  const branch = await git('branch', options);
+  const branch = await git("branch", options);
   return branch.trim();
-}
-
+};
 
 /**
  * @typedef {Object} CommitVersion
@@ -65,21 +64,32 @@ const gitBranch = async (options = []) => {
  * @returns {Promise<CommitVersion>}
  */
 const getVersionData = async () => {
-  const latestCommitInfo = await gitLog(['-n 1', '-p', 'src/*']);
-  const commitInfo = latestCommitInfo.split('\n');
-  let commit = commitInfo.find((line) => line.startsWith('commit'))?.trim().replace('commit', '').trim() ?? '';
-  let date = commitInfo.find((line) => line.startsWith('Date:')) ?? '';
+  const latestCommitInfo = await gitLog(["-n 1", "-p", "src/*"]);
+  const commitInfo = latestCommitInfo.split("\n");
+  const commit =
+    commitInfo
+      .find((line) => line.startsWith("commit"))
+      ?.trim()
+      .replace("commit", "")
+      .trim() ?? "";
+  let date = commitInfo.find((line) => line.startsWith("Date:")) ?? "";
   // First non-empty line after the Date: line is the commit message
-  let message = commitInfo.slice(commitInfo.indexOf(date) + 1).find((line) => line.trim().length > 0)?.trim() ?? '';
+  const message =
+    commitInfo
+      .slice(commitInfo.indexOf(date) + 1)
+      .find((line) => line.trim().length > 0)
+      ?.trim() ?? "";
   // Remove the Date: prefix from the date
-  date = date.replace('Date:', '').trim();
+  date = date.replace("Date:", "").trim();
 
   // Get the current branch of the latest commit
-  const contains = (await gitBranch(['--contains', commit])).split('\n')
-  let branch = (contains.find((line) => line.startsWith('develop') || line.startsWith('*')) ?? '').replace('*', '').trim();
+  const contains = (await gitBranch(["--contains", commit])).split("\n");
+  let branch = (contains.find((line) => line.startsWith("develop") || line.startsWith("*")) ?? "")
+    .replace("*", "")
+    .trim();
 
-  if (branch === '' || branch.includes('HEAD')) {
-    branch = 'develop';
+  if (branch === "" || branch.includes("HEAD")) {
+    branch = "develop";
   }
 
   return {
@@ -88,35 +98,37 @@ const getVersionData = async () => {
     date: new Date(date).toISOString(),
     branch,
   };
-}
+};
 
 const versionLib = async () => {
   const currentPwd = process.cwd();
   // if the currentPwd includes 'node_modules', we are running from within the monorepo package itself
   // and we have to account for the difference
-  let workspaceRoot, currentProjectPath;
-  if (currentPwd.includes('node_modules')) {
-    const [_workspaceRoot, nodeModulesPath, _currentProjectPath] = currentPwd.split('web')
-    workspaceRoot = path.join(_workspaceRoot, 'web', nodeModulesPath)
-    currentProjectPath = _currentProjectPath
+  let workspaceRoot;
+  let currentProjectPath;
+  if (currentPwd.includes("node_modules")) {
+    const [_workspaceRoot, nodeModulesPath, _currentProjectPath] = currentPwd.split("web");
+    workspaceRoot = path.join(_workspaceRoot, "web", nodeModulesPath);
+    currentProjectPath = _currentProjectPath;
   } else {
-    const [_workspaceRoot, _currentProjectPath] = currentPwd.split('web')
-    workspaceRoot = _workspaceRoot
-    currentProjectPath = _currentProjectPath
+    const [_workspaceRoot, _currentProjectPath] = currentPwd.split("web");
+    workspaceRoot = _workspaceRoot;
+    currentProjectPath = _currentProjectPath;
   }
-  const distPath = path.join(workspaceRoot, 'web', 'dist', currentProjectPath)
+  const distPath = path.join(workspaceRoot, "web", "dist", currentProjectPath);
 
   try {
-    await fs.mkdir(distPath, {recursive: true})
-  } catch { /* ignore */
+    await fs.mkdir(distPath, { recursive: true });
+  } catch {
+    /* ignore */
   }
 
   const versionData = await getVersionData();
   const versionJson = JSON.stringify(versionData, null, 2);
-  const versionFile = path.join(distPath, 'version.json');
+  const versionFile = path.join(distPath, "version.json");
   await fs.writeFile(versionFile, versionJson);
-}
+};
 
 versionLib().then(() => {
-  console.log('Versioning complete');
+  console.log("Versioning complete");
 });

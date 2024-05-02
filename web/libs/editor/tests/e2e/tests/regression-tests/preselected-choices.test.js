@@ -1,8 +1,8 @@
-const assert = require('assert');
+const assert = require("assert");
 
-Feature('Preselected choices');
+Feature("Preselected choices");
 
-Scenario('Make a duplicate of annotation with preselected choices', async ({ I, LabelStudio, AtTopbar }) => {
+Scenario("Make a duplicate of annotation with preselected choices", async ({ I, LabelStudio, AtTopbar }) => {
   const params = {
     config: `
 <View>
@@ -13,26 +13,28 @@ Scenario('Make a duplicate of annotation with preselected choices', async ({ I, 
   </Choices>
 </View>`,
     data: {
-      text: 'Some text',
+      text: "Some text",
     },
-    annotations: [{
-      id: 'test',
-      result: [
-        {
-          from_name: 'choices',
-          id: 'mDp7Hpbw6_',
-          origin: 'manual',
-          to_name: 'text',
-          type: 'choices',
-          value: {
-            choices: ['Option 2'],
+    annotations: [
+      {
+        id: "test",
+        result: [
+          {
+            from_name: "choices",
+            id: "mDp7Hpbw6_",
+            origin: "manual",
+            to_name: "text",
+            type: "choices",
+            value: {
+              choices: ["Option 2"],
+            },
           },
-        },
-      ],
-    }],
+        ],
+      },
+    ],
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   LabelStudio.init(params);
   // Try to create copy of current annotation
   AtTopbar.click('[aria-label="Copy Annotation"]');
@@ -40,7 +42,7 @@ Scenario('Make a duplicate of annotation with preselected choices', async ({ I, 
 
   // Make sure there are no results other than the copied ones
   assert.deepStrictEqual(duplicateResult.length, 1);
-  assert.deepStrictEqual(duplicateResult[0].value.choices, ['Option 2']);
+  assert.deepStrictEqual(duplicateResult[0].value.choices, ["Option 2"]);
 
   // Create new annotation
   I.click('[aria-label="Annotations List Toggle"]');
@@ -49,10 +51,10 @@ Scenario('Make a duplicate of annotation with preselected choices', async ({ I, 
 
   // Check that there is only the result come from selecting by default
   assert.deepStrictEqual(annotationWithPresetValues.length, 1);
-  assert.deepStrictEqual(annotationWithPresetValues[0].value.choices, ['Option 1']);
+  assert.deepStrictEqual(annotationWithPresetValues[0].value.choices, ["Option 1"]);
 });
 
-Scenario('Make a duplicate of empty annotation with preselected choices', async ({ I, LabelStudio, AtTopbar }) => {
+Scenario("Make a duplicate of empty annotation with preselected choices", async ({ I, LabelStudio, AtTopbar }) => {
   const params = {
     config: `
 <View>
@@ -63,15 +65,17 @@ Scenario('Make a duplicate of empty annotation with preselected choices', async 
   </Choices>
 </View>`,
     data: {
-      text: 'Some text',
+      text: "Some text",
     },
-    annotations: [{
-      id: 'test',
-      result: [],
-    }],
+    annotations: [
+      {
+        id: "test",
+        result: [],
+      },
+    ],
   };
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   LabelStudio.init(params);
   // Try to create copy of current annotation
   AtTopbar.click('[aria-label="Copy Annotation"]');
@@ -87,5 +91,5 @@ Scenario('Make a duplicate of empty annotation with preselected choices', async 
 
   // Check that there is only the result come from selecting by default
   assert.deepStrictEqual(annotationWithPresetValues.length, 1);
-  assert.deepStrictEqual(annotationWithPresetValues[0].value.choices, ['Option 1']);
+  assert.deepStrictEqual(annotationWithPresetValues[0].value.choices, ["Option 1"]);
 });

@@ -1,19 +1,19 @@
-const Helpers = require('./helpers');
-const Asserts = require('../utils/asserts');
-const assert = require('assert');
+const Helpers = require("./helpers");
+const Asserts = require("../utils/asserts");
+const assert = require("assert");
 
-Feature('Empty labels');
+Feature("Empty labels");
 
-const { examples, Utils } = require('../examples/');
+const { examples, Utils } = require("../examples/");
 
 function isLabelType(type) {
-  return type.toLowerCase().endsWith('labels');
+  return type.toLowerCase().endsWith("labels");
 }
 function isLabels(val, key) {
   return isLabelType(key);
 }
 
-examples.forEach(example => {
+examples.forEach((example) => {
   const { annotations, config, data, result = annotations[0].result, title } = example;
 
   Scenario(`Nonexistent label -> ${title}`, async ({ I, LabelStudio, AtSidebar, AtImageView, AtAudioView }) => {
@@ -23,24 +23,24 @@ examples.forEach(example => {
 
     let { result = annotations[0].result } = example;
 
-    result = result.filter(res => isLabelType(res.type));
-    const params = { annotations: [{ id: 'test', result }], data };
+    result = result.filter((res) => isLabelType(res.type));
+    const params = { annotations: [{ id: "test", result }], data };
     const configTree = Utils.parseXml(config);
 
-    Utils.xmlFilterNodes(configTree, node => {
-      return !node['#name'].toLowerCase().endsWith('label');
+    Utils.xmlFilterNodes(configTree, (node) => {
+      return !node["#name"].toLowerCase().endsWith("label");
     });
     params.config = Utils.renderXml(configTree);
     const regionsCount = Utils.countRegionsInResult(result);
 
-    I.amOnPage('/');
+    I.amOnPage("/");
     LabelStudio.init(params);
     AtSidebar.seeRegions(regionsCount);
 
-    if (Utils.xmlTreeHasTag(configTree, 'Image')) {
+    if (Utils.xmlTreeHasTag(configTree, "Image")) {
       AtImageView.waitForImage();
     }
-    if (Utils.xmlFindBy(configTree, node => node['#name'] === 'Audio')) {
+    if (Utils.xmlFindBy(configTree, (node) => node["#name"] === "Audio")) {
       await AtAudioView.waitForAudio();
     }
 
@@ -48,7 +48,7 @@ examples.forEach(example => {
       const restored = await LabelStudio.serialize();
 
       Asserts.notDeepEqualWithTolerance(result, restored, 1);
-      for (let i = result.length; i--;) {
+      for (let i = result.length; i--; ) {
         Asserts.deepEqualWithTolerance(Helpers.omitBy(result[i], isLabels), restored[i], 1);
       }
     }
@@ -61,26 +61,26 @@ examples.forEach(example => {
       ff_front_dev_2715_audio_3_280722_short: true,
     });
 
-    result = result.filter(res => isLabelType(res.type));
-    const params = { annotations: [{ id: 'test', result }], data };
+    result = result.filter((res) => isLabelType(res.type));
+    const params = { annotations: [{ id: "test", result }], data };
     const configTree = Utils.parseXml(config);
 
-    Utils.xmlForEachNode(configTree, node => {
-      if (node['#name'].toLowerCase().endsWith('labels') && node.$) {
-        node.$.name = 'Not-' + node.$.name;
+    Utils.xmlForEachNode(configTree, (node) => {
+      if (node["#name"].toLowerCase().endsWith("labels") && node.$) {
+        node.$.name = `Not-${node.$.name}`;
       }
     });
     params.config = Utils.renderXml(configTree);
     const regionsCount = Utils.countRegionsInResult(result);
 
-    I.amOnPage('/');
+    I.amOnPage("/");
     LabelStudio.init(params);
     AtSidebar.seeRegions(regionsCount);
 
-    if (Utils.xmlTreeHasTag(configTree, 'Image')) {
+    if (Utils.xmlTreeHasTag(configTree, "Image")) {
       AtImageView.waitForImage();
     }
-    if (Utils.xmlFindBy(configTree, node => node['#name'] === 'Audio')) {
+    if (Utils.xmlFindBy(configTree, (node) => node["#name"] === "Audio")) {
       await AtAudioView.waitForAudio();
     }
 
@@ -88,10 +88,10 @@ examples.forEach(example => {
       const restored = await LabelStudio.serialize();
 
       Asserts.notDeepEqualWithTolerance(result, restored, 1);
-      for (let i = result.length; i--;) {
+      for (let i = result.length; i--; ) {
         Asserts.deepEqualWithTolerance(
-          Helpers.omitBy(result[i], (val, key) => key === 'from_name' || isLabels(val, key)),
-          Helpers.omitBy(restored[i], (val, key) => key === 'from_name' || isLabels(val, key)),
+          Helpers.omitBy(result[i], (val, key) => key === "from_name" || isLabels(val, key)),
+          Helpers.omitBy(restored[i], (val, key) => key === "from_name" || isLabels(val, key)),
           1,
         );
       }
@@ -99,27 +99,27 @@ examples.forEach(example => {
   });
 
   Scenario(`Nonexistent from_name -> ${title}`, async ({ I, LabelStudio, AtTopbar, AtSidebar }) => {
-    const params = { annotations: [{ id: 'test', result }], data };
+    const params = { annotations: [{ id: "test", result }], data };
     const configTree = Utils.parseXml(config);
 
-    Utils.xmlFilterNodes(configTree, node => {
-      return !node['#name'].toLowerCase().endsWith('labels');
+    Utils.xmlFilterNodes(configTree, (node) => {
+      return !node["#name"].toLowerCase().endsWith("labels");
     });
     params.config = Utils.renderXml(configTree);
     const regionsCount = Utils.countRegionsInResult(result);
 
-    I.amOnPage('/');
+    I.amOnPage("/");
     LabelStudio.init(params);
-    AtTopbar.see('Update');
+    AtTopbar.see("Update");
     AtSidebar.dontSeeRegions(regionsCount);
     AtSidebar.dontSeeRegions();
   });
 });
 
-const SINGLE_TYPE = 'single';
-const MULTIPLE_TYPE = 'multiple';
+const SINGLE_TYPE = "single";
+const MULTIPLE_TYPE = "multiple";
 
-[SINGLE_TYPE, MULTIPLE_TYPE].forEach(type => {
+[SINGLE_TYPE, MULTIPLE_TYPE].forEach((type) => {
   Scenario(`Making labels empty -> choice="${type}"`, async ({ I, LabelStudio, AtSidebar, AtAudioView, AtLabels }) => {
     async function expectSelectedLabels(expectedNum) {
       const selectedLabelsNum = await I.grabNumberOfVisibleElements(AtLabels.locateSelected());
@@ -132,9 +132,9 @@ const MULTIPLE_TYPE = 'multiple';
 
       assert.strictEqual(restored[0].value.labels.length, expectedLength);
       await expectSelectedLabels(expectSelectedNum);
-      I.pressKey(['u']);
+      I.pressKey(["u"]);
       await expectSelectedLabels(0);
-      I.click(locate('.lsf-region-item'));
+      I.click(locate(".lsf-region-item"));
       await expectSelectedLabels(expectSelectedNum);
     }
     async function clickLabelWithSelectedExpection(labelNumber, expectSelectedNum) {
@@ -142,16 +142,16 @@ const MULTIPLE_TYPE = 'multiple';
       await expectSelectedLabels(expectSelectedNum);
     }
 
-    const audioRegions = require('../examples/audio-regions');
+    const audioRegions = require("../examples/audio-regions");
     const { annotations, config, data } = audioRegions;
-    let { result = annotations[0].result } = require('../examples/audio-regions');
+    let { result = annotations[0].result } = require("../examples/audio-regions");
 
-    result = result.filter(r => isLabelType(r.type)).filter((r, idx) => !idx);
-    const params = { annotations: [{ id: 'test', result }], data, config };
+    result = result.filter((r) => isLabelType(r.type)).filter((r, idx) => !idx);
+    const params = { annotations: [{ id: "test", result }], data, config };
     const configTree = Utils.parseXml(config);
 
-    Utils.xmlForEachNode(configTree, node => {
-      if (node['#name'].toLowerCase().endsWith('labels') && node.$) {
+    Utils.xmlForEachNode(configTree, (node) => {
+      if (node["#name"].toLowerCase().endsWith("labels") && node.$) {
         node.$.allowempty = true;
         node.$.choice = type;
       }
@@ -160,13 +160,13 @@ const MULTIPLE_TYPE = 'multiple';
 
     const regionsCount = Utils.countRegionsInResult(result);
 
-    I.amOnPage('/');
+    I.amOnPage("/");
     LabelStudio.init(params);
     await AtAudioView.waitForAudio();
     AtSidebar.seeRegions(regionsCount);
 
-    I.click(locate('.lsf-region-item'));
-    AtLabels.clickLabel('1');
+    I.click(locate(".lsf-region-item"));
+    AtLabels.clickLabel("1");
 
     const restored = await LabelStudio.serialize();
 
@@ -187,7 +187,7 @@ const MULTIPLE_TYPE = 'multiple';
     await clickLabelWithLengthExpection(2, 0, 1);
     await clickLabelWithLengthExpection(1, 0, 1);
 
-    I.pressKey(['u']);
+    I.pressKey(["u"]);
 
     await clickLabelWithSelectedExpection(3, 1);
     switch (type) {
@@ -206,23 +206,23 @@ const MULTIPLE_TYPE = 'multiple';
   });
 });
 
-Scenario('Consistency of empty labels', async ({ I, LabelStudio, AtSidebar, AtImageView, AtLabels }) => {
-  const { config, data } = require('../examples/image-bboxes');
-  const params = { annotations: [{ id: 'test', result: [] }], data };
+Scenario("Consistency of empty labels", async ({ I, LabelStudio, AtSidebar, AtImageView, AtLabels }) => {
+  const { config, data } = require("../examples/image-bboxes");
+  const params = { annotations: [{ id: "test", result: [] }], data };
   const configTree = Utils.parseXml(config);
 
-  Utils.xmlForEachNode(configTree, node => {
-    if (node['#name'].toLowerCase().endsWith('labels') && node.$) {
+  Utils.xmlForEachNode(configTree, (node) => {
+    if (node["#name"].toLowerCase().endsWith("labels") && node.$) {
       node.$.allowempty = true;
     }
   });
   params.config = Utils.renderXml(configTree);
 
-  I.amOnPage('/');
+  I.amOnPage("/");
   LabelStudio.init(params);
   AtSidebar.seeRegions(0);
   AtImageView.waitForImage();
-  AtLabels.clickLabel('1');
+  AtLabels.clickLabel("1");
   AtImageView.dragKonva(200, 200, 100, 100);
   const shapesNum = await AtImageView.countKonvaShapes();
 

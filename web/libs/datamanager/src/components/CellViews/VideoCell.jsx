@@ -8,4 +8,3 @@ VideoCell.style = {
   width: 240,
   minWidth: 240,
 };
-
