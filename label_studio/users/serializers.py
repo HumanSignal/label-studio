@@ -85,6 +85,15 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             'phone',
             'active_organization',
             'allow_newsletters',
+            "advocate",
+            "current_lifestyle",
+            "roles",
+            "advocacy_approach",
+            "advocacy_focus",
+            "advocacy_intersectionality",
+            "advocacy_rights",
+            "advocacy_diplomacy", 
+            "advocacy_empiricism"
         )
 
 
@@ -96,7 +105,15 @@ class BaseUserSerializerUpdate(BaseUserSerializer):
 class UserSimpleSerializer(BaseUserSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'avatar')
+        fields = ('id', 'first_name', 'last_name', 'email', 'avatar', "advocate",
+            "current_lifestyle",
+            "roles",
+            "advocacy_approach",
+            "advocacy_focus",
+            "advocacy_intersectionality",
+            "advocacy_rights",
+            "advocacy_diplomacy", 
+            "advocacy_empiricism")
 
 
 UserSerializer = load_func(settings.USER_SERIALIZER)

@@ -23,6 +23,7 @@ venv/
 .env
 .envrc
 # web/static
+env/
 
 deploy/license.txt
 deploy/logs/

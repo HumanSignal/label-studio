@@ -180,6 +180,36 @@ function submit_files(url, method, onSuccess) {
   });
 }
 
+
+$.fn.customSerialize = function() {
+    let serialized = [];
+    let checkboxes = {};
+
+    this.map(function() {
+        let elements = this.elements;
+        for (let i = 0; i < elements.length; i++) {
+            let field = elements[i];
+            if (!field.name || field.disabled || field.type === 'file' || field.type === 'reset' || field.type === 'submit' || field.type === 'button') continue;
+            if (field.type === 'checkbox') {
+                if (!field.checked) continue;
+                if (!checkboxes[field.name]) {
+                    checkboxes[field.name] = [];
+                }
+                checkboxes[field.name].push(field.value);
+            } else if (field.type !== 'radio' || field.checked) {
+                serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
+            }
+        }
+    });
+
+    // Add checkbox values to the serialized data
+    for (let name in checkboxes) {
+        serialized.push(encodeURIComponent(name) + "=" + encodeURIComponent(checkboxes[name].join(',')));
+    }
+
+    return serialized.join('&');
+};
+
 // Take closest form (or form by id) and submit it,
 // optional: prevent page refresh if done passed as function
 function smart_submit(done, form_id) {
@@ -195,8 +225,7 @@ function smart_submit(done, form_id) {
   var params = {
     url: $(f).attr('action'),
     type: $(f).attr('method'),
-    data: $(f).serialize(),
-
+    data: $(f).customSerialize(),
     error: function (result, textStatus, errorThrown) {
       console.log('smart_submit ajax error', result);
 
@@ -227,7 +256,6 @@ function smart_submit(done, form_id) {
     }
   };
 
-  console.log('smart_submit ajax params', params);
   $.ajax(params);
   event.preventDefault();
   return false;

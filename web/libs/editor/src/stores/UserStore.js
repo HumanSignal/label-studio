@@ -12,6 +12,15 @@ export const UserExtended = types
     avatar: types.maybeNull(types.string),
     initials: types.maybeNull(types.string),
     phone: types.maybeNull(types.string),
+    advocate: types.maybeNull(types.string),
+    current_lifestyle: types.maybeNull(types.string),
+    roles: types.maybeNull(types.string),
+    advocacy_approach: types.maybeNull(types.integer),
+    advocacy_focus: types.maybeNull(types.integer),
+    advocacy_intersectionality: types.maybeNull(types.integer),
+    advocacy_rights: types.maybeNull(types.integer),
+    advocacy_diplomacy: types.maybeNull(types.integer),
+    advocacy_empiricism: types.maybeNull(types.integer)
   })
   .preProcessSnapshot((sn) => {
     return camelizeKeys(sn ?? {});

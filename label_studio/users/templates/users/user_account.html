@@ -44,9 +44,117 @@
         <li class="field">
           <label for="">Phone</label>
           <input type="text" class="ls-input" name="phone" value="{{user.phone}}" />
-          <!-- <span>We'll send you sms with code if you change your number</span>
-          <span class="error">Incorrect phone number!</span> -->
         </li>
+        <div>
+          <label for="advocate">Are you an advocate for animals?</label><input type="radio" name="advocate" value=true checked="{{user.advocate}}">Yes</input>
+          <input type="radio" name="advocate" value=false >No</input></div>
+        <div>
+          <label for="current_lifestyle">Current Lifestyle/Diet:</label>
+          <select id="current_lifestyle" name="current_lifestyle">
+            <option value="diet_regular_meat_eater" {% if user.current_lifestyle == "diet_regular_meat_eater" %}selected{% endif %}>              Regular meat eater</option>
+            <option value="diet_occasional_meat_eater" {% if user.current_lifestyle == "diet_occasional_meat_eater" %}selected{% endif %}>Occasional meat eater</option>
+            <option value="diet_flexitarian" {% if user.current_lifestyle == "diet_flexitarian" %}selected{% endif %}>Flexitarian</option>
+            <option value="diet_vegetarian" {% if user.current_lifestyle == "diet_vegetarian" %}selected{% endif %}>Vegetarian</option>
+            <option value="diet_vegan" {% if user.current_lifestyle == "diet_vegan" %}selected{% endif %}>Vegan</option>
+            <option value="diet_other" {% if user.current_lifestyle == "diet_other" %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+        <li>
+          <label for="role">What is your role in animal advocacy?</label>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_volunteer" {% if "role_volunteer" in user.roles %}checked{% endif %}>
+            <label>Volunteer for an Animal Advocacy Organisation</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_donor" {% if "role_donor" in user.roles %}checked{% endif %}>
+            <label>Donor to an Animal Advocacy Organisation</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" value="role_staff" {% if "role_staff" in user.roles %}checked{% endif %}>
+            <label>Staff Member of an Animal Advocacy Organisation</label>
+          </div>  
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_researcher" {% if "role_researcher" in user.roles %}checked{% endif %}>
+            <label>Researcher Studying Animal Advocacy Issues</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_independent" {% if "role_independent" in user.roles %}checked{% endif %}>
+            <label>Independent Animal Advocate</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_legal" {% if "role_legal" in user.roles %}checked{% endif %}>
+            <label>Animal Lawyer or Legal Advocate</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_rescuer" {% if "role_rescuer" in user.roles %}checked{% endif %}>
+            <label>Animal Carer or Rescuer</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_influencer" {% if "role_influencer" in user.roles %}checked{% endif %}>
+            <label>Vegan Influencer, Blogger or Content Creator</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_company_owner" {% if "role_company_owner" in user.roles %}checked{% endif %}>
+            <label>Owner of a Vegan orCruelty-Free Company</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_company_staff" {% if "role_company_staff" in user.roles %}checked{% endif %}>
+            <label>Staff Member of a Vegan or Cruelty-Free Company</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_investor" {% if "role_investor" in user.roles %}checked{% endif %}>
+            <label>Investor in a Vegan or Cruelty-Free Company</label>
+          </div>
+          <div class="checkboxes">
+            <input type="checkbox" name="roles" id="roles" value="role_other" {% if "role_other" in user.roles %}checked{% endif %}>
+            <label>Other</label>
+          </div>
+        </li>
+        <div>
+          <label for="">What is your approach to animal advocacy?</label>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="1" max="5" class="slider" name="advocacy_approach" id="advocacy_approach" value="{{user.advocacy_approach}}">
+        </div>
+        <div class="slider-labels">
+          <span>Incrementalist</span>
+          <span>Abolitionist</span>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="1" max="5"  class="slider" name="advocacy_focus" id="advocacy_focus" value="{{user.advocacy_focus}}">
+        </div>
+        <div class="slider-labels">
+          <span>Individual</span>
+          <span>Institutional</span>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="1" max="5"  class="slider" name="advocacy_intersectionality" id="advocacy_intersectionality" value="{{user.advocacy_intersectionality}}">
+        </div>
+        <div class="slider-labels">
+          <span>Solely on Animal Activisim</span>
+          <span>Intersectional</span>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="1" max="5" class="slider" name="advocacy_rights" id="advocacy_rights" value="{{user.advocacy_rights}}">
+        </div>
+        <div class="slider-labels">
+          <span>Focus on welfare</span>
+          <span>Focus on rights</span>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="1" max="5" class="slider" name="advocacy_diplomacy" id="advocacy_diplomacy" value="{{user.advocacy_diplomacy}}">
+        </div>
+        <div class="slider-labels">
+          <span>Diplomatic</span>
+          <span>Confrontational</span>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="1" max="5"  class="slider" name="advocacy_empiricism" id="advocacy_empiricism" value="{{user.advocacy_empiricism}}">
+        </div>
+        <div class="slider-labels">
+          <span>Intuitive Judgements on Effectiveness</span>
+          <span>Empirical Judgements on Effectiveness</span>
+        </div>
       </ul>
       <div class="user-some-actions">
 

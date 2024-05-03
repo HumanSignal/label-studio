@@ -9,6 +9,7 @@ from core.utils.db import fast_first
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -90,7 +91,16 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     last_name = models.CharField(_('last name'), max_length=256, blank=True)
     phone = models.CharField(_('phone'), max_length=256, blank=True)
     avatar = models.ImageField(upload_to=hash_upload, blank=True)
-
+    advocate = models.BooleanField(default=True)
+    current_lifestyle = models.CharField(_('current lifestyle'), max_length=256, blank=True)
+    roles = models.CharField(_('roles'), max_length=1024, blank=True)
+    advocacy_approach = models.IntegerField(default=3)
+    advocacy_focus = models.IntegerField(default=3)
+    advocacy_intersectionality = models.IntegerField(default=3)
+    advocacy_rights = models.IntegerField(default=3)
+    advocacy_diplomacy = models.IntegerField(default=3)
+    advocacy_empiricism = models.IntegerField(default=3)
+    
     is_staff = models.BooleanField(
         _('staff status'), default=False, help_text=_('Designates whether the user can log into this admin site.')
     )
