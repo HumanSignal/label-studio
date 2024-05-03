@@ -869,7 +869,7 @@ export default observer(
 
     componentWillUnmount() {
       this.detachObserver();
-      window.removeEventListener("resize", this.snResize);
+      window.removeEventListener("resize", this.onResize);
 
       hotkeys.removeDescription("shift");
     }
