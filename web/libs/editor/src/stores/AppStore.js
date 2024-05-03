@@ -858,13 +858,13 @@ export default types
     function enrichUsers(users) {
       const oldUsers = getSnapshot(self.users);
       const oldUsersMap = {};
-      oldUsers.forEach(user => {
+      oldUsers.forEach((user) => {
         oldUsersMap[user.id] = user;
       });
-      const newUsers = users.map(user => {
+      const newUsers = users.map((user) => {
         return { ...oldUsersMap[user.id], ...user };
       });
-      self.setUsers(uniqBy([...newUsers, ...oldUsers], 'id'));
+      self.setUsers(uniqBy([...newUsers, ...oldUsers], "id"));
     }
 
     return {
