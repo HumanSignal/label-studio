@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-851'",
-  "commit": "42b15dcf633900902686551b308b3ff658ae3014",
-  "date": "2024-05-02T19:54:13.000Z",
-  "branch": "fb-leap-851"
+  "message": "fix: OPTIC-546: Empty title in cloud storages lead to totally broken project settings page",
+  "commit": "dee1d4b0a76c98f36e84f84729431ac253dd9ab7",
+  "date": "2024-05-03T13:14:58.000Z",
+  "branch": "fb-OPTIC-546/storage-title"
 }
