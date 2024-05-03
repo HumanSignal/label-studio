@@ -49,7 +49,7 @@ export const Relations = {
       .eq(idx)
       .trigger("mouseover")
       .find(".lsf-relations__actions")
-      .closest(".lsf-relations__action")
+      .find('button[aria-label="Hide Relation"]')
       .click({ force: true });
   },
 };

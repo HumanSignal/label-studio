@@ -164,7 +164,7 @@ describe("Relations: Hide/Show all relations", () => {
     Relations.hasHiddenRelations(0);
   });
 
-  it("should hide rest relations", () => {
+  it("should show rest relations", () => {
     Sidebar.toggleRegionSelection(0);
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
@@ -180,9 +180,9 @@ describe("Relations: Hide/Show all relations", () => {
     ImageView.clickAtRelative(0.51, 0.06);
     Relations.hasRelations(3);
     Relations.toggleRelationVisibility(1);
+    Relations.hasHiddenRelations(1);
+    Relations.showAllRelationsButton.click({ force: true });
     Relations.hasHiddenRelations(0);
-    Relations.hideAllRelationsButton.click({ force: true });
-    Relations.hasHiddenRelations(3);
   });
 
   it("should have tooltip for hide action", () => {
