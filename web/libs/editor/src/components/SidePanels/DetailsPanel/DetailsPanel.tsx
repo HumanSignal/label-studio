@@ -184,9 +184,9 @@ const SelectedRegion: FC<{ region: any }> = observer(({ region }) => {
   return <RegionItem region={region} mainDetails={RegionDetailsMain} metaDetails={RegionDetailsMeta} />;
 });
 
-export const Comments = observer(CommentsTab);
-export const History = observer(HistoryTab);
-export const Relations = observer(RelationsTab);
-export const Info = observer(InfoTab);
+export const Comments = CommentsTab;
+export const History = HistoryTab;
+export const Relations = RelationsTab;
+export const Info = InfoTab;
 export const Details = observer(DetailsComponent);
 export const DetailsPanel = observer(DetailsPanelComponent);
