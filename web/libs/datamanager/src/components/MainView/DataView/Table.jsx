@@ -73,7 +73,7 @@ export const DataView = injector(
 
     const isItemLoaded = useCallback(
       (data, index) => {
-        const rowExists = !!data[index];
+        const rowExists = index < data.length && !!data[index];
         const hasNextPage = dataStore.hasNextPage;
 
         return !hasNextPage || rowExists;
