@@ -262,6 +262,8 @@ Parameters specific to the `rqworkers` service of your Label Studio Enterprise d
 | `rqworker.rbac.rules`                            | Custom RBAC rules to set for rqworker service		                                                 | `[]`                                   |
 | `rqworker.cmdWrapper`                            | Additional commands to run prior to starting App. Useful to run wrappers before startup command | `""`                                   |
 
+<div class="enterprise-only">
+
 ## Label Studio Enterprise parameters
 
 | Parameter                                 | Description                                                                        | Default   |
@@ -269,6 +271,8 @@ Parameters specific to the `rqworkers` service of your Label Studio Enterprise d
 | `enterprise.enabled`                      | Enable Enterprise features                                                         | `false`   |
 | `enterprise.enterpriseLicense.secretName` | Name of an existing secret holding the Label Studio Enterprise license information | `""`      |
 | `enterprise.enterpriseLicense.secretKey`  | Key of an existing secret holding the enterprise license information               | `license` |
+
+</div>
 
 ## Sub-charts parameters
 
