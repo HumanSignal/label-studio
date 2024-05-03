@@ -126,6 +126,12 @@ You can disable data collection by setting the environment variable `COLLECT_AN
 
 </div>
 
+<div class="enterprise-only">
+
+For on-prem installations, you can disable data collection by setting the environment variable `COLLECT_ANALYTICS` to `False`. 
+
+</div>
+
 ## Add self-signed certificate to trusted root store
 
 <div class="code-tabs">
