@@ -1,6 +1,6 @@
 {
-  "message": "typo in method name",
-  "commit": "967948ea7bff0fc608cd82547ee418685e2f2277",
-  "date": "2024-05-03T13:05:10.000Z",
+  "message": "use debounce on video with a check to ensure it does not infinite loop",
+  "commit": "154c8192beea721a58940cbc9fc911fd60581f1e",
+  "date": "2024-05-04T15:25:39.000Z",
   "branch": "fb-optic-669"
 }
