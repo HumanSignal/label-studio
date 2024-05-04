@@ -21,6 +21,7 @@ import { Block, Elem } from "../../../utils/bem";
 import { FF_DEV_2715, isFF } from "../../../utils/feature-flags";
 import ResizeObserver from "../../../utils/resize-observer";
 import { clamp, isDefined } from "../../../utils/utilities";
+import { debounce } from "../../../utils/debounce";
 import "./Video.styl";
 import { VideoRegions } from "./VideoRegions";
 
@@ -126,6 +127,8 @@ const HtxVideoView = ({ item, store }) => {
   const [position, _setPosition] = useState(1);
 
   const [videoSize, setVideoSize] = useState(null);
+  const videoSizeRef = useRef(videoSize);
+  videoSizeRef.current = videoSize;
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0, ratio: 1 });
   const [{ zoom, pan }, { setZoomAndPan, setZoom, setPan }] = useZoom(
     videoDimensions,
@@ -184,15 +187,14 @@ const HtxVideoView = ({ item, store }) => {
   }, []);
 
   useEffect(() => {
-    const onResize = () => {
-      requestAnimationFrame(() => {
-        const block = videoContainerRef.current;
+    const onResize = debounce(() => {
+      const block = videoContainerRef.current;
+      const previousVideoSize = videoSizeRef.current ?? [0, 0];
 
-        if (block) {
-          setVideoSize([block.clientWidth, block.clientHeight]);
-        }
-      });
-    };
+      if (block && (previousVideoSize[0] !== block.clientWidth || previousVideoSize[1] !== block.clientHeight)) {
+        setVideoSize([block.clientWidth, block.clientHeight]);
+      }
+    }, 16);
 
     const onKeyDown = (e) => {
       if (e.code.startsWith("Shift")) {

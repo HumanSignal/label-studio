@@ -1,5 +1,6 @@
 import { forwardRef, memo, type MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
+import { debounce } from "../../utils/debounce";
 import { FF_LSDV_4711, isFF } from "../../utils/feature-flags";
 import { clamp, isDefined } from "../../utils/utilities";
 import "./VideoCanvas.styl";
@@ -341,11 +342,11 @@ export const VideoCanvas = memo(
     }, [filters, zoom, pan, canvasWidth, canvasHeight]);
 
     useEffect(() => {
-      const observer = new ResizeObserver(() => {
-        requestAnimationFrame(() => {
-          props.onResize?.(videoDimensions);
-        });
-      });
+      const onResize = debounce(() => {
+        props.onResize?.(videoDimensions);
+      }, 16);
+
+      const observer = new ResizeObserver(onResize);
 
       observer.observe(rootRef.current!);
 
