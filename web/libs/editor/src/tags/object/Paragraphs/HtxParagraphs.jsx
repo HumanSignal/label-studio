@@ -499,7 +499,7 @@ class HtxParagraphsView extends Component {
       const minHeight = 100;
 
       if (container) this.myRef.current.style.maxHeight = `${height < minHeight ? minHeight : height}px`;
-    })
+    });
   };
 
   _resizeObserver = new ResizeObserver(this._handleScrollContainerHeight);

@@ -459,7 +459,7 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden,
 
         setViewportSizeMatch(checkContentFit());
         setPanelMaxWidth(rootRef.current.clientWidth * 0.4);
-      })
+      });
     });
 
     if (root) {

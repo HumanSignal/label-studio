@@ -1,14 +1,14 @@
-import type {WaveformAudio} from "../Media/WaveformAudio";
-import {averageMinMax, clamp, debounce, defaults, warn} from "../Common/Utils";
-import type {Waveform, WaveformOptions} from "../Waveform";
-import {type CanvasCompositeOperation, Layer, type RenderingContext} from "./Layer";
-import {Events} from "../Common/Events";
-import {LayerGroup} from "./LayerGroup";
-import {Playhead} from "./PlayHead";
-import {rgba} from "../Common/Color";
-import type {Cursor} from "../Cursor/Cursor";
-import type {Padding} from "../Common/Style";
-import type {TimelineOptions} from "../Timeline/Timeline";
+import type { WaveformAudio } from "../Media/WaveformAudio";
+import { averageMinMax, clamp, debounce, defaults, warn } from "../Common/Utils";
+import type { Waveform, WaveformOptions } from "../Waveform";
+import { type CanvasCompositeOperation, Layer, type RenderingContext } from "./Layer";
+import { Events } from "../Common/Events";
+import { LayerGroup } from "./LayerGroup";
+import { Playhead } from "./PlayHead";
+import { rgba } from "../Common/Color";
+import type { Cursor } from "../Cursor/Cursor";
+import type { Padding } from "../Common/Style";
+import type { TimelineOptions } from "../Timeline/Timeline";
 import "./Loader";
 
 // Amount of data samples to buffer on either side of the renderable area

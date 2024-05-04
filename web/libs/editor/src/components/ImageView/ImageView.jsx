@@ -126,23 +126,23 @@ const SelectionBorders = observer(({ item, selectionArea }) => {
 
   const points = bbox
     ? [
-      {
-        x: bbox.left,
-        y: bbox.top,
-      },
-      {
-        x: bbox.right,
-        y: bbox.top,
-      },
-      {
-        x: bbox.left,
-        y: bbox.bottom,
-      },
-      {
-        x: bbox.right,
-        y: bbox.bottom,
-      },
-    ]
+        {
+          x: bbox.left,
+          y: bbox.top,
+        },
+        {
+          x: bbox.right,
+          y: bbox.top,
+        },
+        {
+          x: bbox.left,
+          y: bbox.bottom,
+        },
+        {
+          x: bbox.right,
+          y: bbox.bottom,
+        },
+      ]
     : [];
   const ANCHOR_SIZE = isFF(FF_DEV_3793) ? 6 / item.stageScale : 6;
 
@@ -1051,7 +1051,7 @@ export default observer(
                 onMouseDown={this.handleMouseDown}
                 onMouseMove={this.handleMouseMove}
                 onMouseUp={this.handleMouseUp}
-                onWheel={item.zoom ? this.handleZoom : () => { }}
+                onWheel={item.zoom ? this.handleZoom : () => {}}
               />
             ) : null}
           </div>

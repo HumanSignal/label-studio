@@ -191,7 +191,7 @@ const HtxVideoView = ({ item, store }) => {
         if (block) {
           setVideoSize([block.clientWidth, block.clientHeight]);
         }
-      })
+      });
     };
 
     const onKeyDown = (e) => {

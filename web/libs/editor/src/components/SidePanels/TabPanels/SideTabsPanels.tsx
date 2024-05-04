@@ -500,7 +500,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
         viewportSize.current.height = clientHeight ?? 0;
         setViewportSizeMatch(checkContentFit());
         setPanelMaxWidth(rootRef.current.clientWidth * 0.4);
-      })
+      });
     });
 
     if (root) {
