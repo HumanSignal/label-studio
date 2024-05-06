@@ -84,8 +84,13 @@ SILENCED_SYSTEM_CHECKS = []
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
+DOMAIN_FROM_REQUEST = get_bool_env('DOMAIN_FROM_REQUEST', False)
+
 if HOSTNAME:
-    if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
+    if DOMAIN_FROM_REQUEST and not HOSTNAME.startswith('/'):
+        # in this mode HOSTNAME can be only subpath
+        raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
+    else if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
         logger.info(
             '! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s', HOSTNAME
         )
@@ -103,13 +108,6 @@ if HOSTNAME:
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
                 logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
-
-DOMAIN_FROM_REQUEST = get_bool_env('DOMAIN_FROM_REQUEST', False)
-
-if DOMAIN_FROM_REQUEST:
-    # in this mode HOSTNAME can be only subpath
-    if HOSTNAME and not HOSTNAME.startswith('/'):
-        raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
 
 INTERNAL_PORT = '8080'
 
