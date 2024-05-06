@@ -1,6 +1,6 @@
 {
-  "message": "Apply biome check corrections",
-  "commit": "a656595e120d5e8ba3dd76c7d092de5e2c7476d7",
-  "date": "2024-05-03T15:17:33.000Z",
-  "branch": "fb-leap-921/annotation-history"
+  "message": "Merge branch 'fb-optic-669' of github.com:heartexlabs/label-studio into fb-optic-669",
+  "commit": "badd45f7edecac446c7592e38dddcba33fc5a14b",
+  "date": "2024-05-06T14:31:18.000Z",
+  "branch": "fb-optic-669"
 }

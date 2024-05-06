@@ -78,11 +78,17 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
     let lastHeight = 0;
 
     return new ResizeObserver((entities) => {
-      if (!entities?.[0]?.contentRect || entities?.[0]?.contentRect?.height === lastHeight) {
-        return;
-      }
-      lastHeight = entities?.[0]?.contentRect?.height || 1;
-      setHeight(lastHeight);
+      requestAnimationFrame(() => {
+        if (!entities?.[0]?.contentRect || entities?.[0]?.contentRect?.height === lastHeight) {
+          return;
+        }
+        lastHeight = entities?.[0]?.contentRect?.height || 1;
+
+        // ensure the component is still mounted
+        if (blockRef.current) {
+          setHeight(lastHeight);
+        }
+      });
     });
   }, []);
 
