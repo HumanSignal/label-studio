@@ -96,6 +96,8 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js" defer></script>
 </head>
 <body class="<%- 'page-tier-' + theme.tier %>">
+  
+  
 
   <% if(isEnterpriseTheme) {%>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K6H522B"
@@ -192,6 +194,13 @@
       </div>
     </div>
   </main>
+
+  <script>
+    var savedScrollPosition = localStorage.getItem('labelstudio_scrollPosition');
+      if (savedScrollPosition) {
+        document.querySelector(".page-sidebar").scrollTop = savedScrollPosition;
+      }
+  </script>
 
   <% if (page.permalink.includes("concat.html") || page.permalink.includes("release_notes.html")) { %>
     <%- js('js/collapse.js') %>

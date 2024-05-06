@@ -91,4 +91,8 @@
     const toggleQuicNavButton = document.querySelector(".page-header-content-switcher");
     toggleQuicNavButton.addEventListener("click", toggleQuickNav)
  }
+
+  pageSidebar.addEventListener('scroll', function() {
+    localStorage.setItem('labelstudio_scrollPosition', this.scrollTop);
+  });
 })();
