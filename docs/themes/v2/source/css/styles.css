@@ -32,12 +32,12 @@ html {
   --color-gray-100: #F9F8F6;
   --color-white: #FDFDFC;
 
-  --font-family-primary: "Hellix", sans-serif;
-  --font-family-secondary: "Hellix", sans-serif;
+  --font-family-primary: "Circular", sans-serif;
+  --font-family-secondary: "Circular", sans-serif;
   --font-family-monospace: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 
   color: var(--color-gray-900);
-  font-family: var(--font-family-secondary);
+  font-family: var(--font-family-primary);
 }
 
 html.js-enhanced {
@@ -119,7 +119,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5em;
-  font-family: var(--font-family-secondary);
+  font-family: var(--font-family-primary);
 }
 
 .page-header nav>button svg:last-child {
@@ -224,7 +224,7 @@ body {
   padding: 0 0 .75rem;
   display: block;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .page-header-content-switcher .active {
@@ -443,7 +443,7 @@ main {
 
 .page-sidebar .page-sidebar-list [aria-current="page"] {
   color: var(--color-gray-900);
-  font-weight: 600;
+  font-weight: 500;
   background: var(--color-white);
   border: 1px solid var(--color-gray-300);
   border-radius: .25rem;
@@ -536,7 +536,7 @@ main {
 
 .page-sidebar .page-sidebar-children-list [aria-current="page"] {
   color: var(--color-gray-900);
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   border-radius: 0;
   background: none;
@@ -821,7 +821,7 @@ dl {
 
 strong,
 b {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .Heading a {
@@ -848,7 +848,7 @@ b {
   --max-size: 3.125rem;
   /* 56px */
   --line-height: 106%;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .Heading.Large,
@@ -858,13 +858,13 @@ b {
   --max-size: 2.25rem;
   /* 36px */
   --line-height: 106%;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .content-markdown h3 {
   padding-bottom: 0.25em;
   border-bottom: 1px solid var(--color-gray-300);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 h1,
@@ -873,7 +873,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .Heading.Small,
@@ -883,7 +883,7 @@ h6 {
   --max-size: 1.5rem;
   /* 28px */
   --line-height: 1.07;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .Heading.XSmall,
@@ -895,7 +895,7 @@ h6 {
   --max-size: 1.25rem;
   /* 24px */
   --line-height: 100%;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .Heading.XXSmall,
@@ -907,7 +907,7 @@ h6 {
   /* 18px */
   --breakpoint: 3vw;
   --line-height: 100%;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .content-markdown h2,
@@ -955,7 +955,7 @@ h6 {
   /* 16px */
   --line-height: 1.56;
 
-  font-family: var(--font-family-secondary);
+  font-family: var(--font-family-primary);
   font-size: clamp(var(--min-size), 7vw, var(--max-size));
   color: var(--color-gray-700);
   line-height: var(--line-height);
@@ -1023,17 +1023,17 @@ ul {
 ****************************/
 
 @font-face {
-  font-family: "Hellix";
-  src: url("/fonts/Hellix-Regular.woff2") format("woff2");
+  font-family: "Circular";
+  src: url("/fonts/CircularXXTrialWeb-Regular.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Hellix";
-  src: url("/fonts/Hellix-SemiBold.woff2") format("woff2");
-  font-weight: 600;
+  font-family: "Circular";
+  src: url("/fonts/CircularXXTrialWeb-Medium.woff2") format("woff2");
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
@@ -1049,7 +1049,7 @@ ul {
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .Link svg {
@@ -1093,7 +1093,7 @@ ul {
   gap: 0.5em;
   font-family: var(--font-family-primary);
   border-radius: 10em;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   cursor: pointer;
 }
@@ -1265,7 +1265,7 @@ ul {
 .content-markdown li::marker {
   color: var(--color-gray-900);
   font-family: var(--font-family-primary);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 
@@ -1285,7 +1285,7 @@ ul {
 .content-markdown code:not(.hljs) {
   font-family: var(--font-family-monospace);
   font-size: 0.85em;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-gray-900);
   background-color: var(--color-gray-200);
   padding: 0.25em;
@@ -1309,7 +1309,7 @@ ul {
   color: var(--color-gray-900);
   padding: 0.6em;
   text-align: left;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .content-markdown table thead tr th {
@@ -1318,7 +1318,7 @@ ul {
 }
 
 .content-markdown table tbody tr td b {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .content-markdown table tbody tr:nth-child(even) {
@@ -1348,7 +1348,7 @@ ul {
 }
 
 .content-markdown .rowheader td:first-child {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .content-markdown .noheader table tbody {
@@ -2009,7 +2009,7 @@ Footer
   /* 14px */
   --line-height: 1.41;
 
-  font-family: var(--font-family-secondary);
+  font-family: var(--font-family-primary);
   font-size: clamp(var(--min-size), 7vw, var(--max-size));
   color: var(--color-gray-900);
   line-height: var(--line-height);
@@ -2019,7 +2019,7 @@ Footer
 }
 
 .helpful-form-textarea {
-  font-family: var(--font-family-secondary);
+  font-family: var(--font-family-primary);
   resize: none;
   border: 1px var(--color-gray-300) solid;
   padding: 0.5em;
@@ -2044,7 +2044,7 @@ Footer
   padding: 0.5em;
   width: 100%;
   border-radius: .25rem;
-  font-family: var(--font-family-secondary);
+  font-family: var(--font-family-primary);
 }
 
 .helpful-form-more {
@@ -2308,10 +2308,10 @@ code.hljs {
 
 .playground-buttons a,
 .playground-buttons button {
-  font-family: var(--font-family-secondary);
+  font-family: var(--font-family-primary);
   font-size: 1rem;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   color: var(--color-blue-400);
   transition: all 200ms;
@@ -2423,7 +2423,7 @@ code.hljs {
 
 .algolia-docsearch-suggestion--category-header {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 0.5em;
   margin-top: 1em;
   border-top: 1px var(--color-gray-200) solid;
@@ -2454,7 +2454,7 @@ code.hljs {
 
 .algolia-docsearch-suggestion--highlight {
   color: var(--color-blue-400);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .algolia-docsearch-suggestion--subcategory-column {
