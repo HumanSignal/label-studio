@@ -479,23 +479,28 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   }, [focusTab]);
 
   useEffect(() => {
-    const root = rootRef.current!;
+    const root = rootRef.current;
+    if (!root) return;
+
     const checkContentFit = () => {
-      return (root.clientWidth ?? 0) < maxWindowWidth;
+      return (rootRef.current?.clientWidth ?? 0) < maxWindowWidth;
     };
 
     const observer = new ResizeObserver(() => {
-      const { clientWidth, clientHeight } = root ?? {};
+      requestAnimationFrame(() => {
+        if (!rootRef.current) return;
+        const { clientWidth, clientHeight } = rootRef.current;
 
-      // we don't need to check or resize anything in collapsed state
-      if (clientWidth <= maxWindowWidth) return;
+        // we don't need to check or resize anything in collapsed state
+        if (clientWidth <= maxWindowWidth) return;
 
-      if (viewportSize.current.height !== clientHeight) setPanelData(getSnappedHeights(panelData, clientHeight));
-      // Remember current width and height of the viewport
-      viewportSize.current.width = clientWidth ?? 0;
-      viewportSize.current.height = clientHeight ?? 0;
-      setViewportSizeMatch(checkContentFit());
-      setPanelMaxWidth(root.clientWidth * 0.4);
+        if (viewportSize.current.height !== clientHeight) setPanelData(getSnappedHeights(panelData, clientHeight));
+        // Remember current width and height of the viewport
+        viewportSize.current.width = clientWidth ?? 0;
+        viewportSize.current.height = clientHeight ?? 0;
+        setViewportSizeMatch(checkContentFit());
+        setPanelMaxWidth(rootRef.current.clientWidth * 0.4);
+      });
     });
 
     if (root) {

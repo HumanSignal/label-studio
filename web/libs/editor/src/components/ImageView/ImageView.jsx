@@ -828,15 +828,17 @@ export default observer(
     }
 
     onResize = debounce(() => {
-      if (!this?.props?.item?.containerRef) return;
-      const { offsetWidth, offsetHeight } = this.props.item.containerRef;
+      requestAnimationFrame(() => {
+        if (!this?.props?.item?.containerRef) return;
+        const { offsetWidth, offsetHeight } = this.props.item.containerRef;
 
-      if (this.props.item.naturalWidth <= 1) return;
-      if (this.lastOffsetWidth === offsetWidth && this.lastOffsetHeight === offsetHeight) return;
+        if (this.props.item.naturalWidth <= 1) return;
+        if (this.lastOffsetWidth === offsetWidth && this.lastOffsetHeight === offsetHeight) return;
 
-      this.props.item.onResize(offsetWidth, offsetHeight, true);
-      this.lastOffsetWidth = offsetWidth;
-      this.lastOffsetHeight = offsetHeight;
+        this.props.item.onResize(offsetWidth, offsetHeight, true);
+        this.lastOffsetWidth = offsetWidth;
+        this.lastOffsetHeight = offsetHeight;
+      });
     }, 16);
 
     componentDidMount() {
