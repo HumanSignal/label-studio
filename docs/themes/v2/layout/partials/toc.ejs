@@ -175,13 +175,15 @@
   <div class="toc-section-heading"><%- partial("component/text", {text: "Support", size: "Eyebrow", tag: "h3"}) %></div>
 <% } %>
 <ul class="page-sidebar-list">
-  <li>
+  <% if(isEnterpriseTheme) { %>
+    <li>
     <a href="https://support.humansignal.com" target="_blank">Troubleshooting
       <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
         <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
       </svg>
     </a>
   </li>
+  <% } %>
   <li>
     <a href="https://slack.labelstud.io" target="_blank">Join Slack
       <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">

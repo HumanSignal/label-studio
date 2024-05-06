@@ -1205,9 +1205,14 @@ ul {
   margin-top: 1em;
 }
 
-.notion-toc .toc-list-child {
+.toc-list-child {
   list-style: none;
-  padding-left: 1em;
+  padding-left: 0.7em;
+  margin-top: 0.3em;
+}
+
+.toc-list-child>li+li {
+  margin-top: 0.3em;
 }
 
 .page-rightsidebar {
@@ -1236,9 +1241,7 @@ ul {
   border-radius: .75rem;
 }
 
-.toc-enterprise-cta-copy {
-  
-}
+.toc-enterprise-cta-copy {}
 
 /****************************
   Markdown styles
