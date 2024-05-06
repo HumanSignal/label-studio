@@ -32,8 +32,8 @@ html {
   --color-gray-100: #F9F8F6;
   --color-white: #FDFDFC;
 
-  --font-family-primary: "Circular", sans-serif;
-  --font-family-secondary: "Circular", sans-serif;
+  --font-family-primary: "Manrope", sans-serif;
+  --font-family-secondary: "Manrope", sans-serif;
   --font-family-monospace: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 
   color: var(--color-gray-900);
@@ -1023,16 +1023,16 @@ ul {
 ****************************/
 
 @font-face {
-  font-family: "Circular";
-  src: url("/fonts/CircularXXTrialWeb-Regular.woff2") format("woff2");
+  font-family: "Manrope";
+  src: url("/fonts/Manrope-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Circular";
-  src: url("/fonts/CircularXXTrialWeb-Medium.woff2") format("woff2");
+  font-family: "Manrope";
+  src: url("/fonts/Manrope-SemiBold.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
