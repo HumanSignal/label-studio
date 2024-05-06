@@ -850,8 +850,21 @@ export default types
       self.users.replace(users);
     }
 
+    // @deprecated use `enrichUsers` instead (as mergeUsers will not update existing users and can lose previous data)
     function mergeUsers(users) {
       self.setUsers(uniqBy([...getSnapshot(self.users), ...users], "id"));
+    }
+
+    function enrichUsers(users) {
+      const oldUsers = getSnapshot(self.users);
+      const oldUsersMap = {};
+      oldUsers.forEach((user) => {
+        oldUsersMap[user.id] = user;
+      });
+      const newUsers = users.map((user) => {
+        return { ...oldUsersMap[user.id], ...user };
+      });
+      self.setUsers(uniqBy([...newUsers, ...oldUsers], "id"));
     }
 
     return {
@@ -880,6 +893,7 @@ export default types
       presignUrlForProject,
       setUsers,
       mergeUsers,
+      enrichUsers,
 
       showModal,
       toggleComments,
