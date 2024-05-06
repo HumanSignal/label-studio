@@ -1,9 +1,9 @@
 import { mount } from "cypress/react";
 
-Cypress.on("uncaught:exception", err => {
+Cypress.on("uncaught:exception", (err) => {
   const ignoredErrors: Array<string> = [];
 
-  const ignored = ignoredErrors.some(errMessage => {
+  const ignored = ignoredErrors.some((errMessage) => {
     return err.message.includes(errMessage);
   });
 
