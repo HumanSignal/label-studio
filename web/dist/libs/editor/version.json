@@ -1,6 +1,6 @@
 {
-  "message": "use debounce on video with a check to ensure it does not infinite loop",
-  "commit": "154c8192beea721a58940cbc9fc911fd60581f1e",
-  "date": "2024-05-04T15:25:39.000Z",
+  "message": "reverting video changes to see if the tests will pass again",
+  "commit": "7e2aef6a14ed261491afbfa485cfefc4f94ca700",
+  "date": "2024-05-06T03:32:17.000Z",
   "branch": "fb-optic-669"
 }
