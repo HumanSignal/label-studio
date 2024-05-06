@@ -11,7 +11,7 @@
     <% if(page.type && page.parent !== undefined) { %>
       <%- breadcrumb({pageType: page.type, parentPage: page.parent, currentPage: page.title, parentPageExtension: page.parent_page_extension }) %>
     <% } %>
-    <% if (page.title.trim()) { %>
+    <% if (!page.hide_frontmatter_title && page.title.trim()) { %>
       <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
     <% } %>
     <%- formattedContent %>
