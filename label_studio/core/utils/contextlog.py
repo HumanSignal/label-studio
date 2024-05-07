@@ -303,6 +303,6 @@ class ContextLog(object):
         else:
             try:
                 url = 'https://tele.labelstud.io'
-                r = requests.post(url=url, json=payload, timeout=3.0)
-            except Exception as e:  # noqa: E722
+                requests.post(url=url, json=payload, timeout=3.0)
+            except:  # noqa: E722
                 pass
