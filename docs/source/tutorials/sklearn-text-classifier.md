@@ -1,6 +1,7 @@
 ---
 title: Text classification with Scikit-Learn
 type: guide
+hide_menu: true
 tier: all
 order: 20
 meta_title: Text Classification with Scikit-Learn Tutorial

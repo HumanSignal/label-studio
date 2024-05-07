@@ -1,6 +1,8 @@
 ---
 title: Transcribe text from images with EasyOCR
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 40
 meta_title: EasyOCR model connection for transcribing text in images

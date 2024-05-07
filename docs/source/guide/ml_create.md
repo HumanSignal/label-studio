@@ -7,7 +7,7 @@ order: 254
 order_enterprise: 254
 meta_title: Write your own ML backend
 meta_description: Set up your machine learning model to output and consume predictions in your data science and data labeling projects. 
-section: "Automate Labeling"
+section: "Machine Learning"
 
 ---
 

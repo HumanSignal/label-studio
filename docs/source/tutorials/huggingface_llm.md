@@ -1,6 +1,8 @@
 ---
 title: Hugging Face Large Language Model (LLM)
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 20
 meta_title: Label Studio tutorial to run Hugging Face Large Language Model backend

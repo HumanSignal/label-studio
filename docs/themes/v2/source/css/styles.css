@@ -1194,6 +1194,7 @@ ul {
   color: var(--color-gray-900);
   text-decoration: none;
   font-size: 0.875rem;
+  font-family: var(--font-family-primary);
 }
 
 .toc-list a:hover,
@@ -1207,12 +1208,12 @@ ul {
 
 .toc-list-child {
   list-style: none;
-  padding-left: 0.7em;
-  margin-top: 0.3em;
+  padding-left: 0.825em;
+  margin-top: 0.625em;
 }
 
 .toc-list-child>li+li {
-  margin-top: 0.3em;
+  margin-top: 0.625em;
 }
 
 .page-rightsidebar {

@@ -1,6 +1,8 @@
 ---
 title: Interactive substring matching for NER tasks
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 30
 meta_title: Interactive substring matching for NER tasks
