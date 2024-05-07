@@ -1,5 +1,5 @@
 ---
-title: Annotator performance dashboard
+title: Annotator performance dashboard - Beta 🧪
 short: Annotator dashboard
 tier: enterprise
 type: guide
