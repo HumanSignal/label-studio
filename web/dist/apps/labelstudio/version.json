@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into fb-OPTIC-546/storage-title",
-  "commit": "96c8415ae0ce1db29a24b071eae2cab24c204207",
-  "date": "2024-05-07T12:59:51.000Z",
-  "branch": "fb-OPTIC-546/storage-title"
+  "message": "fix: OPTIC-714: Remove Warning when the page leave datamanager page",
+  "commit": "3ba4b2b22ea1d4e6534842611b87436f14988eb5",
+  "date": "2024-05-03T18:59:02.000Z",
+  "branch": "fb-optic-714/remove-warning"
 }
