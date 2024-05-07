@@ -174,7 +174,7 @@
     ];
       const currentQuickLink = quickLinks.find(link => link.href.includes(page.type));
     %>
-    <% if(currentQuickLink && currentQuickLink.length > 0) {%>
+    <% if(quickLinks && quickLinks.length > 0) {%>
       <ul class="page-header-content-switcher">
       <% quickLinks.forEach(function(link) { %>
         <li><a href="<%- link.href %>" class="<%- link.href === (currentQuickLink.href || quickLinks[0].href) ? 'active' : '' %>"><%- link.label %></a></li>

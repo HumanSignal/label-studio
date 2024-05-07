@@ -194,7 +194,7 @@ body {
 
 @media (max-width: 550px) {
   .page-header-logo {
-    flex-basis: 14em;
+    flex-basis: 12em;
     flex-grow: 1;
   }
 }
@@ -335,19 +335,31 @@ body {
     border-bottom: 0;
     flex-wrap: wrap;
     row-gap: 1em;
-    padding-bottom: 1em;
+    padding-bottom: 0;
     padding-top: 1em;
     height: auto;
   }
 
   .page-header nav {
-    top: 146px;
+    top: 129px;
   }
 }
 
 @media (max-width: 500px) {
   .page-header nav {
-    top: 183px;
+    top: 168px;
+  }
+}
+
+@media (max-width: 400px) {
+
+  .HeaderLogo svg {
+    width: 13em;
+    height: auto;
+  }
+
+  .page-header nav {
+    top: 108px;
   }
 }
 
