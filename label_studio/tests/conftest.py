@@ -471,10 +471,16 @@ def setup_project_choices(client):
     return setup_project(client, project_choices)
 
 
-# TODO replace test_contextlog with this fixture instead of django override_settings
-# @pytest.fixture(name='contextlog_sync')
-# def context_log_sync(settings):
-#     settings.CONTEXTLOG_SYNC = True
+@pytest.fixture()
+def contextlog_test_config(settings):
+    """
+    Configure settings for contextlog tests in CI.
+    Be sure that responses is activated in any testcase where this fixture is used.
+    """
+
+    settings.CONTEXTLOG_SYNC = True
+    settings.TEST_ENVIRONMENT = False
+    settings.DEBUG_CONTEXTLOG = False
 
 
 @pytest.fixture

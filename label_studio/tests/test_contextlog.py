@@ -2,13 +2,11 @@ import json
 
 import pytest
 import responses
-from django.test import override_settings
 
 
 @responses.activate
 @pytest.mark.django_db
-@override_settings(CONTEXTLOG_SYNC=True)
-def test_contextlog(business_client):
+def test_contextlog(business_client, contextlog_test_config):
     responses.add(
         responses.POST,
         'https://tele.labelstud.io',
