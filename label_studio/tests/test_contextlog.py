@@ -1,4 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the 
+"""This file and its contents are licensed under the Apache License 2.0. Please see the
 included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import json
@@ -9,7 +9,7 @@ import responses
 
 @responses.activate
 @pytest.mark.django_db
-def test_contextlog(business_client):
+def test_contextlog(business_client, settings):
     settings.CONTEXTLOG_SYNC = True
     responses.add(
         responses.POST,
