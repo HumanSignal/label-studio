@@ -478,6 +478,7 @@ def contextlog_test_config(settings):
     Be sure that responses is activated in any testcase where this fixture is used.
     """
 
+    settings.COLLECT_ANALYTICS = True
     settings.CONTEXTLOG_SYNC = True
     settings.TEST_ENVIRONMENT = False
     settings.DEBUG_CONTEXTLOG = False
