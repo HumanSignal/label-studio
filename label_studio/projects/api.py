@@ -43,6 +43,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.views import exception_handler
 from tasks.models import Task
 from tasks.serializers import (
@@ -54,8 +55,11 @@ from tasks.serializers import (
 from webhooks.models import WebhookAction
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 
+from label_studio.core.utils.common import load_func
+
 logger = logging.getLogger(__name__)
 
+ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
 _result_schema = openapi.Schema(
     title='Labeling result',
@@ -207,7 +211,6 @@ class ProjectListAPI(generics.ListCreateAPIView):
     ),
 )
 class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
-
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Project.objects.with_counts()
     permission_required = ViewClassPermission(
@@ -275,11 +278,10 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
     ),
 )  # leaving this method decorator info in case we put it back in swagger API docs
 class ProjectNextTaskAPI(generics.RetrieveAPIView):
-
     permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
     queryset = Project.objects.all()
-    swagger_schema = None   # this endpoint doesn't need to be in swagger API docs
+    swagger_schema = None  # this endpoint doesn't need to be in swagger API docs
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
@@ -444,9 +446,10 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
     ),
 )
 class ProjectImportAPI(generics.RetrieveAPIView):
+    permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [ProjectImportPermission]
     parser_classes = (JSONParser,)
     serializer_class = ProjectImportSerializer
-    permission_required = all_permissions.projects_change
     queryset = ProjectImport.objects.all()
     lookup_url_kwarg = 'import_pk'
 
@@ -468,9 +471,10 @@ class ProjectImportAPI(generics.RetrieveAPIView):
     ),
 )
 class ProjectReimportAPI(generics.RetrieveAPIView):
+    permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [ProjectImportPermission]
     parser_classes = (JSONParser,)
     serializer_class = ProjectReimportSerializer
-    permission_required = all_permissions.projects_change
     queryset = ProjectReimport.objects.all()
     lookup_url_kwarg = 'reimport_pk'
 
@@ -516,7 +520,6 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
     ),
 )
 class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, generics.DestroyAPIView):
-
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
     parent_queryset = Project.objects.all()
