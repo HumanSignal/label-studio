@@ -1,13 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import json
+
 import pytest
-import responses 
+import responses
 from django.test import override_settings
 
 
-@pytest.mark.django_db
 @responses.activate
+@pytest.mark.django_db
 @override_settings(CONTEXTLOG_SYNC=True)
 def test_contextlog(business_client):
     responses.add(
