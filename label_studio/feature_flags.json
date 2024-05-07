@@ -12,7 +12,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -36,7 +39,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -60,7 +66,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -84,7 +93,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -108,7 +120,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -132,7 +147,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -156,7 +174,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -180,7 +201,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -204,7 +228,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -228,7 +255,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -252,7 +282,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -276,7 +309,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -300,7 +336,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -324,7 +363,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -348,7 +390,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -372,7 +417,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -396,7 +444,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -420,7 +471,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -444,7 +498,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -468,7 +525,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -492,7 +552,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -516,7 +579,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -540,7 +606,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -564,7 +633,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -588,7 +660,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -612,7 +687,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -636,7 +714,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -660,7 +741,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -684,7 +768,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -708,7 +795,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -732,7 +822,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -756,7 +849,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -780,7 +876,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -804,7 +903,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -828,7 +930,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -852,7 +957,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -876,7 +984,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -900,7 +1011,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -924,7 +1038,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -948,7 +1065,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -972,7 +1092,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -996,7 +1119,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1020,7 +1146,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1044,7 +1173,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1068,7 +1200,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1092,7 +1227,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1116,7 +1254,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1140,7 +1281,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1164,7 +1308,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1188,7 +1335,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1212,7 +1362,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1236,7 +1389,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1260,7 +1416,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1284,7 +1443,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1308,7 +1470,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1332,7 +1497,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1356,7 +1524,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1380,7 +1551,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1404,7 +1578,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1428,7 +1605,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1452,7 +1632,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1473,7 +1656,9 @@
         {
           "contextKind": "user",
           "variation": 0,
-          "values": ["yousif@heartex.com"]
+          "values": [
+            "yousif@heartex.com"
+          ]
         }
       ],
       "contextTargets": [
@@ -1488,7 +1673,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1512,7 +1700,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1536,7 +1727,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1560,7 +1754,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1584,7 +1781,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1608,7 +1808,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1632,7 +1835,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -1656,7 +1862,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1680,7 +1889,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1704,7 +1916,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1728,7 +1943,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1752,7 +1970,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1776,7 +1997,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1800,7 +2024,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1824,7 +2051,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1848,7 +2078,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1872,7 +2105,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1896,7 +2132,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1920,7 +2159,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1944,7 +2186,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -1968,7 +2213,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -1992,7 +2240,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2016,7 +2267,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2040,7 +2294,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2064,7 +2321,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2088,7 +2348,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2112,7 +2375,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2136,7 +2402,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2160,7 +2429,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2184,7 +2456,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2208,7 +2483,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2232,7 +2510,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2256,7 +2537,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2280,7 +2564,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2304,7 +2591,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2328,7 +2618,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2352,7 +2645,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2376,7 +2672,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2400,7 +2699,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2424,7 +2726,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2448,7 +2753,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2472,7 +2780,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2496,7 +2807,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2520,7 +2834,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2544,7 +2861,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2568,7 +2888,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2592,7 +2915,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2616,7 +2942,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2640,7 +2969,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2664,7 +2996,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2688,7 +3023,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2712,7 +3050,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2736,7 +3077,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2760,7 +3104,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2784,7 +3131,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2808,7 +3158,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2832,7 +3185,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2856,7 +3212,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2880,7 +3239,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2904,7 +3266,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2928,7 +3293,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": true
@@ -2952,7 +3320,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -2976,7 +3347,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3000,7 +3374,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3024,7 +3401,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3048,7 +3428,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3072,7 +3455,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3096,7 +3482,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3120,7 +3509,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3144,7 +3536,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3168,7 +3563,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3192,7 +3590,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3216,7 +3617,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3240,7 +3644,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3264,7 +3671,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3288,7 +3698,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3312,7 +3725,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3336,7 +3752,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3360,7 +3779,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3384,7 +3806,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3408,7 +3833,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3432,7 +3860,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3456,7 +3887,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3480,7 +3914,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3504,7 +3941,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3528,7 +3968,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3552,7 +3995,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3576,7 +4022,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3600,7 +4049,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3624,7 +4076,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3648,7 +4103,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3672,7 +4130,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -3696,7 +4157,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3720,7 +4184,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3741,7 +4208,9 @@
         {
           "contextKind": "user",
           "variation": 1,
-          "values": ["mihajlo@heartex.e2e"]
+          "values": [
+            "mihajlo@heartex.e2e"
+          ]
         }
       ],
       "contextTargets": [
@@ -3756,7 +4225,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3780,7 +4252,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3804,7 +4279,10 @@
         "variation": 1
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3828,7 +4306,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3852,7 +4333,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3876,7 +4360,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3900,7 +4387,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3924,7 +4414,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3948,7 +4441,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3972,7 +4468,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -3996,7 +4495,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -4020,7 +4522,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -4044,7 +4549,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -4068,7 +4576,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -4092,7 +4603,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -4116,7 +4630,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -4140,7 +4657,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
@@ -4164,7 +4684,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": true,
         "usingEnvironmentId": false
@@ -4188,7 +4711,10 @@
         "variation": 0
       },
       "offVariation": 1,
-      "variations": [true, false],
+      "variations": [
+        true,
+        false
+      ],
       "clientSideAvailability": {
         "usingMobileKey": false,
         "usingEnvironmentId": false
