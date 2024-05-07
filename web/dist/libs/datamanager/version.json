@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-713: Remove warnings in the console when a infinite scroll is used in datamanager",
-  "commit": "15b97d6c04fd777271133fccc24efb07af0ca6b5",
-  "date": "2024-05-03T18:32:46.000Z",
-  "branch": "fb-optic-713/remove-warnings"
+  "message": "fix: OPTIC-712: Remove warnings in the app related to injection occur before observer",
+  "commit": "9f1d0c707d44c452b223704aa11417b2ba3c039e",
+  "date": "2024-05-03T17:03:19.000Z",
+  "branch": "fb-optic-712/remove-warnings"
 }
