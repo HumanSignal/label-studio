@@ -149,7 +149,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.25em;
-  color: var(--color-gray-900);
+  color: var(--color-white);
 }
 
 .page-header nav a:not(.Button):hover,
@@ -2573,6 +2573,10 @@ code.hljs {
 
 .page-tier-enterprise .page-header nav button+ul {
   background-color: var(--color-white);
+}
+
+.page-tier-enterprise .page-header nav button+ul a {
+  color: var(--color-gray-900);
 }
 
 .page-tier-enterprise .page-header nav>button+ul ul {
