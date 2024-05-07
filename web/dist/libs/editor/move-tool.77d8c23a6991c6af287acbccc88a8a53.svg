@@ -1,0 +1,54 @@
+var _path, _g, _defs;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgMoveTool = function SvgMoveTool(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 32 32",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    stroke: "#000",
+    strokeLinecap: "round",
+    strokeWidth: 2.5,
+    d: "M12.5 9.5 19.4 24",
+    opacity: 0.4
+  })), _g || (_g = /*#__PURE__*/React.createElement("g", {
+    filter: "url(#move-tool_svg__a)"
+  }, /*#__PURE__*/React.createElement("path", {
+    fill: "#000",
+    d: "M11 8.165v12.838c0 .74 1 .974 1.328.31l2.527-5.114a1 1 0 0 1 1.107-.535l5.822 1.252c.712.153 1.155-.746.602-1.217l-9.737-8.295A1 1 0 0 0 11 8.165"
+  }))), _defs || (_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
+    id: "move-tool_svg__a",
+    width: 17.635,
+    height: 20.541,
+    x: 8,
+    y: 5.164,
+    colorInterpolationFilters: "sRGB",
+    filterUnits: "userSpaceOnUse"
+  }, /*#__PURE__*/React.createElement("feFlood", {
+    floodOpacity: 0,
+    result: "BackgroundImageFix"
+  }), /*#__PURE__*/React.createElement("feColorMatrix", {
+    "in": "SourceAlpha",
+    result: "hardAlpha",
+    values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+  }), /*#__PURE__*/React.createElement("feOffset", {
+    dy: 1
+  }), /*#__PURE__*/React.createElement("feGaussianBlur", {
+    stdDeviation: 1.5
+  }), /*#__PURE__*/React.createElement("feColorMatrix", {
+    values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0"
+  }), /*#__PURE__*/React.createElement("feBlend", {
+    in2: "BackgroundImageFix",
+    result: "effect1_dropShadow"
+  }), /*#__PURE__*/React.createElement("feBlend", {
+    "in": "SourceGraphic",
+    in2: "effect1_dropShadow",
+    result: "shape"
+  })))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgMoveTool);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQo8cGF0aCBvcGFjaXR5PSIwLjQiIGQ9Ik0xMi41IDkuNUwxOS40IDI0IiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+DQo8ZyBmaWx0ZXI9InVybCgjZmlsdGVyMF9kKSI+DQo8cGF0aCBkPSJNMTEgOC4xNjU0OVYyMS4wMDMyQzExIDIxLjc0MzYgMTEuOTk5NiAyMS45NzcxIDEyLjMyNzYgMjEuMzEzM0wxNC44NTQ5IDE2LjE5ODVDMTUuMDU3OCAxNS43ODc4IDE1LjUxMzggMTUuNTY3NSAxNS45NjE3IDE1LjY2MzhMMjEuNzg0NCAxNi45MTZDMjIuNDk1NSAxNy4wNjg5IDIyLjkzOTIgMTYuMTcwNCAyMi4zODU1IDE1LjY5ODhMMTIuNjQ4NSA3LjQwNDI1QzExLjk5OTIgNi44NTExNiAxMSA3LjMxMjU4IDExIDguMTY1NDlaIiBmaWxsPSJibGFjayIvPg0KPC9nPg0KPGRlZnM+DQo8ZmlsdGVyIGlkPSJmaWx0ZXIwX2QiIHg9IjgiIHk9IjUuMTYzNTciIHdpZHRoPSIxNy42MzQ3IiBoZWlnaHQ9IjIwLjU0MDYiIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4NCjxmZUZsb29kIGZsb29kLW9wYWNpdHk9IjAiIHJlc3VsdD0iQmFja2dyb3VuZEltYWdlRml4Ii8+DQo8ZmVDb2xvck1hdHJpeCBpbj0iU291cmNlQWxwaGEiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAxMjcgMCIgcmVzdWx0PSJoYXJkQWxwaGEiLz4NCjxmZU9mZnNldCBkeT0iMSIvPg0KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMS41Ii8+DQo8ZmVDb2xvck1hdHJpeCB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMC40IDAiLz4NCjxmZUJsZW5kIG1vZGU9Im5vcm1hbCIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0iZWZmZWN0MV9kcm9wU2hhZG93Ii8+DQo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImVmZmVjdDFfZHJvcFNoYWRvdyIgcmVzdWx0PSJzaGFwZSIvPg0KPC9maWx0ZXI+DQo8L2RlZnM+DQo8L3N2Zz4NCg==";

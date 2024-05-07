@@ -1,0 +1,21 @@
+var _path;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgCursor = function SvgCursor(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    fillRule: "evenodd",
+    d: "M8.243 7.03A1 1 0 0 0 7.03 8.243l2 8a1 1 0 0 0 1.677.464L13 14.414l3.293 3.293a1 1 0 0 0 1.414-1.414L14.414 13l2.293-2.293a1 1 0 0 0-.464-1.677zm2.299 7.014-1.168-4.67 4.67 1.168z",
+    clipRule: "evenodd"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgCursor);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNOC4yNDI1NiA3LjAyOTg4QzcuOTAxNzggNi45NDQ2OCA3LjU0MTI5IDcuMDQ0NTMgNy4yOTI5MSA3LjI5MjkxQzcuMDQ0NTMgNy41NDEyOSA2Ljk0NDY4IDcuOTAxNzggNy4wMjk4OCA4LjI0MjU2TDkuMDI5ODggMTYuMjQyNkM5LjExNzI2IDE2LjU5MjEgOS4zODU4OSAxNi44Njc2IDkuNzMzMDkgMTYuOTYzN0MxMC4wODAzIDE3LjA1OTkgMTAuNDUyNCAxNi45NjE5IDEwLjcwNzEgMTYuNzA3MUwxMy4wMDAxIDE0LjQxNDJMMTYuMjkzIDE3LjcwNzFDMTYuNjgzNSAxOC4wOTc2IDE3LjMxNjYgMTguMDk3NiAxNy43MDcyIDE3LjcwNzFDMTguMDk3NyAxNy4zMTY2IDE4LjA5NzcgMTYuNjgzNCAxNy43MDcyIDE2LjI5MjlMMTQuNDE0MyAxM0wxNi43MDcxIDEwLjcwNzFDMTYuOTYxOSAxMC40NTI0IDE3LjA1OTkgMTAuMDgwMyAxNi45NjM3IDkuNzMzMDlDMTYuODY3NiA5LjM4NTg5IDE2LjU5MjEgOS4xMTcyNiAxNi4yNDI2IDkuMDI5ODhMOC4yNDI1NiA3LjAyOTg4Wk0xMC41NDE4IDE0LjA0NEw5LjM3NDM5IDkuMzc0MzlMMTQuMDQ0IDEwLjU0MThMMTAuNTQxOCAxNC4wNDRaIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4NCjwvc3ZnPg0K";

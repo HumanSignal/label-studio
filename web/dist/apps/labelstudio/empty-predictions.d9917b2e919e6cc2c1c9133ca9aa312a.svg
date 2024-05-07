@@ -1,0 +1,41 @@
+var _circle, _circle2, _defs;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgEmptyPredictions = function SvgEmptyPredictions(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 30,
+    height: 30,
+    fill: "none",
+    ref: ref
+  }, props), _circle || (_circle = /*#__PURE__*/React.createElement("circle", {
+    cx: 15,
+    cy: 15,
+    r: 15,
+    fill: "#F0F0F0"
+  })), _circle2 || (_circle2 = /*#__PURE__*/React.createElement("circle", {
+    cx: 15,
+    cy: 15,
+    r: 15,
+    fill: "url(#empty-predictions_svg__a)"
+  })), _defs || (_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: "empty-predictions_svg__a",
+    x1: 0,
+    x2: 36.094,
+    y1: 0,
+    y2: 12.758,
+    gradientUnits: "userSpaceOnUse"
+  }, /*#__PURE__*/React.createElement("stop", {
+    stopColor: "#FFA663"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: 0.516,
+    stopColor: "#FF7557"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: 1,
+    stopColor: "#E37BD3"
+  })))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgEmptyPredictions);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxjaXJjbGUgY3g9IjE1IiBjeT0iMTUiIHI9IjE1IiBmaWxsPSIjRjBGMEYwIi8+DQo8Y2lyY2xlIGN4PSIxNSIgY3k9IjE1IiByPSIxNSIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzk0OV8zNDg3OSkiLz4NCjxkZWZzPg0KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzk0OV8zNDg3OSIgeDE9IjAiIHkxPSIwIiB4Mj0iMzYuMDk0NCIgeTI9IjEyLjc1NzciIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4NCjxzdG9wIHN0b3AtY29sb3I9IiNGRkE2NjMiLz4NCjxzdG9wIG9mZnNldD0iMC41MTU2MjUiIHN0b3AtY29sb3I9IiNGRjc1NTciLz4NCjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0UzN0JEMyIvPg0KPC9saW5lYXJHcmFkaWVudD4NCjwvZGVmcz4NCjwvc3ZnPg0K";

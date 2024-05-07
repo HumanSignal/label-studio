@@ -1,0 +1,25 @@
+var _path, _path2, _path3;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgSlow = function SvgSlow(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    d: "m8 16-1.281-.854a.5.5 0 0 0-.463-.048L4 16c0 1.182.35 2.015.635 2.499.203.342.588.501.986.501h2.504c.6 0 .856-.765.375-1.125a1.25 1.25 0 0 1-.5-1zM18 16l-2.256-.902a.5.5 0 0 0-.463.048L14 16c0 1.182.35 2.015.635 2.499.203.342.588.501.986.501h2.504c.6 0 .855-.765.375-1.125a1.25 1.25 0 0 1-.5-1zM3.25 12.5c-.367 1.575-1.796 2.543-3.07 3.108-.223.1-.132.692.112.692H4z"
+  })), _path2 || (_path2 = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    d: "M18 14s0-7-7.5-7S3 14 3 14v2s2.5 1 7.5 1 7.5-1 7.5-1z"
+  })), _path3 || (_path3 = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    d: "M20.69 7.794a2.25 2.25 0 0 0-2.647 1.765c-.06.305-.376.742-1.139 1.2-.4.24-.83.441-1.277.579l2.004 4.059 1.589-.78c1.112-.668 2.797-1.98 3.236-4.176a2.25 2.25 0 0 0-1.765-2.647"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgSlow);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGQ9Ik04IDE2TDYuNzE4ODQgMTUuMTQ1OUM2LjU4MTg1IDE1LjA1NDYgNi40MDg2NyAxNS4wMzY1IDYuMjU1OCAxNS4wOTc3TDQgMTZDNCAxNy4xODI0IDQuMzQ5NTQgMTguMDE1MyA0LjYzNTMxIDE4LjQ5ODdDNC44Mzc3OCAxOC44NDExIDUuMjIzNSAxOSA1LjYyMTMyIDE5SDguMTI1QzguNzI1NjMgMTkgOC45ODA1MSAxOC4yMzU0IDguNSAxNy44NzVDOC4xODUyNCAxNy42Mzg5IDggMTcuMjY4NCA4IDE2Ljg3NVYxNloiIGZpbGw9ImN1cnJlbnRDb2xvciIvPg0KPHBhdGggZD0iTTE4IDE2TDE1Ljc0NDIgMTUuMDk3N0MxNS41OTEzIDE1LjAzNjUgMTUuNDE4MiAxNS4wNTQ2IDE1LjI4MTIgMTUuMTQ1OUwxNCAxNkMxNCAxNy4xODI0IDE0LjM0OTUgMTguMDE1MyAxNC42MzUzIDE4LjQ5ODdDMTQuODM3OCAxOC44NDExIDE1LjIyMzUgMTkgMTUuNjIxMyAxOUgxOC4xMjVDMTguNzI1NiAxOSAxOC45ODA1IDE4LjIzNTQgMTguNSAxNy44NzVDMTguMTg1MiAxNy42Mzg5IDE4IDE3LjI2ODQgMTggMTYuODc1VjE2WiIgZmlsbD0iY3VycmVudENvbG9yIi8+DQo8cGF0aCBkPSJNMy4yNSAxMi41QzIuODgyNTcgMTQuMDc0NyAxLjQ1NDQxIDE1LjA0MzIgMC4xODAyOTkgMTUuNjA4MUMtMC4wNDMxNDA0IDE1LjcwNzIgMC4wNDgwMzQgMTYuMyAwLjI5MjQ0OSAxNi4zSDRMMy4yNSAxMi41WiIgZmlsbD0iY3VycmVudENvbG9yIi8+DQo8cGF0aCBkPSJNMTggMTRDMTggMTQgMTggNyAxMC41IDdDMyA3IDMgMTQgMyAxNFYxNkMzIDE2IDUuNSAxNyAxMC41IDE3QzE1LjUgMTcgMTggMTYgMTggMTZWMTRaIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4NCjxwYXRoIGQ9Ik0yMC42OTA4IDcuNzkzNjRDMTkuNDcyMyA3LjU0OTk0IDE4LjI4NyA4LjM0MDE3IDE4LjA0MzMgOS41NTg2OEMxNy45ODIzIDkuODYzNiAxNy42NjY3IDEwLjMwMDcgMTYuOTA0NSAxMC43NTgxQzE2LjUwNDIgMTAuOTk4MiAxNi4wNzMyIDExLjIwMDIgMTUuNjI2NiAxMS4zMzc4TDE3LjYzMTUgMTUuMzk3TDE5LjIxOTcgMTQuNjE2OEMyMC4zMzI0IDEzLjk0OTIgMjIuMDE2OSAxMi42MzYzIDIyLjQ1NTkgMTAuNDQxMkMyMi42OTk2IDkuMjIyNyAyMS45MDkzIDguMDM3MzQgMjAuNjkwOCA3Ljc5MzY0WiIgZmlsbD0iY3VycmVudENvbG9yIi8+DQo8L3N2Zz4NCg==";

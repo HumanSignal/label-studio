@@ -1,0 +1,24 @@
+var _path, _path2;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgVolumeHalf = function SvgVolumeHalf(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    stroke: "currentColor",
+    strokeLinecap: "round",
+    strokeWidth: 2,
+    d: "M17 7s2.5 1.5 2.5 5-2.5 5-2.5 5"
+  })), _path2 || (_path2 = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    d: "M3 11.03c0-.96 0-1.44.161-1.817a2 2 0 0 1 1.052-1.052C4.59 8 5.07 8 6.03 8c.327 0 .49 0 .648-.025a2 2 0 0 0 .571-.183c.143-.072.276-.166.542-.356l3.048-2.177c1.385-.99 2.077-1.484 2.62-1.205.542.28.542 1.13.542 2.832v10.228c0 1.702 0 2.553-.542 2.832-.543.28-1.235-.216-2.62-1.205L7.79 16.564c-.266-.19-.399-.284-.542-.355a2.001 2.001 0 0 0-.571-.184C6.519 16 6.356 16 6.029 16c-.96 0-1.439 0-1.816-.161a2 2 0 0 1-1.052-1.053C3 14.41 3 13.93 3 12.972z"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgVolumeHalf);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGQ9Ik0xNyA3QzE3IDcgMTkuNSA4LjUgMTkuNSAxMkMxOS41IDE1LjUgMTcgMTcgMTcgMTciIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPg0KPHBhdGggZD0iTTMgMTEuMDI5MkMzIDEwLjA2OTkgMyA5LjU5MDIzIDMuMTYxMTUgOS4yMTM0N0MzLjM2MzUgOC43NDAzOSAzLjc0MDM5IDguMzYzNSA0LjIxMzQ3IDguMTYxMTVDNC41OTAyMyA4IDUuMDY5OSA4IDYuMDI5MjQgOEM2LjM1NTc1IDggNi41MTkwMSA4IDYuNjc2OTEgNy45NzQ1OEM2Ljg3NTQ0IDcuOTQyNjMgNy4wNjgwMSA3Ljg4MDkxIDcuMjQ4MTQgNy43OTE1MkM3LjM5MTQgNy43MjA0MyA3LjUyNDI1IDcuNjI1NTQgNy43ODk5NCA3LjQzNTc1TDEwLjgzNzUgNS4yNTg5MUMxMi4yMjI2IDQuMjY5NTYgMTIuOTE1MiAzLjc3NDg4IDEzLjQ1NzYgNC4wNTQwMkMxNCA0LjMzMzE2IDE0IDUuMTg0MjMgMTQgNi44ODYzOFYxNy4xMTM2QzE0IDE4LjgxNTggMTQgMTkuNjY2OCAxMy40NTc2IDE5Ljk0NkMxMi45MTUyIDIwLjIyNTEgMTIuMjIyNiAxOS43MzA0IDEwLjgzNzUgMTguNzQxMUw3Ljc4OTk0IDE2LjU2NDJDNy41MjQyNSAxNi4zNzQ1IDcuMzkxNCAxNi4yNzk2IDcuMjQ4MTQgMTYuMjA4NUM3LjA2ODAxIDE2LjExOTEgNi44NzU0NCAxNi4wNTc0IDYuNjc2OTEgMTYuMDI1NEM2LjUxOTAxIDE2IDYuMzU1NzUgMTYgNi4wMjkyNCAxNkM1LjA2OTkgMTYgNC41OTAyMyAxNiA0LjIxMzQ3IDE1LjgzODlDMy43NDAzOSAxNS42MzY1IDMuMzYzNSAxNS4yNTk2IDMuMTYxMTUgMTQuNzg2NUMzIDE0LjQwOTggMyAxMy45MzAxIDMgMTIuOTcwOFYxMS4wMjkyWiIgZmlsbD0iY3VycmVudENvbG9yIi8+DQo8L3N2Zz4NCg==";

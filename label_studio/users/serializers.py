@@ -85,6 +85,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             'phone',
             'active_organization',
             'allow_newsletters',
+            "is_staff",
         )
 
 

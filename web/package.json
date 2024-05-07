@@ -16,7 +16,7 @@
     "lsf:unit": "nx run editor:unit",
     "dm:watch": "nx run datamanager:build:development --watch",
     "dm:unit": "nx run datamanager:unit",
-    "build": "NODE_ENV=production nx run-many --target=build --configuration=production",
+    "build": "nx run-many --target=build --configuration=production",
     "version:libs": "nx run-many --target=version",
     "docs": "nx run-many --target=docs",
     "watch": "nx run-many --target=build --configuration=production --watch",

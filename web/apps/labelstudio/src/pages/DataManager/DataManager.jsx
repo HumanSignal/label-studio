@@ -17,9 +17,15 @@ import { ExportPage } from "../ExportPage/ExportPage";
 import { APIConfig } from "./api-config";
 import { ToastContext } from "../../components/Toast/Toast";
 import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
-
+import { useCurrentUser } from "../../providers/CurrentUser";
 import "./DataManager.styl";
+const DEFAULT_TOOLBAR =
+  "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button view-toggle";
 
+
+const getToolbar = (currentUser) => {
+  return currentUser?.is_staff ? DEFAULT_TOOLBAR : DEFAULT_TOOLBAR.replace("filters", "");
+}  
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
   if (!root && root.dataset.dmInitialized) return;
@@ -60,6 +66,7 @@ const buildLink = (path, params) => {
 
 export const DataManagerPage = ({ ...props }) => {
   const toast = useContext(ToastContext);
+  const { user:currentUser }=useCurrentUser();
   const root = useRef();
   const params = useParams();
   const history = useHistory();
@@ -87,11 +94,18 @@ export const DataManagerPage = ({ ...props }) => {
 
     const dataManager = (dataManagerRef.current =
       dataManagerRef.current ??
-      (await initializeDataManager(root.current, props, {
-        ...params,
-        project,
-        autoAnnotation: isDefined(interactiveBacked),
-      })));
+      (await initializeDataManager(
+        root.current,
+        {
+          toolbar: getToolbar(currentUser),
+          ...props
+        },
+        {
+          ...params,
+          project,
+          autoAnnotation: isDefined(interactiveBacked)
+        }
+      )));
 
     Object.assign(window, { dataManager });
 

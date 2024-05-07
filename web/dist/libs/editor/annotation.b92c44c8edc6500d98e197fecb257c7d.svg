@@ -1,0 +1,49 @@
+var _path, _path2, _rect, _rect2, _rect3, _rect4;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgAnnotation = function SvgAnnotation(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 14,
+    height: 14,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "#09F",
+    fillOpacity: 0.3,
+    d: "M1 1h12v12H1z"
+  })), _path2 || (_path2 = /*#__PURE__*/React.createElement("path", {
+    stroke: "#09F",
+    strokeOpacity: 0.3,
+    strokeWidth: 2,
+    d: "M2 2h10v10H2z"
+  })), _rect || (_rect = /*#__PURE__*/React.createElement("rect", {
+    width: 4,
+    height: 4,
+    x: 10,
+    y: 10,
+    fill: "#09F",
+    rx: 2
+  })), _rect2 || (_rect2 = /*#__PURE__*/React.createElement("rect", {
+    width: 4,
+    height: 4,
+    y: 10,
+    fill: "#09F",
+    rx: 2
+  })), _rect3 || (_rect3 = /*#__PURE__*/React.createElement("rect", {
+    width: 4,
+    height: 4,
+    x: 10,
+    fill: "#09F",
+    rx: 2
+  })), _rect4 || (_rect4 = /*#__PURE__*/React.createElement("rect", {
+    width: 4,
+    height: 4,
+    fill: "#09F",
+    rx: 2
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgAnnotation);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHZpZXdCb3g9IjAgMCAxNCAxNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxyZWN0IHg9IjEiIHk9IjEiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzAwOTlGRiIgZmlsbC1vcGFjaXR5PSIwLjMiLz4NCjxyZWN0IHg9IjIiIHk9IjIiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgc3Ryb2tlPSIjMDA5OUZGIiBzdHJva2Utb3BhY2l0eT0iMC4zIiBzdHJva2Utd2lkdGg9IjIiLz4NCjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjQiIGhlaWdodD0iNCIgcng9IjIiIGZpbGw9IiMwMDk5RkYiLz4NCjxyZWN0IHk9IjEwIiB3aWR0aD0iNCIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzAwOTlGRiIvPg0KPHJlY3QgeD0iMTAiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSIjMDA5OUZGIi8+DQo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzAwOTlGRiIvPg0KPC9zdmc+DQo=";

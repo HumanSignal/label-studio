@@ -1,0 +1,56 @@
+var _path, _g, _defs;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgKeypointsTool = function SvgKeypointsTool(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 32 32",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    fillRule: "evenodd",
+    d: "M21 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11M3.5 16a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0m12 7a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0",
+    clipRule: "evenodd",
+    opacity: 0.4
+  })), _g || (_g = /*#__PURE__*/React.createElement("g", {
+    filter: "url(#keypoints-tool_svg__a)"
+  }, /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    fillRule: "evenodd",
+    d: "M21 6.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M6.5 16a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0m12 7a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0",
+    clipRule: "evenodd"
+  }))), _defs || (_defs = /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("filter", {
+    id: "keypoints-tool_svg__a",
+    width: 23,
+    height: 25,
+    x: 3.5,
+    y: 4.5,
+    colorInterpolationFilters: "sRGB",
+    filterUnits: "userSpaceOnUse"
+  }, /*#__PURE__*/React.createElement("feFlood", {
+    floodOpacity: 0,
+    result: "BackgroundImageFix"
+  }), /*#__PURE__*/React.createElement("feColorMatrix", {
+    "in": "SourceAlpha",
+    result: "hardAlpha",
+    values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+  }), /*#__PURE__*/React.createElement("feOffset", {
+    dy: 1
+  }), /*#__PURE__*/React.createElement("feGaussianBlur", {
+    stdDeviation: 1.5
+  }), /*#__PURE__*/React.createElement("feColorMatrix", {
+    values: "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0"
+  }), /*#__PURE__*/React.createElement("feBlend", {
+    in2: "BackgroundImageFix",
+    result: "effect1_dropShadow"
+  }), /*#__PURE__*/React.createElement("feBlend", {
+    "in": "SourceGraphic",
+    in2: "effect1_dropShadow",
+    result: "shape"
+  })))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgKeypointsTool);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQo8cGF0aCBvcGFjaXR5PSIwLjQiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMjEgMy41QzE3Ljk2MjQgMy41IDE1LjUgNS45NjI0MyAxNS41IDlDMTUuNSAxMi4wMzc2IDE3Ljk2MjQgMTQuNSAyMSAxNC41QzI0LjAzNzYgMTQuNSAyNi41IDEyLjAzNzYgMjYuNSA5QzI2LjUgNS45NjI0MyAyNC4wMzc2IDMuNSAyMSAzLjVaTTMuNSAxNkMzLjUgMTIuOTYyNCA1Ljk2MjQzIDEwLjUgOSAxMC41QzEyLjAzNzYgMTAuNSAxNC41IDEyLjk2MjQgMTQuNSAxNkMxNC41IDE5LjAzNzYgMTIuMDM3NiAyMS41IDkgMjEuNUM1Ljk2MjQzIDIxLjUgMy41IDE5LjAzNzYgMy41IDE2Wk0xNS41IDIzQzE1LjUgMTkuOTYyNCAxNy45NjI0IDE3LjUgMjEgMTcuNUMyNC4wMzc2IDE3LjUgMjYuNSAxOS45NjI0IDI2LjUgMjNDMjYuNSAyNi4wMzc2IDI0LjAzNzYgMjguNSAyMSAyOC41QzE3Ljk2MjQgMjguNSAxNS41IDI2LjAzNzYgMTUuNSAyM1oiIGZpbGw9ImN1cnJlbnRDb2xvciIvPg0KPGcgZmlsdGVyPSJ1cmwoI2ZpbHRlcjBfZCkiPg0KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0yMSA2LjVDMTkuNjE5MyA2LjUgMTguNSA3LjYxOTI5IDE4LjUgOUMxOC41IDEwLjM4MDcgMTkuNjE5MyAxMS41IDIxIDExLjVDMjIuMzgwNyAxMS41IDIzLjUgMTAuMzgwNyAyMy41IDlDMjMuNSA3LjYxOTI5IDIyLjM4MDcgNi41IDIxIDYuNVpNNi41IDE2QzYuNSAxNC42MTkzIDcuNjE5MjkgMTMuNSA5IDEzLjVDMTAuMzgwNyAxMy41IDExLjUgMTQuNjE5MyAxMS41IDE2QzExLjUgMTcuMzgwNyAxMC4zODA3IDE4LjUgOSAxOC41QzcuNjE5MjkgMTguNSA2LjUgMTcuMzgwNyA2LjUgMTZaTTE4LjUgMjNDMTguNSAyMS42MTkzIDE5LjYxOTMgMjAuNSAyMSAyMC41QzIyLjM4MDcgMjAuNSAyMy41IDIxLjYxOTMgMjMuNSAyM0MyMy41IDI0LjM4MDcgMjIuMzgwNyAyNS41IDIxIDI1LjVDMTkuNjE5MyAyNS41IDE4LjUgMjQuMzgwNyAxOC41IDIzWiIgZmlsbD0iY3VycmVudENvbG9yIi8+DQo8L2c+DQo8ZGVmcz4NCjxmaWx0ZXIgaWQ9ImZpbHRlcjBfZCIgeD0iMy41IiB5PSI0LjUiIHdpZHRoPSIyMyIgaGVpZ2h0PSIyNSIgZmlsdGVyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM9InNSR0IiPg0KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4NCjxmZUNvbG9yTWF0cml4IGluPSJTb3VyY2VBbHBoYSIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDEyNyAwIiByZXN1bHQ9ImhhcmRBbHBoYSIvPg0KPGZlT2Zmc2V0IGR5PSIxIi8+DQo8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxLjUiLz4NCjxmZUNvbG9yTWF0cml4IHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwLjQgMCIvPg0KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbjI9IkJhY2tncm91bmRJbWFnZUZpeCIgcmVzdWx0PSJlZmZlY3QxX2Ryb3BTaGFkb3ciLz4NCjxmZUJsZW5kIG1vZGU9Im5vcm1hbCIgaW49IlNvdXJjZUdyYXBoaWMiIGluMj0iZWZmZWN0MV9kcm9wU2hhZG93IiByZXN1bHQ9InNoYXBlIi8+DQo8L2ZpbHRlcj4NCjwvZGVmcz4NCjwvc3ZnPg0K";

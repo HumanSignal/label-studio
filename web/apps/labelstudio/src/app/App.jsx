@@ -19,7 +19,7 @@ import ErrorBoundary from "./ErrorBoundary";
 import { RootPage } from "./RootPage";
 import { FF_OPTIC_2, isFF } from "../utils/feature-flags";
 import { ToastProvider, ToastViewport } from "../components/Toast/Toast";
-
+import { CurrentUserProvider } from "../providers/CurrentUser";
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
 
 const browserHistory = createBrowserHistory({
@@ -63,6 +63,7 @@ const App = ({ content }) => {
             <RoutesProvider key="rotes" />,
             <ProjectProvider key="project" />,
             <ToastProvider key="toast" />,
+            <CurrentUserProvider key="current-user" />
           ]}
         >
           <AsyncPage>
