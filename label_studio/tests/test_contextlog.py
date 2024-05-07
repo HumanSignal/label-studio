@@ -22,4 +22,4 @@ def test_contextlog(business_client):
     responses.assert_call_count('https://tele.labelstud.io', 1)
     assert responses.calls
     assert r.status_code == 200
-    assert "env" not in json.loads(responses.calls[0].request.body)
+    assert 'env' not in json.loads(responses.calls[0].request.body)
