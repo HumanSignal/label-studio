@@ -470,10 +470,12 @@ def setup_project_ranker(client):
 def setup_project_choices(client):
     return setup_project(client, project_choices)
 
+
 # TODO replace test_contextlog with this fixture instead of django override_settings
 # @pytest.fixture(name='contextlog_sync')
 # def context_log_sync(settings):
 #     settings.CONTEXTLOG_SYNC = True
+
 
 @pytest.fixture
 def business_client(client):
