@@ -37,6 +37,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     POETRY_VIRTUALENVS_CREATE=false \
     DJANGO_SETTINGS_MODULE=core.settings.label_studio \
     LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
+    LABEL_STUDIO_TEST_ENV_VAR=true \
     OPT_DIR=/opt/heartex/instance-data/etc \
     SETUPTOOLS_USE_DISTUTILS=stdlib
 

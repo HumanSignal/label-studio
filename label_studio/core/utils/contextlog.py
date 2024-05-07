@@ -47,13 +47,6 @@ class ContextLog(object):
         self.version = get_app_version()
         self.server_id = self._get_server_id()
 
-    def _get_label_studio_env(self):
-        env = {}
-        for env_key, env_value in os.environ.items():
-            if env_key.startswith('LABEL_STUDIO_'):
-                env[env_key] = env_value
-        return env
-
     def _get_server_id(self):
         user_id_file = os.path.join(get_config_dir(), 'user_id')
         if not os.path.exists(user_id_file):
@@ -227,6 +220,8 @@ class ContextLog(object):
             elif get_bool_env('DEBUG_CONTEXTLOG', False):
                 logger.debug('In DEBUG mode, contextlog is not sent.')
                 logger.debug(json.dumps(payload, indent=2))
+            elif settings.CONTEXTLOG_SYNC:
+                self.send_job(request, response, body)
             else:
                 thread = threading.Thread(target=self.send_job, args=(request, response, body))
                 thread.start()
@@ -262,7 +257,6 @@ class ContextLog(object):
             'client_ip': get_client_ip(request),
             'is_docker': self._is_docker(),
             'python': str(sys.version_info[0]) + '.' + str(sys.version_info[1]),
-            'env': self._get_label_studio_env(),
             'version': self.version,
             'view_name': request.resolver_match.view_name if request.resolver_match else None,
             'namespace': request.resolver_match.namespace if request.resolver_match else None,
@@ -297,7 +291,7 @@ class ContextLog(object):
                 }
             )
         self._secure_data(payload, request)
-        for key in ('json', 'response', 'values', 'env'):
+        for key in ('json', 'response', 'values'):
             payload[key] = payload[key] or None
         return payload
 
@@ -309,6 +303,6 @@ class ContextLog(object):
         else:
             try:
                 url = 'https://tele.labelstud.io'
-                requests.post(url=url, json=payload, timeout=3.0)
-            except:  # noqa: E722
+                r = requests.post(url=url, json=payload, timeout=3.0)
+            except Exception as e:  # noqa: E722
                 pass
