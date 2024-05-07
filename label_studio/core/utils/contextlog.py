@@ -42,7 +42,6 @@ class ContextLog(object):
     _log_payloads = _load_log_payloads()
 
     def __init__(self):
-        self.collect_analytics = settings.COLLECT_ANALYTICS
         self.version = get_app_version()
         self.server_id = self._get_server_id()
 
@@ -202,7 +201,7 @@ class ContextLog(object):
             return True
 
     def dont_send(self, request):
-        return not self.collect_analytics or self._exclude_endpoint(request)
+        return not settings.COLLECT_ANALYTICS or self._exclude_endpoint(request)
 
     def send(self, request=None, response=None, body=None):
         if self.dont_send(request):
