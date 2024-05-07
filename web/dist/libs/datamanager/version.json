@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-546: Empty title in cloud storages lead to totally broken project settings page",
-  "commit": "dee1d4b0a76c98f36e84f84729431ac253dd9ab7",
-  "date": "2024-05-03T13:14:58.000Z",
+  "message": "Merge branch 'develop' into fb-OPTIC-546/storage-title",
+  "commit": "96c8415ae0ce1db29a24b071eae2cab24c204207",
+  "date": "2024-05-07T12:59:51.000Z",
   "branch": "fb-OPTIC-546/storage-title"
 }
