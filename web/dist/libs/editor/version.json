@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-714: Remove Warning when the page leave datamanager page",
-  "commit": "3ba4b2b22ea1d4e6534842611b87436f14988eb5",
-  "date": "2024-05-03T18:59:02.000Z",
-  "branch": "fb-optic-714/remove-warning"
+  "message": "fix: OPTIC-713: Remove warnings in the console when a infinite scroll is used in datamanager",
+  "commit": "15b97d6c04fd777271133fccc24efb07af0ca6b5",
+  "date": "2024-05-03T18:32:46.000Z",
+  "branch": "fb-optic-713/remove-warnings"
 }
