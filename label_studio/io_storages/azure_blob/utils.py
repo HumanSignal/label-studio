@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 class AZURE(object):
     @classmethod
     def get_client_and_container(cls, container, account_name=None, account_key=None):
+        print("HII!")
         # get account name and key from params or from environment variables
         account_name = str(account_name) if account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
         account_key = str(account_key) if account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')
