@@ -1,6 +1,8 @@
 ---
 title: Hugging Face NER
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 25
 meta_title: Label Studio tutorial to run Hugging Face NER backend

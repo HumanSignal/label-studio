@@ -1,6 +1,8 @@
 ---
 title: Sklearn Text Classifier model
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 50
 meta_title: Sklearn Text Classifier model for Label Studio

@@ -1,6 +1,8 @@
 ---
 title: NER labeling with Flair 
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 75
 meta_title: Use Flair with Label Studio

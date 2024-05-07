@@ -1,6 +1,7 @@
 ---
 title: Transfer learning for images with PyTorch
 type: guide
+hide_menu: true
 tier: all
 order: 30
 meta_title: Computer Vision PyTorch Tutorial

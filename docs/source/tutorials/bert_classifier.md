@@ -1,6 +1,8 @@
 ---
 title: Classify text with a BERT model
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 35
 meta_title: BERT-based text classification

@@ -1,6 +1,8 @@
 ---
 title: Object detection with bounding boxes using MMDetection
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 65
 meta_title: Object detection in images with Label Studio and MMDetection

@@ -1,6 +1,7 @@
 ---
 title: spaCy models for NER 
-type: blog
+type: guide
+hide_menu: true
 tier: all
 order: 70
 meta_title: Use spaCy models with Label Studio

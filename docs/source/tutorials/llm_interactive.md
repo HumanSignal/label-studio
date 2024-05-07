@@ -1,6 +1,8 @@
 ---
 title: Interactive LLM labeling with GPT
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 5
 meta_title: Interactive LLM labeling with OpenAI or Azure API

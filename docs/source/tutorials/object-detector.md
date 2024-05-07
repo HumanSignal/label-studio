@@ -1,6 +1,7 @@
 ---
 title: OpenMMLab Image object detector or MMDetection
 type: guide
+hide_menu: true
 tier: all
 order: 40
 meta_title: OpenMMLab Image object detector or MMDetection

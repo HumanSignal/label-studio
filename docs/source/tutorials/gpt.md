@@ -1,6 +1,7 @@
 ---
 title: Chatbot response generation with HuggingFace's GPT2 model
 type: guide
+hide_menu: true
 tier: all
 order: 50
 meta_title: Chatbot response generation with HuggingFace's GPT2 model

@@ -2,6 +2,7 @@
 title: Create the simplest Machine Learning backend
 short: Create a simple ML backend
 type: guide
+hide_menu: true
 tier: all
 order: 10
 meta_title: Integrating with Machine Learning Backend Tutorial

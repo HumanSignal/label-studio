@@ -1,6 +1,8 @@
 ---
 title: RAG with a Langchain search agent
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 45
 meta_title: RAG with a Langchain search agent

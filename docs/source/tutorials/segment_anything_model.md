@@ -1,6 +1,8 @@
 ---
 title: Interactive annotation with Segment Anything Model
-type: blog
+type: guide
+hide_menu: true
+hide_frontmatter_title: true
 tier: all
 order: 10
 meta_title: Interactive annotation in Label Studio with Segment Anything Model (SAM)
