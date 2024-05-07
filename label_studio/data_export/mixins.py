@@ -135,6 +135,11 @@ class ExportMixin:
             options['context'] = {'interpolate_key_frames': settings.INTERPOLATE_KEY_FRAMES}
             if 'interpolate_key_frames' in serialization_options:
                 options['context']['interpolate_key_frames'] = serialization_options['interpolate_key_frames']
+            if (
+                'include_annotation_history' in serialization_options
+                and serialization_options['include_annotation_history'] is False
+            ):
+                options['omit'] = ['annotations.history']
         return options
 
     def get_task_queryset(self, ids, annotation_filter_options):
@@ -198,10 +203,20 @@ class ExportMixin:
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
                     tasks = [task for task in tasks if task.annotations.exists()]
 
+                if serialization_options and serialization_options.get('include_annotation_history') is True:
+                    task_ids = [task.id for task in tasks]
+                    annotation_ids = Annotation.objects.filter(task_id__in=task_ids).values_list('id', flat=True)
+                    base_export_serializer_option = self.update_export_serializer_option(
+                        base_export_serializer_option, annotation_ids
+                    )
+
                 serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
                 self.counters['task_number'] += len(tasks)
                 for task in serializer.data:
                     yield task
+
+    def update_export_serializer_option(self, base_export_serializer_option, annotation_ids):
+        return base_export_serializer_option
 
     @staticmethod
     def eval_md5(file):
