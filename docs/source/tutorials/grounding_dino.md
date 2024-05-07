@@ -70,8 +70,8 @@ See [here](https://github.com/IDEA-Research/GroundingDINO) for more details abou
 </View>
 ```
 
-1. From the **Model** page in the project settings, [connect the model](https://labelstud.io/guide/ml#Connect-the-model-to-Label-Studio). 
-2. Go to an image task in your project. Enable **Auto-annotation** (found at the bottom of the labeling interface). Then enter in the prompt box and press **Add**. After this, you should receive your predictions. See the video above for a demo. 
+6. From the **Model** page in the project settings, [connect the model](https://labelstud.io/guide/ml#Connect-the-model-to-Label-Studio). 
+7. Go to an image task in your project. Enable **Auto-annotation** (found at the bottom of the labeling interface). Then enter in the prompt box and press **Add**. After this, you should receive your predictions. See the video above for a demo. 
 
 
 ## Using GPU
