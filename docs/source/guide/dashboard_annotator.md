@@ -47,6 +47,8 @@ The metrics are calculated from the following data:
 
 ### Performance summaries
 
+![Screenshot of annotator dashboard summaries](/images/project/annotator_dashboard_summary.png)
+
 | Metric | Calculation | Description | 
 | --- | --- | --- |
 | **Total Time** | Sum of `lead_times` | The total time spent annotating during the selected time frame. This is calculated based on annotations that meet the criteria for **Submitted Annotations** (see below). <br /><br />The total time does not include time spent on annotations that have not been submitted and/or updated. For example, it does not include time spent on drafts or time spent on skipped annotations. <br /><br />However, if they return to an annotation draft or a previously skipped annotation, then their earlier time spent on the annotation is included when calculating their total annotation time.  | 
@@ -56,6 +58,8 @@ The metrics are calculated from the following data:
 | **Time per Annotation (Average)** | Average of `lead_times` | The average time they spent on each submitted annotation. | 
 
 ### Graphs
+
+![Screenshot of annotator dashboard graphs](/images/project/annotator_dashboard_graph.png)
 
 | Graph | Description | 
 | --- | --- | 
